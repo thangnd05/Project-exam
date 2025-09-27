@@ -1,0 +1,129 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import classNames from "classnames/bind";
+import style from "./TestByExamTypePage.module.scss";
+import { useAuth } from "../../../../hook/useAuth";
+
+const cx = classNames.bind(style);
+
+function TestByExamTypePage() {
+    const { examTypeId } = useParams();
+    const { userId } = useAuth();
+    const navigate = useNavigate();
+
+    const [tests, setTests] = useState([]);
+    const [examTypeName, setExamTypeName] = useState("");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!examTypeId || !userId) return;
+
+        setLoading(true);
+
+        // Lấy danh sách bài thi của user theo examType
+        axios.get(`/api/tests/user/by-exam-type/${examTypeId}?userId=${userId}`)
+            .then(res => setTests(res.data))
+            .catch(err => console.error("Lỗi khi lấy tests:", err))
+            .finally(() => setLoading(false));
+
+        // Lấy tên examType
+        axios.get(`/api/exam-types/${examTypeId}`)
+            .then(res => setExamTypeName(res.data.name))
+            .catch(err => console.error("Lỗi khi lấy tên exam type:", err));
+    }, [examTypeId, userId]);
+
+    const handleStartTest = (testId, remainingAttempts, availableFrom, availableTo) => {
+        const now = new Date();
+        if (availableFrom && now < new Date(availableFrom)) {
+            alert("Bài thi chưa bắt đầu.");
+            return;
+        }
+        if (availableTo && now > new Date(availableTo)) {
+            alert("Bài thi đã kết thúc.");
+            return;
+        }
+        if (remainingAttempts === 0) {
+            alert("Bạn đã hết số lượt làm bài này");
+            return;
+        }
+        navigate(`/tests/${testId}/start`);
+    };
+
+    const formatDateTime = (dateStr) => {
+        if (!dateStr) return "";
+        const dt = new Date(dateStr);
+        return dt.toLocaleString();
+    };
+
+    const now = new Date();
+
+    return (
+        <div className={cx("container")}>
+            <h3 className={cx("title")}>
+                Bài kiểm tra - {examTypeName || "Loading..."}
+            </h3>
+
+            <div className={cx("grid")}>
+                {loading && <p>Đang tải danh sách bài kiểm tra...</p>}
+
+                {!loading && tests.length === 0 && (
+                    <p>Không có bài kiểm tra nào cho loại đề thi này.</p>
+                )}
+
+                {!loading && tests.map(test => {
+                    const availableFrom = test.availableFrom ? new Date(test.availableFrom) : null;
+                    const availableTo = test.availableTo ? new Date(test.availableTo) : null;
+
+                    let buttonText = "Bắt đầu";
+                    let canStart = true;
+                    let buttonClass = "btn-start";
+
+                    if (availableFrom && now < availableFrom) {
+                        buttonText = `Chưa mở (${formatDateTime(test.availableFrom)})`;
+                        canStart = false;
+                        buttonClass = "btn-disabled btn-not-started";
+                    } else if (availableTo && now > availableTo) {
+                        buttonText = `Đã kết thúc (${formatDateTime(test.availableTo)})`;
+                        canStart = false;
+                        buttonClass = "btn-disabled btn-expired";
+                    } else if (test.remainingAttempts === 0) {
+                        buttonText = "Hết lượt";
+                        canStart = false;
+                        buttonClass = "btn-disabled btn-no-attempts";
+                    }
+
+                    return (
+                        <div key={test.testId} className={cx("card")}>
+                            {test.bannerUrl && (
+                                <img src={test.bannerUrl} alt={test.title} className={cx("banner")} />
+                            )}
+                            <div className={cx("body")}>
+                                <h5 className={cx("card-title")}>{test.title}</h5>
+                                {test.durationMinutes && (
+                                    <p className={cx("card-duration")}>Thời gian: {test.durationMinutes} phút</p>
+                                )}
+                                <button
+                                    className={cx(buttonClass)}
+                                    onClick={() =>
+                                        handleStartTest(
+                                            test.testId,
+                                            test.remainingAttempts,
+                                            test.availableFrom,
+                                            test.availableTo
+                                        )
+                                    }
+                                    disabled={!canStart}
+                                >
+                                    {buttonText}
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+export default TestByExamTypePage;

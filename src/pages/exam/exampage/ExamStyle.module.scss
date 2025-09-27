@@ -1,0 +1,78 @@
+/* Reset chung */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f9;
+  padding: 20px;
+}
+
+/* Container card */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+  padding: 10px;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hover hiệu ứng nổi */
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+/* Ảnh trong card */
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+/* Nội dung card */
+.card-content {
+  flex: 1;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Tiêu đề */
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Text mô tả */
+.card-text {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Nhấn mạnh thời gian */
+.card-text span {
+  font-weight: 500;
+  color: #007bff;
+}

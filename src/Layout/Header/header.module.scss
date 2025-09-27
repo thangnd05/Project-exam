@@ -1,0 +1,101 @@
+
+
+.brand{
+    font-size: 2rem;
+}
+
+.wrapper{
+    font-size: 1.6rem;
+}
+
+
+.home{
+    position: relative;
+    color: #898686;
+    text-decoration: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 10%;
+        width: 0%;
+        height: 3px;
+        border-radius: 1px;
+        background-color: #333;
+        transition: 0.4s;
+    }
+
+    &:hover {
+        color: #111;
+
+        &::after {
+            width: 80%;
+        }
+    }
+}
+.home_sm{
+    color: #898686;
+    text-decoration: none;
+    &:hover {
+        color: #111;
+    }
+
+}
+.new-post{
+    font-size: 1.6rem;
+    border-radius: 8px;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+    &:hover{
+        cursor: pointer;
+        opacity: 0.5;
+    }
+  }
+  
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .username {
+    font-weight: bold;
+    font-size: 2rem;
+    white-space: nowrap;
+    padding-left: 10px;
+  }
+
+
+  .custom-dropdown{
+    font-size: 1.6rem;
+  }
+  .custom-dropdown-item{
+    &:active{
+        background-color: transparent !important;
+    }
+  }
+  .btn-create_sm{
+    font-size: 1.4rem;
+  }
+  .bar{
+    font-size: 1.6rem;
+    width: 5rem;
+  }
+  .tit_sm{
+    font-size: 2.4rem;
+  }
+  
+  
+  
+  
+  
+
+
+    
+
+
+
