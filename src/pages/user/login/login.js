@@ -1,7 +1,7 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
-import { UserContext } from "~/context/AuthContext";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../../hook/useAuth";
 
 function LoginPage() {
   const [identifier, setIdentifier] = useState("");
@@ -9,15 +9,25 @@ function LoginPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { user, login } = useContext(UserContext);
+  // ✅ SỬA 3: Lấy user và login từ hook useAuth
+  const { user, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ SỬA 3: Lấy thông tin location
 
-  // Hook này sẽ tự động chuyển trang khi đăng nhập thành công
+
+  // Hook này sẽ tự động chuyển trang khi đăng nhập thành công (giữ nguyên, đã đúng)
+
   useEffect(() => {
     if (user) {
-      navigate("/");
+      // ✅ SỬA 4: Logic chuyển hướng thông minh
+      // Lấy đường dẫn cũ từ state mà ProtectedRoute đã gửi,
+      // nếu không có thì mặc định là trang chủ "/".
+      const from = location.state?.from?.pathname || "/";
+      
+      // Chuyển hướng về trang đó và thay thế trang login trong lịch sử trình duyệt
+      navigate(from, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, location]); // Thêm location vào dependency array
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,15 +40,14 @@ function LoginPage() {
         password,
       });
 
-      // Lấy trực tiếp object 'user' từ response của backend
       const userData = response.data.user; 
       
-      // Nếu có userData, cập nhật context
       if (userData) {
+        // Gọi hàm login từ context, nó sẽ cập nhật state 'user'
+        // và kích hoạt useEffect ở trên chạy.
         login(userData);
         setMessage("Đăng nhập thành công, đang chuyển hướng...");
       } else {
-        // Phòng trường hợp backend trả về response không mong muốn
         throw new Error("Dữ liệu người dùng không hợp lệ.");
       }
 
@@ -50,11 +59,12 @@ function LoginPage() {
   };
 
   return (
+    // Phần JSX (giao diện) không cần thay đổi
     <div style={styles.container}>
       <div style={styles.loginBox}>
         <h2 style={styles.title}>Đăng nhập</h2>
         <form onSubmit={handleLogin}>
-          {/* Input fields không thay đổi */}
+          {/* ... Input fields và button giữ nguyên ... */}
           <div style={styles.inputGroup}>
             <label htmlFor="identifier" style={styles.label}>Tên đăng nhập hoặc Email</label>
             <input
@@ -81,9 +91,7 @@ function LoginPage() {
               disabled={loading}
             />
           </div>
-
           {message && <p style={styles.message}>{message}</p>}
-
           <button type="submit" style={styles.button} disabled={loading}>
             {loading ? 'Đang xử lý...' : 'Đăng nhập'}
           </button>
@@ -95,6 +103,8 @@ function LoginPage() {
     </div>
   );
 }
+
+
 
 // Giữ nguyên phần styles
 const styles = {

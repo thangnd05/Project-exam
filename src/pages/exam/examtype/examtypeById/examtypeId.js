@@ -17,23 +17,43 @@ function TestByExamTypePage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!examTypeId || !userId) return;
+        if (!examTypeId) {
+            setLoading(false);
+            return;
+        }
 
         setLoading(true);
 
-        // Lấy danh sách bài thi của user theo examType
-        axios.get(`/api/tests/user/by-exam-type/${examTypeId}?userId=${userId}`)
-            .then(res => setTests(res.data))
-            .catch(err => console.error("Lỗi khi lấy tests:", err))
-            .finally(() => setLoading(false));
+        let apiUrl = `/api/tests/user/by-exam-type/${examTypeId}`;
+        if (userId) {
+            apiUrl += `?userId=${userId}`;
+        }
 
-        // Lấy tên examType
+        axios.get(apiUrl)
+            .then(res => {
+                setTests(res.data);
+            })
+            .catch(err => {
+                console.error("Lỗi khi lấy tests:", err);
+                setTests([]);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+
         axios.get(`/api/exam-types/${examTypeId}`)
             .then(res => setExamTypeName(res.data.name))
             .catch(err => console.error("Lỗi khi lấy tên exam type:", err));
+
     }, [examTypeId, userId]);
 
     const handleStartTest = (testId, remainingAttempts, availableFrom, availableTo) => {
+        if (!userId) {
+            alert("Bạn cần đăng nhập để làm bài kiểm tra.");
+            navigate("/login");
+            return;
+        }
+
         const now = new Date();
         if (availableFrom && now < new Date(availableFrom)) {
             alert("Bài thi chưa bắt đầu.");
@@ -79,18 +99,21 @@ function TestByExamTypePage() {
                     let canStart = true;
                     let buttonClass = "btn-start";
 
-                    if (availableFrom && now < availableFrom) {
-                        buttonText = `Chưa mở (${formatDateTime(test.availableFrom)})`;
-                        canStart = false;
-                        buttonClass = "btn-disabled btn-not-started";
-                    } else if (availableTo && now > availableTo) {
-                        buttonText = `Đã kết thúc (${formatDateTime(test.availableTo)})`;
-                        canStart = false;
-                        buttonClass = "btn-disabled btn-expired";
-                    } else if (test.remainingAttempts === 0) {
-                        buttonText = "Hết lượt";
-                        canStart = false;
-                        buttonClass = "btn-disabled btn-no-attempts";
+                    // Đối với người dùng đã đăng nhập, ta mới kiểm tra các điều kiện giới hạn
+                    if (userId) {
+                        if (availableFrom && now < availableFrom) {
+                            buttonText = `Chưa mở (${formatDateTime(test.availableFrom)})`;
+                            canStart = false;
+                            buttonClass = "btn-disabled btn-not-started";
+                        } else if (availableTo && now > availableTo) {
+                            buttonText = `Đã kết thúc (${formatDateTime(test.availableTo)})`;
+                            canStart = false;
+                            buttonClass = "btn-disabled btn-expired";
+                        } else if (test.remainingAttempts === 0) {
+                            buttonText = "Hết lượt";
+                            canStart = false;
+                            buttonClass = "btn-disabled btn-no-attempts";
+                        }
                     }
 
                     return (

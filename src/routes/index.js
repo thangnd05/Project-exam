@@ -6,18 +6,20 @@ import TestByExamTypePage from '~/pages/exam/examtype/examtypeById/examtypeId';
 import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStartPage';
 import TestResultPage from '~/pages/exam/examtype/examtypeById/result/TestResultPage';
 
+// ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
   { path: routes.login, component: Login },
   { path: routes.register, component: Register },
-  {path:routes.home, component: TestPage},
-  {path:routes.examTypeDetail, component: TestByExamTypePage},
-  {path:routes.testStart, component: TestStartPage},
-    {path:routes.testResult, component: TestResultPage}
-
-
-
+  { path: routes.home, component: TestPage },
+  { path: routes.examTypeDetail, component: TestByExamTypePage },
 ];
 
-export const privateRoutes = [];
+// ✅ Các trang yêu cầu phải đăng nhập
+export const privateRoutes = [
+  { path: routes.testStart, component: TestStartPage },
+  { path: routes.testResult, component: TestResultPage },
+  // Thêm các trang riêng tư khác ở đây, ví dụ: trang profile
+  // { path: routes.profile, component: ProfilePage },
+];
 
 export default { publicRoutes, privateRoutes };

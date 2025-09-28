@@ -1,67 +1,77 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
-export const UserContext = createContext();
+// Tạo Context
+export const AuthContext = createContext(null);
 
-export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// Tạo Provider Component
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // Trạng thái loading để biết khi nào check session xong
 
-  // cấu hình axios mặc định
-  axios.defaults.withCredentials = true;
-  axios.defaults.baseURL = 'http://localhost:8080';
+    // Cấu hình axios mặc định
+    axios.defaults.withCredentials = true;
+    axios.defaults.baseURL = 'http://localhost:8080';
 
-  // Kiểm tra session khi load app
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await axios.get('/api/auth/me');
-        const userData = response.data;
+    // Kiểm tra session khi ứng dụng khởi động lần đầu
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const response = await axios.get('/api/auth/me');
+                const userData = response.data;
+                // Lưu thông tin user vào state
+                setUser({
+                    userId: userData.id,
+                    username: userData.username || userData.name || userData.email,
+                    email: userData.email,
+                    role: userData.role,
+                });
+            } catch (err) {
+                // Nếu có lỗi (thường là 401), nghĩa là chưa đăng nhập
+                console.error('Session check failed: Not logged in.');
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCurrentUser();
+    }, []); // Mảng rỗng đảm bảo useEffect chỉ chạy 1 lần khi component mount
+
+    // Hàm login
+    const login = (userData) => {
+        // Cập nhật state với thông tin người dùng
         setUser({
-          userId: userData.id,
-          username: userData.username || userData.name || userData.email,
-          email: userData.email,
-          role: userData.role,
+            userId: userData.id || userData.userId, // Đảm bảo có userId
+            username: userData.username || userData.name || userData.email,
+            ...userData,
         });
-        setError(null);
-      } catch (err) {
-        console.error('Chưa đăng nhập:', err.response?.data || err.message);
-        setUser(null);
-        setError('Chưa đăng nhập');
-      } finally {
-        setLoading(false);
-      }
     };
 
-    fetchCurrentUser();
-  }, []);
+    // Hàm logout
+    const logout = async () => {
+        try {
+            await axios.post('/api/auth/logout');
+        } catch (err) {
+            console.error('Logout API call failed:', err.response?.data || err.message);
+        } finally {
+            // Luôn xóa thông tin người dùng ở client dù API có lỗi hay không
+            setUser(null);
+        }
+    };
 
-  // login
-  const login = (userData) => {
-    setUser({
-      ...userData,
-      username: userData.username || userData.name || userData.email,
-    });
-    setError(null);
-  };
+    // Dùng useMemo để tối ưu, tránh re-render không cần thiết
+    const value = useMemo(
+        () => ({
+            user,
+            loading,
+            login,
+            logout,
+            userId: user?.userId,
+            isAuthenticated: !!user,
+        }),
+        [user, loading] // Chỉ tạo lại object value khi user hoặc loading thay đổi
+    );
 
-  // logout
-  const logout = async () => {
-    try {
-      await axios.post('/api/auth/logout');
-      setUser(null);
-      setError(null);
-    } catch (err) {
-      console.error('Lỗi logout:', err.response?.data || err.message);
-      setUser(null);
-      setError('Lỗi khi đăng xuất');
-    }
-  };
-
-  return (
-    <UserContext.Provider value={{ user, loading, error, login, logout }}>
-      {children}
-    </UserContext.Provider>
-  );
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

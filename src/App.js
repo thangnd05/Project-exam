@@ -1,13 +1,14 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import DefaultLayout from "./Layout/DefaultLayout";
 import routes from "./routes";
-// import ProtectedRoute from "./routes/ProtectedRoute";
+import ProtectedRoute from "./routes/ProtectedRoute"; // ✅ Import ProtectedRoute
 import "bootstrap/dist/css/bootstrap.min.css";
-import { UserProvider } from "~/context/AuthContext";
+import { AuthProvider } from "~/context/AuthContext";
 import ScrollHandler from "./Layout/ScrollToTopOnRouteChange";
+
 function App() {
   return (
-    <UserProvider>
+    <AuthProvider>
       <Router>
         <ScrollHandler />
         <div className="App">
@@ -29,8 +30,8 @@ function App() {
               );
             })}
 
-            {/* Private Routes */}
-            {/* {routes.privateRoutes.map((route, index) => {
+            {/* ✅ Private Routes (Bỏ comment và sử dụng ProtectedRoute) */}
+            {routes.privateRoutes.map((route, index) => {
               const Page = route.component;
               const Layout = DefaultLayout;
               return (
@@ -38,7 +39,7 @@ function App() {
                   key={`private-${index}`}
                   path={route.path}
                   element={
-                    <ProtectedRoute requiredRole={route.requiredRole}>
+                    <ProtectedRoute>
                       <Layout noContainer={route.noContainer || false}>
                         <Page />
                       </Layout>
@@ -46,11 +47,11 @@ function App() {
                   }
                 />
               );
-            })} */}
+            })}
           </Routes>
         </div>
       </Router>
-    </UserProvider>
+    </AuthProvider>
   );
 }
 
