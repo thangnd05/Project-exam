@@ -61,7 +61,7 @@ function Header() {
               {user ? (
                 <>
                   <Nav.Link as={Link} to={routes.post} className={cx("mx-5")}>
-                    <Button variant="outline-secondary" className={cx("new-post")}>Tạo bài viết</Button>
+                    <Button variant="outline-secondary" className={cx("new-post")}>Tạo bài kiểm tra</Button>
                   </Nav.Link>
                   <Dropdown>
                     <Dropdown.Toggle as="div" className={cx("user-info")}>
