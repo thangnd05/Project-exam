@@ -1,0 +1,173 @@
+/* --- STYLE CHO TRANG TẠO ĐỀ THI --- */
+/* File này sẽ kế thừa các biến từ GlobalStyles */
+@import '../../../components/GlobalStyles/GlobalStyles.module.scss';
+
+.container {
+    margin: var(--space-6) auto;
+    padding: 20px;
+    background-color: var(--color-white, #ffffff);
+    border-radius: var(--radius-xl, 16px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+    font-size: var(--fs-5xl, 2.25rem);
+    font-weight: var(--fw-bold, 700);
+    color: var(--accent-color);
+    margin-bottom: var(--space-6, 1.5rem);
+    padding-bottom: var(--space-4, 1rem);
+    border-bottom: 2px solid var(--accent-color);
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+.form-group {
+    margin-bottom: var(--space-6, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3, 0.75rem);
+}
+
+.form-label {
+    font-size: var(--fs-lg, 1.125rem);
+    font-weight: var(--fw-semibold, 600);
+    color: var(--color-text-secondary, #64748b);
+    margin-bottom: var(--space-2, 0.5rem);
+}
+
+.form-control,
+.form-select,
+.input-number {
+    width: 100%;
+    padding: var(--space-4, 1rem);
+    font-size: var(--fs-md, 1rem);
+    background-color: var(--color-background-light, #f9fafb);
+    border: 1px solid var(--color-border-light, #d1d5db);
+    border-radius: var(--radius-md, 8px);
+    transition: all 0.3s ease;
+
+    &:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        background-color: var(--color-white, #ffffff);
+    }
+
+    &::placeholder {
+        color: var(--color-text-placeholder, #a0aec0);
+        font-style: italic;
+    }
+}
+
+.form-control[type="textarea"] {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.input-number {
+    max-width: 120px;
+    text-align: center;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--color-border-light, #d1d5db);
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+    background-color: var(--color-white, #ffffff);
+
+    th,
+    td {
+        padding: var(--space-4, 1rem);
+        font-size: var(--fs-md, 1rem);
+        border-bottom: 1px solid var(--color-border-light, #d1d5db);
+    }
+
+    th {
+        background-color: var(--color-background-muted, #f3f4f6);
+        font-weight: var(--fw-semibold, 600);
+        color: var(--color-text-primary, #1e293b);
+        text-align: left;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr {
+        transition: background-color 0.2s ease;
+        &:hover {
+            background-color: var(--color-background-hover, #edf2f7);
+        }
+    }
+}
+
+.btn-create {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-5, 1.25rem);
+    font-size: var(--fs-xl, 1.25rem);
+    font-weight: var(--fw-semibold, 600);
+    color: var(--color-white, #ffffff);
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: var(--radius-lg, 10px);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: var(--accent-act-color);     
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(30, 64, 175, 0.3);
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.2);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.2);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-4, 1rem);
+        margin: var(--space-4, 1rem) auto;
+    }
+
+    .title {
+        font-size: var(--fs-4xl, 1.875rem);
+    }
+
+    .form-control,
+    .form-select,
+    .input-number {
+        font-size: var(--fs-sm, 0.875rem);
+        padding: var(--space-3, 0.75rem);
+    }
+
+    .table th,
+    .table td {
+        padding: var(--space-3, 0.75rem);
+    }
+
+    .btn-create {
+        font-size: var(--fs-lg, 1.125rem);
+        padding: var(--space-4, 1rem);
+    }
+}

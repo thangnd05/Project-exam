@@ -60,7 +60,7 @@ function Header() {
             <Nav>
               {user ? (
                 <>
-                  <Nav.Link as={Link} to={routes.post} className={cx("mx-5")}>
+                  <Nav.Link as={Link} to={routes.createTest} className={cx("mx-5")}>
                     <Button variant="outline-secondary" className={cx("new-post")}>Tạo bài kiểm tra</Button>
                   </Nav.Link>
                   <Dropdown>

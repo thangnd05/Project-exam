@@ -8,6 +8,7 @@ const routes = {
     testStart: '/tests/:testId/start',
 
     testResult :'/tests/:testId/result/:userTestId',
+    createTest:'/admin/create-test',
 
     examTypeDetail: '/exam-types/:examTypeId',
 
