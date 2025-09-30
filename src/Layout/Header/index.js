@@ -80,7 +80,7 @@ function Header() {
                       as={Link} 
                       to={routes.login} 
                       state={{ from: location }}
-                      className={cx("nav-link", "login-link")}
+                      className={cx("nav-link", "login-link","home")}
                     >
                       Đăng nhập
                   </Nav.Link>                  

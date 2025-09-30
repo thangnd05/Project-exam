@@ -10,30 +10,30 @@ function TestStartPage() {
 
     const [userTestId, setUserTestId] = useState(null);
     const [test, setTest] = useState({ parts: [] });
-    
-    // ✅ BƯỚC 1: Cấu trúc lại state userAnswers
-    // Mỗi câu trả lời sẽ là một object có selectedAnswerId (cho MCQ) và answerText (cho FILL_BLANK)
+    // State này sẽ lưu câu trả lời cho cả MCQ và FILL_BLANK
     const [userAnswers, setUserAnswers] = useState({});
-
-    const [timeLeft, setTimeLeft] = useState(null);
+    
+    const [timeLeft, setTimeLeft] = useState(null); 
     const [preCountdown, setPreCountdown] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [status, setStatus] = useState("loading");
 
     axios.defaults.withCredentials = true;
 
-    // ... (Các useEffect để lấy thông tin test, đếm ngược... giữ nguyên như cũ) ...
+    // --- LOGIC LẤY DỮ LIỆU VÀ ĐẾM NGƯỢC (giữ nguyên) ---
     useEffect(() => {
         if (!testId) return;
         setStatus("loading");
+        // API này cần gọi đến service getTestFullById đã được tối ưu
         axios.get(`/api/tests/usertest/${testId}`, { params: { userId } })
             .then((res) => {
-                // ... logic xử lý trạng thái test
                 const testData = { ...res.data, parts: res.data.parts || [] };
                 setTest(testData);
+
                 const now = new Date();
                 const availableFrom = testData.availableFrom ? new Date(testData.availableFrom) : null;
                 const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
+
                 if (availableFrom && now < availableFrom) {
                     setStatus("locked");
                     setPreCountdown(Math.floor((availableFrom - now) / 1000));
@@ -94,7 +94,7 @@ function TestStartPage() {
         return () => clearInterval(timer);
     }, [timeLeft, status]);
 
-    // ✅ BƯỚC 2: Cập nhật hàm handleAnswerChange để xử lý cả 2 loại
+    // ✅ HÀM NÀY ĐÃ ĐƯỢC CẬP NHẬT ĐỂ XỬ LÝ CẢ 2 LOẠI CÂU HỎI
     const handleAnswerChange = (questionId, type, value) => {
         const currentAnswer = userAnswers[questionId] || {};
         let updatedAnswer;
@@ -111,12 +111,12 @@ function TestStartPage() {
         });
     };
 
+    // ✅ HÀM NÀY CŨNG ĐƯỢC CẬP NHẬT ĐỂ GỬI ĐÚNG PAYLOAD
     const handleSubmit = async () => {
         if (!userTestId || isSubmitting) return;
         setIsSubmitting(true);
 
         try {
-            // ✅ Sửa lại logic tạo payload để gửi đúng định dạng
             const payload = Object.entries(userAnswers).map(([questionId, answerData]) => ({
                 userTestId,
                 questionId: parseInt(questionId),
@@ -145,7 +145,7 @@ function TestStartPage() {
         return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
     };
     
-    // ... (Phần render loading, error, etc. giữ nguyên) ...
+    // --- PHẦN RENDER LOADING (giữ nguyên) ---
     if (status === "loading") return <p>Đang tải thông tin bài thi...</p>;
     if (status === "error") return <p>Không thể tải được thông tin bài thi. Vui lòng thử lại.</p>;
     if (status === "closed") return <p>Bài kiểm tra này đã kết thúc.</p>;
@@ -160,14 +160,25 @@ function TestStartPage() {
             {timeLeft !== null && <p>Thời gian còn lại: <strong>{formatTime(timeLeft)}</strong></p>}
 
             {test.parts?.map((part) => (
-                <div key={part.testPartId} style={{ marginBottom: "2rem" }}>
+                <div key={part.testPartId} style={{ marginBottom: "2rem", borderTop: '2px solid #007bff', paddingTop: '1rem' }}>
                     <h3>Phần: {part.examPartId}</h3>
+
+                    {/* ✅ HIỂN THỊ PASSAGE Ở CẤP ĐỘ PART (ĐÃ ĐỒNG BỘ VỚI BACKEND) */}
+                    {part.passage && (
+                        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', border: '1px solid #dee2e6', borderRadius: '5px' }}>
+                            <h4>Đoạn văn:</h4>
+                            <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+                                {part.passage.content}
+                            </div>
+                            {part.passage.mediaUrl && <img src={part.passage.mediaUrl} alt="passage media" style={{maxWidth: '100%', marginTop: '1rem'}} />}
+                        </div>
+                    )}
+
                     {part.questions?.map((q, index) => (
                         <div key={q.questionId} style={{ marginBottom: "1rem", padding: "1rem", border: "1px solid #ccc", borderRadius: "5px" }}>
                             <p><strong>Câu {index + 1}:</strong> {q.questionText.replace(/__/g, '___')}</p>
-                            {q.passage && <div style={{ marginLeft: "1rem", fontStyle: "italic", whiteSpace: "pre-wrap" }}>{q.passage.content}</div>}
                             
-                            {/* ✅ BƯỚC 3: Hiển thị input phù hợp với loại câu hỏi */}
+                            {/* Hiển thị input phù hợp với loại câu hỏi */}
                             {q.questionType === 'MCQ' && (
                                 <ul>
                                     {q.answers?.map((a) => (
@@ -186,7 +197,6 @@ function TestStartPage() {
                                     ))}
                                 </ul>
                             )}
-
                             {q.questionType === 'FILL_BLANK' && (
                                 <div style={{ marginTop: '0.5rem' }}>
                                     <input
