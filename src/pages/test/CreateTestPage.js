@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./CreateTestPage.module.scss";
 import classNames from "classnames/bind";
-import { useAuth } from '../../../hook/useAuth'; 
+import { useAuth } from '../../hook/useAuth'; 
 
 const cx = classNames.bind(styles);
 

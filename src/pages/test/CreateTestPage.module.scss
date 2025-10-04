@@ -1,6 +1,6 @@
 /* --- STYLE CHO TRANG TẠO ĐỀ THI --- */
 /* File này sẽ kế thừa các biến từ GlobalStyles */
-@import '../../../components/GlobalStyles/GlobalStyles.module.scss';
+@import '../../components/GlobalStyles/GlobalStyles.module.scss';
 
 .container {
     margin: var(--space-6) auto;
