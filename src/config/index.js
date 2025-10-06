@@ -7,9 +7,10 @@ const routes = {
 
     testStart: '/tests/:testId/start',
 
-    testResult :'/tests/:testId/result/:userTestId',
+    testResult :'/tests/result/:userTestId',
     createTest:'/admin/create-test',
     createTestNormal:'/admin/create-test-normal',
+    testHistory:"/tests/history/:testId",
 
     examTypeDetail: '/exam-types/:examTypeId',
 

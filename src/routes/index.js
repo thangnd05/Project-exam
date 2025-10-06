@@ -7,6 +7,7 @@ import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStar
 import TestResultPage from '~/pages/exam/examtype/examtypeById/result/TestResultPage';
 import TestCreationForm from '~/pages/testnormal/TestCreateForm';
 import CreateTestPage from '~/pages/test/CreateTestPage';
+import TestHistoryPage from '~/pages/history/TestHistoryPage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -21,7 +22,9 @@ export const privateRoutes = [
   { path: routes.testStart, component: TestStartPage },
   { path: routes.testResult, component: TestResultPage },
     { path: routes.createTest, component: CreateTestPage},
-    { path: routes.createTestNormal, component: TestCreationForm},
+        { path: routes.createTestNormal, component: TestCreationForm},
+
+    { path: routes.testHistory, component: TestHistoryPage},
 
 
   // Thêm các trang riêng tư khác ở đây, ví dụ: trang profile

@@ -19,7 +19,6 @@ function TestStartPage() {
 
   axios.defaults.withCredentials = true;
 
-  // === Chuẩn hóa URL media ===
   const getFullMediaUrl = (url) => {
     if (!url) return null;
     const cleanUrl = url.trim();
@@ -30,7 +29,7 @@ function TestStartPage() {
     return `${trimmedBackendUrl}/${trimmedCleanUrl}`;
   };
 
-  // === Lấy đề và khôi phục state ===
+  // 🟢 Lấy đề thi + khôi phục state
   useEffect(() => {
     if (!testId || !userId) return;
     setStatus("loading");
@@ -59,9 +58,6 @@ function TestStartPage() {
         const testData = { ...res.data, parts: res.data.parts || [] };
         setTest(testData);
 
-        if (!restored && testData.durationMinutes)
-          setTimeLeft(testData.durationMinutes * 60);
-
         const now = new Date();
         const availableFrom = testData.availableFrom ? new Date(testData.availableFrom) : null;
         const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
@@ -69,9 +65,28 @@ function TestStartPage() {
         if (availableFrom && now < availableFrom) {
           setStatus("locked");
           setPreCountdown(Math.floor((availableFrom - now) / 1000));
-        } else if (availableTo && now > availableTo) {
+          return;
+        }
+
+        if (availableTo && now > availableTo) {
           setStatus("closed");
-        } else if (!restored) {
+          return;
+        }
+
+        if (!restored) {
+          const durationSeconds = (testData.durationMinutes || 0) * 60;
+          let finalTime = durationSeconds;
+
+          if (availableTo) {
+            const diffSeconds = Math.floor((availableTo - now) / 1000);
+            if (diffSeconds > 0) {
+              finalTime = Math.min(durationSeconds, diffSeconds);
+            } else {
+              finalTime = 0;
+            }
+          }
+
+          setTimeLeft(finalTime);
           setStatus("open");
         }
       })
@@ -81,7 +96,7 @@ function TestStartPage() {
       });
   }, [testId, userId]);
 
-  // === Bắt đầu bài thi ===
+  // 🟢 Tạo user_test khi bắt đầu
   useEffect(() => {
     if (status === "open" && userId && test?.testId) {
       setStatus("starting");
@@ -99,10 +114,6 @@ function TestStartPage() {
           const id = res.data.userTestId;
           setUserTestId(id);
           sessionStorage.setItem(`userTest-${test.testId}`, id);
-
-          if (test.durationMinutes && test.durationMinutes > 0)
-            setTimeLeft(test.durationMinutes * 60);
-
           setStatus("active");
         })
         .catch((err) => {
@@ -112,7 +123,7 @@ function TestStartPage() {
     }
   }, [status, userId, test]);
 
-  // === Auto-save local ===
+  // 🟢 Tự động lưu
   useEffect(() => {
     if (status === "active" && userTestId) {
       const saveData = {
@@ -125,7 +136,7 @@ function TestStartPage() {
     }
   }, [userAnswers, timeLeft, userTestId, status, testId]);
 
-  // === Đếm ngược mở đề ===
+  // 🟢 Đếm ngược trước khi mở bài
   useEffect(() => {
     if (status !== "locked" || preCountdown === null) return;
     if (preCountdown <= 0) {
@@ -137,7 +148,7 @@ function TestStartPage() {
     return () => clearInterval(timer);
   }, [preCountdown, status]);
 
-  // === ⏳ Đếm ngược thời gian & kiểm tra giới hạn availableTo ===
+  // 🟢 Đếm ngược làm bài
   useEffect(() => {
     if (status !== "active" || timeLeft === null) return;
 
@@ -146,18 +157,16 @@ function TestStartPage() {
         const now = new Date();
         const availableTo = test.availableTo ? new Date(test.availableTo) : null;
 
-        // ✅ Nếu đã qua thời gian đóng đề thì tự động nộp bài
         if (availableTo && now > availableTo) {
           clearInterval(timer);
-          alert("⏰ Bài thi đã hết thời gian cho phép! Hệ thống sẽ tự động nộp bài.");
+          alert("⏰ Hết hạn làm bài! Hệ thống sẽ tự động nộp.");
           handleSubmit();
           return 0;
         }
 
-        // ✅ Nếu hết thời lượng làm bài thì tự nộp
         if (prev <= 1) {
           clearInterval(timer);
-          alert("⏳ Hết thời gian làm bài. Hệ thống sẽ tự động nộp bài.");
+          alert("⏳ Hết thời gian làm bài. Hệ thống sẽ tự động nộp.");
           handleSubmit();
           return 0;
         }
@@ -169,34 +178,26 @@ function TestStartPage() {
     return () => clearInterval(timer);
   }, [status, timeLeft, test]);
 
-  // === Xử lý câu trả lời ===
+  // 🟢 Cập nhật câu trả lời
   const handleAnswerChange = (questionId, type, value) => {
-    const currentAnswer = userAnswers[questionId] || {};
-    let updatedAnswer;
-
-    if (type === "MCQ") {
-      updatedAnswer = { selectedAnswerId: value, answerText: null };
-    } else if (type === "FILL_BLANK" || type === "ESSAY") {
-      updatedAnswer = { selectedAnswerId: null, answerText: value };
-    }
-
-    setUserAnswers({
-      ...userAnswers,
-      [questionId]: updatedAnswer,
-    });
+    const updatedAnswer =
+      type === "MCQ"
+        ? { selectedAnswerId: value, answerText: null }
+        : { selectedAnswerId: null, answerText: value };
+    setUserAnswers({ ...userAnswers, [questionId]: updatedAnswer });
   };
 
-  // === Nộp bài ===
+  // 🟢 Nộp bài
   const handleSubmit = async () => {
     if (!userTestId || isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      const payload = Object.entries(userAnswers).map(([questionId, answerData]) => ({
+      const payload = Object.entries(userAnswers).map(([questionId, ans]) => ({
         userTestId,
         questionId: parseInt(questionId),
-        selectedAnswerId: answerData.selectedAnswerId || null,
-        answerText: answerData.answerText || null,
+        selectedAnswerId: ans.selectedAnswerId || null,
+        answerText: ans.answerText || null,
       }));
 
       if (payload.length > 0) {
@@ -206,11 +207,10 @@ function TestStartPage() {
       const res = await axios.post(`/api/user-tests/${userTestId}/submit`);
       const totalScore = res.data.totalScore;
 
-      // ✅ Xóa dữ liệu cache sau khi nộp
       sessionStorage.removeItem(`userTest-${testId}`);
       sessionStorage.removeItem(`userTestState-${testId}`);
 
-      navigate(`/tests/${testId}/result/${userTestId}`, { state: { score: totalScore } });
+      navigate(`/tests/result/${userTestId}`, { state: { score: totalScore } });
     } catch (err) {
       console.error("❌ Lỗi khi nộp bài:", err);
       alert("Nộp bài thất bại! Vui lòng thử lại.");
@@ -225,12 +225,11 @@ function TestStartPage() {
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  // === Render ===
-  if (status === "loading") return <p>Đang tải thông tin bài thi...</p>;
-  if (status === "error") return <p>Không thể tải được thông tin bài thi.</p>;
-  if (status === "closed") return <p>❌ Bài kiểm tra đã kết thúc.</p>;
+  if (status === "loading") return <p>Đang tải bài thi...</p>;
+  if (status === "error") return <p>Không thể tải bài thi.</p>;
+  if (status === "closed") return <p>❌ Bài thi đã kết thúc.</p>;
   if (status === "locked") return <p>Bài thi chưa mở. Đợi: {formatTime(preCountdown)}</p>;
-  if (status === "starting") return <p>Đang bắt đầu phiên làm bài...</p>;
+  if (status === "starting") return <p>Đang bắt đầu bài thi...</p>;
   if (status !== "active" || !test) return <p>Đang chuẩn bị bài thi...</p>;
 
   return (
@@ -240,14 +239,13 @@ function TestStartPage() {
 
       {timeLeft !== null && (
         <p>
-          Thời gian còn lại: <strong>{formatTime(timeLeft)}</strong>
+          ⏱ Thời gian còn lại: <strong>{formatTime(timeLeft)}</strong>
         </p>
       )}
 
-      {test.parts?.map((part, partIndex) => (
+      {test.parts?.map((part, i) => (
         <div key={part.testPartId} style={{ marginBottom: "2rem" }}>
-          <h3>Phần {partIndex + 1}</h3>
-
+          <h3>Phần {i + 1}</h3>
           {part.passage && (
             <div style={{ background: "#f8f9fa", padding: "1rem", borderRadius: "6px" }}>
               {part.passage.passageType === "LISTENING" && part.passage.mediaUrl && (
@@ -256,7 +254,6 @@ function TestStartPage() {
               {part.passage.content && <p>{part.passage.content}</p>}
             </div>
           )}
-
           {part.questions?.map((q, qIndex) => (
             <div
               key={q.questionId}
@@ -269,7 +266,6 @@ function TestStartPage() {
             >
               <strong>Câu {qIndex + 1}:</strong> {q.questionText}
 
-              {/* MCQ */}
               {q.questionType === "MCQ" &&
                 q.answers?.map((a) => (
                   <div key={a.answerId}>
@@ -277,7 +273,6 @@ function TestStartPage() {
                       <input
                         type="radio"
                         name={`q-${q.questionId}`}
-                        value={a.answerId}
                         checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
                         onChange={() => handleAnswerChange(q.questionId, "MCQ", a.answerId)}
                       />{" "}
@@ -286,30 +281,23 @@ function TestStartPage() {
                   </div>
                 ))}
 
-              {/* FILL_BLANK */}
               {q.questionType === "FILL_BLANK" && (
-                <div style={{ marginTop: "0.5rem" }}>
-                  <input
-                    type="text"
-                    value={userAnswers[q.questionId]?.answerText || ""}
-                    onChange={(e) => handleAnswerChange(q.questionId, "FILL_BLANK", e.target.value)}
-                    placeholder="Nhập câu trả lời của bạn"
-                    style={{ padding: "0.5rem", width: "100%" }}
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={userAnswers[q.questionId]?.answerText || ""}
+                  onChange={(e) => handleAnswerChange(q.questionId, "FILL_BLANK", e.target.value)}
+                  placeholder="Nhập câu trả lời..."
+                  style={{ padding: "0.5rem", width: "100%", marginTop: "0.5rem" }}
+                />
               )}
 
-              {/* ESSAY */}
               {q.questionType === "ESSAY" && (
-                <div style={{ marginTop: "0.5rem" }}>
-                  <textarea
-                    value={userAnswers[q.questionId]?.answerText || ""}
-                    onChange={(e) => handleAnswerChange(q.questionId, "ESSAY", e.target.value)}
-                    placeholder="Viết bài luận của bạn..."
-                    rows={5}
-                    style={{ padding: "0.5rem", width: "100%", resize: "vertical" }}
-                  />
-                </div>
+                <textarea
+                  value={userAnswers[q.questionId]?.answerText || ""}
+                  onChange={(e) => handleAnswerChange(q.questionId, "ESSAY", e.target.value)}
+                  rows={5}
+                  style={{ width: "100%", marginTop: "0.5rem", padding: "0.5rem" }}
+                />
               )}
             </div>
           ))}
