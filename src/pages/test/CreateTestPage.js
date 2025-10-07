@@ -2,220 +2,346 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./CreateTestPage.module.scss";
 import classNames from "classnames/bind";
-import { useAuth } from '../../hook/useAuth'; 
+import { useAuth } from "../../hook/useAuth";
 
 const cx = classNames.bind(styles);
 
 function CreateTestPage() {
-    const [examTypes, setExamTypes] = useState([]);
-    const [selectedExamType, setSelectedExamType] = useState('');
-    const [examParts, setExamParts] = useState([]);
-    const [testName, setTestName] = useState("");
-    const [testDescription, setTestDescription] = useState("");
-    const [bannerFile, setBannerFile] = useState(null);
-    const [numQuestions, setNumQuestions] = useState({});
-    const { user } = useAuth();
-    const [durationMinutes, setDurationMinutes] = useState('');
+  const [examTypes, setExamTypes] = useState([]);
+  const [selectedExamType, setSelectedExamType] = useState("");
+  const [examParts, setExamParts] = useState([]);
+  const [testName, setTestName] = useState("");
+  const [testDescription, setTestDescription] = useState("");
+  const [bannerFile, setBannerFile] = useState(null);
+  const [numQuestions, setNumQuestions] = useState({});
+  const [maxQuestions, setMaxQuestions] = useState({});
+  const [mode, setMode] = useState({}); // random/manual
+  const [enabledParts, setEnabledParts] = useState({});
+  const [selectedQuestions, setSelectedQuestions] = useState({});
+  const [questionBank, setQuestionBank] = useState({});
+  const { user } = useAuth();
+  const [durationMinutes, setDurationMinutes] = useState("");
 
-    useEffect(() => {
-        axios.get("/api/exam-types")
-            .then((res) => {
-                setExamTypes(res.data);
-            })
-            .catch(err => console.error("Failed to fetch exam types:", err));
-    }, []);
+  // 🟢 Lấy danh sách kỳ thi
+  useEffect(() => {
+    axios
+      .get("/api/exam-types")
+      .then((res) => setExamTypes(res.data))
+      .catch((err) => console.error("Failed to fetch exam types:", err));
+  }, []);
 
-    const handleExamTypeChange = async (examTypeId) => {
-        if (!examTypeId) {
-            setSelectedExamType('');
-            setExamParts([]);
-            setNumQuestions({});
-            setDurationMinutes('');
-            return;
-        }
-        
-        setSelectedExamType(examTypeId);
+  // 🟢 Khi chọn loại kỳ thi -> load các Part
+  const handleExamTypeChange = async (examTypeId) => {
+    if (!examTypeId) {
+      setSelectedExamType("");
+      setExamParts([]);
+      setNumQuestions({});
+      setMaxQuestions({});
+      setMode({});
+      setEnabledParts({});
+      setDurationMinutes("");
+      return;
+    }
 
-        // --- THAY ĐỔI: TỰ ĐỘNG ĐIỀN THỜI GIAN MẶC ĐỊNH ---
-        // 1. Tìm examType đầy đủ thông tin trong danh sách đã có.
-        const selectedType = examTypes.find(
-            (type) => type.examTypeId.toString() === examTypeId
-        );
+    setSelectedExamType(examTypeId);
 
-        // 2. Nếu tìm thấy và có thời gian, gán vào state `durationMinutes`.
-        //    Ngược lại thì reset thành chuỗi rỗng.
-        if (selectedType && selectedType.durationMinutes) {
-            setDurationMinutes(selectedType.durationMinutes.toString());
-        } else {
-            setDurationMinutes('');
-        }
-        // --- KẾT THÚC THAY ĐỔI ---
+    // Tự động set thời lượng mặc định
+    const selectedType = examTypes.find(
+      (t) => t.examTypeId.toString() === examTypeId
+    );
+    setDurationMinutes(selectedType?.durationMinutes?.toString() || "");
 
+    try {
+      const res = await axios.get(`/api/exam-parts/by-exam-type/${examTypeId}`);
+      const parts = res.data || [];
+
+      const initNums = {};
+      const initMode = {};
+      const initEnabled = {};
+      const counts = {};
+
+      // Lấy số câu hỏi tối đa cho từng part
+      for (const p of parts) {
+        initNums[p.examPartId] = p.defaultNumQuestions || 0;
+        initMode[p.examPartId] = "random";
+        initEnabled[p.examPartId] = true; // mặc định bật
         try {
-            const res = await axios.get(`/api/exam-parts/by-exam-type/${examTypeId}`);
-            setExamParts(res.data);
-
-            const initialNumQuestions = {};
-            res.data.forEach((part) => {
-                initialNumQuestions[part.examPartId] = part.defaultNumQuestions || 0;
-            });
-            setNumQuestions(initialNumQuestions);
-        } catch (err) {
-            console.error("Failed to fetch exam parts:", err);
+          const countRes = await axios.get(
+            `/api/questions/count/by-part/${p.examPartId}`
+          );
+          counts[p.examPartId] = countRes.data;
+        } catch {
+          counts[p.examPartId] = 0;
         }
+      }
+
+      setExamParts(parts);
+      setNumQuestions(initNums);
+      setMode(initMode);
+      setEnabledParts(initEnabled);
+      setMaxQuestions(counts);
+    } catch (err) {
+      console.error("Failed to fetch exam parts:", err);
+    }
+  };
+
+  // 🧮 Đổi số câu hỏi
+  const handleNumChange = (partId, value) => {
+    const val = parseInt(value, 10) || 0;
+    const max = maxQuestions[partId] || 0;
+    if (val > max) {
+      alert(`❌ Số câu vượt quá giới hạn (${max} câu)!`);
+      return;
+    }
+    setNumQuestions((prev) => ({ ...prev, [partId]: val }));
+  };
+
+  // 🔁 Chuyển chế độ random/manual
+  const handleModeChange = async (partId, newMode) => {
+    setMode((prev) => ({ ...prev, [partId]: newMode }));
+    if (newMode === "manual" && !questionBank[partId]) {
+      try {
+        const res = await axios.get(`/api/questions/by-part/${partId}`);
+        setQuestionBank((prev) => ({ ...prev, [partId]: res.data || [] }));
+      } catch (err) {
+        console.error("Failed to load question bank:", err);
+      }
+    }
+  };
+
+  // 🧠 Tick chọn câu hỏi thủ công
+  const handleSelectQuestion = (partId, questionId, checked) => {
+    setSelectedQuestions((prev) => {
+      const prevList = prev[partId] || [];
+      const newList = checked
+        ? [...prevList, questionId]
+        : prevList.filter((id) => id !== questionId);
+      return { ...prev, [partId]: newList };
+    });
+  };
+
+  const handleFileChange = (e) => setBannerFile(e.target.files[0]);
+
+  // 🚀 Gửi form tạo đề
+  const handleCreateTest = async () => {
+    if (!selectedExamType || !testName.trim()) {
+      alert("Vui lòng chọn loại kỳ thi và nhập tên đề thi.");
+      return;
+    }
+
+    // Lọc chỉ lấy những part được bật
+    const parts = examParts
+      .filter((p) => enabledParts[p.examPartId])
+      .map((p) => {
+        const partId = p.examPartId;
+        const isRandom = mode[partId] === "random";
+
+        return isRandom
+          ? {
+              examPartId: partId,
+              numQuestions: parseInt(numQuestions[partId] || 0, 10),
+              random: true,
+            }
+          : {
+              examPartId: partId,
+              random: false,
+              questionIds: selectedQuestions[partId] || [],
+            };
+      });
+
+    if (parts.length === 0) {
+      alert("⚠️ Vui lòng bật ít nhất một Part để tạo đề.");
+      return;
+    }
+
+    const testData = {
+      title: testName,
+      description: testDescription,
+      examTypeId: parseInt(selectedExamType, 10),
+      createBy: user?.userId || 1,
+      durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
+      availableFrom: null,
+      availableTo: null,
+      maxAttempts: 1,
+      parts,
     };
 
-    const handleNumChange = (partId, value) => {
-        const numValue = Math.max(0, parseInt(value, 10) || 0);
-        setNumQuestions({ ...numQuestions, [partId]: numValue });
-    };
-    
-    const handleFileChange = (event) => {
-        setBannerFile(event.target.files[0]);
-    };
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(testData));
+    if (bannerFile) formData.append("banner", bannerFile);
 
-    const handleCreateTest = async () => {
-        if (!selectedExamType || !testName.trim()) {
-            alert("Vui lòng chọn loại kỳ thi và nhập tên đề thi.");
-            return;
-        }
+    try {
+      const res = await axios.post("/api/tests", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      alert("✅ Tạo đề thành công!");
+      console.log("Created test:", res.data);
+    } catch (err) {
+      console.error("❌ Error creating test:", err.response?.data || err);
+      alert("Tạo đề thất bại. Kiểm tra console để biết chi tiết.");
+    }
+  };
 
-        const testData = {
-            title: testName,
-            description: testDescription,
-            examTypeId: parseInt(selectedExamType),
-            createBy: user?.userId,
-            durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
-            availableFrom: null,
-            availableTo: null,
-            maxAttempts: null,
-            parts: Object.entries(numQuestions)
-                .filter(([, num]) => parseInt(num, 10) > 0)
-                .map(([partId, num]) => ({
-                    examPartId: parseInt(partId),
-                    numQuestions: parseInt(num),
-                })),
-        };
+  return (
+    <div className={cx("container")}>
+      <h2 className={cx("title")}>Tạo đề thi mới</h2>
 
-        const formData = new FormData();
-        formData.append('data', JSON.stringify(testData));
+      {/* --- Loại kỳ thi --- */}
+      <div className={cx("form-group")}>
+        <label>Loại kỳ thi</label>
+        <select
+          className="form-select"
+          value={selectedExamType}
+          onChange={(e) => handleExamTypeChange(e.target.value)}
+        >
+          <option value="">-- Chọn kỳ thi --</option>
+          {examTypes.map((t) => (
+            <option key={t.examTypeId} value={t.examTypeId}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        if (bannerFile) {
-            formData.append('banner', bannerFile);
-        }
-        
-        try {
-            const response = await axios.post("/api/tests", formData);
-            console.log("Test created successfully:", response.data);
-            alert("Tạo đề thành công!");
+      {/* --- Tên đề thi --- */}
+      <div className={cx("form-group")}>
+        <label>Tên đề thi</label>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="VD: Đề luyện TOEIC tháng 10"
+          value={testName}
+          onChange={(e) => setTestName(e.target.value)}
+        />
+      </div>
 
-        } catch (err) {
-            console.error("Error creating test:", err.response?.data || err.message);
-            alert("Tạo đề thất bại! Vui lòng kiểm tra console để biết chi tiết.");
-        }
-    };
+      {/* --- Thời gian --- */}
+      <div className={cx("form-group")}>
+        <label>Thời gian làm bài (phút)</label>
+        <input
+          type="number"
+          className="form-control"
+          value={durationMinutes}
+          onChange={(e) => setDurationMinutes(e.target.value)}
+        />
+      </div>
 
-    return (
-        <div className={cx("container")}>
-            <h2 className={cx("title")}>Tạo đề thi mới</h2>
+      {/* --- Mô tả --- */}
+      <div className={cx("form-group")}>
+        <label>Mô tả</label>
+        <textarea
+          className="form-control"
+          rows="3"
+          placeholder="Thêm mô tả ngắn cho đề thi (tùy chọn)"
+          value={testDescription}
+          onChange={(e) => setTestDescription(e.target.value)}
+        />
+      </div>
 
-            <div className={cx("form-group")}>
-                <label className="form-label">Loại kỳ thi</label>
+      {/* --- Banner --- */}
+      <div className={cx("form-group")}>
+        <label>Ảnh banner (tùy chọn)</label>
+        <input
+          type="file"
+          className="form-control"
+          accept="image/*"
+          onChange={handleFileChange}
+        />
+      </div>
+
+      {/* --- Danh sách Part --- */}
+      {examParts.length > 0 && (
+        <div className={cx("form-group")}>
+          <h5>Thiết lập cấu hình cho từng Part</h5>
+          {examParts.map((p) => (
+            <div key={p.examPartId} className={cx("part-block")}>
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <input
+                    type="checkbox"
+                    className="form-check-input me-2"
+                    checked={enabledParts[p.examPartId] ?? true}
+                    onChange={(e) =>
+                      setEnabledParts({
+                        ...enabledParts,
+                        [p.examPartId]: e.target.checked,
+                      })
+                    }
+                  />
+                  <b>{p.name}</b> – {p.description}
+                </div>
                 <select
-                    className="form-select"
-                    value={selectedExamType}
-                    onChange={(e) => handleExamTypeChange(e.target.value)}
+                  className="form-select w-auto"
+                  disabled={!enabledParts[p.examPartId]}
+                  value={mode[p.examPartId] || "random"}
+                  onChange={(e) =>
+                    handleModeChange(p.examPartId, e.target.value)
+                  }
                 >
-                    <option value="">-- Chọn kỳ thi --</option>
-                    {examTypes.map((t) => (
-                        <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>
-                    ))}
+                  <option value="random">Ngẫu nhiên</option>
+                  <option value="manual">Thủ công</option>
                 </select>
-            </div>
+              </div>
 
-            <div className={cx("form-group")}>
-                <label className="form-label">Tên đề thi</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Ví dụ: Đề thi thử TOEIC tháng 9"
-                    value={testName}
-                    onChange={(e) => setTestName(e.target.value)}
-                />
-            </div>
-
-            <div className={cx("form-group")}>
-                <label className="form-label">Thời gian làm bài (phút)</label>
-                <input
+              {/* --- Nếu random --- */}
+              {mode[p.examPartId] === "random" && enabledParts[p.examPartId] && (
+                <div className="mb-3">
+                  <input
                     type="number"
                     className="form-control"
-                    placeholder="Để trống để dùng thời gian mặc định của kỳ thi"
                     min="0"
-                    value={durationMinutes}
-                    onChange={(e) => setDurationMinutes(e.target.value)}
-                />
-            </div>
-            
-            <div className={cx("form-group")}>
-                <label className="form-label">Mô tả (Không bắt buộc)</label>
-                <textarea
-                    className="form-control"
-                    rows="3"
-                    placeholder="Mô tả ngắn về đề thi này"
-                    value={testDescription}
-                    onChange={(e) => setTestDescription(e.target.value)}
-                />
-            </div>
-            
-            <div className={cx("form-group")}>
-                <label className="form-label">Ảnh đại diện (Banner)</label>
-                <input
-                    type="file"
-                    className="form-control"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                />
-            </div>
-
-            {examParts.length > 0 && (
-                <div className={cx("form-group")}>
-                    <h5>Chọn số câu hỏi cho từng Part</h5>
-                    <table className={cx("table")}>
-                        <thead>
-                            <tr>
-                                <th>Part</th>
-                                <th>Mô tả</th>
-                                <th>Số câu</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {examParts.map((p) => (
-                                <tr key={p.examPartId}>
-                                    <td>{p.name}</td>
-                                    <td>{p.description}</td>
-                                    <td>
-                                        <input
-                                            type="number"
-                                            className={cx("input-number")}
-                                            min="0"
-                                            value={numQuestions[p.examPartId] || 0}
-                                            onChange={(e) =>
-                                                handleNumChange(p.examPartId, e.target.value)
-                                            }
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    max={maxQuestions[p.examPartId] || 0}
+                    value={numQuestions[p.examPartId] || 0}
+                    onChange={(e) =>
+                      handleNumChange(p.examPartId, e.target.value)
+                    }
+                    placeholder="Số câu muốn random"
+                  />
+                  <small className="text-muted">
+                    Tối đa: {maxQuestions[p.examPartId] || 0} câu
+                  </small>
                 </div>
-            )}
+              )}
 
-            <button className={cx("btn-create")} onClick={handleCreateTest}>
-                Tạo đề
-            </button>
+              {/* --- Nếu thủ công --- */}
+              {mode[p.examPartId] === "manual" && enabledParts[p.examPartId] && (
+                <div className={cx("manual-select")}>
+                  {questionBank[p.examPartId] ? (
+                    questionBank[p.examPartId].map((q) => (
+                      <label key={q.questionId} className="d-block">
+                        <input
+                          type="checkbox"
+                          checked={
+                            selectedQuestions[p.examPartId]?.includes(
+                              q.questionId
+                            ) || false
+                          }
+                          onChange={(e) =>
+                            handleSelectQuestion(
+                              p.examPartId,
+                              q.questionId,
+                              e.target.checked
+                            )
+                          }
+                        />{" "}
+                        {q.questionText}
+                      </label>
+                    ))
+                  ) : (
+                    <i>Đang tải danh sách câu hỏi...</i>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-    );
+      )}
+
+      <button className={cx("btn-create")} onClick={handleCreateTest}>
+        🚀 Tạo đề
+      </button>
+    </div>
+  );
 }
 
 export default CreateTestPage;

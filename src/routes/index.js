@@ -23,7 +23,6 @@ export const privateRoutes = [
   { path: routes.testResult, component: TestResultPage },
     { path: routes.createTest, component: CreateTestPage},
         { path: routes.createTestNormal, component: TestCreationForm},
-
     { path: routes.testHistory, component: TestHistoryPage},
 
 
