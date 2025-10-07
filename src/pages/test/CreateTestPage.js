@@ -15,12 +15,15 @@ function CreateTestPage() {
   const [bannerFile, setBannerFile] = useState(null);
   const [numQuestions, setNumQuestions] = useState({});
   const [maxQuestions, setMaxQuestions] = useState({});
-  const [mode, setMode] = useState({}); // random/manual
+  const [mode, setMode] = useState({});
   const [enabledParts, setEnabledParts] = useState({});
   const [selectedQuestions, setSelectedQuestions] = useState({});
   const [questionBank, setQuestionBank] = useState({});
-  const { user } = useAuth();
+  const [availableFrom, setAvailableFrom] = useState("");
+  const [availableTo, setAvailableTo] = useState("");
+  const [maxAttempts, setMaxAttempts] = useState(1);
   const [durationMinutes, setDurationMinutes] = useState("");
+  const { user } = useAuth();
 
   // 🟢 Lấy danh sách kỳ thi
   useEffect(() => {
@@ -45,12 +48,6 @@ function CreateTestPage() {
 
     setSelectedExamType(examTypeId);
 
-    // Tự động set thời lượng mặc định
-    const selectedType = examTypes.find(
-      (t) => t.examTypeId.toString() === examTypeId
-    );
-    setDurationMinutes(selectedType?.durationMinutes?.toString() || "");
-
     try {
       const res = await axios.get(`/api/exam-parts/by-exam-type/${examTypeId}`);
       const parts = res.data || [];
@@ -60,15 +57,12 @@ function CreateTestPage() {
       const initEnabled = {};
       const counts = {};
 
-      // Lấy số câu hỏi tối đa cho từng part
       for (const p of parts) {
         initNums[p.examPartId] = p.defaultNumQuestions || 0;
         initMode[p.examPartId] = "random";
-        initEnabled[p.examPartId] = true; // mặc định bật
+        initEnabled[p.examPartId] = true;
         try {
-          const countRes = await axios.get(
-            `/api/questions/count/by-part/${p.examPartId}`
-          );
+          const countRes = await axios.get(`/api/questions/count/by-part/${p.examPartId}`);
           counts[p.examPartId] = countRes.data;
         } catch {
           counts[p.examPartId] = 0;
@@ -109,7 +103,6 @@ function CreateTestPage() {
     }
   };
 
-  // 🧠 Tick chọn câu hỏi thủ công
   const handleSelectQuestion = (partId, questionId, checked) => {
     setSelectedQuestions((prev) => {
       const prevList = prev[partId] || [];
@@ -129,13 +122,11 @@ function CreateTestPage() {
       return;
     }
 
-    // Lọc chỉ lấy những part được bật
     const parts = examParts
       .filter((p) => enabledParts[p.examPartId])
       .map((p) => {
         const partId = p.examPartId;
         const isRandom = mode[partId] === "random";
-
         return isRandom
           ? {
               examPartId: partId,
@@ -159,10 +150,10 @@ function CreateTestPage() {
       description: testDescription,
       examTypeId: parseInt(selectedExamType, 10),
       createBy: user?.userId || 1,
-      durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
-      availableFrom: null,
-      availableTo: null,
-      maxAttempts: 1,
+      durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : 60,
+      availableFrom: availableFrom || null,
+      availableTo: availableTo || null,
+      maxAttempts: parseInt(maxAttempts, 10) || 1,
       parts,
     };
 
@@ -186,7 +177,7 @@ function CreateTestPage() {
     <div className={cx("container")}>
       <h2 className={cx("title")}>Tạo đề thi mới</h2>
 
-      {/* --- Loại kỳ thi --- */}
+      {/* === THÔNG TIN CHUNG === */}
       <div className={cx("form-group")}>
         <label>Loại kỳ thi</label>
         <select
@@ -203,7 +194,6 @@ function CreateTestPage() {
         </select>
       </div>
 
-      {/* --- Tên đề thi --- */}
       <div className={cx("form-group")}>
         <label>Tên đề thi</label>
         <input
@@ -215,18 +205,6 @@ function CreateTestPage() {
         />
       </div>
 
-      {/* --- Thời gian --- */}
-      <div className={cx("form-group")}>
-        <label>Thời gian làm bài (phút)</label>
-        <input
-          type="number"
-          className="form-control"
-          value={durationMinutes}
-          onChange={(e) => setDurationMinutes(e.target.value)}
-        />
-      </div>
-
-      {/* --- Mô tả --- */}
       <div className={cx("form-group")}>
         <label>Mô tả</label>
         <textarea
@@ -238,104 +216,121 @@ function CreateTestPage() {
         />
       </div>
 
-      {/* --- Banner --- */}
-      <div className={cx("form-group")}>
-        <label>Ảnh banner (tùy chọn)</label>
-        <input
-          type="file"
-          className="form-control"
-          accept="image/*"
-          onChange={handleFileChange}
-        />
+      <div className={cx("form-grid")}>
+        <div>
+          <label>Thời gian mở</label>
+          <input
+            type="datetime-local"
+            className="form-control"
+            value={availableFrom}
+            onChange={(e) => setAvailableFrom(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Thời gian đóng</label>
+          <input
+            type="datetime-local"
+            className="form-control"
+            value={availableTo}
+            onChange={(e) => setAvailableTo(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* --- Danh sách Part --- */}
-      {examParts.length > 0 && (
-        <div className={cx("form-group")}>
-          <h5>Thiết lập cấu hình cho từng Part</h5>
-          {examParts.map((p) => (
-            <div key={p.examPartId} className={cx("part-block")}>
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                  <input
-                    type="checkbox"
-                    className="form-check-input me-2"
-                    checked={enabledParts[p.examPartId] ?? true}
-                    onChange={(e) =>
-                      setEnabledParts({
-                        ...enabledParts,
-                        [p.examPartId]: e.target.checked,
-                      })
-                    }
-                  />
-                  <b>{p.name}</b> – {p.description}
-                </div>
-                <select
-                  className="form-select w-auto"
-                  disabled={!enabledParts[p.examPartId]}
-                  value={mode[p.examPartId] || "random"}
-                  onChange={(e) =>
-                    handleModeChange(p.examPartId, e.target.value)
-                  }
-                >
-                  <option value="random">Ngẫu nhiên</option>
-                  <option value="manual">Thủ công</option>
-                </select>
-              </div>
-
-              {/* --- Nếu random --- */}
-              {mode[p.examPartId] === "random" && enabledParts[p.examPartId] && (
-                <div className="mb-3">
-                  <input
-                    type="number"
-                    className="form-control"
-                    min="0"
-                    max={maxQuestions[p.examPartId] || 0}
-                    value={numQuestions[p.examPartId] || 0}
-                    onChange={(e) =>
-                      handleNumChange(p.examPartId, e.target.value)
-                    }
-                    placeholder="Số câu muốn random"
-                  />
-                  <small className="text-muted">
-                    Tối đa: {maxQuestions[p.examPartId] || 0} câu
-                  </small>
-                </div>
-              )}
-
-              {/* --- Nếu thủ công --- */}
-              {mode[p.examPartId] === "manual" && enabledParts[p.examPartId] && (
-                <div className={cx("manual-select")}>
-                  {questionBank[p.examPartId] ? (
-                    questionBank[p.examPartId].map((q) => (
-                      <label key={q.questionId} className="d-block">
-                        <input
-                          type="checkbox"
-                          checked={
-                            selectedQuestions[p.examPartId]?.includes(
-                              q.questionId
-                            ) || false
-                          }
-                          onChange={(e) =>
-                            handleSelectQuestion(
-                              p.examPartId,
-                              q.questionId,
-                              e.target.checked
-                            )
-                          }
-                        />{" "}
-                        {q.questionText}
-                      </label>
-                    ))
-                  ) : (
-                    <i>Đang tải danh sách câu hỏi...</i>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+      <div className={cx("form-grid")}>
+        <div>
+          <label>Thời lượng (phút)</label>
+          <input
+            type="number"
+            className="form-control"
+            value={durationMinutes}
+            onChange={(e) => setDurationMinutes(e.target.value)}
+          />
         </div>
-      )}
+        <div>
+          <label>Số lần làm tối đa</label>
+          <input
+            type="number"
+            className="form-control"
+            value={maxAttempts}
+            onChange={(e) => setMaxAttempts(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className={cx("form-group")}>
+        <label>Ảnh banner (tùy chọn)</label>
+        <input type="file" className="form-control" accept="image/*" onChange={handleFileChange} />
+      </div>
+
+      {/* === DANH SÁCH PART === */}
+      {examParts.length > 0 &&
+        examParts.map((p) => (
+          <div key={p.examPartId} className={cx("part-block")}>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <input
+                  type="checkbox"
+                  className="form-check-input me-2"
+                  checked={enabledParts[p.examPartId] ?? true}
+                  onChange={(e) =>
+                    setEnabledParts({ ...enabledParts, [p.examPartId]: e.target.checked })
+                  }
+                />
+                <b>{p.name}</b> – {p.description}
+              </div>
+              <select
+                className="form-select w-auto"
+                disabled={!enabledParts[p.examPartId]}
+                value={mode[p.examPartId] || "random"}
+                onChange={(e) => handleModeChange(p.examPartId, e.target.value)}
+              >
+                <option value="random">Ngẫu nhiên</option>
+                <option value="manual">Thủ công</option>
+              </select>
+            </div>
+
+            {mode[p.examPartId] === "random" && enabledParts[p.examPartId] && (
+              <div className="mb-3">
+                <input
+                  type="number"
+                  className="form-control"
+                  min="0"
+                  max={maxQuestions[p.examPartId] || 0}
+                  value={numQuestions[p.examPartId] || 0}
+                  onChange={(e) => handleNumChange(p.examPartId, e.target.value)}
+                  placeholder="Số câu muốn random"
+                />
+                <small className="text-muted">
+                  Tối đa: {maxQuestions[p.examPartId] || 0} câu
+                </small>
+              </div>
+            )}
+
+            {mode[p.examPartId] === "manual" && enabledParts[p.examPartId] && (
+              <div className={cx("manual-select")}>
+                {questionBank[p.examPartId] ? (
+                  questionBank[p.examPartId].map((q) => (
+                    <label key={q.questionId} className="d-block">
+                      <input
+                        type="checkbox"
+                        checked={
+                          selectedQuestions[p.examPartId]?.includes(q.questionId) || false
+                        }
+                        onChange={(e) =>
+                          handleSelectQuestion(p.examPartId, q.questionId, e.target.checked)
+                        }
+                      />{" "}
+                      {q.questionText}
+                    </label>
+                  ))
+                ) : (
+                  <i>Đang tải danh sách câu hỏi...</i>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
 
       <button className={cx("btn-create")} onClick={handleCreateTest}>
         🚀 Tạo đề
