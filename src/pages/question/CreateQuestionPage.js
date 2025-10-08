@@ -28,7 +28,7 @@ const QuestionGroupCreationForm = () => {
   // 🟢 Fetch danh sách exam type
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/exam-types")
+      .get("/api/exam-types")
       .then((res) => setExamTypes(res.data))
       .catch((err) => console.error("❌ Lỗi khi tải exam types:", err));
   }, []);
@@ -38,7 +38,7 @@ const QuestionGroupCreationForm = () => {
     if (!formData.examTypeId) return;
     axios
       .get(
-        `http://localhost:8080/api/exam-parts/by-exam-type/${formData.examTypeId}`
+        `/api/exam-parts/by-exam-type/${formData.examTypeId}`
       )
       .then((res) => setExamParts(res.data))
       .catch((err) => console.error("❌ Lỗi khi tải exam parts:", err));
@@ -128,7 +128,7 @@ const QuestionGroupCreationForm = () => {
 
     try {
       await axios.post(
-        "http://localhost:8080/api/questions/create-with-passage",
+        "/api/questions/create-with-passage",
         sendData,
         {
           headers: { "Content-Type": "multipart/form-data" },

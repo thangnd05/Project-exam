@@ -9,9 +9,6 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true); // Trạng thái loading để biết khi nào check session xong
 
-    // Cấu hình axios mặc định
-    axios.defaults.withCredentials = true;
-    axios.defaults.baseURL = 'http://localhost:8080';
 
     // Kiểm tra session khi ứng dụng khởi động lần đầu
     useEffect(() => {

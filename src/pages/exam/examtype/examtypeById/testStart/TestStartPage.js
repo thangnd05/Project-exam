@@ -6,7 +6,6 @@ import { useAuth } from "../../../../../hook/useAuth";
 function TestStartPage() {
   const { testId } = useParams();
   const { user } = useAuth();
-  const userId = user?.userId;
   const navigate = useNavigate();
 
   const [userTestId, setUserTestId] = useState(null);
@@ -19,6 +18,17 @@ function TestStartPage() {
 
   axios.defaults.withCredentials = true;
 
+  // ✅ Interceptor tự động gắn token
+  useEffect(() => {
+    const token = user?.token;
+    const interceptor = axios.interceptors.request.use((config) => {
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    });
+    return () => axios.interceptors.request.eject(interceptor);
+  }, [user?.token]);
+
+  // ✅ Hàm lấy full URL media
   const getFullMediaUrl = (url) => {
     if (!url) return null;
     const cleanUrl = url.trim();
@@ -31,7 +41,7 @@ function TestStartPage() {
 
   // 🟢 Lấy đề thi + khôi phục state
   useEffect(() => {
-    if (!testId || !userId) return;
+    if (!testId) return;
     setStatus("loading");
 
     const savedState = sessionStorage.getItem(`userTestState-${testId}`);
@@ -53,7 +63,7 @@ function TestStartPage() {
     }
 
     axios
-      .get(`/api/tests/usertest/${testId}`, { params: { userId } })
+      .get(`/api/tests/usertest/${testId}`)
       .then((res) => {
         const testData = { ...res.data, parts: res.data.parts || [] };
         setTest(testData);
@@ -94,11 +104,11 @@ function TestStartPage() {
         console.error("❌ Lỗi khi tải bài thi:", err);
         setStatus("error");
       });
-  }, [testId, userId]);
+  }, [testId]);
 
   // 🟢 Tạo user_test khi bắt đầu
   useEffect(() => {
-    if (status === "open" && userId && test?.testId) {
+    if (status === "open" && test?.testId) {
       setStatus("starting");
 
       const existing = sessionStorage.getItem(`userTest-${test.testId}`);
@@ -109,7 +119,7 @@ function TestStartPage() {
       }
 
       axios
-        .post("/api/user-tests", { testId: test.testId, userId })
+        .post("/api/user-tests", { testId: test.testId })
         .then((res) => {
           const id = res.data.userTestId;
           setUserTestId(id);
@@ -121,7 +131,7 @@ function TestStartPage() {
           setStatus("error");
         });
     }
-  }, [status, userId, test]);
+  }, [status, test]);
 
   // 🟢 Tự động lưu
   useEffect(() => {
@@ -219,12 +229,14 @@ function TestStartPage() {
     }
   };
 
+  // 🧭 Format thời gian hiển thị
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
+  // 🟢 UI hiển thị
   if (status === "loading") return <p>Đang tải bài thi...</p>;
   if (status === "error") return <p>Không thể tải bài thi.</p>;
   if (status === "closed") return <p>❌ Bài thi đã kết thúc.</p>;

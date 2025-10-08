@@ -149,7 +149,6 @@ function CreateTestPage() {
       title: testName,
       description: testDescription,
       examTypeId: parseInt(selectedExamType, 10),
-      createBy: user?.userId || 1,
       durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : 60,
       availableFrom: availableFrom || null,
       availableTo: availableTo || null,
@@ -164,7 +163,9 @@ function CreateTestPage() {
     try {
       const res = await axios.post("/api/tests", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true, // ✅ thêm
       });
+
       alert("✅ Tạo đề thành công!");
       console.log("Created test:", res.data);
     } catch (err) {

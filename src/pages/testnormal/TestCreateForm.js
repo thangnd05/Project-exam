@@ -22,7 +22,6 @@ const TestCreationForm = ({ user }) => {
     availableFrom: "",
     availableTo: "",
     maxAttempts: 1,
-    createBy: user?.userId || 1,
     parts: [],
   });
 
@@ -36,7 +35,7 @@ const TestCreationForm = ({ user }) => {
       if (!testData.examTypeId) return;
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/exam-parts/by-exam-type/${testData.examTypeId}`
+          `/api/exam-parts/by-exam-type/${testData.examTypeId}`
         );
         const parts = res.data.map((p) => ({
           examPartId: p.examPartId,
@@ -145,12 +144,11 @@ const TestCreationForm = ({ user }) => {
     setIsSubmitting(true);
     setStatusMessage("");
 
-    const requestPayload = {
+        const requestPayload = {
       examTypeId: testData.examTypeId,
       title: testData.title,
       description: testData.description,
       durationMinutes: parseInt(testData.durationMinutes),
-      createBy: testData.createBy || 1,
       availableFrom: testData.availableFrom || null,
       availableTo: testData.availableTo || null,
       maxAttempts: parseInt(testData.maxAttempts),
@@ -172,6 +170,7 @@ const TestCreationForm = ({ user }) => {
       })),
     };
 
+
     const formData = new FormData();
     formData.append("testData", JSON.stringify(requestPayload));
     if (bannerFile) formData.append("bannerFile", bannerFile);
@@ -183,9 +182,8 @@ const TestCreationForm = ({ user }) => {
     });
 
     try {
-      await axios.post("http://localhost:8080/api/tests/create-with-questions", formData, {
+      await axios.post("/api/tests/create-with-questions", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
       });
       setStatusMessage("✅ Tạo bài kiểm tra thành công!");
     } catch (err) {

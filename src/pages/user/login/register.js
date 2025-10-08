@@ -29,7 +29,7 @@ function Register() {
         setLoading(true);
         setMessage('');
         try {
-            const response = await axios.post("http://localhost:8080/api/register", {
+            const response = await axios.post("/api/register", {
                 username,
                 password,
                 email,

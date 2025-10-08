@@ -9,7 +9,7 @@ const cx = classNames.bind(style);
 
 function TestByExamTypePage() {
   const { examTypeId } = useParams();
-  const { userId } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [tests, setTests] = useState([]);
@@ -17,6 +17,17 @@ function TestByExamTypePage() {
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
 
+  // ✅ Gắn interceptor tự động thêm Authorization header
+  useEffect(() => {
+    const token = user?.token;
+    const interceptor = axios.interceptors.request.use((config) => {
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    });
+    return () => axios.interceptors.request.eject(interceptor);
+  }, [user?.token]);
+
+  // 🟢 Lấy danh sách bài kiểm tra theo examTypeId
   useEffect(() => {
     if (!examTypeId) {
       setLoading(false);
@@ -24,24 +35,24 @@ function TestByExamTypePage() {
     }
 
     setLoading(true);
-    let apiUrl = `/api/tests/user/by-exam-type/${examTypeId}`;
-    if (userId) apiUrl += `?userId=${userId}`;
 
     axios
-      .get(apiUrl)
+      .get(`/api/tests/user/by-exam-type/${examTypeId}`)
       .then((res) => setTests(res.data))
       .catch((err) => {
-        console.error("❌ Lỗi khi lấy tests:", err);
+        console.error("❌ Lỗi khi lấy danh sách bài kiểm tra:", err);
         setTests([]);
       })
       .finally(() => setLoading(false));
 
+    // Lấy tên loại bài thi
     axios
       .get(`/api/exam-types/${examTypeId}`)
       .then((res) => setExamTypeName(res.data.name))
       .catch((err) => console.error("❌ Lỗi khi lấy tên exam type:", err));
-  }, [examTypeId, userId]);
+  }, [examTypeId, user?.token]);
 
+  // 🟢 Cập nhật đếm ngược
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -57,6 +68,7 @@ function TestByExamTypePage() {
     return () => clearInterval(interval);
   }, [tests]);
 
+  // 🧭 Format thời gian
   const formatDateTime = (dateStr) => {
     if (!dateStr) return "—";
     return new Date(dateStr).toLocaleString("vi-VN", {
@@ -76,8 +88,9 @@ function TestByExamTypePage() {
     return `${minutes}p ${seconds}s`;
   };
 
+  // 🟢 Xử lý khi người dùng bắt đầu bài thi
   const handleStartTest = (test) => {
-    if (!userId) {
+    if (!user) {
       alert("Bạn cần đăng nhập để làm bài kiểm tra.");
       navigate("/login");
       return;
@@ -105,14 +118,10 @@ function TestByExamTypePage() {
     let allowedTime = test.durationMinutes * 60;
     if (availableTo) {
       const timeUntilClose = Math.floor((availableTo - now) / 1000);
-      if (timeUntilClose < allowedTime) {
-        allowedTime = timeUntilClose;
-      }
+      if (timeUntilClose < allowedTime) allowedTime = timeUntilClose;
     }
 
-    navigate(`/tests/${test.testId}/start`, {
-      state: { allowedTime },
-    });
+    navigate(`/tests/${test.testId}/start`, { state: { allowedTime } });
   };
 
   const handleViewHistory = (testId) => {
@@ -123,7 +132,9 @@ function TestByExamTypePage() {
 
   return (
     <div className={cx("container")}>
-      <h3 className={cx("title")}>Bài kiểm tra - {examTypeName || "Đang tải..."}</h3>
+      <h3 className={cx("title")}>
+        Bài kiểm tra - {examTypeName || "Đang tải..."}
+      </h3>
 
       <div className={cx("grid")}>
         {loading && <p>Đang tải danh sách bài kiểm tra...</p>}
