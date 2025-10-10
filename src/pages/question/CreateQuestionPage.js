@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./CreateQuestionGroupPage.scss"; // dùng lại style cũ cho đồng bộ
+import "./CreateQuestionGroupPage.scss";
 
 const QuestionGroupCreationForm = () => {
   const initialQuestion = {
@@ -16,14 +16,36 @@ const QuestionGroupCreationForm = () => {
 
   const [examTypes, setExamTypes] = useState([]);
   const [examParts, setExamParts] = useState([]);
+  const [classes, setClasses] = useState([]);
+
   const [formData, setFormData] = useState({
+    classId: "",
     examTypeId: "",
     examPartId: "",
     passage: { passageType: "READING", content: "", mediaFile: null },
     questions: [JSON.parse(JSON.stringify(initialQuestion))],
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+
+  // 🟢 Fetch danh sách lớp học
+ // 🟢 Fetch danh sách lớp học (của giáo viên)
+useEffect(() => {
+  axios
+    .get("/api/classes/my")
+    .then((res) => {
+      // Kiểm tra dữ liệu có đúng dạng không
+      if (Array.isArray(res.data)) {
+        setClasses(res.data);
+      } else if (res.data.classes) {
+        // fallback nếu backend trả object chứa field "classes"
+        setClasses(res.data.classes);
+      }
+    })
+    .catch((err) => console.error("❌ Lỗi khi tải danh sách lớp:", err));
+}, []);
+
 
   // 🟢 Fetch danh sách exam type
   useEffect(() => {
@@ -37,9 +59,7 @@ const QuestionGroupCreationForm = () => {
   useEffect(() => {
     if (!formData.examTypeId) return;
     axios
-      .get(
-        `/api/exam-parts/by-exam-type/${formData.examTypeId}`
-      )
+      .get(`/api/exam-parts/by-exam-type/${formData.examTypeId}`)
       .then((res) => setExamParts(res.data))
       .catch((err) => console.error("❌ Lỗi khi tải exam parts:", err));
   }, [formData.examTypeId]);
@@ -67,7 +87,7 @@ const QuestionGroupCreationForm = () => {
     }));
   };
 
-  // 🟢 Câu hỏi
+  // 🟢 Quản lý câu hỏi
   const addQuestion = () => {
     setFormData((prev) => ({
       ...prev,
@@ -101,6 +121,7 @@ const QuestionGroupCreationForm = () => {
     setStatusMessage("");
 
     const payload = {
+      classId: formData.classId ? parseInt(formData.classId) : null,
       examPartId: parseInt(formData.examPartId),
       passage: {
         passageType: formData.passage.passageType,
@@ -127,14 +148,18 @@ const QuestionGroupCreationForm = () => {
     }
 
     try {
-      await axios.post(
-        "/api/questions/create-with-passage",
-        sendData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      await axios.post("/api/questions/create-with-passage", sendData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       setStatusMessage("✅ Tạo nhóm câu hỏi thành công!");
+      // Reset form
+      setFormData({
+        classId: "",
+        examTypeId: "",
+        examPartId: "",
+        passage: { passageType: "READING", content: "", mediaFile: null },
+        questions: [JSON.parse(JSON.stringify(initialQuestion))],
+      });
     } catch (err) {
       console.error(err);
       setStatusMessage("❌ Lỗi khi tạo nhóm câu hỏi!");
@@ -147,6 +172,25 @@ const QuestionGroupCreationForm = () => {
     <div className="test-creation-form container mt-4">
       <h2 className="form-title">🧠 Tạo nhóm câu hỏi theo Passage</h2>
       <form onSubmit={handleSubmit}>
+        {/* === Chọn lớp học === */}
+        {/* === Chọn lớp học === */}
+        <div className="form-section">
+          <label>Chọn lớp học</label>
+          <select
+            className="form-select"
+            value={formData.classId}
+            onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
+          >
+            <option value="">-- Chọn lớp học --</option>
+            {classes.map((cls) => (
+              <option key={cls.classId} value={cls.classId}>
+                {cls.className}
+              </option>
+            ))}
+          </select>
+        </div>
+
+
         {/* === Chọn loại bài thi === */}
         <div className="form-section">
           <label>Loại bài thi</label>
@@ -301,7 +345,9 @@ const QuestionGroupCreationForm = () => {
         </button>
 
         {statusMessage && (
-          <div className="alert alert-info text-center mt-3">{statusMessage}</div>
+          <div className="alert alert-info text-center mt-3">
+            {statusMessage}
+          </div>
         )}
       </form>
     </div>

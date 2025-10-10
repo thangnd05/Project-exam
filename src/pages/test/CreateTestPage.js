@@ -23,7 +23,26 @@ function CreateTestPage() {
   const [availableTo, setAvailableTo] = useState("");
   const [maxAttempts, setMaxAttempts] = useState(1);
   const [durationMinutes, setDurationMinutes] = useState("");
+
+  // 🟢 Thêm state cho lớp học
+  const [classes, setClasses] = useState([]);
+  const [classId, setClassId] = useState("");
+
   const { user } = useAuth();
+
+  // 🟢 Fetch danh sách lớp của giáo viên
+  useEffect(() => {
+    axios
+      .get("/api/classes/my")
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setClasses(res.data);
+        } else if (res.data.classes) {
+          setClasses(res.data.classes);
+        }
+      })
+      .catch((err) => console.error("❌ Lỗi khi tải danh sách lớp:", err));
+  }, []);
 
   // 🟢 Lấy danh sách kỳ thi
   useEffect(() => {
@@ -62,7 +81,9 @@ function CreateTestPage() {
         initMode[p.examPartId] = "random";
         initEnabled[p.examPartId] = true;
         try {
-          const countRes = await axios.get(`/api/questions/count/by-part/${p.examPartId}`);
+          const countRes = await axios.get(
+            `/api/questions/count/by-part/${p.examPartId}`
+          );
           counts[p.examPartId] = countRes.data;
         } catch {
           counts[p.examPartId] = 0;
@@ -154,6 +175,7 @@ function CreateTestPage() {
       availableTo: availableTo || null,
       maxAttempts: parseInt(maxAttempts, 10) || 1,
       parts,
+      classId: classId ? parseInt(classId, 10) : null, // 🟢 thêm classId vào payload
     };
 
     const formData = new FormData();
@@ -163,7 +185,7 @@ function CreateTestPage() {
     try {
       const res = await axios.post("/api/tests", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true, // ✅ thêm
+        withCredentials: true,
       });
 
       alert("✅ Tạo đề thành công!");
@@ -177,6 +199,23 @@ function CreateTestPage() {
   return (
     <div className={cx("container")}>
       <h2 className={cx("title")}>Tạo đề thi mới</h2>
+
+      {/* === 🟢 THÊM CHỌN LỚP === */}
+      <div className={cx("form-group")}>
+        <label>Chọn lớp học</label>
+        <select
+          className="form-select"
+          value={classId}
+          onChange={(e) => setClassId(e.target.value)}
+        >
+          <option value="">-- Chọn lớp --</option>
+          {classes.map((cls) => (
+            <option key={cls.classId} value={cls.classId}>
+              {cls.className}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* === THÔNG TIN CHUNG === */}
       <div className={cx("form-group")}>
@@ -261,7 +300,12 @@ function CreateTestPage() {
 
       <div className={cx("form-group")}>
         <label>Ảnh banner (tùy chọn)</label>
-        <input type="file" className="form-control" accept="image/*" onChange={handleFileChange} />
+        <input
+          type="file"
+          className="form-control"
+          accept="image/*"
+          onChange={handleFileChange}
+        />
       </div>
 
       {/* === DANH SÁCH PART === */}
@@ -275,7 +319,10 @@ function CreateTestPage() {
                   className="form-check-input me-2"
                   checked={enabledParts[p.examPartId] ?? true}
                   onChange={(e) =>
-                    setEnabledParts({ ...enabledParts, [p.examPartId]: e.target.checked })
+                    setEnabledParts({
+                      ...enabledParts,
+                      [p.examPartId]: e.target.checked,
+                    })
                   }
                 />
                 <b>{p.name}</b> – {p.description}
@@ -299,7 +346,9 @@ function CreateTestPage() {
                   min="0"
                   max={maxQuestions[p.examPartId] || 0}
                   value={numQuestions[p.examPartId] || 0}
-                  onChange={(e) => handleNumChange(p.examPartId, e.target.value)}
+                  onChange={(e) =>
+                    handleNumChange(p.examPartId, e.target.value)
+                  }
                   placeholder="Số câu muốn random"
                 />
                 <small className="text-muted">
@@ -316,10 +365,16 @@ function CreateTestPage() {
                       <input
                         type="checkbox"
                         checked={
-                          selectedQuestions[p.examPartId]?.includes(q.questionId) || false
+                          selectedQuestions[p.examPartId]?.includes(
+                            q.questionId
+                          ) || false
                         }
                         onChange={(e) =>
-                          handleSelectQuestion(p.examPartId, q.questionId, e.target.checked)
+                          handleSelectQuestion(
+                            p.examPartId,
+                            q.questionId,
+                            e.target.checked
+                          )
                         }
                       />{" "}
                       {q.questionText}

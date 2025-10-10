@@ -23,11 +23,27 @@ const TestCreationForm = ({ user }) => {
     availableTo: "",
     maxAttempts: 1,
     parts: [],
+    classId: "", // 🟢 thêm classId
   });
 
+  const [classes, setClasses] = useState([]); // 🟢 danh sách lớp học
   const [bannerFile, setBannerFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+
+  // 🟢 Lấy danh sách lớp học của giáo viên
+  useEffect(() => {
+    axios
+      .get("/api/classes/my")
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setClasses(res.data);
+        } else if (res.data.classes) {
+          setClasses(res.data.classes);
+        }
+      })
+      .catch((err) => console.error("❌ Lỗi khi tải danh sách lớp:", err));
+  }, []);
 
   // 🟢 Khi người dùng chọn loại bài thi, tự fetch danh sách exam_part từ backend
   useEffect(() => {
@@ -144,7 +160,7 @@ const TestCreationForm = ({ user }) => {
     setIsSubmitting(true);
     setStatusMessage("");
 
-        const requestPayload = {
+    const requestPayload = {
       examTypeId: testData.examTypeId,
       title: testData.title,
       description: testData.description,
@@ -152,6 +168,7 @@ const TestCreationForm = ({ user }) => {
       availableFrom: testData.availableFrom || null,
       availableTo: testData.availableTo || null,
       maxAttempts: parseInt(testData.maxAttempts),
+      classId: testData.classId ? parseInt(testData.classId) : null, // 🟢 thêm classId vào payload
       parts: testData.parts.map((p) => ({
         examPartId: p.examPartId,
         passage: {
@@ -169,7 +186,6 @@ const TestCreationForm = ({ user }) => {
         })),
       })),
     };
-
 
     const formData = new FormData();
     formData.append("testData", JSON.stringify(requestPayload));
@@ -198,6 +214,23 @@ const TestCreationForm = ({ user }) => {
     <div className="test-creation-form container mt-4">
       <h2 className="form-title">Tạo bài kiểm tra mới</h2>
       <form onSubmit={handleSubmit}>
+        {/* 🟢 Chọn lớp học */}
+        <div className="form-section">
+          <label>Chọn lớp học</label>
+          <select
+            className="form-select"
+            value={testData.classId}
+            onChange={(e) => setTestData({ ...testData, classId: e.target.value })}
+          >
+            <option value="">-- Chọn lớp học --</option>
+            {classes.map((cls) => (
+              <option key={cls.classId} value={cls.classId}>
+                {cls.className}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* === Thông tin chung === */}
         <div className="form-section">
           <label>Loại bài thi</label>
@@ -239,7 +272,9 @@ const TestCreationForm = ({ user }) => {
               type="number"
               className="form-control"
               value={testData.durationMinutes}
-              onChange={(e) => setTestData({ ...testData, durationMinutes: e.target.value })}
+              onChange={(e) =>
+                setTestData({ ...testData, durationMinutes: e.target.value })
+              }
             />
           </div>
           <div>
@@ -248,7 +283,9 @@ const TestCreationForm = ({ user }) => {
               type="number"
               className="form-control"
               value={testData.maxAttempts}
-              onChange={(e) => setTestData({ ...testData, maxAttempts: e.target.value })}
+              onChange={(e) =>
+                setTestData({ ...testData, maxAttempts: e.target.value })
+              }
             />
           </div>
         </div>
@@ -260,7 +297,9 @@ const TestCreationForm = ({ user }) => {
               type="datetime-local"
               className="form-control"
               value={testData.availableFrom}
-              onChange={(e) => setTestData({ ...testData, availableFrom: e.target.value })}
+              onChange={(e) =>
+                setTestData({ ...testData, availableFrom: e.target.value })
+              }
             />
           </div>
           <div>
@@ -269,7 +308,9 @@ const TestCreationForm = ({ user }) => {
               type="datetime-local"
               className="form-control"
               value={testData.availableTo}
-              onChange={(e) => setTestData({ ...testData, availableTo: e.target.value })}
+              onChange={(e) =>
+                setTestData({ ...testData, availableTo: e.target.value })
+              }
             />
           </div>
         </div>
@@ -336,7 +377,9 @@ const TestCreationForm = ({ user }) => {
             <textarea
               className="form-control"
               value={part.passage.content}
-              onChange={(e) => handlePassageChange(partIndex, "content", e.target.value)}
+              onChange={(e) =>
+                handlePassageChange(partIndex, "content", e.target.value)
+              }
             ></textarea>
 
             {part.passage.passageType === "LISTENING" && (
