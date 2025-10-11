@@ -27,21 +27,32 @@ function TestByClassPage() {
   setLoading(true);
 
   axios
-    .get(`/api/tests/by-class/${classId}`)
-    .then((res) => {
-      if (Array.isArray(res.data)) {
-        setTests(res.data);
-      } else {
-        // nếu trả về message hoặc object khác -> coi như không có test
-        console.warn("⚠️ API không trả về mảng:", res.data);
-        setTests([]);
-      }
-    })
-    .catch((err) => {
-      console.error("❌ Lỗi khi lấy danh sách bài kiểm tra:", err);
+  .get(`/api/tests/by-class/${classId}`)
+  .then((res) => {
+    if (Array.isArray(res.data)) {
+      setTests(res.data);
+    } else {
+      console.warn("⚠️ API không trả về mảng:", res.data);
       setTests([]);
-    })
-    .finally(() => setLoading(false));
+    }
+  })
+  .catch((err) => {
+    if (err.response) {
+      if (err.response.status === 401) {
+        alert("🔒 Bạn cần đăng nhập để xem bài kiểm tra này!");
+        navigate("/login");
+      } else if (err.response.status === 403) {
+        alert("❌ Bạn không có quyền truy cập lớp này!");
+        navigate("/my-classes");
+      } else {
+        alert("⚠️ Đã xảy ra lỗi không xác định.");
+      }
+    } else {
+      alert("🚨 Lỗi kết nối tới máy chủ.");
+    }
+  })
+  .finally(() => setLoading(false));
+
 }, [classId]);
 
 
