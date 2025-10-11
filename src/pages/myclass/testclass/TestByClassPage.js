@@ -2,14 +2,14 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
-import style from "../../exam/examtype/examtypeById/TestByExamTypePage.module.scss"; // dùng lại style cũ
+import style from "../../exam/examtype/examtypeById/TestByExamTypePage.module.scss";
 import { useAuth } from "../../../hook/useAuth";
 
 const cx = classNames.bind(style);
 
 function TestByClassPage() {
   const { classId } = useParams();
-  const { user } = useAuth(); // vẫn giữ để biết user đang đăng nhập ai
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [tests, setTests] = useState([]);
@@ -17,44 +17,61 @@ function TestByClassPage() {
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
 
+  // 🟢 Lấy thông tin lớp học (tên lớp)
+  useEffect(() => {
+    if (!classId) return;
+
+    axios
+      .get(`/api/classes/${classId}`)
+      .then((res) => {
+        if (res.data && res.data.className) {
+          setClassName(res.data.className);
+        } else {
+          setClassName("(Không tìm thấy lớp)");
+        }
+      })
+      .catch((err) => {
+        console.error("❌ Lỗi khi lấy thông tin lớp:", err);
+        setClassName("(Không tải được tên lớp)");
+      });
+  }, [classId]);
+
   // 🟢 Lấy danh sách bài test theo classId
   useEffect(() => {
-  if (!classId) {
-    setLoading(false);
-    return;
-  }
-
-  setLoading(true);
-
-  axios
-  .get(`/api/tests/by-class/${classId}`)
-  .then((res) => {
-    if (Array.isArray(res.data)) {
-      setTests(res.data);
-    } else {
-      console.warn("⚠️ API không trả về mảng:", res.data);
-      setTests([]);
+    if (!classId) {
+      setLoading(false);
+      return;
     }
-  })
-  .catch((err) => {
-    if (err.response) {
-      if (err.response.status === 401) {
-        alert("🔒 Bạn cần đăng nhập để xem bài kiểm tra này!");
-        navigate("/login");
-      } else if (err.response.status === 403) {
-        alert("❌ Bạn không có quyền truy cập lớp này!");
-        navigate("/my-classes");
-      } else {
-        alert("⚠️ Đã xảy ra lỗi không xác định.");
-      }
-    } else {
-      alert("🚨 Lỗi kết nối tới máy chủ.");
-    }
-  })
-  .finally(() => setLoading(false));
 
-}, [classId]);
+    setLoading(true);
 
+    axios
+      .get(`/api/tests/by-class/${classId}`)
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setTests(res.data);
+        } else {
+          console.warn("⚠️ API không trả về mảng:", res.data);
+          setTests([]);
+        }
+      })
+      .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 401) {
+            alert("🔒 Bạn cần đăng nhập để xem bài kiểm tra này!");
+            navigate("/login");
+          } else if (err.response.status === 403) {
+            alert("❌ Bạn không có quyền truy cập lớp này!");
+            navigate("/my-classes");
+          } else {
+            alert("⚠️ Đã xảy ra lỗi không xác định.");
+          }
+        } else {
+          alert("🚨 Lỗi kết nối tới máy chủ.");
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [classId, navigate]);
 
   // 🕒 Cập nhật countdown
   useEffect(() => {
@@ -72,7 +89,7 @@ function TestByClassPage() {
     return () => clearInterval(interval);
   }, [tests]);
 
-  // 🧭 Định dạng thời gian
+  // 🧭 Format thời gian
   const formatDateTime = (dateStr) => {
     if (!dateStr) return "—";
     return new Date(dateStr).toLocaleString("vi-VN", {
@@ -128,7 +145,6 @@ function TestByClassPage() {
     navigate(`/tests/${test.testId}/start`, { state: { allowedTime } });
   };
 
-  // 🟢 Xem lịch sử
   const handleViewHistory = (testId) => {
     navigate(`/tests/history/${testId}`);
   };
@@ -137,7 +153,7 @@ function TestByClassPage() {
 
   return (
     <div className={cx("container")}>
-      <h3 className={cx("title")}>📚 Bài kiểm tra trong lớp: {className || "Đang tải..."}</h3>
+      <h3 className={cx("title")}>📚 Bài kiểm tra trong lớp: {className}</h3>
 
       <div className={cx("grid")}>
         {loading && <p>Đang tải danh sách bài kiểm tra...</p>}
@@ -172,16 +188,11 @@ function TestByClassPage() {
             return (
               <div key={test.testId} className={cx("card")}>
                 {test.bannerUrl && (
-                  <img
-                    src={test.bannerUrl}
-                    alt={test.title}
-                    className={cx("banner")}
-                  />
+                  <img src={test.bannerUrl} alt={test.title} className={cx("banner")} />
                 )}
 
                 <div className={cx("body")}>
                   <h5 className={cx("card-title")}>{test.title || "Không có tiêu đề"}</h5>
-
                   <p className={cx("card-duration")}>
                     ⏱ Thời gian: {test.durationMinutes ? `${test.durationMinutes} phút` : ""}
                   </p>
