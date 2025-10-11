@@ -1,7 +1,7 @@
 import { useState } from "react";
 import classNames from "classnames/bind";
 import style from "./login.module.scss";
-import routes from "~/config";
+import routes from "~/config/Routes";
 import { Form, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";

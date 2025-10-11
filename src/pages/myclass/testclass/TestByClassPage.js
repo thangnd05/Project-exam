@@ -2,48 +2,50 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
-import style from "./TestByExamTypePage.module.scss";
-import { useAuth } from "../../../../hook/useAuth";
+import style from "../../exam/examtype/examtypeById/TestByExamTypePage.module.scss"; // dùng lại style cũ
+import { useAuth } from "../../../hook/useAuth";
 
 const cx = classNames.bind(style);
 
-function TestByExamTypePage() {
-  const { examTypeId } = useParams();
-  const { user } = useAuth();
+function TestByClassPage() {
+  const { classId } = useParams();
+  const { user } = useAuth(); // vẫn giữ để biết user đang đăng nhập ai
   const navigate = useNavigate();
 
   const [tests, setTests] = useState([]);
-  const [examTypeName, setExamTypeName] = useState("");
+  const [className, setClassName] = useState("");
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
 
-
-  // 🟢 Lấy danh sách bài kiểm tra theo examTypeId
+  // 🟢 Lấy danh sách bài test theo classId
   useEffect(() => {
-    if (!examTypeId) {
-      setLoading(false);
-      return;
-    }
+  if (!classId) {
+    setLoading(false);
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    axios
-      .get(`/api/tests/user/by-exam-type/${examTypeId}`)
-      .then((res) => setTests(res.data))
-      .catch((err) => {
-        console.error("❌ Lỗi khi lấy danh sách bài kiểm tra:", err);
+  axios
+    .get(`/api/tests/by-class/${classId}`)
+    .then((res) => {
+      if (Array.isArray(res.data)) {
+        setTests(res.data);
+      } else {
+        // nếu trả về message hoặc object khác -> coi như không có test
+        console.warn("⚠️ API không trả về mảng:", res.data);
         setTests([]);
-      })
-      .finally(() => setLoading(false));
+      }
+    })
+    .catch((err) => {
+      console.error("❌ Lỗi khi lấy danh sách bài kiểm tra:", err);
+      setTests([]);
+    })
+    .finally(() => setLoading(false));
+}, [classId]);
 
-    // Lấy tên loại bài thi
-    axios
-      .get(`/api/exam-types/${examTypeId}`)
-      .then((res) => setExamTypeName(res.data.name))
-      .catch((err) => console.error("❌ Lỗi khi lấy tên exam type:", err));
-  }, [examTypeId]);
 
-  // 🟢 Cập nhật đếm ngược
+  // 🕒 Cập nhật countdown
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -59,7 +61,7 @@ function TestByExamTypePage() {
     return () => clearInterval(interval);
   }, [tests]);
 
-  // 🧭 Format thời gian
+  // 🧭 Định dạng thời gian
   const formatDateTime = (dateStr) => {
     if (!dateStr) return "—";
     return new Date(dateStr).toLocaleString("vi-VN", {
@@ -79,7 +81,7 @@ function TestByExamTypePage() {
     return `${minutes}p ${seconds}s`;
   };
 
-  // 🟢 Xử lý khi người dùng bắt đầu bài thi
+  // 🟢 Bắt đầu làm bài
   const handleStartTest = (test) => {
     if (!user) {
       alert("Bạn cần đăng nhập để làm bài kiểm tra.");
@@ -115,6 +117,7 @@ function TestByExamTypePage() {
     navigate(`/tests/${test.testId}/start`, { state: { allowedTime } });
   };
 
+  // 🟢 Xem lịch sử
   const handleViewHistory = (testId) => {
     navigate(`/tests/history/${testId}`);
   };
@@ -123,9 +126,7 @@ function TestByExamTypePage() {
 
   return (
     <div className={cx("container")}>
-      <h3 className={cx("title")}>
-        Bài kiểm tra - {examTypeName || "Đang tải..."}
-      </h3>
+      <h3 className={cx("title")}>📚 Bài kiểm tra trong lớp: {className || "Đang tải..."}</h3>
 
       <div className={cx("grid")}>
         {loading && <p>Đang tải danh sách bài kiểm tra...</p>}
@@ -203,4 +204,4 @@ function TestByExamTypePage() {
   );
 }
 
-export default TestByExamTypePage;
+export default TestByClassPage;

@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Button, Form, Alert } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import routes from "../../config/Routes";
+import "./JoinClassPage.scss";
 
 function JoinClassPage() {
   const [classId, setClassId] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleJoin = async (e) => {
     e.preventDefault();
@@ -20,60 +25,52 @@ function JoinClassPage() {
       const res = await axios.post("/api/class-members/join", {
         classId: Number(classId),
       });
-
       setMessage("✅ Gửi yêu cầu tham gia lớp thành công!");
-      setClassId("");
-
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.error || "❌ Lỗi khi gửi yêu cầu vào lớp!";
-      setMessage(errorMsg);
+      setMessage("❌ Không có lớp nào với mã tham gia này!");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  // 🟢 Điều hướng tới trang Lớp của tôi
+  const handleGoToMyClasses = () => {
+    navigate(routes.myClasses);
+  };
+
   return (
-    <div
-      className="container d-flex justify-content-center align-items-center"
-    >
-      <div
-        className="card shadow p-4"
-        style={{ maxWidth: "400px", width: "100%" }}
-      >
-        <h3 className="text-center mb-4">📘 Tham gia lớp học</h3>
-        <form onSubmit={handleJoin}>
-          <div className="mb-3">
-            <label htmlFor="classId" className="form-label">
-              Mã lớp:
-            </label>
-            <input
-              id="classId"
-              type="number"
-              className="form-control"
-              placeholder="Nhập mã lớp học..."
-              value={classId}
-              onChange={(e) => setClassId(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
+    <div className="join-class-container">
+      <h4>📘 Tham gia lớp học</h4>
 
-          <button
-            type="submit"
-            className="btn btn-primary w-100"
+      {message && <Alert variant="info">{message}</Alert>}
+
+      <Form onSubmit={handleJoin}>
+        <Form.Group controlId="classId">
+          <Form.Control
+            type="text"
+            placeholder="Nhập mã lớp..."
+            value={classId}
+            onChange={(e) => setClassId(e.target.value)}
             disabled={loading}
-          >
-            {loading ? "Đang gửi..." : "Gửi yêu cầu"}
-          </button>
-        </form>
+          />
+        </Form.Group>
 
-        {message && (
-          <p className="mt-3 text-center" style={{ color: "#d9534f" }}>
-            {message}
-          </p>
-        )}
-      </div>
+        <div className="btn-group mt-3 d-flex justify-content-between">
+          <Button type="submit" variant="primary" disabled={loading}>
+            {loading ? "Đang gửi..." : "➕ Tham gia lớp"}
+          </Button>
+
+          {/* 🟢 Nút Lớp của tôi */}
+          <Button
+            variant="success"
+            type="button"
+            onClick={handleGoToMyClasses}
+          >
+            🎓 Lớp của tôi
+          </Button>
+        </div>
+      </Form>
     </div>
   );
 }

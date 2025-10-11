@@ -1,4 +1,4 @@
-import routes from '../config/index';
+import routes from '../config/Routes';
 import Login from '~/pages/user/login/login';
 import Register from '~/pages/user/login/register';
 import TestPage from '~/pages/exam/TestPage';
@@ -9,6 +9,8 @@ import TestCreationForm from '~/pages/testnormal/TestCreateForm';
 import CreateTestPage from '~/pages/test/CreateTestPage';
 import TestHistoryPage from '~/pages/history/TestHistoryPage';
 import CreateQuestionPage from '~/pages/question/CreateQuestionPage';
+import MyClassesPage from '~/pages/myclass/MyClassPage';
+import TestByClassPage from '~/pages/myclass/testclass/TestByClassPage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -27,6 +29,11 @@ export const privateRoutes = [
   { path: routes.createTestNormal, component: TestCreationForm},
   { path: routes.createQuestion, component: CreateQuestionPage},
   { path: routes.testHistory, component: TestHistoryPage},
+  { path: routes.myClasses, component: MyClassesPage},
+  { path: routes.testClasses, component: TestByClassPage},
+
+
+
 
 
   // Thêm các trang riêng tư khác ở đây, ví dụ: trang profile

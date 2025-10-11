@@ -4,7 +4,7 @@ import styles from './footer.module.scss';
 import { Link } from 'react-router-dom';
 import { name } from '~/assets/images';
 import images from "~/assets/images";
-import routes from '~/config';
+import routes from '~/config/Routes';
 
 function Footer() {
     return (

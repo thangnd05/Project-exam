@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Form, Button } from "react-bootstrap";
 import { useState } from "react";
-import routes from "~/config";
+import routes from "~/config/Routes";
 
 const cx = classNames.bind(style);
 

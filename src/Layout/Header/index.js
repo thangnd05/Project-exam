@@ -9,7 +9,7 @@ import classNames from "classnames/bind";
 // import Search from '../Search';
 import { useAuth } from '../../hook/useAuth'; 
 import { name } from '~/assets/images';
-import routes from '~/config';
+import routes from '~/config/Routes';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(style)
