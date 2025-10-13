@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./CreateTestPage.module.scss";
 import classNames from "classnames/bind";
-import { useAuth } from "../../hook/useAuth";
 
 const cx = classNames.bind(styles);
 
@@ -28,8 +27,6 @@ function CreateTestPage() {
   const [classes, setClasses] = useState([]);
   const [classId, setClassId] = useState("");
 
-  const { user } = useAuth();
-
   // 🟢 Fetch danh sách lớp của giáo viên
   useEffect(() => {
     axios
@@ -52,7 +49,7 @@ function CreateTestPage() {
       .catch((err) => console.error("Failed to fetch exam types:", err));
   }, []);
 
-  // 🟢 Khi chọn loại kỳ thi -> load các Part
+  // 🟢 Khi chọn loại kỳ thi -> load các Part (có lọc theo lớp)
   const handleExamTypeChange = async (examTypeId) => {
     if (!examTypeId) {
       setSelectedExamType("");
@@ -80,10 +77,13 @@ function CreateTestPage() {
         initNums[p.examPartId] = p.defaultNumQuestions || 0;
         initMode[p.examPartId] = "random";
         initEnabled[p.examPartId] = true;
+
         try {
-          const countRes = await axios.get(
-            `/api/questions/count/by-part/${p.examPartId}`
-          );
+          // ✅ Gọi API count theo classId nếu có
+          const countUrl = classId
+            ? `/api/questions/count/by-part/${p.examPartId}?classId=${classId}`
+            : `/api/questions/count/by-part/${p.examPartId}`;
+          const countRes = await axios.get(countUrl);
           counts[p.examPartId] = countRes.data;
         } catch {
           counts[p.examPartId] = 0;
@@ -111,12 +111,16 @@ function CreateTestPage() {
     setNumQuestions((prev) => ({ ...prev, [partId]: val }));
   };
 
-  // 🔁 Chuyển chế độ random/manual
+  // 🔁 Chuyển chế độ random/manual (có lọc theo class)
   const handleModeChange = async (partId, newMode) => {
     setMode((prev) => ({ ...prev, [partId]: newMode }));
     if (newMode === "manual" && !questionBank[partId]) {
       try {
-        const res = await axios.get(`/api/questions/by-part/${partId}`);
+        // ✅ Nếu đã chọn lớp → gửi classId để BE lọc câu hỏi
+        const url = classId
+          ? `/api/questions/by-part/${partId}?classId=${classId}`
+          : `/api/questions/by-part/${partId}`;
+        const res = await axios.get(url);
         setQuestionBank((prev) => ({ ...prev, [partId]: res.data || [] }));
       } catch (err) {
         console.error("Failed to load question bank:", err);
@@ -175,7 +179,7 @@ function CreateTestPage() {
       availableTo: availableTo || null,
       maxAttempts: parseInt(maxAttempts, 10) || 1,
       parts,
-      classId: classId ? parseInt(classId, 10) : null, // 🟢 thêm classId vào payload
+      classId: classId ? parseInt(classId, 10) : null, // ✅ gửi classId lên BE
     };
 
     const formData = new FormData();
@@ -200,13 +204,27 @@ function CreateTestPage() {
     <div className={cx("container")}>
       <h2 className={cx("title")}>Tạo đề thi mới</h2>
 
-      {/* === 🟢 THÊM CHỌN LỚP === */}
+      {/* === 🟢 CHỌN LỚP HỌC === */}
       <div className={cx("form-group")}>
         <label>Chọn lớp học</label>
         <select
           className="form-select"
           value={classId}
-          onChange={(e) => setClassId(e.target.value)}
+          onChange={(e) => {
+            const newClassId = e.target.value;
+            setClassId(newClassId);
+
+            // 🧹 Reset lại dữ liệu khi đổi lớp
+            setExamParts([]);
+            setNumQuestions({});
+            setMaxQuestions({});
+            setMode({});
+            setEnabledParts({});
+            setQuestionBank({});
+            setSelectedQuestions({});
+
+            if (selectedExamType) handleExamTypeChange(selectedExamType);
+          }}
         >
           <option value="">-- Chọn lớp --</option>
           {classes.map((cls) => (
