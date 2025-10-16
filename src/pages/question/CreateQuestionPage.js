@@ -116,57 +116,71 @@ useEffect(() => {
 
   // 🟢 Submit form
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setStatusMessage("");
+  e.preventDefault();
+  setIsSubmitting(true);
+  setStatusMessage("");
 
-    const payload = {
-      classId: formData.classId ? parseInt(formData.classId) : null,
-      examPartId: parseInt(formData.examPartId),
-      passage: {
-        passageType: formData.passage.passageType,
-        content: formData.passage.content,
-      },
-      questions: formData.questions.map((q) => ({
-        questionType: q.questionType,
-        questionText: q.questionText,
-        answers: q.options.map((opt) => ({
-          label: opt.label,
-          answerText: opt.content,
-          isCorrect: opt.isCorrect,
-        })),
+  // ✅ Kiểm tra passage có thực sự trống không
+  const hasPassageContent =
+    formData.passage.content?.trim() !== "" ||
+    (formData.passage.passageType === "LISTENING" &&
+      formData.passage.mediaFile);
+
+  // 🧱 Tạo payload cơ bản
+  const payload = {
+    classId: formData.classId ? parseInt(formData.classId) : null,
+    examPartId: parseInt(formData.examPartId),
+    questions: formData.questions.map((q) => ({
+      questionType: q.questionType,
+      questionText: q.questionText,
+      answers: q.options.map((opt) => ({
+        label: opt.label,
+        answerText: opt.content,
+        isCorrect: opt.isCorrect,
       })),
-    };
-
-    const sendData = new FormData();
-    sendData.append("data", JSON.stringify(payload));
-    if (
-      formData.passage.passageType === "LISTENING" &&
-      formData.passage.mediaFile
-    ) {
-      sendData.append("audioFile", formData.passage.mediaFile);
-    }
-
-    try {
-      await axios.post("/api/questions/create-with-passage", sendData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setStatusMessage("✅ Tạo nhóm câu hỏi thành công!");
-      // Reset form
-      setFormData({
-        classId: "",
-        examTypeId: "",
-        examPartId: "",
-        passage: { passageType: "READING", content: "", mediaFile: null },
-        questions: [JSON.parse(JSON.stringify(initialQuestion))],
-      });
-    } catch (err) {
-      console.error(err);
-      setStatusMessage("❌ Lỗi khi tạo nhóm câu hỏi!");
-    } finally {
-      setIsSubmitting(false);
-    }
+    })),
   };
+
+  // ✅ Chỉ thêm passage nếu có nội dung / audio
+  if (hasPassageContent) {
+    payload.passage = {
+      passageType: formData.passage.passageType,
+      content: formData.passage.content,
+    };
+  }
+
+  const sendData = new FormData();
+  sendData.append("data", JSON.stringify(payload));
+
+  if (
+    hasPassageContent &&
+    formData.passage.passageType === "LISTENING" &&
+    formData.passage.mediaFile
+  ) {
+    sendData.append("audioFile", formData.passage.mediaFile);
+  }
+
+  try {
+    await axios.post("/api/questions/create-with-passage", sendData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    setStatusMessage("✅ Tạo nhóm câu hỏi thành công!");
+    // Reset form
+    setFormData({
+      classId: "",
+      examTypeId: "",
+      examPartId: "",
+      passage: { passageType: "READING", content: "", mediaFile: null },
+      questions: [JSON.parse(JSON.stringify(initialQuestion))],
+    });
+  } catch (err) {
+    console.error(err);
+    setStatusMessage("❌ Lỗi khi tạo nhóm câu hỏi!");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="test-creation-form container mt-4">

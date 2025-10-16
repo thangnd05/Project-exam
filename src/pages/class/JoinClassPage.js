@@ -4,15 +4,25 @@ import { Button, Form, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import routes from "../../config/Routes";
 import "./JoinClassPage.scss";
+import { useAuth } from "../../hook/useAuth"; // nếu bạn có AuthContext
 
 function JoinClassPage() {
   const [classId, setClassId] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth(); // 🟢 kiểm tra user
 
   const handleJoin = async (e) => {
     e.preventDefault();
+
+    // 🧩 Nếu chưa login thì chuyển sang trang login
+    if (!user) {
+      setMessage("⚠️ Vui lòng đăng nhập trước khi tham gia lớp!");
+      setTimeout(() => navigate(routes.login), 1000);
+      return;
+    }
+
     if (!classId.trim()) {
       setMessage("⚠️ Vui lòng nhập mã lớp!");
       return;
@@ -34,7 +44,6 @@ function JoinClassPage() {
     }
   };
 
-  // 🟢 Điều hướng tới trang Lớp của tôi
   const handleGoToMyClasses = () => {
     navigate(routes.myClasses);
   };
@@ -61,7 +70,6 @@ function JoinClassPage() {
             {loading ? "Đang gửi..." : "➕ Tham gia lớp"}
           </Button>
 
-          {/* 🟢 Nút Lớp của tôi */}
           <Button
             variant="success"
             type="button"

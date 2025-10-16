@@ -1,4 +1,5 @@
 const routes = {
+
   home: "/",
   about: "/about",
   policy: "/policy",
@@ -12,6 +13,12 @@ const routes = {
   createQuestion: "/admin/create-question",
   testHistory: "/tests/history/:testId",
   examTypeDetail: "/exam-types/:examTypeId",
+
+
+  editTestPage:"/tests/edit/:testId",
+  editQuestion:"/questions/edit/:id",
+
+
 
   // 🏫 Class routes
   myClasses: "/my-classes",

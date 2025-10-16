@@ -11,6 +11,11 @@ import TestHistoryPage from '~/pages/history/TestHistoryPage';
 import CreateQuestionPage from '~/pages/question/CreateQuestionPage';
 import MyClassesPage from '~/pages/myclass/MyClassPage';
 import TestByClassPage from '~/pages/myclass/testclass/TestByClassPage';
+import EditTestPage from '~/pages/edit/EditTestPage';
+import Policy from '~/pages/policy/policy';
+import Service from '~/pages/policy/service';
+import About from '~/pages/intro';
+import QuestionUpdatePage from '~/pages/edit/QuestionUpdatePage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -18,6 +23,11 @@ export const publicRoutes = [
   { path: routes.register, component: Register },
   { path: routes.home, component: TestPage },
   { path: routes.examTypeDetail, component: TestByExamTypePage },
+  { path:routes.policy,component:Policy},
+  { path:routes.service,component:Service},
+  { path:routes.about,component:About},
+
+
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập
@@ -31,6 +41,9 @@ export const privateRoutes = [
   { path: routes.testHistory, component: TestHistoryPage},
   { path: routes.myClasses, component: MyClassesPage},
   { path: routes.testClasses, component: TestByClassPage},
+  { path: routes.editTestPage, component: EditTestPage},
+  { path: routes.editQuestion, component: QuestionUpdatePage},
+
 
 
 
