@@ -19,6 +19,8 @@ const routes = {
   editQuestion:"/questions/edit/:id",
 
 
+  myAlbums :"/my-albums",
+  albumDelta:"/albums/:albumId",
 
   // 🏫 Class routes
   myClasses: "/my-classes",

@@ -54,6 +54,9 @@ function Header() {
             <Nav className={cx("mx-5")}>            
               <Nav.Link as={Link} to={routes.about} className={cx("home")}>Giới thiệu</Nav.Link>
             </Nav>
+            <Nav className={cx("mx-5")}>            
+              <Nav.Link as={Link} to={routes.myAlbums} className={cx("home")}>Từ vựng</Nav.Link>
+            </Nav>
             <Nav>
               {/* <Search /> */}
             </Nav>

@@ -16,6 +16,8 @@ import Policy from '~/pages/policy/policy';
 import Service from '~/pages/policy/service';
 import About from '~/pages/intro';
 import QuestionUpdatePage from '~/pages/edit/QuestionUpdatePage';
+import MyAlbumsPage from '~/pages/album-voca/MyAlbumPage';
+import AlbumDetailPage from '~/pages/album-delta/AlbumDeltaPage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -43,6 +45,10 @@ export const privateRoutes = [
   { path: routes.testClasses, component: TestByClassPage},
   { path: routes.editTestPage, component: EditTestPage},
   { path: routes.editQuestion, component: QuestionUpdatePage},
+  { path: routes.myAlbums, component: MyAlbumsPage},
+  { path: routes.albumDelta, component: AlbumDetailPage},
+
+
 
 
 
