@@ -21,6 +21,7 @@ const routes = {
 
   myAlbums :"/my-albums",
   albumDelta:"/albums/:albumId",
+  vocaPratice:"/practice/:albumId",
 
   // 🏫 Class routes
   myClasses: "/my-classes",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, Container, Row, Col, Spinner, Alert } from "react-bootstrap";
+import { Card, Container, Row, Col, Spinner, Alert, Button, Modal, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "./MyAlbumsPage.scss";
 
@@ -8,6 +8,8 @@ const MyAlbumsPage = () => {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [newAlbum, setNewAlbum] = useState({ name: "", description: "", coverUrl: "" });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +27,19 @@ const MyAlbumsPage = () => {
     fetchAlbums();
   }, []);
 
+  const handleCreateAlbum = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("/api/vocabulary-albums", newAlbum);
+      setAlbums((prev) => [...prev, res.data]);
+      setShowModal(false);
+      setNewAlbum({ name: "", description: "", coverUrl: "" });
+    } catch (err) {
+      alert("❌ Không thể tạo album mới!");
+      console.error(err);
+    }
+  };
+
   if (loading)
     return (
       <div className="text-center mt-5">
@@ -36,7 +51,13 @@ const MyAlbumsPage = () => {
 
   return (
     <Container className="my-5">
-      <h2 className="mb-4 fw-bold text-primary">📚 Album từ vựng của tôi</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="fw-bold text-primary mb-0">📚 Album từ vựng của tôi</h2>
+        <Button variant="success" onClick={() => setShowModal(true)}>
+          ➕ Tạo album mới
+        </Button>
+      </div>
+
       {albums.length === 0 ? (
         <Alert variant="info">Chưa có album nào được tạo.</Alert>
       ) : (
@@ -63,6 +84,43 @@ const MyAlbumsPage = () => {
           ))}
         </Row>
       )}
+
+      {/* 🧱 Modal tạo album */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Form onSubmit={handleCreateAlbum}>
+          <Modal.Header closeButton>
+            <Modal.Title>Tạo album mới</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group className="mb-3">
+              <Form.Label>Tên album</Form.Label>
+              <Form.Control
+                type="text"
+                value={newAlbum.name}
+                onChange={(e) => setNewAlbum({ ...newAlbum, name: e.target.value })}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Mô tả</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={newAlbum.description}
+                onChange={(e) => setNewAlbum({ ...newAlbum, description: e.target.value })}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
+              Huỷ
+            </Button>
+            <Button type="submit" variant="primary">
+              Tạo
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </Container>
   );
 };

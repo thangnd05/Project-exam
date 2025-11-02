@@ -18,6 +18,7 @@ import About from '~/pages/intro';
 import QuestionUpdatePage from '~/pages/edit/QuestionUpdatePage';
 import MyAlbumsPage from '~/pages/album-voca/MyAlbumPage';
 import AlbumDetailPage from '~/pages/album-delta/AlbumDeltaPage';
+import PracticePage from '~/pages/album-pratice/PracticePage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -47,6 +48,8 @@ export const privateRoutes = [
   { path: routes.editQuestion, component: QuestionUpdatePage},
   { path: routes.myAlbums, component: MyAlbumsPage},
   { path: routes.albumDelta, component: AlbumDetailPage},
+    { path: routes.vocaPratice, component: PracticePage},
+
 
 
 

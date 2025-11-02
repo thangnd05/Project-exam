@@ -9,6 +9,7 @@ import {
   Button,
   Modal,
   Form,
+  Card,
 } from "react-bootstrap";
 import "./AlbumDetailPage.scss";
 
@@ -18,6 +19,9 @@ const AlbumDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [flashMode, setFlashMode] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
   const [newVocab, setNewVocab] = useState({
     word: "",
     meaning: "",
@@ -25,7 +29,6 @@ const AlbumDetailPage = () => {
   });
   const navigate = useNavigate();
 
-  // 🟢 Lấy danh sách từ
   const fetchVocabularies = async () => {
     try {
       const res = await axios.get(`/api/vocabularies/album/${albumId}`, {
@@ -44,13 +47,11 @@ const AlbumDetailPage = () => {
     if (albumId) fetchVocabularies();
   }, [albumId]);
 
-  // 🟢 Nhập liệu form
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewVocab({ ...newVocab, [name]: value });
   };
 
-  // 🟢 Gửi dữ liệu tạo từ mới
   const handleSave = async () => {
     if (!newVocab.word.trim() || !newVocab.meaning.trim()) {
       alert("Vui lòng nhập đầy đủ Từ và Nghĩa!");
@@ -58,25 +59,28 @@ const AlbumDetailPage = () => {
     }
 
     try {
-      const res = await axios.post(
+      await axios.post(
         "/api/vocabularies",
-        {
-          albumId: albumId,
-          word: newVocab.word,
-          meaning: newVocab.meaning,
-          example: newVocab.example,
-          // ✅ Không cần gửi phonetic/voiceUrl, BE tự sinh
-        },
+        { albumId, ...newVocab },
         { withCredentials: true }
       );
-
-      alert(`✅ Đã thêm từ '${res.data.word}' thành công!`);
+      alert(`✅ Đã thêm từ '${newVocab.word}' thành công!`);
       setShowModal(false);
       setNewVocab({ word: "", meaning: "", example: "" });
       fetchVocabularies();
     } catch (err) {
       console.error("❌ Lỗi khi thêm từ:", err);
       alert("Không thể thêm từ mới 😢");
+    }
+  };
+
+  const handleDelete = async (vocabId, word) => {
+    if (!window.confirm(`Bạn có chắc muốn xóa từ "${word}"?`)) return;
+    try {
+      await axios.delete(`/api/vocabularies/${vocabId}`, { withCredentials: true });
+      setVocabularies((prev) => prev.filter((v) => v.vocabId !== vocabId));
+    } catch {
+      alert("Không thể xóa từ này 😢");
     }
   };
 
@@ -89,25 +93,113 @@ const AlbumDetailPage = () => {
 
   if (errorMsg) return <Alert variant="danger">{errorMsg}</Alert>;
 
+  // 🧠 Flashcard hiện tại
+  const currentVocab = vocabularies[currentIndex];
+
   return (
     <Container className="my-5">
-      {/* Header buttons */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <Button variant="secondary" onClick={() => navigate(-1)}>
-          ← Quay lại
+    <Button variant="secondary" onClick={() => navigate(-1)}>
+        ← Quay lại
+    </Button>
+
+    <div className="d-flex gap-2">
+        <Button
+        variant="info"
+        onClick={() => navigate(`/practice/${albumId}`)}
+        disabled={vocabularies.length === 0}
+        >
+        🧩 Luyện tập
         </Button>
+
+        <Button
+        variant="outline-primary"
+        onClick={() => setFlashMode(!flashMode)}
+        disabled={vocabularies.length === 0}
+        >
+        🃏 {flashMode ? "Thoát Flashcard" : "Học bằng Flashcard"}
+        </Button>
+
         <Button variant="success" onClick={() => setShowModal(true)}>
-          ➕ Thêm từ mới
+        ➕ Thêm từ mới
         </Button>
-      </div>
+    </div>
+    </div>
 
-      <h2 className="fw-bold text-primary mb-4">📖 Danh sách từ vựng</h2>
 
-      {vocabularies.length === 0 ? (
-        <Alert variant="info">Album này chưa có từ vựng nào.</Alert>
-      ) : (
+      <h2 className="fw-bold text-primary mb-4">
+        {flashMode ? "🎯 Học bằng Flashcard" : "📖 Danh sách từ vựng"}
+      </h2>
+
+        {/* 🧩 Flashcard View */}
+        {flashMode ? (
+        <div className="text-center">
+            <div
+            className="flashcard-container mx-auto"
+            style={{ width: "350px", height: "230px", perspective: "1000px" }}
+            onClick={() => setFlipped(!flipped)}
+            >
+            <div className={`flashcard-inner ${flipped ? "flipped" : ""}`}>
+                {/* Mặt trước */}
+                <div className="flashcard-front d-flex flex-column justify-content-center align-items-center p-4">
+                <h3 className="fw-bold text-primary text-capitalize">
+                    {currentVocab.word}
+                </h3>
+                <p className="text-muted">{currentVocab.phonetic || "..."}</p>
+
+                {/* ✅ Dùng key để buộc React reload audio */}
+                <audio
+                    key={currentVocab.word}
+                    controls
+                    preload="none"
+                    className="mt-2"
+                >
+                    <source
+                    src={`http://localhost:8080/api/tts?text=${encodeURIComponent(
+                        currentVocab.word
+                    )}`}
+                    type="audio/mpeg"
+                    />
+                </audio>
+                </div>
+
+                {/* Mặt sau */}
+                <div className="flashcard-back d-flex flex-column justify-content-center align-items-center p-4">
+                <h5 className="text-dark">{currentVocab.meaning}</h5>
+                <p className="fst-italic mt-2 text-secondary">
+                    {currentVocab.example}
+                </p>
+                </div>
+            </div>
+            </div>
+
+            <div className="mt-4 d-flex justify-content-center gap-3">
+            <Button
+                variant="outline-secondary"
+                disabled={currentIndex === 0}
+                onClick={() => {
+                setFlipped(false);
+                setCurrentIndex((prev) => prev - 1);
+                }}
+            >
+                ⬅️ Trước
+            </Button>
+            <Button
+                variant="outline-secondary"
+                disabled={currentIndex === vocabularies.length - 1}
+                onClick={() => {
+                setFlipped(false);
+                setCurrentIndex((prev) => prev + 1);
+                }}
+            >
+                Tiếp ➡️
+            </Button>
+            </div>
+        </div>
+        ) : (
+        // 🧾 Danh sách bảng
         <Table striped bordered hover responsive className="shadow-sm">
-          <thead className="table-primary">
+          <thead className="table-primary text-center">
             <tr>
               <th>#</th>
               <th>Từ vựng</th>
@@ -115,32 +207,35 @@ const AlbumDetailPage = () => {
               <th>Nghĩa</th>
               <th>Ví dụ</th>
               <th>Phát âm</th>
+              <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
             {vocabularies.map((vocab, index) => (
               <tr key={vocab.vocabId}>
                 <td>{index + 1}</td>
-                <td className="fw-semibold text-capitalize">{vocab.word}</td>
-                <td>{vocab.phonetic || "..."}</td>
+                <td>{vocab.word}</td>
+                <td>{vocab.phonetic}</td>
                 <td>{vocab.meaning}</td>
                 <td>{vocab.example}</td>
                 <td>
-                  {vocab.word ? (
-                    <audio controls preload="none">
-                      <source
-                        src={`http://localhost:8080/api/tts?text=${encodeURIComponent(
-                          vocab.word
-                        )}`}
-                        type="audio/mpeg"
-                      />
-                      Trình duyệt không hỗ trợ phát âm thanh.
-                    </audio>
-                  ) : (
-                    <span className="text-muted fst-italic">
-                      Chưa có file
-                    </span>
-                  )}
+                  <audio controls preload="none">
+                    <source
+                      src={`http://localhost:8080/api/tts?text=${encodeURIComponent(
+                        vocab.word
+                      )}`}
+                      type="audio/mpeg"
+                    />
+                  </audio>
+                </td>
+                <td className="text-center">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDelete(vocab.vocabId, vocab.word)}
+                  >
+                    🗑️ Xóa
+                  </Button>
                 </td>
               </tr>
             ))}
