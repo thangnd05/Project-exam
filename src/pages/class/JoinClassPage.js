@@ -68,11 +68,11 @@ function JoinClassPage() {
 
         <div className="btn-group mt-3 d-flex justify-content-between">
           <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? 'Đang gửi...' : '➕ Tham gia lớp'}
+            {loading ? 'Đang gửi...' : ' Tham gia lớp'}
           </Button>
 
-          <Button variant="success" type="button" onClick={handleGoToMyClasses}>
-            🎓 Lớp của tôi
+          <Button className="btn-bright-green" onClick={handleGoToMyClasses}>
+            Vào lớp của tôi
           </Button>
         </div>
       </Form>

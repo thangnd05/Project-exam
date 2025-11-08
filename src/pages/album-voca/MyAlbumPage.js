@@ -1,20 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import {
-  Card,
-  Container,
-  Row,
-  Col,
-  Spinner,
-  Alert,
-  Button,
-  Modal,
-  Form,
-} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
+import {Modal, Form, Spinner, Button} from 'react-bootstrap';
+import classNames from 'classnames/bind';
+import style from '../exam/examtype/examtypeById/TestByExamTypePage.module.scss';
 import './MyAlbumsPage.scss';
 
-const MyAlbumsPage = () => {
+const cx = classNames.bind(style);
+
+function MyAlbumsPage() {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -26,11 +20,12 @@ const MyAlbumsPage = () => {
   });
   const navigate = useNavigate();
 
+  // 🟢 Lấy danh sách album
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
         const res = await axios.get('/api/vocabulary-albums/my-albums');
-        setAlbums(res.data);
+        setAlbums(res.data || []);
       } catch (err) {
         console.error(err);
         setErrorMsg('Không thể tải danh sách album 😢');
@@ -41,6 +36,7 @@ const MyAlbumsPage = () => {
     fetchAlbums();
   }, []);
 
+  // 🟢 Tạo album mới
   const handleCreateAlbum = async (e) => {
     e.preventDefault();
     try {
@@ -57,51 +53,62 @@ const MyAlbumsPage = () => {
   if (loading)
     return (
       <div className="text-center mt-5">
-        <Spinner animation="border" /> <p>Đang tải...</p>
+        <Spinner animation="border" variant="primary" />
+        <p>Đang tải...</p>
       </div>
     );
 
-  if (errorMsg) return <Alert variant="danger">{errorMsg}</Alert>;
+  if (errorMsg)
+    return (
+      <div className={cx('error-box')}>
+        <p>{errorMsg}</p>
+      </div>
+    );
 
   return (
-    <Container className="my-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold text-primary mb-0">📚 Album từ vựng của tôi</h2>
-        <Button variant="success" onClick={() => setShowModal(true)}>
+    <div className={cx('container')}>
+      {/* === Thanh tiêu đề === */}
+      <div className={cx('header-bar')}>
+        <h3 className={cx('page-title')}>📘 Album từ vựng của tôi</h3>
+        <button className={cx('btn-create')} onClick={() => setShowModal(true)}>
           ➕ Tạo album mới
-        </Button>
+        </button>
       </div>
 
-      {albums.length === 0 ? (
-        <Alert variant="info">Chưa có album nào được tạo.</Alert>
-      ) : (
-        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-          {albums.map((album) => (
-            <Col key={album.albumId}>
-              <Card
-                className="album-card shadow-sm h-100"
-                onClick={() => navigate(`/albums/${album.albumId}`)}
-              >
-                <Card.Img
-                  variant="top"
-                  src={
-                    album.coverUrl || 'https://placehold.co/300x200?text=Album'
-                  }
-                  alt={album.name}
-                />
-                <Card.Body>
-                  <Card.Title className="fw-semibold">{album.name}</Card.Title>
-                  <Card.Text className="text-muted">
-                    {album.description || 'Không có mô tả'}
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+      {/* === Nếu chưa có album === */}
+      {albums.length === 0 && (
+        <div className={cx('empty-box')}>
+          <p>📭 Chưa có album nào được tạo.</p>
+        </div>
       )}
 
-      {/* 🧱 Modal tạo album */}
+      {/* === Danh sách album === */}
+      {albums.length > 0 && (
+        <div className={cx('album-grid')}>
+          {albums.map((album) => (
+            <div
+              key={album.albumId}
+              className={cx('album-card')}
+              onClick={() => navigate(`/albums/${album.albumId}`)}
+            >
+              <img
+                src={
+                  album.coverUrl ||
+                  'https://placehold.co/300x200/def/fff?text=Album'
+                }
+                alt={album.name}
+                className={cx('album-cover')}
+              />
+              <div className={cx('album-body')}>
+                <h5>{album.name}</h5>
+                <p>{album.description || 'Không có mô tả'}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* === Modal tạo album === */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Form onSubmit={handleCreateAlbum}>
           <Modal.Header closeButton>
@@ -141,8 +148,8 @@ const MyAlbumsPage = () => {
           </Modal.Footer>
         </Form>
       </Modal>
-    </Container>
+    </div>
   );
-};
+}
 
 export default MyAlbumsPage;

@@ -63,8 +63,6 @@ const MyClassesPage = () => {
     <Container className="my-classes-page mt-4">
       <h2 className="page-title text-center mb-4">🎓 Lớp học của tôi</h2>
 
-      {message && <Alert variant="info">{message}</Alert>}
-
       {/* 👨‍🏫 Lớp tôi dạy */}
       {teachingClasses.length > 0 && (
         <>
@@ -149,7 +147,7 @@ const MyClassesPage = () => {
 
       {/* Nếu không có lớp nào */}
       {teachingClasses.length === 0 && learningClasses.length === 0 && (
-        <Alert variant="secondary" className="text-center mt-4">
+        <Alert variant="info" className="text-center mt-4">
           Bạn chưa có lớp học nào.
         </Alert>
       )}

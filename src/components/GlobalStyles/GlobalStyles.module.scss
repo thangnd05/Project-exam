@@ -190,3 +190,15 @@ li {
     opacity: 0.7;
   }
 }
+
+.btn-bright-green {
+  background-color: #22bd70ff !important;
+  border-color: #22bd70ff !important;
+  color: white !important;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: var(--font-size-sm) !important;
+  &:hover {
+    background-color: #3ca769 !important;
+    border-color: #28b463 !important;
+  }
+}

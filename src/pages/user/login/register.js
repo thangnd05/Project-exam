@@ -46,7 +46,7 @@ function Register() {
       );
       setMessageType('success');
 
-      setTimeout(() => navigate(routes.login), 1500);
+      alert('📧 Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
     } catch (err) {
       setLoading(false);
 
