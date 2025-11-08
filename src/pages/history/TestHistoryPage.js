@@ -1,15 +1,15 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import classNames from "classnames/bind";
-import style from "./TestHistory.module.scss";
-import { useAuth } from "~/hook/useAuth";
+import axios from 'axios';
+import {useEffect, useState} from 'react';
+import {useParams, useNavigate} from 'react-router-dom';
+import classNames from 'classnames/bind';
+import style from './TestHistory.module.scss';
+import {useAuth} from '~/hook/useAuth';
 
 const cx = classNames.bind(style);
 
 function TestHistoryPage() {
-  const { testId } = useParams();
-  const { userId } = useAuth();
+  const {testId} = useParams();
+  const {userId} = useAuth();
   const navigate = useNavigate();
 
   const [attempts, setAttempts] = useState([]);
@@ -30,7 +30,7 @@ function TestHistoryPage() {
         setAttempts(attemptRes.data);
         setTestInfo(testRes.data);
       } catch (err) {
-        console.error("❌ Lỗi khi tải dữ liệu lịch sử:", err);
+        console.error('❌ Lỗi khi tải dữ liệu lịch sử:', err);
       } finally {
         setLoading(false);
       }
@@ -41,14 +41,14 @@ function TestHistoryPage() {
 
   // 🕓 Format thời gian hiển thị
   const formatDateTime = (dateStr) => {
-    if (!dateStr) return "-";
-    return new Date(dateStr).toLocaleString("vi-VN", {
+    if (!dateStr) return '-';
+    return new Date(dateStr).toLocaleString('vi-VN', {
       hour12: false,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -58,13 +58,13 @@ function TestHistoryPage() {
   };
 
   return (
-    <div className={cx("container")}>
-      <div className={cx("header")}>
-        <button className={cx("btn-back")} onClick={() => navigate(-1)}>
+    <div className={cx('container')}>
+      <div className={cx('header')}>
+        <button className={cx('btn-back')} onClick={() => navigate(-1)}>
           ← Quay lại
         </button>
         <h3>
-          📊 Lịch sử làm bài -{" "}
+          📊 Lịch sử làm bài -{' '}
           {testInfo ? testInfo.title : `Bài thi #${testId}`}
         </h3>
       </div>
@@ -74,7 +74,7 @@ function TestHistoryPage() {
       ) : attempts.length === 0 ? (
         <p>Chưa có lượt làm nào cho bài thi này.</p>
       ) : (
-        <table className={cx("history-table")}>
+        <table className={cx('history-table')}>
           <thead>
             <tr>
               <th>Lần</th>
@@ -91,18 +91,18 @@ function TestHistoryPage() {
                 <td>{i + 1}</td>
                 <td>{formatDateTime(a.startedAt)}</td>
                 <td>{formatDateTime(a.finishedAt)}</td>
-                <td>{a.totalScore ?? "Chưa có"}</td>
+                <td>{a.totalScore ?? 'Chưa có'}</td>
                 <td>
-                  {a.status === "COMPLETED"
-                    ? "✅ Hoàn thành"
-                    : a.status === "IN_PROGRESS"
-                    ? "⏳ Đang làm"
-                    : "❌ Hết hạn"}
+                  {a.status === 'COMPLETED'
+                    ? '✅ Hoàn thành'
+                    : a.status === 'IN_PROGRESS'
+                    ? '⏳ Đang làm'
+                    : '❌ Hết hạn'}
                 </td>
                 <td>
-                  {a.status === "COMPLETED" && (
+                  {a.status === 'COMPLETED' && (
                     <button
-                      className={cx("btn-view")}
+                      className={cx('btn-view')}
                       onClick={() => handleViewResult(a.userTestId)}
                     >
                       👁 Xem kết quả

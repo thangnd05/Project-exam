@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
+import React, {useEffect, useState} from 'react';
+import {useParams} from 'react-router-dom';
+import axios from 'axios';
 import {
   Container,
   Card,
@@ -10,25 +10,27 @@ import {
   Form,
   Toast,
   ToastContainer,
-} from "react-bootstrap";
+} from 'react-bootstrap';
 
 const PracticePage = () => {
-  const { albumId } = useParams();
+  const {albumId} = useParams();
   const [question, setQuestion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [userAnswer, setUserAnswer] = useState({ english: "", vietnamese: "" });
+  const [userAnswer, setUserAnswer] = useState({english: '', vietnamese: ''});
   const [result, setResult] = useState(null);
   const [finished, setFinished] = useState(false);
   const [loadingNext, setLoadingNext] = useState(false);
   const [markingKnown, setMarkingKnown] = useState(false);
-  const [knownMessage, setKnownMessage] = useState("");
+  const [knownMessage, setKnownMessage] = useState('');
 
   // 🟢 Lấy câu hỏi ngẫu nhiên
   const fetchQuestion = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`/api/practice-questions/generate/${albumId}`);
+      const res = await axios.get(
+        `/api/practice-questions/generate/${albumId}`,
+      );
       if (res.status === 204 || !res.data) {
         setFinished(true);
         setQuestion(null);
@@ -36,12 +38,12 @@ const PracticePage = () => {
         setQuestion(res.data);
       }
     } catch (err) {
-      console.error("❌ Lỗi lấy câu hỏi:", err);
+      console.error('❌ Lỗi lấy câu hỏi:', err);
     } finally {
       setLoading(false);
       setResult(null);
       setSelectedOption(null);
-      setUserAnswer({ english: "", vietnamese: "" });
+      setUserAnswer({english: '', vietnamese: ''});
     }
   };
 
@@ -54,7 +56,7 @@ const PracticePage = () => {
     if (!question) return;
 
     const payload =
-      question.type === "MULTICHOICE"
+      question.type === 'MULTICHOICE'
         ? {
             vocabId: question.vocabId,
             type: question.type,
@@ -68,10 +70,10 @@ const PracticePage = () => {
           };
 
     try {
-      const res = await axios.post("/api/practice-questions/check", payload);
+      const res = await axios.post('/api/practice-questions/check', payload);
       setResult(res.data);
     } catch (err) {
-      console.error("❌ Lỗi khi chấm:", err);
+      console.error('❌ Lỗi khi chấm:', err);
     }
   };
 
@@ -90,17 +92,17 @@ const PracticePage = () => {
       await axios.post(
         `/api/practice-questions/mark-known/${question.vocabId}`,
         {},
-        { withCredentials: true }
+        {withCredentials: true},
       );
 
-      setKnownMessage("🎉 Bạn đã đánh dấu từ này là đã biết thành công!");
-      setTimeout(() => setKnownMessage(""), 2000);
+      setKnownMessage('🎉 Bạn đã đánh dấu từ này là đã biết thành công!');
+      setTimeout(() => setKnownMessage(''), 2000);
       setTimeout(async () => {
         await fetchQuestion();
       }, 1500);
     } catch (err) {
-      console.error("❌ Lỗi khi đánh dấu đã biết:", err);
-      setKnownMessage("⚠️ Có lỗi xảy ra khi đánh dấu từ này!");
+      console.error('❌ Lỗi khi đánh dấu đã biết:', err);
+      setKnownMessage('⚠️ Có lỗi xảy ra khi đánh dấu từ này!');
     } finally {
       setMarkingKnown(false);
     }
@@ -142,10 +144,10 @@ const PracticePage = () => {
       <ToastContainer position="top-center" className="p-3">
         <Toast
           show={!!knownMessage}
-          onClose={() => setKnownMessage("")}
+          onClose={() => setKnownMessage('')}
           delay={2000}
           autohide
-          bg={knownMessage.includes("lỗi") ? "danger" : "success"}
+          bg={knownMessage.includes('lỗi') ? 'danger' : 'success'}
         >
           <Toast.Body className="text-white fw-semibold text-center">
             {knownMessage}
@@ -160,16 +162,14 @@ const PracticePage = () => {
         <audio key={question.vocabId} controls preload="none" className="mb-3">
           <source
             src={`http://localhost:8080/api/tts?text=${encodeURIComponent(
-              question.word || ""
+              question.word || '',
             )}`}
             type="audio/mpeg"
           />
         </audio>
 
-
-
         {/* 🧠 MULTICHOICE */}
-        {question.type === "MULTICHOICE" ? (
+        {question.type === 'MULTICHOICE' ? (
           <>
             {question.options?.map((opt, idx) => (
               <Form.Check
@@ -191,7 +191,7 @@ const PracticePage = () => {
               <Form.Control
                 value={userAnswer.english}
                 onChange={(e) =>
-                  setUserAnswer({ ...userAnswer, english: e.target.value })
+                  setUserAnswer({...userAnswer, english: e.target.value})
                 }
               />
             </Form.Group>
@@ -200,7 +200,7 @@ const PracticePage = () => {
               <Form.Control
                 value={userAnswer.vietnamese}
                 onChange={(e) =>
-                  setUserAnswer({ ...userAnswer, vietnamese: e.target.value })
+                  setUserAnswer({...userAnswer, vietnamese: e.target.value})
                 }
               />
             </Form.Group>
@@ -210,20 +210,21 @@ const PracticePage = () => {
         {/* 🧩 Kết quả */}
         {result ? (
           <Alert
-            variant={result.correct ? "success" : "danger"}
+            variant={result.correct ? 'success' : 'danger'}
             className="mt-4"
           >
-            {result.correct ? "✅ Chính xác!" : "❌ Sai rồi!"}
-            <br /> Trạng thái học: <b>{result.status}</b> <br /> 
+            {result.correct ? '✅ Chính xác!' : '❌ Sai rồi!'}
+            <br /> Trạng thái học: <b>{result.status}</b> <br />
             Số lần đúng liên tiếp: <b>{result.correctCount}</b>
-
             {/* 🟡 Nếu sai, hiển thị thêm đáp án đúng */}
             {!result.correct && (
               <div className="mt-2">
                 <hr />
                 <b>Đáp án đúng:</b> <br />
-                Từ tiếng Anh: <span className="text-primary">{question.word}</span> <br />
-                🇻🇳 Nghĩa: <span className="text-success">{question.meaning}</span>
+                Từ tiếng Anh:{' '}
+                <span className="text-primary">{question.word}</span> <br />
+                🇻🇳 Nghĩa:{' '}
+                <span className="text-success">{question.meaning}</span>
               </div>
             )}
           </Alert>
@@ -232,7 +233,7 @@ const PracticePage = () => {
             className="mt-4"
             onClick={handleSubmit}
             disabled={
-              question.type === "MULTICHOICE" && selectedOption === null
+              question.type === 'MULTICHOICE' && selectedOption === null
             }
           >
             Gửi câu trả lời
@@ -247,7 +248,7 @@ const PracticePage = () => {
             onClick={handleNext}
             disabled={loadingNext}
           >
-            {loadingNext ? "Đang tải..." : "Câu tiếp ➡️"}
+            {loadingNext ? 'Đang tải...' : 'Câu tiếp ➡️'}
           </Button>
         )}
 
@@ -258,7 +259,7 @@ const PracticePage = () => {
           onClick={handleMarkKnown}
           disabled={markingKnown}
         >
-          {markingKnown ? "Đang đánh dấu..." : "✅ Đã biết từ này"}
+          {markingKnown ? 'Đang đánh dấu...' : '✅ Đã biết từ này'}
         </Button>
       </Card>
     </Container>

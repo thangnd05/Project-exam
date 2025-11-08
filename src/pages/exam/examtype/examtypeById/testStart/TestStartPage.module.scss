@@ -1,72 +1,56 @@
 .container {
-    padding: 2rem;
+  padding: 2rem;
 }
 
 .title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 .time-left {
-    font-size: 1.2rem;
-    color: red;
-    font-weight: bold;
-    margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: red;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 .attempts {
-    margin-bottom: 1rem;
-    font-weight: bold;
+  margin-bottom: 1rem;
+  font-weight: bold;
 }
 
 .part {
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 .question {
-    margin-bottom: 1rem;
-    padding: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .passage {
-    margin-left: 1rem;
-    padding: 0.5rem;
-    border-left: 3px solid #eee;
-    font-style: italic;
-    white-space: pre-wrap;
+  margin-left: 1rem;
+  padding: 0.5rem;
+  border-left: 3px solid #eee;
+  font-style: italic;
+  white-space: pre-wrap;
 }
 
 .answers {
-    padding-left: 20px;
-    list-style: none;
-}
-
-.submit-btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1.1rem;
-    font-weight: bold;
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-
-    &:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-    }
+  padding-left: 20px;
+  list-style: none;
 }
 
 .no-attempts-container {
-    padding: 2rem;
-    text-align: center;
+  padding: 2rem;
+  text-align: center;
 }
 
 .no-attempts-text {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: red;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: red;
 }

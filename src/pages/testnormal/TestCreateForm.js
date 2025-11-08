@@ -1,40 +1,40 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import "./TestCreationForm.scss";
+import React, {useState, useEffect} from 'react';
+import axios from 'axios';
+import './TestCreationForm.scss';
 
-const TestCreationForm = ({ user }) => {
+const TestCreationForm = ({user}) => {
   const initialQuestion = {
-    questionType: "MCQ",
-    questionText: "",
+    questionType: 'MCQ',
+    questionText: '',
     options: [
-      { label: "A", content: "", isCorrect: false },
-      { label: "B", content: "", isCorrect: false },
-      { label: "C", content: "", isCorrect: false },
-      { label: "D", content: "", isCorrect: false },
+      {label: 'A', content: '', isCorrect: false},
+      {label: 'B', content: '', isCorrect: false},
+      {label: 'C', content: '', isCorrect: false},
+      {label: 'D', content: '', isCorrect: false},
     ],
   };
 
   const [testData, setTestData] = useState({
-    examTypeId: "",
-    title: "",
-    description: "",
-    durationMinutes: "",
-    availableFrom: "",
-    availableTo: "",
+    examTypeId: '',
+    title: '',
+    description: '',
+    durationMinutes: '',
+    availableFrom: '',
+    availableTo: '',
     maxAttempts: 1,
     parts: [],
-    classId: "", // 🟢 thêm classId
+    classId: '', // 🟢 thêm classId
   });
 
   const [classes, setClasses] = useState([]); // 🟢 danh sách lớp học
   const [bannerFile, setBannerFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState('');
 
   // 🟢 Lấy danh sách lớp học của giáo viên
   useEffect(() => {
     axios
-      .get("/api/classes/my")
+      .get('/api/classes/my')
       .then((res) => {
         if (Array.isArray(res.data)) {
           setClasses(res.data);
@@ -42,7 +42,7 @@ const TestCreationForm = ({ user }) => {
           setClasses(res.data.classes);
         }
       })
-      .catch((err) => console.error("❌ Lỗi khi tải danh sách lớp:", err));
+      .catch((err) => console.error('❌ Lỗi khi tải danh sách lớp:', err));
   }, []);
 
   // 🟢 Khi người dùng chọn loại bài thi, tự fetch danh sách exam_part từ backend
@@ -51,28 +51,28 @@ const TestCreationForm = ({ user }) => {
       if (!testData.examTypeId) return;
       try {
         const res = await axios.get(
-          `/api/exam-parts/by-exam-type/${testData.examTypeId}`
+          `/api/exam-parts/by-exam-type/${testData.examTypeId}`,
         );
         const parts = res.data.map((p) => ({
           examPartId: p.examPartId,
           passage: {
             passageType:
               p.skillId === 1
-                ? "LISTENING"
+                ? 'LISTENING'
                 : p.skillId === 2
-                ? "READING"
+                ? 'READING'
                 : p.skillId === 3
-                ? "SPEAKING"
-                : "WRITING",
-            content: "",
+                ? 'SPEAKING'
+                : 'WRITING',
+            content: '',
             mediaFile: null,
           },
           questions: [JSON.parse(JSON.stringify(initialQuestion))],
         }));
-        setTestData((prev) => ({ ...prev, parts }));
+        setTestData((prev) => ({...prev, parts}));
       } catch (err) {
-        console.error("❌ Lỗi khi tải danh sách exam_part:", err);
-        setStatusMessage("❌ Không tải được danh sách phần thi!");
+        console.error('❌ Lỗi khi tải danh sách exam_part:', err);
+        setStatusMessage('❌ Không tải được danh sách phần thi!');
       }
     };
 
@@ -84,10 +84,10 @@ const TestCreationForm = ({ user }) => {
     setTestData((prev) => {
       const newPart = {
         examPartId: prev.parts.length + 1000, // ID tạm
-        passage: { passageType: "READING", content: "", mediaFile: null },
+        passage: {passageType: 'READING', content: '', mediaFile: null},
         questions: [JSON.parse(JSON.stringify(initialQuestion))],
       };
-      return { ...prev, parts: [...prev.parts, newPart] };
+      return {...prev, parts: [...prev.parts, newPart]};
     });
   };
 
@@ -101,18 +101,18 @@ const TestCreationForm = ({ user }) => {
   // 🟢 Xử lý nội dung passage
   const handlePartChange = (index, field, value) => {
     const updatedParts = [...testData.parts];
-    if (field === "passageType") {
+    if (field === 'passageType') {
       updatedParts[index].passage.passageType = value;
     } else {
       updatedParts[index][field] = value;
     }
-    setTestData({ ...testData, parts: updatedParts });
+    setTestData({...testData, parts: updatedParts});
   };
 
   const handlePassageChange = (partIndex, field, value) => {
     const updatedParts = [...testData.parts];
     updatedParts[partIndex].passage[field] = value;
-    setTestData({ ...testData, parts: updatedParts });
+    setTestData({...testData, parts: updatedParts});
   };
 
   // 🟢 Câu hỏi
@@ -120,45 +120,45 @@ const TestCreationForm = ({ user }) => {
     const newQuestion = JSON.parse(JSON.stringify(initialQuestion));
     const updatedParts = [...testData.parts];
     updatedParts[partIndex].questions.push(newQuestion);
-    setTestData({ ...testData, parts: updatedParts });
+    setTestData({...testData, parts: updatedParts});
   };
 
   const removeQuestion = (partIndex, qIndex) => {
     const updatedParts = [...testData.parts];
     updatedParts[partIndex].questions.splice(qIndex, 1);
-    setTestData({ ...testData, parts: updatedParts });
+    setTestData({...testData, parts: updatedParts});
   };
 
   const handleQuestionChange = (partIndex, qIndex, field, value) => {
     const updatedParts = [...testData.parts];
     updatedParts[partIndex].questions[qIndex][field] = value;
-    setTestData({ ...testData, parts: updatedParts });
+    setTestData({...testData, parts: updatedParts});
   };
 
   const handleOptionChange = (partIndex, qIndex, oIndex, field, value) => {
     const updatedParts = [...testData.parts];
     updatedParts[partIndex].questions[qIndex].options[oIndex][field] = value;
-    setTestData({ ...testData, parts: updatedParts });
+    setTestData({...testData, parts: updatedParts});
   };
 
   // 🟢 Audio passage
   const handleFileChange = (partIndex, file) => {
     const updatedParts = [...testData.parts];
     updatedParts[partIndex].passage.mediaFile = file;
-    setTestData({ ...testData, parts: updatedParts });
+    setTestData({...testData, parts: updatedParts});
   };
 
   const removeAudioFile = (partIndex) => {
     const updatedParts = [...testData.parts];
     updatedParts[partIndex].passage.mediaFile = null;
-    setTestData({ ...testData, parts: updatedParts });
+    setTestData({...testData, parts: updatedParts});
   };
 
   // 🟢 Gửi dữ liệu lên backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setStatusMessage("");
+    setStatusMessage('');
 
     const requestPayload = {
       examTypeId: testData.examTypeId,
@@ -188,23 +188,23 @@ const TestCreationForm = ({ user }) => {
     };
 
     const formData = new FormData();
-    formData.append("testData", JSON.stringify(requestPayload));
-    if (bannerFile) formData.append("bannerFile", bannerFile);
+    formData.append('testData', JSON.stringify(requestPayload));
+    if (bannerFile) formData.append('bannerFile', bannerFile);
 
     testData.parts.forEach((part) => {
-      if (part.passage.passageType === "LISTENING" && part.passage.mediaFile) {
-        formData.append("audioFiles", part.passage.mediaFile);
+      if (part.passage.passageType === 'LISTENING' && part.passage.mediaFile) {
+        formData.append('audioFiles', part.passage.mediaFile);
       }
     });
 
     try {
-      await axios.post("/api/tests/create-with-questions", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await axios.post('/api/tests/create-with-questions', formData, {
+        headers: {'Content-Type': 'multipart/form-data'},
       });
-      setStatusMessage("✅ Tạo bài kiểm tra thành công!");
+      setStatusMessage('✅ Tạo bài kiểm tra thành công!');
     } catch (err) {
       console.error(err);
-      setStatusMessage("❌ Lỗi khi tạo bài kiểm tra!");
+      setStatusMessage('❌ Lỗi khi tạo bài kiểm tra!');
     } finally {
       setIsSubmitting(false);
     }
@@ -220,7 +220,9 @@ const TestCreationForm = ({ user }) => {
           <select
             className="form-select"
             value={testData.classId}
-            onChange={(e) => setTestData({ ...testData, classId: e.target.value })}
+            onChange={(e) =>
+              setTestData({...testData, classId: e.target.value})
+            }
           >
             <option value="">-- Chọn lớp học --</option>
             {classes.map((cls) => (
@@ -237,7 +239,9 @@ const TestCreationForm = ({ user }) => {
           <select
             className="form-select"
             value={testData.examTypeId}
-            onChange={(e) => setTestData({ ...testData, examTypeId: e.target.value })}
+            onChange={(e) =>
+              setTestData({...testData, examTypeId: e.target.value})
+            }
           >
             <option value="">-- Chọn loại bài thi --</option>
             <option value="1">TOEIC</option>
@@ -252,7 +256,7 @@ const TestCreationForm = ({ user }) => {
             type="text"
             className="form-control"
             value={testData.title}
-            onChange={(e) => setTestData({ ...testData, title: e.target.value })}
+            onChange={(e) => setTestData({...testData, title: e.target.value})}
           />
         </div>
 
@@ -261,7 +265,9 @@ const TestCreationForm = ({ user }) => {
           <textarea
             className="form-control"
             value={testData.description}
-            onChange={(e) => setTestData({ ...testData, description: e.target.value })}
+            onChange={(e) =>
+              setTestData({...testData, description: e.target.value})
+            }
           ></textarea>
         </div>
 
@@ -273,7 +279,7 @@ const TestCreationForm = ({ user }) => {
               className="form-control"
               value={testData.durationMinutes}
               onChange={(e) =>
-                setTestData({ ...testData, durationMinutes: e.target.value })
+                setTestData({...testData, durationMinutes: e.target.value})
               }
             />
           </div>
@@ -284,7 +290,7 @@ const TestCreationForm = ({ user }) => {
               className="form-control"
               value={testData.maxAttempts}
               onChange={(e) =>
-                setTestData({ ...testData, maxAttempts: e.target.value })
+                setTestData({...testData, maxAttempts: e.target.value})
               }
             />
           </div>
@@ -298,7 +304,7 @@ const TestCreationForm = ({ user }) => {
               className="form-control"
               value={testData.availableFrom}
               onChange={(e) =>
-                setTestData({ ...testData, availableFrom: e.target.value })
+                setTestData({...testData, availableFrom: e.target.value})
               }
             />
           </div>
@@ -309,7 +315,7 @@ const TestCreationForm = ({ user }) => {
               className="form-control"
               value={testData.availableTo}
               onChange={(e) =>
-                setTestData({ ...testData, availableTo: e.target.value })
+                setTestData({...testData, availableTo: e.target.value})
               }
             />
           </div>
@@ -330,7 +336,7 @@ const TestCreationForm = ({ user }) => {
               <img
                 src={URL.createObjectURL(bannerFile)}
                 alt="Banner Preview"
-                style={{ maxWidth: "100%", borderRadius: "8px" }}
+                style={{maxWidth: '100%', borderRadius: '8px'}}
               />
               <div className="mt-2">
                 <button
@@ -365,7 +371,9 @@ const TestCreationForm = ({ user }) => {
             <select
               className="form-select"
               value={part.passage.passageType}
-              onChange={(e) => handlePartChange(partIndex, "passageType", e.target.value)}
+              onChange={(e) =>
+                handlePartChange(partIndex, 'passageType', e.target.value)
+              }
             >
               <option value="READING">Reading</option>
               <option value="LISTENING">Listening</option>
@@ -378,18 +386,20 @@ const TestCreationForm = ({ user }) => {
               className="form-control"
               value={part.passage.content}
               onChange={(e) =>
-                handlePassageChange(partIndex, "content", e.target.value)
+                handlePassageChange(partIndex, 'content', e.target.value)
               }
             ></textarea>
 
-            {part.passage.passageType === "LISTENING" && (
+            {part.passage.passageType === 'LISTENING' && (
               <div>
                 <label>Upload file audio</label>
                 <input
                   type="file"
                   accept="audio/*"
                   className="form-control"
-                  onChange={(e) => handleFileChange(partIndex, e.target.files[0])}
+                  onChange={(e) =>
+                    handleFileChange(partIndex, e.target.files[0])
+                  }
                 />
                 {part.passage.mediaFile && (
                   <div className="mt-2">
@@ -418,7 +428,12 @@ const TestCreationForm = ({ user }) => {
                   className="form-control mb-2"
                   value={q.questionText}
                   onChange={(e) =>
-                    handleQuestionChange(partIndex, qIndex, "questionText", e.target.value)
+                    handleQuestionChange(
+                      partIndex,
+                      qIndex,
+                      'questionText',
+                      e.target.value,
+                    )
                   }
                 />
                 {q.options.map((o, oIndex) => (
@@ -431,8 +446,8 @@ const TestCreationForm = ({ user }) => {
                           partIndex,
                           qIndex,
                           oIndex,
-                          "isCorrect",
-                          e.target.checked
+                          'isCorrect',
+                          e.target.checked,
                         )
                       }
                     />
@@ -447,8 +462,8 @@ const TestCreationForm = ({ user }) => {
                           partIndex,
                           qIndex,
                           oIndex,
-                          "content",
-                          e.target.value
+                          'content',
+                          e.target.value,
                         )
                       }
                     />
@@ -477,7 +492,11 @@ const TestCreationForm = ({ user }) => {
         ))}
 
         <div className="text-center mt-3">
-          <button type="button" className="btn btn-outline-success me-2" onClick={addPart}>
+          <button
+            type="button"
+            className="btn btn-outline-success me-2"
+            onClick={addPart}
+          >
             + Thêm phần
           </button>
         </div>
@@ -487,11 +506,13 @@ const TestCreationForm = ({ user }) => {
           className="btn btn-primary w-100 mt-3"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Đang gửi..." : "Tạo bài kiểm tra"}
+          {isSubmitting ? 'Đang gửi...' : 'Tạo bài kiểm tra'}
         </button>
 
         {statusMessage && (
-          <div className="alert alert-info text-center mt-3">{statusMessage}</div>
+          <div className="alert alert-info text-center mt-3">
+            {statusMessage}
+          </div>
         )}
       </form>
     </div>

@@ -1,10 +1,10 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import DefaultLayout from "./Layout/DefaultLayout";
-import routes from "./routes";
-import ProtectedRoute from "./routes/ProtectedRoute"; // ✅ Import ProtectedRoute
-import "bootstrap/dist/css/bootstrap.min.css";
-import { AuthProvider } from "~/context/AuthContext";
-import ScrollHandler from "./Layout/ScrollToTopOnRouteChange";
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import DefaultLayout from './Layout/DefaultLayout';
+import routes from './routes';
+import ProtectedRoute from './routes/ProtectedRoute'; // ✅ Import ProtectedRoute
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {AuthProvider} from '~/context/AuthContext';
+import ScrollHandler from './Layout/ScrollToTopOnRouteChange';
 
 function App() {
   return (

@@ -1,127 +1,192 @@
 @import 'normalize.css';
 
 :root {
-    --primary: #fe2c55;
-    --black: #000;
-    --white: #fff;
-    --text-color: #161823;
+  --primary: #fe2c55;
+  --black: #000;
+  --white: #fff;
+  --text-color: #161823;
 
-    --font-family: 'ProximaNova', sans-serif;
-    --font-weight: 600;
-    --font-size: 2rem;
-    --padding-top: 1rem;
+  --font-family: 'ProximaNova', sans-serif;
+  --font-weight: 600;
+  --font-size: 2rem;
+  --padding-top: 1rem;
 
-    --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.15);
-    --radius-md: 0.75rem;
-    --radius-lg: 1rem;
-    
-    // Thêm các biến mới cho typography
-    --font-size-xs: 0.75rem;    // 12px
-    --font-size-sm: 1.2rem;   // 14px
-    --font-size-base: 1.6rem;   // 16px (kế thừa từ body)
-    --font-size-lg: 1.8rem;     // 18px
-    --font-size-xl: 2rem;       // 20px
-    --font-size-2xl: 2.4rem;    // 24px
-    --font-size-3xl: 3rem;      // 30px
-    --font-size-4xl: 3.6rem;    // 36px
-    --font-size-5xl: 4.8rem;    // 48px
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.15);
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
 
-    // Font Weights
-    --font-weight-light: 300;
-    --font-weight-normal: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
+  // Thêm các biến mới cho typography
+  --font-size-xs: 0.75rem; // 12px
+  --font-size-sm: 1.2rem;
+  --font-size-ssm: 1.4rem; // 14px
+  --font-size-base: 1.6rem; // 16px (kế thừa từ body)
+  --font-size-lg: 1.8rem; // 18px
+  --font-size-xl: 2rem; // 20px
+  --font-size-2xl: 2.4rem; // 24px
+  --font-size-3xl: 3rem; // 30px
+  --font-size-4xl: 3.6rem; // 36px
+  --font-size-5xl: 4.8rem; // 48px
 
-    // Colors mở rộng
-    --primary-color: #2c3e50;
-    --secondary-color: #495057;
-    --accent-color: #28a745;
-    --accent-act-color: #1d7d33;
+  // Font Weights
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
-    --border-color: #e9ecef;
-    --hover-color: #f8f9fa;
+  // Colors mở rộng
+  --primary-color: #1b3a57; /* navy nhẹ hơn */
+  --secondary-color: #495057;
+  --accent-color: #007bff; /* đổi từ xanh lá -> xanh dương */
+  --accent-act-color: #0056b3; /* xanh đậm khi hover */
+
+  --border-color: #e9ecef;
+  --hover-color: #f8f9fa;
 }
 
 /* SỬA LỖI 1: Các class utility phải được đặt bên ngoài :root */
 // Utility class cho shadow + radius
-.shadow-md { box-shadow: var(--shadow-md) !important; }
-.shadow-lg { box-shadow: var(--shadow-lg) !important; }
-.rounded-md { border-radius: var(--radius-md) !important; }
-.rounded-lg { border-radius: var(--radius-lg) !important; }
+.shadow-md {
+  box-shadow: var(--shadow-md) !important;
+}
+.shadow-lg {
+  box-shadow: var(--shadow-lg) !important;
+}
+.rounded-md {
+  border-radius: var(--radius-md) !important;
+}
+.rounded-lg {
+  border-radius: var(--radius-lg) !important;
+}
 
-.fs-com{
-    font-size: var(--font-size);
+.fs-com {
+  font-size: var(--font-size);
 }
 
 // Các class utility cho font size
-.fs-xs { font-size: var(--font-size-xs) !important; }
-.fs-sm { font-size: var(--font-size-sm) !important; }
-.fs-base { font-size: var(--font-size-base) !important; }
-.fs-lg { font-size: var(--font-size-lg) !important; }
-.fs-xl { font-size: var(--font-size-xl) !important; }
-.fs-2xl { font-size: var(--font-size-2xl) !important; }
-.fs-3xl { font-size: var(--font-size-3xl) !important; }
-.fs-4xl { font-size: var(--font-size-4xl) !important; }
-.fs-5xl { font-size: var(--font-size-5xl) !important; }
+.fs-xs {
+  font-size: var(--font-size-xs) !important;
+}
+.fs-sm {
+  font-size: var(--font-size-sm) !important;
+}
+.fs-base {
+  font-size: var(--font-size-base) !important;
+}
+.fs-lg {
+  font-size: var(--font-size-lg) !important;
+}
+.fs-xl {
+  font-size: var(--font-size-xl) !important;
+}
+.fs-2xl {
+  font-size: var(--font-size-2xl) !important;
+}
+.fs-3xl {
+  font-size: var(--font-size-3xl) !important;
+}
+.fs-4xl {
+  font-size: var(--font-size-4xl) !important;
+}
+.fs-5xl {
+  font-size: var(--font-size-5xl) !important;
+}
 
 // Font weight utilities
-.fw-light { font-weight: var(--font-weight-light) !important; }
-.fw-normal { font-weight: var(--font-weight-normal) !important; }
-.fw-medium { font-weight: var(--font-weight-medium) !important; }
-.fw-semibold { font-weight: var(--font-weight-semibold) !important; }
-.fw-bold { font-weight: var(--font-weight-bold) !important; }
+.fw-light {
+  font-weight: var(--font-weight-light) !important;
+}
+.fw-normal {
+  font-weight: var(--font-weight-normal) !important;
+}
+.fw-medium {
+  font-weight: var(--font-weight-medium) !important;
+}
+.fw-semibold {
+  font-weight: var(--font-weight-semibold) !important;
+}
+.fw-bold {
+  font-weight: var(--font-weight-bold) !important;
+}
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-    font-size: 62.5%;
+  font-size: 62.5%;
 }
 
 body {
-    font-family: var(--font-family);
-    font-size: 1.6rem;
-    line-height: 1.5;
-    text-rendering: optimizespeed;
-    color: var(--text-color);
-    
-    /* SỬA LỖI 2: Thay thế 'overlay' đã lỗi thời bằng thuộc tính CSS mới và chuẩn hơn */
-    scrollbar-gutter: stable;
+  font-family: var(--font-family);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  text-rendering: optimizespeed;
+  color: var(--text-color);
+
+  /* SỬA LỖI 2: Thay thế 'overlay' đã lỗi thời bằng thuộc tính CSS mới và chuẩn hơn */
+  scrollbar-gutter: stable;
 }
 
 // Scrollbar CSS
 html *::-webkit-scrollbar {
-    border-radius: 0;
-    width: 8px;
+  border-radius: 0;
+  width: 8px;
 }
 
 html *::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 html *::-webkit-scrollbar-track {
-    border-radius: 0;
-    background-color: rgba(0, 0, 0, 0);
+  border-radius: 0;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 button,
 input,
 [tabindex] {
-    outline: none;
-    border: none;
+  outline: none;
+  border: none;
 }
 
 a {
-    color: var(--text-color);
-    text-decoration: none;
+  color: var(--text-color);
+  text-decoration: none;
 }
 
-ul,li{
-    list-style: none;
+ul,
+li {
+  list-style: none;
+}
+
+.btn-accent {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  background-color: var(--accent-color);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+
+  &:hover {
+    background-color: var(--accent-act-color);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: #9ac7ff;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 }

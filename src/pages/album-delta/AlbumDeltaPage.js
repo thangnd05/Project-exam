@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, {useEffect, useState} from 'react';
+import {useParams, useNavigate} from 'react-router-dom';
+import axios from 'axios';
 import {
   Container,
   Table,
@@ -10,22 +10,22 @@ import {
   Modal,
   Form,
   Card,
-} from "react-bootstrap";
-import "./AlbumDetailPage.scss";
+} from 'react-bootstrap';
+import './AlbumDetailPage.scss';
 
 const AlbumDetailPage = () => {
-  const { albumId } = useParams();
+  const {albumId} = useParams();
   const [vocabularies, setVocabularies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [flashMode, setFlashMode] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [newVocab, setNewVocab] = useState({
-    word: "",
-    meaning: "",
-    example: "",
+    word: '',
+    meaning: '',
+    example: '',
   });
   const navigate = useNavigate();
 
@@ -36,8 +36,8 @@ const AlbumDetailPage = () => {
       });
       setVocabularies(res.data);
     } catch (err) {
-      console.error("❌ Lỗi khi tải từ vựng:", err);
-      setErrorMsg("Không thể tải danh sách từ vựng 😢");
+      console.error('❌ Lỗi khi tải từ vựng:', err);
+      setErrorMsg('Không thể tải danh sách từ vựng 😢');
     } finally {
       setLoading(false);
     }
@@ -48,39 +48,41 @@ const AlbumDetailPage = () => {
   }, [albumId]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewVocab({ ...newVocab, [name]: value });
+    const {name, value} = e.target;
+    setNewVocab({...newVocab, [name]: value});
   };
 
   const handleSave = async () => {
     if (!newVocab.word.trim() || !newVocab.meaning.trim()) {
-      alert("Vui lòng nhập đầy đủ Từ và Nghĩa!");
+      alert('Vui lòng nhập đầy đủ Từ và Nghĩa!');
       return;
     }
 
     try {
       await axios.post(
-        "/api/vocabularies",
-        { albumId, ...newVocab },
-        { withCredentials: true }
+        '/api/vocabularies',
+        {albumId, ...newVocab},
+        {withCredentials: true},
       );
       alert(`✅ Đã thêm từ '${newVocab.word}' thành công!`);
       setShowModal(false);
-      setNewVocab({ word: "", meaning: "", example: "" });
+      setNewVocab({word: '', meaning: '', example: ''});
       fetchVocabularies();
     } catch (err) {
-      console.error("❌ Lỗi khi thêm từ:", err);
-      alert("Không thể thêm từ mới 😢");
+      console.error('❌ Lỗi khi thêm từ:', err);
+      alert('Không thể thêm từ mới 😢');
     }
   };
 
   const handleDelete = async (vocabId, word) => {
     if (!window.confirm(`Bạn có chắc muốn xóa từ "${word}"?`)) return;
     try {
-      await axios.delete(`/api/vocabularies/${vocabId}`, { withCredentials: true });
+      await axios.delete(`/api/vocabularies/${vocabId}`, {
+        withCredentials: true,
+      });
       setVocabularies((prev) => prev.filter((v) => v.vocabId !== vocabId));
     } catch {
-      alert("Không thể xóa từ này 😢");
+      alert('Không thể xóa từ này 😢');
     }
   };
 
@@ -99,104 +101,103 @@ const AlbumDetailPage = () => {
   return (
     <Container className="my-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-    <Button variant="secondary" onClick={() => navigate(-1)}>
-        ← Quay lại
-    </Button>
-
-    <div className="d-flex gap-2">
-        <Button
-        variant="info"
-        onClick={() => navigate(`/practice/${albumId}`)}
-        disabled={vocabularies.length === 0}
-        >
-        🧩 Luyện tập
+        <Button variant="secondary" onClick={() => navigate(-1)}>
+          ← Quay lại
         </Button>
 
-        <Button
-        variant="outline-primary"
-        onClick={() => setFlashMode(!flashMode)}
-        disabled={vocabularies.length === 0}
-        >
-        🃏 {flashMode ? "Thoát Flashcard" : "Học bằng Flashcard"}
-        </Button>
+        <div className="d-flex gap-2">
+          <Button
+            variant="info"
+            onClick={() => navigate(`/practice/${albumId}`)}
+            disabled={vocabularies.length === 0}
+          >
+            🧩 Luyện tập
+          </Button>
 
-        <Button variant="success" onClick={() => setShowModal(true)}>
-        ➕ Thêm từ mới
-        </Button>
-    </div>
-    </div>
+          <Button
+            variant="outline-primary"
+            onClick={() => setFlashMode(!flashMode)}
+            disabled={vocabularies.length === 0}
+          >
+            🃏 {flashMode ? 'Thoát Flashcard' : 'Học bằng Flashcard'}
+          </Button>
 
+          <Button variant="success" onClick={() => setShowModal(true)}>
+            ➕ Thêm từ mới
+          </Button>
+        </div>
+      </div>
 
       <h2 className="fw-bold text-primary mb-4">
-        {flashMode ? "🎯 Học bằng Flashcard" : "📖 Danh sách từ vựng"}
+        {flashMode ? '🎯 Học bằng Flashcard' : '📖 Danh sách từ vựng'}
       </h2>
 
-        {/* 🧩 Flashcard View */}
-        {flashMode ? (
+      {/* 🧩 Flashcard View */}
+      {flashMode ? (
         <div className="text-center">
-            <div
+          <div
             className="flashcard-container mx-auto"
-            style={{ width: "350px", height: "230px", perspective: "1000px" }}
+            style={{width: '350px', height: '230px', perspective: '1000px'}}
             onClick={() => setFlipped(!flipped)}
-            >
-            <div className={`flashcard-inner ${flipped ? "flipped" : ""}`}>
-                {/* Mặt trước */}
-                <div className="flashcard-front d-flex flex-column justify-content-center align-items-center p-4">
+          >
+            <div className={`flashcard-inner ${flipped ? 'flipped' : ''}`}>
+              {/* Mặt trước */}
+              <div className="flashcard-front d-flex flex-column justify-content-center align-items-center p-4">
                 <h3 className="fw-bold text-primary text-capitalize">
-                    {currentVocab.word}
+                  {currentVocab.word}
                 </h3>
-                <p className="text-muted">{currentVocab.phonetic || "..."}</p>
+                <p className="text-muted">{currentVocab.phonetic || '...'}</p>
 
                 {/* ✅ Dùng key để buộc React reload audio */}
                 <audio
-                    key={currentVocab.word}
-                    controls
-                    preload="none"
-                    className="mt-2"
+                  key={currentVocab.word}
+                  controls
+                  preload="none"
+                  className="mt-2"
                 >
-                    <source
+                  <source
                     src={`http://localhost:8080/api/tts?text=${encodeURIComponent(
-                        currentVocab.word
+                      currentVocab.word,
                     )}`}
                     type="audio/mpeg"
-                    />
+                  />
                 </audio>
-                </div>
+              </div>
 
-                {/* Mặt sau */}
-                <div className="flashcard-back d-flex flex-column justify-content-center align-items-center p-4">
+              {/* Mặt sau */}
+              <div className="flashcard-back d-flex flex-column justify-content-center align-items-center p-4">
                 <h5 className="text-dark">{currentVocab.meaning}</h5>
                 <p className="fst-italic mt-2 text-secondary">
-                    {currentVocab.example}
+                  {currentVocab.example}
                 </p>
-                </div>
+              </div>
             </div>
-            </div>
+          </div>
 
-            <div className="mt-4 d-flex justify-content-center gap-3">
+          <div className="mt-4 d-flex justify-content-center gap-3">
             <Button
-                variant="outline-secondary"
-                disabled={currentIndex === 0}
-                onClick={() => {
+              variant="outline-secondary"
+              disabled={currentIndex === 0}
+              onClick={() => {
                 setFlipped(false);
                 setCurrentIndex((prev) => prev - 1);
-                }}
+              }}
             >
-                ⬅️ Trước
+              ⬅️ Trước
             </Button>
             <Button
-                variant="outline-secondary"
-                disabled={currentIndex === vocabularies.length - 1}
-                onClick={() => {
+              variant="outline-secondary"
+              disabled={currentIndex === vocabularies.length - 1}
+              onClick={() => {
                 setFlipped(false);
                 setCurrentIndex((prev) => prev + 1);
-                }}
+              }}
             >
-                Tiếp ➡️
+              Tiếp ➡️
             </Button>
-            </div>
+          </div>
         </div>
-        ) : (
+      ) : (
         // 🧾 Danh sách bảng
         <Table striped bordered hover responsive className="shadow-sm">
           <thead className="table-primary text-center">
@@ -222,7 +223,7 @@ const AlbumDetailPage = () => {
                   <audio controls preload="none">
                     <source
                       src={`http://localhost:8080/api/tts?text=${encodeURIComponent(
-                        vocab.word
+                        vocab.word,
                       )}`}
                       type="audio/mpeg"
                     />

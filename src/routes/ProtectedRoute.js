@@ -1,10 +1,10 @@
 import React from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
-import { useAuth } from '../hook/useAuth';
+import {useLocation, Navigate} from 'react-router-dom';
+import {useAuth} from '../hook/useAuth';
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({children}) {
   // Lấy trạng thái đăng nhập từ hook useAuth
-  const { isAuthenticated, loading } = useAuth(); 
+  const {isAuthenticated, loading} = useAuth();
   const location = useLocation();
 
   // Nếu đang trong quá trình kiểm tra session, hiển thị loading để tránh bị redirect oan
@@ -18,7 +18,7 @@ function ProtectedRoute({ children }) {
     // Đồng thời, gửi kèm 'location' hiện tại vào state
     // để trang Login biết và chuyển hướng ngược lại sau khi đăng nhập thành công.
 
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{from: location}} replace />;
   }
 
   // Nếu đã đăng nhập, cho phép hiển thị nội dung của trang

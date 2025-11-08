@@ -30,7 +30,8 @@
 
   &:hover {
     transform: translateY(-5px);
-box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-color) 50%, transparent);
+    box-shadow: 0 6px 18px
+      color-mix(in srgb, var(--accent-color) 50%, transparent);
   }
 }
 
@@ -81,17 +82,28 @@ box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-color) 50%, transparent);
 
 .btn-start {
   width: 100%;
-  background: #28a745;
-  color: white;
+  background: var(--accent-color); /* 🔵 dùng biến màu chủ đạo */
+  color: var(--white);
   border: none;
   border-radius: 6px;
   padding: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s ease, transform 0.1s ease;
 
   &:hover {
-    background: #218838;
+    background: var(--accent-act-color); /* 🔵 màu khi hover */
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: #9ac7ff; /* xanh dương nhạt khi disabled */
+    cursor: not-allowed;
+    opacity: 0.7;
   }
 }
 

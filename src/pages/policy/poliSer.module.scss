@@ -1,41 +1,41 @@
 body {
   line-height: 1.6;
-  background-color: #f4f6f8;
-  font-family: "Inter", Arial, sans-serif;
-  color: #333;
+  background-color: var(--hover-color); /* #f4f6f8 */
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--text-color);
 }
 
 /* === Wrapper chung cho Policy & Service === */
 .policy-wapper,
 .service-wapper {
   max-width: 850px;
-  // margin: 50px auto;
   padding: 40px 50px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   text-align: left;
   line-height: 1.8;
   transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
 }
 
 .policy-wapper:hover,
 .service-wapper:hover {
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
 }
 
 /* === Tiêu đề === */
 h1 {
   text-align: center;
-  color: #004aad;
-  font-weight: 700;
+  color: var(--accent-color); /* 🔵 #007bff */
+  font-weight: var(--font-weight-bold);
   font-size: 26px;
   margin-bottom: 25px;
 }
 
 h2 {
-  color: #0066cc;
-  font-weight: 600;
+  color: var(--primary-color); /* #1b3a57 */
+  font-weight: var(--font-weight-semibold);
   font-size: 20px;
   margin-top: 30px;
   margin-bottom: 10px;
@@ -56,19 +56,19 @@ li {
 .thankyou {
   margin-top: 40px;
   text-align: center;
-  font-weight: 600;
-  color: #2a8f2a;
-  background: #f6fff6;
+  font-weight: var(--font-weight-semibold);
+  color: var(--accent-color);
+  background: rgba(0, 123, 255, 0.05);
   padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #c8f1c8;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 123, 255, 0.2);
 }
 
 /* === Flex căn giữa === */
 .d-flex {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Đặt cao hơn để không bị giữa màn hình */
+  align-items: flex-start;
   min-height: 100vh;
   padding: 40px 0;
 }

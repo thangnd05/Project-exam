@@ -1,11 +1,10 @@
-import classNames from "classnames/bind";
-import style from "./GlobalStyles.module.scss"
+import classNames from 'classnames/bind';
+import style from './GlobalStyles.module.scss';
 
-const cx=classNames.bind(style)
-
+const cx = classNames.bind(style);
 
 function GlobalStyles({children}) {
-    return children;
+  return children;
 }
 
 export default GlobalStyles;

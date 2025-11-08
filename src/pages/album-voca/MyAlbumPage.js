@@ -1,25 +1,39 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Card, Container, Row, Col, Spinner, Alert, Button, Modal, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import "./MyAlbumsPage.scss";
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
+import {
+  Card,
+  Container,
+  Row,
+  Col,
+  Spinner,
+  Alert,
+  Button,
+  Modal,
+  Form,
+} from 'react-bootstrap';
+import {useNavigate} from 'react-router-dom';
+import './MyAlbumsPage.scss';
 
 const MyAlbumsPage = () => {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [newAlbum, setNewAlbum] = useState({ name: "", description: "", coverUrl: "" });
+  const [newAlbum, setNewAlbum] = useState({
+    name: '',
+    description: '',
+    coverUrl: '',
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const res = await axios.get("/api/vocabulary-albums/my-albums");
+        const res = await axios.get('/api/vocabulary-albums/my-albums');
         setAlbums(res.data);
       } catch (err) {
         console.error(err);
-        setErrorMsg("Không thể tải danh sách album 😢");
+        setErrorMsg('Không thể tải danh sách album 😢');
       } finally {
         setLoading(false);
       }
@@ -30,12 +44,12 @@ const MyAlbumsPage = () => {
   const handleCreateAlbum = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/vocabulary-albums", newAlbum);
+      const res = await axios.post('/api/vocabulary-albums', newAlbum);
       setAlbums((prev) => [...prev, res.data]);
       setShowModal(false);
-      setNewAlbum({ name: "", description: "", coverUrl: "" });
+      setNewAlbum({name: '', description: '', coverUrl: ''});
     } catch (err) {
-      alert("❌ Không thể tạo album mới!");
+      alert('❌ Không thể tạo album mới!');
       console.error(err);
     }
   };
@@ -70,13 +84,15 @@ const MyAlbumsPage = () => {
               >
                 <Card.Img
                   variant="top"
-                  src={album.coverUrl || "https://placehold.co/300x200?text=Album"}
+                  src={
+                    album.coverUrl || 'https://placehold.co/300x200?text=Album'
+                  }
                   alt={album.name}
                 />
                 <Card.Body>
                   <Card.Title className="fw-semibold">{album.name}</Card.Title>
                   <Card.Text className="text-muted">
-                    {album.description || "Không có mô tả"}
+                    {album.description || 'Không có mô tả'}
                   </Card.Text>
                 </Card.Body>
               </Card>
@@ -97,7 +113,9 @@ const MyAlbumsPage = () => {
               <Form.Control
                 type="text"
                 value={newAlbum.name}
-                onChange={(e) => setNewAlbum({ ...newAlbum, name: e.target.value })}
+                onChange={(e) =>
+                  setNewAlbum({...newAlbum, name: e.target.value})
+                }
                 required
               />
             </Form.Group>
@@ -107,7 +125,9 @@ const MyAlbumsPage = () => {
                 as="textarea"
                 rows={3}
                 value={newAlbum.description}
-                onChange={(e) => setNewAlbum({ ...newAlbum, description: e.target.value })}
+                onChange={(e) =>
+                  setNewAlbum({...newAlbum, description: e.target.value})
+                }
               />
             </Form.Group>
           </Modal.Body>

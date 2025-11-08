@@ -12,42 +12,83 @@
 
   h3 {
     margin: 0;
+    color: var(--primary-color);
+    font-weight: var(--font-weight-bold);
   }
 }
 
+/* Nút quay lại */
 .btn-back {
   background: none;
   border: none;
-  color: #007bff;
-  font-size: 16px;
+  color: var(--accent-color); /* dùng màu chủ đạo */
+  font-size: var(--font-size-base);
   cursor: pointer;
+  transition: color 0.25s ease, transform 0.15s ease;
+
+  &:hover {
+    color: var(--accent-act-color);
+    transform: translateX(-2px);
+  }
+
+  &:active {
+    transform: translateX(0);
+  }
 }
 
+/* Bảng lịch sử */
 .history-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  border: 1px solid var(--border-color);
+  font-size: var(--font-size-sm);
 
-  th, td {
-    border: 1px solid #ddd;
+  th,
+  td {
+    border: 1px solid var(--border-color);
     padding: 8px;
     text-align: center;
   }
 
   th {
-    background-color: #f8f8f8;
+    background-color: var(--hover-color);
+    color: var(--primary-color);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+
+  tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
   }
 }
 
+/* Nút xem chi tiết */
 .btn-view {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--accent-color); /* 🔵 xanh dương */
+  color: var(--white);
   border: none;
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: var(--font-weight-medium);
+  transition: background-color 0.25s ease, transform 0.15s ease;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: var(--accent-act-color); /* 🔵 xanh đậm hơn khi hover */
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: #9ac7ff;
+    cursor: not-allowed;
+    opacity: 0.7;
   }
 }

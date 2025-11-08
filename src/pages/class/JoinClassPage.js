@@ -1,43 +1,43 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { Button, Form, Alert } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import routes from "../../config/Routes";
-import "./JoinClassPage.scss";
-import { useAuth } from "../../hook/useAuth"; // nếu bạn có AuthContext
+import React, {useState} from 'react';
+import axios from 'axios';
+import {Button, Form, Alert} from 'react-bootstrap';
+import {useNavigate} from 'react-router-dom';
+import routes from '../../config/Routes';
+import './JoinClassPage.scss';
+import {useAuth} from '../../hook/useAuth'; // nếu bạn có AuthContext
 
 function JoinClassPage() {
-  const [classId, setClassId] = useState("");
-  const [message, setMessage] = useState("");
+  const [classId, setClassId] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth(); // 🟢 kiểm tra user
+  const {user} = useAuth(); // 🟢 kiểm tra user
 
   const handleJoin = async (e) => {
     e.preventDefault();
 
     // 🧩 Nếu chưa login thì chuyển sang trang login
     if (!user) {
-      setMessage("⚠️ Vui lòng đăng nhập trước khi tham gia lớp!");
+      setMessage('⚠️ Vui lòng đăng nhập trước khi tham gia lớp!');
       setTimeout(() => navigate(routes.login), 1000);
       return;
     }
 
     if (!classId.trim()) {
-      setMessage("⚠️ Vui lòng nhập mã lớp!");
+      setMessage('⚠️ Vui lòng nhập mã lớp!');
       return;
     }
 
     setLoading(true);
-    setMessage("");
+    setMessage('');
 
     try {
-      const res = await axios.post("/api/class-members/join", {
+      const res = await axios.post('/api/class-members/join', {
         classId: Number(classId),
       });
-      setMessage("✅ Gửi yêu cầu tham gia lớp thành công!");
+      setMessage('✅ Gửi yêu cầu tham gia lớp thành công!');
     } catch (err) {
-      setMessage("❌ Không có lớp nào với mã tham gia này!");
+      setMessage('❌ Không có lớp nào với mã tham gia này!');
       console.error(err);
     } finally {
       setLoading(false);
@@ -62,19 +62,16 @@ function JoinClassPage() {
             value={classId}
             onChange={(e) => setClassId(e.target.value)}
             disabled={loading}
+            className="font-join"
           />
         </Form.Group>
 
         <div className="btn-group mt-3 d-flex justify-content-between">
           <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? "Đang gửi..." : "➕ Tham gia lớp"}
+            {loading ? 'Đang gửi...' : '➕ Tham gia lớp'}
           </Button>
 
-          <Button
-            variant="success"
-            type="button"
-            onClick={handleGoToMyClasses}
-          >
+          <Button variant="success" type="button" onClick={handleGoToMyClasses}>
             🎓 Lớp của tôi
           </Button>
         </div>

@@ -22,8 +22,8 @@
       background-color: var(--white);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 0.75rem 1.25rem; // nhỏ gọn hơn
-      font-size: var(--font-size-base); // 16px
+      padding: 0.75rem 1.25rem;
+      font-size: var(--font-size-base);
       font-weight: var(--font-weight-medium);
       color: var(--secondary-color);
       transition: all 0.25s ease;
@@ -33,11 +33,11 @@
       font-family: var(--font-family);
 
       &:hover {
-        background-color: var(--hover-color);
-        border-color: var(--accent-color);
-        transform: translateY(-2px);
-        box-shadow: 0 3px 8px rgba(0, 123, 255, 0.15);
+        border-color: var(--accent-color); /* chỉ đổi viền */
         color: var(--accent-color);
+        background-color: var(--white); /* giữ nền trắng */
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.1); /* xanh dương mờ nhẹ */
       }
 
       &:active {

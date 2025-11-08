@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 import {
   Card,
   Spinner,
@@ -8,23 +8,23 @@ import {
   Row,
   Col,
   Button,
-} from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import "./MyClassPage.scss";
-import routes from "../../config/Routes"; // 🟢 đảm bảo import đúng đường dẫn
+} from 'react-bootstrap';
+import {useNavigate} from 'react-router-dom';
+import './MyClassPage.scss';
+import routes from '../../config/Routes'; // 🟢 đảm bảo import đúng đường dẫn
 
 const MyClassesPage = () => {
   const [teachingClasses, setTeachingClasses] = useState([]);
   const [learningClasses, setLearningClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   // 🟢 Lấy danh sách lớp học (bao gồm lớp dạy + học)
   useEffect(() => {
     const fetchMyClasses = async () => {
       try {
-        const res = await axios.get("/api/class-members/my-classes");
+        const res = await axios.get('/api/class-members/my-classes');
 
         if (res.data.message) {
           setMessage(res.data.message);
@@ -33,8 +33,8 @@ const MyClassesPage = () => {
           setLearningClasses(res.data.learningClasses || []);
         }
       } catch (err) {
-        console.error("❌ Lỗi khi tải danh sách lớp học:", err);
-        setMessage("❌ Lỗi khi tải danh sách lớp học!");
+        console.error('❌ Lỗi khi tải danh sách lớp học:', err);
+        setMessage('❌ Lỗi khi tải danh sách lớp học!');
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ const MyClassesPage = () => {
 
   // 🧭 Khi click vào lớp → chuyển đến danh sách bài test của lớp
   const handleViewTests = (classId) => {
-    const path = routes.testClasses.replace(":classId", classId);
+    const path = routes.testClasses.replace(':classId', classId);
     navigate(path);
   };
 
@@ -77,7 +77,9 @@ const MyClassesPage = () => {
                   onClick={() => handleViewTests(clazz.classId)}
                 >
                   <Card.Body>
-                    <Card.Title className="class-name">{clazz.className}</Card.Title>
+                    <Card.Title className="class-name">
+                      {clazz.className}
+                    </Card.Title>
                     <Card.Subtitle className="mb-2 text-muted">
                       👨‍🏫 Giáo viên: {clazz.teacherName}
                     </Card.Subtitle>
@@ -116,7 +118,9 @@ const MyClassesPage = () => {
                   onClick={() => handleViewTests(clazz.classId)}
                 >
                   <Card.Body>
-                    <Card.Title className="class-name">{clazz.className}</Card.Title>
+                    <Card.Title className="class-name">
+                      {clazz.className}
+                    </Card.Title>
                     <Card.Subtitle className="mb-2 text-muted">
                       👨‍🏫 Giáo viên: {clazz.teacherName}
                     </Card.Subtitle>

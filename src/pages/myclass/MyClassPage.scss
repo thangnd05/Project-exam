@@ -3,24 +3,29 @@
 
   .page-title {
     text-align: center;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     margin-bottom: 30px;
-    color: #007bff;
+    color: var(--accent-color); /* 🔵 dùng màu chủ đạo */
+    font-size: var(--font-size-2xl);
   }
 
   .class-card {
     border-radius: 15px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
 
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 16px rgba(0, 123, 255, 0.15); /* 🔵 bóng nhẹ theo theme */
+      border-color: var(--accent-color);
     }
 
     .class-name {
       font-size: 1.2rem;
-      font-weight: 600;
+      font-weight: var(--font-weight-semibold);
+      color: var(--primary-color);
     }
   }
 }
@@ -31,7 +36,7 @@
   align-items: center;
   height: 60vh;
   font-size: 1.1rem;
-  color: #555;
+  color: var(--secondary-color); /* ⚙️ đồng bộ với text phụ */
 
   span {
     margin-left: 10px;

@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import styles from "./CreateTestPage.module.scss";
-import classNames from "classnames/bind";
+import {useEffect, useState} from 'react';
+import axios from 'axios';
+import styles from './CreateTestPage.module.scss';
+import classNames from 'classnames/bind';
 
 const cx = classNames.bind(styles);
 
 function CreateTestPage() {
   const [examTypes, setExamTypes] = useState([]);
-  const [selectedExamType, setSelectedExamType] = useState("");
+  const [selectedExamType, setSelectedExamType] = useState('');
   const [examParts, setExamParts] = useState([]);
-  const [testName, setTestName] = useState("");
-  const [testDescription, setTestDescription] = useState("");
+  const [testName, setTestName] = useState('');
+  const [testDescription, setTestDescription] = useState('');
   const [bannerFile, setBannerFile] = useState(null);
   const [numQuestions, setNumQuestions] = useState({});
   const [maxQuestions, setMaxQuestions] = useState({});
@@ -18,19 +18,19 @@ function CreateTestPage() {
   const [enabledParts, setEnabledParts] = useState({});
   const [selectedQuestions, setSelectedQuestions] = useState({});
   const [questionBank, setQuestionBank] = useState({});
-  const [availableFrom, setAvailableFrom] = useState("");
-  const [availableTo, setAvailableTo] = useState("");
+  const [availableFrom, setAvailableFrom] = useState('');
+  const [availableTo, setAvailableTo] = useState('');
   const [maxAttempts, setMaxAttempts] = useState(1);
-  const [durationMinutes, setDurationMinutes] = useState("");
+  const [durationMinutes, setDurationMinutes] = useState('');
 
   // 🟢 Thêm state cho lớp học
   const [classes, setClasses] = useState([]);
-  const [classId, setClassId] = useState("");
+  const [classId, setClassId] = useState('');
 
   // 🟢 Fetch danh sách lớp của giáo viên
   useEffect(() => {
     axios
-      .get("/api/classes/my")
+      .get('/api/classes/my')
       .then((res) => {
         if (Array.isArray(res.data)) {
           setClasses(res.data);
@@ -38,27 +38,27 @@ function CreateTestPage() {
           setClasses(res.data.classes);
         }
       })
-      .catch((err) => console.error("❌ Lỗi khi tải danh sách lớp:", err));
+      .catch((err) => console.error('❌ Lỗi khi tải danh sách lớp:', err));
   }, []);
 
   // 🟢 Lấy danh sách kỳ thi
   useEffect(() => {
     axios
-      .get("/api/exam-types")
+      .get('/api/exam-types')
       .then((res) => setExamTypes(res.data))
-      .catch((err) => console.error("Failed to fetch exam types:", err));
+      .catch((err) => console.error('Failed to fetch exam types:', err));
   }, []);
 
   // 🟢 Khi chọn loại kỳ thi -> load các Part (có lọc theo lớp)
   const handleExamTypeChange = async (examTypeId) => {
     if (!examTypeId) {
-      setSelectedExamType("");
+      setSelectedExamType('');
       setExamParts([]);
       setNumQuestions({});
       setMaxQuestions({});
       setMode({});
       setEnabledParts({});
-      setDurationMinutes("");
+      setDurationMinutes('');
       return;
     }
 
@@ -75,7 +75,7 @@ function CreateTestPage() {
 
       for (const p of parts) {
         initNums[p.examPartId] = p.defaultNumQuestions || 0;
-        initMode[p.examPartId] = "random";
+        initMode[p.examPartId] = 'random';
         initEnabled[p.examPartId] = true;
 
         try {
@@ -96,7 +96,7 @@ function CreateTestPage() {
       setEnabledParts(initEnabled);
       setMaxQuestions(counts);
     } catch (err) {
-      console.error("Failed to fetch exam parts:", err);
+      console.error('Failed to fetch exam parts:', err);
     }
   };
 
@@ -108,22 +108,22 @@ function CreateTestPage() {
       alert(`❌ Số câu vượt quá giới hạn (${max} câu)!`);
       return;
     }
-    setNumQuestions((prev) => ({ ...prev, [partId]: val }));
+    setNumQuestions((prev) => ({...prev, [partId]: val}));
   };
 
   // 🔁 Chuyển chế độ random/manual (có lọc theo class)
   const handleModeChange = async (partId, newMode) => {
-    setMode((prev) => ({ ...prev, [partId]: newMode }));
-    if (newMode === "manual" && !questionBank[partId]) {
+    setMode((prev) => ({...prev, [partId]: newMode}));
+    if (newMode === 'manual' && !questionBank[partId]) {
       try {
         // ✅ Nếu đã chọn lớp → gửi classId để BE lọc câu hỏi
         const url = classId
           ? `/api/questions/by-part/${partId}?classId=${classId}`
           : `/api/questions/by-part/${partId}`;
         const res = await axios.get(url);
-        setQuestionBank((prev) => ({ ...prev, [partId]: res.data || [] }));
+        setQuestionBank((prev) => ({...prev, [partId]: res.data || []}));
       } catch (err) {
-        console.error("Failed to load question bank:", err);
+        console.error('Failed to load question bank:', err);
       }
     }
   };
@@ -134,7 +134,7 @@ function CreateTestPage() {
       const newList = checked
         ? [...prevList, questionId]
         : prevList.filter((id) => id !== questionId);
-      return { ...prev, [partId]: newList };
+      return {...prev, [partId]: newList};
     });
   };
 
@@ -143,7 +143,7 @@ function CreateTestPage() {
   // 🚀 Gửi form tạo đề
   const handleCreateTest = async () => {
     if (!selectedExamType || !testName.trim()) {
-      alert("Vui lòng chọn loại kỳ thi và nhập tên đề thi.");
+      alert('Vui lòng chọn loại kỳ thi và nhập tên đề thi.');
       return;
     }
 
@@ -151,7 +151,7 @@ function CreateTestPage() {
       .filter((p) => enabledParts[p.examPartId])
       .map((p) => {
         const partId = p.examPartId;
-        const isRandom = mode[partId] === "random";
+        const isRandom = mode[partId] === 'random';
         return isRandom
           ? {
               examPartId: partId,
@@ -166,7 +166,7 @@ function CreateTestPage() {
       });
 
     if (parts.length === 0) {
-      alert("⚠️ Vui lòng bật ít nhất một Part để tạo đề.");
+      alert('⚠️ Vui lòng bật ít nhất một Part để tạo đề.');
       return;
     }
 
@@ -183,29 +183,29 @@ function CreateTestPage() {
     };
 
     const formData = new FormData();
-    formData.append("data", JSON.stringify(testData));
-    if (bannerFile) formData.append("banner", bannerFile);
+    formData.append('data', JSON.stringify(testData));
+    if (bannerFile) formData.append('banner', bannerFile);
 
     try {
-      const res = await axios.post("/api/tests", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const res = await axios.post('/api/tests', formData, {
+        headers: {'Content-Type': 'multipart/form-data'},
         withCredentials: true,
       });
 
-      alert("✅ Tạo đề thành công!");
-      console.log("Created test:", res.data);
+      alert('✅ Tạo đề thành công!');
+      console.log('Created test:', res.data);
     } catch (err) {
-      console.error("❌ Error creating test:", err.response?.data || err);
-      alert("Tạo đề thất bại. Kiểm tra console để biết chi tiết.");
+      console.error('❌ Error creating test:', err.response?.data || err);
+      alert('Tạo đề thất bại. Kiểm tra console để biết chi tiết.');
     }
   };
 
   return (
-    <div className={cx("container")}>
-      <h2 className={cx("title")}>Tạo đề thi mới</h2>
+    <div className={cx('container')}>
+      <h2 className={cx('title')}>Tạo đề thi mới</h2>
 
       {/* === 🟢 CHỌN LỚP HỌC === */}
-      <div className={cx("form-group")}>
+      <div className={cx('form-group')}>
         <label>Chọn lớp học</label>
         <select
           className="form-select"
@@ -236,7 +236,7 @@ function CreateTestPage() {
       </div>
 
       {/* === THÔNG TIN CHUNG === */}
-      <div className={cx("form-group")}>
+      <div className={cx('form-group')}>
         <label>Loại kỳ thi</label>
         <select
           className="form-select"
@@ -252,7 +252,7 @@ function CreateTestPage() {
         </select>
       </div>
 
-      <div className={cx("form-group")}>
+      <div className={cx('form-group')}>
         <label>Tên đề thi</label>
         <input
           type="text"
@@ -263,7 +263,7 @@ function CreateTestPage() {
         />
       </div>
 
-      <div className={cx("form-group")}>
+      <div className={cx('form-group')}>
         <label>Mô tả</label>
         <textarea
           className="form-control"
@@ -274,7 +274,7 @@ function CreateTestPage() {
         />
       </div>
 
-      <div className={cx("form-grid")}>
+      <div className={cx('form-grid')}>
         <div>
           <label>Thời gian mở</label>
           <input
@@ -295,7 +295,7 @@ function CreateTestPage() {
         </div>
       </div>
 
-      <div className={cx("form-grid")}>
+      <div className={cx('form-grid')}>
         <div>
           <label>Thời lượng (phút)</label>
           <input
@@ -316,7 +316,7 @@ function CreateTestPage() {
         </div>
       </div>
 
-      <div className={cx("form-group")}>
+      <div className={cx('form-group')}>
         <label>Ảnh banner (tùy chọn)</label>
         <input
           type="file"
@@ -329,7 +329,7 @@ function CreateTestPage() {
       {/* === DANH SÁCH PART === */}
       {examParts.length > 0 &&
         examParts.map((p) => (
-          <div key={p.examPartId} className={cx("part-block")}>
+          <div key={p.examPartId} className={cx('part-block')}>
             <div className="d-flex justify-content-between align-items-center mb-2">
               <div>
                 <input
@@ -348,7 +348,7 @@ function CreateTestPage() {
               <select
                 className="form-select w-auto"
                 disabled={!enabledParts[p.examPartId]}
-                value={mode[p.examPartId] || "random"}
+                value={mode[p.examPartId] || 'random'}
                 onChange={(e) => handleModeChange(p.examPartId, e.target.value)}
               >
                 <option value="random">Ngẫu nhiên</option>
@@ -356,7 +356,7 @@ function CreateTestPage() {
               </select>
             </div>
 
-            {mode[p.examPartId] === "random" && enabledParts[p.examPartId] && (
+            {mode[p.examPartId] === 'random' && enabledParts[p.examPartId] && (
               <div className="mb-3">
                 <input
                   type="number"
@@ -375,8 +375,8 @@ function CreateTestPage() {
               </div>
             )}
 
-            {mode[p.examPartId] === "manual" && enabledParts[p.examPartId] && (
-              <div className={cx("manual-select")}>
+            {mode[p.examPartId] === 'manual' && enabledParts[p.examPartId] && (
+              <div className={cx('manual-select')}>
                 {questionBank[p.examPartId] ? (
                   questionBank[p.examPartId].map((q) => (
                     <label key={q.questionId} className="d-block">
@@ -384,17 +384,17 @@ function CreateTestPage() {
                         type="checkbox"
                         checked={
                           selectedQuestions[p.examPartId]?.includes(
-                            q.questionId
+                            q.questionId,
                           ) || false
                         }
                         onChange={(e) =>
                           handleSelectQuestion(
                             p.examPartId,
                             q.questionId,
-                            e.target.checked
+                            e.target.checked,
                           )
                         }
-                      />{" "}
+                      />{' '}
                       {q.questionText}
                     </label>
                   ))
@@ -406,7 +406,7 @@ function CreateTestPage() {
           </div>
         ))}
 
-      <button className={cx("btn-create")} onClick={handleCreateTest}>
+      <button className={cx('btn-create')} onClick={handleCreateTest}>
         🚀 Tạo đề
       </button>
     </div>
