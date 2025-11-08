@@ -21,37 +21,42 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
     if (!rememberMe) {
       setMessage('Bạn phải đồng ý với điều khoản & điều kiện.');
       setMessageType('error');
       return;
     }
+
     setLoading(true);
     setMessage('');
+
     try {
-      const response = await axios.post('/api/register', {
-        username,
-        password,
+      // 🔧 Gửi đúng endpoint và đúng key trùng với RegisterRequest
+      const response = await axios.post('/api/auth/register', {
+        userName: username,
+        fullName: fullname,
         email,
-        fullname,
+        password,
       });
+
       setLoading(false);
-      setMessage('Đăng ký thành công. Vui lòng đăng nhập.');
+      setMessage(
+        response.data.message || 'Đăng ký thành công. Vui lòng đăng nhập.',
+      );
       setMessageType('success');
-      setTimeout(() => navigate(routes.login), 2000);
+
+      setTimeout(() => navigate(routes.login), 1500);
     } catch (err) {
       setLoading(false);
-      if (err.response) {
-        if (err.response.status === 409) {
-          setMessage('Email hoặc Username đã tồn tại.');
-        } else if (err.response.status === 400) {
-          setMessage('Yêu cầu nhập mật khẩu.');
-        } else {
-          setMessage('Có lỗi xảy ra. Vui lòng thử lại sau.');
-        }
-      } else {
-        setMessage('Không thể kết nối đến server. Vui lòng kiểm tra lại.');
-      }
+
+      const errorMessage =
+        err.response?.data?.message ||
+        (err.response?.status === 500
+          ? 'Username hoặc Email đã tồn tại.'
+          : 'Có lỗi xảy ra. Vui lòng thử lại sau.');
+
+      setMessage(errorMessage);
       setMessageType('error');
     }
   };
@@ -60,19 +65,20 @@ function Register() {
     <div className={cx('bodic')}>
       <Form className={cx('wrap')} id="login-form" onSubmit={handleRegister}>
         <h1>Đăng ký</h1>
+
         <Form.Group className={cx('input-box')}>
           <Form.Control
             type="text"
             className={cx('wrap-fullname')}
             id="fullname"
             placeholder="Họ và tên"
-            onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập Họ và tên!'); // Tùy chỉnh thông báo
-            }}
-            onInput={(e) => e.target.setCustomValidity('')} // Xóa thông báo khi người dùng nhập
             required
             value={fullname}
             onChange={(e) => setFullName(e.target.value)}
+            onInvalid={(e) =>
+              e.target.setCustomValidity('Vui lòng nhập Họ và tên!')
+            }
+            onInput={(e) => e.target.setCustomValidity('')}
           />
         </Form.Group>
 
@@ -82,21 +88,13 @@ function Register() {
             className={cx('wrap-email')}
             id="email"
             placeholder="Email"
-            onInvalid={(e) => {
-              if (!e.target.value) {
-                e.target.setCustomValidity('Vui lòng nhập email!'); // Khi để trống
-              } else if (!e.target.value.includes('@')) {
-                e.target.setCustomValidity("Email phải có ký tự '@'!"); // Khi thiếu '@'
-              } else {
-                e.target.setCustomValidity(
-                  'Vui lòng nhập đúng định dạng email!',
-                ); // Khi sai định dạng
-              }
-            }}
-            onInput={(e) => e.target.setCustomValidity('')} // Xóa thông báo khi người dùng nhập lại
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onInvalid={(e) =>
+              e.target.setCustomValidity('Vui lòng nhập đúng định dạng email!')
+            }
+            onInput={(e) => e.target.setCustomValidity('')}
           />
         </Form.Group>
 
@@ -106,14 +104,14 @@ function Register() {
             className={cx('wrap-username')}
             id="username"
             placeholder="Tên đăng nhập"
-            onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập tên đăng nhập!'); // Tùy chỉnh thông báo
-            }}
-            onInput={(e) => e.target.setCustomValidity('')} // Xóa thông báo khi người dùng nhập
             required
             value={username}
-            onChange={(e) => setUserName(e.target.value)}
             maxLength={10}
+            onChange={(e) => setUserName(e.target.value)}
+            onInvalid={(e) =>
+              e.target.setCustomValidity('Vui lòng nhập tên đăng nhập!')
+            }
+            onInput={(e) => e.target.setCustomValidity('')}
           />
         </Form.Group>
 
@@ -123,13 +121,13 @@ function Register() {
             className={cx('wrap-password')}
             id="password"
             placeholder="Mật khẩu"
-            onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập mật khẩu!'); // Tùy chỉnh thông báo
-            }}
-            onInput={(e) => e.target.setCustomValidity('')} // Xóa thông báo khi người dùng nhập
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onInvalid={(e) =>
+              e.target.setCustomValidity('Vui lòng nhập mật khẩu!')
+            }
+            onInput={(e) => e.target.setCustomValidity('')}
           />
         </Form.Group>
 

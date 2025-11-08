@@ -30,6 +30,7 @@ const routes = {
   register: '/register',
   forgot: '/forgot',
   reset: '/reset',
+  verifyEmail: '/verify',
 };
 
 export default routes;

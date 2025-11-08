@@ -1,6 +1,6 @@
-import axios from 'axios';
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import axios from 'axios';
 import {Button} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import style from './ExamTypeStyle.module.scss';
@@ -29,12 +29,13 @@ function ExamTypePage() {
   return (
     <div className={cx('exam-type-container')}>
       <p className={cx('exam-type-title', 'fw-bold')}>Loại đề thi</p>
+
       <div className={cx('exam-types-grid')}>
         {examTypes.map((examType) => (
           <Button
-            variant=""
             key={examType.examTypeId}
-            className={cx('exam-type-btn', 'bg-body-tertiary', 'btn-cate')}
+            variant=""
+            className={cx('exam-type-btn', 'bg-body-tertiary')}
             onClick={() => handleClick(examType.examTypeId)}
           >
             {examType.name}

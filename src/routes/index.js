@@ -20,6 +20,7 @@ import MyAlbumsPage from '~/pages/album-voca/MyAlbumPage';
 import AlbumDetailPage from '~/pages/album-delta/AlbumDeltaPage';
 import PracticePage from '~/pages/album-pratice/PracticePage';
 import MyTestPage from '~/pages/mytest/MyTestPage';
+import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -30,6 +31,7 @@ export const publicRoutes = [
   {path: routes.policy, component: Policy},
   {path: routes.service, component: Service},
   {path: routes.about, component: About},
+  {path: routes.verifyEmail, component: VerifyEmailPage},
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập

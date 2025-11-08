@@ -4,19 +4,19 @@
   padding: 2rem;
 
   .exam-type-title {
+    text-align: center;
     font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-2xl); // vừa phải hơn (30px)
+    font-size: var(--font-size-2xl);
     color: var(--primary-color);
     margin-bottom: 1.5rem;
     line-height: 1.3;
-    text-align: center;
   }
 
   .exam-types-grid {
     display: flex;
-    gap: 1rem;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 1rem;
 
     .exam-type-btn {
       background-color: var(--white);
@@ -26,18 +26,18 @@
       font-size: var(--font-size-base);
       font-weight: var(--font-weight-medium);
       color: var(--secondary-color);
-      transition: all 0.25s ease;
       cursor: pointer;
-      min-width: 120px;
       text-align: center;
+      min-width: 120px;
       font-family: var(--font-family);
+      transition: all 0.25s ease;
 
       &:hover {
-        border-color: var(--accent-color); /* chỉ đổi viền */
+        border-color: var(--accent-color);
         color: var(--accent-color);
-        background-color: var(--white); /* giữ nền trắng */
+        background-color: var(--white);
         transform: translateY(-3px);
-        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.1); /* xanh dương mờ nhẹ */
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.1);
       }
 
       &:active {
@@ -48,13 +48,13 @@
   }
 }
 
-// Responsive design
+/* Responsive */
 @media (max-width: 768px) {
   .exam-type-container {
     padding: 1.25rem;
 
     .exam-type-title {
-      font-size: var(--font-size-2xl); // 24px tablet
+      font-size: var(--font-size-2xl);
       margin-bottom: 1.25rem;
     }
 
@@ -76,7 +76,7 @@
     padding: 1rem;
 
     .exam-type-title {
-      font-size: var(--font-size-xl); // 20px mobile
+      font-size: var(--font-size-xl);
     }
 
     .exam-types-grid {
