@@ -1,148 +1,251 @@
-.bodic {
+/* 🌈 Tổng thể - BỐ CỤC SPLIT-SCREEN */
+.splitContainer {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 70vh;
+  min-height: 100vh;
+  width: 100%;
   background: var(--hover-color);
 }
 
+/* 🖼️ Cột trái (Thông tin/Branding) */
+.infoPanel {
+  flex-basis: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  background-color: var(--primary-color);
+  color: var(--white);
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+
+  .infoLogo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px;
+    object-fit: contain;
+  }
+
+  h2 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 10px;
+    color: white;
+  }
+
+  p {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-light);
+  }
+}
+
+/* 📝 Cột phải (Form) */
+.formPanel {
+  flex-basis: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  @media (max-width: 992px) {
+    flex-basis: 100%;
+  }
+}
+
+/* 🧱 Form chính */
 .wrap {
   max-width: 420px;
   width: 100%;
   background: var(--white);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 30px 40px;
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  padding: 40px 45px;
+  text-align: center;
 
   h1 {
     font-size: var(--font-size-4xl);
-    text-align: center;
-    color: var(--primary-color);
     font-weight: var(--font-weight-bold);
+    margin-bottom: 25px;
   }
 }
 
-.wrap .input-box {
+/* 🔤 Input Box */
+.input-box {
   position: relative;
   width: 100%;
   height: 50px;
   margin: 20px 0;
-}
 
-.wrap-username,
-.wrap-password,
-.wrap-email,
-.wrap-fullname {
-  background: transparent;
-  width: 100%;
-  height: 100%;
-  padding: 20px 45px 20px 20px;
-  border: 2px solid var(--border-color);
-  border-radius: 40px;
-  color: var(--text-color);
-  font-size: var(--font-size-base);
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
-
-  &::placeholder {
-    opacity: 0.7;
+  input {
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    padding: 18px 45px 18px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 40px;
     color: var(--text-color);
+    font-size: var(--font-size-base);
+    outline: none;
+    transition: all 0.3s;
+
+    &:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 8px rgba(0, 198, 255, 0.2);
+    }
   }
 
-  &:focus::placeholder {
-    font-weight: var(--font-weight-medium);
-    opacity: 0.9;
-  }
-
-  &:focus {
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.3);
-    border-color: var(--accent-color);
+  i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    opacity: 0.7;
   }
 }
 
-.input-box i {
-  color: var(--text-color);
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.4rem;
-}
-
+/* 🧩 Ghi nhớ & Quên mật khẩu */
 .remember-forgot {
   display: flex;
   justify-content: space-between;
   font-size: var(--font-size-ssm);
-  margin: 0 15px 10px 15px;
+  margin-bottom: 20px;
   color: var(--secondary-color);
 
   label {
     display: flex;
     align-items: center;
+    cursor: pointer;
+
     input {
-      margin-right: 8px;
-      accent-color: var(--accent-color);
+      margin-right: 6px;
     }
   }
 
   a {
     color: var(--accent-color);
-    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
 
     &:hover {
-      color: var(--accent-act-color);
+      text-decoration: underline;
     }
   }
 }
 
+/* 🟩 Nút đăng nhập chính */
 .login-btn {
   width: 100%;
-  height: 45px;
-  background: var(--accent-color);
+  height: 48px;
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-act-color));
   border-radius: 30px;
-  cursor: pointer;
   border: none;
-  color: var(--white);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  transition: all 0.3s ease;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 
   &:hover {
-    background-color: var(--accent-act-color);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
   }
 
   &:disabled {
-    background-color: #9cd0aa;
+    opacity: 0.7;
     cursor: not-allowed;
   }
 }
 
-.login-message {
-  font-size: var(--font-size-sm);
-  padding: 10px 0;
-  color: red;
-  text-align: center;
+/* 🌐 NÚT GOOGLE */
+.social-login {
+  margin-top: 25px;
 
-  &.success {
-    color: var(--accent-color);
+  .separator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    color: #888;
+    font-size: 13px;
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    span {
+      padding: 0 10px;
+    }
+  }
+
+  .google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 30px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: all 0.3s;
+
+    img {
+      width: 20px;
+      margin-right: 12px;
+    }
+
+    &:hover {
+      background-color: #f8f9fa;
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
   }
 }
 
+/* 📢 Thông báo */
+.login-message {
+  margin-bottom: 15px;
+  font-size: 14px;
+
+  &.error {
+    color: #ff4d4f;
+  }
+
+  &.success {
+    color: #52c41a;
+  }
+}
+
+/* 🧭 Link đăng ký */
 .register-link {
-  font-size: var(--font-size-ssm);
-  text-align: center;
-  margin: 20px 0 15px 0;
-  color: var(--text-color);
+  margin-top: 25px;
+  font-size: 14px;
 
   a {
     color: var(--accent-color);
-    font-weight: var(--font-weight-bold);
+    font-weight: bold;
+  }
+}
 
-    &:hover {
-      color: var(--accent-act-color);
-    }
+/* 🌀 Spinner */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

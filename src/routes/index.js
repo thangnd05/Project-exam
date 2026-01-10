@@ -24,35 +24,36 @@ import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
-  {path: routes.login, component: Login},
-  {path: routes.register, component: Register},
-  {path: routes.home, component: TestPage},
-  {path: routes.examTypeDetail, component: TestByExamTypePage},
-  {path: routes.policy, component: Policy},
-  {path: routes.service, component: Service},
-  {path: routes.about, component: About},
-  {path: routes.verifyEmail, component: VerifyEmailPage},
+  { path: routes.login, component: Login },
+  { path: routes.register, component: Register },
+  { path: routes.home, component: TestPage },
+  { path: routes.examTypeDetail, component: TestByExamTypePage },
+  { path: routes.policy, component: Policy },
+  { path: routes.service, component: Service },
+  { path: routes.about, component: About },
+  { path: routes.verifyEmail, component: VerifyEmailPage },
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập
 export const privateRoutes = [
-  {path: routes.testStart, component: TestStartPage},
-  {path: routes.testResult, component: TestResultPage},
-  {path: routes.createTest, component: CreateTestPage},
-  {path: routes.createTestNormal, component: TestCreationForm},
-  {path: routes.createQuestion, component: CreateQuestionPage},
-  {path: routes.testHistory, component: TestHistoryPage},
-  {path: routes.myClasses, component: MyClassesPage},
-  {path: routes.testClasses, component: TestByClassPage},
-  {path: routes.editTestPage, component: EditTestPage},
-  {path: routes.editQuestion, component: QuestionUpdatePage},
-  {path: routes.myAlbums, component: MyAlbumsPage},
-  {path: routes.albumDelta, component: AlbumDetailPage},
-  {path: routes.vocaPratice, component: PracticePage},
-  {path: routes.MyTest, component: MyTestPage},
+  { path: routes.testStart, component: TestStartPage },
+  { path: routes.testResult, component: TestResultPage },
+  { path: routes.createTest, component: CreateTestPage },
+  { path: routes.createTestNormal, component: TestCreationForm },
+  { path: routes.createQuestion, component: CreateQuestionPage },
+  { path: routes.testHistory, component: TestHistoryPage },
+  { path: routes.myClasses, component: MyClassesPage },
+  { path: routes.testClasses, component: TestByClassPage },
+  { path: routes.editTestPage, component: EditTestPage },
+  { path: routes.editQuestion, component: QuestionUpdatePage },
+  { path: routes.myAlbums, component: MyAlbumsPage },
+  { path: routes.albumDelta, component: AlbumDetailPage },
+  { path: routes.vocaPratice, component: PracticePage },
+  { path: routes.MyTest, component: MyTestPage },
+  { path: routes.oauth2Redirect, component: MyTestPage },
 
   // Thêm các trang riêng tư khác ở đây, ví dụ: trang profile
   // { path: routes.profile, component: ProfilePage },
 ];
 
-export default {publicRoutes, privateRoutes};
+export default { publicRoutes, privateRoutes };

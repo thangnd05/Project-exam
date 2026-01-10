@@ -72,88 +72,94 @@ function Header() {
           {/* Navbar lớn */}
           <Navbar.Collapse
             id="basic-navbar-nav"
-            className={cx('d-none d-lg-flex')}
+            className={cx('d-none d-lg-flex justify-content-between')}
           >
-            <Nav className={cx('mx-5')}>
-              <Nav.Link as={Link} to={routes.about} className={cx('home')}>
-                Giới thiệu
-              </Nav.Link>
-            </Nav>
-            <Nav className={cx('mx-5')}>
-              <Nav.Link as={Link} to={routes.myAlbums} className={cx('home')}>
-                Từ vựng
-              </Nav.Link>
-            </Nav>
-            <Nav className={cx('mx-5')}>
-              <Nav.Link as={Link} to={routes.MyTest} className={cx('home')}>
-                Bài đã tạo
-              </Nav.Link>
-            </Nav>
+            <div className="d-flex">
+              <Nav className={cx('mx-5')}>
+                <Nav.Link as={Link} to={routes.about} className={cx('home')}>
+                  Giới thiệu
+                </Nav.Link>
+              </Nav>
+              <Nav className={cx('mx-5')}>
+                <Nav.Link as={Link} to={routes.myAlbums} className={cx('home')}>
+                  Từ vựng
+                </Nav.Link>
+              </Nav>
+              <Nav className={cx('mx-5')}>
+                <Nav.Link as={Link} to={routes.MyTest} className={cx('home')}>
+                  Bài đã tạo
+                </Nav.Link>
+              </Nav>
+            </div>
             <Nav>{/* <Search /> */}</Nav>
-            <Nav>
-              {user ? (
-                <>
-                  <Nav.Link
-                    as={Link}
-                    to={routes.createTest}
-                    className={cx('mx-5')}
-                  >
-                    <Button variant="" className={cx('new-test')}>
-                      Tạo bài kiểm tra
-                    </Button>
-                  </Nav.Link>
-                  <Dropdown>
-                    <Dropdown.Toggle as="div" className={cx('user-info')}>
-                      <Image
-                        src={images.avtImage}
-                        alt="Avatar"
-                        className={cx('avatar')}
-                      />
-                      <div>
-                        <span className={cx('username')}>{user.username}</span>
-                      </div>
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu className={cx('custom-dropdown')}>
-                      <Dropdown.Item as={Link} to={routes.profile}>
-                        Hồ sơ
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        onClick={handleLogout}
-                        as={Link}
-                        to={routes.home}
-                      >
-                        Đăng xuất
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </>
-              ) : (
-                <>
-                  <Nav.Link
-                    as={Link}
-                    to={routes.login}
-                    state={{from: location}}
-                    className={cx('nav-link', 'login-link', 'home')}
-                  >
-                    Đăng nhập
-                  </Nav.Link>
-                  <Nav.Link
-                    as={Link}
-                    to={routes.register}
-                    className={cx('mx-5', 'home')}
-                  >
-                    Đăng ký
-                  </Nav.Link>
-                </>
-              )}
-            </Nav>
+            <div>
+              <Nav>
+                {user ? (
+                  <>
+                    <Nav.Link
+                      as={Link}
+                      to={routes.createTest}
+                      className={cx('mx-5')}
+                    >
+                      <Button variant="" className={cx('new-test')}>
+                        Tạo bài kiểm tra
+                      </Button>
+                    </Nav.Link>
+                    <Dropdown>
+                      <Dropdown.Toggle as="div" className={cx('user-info')}>
+                        <Image
+                          src={images.avtImage}
+                          alt="Avatar"
+                          className={cx('avatar')}
+                        />
+                        <div>
+                          <span className={cx('username')}>
+                            {user.username}
+                          </span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu className={cx('custom-dropdown')}>
+                        <Dropdown.Item as={Link} to={routes.profile}>
+                          Hồ sơ
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={handleLogout}
+                          as={Link}
+                          to={routes.home}
+                        >
+                          Đăng xuất
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </>
+                ) : (
+                  <>
+                    <Nav.Link
+                      as={Link}
+                      to={routes.login}
+                      state={{from: location}}
+                      className={cx('nav-link', 'login-link', 'home')}
+                    >
+                      Đăng nhập
+                    </Nav.Link>
+                    <Nav.Link
+                      as={Link}
+                      to={routes.register}
+                      className={cx('mx-5', 'home')}
+                    >
+                      Đăng ký
+                    </Nav.Link>
+                  </>
+                )}
+              </Nav>
+            </div>
           </Navbar.Collapse>
 
           {/* Offcanvas (màn hình nhỏ) */}
           <Offcanvas show={showOffcanvas} onHide={handleClose} placement="end">
             <Offcanvas.Header closeButton>
               <Offcanvas.Title as={Link} to={routes.home} onClick={handleClose}>
-                EDT
+                {name}
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>

@@ -4,3 +4,136 @@ footer {
 li {
   list-style: none !important;
 }
+/* footer.module.scss */
+
+.footer {
+  /* Thay thế 'bg-secondary' bằng biến màu global của bạn */
+  background-color: var(--primary-color);
+
+  /* Thay thế 'text-white' */
+  color: var(--white);
+
+  /* Thay thế 'text-center text-lg-start' */
+  text-align: center;
+  @media (min-width: 992px) {
+    // lg breakpoint của Bootstrap
+    text-align: left;
+  }
+}
+
+.logoContainer {
+  /* Thay thế các class utility 'rounded-circle bg-white shadow-1-strong...' */
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: var(--white);
+  box-shadow: var(--shadow-md); // Sử dụng biến shadow global
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem; // Tương đương 'mb-4'
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  /* Giúp logo hiển thị đẹp bên trong vòng tròn */
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+}
+
+.socialLinks {
+  /* Thay thế 'list-unstyled d-flex flex-row justify-content-center' */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+
+  li {
+    padding: 0 0.75rem; // Tương đương 'px-2'
+  }
+
+  a {
+    color: var(--white);
+    font-size: var(--font-size-2xl); // Làm icon to hơn một chút
+    transition: color 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+      color: var(--accent-color); // Dùng màu nhấn khi hover
+      transform: scale(1.1);
+    }
+  }
+}
+
+.title {
+  /* Thay thế 'text-uppercase mb-4' */
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  font-size: var(--font-size-lg);
+}
+
+.titleName {
+  /* Style riêng cho {name} */
+  composes: title; // Kế thừa style từ .title
+  font-size: var(--font-size-2xl); // Nhưng to hơn
+  text-transform: none; // Không uppercase
+}
+
+.navList {
+  list-style: none;
+  padding-left: 0;
+}
+
+.navItem {
+  margin-bottom: 0.75rem; // Tương đương 'mb-2'
+}
+
+.navLink {
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: var(--border-color); // Dùng màu viền (sáng) khi hover
+    text-decoration: underline;
+  }
+}
+
+.contactInfo {
+  list-style: none;
+  padding-left: 0;
+
+  p {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+
+    // Căn giữa trên mobile
+    justify-content: center;
+
+    // Căn trái trên desktop
+    @media (min-width: 992px) {
+      justify-content: flex-start;
+    }
+  }
+
+  svg {
+    /* Thay thế 'pe-2' */
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+  }
+}
+
+.copyright {
+  /* Thay thế style inline */
+  background-color: rgba(0, 0, 0, 0.2);
+
+  /* Thay thế 'p-3' */
+  padding: 1rem;
+  text-align: center;
+}

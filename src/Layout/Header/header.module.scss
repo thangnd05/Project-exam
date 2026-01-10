@@ -4,8 +4,21 @@
   font-size: 2rem;
 }
 
+/* === ✅ Thêm sticky + hiệu ứng mờ vào đây === */
 .wrapper {
   font-size: 1.6rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  /* Nền trong mờ nhẹ */
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* Viền và bóng mờ nhẹ để tách khỏi nội dung */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .new-test {
@@ -19,31 +32,36 @@
     color: white;
   }
 }
+
 .home {
   position: relative;
   color: #898686;
   text-decoration: none;
+  transition: color 0.3s ease;
 
+  /* Hiệu ứng gạch chân từ giữa ra hai bên */
   &::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 10%;
-    width: 0%;
+    left: 50%; /* bắt đầu từ giữa */
+    transform: translateX(-50%); /* canh giữa */
+    width: 0; /* chưa hiển thị */
     height: 3px;
     border-radius: 1px;
     background-color: var(--accent-color);
-    transition: 0.4s;
+    transition: width 0.4s ease;
   }
 
   &:hover {
     color: var(--accent-color);
 
     &::after {
-      width: 80%;
+      width: 80%; /* mở rộng đều ra hai bên */
     }
   }
 }
+
 .home_sm {
   color: #898686;
   text-decoration: none;
@@ -51,6 +69,7 @@
     color: #111;
   }
 }
+
 .user-info {
   display: flex;
   align-items: center;
@@ -77,18 +96,22 @@
 .custom-dropdown {
   font-size: 1.6rem;
 }
+
 .custom-dropdown-item {
   &:active {
     background-color: transparent !important;
   }
 }
+
 .btn-create_sm {
   font-size: 1.4rem;
 }
+
 .bar {
   font-size: 1.6rem;
   width: 5rem;
 }
+
 .tit_sm {
   font-size: 2.4rem;
 }

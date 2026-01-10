@@ -5,7 +5,7 @@ import {
   FaYoutube,
   FaEnvelope,
 } from 'react-icons/fa';
-import styles from './footer.module.scss';
+import styles from './footer.module.scss'; // Import module SCSS
 import {Link} from 'react-router-dom';
 import {name} from '~/assets/images';
 import images from '~/assets/images';
@@ -13,47 +13,57 @@ import routes from '~/config/Routes';
 
 function Footer() {
   return (
-    <Container className={styles.wrapper} fluid>
-      <footer className="bg-secondary text-center text-lg-start text-white ">
+    // Không cần 'styles.wrapper' ở đây nữa
+    <Container fluid className="p-0">
+      {/* Xóa 'bg-secondary text-center text-lg-start text-white'
+        Thêm className={styles.footer}
+      */}
+      <footer className={styles.footer}>
         {/* Grid container */}
         <Container className="p-4">
           {/* Grid row */}
           <Row className="my-4">
             {/* Grid column */}
             <Col lg={3} md={6} className="mb-4 mb-md-0">
-              <div
-                className="rounded-circle bg-white shadow-1-strong d-flex align-items-center justify-content-center mb-4 mx-auto"
-                style={{width: '150px', height: '150px'}}
-              >
+              {/* Thêm className={styles.logoContainer} */}
+              <div className={styles.logoContainer}>
                 <img
                   src={images.logo}
-                  height="150px"
+                  className={styles.logo} // Thêm className={styles.logo}
                   alt="Logo"
                   loading="lazy"
                 />
               </div>
-              <ul className="list-unstyled d-flex flex-row justify-content-center">
-                <a className="text-white px-2" href="#!">
-                  <FaFacebookSquare />
-                </a>
-                <a className="text-white px-2" href="#!">
-                  <FaInstagram />
-                </a>
-                <a className="text-white ps-2" href="#!">
-                  <FaYoutube />
-                </a>
+
+              {/* Thêm className={styles.socialLinks} 
+                Sửa lại HTML cho đúng chuẩn (dùng <li>)
+              */}
+              <ul className={styles.socialLinks}>
+                <li>
+                  <a href="#!">
+                    <FaFacebookSquare />
+                  </a>
+                </li>
+                <li>
+                  <a href="#!">
+                    <FaInstagram />
+                  </a>
+                </li>
+                <li>
+                  <a href="#!">
+                    <FaYoutube />
+                  </a>
+                </li>
               </ul>
             </Col>
             {/* Grid column */}
 
             {/* Grid column */}
             <Col lg={3} md={6} className="mb-4 mb-md-0">
-              <h5 className="mb-4 fw-bold" style={{fontSize: '2rem'}}>
-                {name}
-              </h5>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <Link to={routes.about} className="text-white">
+              <h5 className={styles.titleName}>{name}</h5>
+              <ul className={styles.navList}>
+                <li className={styles.navItem}>
+                  <Link to={routes.about} className={styles.navLink}>
                     Giới thiệu
                   </Link>
                 </li>
@@ -63,15 +73,15 @@ function Footer() {
 
             {/* Grid column */}
             <Col lg={3} md={6} className="mb-4 mb-md-0">
-              <h5 className="text-uppercase mb-4">Chính Sách và Dịch vụ</h5>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <Link to={routes.policy} className="text-white">
+              <h5 className={styles.title}>Chính Sách và Dịch vụ</h5>
+              <ul className={styles.navList}>
+                <li className={styles.navItem}>
+                  <Link to={routes.policy} className={styles.navLink}>
                     Chính Sách Sử Dụng
                   </Link>
                 </li>
-                <li className="mb-2">
-                  <Link to={routes.service} className="text-white">
+                <li className={styles.navItem}>
+                  <Link to={routes.service} className={styles.navLink}>
                     Dịch Vụ Người Dùng
                   </Link>
                 </li>
@@ -81,11 +91,11 @@ function Footer() {
 
             {/* Grid column */}
             <Col lg={3} md={6} className="mb-4 mb-md-0">
-              <h5 className="text-uppercase mb-4">Contact</h5>
-              <ul className="list-unstyled">
+              <h5 className={styles.title}>Contact</h5>
+              <ul className={styles.contactInfo}>
                 <li>
                   <p>
-                    <FaEnvelope className="pe-2 mb-0" />
+                    <FaEnvelope /> {/* Xóa class 'pe-2 mb-0' */}
                     winde.contact@gmail.com
                   </p>
                 </li>
@@ -98,10 +108,10 @@ function Footer() {
         {/* Grid container */}
 
         {/* Copyright */}
-        <div
-          className="text-center p-3"
-          style={{backgroundColor: 'rgba(0, 0, 0, 0.2)'}}
-        >
+        {/* Xóa style inline
+          Thêm className={styles.copyright}
+        */}
+        <div className={styles.copyright}>
           {name} - Nền tảng chia sẻ kiến thức của mọi người
         </div>
         {/* Copyright */}

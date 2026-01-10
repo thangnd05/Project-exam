@@ -18,6 +18,7 @@
     "classnames": "^2.5.1",
     "cors": "^2.8.5",
     "dompurify": "^3.2.3",
+    "framer-motion": "^12.23.24",
     "html-react-parser": "^5.2.2",
     "jodit-react": "^4.1.2",
     "normalize.css": "^8.0.1",

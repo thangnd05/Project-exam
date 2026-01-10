@@ -31,6 +31,9 @@ const routes = {
   forgot: '/forgot',
   reset: '/reset',
   verifyEmail: '/verify',
+
+  oauth2Redirect: '/oauth2/redirect',
+
 };
 
 export default routes;
