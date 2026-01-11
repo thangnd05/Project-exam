@@ -1,65 +1,76 @@
-import {createContext, useState, useEffect, useMemo} from 'react';
+import { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
 
-// Tạo Context
+
 export const AuthContext = createContext(null);
 
-// Tạo Provider Component
-export const AuthProvider = ({children}) => {
+
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Trạng thái loading để biết khi nào check session xong
+  const [loading, setLoading] = useState(true);
 
-  // Kiểm tra session khi ứng dụng khởi động lần đầu
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await axios.get('/api/auth/me');
-        const userData = response.data;
-        // Lưu thông tin user vào state
+
+  // 1. Hàm lấy User hiện tại (được bọc trong useCallback để dùng ổn định)
+  const fetchCurrentUser = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/auth/me');
+      if (response.data && (response.data.id || response.data.userId)) {
         setUser({
-          userId: userData.id,
-          username: userData.username || userData.name || userData.email,
-          email: userData.email,
-          role: userData.role,
+          userId: response.data.id || response.data.userId,
+          username: response.data.username || response.data.name || response.data.email,
+          email: response.data.email,
+          role: response.data.role,
         });
-      } catch (err) {
-        // Nếu có lỗi (thường là 401), nghĩa là chưa đăng nhập
-        console.error('Session check failed: Not logged in.');
+      } else {
         setUser(null);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  // 2. Chạy khi ứng dụng khởi động
+  useEffect(() => {
+    // Gọi check session ngay lập tức
     fetchCurrentUser();
-  }, []); // Mảng rỗng đảm bảo useEffect chỉ chạy 1 lần khi component mount
 
-  // Hàm login
+    // Cấu hình Google SDK để NĂM SAU nó cũng không tự hiện "Avatar ma"
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        auto_select: false, // ❌ QUAN TRỌNG: Tắt tự động chọn
+        itp_support: true,
+      });
+      // Hủy mọi tiến trình prompt đang chạy ngầm của Google
+      window.google.accounts.id.cancel();
+    }
+  }, [fetchCurrentUser]);
+
+  // 3. Hàm login
   const login = (userData) => {
-    // Cập nhật state với thông tin người dùng
     setUser({
-      userId: userData.id || userData.userId, // Đảm bảo có userId
+      userId: userData.id || userData.userId,
       username: userData.username || userData.name || userData.email,
-      ...userData,
+      email: userData.email,
+      role: userData.role,
     });
   };
 
-  // Hàm logout
+  // 4. Hàm logout
   const logout = async () => {
     try {
       await axios.post('/api/auth/logout');
     } catch (err) {
-      console.error(
-        'Logout API call failed:',
-        err.response?.data || err.message,
-      );
+      console.error('Logout error:', err);
     } finally {
-      // Luôn xóa thông tin người dùng ở client dù API có lỗi hay không
       setUser(null);
+      localStorage.clear();
+      sessionStorage.clear();
     }
   };
 
-  // Dùng useMemo để tối ưu, tránh re-render không cần thiết
   const value = useMemo(
     () => ({
       user,
@@ -67,9 +78,9 @@ export const AuthProvider = ({children}) => {
       login,
       logout,
       userId: user?.userId,
-      isAuthenticated: !!user,
+      isAuthenticated: !!user && !!user.userId,
     }),
-    [user, loading], // Chỉ tạo lại object value khi user hoặc loading thay đổi
+    [user, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

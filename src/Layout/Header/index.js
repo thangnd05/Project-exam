@@ -7,23 +7,23 @@ import {
   Image,
   Offcanvas,
 } from 'react-bootstrap';
-import React, {useState} from 'react';
-import {Link, useNavigate, useLocation} from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import images from '~/assets/images';
 import classNames from 'classnames/bind';
 // import Search from '../Search';
-import {useAuth} from '../../hook/useAuth';
-import {name} from '~/assets/images';
+import { useAuth } from '../../hook/useAuth';
+import { name } from '~/assets/images';
 import routes from '~/config/Routes';
-import {faBars} from '@fortawesome/free-solid-svg-icons';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(style);
 
 function Header() {
-  const {user, logout} = useAuth();
+  const { user, logout } = useAuth();
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const navigate = useNavigate();
   const location = useLocation(); // ✅ SỬA 2: Lấy thông tin location hiện tại
@@ -47,7 +47,7 @@ function Header() {
           >
             <div
               className="d-flex align-items-center justify-content-center"
-              style={{width: '140px'}}
+              style={{ width: '140px' }}
             >
               <Image
                 src={images.logo}
@@ -137,7 +137,7 @@ function Header() {
                     <Nav.Link
                       as={Link}
                       to={routes.login}
-                      state={{from: location}}
+                      state={{ from: location }}
                       className={cx('nav-link', 'login-link', 'home')}
                     >
                       Đăng nhập

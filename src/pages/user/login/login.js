@@ -19,8 +19,9 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // URL đăng nhập Google từ Backend
+  // URL đăng nhập OAuth2 từ Backend
   const GOOGLE_AUTH_URL = "http://localhost:8080/oauth2/authorization/google";
+  const FACEBOOK_AUTH_URL = "http://localhost:8080/oauth2/authorization/facebook";
 
   useEffect(() => {
     if (user) {
@@ -121,18 +122,32 @@ function LoginPage() {
             {loading ? <div className={cx('loading-spinner')}></div> : 'Đăng nhập'}
           </button>
 
-          {/* NÚT ĐĂNG NHẬP GOOGLE */}
+          {/* SOCIAL LOGIN SECTION */}
           <div className={cx('social-login')}>
             <div className={cx('separator')}>
               <span>Hoặc đăng nhập với</span>
             </div>
-            <a href={GOOGLE_AUTH_URL} className={cx('google-btn')}>
-              <img
-                src="https://www.vectorlogo.zone/logos/google/google-icon.svg"
-                alt="Google"
-              />
-              Tiếp tục với Google
-            </a>
+
+            <div className={cx('social-btns')}>
+              {/* NÚT GOOGLE */}
+              <a href={GOOGLE_AUTH_URL} className={cx('social-btn', 'google-btn')}>
+                <img
+                  src="https://www.vectorlogo.zone/logos/google/google-icon.svg"
+                  alt="Google"
+                />
+                Google
+              </a>
+
+              {/* NÚT FACEBOOK */}
+              <a href={FACEBOOK_AUTH_URL} className={cx('social-btn', 'facebook-btn')}>
+                <img
+                  src="https://www.vectorlogo.zone/logos/facebook/facebook-tile.svg"
+                  alt="Facebook"
+                  style={{ width: '20px', marginRight: '8px' }}
+                />
+                Facebook
+              </a>
+            </div>
           </div>
 
           {/* Link đăng ký */}

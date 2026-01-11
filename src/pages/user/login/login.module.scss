@@ -249,3 +249,91 @@
     transform: rotate(360deg);
   }
 }
+
+/* ... các phần cũ giữ nguyên ... */
+
+/* 🌐 SOCIAL LOGIN SECTION */
+.social-login {
+  margin-top: 25px;
+
+  .separator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    color: #888;
+    font-size: 13px;
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    span {
+      padding: 0 10px;
+    }
+  }
+
+  .social-btns {
+    display: flex;
+    gap: 12px; // Tạo khoảng cách giữa 2 nút
+    justify-content: space-between;
+  }
+
+  /* Nút chung cho cả Google/Facebook */
+  .social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: 2px solid var(--border-color);
+
+    img {
+      width: 18px;
+      margin-right: 8px;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .google-btn {
+    background: white;
+    color: var(--text-color);
+
+    &:hover {
+      background-color: #f8f9fa;
+      border-color: #4285F4;
+    }
+  }
+
+  .facebook-btn {
+    background: #1877F2;
+    border-color: #1877F2;
+    color: white;
+
+    img {
+      width: 20px;
+      margin-right: 8px;
+      /* Nếu logo gốc là màu xanh, dùng dòng này để biến nó thành trắng */
+      filter: brightness(0) invert(1);
+
+      /* Nếu vẫn không hiện, hãy thử tạm thời xóa dòng filter này đi 
+         để xem logo gốc có hiện lên không */
+    }
+
+    &:hover {
+      background-color: #166fe5;
+      border-color: #166fe5;
+    }
+  }
+}
