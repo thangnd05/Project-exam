@@ -161,6 +161,12 @@ function LoginPage() {
 
             {isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
             <button type="submit" className={cx('login-btn')} disabled={loading}>Đăng ký ngay</button>
+            <div className={cx('mobile-switch')}>
+              <span>Đã có tài khoản? </span>
+              <button type="button" style={{ textDecoration: 'none' }} onClick={() => { setIsSignUp(false); setMessage(''); }}>
+                Đăng nhập ngay
+              </button>
+            </div>
           </form>
         </div>
 
@@ -189,6 +195,13 @@ function LoginPage() {
             <button type="submit" className={cx('login-btn')} disabled={loading}>
               {loading ? <div className={cx('loading-spinner')}></div> : 'Đăng nhập ngay'}
             </button>
+
+            <div className={cx('mobile-switch')}>
+              <span>Chưa có tài khoản? </span>
+              <button type="button" style={{ textDecoration: 'none' }} onClick={() => { setIsSignUp(true); setMessage(''); }}>
+                Đăng ký ngay
+              </button>
+            </div>
           </form>
         </div>
 
