@@ -30,8 +30,7 @@
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 18px
-      color-mix(in srgb, var(--accent-color) 50%, transparent);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-color) 50%, transparent);
   }
 }
 
@@ -82,7 +81,8 @@
 
 .btn-start {
   width: 100%;
-  background: var(--accent-color); /* 🔵 dùng biến màu chủ đạo */
+  background: var(--accent-color);
+  /* 🔵 dùng biến màu chủ đạo */
   color: var(--white);
   border: none;
   border-radius: 6px;
@@ -92,7 +92,8 @@
   transition: background 0.2s ease, transform 0.1s ease;
 
   &:hover {
-    background: var(--accent-act-color); /* 🔵 màu khi hover */
+    background: var(--accent-act-color);
+    /* 🔵 màu khi hover */
     transform: translateY(-1px);
   }
 
@@ -101,7 +102,8 @@
   }
 
   &:disabled {
-    background: #9ac7ff; /* xanh dương nhạt khi disabled */
+    background: #9ac7ff;
+    /* xanh dương nhạt khi disabled */
     cursor: not-allowed;
     opacity: 0.7;
   }
@@ -112,6 +114,7 @@
   color: #fff;
   cursor: not-allowed;
 }
+
 .header-bar {
   display: flex;
   justify-content: space-between;

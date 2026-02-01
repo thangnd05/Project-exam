@@ -2,11 +2,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 100px 5%;
+    padding: 50px 5%;
     max-width: 1300px;
     margin: 0 auto;
     gap: 50px;
-    min-height: 85vh;
+    min-height: 60vh;
 
     @media (max-width: 992px) {
         flex-direction: column;

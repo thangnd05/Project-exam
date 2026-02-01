@@ -82,7 +82,6 @@ li {
 
 .titleName {
   /* Style riêng cho {name} */
-  composes: title; // Kế thừa style từ .title
   font-size: var(--font-size-2xl); // Nhưng to hơn
   text-transform: none; // Không uppercase
 }

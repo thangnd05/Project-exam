@@ -1,13 +1,13 @@
 import axios from 'axios';
-import {useEffect, useState} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function TestStartPage() {
-  const {testId} = useParams();
+  const { testId } = useParams();
   const navigate = useNavigate();
 
   const [userTestId, setUserTestId] = useState(null);
-  const [test, setTest] = useState({parts: []});
+  const [test, setTest] = useState({ parts: [] });
   const [userAnswers, setUserAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
   const [preCountdown, setPreCountdown] = useState(null);
@@ -56,7 +56,7 @@ function TestStartPage() {
     axios
       .get(`/api/tests/usertest/${testId}`)
       .then((res) => {
-        const testData = {...res.data, parts: res.data.parts || []};
+        const testData = { ...res.data, parts: res.data.parts || [] };
         setTest(testData);
 
         if (testData.canDoTest === false) {
@@ -136,7 +136,7 @@ function TestStartPage() {
       }
 
       axios
-        .post('/api/user-tests', {testId: test.testId})
+        .post('/api/user-tests', { testId: test.testId })
         .then((res) => {
           const id = res.data.userTestId;
           setUserTestId(id);
@@ -222,9 +222,9 @@ function TestStartPage() {
   const handleAnswerChange = (questionId, type, value) => {
     const updatedAnswer =
       type === 'MCQ'
-        ? {selectedAnswerId: value, answerText: null}
-        : {selectedAnswerId: null, answerText: value};
-    setUserAnswers({...userAnswers, [questionId]: updatedAnswer});
+        ? { selectedAnswerId: value, answerText: null }
+        : { selectedAnswerId: null, answerText: value };
+    setUserAnswers({ ...userAnswers, [questionId]: updatedAnswer });
   };
 
   // 🟢 Nộp bài
@@ -250,7 +250,7 @@ function TestStartPage() {
       sessionStorage.removeItem(`userTest-${testId}`);
       sessionStorage.removeItem(`userTestState-${testId}`);
 
-      navigate(`/tests/result/${userTestId}`, {state: {score: totalScore}});
+      navigate(`/tests/result/${userTestId}`, { state: { score: totalScore } });
     } catch (err) {
       console.error('❌ Lỗi khi nộp bài:', err);
       alert('Nộp bài thất bại! Vui lòng thử lại.');
@@ -279,7 +279,7 @@ function TestStartPage() {
   if (status !== 'active' || !test) return <p>Đang chuẩn bị bài thi...</p>;
 
   return (
-    <div style={{padding: '2rem', maxWidth: '900px', margin: 'auto'}}>
+    <div style={{ padding: '2rem', maxWidth: '900px', margin: 'auto' }}>
       <h2>{test.title}</h2>
       <p>{test.description}</p>
 
@@ -290,7 +290,7 @@ function TestStartPage() {
       )}
 
       {test.parts?.map((part, i) => (
-        <div key={part.testPartId} style={{marginBottom: '2rem'}}>
+        <div key={part.testPartId} style={{ marginBottom: '2rem' }}>
           <h3>Phần {i + 1}</h3>
           {part.passage && (
             <div
@@ -305,7 +305,7 @@ function TestStartPage() {
                   <audio
                     controls
                     src={getFullMediaUrl(part.passage.mediaUrl)}
-                    style={{width: '100%'}}
+                    style={{ width: '100%' }}
                   />
                 )}
               {part.passage.content && <p>{part.passage.content}</p>}

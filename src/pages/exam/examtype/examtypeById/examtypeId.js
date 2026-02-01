@@ -1,15 +1,15 @@
 import axios from 'axios';
-import {useEffect, useState} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import style from './TestByExamTypePage.module.scss';
-import {useAuth} from '../../../../hook/useAuth';
+import { useAuth } from '../../../../hook/useAuth';
 
 const cx = classNames.bind(style);
 
 function TestByExamTypePage() {
-  const {examTypeId} = useParams();
-  const {user} = useAuth();
+  const { examTypeId } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [tests, setTests] = useState([]);
@@ -113,7 +113,7 @@ function TestByExamTypePage() {
       if (timeUntilClose < allowedTime) allowedTime = timeUntilClose;
     }
 
-    navigate(`/tests/${test.testId}/start`, {state: {allowedTime}});
+    navigate(`/tests/${test.testId}/start`, { state: { allowedTime } });
   };
 
   const handleViewHistory = (testId) => {

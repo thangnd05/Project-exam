@@ -1,5 +1,5 @@
-/* GlobalStyles.scss */
 @import 'normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
   /* --- 1. GIỮ NGUYÊN TÊN BIẾN - CHỈ ĐỔI MÀU SÁNG (MODERN THEME) --- */
@@ -46,7 +46,7 @@
   --hover-color: #f8f9fa;
 
   /* Typography giữ nguyên */
-  --font-family: 'ProximaNova', sans-serif;
+  --font-family: 'Inter', sans-serif;
   --font-weight: 600;
   --font-size: 2rem;
   --padding-top: 1rem;
