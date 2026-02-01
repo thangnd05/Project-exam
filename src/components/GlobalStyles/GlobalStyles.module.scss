@@ -1,61 +1,101 @@
+/* GlobalStyles.scss */
 @import 'normalize.css';
 
 :root {
-  --primary: #fe2c55;
+  /* --- 1. GIỮ NGUYÊN TÊN BIẾN - CHỈ ĐỔI MÀU SÁNG (MODERN THEME) --- */
+
+  /* --primary: Màu chủ đạo (Logo/Brand) -> Đổi sang Xanh Dương Sáng */
+  --primary: #0061f2;
+
+  /* --primary-color: Dùng cho các nút bấm chính/Header 
+     -> Đổi sang màu "Than Chì" (Dark Slate) để nút Đăng nhập nhìn nổi bật, sang trọng */
+  --primary-color: #0061f2;
+  --dark-color: #1e293b;
+  --footer-bg: #0b2c4d;
+  /* navy đậm sang */
+
+
+
+  --primary-gradient: linear-gradient(135deg,
+      var(--accent-color) 0%,
+      var(--accent-act-color) 100%);
+  /* --accent-color: Màu điểm nhấn (Link/Icon/Gradient Start) 
+     -> Xanh Dương Tươi */
+  --accent-color: #0061f2;
+
+  /* --accent-act-color: Màu điểm nhấn 2 (Gradient End/Hover) 
+     -> Xanh Cyan Sáng (để pha màu Gradient đẹp) */
+  --accent-act-color: #00c6ff;
+
+  /* Các màu cơ bản */
   --black: #000;
   --white: #fff;
   --text-color: #161823;
+  --text-secondary: #64748b;
+  /* Màu xám xanh hiện đại cho chữ phụ */
 
+  /* Màu nền & Viền */
+  --bg-body: #f0f2f5;
+  /* Thêm biến này: Màu nền web xám nhẹ */
+  --bg-white: #ffffff;
+  /* Thêm biến này: Màu nền trắng cho Card */
+  --input-bg: #f1f5f9;
+  /* Thêm biến này: Màu nền input */
+  --border-color: #e2e8f0;
+  /* Viền nhạt hơn */
+  --hover-color: #f8f9fa;
+
+  /* Typography giữ nguyên */
   --font-family: 'ProximaNova', sans-serif;
   --font-weight: 600;
   --font-size: 2rem;
   --padding-top: 1rem;
 
-  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.15);
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-
-  // Thêm các biến mới cho typography
-  --font-size-xs: 0.75rem; // 12px
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;
   --font-size-sm: 1.2rem;
-  --font-size-ssm: 1.4rem; // 14px
-  --font-size-base: 1.6rem; // 16px (kế thừa từ body)
-  --font-size-lg: 1.8rem; // 18px
-  --font-size-xl: 2rem; // 20px
-  --font-size-2xl: 2.4rem; // 24px
-  --font-size-3xl: 3rem; // 30px
-  --font-size-4xl: 3.6rem; // 36px
-  --font-size-5xl: 4.8rem; // 48px
+  --font-size-ssm: 1.4rem;
+  --font-size-base: 1.6rem;
+  --font-size-lg: 1.8rem;
+  --font-size-xl: 2rem;
+  --font-size-2xl: 2.4rem;
+  --font-size-3xl: 3rem;
+  --font-size-4xl: 3.6rem;
+  --font-size-5xl: 4.8rem;
 
-  // Font Weights
+  /* Font Weights */
   --font-weight-light: 300;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  // Colors mở rộng
-  --primary-color: #1b3a57; /* navy nhẹ hơn */
-  --secondary-color: #495057;
-  --accent-color: #007bff; /* đổi từ xanh lá -> xanh dương */
-  --accent-act-color: #0056b3; /* xanh đậm khi hover */
+  /* Shadow & Radius */
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 14px 28px rgba(0, 0, 0, 0.05), 0 10px 10px rgba(0, 0, 0, 0.05);
+  /* Bóng cho Card Login */
 
-  --border-color: #e9ecef;
-  --hover-color: #f8f9fa;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 20px;
+  /* Bo góc lớn */
 }
 
-/* SỬA LỖI 1: Các class utility phải được đặt bên ngoài :root */
-// Utility class cho shadow + radius
+/* --- PHẦN CLASS UTILITY (ĐÃ ĐƯA RA NGOÀI :ROOT ĐỂ CODE CHẠY ĐÚNG) --- */
+
 .shadow-md {
   box-shadow: var(--shadow-md) !important;
 }
+
 .shadow-lg {
   box-shadow: var(--shadow-lg) !important;
 }
+
 .rounded-md {
   border-radius: var(--radius-md) !important;
 }
+
 .rounded-lg {
   border-radius: var(--radius-lg) !important;
 }
@@ -64,48 +104,60 @@
   font-size: var(--font-size);
 }
 
-// Các class utility cho font size
+/* Utility Font Sizes */
 .fs-xs {
   font-size: var(--font-size-xs) !important;
 }
+
 .fs-sm {
   font-size: var(--font-size-sm) !important;
 }
+
 .fs-base {
   font-size: var(--font-size-base) !important;
 }
+
 .fs-lg {
   font-size: var(--font-size-lg) !important;
 }
+
 .fs-xl {
   font-size: var(--font-size-xl) !important;
 }
+
 .fs-2xl {
   font-size: var(--font-size-2xl) !important;
 }
+
 .fs-3xl {
   font-size: var(--font-size-3xl) !important;
 }
+
 .fs-4xl {
   font-size: var(--font-size-4xl) !important;
 }
+
 .fs-5xl {
   font-size: var(--font-size-5xl) !important;
 }
 
-// Font weight utilities
+/* Utility Font Weights */
 .fw-light {
   font-weight: var(--font-weight-light) !important;
 }
+
 .fw-normal {
   font-weight: var(--font-weight-normal) !important;
 }
+
 .fw-medium {
   font-weight: var(--font-weight-medium) !important;
 }
+
 .fw-semibold {
   font-weight: var(--font-weight-semibold) !important;
 }
+
 .fw-bold {
   font-weight: var(--font-weight-bold) !important;
 }
@@ -126,12 +178,12 @@ body {
   line-height: 1.5;
   text-rendering: optimizespeed;
   color: var(--text-color);
-
-  /* SỬA LỖI 2: Thay thế 'overlay' đã lỗi thời bằng thuộc tính CSS mới và chuẩn hơn */
+  background-color: var(--bg-body);
+  /* Áp dụng nền xám sáng */
   scrollbar-gutter: stable;
 }
 
-// Scrollbar CSS
+/* Scrollbar */
 html *::-webkit-scrollbar {
   border-radius: 0;
   width: 8px;
@@ -143,8 +195,7 @@ html *::-webkit-scrollbar-thumb {
 }
 
 html *::-webkit-scrollbar-track {
-  border-radius: 0;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
 }
 
 button,
@@ -157,6 +208,11 @@ input,
 a {
   color: var(--text-color);
   text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--accent-color);
+  }
 }
 
 ul,
@@ -164,6 +220,7 @@ li {
   list-style: none;
 }
 
+/* Các button cũ (cập nhật màu mới) */
 .btn-accent {
   padding: 0.75rem 1.5rem;
   font-size: 1.1rem;
@@ -173,7 +230,7 @@ li {
   border-radius: 5px;
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.15s ease;
+  transition: all 0.3s ease;
 
   &:hover {
     background-color: var(--accent-act-color);
@@ -185,20 +242,17 @@ li {
   }
 
   &:disabled {
-    background-color: #9ac7ff;
-    cursor: not-allowed;
     opacity: 0.7;
+    cursor: not-allowed;
   }
 }
 
 .btn-bright-green {
-  background-color: #22bd70ff !important;
-  border-color: #22bd70ff !important;
+  background-color: #22bd70 !important;
   color: white !important;
-  transition: background-color 0.3s ease, transform 0.2s ease;
   font-size: var(--font-size-sm) !important;
+
   &:hover {
-    background-color: #3ca769 !important;
-    border-color: #28b463 !important;
+    background-color: #1ea05e !important;
   }
 }

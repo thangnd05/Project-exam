@@ -1,20 +1,23 @@
 footer {
   margin-top: 150px;
 }
+
 li {
   list-style: none !important;
 }
+
 /* footer.module.scss */
 
 .footer {
   /* Thay thế 'bg-secondary' bằng biến màu global của bạn */
-  background-color: var(--primary-color);
+  background-color: var(--footer-bg);
 
   /* Thay thế 'text-white' */
   color: var(--white);
 
   /* Thay thế 'text-center text-lg-start' */
   text-align: center;
+
   @media (min-width: 992px) {
     // lg breakpoint của Bootstrap
     text-align: left;

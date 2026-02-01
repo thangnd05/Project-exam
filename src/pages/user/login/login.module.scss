@@ -1,140 +1,55 @@
-/* 🎨 Refined Integrated Card - Brand Styles */
+/* login.module.scss */
+
+/* --- 1. Layout Tổng --- */
 .splitContainer {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   min-height: 85vh;
   width: 100%;
   font-family: var(--font-family);
-  padding: 20px;
 }
 
-/* 💎 Khung Card Tích Hợp */
+/* --- 2. Thẻ Card Chính --- */
 .mainCard {
-  background-color: var(--white);
-  border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  background-color: var(--bg-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
-  width: 1000px;
-  max-width: 100%;
-  min-height: 560px;
+  width: 900px;
+  max-width: 95%;
+  min-height: 550px;
   display: flex;
-  transition: transform 0.3s ease;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    min-height: auto;
-    width: 100%;
-    max-width: 450px;
-    border-radius: 20px;
+    height: auto;
   }
 }
 
-/* 📥 Phần Form (Trái) */
+/* --- 3. Cột Trái (Form) --- */
 .formSide {
-  flex: 1.1;
-  background-color: var(--white);
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 50px;
+  padding: 40px;
+  background-color: var(--bg-white);
   text-align: center;
-
-  @media (max-width: 768px) {
-    padding: 40px 24px;
-  }
 
   h1 {
-    font-size: 3.2rem;
-    font-weight: 800;
-    margin-bottom: 24px;
-    color: var(--primary-color);
-  }
-
-  .subtitle {
-    font-size: 1.4rem;
-    color: var(--secondary-color);
-    margin: 10px 0 20px;
-    opacity: 0.7;
-  }
-}
-
-/* 🎭 Phần Thông Tin (Phải - Info Side) */
-.infoSide {
-  flex: 0.9;
-  /* Gradient từ Navy sang Blue chuyên nghiệp */
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-  color: var(--white);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 50px;
-  text-align: center;
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
-  }
-
-  @media (max-width: 768px) {
-    padding: 40px 24px;
-    order: -1; // Đưa phần chào mừng lên trên khi ở mobile
-  }
-
-  h2 {
-    font-size: 3.8rem;
+    font-size: 3rem;
     font-weight: 800;
     margin-bottom: 20px;
-    z-index: 1;
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  p {
-    font-size: 1.5rem;
-    line-height: 1.7;
-    margin-bottom: 35px;
-    opacity: 0.95;
-    z-index: 1;
-  }
-}
-
-/* 🔤 Ô Nhập Liệu Kiểu Mới */
-.input-box {
-  width: 100%;
-  margin-bottom: 16px;
-
-  input {
-    background-color: #f3f4f6; // Xám nhạt hiện đại
-    border: 2px solid transparent;
-    padding: 14px 20px;
-    width: 100%;
-    border-radius: 12px;
-    font-size: 1.5rem;
     color: var(--text-color);
-    outline: none;
-    transition: all 0.25s ease;
-
-    &::placeholder {
-      color: #9ca3af;
-    }
-
-    &:focus {
-      background-color: var(--white);
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
-    }
   }
 }
 
-/* 🧩 Mạng Xã Hội */
+/* Social Icons (Tròn) */
 .social-login {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 
   .social-btns {
     display: flex;
@@ -143,116 +58,188 @@
   }
 
   .social-btn {
-    border: 1px solid #e2e8f0;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    display: inline-flex;
-    justify-content: center;
+    border: 1px solid var(--border-color);
+    display: flex;
     align-items: center;
-    height: 44px;
-    width: 44px;
-    background: var(--white);
-    transition: all 0.2s ease;
+    justify-content: center;
+    background-color: var(--bg-white);
+    transition: all 0.3s ease;
+    cursor: pointer;
 
     &:hover {
+      background-color: #f9fafb;
       transform: translateY(-2px);
-      border-color: var(--accent-color);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--shadow-md);
     }
   }
 }
 
+/* Dòng text phụ */
+.subtitle {
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  margin-bottom: 25px;
+}
+
+/* --- 4. Input Field --- */
+.input-box {
+  width: 100%;
+  margin-bottom: 15px;
+
+  input {
+    width: 100%;
+    background-color: var(--input-bg);
+    /* Nền xám nhạt */
+    border: 1px solid transparent;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    font-size: 1.4rem;
+    color: var(--text-color);
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+
+    &:focus {
+      background-color: var(--bg-white);
+      border-color: var(--border-color);
+      box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.1);
+      /* Shadow xanh nhạt */
+    }
+  }
+}
+
+/* Link Quên mật khẩu */
 .forgot-link {
-  color: var(--secondary-color);
-  font-size: 1.4rem;
-  text-decoration: none;
   display: block;
-  margin: 20px 0 20px;
-  opacity: 0.8;
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  margin: 15px 0 25px;
+  font-weight: 500;
 
   &:hover {
     color: var(--accent-color);
     text-decoration: underline;
-    opacity: 1;
   }
 }
 
-/* 🟩 Nút Bấm Pill Shape */
+/* --- 5. Button Đăng nhập (Màu Tối) --- */
 .login-btn {
-  border-radius: 30px;
-  border: none;
-  background: var(--primary-color);
+  width: 180px;
+  padding: 14px;
+  background: var(--accent-act-color);
+  /* Màu Dark Slate (#1e293b) */
   color: var(--white);
+  border-radius: 30px;
   font-size: 1.4rem;
   font-weight: 700;
-  padding: 14px 60px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(27, 58, 87, 0.2);
+  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25);
 
   &:hover {
-    background: var(--accent-color);
+    background-color: var(--accent-color);
+    /* Đậm hơn chút khi hover */
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
-  }
-
-  &:active {
-    transform: translateY(0);
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.7;
     cursor: not-allowed;
   }
 }
 
-.ghost-btn {
-  background-color: transparent;
-  border: 2px solid var(--white);
+/* --- 6. Cột Phải (Gradient Xanh Sáng) --- */
+.infoSide {
+  flex: 1;
+  /* Gradient từ Xanh Dương -> Cyan */
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-act-color) 100%);
   color: var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+
+  h2 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: var(--white) !important;
+  }
+
+  p {
+    font-size: 1.6rem;
+    line-height: 1.6;
+    margin-bottom: 35px;
+    max-width: 80%;
+    opacity: 0.95;
+    color: var(--white);
+  }
+
+  @media (max-width: 768px) {
+    padding: 30px 20px;
+  }
+}
+
+/* Nút Ghost (Đăng ký) */
+.ghost-btn {
+  border: 2px solid var(--white);
+  background: transparent;
+  color: var(--white);
+  padding: 10px 35px;
   border-radius: 30px;
   font-size: 1.4rem;
   font-weight: 700;
-  padding: 12px 60px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  text-decoration: none;
   transition: all 0.3s ease;
-  z-index: 1;
+  display: inline-block;
 
   &:hover {
     background-color: var(--white);
-    color: var(--primary-color);
-    transform: translateY(-2px);
+    color: var(--accent-color);
+    /* Chữ đổi thành màu xanh khi hover */
+    transform: scale(1.05);
   }
 }
 
-/* 📢 Thông báo */
+/* Message & Spinner */
 .login-message {
-  margin: 10px 0;
-  font-size: 1.4rem;
-  font-weight: 500;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  width: 100%;
 
   &.error {
-    color: #eb4d4b;
+    color: #ef4444;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
   }
 
   &.success {
-    color: #6ab04c;
+    color: #10b981;
+    background: #ecfdf5;
+    border: 1px solid #bbf7d0;
   }
 }
 
-/* 🌀 Hiệu ứng tải */
 .loading-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
   border-radius: 50%;
+  margin: 0 auto;
   animation: spin 0.8s linear infinite;
-  display: inline-block;
 }
 
 @keyframes spin {
