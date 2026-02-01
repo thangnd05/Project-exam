@@ -5,8 +5,8 @@ import { useAuth } from '../../../hook/useAuth';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import images from '~/assets/images';
-import { FcGoogle } from "react-icons/fc"; // Google icon có màu sẵn
-import { FaFacebook } from "react-icons/fa"; // Facebook icon
+import { FaFacebook } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 
 const cx = classNames.bind(style);
 
@@ -21,7 +21,6 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // URL đăng nhập OAuth2 từ Backend
   const GOOGLE_AUTH_URL = "http://localhost:8080/oauth2/authorization/google";
   const FACEBOOK_AUTH_URL = "http://localhost:8080/oauth2/authorization/facebook";
 
@@ -46,15 +45,14 @@ function LoginPage() {
       const userData = response.data.user;
       if (userData) {
         login(userData);
-        setMessage('✅ Đăng nhập thành công! Đang chuyển hướng...');
+        setMessage(' Đăng nhập thành công! Đang chuyển hướng...');
         setMessageType('success');
         setTimeout(() => navigate('/'), 1000);
       } else {
-        throw new Error('Dữ liệu người dùng không hợp lệ.');
+        throw new Error('Dữ liệu không hợp lệ.');
       }
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || err.message || '❌ Đã có lỗi xảy ra!';
+      const errorMessage = err.response?.data?.message || ' Đăng nhập thất bại. Vui lòng thử lại!';
       setMessage(errorMessage);
       setMessageType('error');
     } finally {
@@ -64,96 +62,71 @@ function LoginPage() {
 
   return (
     <div className={cx('splitContainer')}>
-      {/* CỘT TRÁI - THÔNG TIN */}
-      <div className={cx('infoPanel')}>
-        <img src={images.logo} alt="WinDe Logo" className={cx('infoLogo')} />
-        <h2>Chào mừng trở lại!</h2>
-        <p>Nền tảng chia sẻ kiến thức của mọi người.</p>
-      </div>
+      <div className={cx('mainCard')}>
+        {/* PHẦN FORM ĐĂNG NHẬP */}
+        <div className={cx('formSide')}>
+          <form onSubmit={handleLogin} style={{ width: '100%' }}>
+            <h1>Đăng nhập</h1>
 
-      {/* CỘT PHẢI - FORM */}
-      <div className={cx('formPanel')}>
-        <form className={cx('wrap')} onSubmit={handleLogin}>
-          <h1>Đăng nhập</h1>
-
-          {/* Username / Email */}
-          <div className={cx('input-box')}>
-            <input
-              type="text"
-              className={cx('wrap-username')}
-              placeholder="Tên đăng nhập hoặc Email"
-              required
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              disabled={loading}
-            />
-            <i className="fa-solid fa-user"></i>
-          </div>
-
-          {/* Password */}
-          <div className={cx('input-box')}>
-            <input
-              type="password"
-              className={cx('wrap-password')}
-              placeholder="Mật khẩu"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-            />
-            <i className="fa-solid fa-lock"></i>
-          </div>
-
-          {/* Ghi nhớ / Quên mật khẩu */}
-          <div className={cx('remember-forgot')}>
-            <label>
-              <input type="checkbox" /> Ghi nhớ
-            </label>
-            <Link to="/forgot-password">Quên mật khẩu?</Link>
-          </div>
-
-          {/* Thông báo lỗi/thành công */}
-          {message && (
-            <div className={cx('login-message', messageType)}>
-              <p>{message}</p>
-            </div>
-          )}
-
-          {/* Nút đăng nhập hệ thống */}
-          <button type="submit" className={cx('login-btn')} disabled={loading}>
-            {loading ? <div className={cx('loading-spinner')}></div> : 'Đăng nhập'}
-          </button>
-
-          {/* SOCIAL LOGIN SECTION */}
-          <div className={cx('social-login')}>
-            <div className={cx('separator')}>
-              <span>Hoặc đăng nhập với</span>
+            <div className={cx('social-login')}>
+              <div className={cx('social-btns')}>
+                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')}>
+                  <FcGoogle size={24} />
+                </a>
+                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')}>
+                  <FaFacebook size={24} color="#1877F2" />
+                </a>
+              </div>
             </div>
 
-            <div className={cx('social-btns')}>
-              {/* NÚT GOOGLE */}
-              <a href={GOOGLE_AUTH_URL} className={cx('social-btn', 'google-btn')}>
-                <img
-                  src="https://www.vectorlogo.zone/logos/google/google-icon.svg"
-                  alt="Google"
-                />
-                Google
-              </a>
+            <p className={cx('subtitle')}>Sử dụng tài khoản hệ thống của bạn</p>
 
-              {/* NÚT FACEBOOK */}
-              <a href={FACEBOOK_AUTH_URL} className={cx('social-btn', 'facebook-btn')}>
-                <FaFacebook size={22} color="#fff" style={{ marginRight: '8px' }} />
-                Facebook
-              </a>
+            <div className={cx('input-box')}>
+              <input
+                type="text"
+                placeholder="Email hoặc Tên đăng nhập"
+                required
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                disabled={loading}
+              />
             </div>
-          </div>
 
-          {/* Link đăng ký */}
-          <div className={cx('register-link')}>
-            <span>Chưa có tài khoản? </span>
-            <Link to="/register">Đăng ký ngay</Link>
-          </div>
-        </form>
+            <div className={cx('input-box')}>
+              <input
+                type="password"
+                placeholder="Mật khẩu"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            <Link to="/forgot-password" className={cx('forgot-link')}>Bạn quên mật khẩu?</Link>
+
+            {message && (
+              <div className={cx('login-message', messageType)}>
+                <p>{message}</p>
+              </div>
+            )}
+
+            <div>
+              <button type="submit" className={cx('login-btn')} disabled={loading}>
+                {loading ? <div className={cx('loading-spinner')}></div> : 'Đăng nhập ngay'}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* PHẦN CHÀO MỪNG / ĐĂNG KÝ */}
+        <div className={cx('infoSide')}>
+          <h2>Chào bạn!</h2>
+          <p>
+            Bắt đầu hành trình chinh phục tiếng Anh cùng cộng đồng học thuật chuyên nghiệp của chúng tôi.
+          </p>
+          <Link to="/register" className={cx('ghost-btn')}>Đăng ký ngay</Link>
+        </div>
       </div>
     </div>
   );

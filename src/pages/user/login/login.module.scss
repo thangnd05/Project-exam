@@ -1,324 +1,262 @@
-/* 🌈 Tổng thể - BỐ CỤC SPLIT-SCREEN */
+/* 🎨 Refined Integrated Card - Brand Styles */
 .splitContainer {
   display: flex;
-  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  min-height: 85vh;
   width: 100%;
-  background: var(--hover-color);
+  font-family: var(--font-family);
+  padding: 20px;
 }
 
-/* 🖼️ Cột trái (Thông tin/Branding) */
-.infoPanel {
-  flex-basis: 50%;
+/* 💎 Khung Card Tích Hợp */
+.mainCard {
+  background-color: var(--white);
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  position: relative;
+  overflow: hidden;
+  width: 1000px;
+  max-width: 100%;
+  min-height: 560px;
+  display: flex;
+  transition: transform 0.3s ease;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    min-height: auto;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 20px;
+  }
+}
+
+/* 📥 Phần Form (Trái) */
+.formSide {
+  flex: 1.1;
+  background-color: var(--white);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 50px;
   text-align: center;
-  background-color: var(--primary-color);
-  color: var(--white);
 
-  @media (max-width: 992px) {
-    display: none;
+  @media (max-width: 768px) {
+    padding: 40px 24px;
   }
 
-  .infoLogo {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 20px;
-    object-fit: contain;
+  h1 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: var(--primary-color);
+  }
+
+  .subtitle {
+    font-size: 1.4rem;
+    color: var(--secondary-color);
+    margin: 10px 0 20px;
+    opacity: 0.7;
+  }
+}
+
+/* 🎭 Phần Thông Tin (Phải - Info Side) */
+.infoSide {
+  flex: 0.9;
+  /* Gradient từ Navy sang Blue chuyên nghiệp */
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+  text-align: center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+  }
+
+  @media (max-width: 768px) {
+    padding: 40px 24px;
+    order: -1; // Đưa phần chào mừng lên trên khi ở mobile
   }
 
   h2 {
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-bold);
-    margin-bottom: 10px;
-    color: white;
+    font-size: 3.8rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    z-index: 1;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
 
   p {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-light);
+    font-size: 1.5rem;
+    line-height: 1.7;
+    margin-bottom: 35px;
+    opacity: 0.95;
+    z-index: 1;
   }
 }
 
-/* 📝 Cột phải (Form) */
-.formPanel {
-  flex-basis: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-
-  @media (max-width: 992px) {
-    flex-basis: 100%;
-  }
-}
-
-/* 🧱 Form chính */
-.wrap {
-  max-width: 420px;
-  width: 100%;
-  background: var(--white);
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  padding: 40px 45px;
-  text-align: center;
-
-  h1 {
-    font-size: var(--font-size-4xl);
-    font-weight: var(--font-weight-bold);
-    margin-bottom: 25px;
-  }
-}
-
-/* 🔤 Input Box */
+/* 🔤 Ô Nhập Liệu Kiểu Mới */
 .input-box {
-  position: relative;
   width: 100%;
-  height: 50px;
-  margin: 20px 0;
+  margin-bottom: 16px;
 
   input {
-    background: transparent;
+    background-color: #f3f4f6; // Xám nhạt hiện đại
+    border: 2px solid transparent;
+    padding: 14px 20px;
     width: 100%;
-    height: 100%;
-    padding: 18px 45px 18px 20px;
-    border: 2px solid var(--border-color);
-    border-radius: 40px;
+    border-radius: 12px;
+    font-size: 1.5rem;
     color: var(--text-color);
-    font-size: var(--font-size-base);
     outline: none;
-    transition: all 0.3s;
+    transition: all 0.25s ease;
+
+    &::placeholder {
+      color: #9ca3af;
+    }
 
     &:focus {
+      background-color: var(--white);
       border-color: var(--accent-color);
-      box-shadow: 0 0 8px rgba(0, 198, 255, 0.2);
+      box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
     }
-  }
-
-  i {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-color);
-    opacity: 0.7;
   }
 }
 
-/* 🧩 Ghi nhớ & Quên mật khẩu */
-.remember-forgot {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--font-size-ssm);
-  margin-bottom: 20px;
-  color: var(--secondary-color);
+/* 🧩 Mạng Xã Hội */
+.social-login {
+  margin-bottom: 25px;
 
-  label {
+  .social-btns {
     display: flex;
-    align-items: center;
-    cursor: pointer;
-
-    input {
-      margin-right: 6px;
-    }
+    justify-content: center;
+    gap: 15px;
   }
 
-  a {
-    color: var(--accent-color);
-    text-decoration: none;
+  .social-btn {
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 44px;
+    width: 44px;
+    background: var(--white);
+    transition: all 0.2s ease;
 
     &:hover {
-      text-decoration: underline;
+      transform: translateY(-2px);
+      border-color: var(--accent-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
   }
 }
 
-/* 🟩 Nút đăng nhập chính */
-.login-btn {
-  width: 100%;
-  height: 48px;
-  background: linear-gradient(90deg, var(--accent-color), var(--accent-act-color));
-  border-radius: 30px;
-  border: none;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+.forgot-link {
+  color: var(--secondary-color);
+  font-size: 1.4rem;
+  text-decoration: none;
+  display: block;
+  margin: 20px 0 20px;
+  opacity: 0.8;
 
   &:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+    opacity: 1;
+  }
+}
+
+/* 🟩 Nút Bấm Pill Shape */
+.login-btn {
+  border-radius: 30px;
+  border: none;
+  background: var(--primary-color);
+  color: var(--white);
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 14px 60px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(27, 58, 87, 0.2);
+
+  &:hover {
+    background: var(--accent-color);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
   }
 }
 
-/* 🌐 NÚT GOOGLE */
-.social-login {
-  margin-top: 25px;
+.ghost-btn {
+  background-color: transparent;
+  border: 2px solid var(--white);
+  color: var(--white);
+  border-radius: 30px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 12px 60px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  z-index: 1;
 
-  .separator {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    color: #888;
-    font-size: 13px;
-
-    &::before,
-    &::after {
-      content: "";
-      flex: 1;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    span {
-      padding: 0 10px;
-    }
-  }
-
-  .google-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 48px;
-    background: white;
-    border: 2px solid var(--border-color);
-    border-radius: 30px;
-    text-decoration: none;
-    color: var(--text-color);
-    transition: all 0.3s;
-
-    img {
-      width: 20px;
-      margin-right: 12px;
-    }
-
-    &:hover {
-      background-color: #f8f9fa;
-      border-color: var(--accent-color);
-      transform: translateY(-2px);
-    }
+  &:hover {
+    background-color: var(--white);
+    color: var(--primary-color);
+    transform: translateY(-2px);
   }
 }
 
 /* 📢 Thông báo */
 .login-message {
-  margin-bottom: 15px;
-  font-size: 14px;
+  margin: 10px 0;
+  font-size: 1.4rem;
+  font-weight: 500;
 
   &.error {
-    color: #ff4d4f;
+    color: #eb4d4b;
   }
 
   &.success {
-    color: #52c41a;
+    color: #6ab04c;
   }
 }
 
-/* 🧭 Link đăng ký */
-.register-link {
-  margin-top: 25px;
-  font-size: 14px;
-
-  a {
-    color: var(--accent-color);
-    font-weight: bold;
-  }
-}
-
-/* 🌀 Spinner */
+/* 🌀 Hiệu ứng tải */
 .loading-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid white;
-  border-top-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
   border-radius: 50%;
-  margin: 0 auto;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
 }
 
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-/* ... các phần cũ giữ nguyên ... */
-
-/* 🌐 SOCIAL LOGIN SECTION */
-.social-login {
-  margin-top: 25px;
-
-  .separator {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    color: #888;
-    font-size: 13px;
-
-    &::before,
-    &::after {
-      content: "";
-      flex: 1;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    span {
-      padding: 0 10px;
-    }
-  }
-
-  .social-btns {
-    display: flex;
-    gap: 12px; // Tạo khoảng cách giữa 2 nút
-    justify-content: space-between;
-  }
-
-  /* Nút chung cho cả Google/Facebook */
-  .social-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 48px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.3s;
-    border: 2px solid var(--border-color);
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-  }
-
-  .google-btn {
-    background: white;
-    color: var(--text-color);
-
-    &:hover {
-      background-color: #f8f9fa;
-      border-color: #4285F4;
-    }
-  }
-
-  .facebook-btn {
-    background: #1877F2;
-    color: white;
-
-    &:hover {
-      background-color: #166fe5;
-      border-color: white !important;
-
-    }
   }
 }
