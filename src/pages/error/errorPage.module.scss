@@ -1,0 +1,77 @@
+/* ===============================
+   🌍 ERROR PAGE SHARED STYLE
+================================= */
+
+.wrapper {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-body);
+    padding: 20px;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+    max-width: 520px;
+    width: 100%;
+
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.code {
+    font-size: 7rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.title {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.desc {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.btn {
+    display: inline-block;
+    padding: 14px 26px;
+    border-radius: 12px;
+
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-decoration: none;
+
+    color: white;
+    background: var(--primary-gradient);
+
+    transition: all 0.25s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        opacity: 0.95;
+    }
+}
+
+.secondaryBtn {
+    margin-left: 12px;
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+
+    &:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+}

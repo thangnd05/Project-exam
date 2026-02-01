@@ -21,17 +21,21 @@ import AlbumDetailPage from '~/pages/album-delta/AlbumDeltaPage';
 import PracticePage from '~/pages/album-pratice/PracticePage';
 import MyTestPage from '~/pages/mytest/MyTestPage';
 import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
+import NotFoundPage from "~/pages/error/NotFoundPage";
+
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
   { path: routes.login, component: Login },
-  { path: routes.register, component: Register },
+  // { path: routes.register, component: Register },
   { path: routes.home, component: TestPage },
   { path: routes.examTypeDetail, component: TestByExamTypePage },
   { path: routes.policy, component: Policy },
   { path: routes.service, component: Service },
   { path: routes.about, component: About },
   { path: routes.verifyEmail, component: VerifyEmailPage },
+  { path: routes.notFound, component: NotFoundPage },
+
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập
@@ -52,8 +56,8 @@ export const privateRoutes = [
   { path: routes.MyTest, component: MyTestPage },
   { path: routes.oauth2Redirect, component: MyTestPage },
 
-  // Thêm các trang riêng tư khác ở đây, ví dụ: trang profile
-  // { path: routes.profile, component: ProfilePage },
+
+
 ];
 
 export default { publicRoutes, privateRoutes };

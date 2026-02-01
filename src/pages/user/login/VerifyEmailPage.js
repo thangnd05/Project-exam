@@ -1,29 +1,49 @@
-import {useEffect} from 'react';
-import {useSearchParams, useNavigate} from 'react-router-dom';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function VerifyEmailPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const token = params.get('token');
+  const token = params.get("token");
+
+  const [status, setStatus] = useState("loading");
+  const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    if (token) {
-      axios
-        .get(`http://localhost:8080/api/auth/verify?token=${token}`)
-        .then((res) => {
-          alert(res.data.message || '✅ Xác thực thành công!');
-          navigate('/login'); // ✅ nếu xác thực thành công → chuyển đến trang login
-        })
-        .catch((err) => {
-          alert(err.response?.data?.message || '❌ Xác thực thất bại!');
-          navigate('/register'); // ❌ nếu thất bại → chuyển đến trang đăng ký
-        });
-    } else {
-      alert('❌ Thiếu token xác thực!');
-      navigate('/register');
+    if (!token) {
+      setStatus("error");
+      setMsg("❌ Thiếu token xác thực!");
+      return;
     }
+
+    axios
+      .get(`/api/auth/verify?token=${token}`)
+      .then((res) => {
+        setStatus("success");
+        setMsg(res.data.message || "✅ Xác thực thành công!");
+
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      })
+      .catch((err) => {
+        setStatus("error");
+        setMsg(err.response?.data?.message || "❌ Xác thực thất bại!");
+
+        setTimeout(() => {
+          navigate("/register");
+        }, 2500);
+      });
   }, [token, navigate]);
 
-  return <h3>Đang xác thực tài khoản, vui lòng chờ...</h3>;
+  return (
+    <div style={{ textAlign: "center", marginTop: "100px" }}>
+      {status === "loading" && <h2>⏳ Đang xác thực tài khoản...</h2>}
+      {status === "success" && <h2 style={{ color: "green" }}>{msg}</h2>}
+      {status === "error" && <h2 style={{ color: "red" }}>{msg}</h2>}
+
+      <p>Vui lòng chờ trong giây lát...</p>
+    </div>
+  );
 }

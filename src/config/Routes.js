@@ -34,6 +34,9 @@ const routes = {
 
   oauth2Redirect: '/oauth2/redirect',
 
+  notFound: '*',
+
+
 };
 
 export default routes;
