@@ -1,6 +1,6 @@
 import routes from '../config/Routes';
 import Login from '~/pages/user/login/login';
-import Register from '~/pages/user/login/register';
+// import Register from '~/pages/user/login/register';
 import TestPage from '~/pages/exam/TestPage';
 import TestByExamTypePage from '~/pages/exam/examtype/examtypeById/examtypeId';
 import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStartPage';
