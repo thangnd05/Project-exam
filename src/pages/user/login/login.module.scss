@@ -295,11 +295,6 @@
     transition: all 0.3s;
     border: 2px solid var(--border-color);
 
-    img {
-      width: 18px;
-      margin-right: 8px;
-    }
-
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -318,22 +313,12 @@
 
   .facebook-btn {
     background: #1877F2;
-    border-color: #1877F2;
     color: white;
-
-    img {
-      width: 20px;
-      margin-right: 8px;
-      /* Nếu logo gốc là màu xanh, dùng dòng này để biến nó thành trắng */
-      filter: brightness(0) invert(1);
-
-      /* Nếu vẫn không hiện, hãy thử tạm thời xóa dòng filter này đi 
-         để xem logo gốc có hiện lên không */
-    }
 
     &:hover {
       background-color: #166fe5;
-      border-color: #166fe5;
+      border-color: white !important;
+
     }
   }
 }

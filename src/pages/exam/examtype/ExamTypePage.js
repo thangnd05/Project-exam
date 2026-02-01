@@ -1,7 +1,7 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {Button} from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import style from './ExamTypeStyle.module.scss';
 

@@ -5,6 +5,8 @@ import { useAuth } from '../../../hook/useAuth';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import images from '~/assets/images';
+import { FcGoogle } from "react-icons/fc"; // Google icon có màu sẵn
+import { FaFacebook } from "react-icons/fa"; // Facebook icon
 
 const cx = classNames.bind(style);
 
@@ -140,11 +142,7 @@ function LoginPage() {
 
               {/* NÚT FACEBOOK */}
               <a href={FACEBOOK_AUTH_URL} className={cx('social-btn', 'facebook-btn')}>
-                <img
-                  src="https://www.vectorlogo.zone/logos/facebook/facebook-tile.svg"
-                  alt="Facebook"
-                  style={{ width: '20px', marginRight: '8px' }}
-                />
+                <FaFacebook size={22} color="#fff" style={{ marginRight: '8px' }} />
                 Facebook
               </a>
             </div>
