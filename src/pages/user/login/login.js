@@ -6,6 +6,8 @@ import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { name } from '~/assets/images';
+
 
 const cx = classNames.bind(style);
 
@@ -33,6 +35,22 @@ function LoginPage() {
 
   const GOOGLE_AUTH_URL = "http://localhost:8080/oauth2/authorization/google";
   const FACEBOOK_AUTH_URL = "http://localhost:8080/oauth2/authorization/facebook";
+
+  useEffect(() => {
+    // 1. Xử lý logic chuyển Tab (Login/Register) như đã nói ở câu trước
+    if (location.state?.mode) {
+      setIsSignUp(location.state.mode === 'signup');
+    }
+
+    // 2. Xử lý hiển thị thông báo từ ProtectedRoute
+    if (location.state?.flashMessage) {
+      setMessage(location.state.flashMessage);
+      setMessageType('error'); // hoặc 'warning' tùy CSS của bạn
+
+      // Tùy chọn: Xóa state để thông báo không hiện lại khi F5
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -186,7 +204,7 @@ function LoginPage() {
             </div>
             <div className={cx('overlayPanel', 'overlayRight')}>
               <h2>Chào bạn!</h2>
-              <p>Bắt đầu hành trình chinh phục tiếng Anh cùng cộng đồng học thuật chuyên nghiệp của chúng tôi.</p>
+              <p>Bắt đầu hành trình chinh phục cùng cộng đồng {name} ngay nào.</p>
               <button className={cx('ghost-btn')} id="signUp" onClick={() => { setIsSignUp(true); setMessage(''); }}>
                 Đăng ký ngay
               </button>

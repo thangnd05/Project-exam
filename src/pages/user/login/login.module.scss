@@ -260,14 +260,14 @@
 
 .forgot-link {
   display: block;
-  font-size: 1.3rem;
+  font-size: var(--font-size-base);
   color: var(--text-secondary);
   margin: 10px 0 25px;
   font-weight: 500;
 
   &:hover {
     color: var(--accent-color);
-    text-decoration: underline;
+    text-decoration: none;
   }
 }
 
@@ -313,7 +313,8 @@
 /* 🌀 Spinner & Messages */
 .login-message {
   margin-bottom: 15px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-base);
+  font-weight: 500;
   padding: 10px 15px;
   border-radius: var(--radius-md);
   width: 100%;

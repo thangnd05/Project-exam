@@ -155,17 +155,21 @@ function Header() {
                   </>
                 ) : (
                   <>
+                    {/* Link Đăng nhập */}
                     <Nav.Link
                       as={Link}
                       to={routes.login}
-                      state={{ from: location }}
+                      state={{ mode: 'signin' }} // Thêm dòng này
                       className={cx('nav-link', 'login-link', 'home')}
                     >
                       Đăng nhập
                     </Nav.Link>
+
+                    {/* Link Đăng ký */}
                     <Nav.Link
                       as={Link}
-                      to={routes.register}
+                      to={routes.login} // Trỏ về cùng trang chứa form
+                      state={{ mode: 'signup' }} // Thêm dòng này
                       className={cx('mx-5', 'home')}
                     >
                       Đăng ký

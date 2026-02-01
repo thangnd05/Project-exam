@@ -27,7 +27,6 @@ const routes = {
 
   // 👤 Auth
   login: '/login',
-  register: '/register',
   forgot: '/forgot',
   reset: '/reset',
   verifyEmail: '/verify',
