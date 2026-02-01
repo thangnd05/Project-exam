@@ -6,6 +6,7 @@ import {
   Dropdown,
   Image,
   Offcanvas,
+  NavDropdown
 } from 'react-bootstrap';
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -19,6 +20,8 @@ import { useAuth } from '../../hook/useAuth';
 import { name } from '~/assets/images';
 import routes from '~/config/Routes';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import JoinClassModal from "~/components/modals/JoinClassModal";
+
 
 const cx = classNames.bind(style);
 
@@ -30,6 +33,8 @@ function Header() {
 
   const handleClose = () => setShowOffcanvas(false);
   const handleShow = () => setShowOffcanvas(true);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+
 
   const handleLogout = async () => {
     await logout();
@@ -90,6 +95,22 @@ function Header() {
                   Bài đã tạo
                 </Nav.Link>
               </Nav>
+              <Nav className={cx("mx-5")}>
+                <div className={cx("customMenu")}>
+                  <span className={cx("menuTitle")}>Lớp học</span>
+
+                  <div className={cx("menuDropdown")}>
+                    <button onClick={() => setShowJoinModal(true)}>
+                      Tham gia lớp học
+                    </button>
+
+                    <Link to={routes.myClasses}>
+                      Vào lớp học
+                    </Link>
+                  </div>
+                </div>
+              </Nav>
+
             </div>
             <Nav>{/* <Search /> */}</Nav>
             <div>
@@ -217,6 +238,10 @@ function Header() {
           </Offcanvas>
         </Container>
       </Navbar>
+      <JoinClassModal
+        show={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+      />
     </div>
   );
 }

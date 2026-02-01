@@ -39,14 +39,13 @@
   text-decoration: none;
   transition: color 0.3s ease;
 
-  /* Hiệu ứng gạch chân từ giữa ra hai bên */
   &::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 50%; /* bắt đầu từ giữa */
-    transform: translateX(-50%); /* canh giữa */
-    width: 0; /* chưa hiển thị */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
     height: 3px;
     border-radius: 1px;
     background-color: var(--accent-color);
@@ -57,7 +56,8 @@
     color: var(--accent-color);
 
     &::after {
-      width: 80%; /* mở rộng đều ra hai bên */
+      width: 80%;
+      /* mở rộng đều ra hai bên */
     }
   }
 }
@@ -65,6 +65,7 @@
 .home_sm {
   color: #898686;
   text-decoration: none;
+
   &:hover {
     color: #111;
   }
@@ -73,6 +74,7 @@
 .user-info {
   display: flex;
   align-items: center;
+
   &:hover {
     cursor: pointer;
     opacity: 0.5;
@@ -114,4 +116,98 @@
 
 .tit_sm {
   font-size: 2.4rem;
+}
+
+.customMenu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Title */
+.menuTitle {
+  position: relative;
+  font-size: 1.6rem;
+  color: #898686;
+  transition: 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    border-radius: 2px;
+    background-color: var(--accent-color);
+    transition: width 0.35s ease;
+  }
+}
+
+.customMenu:hover .menuTitle {
+  color: var(--accent-color);
+}
+
+.customMenu:hover .menuTitle::after {
+  width: 100%;
+}
+
+/* Dropdown */
+.menuDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: white;
+  border-radius: 12px;
+  min-width: 180px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+  display: none;
+  flex-direction: column;
+  z-index: 999;
+}
+
+/* ✅ Hover bridge */
+.menuDropdown::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 100%;
+  height: 12px;
+
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* ✅ Giữ dropdown mở khi hover */
+.customMenu:hover .menuDropdown,
+.menuDropdown:hover {
+  display: flex;
+}
+
+/* Items */
+.menuDropdown button,
+.menuDropdown a {
+  padding: 12px 16px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text-color);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--hover-color);
+    color: var(--accent-color);
+  }
+}
+
+.menuDropdown button {
+  width: 100%;
 }
