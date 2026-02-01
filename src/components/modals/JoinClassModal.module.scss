@@ -1,6 +1,9 @@
 @import '../../components/GlobalStyles/GlobalStyles.module.scss';
 
 .modalCustom {
+    background: rgba(15, 23, 42, 0.4); // Thêm lớp phủ tối nhẹ
+    backdrop-filter: blur(4px); // Hiệu ứng làm mờ
+
     :global(.modal-content) {
         border: none;
         border-radius: 24px;

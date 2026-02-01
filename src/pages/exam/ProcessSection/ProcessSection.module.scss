@@ -1,0 +1,115 @@
+@import '../../../components/GlobalStyles/GlobalStyles.module.scss';
+
+.section {
+    padding: 60px 0;
+}
+
+
+
+.section-title {
+    font-size: 3.8rem;
+    font-weight: 800;
+    color: var(--accent-color);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+:global(.text-muted) {
+    font-size: var(--font-size-ssm);
+}
+
+.process-card {
+    text-align: center;
+    padding: 40px 25px;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    border: 1px solid #f1f5f9;
+    background: #fff;
+
+    &:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border-color: var(--accent-color);
+    }
+
+    h3 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin: 24px 0 12px;
+    }
+
+    p {
+        color: #64748b;
+        font-size: var(--font-size-ssm);
+        line-height: 1.6;
+    }
+}
+
+.icon-box {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+
+    &.blue {
+        background-color: #ebf8ff;
+        color: #3182ce;
+    }
+
+    &.orange {
+        background-color: #fffaf0;
+        color: #dd6b20;
+    }
+
+    &.green {
+        background-color: #f0fff4;
+        color: #38a169;
+    }
+}
+
+/* --- RESPONSIVE --- */
+// @media (max-width: 768px) {
+//     .section {
+//         padding: 40px 0;
+//     }
+
+//     .section-title {
+//         font-size: 2.8rem;
+//     }
+
+//     :global(.text-muted) {
+//         font-size: 1.1rem;
+//     }
+
+//     .process-card {
+//         padding: 30px 20px;
+//         margin-bottom: 20px;
+
+//         &:hover {
+//             transform: translateY(-4px);
+//         }
+
+//         h3 {
+//             font-size: 1.5rem;
+//         }
+
+//         p {
+//             font-size: 1rem;
+//         }
+//     }
+
+//     .icon-box {
+//         width: 70px;
+//         height: 70px;
+//         font-size: 2rem;
+//         margin-bottom: 20px;
+//     }
+// }
