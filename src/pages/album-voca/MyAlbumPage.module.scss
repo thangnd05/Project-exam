@@ -48,6 +48,10 @@
     margin: 0;
     line-height: 1.2;
     color: white;
+
+    @media (max-width: 576px) {
+        font-size: var(--font-size-3xl);
+    }
 }
 
 .page-subtitle {

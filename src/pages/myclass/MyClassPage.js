@@ -1,17 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Container, Spinner, Alert } from 'react-bootstrap';
+import classNames from 'classnames/bind';
 import {
-  Card,
-  Spinner,
-  Alert,
-  Container,
-  Row,
-  Col,
-  Button,
-} from 'react-bootstrap';
-import {useNavigate} from 'react-router-dom';
-import './MyClassPage.scss';
-import routes from '../../config/Routes'; // 🟢 đảm bảo import đúng đường dẫn
+  IoSchoolOutline,
+  IoPeopleOutline,
+  IoKeyOutline,
+  IoBookOutline,
+  IoArrowForwardOutline,
+  IoPersonOutline
+} from 'react-icons/io5';
+
+import styles from './MyClassPage.module.scss';
+import routes from '../../config/Routes';
+
+const cx = classNames.bind(styles);
 
 const MyClassesPage = () => {
   const [teachingClasses, setTeachingClasses] = useState([]);
@@ -20,12 +24,10 @@ const MyClassesPage = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-  // 🟢 Lấy danh sách lớp học (bao gồm lớp dạy + học)
   useEffect(() => {
     const fetchMyClasses = async () => {
       try {
         const res = await axios.get('/api/class-members/my-classes');
-
         if (res.data.message) {
           setMessage(res.data.message);
         } else {
@@ -34,124 +36,128 @@ const MyClassesPage = () => {
         }
       } catch (err) {
         console.error('❌ Lỗi khi tải danh sách lớp học:', err);
-        setMessage('❌ Lỗi khi tải danh sách lớp học!');
+        setMessage('Không thể kết nối đến máy chủ 😢');
       } finally {
         setLoading(false);
       }
     };
-
     fetchMyClasses();
   }, []);
 
-  // 🧭 Khi click vào lớp → chuyển đến danh sách bài test của lớp
   const handleViewTests = (classId) => {
     const path = routes.testClasses.replace(':classId', classId);
     navigate(path);
   };
 
-  // 🌀 Hiển thị loading khi chưa tải xong
   if (loading) {
     return (
-      <div className="my-classes-loading text-center mt-5">
-        <Spinner animation="border" variant="primary" />
-        <div>Đang tải danh sách lớp học...</div>
+      <div className={cx('loading-container')}>
+        <Spinner animation="grow" variant="primary" size="lg" />
+        <p>Đang chuẩn bị giảng đường của bạn...</p>
       </div>
     );
   }
 
   return (
-    <Container className="my-classes-page mt-4">
-      <h2 className="page-title text-center mb-4">🎓 Lớp học của tôi</h2>
+    <div className={cx('wrapper')}>
+      <Container>
+        {/* === Modern Header === */}
+        <div className={cx('header')}>
+          <h1>Lớp học của tôi</h1>
+          <p>Quản lý và tiếp cận kho học liệu từ các khóa học bạn tham gia</p>
+        </div>
 
-      {/* 👨‍🏫 Lớp tôi dạy */}
-      {teachingClasses.length > 0 && (
-        <>
-          <h4 className="section-title mt-3 mb-3">👨‍🏫 Lớp tôi dạy</h4>
-          <Row>
-            {teachingClasses.map((clazz) => (
-              <Col md={6} lg={4} key={clazz.classId} className="mb-4">
-                <Card
-                  className="class-card shadow-sm"
-                  onClick={() => handleViewTests(clazz.classId)}
-                >
-                  <Card.Body>
-                    <Card.Title className="class-name">
-                      {clazz.className}
-                    </Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
-                      👨‍🏫 Giáo viên: {clazz.teacherName}
-                    </Card.Subtitle>
-                    <Card.Text>
-                      <small>Mã lớp: {clazz.classId}</small>
-                    </Card.Text>
-                    <div className="d-flex justify-content-end">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewTests(clazz.classId);
-                        }}
-                      >
-                        📘 Xem bài kiểm tra
-                      </Button>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </>
-      )}
+        {message && <Alert variant="warning" className="rounded-pill text-center mb-5">{message}</Alert>}
 
-      {/* 👨‍🎓 Lớp tôi học */}
-      {learningClasses.length > 0 && (
-        <>
-          <h4 className="section-title mt-5 mb-3">👨‍🎓 Lớp tôi học</h4>
-          <Row>
-            {learningClasses.map((clazz) => (
-              <Col md={6} lg={4} key={clazz.classId} className="mb-4">
-                <Card
-                  className="class-card shadow-sm"
-                  onClick={() => handleViewTests(clazz.classId)}
-                >
-                  <Card.Body>
-                    <Card.Title className="class-name">
-                      {clazz.className}
-                    </Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
-                      👨‍🏫 Giáo viên: {clazz.teacherName}
-                    </Card.Subtitle>
-                    <Card.Text>
-                      <small>Mã lớp: {clazz.classId}</small>
-                    </Card.Text>
-                    <div className="d-flex justify-content-end">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewTests(clazz.classId);
-                        }}
-                      >
-                        📘 Xem bài kiểm tra
-                      </Button>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </>
-      )}
+        {/* 👨‍🏫 Section: Lớp tôi dạy */}
+        <div className={cx('section-header', 'teaching-header')}>
+          <div className={cx('icon-box')}>
+            <IoSchoolOutline />
+          </div>
+          <h3>Lớp tôi giảng dạy</h3>
+        </div>
 
-      {/* Nếu không có lớp nào */}
-      {teachingClasses.length === 0 && learningClasses.length === 0 && (
-        <Alert variant="info" className="text-center mt-4">
-          Bạn chưa có lớp học nào.
-        </Alert>
-      )}
-    </Container>
+        <div className={cx('class-grid')}>
+          {teachingClasses.length > 0 ? (
+            teachingClasses.map((clazz) => (
+              <div
+                key={clazz.classId}
+                className={cx('class-card', 'teaching-card')}
+                onClick={() => handleViewTests(clazz.classId)}
+              >
+                <div className={cx('class-name')}>{clazz.className}</div>
+                <div className={cx('info-item')}>
+                  <IoPersonOutline />
+                  <span>Vai trò: <strong>Giáo viên</strong></span>
+                </div>
+                <div className={cx('info-item')}>
+                  <IoPeopleOutline />
+                  <span>ID Lớp: </span>
+                  <span className={cx('class-id')}>
+                    <IoKeyOutline size={14} />
+                    {clazz.classId}
+                  </span>
+                </div>
+                <button className={cx('btn-view')}>
+                  <IoBookOutline />
+                  Xem các bài test
+                  <IoArrowForwardOutline />
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className={cx('empty-box')}>
+              <IoPeopleOutline className={cx('icon')} />
+              <h4>Bạn chưa tham gia giảng dạy lớp nào</h4>
+            </div>
+          )}
+        </div>
+
+        {/* 👨‍🎓 Section: Lớp tôi học */}
+        <div className={cx('section-header', 'learning-header')}>
+          <div className={cx('icon-box')}>
+            <IoPeopleOutline />
+          </div>
+          <h3>Lớp tôi tham gia học</h3>
+        </div>
+
+        <div className={cx('class-grid')}>
+          {learningClasses.length > 0 ? (
+            learningClasses.map((clazz) => (
+              <div
+                key={clazz.classId}
+                className={cx('class-card', 'learning-card')}
+                onClick={() => handleViewTests(clazz.classId)}
+              >
+                <div className={cx('class-name')}>{clazz.className}</div>
+                <div className={cx('info-item')}>
+                  <IoPersonOutline />
+                  <span>Giáo viên: <strong>{clazz.teacherName}</strong></span>
+                </div>
+                <div className={cx('info-item')}>
+                  <IoPeopleOutline />
+                  <span>ID Lớp: </span>
+                  <span className={cx('class-id')}>
+                    <IoKeyOutline size={14} />
+                    {clazz.classId}
+                  </span>
+                </div>
+                <button className={cx('btn-view')}>
+                  <IoBookOutline />
+                  Làm bài kiểm tra
+                  <IoArrowForwardOutline />
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className={cx('empty-box')}>
+              <IoSchoolOutline className={cx('icon')} />
+              <h4>Bạn chưa tham gia học lớp nào</h4>
+            </div>
+          )}
+        </div>
+      </Container>
+    </div>
   );
 };
 
