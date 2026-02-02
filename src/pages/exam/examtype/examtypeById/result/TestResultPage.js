@@ -1,235 +1,112 @@
+import { useEffect, useState } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {useEffect, useState} from 'react';
-import {useParams, useLocation} from 'react-router-dom';
-import './TestResultPage.scss';
+import { Container, Spinner, Alert } from 'react-bootstrap';
+import classNames from 'classnames/bind';
+import {
+  IoCheckmarkCircle,
+  IoHomeOutline,
+  IoStatsChartOutline,
+  IoTimeOutline,
+  IoSchoolOutline,
+  IoChevronForwardOutline
+} from 'react-icons/io5';
 
-function QuestionResult({question, userAnswer}) {
-  const correctAnswer = question.answers?.find((a) => a.isCorrect);
-  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
-  let isUserCorrect = false;
+import styles from './TestResultPage.module.scss';
 
-  if (question.questionType === 'MCQ' && userAnswer && correctAnswer) {
-    isUserCorrect = userAnswer.selectedAnswerId === correctAnswer.answerId;
-  } else if (
-    question.questionType === 'FILL_BLANK' &&
-    userAnswer &&
-    correctAnswer
-  ) {
-    isUserCorrect =
-      userAnswer.answerText?.trim().toLowerCase() ===
-      correctAnswer.answerText?.trim().toLowerCase();
-  }
+const cx = classNames.bind(styles);
 
-  const toggleExplanation = () => setIsExplanationOpen((prev) => !prev);
-  let resultClass = 'unanswered';
-  if (userAnswer) {
-    if (question.questionType === 'ESSAY') resultClass = 'neutral';
-    else resultClass = isUserCorrect ? 'correct' : 'incorrect';
-  }
-
-  return (
-    <div className={`question-result ${resultClass}`}>
-      <p className="question-text">
-        <strong>Câu hỏi:</strong> {question.questionText}
-      </p>
-
-      {/* TRẮC NGHIỆM */}
-      {question.questionType === 'MCQ' && (
-        <>
-          {question.answers?.map((a) => {
-            const isUserSelected = userAnswer?.selectedAnswerId === a.answerId;
-            return (
-              <div
-                key={a.answerId}
-                className={`answer ${a.isCorrect ? 'correct-answer' : ''} ${
-                  isUserSelected && !a.isCorrect ? 'incorrect-choice' : ''
-                }`}
-              >
-                <span className="answer-text">
-                  {a.answerLabel}. {a.answerText}
-                </span>
-                <div className="answer-tags">
-                  {a.isCorrect && (
-                    <span className="tag correct-tag">✅ Đáp án đúng</span>
-                  )}
-                  {isUserSelected && !a.isCorrect && (
-                    <span className="tag incorrect-tag">🟡 Bạn chọn</span>
-                  )}
-                  {isUserSelected && a.isCorrect && (
-                    <span className="tag your-choice-tag">
-                      🟢 Bạn chọn & đúng
-                    </span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-          {!userAnswer && (
-            <p className="unanswered-text">Bạn đã bỏ qua câu này.</p>
-          )}
-        </>
-      )}
-
-      {/* ĐIỀN TỪ */}
-      {question.questionType === 'FILL_BLANK' && (
-        <div className="fill-blank-result">
-          <p>
-            <strong>Câu trả lời của bạn: </strong>
-            <span
-              className={
-                userAnswer
-                  ? isUserCorrect
-                    ? 'correct-text'
-                    : 'incorrect-text'
-                  : ''
-              }
-            >
-              {userAnswer?.answerText || '(Chưa trả lời)'}
-            </span>
-          </p>
-          {!isUserCorrect && correctAnswer && (
-            <p>
-              <strong>Đáp án đúng: </strong>{' '}
-              <span className="correct-text">{correctAnswer.answerText}</span>
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* TỰ LUẬN */}
-      {question.questionType === 'ESSAY' && (
-        <div className="essay-result">
-          <p>
-            <strong>Bài làm của bạn:</strong>
-          </p>
-          <div className="essay-content">
-            {userAnswer?.answerText || '(Chưa trả lời)'}
-          </div>
-        </div>
-      )}
-
-      {/* GIẢI THÍCH */}
-      {question.explanation && (
-        <div className="explanation">
-          <div className="toggle-explanation" onClick={toggleExplanation}>
-            <strong>Giải thích:</strong>{' '}
-            <span className="arrow">{isExplanationOpen ? '▼' : '▶'}</span>
-          </div>
-          {isExplanationOpen && (
-            <div
-              className="explanation-content"
-              dangerouslySetInnerHTML={{__html: question.explanation}}
-            />
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function TestResultPage() {
-  const {userTestId} = useParams();
+const TestResultPage = () => {
+  const { userTestId } = useParams();
   const location = useLocation();
-  const [test, setTest] = useState(null);
-  const [score] = useState(location.state?.score || null);
+  const navigate = useNavigate();
   const [result, setResult] = useState(null);
-  const [userAnswers, setUserAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchResults = async () => {
+    const fetchResult = async () => {
       try {
-        // 🟢 Gọi API mới của bạn để lấy testId từ userTestId
-        const metaRes = await axios.get(`/api/user-tests/${userTestId}`);
-        const testId = metaRes.data.testId;
-
-        // 🟢 Sau đó lấy đề & kết quả
-        const [testRes, resultRes, answersRes] = await Promise.all([
-          axios.get(`/api/tests/admintest/${testId}`),
-          axios.get(`/api/user-answers/user-test/${userTestId}/result`),
-          axios.get(`/api/user-answers/user-test/${userTestId}`),
-        ]);
-
-        setTest(testRes.data);
-        setResult(resultRes.data);
-        setUserAnswers(answersRes.data);
+        const res = await axios.get(`/api/user-tests/${userTestId}/result`);
+        setResult(res.data);
       } catch (err) {
-        console.error('❌ Lỗi khi tải kết quả:', err);
+        console.error('❌ Lỗi tải kết quả:', err);
+        setError('Không thể tải kết quả bài thi này 😢');
       } finally {
         setLoading(false);
       }
     };
-
-    if (userTestId) fetchResults();
+    fetchResult();
   }, [userTestId]);
 
-  if (loading) return <p>Đang tải kết quả...</p>;
-  if (!test) return <p>Không tìm thấy thông tin bài thi.</p>;
-
-  return (
-    <div className="test-result-page">
-      <h2>Kết quả bài thi: {test.title}</h2>
-
-      {score !== null && (
-        <p className="score">
-          <strong>Điểm của bạn: {score.toFixed(2)}</strong>
-        </p>
-      )}
-
-      {result && (
-        <div className="result-stats">
-          <span>
-            <strong>Đúng:</strong> {result.correct}
-          </span>
-          <span>
-            <strong>Sai:</strong> {result.wrong}
-          </span>
-          <span>
-            <strong>Tổng:</strong> {result.total}
-          </span>
-        </div>
-      )}
-
-      {test.parts?.map((part, i) => (
-        <div key={part.testPartId} className="test-part">
-          <h3>Phần {i + 1}</h3>
-          {part.passage && (
-            <div className="passage">
-              <h4>
-                {part.passage.passageType === 'LISTENING'
-                  ? 'Bài nghe:'
-                  : 'Đoạn văn:'}
-              </h4>
-              {part.passage.passageType === 'LISTENING' &&
-                part.passage.mediaUrl && (
-                  <audio
-                    controls
-                    src={part.passage.mediaUrl}
-                    style={{width: '100%', marginBottom: '1rem'}}
-                  />
-                )}
-              {part.passage.content && (
-                <div className="passage-content">{part.passage.content}</div>
-              )}
-            </div>
-          )}
-
-          {part.questions?.map((q) => {
-            const userAnswer = userAnswers.find(
-              (ua) => ua.questionId === q.questionId,
-            );
-            return (
-              <QuestionResult
-                key={q.questionId}
-                question={q}
-                userAnswer={userAnswer}
-              />
-            );
-          })}
-        </div>
-      ))}
+  if (loading) return (
+    <div className={cx('wrapper')}>
+      <Container className="d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3 fw-bold text-primary">Đang tổng hợp điểm số của bạn...</p>
+      </Container>
     </div>
   );
-}
+
+  if (error) return (
+    <div className={cx('wrapper')}>
+      <Container>
+        <Alert variant="danger" className="rounded-xl shadow-sm">{error}</Alert>
+        <button className="btn btn-primary rounded-pill mt-3" onClick={() => navigate('/')}>Quay lại trang chủ</button>
+      </Container>
+    </div>
+  );
+
+  return (
+    <div className={cx('wrapper')}>
+      <Container>
+        <div className={cx('result-card')}>
+          <div className={cx('icon-success')}>
+            <IoCheckmarkCircle />
+          </div>
+
+          <h1>Chúc mừng bạn đã hoàn thành!</h1>
+          <p className={cx('subtitle')}>
+            Hệ thống đã ghi nhận nỗ lực của bạn trong bài thi <strong>"{result?.testTitle || 'Luyện tập'}"</strong>
+          </p>
+
+          <div className={cx('score-display')}>
+            <span className={cx('label')}>Điểm số đạt được</span>
+            <div className={cx('points')}>
+              {result?.totalScore || location.state?.score || 0}
+              <span className={cx('unit')}>điểm</span>
+            </div>
+          </div>
+
+          <div className={cx('stats-grid')}>
+            <div className={cx('stat-item')}>
+              <IoTimeOutline size={24} color="#6366f1" />
+              <span className={cx('stat-val')}>-{/* Nếu có data về thời gian làm bài thì thêm vào đây */}--</span>
+              <span className={cx('stat-label')}>Thời gian làm</span>
+            </div>
+            <div className={cx('stat-item')}>
+              <IoStatsChartOutline size={24} color="#f59e0b" />
+              <span className={cx('stat-val')}># {userTestId}</span>
+              <span className={cx('stat-label')}>Số hiệu bài thi</span>
+            </div>
+          </div>
+
+          <div className={cx('actions')}>
+            <button className={cx('btn-home')} onClick={() => navigate('/')}>
+              <IoHomeOutline size={20} />
+              Về trang chủ
+              <IoChevronForwardOutline />
+            </button>
+
+            <button className={cx('btn-review')} onClick={() => navigate('/my-test')}>
+              <IoSchoolOutline size={20} />
+              Xem lịch sử bài thi khác
+            </button>
+          </div>
+        </div>
+      </Container>
+    </div>
+  );
+};
 
 export default TestResultPage;

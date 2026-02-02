@@ -1,6 +1,21 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Container, Spinner, Button, Form } from 'react-bootstrap';
+import classNames from 'classnames/bind';
+import {
+  IoTimeOutline,
+  IoSendOutline,
+  IoInformationCircleOutline,
+  IoLockClosedOutline,
+  IoCheckmarkCircleOutline,
+  IoVolumeHighOutline,
+  IoAlertCircleOutline
+} from 'react-icons/io5';
+
+import styles from './TestStartPage.module.scss';
+
+const cx = classNames.bind(styles);
 
 function TestStartPage() {
   const { testId } = useParams();
@@ -14,27 +29,16 @@ function TestStartPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState('loading');
 
-  // ✅ Hàm lấy full URL media
   const getFullMediaUrl = (url) => {
     if (!url) return null;
     const cleanUrl = url.trim();
     if (cleanUrl.startsWith('http')) return cleanUrl;
-    const backendUrl =
-      process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
-    const trimmedBackendUrl = backendUrl.endsWith('/')
-      ? backendUrl.slice(0, -1)
-      : backendUrl;
-    const trimmedCleanUrl = cleanUrl.startsWith('/')
-      ? cleanUrl.slice(1)
-      : cleanUrl;
-    return `${trimmedBackendUrl}/${trimmedCleanUrl}`;
+    const backendUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+    return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
   };
 
-  // 🟢 Lấy đề thi + khôi phục state
   useEffect(() => {
     if (!testId) return;
-    setStatus('loading');
-
     const savedState = sessionStorage.getItem(`userTestState-${testId}`);
     let restored = false;
 
@@ -44,36 +48,26 @@ function TestStartPage() {
       setUserAnswers(parsed.userAnswers || {});
       if (parsed.timeLeft && parsed.lastSavedAt) {
         const elapsed = Math.floor((Date.now() - parsed.lastSavedAt) / 1000);
-        const newTime = Math.max(0, parsed.timeLeft - elapsed);
-        setTimeLeft(newTime);
+        setTimeLeft(Math.max(0, parsed.timeLeft - elapsed));
       } else {
         setTimeLeft(parsed.timeLeft || null);
       }
-      setStatus('active');
       restored = true;
     }
 
-    axios
-      .get(`/api/tests/usertest/${testId}`)
+    axios.get(`/api/tests/usertest/${testId}`)
       .then((res) => {
         const testData = { ...res.data, parts: res.data.parts || [] };
         setTest(testData);
 
         if (testData.canDoTest === false) {
-          alert(
-            '🚫 Bạn đã làm hết số lần cho phép, không thể làm thêm bài mới.',
-          );
-          navigate('/'); // hoặc navigate("/tests") nếu bạn có trang danh sách đề
+          setStatus('no-attempts');
           return;
         }
 
         const now = new Date();
-        const availableFrom = testData.availableFrom
-          ? new Date(testData.availableFrom)
-          : null;
-        const availableTo = testData.availableTo
-          ? new Date(testData.availableTo)
-          : null;
+        const availableFrom = testData.availableFrom ? new Date(testData.availableFrom) : null;
+        const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
 
         if (availableFrom && now < availableFrom) {
           setStatus('locked');
@@ -89,54 +83,29 @@ function TestStartPage() {
         if (!restored) {
           const durationSeconds = (testData.durationMinutes || 0) * 60;
           let finalTime = durationSeconds;
-
           if (availableTo) {
             const diffSeconds = Math.floor((availableTo - now) / 1000);
-            if (diffSeconds > 0) {
-              finalTime = Math.min(durationSeconds, diffSeconds);
-            } else {
-              finalTime = 0;
-            }
+            if (diffSeconds > 0) finalTime = Math.min(durationSeconds, diffSeconds);
+            else finalTime = 0;
           }
-
           setTimeLeft(finalTime);
           setStatus('open');
+        } else {
+          setStatus('active');
         }
       })
-      .catch((err) => {
-        console.error('❌ Lỗi khi tải bài thi:', err);
+      .catch(() => setStatus('error'));
+  }, [testId, navigate]);
 
-        // 🧭 Nếu backend trả lỗi “hết số lần làm”
-        if (err.response?.data?.message?.includes('hết số lần')) {
-          alert('🚫 Bạn đã làm hết số lần cho phép.');
-          navigate('/'); // về trang chính
-          return;
-        }
-        // 🧭 Nếu lỗi 404 -> bài thi không tồn tại
-        if (err.response?.status === 404) {
-          alert('Không tìm thấy bài thi.');
-          navigate('/'); // về trang chính
-          return;
-        }
-
-        setStatus('error');
-      });
-  }, [testId]);
-
-  // 🟢 Tạo user_test khi bắt đầu
   useEffect(() => {
     if (status === 'open' && test?.testId) {
-      setStatus('starting');
-
       const existing = sessionStorage.getItem(`userTest-${test.testId}`);
       if (existing) {
         setUserTestId(existing);
         setStatus('active');
         return;
       }
-
-      axios
-        .post('/api/user-tests', { testId: test.testId })
+      axios.post('/api/user-tests', { testId: test.testId })
         .then((res) => {
           const id = res.data.userTestId;
           setUserTestId(id);
@@ -144,248 +113,211 @@ function TestStartPage() {
           setStatus('active');
         })
         .catch((err) => {
-          console.error('❌ Lỗi tạo userTest:', err);
-
-          // 🧭 Nếu backend trả về 403 -> Hết số lần thi
-          if (err.response?.status === 403) {
-            alert('🚫 Bạn đã làm hết số lần cho phép.');
-            navigate('/'); // Quay về trang chính
-            return;
-          }
-
-          setStatus('error');
+          if (err.response?.status === 403) setStatus('no-attempts');
+          else setStatus('error');
         });
     }
   }, [status, test]);
 
-  // 🟢 Tự động lưu
   useEffect(() => {
     if (status === 'active' && userTestId) {
-      const saveData = {
-        userTestId,
-        userAnswers,
-        timeLeft,
-        lastSavedAt: Date.now(),
-      };
-      sessionStorage.setItem(
-        `userTestState-${testId}`,
-        JSON.stringify(saveData),
-      );
+      sessionStorage.setItem(`userTestState-${testId}`, JSON.stringify({
+        userTestId, userAnswers, timeLeft, lastSavedAt: Date.now()
+      }));
     }
   }, [userAnswers, timeLeft, userTestId, status, testId]);
 
-  // 🟢 Đếm ngược trước khi mở bài
   useEffect(() => {
-    if (status !== 'locked' || preCountdown === null) return;
-    if (preCountdown <= 0) {
-      setStatus('open');
-      setPreCountdown(null);
-      return;
+    if (status === 'locked' && preCountdown !== null) {
+      if (preCountdown <= 0) { setStatus('open'); return; }
+      const timer = setInterval(() => setPreCountdown(p => p - 1), 1000);
+      return () => clearInterval(timer);
     }
-    const timer = setInterval(() => setPreCountdown((prev) => prev - 1), 1000);
-    return () => clearInterval(timer);
   }, [preCountdown, status]);
 
-  // 🟢 Đếm ngược làm bài
   useEffect(() => {
-    if (status !== 'active' || timeLeft === null) return;
+    if (status === 'active' && timeLeft !== null) {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            handleSubmit();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [status, timeLeft]);
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        const now = new Date();
-        const availableTo = test.availableTo
-          ? new Date(test.availableTo)
-          : null;
-
-        if (availableTo && now > availableTo) {
-          clearInterval(timer);
-          alert('⏰ Hết hạn làm bài! Hệ thống sẽ tự động nộp.');
-          handleSubmit();
-          return 0;
-        }
-
-        if (prev <= 1) {
-          clearInterval(timer);
-          alert('⏳ Hết thời gian làm bài. Hệ thống sẽ tự động nộp.');
-          handleSubmit();
-          return 0;
-        }
-
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [status, timeLeft, test]);
-
-  // 🟢 Cập nhật câu trả lời
   const handleAnswerChange = (questionId, type, value) => {
-    const updatedAnswer =
-      type === 'MCQ'
-        ? { selectedAnswerId: value, answerText: null }
-        : { selectedAnswerId: null, answerText: value };
+    const updatedAnswer = type === 'MCQ' ? { selectedAnswerId: value } : { answerText: value };
     setUserAnswers({ ...userAnswers, [questionId]: updatedAnswer });
   };
 
-  // 🟢 Nộp bài
   const handleSubmit = async () => {
     if (!userTestId || isSubmitting) return;
     setIsSubmitting(true);
-
     try {
-      const payload = Object.entries(userAnswers).map(([questionId, ans]) => ({
-        userTestId,
-        questionId: parseInt(questionId),
+      const payload = Object.entries(userAnswers).map(([qid, ans]) => ({
+        userTestId, questionId: parseInt(qid),
         selectedAnswerId: ans.selectedAnswerId || null,
-        answerText: ans.answerText || null,
+        answerText: ans.answerText || null
       }));
-
-      if (payload.length > 0) {
-        await axios.post('/api/user-answers/batch', payload);
-      }
-
+      if (payload.length > 0) await axios.post('/api/user-answers/batch', payload);
       const res = await axios.post(`/api/user-tests/${userTestId}/submit`);
-      const totalScore = res.data.totalScore;
-
       sessionStorage.removeItem(`userTest-${testId}`);
       sessionStorage.removeItem(`userTestState-${testId}`);
-
-      navigate(`/tests/result/${userTestId}`, { state: { score: totalScore } });
+      navigate(`/tests/result/${userTestId}`, { state: { score: res.data.totalScore } });
     } catch (err) {
-      console.error('❌ Lỗi khi nộp bài:', err);
       alert('Nộp bài thất bại! Vui lòng thử lại.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    } finally { setIsSubmitting(false); }
   };
 
-  // 🧭 Format thời gian hiển thị
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  // 🟢 UI hiển thị
-  if (status === 'loading') return <p>Đang tải bài thi...</p>;
-  if (test.canDoTest === false)
-    return <p>🚫 Bạn đã làm hết số lần cho phép cho bài thi này.</p>;
+  if (status === 'loading') return (
+    <div className={cx('state-box')}>
+      <Spinner animation="grow" variant="primary" />
+      <h3>Đang niêm phong đề thi...</h3>
+    </div>
+  );
 
-  if (status === 'error') return <p>Không thể tải bài thi.</p>;
-  if (status === 'closed') return <p>❌ Bài thi đã kết thúc.</p>;
-  if (status === 'locked')
-    return <p>Bài thi chưa mở. Đợi: {formatTime(preCountdown)}</p>;
-  if (status === 'starting') return <p>Đang bắt đầu bài thi...</p>;
-  if (status !== 'active' || !test) return <p>Đang chuẩn bị bài thi...</p>;
+  if (status === 'no-attempts') return (
+    <div className={cx('state-box')}>
+      <IoAlertCircleOutline size={80} color="#ef4444" />
+      <h3>Hết lượt làm bài</h3>
+      <p>Bạn đã hoàn thành số lượt làm bài cho phép cho bài thi này.</p>
+      <Button variant="primary" className="mt-4 rounded-pill" onClick={() => navigate(-1)}>Quay lại</Button>
+    </div>
+  );
+
+  if (status === 'locked') return (
+    <div className={cx('state-box')}>
+      <IoLockClosedOutline size={80} color="#64748b" />
+      <h3>Phòng thi chưa mở</h3>
+      <p>Vui lòng đợi trong giây lát...</p>
+      <div className={cx('timer-box', 'mt-4')}>
+        <span className={cx('time')}>{formatTime(preCountdown)}</span>
+      </div>
+    </div>
+  );
+
+  if (status === 'closed') return (
+    <div className={cx('state-box')}>
+      <IoAlertCircleOutline size={80} color="#ef4444" />
+      <h3>Phòng thi đã đóng</h3>
+      <p>Rất tiếc, thời gian tham gia bài thi này đã kết thúc.</p>
+      <Button variant="secondary" className="mt-4 rounded-pill" onClick={() => navigate(-1)}>Quay lại</Button>
+    </div>
+  );
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '900px', margin: 'auto' }}>
-      <h2>{test.title}</h2>
-      <p>{test.description}</p>
+    <div className={cx('wrapper')}>
+      {/* --- Sticky Header --- */}
+      <div className={cx('header')}>
+        <Container>
+          <div className={cx('header-inner')}>
+            <div className={cx('test-info')}>
+              <h2>{test.title}</h2>
+            </div>
+            <div className={cx('timer-box')}>
+              <IoTimeOutline className={cx('timer-icon')} />
+              <span className={cx('time')}>{formatTime(timeLeft)}</span>
+            </div>
+          </div>
+        </Container>
+      </div>
 
-      {timeLeft !== null && (
-        <p>
-          ⏱ Thời gian còn lại: <strong>{formatTime(timeLeft)}</strong>
-        </p>
-      )}
+      <Container className={cx('content')}>
+        {test.parts?.map((part, i) => (
+          <div key={part.testPartId} className={cx('part-section')}>
+            <h3>Phần {i + 1}: {part.partName || 'Luyện tập'}</h3>
 
-      {test.parts?.map((part, i) => (
-        <div key={part.testPartId} style={{ marginBottom: '2rem' }}>
-          <h3>Phần {i + 1}</h3>
-          {part.passage && (
-            <div
-              style={{
-                background: '#f8f9fa',
-                padding: '1rem',
-                borderRadius: '6px',
-              }}
-            >
-              {part.passage.passageType === 'LISTENING' &&
-                part.passage.mediaUrl && (
-                  <audio
-                    controls
-                    src={getFullMediaUrl(part.passage.mediaUrl)}
-                    style={{ width: '100%' }}
+            {(part.passage?.content || part.passage?.mediaUrl) && (
+              <div className={cx('passage-box')}>
+                {part.passage.passageType === 'LISTENING' && part.passage.mediaUrl && (
+                  <div className="mb-4">
+                    <div className="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
+                      <IoVolumeHighOutline size={24} />
+                      <span>Nghe đoạn hội thoại</span>
+                    </div>
+                    <audio controls src={getFullMediaUrl(part.passage.mediaUrl)} className={cx('audio-player')} />
+                  </div>
+                )}
+                {part.passage.content && <div className={cx('passage-content')}>{part.passage.content}</div>}
+              </div>
+            )}
+
+            {part.questions?.map((q, qIndex) => (
+              <div key={q.questionId} className={cx('question-card')}>
+                <span className={cx('q-text')}>
+                  <span className={cx('q-number')}>Câu {qIndex + 1}:</span>
+                  {q.questionText}
+                </span>
+
+                {q.questionType === 'MCQ' && (
+                  <div className={cx('mcq-group')}>
+                    {q.answers?.map((a) => (
+                      <div
+                        key={a.answerId}
+                        className={cx('mcq-option', { selected: userAnswers[q.questionId]?.selectedAnswerId === a.answerId })}
+                        onClick={() => handleAnswerChange(q.questionId, 'MCQ', a.answerId)}
+                      >
+                        <Form.Check
+                          type="radio"
+                          name={`q-${q.questionId}`}
+                          checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
+                          readOnly
+                        />
+                        <span>{a.answerLabel}. {a.answerText}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {q.questionType === 'FILL_BLANK' && (
+                  <input
+                    type="text"
+                    className={cx('fill-input')}
+                    value={userAnswers[q.questionId]?.answerText || ''}
+                    onChange={(e) => handleAnswerChange(q.questionId, 'FILL_BLANK', e.target.value)}
+                    placeholder="Nhập câu trả lời của bạn..."
                   />
                 )}
-              {part.passage.content && <p>{part.passage.content}</p>}
-            </div>
-          )}
-          {part.questions?.map((q, qIndex) => (
-            <div
-              key={q.questionId}
-              style={{
-                marginTop: '1rem',
-                padding: '1rem',
-                border: '1px solid #ddd',
-                borderRadius: '5px',
-              }}
-            >
-              <strong>Câu {qIndex + 1}:</strong> {q.questionText}
-              {q.questionType === 'MCQ' &&
-                q.answers?.map((a) => (
-                  <div key={a.answerId}>
-                    <label>
-                      <input
-                        type="radio"
-                        name={`q-${q.questionId}`}
-                        checked={
-                          userAnswers[q.questionId]?.selectedAnswerId ===
-                          a.answerId
-                        }
-                        onChange={() =>
-                          handleAnswerChange(q.questionId, 'MCQ', a.answerId)
-                        }
-                      />{' '}
-                      {`${a.answerLabel}. ${a.answerText}`}
-                    </label>
-                  </div>
-                ))}
-              {q.questionType === 'FILL_BLANK' && (
-                <input
-                  type="text"
-                  value={userAnswers[q.questionId]?.answerText || ''}
-                  onChange={(e) =>
-                    handleAnswerChange(
-                      q.questionId,
-                      'FILL_BLANK',
-                      e.target.value,
-                    )
-                  }
-                  placeholder="Nhập câu trả lời..."
-                  style={{
-                    padding: '0.5rem',
-                    width: '100%',
-                    marginTop: '0.5rem',
-                  }}
-                />
-              )}
-              {q.questionType === 'ESSAY' && (
-                <textarea
-                  value={userAnswers[q.questionId]?.answerText || ''}
-                  onChange={(e) =>
-                    handleAnswerChange(q.questionId, 'ESSAY', e.target.value)
-                  }
-                  rows={5}
-                  style={{
-                    width: '100%',
-                    marginTop: '0.5rem',
-                    padding: '0.5rem',
-                  }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      ))}
 
-      <button
-        onClick={handleSubmit}
-        disabled={isSubmitting}
-        className="btn-accent"
-      >
-        {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài'}
-      </button>
+                {q.questionType === 'ESSAY' && (
+                  <textarea
+                    className={cx('essay-input')}
+                    value={userAnswers[q.questionId]?.answerText || ''}
+                    onChange={(e) => handleAnswerChange(q.questionId, 'ESSAY', e.target.value)}
+                    placeholder="Viết câu trả lời chi tiết tại đây..."
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+      </Container>
+
+      {/* --- Fixed Footer Action --- */}
+      <div className={cx('footer-actions')}>
+        <Container>
+          <button
+            className={cx('btn-submit')}
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? <Spinner animation="border" size="sm" /> : <IoSendOutline />}
+            {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài thi'}
+          </button>
+        </Container>
+      </div>
     </div>
   );
 }

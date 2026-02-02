@@ -92,7 +92,7 @@ const MyClassesPage = () => {
                 </div>
                 <div className={cx('info-item')}>
                   <IoPeopleOutline />
-                  <span>ID Lớp: </span>
+                  <span>Mã Lớp: </span>
                   <span className={cx('class-id')}>
                     <IoKeyOutline size={14} />
                     {clazz.classId}

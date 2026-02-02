@@ -1,94 +1,245 @@
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
+@import '../../components/GlobalStyles/GlobalStyles.module.scss';
+
+.wrapper {
+  padding: 60px 0;
+  min-height: calc(100vh - 200px);
+  background: #f8fafc;
 }
 
+/* --- Premium Header --- */
 .header {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  padding: 50px 40px;
+  border-radius: var(--radius-xl);
+  margin-bottom: 40px;
+  color: white;
+  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+}
+
+.title-section {
+  position: relative;
+  z-index: 2;
+
+  h1 {
+    font-size: 3.2rem;
+    font-weight: 850;
+    margin-top: 15px;
+    margin-bottom: 0;
+
+    @media (max-width: 576px) {
+      font-size: 2.4rem;
+    }
+  }
+}
+
+.btn-back {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1.4rem;
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-
-  h3 {
-    margin: 0;
-    color: var(--primary-color);
-    font-weight: var(--font-weight-bold);
-  }
-}
-
-/* Nút quay lại */
-.btn-back {
-  background: none;
-  border: none;
-  color: var(--accent-color); /* dùng màu chủ đạo */
-  font-size: var(--font-size-base);
-  cursor: pointer;
-  transition: color 0.25s ease, transform 0.15s ease;
+  gap: 8px;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  width: fit-content;
 
   &:hover {
-    color: var(--accent-act-color);
-    transform: translateX(-2px);
-  }
-
-  &:active {
-    transform: translateX(0);
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(-5px);
   }
 }
 
-/* Bảng lịch sử */
-.history-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  border: 1px solid var(--border-color);
-  font-size: var(--font-size-sm);
+/* --- Table Styles --- */
+.table-container {
+  background: white;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid #f1f5f9;
+}
 
-  th,
-  td {
-    border: 1px solid var(--border-color);
-    padding: 8px;
-    text-align: center;
+:global(.table) {
+  margin-bottom: 0;
+
+  thead {
+    background: #f8fafc;
+
+    th {
+      padding: 20px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: none;
+      text-align: center;
+    }
   }
 
-  th {
-    background-color: var(--hover-color);
-    color: var(--primary-color);
-    font-weight: var(--font-weight-semibold);
-  }
+  tbody {
+    tr {
+      transition: all 0.2s;
 
-  tr:nth-child(even) {
-    background-color: #fafafa;
-  }
+      &:hover {
+        background-color: #f5f3ff !important;
+      }
+    }
 
-  tr:hover {
-    background-color: rgba(0, 123, 255, 0.05);
+    td {
+      padding: 18px 20px;
+      font-size: 1.5rem;
+      vertical-align: middle;
+      color: var(--dark-color);
+      border-bottom: 1px solid #f1f5f9;
+      text-align: center;
+    }
   }
 }
 
-/* Nút xem chi tiết */
-.btn-view {
-  background-color: var(--accent-color); /* 🔵 xanh dương */
-  color: var(--white);
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: var(--font-weight-medium);
-  transition: background-color 0.25s ease, transform 0.15s ease;
+.score-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 1.6rem;
+  background: #eef2ff;
+  color: var(--primary);
+  border: 1px solid #e0e7ff;
+}
+
+/* --- Status Labels --- */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.status-completed {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.status-in-progress {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.status-expired {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.btn-view-modern {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: var(--primary);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s;
+  margin: 0 auto;
 
   &:hover {
-    background-color: var(--accent-act-color); /* 🔵 xanh đậm hơn khi hover */
-    transform: translateY(-1px);
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+}
+
+/* --- Loading & Empty --- */
+.loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 0;
+
+  p {
+    margin-top: 20px;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 1.8rem;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 40px;
+  background: white;
+  border-radius: var(--radius-xl);
+  border: 2px dashed #cbd5e1;
+
+  .icon {
+    font-size: 8rem;
+    color: #e2e8f0;
+    margin-bottom: 24px;
   }
 
-  &:active {
-    transform: translateY(0);
+  h4 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 30px 20px;
   }
 
-  &:disabled {
-    background-color: #9ac7ff;
-    cursor: not-allowed;
-    opacity: 0.7;
+  :global(.table) {
+    thead {
+      display: none;
+    }
+
+    tbody td {
+      display: block;
+      text-align: left;
+      padding: 10px 20px;
+      border: none;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--text-secondary);
+        width: 100px;
+        display: inline-block;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+      }
+    }
+
+    tr {
+      display: block;
+      border-bottom: 2px solid #f1f5f9;
+      padding: 20px 0;
+    }
   }
 }

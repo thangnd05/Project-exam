@@ -1,15 +1,27 @@
 import axios from 'axios';
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Container, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import style from '../exam/examtype/examtypeById/TestByExamTypePage.module.scss';
-import {useAuth} from '../../hook/useAuth';
-import {Button, Spinner} from 'react-bootstrap';
+import {
+  IoAdd,
+  IoTimeOutline,
+  IoCalendarOutline,
+  IoStatsChartOutline,
+  IoPlayCircleOutline,
+  IoLockClosedOutline,
+  IoHourglassOutline,
+  IoDocumentTextOutline,
+  IoFlashOutline
+} from 'react-icons/io5';
 
-const cx = classNames.bind(style);
+import styles from './MyTestPage.module.scss';
+import { useAuth } from '../../hook/useAuth';
+
+const cx = classNames.bind(styles);
 
 function MyTestPage() {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [tests, setTests] = useState([]);
@@ -18,7 +30,6 @@ function MyTestPage() {
 
   useEffect(() => {
     if (!user) {
-      alert('🔒 Bạn cần đăng nhập để xem danh sách bài kiểm tra.');
       navigate('/login');
       return;
     }
@@ -31,8 +42,7 @@ function MyTestPage() {
         else setTests([]);
       })
       .catch((err) => {
-        console.error('❌ Lỗi khi lấy danh sách bài test:', err);
-        alert('⚠️ Lỗi khi tải danh sách bài kiểm tra.');
+        console.error('❌ Lỗi:', err);
       })
       .finally(() => setLoading(false));
   }, [user, navigate]);
@@ -55,8 +65,6 @@ function MyTestPage() {
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '—';
     return new Date(dateStr).toLocaleString('vi-VN', {
-      hour12: false,
-      year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
@@ -66,9 +74,9 @@ function MyTestPage() {
 
   const formatCountdown = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}p ${seconds}s`;
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m}p ${s}s`;
   };
 
   const handleStartTest = (test) => {
@@ -76,131 +84,137 @@ function MyTestPage() {
     const from = test.availableFrom ? new Date(test.availableFrom) : null;
     const to = test.availableTo ? new Date(test.availableTo) : null;
 
-    if (from && now < from) {
-      alert('⏳ Bài thi chưa mở. Vui lòng quay lại sau.');
-      return;
-    }
-    if (to && now > to) {
-      alert('❌ Bài thi đã kết thúc, bạn không thể làm nữa.');
-      return;
-    }
-    if (test.remainingAttempts === 0) {
-      alert('⚠️ Bạn đã hết lượt làm bài này.');
-      return;
-    }
+    if (from && now < from) return;
+    if (to && now > to) return;
+    if (test.remainingAttempts === 0) return;
 
     navigate(`/tests/${test.testId}/start`, {
-      state: {allowedTime: test.durationMinutes * 60},
+      state: { allowedTime: test.durationMinutes * 60 },
     });
-  };
-
-  const handleViewHistory = (testId) => {
-    navigate(`/tests/history/${testId}`);
-  };
-
-  const handleCreateTest = () => {
-    navigate('/tests/create');
   };
 
   const now = new Date();
 
-  return (
-    <div className={cx('container')}>
-      {/* 🎯 Tiêu đề giống giao diện album */}
-      <div className={cx('header-bar')}>
-        <h3 className={cx('page-title')}>📘 Bài kiểm tra của tôi</h3>
-        <button className={cx('btn-create')} onClick={handleCreateTest}>
-          ➕ Tạo kiểm tra mới
-        </button>
+  if (loading) {
+    return (
+      <div className={cx('loading-box')}>
+        <Spinner animation="grow" variant="danger" size="lg" />
+        <p>Đang tải bộ sưu tập đề thi...</p>
       </div>
+    );
+  }
 
-      {/* 🧩 Hiển thị nội dung */}
-      {loading ? (
-        <div className="text-center mt-5">
-          <Spinner animation="border" variant="primary" />
-          <p>Đang tải...</p>
+  return (
+    <div className={cx('wrapper')}>
+      <Container>
+        {/* === Premium Header === */}
+        <div className={cx('header')}>
+          <div className={cx('title-box')}>
+            <h1>Bài kiểm tra của tôi</h1>
+            <p>Quản lý và ôn luyện các bộ đề cá nhân của bạn</p>
+          </div>
+          <button className={cx('btn-create-test')} onClick={() => navigate('/tests/create')}>
+            <IoAdd size={24} />
+            Tạo kiểm tra mới
+          </button>
         </div>
-      ) : tests.length === 0 ? (
-        // 🟢 Thông báo trống giống kiểu album
-        <div className={cx('empty-box')}>
-          <p>📭 Chưa có bài kiểm tra nào được tạo.</p>
-        </div>
-      ) : (
-        // 🟢 Giữ nguyên phần card gốc
-        <div className={cx('grid')}>
-          {tests.map((test) => {
-            const availableFrom = test.availableFrom
-              ? new Date(test.availableFrom)
-              : null;
-            const availableTo = test.availableTo
-              ? new Date(test.availableTo)
-              : null;
-            const remainingTime = countdowns[test.testId];
 
-            let buttonText = 'Bắt đầu';
-            let canStart = true;
-            let buttonClass = 'btn-start';
+        {/* === Grid Content === */}
+        <div className={cx('test-grid')}>
+          {tests.length > 0 ? (
+            tests.map((test) => {
+              const availableFrom = test.availableFrom ? new Date(test.availableFrom) : null;
+              const availableTo = test.availableTo ? new Date(test.availableTo) : null;
+              const remainingTime = countdowns[test.testId];
 
-            if (availableFrom && now < availableFrom) {
-              buttonText = remainingTime
-                ? `Mở sau ${formatCountdown(remainingTime)}`
-                : `Chưa mở (${formatDateTime(test.availableFrom)})`;
-              canStart = false;
-              buttonClass = 'btn-disabled btn-not-started';
-            } else if (availableTo && now > availableTo) {
-              buttonText = `Đã kết thúc (${formatDateTime(test.availableTo)})`;
-              canStart = false;
-              buttonClass = 'btn-disabled btn-expired';
-            } else if (test.remainingAttempts === 0) {
-              buttonText = 'Hết lượt';
-              canStart = false;
-              buttonClass = 'btn-disabled btn-no-attempts';
-            }
+              let status = 'open';
+              let statusLabel = 'Đang diễn ra';
+              let buttonText = 'Bắt đầu làm bài';
+              let canStart = true;
 
-            return (
-              <div key={test.testId} className={cx('card')}>
-                {test.bannerUrl && (
-                  <img
-                    src={test.bannerUrl}
-                    alt={test.title}
-                    className={cx('banner')}
-                  />
-                )}
-                <div className={cx('body')}>
-                  <h5 className={cx('card-title')}>
-                    {test.title || 'Không có tiêu đề'}
-                  </h5>
-                  <p className={cx('card-duration')}>
-                    ⏱ Thời gian:{' '}
-                    {test.durationMinutes ? `${test.durationMinutes} phút` : ''}
-                  </p>
-                  <p>📅 Mở từ: {formatDateTime(test.availableFrom)}</p>
-                  <p>⏰ Đến hết: {formatDateTime(test.availableTo)}</p>
+              if (availableFrom && now < availableFrom) {
+                status = 'locked';
+                statusLabel = 'Sắp diễn ra';
+                buttonText = remainingTime ? `Mở sau ${formatCountdown(remainingTime)}` : 'Chưa mở';
+                canStart = false;
+              } else if (availableTo && now > availableTo) {
+                status = 'expired';
+                statusLabel = 'Đã kết thúc';
+                buttonText = 'Hết hạn nộp';
+                canStart = false;
+              } else if (test.remainingAttempts === 0) {
+                status = 'expired';
+                statusLabel = 'Hết lượt làm';
+                buttonText = 'Vượt quá lượt thi';
+                canStart = false;
+              }
 
-                  <div>
-                    <button
-                      className={cx('btn-history')}
-                      onClick={() => handleViewHistory(test.testId)}
-                    >
-                      📊 Xem lịch sử
-                    </button>
+              return (
+                <div key={test.testId} className={cx('test-card')}>
+                  <div className={cx('banner-box')}>
+                    <img
+                      src={test.bannerUrl || 'https://images.unsplash.com/photo-1544391682-17762238690f?q=80&w=1000&auto=format&fit=crop'}
+                      className={cx('banner-img')}
+                      alt={test.title}
+                    />
+                    <div className={cx('status-tag', `status-${status}`)}>
+                      {statusLabel}
+                    </div>
                   </div>
 
-                  <div className={cx('btn-group')}>
-                    <button
-                      className={cx(buttonClass)}
-                      onClick={() => handleStartTest(test)}
-                      disabled={!canStart}
-                    >
-                      {buttonText}
-                    </button>
+                  <div className={cx('card-body')}>
+                    <h5 className={cx('title')}>{test.title || 'Bài thi cá nhân'}</h5>
+
+                    <div className={cx('info-group')}>
+                      <div className={cx('info-item')}>
+                        <IoTimeOutline />
+                        <span>Thời gian: <strong>{test.durationMinutes || 0} phút</strong></span>
+                      </div>
+                      <div className={cx('info-item')}>
+                        <IoCalendarOutline />
+                        <span>Ngày mở: {formatDateTime(test.availableFrom)}</span>
+                      </div>
+                      <div className={cx('info-item')}>
+                        <IoHourglassOutline />
+                        <span>Hạn cuối: {formatDateTime(test.availableTo)}</span>
+                      </div>
+                    </div>
+
+                    <div className={cx('actions')}>
+                      <button
+                        className={cx('btn-primary-modern')}
+                        onClick={() => handleStartTest(test)}
+                        disabled={!canStart}
+                      >
+                        {canStart ? <IoPlayCircleOutline size={22} /> : <IoLockClosedOutline size={20} />}
+                        {buttonText}
+                      </button>
+
+                      <button
+                        className={cx('btn-outline-modern')}
+                        onClick={() => navigate(`/tests/history/${test.testId}`)}
+                      >
+                        <IoStatsChartOutline />
+                        Xem điểm & Lịch sử
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <div className={cx('empty-state')}>
+              <IoDocumentTextOutline className={cx('icon')} />
+              <h4>Kho lưu trữ hiện đang trống</h4>
+              <p>Hãy bắt đầu hành trình chinh phục kiến thức bằng cách tạo bài kiểm tra đầu tiên của bạn!</p>
+              <button className={cx('btn-create-test')} style={{ margin: '0 auto' }} onClick={() => navigate('/tests/create')}>
+                <IoAdd size={24} />
+                Tạo kiểm tra ngay
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </Container>
     </div>
   );
 }
