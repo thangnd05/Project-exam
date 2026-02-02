@@ -38,30 +38,49 @@ function Header() {
     navigate(routes.home);
   };
   // --- Sub-components để tái sử dụng ---
-  const NavItems = ({ isMobile = false }) => (
-    <>
-      <Nav.Link as={Link} to={routes.about} className={cx('home', { 'mx-5': !isMobile })}>
-        Giới thiệu
-      </Nav.Link>
-      <Nav.Link as={Link} to={routes.myAlbums} className={cx('home', { 'mx-5': !isMobile })}>
-        Từ vựng
-      </Nav.Link>
-      <Nav.Link as={Link} to={routes.MyTest} className={cx('home', { 'mx-5': !isMobile })}>
-        Bài đã tạo
-      </Nav.Link>
-      <div className={cx("customMenu", { "mx-5": !isMobile })}>
-        <span className={cx("menuTitle")}>Lớp học</span>
-        <div className={cx("menuDropdown")}>
-          <button onClick={() => { setShowJoinModal(true); isMobile && handleClose(); }}>
-            Tham gia lớp học
-          </button>
-          <Link to={routes.myClasses} onClick={() => isMobile && handleClose()}>
-            Vào lớp học
-          </Link>
+  const NavItems = ({ isMobile = false }) => {
+    const handleClassAction = (e, targetRoute, isModal = false) => {
+      e.preventDefault();
+      if (!user) {
+        alert("⚠️ Bạn cần đăng nhập để tham gia lớp học!");
+        navigate(routes.login);
+        isMobile && handleClose();
+        return;
+      }
+
+      if (isModal) {
+        setShowJoinModal(true);
+      } else {
+        navigate(targetRoute);
+      }
+      isMobile && handleClose();
+    };
+
+    return (
+      <>
+        <Nav.Link as={Link} to={routes.about} className={cx('home', { 'mx-5': !isMobile })}>
+          Giới thiệu
+        </Nav.Link>
+        <Nav.Link as={Link} to={routes.myAlbums} className={cx('home', { 'mx-5': !isMobile })}>
+          Từ vựng
+        </Nav.Link>
+        <Nav.Link as={Link} to={routes.MyTest} className={cx('home', { 'mx-5': !isMobile })}>
+          Bài đã tạo
+        </Nav.Link>
+        <div className={cx("customMenu", { "mx-5": !isMobile })}>
+          <span className={cx("menuTitle")}>Lớp học</span>
+          <div className={cx("menuDropdown")}>
+            <button onClick={(e) => handleClassAction(e, null, true)}>
+              Tham gia lớp học
+            </button>
+            <button onClick={(e) => handleClassAction(e, routes.myClasses)}>
+              Vào lớp học
+            </button>
+          </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  };
 
   const UserMenu = ({ isMobile = false }) => {
     if (!user) {

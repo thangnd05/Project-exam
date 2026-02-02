@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Hàm chuẩn hóa user từ API DTO
+  // ✅ Chuẩn hóa user từ DTO backend
   const normalizeUser = (data) => ({
     userId: data.id,
     username: data.username,
@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     avatarUrl: data.avatarUrl,
   });
 
-  // 1. Lấy user hiện tại từ /me
+  // ✅ Lấy user hiện tại từ /me
   const fetchCurrentUser = useCallback(async () => {
     try {
       const response = await axios.get("/api/auth/me");
@@ -33,11 +33,11 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // 2. Chạy khi app khởi động
+  // ✅ Chạy khi app khởi động
   useEffect(() => {
     fetchCurrentUser();
 
-    // Google SDK (giữ nguyên)
+    // Google SDK fix avatar ma
     if (window.google) {
       window.google.accounts.id.initialize({
         client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
@@ -48,12 +48,12 @@ export const AuthProvider = ({ children }) => {
     }
   }, [fetchCurrentUser]);
 
-  // 3. Login (nhận thẳng UserResponse)
+  // ✅ Login (backend trả thẳng UserResponse)
   const login = (userData) => {
     setUser(normalizeUser(userData));
   };
 
-  // 4. Logout
+  // ✅ Logout
   const logout = async () => {
     try {
       await axios.post("/api/auth/logout");
@@ -66,6 +66,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // ✅ Value export ra toàn app
   const value = useMemo(
     () => ({
       user,
@@ -74,6 +75,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       userId: user?.userId,
       roleId: user?.roleId,
+      avatarUrl: user?.avatarUrl,
       isAuthenticated: !!user?.userId,
     }),
     [user, loading]

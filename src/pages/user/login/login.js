@@ -63,26 +63,33 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await axios.post("/api/auth/login", {
         identifier: loginIdentifier,
         password: loginPassword,
       });
 
-      const userData = response.data.user;
-      if (userData) {
-        login(userData);
-        setMessage('Đăng nhập thành công! Đang chuyển hướng...');
-        setMessageType('success');
-        setTimeout(() => navigate('/'), 1000);
+      // ✅ Backend trả thẳng UserResponse
+      const userData = response.data;
+
+      if (userData?.id) {
+        login(userData); // ✅ truyền thẳng vào AuthContext
+
+        setMessage("Đăng nhập thành công! Đang chuyển hướng...");
+        setMessageType("success");
+
+        setTimeout(() => navigate("/"), 1000);
       } else {
-        throw new Error('Dữ liệu không hợp lệ.');
+        throw new Error("User data invalid");
       }
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại!');
-      setMessageType('error');
+      setMessage(
+        err.response?.data?.message ||
+        "Đăng nhập thất bại. Vui lòng thử lại!"
+      );
+      setMessageType("error");
     } finally {
       setLoading(false);
     }
