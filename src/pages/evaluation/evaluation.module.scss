@@ -8,9 +8,10 @@
 }
 
 .section-title {
-    font-weight: 700;
-    color: #1a202c;
+    font-weight: 800;
+    color: var(--accent-color);
     margin-bottom: 10px;
+    font-size: var(--font-size-4xl);
 }
 
 .reviews-section {
@@ -47,7 +48,7 @@
 }
 
 .review-content {
-    font-size: 1rem;
+    font-size: var(--font-size-ssm);
     color: #4a5568;
     line-height: 1.6;
     font-style: italic;
@@ -79,14 +80,14 @@
 }
 
 .user-name {
-    font-size: 1rem;
+    font-size: var(--font-size-ssm);
     font-weight: 700;
     color: #2d3748;
     margin: 0;
 }
 
 .user-role {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: #718096;
     margin-bottom: 4px;
 }

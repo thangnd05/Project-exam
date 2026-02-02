@@ -1,4 +1,4 @@
-@import '../../../components/GlobalStyles/GlobalStyles.module.scss';
+@import '../../components/GlobalStyles/GlobalStyles.module.scss';
 
 .section {
     padding: 60px 0;
@@ -7,7 +7,7 @@
 
 
 .section-title {
-    font-size: 3.8rem;
+    font-size: var(--font-size-4xl);
     font-weight: 800;
     color: var(--accent-color);
     margin-bottom: 12px;
@@ -15,7 +15,7 @@
 }
 
 :global(.text-muted) {
-    font-size: var(--font-size-ssm);
+    font-size: var(--font-size-base);
 }
 
 .process-card {
@@ -76,40 +76,9 @@
 }
 
 /* --- RESPONSIVE --- */
-// @media (max-width: 768px) {
-//     .section {
-//         padding: 40px 0;
-//     }
+@media (max-width: 768px) {
+    .section-title {
+        font-size: var(--font-size-3xl);
+    }
 
-//     .section-title {
-//         font-size: 2.8rem;
-//     }
-
-//     :global(.text-muted) {
-//         font-size: 1.1rem;
-//     }
-
-//     .process-card {
-//         padding: 30px 20px;
-//         margin-bottom: 20px;
-
-//         &:hover {
-//             transform: translateY(-4px);
-//         }
-
-//         h3 {
-//             font-size: 1.5rem;
-//         }
-
-//         p {
-//             font-size: 1rem;
-//         }
-//     }
-
-//     .icon-box {
-//         width: 70px;
-//         height: 70px;
-//         font-size: 2rem;
-//         margin-bottom: 20px;
-//     }
-// }
+}
