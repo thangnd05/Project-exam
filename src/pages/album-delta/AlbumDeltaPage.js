@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Container,
@@ -9,12 +9,27 @@ import {
   Button,
   Modal,
   Form,
-  Card,
 } from 'react-bootstrap';
-import './AlbumDetailPage.scss';
+import classNames from 'classnames/bind';
+import {
+  IoArrowBack,
+  IoAdd,
+  IoPlay,
+  IoFlashOutline,
+  IoTrashOutline,
+  IoChevronBack,
+  IoChevronForward,
+  IoListOutline,
+  IoSchoolOutline,
+  IoVolumeHighOutline
+} from 'react-icons/io5';
+
+import styles from './AlbumDeltaPage.module.scss';
+
+const cx = classNames.bind(styles);
 
 const AlbumDetailPage = () => {
-  const {albumId} = useParams();
+  const { albumId } = useParams();
   const [vocabularies, setVocabularies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -28,6 +43,7 @@ const AlbumDetailPage = () => {
     example: '',
   });
   const navigate = useNavigate();
+  const audioRef = useRef(null);
 
   const fetchVocabularies = async () => {
     try {
@@ -48,25 +64,20 @@ const AlbumDetailPage = () => {
   }, [albumId]);
 
   const handleChange = (e) => {
-    const {name, value} = e.target;
-    setNewVocab({...newVocab, [name]: value});
+    const { name, value } = e.target;
+    setNewVocab({ ...newVocab, [name]: value });
   };
 
-  const handleSave = async () => {
-    if (!newVocab.word.trim() || !newVocab.meaning.trim()) {
-      alert('Vui lòng nhập đầy đủ Từ và Nghĩa!');
-      return;
-    }
-
+  const handleSave = async (e) => {
+    e.preventDefault();
     try {
       await axios.post(
         '/api/vocabularies',
-        {albumId, ...newVocab},
-        {withCredentials: true},
+        { albumId, ...newVocab },
+        { withCredentials: true },
       );
-      alert(`✅ Đã thêm từ '${newVocab.word}' thành công!`);
       setShowModal(false);
-      setNewVocab({word: '', meaning: '', example: ''});
+      setNewVocab({ word: '', meaning: '', example: '' });
       fetchVocabularies();
     } catch (err) {
       console.error('❌ Lỗi khi thêm từ:', err);
@@ -86,210 +97,237 @@ const AlbumDetailPage = () => {
     }
   };
 
+  const playAudio = (word) => {
+    const ttsUrl = `http://localhost:8080/api/tts?text=${encodeURIComponent(word)}`;
+    const audio = new Audio(ttsUrl);
+    audio.play();
+  };
+
   if (loading)
     return (
-      <div className="text-center mt-5">
-        <Spinner animation="border" /> <p>Đang tải...</p>
+      <div className={cx('loading-box')}>
+        <Spinner animation="grow" variant="primary" size="lg" />
+        <p>Đang mài giũa kiến thức...</p>
       </div>
     );
 
-  if (errorMsg) return <Alert variant="danger">{errorMsg}</Alert>;
+  if (errorMsg) return (
+    <Container className="mt-5">
+      <Alert variant="danger">{errorMsg}</Alert>
+    </Container>
+  );
 
-  // 🧠 Flashcard hiện tại
   const currentVocab = vocabularies[currentIndex];
 
   return (
-    <Container className="my-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <Button variant="secondary" onClick={() => navigate(-1)}>
-          ← Quay lại
-        </Button>
+    <div className={cx('wrapper')}>
+      <Container>
+        {/* === Modern Header === */}
+        <div className={cx('header')}>
+          <div className={cx('title-section')}>
+            <button className={cx('btn-back')} onClick={() => navigate(-1)}>
+              <IoArrowBack />
+              Album của tôi
+            </button>
+            <h2 className="mt-3">
+              {flashMode ? '🎯 Học bằng Flashcard' : '📖 Danh sách từ vựng'}
+            </h2>
+          </div>
 
-        <div className="d-flex gap-2">
-          <Button
-            variant="info"
-            onClick={() => navigate(`/practice/${albumId}`)}
-            disabled={vocabularies.length === 0}
-          >
-            🧩 Luyện tập
-          </Button>
+          <div className={cx('actions')}>
+            <Button
+              className={cx('btn-outline')}
+              onClick={() => navigate(`/practice/${albumId}`)}
+              disabled={vocabularies.length === 0}
+            >
+              <IoSchoolOutline />
+              Luyện tập
+            </Button>
 
-          <Button
-            variant="outline-primary"
-            onClick={() => setFlashMode(!flashMode)}
-            disabled={vocabularies.length === 0}
-          >
-            🃏 {flashMode ? 'Thoát Flashcard' : 'Học bằng Flashcard'}
-          </Button>
+            <Button
+              className={cx('btn-outline')}
+              onClick={() => {
+                setFlashMode(!flashMode);
+                setFlipped(false);
+              }}
+              disabled={vocabularies.length === 0}
+            >
+              {flashMode ? <IoListOutline /> : <IoFlashOutline />}
+              {flashMode ? 'Chế độ Danh sách' : 'Chế độ Flashcard'}
+            </Button>
 
-          <Button variant="success" onClick={() => setShowModal(true)}>
-            ➕ Thêm từ mới
-          </Button>
+            <Button className={cx('btn-primary')} onClick={() => setShowModal(true)}>
+              <IoAdd />
+              Thêm từ vựng
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <h2 className="fw-bold text-primary mb-4">
-        {flashMode ? '🎯 Học bằng Flashcard' : '📖 Danh sách từ vựng'}
-      </h2>
+        {/* === Content View === */}
+        {flashMode ? (
+          <div className={cx('flashcard-wrapper')}>
+            <div
+              className={cx('flashcard')}
+              onClick={() => setFlipped(!flipped)}
+            >
+              <div className={cx('flashcard-inner', { flipped })}>
+                <div className={cx('flashcard-front')}>
+                  <div className={cx('word')}>{currentVocab.word}</div>
+                  <div className={cx('phonetic')}>/{currentVocab.phonetic || '...'}/</div>
+                  <button
+                    className={cx('btn-play')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playAudio(currentVocab.word);
+                    }}
+                    style={{ marginTop: '20px', border: 'none', background: '#f1f5f9', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <IoVolumeHighOutline size={24} color="#0061f2" />
+                  </button>
+                </div>
 
-      {/* 🧩 Flashcard View */}
-      {flashMode ? (
-        <div className="text-center">
-          <div
-            className="flashcard-container mx-auto"
-            style={{width: '350px', height: '230px', perspective: '1000px'}}
-            onClick={() => setFlipped(!flipped)}
-          >
-            <div className={`flashcard-inner ${flipped ? 'flipped' : ''}`}>
-              {/* Mặt trước */}
-              <div className="flashcard-front d-flex flex-column justify-content-center align-items-center p-4">
-                <h3 className="fw-bold text-primary text-capitalize">
-                  {currentVocab.word}
-                </h3>
-                <p className="text-muted">{currentVocab.phonetic || '...'}</p>
-
-                {/* ✅ Dùng key để buộc React reload audio */}
-                <audio
-                  key={currentVocab.word}
-                  controls
-                  preload="none"
-                  className="mt-2"
-                >
-                  <source
-                    src={`http://localhost:8080/api/tts?text=${encodeURIComponent(
-                      currentVocab.word,
-                    )}`}
-                    type="audio/mpeg"
-                  />
-                </audio>
-              </div>
-
-              {/* Mặt sau */}
-              <div className="flashcard-back d-flex flex-column justify-content-center align-items-center p-4">
-                <h5 className="text-dark">{currentVocab.meaning}</h5>
-                <p className="fst-italic mt-2 text-secondary">
-                  {currentVocab.example}
-                </p>
+                <div className={cx('flashcard-back')}>
+                  <div className={cx('meaning')}>{currentVocab.meaning}</div>
+                  <div className={cx('example')}>"{currentVocab.example || 'Chưa có ví dụ.'}"</div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-4 d-flex justify-content-center gap-3">
-            <Button
-              variant="outline-secondary"
-              disabled={currentIndex === 0}
-              onClick={() => {
-                setFlipped(false);
-                setCurrentIndex((prev) => prev - 1);
-              }}
-            >
-              ⬅️ Trước
-            </Button>
-            <Button
-              variant="outline-secondary"
-              disabled={currentIndex === vocabularies.length - 1}
-              onClick={() => {
-                setFlipped(false);
-                setCurrentIndex((prev) => prev + 1);
-              }}
-            >
-              Tiếp ➡️
-            </Button>
+            <div className={cx('card-controls')}>
+              <button
+                className={cx('btn-nav')}
+                disabled={currentIndex === 0}
+                onClick={() => {
+                  setFlipped(false);
+                  setCurrentIndex((prev) => prev - 1);
+                }}
+              >
+                <IoChevronBack />
+              </button>
+              <div className={cx('progress-text')}>
+                {currentIndex + 1} / {vocabularies.length}
+              </div>
+              <button
+                className={cx('btn-nav')}
+                disabled={currentIndex === vocabularies.length - 1}
+                onClick={() => {
+                  setFlipped(false);
+                  setCurrentIndex((prev) => prev + 1);
+                }}
+              >
+                <IoChevronForward />
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        // 🧾 Danh sách bảng
-        <Table striped bordered hover responsive className="shadow-sm">
-          <thead className="table-primary text-center">
-            <tr>
-              <th>#</th>
-              <th>Từ vựng</th>
-              <th>Phiên âm</th>
-              <th>Nghĩa</th>
-              <th>Ví dụ</th>
-              <th>Phát âm</th>
-              <th>Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vocabularies.map((vocab, index) => (
-              <tr key={vocab.vocabId}>
-                <td>{index + 1}</td>
-                <td>{vocab.word}</td>
-                <td>{vocab.phonetic}</td>
-                <td>{vocab.meaning}</td>
-                <td>{vocab.example}</td>
-                <td>
-                  <audio controls preload="none">
-                    <source
-                      src={`http://localhost:8080/api/tts?text=${encodeURIComponent(
-                        vocab.word,
-                      )}`}
-                      type="audio/mpeg"
-                    />
-                  </audio>
-                </td>
-                <td className="text-center">
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDelete(vocab.vocabId, vocab.word)}
-                  >
-                    🗑️ Xóa
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
+        ) : (
+          <div className={cx('table-container')}>
+            <Table responsive hover>
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Từ vựng</th>
+                  <th>Nghĩa</th>
+                  <th>Ví dụ</th>
+                  <th>Phát âm</th>
+                  <th className="text-center">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {vocabularies.map((vocab, index) => (
+                  <tr key={vocab.vocabId}>
+                    <td className="text-muted fw-bold">{index + 1}</td>
+                    <td>
+                      <div className={cx('word-main')}>{vocab.word}</div>
+                      <div className={cx('phonetic')}>/{vocab.phonetic}/</div>
+                    </td>
+                    <td className="fw-semibold">{vocab.meaning}</td>
+                    <td className="text-muted fst-italic" style={{ maxWidth: '300px' }}>
+                      {vocab.example || '...'}
+                    </td>
+                    <td className={cx('audio-cell')}>
+                      <div
+                        className={cx('btn-play')}
+                        onClick={() => playAudio(vocab.word)}
+                      >
+                        <IoVolumeHighOutline size={20} />
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      <button
+                        className="btn btn-link text-danger p-0"
+                        onClick={() => handleDelete(vocab.vocabId, vocab.word)}
+                      >
+                        <IoTrashOutline size={22} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+            {vocabularies.length === 0 && (
+              <div className="text-center py-5 text-muted">
+                <IoSchoolOutline size={64} className="mb-3 opacity-25" />
+                <h5>Album này còn trống</h5>
+                <p>Hãy thêm những từ vựng đầu tiên để bắt đầu học nhé!</p>
+              </div>
+            )}
+          </div>
+        )}
+      </Container>
 
-      {/* 🟢 Modal thêm từ */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Thêm từ vựng mới</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Từ vựng</Form.Label>
+      {/* === Modal Thêm từ Modern === */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
+        <Form onSubmit={handleSave}>
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <IoAdd className="me-2" />
+              Thêm từ vựng mới
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group className="mb-4">
+              <Form.Label>Từ vựng (Tiếng Anh)</Form.Label>
               <Form.Control
                 name="word"
                 value={newVocab.word}
                 onChange={handleChange}
-                placeholder="Ví dụ: love"
+                placeholder="Ví dụ: Excellence"
+                required
               />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Nghĩa</Form.Label>
+            <Form.Group className="mb-4">
+              <Form.Label>Nghĩa (Tiếng Việt)</Form.Label>
               <Form.Control
                 name="meaning"
                 value={newVocab.meaning}
                 onChange={handleChange}
-                placeholder="Tình yêu"
+                placeholder="Ví dụ: Sự xuất sắc"
+                required
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Ví dụ</Form.Label>
+              <Form.Label>Ví dụ minh họa</Form.Label>
               <Form.Control
+                as="textarea"
+                rows={3}
                 name="example"
                 value={newVocab.example}
                 onChange={handleChange}
-                placeholder="I love learning English."
+                placeholder="Ví dụ: He strive for excellence in everything."
               />
             </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Hủy
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Lưu
-          </Button>
-        </Modal.Footer>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="light" onClick={() => setShowModal(false)}>
+              Hủy
+            </Button>
+            <Button type="submit" className={cx('btn-primary')}>
+              Lưu từ vựng
+            </Button>
+          </Modal.Footer>
+        </Form>
       </Modal>
-    </Container>
+    </div>
   );
 };
 
