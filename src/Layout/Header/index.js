@@ -5,8 +5,7 @@ import {
   Button,
   Dropdown,
   Image,
-  Offcanvas,
-  NavDropdown
+  Offcanvas
 } from 'react-bootstrap';
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -28,159 +27,132 @@ const cx = classNames.bind(style);
 function Header() {
   const { user, logout } = useAuth();
   const [showOffcanvas, setShowOffcanvas] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ SỬA 2: Lấy thông tin location hiện tại
 
   const handleClose = () => setShowOffcanvas(false);
   const handleShow = () => setShowOffcanvas(true);
-  const [showJoinModal, setShowJoinModal] = useState(false);
-
 
   const handleLogout = async () => {
     await logout();
-    navigate(routes.home); // redirect về trang chính sau logout
+    navigate(routes.home);
+  };
+
+  // --- Sub-components để tái sử dụng ---
+  const NavItems = ({ isMobile = false }) => (
+    <>
+      <Nav.Link as={Link} to={routes.about} className={cx('home', { 'mx-5': !isMobile })}>
+        Giới thiệu
+      </Nav.Link>
+      <Nav.Link as={Link} to={routes.myAlbums} className={cx('home', { 'mx-5': !isMobile })}>
+        Từ vựng
+      </Nav.Link>
+      <Nav.Link as={Link} to={routes.MyTest} className={cx('home', { 'mx-5': !isMobile })}>
+        Bài đã tạo
+      </Nav.Link>
+      <div className={cx("customMenu", { "mx-5": !isMobile })}>
+        <span className={cx("menuTitle")}>Lớp học</span>
+        <div className={cx("menuDropdown")}>
+          <button onClick={() => { setShowJoinModal(true); isMobile && handleClose(); }}>
+            Tham gia lớp học
+          </button>
+          <Link to={routes.myClasses} onClick={() => isMobile && handleClose()}>
+            Vào lớp học
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+
+  const UserMenu = ({ isMobile = false }) => {
+    if (!user) {
+      return (
+        <>
+          <Nav.Link
+            as={Link}
+            to={routes.login}
+            state={{ mode: 'signin' }}
+            className={cx('home', 'login-link', { 'mx-5': !isMobile })}
+            onClick={() => isMobile && handleClose()}
+          >
+            Đăng nhập
+          </Nav.Link>
+          <Nav.Link
+            as={Link}
+            to={routes.login}
+            state={{ mode: 'signup' }}
+            className={cx('home', { 'mx-5': !isMobile })}
+            onClick={() => isMobile && handleClose()}
+          >
+            Đăng ký
+          </Nav.Link>
+        </>
+      );
+    }
+
+    return (
+      <div className={cx('d-lg-flex align-items-center')}>
+        {!isMobile && (
+          <Nav.Link as={Link} to={routes.createTest} className={cx('mx-5')}>
+            <Button variant="" className={cx('new-test')}>
+              Tạo bài kiểm tra
+            </Button>
+          </Nav.Link>
+        )}
+        <Dropdown className={cx(isMobile ? 'mt-3' : '')}>
+          <Dropdown.Toggle as="div" className={cx('user-info')}>
+            <Image
+              src={user?.avatarUrl || images.avtImage}
+              alt="Avatar"
+              className={cx("avatar")}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = images.avtImage;
+              }}
+            />
+            <div>
+              <span className={cx('username')}>{user.username}</span>
+            </div>
+          </Dropdown.Toggle>
+          <Dropdown.Menu className={cx('custom-dropdown')}>
+            <Dropdown.Item as={Link} to={routes.profile} onClick={() => isMobile && handleClose()}>
+              Hồ sơ
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => { handleLogout(); isMobile && handleClose(); }}>
+              Đăng xuất
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+    );
   };
 
   return (
     <div className={cx('wrapper')}>
       <Navbar expand="lg" className={cx('bg-body-tertiary p-5')}>
         <Container fluid="lg">
-          <Navbar.Brand
-            as={Link}
-            to={routes.home}
-            className={cx('brand', 'fw-bold')}
-          >
-            <div
-              className="d-flex align-items-center justify-content-center"
-              style={{ width: '140px' }}
-            >
-              <Image
-                src={images.logo}
-                alt="logo"
-                height="70"
-                loading="lazy"
-                className={cx('logo-brand')}
-              />
+          <Navbar.Brand as={Link} to={routes.home} className={cx('brand', 'fw-bold')}>
+            <div className="d-flex align-items-center justify-content-center" style={{ width: '140px' }}>
+              <Image src={images.logo} alt="logo" height="70" loading="lazy" className={cx('logo-brand')} />
               {name}
             </div>
           </Navbar.Brand>
 
-          <Button
-            variant="outline-secondary"
-            onClick={handleShow}
-            className={cx('d-lg-none', 'ms-auto', 'bar')}
-            aria-controls="basic-navbar-nav"
-          >
+          <Button variant="outline-secondary" onClick={handleShow} className={cx('d-lg-none', 'ms-auto', 'bar')}>
             <FontAwesomeIcon icon={faBars} />
           </Button>
 
-          {/* Navbar lớn */}
-          <Navbar.Collapse
-            id="basic-navbar-nav"
-            className={cx('d-none d-lg-flex justify-content-between')}
-          >
-            <div className="d-flex">
-              <Nav className={cx('mx-5')}>
-                <Nav.Link as={Link} to={routes.about} className={cx('home')}>
-                  Giới thiệu
-                </Nav.Link>
-              </Nav>
-              <Nav className={cx('mx-5')}>
-                <Nav.Link as={Link} to={routes.myAlbums} className={cx('home')}>
-                  Từ vựng
-                </Nav.Link>
-              </Nav>
-              <Nav className={cx('mx-5')}>
-                <Nav.Link as={Link} to={routes.MyTest} className={cx('home')}>
-                  Bài đã tạo
-                </Nav.Link>
-              </Nav>
-              <Nav className={cx("mx-5")}>
-                <div className={cx("customMenu")}>
-                  <span className={cx("menuTitle")}>Lớp học</span>
-
-                  <div className={cx("menuDropdown")}>
-                    <button onClick={() => setShowJoinModal(true)}>
-                      Tham gia lớp học
-                    </button>
-
-                    <Link to={routes.myClasses}>
-                      Vào lớp học
-                    </Link>
-                  </div>
-                </div>
-              </Nav>
-
-            </div>
-            <Nav>{/* <Search /> */}</Nav>
-            <div>
-              <Nav>
-                {user ? (
-                  <>
-                    <Nav.Link
-                      as={Link}
-                      to={routes.createTest}
-                      className={cx('mx-5')}
-                    >
-                      <Button variant="" className={cx('new-test')}>
-                        Tạo bài kiểm tra
-                      </Button>
-                    </Nav.Link>
-                    <Dropdown>
-                      <Dropdown.Toggle as="div" className={cx('user-info')}>
-                        <Image
-                          src={images.avtImage}
-                          alt="Avatar"
-                          className={cx('avatar')}
-                        />
-                        <div>
-                          <span className={cx('username')}>
-                            {user.username}
-                          </span>
-                        </div>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu className={cx('custom-dropdown')}>
-                        <Dropdown.Item as={Link} to={routes.profile}>
-                          Hồ sơ
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          onClick={handleLogout}
-                          as={Link}
-                          to={routes.home}
-                        >
-                          Đăng xuất
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </>
-                ) : (
-                  <>
-                    {/* Link Đăng nhập */}
-                    <Nav.Link
-                      as={Link}
-                      to={routes.login}
-                      state={{ mode: 'signin' }} // Thêm dòng này
-                      className={cx('nav-link', 'login-link', 'home')}
-                    >
-                      Đăng nhập
-                    </Nav.Link>
-
-                    {/* Link Đăng ký */}
-                    <Nav.Link
-                      as={Link}
-                      to={routes.login} // Trỏ về cùng trang chứa form
-                      state={{ mode: 'signup' }} // Thêm dòng này
-                      className={cx('mx-5', 'home')}
-                    >
-                      Đăng ký
-                    </Nav.Link>
-                  </>
-                )}
-              </Nav>
-            </div>
+          {/* Desktop Navbar */}
+          <Navbar.Collapse id="basic-navbar-nav" className={cx('d-none d-lg-flex justify-content-between')}>
+            <Nav className="d-flex align-items-center">
+              <NavItems />
+            </Nav>
+            <Nav className="d-flex align-items-center">
+              <UserMenu />
+            </Nav>
           </Navbar.Collapse>
 
-          {/* Offcanvas (màn hình nhỏ) */}
+          {/* Mobile Offcanvas */}
           <Offcanvas show={showOffcanvas} onHide={handleClose} placement="end">
             <Offcanvas.Header closeButton>
               <Offcanvas.Title as={Link} to={routes.home} onClick={handleClose}>
@@ -188,64 +160,17 @@ function Header() {
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              <Nav className="flex-column" onClick={handleClose}>
-                <Nav.Link as={Link} to={routes.content}>
-                  Bài viết
-                </Nav.Link>
-                <Nav.Link as={Link} to={routes.about}>
-                  Giới thiệu
-                </Nav.Link>
-                {user ? (
-                  <>
-                    <Nav.Link as={Link} to={routes.post}>
-                      Tạo bài viết
-                    </Nav.Link>
-                    <Dropdown>
-                      <Dropdown.Toggle as="div" className={cx('user-info')}>
-                        <Image
-                          src={images.avtImage}
-                          alt="Avatar"
-                          className={cx('avatar')}
-                        />
-                        <div>
-                          <span className={cx('username')}>
-                            {user.username}
-                          </span>
-                        </div>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item as={Link} to={routes.profile}>
-                          Hồ sơ
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          onClick={handleLogout}
-                          as={Link}
-                          to={routes.home}
-                        >
-                          Đăng xuất
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </>
-                ) : (
-                  <>
-                    <Nav.Link as={Link} to={routes.login}>
-                      Đăng nhập
-                    </Nav.Link>
-                    <Nav.Link as={Link} to={routes.register}>
-                      Đăng ký
-                    </Nav.Link>
-                  </>
-                )}
+              <Nav className="flex-column">
+                <NavItems isMobile />
+                <hr />
+                <UserMenu isMobile />
               </Nav>
             </Offcanvas.Body>
           </Offcanvas>
         </Container>
       </Navbar>
-      <JoinClassModal
-        show={showJoinModal}
-        onClose={() => setShowJoinModal(false)}
-      />
+
+      <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
     </div>
   );
 }

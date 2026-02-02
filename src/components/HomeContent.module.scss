@@ -211,6 +211,34 @@
                 }
             }
         }
+
+        /* Style cho Navigation Arrows (Khi ẩn Dots) */
+        .slick-prev,
+        .slick-next {
+            width: 40px;
+            height: 40px;
+            z-index: 10;
+
+            &:before {
+                font-size: 30px;
+                color: #94a3b8; // Màu xám xanh mặc định
+                opacity: 0.7;
+                transition: all 0.3s;
+            }
+
+            &:hover:before {
+                color: var(--accent-color, #0061f2);
+                opacity: 1;
+            }
+        }
+
+        .slick-prev {
+            left: -35px; // Đẩy ra vừa phải
+        }
+
+        .slick-next {
+            right: -35px;
+        }
     }
 }
 

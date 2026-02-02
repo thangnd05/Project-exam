@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-    FaSearch, FaLaptopCode, FaChartLine, FaDatabase, FaLayerGroup, FaCheckCircle,
+    FaDatabase, FaLayerGroup, FaCheckCircle,
     FaStar, FaQuoteLeft, FaPen, FaTimes, FaInfoCircle
 } from 'react-icons/fa';
 import classNames from 'classnames/bind';
@@ -57,23 +57,81 @@ const HomeContent = () => {
             avatar: 'https://i.pravatar.cc/150?img=24',
             content: 'Nhờ WinDe mà mình tự tin hơn hẳn cho kỳ thi đại học sắp tới. Đề thi thử rất sát form.',
             rating: 5
+        },
+        {
+            id: 6,
+            name: 'Phạm Hương',
+            role: 'Học sinh THPT',
+            avatar: 'https://i.pravatar.cc/150?img=24',
+            content: 'Nhờ WinDe mà mình tự tin hơn hẳn cho kỳ thi đại học sắp tới. Đề thi thử rất sát form.',
+            rating: 5
+        },
+        {
+            id: 7,
+            name: 'Phạm Hương',
+            role: 'Học sinh THPT',
+            avatar: 'https://i.pravatar.cc/150?img=24',
+            content: 'Nhờ WinDe mà mình tự tin hơn hẳn cho kỳ thi đại học sắp tới. Đề thi thử rất sát form.',
+            rating: 5
+        },
+        {
+            id: 8,
+            name: 'Phạm Hương',
+            role: 'Học sinh THPT',
+            avatar: 'https://i.pravatar.cc/150?img=24',
+            content: 'Nhờ WinDe mà mình tự tin hơn hẳn cho kỳ thi đại học sắp tới. Đề thi thử rất sát form.',
+            rating: 5
+        },
+        {
+            id: 9,
+            name: 'Phạm Hương',
+            role: 'Học sinh THPT',
+            avatar: 'https://i.pravatar.cc/150?img=24',
+            content: 'Nhờ WinDe mà mình tự tin hơn hẳn cho kỳ thi đại học sắp tới. Đề thi thử rất sát form.',
+            rating: 5
+        },
+        {
+            id: 10,
+            name: 'Phạm Hương',
+            role: 'Học sinh THPT',
+            avatar: 'https://i.pravatar.cc/150?img=24',
+            content: 'Nhờ WinDe mà mình tự tin hơn hẳn cho kỳ thi đại học sắp tới. Đề thi thử rất sát form.',
+            rating: 5
         }
     ];
 
+    // Xử lý Logic hiển thị Dots/Arrows dựa trên số lượng đánh giá
+    // Nếu có quá nhiều đánh giá (> 15), việc hiển thị full dots sẽ rất rối mắt -> Chuyển sang dùng Arrows
+    const showDots = reviews.length < 15;
+
     // Cấu hình cho Slide
     const settings = {
-        dots: true,
+        dots: showDots,
         infinite: true,
         speed: 500,
         slidesToShow: 3,
-        slidesToScroll: 1,
+        // Nếu hiện dots: scroll theo trang (3 item) để giảm số lượng dots
+        // Nếu không hiện dots: scroll từng item (1) để trải nghiệm mượt mà hơn với arrows/autoplay
+        slidesToScroll: showDots ? 3 : 1,
         autoplay: true,
         autoplaySpeed: 3000,
         pauseOnHover: false,
-        arrows: false,
+        arrows: !showDots, // Tự động bật mũi tên điều hướng khi ẩn dots
         responsive: [
-            { breakpoint: 1024, settings: { slidesToShow: 2 } },
-            { breakpoint: 600, settings: { slidesToShow: 1 } }
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: showDots ? 2 : 1
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
         ]
     };
 
