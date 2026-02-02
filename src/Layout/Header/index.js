@@ -37,7 +37,6 @@ function Header() {
     await logout();
     navigate(routes.home);
   };
-
   // --- Sub-components để tái sử dụng ---
   const NavItems = ({ isMobile = false }) => (
     <>
