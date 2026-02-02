@@ -1,141 +1,173 @@
-footer {
-  margin-top: 150px;
-}
-
-li {
-  list-style: none !important;
-}
-
-/* footer.module.scss */
-
 .footer {
-  /* Thay thế 'bg-secondary' bằng biến màu global của bạn */
-  background-color: var(--footer-bg);
+  background: linear-gradient(135deg, #0b4fd8 0%, #1178e5 50%, #1aa6c8 100%);
+  color: white;
+  position: relative;
+  padding: 60px 0 30px;
+  margin-top: 80px;
+  border-top: 6px solid #e2e8f0; // Adding a subtle border for separation
+}
 
-  /* Thay thế 'text-white' */
-  color: var(--white);
+.container {
+  position: relative;
+  z-index: 5;
+  max-width: 1300px;
+}
 
-  /* Thay thế 'text-center text-lg-start' */
-  text-align: center;
+/* --- Brand Section --- */
+.brandContainer {
+  display: flex;
+  align-items: center;
+  gap: 30px;
 
-  @media (min-width: 992px) {
-    // lg breakpoint của Bootstrap
-    text-align: left;
+  @media (max-width: 991px) {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 40px;
   }
 }
 
-.logoContainer {
-  /* Thay thế các class utility 'rounded-circle bg-white shadow-1-strong...' */
-  width: 150px;
-  height: 150px;
+.logoWrapper {
+  width: 110px;
+  height: 110px;
+  background: white;
   border-radius: 50%;
-  background-color: var(--white);
-  box-shadow: var(--shadow-md); // Sử dụng biến shadow global
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem; // Tương đương 'mb-4'
-  margin-left: auto;
-  margin-right: auto;
-}
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 18px;
+  flex-shrink: 0;
 
-.logo {
-  /* Giúp logo hiển thị đẹp bên trong vòng tròn */
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
-}
-
-.socialLinks {
-  /* Thay thế 'list-unstyled d-flex flex-row justify-content-center' */
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-
-  li {
-    padding: 0 0.75rem; // Tương đương 'px-2'
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
+}
+
+.brandName {
+  font-size: 3.2rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.brandSub {
+  font-size: 1.5rem;
+  opacity: 0.9;
+  margin: 4px 0 12px;
+}
+
+.socialIcons {
+  display: flex;
+  gap: 15px;
+  font-size: 2.2rem;
 
   a {
-    color: var(--white);
-    font-size: var(--font-size-2xl); // Làm icon to hơn một chút
-    transition: color 0.3s ease, transform 0.2s ease;
+    color: white;
+    transition: 0.2s;
 
     &:hover {
-      color: var(--accent-color); // Dùng màu nhấn khi hover
-      transform: scale(1.1);
+      opacity: 0.8;
+      transform: translateY(-2px);
     }
   }
-}
 
-.title {
-  /* Thay thế 'text-uppercase mb-4' */
-  font-family: var(--font-family);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  margin-bottom: 1.5rem;
-  font-size: var(--font-size-lg);
-}
-
-.titleName {
-  /* Style riêng cho {name} */
-  font-size: var(--font-size-2xl); // Nhưng to hơn
-  text-transform: none; // Không uppercase
-}
-
-.navList {
-  list-style: none;
-  padding-left: 0;
-}
-
-.navItem {
-  margin-bottom: 0.75rem; // Tương đương 'mb-2'
-}
-
-.navLink {
-  color: var(--white);
-  text-decoration: none;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: var(--border-color); // Dùng màu viền (sáng) khi hover
-    text-decoration: underline;
-  }
-}
-
-.contactInfo {
-  list-style: none;
-  padding-left: 0;
-
-  p {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0;
-
-    // Căn giữa trên mobile
+  @media (max-width: 991px) {
     justify-content: center;
+  }
+}
 
-    // Căn trái trên desktop
-    @media (min-width: 992px) {
-      justify-content: flex-start;
-    }
+/* --- Statistics Section (Structured & Flat) --- */
+.statsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 20px;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+.statItem {
+  text-align: left;
+}
+
+.statMain {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 5px;
+
+  .statIcon {
+    font-size: 2.8rem;
   }
 
-  svg {
-    /* Thay thế 'pe-2' */
-    margin-right: 0.5rem;
-    flex-shrink: 0;
+  .statValue {
+    font-size: 4.2rem;
+    font-weight: 800;
   }
+}
+
+.statLabel {
+  font-size: 1.4rem;
+  opacity: 0.85;
+  padding-left: 40px;
+
+  @media (max-width: 767px) {
+    padding-left: 0;
+    text-align: center;
+  }
+}
+
+.verticalDivider {
+  width: 1px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+/* --- Contact Bar (Solid & Rectangular) --- */
+.contactBar {
+  margin-top: 50px;
+  display: flex;
+  justify-content: flex-end;
+
+  @media (max-width: 991px) {
+    justify-content: center;
+  }
+}
+
+.emailBox {
+  background: rgba(0, 0, 0, 0.15); // Solid-feeling dark rectangle
+  border-radius: 8px; // squared off as requested
+  padding: 12px 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 650px;
+  justify-content: flex-end;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  @media (max-width: 991px) {
+    justify-content: center;
+  }
+}
+
+.emailIcon {
+  font-size: 1.6rem;
+}
+
+.emailText {
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .copyright {
-  /* Thay thế style inline */
-  background-color: rgba(0, 0, 0, 0.2);
-
-  /* Thay thế 'p-3' */
-  padding: 1rem;
-  text-align: center;
+  display: none;
 }

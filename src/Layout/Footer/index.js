@@ -1,122 +1,83 @@
-import {Container, Row, Col} from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import {
   FaFacebookSquare,
   FaInstagram,
   FaYoutube,
   FaEnvelope,
+  FaListUl,
+  FaLayerGroup,
+  FaCheckCircle
 } from 'react-icons/fa';
-import styles from './footer.module.scss'; // Import module SCSS
-import {Link} from 'react-router-dom';
-import {name} from '~/assets/images';
+
+import styles from './footer.module.scss';
 import images from '~/assets/images';
-import routes from '~/config/Routes';
 
 function Footer() {
   return (
-    // Không cần 'styles.wrapper' ở đây nữa
-    <Container fluid className="p-0">
-      {/* Xóa 'bg-secondary text-center text-lg-start text-white'
-        Thêm className={styles.footer}
-      */}
-      <footer className={styles.footer}>
-        {/* Grid container */}
-        <Container className="p-4">
-          {/* Grid row */}
-          <Row className="my-4">
-            {/* Grid column */}
-            <Col lg={3} md={6} className="mb-4 mb-md-0">
-              {/* Thêm className={styles.logoContainer} */}
-              <div className={styles.logoContainer}>
-                <img
-                  src={images.logo}
-                  className={styles.logo} // Thêm className={styles.logo}
-                  alt="Logo"
-                  loading="lazy"
-                />
+    <footer className={styles.footer}>
+      <Container className={styles.container}>
+        <Row className="align-items-center">
+          {/* Brand Section */}
+          <Col lg={4} md={12} className="mb-4 mb-lg-0">
+            <div className={styles.brandContainer}>
+              <div className={styles.logoWrapper}>
+                <img src={images.logo} alt="Logo" />
+              </div>
+              <div className={styles.brandInfo}>
+                <h3 className={styles.brandName}>WinDe</h3>
+                <p className={styles.brandSub}>Giới thiệu</p>
+                <div className={styles.socialIcons}>
+                  <a href="#"><FaFacebookSquare /></a>
+                  <a href="#"><FaInstagram /></a>
+                  <a href="#"><FaYoutube /></a>
+                </div>
+              </div>
+            </div>
+          </Col>
+
+          {/* Statistics Section */}
+          <Col lg={8} md={12}>
+            <div className={styles.statsWrapper}>
+              <div className={styles.statItem}>
+                <div className={styles.statMain}>
+                  <FaListUl className={styles.statIcon} />
+                  <span className={styles.statValue}>500+</span>
+                </div>
+                <div className={styles.statLabel}>Câu hỏi trắc nghiệm</div>
               </div>
 
-              {/* Thêm className={styles.socialLinks} 
-                Sửa lại HTML cho đúng chuẩn (dùng <li>)
-              */}
-              <ul className={styles.socialLinks}>
-                <li>
-                  <a href="#!">
-                    <FaFacebookSquare />
-                  </a>
-                </li>
-                <li>
-                  <a href="#!">
-                    <FaInstagram />
-                  </a>
-                </li>
-                <li>
-                  <a href="#!">
-                    <FaYoutube />
-                  </a>
-                </li>
-              </ul>
-            </Col>
-            {/* Grid column */}
+              <div className={styles.verticalDivider} />
 
-            {/* Grid column */}
-            <Col lg={3} md={6} className="mb-4 mb-md-0">
-              <h5 className={styles.titleName}>{name}</h5>
-              <ul className={styles.navList}>
-                <li className={styles.navItem}>
-                  <Link to={routes.about} className={styles.navLink}>
-                    Giới thiệu
-                  </Link>
-                </li>
-              </ul>
-            </Col>
-            {/* Grid column */}
+              <div className={styles.statItem}>
+                <div className={styles.statMain}>
+                  <FaLayerGroup className={styles.statIcon} />
+                  <span className={styles.statValue}>50+</span>
+                </div>
+                <div className={styles.statLabel}>Bộ đề hoàn chỉnh</div>
+              </div>
 
-            {/* Grid column */}
-            <Col lg={3} md={6} className="mb-4 mb-md-0">
-              <h5 className={styles.title}>Chính Sách và Dịch vụ</h5>
-              <ul className={styles.navList}>
-                <li className={styles.navItem}>
-                  <Link to={routes.policy} className={styles.navLink}>
-                    Chính Sách Sử Dụng
-                  </Link>
-                </li>
-                <li className={styles.navItem}>
-                  <Link to={routes.service} className={styles.navLink}>
-                    Dịch Vụ Người Dùng
-                  </Link>
-                </li>
-              </ul>
-            </Col>
-            {/* Grid column */}
+              <div className={styles.verticalDivider} />
 
-            {/* Grid column */}
-            <Col lg={3} md={6} className="mb-4 mb-md-0">
-              <h5 className={styles.title}>Contact</h5>
-              <ul className={styles.contactInfo}>
-                <li>
-                  <p>
-                    <FaEnvelope /> {/* Xóa class 'pe-2 mb-0' */}
-                    winde.contact@gmail.com
-                  </p>
-                </li>
-              </ul>
-            </Col>
-            {/* Grid column */}
-          </Row>
-          {/* Grid row */}
-        </Container>
-        {/* Grid container */}
+              <div className={styles.statItem}>
+                <div className={styles.statMain}>
+                  <FaCheckCircle className={styles.statIcon} />
+                  <span className={styles.statValue}>100%</span>
+                </div>
+                <div className={styles.statLabel}>Cơ hội thi tốt nhất</div>
+              </div>
+            </div>
+          </Col>
+        </Row>
 
-        {/* Copyright */}
-        {/* Xóa style inline
-          Thêm className={styles.copyright}
-        */}
-        <div className={styles.copyright}>
-          {name} - Nền tảng chia sẻ kiến thức của mọi người
+        {/* Rectangular Contact Bar at Bottom Right */}
+        <div className={styles.contactBar}>
+          <div className={styles.emailBox}>
+            <FaEnvelope className={styles.emailIcon} />
+            <span className={styles.emailText}>winde.contact@gmail.com</span>
+          </div>
         </div>
-        {/* Copyright */}
-      </footer>
-    </Container>
+      </Container>
+    </footer>
   );
 }
 
