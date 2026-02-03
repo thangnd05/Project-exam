@@ -53,6 +53,11 @@ export const privateRoutes = [
   { path: routes.vocaPratice, component: PracticePage },
   { path: routes.MyTest, component: MyTestPage },
   { path: routes.oauth2Redirect, component: MyTestPage },
+  // {
+  //   path: routes.oauth2Redirect,
+  //   component: MyTestPage,
+  //   noContainer: true, // nếu cần full màn
+  // },
 
 
 

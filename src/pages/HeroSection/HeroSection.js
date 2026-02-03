@@ -10,7 +10,7 @@ function HeroSection() {
             <div className={cx('content')}>
                 <h1 className={cx('welcome')}>Chào mừng đến với {name}</h1>
                 <p className={cx('desc')}>
-                    <strong>{name}</strong> – Người bạn đồng hành cùng hành trình chinh phục tri thức.
+                    <strong>{name}</strong> – Người đồng hành cùng bạn trên hành trình chinh phục tri thức.
                     Chúng tôi mang đến giải pháp hỗ trợ thông minh và cá nhân hóa,
                     không chỉ cung cấp nguồn bài tập chọn lọc mà còn giúp bạn tự xây dựng
                     kho câu hỏi riêng để việc ôn luyện trở nên thực tế và thú vị hơn.

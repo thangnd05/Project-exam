@@ -20,7 +20,7 @@
     animation: fadeInUp 0.8s ease-out both;
 
     .exam-type-title {
-      font-size: 3.5rem;
+      font-size: var(--font-size-4xl);
       font-weight: 900;
       background: var(--primary-gradient);
       -webkit-background-clip: text;
@@ -31,7 +31,7 @@
     }
 
     .exam-type-subtitle {
-      font-size: 1.8rem;
+      font-size: var(--font-size-lg);
       color: #64748b;
       max-width: 700px;
       margin: 0 auto;

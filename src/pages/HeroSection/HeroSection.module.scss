@@ -20,11 +20,13 @@
     animation: fadeInUp 0.8s ease-out;
 
     .welcome {
-        font-size: var(--font-size-5xl); // Sử dụng biến 4.8rem
-        font-weight: var(--font-weight-bold);
-        color: var(--accent-color); // Sử dụng màu chủ đạo mới (xanh dương)
-        margin-bottom: 24px;
-        line-height: 1.2;
+        font-size: var(--font-size-5xl);
+        font-weight: 900;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 16px;
         letter-spacing: -1px;
 
         @media (max-width: 768px) {
