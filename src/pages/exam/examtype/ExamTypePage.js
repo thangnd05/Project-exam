@@ -48,24 +48,29 @@ function ExamTypePage() {
 
   return (
     <div className={cx('exam-type-container')}>
+      {/* Decorative background elements managed in CSS, but keeping structure clean */}
       <div className={cx('header-box')}>
         <h2 className={cx('exam-type-title')}>Lựa chọn loại đề thi</h2>
         <p className={cx('exam-type-subtitle')}>Khám phá kho đề thi phong phú và đa dạng phù hợp với mọi mục tiêu ôn tập</p>
       </div>
 
       <div className={cx('exam-types-grid')}>
-        {examTypes.map((examType) => (
+        {examTypes.map((examType, index) => (
           <div
             key={examType.examTypeId}
             className={cx('category-card')}
             onClick={() => handleClick(examType.examTypeId)}
+            style={{ animationDelay: `${index * 0.1}s` }}
           >
             <div className={cx('icon-wrapper')}>
               {getIcon(examType.name)}
             </div>
             <div className={cx('card-info')}>
               <h4 className={cx('name')}>{examType.name}</h4>
-              <span className={cx('action-text')}>Khám phá ngay →</span>
+              <span className={cx('action-text')}>
+                Khám phá ngay
+                <span className={cx('arrow')}>→</span>
+              </span>
             </div>
           </div>
         ))}
