@@ -20,6 +20,7 @@ import { name } from '~/assets/images';
 import routes from '~/config/Routes';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import JoinClassModal from "~/components/modals/JoinClassModal";
+import CreateClassModal from "~/components/modals/CreateClassModal";
 
 
 const cx = classNames.bind(style);
@@ -28,6 +29,7 @@ function Header() {
   const { user, logout } = useAuth();
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
 
   const handleClose = () => setShowOffcanvas(false);
@@ -39,17 +41,19 @@ function Header() {
   };
   // --- Sub-components để tái sử dụng ---
   const NavItems = ({ isMobile = false }) => {
-    const handleClassAction = (e, targetRoute, isModal = false) => {
+    const handleClassAction = (e, targetRoute, modalType = null) => {
       e.preventDefault();
       if (!user) {
-        alert("⚠️ Bạn cần đăng nhập để tham gia lớp học!");
+        alert("⚠️ Bạn cần đăng nhập để thao tác lớp học!");
         navigate(routes.login);
         isMobile && handleClose();
         return;
       }
 
-      if (isModal) {
+      if (modalType === 'join') {
         setShowJoinModal(true);
+      } else if (modalType === 'create') {
+        setShowCreateModal(true);
       } else {
         navigate(targetRoute);
       }
@@ -70,11 +74,14 @@ function Header() {
         <div className={cx("customMenu", { "mx-5": !isMobile })}>
           <span className={cx("menuTitle")}>Lớp học</span>
           <div className={cx("menuDropdown")}>
-            <button onClick={(e) => handleClassAction(e, null, true)}>
+            <button onClick={(e) => handleClassAction(e, null, 'join')}>
               Tham gia lớp học
             </button>
             <button onClick={(e) => handleClassAction(e, routes.myClasses)}>
               Vào lớp học
+            </button>
+            <button onClick={(e) => handleClassAction(e, null, 'create')}>
+              Tạo lớp học
             </button>
           </div>
         </div>
@@ -189,6 +196,7 @@ function Header() {
       </Navbar>
 
       <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
+      <CreateClassModal show={showCreateModal} onClose={() => setShowCreateModal(false)} />
     </div>
   );
 }
