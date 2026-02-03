@@ -1,5 +1,98 @@
-.content {
-  min-height: 50vh;
+@import url('../../components/GlobalStyles/GlobalStyles.module.scss');
 
+/* ============================= */
+/* Wrapper toàn trang */
+/* ============================= */
+.wrapper {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
+/* ============================= */
+/* Main content (nền chính) */
+/* ============================= */
+.main {
+  flex: 1;
+  width: 100%;
+  min-height: 80vh;
+  padding-top: 30px;
+  padding-bottom: 60px;
+
+  /* ✅ Background gradient hiện đại */
+  background: linear-gradient(to bottom,
+      #f8fafc,
+      #eef2ff,
+      #f0f9ff);
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================= */
+/* Decorative Blobs nền giống ExamType */
+/* ============================= */
+.main::before,
+.main::after {
+  content: '';
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.18;
+  z-index: 0;
+  animation: pulse 10s infinite alternate;
+}
+
+.main::before {
+  background: var(--accent-color);
+  top: -150px;
+  left: -150px;
+}
+
+.main::after {
+  background: var(--accent-act-color);
+  bottom: -150px;
+  right: -150px;
+  animation-delay: -5s;
+}
+
+/* ============================= */
+/* Container content luôn nằm trên nền */
+/* ============================= */
+.main>* {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================= */
+/* Animation nền */
+/* ============================= */
+@keyframes pulse {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+
+  100% {
+    transform: scale(1.2) translate(30px, 30px);
+  }
+}
+
+/* ============================= */
+/* Responsive Mobile */
+/* ============================= */
+@media (max-width: 768px) {
+  .main {
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+
+  .main::before,
+  .main::after {
+    width: 280px;
+    height: 280px;
+    filter: blur(80px);
+  }
 }
