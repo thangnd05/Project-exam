@@ -1,18 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Container, Spinner, Alert } from 'react-bootstrap';
-import classNames from 'classnames/bind';
+import { useEffect, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Container, Spinner, Alert } from "react-bootstrap";
+import classNames from "classnames/bind";
 import {
   IoCheckmarkCircle,
   IoHomeOutline,
   IoStatsChartOutline,
   IoTimeOutline,
   IoSchoolOutline,
-  IoChevronForwardOutline
-} from 'react-icons/io5';
+  IoLockClosedOutline,
+  IoChevronForwardOutline,
+} from "react-icons/io5";
 
-import styles from './TestResultPage.module.scss';
+import styles from "./TestResultPage.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -20,30 +21,68 @@ const TestResultPage = () => {
   const { userTestId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+
   const [result, setResult] = useState(null);
   const [test, setTest] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]);
+
   const [showDetail, setShowDetail] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
-  const [error, setError] = useState('');
 
+  const [error, setError] = useState("");
+
+  // ================================
+  // ✅ LOAD RESULT + CHECK REVIEW TIME
+  // ================================
   useEffect(() => {
     const fetchResult = async () => {
       try {
-        const res = await axios.get(`/api/user-tests/${userTestId}/result`);
+        // 1. Lấy meta userTest
+        const metaRes = await axios.get(`/api/user-tests/${userTestId}`);
+        const testId = metaRes.data.testId;
+
+        // 2. ✅ Lấy result đúng endpoint (API cũ)
+        const res = await axios.get(
+          `/api/user-answers/user-test/${userTestId}/result`
+        );
+
         setResult(res.data);
+
+        // 3. Check hạn kết thúc bài thi
+        const testRes = await axios.get(`/api/tests/usertest/${testId}`);
+        const testData = testRes.data;
+
+        const now = new Date();
+        const availableTo = testData.availableTo
+          ? new Date(testData.availableTo)
+          : null;
+
+        // Review được nếu hết hạn hoặc không có hạn
+        const reviewAllowed = !availableTo || now > availableTo;
+        setCanReview(reviewAllowed);
       } catch (err) {
-        console.error('❌ Lỗi tải kết quả:', err);
-        setError('Không thể tải kết quả bài thi này 😢');
+        console.error("❌ Lỗi tải kết quả:", err);
+        setError("Không thể tải kết quả bài thi này 😢");
       } finally {
         setLoading(false);
       }
     };
+
     fetchResult();
   }, [userTestId]);
 
+  // ================================
+  // ✅ SHOW DETAIL QUESTIONS
+  // ================================
   const handleShowDetail = async () => {
+    if (!canReview) {
+      alert("Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.");
+      return;
+    }
+
     if (showDetail) {
       setShowDetail(false);
       return;
@@ -55,6 +94,7 @@ const TestResultPage = () => {
     }
 
     setDetailLoading(true);
+
     try {
       const metaRes = await axios.get(`/api/user-tests/${userTestId}`);
       const testId = metaRes.data.testId;
@@ -66,125 +106,165 @@ const TestResultPage = () => {
 
       setTest(testRes.data);
       setUserAnswers(answersRes.data);
+
       setShowDetail(true);
     } catch (err) {
-      console.error('❌ Lỗi tải chi tiết bài thi:', err);
-      alert('Không thể tải chi tiết câu hỏi. Vui lòng thử lại sau.');
+      console.error("❌ Lỗi tải chi tiết:", err);
+      alert("Không thể tải chi tiết câu hỏi. Vui lòng thử lại.");
     } finally {
       setDetailLoading(false);
     }
   };
 
-  if (loading) return (
-    <div className={cx('wrapper')}>
-      <Container className="d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
-        <Spinner animation="border" variant="primary" />
-        <p className="mt-3 fw-bold text-primary">Đang tổng hợp điểm số của bạn...</p>
-      </Container>
-    </div>
-  );
+  // ================================
+  // UI LOADING / ERROR
+  // ================================
+  if (loading)
+    return (
+      <div className={cx("wrapper")}>
+        <Container className="d-flex flex-column align-items-center justify-content-center">
+          <Spinner animation="border" />
+          <p className="mt-3 fw-bold text-primary">
+            Đang tổng hợp điểm số của bạn...
+          </p>
+        </Container>
+      </div>
+    );
 
-  if (error) return (
-    <div className={cx('wrapper')}>
-      <Container>
-        <Alert variant="danger" className="rounded-xl shadow-sm">{error}</Alert>
-        <button className="btn btn-primary rounded-pill mt-3" onClick={() => navigate('/')}>Quay lại trang chủ</button>
-      </Container>
-    </div>
-  );
+  if (error)
+    return (
+      <div className={cx("wrapper")}>
+        <Container>
+          <Alert variant="danger">{error}</Alert>
+          <button className="btn btn-primary mt-3" onClick={() => navigate("/")}>
+            Quay lại trang chủ
+          </button>
+        </Container>
+      </div>
+    );
 
+  // ================================
+  // MAIN UI
+  // ================================
   return (
-    <div className={cx('wrapper')}>
+    <div className={cx("wrapper")}>
       <Container>
-        <div className={cx('result-card')}>
-          <div className={cx('icon-success')}>
+        {/* ================= RESULT CARD ================= */}
+        <div className={cx("result-card")}>
+          <div className={cx("icon-success")}>
             <IoCheckmarkCircle />
           </div>
 
-          <h1>Chúc mừng bạn đã hoàn thành!</h1>
-          <p className={cx('subtitle')}>
-            Hệ thống đã ghi nhận nỗ lực của bạn trong bài thi <strong>"{result?.testTitle || 'Luyện tập'}"</strong>
+          <h1>Hoàn thành bài thi!</h1>
+
+          <p className={cx("subtitle")}>
+            Bạn đã hoàn thành bài thi{" "}
+            <strong>{result?.testTitle || "Luyện tập"}</strong>
           </p>
 
-          <div className={cx('score-display')}>
-            <span className={cx('label')}>Điểm số đạt được</span>
-            <div className={cx('points')}>
-              {result?.totalScore?.toFixed(2) || location.state?.score?.toFixed(2) || '0.00'}
-              <span className={cx('unit')}>điểm</span>
+          {/* SCORE */}
+          <div className={cx("score-display")}>
+            <span className={cx("label")}>Điểm số</span>
+            <div className={cx("points")}>
+              {result?.totalScore?.toFixed(2) ||
+                location.state?.score?.toFixed(2) ||
+                "0.00"}
+              <span className={cx("unit")}>điểm</span>
             </div>
           </div>
 
-          <div className={cx('stats-grid')}>
-            <div className={cx('stat-item', 'correct')}>
+          {/* STATS */}
+          <div className={cx("stats-grid")}>
+            <div className={cx("stat-item", "correct")}>
               <IoCheckmarkCircle size={24} />
-              <span className={cx('stat-val')}>{result?.correct || 0}</span>
-              <span className={cx('stat-label')}>Câu đúng</span>
+              <span className={cx("stat-val")}>{result?.correct || 0}</span>
+              <span className={cx("stat-label")}>Câu đúng</span>
             </div>
-            <div className={cx('stat-item', 'wrong')}>
+
+            <div className={cx("stat-item", "wrong")}>
               <IoStatsChartOutline size={24} />
-              <span className={cx('stat-val')}>{result?.wrong || 0}</span>
-              <span className={cx('stat-label')}>Câu sai</span>
+              <span className={cx("stat-val")}>{result?.wrong || 0}</span>
+              <span className={cx("stat-label")}>Câu sai</span>
             </div>
-            <div className={cx('stat-item', 'total')}>
+
+            <div className={cx("stat-item", "total")}>
               <IoSchoolOutline size={24} />
-              <span className={cx('stat-val')}>{result?.total || 0}</span>
-              <span className={cx('stat-label')}>Tổng số câu</span>
+              <span className={cx("stat-val")}>{result?.total || 0}</span>
+              <span className={cx("stat-label")}>Tổng số câu</span>
             </div>
-            <div className={cx('stat-item')}>
-              <IoTimeOutline size={24} color="#6366f1" />
-              <span className={cx('stat-val')}>--</span>
-              <span className={cx('stat-label')}>Thời gian làm</span>
+
+            <div className={cx("stat-item")}>
+              <IoTimeOutline size={24} />
+              <span className={cx("stat-val")}>--</span>
+              <span className={cx("stat-label")}>Thời gian</span>
             </div>
           </div>
 
-          <div className={cx('actions')}>
+          {/* ACTIONS */}
+          <div className={cx("actions")}>
+            {!canReview && (
+              <div className={cx("lock-message")}>
+                <IoLockClosedOutline />
+                <span>
+                  Đáp án sẽ hiển thị sau khi thời gian làm bài kết thúc.
+                </span>
+              </div>
+            )}
+
             <button
-              className={cx('btn-detail')}
+              className={cx("btn-detail", { "is-locked": !canReview })}
               onClick={handleShowDetail}
               disabled={detailLoading}
             >
-              {detailLoading ? <Spinner animation="border" size="sm" /> : <IoStatsChartOutline size={20} />}
-              {showDetail ? 'Ẩn chi tiết bài làm' : 'Xem giải thích & Đáp án'}
+              {detailLoading ? (
+                <Spinner animation="border" size="sm" />
+              ) : !canReview ? (
+                <IoLockClosedOutline />
+              ) : (
+                <IoStatsChartOutline />
+              )}
+
+              {showDetail ? "Ẩn chi tiết" : "Xem đáp án & giải thích"}
             </button>
 
-            <button className={cx('btn-home')} onClick={() => navigate('/')}>
-              <IoHomeOutline size={20} />
-              Về trang chủ
-              <IoChevronForwardOutline />
+            <button className={cx("btn-home")} onClick={() => navigate("/")}>
+              <IoHomeOutline /> Trang chủ
             </button>
 
-            <button className={cx('btn-review')} onClick={() => navigate('/my-test')}>
-              <IoSchoolOutline size={20} />
-              Xem lịch sử bài thi khác
+            <button
+              className={cx("btn-review")}
+              onClick={() => navigate("/my-test")}
+            >
+              <IoSchoolOutline /> Lịch sử bài thi
             </button>
           </div>
         </div>
 
-        {/* CHI TIẾT BÀI LÀM */}
+        {/* ================= DETAIL SECTION ================= */}
         {showDetail && test && (
-          <div className={cx('detail-section')}>
-            <h2 className={cx('section-title')}>Chi tiết bài làm</h2>
-            {test.parts?.map((part, i) => (
-              <div key={part.testPartId} className={cx('test-part')}>
-                <h3 className={cx('part-title')}>Phần {i + 1}</h3>
-                {part.passage && (
-                  <div className={cx('passage')}>
-                    <h4>
-                      {part.passage.passageType === 'LISTENING' ? '🎵 Bài nghe:' : '📖 Đoạn văn:'}
-                    </h4>
-                    {part.passage.passageType === 'LISTENING' && part.passage.mediaUrl && (
-                      <audio controls src={part.passage.mediaUrl} className={cx('audio-player')} />
-                    )}
-                    {part.passage.content && (
-                      <div className={cx('passage-content')}>{part.passage.content}</div>
-                    )}
-                  </div>
-                )}
+          <div className={cx("detail-section")}>
+            <h2 className={cx("section-title")}>Chi tiết bài làm</h2>
 
-                <div className={cx('questions-list')}>
+            {test.parts?.map((part, i) => (
+              <div key={part.testPartId} className={cx("test-part")}>
+                <h3>Phần {i + 1}</h3>
+
+                <div className={cx("questions-list")}>
                   {part.questions?.map((q) => {
-                    const userAnswer = userAnswers.find(ua => ua.questionId === q.questionId);
-                    return <QuestionResult key={q.questionId} question={q} userAnswer={userAnswer} />;
+                    // ✅ FIX MATCH ID STRING/NUMBER
+                    const userAnswer = userAnswers.find(
+                      (ua) =>
+                        String(ua.questionId) === String(q.questionId)
+                    );
+
+                    return (
+                      <QuestionResult
+                        key={q.questionId}
+                        question={q}
+                        userAnswer={userAnswer}
+                        canReview={canReview}
+                      />
+                    );
                   })}
                 </div>
               </div>
@@ -196,104 +276,71 @@ const TestResultPage = () => {
   );
 };
 
-// COMPONENT HIỂN THỊ TỪNG CÂU HỎI
-function QuestionResult({ question, userAnswer }) {
-  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+// =============================
+// QUESTION COMPONENT
+// =============================
+function QuestionResult({ question, userAnswer, canReview }) {
   const correctAnswer = question.answers?.find((a) => a.isCorrect);
 
   let isUserCorrect = false;
-  if (question.questionType === 'MCQ' && userAnswer && correctAnswer) {
-    isUserCorrect = userAnswer.selectedAnswerId === correctAnswer.answerId;
-  } else if (question.questionType === 'FILL_BLANK' && userAnswer && correctAnswer) {
-    isUserCorrect = userAnswer.answerText?.trim().toLowerCase() === correctAnswer.answerText?.trim().toLowerCase();
+
+  if (question.questionType === "MCQ" && userAnswer && correctAnswer) {
+    isUserCorrect =
+      userAnswer.selectedAnswerId === correctAnswer.answerId;
   }
 
-  let resultClass = 'unanswered';
+  let resultClass = "unanswered";
   if (userAnswer) {
-    if (question.questionType === 'ESSAY') resultClass = 'neutral';
-    else resultClass = isUserCorrect ? 'correct' : 'incorrect';
+    resultClass = isUserCorrect ? "correct" : "incorrect";
   }
 
   return (
-    <div className={cx('question-item', resultClass)}>
-      <div className={cx('question-header')}>
-        <span className={cx('question-label')}>Câu hỏi:</span>
-        <div className={cx('question-text')}>{question.questionText}</div>
-      </div>
+    <div className={cx("question-item", resultClass)}>
+      <p>
+        <strong>Câu hỏi:</strong> {question.questionText}
+      </p>
 
-      {/* TRẮC NGHIỆM */}
-      {question.questionType === 'MCQ' && (
-        <div className={cx('answers-options')}>
+      {/* MCQ */}
+      {question.questionType === "MCQ" && (
+        <div className={cx("answers-options")}>
           {question.answers?.map((a) => {
-            const isUserSelected = userAnswer?.selectedAnswerId === a.answerId;
+            const isUserSelected =
+              userAnswer?.selectedAnswerId === a.answerId;
+
             return (
               <div
                 key={a.answerId}
-                className={cx('answer-option', {
-                  'is-correct': a.isCorrect,
-                  'is-incorrect-choice': isUserSelected && !a.isCorrect,
-                  'is-user-choice': isUserSelected
+                className={cx("answer-option", {
+                  "is-correct": canReview && a.isCorrect,
+                  "is-incorrect-choice":
+                    isUserSelected && !a.isCorrect,
+                  "is-user-choice": isUserSelected,
                 })}
               >
-                <span className={cx('option-marker')}>{a.answerLabel}.</span>
-                <span className={cx('option-text')}>{a.answerText}</span>
-
-                <div className={cx('option-tags')}>
-                  {a.isCorrect && <span className={cx('tag', 'tag-correct')}>Đúng</span>}
-                  {isUserSelected && !a.isCorrect && <span className={cx('tag', 'tag-wrong')}>Bạn chọn</span>}
-                </div>
+                {a.answerLabel}. {a.answerText}
               </div>
             );
           })}
         </div>
       )}
 
-      {/* ĐIỀN TỪ */}
-      {question.questionType === 'FILL_BLANK' && (
-        <div className={cx('fill-blank-area')}>
-          <div className={cx('user-answer')}>
-            <strong>Câu trả lời của bạn:</strong>
-            <span className={cx(userAnswer ? (isUserCorrect ? 'text-success' : 'text-danger') : 'text-muted')}>
-              {userAnswer?.answerText || '(Chưa trả lời)'}
-            </span>
-          </div>
-          {!isUserCorrect && correctAnswer && (
-            <div className={cx('correct-answer-reveal')}>
-              <strong>Đáp án đúng:</strong>
-              <span className={cx('text-success')}>{correctAnswer.answerText}</span>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Fill blank */}
+      {question.questionType === "FILL_BLANK" && (
+        <div>
+          <p>
+            <strong>Bạn trả lời:</strong>{" "}
+            {userAnswer?.answerText || "(Chưa trả lời)"}
+          </p>
 
-      {/* TỰ LUẬN */}
-      {question.questionType === 'ESSAY' && (
-        <div className={cx('essay-area')}>
-          <strong>Bài làm của bạn:</strong>
-          <div className={cx('essay-content')}>
-            {userAnswer?.answerText || '(Chưa trả lời)'}
-          </div>
-        </div>
-      )}
-
-      {/* GIẢI THÍCH */}
-      {question.explanation && (
-        <div className={cx('explanation-box')}>
-          <button className={cx('btn-toggle-explain')} onClick={() => setIsExplanationOpen(!isExplanationOpen)}>
-            <strong>Giải thích:</strong>
-            <IoChevronForwardOutline className={cx('arrow', { open: isExplanationOpen })} />
-          </button>
-          {isExplanationOpen && (
-            <div
-              className={cx('explain-content')}
-              dangerouslySetInnerHTML={{ __html: question.explanation }}
-            />
+          {canReview && correctAnswer && (
+            <p>
+              <strong>Đáp án đúng:</strong> {correctAnswer.answerText}
+            </p>
           )}
         </div>
       )}
     </div>
   );
 }
-
 
 export default TestResultPage;

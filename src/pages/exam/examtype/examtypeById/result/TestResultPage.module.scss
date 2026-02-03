@@ -152,6 +152,21 @@ h1 {
     gap: 15px;
 }
 
+.lock-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #fff7ed;
+    color: #c2410c;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    border: 1px solid #ffedd5;
+}
+
 .btn-detail {
     background: #f8fafc;
     border: 2px solid #e2e8f0;
@@ -166,10 +181,21 @@ h1 {
     gap: 10px;
     transition: all 0.3s;
 
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled):not(.is-locked) {
         background: #f1f5f9;
         border-color: var(--primary);
         transform: translateY(-2px);
+    }
+
+    &.is-locked {
+        background: #f1f5f9;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+        cursor: pointer;
+
+        &:hover {
+            background: #e2e8f0;
+        }
     }
 
     &:disabled {
