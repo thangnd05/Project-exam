@@ -11,11 +11,13 @@ import {
   IoLockClosedOutline,
   IoCheckmarkDoneOutline,
   IoHourglassOutline,
-  IoDocumentTextOutline
+  IoDocumentTextOutline,
+  IoAdd
 } from 'react-icons/io5';
 
 import styles from './TestByClassPage.module.scss';
 import { useAuth } from '../../../hook/useAuth';
+import CreateChapterModal from '~/components/modals/CreateChapterModal';
 
 const cx = classNames.bind(styles);
 
@@ -28,6 +30,7 @@ function TestByClassPage() {
   const [className, setClassName] = useState('');
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
+  const [showCreateChapter, setShowCreateChapter] = useState(false);
 
   // 🟢 Lấy thông tin lớp học
   useEffect(() => {
@@ -131,8 +134,14 @@ function TestByClassPage() {
       <Container>
         {/* === Premium Header === */}
         <div className={cx('header')}>
-          <span className={cx('class-label')}>Phòng thi của lớp</span>
-          <h1>{className || 'Lớp học hiện tại'}</h1>
+          <div className={cx('header-content')}>
+            <span className={cx('class-label')}>Phòng thi của lớp</span>
+            <h1>{className || 'Lớp học hiện tại'}</h1>
+          </div>
+          <button className={cx('btn-create-chapter')} onClick={() => setShowCreateChapter(true)}>
+            <IoAdd size={24} />
+            Tạo chương mới
+          </button>
         </div>
 
         {/* === Test Cards Grid === */}
@@ -227,6 +236,18 @@ function TestByClassPage() {
           )}
         </div>
       </Container>
+
+      {/* === Add Chapter Modal === */}
+      <CreateChapterModal
+        show={showCreateChapter}
+        onClose={() => setShowCreateChapter(false)}
+        classId={classId}
+        onSuccess={() => {
+          // Re-fetch tests or chapters if needed
+          // For now just console log
+          console.log('🎉 Chapter created successfully!');
+        }}
+      />
     </div>
   );
 }

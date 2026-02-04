@@ -12,10 +12,13 @@
     border-radius: var(--radius-xl);
     margin-bottom: 40px;
     color: white;
-    text-align: center;
+    text-align: left;
     box-shadow: 0 15px 35px rgba(124, 58, 237, 0.2);
     position: relative;
     overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     &::after {
         content: '';
@@ -46,6 +49,37 @@
         @media (max-width: 576px) {
             font-size: 2.4rem;
         }
+    }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+}
+
+.btn-create-chapter {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
     }
 }
 
@@ -113,6 +147,7 @@
         line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
