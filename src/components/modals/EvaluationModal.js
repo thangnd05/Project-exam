@@ -99,7 +99,7 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
                         Hủy
                     </button>
                     <button className={cx('btnSubmit')} onClick={handleReviewSubmit} disabled={submitting}>
-                        {submitting ? 'Đơng gửi...' : 'Gửi đánh giá'}
+                        {submitting ? 'Đang gửi...' : 'Gửi đánh giá'}
                     </button>
                 </div>
             </div>

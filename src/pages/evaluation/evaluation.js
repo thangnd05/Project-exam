@@ -109,7 +109,7 @@ const Evaluation = () => {
         <section className={cx('section', 'reviews-section')}>
             <div className="container">
                 <div className="text-center mb-5">
-                    <h2 className={cx('section-title')}>Học viên nói gì về WinDe?</h2>
+                    <h2 className={cx('section-title')}>Người dùng nói gì về WinDe?</h2>
                     <p className="text-muted">Niềm tin được khẳng định qua kết quả thực tế</p>
                 </div>
 
