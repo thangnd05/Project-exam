@@ -7,7 +7,7 @@ import TestResultPage from '~/pages/exam/examtype/examtypeById/result/TestResult
 import TestCreationForm from '~/pages/testnormal/TestCreateForm';
 import CreateTestPage from '~/pages/test/CreateTestPage';
 import TestHistoryPage from '~/pages/history/TestHistoryPage';
-import CreateQuestionPage from '~/pages/question/CreateQuestionPage';
+import CreateQuestionPage from '~/pages/question/CreateQuestionsWithPassage';
 import MyClassesPage from '~/pages/myclass/MyClassPage';
 import TestByClassPage from '~/pages/myclass/testclass/TestByClassPage';
 import EditTestPage from '~/pages/edit/EditTestPage';
@@ -21,7 +21,9 @@ import PracticePage from '~/pages/album-pratice/PracticePage';
 import MyTestPage from '~/pages/mytest/MyTestPage';
 import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
 import NotFoundPage from "~/pages/error/NotFoundPage";
-
+import CreateBulkQuestionsToBank from '~/pages/question/bulk-question/CreateBulkQuestionsToBank';
+import CreateRealTest from '~/pages/question/CreateRealTest';
+import CreateQuestionsWithPassage from "~/pages/question/CreateQuestionsWithPassage"
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -40,9 +42,17 @@ export const publicRoutes = [
 export const privateRoutes = [
   { path: routes.testStart, component: TestStartPage },
   { path: routes.testResult, component: TestResultPage },
+
+
   { path: routes.createTest, component: CreateTestPage },
   { path: routes.createTestNormal, component: TestCreationForm },
-  { path: routes.createQuestion, component: CreateQuestionPage },
+  { path: routes.createQuestionWithPassage, component: CreateQuestionsWithPassage },
+  { path: routes.createQuestionPage, component: CreateQuestionPage },
+  { path: routes.createTestWithQuestions, component: CreateRealTest },
+  { path: routes.createBulkQuestion, component: CreateBulkQuestionsToBank },
+
+
+
   { path: routes.testHistory, component: TestHistoryPage },
   { path: routes.myClasses, component: MyClassesPage },
   { path: routes.testClasses, component: TestByClassPage },

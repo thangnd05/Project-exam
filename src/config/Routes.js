@@ -8,8 +8,20 @@ const routes = {
   testStart: '/tests/:testId/start',
   testResult: '/tests/result/:userTestId',
   createTest: '/admin/create-test',
+
+
+
   createTestNormal: '/admin/create-test-normal',
-  createQuestion: '/admin/create-question',
+  createQuestionWithPassage: '/admin/create-questions-with-passage',
+  createBulkQuestion: '/admin/create-bulk-question-to-bank',
+  createQuestionPage: '/admin/create-question-page',
+  createTestWithQuestions: '/admin/create-test-with-questions',
+
+
+
+
+
+
   testHistory: '/tests/history/:testId',
   examTypeDetail: '/exam-types/:examTypeId',
   MyTest: '/my-test',
