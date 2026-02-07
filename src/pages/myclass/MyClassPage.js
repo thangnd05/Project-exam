@@ -45,7 +45,7 @@ const MyClassesPage = () => {
   }, []);
 
   const handleViewTests = (classId) => {
-    const path = routes.testClasses.replace(':classId', classId);
+    const path = routes.classChapterPage.replace(':classId', classId);
     navigate(path);
   };
 

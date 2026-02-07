@@ -24,6 +24,7 @@ import NotFoundPage from "~/pages/error/NotFoundPage";
 import CreateBulkQuestionsToBank from '~/pages/question/bulk-question/CreateBulkQuestionsToBank';
 import CreateRealTest from '~/pages/question/CreateRealTest';
 import CreateQuestionsWithPassage from "~/pages/question/CreateQuestionsWithPassage"
+import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -63,6 +64,7 @@ export const privateRoutes = [
   { path: routes.vocaPratice, component: PracticePage },
   { path: routes.MyTest, component: MyTestPage },
   { path: routes.oauth2Redirect, component: MyTestPage },
+  { path: routes.classChapterPage, component: ChapterOfClass },
   // {
   //   path: routes.oauth2Redirect,
   //   component: MyTestPage,
