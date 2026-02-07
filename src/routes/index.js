@@ -56,7 +56,7 @@ export const privateRoutes = [
 
   { path: routes.testHistory, component: TestHistoryPage },
   { path: routes.myClasses, component: MyClassesPage },
-  { path: routes.testClasses, component: TestByClassPage },
+  { path: routes.classChapterTests, component: TestByClassPage },
   { path: routes.editTestPage, component: EditTestPage },
   { path: routes.editQuestion, component: QuestionUpdatePage },
   { path: routes.myAlbums, component: MyAlbumsPage },

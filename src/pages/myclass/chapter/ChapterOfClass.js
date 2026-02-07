@@ -7,10 +7,13 @@ import {
     IoBookOutline,
     IoArrowBackOutline,
     IoDocumentTextOutline,
-    IoCalendarOutline
+    IoCalendarOutline,
+    IoAdd
 } from 'react-icons/io5';
 
 import styles from './ChapterOfClass.module.scss';
+import CreateChapterModal from '~/components/modals/CreateChapterModal';
+import routes from '../../../config/Routes';
 
 const cx = classNames.bind(styles);
 
@@ -19,22 +22,44 @@ const ChapterOfClass = () => {
     const navigate = useNavigate();
 
     const [chapters, setChapters] = useState([]);
+    const [className, setClassName] = useState('');
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
+    const [showCreateChapter, setShowCreateChapter] = useState(false);
+
+    const handleViewTests = (chapterId) => {
+        const path = routes.classChapterTests
+            .replace(':classId', classId)
+            .replace(':chapterId', chapterId);
+
+        navigate(path);
+    };
+
+    const fetchChapters = async () => {
+        try {
+            const res = await axios.get(`/api/chapters/class/${classId}`);
+            setChapters(res.data || []);
+        } catch (err) {
+            console.error('❌ Lỗi load chapter:', err);
+            setMessage('Không thể tải danh sách chương 😢');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchChapters = async () => {
+        const fetchClassInfo = async () => {
             try {
-                const res = await axios.get(`/api/chapters/class/${classId}`);
-                setChapters(res.data || []);
+                const res = await axios.get(`/api/classes/${classId}`);
+                if (res.data?.className) {
+                    setClassName(res.data.className);
+                }
             } catch (err) {
-                console.error('❌ Lỗi load chapter:', err);
-                setMessage('Không thể tải danh sách chương 😢');
-            } finally {
-                setLoading(false);
+                console.error('❌ Lỗi load class info:', err);
             }
         };
 
+        fetchClassInfo();
         fetchChapters();
     }, [classId]);
 
@@ -58,14 +83,22 @@ const ChapterOfClass = () => {
                     Quay lại lớp học
                 </button>
 
-                <div className={cx('header')}>
-                    <div className={cx('header-icon')}>
-                        <IoBookOutline size={40} />
+                <div className={cx('header-hero')}>
+                    <div className={cx('hero-content')}>
+                        <span className={cx('hero-label')}>Danh sách nội dung học tập</span>
+                        <h1>{className || 'Chương trình học tập'}</h1>
+                        <div className={cx('hero-badge')}>
+                            Mã lớp: {classId}
+                        </div>
                     </div>
-                    <h2>Chương trình học tập</h2>
-                    <div className={cx('class-badge')}>
-                        Lớp học: {classId}
-                    </div>
+
+                    <button
+                        className={cx('btn-create-chapter')}
+                        onClick={() => setShowCreateChapter(true)}
+                    >
+                        <IoAdd size={24} />
+                        Tạo chương mới
+                    </button>
                 </div>
 
                 {message && (
@@ -86,7 +119,6 @@ const ChapterOfClass = () => {
                             <div
                                 key={chapter.chapterId}
                                 className={cx('chapter-card')}
-                                onClick={() => {/* Navigate to lessons */ }}
                             >
                                 <div className={cx('card-top')}>
                                     <div className={cx('card-icon')}>
@@ -101,20 +133,19 @@ const ChapterOfClass = () => {
                                     {chapter.title}
                                 </h3>
 
-                                {chapter.description && (
-                                    <p className={cx('chapter-desc')}>
-                                        {chapter.description}
-                                    </p>
-                                )}
-
                                 <div className={cx('chapter-info')}>
                                     <IoCalendarOutline />
                                     <span>
-                                        Cập nhật: {new Date(chapter.createdAt).toLocaleDateString('vi-VN')}
+                                        Cập nhật: {new Date(chapter.createdAt)
+                                            .toLocaleDateString('vi-VN')}
                                     </span>
                                 </div>
 
-                                <button className={cx('btn-view')}>
+                                {/* ✅ Chỉ 1 nút duy nhất */}
+                                <button
+                                    className={cx('btn-view')}
+                                    onClick={() => handleViewTests(chapter.chapterId)}
+                                >
                                     Bắt đầu học ngay
                                 </button>
                             </div>
@@ -122,6 +153,16 @@ const ChapterOfClass = () => {
                     </div>
                 )}
             </Container>
+
+            <CreateChapterModal
+                show={showCreateChapter}
+                onClose={() => setShowCreateChapter(false)}
+                classId={classId}
+                onSuccess={() => {
+                    fetchChapters();
+                    setShowCreateChapter(false);
+                }}
+            />
         </div>
     );
 };

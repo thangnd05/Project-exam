@@ -36,7 +36,7 @@ const routes = {
 
   // 🏫 Class routes
   myClasses: '/my-classes',
-  testClasses: '/class/:classId/tests',
+  classChapterTests: '/classes/:classId/chapters/:chapterId/tests',
 
   // 👤 Auth
   login: '/login',
