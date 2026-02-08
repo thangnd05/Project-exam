@@ -157,11 +157,6 @@ const TestResultPage = () => {
 
           <h1>Hoàn thành bài thi!</h1>
 
-          <p className={cx("subtitle")}>
-            Bạn đã hoàn thành bài thi{" "}
-            <strong>{result?.testTitle || "Luyện tập"}</strong>
-          </p>
-
           {/* SCORE */}
           <div className={cx("score-display")}>
             <span className={cx("label")}>Điểm số</span>
@@ -169,7 +164,6 @@ const TestResultPage = () => {
               {result?.totalScore?.toFixed(2) ||
                 location.state?.score?.toFixed(2) ||
                 "0.00"}
-              <span className={cx("unit")}>điểm</span>
             </div>
           </div>
 

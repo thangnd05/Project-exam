@@ -234,16 +234,48 @@ function TestStartPage() {
 
   return (
     <div className={cx('wrapper')}>
-      {/* --- Sticky Header --- */}
+      {/* --- Premium Sticky Header --- */}
       <div className={cx('header')}>
         <Container>
           <div className={cx('header-inner')}>
-            <div className={cx('test-info')}>
-              <h2> Đề thi: {test.title}</h2>
+            <div className={cx('header-left')}>
+              <button className={cx('btn-back')} onClick={() => navigate(-1)} title="Quay lại">
+                <IoChevronBackOutline />
+              </button>
+              <div className={cx('test-info')}>
+                <div className={cx('title-wrapper')}>
+                  <span className={cx('title-prefix')}>Đề thi:</span>
+                  <h2>{test.title}</h2>
+                </div>
+                <div className={cx('test-meta')}>
+                  <span>{test.testType || 'Kiểm tra'}</span>
+                  <span className={cx('separator')}>•</span>
+                  <span>{allQuestions.length} câu hỏi</span>
+                </div>
+              </div>
             </div>
-            {/* Header actions can go here if needed */}
+
+            <div className={cx('header-right')}>
+              <div className={cx('stats-item')}>
+                <div className={cx('stats-label')}>HOÀN THÀNH</div>
+                <div className={cx('stats-value')}>
+                  <IoCheckmarkCircleOutline className={cx('icon')} />
+                  <span>{Object.keys(userAnswers).length}/{allQuestions.length}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </Container>
+
+        {/* Dynamic Progress Bar */}
+        <div className={cx('progress-container')}>
+          <div
+            className={cx('progress-bar')}
+            style={{
+              width: `${allQuestions.length > 0 ? (Object.keys(userAnswers).length / allQuestions.length) * 100 : 0}%`
+            }}
+          />
+        </div>
       </div>
 
       <Container className={cx('content')}>
