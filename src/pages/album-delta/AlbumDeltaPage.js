@@ -6,10 +6,11 @@ import {
   Table,
   Spinner,
   Alert,
-  Button,
-  Modal,
-  Form,
 } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+import PageHeader from '~/components/common/PageHeader/PageHeader';
+import CreateVocabularyModal from '~/components/modals/CreateVocabularyModal';
+import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import classNames from 'classnames/bind';
 import {
   IoArrowBack,
@@ -34,14 +35,11 @@ const AlbumDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [vocabToDelete, setVocabToDelete] = useState(null);
   const [flashMode, setFlashMode] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const [newVocab, setNewVocab] = useState({
-    word: '',
-    meaning: '',
-    example: '',
-  });
   const navigate = useNavigate();
   const audioRef = useRef(null);
 
@@ -61,39 +59,38 @@ const AlbumDetailPage = () => {
 
   useEffect(() => {
     if (albumId) fetchVocabularies();
+
+    // Auto-switch to Flashcard mode for mobile/tablet devices
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setFlashMode(true);
+      }
+    };
+
+    handleResize(); // Check on mount
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [albumId]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewVocab({ ...newVocab, [name]: value });
+  const handleDeleteClick = (vocab) => {
+    setVocabToDelete(vocab);
+    setShowDeleteModal(true);
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
+  const handleConfirmDelete = async () => {
+    if (!vocabToDelete) return;
     try {
-      await axios.post(
-        '/api/vocabularies',
-        { albumId, ...newVocab },
-        { withCredentials: true },
-      );
-      setShowModal(false);
-      setNewVocab({ word: '', meaning: '', example: '' });
-      fetchVocabularies();
-    } catch (err) {
-      console.error('❌ Lỗi khi thêm từ:', err);
-      alert('Không thể thêm từ mới 😢');
-    }
-  };
-
-  const handleDelete = async (vocabId, word) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa từ "${word}"?`)) return;
-    try {
-      await axios.delete(`/api/vocabularies/${vocabId}`, {
+      await axios.delete(`/api/vocabularies/${vocabToDelete.vocabId}`, {
         withCredentials: true,
       });
-      setVocabularies((prev) => prev.filter((v) => v.vocabId !== vocabId));
-    } catch {
-      alert('Không thể xóa từ này 😢');
+      setVocabularies((prev) => prev.filter((v) => v.vocabId !== vocabToDelete.vocabId));
+      toast.success(`Đã xóa từ "${vocabToDelete.word}" thành công!`);
+    } catch (err) {
+      console.error('❌ Lỗi khi xóa:', err);
+      toast.error('Không thể xóa từ này. Vui lòng thử lại!');
+    } finally {
+      setShowDeleteModal(false);
+      setVocabToDelete(null);
     }
   };
 
@@ -122,30 +119,33 @@ const AlbumDetailPage = () => {
   return (
     <div className={cx('wrapper')}>
       <Container>
-        {/* === Modern Header === */}
-        <div className={cx('header')}>
-          <div className={cx('title-section')}>
-            <button className={cx('btn-back')} onClick={() => navigate(-1)}>
-              <IoArrowBack />
-              Album của tôi
-            </button>
-            <h2 className="mt-3">
-              {flashMode ? '🎯 Học bằng Flashcard' : '📖 Danh sách từ vựng'}
-            </h2>
-          </div>
+        {/* === Standardized Page Header === */}
+        <PageHeader
+          title={flashMode ? '🎯 Học bằng Flashcard' : '📖 Danh sách từ vựng'}
+          label="QUẢN LÝ TỪ VỰNG"
+          onAction={() => setShowModal(true)}
+          actionText="Thêm từ vựng"
+          actionIcon={IoAdd}
+        />
 
-          <div className={cx('actions')}>
-            <Button
-              className={cx('btn-outline')}
+        <div className={cx('custom-actions')}>
+          <button className={cx('btn-back')} onClick={() => navigate(-1)}>
+            <IoArrowBack />
+            Quay lại album
+          </button>
+
+          <div className={cx('mode-group')}>
+            <button
+              className={cx('btn-mode', { active: !flashMode })}
               onClick={() => navigate(`/practice/${albumId}`)}
               disabled={vocabularies.length === 0}
             >
               <IoSchoolOutline />
               Luyện tập
-            </Button>
+            </button>
 
-            <Button
-              className={cx('btn-outline')}
+            <button
+              className={cx('btn-mode', { active: flashMode })}
               onClick={() => {
                 setFlashMode(!flashMode);
                 setFlipped(false);
@@ -154,12 +154,7 @@ const AlbumDetailPage = () => {
             >
               {flashMode ? <IoListOutline /> : <IoFlashOutline />}
               {flashMode ? 'Chế độ Danh sách' : 'Chế độ Flashcard'}
-            </Button>
-
-            <Button className={cx('btn-primary')} onClick={() => setShowModal(true)}>
-              <IoAdd />
-              Thêm từ vựng
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -188,7 +183,9 @@ const AlbumDetailPage = () => {
 
                 <div className={cx('flashcard-back')}>
                   <div className={cx('meaning')}>{currentVocab.meaning}</div>
-                  <div className={cx('example')}>"{currentVocab.example || 'Chưa có ví dụ.'}"</div>
+                  {currentVocab.example && (
+                    <div className={cx('example')}>"{currentVocab.example}"</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -242,7 +239,7 @@ const AlbumDetailPage = () => {
                     </td>
                     <td className="fw-semibold">{vocab.meaning}</td>
                     <td className="text-muted fst-italic" style={{ maxWidth: '300px' }}>
-                      {vocab.example || '...'}
+                      {vocab.example || ''}
                     </td>
                     <td className={cx('audio-cell')}>
                       <div
@@ -255,7 +252,7 @@ const AlbumDetailPage = () => {
                     <td className="text-center">
                       <button
                         className="btn btn-link text-danger p-0"
-                        onClick={() => handleDelete(vocab.vocabId, vocab.word)}
+                        onClick={() => handleDeleteClick(vocab)}
                       >
                         <IoTrashOutline size={22} />
                       </button>
@@ -275,58 +272,21 @@ const AlbumDetailPage = () => {
         )}
       </Container>
 
-      {/* === Modal Thêm từ Modern === */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
-        <Form onSubmit={handleSave}>
-          <Modal.Header closeButton>
-            <Modal.Title>
-              <IoAdd className="me-2" />
-              Thêm từ vựng mới
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Group className="mb-4">
-              <Form.Label>Từ vựng (Tiếng Anh)</Form.Label>
-              <Form.Control
-                name="word"
-                value={newVocab.word}
-                onChange={handleChange}
-                placeholder="Ví dụ: Excellence"
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-4">
-              <Form.Label>Nghĩa (Tiếng Việt)</Form.Label>
-              <Form.Control
-                name="meaning"
-                value={newVocab.meaning}
-                onChange={handleChange}
-                placeholder="Ví dụ: Sự xuất sắc"
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Ví dụ minh họa</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                name="example"
-                value={newVocab.example}
-                onChange={handleChange}
-                placeholder="Ví dụ: He strive for excellence in everything."
-              />
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="light" onClick={() => setShowModal(false)}>
-              Để sau
-            </Button>
-            <Button type="submit" className={cx('btn-primary')}>
-              Lưu từ vựng
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+      {/* === Modern Modals === */}
+      <CreateVocabularyModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSuccess={fetchVocabularies}
+        albumId={albumId}
+      />
+
+      <ConfirmDeleteModal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="Xác nhận xóa từ vựng"
+        message={`Bạn có chắc chắn muốn xóa từ "${vocabToDelete?.word}" khỏi album này?`}
+      />
     </div>
   );
 };
