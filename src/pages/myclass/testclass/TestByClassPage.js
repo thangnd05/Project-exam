@@ -143,13 +143,13 @@ function TestByClassPage() {
             <span className={cx('class-label')}>Phòng thi của lớp</span>
             <h1>{className || 'Lớp học hiện tại'}</h1>
           </div>
-          <Button
+          <button
             className={cx('btn-create-test')}
             onClick={() => setShowCreateTestModal(true)}
           >
             <IoAddCircleOutline size={20} />
             Tạo bài kiểm tra mới
-          </Button>
+          </button>
         </div>
 
         {/* === Test Cards Grid === */}

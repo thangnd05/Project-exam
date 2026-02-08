@@ -156,6 +156,7 @@
     &:hover {
         transform: translateY(-8px);
         box-shadow: 0 25px 50px rgba(0, 97, 242, 0.18);
+        cursor: pointer;
 
         &::before {
             opacity: 1;

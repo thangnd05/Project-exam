@@ -119,6 +119,8 @@ const ChapterOfClass = () => {
                             <div
                                 key={chapter.chapterId}
                                 className={cx('chapter-card')}
+                                onClick={() => handleViewTests(chapter.chapterId)}
+
                             >
                                 <div className={cx('card-top')}>
                                     <div className={cx('card-icon')}>
