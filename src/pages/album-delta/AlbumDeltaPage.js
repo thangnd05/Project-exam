@@ -9,7 +9,7 @@ import {
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
-import CreateVocabularyModal from '~/components/modals/CreateVocabularyModal';
+import CreateVocabularyModal from '~/components/vocabulary/CreateVocabularyModal';
 import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import classNames from 'classnames/bind';
 import {

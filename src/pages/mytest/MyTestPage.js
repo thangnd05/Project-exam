@@ -12,11 +12,12 @@ import {
   IoLockClosedOutline,
   IoHourglassOutline,
   IoDocumentTextOutline,
-  IoFlashOutline
 } from 'react-icons/io5';
 
 import styles from './MyTestPage.module.scss';
 import { useAuth } from '../../hook/useAuth';
+import PageHeader from '~/components/common/PageHeader/PageHeader';
+import CreateTestModal from '~/components/modals/CreateTestModal';
 
 const cx = classNames.bind(styles);
 
@@ -27,16 +28,12 @@ function MyTestPage() {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
+  const fetchTests = () => {
     setLoading(true);
     axios
-      .get('/api/tests/my-test')
+      .get('/api/tests/my-tests')
       .then((res) => {
         if (Array.isArray(res.data)) setTests(res.data);
         else setTests([]);
@@ -45,6 +42,14 @@ function MyTestPage() {
         console.error('❌ Lỗi:', err);
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    fetchTests();
   }, [user, navigate]);
 
   useEffect(() => {
@@ -98,7 +103,7 @@ function MyTestPage() {
   if (loading) {
     return (
       <div className={cx('loading-box')}>
-        <Spinner animation="grow" variant="danger" size="lg" />
+        <Spinner animation="grow" variant="primary" size="lg" />
         <p>Đang tải bộ sưu tập đề thi...</p>
       </div>
     );
@@ -107,17 +112,14 @@ function MyTestPage() {
   return (
     <div className={cx('wrapper')}>
       <Container>
-        {/* === Premium Header === */}
-        <div className={cx('header')}>
-          <div className={cx('title-box')}>
-            <h1>Bài kiểm tra của tôi</h1>
-            <p>Quản lý và ôn luyện các bộ đề cá nhân của bạn</p>
-          </div>
-          <button className={cx('btn-create-test')} onClick={() => navigate('/tests/create')}>
-            <IoAdd size={24} />
-            Tạo kiểm tra mới
-          </button>
-        </div>
+        {/* === Generic Page Header === */}
+        <PageHeader
+          title="Bài kiểm tra của tôi"
+          label="QUẢN LÝ ĐỀ THI"
+          actionText="Tạo đề thi mới"
+          actionIcon={IoAdd}
+          onAction={() => setShowCreateModal(true)}
+        />
 
         {/* === Grid Content === */}
         <div className={cx('test-grid')}>
@@ -207,7 +209,7 @@ function MyTestPage() {
               <IoDocumentTextOutline className={cx('icon')} />
               <h4>Kho lưu trữ hiện đang trống</h4>
               <p>Hãy bắt đầu hành trình chinh phục kiến thức bằng cách tạo bài kiểm tra đầu tiên của bạn!</p>
-              <button className={cx('btn-create-test')} style={{ margin: '0 auto' }} onClick={() => navigate('/tests/create')}>
+              <button className={cx('btn-primary-modern')} style={{ paddingLeft: '30px', paddingRight: '30px', width: 'auto', margin: '0 auto' }} onClick={() => setShowCreateModal(true)}>
                 <IoAdd size={24} />
                 Tạo kiểm tra ngay
               </button>
@@ -215,6 +217,14 @@ function MyTestPage() {
           )}
         </div>
       </Container>
+
+      {/* --- Standardized Modal --- */}
+      <CreateTestModal
+        show={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={fetchTests}
+        mode="personal"
+      />
     </div>
   );
 }

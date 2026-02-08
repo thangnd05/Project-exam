@@ -224,7 +224,7 @@ function TestStartPage() {
         <Container>
           <div className={cx('header-inner')}>
             <div className={cx('test-info')}>
-              <h2>{test.title}</h2>
+              <h2> Đề thi: {test.title}</h2>
             </div>
             <div className={cx('timer-box')}>
               <IoTimeOutline className={cx('timer-icon')} />

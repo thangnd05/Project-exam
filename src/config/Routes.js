@@ -25,7 +25,7 @@ const routes = {
 
   testHistory: '/tests/history/:testId',
   examTypeDetail: '/exam-types/:examTypeId',
-  MyTest: '/my-test',
+  MyTest: '/my-tests',
 
   editTestPage: '/tests/edit/:testId',
   editQuestion: '/questions/edit/:id',

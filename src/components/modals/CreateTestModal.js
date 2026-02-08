@@ -16,6 +16,7 @@ import {
 } from "react-icons/io5";
 import { Trash, PlusCircle } from "lucide-react";
 import classNames from "classnames/bind";
+import { toast } from 'react-toastify';
 import styles from "./CreateTestModal.module.scss";
 import { useCreateTest } from "../../hook/useCreateTest";
 
@@ -60,6 +61,7 @@ const CreateTestModal = ({ show, onClose, mode = "personal", classId, chapterId,
     const handleFormSubmit = async () => {
         const success = await handleSubmit();
         if (success && onSuccess) {
+            toast.success('Đã tạo đề thi thành công! 🚀');
             onSuccess();
             onClose();
         }
