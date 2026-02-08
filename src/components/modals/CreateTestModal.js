@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Row, Col, Spinner, Alert, Button } from "react-bootstrap";
+import axios from 'axios';
 import {
     IoRocketOutline,
     IoSettingsOutline,
@@ -9,7 +10,9 @@ import {
     IoTimeOutline,
     IoImageOutline,
     IoInformationCircleOutline,
-    IoClose
+    IoClose,
+    IoSchoolOutline,
+    IoBookOutline
 } from "react-icons/io5";
 import { Trash, PlusCircle } from "lucide-react";
 import classNames from "classnames/bind";
@@ -23,6 +26,34 @@ const CreateTestModal = ({ show, onClose, mode = "personal", classId, chapterId,
         examTypes, examParts, testInfo, setTestInfo, questions, loading, notification,
         handleExamTypeChange, addQuestion, removeQuestion, updateQuestionText, updateAnswer, handleSubmit,
     } = useCreateTest({ mode, classId, chapterId });
+
+    const [className, setClassName] = useState('');
+    const [chapterName, setChapterName] = useState('');
+
+    // Fetch class and chapter names when in class mode
+    useEffect(() => {
+        if (mode === 'class' && show) {
+            // Fetch class name
+            if (classId) {
+                axios.get(`/api/classes/${classId}`)
+                    .then(res => setClassName(res.data?.className || `Lớp ${classId}`))
+                    .catch(err => {
+                        console.error('Error fetching class:', err);
+                        setClassName(`Lớp ${classId}`);
+                    });
+            }
+
+            // Fetch chapter name
+            if (chapterId) {
+                axios.get(`/api/chapters/${chapterId}`)
+                    .then(res => setChapterName(res.data?.title || `Chapter ${chapterId}`))
+                    .catch(err => {
+                        console.error('Error fetching chapter:', err);
+                        setChapterName(`Chapter ${chapterId}`);
+                    });
+            }
+        }
+    }, [mode, classId, chapterId, show]);
 
     if (!show) return null;
 
@@ -66,6 +97,34 @@ const CreateTestModal = ({ show, onClose, mode = "personal", classId, chapterId,
                         </div>
 
                         <Row className="g-3">
+                            {/* Show Class and Chapter info when in class mode */}
+                            {mode === 'class' && (
+                                <>
+                                    <Col md={6}>
+                                        <div className={cx("formGroupModern")}>
+                                            <label><IoSchoolOutline /> Lớp học</label>
+                                            <input
+                                                className={cx("inputModern", "inputDisabled")}
+                                                value={className}
+                                                disabled
+                                                readOnly
+                                            />
+                                        </div>
+                                    </Col>
+                                    <Col md={6}>
+                                        <div className={cx("formGroupModern")}>
+                                            <label><IoBookOutline /> Chương</label>
+                                            <input
+                                                className={cx("inputModern", "inputDisabled")}
+                                                value={chapterName}
+                                                disabled
+                                                readOnly
+                                            />
+                                        </div>
+                                    </Col>
+                                </>
+                            )}
+
                             <Col md={8}>
                                 <div className={cx("formGroupModern")}>
                                     <label>Tiêu đề đề thi</label>

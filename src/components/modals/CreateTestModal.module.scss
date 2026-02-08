@@ -248,6 +248,19 @@
     }
 }
 
+.inputDisabled {
+    background: #e2e8f0 !important;
+    color: #64748b !important;
+    font-weight: 600;
+    cursor: not-allowed !important;
+    border-color: #cbd5e1 !important;
+
+    &:focus {
+        box-shadow: none !important;
+        border-color: #cbd5e1 !important;
+    }
+}
+
 .partBlock {
     background: #f8fafc;
     border: 2px solid #e2e8f0;

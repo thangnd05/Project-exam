@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Spinner } from 'react-bootstrap';
+import { Container, Spinner, Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
   IoTimeOutline,
@@ -11,11 +11,13 @@ import {
   IoLockClosedOutline,
   IoCheckmarkDoneOutline,
   IoHourglassOutline,
-  IoDocumentTextOutline
+  IoDocumentTextOutline,
+  IoAddCircleOutline
 } from 'react-icons/io5';
 
 import styles from './TestByClassPage.module.scss';
 import { useAuth } from '../../../hook/useAuth';
+import CreateTestModal from '~/components/modals/CreateTestModal';
 
 const cx = classNames.bind(styles);
 
@@ -29,6 +31,7 @@ function TestByClassPage() {
   const [className, setClassName] = useState('');
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
+  const [showCreateTestModal, setShowCreateTestModal] = useState(false);
 
   // 🟢 Lấy thông tin lớp học
   useEffect(() => {
@@ -44,7 +47,7 @@ function TestByClassPage() {
   }, [classId]);
 
   // 🟢 Lấy danh sách bài test
-  useEffect(() => {
+  const fetchTests = () => {
     if (!classId || !chapterId) return;
     setLoading(true);
     axios
@@ -58,7 +61,11 @@ function TestByClassPage() {
         console.error('❌ Lỗi bài test:', err);
       })
       .finally(() => setLoading(false));
-  }, [classId]);
+  };
+
+  useEffect(() => {
+    fetchTests();
+  }, [classId, chapterId]);
 
   // 🕒 Countdown logic
   useEffect(() => {
@@ -136,6 +143,13 @@ function TestByClassPage() {
             <span className={cx('class-label')}>Phòng thi của lớp</span>
             <h1>{className || 'Lớp học hiện tại'}</h1>
           </div>
+          <Button
+            className={cx('btn-create-test')}
+            onClick={() => setShowCreateTestModal(true)}
+          >
+            <IoAddCircleOutline size={20} />
+            Tạo bài kiểm tra mới
+          </Button>
         </div>
 
         {/* === Test Cards Grid === */}
@@ -230,6 +244,19 @@ function TestByClassPage() {
           )}
         </div>
       </Container>
+
+      {/* Modal tạo test */}
+      <CreateTestModal
+        show={showCreateTestModal}
+        onClose={() => setShowCreateTestModal(false)}
+        mode="class"
+        classId={classId}
+        chapterId={chapterId}
+        onSuccess={() => {
+          fetchTests(); // Refresh danh sách test
+          setShowCreateTestModal(false);
+        }}
+      />
     </div>
   );
 }
