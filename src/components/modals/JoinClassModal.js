@@ -133,7 +133,7 @@ function JoinClassModal({ show, onClose }) {
             {/* Footer */}
             <div className={cx("footer")}>
                 <button className={cx("btnCancel")} onClick={onClose}>
-                    Hủy
+                    Để sau
                 </button>
 
                 <button

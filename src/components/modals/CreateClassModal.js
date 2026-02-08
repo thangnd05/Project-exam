@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal, Alert } from "react-bootstrap";
+import { toast } from 'react-toastify';
 import axios from "axios";
 import classNames from "classnames/bind";
 import styles from "./CreateClassModal.module.scss";
@@ -57,17 +58,14 @@ function CreateClassModal({ show, onClose }) {
                 description: description
             });
 
-            setType("success");
-            setMessage("🎉 Tạo lớp học thành công!");
+            toast.success("🎉 Tạo lớp học thành công!");
 
-            // Reset + close modal
-            setTimeout(() => {
-                setClassName("");
-                setDescription("");
-                onClose();
-                // Optionally navigate to myClasses or the new class
-                navigate(routes.myClasses);
-            }, 1500);
+            // Reset + close modal immediately
+            setClassName("");
+            setDescription("");
+            onClose();
+            // Optionally navigate to myClasses or the new class
+            navigate(routes.myClasses);
         } catch (err) {
             setType("danger");
             setMessage(
@@ -150,7 +148,7 @@ function CreateClassModal({ show, onClose }) {
             {/* Footer */}
             <div className={cx("footer")}>
                 <button className={cx("btnCancel")} onClick={onClose}>
-                    Hủy
+                    Để sau
                 </button>
 
                 <button

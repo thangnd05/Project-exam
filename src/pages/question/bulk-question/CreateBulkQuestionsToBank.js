@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { Container, Row, Col, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
@@ -104,9 +105,11 @@ const CreateBulkQuestionsToBank = () => {
 
             await axios.post('/api/questions/bulk', payload);
             setStatus('SUCCESS');
+            toast.success('🎉 Đã lưu câu hỏi vào kho!');
         } catch (err) {
             console.error(err);
             setStatus('ERROR');
+            toast.error('❌ Có lỗi xảy ra, vui lòng thử lại');
         } finally {
             setLoading(false);
         }

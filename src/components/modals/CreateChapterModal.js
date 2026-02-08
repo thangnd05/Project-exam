@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { FaBook, FaEdit, FaInfoCircle, FaTimes } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import styles from './CreateChapterModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -28,14 +29,14 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }) => {
                 title: title,
                 description: description
             });
-            alert('🎉 Tạo chương mới thành công!');
+            toast.success('🎉 Tạo chương mới thành công!');
             setTitle('');
             setDescription('');
             onSuccess();
             onClose();
         } catch (error) {
             console.error('Failed to create chapter:', error);
-            alert('❌ Có lỗi xảy ra khi tạo chương mới!');
+            toast.error('❌ Có lỗi xảy ra khi tạo chương mới!');
         } finally {
             setSubmitting(false);
         }
@@ -98,7 +99,7 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }) => {
                 {/* Footer */}
                 <div className={cx('footer')}>
                     <button className={cx('btnCancel')} onClick={onClose} disabled={submitting}>
-                        Hủy
+                        Để sau
                     </button>
                     <button className={cx('btnSubmit')} onClick={handleCreate} disabled={submitting}>
                         {submitting ? 'Đang tạo...' : 'Tạo chương ngay'}

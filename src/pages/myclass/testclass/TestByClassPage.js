@@ -14,10 +14,12 @@ import {
   IoDocumentTextOutline,
   IoAddCircleOutline
 } from 'react-icons/io5';
+import { toast } from 'react-toastify';
 
 import styles from './TestByClassPage.module.scss';
 import { useAuth } from '../../../hook/useAuth';
 import CreateTestModal from '~/components/modals/CreateTestModal';
+import PageHeader from '~/components/common/PageHeader/PageHeader';
 
 const cx = classNames.bind(styles);
 
@@ -138,19 +140,13 @@ function TestByClassPage() {
     <div className={cx('wrapper')}>
       <Container>
         {/* === Premium Header === */}
-        <div className={cx('header')}>
-          <div className={cx('header-content')}>
-            <span className={cx('class-label')}>Phòng thi của lớp</span>
-            <h1>{className || 'Lớp học hiện tại'}</h1>
-          </div>
-          <button
-            className={cx('btn-create-test')}
-            onClick={() => setShowCreateTestModal(true)}
-          >
-            <IoAddCircleOutline size={20} />
-            Tạo bài kiểm tra mới
-          </button>
-        </div>
+        <PageHeader
+          title={className || 'Lớp học hiện tại'}
+          label="Phòng thi của lớp"
+          actionText="Tạo bài kiểm tra mới"
+          actionIcon={IoAddCircleOutline}
+          onAction={() => setShowCreateTestModal(true)}
+        />
 
         {/* === Test Cards Grid === */}
         <div className={cx('test-grid')}>
@@ -255,6 +251,7 @@ function TestByClassPage() {
         onSuccess={() => {
           fetchTests(); // Refresh danh sách test
           setShowCreateTestModal(false);
+          toast.success("Tạo bài kiểm tra mới thành công! 🎉");
         }}
       />
     </div>

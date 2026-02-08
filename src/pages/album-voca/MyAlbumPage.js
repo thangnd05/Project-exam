@@ -1,56 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Form, Spinner, Button, Container } from 'react-bootstrap';
+import { Spinner, Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { IoAddCircleOutline, IoFolderOpenOutline, IoArrowForwardOutline, IoInformationCircleOutline } from "react-icons/io5";
-import { FaBookOpen } from "react-icons/fa";
+import { IoAddCircleOutline, IoFolderOpenOutline, IoArrowForwardOutline, IoDocumentTextOutline } from "react-icons/io5";
+import { FaBook } from "react-icons/fa";
 
 import styles from './MyAlbumPage.module.scss';
+
+import CreateAlbumModal from '../../components/modals/CreateAlbumModal';
+import PageHeader from '../../components/common/PageHeader/PageHeader';
 
 const cx = classNames.bind(styles);
 
 function MyAlbumsPage() {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [newAlbum, setNewAlbum] = useState({
-    name: '',
-    description: '',
-    coverUrl: '',
-  });
   const navigate = useNavigate();
 
   // 🟢 Lấy danh sách album
-  useEffect(() => {
-    const fetchAlbums = async () => {
-      try {
-        const res = await axios.get('/api/vocabulary-albums/my-albums');
-        setAlbums(res.data || []);
-      } catch (err) {
-        console.error(err);
-        setErrorMsg('Không thể tải danh sách album 😢');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAlbums();
-  }, []);
-
-  // 🟢 Tạo album mới
-  const handleCreateAlbum = async (e) => {
-    e.preventDefault();
+  const fetchAlbums = async () => {
     try {
-      const res = await axios.post('/api/vocabulary-albums', newAlbum);
-      setAlbums((prev) => [...prev, res.data]);
-      setShowModal(false);
-      setNewAlbum({ name: '', description: '', coverUrl: '' });
+      const res = await axios.get('/api/vocabulary-albums/my-albums');
+      setAlbums(res.data || []);
     } catch (err) {
-      alert('❌ Không thể tạo album mới!');
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAlbums();
+  }, []);
 
   if (loading)
     return (
@@ -64,16 +47,14 @@ function MyAlbumsPage() {
     <div className={cx('wrapper')}>
       <Container>
         {/* === Header Dashboard === */}
-        <div className={cx('header')}>
-          <div className={cx('title-section')}>
-            <h1 className={cx('page-title')}>Album từ vựng</h1>
-            <p className={cx('page-subtitle')}>Lưu trữ và quản lý hành trình chinh phục ngôn ngữ của bạn</p>
-          </div>
-          <button className={cx('btn-create')} onClick={() => setShowModal(true)}>
-            <IoAddCircleOutline />
-            Tạo album mới
-          </button>
-        </div>
+        {/* === Header Dashboard === */}
+        <PageHeader
+          title="Album từ vựng"
+          label="Lưu trữ và quản lý hành trình chinh phục ngôn ngữ của bạn"
+          actionText="Tạo album mới"
+          actionIcon={IoAddCircleOutline}
+          onAction={() => setShowModal(true)}
+        />
 
         {/* === Body Content === */}
         {albums.length === 0 ? (
@@ -90,89 +71,45 @@ function MyAlbumsPage() {
           </div>
         ) : (
           <div className={cx('album-grid')}>
-            {albums.map((album) => (
+            {albums.map((album, index) => (
               <div
                 key={album.albumId}
                 className={cx('album-card')}
                 onClick={() => navigate(`/albums/${album.albumId}`)}
               >
-                <div className={cx('cover-wrapper')}>
-                  <img
-                    src={
-                      album.coverUrl ||
-                      'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1000&auto=format&fit=crop'
-                    }
-                    alt={album.name}
-                    className={cx('album-cover')}
-                  />
-                </div>
-                <div className={cx('album-body')}>
-                  <h5>{album.name}</h5>
-                  <p>{album.description || 'Hành trình chinh phục từ vựng tiếng Anh mỗi ngày cùng WinDe.'}</p>
-
-                  <div className={cx('album-footer')}>
-                    <div className={cx('view-link')}>
-                      <FaBookOpen />
-                      Xem chi tiết
-                    </div>
-                    <IoArrowForwardOutline />
+                <div className={cx('card-top')}>
+                  <div className={cx('card-icon')}>
+                    <FaBook />
                   </div>
+                  <span className={cx('index')}>
+                    {(index + 1).toString().padStart(2, '0')}
+                  </span>
                 </div>
+
+                <h3 className={cx('album-title')}>{album.name}</h3>
+
+                <div className={cx('album-info')}>
+                  <IoDocumentTextOutline />
+                  <span>
+                    {album.description || 'Hành trình chinh phục từ vựng mỗi ngày'}
+                  </span>
+                </div>
+
+                <button className={cx('btn-view')}>
+                  Bắt đầu học ngay
+                </button>
               </div>
             ))}
           </div>
         )}
       </Container>
 
-      {/* === Modal tạo album Refined === */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
-        <Form onSubmit={handleCreateAlbum}>
-          <Modal.Header closeButton>
-            <Modal.Title>
-              <IoAddCircleOutline className="me-2" />
-              Khởi tạo Album mới
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Group className="mb-4">
-              <Form.Label>Tên Album của bạn</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="VD: Từ vựng IELTS 7.0, Giao tiếp hàng ngày..."
-                value={newAlbum.name}
-                onChange={(e) =>
-                  setNewAlbum({ ...newAlbum, name: e.target.value })
-                }
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Mô tả ngắn gọn</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                placeholder="Ghi chú thêm về mục tiêu của album này..."
-                value={newAlbum.description}
-                onChange={(e) =>
-                  setNewAlbum({ ...newAlbum, description: e.target.value })
-                }
-              />
-            </Form.Group>
-            <div className="d-flex align-items-center text-muted small mt-2">
-              <IoInformationCircleOutline className="me-1" />
-              Bạn có thể thay đổi thông tin này bất cứ lúc nào.
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="light" onClick={() => setShowModal(false)} className="px-4">
-              Để sau
-            </Button>
-            <Button type="submit" variant="primary" className="px-5 shadow-sm">
-              Tạo Album
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+      {/* === Modal tạo album Standardized === */}
+      <CreateAlbumModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSuccess={fetchAlbums}
+      />
     </div>
   );
 }

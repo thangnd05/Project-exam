@@ -107,7 +107,8 @@
 
     .inputControl {
         width: 100%;
-        padding: 14px 18px;
+        padding: 14px 18px 14px 48px;
+        /* Tăng padding-left để né icon */
         border-radius: 16px;
         border: 2px solid #e2e8f0;
         font-size: 1.5rem;
@@ -125,7 +126,8 @@
         }
 
         &.textarea {
-            padding-left: 18px;
+            padding: 14px 18px;
+            /* Reset padding cho textarea */
         }
     }
 

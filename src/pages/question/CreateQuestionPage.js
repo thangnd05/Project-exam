@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { Container, Row, Col, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
@@ -135,9 +136,11 @@ const QuestionGroupCreationForm = () => {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             setStatusMessage('SUCCESS');
+            toast.success('🎉 Đã lưu nhóm câu hỏi vào ngân hàng!');
         } catch (err) {
             console.error(err);
             setStatusMessage('ERROR');
+            toast.error('❌ Lỗi khi lưu, vui lòng thử lại!');
         } finally {
             setIsSubmitting(false);
         }

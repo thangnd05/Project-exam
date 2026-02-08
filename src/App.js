@@ -1,16 +1,19 @@
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DefaultLayout from './Layout/DefaultLayout';
 import routes from './routes';
 import ProtectedRoute from './routes/ProtectedRoute'; // ✅ Import ProtectedRoute
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {AuthProvider} from '~/context/AuthContext';
+import { AuthProvider } from '~/context/AuthContext';
 import ScrollHandler from './Layout/ScrollToTopOnRouteChange';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <ScrollHandler />
+        <ToastContainer position="top-right" autoClose={3000} />
         <div className="App">
           <Routes>
             {/* Public Routes */}

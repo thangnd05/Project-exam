@@ -319,7 +319,7 @@ const AlbumDetailPage = () => {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="light" onClick={() => setShowModal(false)}>
-              Hủy
+              Để sau
             </Button>
             <Button type="submit" className={cx('btn-primary')}>
               Lưu từ vựng

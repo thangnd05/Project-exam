@@ -96,7 +96,7 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
                 {/* FOOTER */}
                 <div className={cx('footer')}>
                     <button className={cx('btnCancel')} onClick={onClose} disabled={submitting}>
-                        Hủy
+                        Để sau
                     </button>
                     <button className={cx('btnSubmit')} onClick={handleReviewSubmit} disabled={submitting}>
                         {submitting ? 'Đang gửi...' : 'Gửi đánh giá'}

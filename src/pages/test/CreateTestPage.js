@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CreateTestModal from "~/components/modals/CreateTestModal";
+import { toast } from 'react-toastify';
 import { IoRocketOutline } from "react-icons/io5";
 import styles from "./CreateTestPage.module.scss";
 import classNames from "classnames/bind";
@@ -11,6 +12,7 @@ function CreateTestPage() {
 
   const handleSuccess = () => {
     // Refresh or navigate after successful creation
+    toast.success("Tạo bài kiểm tra thành công! 🎉");
     console.log("Test created successfully!");
   };
 

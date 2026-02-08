@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from 'react-toastify';
 import {
     Container,
     Row,
@@ -172,6 +173,7 @@ const CreateRealTest = ({ classId = 56665354 }) => {
                 type: "success",
                 message: "🎉 Đã tạo bài thi và toàn bộ câu hỏi thành công!",
             });
+            toast.success("🎉 Đã tạo bài thi và toàn bộ câu hỏi thành công!");
 
             // Reset form
             setTestInfo({ ...testInfo, title: "", description: "" });
@@ -185,6 +187,7 @@ const CreateRealTest = ({ classId = 56665354 }) => {
                 type: "danger",
                 message: "❌ Thất bại: " + errorMsg,
             });
+            toast.error("❌ Thất bại: " + errorMsg);
         } finally {
             setLoading(false);
         }

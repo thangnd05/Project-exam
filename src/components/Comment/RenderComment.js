@@ -35,7 +35,7 @@ function RenderComment({
 
     const handleReplyClick = () => {
         setReplyingTo(comment.comment_id);
-        setReplyContent(`<p>@${comment.user.username}&nbsp;</p>`); 
+        setReplyContent(`<p>@${comment.user.username}&nbsp;</p>`);
     };
 
     const indentationStyle = {
@@ -53,11 +53,11 @@ function RenderComment({
                         <Form className={cx('w-100')}>
                             <Form.Group className={cx("quill")}>
                                 <ReactQuill
-                                    className={cx("comment","h-100","fs-com")}
+                                    className={cx("comment", "h-100", "fs-com")}
                                     value={editingContent}
                                     onChange={setEditingContent}
                                     placeholder="Nhập bình luận"
-                                    style={{ minHeight: "150px"}}
+                                    style={{ minHeight: "150px" }}
                                     modules={{ toolbar: false }}
                                     theme="bubble"
                                     ref={quillRef}
@@ -65,19 +65,19 @@ function RenderComment({
                             </Form.Group>
                         </Form>
                         <div className={cx("d-flex mt-3")}>
-                            <button onClick={() => handleSave(comment.comment_id)} className={cx("btn btn-success py-2 ","btn-text")}>Lưu</button>
-                            <button onClick={() => setEditingCommentId(null)} className={cx("btn btn-secondary mx-3 py-2 ","btn-text")}>Hủy</button>
+                            <button onClick={() => handleSave(comment.comment_id)} className={cx("btn btn-success py-2 ", "btn-text")}>Lưu</button>
+                            <button onClick={() => setEditingCommentId(null)} className={cx("btn btn-secondary mx-3 py-2 ", "btn-text")}>Để sau</button>
                         </div>
                     </div>
                 ) : (
                     <>
-                        <div className={cx("text-content")} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment.content) }}/>
+                        <div className={cx("text-content")} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment.content) }} />
                         <div className={cx("d-flex align-items-start mt-3")}>
                             {/* Điều kiện 1: Nếu là chủ comment, hiện Sửa/Xóa */}
                             {comment.userId === userId && (
                                 <div>
-                                    <span onClick={() => handleEdit(comment)} className={cx("text-primary text-decoration-underline", "fix_content",'cursor-pointer')}>Sửa</span>
-                                    <span disabled={isDeleting} onClick={() => deleteComment(comment.comment_id)} className={cx("text-danger text-decoration-underline mx-4", "fix_content",'cursor-pointer')}>Xóa</span>
+                                    <span onClick={() => handleEdit(comment)} className={cx("text-primary text-decoration-underline", "fix_content", 'cursor-pointer')}>Sửa</span>
+                                    <span disabled={isDeleting} onClick={() => deleteComment(comment.comment_id)} className={cx("text-danger text-decoration-underline mx-4", "fix_content", 'cursor-pointer')}>Xóa</span>
                                 </div>
                             )}
 
@@ -107,12 +107,12 @@ function RenderComment({
                         onChange={setReplyContent}
                         placeholder={`Trả lời ${comment.user.username}...`}
                         modules={{ toolbar: false }}
-                        className={cx("comment","h-100","fs-com")}
+                        className={cx("comment", "h-100", "fs-com")}
                         style={{ minHeight: "100px" }}
                     />
                     <div className="mt-3">
                         <Button size="sm" variant="primary" onClick={() => handleReplySubmit(comment.comment_id)}>Gửi</Button>
-                        <Button size="sm" variant="secondary" className="ms-2" onClick={() => setReplyingTo(null)}>Hủy</Button>
+                        <Button size="sm" variant="secondary" className="ms-2" onClick={() => setReplyingTo(null)}>Để sau</Button>
                     </div>
                 </div>
             )}

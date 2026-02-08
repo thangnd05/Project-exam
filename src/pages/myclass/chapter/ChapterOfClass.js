@@ -13,6 +13,7 @@ import {
 
 import styles from './ChapterOfClass.module.scss';
 import CreateChapterModal from '~/components/modals/CreateChapterModal';
+import PageHeader from '~/components/common/PageHeader/PageHeader';
 import routes from '../../../config/Routes';
 
 const cx = classNames.bind(styles);
@@ -83,23 +84,14 @@ const ChapterOfClass = () => {
                     Quay lại lớp học
                 </button>
 
-                <div className={cx('header-hero')}>
-                    <div className={cx('hero-content')}>
-                        <span className={cx('hero-label')}>Danh sách nội dung học tập</span>
-                        <h1>{className || 'Chương trình học tập'}</h1>
-                        <div className={cx('hero-badge')}>
-                            Mã lớp: {classId}
-                        </div>
-                    </div>
-
-                    <button
-                        className={cx('btn-create-chapter')}
-                        onClick={() => setShowCreateChapter(true)}
-                    >
-                        <IoAdd size={24} />
-                        Tạo chương mới
-                    </button>
-                </div>
+                <PageHeader
+                    title={className || 'Chương trình học tập'}
+                    label="Danh sách nội dung học tập"
+                    badgeLabel={`Mã lớp: ${classId}`}
+                    actionText="Tạo chương mới"
+                    actionIcon={IoAdd}
+                    onAction={() => setShowCreateChapter(true)}
+                />
 
                 {message && (
                     <Alert variant="danger" className="text-center shadow-sm">

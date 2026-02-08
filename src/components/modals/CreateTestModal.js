@@ -291,7 +291,7 @@ const CreateTestModal = ({ show, onClose, mode = "personal", classId, chapterId,
                         <PlusCircle size={18} /> Thêm câu hỏi
                     </button>
                     <button className={cx("btnCancel")} onClick={onClose} disabled={loading}>
-                        Hủy
+                        Để sau
                     </button>
                     <button className={cx("btnSubmit")} onClick={handleFormSubmit} disabled={loading}>
                         {loading ? <Spinner size="sm" /> : (
