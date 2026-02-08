@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Spinner, Button, Form } from 'react-bootstrap';
+import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
   IoTimeOutline,
@@ -10,7 +10,8 @@ import {
   IoLockClosedOutline,
   IoCheckmarkCircleOutline,
   IoVolumeHighOutline,
-  IoAlertCircleOutline
+  IoAlertCircleOutline,
+  IoChevronBackOutline
 } from 'react-icons/io5';
 
 import styles from './TestStartPage.module.scss';
@@ -175,6 +176,20 @@ function TestStartPage() {
     } finally { setIsSubmitting(false); }
   };
 
+  const scrollToQuestion = (questionId) => {
+    const element = document.getElementById(`q-${questionId}`);
+    if (element) {
+      const offset = 80; // Header height
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+    }
+  };
+
+  const allQuestions = test.parts?.reduce((acc, part) => {
+    return [...acc, ...(part.questions || [])];
+  }, []) || [];
+
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -226,83 +241,139 @@ function TestStartPage() {
             <div className={cx('test-info')}>
               <h2> Đề thi: {test.title}</h2>
             </div>
-            <div className={cx('timer-box')}>
-              <IoTimeOutline className={cx('timer-icon')} />
-              <span className={cx('time')}>{formatTime(timeLeft)}</span>
-            </div>
+            {/* Header actions can go here if needed */}
           </div>
         </Container>
       </div>
 
       <Container className={cx('content')}>
-        {test.parts?.map((part, i) => (
-          <div key={part.testPartId} className={cx('part-section')}>
-            <h3>Phần {i + 1}: {part.partName || 'Luyện tập'}</h3>
-
-            {(part.passage?.content || part.passage?.mediaUrl) && (
-              <div className={cx('passage-box')}>
-                {part.passage.passageType === 'LISTENING' && part.passage.mediaUrl && (
-                  <div className="mb-4">
-                    <div className="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
-                      <IoVolumeHighOutline size={24} />
-                      <span>Nghe đoạn hội thoại</span>
-                    </div>
-                    <audio controls src={getFullMediaUrl(part.passage.mediaUrl)} className={cx('audio-player')} />
+        <Row>
+          {/* Sidebar Question Dashboard */}
+          <Col lg={3}>
+            <div className={cx('dashboard')}>
+              <div className={cx('dashboard-card')}>
+                <div className={cx('dashboard-timer')}>
+                  <div className={cx('timer-label')}>THỜI GIAN CÒN LẠI</div>
+                  <div className={cx('timer-value')}>
+                    <IoTimeOutline className={cx('timer-icon')} />
+                    <span>{formatTime(timeLeft)}</span>
                   </div>
-                )}
-                {part.passage.content && <div className={cx('passage-content')}>{part.passage.content}</div>}
-              </div>
-            )}
+                </div>
 
-            {part.questions?.map((q, qIndex) => (
-              <div key={q.questionId} className={cx('question-card')}>
-                <span className={cx('q-text')}>
-                  <span className={cx('q-number')}>Câu {qIndex + 1}:</span>
-                  {q.questionText}
-                </span>
-
-                {q.questionType === 'MCQ' && (
-                  <div className={cx('mcq-group')}>
-                    {q.answers?.map((a) => (
-                      <div
-                        key={a.answerId}
-                        className={cx('mcq-option', { selected: userAnswers[q.questionId]?.selectedAnswerId === a.answerId })}
-                        onClick={() => handleAnswerChange(q.questionId, 'MCQ', a.answerId)}
+                <div className={cx('dashboard-header')}>
+                  <IoInformationCircleOutline />
+                  <span>Danh sách câu hỏi</span>
+                </div>
+                <div className={cx('question-grid')}>
+                  {allQuestions.map((q, idx) => {
+                    const isAnswered = !!userAnswers[q.questionId]?.selectedAnswerId || !!userAnswers[q.questionId]?.answerText;
+                    return (
+                      <button
+                        key={q.questionId}
+                        className={cx('q-nav-item', { answered: isAnswered })}
+                        onClick={() => scrollToQuestion(q.questionId)}
                       >
-                        <Form.Check
-                          type="radio"
-                          name={`q-${q.questionId}`}
-                          checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
-                          readOnly
-                        />
-                        <span>{a.answerLabel}. {a.answerText}</span>
+                        {idx + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className={cx('dashboard-footer')}>
+                  <div className={cx('status-item')}>
+                    <span className={cx('dot', 'answered')}></span>
+                    <span>Đã làm</span>
+                  </div>
+                  <div className={cx('status-item')}>
+                    <span className={cx('dot')}></span>
+                    <span>Chưa làm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Col>
+
+          {/* Main Question List */}
+          <Col lg={9}>
+            {test.parts?.map((part, i) => (
+              <div key={part.testPartId} className={cx('part-section')}>
+                <h3>Phần {i + 1}: {part.partName || 'Luyện tập'}</h3>
+
+                {(part.passage?.content || part.passage?.mediaUrl) && (
+                  <div className={cx('passage-box')}>
+                    {part.passage.passageType === 'LISTENING' && part.passage.mediaUrl && (
+                      <div className="mb-4">
+                        <div className="d-flex align-items-center gap-2 mb-3 text-primary fw-bold">
+                          <IoVolumeHighOutline size={24} />
+                          <span>NGHE ĐOẠN HỘI THOẠI</span>
+                        </div>
+                        <audio controls src={getFullMediaUrl(part.passage.mediaUrl)} className={cx('audio-player')} />
                       </div>
-                    ))}
+                    )}
+                    {part.passage.content && (
+                      <div className={cx('passage-content')}>
+                        {part.passage.content}
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {q.questionType === 'FILL_BLANK' && (
-                  <input
-                    type="text"
-                    className={cx('fill-input')}
-                    value={userAnswers[q.questionId]?.answerText || ''}
-                    onChange={(e) => handleAnswerChange(q.questionId, 'FILL_BLANK', e.target.value)}
-                    placeholder="Nhập câu trả lời của bạn..."
-                  />
-                )}
+                <div className={cx('questions-list')}>
+                  {part.questions?.map((q, qIndex) => {
+                    const absoluteIndex = allQuestions.findIndex(allQ => allQ.questionId === q.questionId) + 1;
 
-                {q.questionType === 'ESSAY' && (
-                  <textarea
-                    className={cx('essay-input')}
-                    value={userAnswers[q.questionId]?.answerText || ''}
-                    onChange={(e) => handleAnswerChange(q.questionId, 'ESSAY', e.target.value)}
-                    placeholder="Viết câu trả lời chi tiết tại đây..."
-                  />
-                )}
+                    return (
+                      <div key={q.questionId} id={`q-${q.questionId}`} className={cx('question-card')}>
+                        <span className={cx('q-text')}>
+                          <span className={cx('q-number')}>Câu {absoluteIndex}:</span>
+                          {q.questionText}
+                        </span>
+
+                        {q.questionType === 'MCQ' && (
+                          <div className={cx('mcq-group')}>
+                            {q.answers?.map((a) => (
+                              <div
+                                key={a.answerId}
+                                className={cx('mcq-option', { selected: userAnswers[q.questionId]?.selectedAnswerId === a.answerId })}
+                                onClick={() => handleAnswerChange(q.questionId, 'MCQ', a.answerId)}
+                              >
+                                <Form.Check
+                                  type="radio"
+                                  name={`q-${q.questionId}`}
+                                  checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
+                                  readOnly
+                                />
+                                <span>{a.answerLabel}. {a.answerText}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {q.questionType === 'FILL_BLANK' && (
+                          <input
+                            type="text"
+                            className={cx('fill-input')}
+                            value={userAnswers[q.questionId]?.answerText || ''}
+                            onChange={(e) => handleAnswerChange(q.questionId, 'FILL_BLANK', e.target.value)}
+                            placeholder="Nhập câu trả lời của bạn..."
+                          />
+                        )}
+
+                        {q.questionType === 'ESSAY' && (
+                          <textarea
+                            className={cx('essay-input')}
+                            value={userAnswers[q.questionId]?.answerText || ''}
+                            onChange={(e) => handleAnswerChange(q.questionId, 'ESSAY', e.target.value)}
+                            placeholder="Viết câu trả lời chi tiết tại đây..."
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ))}
-          </div>
-        ))}
+          </Col>
+        </Row>
       </Container>
 
       {/* --- Fixed Footer Action --- */}

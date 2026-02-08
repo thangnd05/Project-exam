@@ -41,7 +41,7 @@ export const publicRoutes = [
 
 // ✅ Các trang yêu cầu phải đăng nhập
 export const privateRoutes = [
-  { path: routes.testStart, component: TestStartPage },
+  { path: routes.testStart, component: TestStartPage, },
   { path: routes.testResult, component: TestResultPage },
 
 
