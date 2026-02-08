@@ -21,6 +21,7 @@ import routes from '~/config/Routes';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import JoinClassModal from "~/components/modals/JoinClassModal";
 import CreateClassModal from "~/components/modals/CreateClassModal";
+import CreateTestModal from "~/components/modals/CreateTestModal";
 
 
 const cx = classNames.bind(style);
@@ -30,6 +31,7 @@ function Header() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateTestModal, setShowCreateTestModal] = useState(false);
   const navigate = useNavigate();
 
   const handleClose = () => setShowOffcanvas(false);
@@ -118,11 +120,13 @@ function Header() {
     return (
       <div className={cx('d-lg-flex align-items-center')}>
         {!isMobile && (
-          <Nav.Link as={Link} to={routes.createTest} className={cx('mx-5')}>
-            <Button variant="" className={cx('new-test')}>
-              Tạo bài kiểm tra
-            </Button>
-          </Nav.Link>
+          <Button
+            variant=""
+            className={cx('new-test', 'mx-5')}
+            onClick={() => setShowCreateTestModal(true)}
+          >
+            Tạo bài kiểm tra
+          </Button>
         )}
         <Dropdown className={cx(isMobile ? 'mt-3' : '')}>
           <Dropdown.Toggle as="div" className={cx('user-info')}>
@@ -197,6 +201,15 @@ function Header() {
 
       <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
       <CreateClassModal show={showCreateModal} onClose={() => setShowCreateModal(false)} />
+      <CreateTestModal
+        show={showCreateTestModal}
+        onClose={() => setShowCreateTestModal(false)}
+        mode="personal"
+        onSuccess={() => {
+          setShowCreateTestModal(false);
+          // Optionally navigate to test list or refresh
+        }}
+      />
     </div>
   );
 }

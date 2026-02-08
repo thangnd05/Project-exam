@@ -78,7 +78,7 @@ export const useCreateTest = ({ mode, classId, chapterId }) => {
     const handleSubmit = async () => {
         if (!testInfo.title || !testInfo.examTypeId || !testInfo.examPartId) {
             setNotification({ type: "warning", message: "Vui lòng điền đủ Tên, Loại và Phần thi!" });
-            return;
+            return false;
         }
 
         setLoading(true);
@@ -138,10 +138,13 @@ export const useCreateTest = ({ mode, classId, chapterId }) => {
                 availableTo: ""
             });
 
+            return true; // Success
+
         } catch (error) {
             console.error(error);
             const errorMsg = error.response?.data?.message || error.message || "Lỗi không xác định";
             setNotification({ type: "danger", message: "❌ Lỗi: " + errorMsg });
+            return false; // Failure
         } finally {
             setLoading(false);
         }
