@@ -6,11 +6,6 @@ import classNames from 'classnames/bind';
 import {
   IoTimeOutline,
   IoCalendarOutline,
-  IoStatsChartOutline,
-  IoPlayCircleOutline,
-  IoLockClosedOutline,
-  IoCheckmarkDoneOutline,
-  IoHourglassOutline,
   IoDocumentTextOutline,
   IoAddCircleOutline
 } from 'react-icons/io5';
@@ -20,6 +15,8 @@ import styles from './TestByClassPage.module.scss';
 import { useAuth } from '../../../hook/useAuth';
 import CreateTestModal from '~/components/modals/CreateTestModal';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
+import TestCard from '~/components/common/TestCard/TestCard';
+import { formatDateTime } from '~/utils/testStatusHelper';
 
 const cx = classNames.bind(styles);
 
@@ -95,35 +92,9 @@ function TestByClassPage() {
     });
   };
 
-  const formatCountdown = (ms) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const m = Math.floor(totalSeconds / 60);
-    const s = totalSeconds % 60;
-    return `${m}p ${s}s`;
-  };
+  // formatCountdown moved to TestCard
 
-  const handleStartTest = (test) => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    const now = new Date();
-    const availableFrom = test.availableFrom ? new Date(test.availableFrom) : null;
-    const availableTo = test.availableTo ? new Date(test.availableTo) : null;
-
-    if (availableFrom && now < availableFrom) return;
-    if (availableTo && now > availableTo) return;
-    if (test.remainingAttempts === 0) return;
-
-    let allowedTime = test.durationMinutes * 60;
-    if (availableTo) {
-      const timeUntilClose = Math.floor((availableTo - now) / 1000);
-      if (timeUntilClose < allowedTime) allowedTime = timeUntilClose;
-    }
-
-    navigate(`/tests/${test.testId}/start`, { state: { allowedTime } });
-  };
+  // handleStartTest moved to TestCard
 
   const now = new Date();
 
@@ -151,86 +122,9 @@ function TestByClassPage() {
         {/* === Test Cards Grid === */}
         <div className={cx('test-grid')}>
           {tests.length > 0 ? (
-            tests.map((test) => {
-              const availableFrom = test.availableFrom ? new Date(test.availableFrom) : null;
-              const availableTo = test.availableTo ? new Date(test.availableTo) : null;
-              const remainingTime = countdowns[test.testId];
-
-              let status = 'open';
-              let statusLabel = 'Đang diễn ra';
-              let buttonText = 'Bắt đầu làm bài';
-              let canStart = true;
-
-              if (availableFrom && now < availableFrom) {
-                status = 'locked';
-                statusLabel = 'Sắp diễn ra';
-                buttonText = remainingTime ? `Mở sau ${formatCountdown(remainingTime)}` : 'Chưa mở';
-                canStart = false;
-              } else if (availableTo && now > availableTo) {
-                status = 'expired';
-                statusLabel = 'Đã kết thúc';
-                buttonText = 'Vòng thi đã đóng';
-                canStart = false;
-              } else if (test.remainingAttempts === 0) {
-                status = 'expired';
-                statusLabel = 'Hết lượt làm';
-                buttonText = 'Không còn lượt làm';
-                canStart = false;
-              }
-
-              return (
-                <div key={test.testId} className={cx('test-card')}>
-                  <div className={cx('banner-wrapper')}>
-                    <img
-                      src={test.bannerUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1000&auto=format&fit=crop'}
-                      className={cx('banner-img')}
-                      alt={test.title}
-                    />
-                    <div className={cx('status-badge', `status-${status}`)}>
-                      {statusLabel}
-                    </div>
-                  </div>
-
-                  <div className={cx('body')}>
-                    <h5 className={cx('title')}>{test.title}</h5>
-
-                    <div className={cx('info-list')}>
-                      <div className={cx('info-item')}>
-                        <IoTimeOutline />
-                        <span>Thời gian: <strong>{test.durationMinutes} phút</strong></span>
-                      </div>
-                      <div className={cx('info-item')}>
-                        <IoCalendarOutline />
-                        <span>Bắt đầu: {formatDateTime(test.availableFrom)}</span>
-                      </div>
-                      <div className={cx('info-item')}>
-                        <IoHourglassOutline />
-                        <span>Kết thúc: {formatDateTime(test.availableTo)}</span>
-                      </div>
-                    </div>
-
-                    <div className={cx('btn-group')}>
-                      <button
-                        className={cx('btn-primary-modern')}
-                        onClick={() => handleStartTest(test)}
-                        disabled={!canStart}
-                      >
-                        {canStart ? <IoPlayCircleOutline size={22} /> : <IoLockClosedOutline size={20} />}
-                        {buttonText}
-                      </button>
-
-                      <button
-                        className={cx('btn-outline-modern')}
-                        onClick={() => navigate(`/tests/history/${test.testId}`)}
-                      >
-                        <IoStatsChartOutline />
-                        Xem lịch sử kết quả
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
+            tests.map((test) => (
+              <TestCard key={test.testId} test={test} countdowns={countdowns} />
+            ))
           ) : (
             <div className={cx('empty-state')}>
               <IoDocumentTextOutline className={cx('icon')} />
