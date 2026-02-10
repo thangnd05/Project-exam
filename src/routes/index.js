@@ -25,6 +25,7 @@ import CreateBulkQuestionsToBank from '~/pages/question/bulk-question/CreateBulk
 import CreateRealTest from '~/pages/question/CreateRealTest';
 import CreateQuestionsWithPassage from "~/pages/question/CreateQuestionsWithPassage"
 import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
+import QuestionBankCreator from '~/pages/test123/QuestionBankCreator';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -65,6 +66,7 @@ export const privateRoutes = [
   { path: routes.MyTest, component: MyTestPage },
   { path: routes.oauth2Redirect, component: MyTestPage },
   { path: routes.classChapterPage, component: ChapterOfClass },
+  { path: routes.unifiedCreateQuestion, component: QuestionBankCreator },
   // {
   //   path: routes.oauth2Redirect,
   //   component: MyTestPage,
