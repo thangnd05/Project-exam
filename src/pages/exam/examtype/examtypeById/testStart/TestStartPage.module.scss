@@ -7,15 +7,37 @@
 
 .content {
   padding-top: 60px;
+  padding-left: 24px;
+  padding-right: 24px;
+  max-width: 1580px;
+  /* Vừa phải, không ăn hết màn hình */
+  margin-left: auto;
+  margin-right: auto;
 
   @media (max-width: 768px) {
     padding-top: 30px;
+    padding-left: 16px;
+    padding-right: 16px;
 
     .part-section {
-      margin-bottom: 50px;
+      margin-bottom: 28px;
+      /* Điện thoại: thu nhỏ khoảng cách giữa các phần */
 
       h3 {
-        padding: 20px 0px 0px 0px;
+        padding: 16px 0 0 0;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    padding-left: 12px;
+    padding-right: 12px;
+
+    .part-section {
+      margin-bottom: 20px;
+
+      h3 {
+        padding: 12px 0 0 0;
       }
     }
   }
@@ -175,7 +197,6 @@
   width: 100%;
 }
 
-
 .dashboard-timer {
   background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
   border: 1px solid #fecdd3;
@@ -325,6 +346,15 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+
+  @media (max-width: 768px) {
+    gap: 16px;
+    /* Điện thoại: thu nhỏ khoảng cách giữa các câu hỏi */
+  }
+
+  @media (max-width: 576px) {
+    gap: 12px;
+  }
 }
 
 .passage-box {
@@ -365,6 +395,88 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  /* Ảnh trái – câu hỏi phải, khoảng cách vừa đẹp */
+  &.split-layout {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 24px;
+    align-items: start;
+    margin-bottom: 28px;
+
+    @media (max-width: 992px) {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      /* Điện thoại: thu nhỏ khoảng cách giữa ảnh và câu hỏi */
+      margin-bottom: 16px;
+    }
+  }
+}
+
+/* Điện thoại: thu nhỏ khoảng cách chung */
+@media (max-width: 768px) {
+  .question-card-wrapper {
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+}
+
+.passage-column {
+  position: sticky;
+  top: 72px;
+
+  .passage-box {
+    margin-bottom: 0;
+    padding: 16px;
+    /* Khoảng trống vừa đẹp quanh ảnh */
+  }
+
+  /* Ảnh full chiều rộng cột */
+  .passage-image {
+    width: 100%;
+    height: auto;
+    max-height: 92vh;
+    // min-height: 65vh;
+    object-fit: contain;
+    object-position: top center;
+    display: block;
+    border-radius: var(--radius-md, 8px);
+    margin-bottom: 16px;
+    /* Cách nhau vừa đẹp giữa các ảnh */
+  }
+
+  .passage-image:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 992px) {
+    position: static;
+
+    .passage-box {
+      padding: 12px;
+      /* Điện thoại: ít padding hơn */
+    }
+
+    .passage-image {
+      // min-height: 50vh;
+      margin-bottom: 12px;
+      /* Điện thoại: khoảng cách giữa các ảnh nhỏ hơn */
+    }
+  }
+
+  @media (max-width: 576px) {
+    .passage-box {
+      padding: 8px;
+    }
+
+    .passage-image {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.question-column {
+  min-width: 0;
 }
 
 .question-card {
@@ -390,6 +502,19 @@
     color: var(--dark-color);
     margin-bottom: 20px;
     display: block;
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    /* Điện thoại: thu nhỏ padding ô câu hỏi */
+  }
+
+  @media (max-width: 576px) {
+    padding: 12px;
+
+    .q-text {
+      margin-bottom: 14px;
+    }
   }
 }
 

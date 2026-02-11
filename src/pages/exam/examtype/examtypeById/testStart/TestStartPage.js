@@ -243,6 +243,14 @@ function TestStartPage() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  const hasPassageImage = (passage, fallbackObj) => {
+    const mediaList = passage?.passageMediaList ?? passage?.passageMedias ?? passage?.mediaList ?? passage?.passage_media ?? [];
+    if (Array.isArray(mediaList) && mediaList.some((m) => (m.mediaType ?? m.media_type ?? '').toUpperCase() === 'IMAGE')) return true;
+    const singleUrl = passage?.mediaUrl ?? passage?.media_url ?? fallbackObj?.mediaUrl ?? fallbackObj?.media_url;
+    const pType = passage?.passageType ?? passage?.passage_type ?? fallbackObj?.passageType;
+    return !!(singleUrl && (pType === 'READING' || pType === 'reading'));
+  };
+
   const renderPassage = (passage, fallbackObj) => {
     const content = passage?.content ?? passage?.passage_content ?? fallbackObj?.content ?? fallbackObj?.passage_content;
     const pType = passage?.passageType ?? passage?.passage_type ?? 'READING';
@@ -348,7 +356,7 @@ function TestStartPage() {
         onBack={() => navigate(-1)}
       />
 
-      <Container className={cx('content')}>
+      <Container fluid className={cx('content')}>
         <Row>
           <Col xs={12}>
             {test.parts?.map((part, i) => (
@@ -360,55 +368,76 @@ function TestStartPage() {
                 <div className={cx('questions-list')}>
                   {part.questions?.map((q, qIndex) => {
                     const absoluteIndex = allQuestions.findIndex(allQ => allQ.questionId === q.questionId) + 1;
+                    const passageHasImage = hasPassageImage(q.passage, q);
+                    const questionCard = (
+                      <div className={cx('question-card')}>
+                        <span className={cx('q-text')}>
+                          <span className={cx('q-number')}>Câu {absoluteIndex}:</span>
+                          {q.questionText}
+                        </span>
+
+                        {q.questionType === 'MCQ' && (
+                          <div className={cx('mcq-group')}>
+                            {q.answers?.map((a) => (
+                              <div
+                                key={a.answerId}
+                                className={cx('mcq-option', { selected: userAnswers[q.questionId]?.selectedAnswerId === a.answerId })}
+                                onClick={() => handleAnswerChange(q.questionId, 'MCQ', a.answerId)}
+                              >
+                                <Form.Check
+                                  type="radio"
+                                  name={`q-${q.questionId}`}
+                                  checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
+                                  readOnly
+                                />
+                                <span>{a.answerLabel}. {a.answerText}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {q.questionType === 'FILL_BLANK' && (
+                          <input
+                            type="text"
+                            className={cx('fill-input')}
+                            value={userAnswers[q.questionId]?.answerText || ''}
+                            onChange={(e) => handleAnswerChange(q.questionId, 'FILL_BLANK', e.target.value)}
+                            placeholder="Nhập câu trả lời của bạn..."
+                          />
+                        )}
+
+                        {q.questionType === 'ESSAY' && (
+                          <textarea
+                            className={cx('essay-input')}
+                            value={userAnswers[q.questionId]?.answerText || ''}
+                            onChange={(e) => handleAnswerChange(q.questionId, 'ESSAY', e.target.value)}
+                            placeholder="Viết câu trả lời chi tiết tại đây..."
+                          />
+                        )}
+                      </div>
+                    );
 
                     return (
-                      <div key={q.questionId} id={`q-${q.questionId}`} className={cx('question-card-wrapper')}>
-                        {renderPassage(q.passage, q)}
-                        <div className={cx('question-card')}>
-                          <span className={cx('q-text')}>
-                            <span className={cx('q-number')}>Câu {absoluteIndex}:</span>
-                            {q.questionText}
-                          </span>
-
-                          {q.questionType === 'MCQ' && (
-                            <div className={cx('mcq-group')}>
-                              {q.answers?.map((a) => (
-                                <div
-                                  key={a.answerId}
-                                  className={cx('mcq-option', { selected: userAnswers[q.questionId]?.selectedAnswerId === a.answerId })}
-                                  onClick={() => handleAnswerChange(q.questionId, 'MCQ', a.answerId)}
-                                >
-                                  <Form.Check
-                                    type="radio"
-                                    name={`q-${q.questionId}`}
-                                    checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
-                                    readOnly
-                                  />
-                                  <span>{a.answerLabel}. {a.answerText}</span>
-                                </div>
-                              ))}
+                      <div
+                        key={q.questionId}
+                        id={`q-${q.questionId}`}
+                        className={cx('question-card-wrapper', { 'split-layout': passageHasImage })}
+                      >
+                        {passageHasImage ? (
+                          <>
+                            <div className={cx('passage-column')} aria-label="Đọc tài liệu">
+                              {renderPassage(q.passage, q)}
                             </div>
-                          )}
-
-                          {q.questionType === 'FILL_BLANK' && (
-                            <input
-                              type="text"
-                              className={cx('fill-input')}
-                              value={userAnswers[q.questionId]?.answerText || ''}
-                              onChange={(e) => handleAnswerChange(q.questionId, 'FILL_BLANK', e.target.value)}
-                              placeholder="Nhập câu trả lời của bạn..."
-                            />
-                          )}
-
-                          {q.questionType === 'ESSAY' && (
-                            <textarea
-                              className={cx('essay-input')}
-                              value={userAnswers[q.questionId]?.answerText || ''}
-                              onChange={(e) => handleAnswerChange(q.questionId, 'ESSAY', e.target.value)}
-                              placeholder="Viết câu trả lời chi tiết tại đây..."
-                            />
-                          )}
-                        </div>
+                            <div className={cx('question-column')}>
+                              {questionCard}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {renderPassage(q.passage, q)}
+                            {questionCard}
+                          </>
+                        )}
                       </div>
                     );
                   })}
