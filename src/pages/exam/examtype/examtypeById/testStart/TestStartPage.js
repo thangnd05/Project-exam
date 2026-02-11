@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
+import {useEffect, useState} from 'react';
+import {useParams, useNavigate} from 'react-router-dom';
+import {Container, Spinner, Button, Form, Row, Col} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
   IoSendOutline,
@@ -12,19 +12,19 @@ import {
   IoCheckmarkCircleOutline,
 } from 'react-icons/io5';
 
-import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
+import {getPassageMediaByPassageId} from '~/api/passageMediaApi';
 import TestStartDashboard from './TestStartDashboard';
-import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
+import {IoListOutline, IoCloseOutline} from 'react-icons/io5';
 import styles from './TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
 function TestStartPage() {
-  const { testId } = useParams();
+  const {testId} = useParams();
   const navigate = useNavigate();
 
   const [userTestId, setUserTestId] = useState(null);
-  const [test, setTest] = useState({ parts: [] });
+  const [test, setTest] = useState({parts: []});
   const [userAnswers, setUserAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
   const [preCountdown, setPreCountdown] = useState(null);
@@ -36,7 +36,8 @@ function TestStartPage() {
     if (!url) return null;
     const cleanUrl = url.trim();
     if (cleanUrl.startsWith('http')) return cleanUrl;
-    const backendUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+    const backendUrl =
+      process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
     return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
   };
 
@@ -54,35 +55,49 @@ function TestStartPage() {
       if (pid && !hasMediaList(p)) passageIdsToFetch.add(pid);
       (part.questions || []).forEach((q) => {
         const qp = q.passage;
-        const qpid = qp?.passageId ?? qp?.passage_id ?? q.passageId ?? q.passage_id;
+        const qpid =
+          qp?.passageId ?? qp?.passage_id ?? q.passageId ?? q.passage_id;
         if (qpid && !hasMediaList(qp)) passageIdsToFetch.add(qpid);
       });
     });
     if (passageIdsToFetch.size === 0) return testData;
 
     const ids = [...passageIdsToFetch];
-    const results = await Promise.all(ids.map((id) => getPassageMediaByPassageId(id).catch(() => [])));
+    const results = await Promise.all(
+      ids.map((id) => getPassageMediaByPassageId(id).catch(() => [])),
+    );
     const mediaByPassageId = {};
-    ids.forEach((id, i) => { mediaByPassageId[id] = Array.isArray(results[i]) ? results[i] : []; });
+    ids.forEach((id, i) => {
+      mediaByPassageId[id] = Array.isArray(results[i]) ? results[i] : [];
+    });
 
     const enrichedParts = parts.map((part) => {
-      const partCopy = { ...part };
+      const partCopy = {...part};
       const ppid = partCopy.passage?.passageId ?? partCopy.passage?.passage_id;
       if (ppid && mediaByPassageId[ppid]) {
-        partCopy.passage = { ...partCopy.passage, passageMedias: mediaByPassageId[ppid] };
+        partCopy.passage = {
+          ...partCopy.passage,
+          passageMedias: mediaByPassageId[ppid],
+        };
       }
       partCopy.questions = (part.questions || []).map((q) => {
-        const qCopy = { ...q };
-        const qpid = qCopy.passage?.passageId ?? qCopy.passage?.passage_id ?? qCopy.passageId ?? qCopy.passage_id;
+        const qCopy = {...q};
+        const qpid =
+          qCopy.passage?.passageId ??
+          qCopy.passage?.passage_id ??
+          qCopy.passageId ??
+          qCopy.passage_id;
         if (qpid && mediaByPassageId[qpid]) {
-          const passage = qCopy.passage ? { ...qCopy.passage, passageMedias: mediaByPassageId[qpid] } : { passageId: qpid, passageMedias: mediaByPassageId[qpid] };
+          const passage = qCopy.passage
+            ? {...qCopy.passage, passageMedias: mediaByPassageId[qpid]}
+            : {passageId: qpid, passageMedias: mediaByPassageId[qpid]};
           qCopy.passage = passage;
         }
         return qCopy;
       });
       return partCopy;
     });
-    return { ...testData, parts: enrichedParts };
+    return {...testData, parts: enrichedParts};
   };
 
   useEffect(() => {
@@ -103,9 +118,10 @@ function TestStartPage() {
       restored = true;
     }
 
-    axios.get(`/api/tests/usertest/${testId}`)
+    axios
+      .get(`/api/tests/usertest/${testId}`)
       .then(async (res) => {
-        const testData = { ...res.data, parts: res.data.parts || [] };
+        const testData = {...res.data, parts: res.data.parts || []};
         const enriched = await enrichTestWithPassageMedia(testData);
         setTest(enriched);
 
@@ -115,8 +131,12 @@ function TestStartPage() {
         }
 
         const now = new Date();
-        const availableFrom = testData.availableFrom ? new Date(testData.availableFrom) : null;
-        const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
+        const availableFrom = testData.availableFrom
+          ? new Date(testData.availableFrom)
+          : null;
+        const availableTo = testData.availableTo
+          ? new Date(testData.availableTo)
+          : null;
 
         if (availableFrom && now < availableFrom) {
           setStatus('locked');
@@ -134,7 +154,8 @@ function TestStartPage() {
           let finalTime = durationSeconds;
           if (availableTo) {
             const diffSeconds = Math.floor((availableTo - now) / 1000);
-            if (diffSeconds > 0) finalTime = Math.min(durationSeconds, diffSeconds);
+            if (diffSeconds > 0)
+              finalTime = Math.min(durationSeconds, diffSeconds);
             else finalTime = 0;
           }
           setTimeLeft(finalTime);
@@ -154,7 +175,8 @@ function TestStartPage() {
         setStatus('active');
         return;
       }
-      axios.post('/api/user-tests', { testId: test.testId })
+      axios
+        .post('/api/user-tests', {testId: test.testId})
         .then((res) => {
           const id = res.data.userTestId;
           setUserTestId(id);
@@ -170,16 +192,25 @@ function TestStartPage() {
 
   useEffect(() => {
     if (status === 'active' && userTestId) {
-      sessionStorage.setItem(`userTestState-${testId}`, JSON.stringify({
-        userTestId, userAnswers, timeLeft, lastSavedAt: Date.now()
-      }));
+      sessionStorage.setItem(
+        `userTestState-${testId}`,
+        JSON.stringify({
+          userTestId,
+          userAnswers,
+          timeLeft,
+          lastSavedAt: Date.now(),
+        }),
+      );
     }
   }, [userAnswers, timeLeft, userTestId, status, testId]);
 
   useEffect(() => {
     if (status === 'locked' && preCountdown !== null) {
-      if (preCountdown <= 0) { setStatus('open'); return; }
-      const timer = setInterval(() => setPreCountdown(p => p - 1), 1000);
+      if (preCountdown <= 0) {
+        setStatus('open');
+        return;
+      }
+      const timer = setInterval(() => setPreCountdown((p) => p - 1), 1000);
       return () => clearInterval(timer);
     }
   }, [preCountdown, status]);
@@ -187,7 +218,7 @@ function TestStartPage() {
   useEffect(() => {
     if (status === 'active' && timeLeft !== null) {
       const timer = setInterval(() => {
-        setTimeLeft(prev => {
+        setTimeLeft((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
             handleSubmit();
@@ -201,8 +232,9 @@ function TestStartPage() {
   }, [status, timeLeft]);
 
   const handleAnswerChange = (questionId, type, value) => {
-    const updatedAnswer = type === 'MCQ' ? { selectedAnswerId: value } : { answerText: value };
-    setUserAnswers({ ...userAnswers, [questionId]: updatedAnswer });
+    const updatedAnswer =
+      type === 'MCQ' ? {selectedAnswerId: value} : {answerText: value};
+    setUserAnswers({...userAnswers, [questionId]: updatedAnswer});
   };
 
   const handleSubmit = async () => {
@@ -210,18 +242,24 @@ function TestStartPage() {
     setIsSubmitting(true);
     try {
       const payload = Object.entries(userAnswers).map(([qid, ans]) => ({
-        userTestId, questionId: parseInt(qid),
+        userTestId,
+        questionId: parseInt(qid),
         selectedAnswerId: ans.selectedAnswerId || null,
-        answerText: ans.answerText || null
+        answerText: ans.answerText || null,
       }));
-      if (payload.length > 0) await axios.post('/api/user-answers/batch', payload);
+      if (payload.length > 0)
+        await axios.post('/api/user-answers/batch', payload);
       const res = await axios.post(`/api/user-tests/${userTestId}/submit`);
       sessionStorage.removeItem(`userTest-${testId}`);
       sessionStorage.removeItem(`userTestState-${testId}`);
-      navigate(`/tests/result/${userTestId}`, { state: { score: res.data.totalScore } });
+      navigate(`/tests/result/${userTestId}`, {
+        state: {score: res.data.totalScore},
+      });
     } catch (err) {
       alert('Nộp bài thất bại! Vui lòng thử lại.');
-    } finally { setIsSubmitting(false); }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const scrollToQuestion = (questionId) => {
@@ -230,13 +268,14 @@ function TestStartPage() {
       const offset = 80; // Header height
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      window.scrollTo({top: offsetPosition, behavior: 'smooth'});
     }
   };
 
-  const allQuestions = test.parts?.reduce((acc, part) => {
-    return [...acc, ...(part.questions || [])];
-  }, []) || [];
+  const allQuestions =
+    test.parts?.reduce((acc, part) => {
+      return [...acc, ...(part.questions || [])];
+    }, []) || [];
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -245,23 +284,55 @@ function TestStartPage() {
   };
 
   const hasPassageImage = (passage, fallbackObj) => {
-    const mediaList = passage?.passageMediaList ?? passage?.passageMedias ?? passage?.mediaList ?? passage?.passage_media ?? [];
-    if (Array.isArray(mediaList) && mediaList.some((m) => (m.mediaType ?? m.media_type ?? '').toUpperCase() === 'IMAGE')) return true;
-    const singleUrl = passage?.mediaUrl ?? passage?.media_url ?? fallbackObj?.mediaUrl ?? fallbackObj?.media_url;
-    const pType = passage?.passageType ?? passage?.passage_type ?? fallbackObj?.passageType;
+    const mediaList =
+      passage?.passageMediaList ??
+      passage?.passageMedias ??
+      passage?.mediaList ??
+      passage?.passage_media ??
+      [];
+    if (
+      Array.isArray(mediaList) &&
+      mediaList.some(
+        (m) => (m.mediaType ?? m.media_type ?? '').toUpperCase() === 'IMAGE',
+      )
+    )
+      return true;
+    const singleUrl =
+      passage?.mediaUrl ??
+      passage?.media_url ??
+      fallbackObj?.mediaUrl ??
+      fallbackObj?.media_url;
+    const pType =
+      passage?.passageType ?? passage?.passage_type ?? fallbackObj?.passageType;
     return !!(singleUrl && (pType === 'READING' || pType === 'reading'));
   };
 
   const renderPassage = (passage, fallbackObj) => {
-    const content = passage?.content ?? passage?.passage_content ?? fallbackObj?.content ?? fallbackObj?.passage_content;
+    const content =
+      passage?.content ??
+      passage?.passage_content ??
+      fallbackObj?.content ??
+      fallbackObj?.passage_content;
     const pType = passage?.passageType ?? passage?.passage_type ?? 'READING';
 
     // Bảng trung gian passage_media: passage có danh sách media (nhiều audio/ảnh)
-    const mediaList = passage?.passageMediaList ?? passage?.passageMedias ?? passage?.mediaList ?? passage?.passage_media ?? [];
+    const mediaList =
+      passage?.passageMediaList ??
+      passage?.passageMedias ??
+      passage?.mediaList ??
+      passage?.passage_media ??
+      [];
     const hasMediaList = Array.isArray(mediaList) && mediaList.length > 0;
 
     // Backward compat: một media trực tiếp trên passage (cũ)
-    const singleMediaUrl = passage?.mediaUrl ?? passage?.media_url ?? fallbackObj?.mediaUrl ?? fallbackObj?.media_url ?? fallbackObj?.audioUrl ?? fallbackObj?.audio_url ?? fallbackObj?.passageMediaUrl;
+    const singleMediaUrl =
+      passage?.mediaUrl ??
+      passage?.media_url ??
+      fallbackObj?.mediaUrl ??
+      fallbackObj?.media_url ??
+      fallbackObj?.audioUrl ??
+      fallbackObj?.audio_url ??
+      fallbackObj?.passageMediaUrl;
 
     const hasContent = !!content;
     const hasAnyMedia = hasMediaList || !!singleMediaUrl;
@@ -269,85 +340,122 @@ function TestStartPage() {
 
     return (
       <div className={cx('passage-box')}>
-        {hasMediaList && mediaList.map((m, idx) => {
-          const url = m.mediaUrl ?? m.media_url;
-          if (!url) return null;
-          const type = (m.mediaType ?? m.media_type ?? '').toUpperCase();
-          if (type === 'AUDIO') {
-            return (
-              <div key={idx} className="mb-3">
-                <div className="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
-                  <IoVolumeHighOutline size={24} />
-                  <span>NGHE {mediaList.filter(x => (x.mediaType ?? x.media_type ?? '').toUpperCase() === 'AUDIO').length > 1 ? `(${idx + 1})` : 'ĐOẠN HỘI THOẠI'}</span>
+        {hasMediaList &&
+          mediaList.map((m, idx) => {
+            const url = m.mediaUrl ?? m.media_url;
+            if (!url) return null;
+            const type = (m.mediaType ?? m.media_type ?? '').toUpperCase();
+            if (type === 'AUDIO') {
+              return (
+                <div key={idx} className="mb-3">
+                  <div className="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
+                    <IoVolumeHighOutline size={24} />
+                    <span>
+                      NGHE{' '}
+                      {mediaList.filter(
+                        (x) =>
+                          (x.mediaType ?? x.media_type ?? '').toUpperCase() ===
+                          'AUDIO',
+                      ).length > 1
+                        ? `(${idx + 1})`
+                        : 'ĐOẠN HỘI THOẠI'}
+                    </span>
+                  </div>
+                  <audio
+                    controls
+                    src={getFullMediaUrl(url)}
+                    className={cx('audio-player')}
+                  />
                 </div>
-                <audio controls src={getFullMediaUrl(url)} className={cx('audio-player')} />
+              );
+            }
+            if (type === 'IMAGE') {
+              return (
+                <div key={idx} className="mb-3">
+                  <img
+                    src={getFullMediaUrl(url)}
+                    alt={`Passage ${idx + 1}`}
+                    className={cx('passage-image')}
+                  />
+                </div>
+              );
+            }
+            return null;
+          })}
+        {!hasMediaList &&
+          singleMediaUrl &&
+          (pType === 'LISTENING' || pType === 'listening') && (
+            <div className="mb-4">
+              <div className="d-flex align-items-center gap-2 mb-3 text-primary fw-bold">
+                <IoVolumeHighOutline size={24} />
+                <span>NGHE ĐOẠN HỘI THOẠI</span>
               </div>
-            );
-          }
-          if (type === 'IMAGE') {
-            return (
-              <div key={idx} className="mb-3">
-                <img src={getFullMediaUrl(url)} alt={`Passage ${idx + 1}`} className={cx('passage-image')} />
-              </div>
-            );
-          }
-          return null;
-        })}
-        {!hasMediaList && singleMediaUrl && (pType === 'LISTENING' || pType === 'listening') && (
-          <div className="mb-4">
-            <div className="d-flex align-items-center gap-2 mb-3 text-primary fw-bold">
-              <IoVolumeHighOutline size={24} />
-              <span>NGHE ĐOẠN HỘI THOẠI</span>
+              <audio
+                controls
+                src={getFullMediaUrl(singleMediaUrl)}
+                className={cx('audio-player')}
+              />
             </div>
-            <audio controls src={getFullMediaUrl(singleMediaUrl)} className={cx('audio-player')} />
-          </div>
-        )}
-        {content && (
-          <div className={cx('passage-content')}>{content}</div>
-        )}
+          )}
+        {content && <div className={cx('passage-content')}>{content}</div>}
       </div>
     );
   };
 
-  if (status === 'loading') return (
-    <div className={cx('state-box')}>
-      <Spinner animation="grow" variant="primary" />
-      <h3>Đang niêm phong đề thi...</h3>
-    </div>
-  );
-
-  if (status === 'no-attempts') return (
-    <div className={cx('state-box')}>
-      <IoAlertCircleOutline size={80} color="#ef4444" />
-      <h3>Hết lượt làm bài</h3>
-      <p>Bạn đã hoàn thành số lượt làm bài cho phép cho bài thi này.</p>
-      <Button variant="primary" className="mt-4 rounded-pill" onClick={() => navigate(-1)}>Quay lại</Button>
-    </div>
-  );
-
-  if (status === 'locked') return (
-    <div className={cx('state-box')}>
-      <IoLockClosedOutline size={80} color="#64748b" />
-      <h3>Phòng thi chưa mở</h3>
-      <p>Vui lòng đợi trong giây lát...</p>
-      <div className={cx('timer-box', 'mt-4')}>
-        <span className={cx('time')}>{formatTime(preCountdown)}</span>
+  if (status === 'loading')
+    return (
+      <div className={cx('state-box')}>
+        <Spinner animation="grow" variant="primary" />
+        <h3>Đang niêm phong đề thi...</h3>
       </div>
-    </div>
-  );
+    );
 
-  if (status === 'closed') return (
-    <div className={cx('state-box')}>
-      <IoAlertCircleOutline size={80} color="#ef4444" />
-      <h3>Phòng thi đã đóng</h3>
-      <p>Rất tiếc, thời gian tham gia bài thi này đã kết thúc.</p>
-      <Button variant="secondary" className="mt-4 rounded-pill" onClick={() => navigate(-1)}>Quay lại</Button>
-    </div>
-  );
+  if (status === 'no-attempts')
+    return (
+      <div className={cx('state-box')}>
+        <IoAlertCircleOutline size={80} color="#ef4444" />
+        <h3>Hết lượt làm bài</h3>
+        <p>Bạn đã hoàn thành số lượt làm bài cho phép cho bài thi này.</p>
+        <Button
+          variant="primary"
+          className="mt-4 rounded-pill"
+          onClick={() => navigate(-1)}
+        >
+          Quay lại
+        </Button>
+      </div>
+    );
+
+  if (status === 'locked')
+    return (
+      <div className={cx('state-box')}>
+        <IoLockClosedOutline size={80} color="#64748b" />
+        <h3>Phòng thi chưa mở</h3>
+        <p>Vui lòng đợi trong giây lát...</p>
+        <div className={cx('timer-box', 'mt-4')}>
+          <span className={cx('time')}>{formatTime(preCountdown)}</span>
+        </div>
+      </div>
+    );
+
+  if (status === 'closed')
+    return (
+      <div className={cx('state-box')}>
+        <IoAlertCircleOutline size={80} color="#ef4444" />
+        <h3>Phòng thi đã đóng</h3>
+        <p>Rất tiếc, thời gian tham gia bài thi này đã kết thúc.</p>
+        <Button
+          variant="secondary"
+          className="mt-4 rounded-pill"
+          onClick={() => navigate(-1)}
+        >
+          Quay lại
+        </Button>
+      </div>
+    );
 
   return (
     <div className={cx('wrapper')}>
-
       <Container fluid className={cx('content')}>
         <h1>Bài thi</h1>
 
@@ -355,18 +463,25 @@ function TestStartPage() {
           <Col xs={12}>
             {test.parts?.map((part, i) => (
               <div key={part.testPartId} className={cx('part-section')}>
-                <h3>Phần {i + 1}: {part.partName || 'Luyện tập'}</h3>
+                <h3>
+                  Phần {i + 1}: {part.partName || 'Luyện tập'}
+                </h3>
 
                 {renderPassage(part.passage)}
 
                 <div className={cx('questions-list')}>
                   {part.questions?.map((q, qIndex) => {
-                    const absoluteIndex = allQuestions.findIndex(allQ => allQ.questionId === q.questionId) + 1;
+                    const absoluteIndex =
+                      allQuestions.findIndex(
+                        (allQ) => allQ.questionId === q.questionId,
+                      ) + 1;
                     const passageHasImage = hasPassageImage(q.passage, q);
                     const questionCard = (
                       <div className={cx('question-card')}>
                         <span className={cx('q-text')}>
-                          <span className={cx('q-number')}>Câu {absoluteIndex}:</span>
+                          <span className={cx('q-number')}>
+                            Câu {absoluteIndex}:
+                          </span>
                           {q.questionText}
                         </span>
 
@@ -375,16 +490,31 @@ function TestStartPage() {
                             {q.answers?.map((a) => (
                               <div
                                 key={a.answerId}
-                                className={cx('mcq-option', { selected: userAnswers[q.questionId]?.selectedAnswerId === a.answerId })}
-                                onClick={() => handleAnswerChange(q.questionId, 'MCQ', a.answerId)}
+                                className={cx('mcq-option', {
+                                  selected:
+                                    userAnswers[q.questionId]
+                                      ?.selectedAnswerId === a.answerId,
+                                })}
+                                onClick={() =>
+                                  handleAnswerChange(
+                                    q.questionId,
+                                    'MCQ',
+                                    a.answerId,
+                                  )
+                                }
                               >
                                 <Form.Check
                                   type="radio"
                                   name={`q-${q.questionId}`}
-                                  checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
+                                  checked={
+                                    userAnswers[q.questionId]
+                                      ?.selectedAnswerId === a.answerId
+                                  }
                                   readOnly
                                 />
-                                <span>{a.answerLabel}. {a.answerText}</span>
+                                <span>
+                                  {a.answerLabel}. {a.answerText}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -395,7 +525,13 @@ function TestStartPage() {
                             type="text"
                             className={cx('fill-input')}
                             value={userAnswers[q.questionId]?.answerText || ''}
-                            onChange={(e) => handleAnswerChange(q.questionId, 'FILL_BLANK', e.target.value)}
+                            onChange={(e) =>
+                              handleAnswerChange(
+                                q.questionId,
+                                'FILL_BLANK',
+                                e.target.value,
+                              )
+                            }
                             placeholder="Nhập câu trả lời của bạn..."
                           />
                         )}
@@ -404,7 +540,13 @@ function TestStartPage() {
                           <textarea
                             className={cx('essay-input')}
                             value={userAnswers[q.questionId]?.answerText || ''}
-                            onChange={(e) => handleAnswerChange(q.questionId, 'ESSAY', e.target.value)}
+                            onChange={(e) =>
+                              handleAnswerChange(
+                                q.questionId,
+                                'ESSAY',
+                                e.target.value,
+                              )
+                            }
                             placeholder="Viết câu trả lời chi tiết tại đây..."
                           />
                         )}
@@ -415,11 +557,16 @@ function TestStartPage() {
                       <div
                         key={q.questionId}
                         id={`q-${q.questionId}`}
-                        className={cx('question-card-wrapper', { 'split-layout': passageHasImage })}
+                        className={cx('question-card-wrapper', {
+                          'split-layout': passageHasImage,
+                        })}
                       >
                         {passageHasImage ? (
                           <>
-                            <div className={cx('passage-column')} aria-label="Đọc tài liệu">
+                            <div
+                              className={cx('passage-column')}
+                              aria-label="Đọc tài liệu"
+                            >
                               {renderPassage(q.passage, q)}
                             </div>
                             <div className={cx('question-column')}>
@@ -462,23 +609,35 @@ function TestStartPage() {
           <Container className={cx('footer-buttons-inner')}>
             <button
               type="button"
-              className={cx('btn-toggle-info', { active: showInfoPanel })}
+              className={cx('btn-toggle-info', {active: showInfoPanel})}
               onClick={() => setShowInfoPanel((v) => !v)}
               aria-expanded={showInfoPanel}
-              aria-label={showInfoPanel ? 'Ẩn thời gian và danh sách câu' : 'Xem thời gian và danh sách câu'}
+              aria-label={
+                showInfoPanel
+                  ? 'Ẩn thời gian và danh sách câu'
+                  : 'Xem thời gian và danh sách câu'
+              }
             >
-              {showInfoPanel ? <IoCloseOutline size={22} /> : <IoListOutline size={22} />}
+              {showInfoPanel ? (
+                <IoCloseOutline size={22} />
+              ) : (
+                <IoListOutline size={22} />
+              )}
               <span>{showInfoPanel ? 'Ẩn' : 'Thời gian & Câu hỏi'}</span>
             </button>
             <div className={cx('footer-right-group')}>
               <div className={cx('footer-pills')}>
                 <div className={cx('exam-stat', 'exam-stat-time')}>
                   <IoTimeOutline aria-hidden />
-                  <span className={cx('exam-stat-value')}>{formatTime(timeLeft)}</span>
+                  <span className={cx('exam-stat-value')}>
+                    {formatTime(timeLeft)}
+                  </span>
                 </div>
                 <div className={cx('exam-stat', 'exam-stat-done')}>
                   <IoCheckmarkCircleOutline aria-hidden />
-                  <span className={cx('exam-stat-value')}>{Object.keys(userAnswers).length}/{allQuestions.length}</span>
+                  <span className={cx('exam-stat-value')}>
+                    {Object.keys(userAnswers).length}/{allQuestions.length}
+                  </span>
                 </div>
               </div>
               <button
@@ -486,7 +645,11 @@ function TestStartPage() {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? <Spinner animation="border" size="sm" /> : <IoSendOutline />}
+                {isSubmitting ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  <IoSendOutline />
+                )}
                 {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài thi'}
               </button>
             </div>
