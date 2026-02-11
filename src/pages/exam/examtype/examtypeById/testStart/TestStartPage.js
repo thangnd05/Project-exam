@@ -8,10 +8,11 @@ import {
   IoLockClosedOutline,
   IoVolumeHighOutline,
   IoAlertCircleOutline,
+  IoTimeOutline,
+  IoCheckmarkCircleOutline,
 } from 'react-icons/io5';
 
 import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
-import TestStartHeader from './TestStartHeader';
 import TestStartDashboard from './TestStartDashboard';
 import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
 import styles from './TestStartPage.module.scss';
@@ -346,17 +347,10 @@ function TestStartPage() {
 
   return (
     <div className={cx('wrapper')}>
-      <TestStartHeader
-        testTitle={test.title}
-        testType={test.testType}
-        totalQuestions={allQuestions.length}
-        completedCount={Object.keys(userAnswers).length}
-        timeLeft={timeLeft}
-        formatTime={formatTime}
-        onBack={() => navigate(-1)}
-      />
 
       <Container fluid className={cx('content')}>
+        <h1>Bài thi</h1>
+
         <Row>
           <Col xs={12}>
             {test.parts?.map((part, i) => (
@@ -476,14 +470,26 @@ function TestStartPage() {
               {showInfoPanel ? <IoCloseOutline size={22} /> : <IoListOutline size={22} />}
               <span>{showInfoPanel ? 'Ẩn' : 'Thời gian & Câu hỏi'}</span>
             </button>
-            <button
-              className={cx('btn-submit')}
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? <Spinner animation="border" size="sm" /> : <IoSendOutline />}
-              {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài thi'}
-            </button>
+            <div className={cx('footer-right-group')}>
+              <div className={cx('footer-pills')}>
+                <div className={cx('exam-stat', 'exam-stat-time')}>
+                  <IoTimeOutline aria-hidden />
+                  <span className={cx('exam-stat-value')}>{formatTime(timeLeft)}</span>
+                </div>
+                <div className={cx('exam-stat', 'exam-stat-done')}>
+                  <IoCheckmarkCircleOutline aria-hidden />
+                  <span className={cx('exam-stat-value')}>{Object.keys(userAnswers).length}/{allQuestions.length}</span>
+                </div>
+              </div>
+              <button
+                className={cx('btn-submit')}
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <Spinner animation="border" size="sm" /> : <IoSendOutline />}
+                {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài thi'}
+              </button>
+            </div>
           </Container>
         </div>
       </div>

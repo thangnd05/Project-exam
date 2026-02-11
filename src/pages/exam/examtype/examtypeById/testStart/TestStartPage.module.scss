@@ -3,6 +3,8 @@
 .wrapper {
   min-height: 100vh;
   padding-bottom: 100px;
+  /* Bỏ hở phía trên: kéo sát lên dưới header app */
+  margin-top: -30px;
 }
 
 .content {
@@ -43,151 +45,75 @@
   }
 }
 
-/* --- Premium Floating Header (sticky khi scroll) --- */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  padding: 16px 0;
-  padding-bottom: 20px;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
-}
-
-.stats-timer .stats-label {
-  color: #e11d48;
-}
-
-.stats-timer .stats-time-value,
-.stats-timer .stats-time-value .icon {
-  color: #e11d48;
-}
-
-.header-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-left {
+/* Pills thời gian & hoàn thành (footer) */
+.exam-stat {
   display: flex;
   align-items: center;
-  gap: 16px; // Slightly tighter gap for better grouping
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.4rem;
 
-  .btn-back {
-    width: 40px; // Slightly smaller
-    height: 40px;
-    border-radius: 12px; // Modern rounded square instead of circle
-    border: 1px solid #e2e8f0;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    color: #64748b;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  svg {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+}
 
-    &:hover {
-      background: #f8fafc;
-      border-color: var(--primary);
-      color: var(--primary);
-      transform: scale(1.05);
+.exam-stat-time {
+  background: #fef2f2;
+  color: #dc2626;
+
+  svg {
+    color: #dc2626;
+  }
+}
+
+.exam-stat-done {
+  background: #f0fdf4;
+  color: #16a34a;
+
+  svg {
+    color: #16a34a;
+  }
+}
+
+.exam-stat-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.footer-right-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.footer-pills {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .footer-pills .exam-stat {
+    padding: 8px 12px;
+    font-size: 1.2rem;
+
+    svg {
+      font-size: 1.4rem;
     }
   }
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
+@media (max-width: 576px) {
+  .footer-pills .exam-stat {
+    padding: 6px 10px;
+    font-size: 1.05rem;
 
-.stats-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-
-  .stats-label {
-    font-size: 1rem;
-    font-weight: 800;
-    color: #64748b;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .stats-value {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--dark-color);
-
-    .icon {
-      color: #16a34a;
-      font-size: 2rem;
-    }
-  }
-}
-
-/* --- Progress Bar --- */
-.progress-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: #f1f5f9;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background: var(--primary-gradient);
-  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 0 10px rgba(0, 97, 242, 0.3);
-}
-
-.test-info {
-  .title-wrapper {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 2px;
-  }
-
-  .title-prefix {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  h2 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #1e293b;
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  .test-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #64748b;
-
-    .separator {
-      color: #cbd5e1;
-      font-size: 1.6rem;
+    svg {
+      font-size: 1.25rem;
     }
   }
 }
@@ -649,7 +575,9 @@
 .btn-toggle-info {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  min-width: 220px; /* Bằng nhau khi "Thời gian & Câu hỏi" / "Ẩn" */
   padding: 10px 20px;
   border-radius: 50px;
   border: 2px solid #e2e8f0;
