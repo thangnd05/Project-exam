@@ -269,12 +269,12 @@ function CreateTest({ mode = "personal", classId, chapterId }) {
                                             }
                                         />
                                         <span className="ms-2 fw-bold">
-                                            {ans.label}.
+                                            {ans.answerLabel || ans.label}.
                                         </span>
                                         <input
                                             className={cx("input-modern", "ms-2")}
                                             value={ans.answerText}
-                                            placeholder={`Đáp án ${ans.label}`}
+                                            placeholder={`Đáp án ${ans.answerLabel || ans.label}`}
                                             onChange={(e) =>
                                                 updateAnswer(i, aIndex, "answerText", e.target.value)
                                             }

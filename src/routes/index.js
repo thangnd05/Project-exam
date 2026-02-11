@@ -23,9 +23,11 @@ import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
 import NotFoundPage from "~/pages/error/NotFoundPage";
 import CreateBulkQuestionsToBank from '~/pages/question/bulk-question/CreateBulkQuestionsToBank';
 import CreateRealTest from '~/pages/question/CreateRealTest';
+import PremiumBulkQuestionCreator from '~/pages/question/bulk-question/PremiumBulkQuestionCreator';
 import CreateQuestionsWithPassage from "~/pages/question/CreateQuestionsWithPassage"
 import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
 import QuestionBankCreator from '~/pages/test123/QuestionBankCreator';
+import BulkQuestionGroupCreator from '~/pages/test23/BulkQuestionGroupCreator';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -67,6 +69,8 @@ export const privateRoutes = [
   { path: routes.oauth2Redirect, component: MyTestPage },
   { path: routes.classChapterPage, component: ChapterOfClass },
   { path: routes.unifiedCreateQuestion, component: QuestionBankCreator },
+  { path: routes.premiumBulkQuestion, component: PremiumBulkQuestionCreator },
+  { path: routes.bulkPassageGroup, component: BulkQuestionGroupCreator },
   // {
   //   path: routes.oauth2Redirect,
   //   component: MyTestPage,

@@ -18,10 +18,10 @@ const emptyQuestion = {
     questionText: "",
     questionType: "MCQ",
     answers: [
-        { label: "A", answerText: "", isCorrect: false },
-        { label: "B", answerText: "", isCorrect: false },
-        { label: "C", answerText: "", isCorrect: false },
-        { label: "D", answerText: "", isCorrect: false },
+        { answerLabel: "A", answerText: "", isCorrect: false },
+        { answerLabel: "B", answerText: "", isCorrect: false },
+        { answerLabel: "C", answerText: "", isCorrect: false },
+        { answerLabel: "D", answerText: "", isCorrect: false },
     ],
 };
 
@@ -254,8 +254,8 @@ const CreateRealTest = ({ classId = 56665354 }) => {
                                         <Col md={6} key={aIndex}>
                                             <InputGroup>
                                                 <InputGroup.Checkbox checked={ans.isCorrect} onChange={(e) => updateAnswer(qIndex, aIndex, "isCorrect", e.target.checked)} />
-                                                <InputGroup.Text className="fw-bold">{ans.label}</InputGroup.Text>
-                                                <Form.Control type="text" placeholder={`Đáp án ${ans.label}`} value={ans.answerText} onChange={(e) => updateAnswer(qIndex, aIndex, "answerText", e.target.value)} className={ans.isCorrect ? "border-success bg-success-subtle" : ""} />
+                                                <InputGroup.Text className="fw-bold">{ans.answerLabel || ans.label}</InputGroup.Text>
+                                                <Form.Control type="text" placeholder={`Đáp án ${ans.answerLabel || ans.label}`} value={ans.answerText} onChange={(e) => updateAnswer(qIndex, aIndex, "answerText", e.target.value)} className={ans.isCorrect ? "border-success bg-success-subtle" : ""} />
                                             </InputGroup>
                                         </Col>
                                     ))}

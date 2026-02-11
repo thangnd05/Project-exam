@@ -25,10 +25,10 @@ const QuestionGroupCreationForm = () => {
         questionType: 'MCQ',
         questionText: '',
         options: [
-            { label: 'A', content: '', isCorrect: false },
-            { label: 'B', content: '', isCorrect: false },
-            { label: 'C', content: '', isCorrect: false },
-            { label: 'D', content: '', isCorrect: false },
+            { answerLabel: 'A', content: '', isCorrect: false },
+            { answerLabel: 'B', content: '', isCorrect: false },
+            { answerLabel: 'C', content: '', isCorrect: false },
+            { answerLabel: 'D', content: '', isCorrect: false },
         ],
     };
 
@@ -111,7 +111,7 @@ const QuestionGroupCreationForm = () => {
                 questionType: q.questionType,
                 questionText: q.questionText,
                 answers: q.options.map((opt) => ({
-                    label: opt.label,
+                    answerLabel: opt.answerLabel,
                     answerText: opt.content,
                     isCorrect: opt.isCorrect,
                 })),
@@ -238,7 +238,7 @@ const QuestionGroupCreationForm = () => {
                                 {q.options.map((o, oIndex) => (
                                     <Col md={6} key={oIndex} className={cx('option-row')}>
                                         <input type="checkbox" className={cx('check-box')} checked={o.isCorrect} onChange={(e) => handleOptionChange(qIndex, oIndex, 'isCorrect', e.target.checked)} />
-                                        <span className={cx('choice-label')}>{o.label}</span>
+                                        <span className={cx('choice-label')}>{o.answerLabel || o.label}</span>
                                         <input type="text" className={cx('input-modern')} value={o.content} onChange={(e) => handleOptionChange(qIndex, oIndex, 'content', e.target.value)} placeholder="Nhập đáp án..." />
                                     </Col>
                                 ))}

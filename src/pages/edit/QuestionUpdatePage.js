@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './QuestionUpdatePage.scss';
-import {useParams} from 'react-router-dom'; // ✅ thêm dòng này
+import { useParams } from 'react-router-dom'; // ✅ thêm dòng này
 
 const QuestionUpdatePage = () => {
-  const {id} = useParams(); // ✅ lấy id từ URL
+  const { id } = useParams(); // ✅ lấy id từ URL
   const questionId = id; // hoặc Number(id)
   const [examTypes, setExamTypes] = useState([]);
   const [examParts, setExamParts] = useState([]);
@@ -23,10 +23,10 @@ const QuestionUpdatePage = () => {
       mediaFile: null,
     },
     answers: [
-      {label: 'A', answerText: '', isCorrect: false},
-      {label: 'B', answerText: '', isCorrect: false},
-      {label: 'C', answerText: '', isCorrect: false},
-      {label: 'D', answerText: '', isCorrect: false},
+      { answerLabel: 'A', answerText: '', isCorrect: false },
+      { answerLabel: 'B', answerText: '', isCorrect: false },
+      { answerLabel: 'C', answerText: '', isCorrect: false },
+      { answerLabel: 'D', answerText: '', isCorrect: false },
     ],
   });
 
@@ -84,15 +84,15 @@ const QuestionUpdatePage = () => {
             mediaFile: null,
           },
           answers: q.answers?.map((a) => ({
-            label: a.answerLabel || a.label || '',
+            answerLabel: a.answerLabel || a.label || '',
             answerText: a.answerText || '',
             isCorrect: a.isCorrect || false,
           })) || [
-            {label: 'A', answerText: '', isCorrect: false},
-            {label: 'B', answerText: '', isCorrect: false},
-            {label: 'C', answerText: '', isCorrect: false},
-            {label: 'D', answerText: '', isCorrect: false},
-          ],
+              { answerLabel: 'A', answerText: '', isCorrect: false },
+              { answerLabel: 'B', answerText: '', isCorrect: false },
+              { answerLabel: 'C', answerText: '', isCorrect: false },
+              { answerLabel: 'D', answerText: '', isCorrect: false },
+            ],
         });
       })
       .catch((err) => console.error('❌ Lỗi khi tải câu hỏi:', err));
@@ -100,26 +100,26 @@ const QuestionUpdatePage = () => {
 
   // 🟢 Handlers
   const handleChange = (field, value) => {
-    setFormData({...formData, [field]: value});
+    setFormData({ ...formData, [field]: value });
   };
 
   const handlePassageChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
-      passage: {...prev.passage, [field]: value},
+      passage: { ...prev.passage, [field]: value },
     }));
   };
 
   const handleAnswerChange = (index, field, value) => {
     const updated = [...formData.answers];
     updated[index][field] = value;
-    setFormData({...formData, answers: updated});
+    setFormData({ ...formData, answers: updated });
   };
 
   const handleFileChange = (file) => {
     setFormData((prev) => ({
       ...prev,
-      passage: {...prev.passage, mediaFile: file},
+      passage: { ...prev.passage, mediaFile: file },
     }));
   };
 
@@ -140,7 +140,7 @@ const QuestionUpdatePage = () => {
         mediaUrl: formData.passage.mediaUrl || null,
       },
       answers: formData.answers.map((a) => ({
-        label: a.label,
+        answerLabel: a.answerLabel,
         answerText: a.answerText,
         isCorrect: a.isCorrect,
       })),
@@ -158,7 +158,7 @@ const QuestionUpdatePage = () => {
 
     try {
       await axios.put(`/api/questions/${questionId}`, sendData, {
-        headers: {'Content-Type': 'multipart/form-data'},
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       setStatusMessage('✅ Cập nhật câu hỏi thành công!');
     } catch (err) {
@@ -285,7 +285,7 @@ const QuestionUpdatePage = () => {
                   handleAnswerChange(i, 'isCorrect', e.target.checked)
                 }
               />
-              <span className="ms-2 fw-bold">{a.label}.</span>
+              <span className="ms-2 fw-bold">{a.answerLabel}.</span>
               <input
                 type="text"
                 className="form-control ms-2"

@@ -19,6 +19,8 @@ const routes = {
   createTestWithQuestions: '/admin/create-test-with-questions',
   createTestQuestionBank: '/admin/create-test-question-bank',
   unifiedCreateQuestion: '/admin/unified-create-question',
+  premiumBulkQuestion: '/admin/premium-bulk-question',
+  bulkPassageGroup: '/admin/bulk-passage-group',
 
 
 

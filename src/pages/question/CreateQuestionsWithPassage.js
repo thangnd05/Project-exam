@@ -22,10 +22,10 @@ const CreateQuestionsWithPassage = () => {
     questionType: 'MCQ',
     questionText: '',
     options: [
-      { label: 'A', content: '', isCorrect: false },
-      { label: 'B', content: '', isCorrect: false },
-      { label: 'C', content: '', isCorrect: false },
-      { label: 'D', content: '', isCorrect: false },
+      { answerLabel: 'A', content: '', isCorrect: false },
+      { answerLabel: 'B', content: '', isCorrect: false },
+      { answerLabel: 'C', content: '', isCorrect: false },
+      { answerLabel: 'D', content: '', isCorrect: false },
     ],
   };
 
@@ -127,7 +127,7 @@ const CreateQuestionsWithPassage = () => {
           questionType: q.questionType,
           questionText: q.questionText,
           answers: q.options.map(opt => ({
-            label: opt.label,
+            answerLabel: opt.answerLabel,
             answerText: opt.content,
             isCorrect: opt.isCorrect,
           })),
@@ -306,7 +306,7 @@ const CreateQuestionsWithPassage = () => {
                         handleOptionChange(qIndex, oIndex, 'isCorrect', e.target.checked)
                       }
                     />
-                    <span className="mx-2">{o.label}</span>
+                    <span className="mx-2">{o.answerLabel || o.label}</span>
                     <input
                       type="text"
                       className={cx('input-modern')}
@@ -314,6 +314,7 @@ const CreateQuestionsWithPassage = () => {
                       onChange={e =>
                         handleOptionChange(qIndex, oIndex, 'content', e.target.value)
                       }
+                      placeholder={`Đáp án ${o.answerLabel || o.label}`}
                     />
                   </Col>
                 ))}

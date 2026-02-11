@@ -8,7 +8,12 @@ import {
     IoCloudUploadOutline,
     IoDocumentsOutline,
     IoListOutline,
-    IoDocumentTextOutline
+    IoDocumentTextOutline,
+    IoMusicalNotesOutline,
+    IoSchoolOutline,
+    IoBookOutline,
+    IoLayersOutline,
+    IoCheckmarkCircleOutline
 } from 'react-icons/io5';
 
 import styles from './QuestionBankCreator.module.scss';
@@ -18,28 +23,35 @@ const cx = classNames.bind(styles);
 const MODES = {
     SINGLE: 'SINGLE',
     BULK_PASSAGE: 'BULK_PASSAGE',
-    BULK_NO_PASSAGE: 'BULK_NO_PASSAGE'
+    BULK_INDEPENDENT: 'BULK_INDEPENDENT',
+    BULK_INDEPENDENT_AUDIO: 'BULK_INDEPENDENT_AUDIO'
 };
 
 const INITIAL_ANSWER = { content: '', isCorrect: false };
 const INITIAL_QUESTION = {
     questionText: '',
-    questionType: 'SINGLE_CHOICE',
+    questionType: 'MCQ',
+    audioFile: null,
     answers: [
-        { ...INITIAL_ANSWER },
-        { ...INITIAL_ANSWER },
-        { ...INITIAL_ANSWER },
-        { ...INITIAL_ANSWER }
+        { answerLabel: 'A', ...INITIAL_ANSWER },
+        { answerLabel: 'B', ...INITIAL_ANSWER },
+        { answerLabel: 'C', ...INITIAL_ANSWER },
+        { answerLabel: 'D', ...INITIAL_ANSWER }
     ]
 };
 
 const QuestionBankCreator = () => {
     const [mode, setMode] = useState(MODES.SINGLE);
+    const [examTypes, setExamTypes] = useState([]);
+    const [examParts, setExamParts] = useState([]);
+    const [classes, setClasses] = useState([]);
+
+    const [examTypeId, setExamTypeId] = useState('');
     const [examPartId, setExamPartId] = useState('');
     const [classId, setClassId] = useState('');
     const [chapterId, setChapterId] = useState('');
 
-    // Passage state
+    // Shared state
     const [passage, setPassage] = useState({
         content: '',
         passageType: 'READING',
@@ -48,7 +60,21 @@ const QuestionBankCreator = () => {
     const [audioFile, setAudioFile] = useState(null);
 
     // Questions state
-    const [questions, setQuestions] = useState([{ ...INITIAL_QUESTION }]);
+    const [questions, setQuestions] = useState([{ ...INITIAL_QUESTION, answers: INITIAL_QUESTION.answers.map(a => ({ ...a })) }]);
+
+    // ===== Load base data =====
+    React.useEffect(() => {
+        axios.get('/api/exam-types').then(res => setExamTypes(res.data || []));
+        axios.get('/api/classes/my').then(res => setClasses(Array.isArray(res.data) ? res.data : (res.data.classes || [])));
+    }, []);
+
+    React.useEffect(() => {
+        if (!examTypeId) {
+            setExamParts([]);
+            return;
+        }
+        axios.get(`/api/exam-parts/by-exam-type/${examTypeId}`).then(res => setExamParts(res.data || []));
+    }, [examTypeId]);
 
     const handleAddQuestion = () => {
         setQuestions([...questions, { ...INITIAL_QUESTION, answers: INITIAL_QUESTION.answers.map(a => ({ ...a })) }]);
@@ -67,8 +93,8 @@ const QuestionBankCreator = () => {
 
     const handleAnswerChange = (qIndex, aIndex, field, value) => {
         const newQuestions = [...questions];
-        if (field === 'isCorrect' && newQuestions[qIndex].questionType === 'SINGLE_CHOICE') {
-            // Reset all others to false for single choice
+        if (field === 'isCorrect') {
+            // MCQ Style: only one correct
             newQuestions[qIndex].answers.forEach((ans, i) => {
                 ans.isCorrect = i === aIndex;
             });
@@ -79,59 +105,73 @@ const QuestionBankCreator = () => {
     };
 
     const handleSubmit = async () => {
+        if (!examPartId) {
+            toast.warn('Vui lòng nhập Exam Part ID');
+            return;
+        }
+
         try {
-            const baseUrl = 'http://localhost:8080/api/questions'; // Adjust accordingly
-            const token = localStorage.getItem('token');
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+            const formData = new FormData();
+            const baseUrl = '/api/questions';
+
+            const requestData = {
+                examPartId: Number(examPartId),
+                classId: classId ? Number(classId) : null,
+                chapterId: chapterId ? Number(chapterId) : null,
             };
 
             if (mode === MODES.SINGLE) {
                 const payload = {
-                    examPartId,
-                    classId,
-                    chapterId,
-                    passage: passage.content || passage.mediaUrl ? passage : null,
-                    ...questions[0]
+                    ...requestData,
+                    ...questions[0],
+                    passage: (passage.content || passage.mediaUrl || audioFile) ? passage : null,
                 };
-                await axios.post(baseUrl, payload, config);
-            }
-            else if (mode === MODES.BULK_NO_PASSAGE) {
-                const payload = {
-                    examPartId,
-                    classId,
-                    chapterId,
-                    questions: questions
-                };
-                await axios.post(`${baseUrl}/bulk`, payload, config);
+                // For single with audio, we might need multipart or just post JSON if no file
+                if (audioFile) {
+                    const singleForm = new FormData();
+                    singleForm.append('request', JSON.stringify({ ...payload, passage: { ...passage, passageType: 'LISTENING' } }));
+                    singleForm.append('audio', audioFile);
+                    await axios.post(`${baseUrl}/bulk-with-passage`, singleForm); // Use bulk endpoint for consistency if has audio
+                } else {
+                    await axios.post(baseUrl, payload);
+                }
             }
             else if (mode === MODES.BULK_PASSAGE) {
-                const requestData = {
-                    examPartId,
-                    classId,
-                    chapterId,
-                    passage: passage,
-                    questions: questions
-                };
+                requestData.passage = passage;
+                requestData.questions = questions.map(q => ({
+                    questionType: q.questionType,
+                    questionText: q.questionText,
+                    answers: q.answers
+                }));
 
-                const formData = new FormData();
                 formData.append('request', JSON.stringify(requestData));
-                if (audioFile) {
-                    formData.append('audio', audioFile);
-                }
+                if (audioFile) formData.append('audio', audioFile);
+                await axios.post(`${baseUrl}/bulk-with-passage`, formData);
+            }
+            else if (mode === MODES.BULK_INDEPENDENT) {
+                requestData.questions = questions.map(q => ({
+                    questionType: q.questionType,
+                    questionText: q.questionText,
+                    answers: q.answers
+                }));
+                await axios.post(`${baseUrl}/bulk`, requestData);
+            }
+            else if (mode === MODES.BULK_INDEPENDENT_AUDIO) {
+                requestData.questions = questions.map(q => ({
+                    questionType: q.questionType,
+                    questionText: q.questionText,
+                    passage: q.audioFile ? { passageType: "LISTENING", content: "" } : null,
+                    answers: q.answers
+                }));
 
-                await axios.post(`${baseUrl}/bulk-with-passage`, formData, {
-                    ...config,
-                    headers: {
-                        ...config.headers,
-                        'Content-Type': 'multipart/form-data'
-                    }
+                formData.append('data', JSON.stringify(requestData));
+                questions.forEach(q => {
+                    if (q.audioFile) formData.append('audioFiles', q.audioFile);
                 });
+                await axios.post(`${baseUrl}/bulk-independent-with-audio`, formData);
             }
 
-            toast.success('Tạo câu hỏi thành công!');
+            toast.success('🎉 Đã lưu toàn bộ câu hỏi vào kho!');
         } catch (error) {
             console.error('Error creating questions:', error);
             toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tạo câu hỏi.');
@@ -142,8 +182,8 @@ const QuestionBankCreator = () => {
         <div className={cx('wrapper')}>
             <div className={cx('container')}>
                 <div className={cx('header')}>
-                    <h1>Kho Câu Hỏi Thông Minh</h1>
-                    <p>Hệ thống hỗ trợ tạo câu hỏi đa dạng, chuyên nghiệp</p>
+                    <h1>Premium Question Builder</h1>
+                    <p>Công cụ khởi tạo ngân hàng câu hỏi đa năng, mạnh mẽ</p>
                 </div>
 
                 <div className={cx('modeSelector')}>
@@ -157,53 +197,78 @@ const QuestionBankCreator = () => {
                         className={cx('modeBtn', { active: mode === MODES.BULK_PASSAGE })}
                         onClick={() => setMode(MODES.BULK_PASSAGE)}
                     >
-                        <IoDocumentsOutline size={18} /> Theo đoạn (Bulk)
+                        <IoDocumentsOutline size={18} /> Shared Passage
                     </button>
                     <button
-                        className={cx('modeBtn', { active: mode === MODES.BULK_NO_PASSAGE })}
-                        onClick={() => setMode(MODES.BULK_NO_PASSAGE)}
+                        className={cx('modeBtn', { active: mode === MODES.BULK_INDEPENDENT_AUDIO })}
+                        onClick={() => setMode(MODES.BULK_INDEPENDENT_AUDIO)}
                     >
-                        <IoListOutline size={18} /> Độc lập (Bulk)
+                        <IoMusicalNotesOutline size={18} /> Multi-Audio
+                    </button>
+                    <button
+                        className={cx('modeBtn', { active: mode === MODES.BULK_INDEPENDENT })}
+                        onClick={() => setMode(MODES.BULK_INDEPENDENT)}
+                    >
+                        <IoListOutline size={18} /> Bulk Text
                     </button>
                 </div>
 
                 {/* Common Info */}
                 <div className={cx('formSection')}>
-                    <h3>Thông tin chung</h3>
+                    <h3><IoSchoolOutline /> Thông tin chung</h3>
                     <div className={cx('answerGrid')}>
                         <div className={cx('inputGroup')}>
-                            <label>Mã phần thi (Exam Part ID)</label>
-                            <input
-                                type="number"
-                                value={examPartId}
-                                onChange={(e) => setExamPartId(e.target.value)}
-                                placeholder="Ví dụ: 1"
-                            />
+                            <label>Loại kỳ thi</label>
+                            <select
+                                value={examTypeId}
+                                onChange={(e) => setExamTypeId(e.target.value)}
+                            >
+                                <option value="">-- Chọn kỳ thi --</option>
+                                {examTypes.map(et => (
+                                    <option key={et.examTypeId} value={et.examTypeId}>{et.name}</option>
+                                ))}
+                            </select>
                         </div>
                         <div className={cx('inputGroup')}>
-                            <label>Lớp (Class ID)</label>
-                            <input
-                                type="number"
+                            <label>Phần thi (Part) *</label>
+                            <select
+                                value={examPartId}
+                                onChange={(e) => setExamPartId(e.target.value)}
+                                disabled={!examTypeId}
+                            >
+                                <option value="">-- Chọn phần thi --</option>
+                                {examParts.map(p => (
+                                    <option key={p.examPartId} value={p.examPartId}>{p.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className={cx('inputGroup')}>
+                            <label>Lớp học (Tuỳ chọn)</label>
+                            <select
                                 value={classId}
                                 onChange={(e) => setClassId(e.target.value)}
-                                placeholder="Ví dụ: 10"
-                            />
+                            >
+                                <option value="">-- Không chọn --</option>
+                                {classes.map(c => (
+                                    <option key={c.classId} value={c.classId}>{c.className}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 </div>
 
-                {/* Passage Section */}
+                {/* Shared Passage Section */}
                 {(mode === MODES.SINGLE || mode === MODES.BULK_PASSAGE) && (
                     <div className={cx('formSection')}>
-                        <h3>Đoạn văn / Nội dung (Passage)</h3>
+                        <h3><IoBookOutline /> Shared Passage (Nội dung chung)</h3>
                         <div className={cx('inputGroup')}>
                             <label>Loại nội dung</label>
                             <select
                                 value={passage.passageType}
                                 onChange={(e) => setPassage({ ...passage, passageType: e.target.value })}
                             >
-                                <option value="READING">Đọc hiểu (Reading)</option>
-                                <option value="LISTENING">Nghe (Listening)</option>
+                                <option value="READING">Văn bản (Reading)</option>
+                                <option value="LISTENING">Âm thanh (Listening)</option>
                             </select>
                         </div>
                         {passage.passageType === 'READING' ? (
@@ -212,34 +277,31 @@ const QuestionBankCreator = () => {
                                 <textarea
                                     value={passage.content}
                                     onChange={(e) => setPassage({ ...passage, content: e.target.value })}
-                                    placeholder="Nhập nội dung đoạn văn..."
+                                    placeholder="Nhập nội dung đoạn văn bài đọc..."
                                 />
                             </div>
                         ) : (
                             <div className={cx('inputGroup')}>
-                                <label>File âm thanh (Audio)</label>
+                                <label>Tải lên File Audio chung</label>
                                 <input
                                     type="file"
                                     accept="audio/*"
                                     onChange={(e) => setAudioFile(e.target.files[0])}
+                                    className={cx('input-modern')}
                                 />
+                                {audioFile && (
+                                    <div className="mt-2">
+                                        <audio controls src={URL.createObjectURL(audioFile)} style={{ width: '100%' }} />
+                                    </div>
+                                )}
                             </div>
                         )}
-                        <div className={cx('inputGroup')}>
-                            <label>Media URL (Nếu có)</label>
-                            <input
-                                type="text"
-                                value={passage.mediaUrl}
-                                onChange={(e) => setPassage({ ...passage, mediaUrl: e.target.value })}
-                                placeholder="https://..."
-                            />
-                        </div>
                     </div>
                 )}
 
                 {/* Questions Section */}
                 <div className={cx('formSection')}>
-                    <h3>Danh sách câu hỏi</h3>
+                    <h3><IoLayersOutline /> Danh sách câu hỏi ({questions.length})</h3>
                     {questions.map((q, qIndex) => (
                         <div key={qIndex} className={cx('questionItem')}>
                             {questions.length > 1 && (
@@ -248,28 +310,52 @@ const QuestionBankCreator = () => {
                                 </button>
                             )}
                             <div className={cx('inputGroup')}>
-                                <label>Câu hỏi {qIndex + 1}</label>
-                                <input
-                                    type="text"
+                                <label className="fw-bold">Câu hỏi {qIndex + 1}</label>
+                                <textarea
+                                    className={cx('input-modern')}
+                                    rows={2}
                                     value={q.questionText}
                                     onChange={(e) => handleQuestionChange(qIndex, 'questionText', e.target.value)}
                                     placeholder="Nhập nội dung câu hỏi..."
                                 />
                             </div>
+
+                            {/* Per-question Audio for Independent mode */}
+                            {mode === MODES.BULK_INDEPENDENT_AUDIO && (
+                                <div className="mb-3 p-3 bg-light rounded-3 border">
+                                    <label className="fw-bold mb-2 d-flex align-items-center gap-2">
+                                        <IoMusicalNotesOutline className="text-primary" /> Audio riêng cho câu này
+                                    </label>
+                                    <input
+                                        type="file"
+                                        accept="audio/*"
+                                        onChange={(e) => handleQuestionChange(qIndex, 'audioFile', e.target.files[0])}
+                                    />
+                                    {q.audioFile && (
+                                        <div className="mt-2">
+                                            <audio controls src={URL.createObjectURL(q.audioFile)} style={{ width: '100%' }} />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             <div className={cx('answerGrid')}>
                                 {q.answers.map((a, aIndex) => (
                                     <div key={aIndex} className={cx('answerItem', { correct: a.isCorrect })}>
                                         <input
-                                            type="checkbox"
+                                            type="radio"
+                                            name={`q-${qIndex}`}
                                             className={cx('checkbox')}
                                             checked={a.isCorrect}
                                             onChange={(e) => handleAnswerChange(qIndex, aIndex, 'isCorrect', e.target.checked)}
                                         />
+                                        <b className="ms-1">{a.answerLabel || a.label}.</b>
                                         <input
                                             type="text"
+                                            className={cx('input-modern')}
                                             value={a.content}
                                             onChange={(e) => handleAnswerChange(qIndex, aIndex, 'content', e.target.value)}
-                                            placeholder={`Đáp án ${String.fromCharCode(65 + aIndex)}`}
+                                            placeholder={`Đáp án ${a.answerLabel || a.label}`}
                                         />
                                     </div>
                                 ))}
@@ -278,15 +364,16 @@ const QuestionBankCreator = () => {
                     ))}
 
                     {(mode !== MODES.SINGLE) && (
-                        <button className={cx('btnSecondary')} onClick={handleAddQuestion} style={{ width: '100%', marginTop: '12px' }}>
-                            <IoAddOutline size={20} /> Thêm câu hỏi
+                        <button className={cx('btnSecondary')} onClick={handleAddQuestion} style={{ width: '100%', marginTop: '12px', borderStyle: 'dashed' }}>
+                            <IoAddOutline size={20} /> Thêm câu hỏi tiếp theo
                         </button>
                     )}
                 </div>
 
                 <div className={cx('btnActions')}>
-                    <button className={cx('btnPrimary')} onClick={handleSubmit}>
-                        <IoCloudUploadOutline size={22} /> Lưu vào kho câu hỏi
+                    <button className={cx('btnPrimary')} onClick={handleSubmit} style={{ height: '60px', borderRadius: '18px' }}>
+                        <IoCheckmarkCircleOutline size={26} />
+                        Xác nhận & Lưu {questions.length} câu hỏi vào kho
                     </button>
                 </div>
             </div>

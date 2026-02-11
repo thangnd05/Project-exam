@@ -24,10 +24,10 @@ const TestCreationForm = ({ user }) => {
     questionType: 'MCQ',
     questionText: '',
     options: [
-      { label: 'A', content: '', isCorrect: false },
-      { label: 'B', content: '', isCorrect: false },
-      { label: 'C', content: '', isCorrect: false },
-      { label: 'D', content: '', isCorrect: false },
+      { answerLabel: 'A', content: '', isCorrect: false },
+      { answerLabel: 'B', content: '', isCorrect: false },
+      { answerLabel: 'C', content: '', isCorrect: false },
+      { answerLabel: 'D', content: '', isCorrect: false },
     ],
   };
 
@@ -161,7 +161,7 @@ const TestCreationForm = ({ user }) => {
           questionType: q.questionType,
           questionText: q.questionText,
           answers: q.options.map((opt) => ({
-            label: opt.label,
+            answerLabel: opt.answerLabel,
             answerText: opt.content,
             isCorrect: opt.isCorrect,
           })),
@@ -307,7 +307,7 @@ const TestCreationForm = ({ user }) => {
                     {q.options.map((o, oIndex) => (
                       <Col md={6} key={oIndex} className={cx('option-line')}>
                         <input type="checkbox" className={cx('check-custom')} checked={o.isCorrect} onChange={(e) => handleOptionChange(partIndex, qIndex, oIndex, 'isCorrect', e.target.checked)} />
-                        <span className={cx('label-tag')}>{o.label}.</span>
+                        <span className={cx('label-tag')}>{o.answerLabel || o.label}.</span>
                         <input type="text" className={cx('input-modern')} value={o.content} onChange={(e) => handleOptionChange(partIndex, qIndex, oIndex, 'content', e.target.value)} placeholder="Nhập đáp án..." />
                       </Col>
                     ))}

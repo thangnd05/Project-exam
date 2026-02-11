@@ -9,6 +9,7 @@ import {
     IoCheckmarkCircleOutline,
     IoLayersOutline,
     IoSchoolOutline,
+    IoMusicalNotesOutline
 } from 'react-icons/io5';
 
 import styles from '../CreateQuestionsWithPassage.module.scss';
@@ -17,6 +18,7 @@ const cx = classNames.bind(styles);
 const emptyQuestion = {
     questionType: 'MCQ',
     questionText: '',
+    audioFile: null,
     options: [
         { answerLabel: 'A', content: '', isCorrect: false },
         { answerLabel: 'B', content: '', isCorrect: false },
@@ -25,7 +27,7 @@ const emptyQuestion = {
     ],
 };
 
-const CreateBulkQuestionsToBank = () => {
+const PremiumBulkQuestionCreator = () => {
     const [examTypes, setExamTypes] = useState([]);
     const [examParts, setExamParts] = useState([]);
     const [classes, setClasses] = useState([]);
@@ -88,6 +90,8 @@ const CreateBulkQuestionsToBank = () => {
         setStatus(null);
 
         try {
+            const formData = new FormData();
+
             const payload = {
                 examPartId: Number(form.examPartId),
                 classId: form.classId ? Number(form.classId) : null,
@@ -95,6 +99,7 @@ const CreateBulkQuestionsToBank = () => {
                 questions: form.questions.map(q => ({
                     questionType: q.questionType,
                     questionText: q.questionText,
+                    passage: q.audioFile ? { passageType: "LISTENING", content: "" } : null,
                     answers: q.options.map(o => ({
                         answerLabel: o.answerLabel,
                         answerText: o.content,
@@ -103,7 +108,19 @@ const CreateBulkQuestionsToBank = () => {
                 })),
             };
 
-            await axios.post('/api/questions/bulk', payload);
+            formData.append("data", JSON.stringify(payload));
+
+            // Append audio files
+            form.questions.forEach((q, index) => {
+                if (q.audioFile) {
+                    formData.append("audioFiles", q.audioFile);
+                }
+            });
+
+            await axios.post('/api/questions/bulk-independent-with-audio', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
             setStatus('SUCCESS');
             toast.success('🎉 Đã lưu câu hỏi vào kho!');
         } catch (err) {
@@ -119,19 +136,19 @@ const CreateBulkQuestionsToBank = () => {
         <div className={cx('wrapper')}>
             <Container>
                 <div className={cx('header')}>
-                    <h1>Tạo nhiều câu hỏi vào kho</h1>
-                    <p>Tạo nhanh nhiều câu hỏi độc lập (không passage)</p>
+                    <h1>Premium Bulk Question Creator</h1>
+                    <p>Hệ thống tạo câu hỏi hàng loạt hỗ trợ Audio và Media chuyên nghiệp</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     {/* ===== Classification ===== */}
                     <div className={cx('form-card')}>
                         <div className={cx('section-title')}>
-                            <IoSchoolOutline /> Phân loại
+                            <IoSchoolOutline /> Cấu trúc & Phân loại
                         </div>
                         <Row className="g-4">
                             <Col md={4}>
-                                <label>Loại kỳ thi</label>
+                                <label className="fw-bold mb-1">Loại kỳ thi</label>
                                 <select
                                     className={cx('input-modern')}
                                     value={form.examTypeId}
@@ -149,7 +166,7 @@ const CreateBulkQuestionsToBank = () => {
                             </Col>
 
                             <Col md={4}>
-                                <label>Phần thi</label>
+                                <label className="fw-bold mb-1">Phần thi (Part)</label>
                                 <select
                                     className={cx('input-modern')}
                                     value={form.examPartId}
@@ -167,7 +184,7 @@ const CreateBulkQuestionsToBank = () => {
                             </Col>
 
                             <Col md={4}>
-                                <label>Lớp (tuỳ chọn)</label>
+                                <label className="fw-bold mb-1">Lớp (Tuỳ chọn)</label>
                                 <select
                                     className={cx('input-modern')}
                                     value={form.classId}
@@ -188,38 +205,61 @@ const CreateBulkQuestionsToBank = () => {
 
                     {/* ===== Questions ===== */}
                     <div className={cx('section-title')}>
-                        <IoLayersOutline /> Danh sách câu hỏi
+                        <IoLayersOutline /> Danh sách câu hỏi ({form.questions.length})
                     </div>
 
                     {form.questions.map((q, qIndex) => (
                         <div key={qIndex} className={cx('question-card')}>
                             <div className="d-flex justify-content-between mb-3">
-                                <strong>Câu {qIndex + 1}</strong>
+                                <span className="badge bg-primary fs-6">CÂU HỎI #{qIndex + 1}</span>
                                 <button
                                     type="button"
-                                    className="btn btn-link text-danger"
+                                    className="btn btn-link text-danger p-0"
                                     onClick={() => removeQuestion(qIndex)}
                                 >
-                                    <IoTrashOutline />
+                                    <IoTrashOutline size={22} />
                                 </button>
                             </div>
 
                             <textarea
                                 className={cx('input-modern', 'mb-3')}
                                 rows={2}
-                                placeholder="Nội dung câu hỏi"
+                                placeholder="Nhập nội dung câu hỏi..."
                                 value={q.questionText}
                                 onChange={e =>
                                     updateQuestion(qIndex, 'questionText', e.target.value)
                                 }
                             />
 
+                            {/* Audio Upload */}
+                            <div className="mb-4 p-3 bg-light rounded-3 border">
+                                <label className="fw-bold mb-2 d-flex align-items-center gap-2">
+                                    <IoMusicalNotesOutline size={20} className="text-primary" />
+                                    Tải lên Audio cho câu hỏi này
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    className={cx('input-modern')}
+                                    onChange={e =>
+                                        updateQuestion(qIndex, 'audioFile', e.target.files[0])
+                                    }
+                                />
+                                {q.audioFile && (
+                                    <div className="mt-3">
+                                        <audio controls style={{ width: '100%' }} src={URL.createObjectURL(q.audioFile)} />
+                                    </div>
+                                )}
+                            </div>
+
                             <Row className="g-3">
                                 {q.options.map((o, oIndex) => (
                                     <Col md={6} key={oIndex}>
-                                        <div className="d-flex align-items-center gap-2">
+                                        <div className={cx('option-row', 'd-flex align-items-center gap-3')}>
                                             <input
                                                 type="checkbox"
+                                                className={cx('check-box')}
+                                                style={{ width: '20px', height: '20px' }}
                                                 checked={o.isCorrect}
                                                 onChange={e =>
                                                     updateOption(
@@ -230,11 +270,11 @@ const CreateBulkQuestionsToBank = () => {
                                                     )
                                                 }
                                             />
-                                            <strong>{o.answerLabel || o.label}</strong>
+                                            <b className="fs-5">{o.answerLabel || o.label}.</b>
                                             <input
                                                 type="text"
                                                 className={cx('input-modern')}
-                                                placeholder="Đáp án"
+                                                placeholder={`Đáp án ${o.answerLabel || o.label}`}
                                                 value={o.content}
                                                 onChange={e =>
                                                     updateOption(
@@ -252,42 +292,50 @@ const CreateBulkQuestionsToBank = () => {
                         </div>
                     ))}
 
-                    <button
-                        type="button"
-                        className={cx('btn-add-ghost')}
-                        onClick={addQuestion}
-                    >
-                        <IoAdd /> Thêm câu hỏi
-                    </button>
+                    <div className="mt-4 mb-5">
+                        <button
+                            type="button"
+                            className={cx('btn-add-ghost')}
+                            onClick={addQuestion}
+                            style={{ width: '100%', borderStyle: 'dashed' }}
+                        >
+                            <IoAdd size={24} /> Thêm câu hỏi mới
+                        </button>
+                    </div>
 
                     {status === 'SUCCESS' && (
-                        <Alert variant="success" className="mt-4">
-                            🎉 Đã lưu câu hỏi vào kho!
+                        <Alert variant="success" className="mt-4 text-center py-3">
+                            <IoCheckmarkCircleOutline size={24} className="me-2" />
+                            <b>Thành công!</b> Tất cả câu hỏi đã được lưu vào kho dữ liệu.
                         </Alert>
                     )}
                     {status === 'ERROR' && (
-                        <Alert variant="danger" className="mt-4">
-                            ❌ Có lỗi xảy ra, vui lòng thử lại
+                        <Alert variant="danger" className="mt-4 text-center py-3">
+                            ❌ <b>Lỗi!</b> Có sự cố xảy ra khi lưu dữ liệu. Vui lòng kiểm tra lại.
                         </Alert>
                     )}
 
-                    <button
-                        type="submit"
-                        className={cx('btn-submit-large')}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <Spinner size="sm" />
-                        ) : (
-                            <>
-                                <IoCheckmarkCircleOutline size={22} /> Lưu vào kho
-                            </>
-                        )}
-                    </button>
+                    <div className="sticky-bottom bg-white py-3 border-top mt-5" style={{ zIndex: 100 }}>
+                        <button
+                            type="submit"
+                            className={cx('btn-submit-large')}
+                            disabled={loading}
+                            style={{ width: '100%', height: '60px', fontSize: '1.8rem' }}
+                        >
+                            {loading ? (
+                                <Spinner animation="border" size="sm" />
+                            ) : (
+                                <>
+                                    <IoCheckmarkCircleOutline size={26} />
+                                    Xác nhận & Lưu {form.questions.length} câu hỏi vào kho
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </form>
             </Container>
         </div>
     );
 };
 
-export default CreateBulkQuestionsToBank;
+export default PremiumBulkQuestionCreator;

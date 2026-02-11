@@ -6,10 +6,10 @@ const emptyQuestion = {
     questionType: "MCQ",
     audioFile: null,
     answers: [
-        { label: "A", answerText: "", isCorrect: false },
-        { label: "B", answerText: "", isCorrect: false },
-        { label: "C", answerText: "", isCorrect: false },
-        { label: "D", answerText: "", isCorrect: false },
+        { answerLabel: "A", answerText: "", isCorrect: false },
+        { answerLabel: "B", answerText: "", isCorrect: false },
+        { answerLabel: "C", answerText: "", isCorrect: false },
+        { answerLabel: "D", answerText: "", isCorrect: false },
     ],
 };
 

@@ -344,10 +344,11 @@ const CreateTestModal = ({
                                                     updateAnswer(i, aIndex, "isCorrect", e.target.checked)
                                                 }
                                             />
-                                            <span className="ms-2 fw-bold">{ans.label}.</span>
+                                            <span className="ms-2 fw-bold">{ans.answerLabel}.</span>
                                             <input
                                                 className={cx("inputModern", "ms-2")}
                                                 value={ans.answerText}
+                                                placeholder={`Đáp án ${ans.answerLabel || ans.label}`}
                                                 onChange={(e) =>
                                                     updateAnswer(i, aIndex, "answerText", e.target.value)
                                                 }
