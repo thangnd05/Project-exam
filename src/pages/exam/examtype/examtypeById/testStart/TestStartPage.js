@@ -4,17 +4,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
-  IoTimeOutline,
   IoSendOutline,
-  IoInformationCircleOutline,
   IoLockClosedOutline,
-  IoCheckmarkCircleOutline,
   IoVolumeHighOutline,
   IoAlertCircleOutline,
-  IoChevronBackOutline
 } from 'react-icons/io5';
 
 import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
+import TestStartHeader from './TestStartHeader';
+import TestStartDashboard from './TestStartDashboard';
+import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
 import styles from './TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -30,6 +29,7 @@ function TestStartPage() {
   const [preCountdown, setPreCountdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState('loading');
+  const [showInfoPanel, setShowInfoPanel] = useState(false);
 
   const getFullMediaUrl = (url) => {
     if (!url) return null;
@@ -338,98 +338,19 @@ function TestStartPage() {
 
   return (
     <div className={cx('wrapper')}>
-      {/* --- Premium Sticky Header --- */}
-      <div className={cx('header')}>
-        <Container>
-          <div className={cx('header-inner')}>
-            <div className={cx('header-left')}>
-              <button className={cx('btn-back')} onClick={() => navigate(-1)} title="Quay lại">
-                <IoChevronBackOutline />
-              </button>
-              <div className={cx('test-info')}>
-                <div className={cx('title-wrapper')}>
-                  <span className={cx('title-prefix')}>Đề thi:</span>
-                  <h2>{test.title}</h2>
-                </div>
-                <div className={cx('test-meta')}>
-                  <span>{test.testType || 'Kiểm tra'}</span>
-                  <span className={cx('separator')}>•</span>
-                  <span>{allQuestions.length} câu hỏi</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={cx('header-right')}>
-              <div className={cx('stats-item')}>
-                <div className={cx('stats-label')}>HOÀN THÀNH</div>
-                <div className={cx('stats-value')}>
-                  <IoCheckmarkCircleOutline className={cx('icon')} />
-                  <span>{Object.keys(userAnswers).length}/{allQuestions.length}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Container>
-
-        {/* Dynamic Progress Bar */}
-        <div className={cx('progress-container')}>
-          <div
-            className={cx('progress-bar')}
-            style={{
-              width: `${allQuestions.length > 0 ? (Object.keys(userAnswers).length / allQuestions.length) * 100 : 0}%`
-            }}
-          />
-        </div>
-      </div>
+      <TestStartHeader
+        testTitle={test.title}
+        testType={test.testType}
+        totalQuestions={allQuestions.length}
+        completedCount={Object.keys(userAnswers).length}
+        timeLeft={timeLeft}
+        formatTime={formatTime}
+        onBack={() => navigate(-1)}
+      />
 
       <Container className={cx('content')}>
         <Row>
-          {/* Sidebar Question Dashboard */}
-          <Col lg={3}>
-            <div className={cx('dashboard')}>
-              <div className={cx('dashboard-card')}>
-                <div className={cx('dashboard-timer')}>
-                  <div className={cx('timer-label')}>THỜI GIAN CÒN LẠI</div>
-                  <div className={cx('timer-value')}>
-                    <IoTimeOutline className={cx('timer-icon')} />
-                    <span>{formatTime(timeLeft)}</span>
-                  </div>
-                </div>
-
-                <div className={cx('dashboard-header')}>
-                  <IoInformationCircleOutline />
-                  <span>Danh sách câu hỏi</span>
-                </div>
-                <div className={cx('question-grid')}>
-                  {allQuestions.map((q, idx) => {
-                    const isAnswered = !!userAnswers[q.questionId]?.selectedAnswerId || !!userAnswers[q.questionId]?.answerText;
-                    return (
-                      <button
-                        key={q.questionId}
-                        className={cx('q-nav-item', { answered: isAnswered })}
-                        onClick={() => scrollToQuestion(q.questionId)}
-                      >
-                        {idx + 1}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className={cx('dashboard-footer')}>
-                  <div className={cx('status-item')}>
-                    <span className={cx('dot', 'answered')}></span>
-                    <span>Đã làm</span>
-                  </div>
-                  <div className={cx('status-item')}>
-                    <span className={cx('dot')}></span>
-                    <span>Chưa làm</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Col>
-
-          {/* Main Question List */}
-          <Col lg={9}>
+          <Col xs={12}>
             {test.parts?.map((part, i) => (
               <div key={part.testPartId} className={cx('part-section')}>
                 <h3>Phần {i + 1}: {part.partName || 'Luyện tập'}</h3>
@@ -498,18 +419,44 @@ function TestStartPage() {
         </Row>
       </Container>
 
-      {/* --- Fixed Footer Action --- */}
+      {/* --- Footer: nút xem thời gian & câu hỏi + Nộp bài --- */}
       <div className={cx('footer-actions')}>
-        <Container>
-          <button
-            className={cx('btn-submit')}
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? <Spinner animation="border" size="sm" /> : <IoSendOutline />}
-            {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài thi'}
-          </button>
-        </Container>
+        {showInfoPanel && (
+          <div className={cx('footer-panel')}>
+            <TestStartDashboard
+              timeLeft={timeLeft}
+              formatTime={formatTime}
+              allQuestions={allQuestions}
+              userAnswers={userAnswers}
+              onScrollToQuestion={(id) => {
+                scrollToQuestion(id);
+                setShowInfoPanel(false);
+              }}
+            />
+          </div>
+        )}
+        <div className={cx('footer-buttons')}>
+          <Container className={cx('footer-buttons-inner')}>
+            <button
+              type="button"
+              className={cx('btn-toggle-info', { active: showInfoPanel })}
+              onClick={() => setShowInfoPanel((v) => !v)}
+              aria-expanded={showInfoPanel}
+              aria-label={showInfoPanel ? 'Ẩn thời gian và danh sách câu' : 'Xem thời gian và danh sách câu'}
+            >
+              {showInfoPanel ? <IoCloseOutline size={22} /> : <IoListOutline size={22} />}
+              <span>{showInfoPanel ? 'Ẩn' : 'Thời gian & Câu hỏi'}</span>
+            </button>
+            <button
+              className={cx('btn-submit')}
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? <Spinner animation="border" size="sm" /> : <IoSendOutline />}
+              {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài thi'}
+            </button>
+          </Container>
+        </div>
       </div>
     </div>
   );

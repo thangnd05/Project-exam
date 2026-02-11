@@ -21,18 +21,28 @@
   }
 }
 
-/* --- Premium Floating Header --- */
+/* --- Premium Floating Header (sticky khi scroll) --- */
 .header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  padding: 16px 0; // Slightly more padding for breathability
-  background: rgba(255, 255, 255, 0.9);
+  padding: 16px 0;
+  padding-bottom: 20px;
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid rgba(226, 232, 240, 0.6);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
   transition: all 0.3s ease;
+}
+
+.stats-timer .stats-label {
+  color: #e11d48;
+}
+
+.stats-timer .stats-time-value,
+.stats-timer .stats-time-value .icon {
+  color: #e11d48;
 }
 
 .header-inner {
@@ -159,6 +169,12 @@
     }
   }
 }
+
+/* Dashboard dùng trong footer panel (không còn sidebar) */
+.dashboard {
+  width: 100%;
+}
+
 
 .dashboard-timer {
   background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
@@ -326,10 +342,14 @@
 
   .passage-image {
     max-width: 100%;
+    max-height: 420px;
+    width: auto;
     height: auto;
+    object-fit: contain;
     border-radius: var(--radius-md, 8px);
     display: block;
     margin-bottom: 16px;
+    cursor: pointer;
   }
 
   .passage-content {
@@ -439,41 +459,117 @@
   min-height: 150px;
 }
 
-/* --- Footer Actions --- */
+/* --- Footer: panel thời gian & câu hỏi + nút Nộp bài --- */
 .footer-actions {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background: white;
-  padding: 20px 0;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
   border-top: 2px solid #e2e8f0;
   z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
 
-  .btn-submit {
-    background: var(--primary-gradient);
-    color: white;
-    border: none;
-    padding: 15px 40px;
-    border-radius: 50px;
-    font-weight: 800;
-    font-size: 1.8rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-left: auto;
-    transition: all 0.3s;
+.footer-panel {
+  padding: 16px 0;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+  max-height: 320px;
+  overflow-y: auto;
 
-    &:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 97, 242, 0.3);
-    }
+  .dashboard {
+    margin: 0;
+  }
 
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+  .dashboard-card {
+    margin: 0 auto;
+    max-width: 560px;
+    padding: 16px 20px;
+  }
+
+  .dashboard-timer {
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+
+  .dashboard-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+
+  .question-grid {
+    margin-bottom: 12px;
+  }
+
+  .dashboard-footer {
+    padding-top: 10px;
+  }
+}
+
+.footer-buttons {
+  padding: 16px 0 20px;
+}
+
+.footer-buttons-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-toggle-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #64748b;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #f0f9ff;
+  }
+
+  &.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #eff6ff;
+  }
+}
+
+.footer-actions .btn-submit {
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 97, 242, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 

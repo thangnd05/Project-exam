@@ -8,6 +8,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden; /* Tránh scroll ngang do blob nền, không chặn sticky */
 }
 
 /* ============================= */
@@ -27,7 +28,7 @@
       #f0f9ff);
 
   position: relative;
-  overflow: hidden;
+  /* Không dùng overflow: hidden để position: sticky hoạt động (header/sidebar trang thi) */
 }
 
 /* ============================= */
