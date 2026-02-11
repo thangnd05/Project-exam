@@ -14,6 +14,7 @@ import {
   IoChevronBackOutline
 } from 'react-icons/io5';
 
+import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
 import styles from './TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -38,6 +39,51 @@ function TestStartPage() {
     return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
   };
 
+  const hasMediaList = (p) => {
+    const list = p?.passageMedias ?? p?.passageMediaList ?? p?.passage_media;
+    return Array.isArray(list) && list.length > 0;
+  };
+
+  const enrichTestWithPassageMedia = async (testData) => {
+    const parts = testData.parts || [];
+    const passageIdsToFetch = new Set();
+    parts.forEach((part) => {
+      const p = part.passage;
+      const pid = p?.passageId ?? p?.passage_id;
+      if (pid && !hasMediaList(p)) passageIdsToFetch.add(pid);
+      (part.questions || []).forEach((q) => {
+        const qp = q.passage;
+        const qpid = qp?.passageId ?? qp?.passage_id ?? q.passageId ?? q.passage_id;
+        if (qpid && !hasMediaList(qp)) passageIdsToFetch.add(qpid);
+      });
+    });
+    if (passageIdsToFetch.size === 0) return testData;
+
+    const ids = [...passageIdsToFetch];
+    const results = await Promise.all(ids.map((id) => getPassageMediaByPassageId(id).catch(() => [])));
+    const mediaByPassageId = {};
+    ids.forEach((id, i) => { mediaByPassageId[id] = Array.isArray(results[i]) ? results[i] : []; });
+
+    const enrichedParts = parts.map((part) => {
+      const partCopy = { ...part };
+      const ppid = partCopy.passage?.passageId ?? partCopy.passage?.passage_id;
+      if (ppid && mediaByPassageId[ppid]) {
+        partCopy.passage = { ...partCopy.passage, passageMedias: mediaByPassageId[ppid] };
+      }
+      partCopy.questions = (part.questions || []).map((q) => {
+        const qCopy = { ...q };
+        const qpid = qCopy.passage?.passageId ?? qCopy.passage?.passage_id ?? qCopy.passageId ?? qCopy.passage_id;
+        if (qpid && mediaByPassageId[qpid]) {
+          const passage = qCopy.passage ? { ...qCopy.passage, passageMedias: mediaByPassageId[qpid] } : { passageId: qpid, passageMedias: mediaByPassageId[qpid] };
+          qCopy.passage = passage;
+        }
+        return qCopy;
+      });
+      return partCopy;
+    });
+    return { ...testData, parts: enrichedParts };
+  };
+
   useEffect(() => {
     if (!testId) return;
     const savedState = sessionStorage.getItem(`userTestState-${testId}`);
@@ -57,9 +103,10 @@ function TestStartPage() {
     }
 
     axios.get(`/api/tests/usertest/${testId}`)
-      .then((res) => {
+      .then(async (res) => {
         const testData = { ...res.data, parts: res.data.parts || [] };
-        setTest(testData);
+        const enriched = await enrichTestWithPassageMedia(testData);
+        setTest(enriched);
 
         if (testData.canDoTest === false) {
           setStatus('no-attempts');
@@ -197,27 +244,57 @@ function TestStartPage() {
   };
 
   const renderPassage = (passage, fallbackObj) => {
-    // Check both objects for content and media URLs (camelCase and snake_case)
-    const mUrl = passage?.mediaUrl || passage?.media_url || fallbackObj?.mediaUrl || fallbackObj?.media_url || fallbackObj?.audioUrl || fallbackObj?.audio_url || fallbackObj?.media || fallbackObj?.audio || fallbackObj?.passageMediaUrl;
-    const content = passage?.content || passage?.passage_content || fallbackObj?.content || fallbackObj?.passage_content;
-    const pType = passage?.passageType || passage?.passage_type || (mUrl ? 'LISTENING' : 'READING');
+    const content = passage?.content ?? passage?.passage_content ?? fallbackObj?.content ?? fallbackObj?.passage_content;
+    const pType = passage?.passageType ?? passage?.passage_type ?? 'READING';
 
-    if (!content && !mUrl) return null;
+    // Bảng trung gian passage_media: passage có danh sách media (nhiều audio/ảnh)
+    const mediaList = passage?.passageMediaList ?? passage?.passageMedias ?? passage?.mediaList ?? passage?.passage_media ?? [];
+    const hasMediaList = Array.isArray(mediaList) && mediaList.length > 0;
+
+    // Backward compat: một media trực tiếp trên passage (cũ)
+    const singleMediaUrl = passage?.mediaUrl ?? passage?.media_url ?? fallbackObj?.mediaUrl ?? fallbackObj?.media_url ?? fallbackObj?.audioUrl ?? fallbackObj?.audio_url ?? fallbackObj?.passageMediaUrl;
+
+    const hasContent = !!content;
+    const hasAnyMedia = hasMediaList || !!singleMediaUrl;
+    if (!hasContent && !hasAnyMedia) return null;
+
     return (
       <div className={cx('passage-box')}>
-        {(pType === 'LISTENING' || pType === 'listening') && mUrl && (
+        {hasMediaList && mediaList.map((m, idx) => {
+          const url = m.mediaUrl ?? m.media_url;
+          if (!url) return null;
+          const type = (m.mediaType ?? m.media_type ?? '').toUpperCase();
+          if (type === 'AUDIO') {
+            return (
+              <div key={idx} className="mb-3">
+                <div className="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
+                  <IoVolumeHighOutline size={24} />
+                  <span>NGHE {mediaList.filter(x => (x.mediaType ?? x.media_type ?? '').toUpperCase() === 'AUDIO').length > 1 ? `(${idx + 1})` : 'ĐOẠN HỘI THOẠI'}</span>
+                </div>
+                <audio controls src={getFullMediaUrl(url)} className={cx('audio-player')} />
+              </div>
+            );
+          }
+          if (type === 'IMAGE') {
+            return (
+              <div key={idx} className="mb-3">
+                <img src={getFullMediaUrl(url)} alt={`Passage ${idx + 1}`} className={cx('passage-image')} />
+              </div>
+            );
+          }
+          return null;
+        })}
+        {!hasMediaList && singleMediaUrl && (pType === 'LISTENING' || pType === 'listening') && (
           <div className="mb-4">
             <div className="d-flex align-items-center gap-2 mb-3 text-primary fw-bold">
               <IoVolumeHighOutline size={24} />
               <span>NGHE ĐOẠN HỘI THOẠI</span>
             </div>
-            <audio controls src={getFullMediaUrl(mUrl)} className={cx('audio-player')} />
+            <audio controls src={getFullMediaUrl(singleMediaUrl)} className={cx('audio-player')} />
           </div>
         )}
         {content && (
-          <div className={cx('passage-content')}>
-            {content}
-          </div>
+          <div className={cx('passage-content')}>{content}</div>
         )}
       </div>
     );

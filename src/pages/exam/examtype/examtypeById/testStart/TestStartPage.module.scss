@@ -324,6 +324,14 @@
     margin-bottom: 20px;
   }
 
+  .passage-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md, 8px);
+    display: block;
+    margin-bottom: 16px;
+  }
+
   .passage-content {
     font-size: 1.7rem;
     line-height: 1.8;
