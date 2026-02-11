@@ -13,7 +13,6 @@ import {
     IoClose,
     IoSchoolOutline,
     IoBookOutline,
-    IoMusicalNotesOutline
 } from "react-icons/io5";
 import { Trash, PlusCircle } from "lucide-react";
 import classNames from "classnames/bind";
@@ -45,7 +44,9 @@ const CreateTestModal = ({
         removeQuestion,
         updateQuestionText,
         updateAnswer,
-        updateAudio,   // 👈 thêm audio
+        addMediaFiles,
+        removeMediaFile,
+        setPassageType,
         handleSubmit,
     } = useCreateTest({ mode, classId, chapterId });
 
@@ -307,27 +308,65 @@ const CreateTestModal = ({
                                 onChange={(e) => updateQuestionText(i, e.target.value)}
                             />
 
-                            {/* AUDIO UPLOAD */}
+                            {/* MEDIA (đa file: audio hoặc ảnh) */}
                             <div className="mb-3">
-                                <label className="fw-bold mb-1">
-                                    <IoMusicalNotesOutline /> Audio (nếu có)
+                                <label className="fw-bold mb-1 d-block">
+                                    Phương tiện (nếu có)
                                 </label>
-
-                                <input
-                                    type="file"
-                                    accept="audio/*"
-                                    className={cx("inputModern")}
-                                    onChange={(e) =>
-                                        updateAudio(i, e.target.files[0])
-                                    }
-                                />
-
-                                {q.audioFile && (
-                                    <audio controls className="mt-2 w-100">
-                                        <source
-                                            src={URL.createObjectURL(q.audioFile)}
-                                        />
-                                    </audio>
+                                <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    <select
+                                        className={cx("inputModern")}
+                                        style={{ width: "auto" }}
+                                        value={q.passageType || "LISTENING"}
+                                        onChange={(e) => setPassageType(i, e.target.value)}
+                                        aria-label="Loại phương tiện"
+                                    >
+                                        <option value="LISTENING">Nghe (audio)</option>
+                                        <option value="READING">Đọc (ảnh)</option>
+                                    </select>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept={q.passageType === "READING" ? "image/*" : "audio/*"}
+                                        className={cx("inputModern")}
+                                        style={{ width: "auto" }}
+                                        onChange={(e) => {
+                                            addMediaFiles(i, e.target.files);
+                                            e.target.value = "";
+                                        }}
+                                        aria-label="Thêm file (có thể chọn nhiều)"
+                                    />
+                                </div>
+                                {q.mediaFiles?.length > 0 && (
+                                    <ul className="list-unstyled mb-0 mt-2">
+                                        {q.mediaFiles.map((file, fIdx) => (
+                                            <li key={fIdx} className="d-flex align-items-center gap-2 mb-1">
+                                                <span className="small text-secondary">
+                                                    {file.name}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline-danger p-0 px-1"
+                                                    onClick={() => removeMediaFile(i, fIdx)}
+                                                    aria-label={`Xóa ${file.name}`}
+                                                >
+                                                    <Trash size={14} />
+                                                </button>
+                                                {q.passageType === "LISTENING" && file.type.startsWith("audio/") && (
+                                                    <audio controls className="flex-grow-1" style={{ maxHeight: 32 }}>
+                                                        <source src={URL.createObjectURL(file)} />
+                                                    </audio>
+                                                )}
+                                                {q.passageType === "READING" && file.type.startsWith("image/") && (
+                                                    <img
+                                                        src={URL.createObjectURL(file)}
+                                                        alt={file.name}
+                                                        style={{ maxHeight: 40, objectFit: "contain" }}
+                                                    />
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
 

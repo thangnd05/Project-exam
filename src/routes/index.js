@@ -5,16 +5,13 @@ import TestByExamTypePage from '~/pages/exam/examtype/examtypeById/examtypeId';
 import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStartPage';
 import TestResultPage from '~/pages/exam/examtype/examtypeById/result/TestResultPage';
 import TestCreationForm from '~/pages/testnormal/TestCreateForm';
-import CreateTestPage from '~/pages/test/CreateTestPage';
 import TestHistoryPage from '~/pages/history/TestHistoryPage';
 import CreateQuestionPage from '~/pages/question/CreateQuestionsWithPassage';
 import MyClassesPage from '~/pages/myclass/MyClassPage';
 import TestByClassPage from '~/pages/myclass/testclass/TestByClassPage';
-import EditTestPage from '~/pages/edit/EditTestPage';
 import Policy from '~/pages/policy/policy';
 import Service from '~/pages/policy/service';
 import About from '~/pages/intro';
-import QuestionUpdatePage from '~/pages/edit/QuestionUpdatePage';
 import MyAlbumsPage from '~/pages/album-voca/MyAlbumPage';
 import AlbumDetailPage from '~/pages/album-delta/AlbumDeltaPage';
 import PracticePage from '~/pages/album-pratice/PracticePage';
@@ -48,7 +45,6 @@ export const privateRoutes = [
   { path: routes.testResult, component: TestResultPage },
 
 
-  { path: routes.createTest, component: CreateTestPage },
   { path: routes.createTestNormal, component: TestCreationForm },
   { path: routes.createQuestionWithPassage, component: CreateQuestionsWithPassage },
   { path: routes.createQuestionPage, component: CreateQuestionPage },
@@ -60,8 +56,6 @@ export const privateRoutes = [
   { path: routes.testHistory, component: TestHistoryPage },
   { path: routes.myClasses, component: MyClassesPage },
   { path: routes.classChapterTests, component: TestByClassPage },
-  { path: routes.editTestPage, component: EditTestPage },
-  { path: routes.editQuestion, component: QuestionUpdatePage },
   { path: routes.myAlbums, component: MyAlbumsPage },
   { path: routes.albumDelta, component: AlbumDetailPage },
   { path: routes.vocaPratice, component: PracticePage },

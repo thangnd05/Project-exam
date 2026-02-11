@@ -4,7 +4,8 @@ import axios from "axios";
 const emptyQuestion = {
     questionText: "",
     questionType: "MCQ",
-    audioFile: null,
+    mediaFiles: [],
+    passageType: "LISTENING",
     answers: [
         { answerLabel: "A", answerText: "", isCorrect: false },
         { answerLabel: "B", answerText: "", isCorrect: false },
@@ -76,9 +77,30 @@ export const useCreateTest = ({ mode, classId, chapterId }) => {
         setQuestions(newQ);
     };
 
-    const updateAudio = (index, file) => {
+    const addMediaFile = (index, file) => {
+        if (!file) return;
         const newQ = [...questions];
-        newQ[index].audioFile = file;
+        newQ[index].mediaFiles = [...(newQ[index].mediaFiles || []), file];
+        setQuestions(newQ);
+    };
+
+    const addMediaFiles = (index, fileList) => {
+        const files = fileList ? Array.from(fileList) : [];
+        if (files.length === 0) return;
+        const newQ = [...questions];
+        newQ[index].mediaFiles = [...(newQ[index].mediaFiles || []), ...files];
+        setQuestions(newQ);
+    };
+
+    const removeMediaFile = (qIndex, fileIndex) => {
+        const newQ = [...questions];
+        newQ[qIndex].mediaFiles = newQ[qIndex].mediaFiles.filter((_, i) => i !== fileIndex);
+        setQuestions(newQ);
+    };
+
+    const setPassageType = (index, passageType) => {
+        const newQ = [...questions];
+        newQ[index].passageType = passageType;
         setQuestions(newQ);
     };
 
@@ -117,25 +139,29 @@ export const useCreateTest = ({ mode, classId, chapterId }) => {
 
             const newPartId = partRes.data.testPartId || partRes.data.id;
 
-            // 3️⃣ CREATE QUESTIONS (multipart)
+            // 3️⃣ CREATE QUESTIONS (multipart, đa file)
             await Promise.all(
                 questions.map((q) => {
-
                     const formData = new FormData();
+                    const hasMedia = q.mediaFiles && q.mediaFiles.length > 0;
+                    const passageType = q.passageType || "LISTENING";
 
                     const payload = {
                         testPartId: Number(newPartId),
                         questionText: q.questionText,
                         questionType: q.questionType,
                         classId: mode === "class" ? Number(classId) : null,
+                        chapterId: mode === "class" ? Number(chapterId) : null,
                         answers: q.answers,
-                        passage: q.audioFile ? { passageType: "LISTENING", content: "" } : null,
+                        passage: hasMedia ? { passageType, content: "" } : null,
                     };
 
                     formData.append("request", JSON.stringify(payload));
 
-                    if (q.audioFile) {
-                        formData.append("audio", q.audioFile);
+                    if (hasMedia) {
+                        q.mediaFiles.forEach((file, i) => {
+                            formData.append(`file${i}`, file);
+                        });
                     }
 
                     return axios.post(
@@ -173,7 +199,10 @@ export const useCreateTest = ({ mode, classId, chapterId }) => {
         removeQuestion,
         updateQuestionText,
         updateAnswer,
-        updateAudio,
+        addMediaFile,
+        addMediaFiles,
+        removeMediaFile,
+        setPassageType,
         handleSubmit,
     };
 };

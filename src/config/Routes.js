@@ -7,7 +7,6 @@ const routes = {
   // 🧩 Test / Exam
   testStart: '/tests/:testId/start',
   testResult: '/tests/result/:userTestId',
-  createTest: '/admin/create-test',
   classChapterPage: '/class/:classId/chapters',
 
 
@@ -31,8 +30,6 @@ const routes = {
   examTypeDetail: '/exam-types/:examTypeId',
   MyTest: '/my-tests',
 
-  editTestPage: '/tests/edit/:testId',
-  editQuestion: '/questions/edit/:id',
 
   myAlbums: '/my-albums',
   albumDelta: '/albums/:albumId',
