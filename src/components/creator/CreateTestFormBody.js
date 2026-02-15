@@ -18,6 +18,9 @@ import { Trash, PlusCircle } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useCreateTest, CREATOR_TYPES } from '~/hook/useCreateTest';
+import QuestionBlock from './QuestionBlock';
+import CreatorTabs from './CreatorTabs';
+import FormFooter from './FormFooter';
 import styles from '../modals/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -94,58 +97,6 @@ const CreateTestFormBody = ({
     }
   };
 
-  const renderQuestionBlock = (q, i, removeQuestionFn, updateQuestionTextFn, updateAnswerFn, addMediaFilesFn, removeMediaFileFn, setPassageTypeFn, withMedia = true, minQuestions = 1) => (
-    <div key={i} className={cx('partBlock')}>
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <b>Câu hỏi số {i + 1}</b>
-        <Button variant="link" className="text-danger p-0" onClick={() => removeQuestionFn(i)} disabled={minQuestions <= 1}>
-          <Trash size={18} />
-        </Button>
-      </div>
-      <input
-        className={cx('inputModern', 'mb-3')}
-        placeholder="Nhập nội dung câu hỏi..."
-        value={q.questionText}
-        onChange={(e) => updateQuestionTextFn(i, e.target.value)}
-      />
-      {withMedia && (
-        <div className="mb-3">
-          <label className="fw-bold mb-1 d-block">Phương tiện (nếu có)</label>
-          <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-            <select className={cx('inputModern')} style={{ width: 'auto' }} value={q.passageType || 'LISTENING'} onChange={(e) => setPassageTypeFn(i, e.target.value)} aria-label="Loại phương tiện">
-              <option value="LISTENING">Nghe (audio)</option>
-              <option value="READING">Đọc (ảnh)</option>
-              <option value="DOCUMENT">Tài liệu (PDF/DOCX)</option>
-            </select>
-            <input type="file" multiple accept={ACCEPT_BY_TYPE[q.passageType] || ACCEPT_BY_TYPE.READING} className={cx('inputModern')} style={{ width: 'auto' }} onChange={(e) => { addMediaFilesFn(i, e.target.files); e.target.value = ''; }} aria-label="Thêm file" />
-          </div>
-          {q.mediaFiles?.length > 0 && (
-            <ul className="list-unstyled mb-0 mt-2">
-              {q.mediaFiles.map((file, fIdx) => (
-                <li key={fIdx} className="d-flex align-items-center gap-2 mb-1">
-                  <span className="small text-secondary">{file.name}</span>
-                  <button type="button" className="btn btn-sm btn-outline-danger p-0 px-1" onClick={() => removeMediaFileFn(i, fIdx)} aria-label={`Xóa ${file.name}`}><Trash size={14} /></button>
-                  {q.passageType === 'LISTENING' && file.type.startsWith('audio/') && <audio controls className="flex-grow-1" style={{ maxHeight: 32 }}><source src={URL.createObjectURL(file)} /></audio>}
-                  {q.passageType === 'READING' && file.type.startsWith('image/') && <img src={URL.createObjectURL(file)} alt={file.name} style={{ maxHeight: 40, objectFit: 'contain' }} />}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-      <Row className="g-2">
-        {q.answers.map((ans, aIndex) => (
-          <Col md={6} key={aIndex}>
-            <div className={cx('answerItem')}>
-              <input type="radio" name={`q-${i}`} checked={ans.isCorrect} onChange={() => updateAnswerFn(i, aIndex, 'isCorrect', true)} />
-              <span className="ms-2 fw-bold">{ans.answerLabel}.</span>
-              <input className={cx('inputModern', 'ms-2')} value={ans.answerText} placeholder={`Đáp án ${ans.answerLabel}`} onChange={(e) => updateAnswerFn(i, aIndex, 'answerText', e.target.value)} />
-            </div>
-          </Col>
-        ))}
-      </Row>
-    </div>
-  );
 
   return (
     <div className={cx('body')}>
@@ -154,17 +105,7 @@ const CreateTestFormBody = ({
       )}
 
       {showCreatorTypeTabs && (
-        <div className={cx('creatorTypeTabs')}>
-          <button type="button" className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.TEST })} onClick={() => setCreatorType(CREATOR_TYPES.TEST)}>
-            <IoRocketOutline size={20} /> Tạo đề thi
-          </button>
-          <button type="button" className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.BULK })} onClick={() => setCreatorType(CREATOR_TYPES.BULK)}>
-            <IoMusicalNotesOutline size={20} /> Tạo câu hỏi bulk
-          </button>
-          <button type="button" className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.PASSAGE })} onClick={() => setCreatorType(CREATOR_TYPES.PASSAGE)}>
-            <IoLayersOutline size={20} /> Tạo nhóm passage
-          </button>
-        </div>
+        <CreatorTabs activeCreatorType={activeCreatorType} setCreatorType={setCreatorType} />
       )}
 
       <div className={cx('configCard')}>
@@ -264,7 +205,20 @@ const CreateTestFormBody = ({
           <div className={cx('sectionTitle')}>
             <IoLayersOutline /> 2. Danh sách câu hỏi ({questions.length})
           </div>
-          {questions.map((q, i) => renderQuestionBlock(q, i, removeQuestion, updateQuestionText, updateAnswer, addMediaFiles, removeMediaFile, setPassageType, true, questions.length))}
+          {questions.map((q, i) => (
+            <QuestionBlock
+              key={i}
+              question={q}
+              index={i}
+              removeQuestionFn={removeQuestion}
+              updateQuestionTextFn={updateQuestionText}
+              updateAnswerFn={updateAnswer}
+              addMediaFilesFn={addMediaFiles}
+              removeMediaFileFn={removeMediaFile}
+              setPassageTypeFn={setPassageType}
+              minQuestions={questions.length}
+            />
+          ))}
         </>
       )}
 
@@ -311,17 +265,20 @@ const CreateTestFormBody = ({
                 </div>
               </div>
               <div className={cx('questionsSection')}>
-                {group.questions.map((q, qIndex) => renderQuestionBlock(
-                  q,
-                  qIndex,
-                  (i) => removeGroupQuestion(gIndex, i),
-                  (i, v) => updateGroupQuestion(gIndex, i, 'questionText', v),
-                  (i, aIndex, field, value) => updateGroupAnswer(gIndex, i, aIndex, field, value),
-                  () => {},
-                  () => {},
-                  () => {},
-                  false,
-                  group.questions.length
+                {group.questions.map((q, qIndex) => (
+                  <QuestionBlock
+                    key={qIndex}
+                    question={q}
+                    index={qIndex}
+                    removeQuestionFn={(i) => removeGroupQuestion(gIndex, i)}
+                    updateQuestionTextFn={(i, v) => updateGroupQuestion(gIndex, i, 'questionText', v)}
+                    updateAnswerFn={(i, aIndex, field, value) => updateGroupAnswer(gIndex, i, aIndex, field, value)}
+                    addMediaFilesFn={() => { }}
+                    removeMediaFileFn={() => { }}
+                    setPassageTypeFn={() => { }}
+                    withMedia={false}
+                    minQuestions={group.questions.length}
+                  />
                 ))}
                 <button type="button" className={cx('btnSecondary')} onClick={() => addGroupQuestion(gIndex)}><PlusCircle size={18} /> Thêm câu hỏi</button>
               </div>
@@ -332,22 +289,22 @@ const CreateTestFormBody = ({
       )}
 
       {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
-        <div className={cx('footer')}>
-          <button type="button" className={cx('btnAdd')} onClick={addQuestion}><PlusCircle size={18} /> Thêm câu hỏi</button>
-          {onCancel && <button type="button" className={cx('btnCancel')} onClick={onCancel}>Để sau</button>}
-          <button type="button" className={cx('btnSubmit')} onClick={handleFormSubmit} disabled={loading}>
-            {loading ? <Spinner size="sm" /> : <><IoRocketOutline /> Lưu & Xuất bản</>}
-          </button>
-        </div>
+        <FormFooter
+          loading={loading}
+          onAddQuestion={addQuestion}
+          onCancel={onCancel}
+          onSubmit={handleFormSubmit}
+        />
       )}
 
       {activeCreatorType === CREATOR_TYPES.PASSAGE && (
-        <div className={cx('footer')}>
-          {onCancel && <button type="button" className={cx('btnCancel')} onClick={onCancel}>Để sau</button>}
-          <button type="button" className={cx('btnSubmit')} onClick={handleFormSubmit} disabled={loading}>
-            {loading ? <Spinner size="sm" /> : <><IoRocketOutline /> Lưu tất cả</>}
-          </button>
-        </div>
+        <FormFooter
+          loading={loading}
+          onCancel={onCancel}
+          onSubmit={handleFormSubmit}
+          submitLabel="Lưu tất cả"
+          showAddBtn={false}
+        />
       )}
     </div>
   );
