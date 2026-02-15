@@ -4,8 +4,6 @@ import { Row, Col, Spinner, Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {
-  IoAddOutline,
-  IoTrashOutline,
   IoCheckmarkCircleOutline,
   IoLayersOutline,
   IoSettingsOutline,
@@ -98,14 +96,15 @@ const PremiumBulkQuestionCreator = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!form.examPartId) {
       toast.warn('Vui lòng chọn Phần thi (Part)');
       return;
     }
 
     setLoading(true);
+
     try {
-      const formData = new FormData();
       const payload = {
         examPartId: Number(form.examPartId),
         classId: form.classId ? Number(form.classId) : null,
@@ -113,7 +112,6 @@ const PremiumBulkQuestionCreator = () => {
         questions: form.questions.map((q) => ({
           questionType: q.questionType,
           questionText: q.questionText,
-          passage: q.audioFile ? { passageType: 'LISTENING', content: '' } : null,
           answers: q.options.map((o) => ({
             answerLabel: o.answerLabel,
             answerText: o.content,
@@ -122,23 +120,44 @@ const PremiumBulkQuestionCreator = () => {
         })),
       };
 
-      formData.append('data', JSON.stringify(payload));
-      form.questions.forEach((q) => {
-        if (q.audioFile) formData.append('audioFiles', q.audioFile);
+      const formData = new FormData();
+
+      // 1. Append JSON payload
+      formData.append('request', JSON.stringify(payload));
+
+      // 2. Sửa lại key append audio ở đây để khớp với Backend
+      form.questions.forEach((q, index) => {
+        if (q.audioFile) {
+          // Sửa "audio_" thành "media_${index}_audio"
+          // Backend dùng startsWith("media_" + index + "_") nên phải có dấu gạch dưới sau index
+          formData.append(`media_${index}_audio`, q.audioFile);
+        }
       });
 
-      await axios.post('/api/questions/bulk-independent-with-audio', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      await axios.post('/api/questions/bulk', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       toast.success('🎉 Đã lưu câu hỏi vào kho!');
-      setForm((prev) => ({ ...prev, questions: [JSON.parse(JSON.stringify(emptyQuestion))] }));
+
+      setForm((prev) => ({
+        ...prev,
+        questions: [JSON.parse(JSON.stringify(emptyQuestion))],
+      }));
+
     } catch (err) {
-      toast.error(err.response?.data?.message || '❌ Có lỗi xảy ra, vui lòng thử lại');
+      console.error(err);
+      toast.error(
+        err.response?.data?.message ||
+        '❌ Có lỗi xảy ra, vui lòng thử lại'
+      );
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className={cx('wrapper')}>

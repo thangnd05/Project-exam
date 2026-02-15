@@ -4,7 +4,6 @@ import TestPage from '~/pages/exam/TestPage';
 import TestByExamTypePage from '~/pages/exam/examtype/examtypeById/examtypeId';
 import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStartPage';
 import TestResultPage from '~/pages/exam/examtype/examtypeById/result/TestResultPage';
-import TestCreationForm from '~/pages/testnormal/TestCreateForm';
 import TestHistoryPage from '~/pages/history/TestHistoryPage';
 import CreateQuestionPage from '~/pages/question/CreateQuestionsWithPassage';
 import MyClassesPage from '~/pages/myclass/MyClassPage';
@@ -18,12 +17,9 @@ import PracticePage from '~/pages/album-pratice/PracticePage';
 import MyTestPage from '~/pages/mytest/MyTestPage';
 import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
 import NotFoundPage from "~/pages/error/NotFoundPage";
-import CreateBulkQuestionsToBank from '~/pages/question/bulk-question/CreateBulkQuestionsToBank';
-import CreateRealTest from '~/pages/question/CreateRealTest';
 import PremiumBulkQuestionCreator from '~/pages/question/bulk-question/PremiumBulkQuestionCreator';
 import CreateQuestionsWithPassage from "~/pages/question/CreateQuestionsWithPassage"
 import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
-import QuestionBankCreator from '~/pages/test123/QuestionBankCreator';
 import BulkQuestionGroupCreator from '~/pages/test23/BulkQuestionGroupCreator';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
@@ -45,11 +41,8 @@ export const privateRoutes = [
   { path: routes.testResult, component: TestResultPage },
 
 
-  { path: routes.createTestNormal, component: TestCreationForm },
   { path: routes.createQuestionWithPassage, component: CreateQuestionsWithPassage },
   { path: routes.createQuestionPage, component: CreateQuestionPage },
-  { path: routes.createTestWithQuestions, component: CreateRealTest },
-  { path: routes.createBulkQuestion, component: CreateBulkQuestionsToBank },
 
 
 
@@ -62,7 +55,6 @@ export const privateRoutes = [
   { path: routes.MyTest, component: MyTestPage },
   { path: routes.oauth2Redirect, component: MyTestPage },
   { path: routes.classChapterPage, component: ChapterOfClass },
-  { path: routes.unifiedCreateQuestion, component: QuestionBankCreator },
   { path: routes.premiumBulkQuestion, component: PremiumBulkQuestionCreator },
   { path: routes.bulkPassageGroup, component: BulkQuestionGroupCreator },
   // {
