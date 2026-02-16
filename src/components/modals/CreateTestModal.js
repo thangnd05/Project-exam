@@ -30,7 +30,7 @@ const CreateTestModal = ({
         <div className={cx('header')}>
           <div className={cx('titleWrapper')}>
             <IoRocketOutline />
-            <h3 className={cx('title')}>Kiến tạo bài thi</h3>
+            <h3 className={cx('title')}>Khởi tạo bài thi</h3>
             <span className={cx('badge')}>
               {mode === 'class' ? `Lớp: ${classId}` : 'Cá nhân'}
             </span>
