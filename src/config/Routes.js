@@ -13,7 +13,6 @@ const routes = {
 
   createQuestionWithPassage: '/admin/create-questions-with-passage',
   createQuestionPage: '/admin/create-question-page',
-  createTestQuestionBank: '/admin/create-test-question-bank',
   createTestFromBank: '/admin/create-test-from-bank',
   premiumBulkQuestion: '/admin/premium-bulk-question',
   bulkPassageGroup: '/admin/bulk-passage-group',
