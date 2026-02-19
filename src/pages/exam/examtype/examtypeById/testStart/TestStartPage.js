@@ -1,7 +1,7 @@
 import axios from 'axios';
-import {useEffect, useState} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
-import {Container, Spinner, Button, Form, Row, Col} from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
   IoSendOutline,
@@ -12,19 +12,19 @@ import {
   IoCheckmarkCircleOutline,
 } from 'react-icons/io5';
 
-import {getPassageMediaByPassageId} from '~/api/passageMediaApi';
+import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
 import TestStartDashboard from './TestStartDashboard';
-import {IoListOutline, IoCloseOutline} from 'react-icons/io5';
+import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
 import styles from './TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
 function TestStartPage() {
-  const {testId} = useParams();
+  const { testId } = useParams();
   const navigate = useNavigate();
 
   const [userTestId, setUserTestId] = useState(null);
-  const [test, setTest] = useState({parts: []});
+  const [test, setTest] = useState({ parts: [] });
   const [userAnswers, setUserAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
   const [preCountdown, setPreCountdown] = useState(null);
@@ -72,7 +72,7 @@ function TestStartPage() {
     });
 
     const enrichedParts = parts.map((part) => {
-      const partCopy = {...part};
+      const partCopy = { ...part };
       const ppid = partCopy.passage?.passageId ?? partCopy.passage?.passage_id;
       if (ppid && mediaByPassageId[ppid]) {
         partCopy.passage = {
@@ -81,7 +81,7 @@ function TestStartPage() {
         };
       }
       partCopy.questions = (part.questions || []).map((q) => {
-        const qCopy = {...q};
+        const qCopy = { ...q };
         const qpid =
           qCopy.passage?.passageId ??
           qCopy.passage?.passage_id ??
@@ -89,15 +89,15 @@ function TestStartPage() {
           qCopy.passage_id;
         if (qpid && mediaByPassageId[qpid]) {
           const passage = qCopy.passage
-            ? {...qCopy.passage, passageMedias: mediaByPassageId[qpid]}
-            : {passageId: qpid, passageMedias: mediaByPassageId[qpid]};
+            ? { ...qCopy.passage, passageMedias: mediaByPassageId[qpid] }
+            : { passageId: qpid, passageMedias: mediaByPassageId[qpid] };
           qCopy.passage = passage;
         }
         return qCopy;
       });
       return partCopy;
     });
-    return {...testData, parts: enrichedParts};
+    return { ...testData, parts: enrichedParts };
   };
 
   useEffect(() => {
@@ -121,7 +121,7 @@ function TestStartPage() {
     axios
       .get(`/api/tests/usertest/${testId}`)
       .then(async (res) => {
-        const testData = {...res.data, parts: res.data.parts || []};
+        const testData = { ...res.data, parts: res.data.parts || [] };
         const enriched = await enrichTestWithPassageMedia(testData);
         setTest(enriched);
 
@@ -176,7 +176,7 @@ function TestStartPage() {
         return;
       }
       axios
-        .post('/api/user-tests', {testId: test.testId})
+        .post('/api/user-tests', { testId: test.testId })
         .then((res) => {
           const id = res.data.userTestId;
           setUserTestId(id);
@@ -233,8 +233,8 @@ function TestStartPage() {
 
   const handleAnswerChange = (questionId, type, value) => {
     const updatedAnswer =
-      type === 'MCQ' ? {selectedAnswerId: value} : {answerText: value};
-    setUserAnswers({...userAnswers, [questionId]: updatedAnswer});
+      type === 'MCQ' ? { selectedAnswerId: value } : { answerText: value };
+    setUserAnswers({ ...userAnswers, [questionId]: updatedAnswer });
   };
 
   const handleSubmit = async () => {
@@ -253,7 +253,7 @@ function TestStartPage() {
       sessionStorage.removeItem(`userTest-${testId}`);
       sessionStorage.removeItem(`userTestState-${testId}`);
       navigate(`/tests/result/${userTestId}`, {
-        state: {score: res.data.totalScore},
+        state: { score: res.data.totalScore },
       });
     } catch (err) {
       alert('Nộp bài thất bại! Vui lòng thử lại.');
@@ -268,7 +268,7 @@ function TestStartPage() {
       const offset = 80; // Header height
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({top: offsetPosition, behavior: 'smooth'});
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
   };
 
@@ -609,7 +609,7 @@ function TestStartPage() {
           <Container className={cx('footer-buttons-inner')}>
             <button
               type="button"
-              className={cx('btn-toggle-info', {active: showInfoPanel})}
+              className={cx('btn-toggle-info', { active: showInfoPanel })}
               onClick={() => setShowInfoPanel((v) => !v)}
               aria-expanded={showInfoPanel}
               aria-label={
