@@ -33,6 +33,20 @@ const TestResultPage = () => {
   const [detailLoading, setDetailLoading] = useState(false);
 
   const [error, setError] = useState("");
+  const [testGroups, setTestGroups] = useState([]); // Chứa dữ liệu đã format
+
+  const getFullMediaUrl = (url) => {
+    if (!url) return null;
+    const cleanUrl = url.trim();
+    if (cleanUrl.startsWith('http')) return cleanUrl;
+    const backendUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+    return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
+  };
+
+  const hasMediaList = (p) => {
+    const list = p?.passageMedias ?? p?.passageMediaList ?? p?.passage_media;
+    return Array.isArray(list) && list.length > 0;
+  };
 
   // ================================
   // ✅ LOAD RESULT + CHECK REVIEW TIME
@@ -114,6 +128,105 @@ const TestResultPage = () => {
     } finally {
       setDetailLoading(false);
     }
+  };
+
+  const hasPassageImage = (passage, fallbackObj) => {
+    const mediaList =
+      passage?.passageMediaList ??
+      passage?.passageMedias ??
+      passage?.mediaList ??
+      passage?.passage_media ??
+      [];
+    if (
+      Array.isArray(mediaList) &&
+      mediaList.some(
+        (m) => (m.mediaType ?? m.media_type ?? "").toUpperCase() === "IMAGE"
+      )
+    )
+      return true;
+    const singleUrl =
+      passage?.mediaUrl ??
+      passage?.media_url ??
+      fallbackObj?.mediaUrl ??
+      fallbackObj?.media_url;
+    const pType =
+      passage?.passageType ?? passage?.passage_type ?? fallbackObj?.passageType;
+    return !!(singleUrl && (pType === "READING" || pType === "reading"));
+  };
+
+  const renderPassage = (passage, fallbackObj) => {
+    const content =
+      passage?.content ??
+      passage?.passage_content ??
+      fallbackObj?.content ??
+      fallbackObj?.passage_content;
+    const pType = passage?.passageType ?? passage?.passage_type ?? "READING";
+
+    const mediaList =
+      passage?.passageMediaList ??
+      passage?.passageMedias ??
+      passage?.mediaList ??
+      passage?.passage_media ??
+      [];
+    const hasMediaList = Array.isArray(mediaList) && mediaList.length > 0;
+
+    const singleMediaUrl =
+      passage?.mediaUrl ??
+      passage?.media_url ??
+      fallbackObj?.mediaUrl ??
+      fallbackObj?.media_url ??
+      fallbackObj?.audioUrl ??
+      fallbackObj?.audio_url ??
+      fallbackObj?.passageMediaUrl;
+
+    const hasContent = !!content;
+    const hasAnyMedia = hasMediaList || !!singleMediaUrl;
+    if (!hasContent && !hasAnyMedia) return null;
+
+    return (
+      <div className={cx("passage-box")}>
+        {hasMediaList &&
+          mediaList.map((m, idx) => {
+            const url = m.mediaUrl ?? m.media_url;
+            if (!url) return null;
+            const type = (m.mediaType ?? m.media_type ?? "").toUpperCase();
+            if (type === "AUDIO") {
+              return (
+                <div key={idx} className="mb-3">
+                  <audio
+                    src={getFullMediaUrl(url)}
+                    className={cx("audio-player")}
+                  />
+                </div>
+              );
+            }
+            if (type === "IMAGE") {
+              return (
+                <div key={idx} className="mb-3 text-center">
+                  <img
+                    src={getFullMediaUrl(url)}
+                    alt={`Passage ${idx + 1}`}
+                    className={cx("passage-image")}
+                  />
+                </div>
+              );
+            }
+            return null;
+          })}
+        {!hasMediaList &&
+          singleMediaUrl &&
+          (pType === "LISTENING" || pType === "listening") && (
+            <div className="mb-4">
+              <audio
+                controls
+                src={getFullMediaUrl(singleMediaUrl)}
+                className={cx("audio-player")}
+              />
+            </div>
+          )}
+        {content && <div className={cx("passage-content")}>{content}</div>}
+      </div>
+    );
   };
 
   // ================================
@@ -241,23 +354,62 @@ const TestResultPage = () => {
 
             {test.parts?.map((part, i) => (
               <div key={part.testPartId} className={cx("test-part")}>
-                <h3>Phần {i + 1}</h3>
+                <h3 className={cx("part-title")}>Phần {i + 1}</h3>
 
-                <div className={cx("questions-list")}>
-                  {part.questions?.map((q) => {
-                    // ✅ FIX MATCH ID STRING/NUMBER
-                    const userAnswer = userAnswers.find(
-                      (ua) =>
-                        String(ua.questionId) === String(q.questionId)
-                    );
+                <div className={cx("question-groups-list")}>
+                  {part.questionGroups?.map((group, groupIndex) => {
+                    const firstQ = group.questions?.[0];
+                    const passageHasImage = hasPassageImage(group.passage, firstQ);
 
                     return (
-                      <QuestionResult
-                        key={q.questionId}
-                        question={q}
-                        userAnswer={userAnswer}
-                        canReview={canReview}
-                      />
+                      <div
+                        key={groupIndex}
+                        className={cx("question-group-wrapper", {
+                          "split-layout": passageHasImage,
+                        })}
+                      >
+                        {passageHasImage ? (
+                          <div className={cx("split-container")}>
+                            <div className={cx("passage-column")}>
+                              {renderPassage(group.passage, firstQ)}
+                            </div>
+                            <div className={cx("question-column")}>
+                              {group.questions?.map((q) => {
+                                const userAnswer = userAnswers.find(
+                                  (ua) =>
+                                    String(ua.questionId) === String(q.questionId)
+                                );
+                                return (
+                                  <QuestionResult
+                                    key={q.questionId}
+                                    question={q}
+                                    userAnswer={userAnswer}
+                                    canReview={canReview}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            {renderPassage(group.passage, firstQ)}
+                            {group.questions?.map((q) => {
+                              const userAnswer = userAnswers.find(
+                                (ua) =>
+                                  String(ua.questionId) === String(q.questionId)
+                              );
+                              return (
+                                <QuestionResult
+                                  key={q.questionId}
+                                  question={q}
+                                  userAnswer={userAnswer}
+                                  canReview={canReview}
+                                />
+                              );
+                            })}
+                          </>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
