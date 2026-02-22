@@ -136,13 +136,19 @@ function TestStartPage() {
         }
 
         if (!restored) {
-          const durationSeconds = (testData.durationMinutes || 0) * 60;
-          let finalTime = durationSeconds;
+          const durationMinutes = testData.durationMinutes;
+          let finalTime = null;
+
+          if (durationMinutes && durationMinutes > 0) {
+            finalTime = durationMinutes * 60;
+          }
+
           if (availableTo) {
             const diffSeconds = Math.floor((availableTo - now) / 1000);
-            if (diffSeconds > 0)
-              finalTime = Math.min(durationSeconds, diffSeconds);
-            else finalTime = 0;
+            const deadlineRemaining = Math.max(0, diffSeconds);
+            if (finalTime === null || deadlineRemaining < finalTime) {
+              finalTime = deadlineRemaining;
+            }
           }
           setTimeLeft(finalTime);
           setStatus('open');
@@ -238,9 +244,10 @@ function TestStartPage() {
   handleSubmitRef.current = handleSubmit;
 
   useEffect(() => {
-    if (status !== 'active' || timeLeft === null) return;
+    if (status !== 'active' || timeLeft == null) return;
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
+        if (prev == null) return prev;
         if (prev <= 1) {
           clearInterval(timer);
           handleSubmitRef.current();
@@ -282,6 +289,7 @@ function TestStartPage() {
   }, [allQuestions]);
 
   const formatTime = (seconds) => {
+    if (seconds === null) return '--:--';
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
@@ -630,12 +638,12 @@ function TestStartPage() {
             </button>
             <div className={cx('footer-right-group')}>
               <div className={cx('footer-pills')}>
-                <div className={cx('exam-stat', 'exam-stat-time')}>
-                  <IoTimeOutline aria-hidden />
-                  <span className={cx('exam-stat-value')}>
-                    {formatTime(timeLeft)}
-                  </span>
-                </div>
+                {timeLeft !== null && (
+                  <div className={cx('exam-stat', 'exam-stat-time')}>
+                    <IoTimeOutline aria-hidden />
+                    <span className={cx('exam-stat-value')}>{formatTime(timeLeft)}</span>
+                  </div>
+                )}
                 <div className={cx('exam-stat', 'exam-stat-done')}>
                   <IoCheckmarkCircleOutline aria-hidden />
                   <span className={cx('exam-stat-value')}>
