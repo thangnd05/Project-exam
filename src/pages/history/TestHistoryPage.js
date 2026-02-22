@@ -12,11 +12,13 @@ import {
   IoHourglassOutline,
   IoCloseCircleOutline,
   IoDocumentTextOutline,
-  IoTrophyOutline
+  IoTrophyOutline,
+  IoTimeOutline
 } from 'react-icons/io5';
 
 import style from './TestHistory.module.scss';
 import { useAuth } from '~/hook/useAuth';
+import PageHeader from '~/components/common/PageHeader/PageHeader';
 
 const cx = classNames.bind(style);
 
@@ -37,7 +39,7 @@ function TestHistoryPage() {
       try {
         const [attemptRes, testRes] = await Promise.all([
           axios.get(`/api/user-tests/by-user/${userId}/by-test/${testId}`),
-          axios.get(`/api/tests/${testId}`),
+          axios.get(`/api/tests/usertest/${testId}`),
         ]);
         setAttempts(attemptRes.data);
         setTestInfo(testRes.data);
@@ -79,17 +81,26 @@ function TestHistoryPage() {
     <div className={cx('wrapper')}>
       <Container>
         {/* === Premium Header === */}
-        <div className={cx('header')}>
-          <div className={cx('title-section')}>
-            <button className={cx('btn-back')} onClick={() => navigate(-1)}>
-              <IoArrowBack />
-              Quay lại
-            </button>
-            <h1>
-              {testInfo ? testInfo.title : `Lịch sử bài thi #${testId}`}
-            </h1>
-          </div>
+        <div className={cx('header-top')}>
+          <button className={cx('btn-back')} onClick={() => navigate(-1)}>
+            <IoArrowBack />
+            Quay lại
+          </button>
         </div>
+
+        <PageHeader
+          className={cx('historyHeader')}
+          title={testInfo ? testInfo.title : 'Đang tải thông tin...'}
+          description={testInfo?.description}
+          label="Lịch sử làm bài kiểm tra"
+          labelClassName={cx('historyLabel')}
+          badgeLabel={
+            <div className="d-flex align-items-center gap-2">
+              <IoStatsChartOutline />
+              <span>{attempts.length} lượt đã làm</span>
+            </div>
+          }
+        />
 
         {/* === Table Content === */}
         {attempts.length === 0 ? (

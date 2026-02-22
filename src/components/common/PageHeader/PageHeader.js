@@ -12,12 +12,14 @@ const PageHeader = ({
     onAction,
     actionText,
     actionIcon: Icon,
-    className
+    className,
+    description,
+    labelClassName
 }) => {
     return (
         <div className={cx('headerHero', className)}>
             <div className={cx('heroContent')}>
-                {label && <span className={cx('label')}>{label}</span>}
+                {label && <span className={cx('label', labelClassName)}>{label}</span>}
                 <h1>{title}</h1>
                 {badgeLabel && (
                     <div className={cx('badge')}>
@@ -47,6 +49,8 @@ PageHeader.propTypes = {
     actionText: PropTypes.string,
     actionIcon: PropTypes.elementType,
     className: PropTypes.string,
+    description: PropTypes.node,
+    labelClassName: PropTypes.string,
 };
 
 export default PageHeader;
