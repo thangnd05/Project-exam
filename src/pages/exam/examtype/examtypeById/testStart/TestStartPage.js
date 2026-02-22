@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -36,9 +36,9 @@ function TestStartPage() {
     if (!url) return null;
     const cleanUrl = url.trim();
     if (cleanUrl.startsWith('http')) return cleanUrl;
-    const backendUrl =
-      process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
-    return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
+    const backendUrl = axios.defaults.baseURL || 'http://localhost:8080';
+    return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl
+      }`;
   };
 
   const hasMediaList = (p) => {
@@ -51,39 +51,40 @@ function TestStartPage() {
     const passageIdsToFetch = new Set();
     parts.forEach((part) => {
       (part.questionGroups || []).forEach((group) => {
-        const p = group.passage;
-        const pid = p?.passageId ?? p?.passage_id;
-        if (pid && !hasMediaList(p)) passageIdsToFetch.add(pid);
+        const gpid = group.passage?.passageId ?? group.passage?.passage_id;
+        if (gpid && !hasMediaList(group.passage)) passageIdsToFetch.add(gpid);
+        (group.questions || []).forEach((q) => {
+          const qpid = q.passage?.passageId ?? q.passage?.passage_id ?? q.passageId;
+          if (qpid && !hasMediaList(q.passage)) passageIdsToFetch.add(qpid);
+        });
       });
     });
     if (passageIdsToFetch.size === 0) return testData;
 
     const ids = [...passageIdsToFetch];
-    const results = await Promise.all(
-      ids.map((id) => getPassageMediaByPassageId(id).catch(() => [])),
-    );
-    const mediaByPassageId = {};
-    ids.forEach((id, i) => {
-      mediaByPassageId[id] = Array.isArray(results[i]) ? results[i] : [];
-    });
+    const results = await Promise.all(ids.map((id) => getPassageMediaByPassageId(id).catch(() => [])));
+    const mediaMap = Object.fromEntries(ids.map((id, i) => [id, results[i]]));
+
+    const enrichWrapper = (obj) => {
+      const pid = obj?.passage?.passageId ?? obj?.passage?.passage_id ?? obj?.passageId;
+      if (pid && mediaMap[pid]) {
+        return {
+          ...obj,
+          passage: { ...(obj.passage || { passageId: pid }), passageMedias: mediaMap[pid] },
+        };
+      }
+      return obj;
+    };
 
     const enrichedParts = parts.map((part) => ({
       ...part,
-      questionGroups: (part.questionGroups || []).map((group) => {
-        const passage = group.passage;
-        const pid = passage?.passageId ?? passage?.passage_id;
-        if (pid && mediaByPassageId[pid]) {
-          return {
-            ...group,
-            passage: { ...passage, passageMedias: mediaByPassageId[pid] },
-          };
-        }
-        return group;
-      }),
+      questionGroups: (part.questionGroups || []).map((group) => ({
+        ...enrichWrapper(group),
+        questions: (group.questions || []).map(enrichWrapper),
+      })),
     }));
     return { ...testData, parts: enrichedParts };
   };
-
 
   useEffect(() => {
     if (!testId) return;
@@ -200,21 +201,7 @@ function TestStartPage() {
     }
   }, [preCountdown, status]);
 
-  useEffect(() => {
-    if (status === 'active' && timeLeft !== null) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            handleSubmit();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [status, timeLeft]);
+
 
   const handleAnswerChange = (questionId, type, value) => {
     const updatedAnswer =
@@ -247,6 +234,24 @@ function TestStartPage() {
     }
   };
 
+  const handleSubmitRef = useRef();
+  handleSubmitRef.current = handleSubmit;
+
+  useEffect(() => {
+    if (status !== 'active' || timeLeft === null) return;
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleSubmitRef.current();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [status]);
+
   const scrollToQuestion = (questionId) => {
     const element = document.getElementById(`q-${questionId}`);
     if (element) {
@@ -257,14 +262,24 @@ function TestStartPage() {
     }
   };
 
-  const allQuestions =
-    test.parts?.reduce((acc, part) => {
-      const questionsInPart = (part.questionGroups || []).reduce(
-        (qAcc, group) => [...qAcc, ...(group.questions || [])],
-        [],
-      );
-      return [...acc, ...questionsInPart];
-    }, []) || [];
+  const allQuestions = useMemo(() => {
+    return (
+      test.parts?.reduce((acc, part) => {
+        const groupedQuestions = (part.questionGroups || []).reduce((gAcc, group) => {
+          return [...gAcc, ...(group.questions || [])];
+        }, []);
+        return [...acc, ...groupedQuestions];
+      }, []) || []
+    );
+  }, [test.parts]);
+
+  const questionIndexMap = useMemo(() => {
+    const map = {};
+    allQuestions.forEach((q, index) => {
+      map[q.questionId] = index + 1;
+    });
+    return map;
+  }, [allQuestions]);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -391,6 +406,89 @@ function TestStartPage() {
     );
   };
 
+  const renderQuestionOnly = (q, absoluteIndex) => {
+    return (
+      <div key={q.questionId} id={`q-${q.questionId}`} className={cx('question-card')}>
+        <span className={cx('q-text')}>
+          <span className={cx('q-number')}>Câu {absoluteIndex}:</span>
+          {q.questionText}
+        </span>
+
+        {q.questionType === 'MCQ' && (
+          <div className={cx('mcq-group')}>
+            {q.answers?.map((a) => (
+              <div
+                key={a.answerId}
+                className={cx('mcq-option', {
+                  selected: userAnswers[q.questionId]?.selectedAnswerId === a.answerId,
+                })}
+                onClick={() => handleAnswerChange(q.questionId, 'MCQ', a.answerId)}
+              >
+                <Form.Check
+                  type="radio"
+                  name={`q-${q.questionId}`}
+                  checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
+                  readOnly
+                />
+                <span>
+                  {a.answerLabel}. {a.answerText}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {q.questionType === 'FILL_BLANK' && (
+          <input
+            type="text"
+            className={cx('fill-input')}
+            value={userAnswers[q.questionId]?.answerText || ''}
+            onChange={(e) => handleAnswerChange(q.questionId, 'FILL_BLANK', e.target.value)}
+            placeholder="Nhập câu trả lời của bạn..."
+          />
+        )}
+
+        {q.questionType === 'ESSAY' && (
+          <textarea
+            className={cx('essay-input')}
+            value={userAnswers[q.questionId]?.answerText || ''}
+            onChange={(e) => handleAnswerChange(q.questionId, 'ESSAY', e.target.value)}
+            placeholder="Viết câu trả lời chi tiết tại đây..."
+          />
+        )}
+      </div>
+    );
+  };
+
+  const renderQuestionCard = (q, absoluteIndex) => {
+    const passageHasImage = hasPassageImage(q.passage, q);
+    const questionCard = renderQuestionOnly(q, absoluteIndex);
+
+    return (
+      <div
+        key={q.questionId}
+        id={`q-${q.questionId}`}
+        className={cx('question-card-wrapper', {
+          'split-layout': passageHasImage,
+        })}
+      >
+        {passageHasImage ? (
+          <>
+            <div className={cx('passage-column')} aria-label="Đọc tài liệu">
+              {renderPassage(q.passage, q)}
+            </div>
+            <div className={cx('question-column')}>{questionCard}</div>
+          </>
+        ) : (
+          <>
+            {renderPassage(q.passage, q)}
+            {questionCard}
+          </>
+        )}
+      </div>
+    );
+  };
+
   if (status === 'loading')
     return (
       <div className={cx('state-box')}>
@@ -456,130 +554,32 @@ function TestStartPage() {
                   Phần {i + 1}: {part.partName || 'Luyện tập'}
                 </h3>
 
-                {renderPassage(part.passage)}
-
                 <div className={cx('questions-list')}>
-                  {part.questionGroups?.map((group, groupIndex) => {
-                    const firstQ = group.questions?.[0];
-                    const passageHasImage = hasPassageImage(group.passage, firstQ);
-
-                    const renderQuestionCard = (q) => {
-                      const absoluteIndex =
-                        allQuestions.findIndex(
-                          (allQ) => allQ.questionId === q.questionId,
-                        ) + 1;
-
-                      return (
-                        <div
-                          key={q.questionId}
-                          id={`q-${q.questionId}`}
-                          className={cx('question-card')}
-                        >
-                          <span className={cx('q-text')}>
-                            <span className={cx('q-number')}>
-                              Câu {absoluteIndex}:
-                            </span>
-                            {q.questionText}
-                          </span>
-
-                          {q.questionType === 'MCQ' && (
-                            <div className={cx('mcq-group')}>
-                              {q.answers?.map((a) => (
-                                <div
-                                  key={a.answerId}
-                                  className={cx('mcq-option', {
-                                    selected:
-                                      userAnswers[q.questionId]
-                                        ?.selectedAnswerId === a.answerId,
-                                  })}
-                                  onClick={() =>
-                                    handleAnswerChange(
-                                      q.questionId,
-                                      'MCQ',
-                                      a.answerId,
-                                    )
-                                  }
-                                >
-                                  <Form.Check
-                                    type="radio"
-                                    name={`q-${q.questionId}`}
-                                    checked={
-                                      userAnswers[q.questionId]
-                                        ?.selectedAnswerId === a.answerId
-                                    }
-                                    readOnly
-                                  />
-                                  <span>
-                                    {a.answerLabel}. {a.answerText}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          {q.questionType === 'FILL_BLANK' && (
-                            <input
-                              type="text"
-                              className={cx('fill-input')}
-                              value={
-                                userAnswers[q.questionId]?.answerText || ''
-                              }
-                              onChange={(e) =>
-                                handleAnswerChange(
-                                  q.questionId,
-                                  'FILL_BLANK',
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="Nhập câu trả lời của bạn..."
-                            />
-                          )}
-
-                          {q.questionType === 'ESSAY' && (
-                            <textarea
-                              className={cx('essay-input')}
-                              value={
-                                userAnswers[q.questionId]?.answerText || ''
-                              }
-                              onChange={(e) =>
-                                handleAnswerChange(
-                                  q.questionId,
-                                  'ESSAY',
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="Viết câu trả lời chi tiết tại đây..."
-                            />
-                          )}
-                        </div>
-                      );
-                    };
-
+                  {/* Render question groups */}
+                  {part.questionGroups?.map((group, groupIdx) => {
+                    const passageHasImage = hasPassageImage(group.passage);
                     return (
                       <div
-                        key={groupIndex}
-                        className={cx('question-card-wrapper', {
-                          'split-layout': passageHasImage,
-                        })}
+                        key={group.passage?.passageId || groupIdx}
+                        className={cx('group-section', { 'split-layout': passageHasImage })}
                       >
                         {passageHasImage ? (
                           <>
-                            <div
-                              className={cx('passage-column')}
-                              aria-label="Đọc tài liệu"
-                            >
-                              {renderPassage(group.passage, firstQ)}
+                            <div className={cx('passage-column')} aria-label="Đọc tài liệu">
+                              {renderPassage(group.passage)}
                             </div>
                             <div className={cx('question-column')}>
-                              {group.questions?.map((q) =>
-                                renderQuestionCard(q),
-                              )}
+                              {group.questions?.map((q) => {
+                                return renderQuestionOnly(q, questionIndexMap[q.questionId]);
+                              })}
                             </div>
                           </>
                         ) : (
                           <>
-                            {renderPassage(group.passage, firstQ)}
-                            {group.questions?.map((q) => renderQuestionCard(q))}
+                            {renderPassage(group.passage)}
+                            {group.questions?.map((q) => {
+                              return renderQuestionCard(q, questionIndexMap[q.questionId]);
+                            })}
                           </>
                         )}
                       </div>
