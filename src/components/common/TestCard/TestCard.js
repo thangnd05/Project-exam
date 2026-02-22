@@ -60,7 +60,12 @@ function TestCard({ test, countdowns }) {
                     <div className={cx('info-item')}>
                         <IoTimeOutline />
                         <span>
-                            Thời lượng: <strong>{test.durationMinutes || 0} phút</strong>
+                            Thời lượng:{' '}
+                            <strong>
+                                {test.durationMinutes != null
+                                    ? `${test.durationMinutes} phút`
+                                    : 'Không giới hạn'}
+                            </strong>
                         </span>
                     </div>
 

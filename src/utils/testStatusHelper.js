@@ -39,7 +39,12 @@ export const getTestStatus = (test, now, countdowns) => {
         statusLabel = 'Đã kết thúc';
         buttonText = 'Hết hạn nộp';
         canStart = false;
-    } else if (test.remainingAttempts === 0) {
+    } else if (test.canDoTest === false) {
+        status = 'expired';
+        statusLabel = 'Hết lượt';
+        buttonText = 'Vượt quá lượt làm';
+        canStart = false;
+    } else if (test.maxAttempts != null && test.remainingAttempts === 0) {
         status = 'expired';
         statusLabel = 'Hết lượt';
         buttonText = 'Vượt quá lượt làm';
@@ -52,6 +57,11 @@ export const getTestStatus = (test, now, countdowns) => {
 export const calculateAllowedTime = (test) => {
     const now = new Date();
     const availableTo = test.availableTo ? new Date(test.availableTo) : null;
+
+    // Nếu không giới hạn thời gian
+    if (!test.durationMinutes || test.durationMinutes <= 0) {
+        return null;   // ← QUAN TRỌNG
+    }
 
     let allowedTime = test.durationMinutes * 60;
 

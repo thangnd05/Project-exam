@@ -111,7 +111,7 @@ function TestStartPage() {
         const enriched = await enrichTestWithPassageMedia(testData);
         setTest(enriched);
 
-        if (testData.canDoTest === false) {
+        if (testData.canDoTest === false || testData.status === 'FORBIDDEN') {
           setStatus('no-attempts');
           return;
         }
