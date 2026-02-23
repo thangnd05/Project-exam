@@ -23,6 +23,7 @@ const TestResultPage = () => {
   const navigate = useNavigate();
 
   const [result, setResult] = useState(null);
+  const [testId, setTestId] = useState(null);
   const [test, setTest] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]);
 
@@ -56,7 +57,8 @@ const TestResultPage = () => {
       try {
         // 1. Lấy meta userTest
         const metaRes = await axios.get(`/api/user-tests/${userTestId}`);
-        const testId = metaRes.data.testId;
+        const tId = metaRes.data.testId;
+        setTestId(tId);
 
         // 2. ✅ Lấy result đúng endpoint (API cũ)
         const res = await axios.get(
@@ -66,7 +68,7 @@ const TestResultPage = () => {
         setResult(res.data);
 
         // 3. Check hạn kết thúc bài thi
-        const testRes = await axios.get(`/api/tests/usertest/${testId}`);
+        const testRes = await axios.get(`/api/tests/usertest/${tId}`);
         const testData = testRes.data;
 
         const now = new Date();
@@ -196,6 +198,7 @@ const TestResultPage = () => {
                   <audio
                     src={getFullMediaUrl(url)}
                     className={cx("audio-player")}
+                    controls
                   />
                 </div>
               );
@@ -302,7 +305,9 @@ const TestResultPage = () => {
 
             <div className={cx("stat-item")}>
               <IoTimeOutline size={24} />
-              <span className={cx("stat-val")}>--</span>
+              <span className={cx("stat-val")}>
+                {result?.timeTaken ? `${Math.floor(result.timeTaken / 60)}:${(result.timeTaken % 60).toString().padStart(2, '0')}` : "--:--"}
+              </span>
               <span className={cx("stat-label")}>Thời gian</span>
             </div>
           </div>
@@ -340,7 +345,7 @@ const TestResultPage = () => {
 
             <button
               className={cx("btn-review")}
-              onClick={() => navigate("/my-test")}
+              onClick={() => navigate(`/tests/history/${testId}`)}
             >
               <IoSchoolOutline /> Lịch sử bài thi
             </button>
