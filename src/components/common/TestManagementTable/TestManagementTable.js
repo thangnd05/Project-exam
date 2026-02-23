@@ -10,21 +10,21 @@ import {
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './TestManagementTable.module.scss';
-import { formatDateTime } from '~/utils/testStatusHelper';
+import { formatDateTime, getTestStatus } from '~/utils/testStatusHelper';
 
 const cx = classNames.bind(styles);
 
-const TestManagementTable = ({ tests, onDelete }) => {
+const TestManagementTable = ({ tests, onDelete, countdowns }) => {
     const navigate = useNavigate();
     const now = new Date();
 
-    const getStatus = (test) => {
-        const from = test.availableFrom ? new Date(test.availableFrom) : null;
-        const to = test.availableTo ? new Date(test.availableTo) : null;
-
-        if (to && now > to) return { label: 'Đã kết thúc', variant: 'danger' };
-        if (from && now < from) return { label: 'Chưa bắt đầu', variant: 'warning' };
-        return { label: 'Đang diễn ra', variant: 'success' };
+    const getBadgeVariant = (status) => {
+        switch (status) {
+            case 'open': return 'success';
+            case 'locked': return 'warning';
+            case 'expired': return 'danger';
+            default: return 'secondary';
+        }
     };
 
     return (
@@ -41,7 +41,9 @@ const TestManagementTable = ({ tests, onDelete }) => {
                 </thead>
                 <tbody>
                     {tests.map((test) => {
-                        const status = getStatus(test);
+                        const { status, statusLabel } = getTestStatus(test, now, countdowns);
+                        const variant = getBadgeVariant(status);
+
                         return (
                             <tr key={test.testId}>
                                 <td className={cx('test-title')}>
@@ -51,8 +53,8 @@ const TestManagementTable = ({ tests, onDelete }) => {
                                     {test.durationMinutes ? `${test.durationMinutes} phút` : 'Không giới hạn'}
                                 </td>
                                 <td>
-                                    <Badge bg={status.variant} className={cx('status-badge')}>
-                                        {status.label}
+                                    <Badge bg={variant} className={cx('status-badge')}>
+                                        {statusLabel}
                                     </Badge>
                                 </td>
                                 <td className={cx('test-participants')}>
@@ -84,7 +86,7 @@ const TestManagementTable = ({ tests, onDelete }) => {
                                             <Button
                                                 variant="link"
                                                 className={cx('btn-action', 'stats')}
-                                                onClick={() => navigate(`/tests/stats/${test.testId}`)}
+                                                onClick={() => navigate(`/tests/history/${test.testId}`)}
                                             >
                                                 <IoStatsChartOutline />
                                             </Button>

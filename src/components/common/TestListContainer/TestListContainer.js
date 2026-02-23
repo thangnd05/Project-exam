@@ -63,7 +63,11 @@ const TestListContainer = ({
                                 ))}
                             </div>
                         ) : (
-                            <TestManagementTable tests={tests} onDelete={handleDeleteTest} />
+                            <TestManagementTable
+                                tests={tests}
+                                onDelete={handleDeleteTest}
+                                countdowns={countdowns}
+                            />
                         )
                     ) : (
                         emptyState || (
