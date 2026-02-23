@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Spinner } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
   IoDocumentTextOutline,
@@ -11,22 +11,17 @@ import { toast } from 'react-toastify';
 
 import styles from './TestByClassPage.module.scss';
 import CreateTestModal from '~/components/modals/CreateTestModal';
-import PageHeader from '~/components/common/PageHeader/PageHeader';
-import TestCard from '~/components/common/TestCard/TestCard';
-import TestManagementTable from '~/components/common/TestManagementTable/TestManagementTable';
-import { IoListOutline, IoGridOutline } from 'react-icons/io5';
+import TestListContainer from '~/components/common/TestListContainer/TestListContainer';
 
 const cx = classNames.bind(styles);
 
 function TestByClassPage() {
-  const { classId } = useParams();
-  const { chapterId } = useParams();
+  const { classId, chapterId } = useParams();
   const [tests, setTests] = useState([]);
   const [className, setClassName] = useState('');
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
 
   // 🟢 Lấy thông tin lớp học
   useEffect(() => {
@@ -93,22 +88,6 @@ function TestByClassPage() {
     return () => clearInterval(interval);
   }, [tests]);
 
-  const formatDateTime = (dateStr) => {
-    if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleString('vi-VN', {
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  // formatCountdown moved to TestCard
-
-  // handleStartTest moved to TestCard
-
-  const now = new Date();
-
   if (loading) {
     return (
       <div className="d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
@@ -118,58 +97,28 @@ function TestByClassPage() {
     );
   }
 
+  const emptyState = (
+    <div className={cx('empty-state')}>
+      <IoDocumentTextOutline className={cx('icon')} />
+      <h4>Chưa có bài kiểm tra nào được công bố</h4>
+      <p className="text-muted">Giáo viên của bạn sẽ sớm cập nhật các bài thi tại đây.</p>
+    </div>
+  );
+
   return (
-    <div className={cx('wrapper')}>
-      <Container>
-        {/* === Premium Header === */}
-        <PageHeader
-          title={className || 'Lớp học hiện tại'}
-          label="Phòng thi của lớp"
-          actionText="Tạo bài kiểm tra mới"
-          actionIcon={IoAddCircleOutline}
-          onAction={() => setShowCreateTestModal(true)}
-        >
-          <div className={cx('view-toggle')}>
-            <button
-              className={cx('toggle-btn', { active: viewMode === 'grid' })}
-              onClick={() => setViewMode('grid')}
-              title="Dạng lưới"
-            >
-              <IoGridOutline />
-            </button>
-            <button
-              className={cx('toggle-btn', { active: viewMode === 'table' })}
-              onClick={() => setViewMode('table')}
-              title="Quản lý chi tiết (Dạng bảng)"
-            >
-              <IoListOutline />
-            </button>
-          </div>
-        </PageHeader>
+    <>
+      <TestListContainer
+        title={className || 'Lớp học hiện tại'}
+        label="Phòng thi của lớp"
+        actionText="Tạo bài kiểm tra mới"
+        actionIcon={IoAddCircleOutline}
+        onAction={() => setShowCreateTestModal(true)}
+        tests={tests}
+        countdowns={countdowns}
+        handleDeleteTest={handleDeleteTest}
+        emptyState={emptyState}
+      />
 
-        {/* === Test Cards Grid === */}
-        <div className={cx('content-section')}>
-          {tests.length > 0 ? (
-            viewMode === 'grid' ? (
-              <div className={cx('test-grid')}>
-                {tests.map((test) => (
-                  <TestCard key={test.testId} test={test} countdowns={countdowns} />
-                ))}
-              </div>
-            ) : (
-              <TestManagementTable tests={tests} onDelete={handleDeleteTest} />
-            )
-          ) : (
-            <div className={cx('empty-state')}>
-              <IoDocumentTextOutline className={cx('icon')} />
-              <h4>Chưa có bài kiểm tra nào được công bố</h4>
-              <p className="text-muted">Giáo viên của bạn sẽ sớm cập nhật các bài thi tại đây.</p>
-            </div>
-          )}
-        </div>
-      </Container>
-
-      {/* Modal tạo test */}
       <CreateTestModal
         show={showCreateTestModal}
         onClose={() => setShowCreateTestModal(false)}
@@ -177,12 +126,12 @@ function TestByClassPage() {
         classId={classId}
         chapterId={chapterId}
         onSuccess={() => {
-          fetchTests(); // Refresh danh sách test
+          fetchTests();
           setShowCreateTestModal(false);
           toast.success("Tạo bài kiểm tra mới thành công! 🎉");
         }}
       />
-    </div>
+    </>
   );
 }
 
