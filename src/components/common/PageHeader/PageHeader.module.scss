@@ -71,8 +71,19 @@
     }
 }
 
-.actionBtn {
+.actions-wrapper {
     z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+.actionBtn {
     display: inline-flex;
     align-items: center;
     gap: 8px;

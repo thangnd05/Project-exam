@@ -14,7 +14,8 @@ const PageHeader = ({
     actionIcon: Icon,
     className,
     description,
-    labelClassName
+    labelClassName,
+    children
 }) => {
     return (
         <div className={cx('headerHero', className)}>
@@ -28,15 +29,18 @@ const PageHeader = ({
                 )}
             </div>
 
-            {onAction && actionText && (
-                <button
-                    className={cx('actionBtn')}
-                    onClick={onAction}
-                >
-                    {Icon && <Icon size={24} />}
-                    {actionText}
-                </button>
-            )}
+            <div className={cx('actions-wrapper')}>
+                {onAction && actionText && (
+                    <button
+                        className={cx('actionBtn')}
+                        onClick={onAction}
+                    >
+                        {Icon && <Icon size={24} />}
+                        {actionText}
+                    </button>
+                )}
+                {children}
+            </div>
         </div>
     );
 };

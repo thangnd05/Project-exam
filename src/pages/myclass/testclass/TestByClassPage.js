@@ -13,6 +13,8 @@ import styles from './TestByClassPage.module.scss';
 import CreateTestModal from '~/components/modals/CreateTestModal';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import TestCard from '~/components/common/TestCard/TestCard';
+import TestManagementTable from '~/components/common/TestManagementTable/TestManagementTable';
+import { IoListOutline, IoGridOutline } from 'react-icons/io5';
 
 const cx = classNames.bind(styles);
 
@@ -24,6 +26,7 @@ function TestByClassPage() {
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
 
   // 🟢 Lấy thông tin lớp học
   useEffect(() => {
@@ -53,6 +56,21 @@ function TestByClassPage() {
         console.error('❌ Lỗi bài test:', err);
       })
       .finally(() => setLoading(false));
+  };
+
+  const handleDeleteTest = (testId) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa bài kiểm tra này không?')) {
+      axios
+        .delete(`/api/tests/${testId}`)
+        .then(() => {
+          toast.success('Xóa bài kiểm tra thành công!');
+          fetchTests();
+        })
+        .catch((err) => {
+          console.error('❌ Lỗi xóa bài test:', err);
+          toast.error('Không thể xóa bài kiểm tra. Vui lòng thử lại.');
+        });
+    }
   };
 
   useEffect(() => {
@@ -110,14 +128,37 @@ function TestByClassPage() {
           actionText="Tạo bài kiểm tra mới"
           actionIcon={IoAddCircleOutline}
           onAction={() => setShowCreateTestModal(true)}
-        />
+        >
+          <div className={cx('view-toggle')}>
+            <button
+              className={cx('toggle-btn', { active: viewMode === 'grid' })}
+              onClick={() => setViewMode('grid')}
+              title="Dạng lưới"
+            >
+              <IoGridOutline />
+            </button>
+            <button
+              className={cx('toggle-btn', { active: viewMode === 'table' })}
+              onClick={() => setViewMode('table')}
+              title="Quản lý chi tiết (Dạng bảng)"
+            >
+              <IoListOutline />
+            </button>
+          </div>
+        </PageHeader>
 
         {/* === Test Cards Grid === */}
-        <div className={cx('test-grid')}>
+        <div className={cx('content-section')}>
           {tests.length > 0 ? (
-            tests.map((test) => (
-              <TestCard key={test.testId} test={test} countdowns={countdowns} />
-            ))
+            viewMode === 'grid' ? (
+              <div className={cx('test-grid')}>
+                {tests.map((test) => (
+                  <TestCard key={test.testId} test={test} countdowns={countdowns} />
+                ))}
+              </div>
+            ) : (
+              <TestManagementTable tests={tests} onDelete={handleDeleteTest} />
+            )
           ) : (
             <div className={cx('empty-state')}>
               <IoDocumentTextOutline className={cx('icon')} />
