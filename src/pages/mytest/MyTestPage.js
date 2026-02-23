@@ -14,12 +14,6 @@ import PageHeader from '~/components/common/PageHeader/PageHeader';
 import CreateTestModal from '~/components/modals/CreateTestModal';
 import TestCard from '~/components/common/TestCard/TestCard';
 
-import {
-  getTestStatus,
-  calculateAllowedTime,
-  formatDateTime,
-} from '~/utils/testStatusHelper';
-
 const cx = classNames.bind(styles);
 
 function MyTestPage() {

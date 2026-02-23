@@ -10,7 +10,6 @@ import {
   IoTimeOutline,
   IoSchoolOutline,
   IoLockClosedOutline,
-  IoChevronForwardOutline,
 } from "react-icons/io5";
 
 import styles from "./TestResultPage.module.scss";
@@ -34,7 +33,6 @@ const TestResultPage = () => {
   const [detailLoading, setDetailLoading] = useState(false);
 
   const [error, setError] = useState("");
-  const [testGroups, setTestGroups] = useState([]); // Chứa dữ liệu đã format
 
   const getFullMediaUrl = (url) => {
     if (!url) return null;
@@ -43,12 +41,6 @@ const TestResultPage = () => {
     const backendUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
     return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
   };
-
-  const hasMediaList = (p) => {
-    const list = p?.passageMedias ?? p?.passageMediaList ?? p?.passage_media;
-    return Array.isArray(list) && list.length > 0;
-  };
-
   // ================================
   // ✅ LOAD RESULT + CHECK REVIEW TIME
   // ================================

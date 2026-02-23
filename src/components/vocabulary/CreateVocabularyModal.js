@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { IoAdd, IoText, IoLanguage, IoChatboxEllipses, IoClose } from 'react-icons/io5';
+import { IoAdd, IoText, IoLanguage, IoClose } from 'react-icons/io5';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';

@@ -15,7 +15,6 @@ import classNames from 'classnames/bind';
 import {
   IoArrowBack,
   IoAdd,
-  IoPlay,
   IoFlashOutline,
   IoTrashOutline,
   IoChevronBack,
@@ -41,7 +40,6 @@ const AlbumDetailPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const navigate = useNavigate();
-  const audioRef = useRef(null);
 
   const fetchVocabularies = async () => {
     try {

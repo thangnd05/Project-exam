@@ -1,29 +1,20 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Container, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
-  IoTimeOutline,
-  IoCalendarOutline,
-  IoStatsChartOutline,
-  IoPlayCircleOutline,
-  IoLockClosedOutline,
-  IoHourglassOutline,
   IoDocumentTextOutline,
 } from 'react-icons/io5';
 
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import TestCard from '~/components/common/TestCard/TestCard';
 import style from './TestByExamTypePage.module.scss';
-import { useAuth } from '../../../../hook/useAuth';
 
 const cx = classNames.bind(style);
 
 function TestByExamTypePage() {
   const { examTypeId } = useParams();
-  const { user } = useAuth();
-  const navigate = useNavigate();
 
   const [tests, setTests] = useState([]);
   const [examTypeName, setExamTypeName] = useState('');

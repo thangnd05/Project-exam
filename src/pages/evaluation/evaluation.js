@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    FaStar, FaQuoteLeft, FaPen, FaTimes, FaInfoCircle
+    FaStar, FaQuoteLeft, FaPen
 } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import styles from './evaluation.module.scss';

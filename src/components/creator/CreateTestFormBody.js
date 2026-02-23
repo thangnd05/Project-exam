@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Spinner, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Alert, Button } from 'react-bootstrap';
 import axios from 'axios';
 import {
   IoSettingsOutline,
@@ -11,7 +11,6 @@ import {
   IoSchoolOutline,
   IoBookOutline,
   IoRocketOutline,
-  IoMusicalNotesOutline,
   IoAddOutline,
 } from 'react-icons/io5';
 import { Trash, PlusCircle } from 'lucide-react';

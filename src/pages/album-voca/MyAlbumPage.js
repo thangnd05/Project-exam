@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { IoAddCircleOutline, IoFolderOpenOutline, IoArrowForwardOutline, IoDocumentTextOutline } from "react-icons/io5";
+import { IoAddCircleOutline, IoFolderOpenOutline, IoDocumentTextOutline } from "react-icons/io5";
 import { FaBook } from "react-icons/fa";
 
 import styles from './MyAlbumPage.module.scss';

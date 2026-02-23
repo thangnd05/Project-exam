@@ -9,9 +9,7 @@ import {
   IoSchoolOutline,
   IoBookOutline,
   IoCheckmarkCircleOutline,
-  IoTrashOutline,
   IoAddOutline,
-  IoImageOutline,
   IoMusicalNotesOutline,
   IoDocumentOutline,
 } from 'react-icons/io5';

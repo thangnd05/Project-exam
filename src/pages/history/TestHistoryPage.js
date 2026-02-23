@@ -13,7 +13,6 @@ import {
   IoCloseCircleOutline,
   IoDocumentTextOutline,
   IoTrophyOutline,
-  IoTimeOutline
 } from 'react-icons/io5';
 
 import style from './TestHistory.module.scss';
