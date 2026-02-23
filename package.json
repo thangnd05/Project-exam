@@ -18,6 +18,8 @@
     "classnames": "^2.5.1",
     "cors": "^2.8.5",
     "dompurify": "^3.2.3",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.6",
     "framer-motion": "^12.23.24",
     "html-react-parser": "^5.2.2",
     "jodit-react": "^4.1.2",
@@ -34,6 +36,7 @@
     "react-scripts": "5.0.1",
     "react-slick": "^0.31.0",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.7.0",
     "slick-carousel": "^1.8.1",
     "web-vitals": "^2.1.4"
   },

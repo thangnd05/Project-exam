@@ -22,6 +22,7 @@ import CreateQuestionsWithPassage from "~/pages/question/CreateQuestionsWithPass
 import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
 import BulkQuestionGroupCreator from '~/pages/test23/BulkQuestionGroupCreator';
 import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFromBankPage';
+import AdminDashboard from '~/Admin/AdminDashboard';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -33,6 +34,8 @@ export const publicRoutes = [
   { path: routes.about, component: About },
   { path: routes.verifyEmail, component: VerifyEmailPage },
   { path: routes.notFound, component: NotFoundPage },
+  { path: routes.adminDashboard, component: AdminDashboard, noContainer: true },
+
 
 ];
 

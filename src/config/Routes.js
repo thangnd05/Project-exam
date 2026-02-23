@@ -19,6 +19,10 @@ const routes = {
 
 
 
+  adminDashboard: '/admin/dashboard',
+
+
+
 
 
 
