@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Container } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import { IoAddCircleOutline, IoFolderOpenOutline, IoDocumentTextOutline } from "react-icons/io5";
+import { IoAddCircleOutline, IoFolderOpenOutline, IoDocumentTextOutline, IoGridOutline, IoListOutline, IoAdd } from "react-icons/io5";
 import { FaBook } from "react-icons/fa";
 
 import styles from './MyAlbumPage.module.scss';
 
 import CreateAlbumModal from '../../components/modals/CreateAlbumModal';
+import UpdateAlbumModal from '../../components/modals/UpdateAlbumModal';
 import PageHeader from '../../components/common/PageHeader/PageHeader';
+import AlbumManagementTable from '../../components/common/AlbumManagementTable/AlbumManagementTable';
 
 const cx = classNames.bind(styles);
 
@@ -17,6 +20,9 @@ function MyAlbumsPage() {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingAlbum, setEditingAlbum] = useState(null);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
   const navigate = useNavigate();
 
   // 🟢 Lấy danh sách album
@@ -29,6 +35,26 @@ function MyAlbumsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteAlbum = (albumId) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa album này không?')) {
+      axios
+        .delete(`/api/vocabulary-albums/${albumId}`)
+        .then(() => {
+          toast.success("🎉 Xóa Album thành công!");
+          fetchAlbums();
+        })
+        .catch((err) => {
+          console.error('❌ Lỗi xóa album:', err);
+          toast.error("❌ Có lỗi xảy ra khi xóa Album!");
+        });
+    }
+  };
+
+  const handleEditAlbum = (album) => {
+    setEditingAlbum(album);
+    setShowEditModal(true);
   };
 
   useEffect(() => {
@@ -47,67 +73,102 @@ function MyAlbumsPage() {
     <div className={cx('wrapper')}>
       <Container>
         {/* === Header Dashboard === */}
-        {/* === Header Dashboard === */}
         <PageHeader
           title="Album từ vựng"
-          label="Lưu trữ và quản lý hành trình chinh phục ngôn ngữ của bạn"
+          label="QUẢN LÝ ALBUM"
           actionText="Tạo album mới"
-          actionIcon={IoAddCircleOutline}
+          actionIcon={IoAdd}
           onAction={() => setShowModal(true)}
-        />
-
-        {/* === Body Content === */}
-        {albums.length === 0 ? (
-          <div className={cx('empty-state')}>
-            <div className={cx('empty-icon')}>
-              <IoFolderOpenOutline />
-            </div>
-            <h4>Chưa có album nào</h4>
-            <p>Bắt đầu tạo album đầu tiên để lưu lại các từ vựng thú vị nhé!</p>
-            <button className={cx('btn-create-empty')} onClick={() => setShowModal(true)}>
-              <IoAddCircleOutline />
-              Tạo album ngay
+        >
+          <div className={cx('view-toggle')}>
+            <button
+              className={cx('toggle-btn', { active: viewMode === 'grid' })}
+              onClick={() => setViewMode('grid')}
+              title="Dạng lưới"
+            >
+              <IoGridOutline />
+            </button>
+            <button
+              className={cx('toggle-btn', { active: viewMode === 'table' })}
+              onClick={() => setViewMode('table')}
+              title="Dạng danh sách"
+            >
+              <IoListOutline />
             </button>
           </div>
-        ) : (
-          <div className={cx('album-grid')}>
-            {albums.map((album, index) => (
-              <div
-                key={album.albumId}
-                className={cx('album-card')}
-                onClick={() => navigate(`/albums/${album.albumId}`)}
-              >
-                <div className={cx('card-top')}>
-                  <div className={cx('card-icon')}>
-                    <FaBook />
-                  </div>
-                  <span className={cx('index')}>
-                    {(index + 1).toString().padStart(2, '0')}
-                  </span>
-                </div>
+        </PageHeader>
 
-                <h3 className={cx('album-title')}>{album.name}</h3>
-
-                <div className={cx('album-info')}>
-                  <IoDocumentTextOutline />
-                  <span>
-                    {album.description || 'Hành trình chinh phục từ vựng mỗi ngày'}
-                  </span>
-                </div>
-
-                <button className={cx('btn-view')}>
-                  Bắt đầu học ngay
-                </button>
+        {/* === Body Content === */}
+        <div className={cx('content-section')}>
+          {albums.length === 0 ? (
+            <div className={cx('empty-state')}>
+              <div className={cx('empty-icon')}>
+                <IoFolderOpenOutline />
               </div>
-            ))}
-          </div>
-        )}
+              <h4>Chưa có album nào</h4>
+              <p>Bắt đầu tạo album đầu tiên để lưu lại các từ vựng thú vị nhé!</p>
+              <button className={cx('btn-create-empty')} onClick={() => setShowModal(true)}>
+                <IoAddCircleOutline />
+                Tạo album ngay
+              </button>
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className={cx('album-grid')}>
+              {albums.map((album, index) => (
+                <div
+                  key={album.albumId}
+                  className={cx('album-card')}
+                  onClick={() => navigate(`/albums/${album.albumId}`)}
+                >
+                  <div className={cx('card-top')}>
+                    <div className={cx('card-icon')}>
+                      <FaBook />
+                    </div>
+                    <span className={cx('index')}>
+                      {(index + 1).toString().padStart(2, '0')}
+                    </span>
+                  </div>
+
+                  <h3 className={cx('album-title')}>{album.name}</h3>
+
+                  <div className={cx('album-info')}>
+                    <IoDocumentTextOutline />
+                    <span>
+                      {album.description || 'Hành trình chinh phục từ vựng mỗi ngày'}
+                    </span>
+                  </div>
+
+                  <button className={cx('btn-view')}>
+                    Bắt đầu học ngay
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <AlbumManagementTable
+              albums={albums}
+              onDelete={handleDeleteAlbum}
+              onEdit={handleEditAlbum}
+            />
+          )}
+        </div>
       </Container>
 
-      {/* === Modal tạo album Standardized === */}
+      {/* === Modal tạo album === */}
       <CreateAlbumModal
         show={showModal}
         onClose={() => setShowModal(false)}
+        onSuccess={fetchAlbums}
+      />
+
+      {/* === Modal chỉnh sửa album === */}
+      <UpdateAlbumModal
+        show={showEditModal}
+        album={editingAlbum}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingAlbum(null);
+        }}
         onSuccess={fetchAlbums}
       />
     </div>

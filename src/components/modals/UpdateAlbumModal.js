@@ -1,19 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { toast } from 'react-toastify';
 import axios from "axios";
 import classNames from "classnames/bind";
-import styles from "./CreateAlbumModal.module.scss";
-import { FaFolderPlus, FaEdit, FaInfoCircle, FaTimes } from "react-icons/fa";
+import styles from "./CreateAlbumModal.module.scss"; // Reuse same styles
+import { FaEdit, FaInfoCircle, FaTimes } from "react-icons/fa";
+import { IoSaveOutline } from "react-icons/io5";
 
 const cx = classNames.bind(styles);
 
-function CreateAlbumModal({ show, onClose, onSuccess }) {
+function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleCreate = async () => {
+    useEffect(() => {
+        if (album) {
+            setName(album.name || "");
+            setDescription(album.description || "");
+        }
+    }, [album, show]);
+
+    const handleUpdate = async () => {
         if (!name.trim()) {
             toast.warning("⚠️ Vui lòng nhập tên Album!");
             return;
@@ -27,22 +35,18 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
                 description: description
             };
 
-            await axios.post("/api/vocabulary-albums", payload);
+            await axios.put(`/api/vocabulary-albums/${album.albumId}`, payload);
 
-            toast.success("🎉 Tạo Album thành công!");
+            toast.success("🎉 Cập nhật Album thành công!");
 
-            // Reset + close modal
-            setName("");
-            setDescription("");
             onClose();
-
             if (onSuccess) onSuccess();
 
         } catch (err) {
             console.error(err);
             toast.error(
                 err.response?.data?.message ||
-                "❌ Có lỗi xảy ra khi tạo Album!"
+                "❌ Có lỗi xảy ra khi cập nhật Album!"
             );
         } finally {
             setLoading(false);
@@ -60,8 +64,8 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
             {/* Header */}
             <div className={cx("header")}>
                 <div className={cx("titleWrapper")}>
-                    <FaFolderPlus />
-                    <h3 className={cx("title")}>Tạo Album Mới</h3>
+                    <FaEdit />
+                    <h3 className={cx("title")}>Chỉnh sửa Album</h3>
                 </div>
 
                 <button className={cx("closeBtn")} onClick={onClose}>
@@ -111,19 +115,20 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
             {/* Footer */}
             <div className={cx("footer")}>
                 <button className={cx("btnCancel")} onClick={onClose} disabled={loading}>
-                    Để sau
+                    Hủy
                 </button>
 
                 <button
                     className={cx("btnSubmit")}
-                    onClick={handleCreate}
+                    onClick={handleUpdate}
                     disabled={loading}
                 >
-                    {loading ? "Đang tạo..." : "Tạo Album ngay"}
+                    <IoSaveOutline className="me-2" />
+                    {loading ? "Đang lưu..." : "Lưu thay đổi"}
                 </button>
             </div>
         </Modal>
     );
 }
 
-export default CreateAlbumModal;
+export default UpdateAlbumModal;
