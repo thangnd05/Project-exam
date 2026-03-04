@@ -1,15 +1,14 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Spinner } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
   IoDocumentTextOutline,
 } from 'react-icons/io5';
 
-import PageHeader from '~/components/common/PageHeader/PageHeader';
-import TestCard from '~/components/common/TestCard/TestCard';
 import style from './TestByExamTypePage.module.scss';
+import TestListContainer from '~/components/common/TestListContainer/TestListContainer';
 
 const cx = classNames.bind(style);
 
@@ -60,8 +59,6 @@ function TestByExamTypePage() {
     return () => clearInterval(interval);
   }, [tests]);
 
-  // handleStartTest moved to TestCard
-
   if (loading) {
     return (
       <div
@@ -74,32 +71,24 @@ function TestByExamTypePage() {
     );
   }
 
-  return (
-    <div className={cx('wrapper')}>
-      <Container>
-        <PageHeader
-          className={cx('centerHeader')}
-          title={examTypeName || 'Loại bài tập'}
-          label="Khám phá bộ đề"
-        />
-
-        <div className={cx('grid')}>
-          {tests.length > 0 ? (
-            tests.map((test) => (
-              <TestCard key={test.testId} test={test} countdowns={countdowns} />
-            ))
-          ) : (
-            <div className={cx('empty-state')}>
-              <IoDocumentTextOutline className={cx('icon')} />
-              <h4>Bộ đề này hiện đang được soạn thảo</h4>
-              <p className="text-muted">
-                Vui lòng quay lại sau để trải nghiệm những thử thách mới.
-              </p>
-            </div>
-          )}
-        </div>
-      </Container>
+  const emptyState = (
+    <div className={cx('empty-state')}>
+      <IoDocumentTextOutline className={cx('icon')} />
+      <h4>Bộ đề này hiện đang được soạn thảo</h4>
+      <p className="text-muted">
+        Vui lòng quay lại sau để trải nghiệm những thử thách mới.
+      </p>
     </div>
+  );
+
+  return (
+    <TestListContainer
+      title={examTypeName || 'Loại bài tập'}
+      label="Khám phá bộ đề"
+      tests={tests}
+      countdowns={countdowns}
+      emptyState={emptyState}
+    />
   );
 }
 
