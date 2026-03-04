@@ -72,7 +72,7 @@ const AlbumManagementTable = ({ albums, onDelete, onEdit }) => {
                                                 className={cx('btn-action', 'delete')}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onDelete(album.albumId);
+                                                    onDelete(album);
                                                 }}
                                             >
                                                 <IoTrashOutline />

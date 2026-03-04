@@ -11,6 +11,7 @@ import styles from './MyAlbumPage.module.scss';
 
 import CreateAlbumModal from '../../components/modals/CreateAlbumModal';
 import UpdateAlbumModal from '../../components/modals/UpdateAlbumModal';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import PageHeader from '../../components/common/PageHeader/PageHeader';
 import AlbumManagementTable from '../../components/common/AlbumManagementTable/AlbumManagementTable';
 
@@ -21,7 +22,9 @@ function MyAlbumsPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editingAlbum, setEditingAlbum] = useState(null);
+  const [albumToDelete, setAlbumToDelete] = useState(null);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
   const navigate = useNavigate();
 
@@ -37,18 +40,24 @@ function MyAlbumsPage() {
     }
   };
 
-  const handleDeleteAlbum = (albumId) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa album này không?')) {
-      axios
-        .delete(`/api/vocabulary-albums/${albumId}`)
-        .then(() => {
-          toast.success("🎉 Xóa Album thành công!");
-          fetchAlbums();
-        })
-        .catch((err) => {
-          console.error('❌ Lỗi xóa album:', err);
-          toast.error("❌ Có lỗi xảy ra khi xóa Album!");
-        });
+  const handleDeleteAlbum = (album) => {
+    setAlbumToDelete(album);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!albumToDelete) return;
+
+    try {
+      await axios.delete(`/api/vocabulary-albums/${albumToDelete.albumId}`);
+      toast.success("🎉 Xóa Album thành công!");
+      fetchAlbums();
+    } catch (err) {
+      console.error('❌ Lỗi xóa album:', err);
+      toast.error("❌ Có lỗi xảy ra khi xóa Album!");
+    } finally {
+      setShowDeleteModal(false);
+      setAlbumToDelete(null);
     }
   };
 
@@ -170,6 +179,18 @@ function MyAlbumsPage() {
           setEditingAlbum(null);
         }}
         onSuccess={fetchAlbums}
+      />
+
+      {/* === Modal xác nhận xóa === */}
+      <ConfirmDeleteModal
+        show={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setAlbumToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Xác nhận xóa Album"
+        message={`Bạn có chắc chắn muốn xóa album "${albumToDelete?.name}"? Mọi từ vựng trong album sẽ bị ảnh hưởng.`}
       />
     </div>
   );
