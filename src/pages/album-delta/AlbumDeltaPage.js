@@ -10,6 +10,7 @@ import {
 import { toast } from 'react-toastify';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import CreateVocabularyModal from '~/components/vocabulary/CreateVocabularyModal';
+import UpdateVocabularyModal from '~/components/vocabulary/UpdateVocabularyModal';
 import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import classNames from 'classnames/bind';
 import {
@@ -17,6 +18,7 @@ import {
   IoAdd,
   IoFlashOutline,
   IoTrashOutline,
+  IoPencilOutline,
   IoChevronBack,
   IoChevronForward,
   IoListOutline,
@@ -34,8 +36,10 @@ const AlbumDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [vocabToDelete, setVocabToDelete] = useState(null);
+  const [vocabToUpdate, setVocabToUpdate] = useState(null);
   const [flashMode, setFlashMode] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -73,6 +77,11 @@ const AlbumDetailPage = () => {
   const handleDeleteClick = (vocab) => {
     setVocabToDelete(vocab);
     setShowDeleteModal(true);
+  };
+
+  const handleEditClick = (vocab) => {
+    setVocabToUpdate(vocab);
+    setShowUpdateModal(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -248,12 +257,22 @@ const AlbumDetailPage = () => {
                       </div>
                     </td>
                     <td className="text-center">
-                      <button
-                        className="btn btn-link text-danger p-0"
-                        onClick={() => handleDeleteClick(vocab)}
-                      >
-                        <IoTrashOutline size={22} />
-                      </button>
+                      <div className="d-flex justify-content-center gap-2">
+                        <button
+                          className="btn btn-link text-primary p-0"
+                          onClick={() => handleEditClick(vocab)}
+                          title="Sửa từ vựng"
+                        >
+                          <IoPencilOutline size={22} />
+                        </button>
+                        <button
+                          className="btn btn-link text-danger p-0"
+                          onClick={() => handleDeleteClick(vocab)}
+                          title="Xóa từ vựng"
+                        >
+                          <IoTrashOutline size={22} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -276,6 +295,16 @@ const AlbumDetailPage = () => {
         onClose={() => setShowModal(false)}
         onSuccess={fetchVocabularies}
         albumId={albumId}
+      />
+
+      <UpdateVocabularyModal
+        show={showUpdateModal}
+        vocab={vocabToUpdate}
+        onClose={() => {
+          setShowUpdateModal(false);
+          setVocabToUpdate(null);
+        }}
+        onSuccess={fetchVocabularies}
       />
 
       <ConfirmDeleteModal
