@@ -43,13 +43,8 @@ export const publicRoutes = [
 export const privateRoutes = [
   { path: routes.testStart, component: TestStartPage, noContainer: true },
   { path: routes.testResult, component: TestResultPage },
-
-
   { path: routes.createQuestionWithPassage, component: CreateQuestionsWithPassage },
   { path: routes.createQuestionPage, component: CreateQuestionPage },
-
-
-
   { path: routes.testHistory, component: TestHistoryPage },
   { path: routes.myClasses, component: MyClassesPage },
   { path: routes.classChapterTests, component: TestByClassPage },

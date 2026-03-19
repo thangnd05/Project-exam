@@ -21,7 +21,8 @@ const TestListContainer = ({
     countdowns = {},
     handleDeleteTest,
     emptyState,
-    loading
+    loading,
+    onRefresh
 }) => {
     const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
 
@@ -66,6 +67,7 @@ const TestListContainer = ({
                             <TestManagementTable
                                 tests={tests}
                                 onDelete={handleDeleteTest}
+                                onRefresh={onRefresh}
                                 countdowns={countdowns}
                             />
                         )

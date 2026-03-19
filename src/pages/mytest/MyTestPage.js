@@ -117,6 +117,7 @@ function MyTestPage() {
         tests={tests}
         countdowns={countdowns}
         handleDeleteTest={handleDeleteTest}
+        onRefresh={fetchTests}
         emptyState={emptyState}
       />
 

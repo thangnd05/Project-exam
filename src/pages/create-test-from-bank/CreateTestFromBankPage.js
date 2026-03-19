@@ -20,9 +20,12 @@ import {
   IoRocketOutline,
   IoChevronDownOutline,
   IoChevronUpOutline,
+  IoCreateOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hook/useBaseMetaData';
+import EditQuestionModal from '~/components/modals/EditQuestionModal';
 import styles from './CreateTestFromBankPage.module.scss';
+
 
 const cx = classNames.bind(styles);
 
@@ -55,23 +58,16 @@ const CreateTestFromBankPage = () => {
   const [partConfigs, setPartConfigs] = useState({});
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [notification, setNotification] = useState({});
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [editingPartId, setEditingPartId] = useState(null);
 
   const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
 
-  // BE: GET /api/questions/by-part/{examPartId} (cá nhân: không classId/chapterId; JWT tự gửi)
-  useEffect(() => {
-    if (!testInfo.examTypeId || !examParts?.length) {
-      setPartConfigs({});
-      return;
-    }
-    const initial = {};
-    examParts.forEach((p) => {
-      initial[p.examPartId] = { ...defaultPartConfig(), expanded: false, loading: true };
-    });
-    setPartConfigs(initial);
-
-    examParts.forEach((part) => {
-      const examPartId = part.examPartId;
+  const loadQuestionsForPart = (examPartId) => {
+      setPartConfigs((prev) => ({
+        ...prev,
+        [examPartId]: { ...prev[examPartId], loading: true },
+      }));
       axios
         .get(`/api/questions/by-part/${examPartId}`)
         .then((res) => {
@@ -88,8 +84,31 @@ const CreateTestFromBankPage = () => {
             [examPartId]: { ...prev[examPartId], bankQuestions: [], loading: false },
           }));
         });
+  };
+
+  // BE: GET /api/questions/by-part/{examPartId} (cá nhân: không classId/chapterId; JWT tự gửi)
+  useEffect(() => {
+    if (!testInfo.examTypeId || !examParts?.length) {
+      setPartConfigs({});
+      return;
+    }
+    const initial = {};
+    examParts.forEach((p) => {
+      initial[p.examPartId] = { ...defaultPartConfig(), expanded: false, loading: true };
+    });
+    setPartConfigs(initial);
+
+    examParts.forEach((part) => {
+      loadQuestionsForPart(part.examPartId);
     });
   }, [testInfo.examTypeId, examParts]);
+
+  const handleEditQuestionSuccess = () => {
+      setEditingQuestionId(null);
+      if (editingPartId) {
+          loadQuestionsForPart(editingPartId);
+      }
+  };
 
   const handleExamTypeChange = (value) => {
     setTestInfo((prev) => ({ ...prev, examTypeId: value }));
@@ -472,6 +491,17 @@ const CreateTestFromBankPage = () => {
                                             <li key={id} className={cx('questionItem', { selected: checked })}>
                                               <span className={cx('questionIndex')}>{index + 1}.</span>
                                               <span className={cx('questionText')}>{q.questionText || '(Không có nội dung)'}</span>
+                                              <button 
+                                                type="button" 
+                                                className={cx('btnEditQuestion')}
+                                                onClick={() => {
+                                                    setEditingPartId(part.examPartId);
+                                                    setEditingQuestionId(id);
+                                                }}
+                                                title="Sửa câu hỏi này"
+                                              >
+                                                  <IoCreateOutline size={18} />
+                                              </button>
                                             </li>
                                           );
                                         })}
@@ -506,6 +536,14 @@ const CreateTestFromBankPage = () => {
           </div>
         </Form>
       </div>
+      
+      {/* Edit Question Modal */}
+      <EditQuestionModal 
+        show={!!editingQuestionId} 
+        onHide={() => setEditingQuestionId(null)} 
+        questionId={editingQuestionId}
+        onSuccess={handleEditQuestionSuccess}
+      />
     </div>
   );
 };

@@ -11,12 +11,14 @@ import {
 import classNames from 'classnames/bind';
 import styles from './TestManagementTable.module.scss';
 import { formatDateTime, getTestStatus } from '~/utils/testStatusHelper';
+import EditTestModal from '~/components/modals/EditTestModal';
 
 const cx = classNames.bind(styles);
 
-const TestManagementTable = ({ tests, onDelete, countdowns }) => {
+const TestManagementTable = ({ tests, onDelete, onRefresh, countdowns }) => {
     const navigate = useNavigate();
     const now = new Date();
+    const [editingTest, setEditingTest] = React.useState(null);
 
     const getBadgeVariant = (status) => {
         switch (status) {
@@ -62,16 +64,19 @@ const TestManagementTable = ({ tests, onDelete, countdowns }) => {
                                 </td>
                                 <td>
                                     <div className={cx('action-group')}>
+                                        {onRefresh && (
                                         <OverlayTrigger overlay={<Tooltip>Sửa bài test</Tooltip>}>
                                             <Button
                                                 variant="link"
                                                 className={cx('btn-action', 'edit')}
-                                                onClick={() => navigate(`/tests/edit/${test.testId}`)}
+                                                onClick={() => setEditingTest(test)}
                                             >
                                                 <IoPencilOutline />
                                             </Button>
                                         </OverlayTrigger>
+                                        )}
 
+                                        {onDelete && (
                                         <OverlayTrigger overlay={<Tooltip>Xóa bài test</Tooltip>}>
                                             <Button
                                                 variant="link"
@@ -81,6 +86,7 @@ const TestManagementTable = ({ tests, onDelete, countdowns }) => {
                                                 <IoTrashOutline />
                                             </Button>
                                         </OverlayTrigger>
+                                        )}
 
                                         <OverlayTrigger overlay={<Tooltip>Xem chi tiết điểm</Tooltip>}>
                                             <Button
@@ -98,6 +104,16 @@ const TestManagementTable = ({ tests, onDelete, countdowns }) => {
                     })}
                 </tbody>
             </Table>
+            
+            <EditTestModal
+                show={!!editingTest}
+                onHide={() => setEditingTest(null)}
+                test={editingTest}
+                onSuccess={() => {
+                    setEditingTest(null);
+                    if (onRefresh) onRefresh();
+                }}
+            />
         </div>
     );
 };
