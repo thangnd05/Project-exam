@@ -59,6 +59,7 @@ const CreateTestFormBody = ({
     addQuestion,
     removeQuestion,
     updateQuestionText,
+    updateQuestionField,
     updateAnswer,
     addMediaFiles,
     removeMediaFile,
@@ -105,6 +106,13 @@ const CreateTestFormBody = ({
 
       {showCreatorTypeTabs && (
         <CreatorTabs activeCreatorType={activeCreatorType} setCreatorType={setCreatorType} />
+      )}
+
+      {activeCreatorType === CREATOR_TYPES.TEST && (
+        <Alert variant="info" className="mb-3">
+          <strong>Ghi chú:</strong> Sau khi tạo đề, vào chế độ quản lý dạng bảng và bấm biểu tượng bút chì để sửa đề,
+          sửa từng câu hỏi, đáp án, cũng như cập nhật file ảnh/audio liên quan.
+        </Alert>
       )}
 
       <div className={cx('configCard')}>
@@ -211,6 +219,7 @@ const CreateTestFormBody = ({
               index={i}
               removeQuestionFn={removeQuestion}
               updateQuestionTextFn={updateQuestionText}
+              updateQuestionFieldFn={updateQuestionField}
               updateAnswerFn={updateAnswer}
               addMediaFilesFn={addMediaFiles}
               removeMediaFileFn={removeMediaFile}

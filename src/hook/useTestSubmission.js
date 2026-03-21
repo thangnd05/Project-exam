@@ -72,6 +72,7 @@ export const useTestSubmission = ({
                     questions.map((q) => {
                         const formData = new FormData();
                         const hasMedia = q.mediaFiles && q.mediaFiles.length > 0;
+                        const hasMediaUrl = !!q.mediaUrl?.trim();
                         const passageType = q.passageType || 'LISTENING';
                         const payload = {
                             testPartId: Number(newPartId),
@@ -80,7 +81,9 @@ export const useTestSubmission = ({
                             classId: mode === 'class' ? Number(classId) : null,
                             chapterId: mode === 'class' ? Number(chapterId) : null,
                             answers: q.answers,
-                            passage: hasMedia ? { passageType, content: '' } : null,
+                            passage: (hasMedia || hasMediaUrl)
+                                ? { passageType, content: '', mediaUrl: q.mediaUrl?.trim() || null }
+                                : null,
                         };
                         formData.append('request', JSON.stringify(payload));
                         if (hasMedia) {

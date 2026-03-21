@@ -1,13 +1,10 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Spinner } from 'react-bootstrap';
+import {useEffect, useState} from 'react';
+import {useParams} from 'react-router-dom';
+import {Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {
-  IoDocumentTextOutline,
-  IoAddCircleOutline
-} from 'react-icons/io5';
-import { toast } from 'react-toastify';
+import {IoDocumentTextOutline, IoAddCircleOutline} from 'react-icons/io5';
+import {toast} from 'react-toastify';
 
 import styles from './TestByClassPage.module.scss';
 import CreateTestModal from '~/components/modals/CreateTestModal';
@@ -16,7 +13,7 @@ import TestListContainer from '~/components/common/TestListContainer/TestListCon
 const cx = classNames.bind(styles);
 
 function TestByClassPage() {
-  const { classId, chapterId } = useParams();
+  const {classId, chapterId} = useParams();
   const [tests, setTests] = useState([]);
   const [className, setClassName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -90,7 +87,10 @@ function TestByClassPage() {
 
   if (loading) {
     return (
-      <div className="d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
+      <div
+        className="d-flex flex-column align-items-center justify-content-center"
+        style={{minHeight: '60vh'}}
+      >
         <Spinner animation="grow" variant="primary" />
         <p className="mt-3 fw-bold text-primary">Đang tải phòng thi...</p>
       </div>
@@ -101,7 +101,9 @@ function TestByClassPage() {
     <div className={cx('empty-state')}>
       <IoDocumentTextOutline className={cx('icon')} />
       <h4>Chưa có bài kiểm tra nào được công bố</h4>
-      <p className="text-muted">Giáo viên của bạn sẽ sớm cập nhật các bài thi tại đây.</p>
+      <p className="text-muted">
+        Giáo viên của bạn sẽ sớm cập nhật các bài thi tại đây.
+      </p>
     </div>
   );
 
@@ -129,7 +131,7 @@ function TestByClassPage() {
         onSuccess={() => {
           fetchTests();
           setShowCreateTestModal(false);
-          toast.success("Tạo bài kiểm tra mới thành công! 🎉");
+          toast.success('Tạo bài kiểm tra mới thành công! 🎉');
         }}
       />
     </>

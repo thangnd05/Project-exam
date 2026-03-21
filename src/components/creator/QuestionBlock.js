@@ -17,6 +17,7 @@ const QuestionBlock = ({
     index,
     removeQuestionFn,
     updateQuestionTextFn,
+    updateQuestionFieldFn,
     updateAnswerFn,
     addMediaFilesFn,
     removeMediaFileFn,
@@ -71,6 +72,14 @@ const QuestionBlock = ({
                             aria-label="Thêm file"
                         />
                     </div>
+                    <input
+                        type="text"
+                        className={cx('inputModern')}
+                        placeholder="Hoặc điền URL phương tiện (audio/image/document)..."
+                        value={question.mediaUrl || ''}
+                        onChange={(e) => updateQuestionFieldFn?.(index, 'mediaUrl', e.target.value)}
+                        aria-label="Điền URL phương tiện"
+                    />
                     {question.mediaFiles?.length > 0 && (
                         <ul className="list-unstyled mb-0 mt-2">
                             {question.mediaFiles.map((file, fIdx) => (

@@ -15,6 +15,7 @@ const emptyQuestion = {
   questionText: '',
   questionType: 'MCQ',
   mediaFiles: [],
+  mediaUrl: '',
   passageType: 'LISTENING',
   answers: [
     { answerLabel: 'A', answerText: '', isCorrect: false },
@@ -56,7 +57,7 @@ export const useCreateTest = ({
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({});
 
-  const { examTypes, examParts, setExamParts } = useBaseMetaData(testInfo.examTypeId);
+  const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
 
   const { handleSubmit: submitLogic } = useTestSubmission({
     mode,
@@ -93,6 +94,12 @@ export const useCreateTest = ({
   const updateQuestionText = (index, value) => {
     const newQ = [...questions];
     newQ[index] = { ...newQ[index], questionText: value };
+    setQuestions(newQ);
+  };
+
+  const updateQuestionField = (index, field, value) => {
+    const newQ = [...questions];
+    newQ[index] = { ...newQ[index], [field]: value };
     setQuestions(newQ);
   };
 
@@ -224,6 +231,7 @@ export const useCreateTest = ({
     addQuestion,
     removeQuestion,
     updateQuestionText,
+    updateQuestionField,
     updateAnswer,
     addMediaFiles,
     removeMediaFile,
