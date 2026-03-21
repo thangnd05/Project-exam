@@ -23,6 +23,7 @@ import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
 import BulkQuestionGroupCreator from '~/pages/test23/BulkQuestionGroupCreator';
 import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFromBankPage';
 import AdminDashboard from '~/Admin/AdminDashboard';
+import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBankPage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -55,6 +56,7 @@ export const privateRoutes = [
   { path: routes.oauth2Redirect, component: MyTestPage },
   { path: routes.classChapterPage, component: ChapterOfClass },
   { path: routes.createTestFromBank, component: CreateTestFromBankPage },
+  { path: routes.personalQuestionBank, component: PersonalQuestionBankPage },
   { path: routes.premiumBulkQuestion, component: PremiumBulkQuestionCreator },
   { path: routes.bulkPassageGroup, component: BulkQuestionGroupCreator },
   // {

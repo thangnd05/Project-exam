@@ -16,10 +16,12 @@ import {
 import { Trash, PlusCircle } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import { useCreateTest, CREATOR_TYPES } from '~/hook/useCreateTest';
 import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
+import routes from '~/config/Routes';
 import styles from '../modals/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -41,6 +43,7 @@ const CreateTestFormBody = ({
   embedded = false,
   showCreatorTypeTabs = true,
 }) => {
+  const navigate = useNavigate();
   const [creatorTypeLocal, setCreatorTypeLocal] = useState(creatorTypeProp);
   const isControlled = typeof onCreatorTypeChange === 'function';
   const activeCreatorType = isControlled ? creatorTypeProp : creatorTypeLocal;
@@ -112,6 +115,26 @@ const CreateTestFormBody = ({
         <Alert variant="info" className="mb-3">
           <strong>Ghi chú:</strong> Sau khi tạo đề, vào chế độ quản lý dạng bảng và bấm biểu tượng bút chì để sửa đề,
           sửa từng câu hỏi, đáp án, cũng như cập nhật file ảnh/audio liên quan.
+        </Alert>
+      )}
+
+      {activeCreatorType === CREATOR_TYPES.TEST && (
+        <Alert variant="light" className="mb-3 border">
+          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span>
+              <strong>Kho lưu trữ câu hỏi:</strong> Nếu bạn muốn tạo đề từ câu hỏi đã lưu trong kho (chọn thủ công hoặc random theo từng part), vào trang này.
+            </span>
+            <Button
+              type="button"
+              variant="outline-primary"
+              onClick={() => {
+                onCancel?.();
+                navigate(routes.personalQuestionBank);
+              }}
+            >
+              Mở kho lưu trữ
+            </Button>
+          </div>
         </Alert>
       )}
 
