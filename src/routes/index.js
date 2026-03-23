@@ -1,5 +1,7 @@
 import routes from '../config/Routes';
 import Login from '~/pages/user/login/login';
+import ForgotPassword from '~/pages/user/login/forgot';
+import ResetPassWord from '~/pages/user/login/reset';
 import TestPage from '~/pages/exam/TestPage';
 import TestByExamTypePage from '~/pages/exam/examtype/examtypeById/TestByExamTypePage';
 import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStartPage';
@@ -24,10 +26,13 @@ import BulkQuestionGroupCreator from '~/pages/test23/BulkQuestionGroupCreator';
 import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFromBankPage';
 import AdminDashboard from '~/Admin/AdminDashboard';
 import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBankPage';
+import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
   { path: routes.login, component: Login },
+  { path: routes.forgot, component: ForgotPassword },
+  { path: routes.reset, component: ResetPassWord },
   { path: routes.home, component: TestPage },
   { path: routes.examTypeDetail, component: TestByExamTypePage },
   { path: routes.policy, component: Policy },
@@ -59,6 +64,7 @@ export const privateRoutes = [
   { path: routes.personalQuestionBank, component: PersonalQuestionBankPage },
   { path: routes.premiumBulkQuestion, component: PremiumBulkQuestionCreator },
   { path: routes.bulkPassageGroup, component: BulkQuestionGroupCreator },
+  { path: routes.profile, component: ProfileOverviewPage },
   // {
   //   path: routes.oauth2Redirect,
   //   component: MyTestPage,

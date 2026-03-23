@@ -45,6 +45,7 @@ const routes = {
   forgot: '/forgot',
   reset: '/reset',
   verifyEmail: '/verify',
+  profile: '/profile',
 
   oauth2Redirect: '/oauth2/redirect',
 
