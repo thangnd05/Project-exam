@@ -249,18 +249,12 @@ const PersonalQuestionBankPage = () => {
       <div className={cx('container')}>
         <header className={cx('header')}>
           <h1 className={cx('title')}>
-            <IoLibraryOutline
-              className={cx({
-                titlePersonalIcon: bankScope === BANK_SCOPE.PERSONAL,
-              })}
-            />{' '}
-            {bankScope === BANK_SCOPE.CLASS
-              ? 'Kho câu hỏi lớp học'
-              : (
-                <span className={cx('titlePersonalGradient')}>
-                  Kho câu hỏi cá nhân
-                </span>
-              )}
+            <IoLibraryOutline className={cx('titleIcon')} />{' '}
+            <span className={cx('titleGradient')}>
+              {bankScope === BANK_SCOPE.CLASS
+                ? 'Kho câu hỏi lớp học'
+                : 'Kho câu hỏi cá nhân'}
+            </span>
           </h1>
           <p className={cx('subtitle')}>
             {bankScope === BANK_SCOPE.CLASS

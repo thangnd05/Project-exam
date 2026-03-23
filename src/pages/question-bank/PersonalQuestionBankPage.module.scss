@@ -24,7 +24,7 @@
   font-weight: 800;
 }
 
-.titlePersonalGradient {
+.titleGradient {
   background: var(--primary-gradient);
   -webkit-background-clip: text;
   background-clip: text;
@@ -32,7 +32,7 @@
   color: transparent;
 }
 
-.titlePersonalIcon {
+.titleIcon {
   color: var(--accent-color);
 }
 
@@ -76,6 +76,9 @@
 .scopeBtn {
   border-radius: 10px !important;
   font-weight: 700 !important;
+  min-height: 38px !important;
+  padding: 8px 14px !important;
+  font-size: 1.35rem !important;
 }
 
 .selectField {
@@ -97,10 +100,10 @@
 
 .partCardHeader {
   width: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   padding: 14px 16px;
   border: none;
   background: #f8fafc;
@@ -110,6 +113,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  text-align: left;
   font-size: 1.45rem;
   font-weight: 700;
   color: #0f172a;
@@ -121,7 +126,9 @@
   font-size: 1.2rem;
   font-weight: 700;
   border-radius: 999px;
+  min-width: 64px;
   padding: 4px 10px;
+  text-align: center;
 }
 
 .partCardBody {
@@ -187,6 +194,13 @@
 
 .editBtn {
   border-radius: 9px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  font-size: 1.55rem !important;
 }
 
 .loadingWrap {
