@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
   IoAdd,
@@ -11,6 +12,7 @@ import {
 import styles from './MyTestPage.module.scss';
 import { useAuth } from '../../hook/useAuth';
 import CreateTestModal from '~/components/modals/CreateTestModal';
+import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import TestListContainer from '~/components/common/TestListContainer/TestListContainer';
 
 const cx = classNames.bind(styles);
@@ -23,6 +25,8 @@ function MyTestPage() {
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [testToDelete, setTestToDelete] = useState(null);
 
   const fetchTests = () => {
     setLoading(true);
@@ -40,15 +44,26 @@ function MyTestPage() {
   };
 
   const handleDeleteTest = (testId) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa bài kiểm tra này không?')) {
-      axios
-        .delete(`/api/tests/${testId}`)
-        .then(() => {
-          fetchTests();
-        })
-        .catch((err) => {
-          console.error('❌ Lỗi xóa bài test:', err);
-        });
+    const selectedTest = tests.find((testItem) => testItem.testId === testId);
+    setTestToDelete(selectedTest || null);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDeleteTest = async () => {
+    if (!testToDelete?.testId) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/api/tests/${testToDelete.testId}`);
+      toast.success('Xóa bài kiểm tra thành công!');
+      fetchTests();
+    } catch (err) {
+      console.error('❌ Lỗi xóa bài test:', err);
+      toast.error('Không thể xóa bài kiểm tra. Vui lòng thử lại.');
+    } finally {
+      setShowDeleteModal(false);
+      setTestToDelete(null);
     }
   };
 
@@ -126,6 +141,19 @@ function MyTestPage() {
         onClose={() => setShowCreateModal(false)}
         onSuccess={fetchTests}
         mode="personal"
+      />
+
+      <ConfirmDeleteModal
+        show={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setTestToDelete(null);
+        }}
+        onConfirm={handleConfirmDeleteTest}
+        title="Xác nhận xóa bài kiểm tra"
+        message={`Bạn có chắc chắn muốn xóa bài kiểm tra "${
+          testToDelete?.title || 'này'
+        }"? Hành động này không thể hoàn tác.`}
       />
     </>
   );
