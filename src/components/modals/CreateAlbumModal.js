@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Modal } from "react-bootstrap";
 import { toast } from 'react-toastify';
 import axios from "axios";
 import classNames from "classnames/bind";
-import styles from "./CreateAlbumModal.module.scss";
-import { FaFolderPlus, FaEdit, FaInfoCircle, FaTimes } from "react-icons/fa";
+import { FaFolderPlus, FaEdit, FaInfoCircle } from "react-icons/fa";
+import CommonFormModal from "~/components/common/modal/CommonFormModal";
+import ModalActionFooter from "~/components/common/modal/ModalActionFooter";
+import styles from "~/components/common/modal/CommonFormModal.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -50,27 +51,22 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
     };
 
     return (
-        <Modal
+        <CommonFormModal
             show={show}
             onHide={onClose}
-            centered
-            className={cx("modalCustom")}
-            contentClassName={cx("modalContent")}
+            title="Tạo Album Mới"
+            icon={FaFolderPlus}
+            footer={(
+                <ModalActionFooter
+                    cancelLabel="Để sau"
+                    submitLabel="Tạo Album ngay"
+                    loadingLabel="Đang tạo..."
+                    loading={loading}
+                    onCancel={onClose}
+                    onSubmit={handleCreate}
+                />
+            )}
         >
-            {/* Header */}
-            <div className={cx("header")}>
-                <div className={cx("titleWrapper")}>
-                    <FaFolderPlus />
-                    <h3 className={cx("title")}>Tạo Album Mới</h3>
-                </div>
-
-                <button className={cx("closeBtn")} onClick={onClose}>
-                    <FaTimes />
-                </button>
-            </div>
-
-            {/* Body */}
-            <div className={cx("body")}>
                 <div className={cx("formGroup")}>
                     <label className={cx("label")}>Tên Album</label>
                     <div className={cx("inputWrapper")}>
@@ -106,23 +102,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
                         <span>Mô tả giúp bạn ghi nhớ mục đích học tập của album.</span>
                     </div>
                 </div>
-            </div>
-
-            {/* Footer */}
-            <div className={cx("footer")}>
-                <button className={cx("btnCancel")} onClick={onClose} disabled={loading}>
-                    Để sau
-                </button>
-
-                <button
-                    className={cx("btnSubmit")}
-                    onClick={handleCreate}
-                    disabled={loading}
-                >
-                    {loading ? "Đang tạo..." : "Tạo Album ngay"}
-                </button>
-            </div>
-        </Modal>
+        </CommonFormModal>
     );
 }
 

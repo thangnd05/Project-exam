@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { FaStar, FaPen, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import axios from 'axios';
-import styles from './EvaluationModal.module.scss';
+import styles from '~/components/common/modal/PortalFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 

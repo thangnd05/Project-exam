@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Modal } from 'react-bootstrap';
 import { IoAdd, IoText, IoLanguage, IoClose } from 'react-icons/io5';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import styles from './CreateVocabularyModal.module.scss';
+import CommonFormModal from '~/components/common/modal/CommonFormModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import styles from '~/components/common/modal/CommonFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -48,27 +49,22 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
     };
 
     return (
-        <Modal
+        <CommonFormModal
             show={show}
             onHide={onClose}
-            centered
-            className={cx('modalCustom')}
-            contentClassName={cx('modalContent')}
+            title="Thêm Từ Vựng Mới"
+            icon={IoAdd}
+            footer={(
+                <ModalActionFooter
+                    cancelLabel="Hủy bỏ"
+                    submitLabel="Lưu từ vựng ngay"
+                    loadingLabel="Đang lưu..."
+                    loading={loading}
+                    onCancel={onClose}
+                    onSubmit={handleSave}
+                />
+            )}
         >
-            {/* Custom Header */}
-            <div className={cx('header')}>
-                <div className={cx('titleWrapper')}>
-                    <IoAdd />
-                    <h3 className={cx('title')}>Thêm Từ Vựng Mới</h3>
-                </div>
-
-                <button className={cx('closeBtn')} onClick={onClose}>
-                    <IoClose />
-                </button>
-            </div>
-
-            {/* Body */}
-            <div className={cx('body')}>
                 <div className={cx('formGroup')}>
                     <label className={cx('label')}>Từ vựng (Tiếng Anh)</label>
                     <div className={cx('inputWrapper')}>
@@ -120,23 +116,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                         />
                     </div>
                 </div>
-            </div>
-
-            {/* Footer */}
-            <div className={cx('footer')}>
-                <button className={cx('btnCancel')} onClick={onClose} disabled={loading}>
-                    Hủy bỏ
-                </button>
-
-                <button
-                    className={cx('btnSubmit')}
-                    onClick={handleSave}
-                    disabled={loading}
-                >
-                    {loading ? 'Đang lưu...' : 'Lưu từ vựng ngay'}
-                </button>
-            </div>
-        </Modal>
+        </CommonFormModal>
     );
 };
 

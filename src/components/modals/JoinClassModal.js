@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Modal, Alert } from "react-bootstrap";
+import { Alert } from "react-bootstrap";
 import axios from "axios";
 import classNames from "classnames/bind";
-import styles from "./JoinClassModal.module.scss";
-import { FaUsers, FaKey, FaInfoCircle, FaTimes } from "react-icons/fa";
+import { FaUsers, FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "~/hook/useAuth";
 import { useNavigate } from "react-router-dom";
 import routes from "~/config/Routes";
+import CommonFormModal from "~/components/common/modal/CommonFormModal";
+import ModalActionFooter from "~/components/common/modal/ModalActionFooter";
+import styles from "~/components/common/modal/CommonFormModal.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -74,25 +76,22 @@ function JoinClassModal({ show, onClose }) {
     };
 
     return (
-        <Modal
+        <CommonFormModal
             show={show}
             onHide={onClose}
-            centered
-            className={cx("modalCustom")}
-            contentClassName={cx("modalContent")}
+            title="Tham gia lớp học"
+            icon={FaUsers}
+            footer={(
+                <ModalActionFooter
+                    cancelLabel="Để sau"
+                    submitLabel="Tham gia ngay"
+                    loadingLabel="Đang xử lý..."
+                    loading={loading}
+                    onCancel={onClose}
+                    onSubmit={handleJoin}
+                />
+            )}
         >
-            {/* Header */}
-            <div className={cx("header")}>
-                <div className={cx("titleWrapper")}>
-                    <FaUsers />
-                    <h3 className={cx("title")}>Tham gia lớp học</h3>
-                </div>
-
-                <button className={cx("closeBtn")} onClick={onClose}>
-                    <FaTimes />
-                </button>
-            </div>
-
             {/* ✅ Alert Message */}
             {message && (
                 <Alert
@@ -103,8 +102,6 @@ function JoinClassModal({ show, onClose }) {
                 </Alert>
             )}
 
-            {/* Body */}
-            <div className={cx("body")}>
                 <div className={cx("formGroup")}>
                     <label className={cx("label")}>Mã lớp học</label>
 
@@ -128,23 +125,7 @@ function JoinClassModal({ show, onClose }) {
                         <span>Liên hệ giáo viên để lấy mã lớp chính xác.</span>
                     </div>
                 </div>
-            </div>
-
-            {/* Footer */}
-            <div className={cx("footer")}>
-                <button className={cx("btnCancel")} onClick={onClose}>
-                    Để sau
-                </button>
-
-                <button
-                    className={cx("btnSubmit")}
-                    onClick={handleJoin}
-                    disabled={loading}
-                >
-                    {loading ? "Đang xử lý..." : "Tham gia ngay"}
-                </button>
-            </div>
-        </Modal>
+        </CommonFormModal>
     );
 }
 

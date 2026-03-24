@@ -2,7 +2,6 @@ import React, {useEffect, useMemo, useState} from 'react';
 import axios from 'axios';
 import classNames from 'classnames/bind';
 import {Alert, Spinner} from 'react-bootstrap';
-import {Link} from 'react-router-dom';
 import {
   IoCalendarOutline,
   IoCheckmarkCircleOutline,
@@ -14,7 +13,7 @@ import {
   IoSchoolOutline,
   IoStatsChartOutline,
 } from 'react-icons/io5';
-import routes from '~/config/Routes';
+import ChangePasswordModal from '~/components/modals/ChangePasswordModal';
 import styles from './ProfileOverviewPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -52,6 +51,7 @@ function ProfileOverviewPage() {
   const [profileOverview, setProfileOverview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   useEffect(() => {
     const fetchProfileOverview = async () => {
@@ -144,10 +144,14 @@ function ProfileOverviewPage() {
                 </div>
 
                 <div className={cx('actionRow')}>
-                  <Link to={routes.forgot} className={cx('changePasswordBtn')}>
+                  <button
+                    type="button"
+                    className={cx('changePasswordBtn')}
+                    onClick={() => setShowChangePasswordModal(true)}
+                  >
                     <IoLockClosedOutline />
                     Đổi mật khẩu
-                  </Link>
+                  </button>
                 </div>
               </div>
             </section>
@@ -254,6 +258,11 @@ function ProfileOverviewPage() {
           </Alert>
         )}
       </div>
+
+      <ChangePasswordModal
+        show={showChangePasswordModal}
+        onHide={() => setShowChangePasswordModal(false)}
+      />
     </div>
   );
 }

@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Modal, Alert } from "react-bootstrap";
+import { Alert } from "react-bootstrap";
 import { toast } from 'react-toastify';
 import axios from "axios";
 import classNames from "classnames/bind";
-import styles from "./CreateClassModal.module.scss";
-import { FaChalkboardTeacher, FaEdit, FaInfoCircle, FaTimes } from "react-icons/fa";
+import { FaChalkboardTeacher, FaEdit, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "~/hook/useAuth";
 import { useNavigate } from "react-router-dom";
 import routes from "~/config/Routes";
+import CommonFormModal from "~/components/common/modal/CommonFormModal";
+import ModalActionFooter from "~/components/common/modal/ModalActionFooter";
+import styles from "~/components/common/modal/CommonFormModal.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -78,25 +80,22 @@ function CreateClassModal({ show, onClose }) {
     };
 
     return (
-        <Modal
+        <CommonFormModal
             show={show}
             onHide={onClose}
-            centered
-            className={cx("modalCustom")}
-            contentClassName={cx("modalContent")}
+            title="Tạo lớp học mới"
+            icon={FaChalkboardTeacher}
+            footer={(
+                <ModalActionFooter
+                    cancelLabel="Để sau"
+                    submitLabel="Tạo lớp ngay"
+                    loadingLabel="Đang xử lý..."
+                    loading={loading}
+                    onCancel={onClose}
+                    onSubmit={handleCreate}
+                />
+            )}
         >
-            {/* Header */}
-            <div className={cx("header")}>
-                <div className={cx("titleWrapper")}>
-                    <FaChalkboardTeacher />
-                    <h3 className={cx("title")}>Tạo lớp học mới</h3>
-                </div>
-
-                <button className={cx("closeBtn")} onClick={onClose}>
-                    <FaTimes />
-                </button>
-            </div>
-
             {/* ✅ Alert Message */}
             {message && (
                 <Alert
@@ -107,8 +106,6 @@ function CreateClassModal({ show, onClose }) {
                 </Alert>
             )}
 
-            {/* Body */}
-            <div className={cx("body")}>
                 <div className={cx("formGroup")}>
                     <label className={cx("label")}>Tên lớp học</label>
                     <div className={cx("inputWrapper")}>
@@ -143,23 +140,7 @@ function CreateClassModal({ show, onClose }) {
                         <span>Mô tả giúp học sinh hiểu rõ hơn về nội dung lớp học.</span>
                     </div>
                 </div>
-            </div>
-
-            {/* Footer */}
-            <div className={cx("footer")}>
-                <button className={cx("btnCancel")} onClick={onClose}>
-                    Để sau
-                </button>
-
-                <button
-                    className={cx("btnSubmit")}
-                    onClick={handleCreate}
-                    disabled={loading}
-                >
-                    {loading ? "Đang xử lý..." : "Tạo lớp ngay"}
-                </button>
-            </div>
-        </Modal>
+        </CommonFormModal>
     );
 }
 

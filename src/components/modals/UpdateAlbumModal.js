@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Modal } from "react-bootstrap";
 import { toast } from 'react-toastify';
 import axios from "axios";
 import classNames from "classnames/bind";
-import styles from "./CreateAlbumModal.module.scss"; // Reuse same styles
-import { FaEdit, FaInfoCircle, FaTimes } from "react-icons/fa";
+import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";
+import CommonFormModal from "~/components/common/modal/CommonFormModal";
+import ModalActionFooter from "~/components/common/modal/ModalActionFooter";
+import styles from "~/components/common/modal/CommonFormModal.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -54,27 +55,23 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
     };
 
     return (
-        <Modal
+        <CommonFormModal
             show={show}
             onHide={onClose}
-            centered
-            className={cx("modalCustom")}
-            contentClassName={cx("modalContent")}
+            title="Chỉnh sửa Album"
+            icon={FaEdit}
+            footer={(
+                <ModalActionFooter
+                    cancelLabel="Hủy"
+                    submitLabel="Lưu thay đổi"
+                    loadingLabel="Đang lưu..."
+                    loading={loading}
+                    onCancel={onClose}
+                    onSubmit={handleUpdate}
+                    submitIcon={IoSaveOutline}
+                />
+            )}
         >
-            {/* Header */}
-            <div className={cx("header")}>
-                <div className={cx("titleWrapper")}>
-                    <FaEdit />
-                    <h3 className={cx("title")}>Chỉnh sửa Album</h3>
-                </div>
-
-                <button className={cx("closeBtn")} onClick={onClose}>
-                    <FaTimes />
-                </button>
-            </div>
-
-            {/* Body */}
-            <div className={cx("body")}>
                 <div className={cx("formGroup")}>
                     <label className={cx("label")}>Tên Album</label>
                     <div className={cx("inputWrapper")}>
@@ -110,24 +107,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
                         <span>Mô tả giúp bạn ghi nhớ mục đích học tập của album.</span>
                     </div>
                 </div>
-            </div>
-
-            {/* Footer */}
-            <div className={cx("footer")}>
-                <button className={cx("btnCancel")} onClick={onClose} disabled={loading}>
-                    Hủy
-                </button>
-
-                <button
-                    className={cx("btnSubmit")}
-                    onClick={handleUpdate}
-                    disabled={loading}
-                >
-                    <IoSaveOutline className="me-2" />
-                    {loading ? "Đang lưu..." : "Lưu thay đổi"}
-                </button>
-            </div>
-        </Modal>
+        </CommonFormModal>
     );
 }
 

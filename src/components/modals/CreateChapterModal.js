@@ -4,7 +4,7 @@ import { FaBook, FaEdit, FaInfoCircle, FaTimes } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import styles from './CreateChapterModal.module.scss';
+import styles from '~/components/common/modal/PortalFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 

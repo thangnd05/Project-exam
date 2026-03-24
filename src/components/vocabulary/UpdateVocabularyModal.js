@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Modal } from 'react-bootstrap';
-import { IoPencil, IoText, IoLanguage, IoClose } from 'react-icons/io5';
+import { IoPencil, IoText, IoLanguage } from 'react-icons/io5';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import styles from './CreateVocabularyModal.module.scss'; // Reuse styles
+import CommonFormModal from '~/components/common/modal/CommonFormModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import styles from '~/components/common/modal/CommonFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -57,27 +58,22 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }) => {
     };
 
     return (
-        <Modal
+        <CommonFormModal
             show={show}
             onHide={onClose}
-            centered
-            className={cx('modalCustom')}
-            contentClassName={cx('modalContent')}
+            title="Chỉnh Sửa Từ Vựng"
+            icon={IoPencil}
+            footer={(
+                <ModalActionFooter
+                    cancelLabel="Hủy bỏ"
+                    submitLabel="Lưu thay đổi"
+                    loadingLabel="Đang lưu..."
+                    loading={loading}
+                    onCancel={onClose}
+                    onSubmit={handleUpdate}
+                />
+            )}
         >
-            {/* Custom Header */}
-            <div className={cx('header')}>
-                <div className={cx('titleWrapper')}>
-                    <IoPencil />
-                    <h3 className={cx('title')}>Chỉnh Sửa Từ Vựng</h3>
-                </div>
-
-                <button className={cx('closeBtn')} onClick={onClose}>
-                    <IoClose />
-                </button>
-            </div>
-
-            {/* Body */}
-            <div className={cx('body')}>
                 <div className={cx('formGroup')}>
                     <label className={cx('label')}>Từ vựng (Tiếng Anh)</label>
                     <div className={cx('inputWrapper')}>
@@ -129,23 +125,7 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }) => {
                         />
                     </div>
                 </div>
-            </div>
-
-            {/* Footer */}
-            <div className={cx('footer')}>
-                <button className={cx('btnCancel')} onClick={onClose} disabled={loading}>
-                    Hủy bỏ
-                </button>
-
-                <button
-                    className={cx('btnSubmit')}
-                    onClick={handleUpdate}
-                    disabled={loading}
-                >
-                    {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
-                </button>
-            </div>
-        </Modal>
+        </CommonFormModal>
     );
 };
 
