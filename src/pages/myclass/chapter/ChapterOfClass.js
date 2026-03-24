@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import axios from 'axios';
 import {useParams, useNavigate} from 'react-router-dom';
 import {Container, Spinner, Alert} from 'react-bootstrap';
@@ -9,11 +9,14 @@ import {
   IoDocumentTextOutline,
   IoCalendarOutline,
   IoAdd,
+  IoGridOutline,
+  IoListOutline,
 } from 'react-icons/io5';
 
 import styles from './ChapterOfClass.module.scss';
 import CreateChapterModal from '~/components/modals/CreateChapterModal';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
+import PageHeaderViewToggle from '~/components/common/PageHeader/PageHeaderViewToggle';
 import routes from '../../../config/Routes';
 
 const cx = classNames.bind(styles);
@@ -27,6 +30,7 @@ const ChapterOfClass = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [showCreateChapter, setShowCreateChapter] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
 
   const handleViewTests = (chapterId) => {
     const path = routes.classChapterTests
@@ -36,7 +40,7 @@ const ChapterOfClass = () => {
     navigate(path);
   };
 
-  const fetchChapters = async () => {
+  const fetchChapters = useCallback(async () => {
     try {
       const res = await axios.get(`/api/chapters/class/${classId}`);
       setChapters(res.data || []);
@@ -46,7 +50,7 @@ const ChapterOfClass = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [classId]);
 
   useEffect(() => {
     const fetchClassInfo = async () => {
@@ -62,7 +66,7 @@ const ChapterOfClass = () => {
 
     fetchClassInfo();
     fetchChapters();
-  }, [classId]);
+  }, [classId, fetchChapters]);
 
   if (loading) {
     return (
@@ -88,7 +92,16 @@ const ChapterOfClass = () => {
           actionText="Tạo chương mới"
           actionIcon={IoAdd}
           onAction={() => setShowCreateChapter(true)}
-        />
+        >
+          <PageHeaderViewToggle
+            activeKey={viewMode}
+            onChange={setViewMode}
+            options={[
+              {key: 'grid', title: 'Dạng lưới', icon: IoGridOutline},
+              {key: 'list', title: 'Dạng danh sách', icon: IoListOutline},
+            ]}
+          />
+        </PageHeader>
 
         {message && (
           <Alert variant="danger" className="text-center shadow-sm">
@@ -103,42 +116,68 @@ const ChapterOfClass = () => {
             <p>Vui lòng quay lại sau hoặc liên hệ giáo viên</p>
           </div>
         ) : (
-          <div className={cx('chapter-grid')}>
-            {chapters.map((chapter, index) => (
-              <div
-                key={chapter.chapterId}
-                className={cx('chapter-card')}
-                onClick={() => handleViewTests(chapter.chapterId)}
-              >
-                <div className={cx('card-top')}>
-                  <div className={cx('card-icon')}>
-                    <IoBookOutline />
+          <>
+            {viewMode === 'grid' ? (
+              <div className={cx('chapter-grid')}>
+                {chapters.map((chapter, index) => (
+                  <div
+                    key={chapter.chapterId}
+                    className={cx('chapter-card')}
+                    onClick={() => handleViewTests(chapter.chapterId)}
+                  >
+                    <div className={cx('card-top')}>
+                      <div className={cx('card-icon')}>
+                        <IoBookOutline />
+                      </div>
+                      <span className={cx('index')}>
+                        {(index + 1).toString().padStart(2, '0')}
+                      </span>
+                    </div>
+
+                    <h3 className={cx('chapter-title')}>{chapter.title}</h3>
+
+                    <div className={cx('chapter-info')}>
+                      <IoCalendarOutline />
+                      <span>
+                        Cập nhật:{' '}
+                        {new Date(chapter.createdAt).toLocaleDateString('vi-VN')}
+                      </span>
+                    </div>
+
+                    <button
+                      className={cx('btn-view')}
+                      onClick={() => handleViewTests(chapter.chapterId)}
+                    >
+                      Bắt đầu học ngay
+                    </button>
                   </div>
-                  <span className={cx('index')}>
-                    {(index + 1).toString().padStart(2, '0')}
-                  </span>
-                </div>
-
-                <h3 className={cx('chapter-title')}>{chapter.title}</h3>
-
-                <div className={cx('chapter-info')}>
-                  <IoCalendarOutline />
-                  <span>
-                    Cập nhật:{' '}
-                    {new Date(chapter.createdAt).toLocaleDateString('vi-VN')}
-                  </span>
-                </div>
-
-                {/* ✅ Chỉ 1 nút duy nhất */}
-                <button
-                  className={cx('btn-view')}
-                  onClick={() => handleViewTests(chapter.chapterId)}
-                >
-                  Bắt đầu học ngay
-                </button>
+                ))}
               </div>
-            ))}
-          </div>
+            ) : (
+              <div className={cx('chapter-list')}>
+                {chapters.map((chapter, index) => (
+                  <button
+                    key={chapter.chapterId}
+                    type="button"
+                    className={cx('chapter-list-item')}
+                    onClick={() => handleViewTests(chapter.chapterId)}
+                  >
+                    <span className={cx('chapter-list-index')}>
+                      {(index + 1).toString().padStart(2, '0')}
+                    </span>
+                    <span className={cx('chapter-list-name')}>
+                      <IoBookOutline />
+                      {chapter.title}
+                    </span>
+                    <span className={cx('chapter-list-date')}>
+                      <IoCalendarOutline />
+                      {new Date(chapter.createdAt).toLocaleDateString('vi-VN')}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </Container>
 

@@ -15,41 +15,6 @@ $brand-border: #e2e8f0;
   }
 }
 
-.view-toggle {
-  display: flex;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 6px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(8px);
-
-  .toggle-btn {
-    width: 46px;
-    height: 46px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    font-size: 2.2rem;
-    color: rgba(255, 255, 255, 0.7);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: transparent;
-    border: none;
-
-    &:hover {
-      color: white;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    &.active {
-      background: white;
-      color: #0f6bdc;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transform: scale(1.05);
-    }
-  }
-}
-
 .content-section {
   width: 100%;
   animation: fadeIn 0.5s ease-out;

@@ -5,6 +5,7 @@ import {IoListOutline, IoGridOutline} from 'react-icons/io5';
 
 import styles from './TestListContainer.module.scss';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
+import PageHeaderViewToggle from '~/components/common/PageHeader/PageHeaderViewToggle';
 import TestCard from '~/components/common/TestCard/TestCard';
 import TestManagementTable from '~/components/common/TestManagementTable/TestManagementTable';
 
@@ -37,22 +38,18 @@ const TestListContainer = ({
           actionIcon={actionIcon}
           onAction={onAction}
         >
-          <div className={cx('view-toggle')}>
-            <button
-              className={cx('toggle-btn', {active: viewMode === 'grid'})}
-              onClick={() => setViewMode('grid')}
-              title="Dạng lưới"
-            >
-              <IoGridOutline />
-            </button>
-            <button
-              className={cx('toggle-btn', {active: viewMode === 'table'})}
-              onClick={() => setViewMode('table')}
-              title="Quản lý chi tiết (Dạng bảng)"
-            >
-              <IoListOutline />
-            </button>
-          </div>
+          <PageHeaderViewToggle
+            activeKey={viewMode}
+            onChange={setViewMode}
+            options={[
+              {key: 'grid', title: 'Dạng lưới', icon: IoGridOutline},
+              {
+                key: 'table',
+                title: 'Quản lý chi tiết (Dạng bảng)',
+                icon: IoListOutline,
+              },
+            ]}
+          />
         </PageHeader>
 
         <div className={cx('content-section')}>

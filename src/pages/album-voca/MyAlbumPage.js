@@ -13,6 +13,7 @@ import CreateAlbumModal from '../../components/modals/CreateAlbumModal';
 import UpdateAlbumModal from '../../components/modals/UpdateAlbumModal';
 import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import PageHeader from '../../components/common/PageHeader/PageHeader';
+import PageHeaderViewToggle from '../../components/common/PageHeader/PageHeaderViewToggle';
 import AlbumManagementTable from '../../components/common/AlbumManagementTable/AlbumManagementTable';
 
 const cx = classNames.bind(styles);
@@ -89,22 +90,14 @@ function MyAlbumsPage() {
           actionIcon={IoAdd}
           onAction={() => setShowModal(true)}
         >
-          <div className={cx('view-toggle')}>
-            <button
-              className={cx('toggle-btn', { active: viewMode === 'grid' })}
-              onClick={() => setViewMode('grid')}
-              title="Dạng lưới"
-            >
-              <IoGridOutline />
-            </button>
-            <button
-              className={cx('toggle-btn', { active: viewMode === 'table' })}
-              onClick={() => setViewMode('table')}
-              title="Dạng danh sách"
-            >
-              <IoListOutline />
-            </button>
-          </div>
+          <PageHeaderViewToggle
+            activeKey={viewMode}
+            onChange={setViewMode}
+            options={[
+              { key: 'grid', title: 'Dạng lưới', icon: IoGridOutline },
+              { key: 'table', title: 'Dạng danh sách', icon: IoListOutline },
+            ]}
+          />
         </PageHeader>
 
         {/* === Body Content === */}

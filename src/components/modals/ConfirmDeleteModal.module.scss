@@ -10,18 +10,23 @@
 .header {
     border: none;
     padding: 20px 30px;
-    background: #fff;
+    background: linear-gradient(135deg, #0f6bdc 0%, #19b5fe 100%);
+
+    :global(.btn-close) {
+        filter: brightness(0) invert(1);
+        opacity: 0.95;
+    }
 
     .title {
         font-size: 1.8rem;
         font-weight: 700;
-        color: #1e293b;
+        color: #ffffff;
         display: flex;
         align-items: center;
         gap: 12px;
 
         .warning-icon {
-            color: #f59e0b;
+            color: #ffffff;
             font-size: 2.2rem;
         }
     }
