@@ -113,9 +113,7 @@ function TestByClassPage() {
     <div className={cx('empty-state')}>
       <IoDocumentTextOutline className={cx('icon')} />
       <h4>Chưa có bài kiểm tra nào được công bố</h4>
-      <p className="text-muted">
-        Giáo viên của bạn sẽ sớm cập nhật các bài thi tại đây.
-      </p>
+      <p>Giáo viên của bạn sẽ sớm cập nhật các bài thi tại đây.</p>
     </div>
   );
 

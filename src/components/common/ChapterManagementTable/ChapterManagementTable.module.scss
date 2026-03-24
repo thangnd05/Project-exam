@@ -1,0 +1,114 @@
+.table-responsive {
+  background: white;
+  border-radius: 24px;
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eef2f7;
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.management-table {
+  margin-bottom: 0;
+  min-width: 760px;
+}
+
+.management-table thead th {
+  background: #fcfdfe;
+  border-bottom: 1px solid #edf2f7;
+  padding: 20px 16px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.management-table tbody td {
+  padding: 20px 16px;
+  vertical-align: middle;
+  font-size: 1.5rem;
+  color: #334155;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.management-table tr:last-child td {
+  border-bottom: none;
+}
+
+.management-table tr:hover td {
+  background-color: #fcfdfe;
+}
+
+.table-row-clickable {
+  cursor: pointer;
+}
+
+.chapter-title {
+  max-width: 420px;
+}
+
+.chapter-link-btn {
+  border: none;
+  background: transparent;
+  color: #1b2b41;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+
+.chapter-link-btn:hover {
+  color: var(--accent-color);
+}
+
+.chapter-date {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.action-group {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn-action {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 2rem;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+}
+
+.btn-action.edit {
+  color: #3b82f6;
+}
+
+.btn-action.edit:hover {
+  background: #eff6ff;
+  border-color: #dbeafe;
+}
+
+.btn-action.delete {
+  color: #ef4444;
+}
+
+.btn-action.delete:hover {
+  background: #fef2f2;
+  border-color: #fee2e2;
+}

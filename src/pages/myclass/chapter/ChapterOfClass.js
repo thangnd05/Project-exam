@@ -3,6 +3,7 @@ import axios from 'axios';
 import {useParams, useNavigate} from 'react-router-dom';
 import {Container, Spinner, Alert} from 'react-bootstrap';
 import classNames from 'classnames/bind';
+import {toast} from 'react-toastify';
 import {
   IoBookOutline,
   IoArrowBackOutline,
@@ -15,8 +16,11 @@ import {
 
 import styles from './ChapterOfClass.module.scss';
 import CreateChapterModal from '~/components/modals/CreateChapterModal';
+import UpdateChapterModal from '~/components/modals/UpdateChapterModal';
+import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import PageHeaderViewToggle from '~/components/common/PageHeader/PageHeaderViewToggle';
+import ChapterManagementTable from '~/components/common/ChapterManagementTable/ChapterManagementTable';
 import routes from '../../../config/Routes';
 
 const cx = classNames.bind(styles);
@@ -30,6 +34,9 @@ const ChapterOfClass = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [showCreateChapter, setShowCreateChapter] = useState(false);
+  const [showUpdateChapter, setShowUpdateChapter] = useState(false);
+  const [showDeleteChapter, setShowDeleteChapter] = useState(false);
+  const [selectedChapter, setSelectedChapter] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
 
   const handleViewTests = (chapterId) => {
@@ -38,6 +45,35 @@ const ChapterOfClass = () => {
       .replace(':chapterId', chapterId);
 
     navigate(path);
+  };
+
+  const handleEditChapter = (chapter) => {
+    setSelectedChapter(chapter);
+    setShowUpdateChapter(true);
+  };
+
+  const handleDeleteChapterClick = (chapter) => {
+    setSelectedChapter(chapter);
+    setShowDeleteChapter(true);
+  };
+
+  const handleConfirmDeleteChapter = async () => {
+    if (!selectedChapter?.chapterId) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/api/chapters/${selectedChapter.chapterId}`);
+      toast.success('Xóa chương thành công!');
+      fetchChapters();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || 'Không thể xóa chương. Vui lòng thử lại.',
+      );
+    } finally {
+      setShowDeleteChapter(false);
+      setSelectedChapter(null);
+    }
   };
 
   const fetchChapters = useCallback(async () => {
@@ -154,28 +190,12 @@ const ChapterOfClass = () => {
                 ))}
               </div>
             ) : (
-              <div className={cx('chapter-list')}>
-                {chapters.map((chapter, index) => (
-                  <button
-                    key={chapter.chapterId}
-                    type="button"
-                    className={cx('chapter-list-item')}
-                    onClick={() => handleViewTests(chapter.chapterId)}
-                  >
-                    <span className={cx('chapter-list-index')}>
-                      {(index + 1).toString().padStart(2, '0')}
-                    </span>
-                    <span className={cx('chapter-list-name')}>
-                      <IoBookOutline />
-                      {chapter.title}
-                    </span>
-                    <span className={cx('chapter-list-date')}>
-                      <IoCalendarOutline />
-                      {new Date(chapter.createdAt).toLocaleDateString('vi-VN')}
-                    </span>
-                  </button>
-                ))}
-              </div>
+              <ChapterManagementTable
+                chapters={chapters}
+                onViewTests={handleViewTests}
+                onEdit={handleEditChapter}
+                onDelete={handleDeleteChapterClick}
+              />
             )}
           </>
         )}
@@ -189,6 +209,30 @@ const ChapterOfClass = () => {
           fetchChapters();
           setShowCreateChapter(false);
         }}
+      />
+
+      <UpdateChapterModal
+        show={showUpdateChapter}
+        onClose={() => {
+          setShowUpdateChapter(false);
+          setSelectedChapter(null);
+        }}
+        chapter={selectedChapter}
+        classId={classId}
+        onSuccess={fetchChapters}
+      />
+
+      <ConfirmDeleteModal
+        show={showDeleteChapter}
+        onClose={() => {
+          setShowDeleteChapter(false);
+          setSelectedChapter(null);
+        }}
+        onConfirm={handleConfirmDeleteChapter}
+        title="Xác nhận xóa chương"
+        message={`Bạn có chắc chắn muốn xóa chương "${
+          selectedChapter?.title || ''
+        }"?`}
       />
     </div>
   );
