@@ -1,175 +1,174 @@
 .table-responsive {
-    background: white;
-    border-radius: 24px;
-    padding: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-    border: 1px solid #eef2f7;
-    margin-top: 10px;
-    overflow-x: auto;
+  background: white;
+  border-radius: 24px;
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eef2f7;
+  margin-top: 10px;
+  overflow-x: auto;
 
-    &::-webkit-scrollbar {
-        height: 6px;
-    }
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
 
-    &::-webkit-scrollbar-thumb {
-        background: #e2e8f0;
-        border-radius: 10px;
-    }
+  &::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
 }
 
 .management-table {
-    margin-bottom: 0;
-    min-width: 800px;
+  margin-bottom: 0;
+  min-width: 800px;
 
-    thead th {
-        background: #fcfdfe;
-        border-bottom: 1px solid #edf2f7;
-        padding: 20px 16px;
-        font-size: 1.3rem;
-        font-weight: 800;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+  thead th {
+    background: #fcfdfe;
+    border-bottom: 1px solid #edf2f7;
+    padding: 20px 16px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  tbody td {
+    padding: 22px 16px;
+    vertical-align: middle;
+    font-size: 1.6rem;
+    color: #334155;
+    border-bottom: 1px solid #f8fafc;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  tr {
+    animation: tableRowFadeIn 0.5s ease-out both;
+
+    @for $i from 1 through 20 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.05}s;
+      }
     }
+  }
 
-    tbody td {
-        padding: 22px 16px;
-        vertical-align: middle;
-        font-size: 1.6rem;
-        color: #334155;
-        border-bottom: 1px solid #f8fafc;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+  tr:last-child td {
+    border-bottom: none;
+  }
 
-    tr {
-        animation: tableRowFadeIn 0.5s ease-out both;
-
-        @for $i from 1 through 20 {
-            &:nth-child(#{$i}) {
-                animation-delay: #{$i * 0.05}s;
-            }
-        }
-    }
-
-    tr:last-child td {
-        border-bottom: none;
-    }
-
-    tr:hover td {
-        background-color: #fcfdfe;
-        color: var(--accent-color);
-        transform: scale(1.002);
-    }
+  tr:hover td {
+    background-color: #fcfdfe;
+    color: var(--accent-color);
+    transform: scale(1.002);
+  }
 }
 
 @keyframes tableRowFadeIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .test-title {
-    max-width: 320px;
+  max-width: 320px;
 
-    strong {
-        display: block;
-        font-weight: 800;
-        color: #1e293b;
-        transition: color 0.2s;
-    }
+  strong {
+    display: block;
+    font-weight: 800;
+    color: #1e293b;
+    transition: color 0.2s;
+  }
 }
 
 .status-badge {
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: 0.3px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 
-    &.bg-success {
-        background: #ecfdf5 !important;
-        color: #059669 !important;
-    }
+  &.bg-success {
+    background: #ecfdf5 !important;
+    color: #059669 !important;
+  }
 
-    &.bg-danger {
-        background: #fef2f2 !important;
-        color: #dc2626 !important;
-    }
+  &.bg-danger {
+    background: #fef2f2 !important;
+    color: #dc2626 !important;
+  }
 
-    &.bg-warning {
-        background: #fffbeb !important;
-        color: #d97706 !important;
-    }
+  &.bg-warning {
+    background: #fffbeb !important;
+    color: #d97706 !important;
+  }
 }
 
 .test-duration,
 .test-participants {
-    font-weight: 700;
-    color: #475569;
-    font-size: 1.4rem;
+  font-weight: 700;
+  color: #475569;
+  font-size: 1.4rem;
 
-    &::after {
-        content: ' 👤';
-        font-size: 1.2rem;
-        opacity: 0.6;
-    }
+  &::after {
+    font-size: 1.2rem;
+    opacity: 0.6;
+  }
 }
 
 .action-group {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
 }
 
 .btn-action {
-    width: 42px;
-    height: 42px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    font-size: 2rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #f8fafc;
-    border: 1px solid #f1f5f9;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+
+  &:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  }
+
+  &.edit {
+    color: #3b82f6;
 
     &:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+      background: #eff6ff;
+      border-color: #dbeafe;
     }
+  }
 
-    &.edit {
-        color: #3b82f6;
+  &.delete {
+    color: #ef4444;
 
-        &:hover {
-            background: #eff6ff;
-            border-color: #dbeafe;
-        }
+    &:hover {
+      background: #fef2f2;
+      border-color: #fee2e2;
     }
+  }
 
-    &.delete {
-        color: #ef4444;
+  &.stats {
+    color: #10b981;
 
-        &:hover {
-            background: #fef2f2;
-            border-color: #fee2e2;
-        }
+    &:hover {
+      background: #ecfdf5;
+      border-color: #d1fae5;
     }
-
-    &.stats {
-        color: #10b981;
-
-        &:hover {
-            background: #ecfdf5;
-            border-color: #d1fae5;
-        }
-    }
+  }
 }
