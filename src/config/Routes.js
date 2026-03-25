@@ -9,28 +9,14 @@ const routes = {
   testResult: '/tests/result/:userTestId',
   classChapterPage: '/class/:classId/chapters',
 
-
-
-  createQuestionWithPassage: '/admin/create-questions-with-passage',
-  createQuestionPage: '/admin/create-question-page',
   createTestFromBank: '/admin/create-test-from-bank',
   personalQuestionBank: '/admin/personal-question-bank',
-  premiumBulkQuestion: '/admin/premium-bulk-question',
-  bulkPassageGroup: '/admin/bulk-passage-group',
-
-
 
   adminDashboard: '/admin/dashboard',
-
-
-
-
-
 
   testHistory: '/tests/history/:testId',
   examTypeDetail: '/exam-types/:examTypeId',
   MyTest: '/my-tests',
-
 
   myAlbums: '/my-albums',
   albumDelta: '/albums/:albumId',
@@ -50,8 +36,6 @@ const routes = {
   oauth2Redirect: '/oauth2/redirect',
 
   notFound: '*',
-
-
 };
 
 export default routes;
