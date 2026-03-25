@@ -1,9 +1,9 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import classNames from 'classnames/bind';
-import {toast} from 'react-toastify';
-import {IoPersonCircleOutline, IoCameraOutline} from 'react-icons/io5';
-import {Spinner} from 'react-bootstrap';
+import { toast } from 'react-toastify';
+import { IoPersonCircleOutline, IoCameraOutline } from 'react-icons/io5';
+import { Spinner } from 'react-bootstrap';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import commonModalStyles from '~/components/common/modal/CommonFormModal.module.scss';
@@ -12,20 +12,20 @@ import styles from './UpdateProfileModal.module.scss';
 const cmx = classNames.bind(commonModalStyles);
 const cx = classNames.bind(styles);
 
-function UpdateProfileModal({show, onHide, onUpdateSuccess}) {
+function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
-  
+
   const [formValues, setFormValues] = useState({
     fullName: '',
     email: '',
     userName: '' // userName might not be editable but let's show it or allow edit if backend supports
   });
-  
+
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState('');
-  
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -114,7 +114,7 @@ function UpdateProfileModal({show, onHide, onUpdateSuccess}) {
 
     try {
       const formData = new FormData();
-      
+
       const userPayload = {
         userId: userInfo.userId,
         userName: formValues.userName,
@@ -124,9 +124,9 @@ function UpdateProfileModal({show, onHide, onUpdateSuccess}) {
         password: userInfo.password, // Preserve current info if needed by backend
         verified: userInfo.verified
       };
-      
+
       formData.append('user', JSON.stringify(userPayload));
-      
+
       if (avatarFile) {
         formData.append('avatar', avatarFile);
       }
@@ -136,7 +136,7 @@ function UpdateProfileModal({show, onHide, onUpdateSuccess}) {
           'Content-Type': 'multipart/form-data'
         }
       });
-      
+
       toast.success('Cập nhật thông tin thành công!');
       if (onUpdateSuccess) {
         onUpdateSuccess();
@@ -153,9 +153,9 @@ function UpdateProfileModal({show, onHide, onUpdateSuccess}) {
   if (loading && show) {
     return (
       <CommonFormModal show={show} onHide={closeModal} title="Cập nhật hồ sơ" icon={IoPersonCircleOutline}>
-         <div className="d-flex justify-content-center p-4">
-            <Spinner animation="border" variant="primary" />
-         </div>
+        <div className="d-flex justify-content-center p-4">
+          <Spinner animation="border" variant="primary" />
+        </div>
       </CommonFormModal>
     );
   }
@@ -190,10 +190,10 @@ function UpdateProfileModal({show, onHide, onUpdateSuccess}) {
             <IoCameraOutline size={24} />
           </div>
         </div>
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          style={{display: 'none'}} 
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
           accept="image/*"
           onChange={handleFileChange}
           disabled={submitting}
@@ -241,6 +241,7 @@ function UpdateProfileModal({show, onHide, onUpdateSuccess}) {
           value={formValues.email}
           onChange={(event) => updateField('email', event.target.value)}
           disabled={submitting}
+          readOnly={true}
         />
       </div>
     </CommonFormModal>
