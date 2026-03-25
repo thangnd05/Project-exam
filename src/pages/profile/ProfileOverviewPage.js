@@ -1,8 +1,8 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import classNames from 'classnames/bind';
-import {Alert, Spinner} from 'react-bootstrap';
-import {useNavigate} from 'react-router-dom';
+import { Alert, Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import {
   IoCalendarOutline,
   IoCheckmarkCircleOutline,
@@ -133,7 +133,7 @@ function ProfileOverviewPage() {
               <section className={cx('profileCard')}>
                 <div className={cx('avatarWrap')}>
                   <img
-                    src={profileOverview.avatarUrl || 'https://via.placeholder.com/150'}
+                    src={profileOverview.avatarUrl}
                     alt={fullName}
                     className={cx('avatar')}
                   />
@@ -148,7 +148,7 @@ function ProfileOverviewPage() {
                       <IoMailOutline /> {profileOverview.email || '--'}
                     </span>
                     <span className={cx('metaItem')} title="Vai trò">
-                      <IoLayersOutline /> {profileOverview.roleId ?? '--'}
+                      <IoLayersOutline /> {profileOverview.roleName}
                     </span>
                     <span className={cx('metaItem')} title="Ngày tham gia">
                       <IoCalendarOutline /> {formatDateTime(profileOverview.createdAt)}
@@ -280,7 +280,7 @@ function ProfileOverviewPage() {
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
                           <XAxis dataKey="name" />
                           <YAxis allowDecimals={false} />
-                          <RechartsTooltip cursor={{fill: 'rgba(0,0,0,0.04)'}} />
+                          <RechartsTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
                           <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={60}>
                             {testData.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
