@@ -72,7 +72,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}) => {
                   </Badge>
                 </td>
                 <td className={cx('test-participants')}>
-                  {test.participantCount ?? 0}
+                  {test.totalAttempts ?? 0}
                 </td>
                 <td>
                   <div className={cx('action-group')}>
