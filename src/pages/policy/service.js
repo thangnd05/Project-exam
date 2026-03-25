@@ -8,25 +8,29 @@ function Service() {
   return (
     <Container className={cx("d-flex")}>
       <section className={cx("service-wapper")}>
-        <h1>Dịch Vụ & Tính Năng Hệ Thống</h1>
+        <h1>Dịch Vụ & Tính Năng Nền Tảng</h1>
+
+        <div>
+          <p>
+            Nền tảng hỗ trợ học tập và kiểm tra trực tuyến cho nhiều vai trò (học viên, giáo viên, quản trị viên).
+            Các tính năng có thể thay đổi theo phiên bản và theo phân quyền tài khoản.
+          </p>
+        </div>
 
         <div>
           <h2>1. Dành Cho Giáo Viên</h2>
           <ul>
             <li>
-              <strong>Tạo bài kiểm tra dễ dàng:</strong> Hệ thống hỗ trợ giáo viên tạo đề thi theo kỹ năng hoặc môn học, 
-              có thể nhập câu hỏi thủ công hoặc chọn từ ngân hàng đề.
+              <strong>Tạo bài kiểm tra:</strong> Tạo đề theo kỹ năng/môn học, nhập câu hỏi thủ công hoặc chọn từ kho câu hỏi.
             </li>
             <li>
-              <strong>Quản lý lớp học:</strong> Giáo viên có thể tạo lớp, duyệt học viên tham gia, 
-              và theo dõi tiến trình làm bài, điểm số, cũng như kết quả từng học viên.
+              <strong>Quản lý lớp học:</strong> Tạo lớp, duyệt học viên tham gia và theo dõi tiến trình/điểm số theo từng bài.
             </li>
             <li>
-              <strong>Chấm điểm và thống kê:</strong> Tự động chấm điểm, hiển thị thống kê theo lớp, theo kỹ năng hoặc theo kỳ thi.
+              <strong>Chấm điểm và thống kê:</strong> Tự động chấm điểm (tùy loại câu hỏi), hiển thị thống kê theo lớp/bài.
             </li>
             <li>
-              <strong>Tùy chỉnh thời gian và giới hạn:</strong> Có thể đặt thời gian thi, số lần làm, 
-              hoặc giới hạn quyền truy cập theo lớp học cụ thể.
+              <strong>Thiết lập điều kiện làm bài:</strong> Cấu hình thời gian, số lần làm, thời gian mở/đóng, phạm vi theo lớp/chương.
             </li>
           </ul>
         </div>
@@ -35,17 +39,16 @@ function Service() {
           <h2>2. Dành Cho Học Viên</h2>
           <ul>
             <li>
-              <strong>Tham gia lớp học:</strong> Học viên có thể nhập mã lớp để tham gia vào lớp học của giáo viên.
+              <strong>Tham gia lớp học:</strong> Tham gia lớp bằng mã/lời mời (tùy lớp) và xem các bài được công bố.
             </li>
             <li>
-              <strong>Làm bài kiểm tra trực tuyến:</strong> Giao diện làm bài trực quan, hiển thị thời gian và tự động lưu tiến độ.
+              <strong>Làm bài trực tuyến:</strong> Giao diện làm bài trực quan, hiển thị thời gian và tự động lưu tiến độ (khi được hỗ trợ).
             </li>
             <li>
-              <strong>Xem điểm và kết quả:</strong> Sau khi hoàn thành bài thi, hệ thống sẽ chấm tự động 
-              và hiển thị chi tiết đáp án đúng/sai.
+              <strong>Xem kết quả:</strong> Xem điểm và lịch sử làm bài; một số bài có thể hiển thị chi tiết đáp án đúng/sai tùy cấu hình.
             </li>
             <li>
-              <strong>Ôn tập và luyện thi:</strong> Học viên có thể làm lại bài hoặc luyện các câu hỏi trong ngân hàng đề của lớp.
+              <strong>Ôn tập:</strong> Luyện tập lại theo bài/lớp, và quản lý kho từ vựng/album cá nhân để học tập.
             </li>
           </ul>
         </div>
@@ -69,7 +72,7 @@ function Service() {
           <h2>4. Hạ Tầng & Hỗ Trợ Kỹ Thuật</h2>
           <ul>
             <li>
-              Dữ liệu được lưu trữ an toàn trên máy chủ, bảo mật bằng công nghệ mã hóa hiện đại.
+              Dữ liệu được lưu trữ và bảo vệ nhằm phục vụ vận hành hệ thống và hạn chế truy cập trái phép.
             </li>
             <li>
               Hệ thống hoạt động ổn định trên cả máy tính và thiết bị di động.
@@ -78,6 +81,14 @@ function Service() {
               Hỗ trợ kỹ thuật và phản hồi người dùng qua trang liên hệ hoặc email hỗ trợ.
             </li>
           </ul>
+        </div>
+
+        <div>
+          <h2>5. Blog (dự kiến)</h2>
+          <p>
+            Nền tảng có thể phát triển thêm Blog để đăng bài chia sẻ kiến thức, thông báo và hướng dẫn học tập.
+            Nội dung blog sẽ được quản lý theo quy tắc cộng đồng và chính sách bản quyền.
+          </p>
         </div>
 
         <p className={cx("thankyou")}>

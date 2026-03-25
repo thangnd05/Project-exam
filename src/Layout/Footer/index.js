@@ -1,4 +1,5 @@
 import { Container, Row, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import {
   FaFacebookSquare,
   FaInstagram,
@@ -11,6 +12,7 @@ import {
 
 import styles from './footer.module.scss';
 import images from '~/assets/images';
+import routes from '~/config/Routes';
 
 function Footer() {
   return (
@@ -25,7 +27,17 @@ function Footer() {
               </div>
               <div className={styles.brandInfo}>
                 <h3 className={styles.brandName}>WinDe</h3>
-                <p className={styles.brandSub}>Giới thiệu</p>
+                <Link className={styles.footerLink} to={routes.about}>
+                  Giới thiệu
+                </Link>
+                <div className={styles.footerLinks}>
+                  <Link className={styles.footerLink} to={routes.policy}>
+                    Chính sách
+                  </Link>
+                  <Link className={styles.footerLink} to={routes.service}>
+                    Điều khoản & dịch vụ
+                  </Link>
+                </div>
                 <div className={styles.socialIcons}>
                   <a href="#"><FaFacebookSquare /></a>
                   <a href="#"><FaInstagram /></a>
