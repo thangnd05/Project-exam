@@ -111,13 +111,7 @@ function MyTestPage() {
         Hãy bắt đầu hành trình chinh phục kiến thức bằng cách tạo bài
         kiểm tra đầu tiên của bạn!
       </p>
-      <button
-        className={cx('btn-primary-modern')}
-        onClick={() => setShowCreateModal(true)}
-      >
-        <IoAdd size={24} />
-        Tạo kiểm tra ngay
-      </button>
+
     </div>
   );
 
@@ -151,9 +145,8 @@ function MyTestPage() {
         }}
         onConfirm={handleConfirmDeleteTest}
         title="Xác nhận xóa bài kiểm tra"
-        message={`Bạn có chắc chắn muốn xóa bài kiểm tra "${
-          testToDelete?.title || 'này'
-        }"? Hành động này không thể hoàn tác.`}
+        message={`Bạn có chắc chắn muốn xóa bài kiểm tra "${testToDelete?.title || 'này'
+          }"? Hành động này không thể hoàn tác.`}
       />
     </>
   );

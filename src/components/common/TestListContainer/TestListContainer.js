@@ -38,18 +38,20 @@ const TestListContainer = ({
           actionIcon={actionIcon}
           onAction={onAction}
         >
-          <PageHeaderViewToggle
-            activeKey={viewMode}
-            onChange={setViewMode}
-            options={[
-              {key: 'grid', title: 'Dạng lưới', icon: IoGridOutline},
-              {
-                key: 'table',
-                title: 'Quản lý chi tiết (Dạng bảng)',
-                icon: IoListOutline,
-              },
-            ]}
-          />
+          {tests.length > 0 && (
+            <PageHeaderViewToggle
+              activeKey={viewMode}
+              onChange={setViewMode}
+              options={[
+                {key: 'grid', title: 'Dạng lưới', icon: IoGridOutline},
+                {
+                  key: 'table',
+                  title: 'Quản lý chi tiết (Dạng bảng)',
+                  icon: IoListOutline,
+                },
+              ]}
+            />
+          )}
         </PageHeader>
 
         <div className={cx('content-section')}>
