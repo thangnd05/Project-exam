@@ -34,6 +34,16 @@ const TestResultPage = () => {
 
   const [error, setError] = useState("");
 
+  const formatTime = (start, end) => {
+    if (!start || !end) return "--:--";
+
+    const diff = Math.floor((new Date(end) - new Date(start)) / 1000);
+    const m = Math.floor(diff / 60);
+    const s = diff % 60;
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
   const getFullMediaUrl = (url) => {
     if (!url) return null;
     const cleanUrl = url.trim();
@@ -47,33 +57,34 @@ const TestResultPage = () => {
   useEffect(() => {
     const fetchResult = async () => {
       try {
-        // 1. Lấy meta userTest
+        setLoading(true);
+        // 1. Lấy thông tin tổng quan bài test (Chứa startedAt, finishedAt)
         const metaRes = await axios.get(`/api/user-tests/${userTestId}`);
-        const tId = metaRes.data.testId;
-        setTestId(tId);
+        const metaData = metaRes.data; // Đây là chỗ có startedAt, finishedAt
+        setTestId(metaData.testId);
 
-        // 2. ✅ Lấy result đúng endpoint (API cũ)
+        // 2. Lấy kết quả điểm số, số câu đúng/sai
         const res = await axios.get(
           `/api/user-answers/user-test/${userTestId}/result`
         );
 
-        setResult(res.data);
+        // ✅ KHẮC PHỤC: Gộp dữ liệu từ metaData vào result
+        setResult({
+          ...res.data,
+          startedAt: metaData.startedAt,
+          finishedAt: metaData.finishedAt,
+        });
 
-        // 3. Check hạn kết thúc bài thi
-        const testRes = await axios.get(`/api/tests/usertest/${tId}`);
+        // 3. Check hạn review (giữ nguyên code cũ của bạn)
+        const testRes = await axios.get(`/api/tests/usertest/${metaData.testId}`);
         const testData = testRes.data;
-
         const now = new Date();
-        const availableTo = testData.availableTo
-          ? new Date(testData.availableTo)
-          : null;
+        const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
+        setCanReview(!availableTo || now > availableTo);
 
-        // Review được nếu hết hạn hoặc không có hạn
-        const reviewAllowed = !availableTo || now > availableTo;
-        setCanReview(reviewAllowed);
       } catch (err) {
         console.error("❌ Lỗi tải kết quả:", err);
-        setError("Không thể tải kết quả bài thi này 😢");
+        setError("Không thể tải kết quả bài thi này");
       } finally {
         setLoading(false);
       }
@@ -298,7 +309,7 @@ const TestResultPage = () => {
             <div className={cx("stat-item")}>
               <IoTimeOutline size={24} />
               <span className={cx("stat-val")}>
-                {result?.timeTaken ? `${Math.floor(result.timeTaken / 60)}:${(result.timeTaken % 60).toString().padStart(2, '0')}` : "--:--"}
+                {formatTime(result?.startedAt, result?.finishedAt)}
               </span>
               <span className={cx("stat-label")}>Thời gian</span>
             </div>
