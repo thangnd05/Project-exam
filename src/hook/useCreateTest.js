@@ -4,6 +4,7 @@ import { useTestSubmission } from './useTestSubmission';
 
 export const CREATOR_TYPES = {
   TEST: 'test',
+  BANK: 'bank',
   BULK: 'bulk',
   PASSAGE: 'passage',
 };

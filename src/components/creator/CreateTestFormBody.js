@@ -21,6 +21,7 @@ import { useCreateTest, CREATOR_TYPES } from '~/hook/useCreateTest';
 import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
+import CreateFromBankBody from './CreateFromBankBody';
 import routes from '~/config/Routes';
 import styles from '../modals/CreateTestModal.module.scss';
 
@@ -138,6 +139,7 @@ const CreateTestFormBody = ({
         </Alert>
       )}
 
+      {activeCreatorType !== CREATOR_TYPES.BANK && (
       <div className={cx('configCard')}>
         <div className={cx('sectionTitle')}>
           <IoSettingsOutline /> 1. {activeCreatorType === CREATOR_TYPES.TEST ? 'Cấu hình bài thi' : 'Thông tin chung'}
@@ -229,6 +231,7 @@ const CreateTestFormBody = ({
           )}
         </Row>
       </div>
+      )}
 
       {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
         <>
@@ -317,6 +320,10 @@ const CreateTestFormBody = ({
           ))}
           <button type="button" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><IoAddOutline size={20} /> Thêm nhóm passage</button>
         </>
+      )}
+
+      {activeCreatorType === CREATOR_TYPES.BANK && (
+        <CreateFromBankBody onCancel={onCancel} onSuccess={onSuccess} />
       )}
 
       {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (

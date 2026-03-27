@@ -1,5 +1,5 @@
 import React from 'react';
-import { IoRocketOutline, IoMusicalNotesOutline, IoLayersOutline } from 'react-icons/io5';
+import { IoRocketOutline, IoMusicalNotesOutline, IoLayersOutline, IoLibraryOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from '../modals/CreateTestModal.module.scss';
 import { CREATOR_TYPES } from '~/hook/useCreateTest';
@@ -15,6 +15,13 @@ const CreatorTabs = ({ activeCreatorType, setCreatorType }) => {
                 onClick={() => setCreatorType(CREATOR_TYPES.TEST)}
             >
                 <IoRocketOutline size={20} /> Tạo đề thi
+            </button>
+            <button
+                type="button"
+                className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.BANK })}
+                onClick={() => setCreatorType(CREATOR_TYPES.BANK)}
+            >
+                <IoLibraryOutline size={20} /> Tạo đề từ kho
             </button>
             <button
                 type="button"
