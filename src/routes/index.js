@@ -20,9 +20,18 @@ import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
 import NotFoundPage from '~/pages/error/NotFoundPage';
 import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
 import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFromBankPage';
-import AdminDashboard from '~/Admin/AdminDashboard';
 import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBankPage';
 import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
+
+// Admin imports
+import AdminLayout from '~/Admin/layouts/AdminLayout';
+import AdminDashboard from '~/Admin/pages/Dashboard';
+import UsersManagement from '~/Admin/pages/Users';
+import ClassesManagement from '~/Admin/pages/Classes';
+import TestsManagement from '~/Admin/pages/Tests';
+import QuestionsManagement from '~/Admin/pages/Questions';
+import VocabularyManagement from '~/Admin/pages/Vocabulary';
+import AnalyticsPage from '~/Admin/pages/Analytics';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -36,7 +45,17 @@ export const publicRoutes = [
   {path: routes.about, component: About},
   {path: routes.verifyEmail, component: VerifyEmailPage},
   {path: routes.notFound, component: NotFoundPage},
-  {path: routes.adminDashboard, component: AdminDashboard, noContainer: true},
+];
+
+// ✅ Các trang admin (yêu cầu quyền admin)
+export const adminRoutes = [
+  {path: routes.adminDashboard, component: AdminDashboard},
+  {path: routes.adminUsers, component: UsersManagement},
+  {path: routes.adminClasses, component: ClassesManagement},
+  {path: routes.adminTests, component: TestsManagement},
+  {path: routes.adminQuestions, component: QuestionsManagement},
+  {path: routes.adminVocabulary, component: VocabularyManagement},
+  {path: routes.adminAnalytics, component: AnalyticsPage},
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập
@@ -55,11 +74,6 @@ export const privateRoutes = [
   {path: routes.createTestFromBank, component: CreateTestFromBankPage},
   {path: routes.personalQuestionBank, component: PersonalQuestionBankPage},
   {path: routes.profile, component: ProfileOverviewPage},
-  // {
-  //   path: routes.oauth2Redirect,
-  //   component: MyTestPage,
-  //   noContainer: true, // nếu cần full màn
-  // },
 ];
 
-export default {publicRoutes, privateRoutes};
+export default {publicRoutes, privateRoutes, adminRoutes};

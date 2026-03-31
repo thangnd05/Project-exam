@@ -1,0 +1,464 @@
+// ============================================
+// Dashboard Styles
+// ============================================
+
+// Variables
+$primary: #3b82f6;
+$success: #10b981;
+$warning: #f59e0b;
+$danger: #ef4444;
+$purple: #8b5cf6;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$bg-light: #f8fafc;
+$bg-white: #ffffff;
+$border-color: #e2e8f0;
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+$transition: all 0.3s ease;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+.dashboard {
+    padding: 0;
+}
+
+// ============================================
+// Page Header
+// ============================================
+.pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: $text-primary;
+        margin-bottom: 4px;
+    }
+
+    p {
+        color: $text-secondary;
+        margin: 0;
+    }
+}
+
+.headerActions {
+    display: flex;
+    gap: 12px;
+}
+
+.dateBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: $bg-white;
+    border-radius: $radius-md;
+    color: $text-secondary;
+    font-size: 14px;
+    box-shadow: $shadow-sm;
+}
+
+// ============================================
+// Stats Cards
+// ============================================
+.statsRow {
+    margin-bottom: 20px;
+}
+
+.statCard {
+    background: $bg-white;
+    border-radius: $radius-lg;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+    transition: $transition;
+    height: 100%;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+    }
+}
+
+.statIcon {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.statContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.statTitle {
+    font-size: 13px;
+    color: $text-secondary;
+    margin-bottom: 4px;
+}
+
+.statValue {
+    font-size: 28px;
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1;
+}
+
+.statTrend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    margin-top: 6px;
+
+    &.up {
+        color: $success;
+    }
+
+    &.down {
+        color: $danger;
+    }
+}
+
+// ============================================
+// Secondary Stats
+// ============================================
+.secondaryStats {
+    margin-bottom: 24px;
+}
+
+.miniStat {
+    background: $bg-white;
+    border-radius: $radius-md;
+    padding: 16px;
+    text-align: center;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+    height: 100%;
+}
+
+.miniValue {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.miniLabel {
+    display: block;
+    font-size: 12px;
+    color: $text-secondary;
+    margin-top: 4px;
+}
+
+// ============================================
+// Charts
+// ============================================
+.chartsRow {
+    margin-bottom: 24px;
+}
+
+.chartCard {
+    background: $bg-white;
+    border-radius: $radius-lg;
+    padding: 20px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+    height: 100%;
+}
+
+.chartHeader {
+    margin-bottom: 20px;
+
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
+    }
+}
+
+// ============================================
+// Bottom Row
+// ============================================
+.bottomRow {
+    margin-bottom: 24px;
+}
+
+.tableCard {
+    background: $bg-white;
+    border-radius: $radius-lg;
+    padding: 20px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+    height: 100%;
+}
+
+.tableHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
+    }
+}
+
+.viewAll {
+    font-size: 13px;
+    color: $primary;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+.customTable {
+    margin-bottom: 0;
+
+    th {
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid $border-color;
+        padding: 12px 16px;
+        white-space: nowrap;
+    }
+
+    td {
+        font-size: 14px;
+        color: $text-primary;
+        padding: 14px 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid $border-color;
+    }
+
+    tbody tr {
+        transition: $transition;
+
+        &:hover {
+            background: rgba($primary, 0.03);
+        }
+    }
+}
+
+.userCell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.userAvatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, $primary 0%, #60a5fa 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.userName {
+    display: block;
+    font-weight: 500;
+}
+
+.userUsername {
+    display: block;
+    font-size: 12px;
+    color: $text-secondary;
+}
+
+.score {
+    font-weight: 600;
+    color: $primary;
+}
+
+.actions {
+    display: flex;
+    gap: 4px;
+}
+
+.actionBtn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+        background: $bg-light;
+        color: $primary;
+    }
+
+    &.delete:hover {
+        background: rgba($danger, 0.1);
+        color: $danger;
+    }
+}
+
+// ============================================
+// Activity Card
+// ============================================
+.activityCard {
+    background: $bg-white;
+    border-radius: $radius-lg;
+    padding: 20px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+    height: 100%;
+}
+
+.activityHeader {
+    margin-bottom: 20px;
+
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
+    }
+}
+
+.activityList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activityItem {
+    display: flex;
+    gap: 12px;
+}
+
+.activityIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: $bg-light;
+
+    &.success {
+        background: rgba($success, 0.1);
+        color: $success;
+    }
+
+    &.primary {
+        background: rgba($primary, 0.1);
+        color: $primary;
+    }
+
+    &.warning {
+        background: rgba($warning, 0.1);
+        color: $warning;
+    }
+
+    &.info {
+        background: rgba($purple, 0.1);
+        color: $purple;
+    }
+}
+
+.activityContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.activityUser {
+    font-weight: 500;
+    color: $text-primary;
+    font-size: 14px;
+}
+
+.activityAction {
+    font-size: 13px;
+    color: $text-secondary;
+    margin-top: 2px;
+}
+
+.activityTime {
+    font-size: 12px;
+    color: $text-muted;
+    margin-top: 4px;
+}
+
+// ============================================
+// Responsive
+// ============================================
+@media (max-width: 992px) {
+    .pageHeader {
+        flex-direction: column;
+        align-items: flex-start;
+
+        h1 {
+            font-size: 24px;
+        }
+    }
+
+    .statsRow {
+        .col-lg-3 {
+            margin-bottom: 16px;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .secondaryStats {
+        .col-lg-2 {
+            margin-bottom: 12px;
+        }
+    }
+
+    .tableHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DefaultLayout from './Layout/DefaultLayout';
-import routes from './routes';
-import ProtectedRoute from './routes/ProtectedRoute'; // ✅ Import ProtectedRoute
+import routes, { publicRoutes, privateRoutes, adminRoutes } from './routes';
+import ProtectedRoute from './routes/ProtectedRoute';
+import AdminLayout from './Admin/layouts/AdminLayout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from '~/context/AuthContext';
 import ScrollHandler from './Layout/ScrollToTopOnRouteChange';
@@ -17,7 +18,7 @@ function App() {
         <div className="App">
           <Routes>
             {/* Public Routes */}
-            {routes.publicRoutes.map((route, index) => {
+            {publicRoutes.map((route, index) => {
               const Page = route.component;
               const Layout = DefaultLayout;
               return (
@@ -33,8 +34,24 @@ function App() {
               );
             })}
 
-            {/* ✅ Private Routes (Bỏ comment và sử dụng ProtectedRoute) */}
-            {routes.privateRoutes.map((route, index) => {
+            {/* ✅ Admin Routes */}
+            {adminRoutes.map((route, index) => {
+              const Page = route.component;
+              return (
+                <Route
+                  key={`admin-${index}`}
+                  path={route.path}
+                  element={
+                    <AdminLayout>
+                      <Page />
+                    </AdminLayout>
+                  }
+                />
+              );
+            })}
+
+            {/* ✅ Private Routes */}
+            {privateRoutes.map((route, index) => {
               const Page = route.component;
               const Layout = DefaultLayout;
               return (

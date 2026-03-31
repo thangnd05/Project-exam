@@ -12,7 +12,14 @@ const routes = {
   createTestFromBank: '/admin/create-test-from-bank',
   personalQuestionBank: '/admin/personal-question-bank',
 
+  // 🛠️ Admin Dashboard
   adminDashboard: '/admin/dashboard',
+  adminUsers: '/admin/users',
+  adminClasses: '/admin/classes',
+  adminTests: '/admin/tests',
+  adminQuestions: '/admin/questions',
+  adminVocabulary: '/admin/vocabulary',
+  adminAnalytics: '/admin/analytics',
 
   testHistory: '/tests/history/:testId',
   examTypeDetail: '/exam-types/:examTypeId',
