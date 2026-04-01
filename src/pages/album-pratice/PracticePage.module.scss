@@ -306,53 +306,34 @@ $transition: all 0.3s ease;
 }
 
 .audioPlayer {
-    width: 100%;
-    max-width: 400px;
-    height: 40px;
-    border-radius: 20px;
-    background: rgba(0, 0, 0, 0.4);
-    outline: none;
+    display: none;
+}
 
-    &::-webkit-media-controls-panel {
-        background: rgba(0, 0, 0, 0.4);
+.playBtn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+        transform: scale(1.1);
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     }
 
-    &::-webkit-media-controls-play-button,
-    &::-webkit-media-controls-mute-button {
-        background-color: rgba(255, 255, 255, 1) !important;
-        border-radius: 50% !important;
-        -webkit-appearance: none;
-        width: 24px !important;
-        height: 24px !important;
+    &:active {
+        transform: scale(0.95);
     }
 
-    &::-webkit-media-controls-current-time-display,
-    &::-webkit-media-controls-time-remaining-display {
-        color: white !important;
-        font-size: 11px !important;
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
-    }
-
-    &::-webkit-media-controls-timeline-container {
-        background: rgba(255, 255, 255, 0.2);
-    }
-
-    &::-webkit-media-controls-timeline {
-        background: rgba(255, 255, 255, 0.4);
-        border-radius: 10px;
-    }
-
-    &::-webkit-media-controls-volume-slider-container {
-        background: rgba(255, 255, 255, 0.2);
-    }
-
-    &::-webkit-media-controls-volume-slider {
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 10px;
-    }
-
-    &::-internal-media-controls-overflow-button {
-        background-color: rgba(255, 255, 255, 1) !important;
+    svg {
+        color: $primary;
     }
 }
 

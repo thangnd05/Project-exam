@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {useParams} from 'react-router-dom';
 import axios from 'axios';
 import {Container, Spinner} from 'react-bootstrap';
@@ -13,7 +13,8 @@ import {
     BookOpen,
     Target,
     Trophy,
-    ChevronRight
+    ChevronRight,
+    Volume2
 } from 'lucide-react';
 
 import styles from './PracticePage.module.scss';
@@ -32,6 +33,7 @@ const PracticePage = () => {
     const [markingKnown, setMarkingKnown] = useState(false);
     const [knownMessage, setKnownMessage] = useState('');
     const [sessionScore, setSessionScore] = useState({correct: 0, total: 0});
+    const audioRef = useRef(null);
 
     const fetchQuestion = async () => {
         try {
@@ -251,8 +253,8 @@ const PracticePage = () => {
                         {/* Audio Player */}
                         <div className={cx('audioSection')}>
                             <audio
+                                ref={audioRef}
                                 key={question.vocabId}
-                                controls
                                 preload="none"
                                 className={cx('audioPlayer')}
                             >
@@ -261,6 +263,16 @@ const PracticePage = () => {
                                     type="audio/mpeg"
                                 />
                             </audio>
+                            <button
+                                className={cx('playBtn')}
+                                onClick={() => {
+                                    if (audioRef.current) {
+                                        audioRef.current.play();
+                                    }
+                                }}
+                            >
+                                <Volume2 size={28} />
+                            </button>
                         </div>
                     </div>
 
