@@ -172,6 +172,34 @@
   }
 }
 
+.btn-manage-members {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  color: #10b981;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: var(--font-family);
+
+  svg {
+    font-size: 1.8rem;
+  }
+
+  &:hover {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+}
+
 /* ================= LOADING & EMPTY ================= */
 
 .loading,

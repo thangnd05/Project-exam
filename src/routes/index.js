@@ -19,6 +19,7 @@ import MyTestPage from '~/pages/mytest/MyTestPage';
 import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
 import NotFoundPage from '~/pages/error/NotFoundPage';
 import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
+import ClassMemberManagementPage from '~/pages/myclass/class-member/ClassMemberManagementPage';
 import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFromBankPage';
 import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBankPage';
 import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
@@ -71,6 +72,7 @@ export const privateRoutes = [
   {path: routes.MyTest, component: MyTestPage},
   {path: routes.oauth2Redirect, component: MyTestPage},
   {path: routes.classChapterPage, component: ChapterOfClass},
+  {path: routes.classMemberManagement, component: ClassMemberManagementPage},
   {path: routes.createTestFromBank, component: CreateTestFromBankPage},
   {path: routes.personalQuestionBank, component: PersonalQuestionBankPage},
   {path: routes.profile, component: ProfileOverviewPage},

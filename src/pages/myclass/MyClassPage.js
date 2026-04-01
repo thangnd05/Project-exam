@@ -9,7 +9,8 @@ import {
   IoKeyOutline,
   IoBookOutline,
   IoArrowForwardOutline,
-  IoPersonOutline
+  IoPersonOutline,
+  IoSettingsOutline,
 } from 'react-icons/io5';
 
 import styles from './MyClassPage.module.scss';
@@ -46,6 +47,12 @@ const MyClassesPage = () => {
 
   const handleViewTests = (classId) => {
     const path = routes.classChapterPage.replace(':classId', classId);
+    navigate(path);
+  };
+
+  const handleManageMembers = (e, classId) => {
+    e.stopPropagation();
+    const path = routes.classMemberManagement.replace(':classId', classId);
     navigate(path);
   };
 
@@ -102,6 +109,14 @@ const MyClassesPage = () => {
                   <IoBookOutline />
                   Xem các bài test
                   <IoArrowForwardOutline />
+                </button>
+                <button
+                  className={cx('btn-manage-members')}
+                  onClick={(e) => handleManageMembers(e, clazz.classId)}
+                >
+                  <IoPeopleOutline />
+                  Quản lý học sinh
+                  <IoSettingsOutline />
                 </button>
               </div>
             ))

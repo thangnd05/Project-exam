@@ -32,6 +32,7 @@ const routes = {
   // 🏫 Class routes
   myClasses: '/my-classes',
   classChapterTests: '/classes/:classId/chapters/:chapterId/tests',
+  classMemberManagement: '/class/:classId/members',
 
   // 👤 Auth
   login: '/login',

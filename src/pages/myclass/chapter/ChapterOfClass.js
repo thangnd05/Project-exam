@@ -12,6 +12,7 @@ import {
   IoAdd,
   IoGridOutline,
   IoListOutline,
+  IoPeopleOutline,
 } from 'react-icons/io5';
 
 import styles from './ChapterOfClass.module.scss';
@@ -55,6 +56,11 @@ const ChapterOfClass = () => {
   const handleDeleteChapterClick = (chapter) => {
     setSelectedChapter(chapter);
     setShowDeleteChapter(true);
+  };
+
+  const handleManageMembers = () => {
+    const path = routes.classMemberManagement.replace(':classId', classId);
+    navigate(path);
   };
 
   const handleConfirmDeleteChapter = async () => {
@@ -129,6 +135,10 @@ const ChapterOfClass = () => {
           actionIcon={IoAdd}
           onAction={() => setShowCreateChapter(true)}
         >
+          <button className={cx('btn-manage-members')} onClick={handleManageMembers}>
+            <IoPeopleOutline />
+            Quản lý học sinh
+          </button>
           <PageHeaderViewToggle
             activeKey={viewMode}
             onChange={setViewMode}
