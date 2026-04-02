@@ -43,7 +43,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }) =
                     <OverlayTrigger overlay={<Tooltip>Sửa lớp học</Tooltip>}>
                       <button
                         className={cx('btn-action', 'edit')}
-                        onClick={() => onEdit(clazz.classId)}
+                        onClick={() => onEdit(clazz)}
                       >
                         <IoPencilOutline />
                       </button>
@@ -54,7 +54,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }) =
                     <OverlayTrigger overlay={<Tooltip>Xóa lớp học</Tooltip>}>
                       <button
                         className={cx('btn-action', 'delete')}
-                        onClick={() => onDelete(clazz.classId)}
+                        onClick={() => onDelete(clazz)}
                       >
                         <IoTrashOutline />
                       </button>

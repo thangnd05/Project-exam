@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Spinner, Alert } from 'react-bootstrap';
+import {useNavigate} from 'react-router-dom';
+import {Spinner, Alert} from 'react-bootstrap';
+import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 
 import styles from './MyClassPage.module.scss';
 import routes from '../../config/Routes';
 import ClassListContainer from '../../components/common/ClassListContainer/ClassListContainer';
+import EditClassModal from '../../components/modals/EditClassModal';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 
 const cx = classNames.bind(styles);
 
@@ -15,6 +18,10 @@ const MyClassesPage = () => {
   const [learningClasses, setLearningClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,17 +55,48 @@ const MyClassesPage = () => {
     navigate(path);
   };
 
-  const handleEditClass = (classId) => {
-    console.log('Edit class:', classId);
+  const handleEditClass = (classData) => {
+    setSelectedClass(classData);
+    setShowEditModal(true);
   };
 
-  const handleDeleteClass = (classId) => {
-    console.log('Delete class:', classId);
+  const handleDeleteClass = (classData) => {
+    setSelectedClass(classData);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedClass) return;
+    setDeleting(true);
+
+    try {
+      await axios.delete(`/api/classes/${selectedClass.classId}`);
+      toast.success(' Xóa lớp học thành công!');
+
+      // Remove from local state
+      setTeachingClasses((prev) =>
+        prev.filter((c) => c.classId !== selectedClass.classId),
+      );
+      setShowDeleteModal(false);
+      setSelectedClass(null);
+    } catch (err) {
+      toast.error(err.response?.data?.error || '❌ Xóa lớp học thất bại!');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleManageStudents = (classId) => {
     const path = routes.classMemberManagement.replace(':classId', classId);
     navigate(path);
+  };
+
+  const handleEditSuccess = (updatedClass) => {
+    setTeachingClasses((prev) =>
+      prev.map((c) =>
+        c.classId === updatedClass.classId ? {...c, ...updatedClass} : c,
+      ),
+    );
   };
 
   if (loading) {
@@ -89,6 +127,27 @@ const MyClassesPage = () => {
         onEditClass={handleEditClass}
         onDeleteClass={handleDeleteClass}
         onManageStudents={handleManageStudents}
+      />
+
+      <EditClassModal
+        show={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedClass(null);
+        }}
+        classData={selectedClass}
+        onSuccess={handleEditSuccess}
+      />
+
+      <ConfirmDeleteModal
+        show={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSelectedClass(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Xóa lớp học"
+        message={`Bạn có chắc chắn muốn xóa lớp "${selectedClass?.className}"? Hành động này không thể hoàn tác.`}
       />
     </>
   );
