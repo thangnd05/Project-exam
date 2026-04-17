@@ -2,15 +2,15 @@ package com.example.english_exam.controllers;
 
 import com.example.english_exam.dto.request.ExamPartRequest;
 import com.example.english_exam.dto.request.ExamTypeRequest;
+import com.example.english_exam.dto.response.AuditLogPageResponse;
 import com.example.english_exam.dto.response.ExamPartResponse;
 import com.example.english_exam.dto.response.ExamTypeResponse;
-import com.example.english_exam.dto.response.ProfileOverviewResponse;
 import com.example.english_exam.models.User;
+import com.example.english_exam.services.AuditLogService;
 import com.example.english_exam.services.ExamAndTest.ExamPartService;
 import com.example.english_exam.services.ExamAndTest.ExamTypeService;
 import com.example.english_exam.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -29,6 +28,7 @@ public class AdminController {
     private final ExamTypeService examTypeService;
     private final ExamPartService examPartService;
     private final UserService userService;
+    private final AuditLogService auditLogService;
 
     // ==================== EXAM TYPE CRUD ====================
 
@@ -133,10 +133,11 @@ public class AdminController {
 
     // ==================== AUDIT ====================
     @GetMapping("/audits")
-    public ResponseEntity<List<AuditLog>> getRecentAudits(
+    public ResponseEntity<AuditLogPageResponse> getRecentAudits(
             @RequestParam(required = false) Long userId,
-            @RequestParam(defaultValue = "50") Integer limit
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size
     ) {
-        return ResponseEntity.ok(auditLogService.getRecentLogs(userId, limit));
+        return ResponseEntity.ok(auditLogService.getRecentLogs(userId, page, size));
     }
 }
