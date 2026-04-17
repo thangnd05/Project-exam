@@ -129,4 +129,14 @@ public class AdminController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+
+    // ==================== AUDIT ====================
+    @GetMapping("/audits")
+    public ResponseEntity<List<AuditLog>> getRecentAudits(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "50") Integer limit
+    ) {
+        return ResponseEntity.ok(auditLogService.getRecentLogs(userId, limit));
+    }
 }
