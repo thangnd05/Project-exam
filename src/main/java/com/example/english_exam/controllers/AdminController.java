@@ -2,13 +2,16 @@ package com.example.english_exam.controllers;
 
 import com.example.english_exam.dto.request.ExamPartRequest;
 import com.example.english_exam.dto.request.ExamTypeRequest;
+import com.example.english_exam.dto.request.RoleRequest;
 import com.example.english_exam.dto.response.AuditLogPageResponse;
 import com.example.english_exam.dto.response.ExamPartResponse;
 import com.example.english_exam.dto.response.ExamTypeResponse;
+import com.example.english_exam.dto.response.RoleResponse;
 import com.example.english_exam.models.User;
 import com.example.english_exam.services.AuditLogService;
 import com.example.english_exam.services.ExamAndTest.ExamPartService;
 import com.example.english_exam.services.ExamAndTest.ExamTypeService;
+import com.example.english_exam.services.RoleService;
 import com.example.english_exam.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -29,6 +32,7 @@ public class AdminController {
     private final ExamPartService examPartService;
     private final UserService userService;
     private final AuditLogService auditLogService;
+    private final RoleService roleService;
 
     // ==================== EXAM TYPE CRUD ====================
 
@@ -130,6 +134,38 @@ public class AdminController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // ==================== ROLE CRUD ====================
+
+    @PostMapping("/roles")
+    public ResponseEntity<RoleResponse> createRole(@RequestBody RoleRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(roleService.create(request));
+    }
+
+    @PutMapping("/roles/{id}")
+    public ResponseEntity<RoleResponse> updateRole(@PathVariable Long id, @RequestBody RoleRequest request) {
+        try {
+            return ResponseEntity.ok(roleService.update(id, request));
+        } catch (RuntimeException e) {
+            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/roles/{id}")
+    public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
+        try {
+            roleService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
     // ==================== AUDIT ====================
     @GetMapping("/audits")
@@ -139,5 +175,14 @@ public class AdminController {
             @RequestParam(defaultValue = "20") Integer size
     ) {
         return ResponseEntity.ok(auditLogService.getRecentLogs(userId, page, size));
+    }
+
+    @GetMapping("/login-audits")
+    public ResponseEntity<AuditLogPageResponse> getLoginAudits(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size
+    ) {
+        return ResponseEntity.ok(auditLogService.getLoginLogs(userId, page, size));
     }
 }

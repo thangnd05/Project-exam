@@ -24,4 +24,13 @@ public class AuditLogController {
     ) {
         return ResponseEntity.ok(auditLogService.getRecentLogs(userId, page, size));
     }
+
+    @GetMapping("/login")
+    public ResponseEntity<AuditLogPageResponse> getLoginAudits(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size
+    ) {
+        return ResponseEntity.ok(auditLogService.getLoginLogs(userId, page, size));
+    }
 }

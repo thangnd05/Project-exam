@@ -38,7 +38,7 @@ public class AuditLogInterceptor implements HandlerInterceptor {
         auditLog.setUserId(extractUserIdSafely(request));
         auditLog.setHttpMethod(method);
         auditLog.setEndpoint(endpoint);
-        auditLog.setAction(resolveAction(method));
+        auditLog.setAction(resolveAction(method, endpoint));
         auditLog.setResource(resolveResource(endpoint));
         auditLog.setResourceId(resolveResourceId(endpoint));
         auditLog.setIpAddress(request.getRemoteAddr());
@@ -59,7 +59,13 @@ public class AuditLogInterceptor implements HandlerInterceptor {
         }
     }
 
-    private String resolveAction(String method) {
+    private String resolveAction(String method, String endpoint) {
+        if ("POST".equals(method) && "/api/auth/login".equals(endpoint)) {
+            return "LOGIN";
+        }
+        if ("POST".equals(method) && "/api/auth/logout".equals(endpoint)) {
+            return "LOGOUT";
+        }
         return switch (method) {
             case "POST" -> "CREATE";
             case "PUT" -> "UPDATE";
