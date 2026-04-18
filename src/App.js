@@ -6,7 +6,7 @@ import AdminLayout from './Admin/layouts/AdminLayout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from '~/context/AuthContext';
 import ScrollHandler from './Layout/ScrollToTopOnRouteChange';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
@@ -14,7 +14,17 @@ function App() {
     <AuthProvider>
       <Router>
         <ScrollHandler />
-        <ToastContainer position="top-right" autoClose={3000} />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          limit={3}
+        />
         <div className="App">
           <Routes>
             {/* Public Routes */}

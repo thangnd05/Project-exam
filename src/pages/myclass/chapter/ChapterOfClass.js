@@ -74,7 +74,8 @@ const ChapterOfClass = () => {
       fetchChapters();
     } catch (error) {
       toast.error(
-        error.response?.data?.message || 'Không thể xóa chương. Vui lòng thử lại.',
+        error.response?.data?.message ||
+          'Không thể xóa chương. Vui lòng thử lại.',
       );
     } finally {
       setShowDeleteChapter(false);
@@ -135,10 +136,6 @@ const ChapterOfClass = () => {
           actionIcon={IoAdd}
           onAction={() => setShowCreateChapter(true)}
         >
-          <button className={cx('btn-manage-members')} onClick={handleManageMembers}>
-            <IoPeopleOutline />
-            Quản lý học sinh
-          </button>
           <PageHeaderViewToggle
             activeKey={viewMode}
             onChange={setViewMode}
@@ -186,7 +183,9 @@ const ChapterOfClass = () => {
                       <IoCalendarOutline />
                       <span>
                         Cập nhật:{' '}
-                        {new Date(chapter.createdAt).toLocaleDateString('vi-VN')}
+                        {new Date(chapter.createdAt).toLocaleDateString(
+                          'vi-VN',
+                        )}
                       </span>
                     </div>
 

@@ -99,6 +99,7 @@ function TestCard({ test, countdowns }) {
                         onClick={() =>
                             navigate(`/tests/history/${test.testId}`)
                         }
+                        disabled={!canStart}
                     >
                         <IoStatsChartOutline />
                         Lịch sử điểm của tôi

@@ -15,11 +15,15 @@ const routes = {
   // 🛠️ Admin Dashboard
   adminDashboard: '/admin/dashboard',
   adminUsers: '/admin/users',
+  adminRoles: '/admin/roles',
+  adminExamTypes: '/admin/exam-types',
+  adminExamParts: '/admin/exam-parts',
   adminClasses: '/admin/classes',
   adminTests: '/admin/tests',
   adminQuestions: '/admin/questions',
   adminVocabulary: '/admin/vocabulary',
   adminAnalytics: '/admin/analytics',
+  adminAuditLogs: '/admin/audit-logs',
 
   testHistory: '/tests/history/:testId',
   examTypeDetail: '/exam-types/:examTypeId',

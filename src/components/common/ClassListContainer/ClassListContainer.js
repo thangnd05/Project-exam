@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
-import { Container } from 'react-bootstrap';
-import { IoListOutline, IoGridOutline, IoSchoolOutline, IoPeopleOutline } from 'react-icons/io5';
+import React, {useState} from 'react';
+import {Container} from 'react-bootstrap';
+import {
+  IoListOutline,
+  IoGridOutline,
+  IoSchoolOutline,
+  IoPeopleOutline,
+} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './ClassListContainer.module.scss';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
@@ -29,8 +34,8 @@ const ClassListContainer = ({
   const hasAnyClasses = hasTeaching || hasLearning;
 
   const viewModeOptions = [
-    { key: 'grid', title: 'Dạng lưới', icon: IoGridOutline },
-    { key: 'table', title: 'Dạng bảng', icon: IoListOutline },
+    {key: 'grid', title: 'Dạng lưới', icon: IoGridOutline},
+    {key: 'table', title: 'Dạng bảng', icon: IoListOutline},
   ];
 
   return (

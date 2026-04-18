@@ -25,14 +25,13 @@ import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBank
 import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
 
 // Admin imports
-import AdminLayout from '~/Admin/layouts/AdminLayout';
 import AdminDashboard from '~/Admin/pages/Dashboard';
 import UsersManagement from '~/Admin/pages/Users';
-import ClassesManagement from '~/Admin/pages/Classes';
-import TestsManagement from '~/Admin/pages/Tests';
-import QuestionsManagement from '~/Admin/pages/Questions';
-import VocabularyManagement from '~/Admin/pages/Vocabulary';
+import RolesManagement from '~/Admin/pages/Roles';
 import AnalyticsPage from '~/Admin/pages/Analytics';
+import AuditLogs from '~/Admin/pages/AuditLogs';
+import ExamTypesManagement from '~/Admin/pages/ExamTypes';
+import ExamPartsManagement from '~/Admin/pages/ExamParts';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -52,11 +51,11 @@ export const publicRoutes = [
 export const adminRoutes = [
   {path: routes.adminDashboard, component: AdminDashboard},
   {path: routes.adminUsers, component: UsersManagement},
-  {path: routes.adminClasses, component: ClassesManagement},
-  {path: routes.adminTests, component: TestsManagement},
-  {path: routes.adminQuestions, component: QuestionsManagement},
-  {path: routes.adminVocabulary, component: VocabularyManagement},
+  {path: routes.adminRoles, component: RolesManagement},
+  {path: routes.adminExamTypes, component: ExamTypesManagement},
+  {path: routes.adminExamParts, component: ExamPartsManagement},
   {path: routes.adminAnalytics, component: AnalyticsPage},
+  {path: routes.adminAuditLogs, component: AuditLogs},
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập
@@ -78,4 +77,6 @@ export const privateRoutes = [
   {path: routes.profile, component: ProfileOverviewPage},
 ];
 
-export default {publicRoutes, privateRoutes, adminRoutes};
+const appRoutes = {publicRoutes, privateRoutes, adminRoutes};
+
+export default appRoutes;
