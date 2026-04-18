@@ -177,6 +177,31 @@ public class QuestionController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping(value = "/create-and-attach/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createQuestionsFromDocumentAndAttachToTest(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam Long testPartId,
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) Long chapterId,
+            HttpServletRequest httpRequest
+    ) {
+        try {
+            List<QuestionAdminResponse> responses = questionService.createQuestionsFromDocumentAndAttachToTest(
+                    file,
+                    testPartId,
+                    classId,
+                    chapterId,
+                    httpRequest
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Tạo nhanh câu hỏi từ Word thất bại",
+                    "detail", e.getMessage()
+            ));
+        }
+    }
+
     @PostMapping(value = "/import/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> importQuestionsFromDocument(
             @RequestPart("file") MultipartFile file,

@@ -276,7 +276,7 @@ public class QuestionService {
             HttpServletRequest httpRequest
     ) throws IOException {
         if (file == null || file.isEmpty()) {
-            throw new RuntimeException("Vui lòng chọn file PDF/Word.");
+            throw new RuntimeException("Vui lòng chọn file Word.");
         }
         if (examPartId == null) {
             throw new RuntimeException("Thiếu examPartId.");
@@ -291,6 +291,68 @@ public class QuestionService {
         );
 
         return createBulkQuestionsToBankNoPassage(bulkRequest, httpRequest, Collections.emptyMap());
+    }
+
+    @Transactional
+    public List<QuestionAdminResponse> createQuestionsFromDocumentAndAttachToTest(
+            MultipartFile file,
+            Long testPartId,
+            Long classId,
+            Long chapterId,
+            HttpServletRequest httpRequest
+    ) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("Vui lòng chọn file Word.");
+        }
+        if (testPartId == null) {
+            throw new RuntimeException("Thiếu testPartId.");
+        }
+
+        Long currentUserId = authUtils.getUserId(httpRequest);
+        if (currentUserId == null) {
+            throw new RuntimeException("Không xác định được người dùng.");
+        }
+
+        TestPart testPart = testPartRepository.findById(testPartId)
+                .orElseThrow(() -> new RuntimeException("TestPart không tồn tại: " + testPartId));
+
+        List<NormalQuestionRequest> parsedQuestions = questionDocumentImportService.parseQuestionsFromDocument(file);
+        if (parsedQuestions.isEmpty()) {
+            return List.of();
+        }
+
+        List<QuestionAdminResponse> responses = new ArrayList<>();
+        for (NormalQuestionRequest parsedQuestion : parsedQuestions) {
+            Question question = new Question();
+            question.setExamPartId(testPart.getExamPartId());
+            question.setPassageId(null);
+            question.setQuestionText(parsedQuestion.getQuestionText());
+            question.setQuestionType(parsedQuestion.getQuestionType());
+            question.setCreatedBy(currentUserId);
+            question.setIsBank(Boolean.FALSE);
+            if (classId != null) {
+                question.setClassId(classId);
+            }
+            if (chapterId != null) {
+                question.setChapterId(chapterId);
+            }
+            question = questionRepository.save(question);
+
+            List<Answer> savedAnswers = saveAnswersForQuestion(
+                    question.getQuestionId(),
+                    parsedQuestion.getAnswers(),
+                    parsedQuestion.getQuestionType()
+            );
+
+            TestQuestion testQuestion = new TestQuestion();
+            testQuestion.setTestPartId(testPartId);
+            testQuestion.setQuestionId(question.getQuestionId());
+            testQuestionRepository.save(testQuestion);
+
+            responses.add(buildQuestionAdminResponse(question, null, savedAnswers));
+        }
+
+        return responses;
     }
 
 
