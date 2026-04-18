@@ -12,6 +12,8 @@ export { default as QuestionsManagement } from './pages/Questions';
 export { default as VocabularyManagement } from './pages/Vocabulary';
 export { default as AnalyticsPage } from './pages/Analytics';
 export { default as AuditLogs } from './pages/AuditLogs';
+export { default as LoginAudit } from './pages/LoginAudit';
+export { default as TestsManagement } from './pages/Tests';
 
 // Export fake data for use in components
 export * from './data/fakeData';

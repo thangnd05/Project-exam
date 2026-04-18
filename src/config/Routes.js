@@ -27,6 +27,7 @@ const routes = {
   adminVocabulary: '/admin/vocabulary',
   adminAnalytics: '/admin/analytics',
   adminAuditLogs: '/admin/audit-logs',
+  adminLoginAudit: '/admin/audit-login',
 
   testHistory: '/tests/history/:testId',
   examTypeDetail: '/exam-types/:examTypeId',

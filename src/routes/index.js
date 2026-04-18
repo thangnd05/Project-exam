@@ -33,6 +33,8 @@ import ScoringConversionManagement from '~/Admin/pages/ScoringConversion';
 import EvaluationsManagement from '~/Admin/pages/Evaluations';
 import AnalyticsPage from '~/Admin/pages/Analytics';
 import AuditLogs from '~/Admin/pages/AuditLogs';
+import LoginAudit from '~/Admin/pages/LoginAudit';
+import TestsManagement from '~/Admin/pages/Tests';
 import ExamTypesManagement from '~/Admin/pages/ExamTypes';
 import ExamPartsManagement from '~/Admin/pages/ExamParts';
 
@@ -60,8 +62,10 @@ export const adminRoutes = [
   {path: routes.adminEvaluations, component: EvaluationsManagement},
   {path: routes.adminExamTypes, component: ExamTypesManagement},
   {path: routes.adminExamParts, component: ExamPartsManagement},
+  {path: routes.adminTests, component: TestsManagement},
   {path: routes.adminAnalytics, component: AnalyticsPage},
   {path: routes.adminAuditLogs, component: AuditLogs},
+  {path: routes.adminLoginAudit, component: LoginAudit},
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập

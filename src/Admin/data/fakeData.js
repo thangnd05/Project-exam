@@ -695,6 +695,50 @@ export const fakeAuditLogs = [
   },
 ];
 
+// ---- Login Audit (login_audit) ----
+export const fakeLoginAudit = [
+  {
+    id: 1,
+    failure_reason: null,
+    ip_address: '192.168.1.10',
+    login_time: '2026-04-17 08:00:00',
+    status: 'SUCCESS',
+    user_agent: 'Mozilla/5.0',
+    user_id: 4,
+    user_name: 'student_hung',
+  },
+  {
+    id: 2,
+    failure_reason: 'Sai mật khẩu',
+    ip_address: '203.0.113.44',
+    login_time: '2026-04-17 08:15:22',
+    status: 'FAILED',
+    user_agent: 'Mozilla/5.0',
+    user_id: null,
+    user_name: 'admin01',
+  },
+  {
+    id: 3,
+    failure_reason: null,
+    ip_address: '192.168.1.12',
+    login_time: '2026-04-17 09:30:00',
+    status: 'SUCCESS',
+    user_agent: 'Mozilla/5.0',
+    user_id: 2,
+    user_name: 'teacher_anh',
+  },
+  {
+    id: 4,
+    failure_reason: 'Tài khoản chưa xác thực',
+    ip_address: '198.51.100.8',
+    login_time: '2026-04-17 10:02:11',
+    status: 'FAILED',
+    user_agent: 'PostmanRuntime/7.37.3',
+    user_id: null,
+    user_name: 'student_tuyet',
+  },
+];
+
 // ---- Dashboard Statistics (Aggregated) ----
 export const dashboardStats = {
   totalUsers: fakeUsers.length,

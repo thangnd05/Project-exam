@@ -13,6 +13,8 @@ import {
   Layers,
   ListChecks,
   ShieldAlert,
+  KeyRound,
+  FileStack,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -64,6 +66,11 @@ const adminRoutes = [
     label: 'Quản lý phần thi',
   },
   {
+    path: routes.adminTests,
+    icon: <FileStack size={20} />,
+    label: 'Quản lý đề thi',
+  },
+  {
     path: routes.adminAnalytics,
     icon: <BarChart3 size={20} />,
     label: 'Thống kê',
@@ -72,6 +79,11 @@ const adminRoutes = [
     path: routes.adminAuditLogs,
     icon: <ShieldAlert size={20} />,
     label: 'Audit logs',
+  },
+  {
+    path: routes.adminLoginAudit,
+    icon: <KeyRound size={20} />,
+    label: 'Audit đăng nhập',
   },
 ];
 
