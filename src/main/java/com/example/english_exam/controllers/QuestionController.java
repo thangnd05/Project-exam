@@ -177,6 +177,31 @@ public class QuestionController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping(value = "/import/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> importQuestionsFromDocument(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam Long examPartId,
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) Long chapterId,
+            HttpServletRequest httpRequest
+    ) {
+        try {
+            List<QuestionAdminResponse> responses = questionService.importQuestionsFromDocument(
+                    file,
+                    examPartId,
+                    classId,
+                    chapterId,
+                    httpRequest
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Import câu hỏi thất bại",
+                    "detail", e.getMessage()
+            ));
+        }
+    }
+
     // =================== UPDATE ===================
 
     /** Cập nhật câu hỏi (JSON). Body: QuestionCreateRequest (patch). */

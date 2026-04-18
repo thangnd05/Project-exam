@@ -36,6 +36,7 @@ public class QuestionService {
     private final AnswerService answerService;
     private final ClassMemberRepository classMemberRepository;
     private final ClassRepository classRepository;
+    private final QuestionDocumentImportService questionDocumentImportService;
 
 
 
@@ -264,6 +265,32 @@ public class QuestionService {
             return questionRepository.countByClassIdAndChapterIdAndCreatedByAndIsBankTrue(resolvedClassId, chapterId, currentUserId);
         }
         return questionRepository.countByClassIdAndCreatedByAndIsBankTrue(resolvedClassId, currentUserId);
+    }
+
+    @Transactional
+    public List<QuestionAdminResponse> importQuestionsFromDocument(
+            MultipartFile file,
+            Long examPartId,
+            Long classId,
+            Long chapterId,
+            HttpServletRequest httpRequest
+    ) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("Vui lòng chọn file PDF/Word.");
+        }
+        if (examPartId == null) {
+            throw new RuntimeException("Thiếu examPartId.");
+        }
+
+        List<NormalQuestionRequest> parsedQuestions = questionDocumentImportService.parseQuestionsFromDocument(file);
+        BulkCreateQuestionsToBankRequest bulkRequest = new BulkCreateQuestionsToBankRequest(
+                examPartId,
+                classId,
+                chapterId,
+                parsedQuestions
+        );
+
+        return createBulkQuestionsToBankNoPassage(bulkRequest, httpRequest, Collections.emptyMap());
     }
 
 
