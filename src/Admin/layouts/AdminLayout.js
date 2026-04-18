@@ -7,6 +7,9 @@ import {
   Users,
   ShieldCheck,
   BarChart3,
+  Brain,
+  Calculator,
+  MessageSquareWarning,
   Layers,
   ListChecks,
   ShieldAlert,
@@ -34,6 +37,21 @@ const adminRoutes = [
     path: routes.adminRoles,
     icon: <ShieldCheck size={20} />,
     label: 'Quản lý vai trò',
+  },
+  {
+    path: routes.adminSkills,
+    icon: <Brain size={20} />,
+    label: 'Quản lý kỹ năng',
+  },
+  {
+    path: routes.adminScoringConversion,
+    icon: <Calculator size={20} />,
+    label: 'Quy đổi điểm',
+  },
+  {
+    path: routes.adminEvaluations,
+    icon: <MessageSquareWarning size={20} />,
+    label: 'Duyệt đánh giá',
   },
   {
     path: routes.adminExamTypes,

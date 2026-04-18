@@ -28,6 +28,9 @@ import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
 import AdminDashboard from '~/Admin/pages/Dashboard';
 import UsersManagement from '~/Admin/pages/Users';
 import RolesManagement from '~/Admin/pages/Roles';
+import SkillsManagement from '~/Admin/pages/Skills';
+import ScoringConversionManagement from '~/Admin/pages/ScoringConversion';
+import EvaluationsManagement from '~/Admin/pages/Evaluations';
 import AnalyticsPage from '~/Admin/pages/Analytics';
 import AuditLogs from '~/Admin/pages/AuditLogs';
 import ExamTypesManagement from '~/Admin/pages/ExamTypes';
@@ -52,6 +55,9 @@ export const adminRoutes = [
   {path: routes.adminDashboard, component: AdminDashboard},
   {path: routes.adminUsers, component: UsersManagement},
   {path: routes.adminRoles, component: RolesManagement},
+  {path: routes.adminSkills, component: SkillsManagement},
+  {path: routes.adminScoringConversion, component: ScoringConversionManagement},
+  {path: routes.adminEvaluations, component: EvaluationsManagement},
   {path: routes.adminExamTypes, component: ExamTypesManagement},
   {path: routes.adminExamParts, component: ExamPartsManagement},
   {path: routes.adminAnalytics, component: AnalyticsPage},
