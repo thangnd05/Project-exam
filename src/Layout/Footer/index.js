@@ -1,5 +1,5 @@
-import { Container, Row, Col } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import {Container, Row, Col} from 'react-bootstrap';
+import {Link} from 'react-router-dom';
 import {
   FaFacebookSquare,
   FaInstagram,
@@ -7,7 +7,7 @@ import {
   FaEnvelope,
   FaListUl,
   FaLayerGroup,
-  FaCheckCircle
+  FaCheckCircle,
 } from 'react-icons/fa';
 
 import styles from './footer.module.scss';
@@ -39,9 +39,15 @@ function Footer() {
                   </Link>
                 </div>
                 <div className={styles.socialIcons}>
-                  <a href="#"><FaFacebookSquare /></a>
-                  <a href="#"><FaInstagram /></a>
-                  <a href="#"><FaYoutube /></a>
+                  <a href="#">
+                    <FaFacebookSquare />
+                  </a>
+                  <a href="#">
+                    <FaInstagram />
+                  </a>
+                  <a href="#">
+                    <FaYoutube />
+                  </a>
                 </div>
               </div>
             </div>
