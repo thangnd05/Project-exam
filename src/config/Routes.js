@@ -48,6 +48,7 @@ const routes = {
   reset: '/reset',
   verifyEmail: '/verify',
   profile: '/profile',
+  myEvaluations: '/my-evaluations',
 
   oauth2Redirect: '/oauth2/redirect',
 

@@ -5,6 +5,7 @@ import { Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import {
   IoCalendarOutline,
+  IoChevronForwardOutline,
   IoCheckmarkCircleOutline,
   IoClipboardOutline,
   IoLayersOutline,
@@ -16,7 +17,8 @@ import {
   IoBookOutline,
   IoFolderOpenOutline,
   IoDesktopOutline,
-  IoPencilOutline
+  IoPencilOutline,
+  IoStar
 } from 'react-icons/io5';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
@@ -58,6 +60,9 @@ function ProfileOverviewPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
+  const [myEvaluations, setMyEvaluations] = useState([]);
+  const [loadingEvaluations, setLoadingEvaluations] = useState(true);
+  const PREVIEW_EVALUATION_COUNT = 3;
 
   const fetchProfileOverview = async (showLoader = true) => {
     if (showLoader) setLoading(true);
@@ -75,6 +80,22 @@ function ProfileOverviewPage() {
 
   useEffect(() => {
     fetchProfileOverview();
+  }, []);
+
+  const fetchMyEvaluations = async () => {
+    setLoadingEvaluations(true);
+    try {
+      const response = await axios.get('/api/evaluations/me');
+      setMyEvaluations(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      setMyEvaluations([]);
+    } finally {
+      setLoadingEvaluations(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMyEvaluations();
   }, []);
 
   const fullName = useMemo(() => {
@@ -199,6 +220,10 @@ function ProfileOverviewPage() {
                     <IoFolderOpenOutline className={cx('btnIcon')} />
                     <span>Ngân hàng câu hỏi</span>
                   </button>
+                  <button onClick={() => navigate(routes.myEvaluations)} className={cx('actionBtn', 'btnYellow')}>
+                    <IoStar className={cx('btnIcon')} />
+                    <span>Đánh giá của tôi</span>
+                  </button>
                 </div>
               </section>
             </aside>
@@ -315,6 +340,60 @@ function ProfileOverviewPage() {
                       <strong>{formatDateTime(profileOverview.testStats?.lastAttemptAt)}</strong>
                     </div>
                   </div>
+                </article>
+              </section>
+
+              <section className={cx('detailsRow')}>
+                <article className={cx('statCard')}>
+                  <h3 className={cx('cardTitle')}>
+                    <IoStar />
+                    Đánh giá của bạn
+                  </h3>
+
+                  {loadingEvaluations ? (
+                    <div className={cx('noDataMessage')}>Đang tải đánh giá...</div>
+                  ) : myEvaluations.length === 0 ? (
+                    <div className={cx('noDataMessage')}>Bạn chưa gửi đánh giá nào.</div>
+                  ) : (
+                    <div className={cx('evaluationList')}>
+                      {myEvaluations
+                        .slice(0, PREVIEW_EVALUATION_COUNT)
+                        .map((evaluation) => (
+                        <article key={evaluation.id} className={cx('evaluationItem')}>
+                          <div className={cx('evaluationHeader')}>
+                            <div className={cx('evaluationStars')}>
+                              {Array.from({ length: 5 }).map((_, index) => (
+                                <IoStar
+                                  key={`${evaluation.id}-star-${index}`}
+                                  className={cx(
+                                    index < Number(evaluation.rating || 0)
+                                      ? 'evaluationStarActive'
+                                      : 'evaluationStarInactive'
+                                  )}
+                                />
+                              ))}
+                            </div>
+                            <span className={cx('evaluationDate')}>
+                              {formatDateTime(evaluation.createdAt)}
+                            </span>
+                          </div>
+                          <p className={cx('evaluationContent')}>
+                            {evaluation.content || '--'}
+                          </p>
+                        </article>
+                      ))}
+                      {myEvaluations.length > PREVIEW_EVALUATION_COUNT && (
+                        <button
+                          type="button"
+                          className={cx('viewAllEvaluationsBtn')}
+                          onClick={() => navigate(routes.myEvaluations)}
+                        >
+                          Xem tất cả {formatNumber(myEvaluations.length)} đánh giá
+                          <IoChevronForwardOutline />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </article>
               </section>
 

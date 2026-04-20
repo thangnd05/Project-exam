@@ -264,6 +264,16 @@
   color: #a855f7;
 }
 
+.btnYellow:hover {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.btnYellow .btnIcon {
+  color: #f59e0b;
+}
+
 /* RIGHT COLUMN */
 .rightCol {
   display: flex;
@@ -398,6 +408,77 @@
   font-weight: 700;
 }
 
+.evaluationList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.evaluationItem {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #f8fafc;
+}
+
+.evaluationHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.evaluationStars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 1.45rem;
+}
+
+.evaluationStarActive {
+  color: #f59e0b;
+}
+
+.evaluationStarInactive {
+  color: #cbd5e1;
+}
+
+.evaluationDate {
+  font-size: 1.2rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.evaluationContent {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #334155;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.viewAllEvaluationsBtn {
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 10px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewAllEvaluationsBtn:hover {
+  background: #dbeafe;
+}
+
 /* RESPONSIVE */
 @media (max-width: 992px) {
   .dashboardGrid {
@@ -427,5 +508,14 @@
 
   .title {
     font-size: 2rem;
+  }
+
+  .evaluationHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .evaluationDate {
+    white-space: normal;
   }
 }

@@ -23,6 +23,7 @@ import ClassMemberManagementPage from '~/pages/myclass/class-member/ClassMemberM
 import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFromBankPage';
 import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBankPage';
 import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
+import MyEvaluationsPage from '~/pages/profile/MyEvaluationsPage';
 
 // Admin imports
 import AdminDashboard from '~/Admin/pages/Dashboard';
@@ -85,6 +86,7 @@ export const privateRoutes = [
   {path: routes.createTestFromBank, component: CreateTestFromBankPage},
   {path: routes.personalQuestionBank, component: PersonalQuestionBankPage},
   {path: routes.profile, component: ProfileOverviewPage},
+  {path: routes.myEvaluations, component: MyEvaluationsPage},
 ];
 
 const appRoutes = {publicRoutes, privateRoutes, adminRoutes};

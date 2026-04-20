@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { FaStar, FaPen, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import axios from 'axios';
+import {toast} from 'react-toastify';
 import styles from '~/components/common/modal/PortalFormModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -17,7 +18,7 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
         if (!content.trim()) {
-            alert('Vui lòng nhập nội dung đánh giá');
+            toast.warning('Vui lòng nhập nội dung đánh giá');
             return;
         }
 
@@ -27,14 +28,14 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
                 content: content,
                 rating: userRating
             });
-            alert('Cảm ơn bạn đã gửi đánh giá!');
+            toast.success('Cảm ơn bạn đã gửi đánh giá!');
             setContent('');
             setUserRating(5);
             onSuccess(); // Refresh list or handle success
             onClose();
         } catch (error) {
             console.error('Failed to submit review:', error);
-            alert('Gửi đánh giá thất bại. Vui lòng thử lại sau!');
+            toast.error('Gửi đánh giá thất bại. Vui lòng thử lại sau!');
         } finally {
             setSubmitting(false);
         }

@@ -6,6 +6,7 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import axios from 'axios';
+import {toast} from 'react-toastify';
 import {useAuth} from '~/hook/useAuth';
 import {useNavigate} from 'react-router-dom';
 import routes from '~/config/Routes';
@@ -81,7 +82,7 @@ const Evaluation = () => {
 
   const handleWriteReviewClick = () => {
     if (!user) {
-      alert('⚠️ Bạn cần đăng nhập để gửi đánh giá!');
+      toast.warning('⚠️ Bạn cần đăng nhập để gửi đánh giá!');
       navigate(routes.login);
       return;
     }
