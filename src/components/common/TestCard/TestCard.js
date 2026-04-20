@@ -17,6 +17,46 @@ import {
 
 const cx = classNames.bind(styles);
 
+const DEFAULT_BANNERS = {
+    open: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop',
+    locked: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1200&auto=format&fit=crop',
+    expired: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop',
+};
+
+const getSubjectBanner = (title = '', status = 'open') => {
+    const normalizedTitle = String(title).toLowerCase();
+
+    if (normalizedTitle.includes('toán') || normalizedTitle.includes('math')) {
+        return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop';
+    }
+
+    if (
+        normalizedTitle.includes('hóa') ||
+        normalizedTitle.includes('chem') ||
+        normalizedTitle.includes('hoá')
+    ) {
+        return 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1200&auto=format&fit=crop';
+    }
+
+    if (
+        normalizedTitle.includes('lý') ||
+        normalizedTitle.includes('vật lý') ||
+        normalizedTitle.includes('physics')
+    ) {
+        return 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?q=80&w=1200&auto=format&fit=crop';
+    }
+
+    if (
+        normalizedTitle.includes('anh') ||
+        normalizedTitle.includes('english') ||
+        normalizedTitle.includes('ielts')
+    ) {
+        return 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1200&auto=format&fit=crop';
+    }
+
+    return DEFAULT_BANNERS[status] || DEFAULT_BANNERS.open;
+};
+
 function TestCard({ test, countdowns }) {
     const navigate = useNavigate();
     const now = new Date();
@@ -40,7 +80,7 @@ function TestCard({ test, countdowns }) {
                 <img
                     src={
                         test.bannerUrl ||
-                        'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=1000&auto=format&fit=crop'
+                        getSubjectBanner(test.title, status)
                     }
                     className={cx('banner-img')}
                     alt={test.title}
@@ -71,12 +111,12 @@ function TestCard({ test, countdowns }) {
 
                     <div className={cx('info-item')}>
                         <IoCalendarOutline />
-                        <span>Mở: {formatDateTime(test.availableFrom)}</span>
+                        <span>Ngày mở: <strong>{formatDateTime(test.availableFrom)}</strong></span>
                     </div>
 
                     <div className={cx('info-item')}>
                         <IoHourglassOutline />
-                        <span>Hạn: {formatDateTime(test.availableTo)}</span>
+                        <span>Hạn nộp: <strong>{formatDateTime(test.availableTo)}</strong></span>
                     </div>
                 </div>
 
@@ -99,10 +139,9 @@ function TestCard({ test, countdowns }) {
                         onClick={() =>
                             navigate(`/tests/history/${test.testId}`)
                         }
-                        disabled={!canStart}
                     >
                         <IoStatsChartOutline />
-                        Lịch sử điểm của tôi
+                        Lịch sử điểm
                     </button>
                 </div>
             </div>
