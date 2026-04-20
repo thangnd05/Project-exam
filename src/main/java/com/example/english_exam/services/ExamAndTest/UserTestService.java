@@ -258,7 +258,7 @@ public class UserTestService {
             return Collections.emptyList();
         }
     
-        List<UserTest> list = userTestRepository.findByUserIdAndTestId(userId, testId);
+        List<UserTest> list = userTestRepository.findByUserIdAndTestIdOrderByStartedAtDesc(userId, testId);
 
         return list.stream()
                 .map(u -> UserTestResponse.builder()
@@ -275,11 +275,6 @@ public class UserTestService {
                                         : null
                         )
                         .build()
-                )
-                .sorted(
-                        Comparator
-                                .comparing(UserTestResponse::getTotalScore, Comparator.nullsLast(Comparator.reverseOrder()))
-                                .thenComparing(UserTestResponse::getDurationTaken, Comparator.nullsLast(Comparator.naturalOrder()))
                 )
                 .collect(Collectors.toList());
     }

@@ -144,10 +144,11 @@ public class UserTestController {
         }
     }
 
-    @GetMapping("/by-user/{userId}/by-test/{testId}")
+    @GetMapping("/my/by-test/{testId}")
     public ResponseEntity<List<UserTestResponse>> getAttempts(
-            @PathVariable Long userId,
-            @PathVariable Long testId) {
+            @PathVariable Long testId,
+            HttpServletRequest httpRequest) {
+        Long userId = authUtils.getUserId(httpRequest);
 
         List<UserTestResponse> res = userTestService.getAttemptsByUserAndTest(userId, testId);
         return ResponseEntity.ok(res);
