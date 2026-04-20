@@ -2,6 +2,28 @@
 
 .brand {
   font-size: 2rem;
+  font-weight: 700;
+  margin-right: 16px;
+}
+
+.brandInner {
+  display: flex;
+  align-items: center;
+  min-width: 140px;
+}
+
+.navbarRoot {
+  padding: 12px 20px;
+}
+
+.desktopCollapse {
+  display: none;
+}
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
 }
 
 /* === ✅ Thêm sticky + hiệu ứng mờ vào đây === */
@@ -22,10 +44,12 @@
 }
 
 .new-test {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   border-radius: 8px;
   border: 2px solid var(--accent-color);
   color: var(--accent-color);
+  white-space: nowrap;
+  padding: 8px 12px;
 
   &:hover {
     background-color: var(--accent-color);
@@ -35,6 +59,8 @@
 
 .home {
   position: relative;
+  font-size: 1.5rem;
+  padding: 8px 0 !important;
   color: #898686;
   text-decoration: none;
   transition: color 0.3s ease;
@@ -74,6 +100,8 @@
 .user-info {
   display: flex;
   align-items: center;
+  gap: 8px;
+  padding: 4px 0;
 
   &:hover {
     cursor: pointer;
@@ -90,9 +118,8 @@
 
 .username {
   font-weight: bold;
-  font-size: 2rem;
+  font-size: 1.5rem;
   white-space: nowrap;
-  padding-left: 10px;
 }
 
 .custom-dropdown {
@@ -110,8 +137,12 @@
 }
 
 .bar {
-  font-size: 1.6rem;
-  width: 5rem;
+  font-size: 1.4rem;
+  width: 42px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tit_sm {
@@ -123,12 +154,13 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 8px 0;
 }
 
 /* Title */
 .menuTitle {
   position: relative;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   color: #898686;
   transition: 0.2s;
 
@@ -220,4 +252,111 @@
 
 .menuDropdown button {
   width: 100%;
+}
+
+.userMenuWrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.userNameWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.mobileDrawer {
+  width: min(88vw, 360px) !important;
+}
+
+.mobileNav {
+  gap: 6px;
+}
+
+.mobileNavLink {
+  color: #3a3a3a;
+  font-size: 1.5rem;
+  padding: 10px 0 !important;
+  border-bottom: 1px solid #f1f5f9;
+
+  &:hover {
+    color: var(--accent-color);
+  }
+}
+
+.mobileMenuGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.mobileMenuTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #64748b;
+}
+
+.mobileMenuAction {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 1.4rem;
+  color: #334155;
+
+  &:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+  }
+}
+
+.mobileCreateTest {
+  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.mobileUserDropdown {
+  margin-top: 12px;
+}
+
+@media (max-width: 991.98px) {
+  .brand {
+    font-size: 1.7rem;
+  }
+
+  .brandInner img {
+    height: 52px;
+  }
+
+  .user-info {
+    justify-content: space-between;
+    padding: 8px 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .desktopCollapse {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .navbarRoot {
+    padding: 12px 36px;
+  }
+
+  .desktopNav {
+    gap: 28px;
+  }
 }

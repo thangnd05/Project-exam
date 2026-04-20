@@ -4,256 +4,267 @@
    PHẦN ĐÁNH GIÁ & SLIDER (REVIEWS SECTION)
    ========================================= */
 .section {
-    padding: 60px 0;
+  padding: 60px 0;
 }
 
 .section-title {
-    font-size: var(--font-size-4xl);
-    font-weight: 900;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 16px;
-    letter-spacing: -1px;
+  font-size: var(--font-size-4xl);
+  font-weight: 900;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
 }
 
 /* --- Style cho Card Đánh giá --- */
 .review-card {
-    background: white;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    height: 100%;
-    min-height: 280px;
-    /* Chiều cao tối thiểu để các card đều nhau */
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    transition: transform 0.3s ease;
-    margin-bottom: 10px;
-    /* Tránh bị cắt bóng đổ khi hover */
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  min-height: 280px;
+  /* Chiều cao tối thiểu để các card đều nhau */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s ease;
+  margin-bottom: 10px;
+  /* Tránh bị cắt bóng đổ khi hover */
 
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .quote-icon {
-    font-size: 2rem;
-    color: #e2e8f0;
-    margin-bottom: 15px;
+  font-size: 2rem;
+  color: #e2e8f0;
+  margin-bottom: 15px;
 }
 
 .review-content {
-    font-size: var(--font-size-ssm);
-    color: #4a5568;
-    line-height: 1.6;
-    font-style: italic;
-    margin-bottom: 25px;
-    flex-grow: 1;
-    /* Đẩy phần footer xuống đáy */
+  font-size: var(--font-size-ssm);
+  color: #4a5568;
+  line-height: 1.6;
+  font-style: italic;
+  margin-bottom: 25px;
+  flex-grow: 1;
+  /* Đẩy phần footer xuống đáy */
 }
 
 .review-footer {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    border-top: 1px solid #edf2f7;
-    padding-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-top: 1px solid #edf2f7;
+  padding-top: 20px;
 }
 
 .avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .user-info {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .user-name {
-    font-size: var(--font-size-ssm);
-    font-weight: 700;
-    color: #2d3748;
-    margin: 0;
+  font-size: var(--font-size-ssm);
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
 }
 
 .user-role {
-    font-size: var(--font-size-sm);
-    color: #718096;
-    margin-bottom: 4px;
+  font-size: var(--font-size-sm);
+  color: #718096;
+  margin-bottom: 4px;
 }
 
 .stars {
-    display: flex;
-    gap: 4px;
-    align-items: center;
+  display: flex;
+  gap: 4px;
+  align-items: center;
 
-    .star-filled {
-        color: #fbbf24;
-        font-size: 1.2rem;
-        transition: transform 0.2s;
-    }
+  .star-filled {
+    color: #fbbf24;
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+  }
 
-    .star-empty {
-        color: #e2e8f0;
-        font-size: 0.9rem;
-    }
+  .star-empty {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+  }
 }
 
 /* --- Cấu hình Slider & Chấm tròn (Dots) --- */
 .slider-container {
-    padding-bottom: 40px;
-    /* Tăng khoảng cách dưới để chứa các chấm */
+  padding-bottom: 40px;
+  /* Tăng khoảng cách dưới để chứa các chấm */
 
-    /* FIX LỖI DOTS: Dùng :global để can thiệp vào class của thư viện */
-    :global {
-        .slick-dots {
-            bottom: -40px;
-            display: block !important;
-            width: 100%;
-            padding: 0;
-            margin: 0;
-            list-style: none;
+  /* FIX LỖI DOTS: Dùng :global để can thiệp vào class của thư viện */
+  :global {
+    .slick-dots {
+      bottom: -40px;
+      display: block !important;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      text-align: center;
+
+      li {
+        position: relative;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        margin: 0 2px;
+        padding: 0;
+        cursor: pointer;
+
+        button {
+          font-size: 0;
+          line-height: 0;
+          display: block;
+          width: 20px;
+          height: 20px;
+          padding: 5px;
+          cursor: pointer;
+          color: transparent;
+          border: 0;
+          outline: none;
+          background: transparent;
+
+          &:before {
+            font-family: 'slick';
+            font-size: 12px;
+            line-height: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            content: '•' !important;
             text-align: center;
-
-            li {
-                position: relative;
-                display: inline-block;
-                width: 20px;
-                height: 20px;
-                margin: 0 2px;
-                padding: 0;
-                cursor: pointer;
-
-                button {
-                    font-size: 0;
-                    line-height: 0;
-                    display: block;
-                    width: 20px;
-                    height: 20px;
-                    padding: 5px;
-                    cursor: pointer;
-                    color: transparent;
-                    border: 0;
-                    outline: none;
-                    background: transparent;
-
-                    &:before {
-                        font-family: 'slick';
-                        font-size: 12px;
-                        line-height: 20px;
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 20px;
-                        height: 20px;
-                        content: '•' !important;
-                        text-align: center;
-                        opacity: 0.3 !important;
-                        color: #94a3b8 !important;
-                        -webkit-font-smoothing: antialiased;
-                        -moz-osx-font-smoothing: grayscale;
-                        transition: all 0.3s ease;
-                    }
-                }
-
-                &.slick-active button:before {
-                    opacity: 1 !important;
-                    color: var(--accent-color) !important;
-                    font-size: 14px !important;
-                    transform: none;
-                }
-
-                &:hover button:before {
-                    opacity: 0.8 !important;
-                    color: var(--accent-color) !important;
-                    transform: scale(1.1);
-                }
-            }
+            opacity: 0.3 !important;
+            color: #94a3b8 !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: all 0.3s ease;
+          }
         }
 
-        /* Style cho Navigation Arrows (Khi ẩn Dots) */
-        .slick-prev,
-        .slick-next {
-            width: 40px;
-            height: 40px;
-            z-index: 10;
-
-            &:before {
-                font-size: 30px;
-                color: #94a3b8;
-                opacity: 0.7;
-                transition: all 0.3s;
-            }
-
-            &:hover:before {
-                color: var(--accent-color, #0061f2);
-                opacity: 1;
-            }
+        &.slick-active button:before {
+          opacity: 1 !important;
+          color: var(--accent-color) !important;
+          font-size: 14px !important;
+          transform: none;
         }
 
-        .slick-prev {
-            left: -35px;
+        &:hover button:before {
+          opacity: 0.8 !important;
+          color: var(--accent-color) !important;
+          transform: scale(1.1);
         }
-
-        .slick-next {
-            right: -35px;
-        }
+      }
     }
+
+    /* Style cho Navigation Arrows (Khi ẩn Dots) */
+    .slick-prev,
+    .slick-next {
+      width: 40px;
+      height: 40px;
+      z-index: 10;
+
+      &:before {
+        font-size: 30px;
+        color: #94a3b8;
+        opacity: 0.7;
+        transition: all 0.3s;
+      }
+
+      &:hover:before {
+        color: var(--accent-color, #0061f2);
+        opacity: 1;
+      }
+    }
+
+    .slick-prev {
+      left: -35px;
+    }
+
+    .slick-next {
+      right: -35px;
+    }
+  }
 }
 
 .slide-item {
-    padding: 10px;
-    height: 100%;
+  padding: 10px;
+  height: 100%;
 }
 
 /* --- NÚT GỬI ĐÁNH GIÁ --- */
 .btn-write-review {
-    background-color: white;
-    color: #0061f2;
-    border: 2px solid #0061f2;
-    padding: 10px 25px;
-    border-radius: 30px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
+  background-color: white;
+  color: #0061f2;
+  border: 2px solid #0061f2;
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
 
-    &:hover {
-        background-color: #0061f2;
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 97, 242, 0.2);
-    }
+  &:hover {
+    background-color: #0061f2;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 97, 242, 0.2);
+  }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
+  from {
+    opacity: 0;
+  }
 
-    to {
-        opacity: 1;
-    }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .slider-container {
+    :global {
+      .slick-prev,
+      .slick-next {
+        display: none !important;
+      }
     }
+  }
 }

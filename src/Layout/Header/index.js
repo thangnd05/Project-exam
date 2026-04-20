@@ -5,29 +5,28 @@ import {
   Button,
   Dropdown,
   Image,
-  Offcanvas
+  Offcanvas,
 } from 'react-bootstrap';
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import images from '~/assets/images';
 import classNames from 'classnames/bind';
 // import Search from '../Search';
-import { useAuth } from '../../hook/useAuth';
-import { name } from '~/assets/images';
+import {useAuth} from '../../hook/useAuth';
+import {name} from '~/assets/images';
 import routes from '~/config/Routes';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
-import JoinClassModal from "~/components/modals/JoinClassModal";
-import CreateClassModal from "~/components/modals/CreateClassModal";
-import CreateTestModal from "~/components/modals/CreateTestModal";
-
+import {faBars} from '@fortawesome/free-solid-svg-icons';
+import JoinClassModal from '~/components/modals/JoinClassModal';
+import CreateClassModal from '~/components/modals/CreateClassModal';
+import CreateTestModal from '~/components/modals/CreateTestModal';
 
 const cx = classNames.bind(style);
 
 function Header() {
-  const { user, logout } = useAuth();
+  const {user, logout} = useAuth();
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -42,11 +41,11 @@ function Header() {
     navigate(routes.home);
   };
   // --- Sub-components để tái sử dụng ---
-  const NavItems = ({ isMobile = false }) => {
+  const NavItems = ({isMobile = false}) => {
     const handleClassAction = (e, targetRoute, modalType = null) => {
       e.preventDefault();
       if (!user) {
-        alert("⚠️ Bạn cần đăng nhập để thao tác lớp học!");
+        alert('⚠️ Bạn cần đăng nhập để thao tác lớp học!');
         navigate(routes.login);
         isMobile && handleClose();
         return;
@@ -62,20 +61,60 @@ function Header() {
       isMobile && handleClose();
     };
 
+    if (isMobile) {
+      return (
+        <>
+          <Nav.Link as={Link} to={routes.about} className={cx('mobileNavLink')}>
+            Giới thiệu
+          </Nav.Link>
+          <Nav.Link as={Link} to={routes.myAlbums} className={cx('mobileNavLink')}>
+            Từ vựng
+          </Nav.Link>
+          <Nav.Link as={Link} to={routes.MyTest} className={cx('mobileNavLink')}>
+            Bài đã tạo
+          </Nav.Link>
+          <div className={cx('mobileMenuGroup')}>
+            <span className={cx('mobileMenuTitle')}>Lớp học</span>
+            <button
+              type="button"
+              className={cx('mobileMenuAction')}
+              onClick={(e) => handleClassAction(e, null, 'join')}
+            >
+              Tham gia lớp học
+            </button>
+            <button
+              type="button"
+              className={cx('mobileMenuAction')}
+              onClick={(e) => handleClassAction(e, routes.myClasses)}
+            >
+              Vào lớp học
+            </button>
+            <button
+              type="button"
+              className={cx('mobileMenuAction')}
+              onClick={(e) => handleClassAction(e, null, 'create')}
+            >
+              Tạo lớp học
+            </button>
+          </div>
+        </>
+      );
+    }
+
     return (
       <>
-        <Nav.Link as={Link} to={routes.about} className={cx('home', { 'mx-5': !isMobile })}>
+        <Nav.Link as={Link} to={routes.about} className={cx('home')}>
           Giới thiệu
         </Nav.Link>
-        <Nav.Link as={Link} to={routes.myAlbums} className={cx('home', { 'mx-5': !isMobile })}>
+        <Nav.Link as={Link} to={routes.myAlbums} className={cx('home')}>
           Từ vựng
         </Nav.Link>
-        <Nav.Link as={Link} to={routes.MyTest} className={cx('home', { 'mx-5': !isMobile })}>
+        <Nav.Link as={Link} to={routes.MyTest} className={cx('home')}>
           Bài đã tạo
         </Nav.Link>
-        <div className={cx("customMenu", { "mx-5": !isMobile })}>
-          <span className={cx("menuTitle")}>Lớp học</span>
-          <div className={cx("menuDropdown")}>
+        <div className={cx('customMenu')}>
+          <span className={cx('menuTitle')}>Lớp học</span>
+          <div className={cx('menuDropdown')}>
             <button onClick={(e) => handleClassAction(e, null, 'join')}>
               Tham gia lớp học
             </button>
@@ -91,15 +130,15 @@ function Header() {
     );
   };
 
-  const UserMenu = ({ isMobile = false }) => {
+  const UserMenu = ({isMobile = false}) => {
     if (!user) {
       return (
         <>
           <Nav.Link
             as={Link}
             to={routes.login}
-            state={{ mode: 'signin' }}
-            className={cx('home', 'login-link', { 'mx-5': !isMobile })}
+            state={{mode: 'signin'}}
+            className={cx(isMobile ? 'mobileNavLink' : 'home')}
             onClick={() => isMobile && handleClose()}
           >
             Đăng nhập
@@ -107,8 +146,8 @@ function Header() {
           <Nav.Link
             as={Link}
             to={routes.login}
-            state={{ mode: 'signup' }}
-            className={cx('home', { 'mx-5': !isMobile })}
+            state={{mode: 'signup'}}
+            className={cx(isMobile ? 'mobileNavLink' : 'home')}
             onClick={() => isMobile && handleClose()}
           >
             Đăng ký
@@ -118,36 +157,54 @@ function Header() {
     }
 
     return (
-      <div className={cx('d-lg-flex align-items-center')}>
+      <div className={cx('userMenuWrapper')}>
         {!isMobile && (
           <Button
             variant=""
-            className={cx('new-test', 'mx-5')}
+            className={cx('new-test')}
             onClick={() => setShowCreateTestModal(true)}
           >
             Tạo bài kiểm tra
           </Button>
         )}
-        <Dropdown className={cx(isMobile ? 'mt-3' : '')}>
+        {isMobile && (
+          <Button
+            variant=""
+            className={cx('new-test', 'mobileCreateTest')}
+            onClick={() => setShowCreateTestModal(true)}
+          >
+            Tạo bài kiểm tra
+          </Button>
+        )}
+        <Dropdown className={cx(isMobile ? 'mobileUserDropdown' : '')}>
           <Dropdown.Toggle as="div" className={cx('user-info')}>
             <Image
               src={user?.avatarUrl || images.avtImage}
               alt="Avatar"
-              className={cx("avatar")}
+              className={cx('avatar')}
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = images.avtImage;
               }}
             />
-            <div>
+            <div className={cx('userNameWrapper')}>
               <span className={cx('username')}>{user.username}</span>
             </div>
           </Dropdown.Toggle>
           <Dropdown.Menu className={cx('custom-dropdown')}>
-            <Dropdown.Item as={Link} to={routes.profile} onClick={() => isMobile && handleClose()}>
+            <Dropdown.Item
+              as={Link}
+              to={routes.profile}
+              onClick={() => isMobile && handleClose()}
+            >
               Hồ sơ
             </Dropdown.Item>
-            <Dropdown.Item onClick={() => { handleLogout(); isMobile && handleClose(); }}>
+            <Dropdown.Item
+              onClick={() => {
+                handleLogout();
+                isMobile && handleClose();
+              }}
+            >
               Đăng xuất
             </Dropdown.Item>
           </Dropdown.Menu>
@@ -158,38 +215,60 @@ function Header() {
 
   return (
     <div className={cx('wrapper')}>
-      <Navbar expand="lg" className={cx('bg-body-tertiary p-5')}>
-        <Container fluid="lg">
-          <Navbar.Brand as={Link} to={routes.home} className={cx('brand', 'fw-bold')}>
-            <div className="d-flex align-items-center justify-content-center" style={{ width: '140px' }}>
-              <Image src={images.logo} alt="logo" height="70" loading="lazy" className={cx('logo-brand')} />
+      <Navbar expand="lg" className={cx('navbarRoot')}>
+        <Container fluid>
+          <Navbar.Brand
+            as={Link}
+            to={routes.home}
+            className={cx('brand')}
+          >
+            <div className={cx('brandInner')}>
+              <Image
+                src={images.logo}
+                alt="logo"
+                height="70"
+                loading="lazy"
+                className={cx('logo-brand')}
+              />
               {name}
             </div>
           </Navbar.Brand>
 
-          <Button variant="outline-secondary" onClick={handleShow} className={cx('d-lg-none', 'ms-auto', 'bar')}>
+          <Button
+            variant="outline-secondary"
+            onClick={handleShow}
+            className={cx('d-lg-none', 'ms-auto', 'bar')}
+          >
             <FontAwesomeIcon icon={faBars} />
           </Button>
 
           {/* Desktop Navbar */}
-          <Navbar.Collapse id="basic-navbar-nav" className={cx('d-none d-lg-flex justify-content-between')}>
-            <Nav className="d-flex align-items-center">
+          <Navbar.Collapse
+            id="basic-navbar-nav"
+            className={cx('desktopCollapse')}
+          >
+            <Nav className={cx('desktopNav')}>
               <NavItems />
             </Nav>
-            <Nav className="d-flex align-items-center">
+            <Nav className={cx('desktopNav')}>
               <UserMenu />
             </Nav>
           </Navbar.Collapse>
 
           {/* Mobile Offcanvas */}
-          <Offcanvas show={showOffcanvas} onHide={handleClose} placement="end">
+          <Offcanvas
+            show={showOffcanvas}
+            onHide={handleClose}
+            placement="end"
+            className={cx('mobileDrawer')}
+          >
             <Offcanvas.Header closeButton>
               <Offcanvas.Title as={Link} to={routes.home} onClick={handleClose}>
                 {name}
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              <Nav className="flex-column">
+              <Nav className={cx('mobileNav')}>
                 <NavItems isMobile />
                 <hr />
                 <UserMenu isMobile />
@@ -199,8 +278,14 @@ function Header() {
         </Container>
       </Navbar>
 
-      <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
-      <CreateClassModal show={showCreateModal} onClose={() => setShowCreateModal(false)} />
+      <JoinClassModal
+        show={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+      />
+      <CreateClassModal
+        show={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
       <CreateTestModal
         show={showCreateTestModal}
         onClose={() => setShowCreateTestModal(false)}

@@ -4,8 +4,6 @@
     padding: 60px 0;
 }
 
-
-
 .section-title {
     font-size: var(--font-size-4xl);
     font-weight: 900;
@@ -19,6 +17,17 @@
 
 :global(.text-muted) {
     font-size: var(--font-size-lg);
+}
+
+.processGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 56px;
+    row-gap: 24px;
+}
+
+.processItem {
+    position: relative;
 }
 
 .process-card {
@@ -86,6 +95,24 @@
     }
 }
 
+.stepTransition {
+    position: absolute;
+    top: 50%;
+    right: -49px;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 97, 242, 0.08);
+    color: var(--accent-color);
+    box-shadow: 0 10px 24px rgba(0, 97, 242, 0.14);
+    z-index: 2;
+    animation: pulseArrow 2.2s ease-in-out infinite;
+}
+
 .icon-box {
     width: 90px;
     height: 90px;
@@ -115,12 +142,71 @@
         background: rgba(56, 161, 105, 0.05);
         color: #38a169;
     }
+
+}
+
+@keyframes pulseArrow {
+    0%,
+    100% {
+        transform: translateY(-50%) translateX(0);
+        opacity: 0.92;
+    }
+
+    50% {
+        transform: translateY(-50%) translateX(4px);
+        opacity: 1;
+    }
+}
+
+@keyframes pulseArrowVertical {
+    0%,
+    100% {
+        transform: translateX(-50%) rotate(90deg) translateX(0);
+        opacity: 0.92;
+    }
+
+    50% {
+        transform: translateX(-50%) rotate(90deg) translateX(4px);
+        opacity: 1;
+    }
 }
 
 /* --- RESPONSIVE --- */
+@media (max-width: 1199px) {
+    .processGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 40px;
+    }
+
+    .stepTransition {
+        right: -35px;
+    }
+}
+
 @media (max-width: 768px) {
     .section-title {
         font-size: var(--font-size-3xl);
     }
 
+    .processGrid {
+        grid-template-columns: 1fr;
+        row-gap: 20px;
+    }
+
+    .processItem {
+        padding-bottom: 34px;
+    }
+
+    .processItem:last-child {
+        padding-bottom: 0;
+    }
+
+    .stepTransition {
+        top: auto;
+        bottom: 0;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) rotate(90deg);
+        animation-name: pulseArrowVertical;
+    }
 }
