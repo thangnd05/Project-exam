@@ -24,7 +24,7 @@ public interface UserTestRepository extends JpaRepository<UserTest, Long> {
                                           @Param("testId") Long testId,
                                           @Param("status") UserTest.Status status);
 
-    List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(Long userId, Long testId);
+    List<UserTest> findByUserIdAndTestId(Long userId, Long testId);
 
     List<UserTest> findByTestIdOrderByTotalScoreDesc(Long testId);
 

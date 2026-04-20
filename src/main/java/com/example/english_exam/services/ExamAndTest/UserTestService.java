@@ -218,7 +218,7 @@ public class UserTestService {
 
     @Transactional
     public UserTest startUserTest(Long testId, Long userId) {
-        Test test = testRepository.findById(testId)
+        testRepository.findById(testId)
                 .orElseThrow(() -> new RuntimeException("Test not found with id: " + testId));
 
         // ✅ Kiểm tra xem user đã có bài thi đang làm dở chưa
@@ -258,24 +258,30 @@ public class UserTestService {
             return Collections.emptyList();
         }
     
-        List<UserTest> list = userTestRepository
-                .findByUserIdAndTestIdOrderByStartedAtDesc(userId, testId);
-    
-        return list.stream().map(u -> UserTestResponse.builder()
-                .userTestId(u.getUserTestId())
-                .userId(u.getUserId())
-                .testId(u.getTestId())
-                .startedAt(u.getStartedAt())
-                .finishedAt(u.getFinishedAt())
-                .totalScore(u.getTotalScore())
-                .status(u.getStatus().name())
-                .durationTaken(
-                    u.getFinishedAt() != null
-                            ? Duration.between(u.getStartedAt(), u.getFinishedAt()).getSeconds()
-                            : null
+        List<UserTest> list = userTestRepository.findByUserIdAndTestId(userId, testId);
+
+        return list.stream()
+                .map(u -> UserTestResponse.builder()
+                        .userTestId(u.getUserTestId())
+                        .userId(u.getUserId())
+                        .testId(u.getTestId())
+                        .startedAt(u.getStartedAt())
+                        .finishedAt(u.getFinishedAt())
+                        .totalScore(u.getTotalScore())
+                        .status(u.getStatus().name())
+                        .durationTaken(
+                                u.getFinishedAt() != null
+                                        ? Duration.between(u.getStartedAt(), u.getFinishedAt()).getSeconds()
+                                        : null
+                        )
+                        .build()
                 )
-                .build()
-        ).collect(Collectors.toList());
+                .sorted(
+                        Comparator
+                                .comparing(UserTestResponse::getTotalScore, Comparator.nullsLast(Comparator.reverseOrder()))
+                                .thenComparing(UserTestResponse::getDurationTaken, Comparator.nullsLast(Comparator.naturalOrder()))
+                )
+                .collect(Collectors.toList());
     }
 
     public List<UserTestResponse> getAttemptsByTest(Long testId) {
@@ -289,19 +295,30 @@ public class UserTestService {
         if (!isUnlimited && !isEnded) {
             return Collections.emptyList();
         }
-    
-        List<UserTest> list = userTestRepository.findByTestIdOrderByTotalScoreDesc(testId);
-        return list.stream().map(u -> UserTestResponse.builder()
-                .userTestId(u.getUserTestId())
-                .userId(u.getUserId())       // ✅ thêm
-                .testId(u.getTestId())       // ✅ thêm
-                .startedAt(u.getStartedAt())
-                .finishedAt(u.getFinishedAt())
-                .totalScore(u.getTotalScore())
-                .status(u.getStatus().name())
-                .durationTaken(u.getFinishedAt() != null ? Duration.between(u.getStartedAt(), u.getFinishedAt()).getSeconds() : null)
-                .build()
-        ).collect(Collectors.toList());
+
+        List<UserTest> list = userTestRepository.findByTestId(testId);
+        return list.stream()
+                .map(u -> UserTestResponse.builder()
+                        .userTestId(u.getUserTestId())
+                        .userId(u.getUserId())
+                        .testId(u.getTestId())
+                        .startedAt(u.getStartedAt())
+                        .finishedAt(u.getFinishedAt())
+                        .totalScore(u.getTotalScore())
+                        .status(u.getStatus().name())
+                        .durationTaken(
+                                u.getFinishedAt() != null
+                                        ? Duration.between(u.getStartedAt(), u.getFinishedAt()).getSeconds()
+                                        : null
+                        )
+                        .build()
+                )
+                .sorted(
+                        Comparator
+                                .comparing(UserTestResponse::getTotalScore, Comparator.nullsLast(Comparator.reverseOrder()))
+                                .thenComparing(UserTestResponse::getDurationTaken, Comparator.nullsLast(Comparator.naturalOrder()))
+                )
+                .collect(Collectors.toList());
     }
 
 

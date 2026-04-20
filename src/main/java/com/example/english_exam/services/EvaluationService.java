@@ -81,7 +81,10 @@ public class EvaluationService {
 
     public List<EvaluationResponse> getMyEvaluations(HttpServletRequest httpRequest) {
         Long currentUserId = authUtils.getUserId(httpRequest);
-        return getByUser(currentUserId);
+        return evaluationRepository.findByUserIdOrderByCreatedAtDesc(currentUserId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     // ============================

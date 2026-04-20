@@ -9,4 +9,6 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
 
     // Lấy tất cả đánh giá theo user
     List<Evaluation> findByUserId(Long userId);
+
+    List<Evaluation> findByUserIdOrderByCreatedAtDesc(Long userId);
 }
