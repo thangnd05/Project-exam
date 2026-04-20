@@ -79,6 +79,11 @@ public class EvaluationService {
                 .toList();
     }
 
+    public List<EvaluationResponse> getMyEvaluations(HttpServletRequest httpRequest) {
+        Long currentUserId = authUtils.getUserId(httpRequest);
+        return getByUser(currentUserId);
+    }
+
     // ============================
     // ✅ UPDATE
     // ============================

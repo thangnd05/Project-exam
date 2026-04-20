@@ -53,6 +53,11 @@ public class EvaluationController {
         return ResponseEntity.ok(evaluationService.getByUser(userId));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<List<EvaluationResponse>> getMyEvaluations(HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(evaluationService.getMyEvaluations(httpRequest));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<EvaluationResponse> update(
             @PathVariable Long id,
