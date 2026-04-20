@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Table, Spinner } from 'react-bootstrap';
+import {useEffect, useState} from 'react';
+import {useParams, useNavigate} from 'react-router-dom';
+import {Container, Table, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
   IoArrowBack,
@@ -12,18 +12,17 @@ import {
   IoHourglassOutline,
   IoCloseCircleOutline,
   IoDocumentTextOutline,
-  IoTrophyOutline,
+  IoPodiumOutline,
 } from 'react-icons/io5';
 
 import style from './TestHistory.module.scss';
-import { useAuth } from '~/hook/useAuth';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
+import routes from '~/config/Routes';
 
 const cx = classNames.bind(style);
 
 function TestHistoryPage() {
-  const { testId } = useParams();
-  const { userId } = useAuth();
+  const {testId} = useParams();
   const navigate = useNavigate();
 
   const [attempts, setAttempts] = useState([]);
@@ -31,26 +30,33 @@ function TestHistoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!testId || !userId) return;
+    if (!testId) return;
 
     const fetchHistory = async () => {
       setLoading(true);
       try {
         const [attemptRes, testRes] = await Promise.all([
-          axios.get(`/api/user-tests/by-user/${userId}/by-test/${testId}`),
+          axios.get(`/api/user-tests/my/by-test/${testId}`),
           axios.get(`/api/tests/usertest/${testId}`),
         ]);
-        setAttempts(attemptRes.data);
+        const attemptsPayload = attemptRes.data;
+        const normalizedAttempts = Array.isArray(attemptsPayload)
+          ? attemptsPayload
+          : Array.isArray(attemptsPayload?.data)
+            ? attemptsPayload.data
+            : [];
+        setAttempts(normalizedAttempts);
         setTestInfo(testRes.data);
       } catch (err) {
         console.error('❌ Lỗi khi tải dữ liệu lịch sử:', err);
+        setAttempts([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchHistory();
-  }, [testId, userId]);
+  }, [testId]);
 
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '-';
@@ -106,7 +112,9 @@ function TestHistoryPage() {
           <div className={cx('empty-state')}>
             <IoDocumentTextOutline className={cx('icon')} />
             <h4>Chưa có lần làm bài nào</h4>
-            <p className="text-muted">Hãy bắt đầu thử sức với bài thi này để xem kết quả tại đây nhé!</p>
+            <p className="text-muted">
+              Hãy bắt đầu thử sức với bài thi này để xem kết quả tại đây nhé!
+            </p>
           </div>
         ) : (
           <div className={cx('table-container')}>
@@ -117,6 +125,7 @@ function TestHistoryPage() {
                   <th>Thời gian bắt đầu</th>
                   <th>Thời gian nộp</th>
                   <th>Điểm số</th>
+                  <th>Top điểm</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
@@ -124,7 +133,9 @@ function TestHistoryPage() {
               <tbody>
                 {attempts.map((a, i) => (
                   <tr key={a.userTestId}>
-                    <td data-label="Lần" className="fw-bold text-muted">#{i + 1}</td>
+                    <td data-label="Lần" className="fw-bold text-muted">
+                      #{i + 1}
+                    </td>
                     <td data-label="Bắt đầu">
                       <div className="d-flex align-items-center justify-content-center gap-2">
                         <IoCalendarOutline size={16} />
@@ -139,9 +150,22 @@ function TestHistoryPage() {
                     </td>
                     <td data-label="Điểm">
                       <div className={cx('score-badge')}>
-                        <IoTrophyOutline size={18} className="me-2" />
                         {a.totalScore ?? '--'}
                       </div>
+                    </td>
+                    <td data-label="Top điểm">
+                      <button
+                        type="button"
+                        className={cx('btn-ranking')}
+                        onClick={() =>
+                          navigate(
+                            routes.testLeaderboard.replace(':testId', String(testId)),
+                          )
+                        }
+                      >
+                        <IoPodiumOutline />
+                        Xem top
+                      </button>
                     </td>
                     <td data-label="Trạng thái">
                       {a.status === 'COMPLETED' ? (
@@ -149,7 +173,9 @@ function TestHistoryPage() {
                           <IoCheckmarkCircleOutline /> Hoàn thành
                         </span>
                       ) : a.status === 'IN_PROGRESS' ? (
-                        <span className={cx('status-pill', 'status-in-progress')}>
+                        <span
+                          className={cx('status-pill', 'status-in-progress')}
+                        >
                           <IoHourglassOutline /> Đang làm
                         </span>
                       ) : (
@@ -168,7 +194,9 @@ function TestHistoryPage() {
                           Chi tiết
                         </button>
                       ) : (
-                        <span className="text-muted small italic">Không khả dụng</span>
+                        <span className="text-muted small italic">
+                          Không khả dụng
+                        </span>
                       )}
                     </td>
                   </tr>

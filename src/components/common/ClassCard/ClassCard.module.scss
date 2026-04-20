@@ -3,7 +3,7 @@
 .class-card {
   background: white;
   border-radius: var(--radius-lg);
-  padding: 30px;
+  padding: 24px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-md);
   cursor: pointer;
@@ -41,23 +41,23 @@
 }
 
 .class-name {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: var(--dark-color);
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   transition: color 0.3s;
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.5rem;
+  gap: 8px;
+  font-size: 1.3rem;
   color: var(--text-secondary);
   margin-bottom: 8px;
 
   svg {
-    font-size: 1.8rem;
+    font-size: 1.55rem;
     opacity: 0.7;
   }
 
@@ -69,24 +69,26 @@
 .class-id {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: #f8fafc;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 8px;
   font-family: 'Inter', monospace;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 1.2rem;
   color: #64748b;
   border: 1px solid #e2e8f0;
 }
 
 .btn-view {
-  margin-top: 25px;
+  margin-top: 18px;
   width: 100%;
   background: #f1f5f9;
   color: var(--dark-color);
-  padding: 12px;
+  padding: 10px;
   border-radius: 12px;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 1.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,9 +107,10 @@
   width: 100%;
   background: white;
   color: var(--primary);
-  padding: 12px;
+  padding: 10px;
   border-radius: 12px;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 1.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,7 +119,7 @@
   border: 2px solid var(--primary);
 
   svg {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
 
   &:hover {

@@ -30,6 +30,7 @@ const routes = {
   adminLoginAudit: '/admin/audit-login',
 
   testHistory: '/tests/history/:testId',
+  testLeaderboard: '/tests/leaderboard/:testId',
   examTypeDetail: '/exam-types/:examTypeId',
   MyTest: '/my-tests',
 

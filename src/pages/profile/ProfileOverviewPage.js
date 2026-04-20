@@ -43,14 +43,6 @@ const formatNumber = (value) => {
   return safeValue.toLocaleString('vi-VN');
 };
 
-const safeAverage = (value) => {
-  if (value === null || value === undefined) return '--';
-  return Number(value).toLocaleString('vi-VN', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-};
-
 const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'];
 
 function ProfileOverviewPage() {
@@ -316,29 +308,6 @@ function ProfileOverviewPage() {
                     ) : (
                       <div className={cx('noDataMessage')}>Chưa có dữ liệu bài thi</div>
                     )}
-                  </div>
-                </article>
-              </section>
-
-              <section className={cx('detailsRow')}>
-                <article className={cx('statCard')}>
-                  <h3 className={cx('cardTitle')}>
-                    <IoStatsChartOutline />
-                    Chi tiết Bài kiểm tra
-                  </h3>
-                  <div className={cx('statRows')}>
-                    <div className={cx('statRow')}>
-                      <span>Điểm cao nhất</span>
-                      <strong>{formatNumber(profileOverview.testStats?.bestScore)}</strong>
-                    </div>
-                    <div className={cx('statRow')}>
-                      <span>Điểm trung bình</span>
-                      <strong>{safeAverage(profileOverview.testStats?.averageScore)}</strong>
-                    </div>
-                    <div className={cx('statRow')}>
-                      <span>Lần làm gần nhất</span>
-                      <strong>{formatDateTime(profileOverview.testStats?.lastAttemptAt)}</strong>
-                    </div>
                   </div>
                 </article>
               </section>

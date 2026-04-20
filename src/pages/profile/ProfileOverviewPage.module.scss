@@ -386,28 +386,6 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-.statRows {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.statRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: #f8fafc;
-  border-radius: 10px;
-  font-size: 1.35rem;
-  color: #475569;
-}
-
-.statRow strong {
-  color: #0f172a;
-  font-weight: 700;
-}
-
 .evaluationList {
   display: flex;
   flex-direction: column;

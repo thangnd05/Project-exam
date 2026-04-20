@@ -7,6 +7,7 @@ import TestByExamTypePage from '~/pages/exam/examtype/examtypeById/TestByExamTyp
 import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStartPage';
 import TestResultPage from '~/pages/exam/examtype/examtypeById/result/TestResultPage';
 import TestHistoryPage from '~/pages/history/TestHistoryPage';
+import TestLeaderboardPage from '~/pages/leaderboard/TestLeaderboardPage';
 import MyClassesPage from '~/pages/myclass/MyClassPage';
 import TestByClassPage from '~/pages/myclass/testclass/TestByClassPage';
 import Policy from '~/pages/policy/policy';
@@ -74,6 +75,7 @@ export const privateRoutes = [
   {path: routes.testStart, component: TestStartPage, noContainer: true},
   {path: routes.testResult, component: TestResultPage},
   {path: routes.testHistory, component: TestHistoryPage},
+  {path: routes.testLeaderboard, component: TestLeaderboardPage},
   {path: routes.myClasses, component: MyClassesPage},
   {path: routes.classChapterTests, component: TestByClassPage},
   {path: routes.myAlbums, component: MyAlbumsPage},
