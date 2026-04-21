@@ -28,19 +28,11 @@ public class UserTestController {
     // ✅ Lấy theo ID
     @GetMapping("/{userTestId}")
     public ResponseEntity<UserTestResponse> getUserTestById(@PathVariable Long userTestId) {
-        return userTestService.findById(userTestId)
-                .map(ut -> ResponseEntity.ok(
-                        UserTestResponse.builder()
-                                .userTestId(ut.getUserTestId())
-                                .userId(ut.getUserId())
-                                .testId(ut.getTestId())
-                                .startedAt(ut.getStartedAt())
-                                .finishedAt(ut.getFinishedAt())
-                                .totalScore(ut.getTotalScore())
-                                .status(ut.getStatus().name())
-                                .build()
-                ))
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            return ResponseEntity.ok(userTestService.getMeta(userTestId));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // ✅ Lấy theo userId

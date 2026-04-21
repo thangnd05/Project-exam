@@ -29,6 +29,7 @@ public class UserTestService {
     private final ScoringConversionRepository scoringConversionRepository;
     private final QuestionRepository questionRepository;
     private final ExamPartRepository examPartRepository;
+    private final UserRepository userRepository;
 
 
 
@@ -253,7 +254,7 @@ public class UserTestService {
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;
     
-        // ❌ chỉ chặn khi có giới hạn thời gian nhưng chưa hết
+        // chỉ chặn khi có giới hạn thời gian nhưng chưa hết
         if (!isUnlimited && !isEnded) {
             return Collections.emptyList();
         }
@@ -264,6 +265,7 @@ public class UserTestService {
                 .map(u -> UserTestResponse.builder()
                         .userTestId(u.getUserTestId())
                         .userId(u.getUserId())
+                        .userName(resolveUserName(u.getUserId()))
                         .testId(u.getTestId())
                         .startedAt(u.getStartedAt())
                         .finishedAt(u.getFinishedAt())
@@ -292,10 +294,21 @@ public class UserTestService {
         }
 
         List<UserTest> list = userTestRepository.findByTestId(testId);
-        return list.stream()
+        Map<Long, UserTest> bestAttemptByUser = new HashMap<>();
+        for (UserTest attempt : list) {
+            Long userId = attempt.getUserId();
+            UserTest currentBest = bestAttemptByUser.get(userId);
+
+            if (currentBest == null || isBetterAttempt(attempt, currentBest)) {
+                bestAttemptByUser.put(userId, attempt);
+            }
+        }
+
+        return bestAttemptByUser.values().stream()
                 .map(u -> UserTestResponse.builder()
                         .userTestId(u.getUserTestId())
                         .userId(u.getUserId())
+                        .userName(resolveUserName(u.getUserId()))
                         .testId(u.getTestId())
                         .startedAt(u.getStartedAt())
                         .finishedAt(u.getFinishedAt())
@@ -316,6 +329,26 @@ public class UserTestService {
                 .collect(Collectors.toList());
     }
 
+    private boolean isBetterAttempt(UserTest candidate, UserTest currentBest) {
+        int candidateScore = candidate.getTotalScore() != null ? candidate.getTotalScore() : Integer.MIN_VALUE;
+        int currentBestScore = currentBest.getTotalScore() != null ? currentBest.getTotalScore() : Integer.MIN_VALUE;
+
+        if (candidateScore != currentBestScore) {
+            return candidateScore > currentBestScore;
+        }
+
+        Long candidateDuration = getDurationTaken(candidate);
+        Long currentBestDuration = getDurationTaken(currentBest);
+        return candidateDuration < currentBestDuration;
+    }
+
+    private long getDurationTaken(UserTest userTest) {
+        if (userTest.getStartedAt() == null || userTest.getFinishedAt() == null) {
+            return Long.MAX_VALUE;
+        }
+        return Duration.between(userTest.getStartedAt(), userTest.getFinishedAt()).getSeconds();
+    }
+
 
     public UserTestResponse getMeta(Long userTestId) {
         var ut = userTestRepository.findById(userTestId)
@@ -324,12 +357,19 @@ public class UserTestService {
                 .userTestId(ut.getUserTestId())
                 .testId(ut.getTestId())
                 .userId(ut.getUserId())
+                .userName(resolveUserName(ut.getUserId()))
                 .startedAt(ut.getStartedAt())
                 .finishedAt(ut.getFinishedAt())
                 .totalScore(ut.getTotalScore())
                 .status(ut.getStatus().name())
                 .durationTaken(ut.getFinishedAt() != null ? Duration.between(ut.getStartedAt(), ut.getFinishedAt()).getSeconds() : null)
                 .build();
+    }
+
+    private String resolveUserName(Long userId) {
+        return userRepository.findById(userId)
+                .map(User::getUserName)
+                .orElse(null);
     }
 
 

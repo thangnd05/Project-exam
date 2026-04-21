@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class UserTestResponse {
     private Long userTestId;
     private Long userId;     // 🟢 thêm
+    private String userName;
     private Long testId;     // 🟢 thêm
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
