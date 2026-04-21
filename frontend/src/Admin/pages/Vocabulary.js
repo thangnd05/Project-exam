@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Table, Badge, Button, Modal, Form } from 'react-bootstrap';
+import { Row, Col, Table, Badge, Button, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import {
@@ -16,8 +16,6 @@ import {
 import {
     fakeVocabulary,
     fakeVocabularyAlbums,
-    fakeUsers,
-    getUserById,
     dashboardStats
 } from '../data/fakeData';
 
@@ -28,10 +26,7 @@ const cx = classNames.bind(styles);
 const VocabularyManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [albumFilter, setAlbumFilter] = useState('all');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [showModal, setShowModal] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [selectedVocab, setSelectedVocab] = useState(null);
+    const [currentPage] = useState(1);
     const itemsPerPage = 10;
 
     // Enrich vocabulary with related data
@@ -49,25 +44,13 @@ const VocabularyManagement = () => {
     });
 
     // Pagination
-    const totalPages = Math.ceil(filteredVocab.length / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentVocab = filteredVocab.slice(indexOfFirstItem, indexOfLastItem);
 
-    const handleView = (vocab) => {
-        setSelectedVocab(vocab);
-        setShowModal(true);
-    };
-
-    const handleEdit = (vocab) => {
-        setSelectedVocab(vocab);
-        setShowModal(true);
-    };
-
-    const handleDelete = (vocab) => {
-        setSelectedVocab(vocab);
-        setShowDeleteConfirm(true);
-    };
+    const handleView = () => {};
+    const handleEdit = () => {};
+    const handleDelete = () => {};
 
     return (
         <div className={cx('vocabularyPage')}>

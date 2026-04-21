@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
@@ -28,15 +28,14 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
 
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    if (show) {
-      fetchUserInfo();
-    } else {
-      resetForm();
-    }
-  }, [show]);
+  const resetForm = useCallback(() => {
+    setFormValues({ fullName: '', email: '', userName: '' });
+    setAvatarFile(null);
+    setAvatarPreview('');
+    setUserInfo(null);
+  }, []);
 
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get('/api/users/me/info-user');
@@ -56,7 +55,15 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [onHide]);
+
+  useEffect(() => {
+    if (show) {
+      fetchUserInfo();
+      return;
+    }
+    resetForm();
+  }, [show, fetchUserInfo, resetForm]);
 
   const updateField = (fieldName, fieldValue) => {
     setFormValues((prev) => ({
@@ -85,13 +92,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
-  };
-
-  const resetForm = () => {
-    setFormValues({ fullName: '', email: '', userName: '' });
-    setAvatarFile(null);
-    setAvatarPreview('');
-    setUserInfo(null);
   };
 
   const closeModal = () => {

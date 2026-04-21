@@ -8,7 +8,6 @@ import {
     Users,
     BookOpen,
     Award,
-    Clock,
     Target,
     PieChart as PieChartIcon
 } from 'lucide-react';
@@ -19,10 +18,7 @@ import {
     examTypeDistribution,
     skillDistribution,
     weeklyUserRegistrations,
-    dashboardStats,
-    fakeUsers,
-    fakeTests,
-    fakeUserTests
+    dashboardStats
 } from '../data/fakeData';
 
 import styles from './Analytics.module.scss';

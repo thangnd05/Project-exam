@@ -1,5 +1,4 @@
 import {
-  IoSchoolOutline,
   IoPeopleOutline,
   IoKeyOutline,
   IoBookOutline,

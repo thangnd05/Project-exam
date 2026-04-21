@@ -12,7 +12,6 @@ import {
   IoAdd,
   IoGridOutline,
   IoListOutline,
-  IoPeopleOutline,
 } from 'react-icons/io5';
 
 import styles from './ChapterOfClass.module.scss';
@@ -22,7 +21,7 @@ import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import PageHeaderViewToggle from '~/components/common/PageHeader/PageHeaderViewToggle';
 import ChapterManagementTable from '~/components/common/ChapterManagementTable/ChapterManagementTable';
-import routes from '../../../config/Routes';
+import routes from '~/config/Routes';
 
 const cx = classNames.bind(styles);
 
@@ -56,11 +55,6 @@ const ChapterOfClass = () => {
   const handleDeleteChapterClick = (chapter) => {
     setSelectedChapter(chapter);
     setShowDeleteChapter(true);
-  };
-
-  const handleManageMembers = () => {
-    const path = routes.classMemberManagement.replace(':classId', classId);
-    navigate(path);
   };
 
   const handleConfirmDeleteChapter = async () => {

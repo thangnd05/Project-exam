@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -45,7 +45,7 @@ const AlbumDetailPage = () => {
   const [flipped, setFlipped] = useState(false);
   const navigate = useNavigate();
 
-  const fetchVocabularies = async () => {
+  const fetchVocabularies = useCallback(async () => {
     try {
       const res = await axios.get(`/api/vocabularies/album/${albumId}`, {
         withCredentials: true,
@@ -57,7 +57,7 @@ const AlbumDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [albumId]);
 
   useEffect(() => {
     if (albumId) fetchVocabularies();
@@ -72,7 +72,7 @@ const AlbumDetailPage = () => {
     handleResize(); // Check on mount
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [albumId]);
+  }, [albumId, fetchVocabularies]);
 
   const handleDeleteClick = (vocab) => {
     setVocabToDelete(vocab);

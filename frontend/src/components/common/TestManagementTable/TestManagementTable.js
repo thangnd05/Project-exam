@@ -10,7 +10,7 @@ import {
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './TestManagementTable.module.scss';
-import {formatDateTime, getTestStatus} from '~/utils/testStatusHelper';
+import {getTestStatus} from '~/utils/testStatusHelper';
 import EditTestModal from '~/components/modals/EditTestModal';
 
 const cx = classNames.bind(styles);

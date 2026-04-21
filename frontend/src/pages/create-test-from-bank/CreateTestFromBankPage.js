@@ -482,7 +482,7 @@ const CreateTestFromBankPage = () => {
                                         />
                                         <span className={cx('groupLabel')}>{grLabel}</span>
                                       </div>
-                                      <ul className={cx('questionList')} role="list">
+                                      <ul className={cx('questionList')}>
                                         {gr.questions.map((q, index) => {
                                           const id = q.questionId ?? q.id;
                                           if (id == null) return null;

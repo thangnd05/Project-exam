@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {useParams} from 'react-router-dom';
 import axios from 'axios';
 import {Container, Spinner} from 'react-bootstrap';
@@ -35,7 +35,7 @@ const PracticePage = () => {
     const [sessionScore, setSessionScore] = useState({correct: 0, total: 0});
     const audioRef = useRef(null);
 
-    const fetchQuestion = async () => {
+    const fetchQuestion = useCallback(async () => {
         try {
             setLoading(true);
             const res = await axios.get(`/api/practice-questions/generate/${albumId}`);
@@ -53,11 +53,11 @@ const PracticePage = () => {
             setSelectedOption(null);
             setUserAnswer({english: '', vietnamese: ''});
         }
-    };
+    }, [albumId]);
 
     useEffect(() => {
         fetchQuestion();
-    }, [albumId]);
+    }, [fetchQuestion]);
 
     const handleSubmit = async () => {
         if (!question) return;

@@ -39,13 +39,13 @@ function Footer() {
                   </Link>
                 </div>
                 <div className={styles.socialIcons}>
-                  <a href="#">
+                  <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
                     <FaFacebookSquare />
                   </a>
-                  <a href="#">
+                  <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
                     <FaInstagram />
                   </a>
-                  <a href="#">
+                  <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube">
                     <FaYoutube />
                   </a>
                 </div>

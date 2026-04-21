@@ -4,7 +4,7 @@
  * SCSS dùng chung CreateTestModal.module.scss.
  */
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Spinner, Alert, Button, Form } from 'react-bootstrap';
+import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import axios from 'axios';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
@@ -474,7 +474,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
                                       />
                                       <span className={cx('bankGroupLabel')}>{grLabel}</span>
                                     </div>
-                                    <ul className={cx('bankQuestionList')} role="list">
+                                    <ul className={cx('bankQuestionList')}>
                                       {gr.questions.map((q, index) => {
                                         const id = q.questionId ?? q.id;
                                         if (id == null) return null;

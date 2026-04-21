@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Table, Badge, ProgressBar } from 'react-bootstrap';
+import React from 'react';
+import { Row, Col, Table, Badge } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import {
@@ -7,13 +7,9 @@ import {
     GraduationCap,
     BookOpen,
     FileQuestion,
-    BookMarked,
     TrendingUp,
-    TrendingDown,
     Clock,
     CheckCircle,
-    XCircle,
-    AlertCircle,
     Eye,
     Edit,
     Trash2,
@@ -33,15 +29,9 @@ import {
     recentActivities,
     examTypeDistribution,
     skillDistribution,
-    fakeUsers,
-    fakeClasses,
-    fakeTests,
-    fakeQuestions,
     fakeUserTests,
-    getRoleName,
     getUserById,
-    getTestById,
-    getExamTypeById
+    getTestById
 } from '../data/fakeData';
 
 import styles from './Dashboard.module.scss';
@@ -84,13 +74,6 @@ const getActivityIcon = (type) => {
 };
 
 const AdminDashboard = () => {
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 500);
-        return () => clearTimeout(timer);
-    }, []);
-
     // Chart Configurations
     const lineChartOption = {
         tooltip: {
@@ -540,7 +523,7 @@ const AdminDashboard = () => {
                     >
                         <div className={cx('tableHeader')}>
                             <h3>Bài thi gần đây</h3>
-                            <a href="#" className={cx('viewAll')}>Xem tất cả</a>
+                            <button type="button" className={cx('viewAll')}>Xem tất cả</button>
                         </div>
                         <div className={cx('tableWrapper')}>
                             <Table responsive className={cx('customTable')}>

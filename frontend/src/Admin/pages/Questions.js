@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Table, Badge, Button, Modal, Form } from 'react-bootstrap';
+import { Row, Col, Table, Badge, Button, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import {
@@ -9,14 +9,11 @@ import {
     Trash2,
     FileQuestion,
     Eye,
-    Copy,
-    Filter
+    Copy
 } from 'lucide-react';
 
 import {
     fakeQuestions,
-    fakeExamParts,
-    fakeUsers,
     getUserById,
     dashboardStats
 } from '../data/fakeData';
@@ -40,10 +37,7 @@ const questionTypeColors = {
 const QuestionsManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [showModal, setShowModal] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [selectedQuestion, setSelectedQuestion] = useState(null);
+    const [currentPage] = useState(1);
     const itemsPerPage = 10;
 
     // Enrich questions with related data
@@ -60,25 +54,13 @@ const QuestionsManagement = () => {
     });
 
     // Pagination
-    const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentQuestions = filteredQuestions.slice(indexOfFirstItem, indexOfLastItem);
 
-    const handleView = (question) => {
-        setSelectedQuestion(question);
-        setShowModal(true);
-    };
-
-    const handleEdit = (question) => {
-        setSelectedQuestion(question);
-        setShowModal(true);
-    };
-
-    const handleDelete = (question) => {
-        setSelectedQuestion(question);
-        setShowDeleteConfirm(true);
-    };
+    const handleView = () => {};
+    const handleEdit = () => {};
+    const handleDelete = () => {};
 
     return (
         <div className={cx('questionsPage')}>

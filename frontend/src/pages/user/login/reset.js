@@ -34,7 +34,7 @@ function ResetPassWord() {
       params.append('newPassword', newPassword);
 
       // Gửi yêu cầu đặt lại mật khẩu
-      const response = await axios.post('/api/auth/reset-password', params, {
+      await axios.post('/api/auth/reset-password', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },

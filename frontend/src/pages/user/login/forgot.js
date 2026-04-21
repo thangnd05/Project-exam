@@ -28,7 +28,7 @@ function ForgotPassword() {
       params.append('email', email);
 
       // Gửi yêu cầu đặt lại mật khẩu
-      const response = await axios.post('/api/auth/forgot-password', params, {
+      await axios.post('/api/auth/forgot-password', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },

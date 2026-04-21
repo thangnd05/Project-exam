@@ -1,6 +1,5 @@
 import React from 'react';
 import { Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 import {
   IoPencilOutline,
   IoTrashOutline,
@@ -12,8 +11,6 @@ import styles from './ClassManagementTable.module.scss';
 const cx = classNames.bind(styles);
 
 const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }) => {
-  const navigate = useNavigate();
-
   return (
     <div className={cx('table-responsive')}>
       <Table hover className={cx('management-table')}>

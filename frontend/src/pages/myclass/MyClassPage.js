@@ -21,7 +21,6 @@ const MyClassesPage = () => {
   const [selectedClass, setSelectedClass] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,7 +66,6 @@ const MyClassesPage = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedClass) return;
-    setDeleting(true);
 
     try {
       await axios.delete(`/api/classes/${selectedClass.classId}`);
@@ -81,8 +79,6 @@ const MyClassesPage = () => {
       setSelectedClass(null);
     } catch (err) {
       toast.error(err.response?.data?.error || '❌ Xóa lớp học thất bại!');
-    } finally {
-      setDeleting(false);
     }
   };
 

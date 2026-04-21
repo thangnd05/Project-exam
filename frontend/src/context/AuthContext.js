@@ -1,5 +1,5 @@
-import { createContext, useState, useEffect, useMemo, useCallback } from "react";
-import axios from "axios";
+import { createContext, useState, useEffect, useMemo, useCallback } from 'react';
+import axios from 'axios';
 
 export const AuthContext = createContext(null);
 
@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
   // ✅ Lấy user hiện tại từ /me
   const fetchCurrentUser = useCallback(async () => {
     try {
-      const response = await axios.get("/api/auth/me");
+      const response = await axios.get('/api/auth/me');
 
       if (response.data?.id) {
         setUser(normalizeUser(response.data));
@@ -49,16 +49,16 @@ export const AuthProvider = ({ children }) => {
   }, [fetchCurrentUser]);
 
   // ✅ Login (backend trả thẳng UserResponse)
-  const login = (userData) => {
+  const login = useCallback((userData) => {
     setUser(normalizeUser(userData));
-  };
+  }, []);
 
   // ✅ Logout
   const logout = async () => {
     try {
-      await axios.post("/api/auth/logout");
+      await axios.post('/api/auth/logout');
     } catch (err) {
-      console.error("Logout error:", err);
+      console.error('Logout error:', err);
     } finally {
       setUser(null);
       localStorage.clear();
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
       avatarUrl: user?.avatarUrl,
       isAuthenticated: !!user?.userId,
     }),
-    [user, loading]
+    [user, loading, login]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

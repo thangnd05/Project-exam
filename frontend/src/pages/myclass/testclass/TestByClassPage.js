@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {useParams} from 'react-router-dom';
 import {Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -37,7 +37,7 @@ function TestByClassPage() {
   }, [classId]);
 
   // 🟢 Lấy danh sách bài test
-  const fetchTests = () => {
+  const fetchTests = useCallback(() => {
     if (!classId || !chapterId) return;
     setLoading(true);
     axios
@@ -51,7 +51,7 @@ function TestByClassPage() {
         console.error('❌ Lỗi bài test:', err);
       })
       .finally(() => setLoading(false));
-  };
+  }, [classId, chapterId]);
 
   const handleDeleteTest = (testId) => {
     const selectedTest = tests.find((testItem) => testItem.testId === testId);
@@ -79,7 +79,7 @@ function TestByClassPage() {
 
   useEffect(() => {
     fetchTests();
-  }, [classId, chapterId]);
+  }, [fetchTests]);
 
   // 🕒 Countdown logic
   useEffect(() => {

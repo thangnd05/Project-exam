@@ -4,18 +4,14 @@ import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import {
     Search,
-    Filter,
     Plus,
     Edit,
     Trash2,
     Eye,
     CheckCircle,
-    XCircle,
-    Mail,
     UserX,
     Shield,
     UserCheck,
-    Download,
     ChevronLeft,
     ChevronRight
 } from 'lucide-react';
@@ -42,8 +38,6 @@ const UsersManagement = () => {
     const [roleFilter, setRoleFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
     const [currentPage, setCurrentPage] = useState(1);
-    const [showModal, setShowModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
 
@@ -69,13 +63,11 @@ const UsersManagement = () => {
 
     // Handlers
     const handleViewUser = (user) => {
-        setSelectedUser(user);
-        setShowModal(true);
+        console.log('View user:', user?.user_id);
     };
 
     const handleEditUser = (user) => {
-        setSelectedUser(user);
-        setShowModal(true);
+        console.log('Edit user:', user?.user_id);
     };
 
     const handleDeleteClick = (user) => {

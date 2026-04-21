@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -46,7 +46,7 @@ function TestStartPage() {
     return Array.isArray(list) && list.length > 0;
   };
 
-  const enrichTestWithPassageMedia = async (testData) => {
+  const enrichTestWithPassageMedia = useCallback(async (testData) => {
     const parts = testData.parts || [];
     const passageIdsToFetch = new Set();
     parts.forEach((part) => {
@@ -84,7 +84,7 @@ function TestStartPage() {
       })),
     }));
     return { ...testData, parts: enrichedParts };
-  };
+  }, []);
 
   useEffect(() => {
     if (!testId) return;
@@ -157,7 +157,7 @@ function TestStartPage() {
         }
       })
       .catch(() => setStatus('error'));
-  }, [testId, navigate]);
+  }, [testId, navigate, enrichTestWithPassageMedia]);
 
   useEffect(() => {
     if (status === 'open' && test?.testId) {
@@ -257,7 +257,7 @@ function TestStartPage() {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [status]);
+  }, [status, timeLeft]);
 
   const scrollToQuestion = (questionId) => {
     const element = document.getElementById(`q-${questionId}`);

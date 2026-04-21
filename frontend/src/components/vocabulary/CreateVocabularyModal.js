@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IoAdd, IoText, IoLanguage, IoClose } from 'react-icons/io5';
+import { IoAdd, IoText, IoLanguage } from 'react-icons/io5';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
