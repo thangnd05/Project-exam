@@ -1,0 +1,48 @@
+# ==========================================
+# BACKEND (Java Spring Boot)
+# ==========================================
+backend/target/
+backend/!.mvn/wrapper/maven-wrapper.jar
+backend/!**/src/main/**/target/
+backend/!**/src/test/**/target/
+
+# STS, IntelliJ, NetBeans, VS Code (Specific to backend folder)
+backend/.apt_generated
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings
+backend/.springBeans
+backend/.sts4-cache
+backend/.idea
+backend/*.iws
+backend/*.iml
+backend/*.ipr
+backend/.vscode/
+
+# Sensitive files
+backend/src/main/resources/application.properties
+
+# ==========================================
+# FRONTEND (Node/React/Vue)
+# ==========================================
+frontend/node_modules/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/build/
+frontend/dist/
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.cache/
+frontend/coverage/
+
+# ==========================================
+# GENERAL (Root & OS)
+# ==========================================
+.DS_Store
+*.log
+.idea/
+.vscode/
