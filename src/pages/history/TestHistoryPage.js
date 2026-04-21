@@ -106,6 +106,18 @@ function TestHistoryPage() {
             </div>
           }
         />
+        <div className={cx('history-actions')}>
+          <button
+            type="button"
+            className={cx('btn-ranking')}
+            onClick={() =>
+              navigate(routes.testLeaderboard.replace(':testId', String(testId)))
+            }
+          >
+            <IoPodiumOutline />
+            Xem bảng xếp hạng
+          </button>
+        </div>
 
         {/* === Table Content === */}
         {attempts.length === 0 ? (
@@ -125,7 +137,6 @@ function TestHistoryPage() {
                   <th>Thời gian bắt đầu</th>
                   <th>Thời gian nộp</th>
                   <th>Điểm số</th>
-                  <th>Top điểm</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
@@ -152,20 +163,6 @@ function TestHistoryPage() {
                       <div className={cx('score-badge')}>
                         {a.totalScore ?? '--'}
                       </div>
-                    </td>
-                    <td data-label="Top điểm">
-                      <button
-                        type="button"
-                        className={cx('btn-ranking')}
-                        onClick={() =>
-                          navigate(
-                            routes.testLeaderboard.replace(':testId', String(testId)),
-                          )
-                        }
-                      >
-                        <IoPodiumOutline />
-                        Xem top
-                      </button>
                     </td>
                     <td data-label="Trạng thái">
                       {a.status === 'COMPLETED' ? (

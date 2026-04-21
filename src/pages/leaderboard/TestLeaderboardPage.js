@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Container, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -81,45 +81,19 @@ function TestLeaderboardPage() {
     }
   }, [testId]);
 
-  const rows = useMemo(() => {
-    const groupedByUser = new Map();
-
-    rawRows.forEach((entry, index) => {
-      const status = String(entry.status || '').toUpperCase();
-      if (status && status !== 'COMPLETED') {
-        return;
-      }
-
-      const userId = entry.userId ?? `anonymous-${index}`;
-      const score = Number(entry.totalScore ?? entry.score ?? 0);
-
-      const existingUser = groupedByUser.get(userId);
-      if (!existingUser) {
-        groupedByUser.set(userId, {
-          id: userId,
-          displayName:
-            entry.fullName ||
-            entry.userName ||
-            entry.username ||
-            entry.displayName ||
-            `User ${userId}`,
-          score,
-          attemptCount: 1,
-        });
-        return;
-      }
-
-      groupedByUser.set(userId, {
-        ...existingUser,
-        score: Math.max(existingUser.score, score),
-        attemptCount: existingUser.attemptCount + 1,
-      });
-    });
-
-    return Array.from(groupedByUser.values())
-      .sort((leftItem, rightItem) => rightItem.score - leftItem.score)
-      .map((entry, index) => ({...entry, rank: index + 1}));
-  }, [rawRows]);
+  const rows = rawRows.map((entry, index) => ({
+    id: entry.userTestId ?? entry.userId ?? `row-${index}`,
+    rank: index + 1,
+    displayName:
+      entry.fullName ||
+      entry.userName ||
+      entry.username ||
+      entry.displayName ||
+      (entry.userId ? `User ${entry.userId}` : 'Người dùng'),
+    score: Number(entry.totalScore ?? entry.score ?? 0),
+    durationTaken:
+      typeof entry.durationTaken === 'number' ? entry.durationTaken : null,
+  }));
 
   return (
     <div className={cx('wrapper')}>
@@ -172,7 +146,7 @@ function TestLeaderboardPage() {
                   <th>Hạng</th>
                   <th>Người dùng</th>
                   <th>Điểm</th>
-                  <th>Số lượt làm</th>
+                  <th>Thời gian làm</th>
                 </tr>
               </thead>
               <tbody>
@@ -200,7 +174,11 @@ function TestLeaderboardPage() {
                         {entry.score.toFixed(2)}
                       </span>
                     </td>
-                    <td data-label="Số lượt làm">{entry.attemptCount}</td>
+                    <td data-label="Thời gian làm">
+                      {entry.durationTaken != null
+                        ? `${entry.durationTaken}s`
+                        : '---'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
