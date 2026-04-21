@@ -260,12 +260,13 @@ public class UserTestService {
         }
     
         List<UserTest> list = userTestRepository.findByUserIdAndTestIdOrderByStartedAtDesc(userId, testId);
+        Map<Long, String> userNameById = loadUserNames(list);
 
         return list.stream()
                 .map(u -> UserTestResponse.builder()
                         .userTestId(u.getUserTestId())
                         .userId(u.getUserId())
-                        .userName(resolveUserName(u.getUserId()))
+                        .userName(userNameById.get(u.getUserId()))
                         .testId(u.getTestId())
                         .startedAt(u.getStartedAt())
                         .finishedAt(u.getFinishedAt())
@@ -303,12 +304,13 @@ public class UserTestService {
                 bestAttemptByUser.put(userId, attempt);
             }
         }
+        Map<Long, String> userNameById = loadUserNames(bestAttemptByUser.values());
 
         return bestAttemptByUser.values().stream()
                 .map(u -> UserTestResponse.builder()
                         .userTestId(u.getUserTestId())
                         .userId(u.getUserId())
-                        .userName(resolveUserName(u.getUserId()))
+                        .userName(userNameById.get(u.getUserId()))
                         .testId(u.getTestId())
                         .startedAt(u.getStartedAt())
                         .finishedAt(u.getFinishedAt())
@@ -364,6 +366,18 @@ public class UserTestService {
                 .status(ut.getStatus().name())
                 .durationTaken(ut.getFinishedAt() != null ? Duration.between(ut.getStartedAt(), ut.getFinishedAt()).getSeconds() : null)
                 .build();
+    }
+
+    private Map<Long, String> loadUserNames(Collection<UserTest> attempts) {
+        Set<Long> userIds = attempts.stream()
+                .map(UserTest::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(User::getUserId, User::getUserName));
     }
 
     private String resolveUserName(Long userId) {

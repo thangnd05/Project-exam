@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -30,7 +31,7 @@ public class UserTestController {
     public ResponseEntity<UserTestResponse> getUserTestById(@PathVariable Long userTestId) {
         try {
             return ResponseEntity.ok(userTestService.getMeta(userTestId));
-        } catch (Exception e) {
+        } catch (ResponseStatusException e) {
             return ResponseEntity.notFound().build();
         }
     }
