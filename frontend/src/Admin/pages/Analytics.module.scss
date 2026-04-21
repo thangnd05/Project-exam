@@ -1,0 +1,129 @@
+// ============================================
+// Analytics Page Styles
+// ============================================
+
+// Variables
+$primary: #3b82f6;
+$success: #10b981;
+$warning: #f59e0b;
+$danger: #ef4444;
+$purple: #8b5cf6;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$bg-white: #ffffff;
+$border-color: #e2e8f0;
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$radius-md: 12px;
+$radius-lg: 16px;
+
+.analyticsPage {
+    padding: 0;
+}
+
+.pageHeader {
+    margin-bottom: 24px;
+
+    h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: $text-primary;
+        margin-bottom: 4px;
+    }
+
+    p {
+        color: $text-secondary;
+        margin: 0;
+    }
+}
+
+.metricsRow {
+    margin-bottom: 24px;
+}
+
+.metricCard {
+    background: $bg-white;
+    border-radius: $radius-lg;
+    padding: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+    height: 100%;
+}
+
+.metricIcon {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.metricInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.metricValue {
+    font-size: 28px;
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1.2;
+}
+
+.metricLabel {
+    font-size: 14px;
+    color: $text-secondary;
+    margin-top: 4px;
+}
+
+.metricTrend {
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 8px;
+
+    &.up {
+        color: $success;
+    }
+
+    &.down {
+        color: $danger;
+    }
+}
+
+.chartsRow {
+    margin-bottom: 24px;
+}
+
+.chartCard {
+    background: $bg-white;
+    border-radius: $radius-lg;
+    padding: 24px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+    height: 100%;
+}
+
+.chartHeader {
+    margin-bottom: 20px;
+
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
+    }
+}
+
+@media (max-width: 992px) {
+    .pageHeader h1 {
+        font-size: 24px;
+    }
+}

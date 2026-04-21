@@ -1,0 +1,362 @@
+@import '../../components/GlobalStyles/GlobalStyles.module.scss';
+
+.brand {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-right: 16px;
+}
+
+.brandInner {
+  display: flex;
+  align-items: center;
+  min-width: 140px;
+}
+
+.navbarRoot {
+  padding: 12px 20px;
+}
+
+.desktopCollapse {
+  display: none;
+}
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+/* === ✅ Thêm sticky + hiệu ứng mờ vào đây === */
+.wrapper {
+  font-size: 1.6rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  /* Nền trong mờ nhẹ */
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* Viền và bóng mờ nhẹ để tách khỏi nội dung */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.new-test {
+  font-size: 1.4rem;
+  border-radius: 8px;
+  border: 2px solid var(--accent-color);
+  color: var(--accent-color);
+  white-space: nowrap;
+  padding: 8px 12px;
+
+  &:hover {
+    background-color: var(--accent-color);
+    color: white;
+  }
+}
+
+.home {
+  position: relative;
+  font-size: 1.5rem;
+  padding: 8px 0 !important;
+  color: #898686;
+  text-decoration: none;
+  transition: color 0.3s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    border-radius: 1px;
+    background-color: var(--accent-color);
+    transition: width 0.4s ease;
+  }
+
+  &:hover {
+    color: var(--accent-color);
+
+    &::after {
+      width: 80%;
+      /* mở rộng đều ra hai bên */
+    }
+  }
+}
+
+.home_sm {
+  color: #898686;
+  text-decoration: none;
+
+  &:hover {
+    color: #111;
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+
+  &:hover {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  font-weight: bold;
+  font-size: 1.5rem;
+  white-space: nowrap;
+}
+
+.custom-dropdown {
+  font-size: 1.6rem;
+}
+
+.custom-dropdown-item {
+  &:active {
+    background-color: transparent !important;
+  }
+}
+
+.btn-create_sm {
+  font-size: 1.4rem;
+}
+
+.bar {
+  font-size: 1.4rem;
+  width: 42px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tit_sm {
+  font-size: 2.4rem;
+}
+
+.customMenu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+/* Title */
+.menuTitle {
+  position: relative;
+  font-size: 1.5rem;
+  color: #898686;
+  transition: 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    border-radius: 2px;
+    background-color: var(--accent-color);
+    transition: width 0.35s ease;
+  }
+}
+
+.customMenu:hover .menuTitle {
+  color: var(--accent-color);
+}
+
+.customMenu:hover .menuTitle::after {
+  width: 100%;
+}
+
+/* Dropdown */
+.menuDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: white;
+  border-radius: 12px;
+  min-width: 180px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+  display: none;
+  flex-direction: column;
+  z-index: 999;
+}
+
+/* ✅ Hover bridge */
+.menuDropdown::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 100%;
+  height: 12px;
+
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* ✅ Giữ dropdown mở khi hover */
+.customMenu:hover .menuDropdown,
+.menuDropdown:hover {
+  display: flex;
+}
+
+/* Items */
+.menuDropdown button,
+.menuDropdown a {
+  padding: 12px 16px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text-color);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--hover-color);
+    color: var(--accent-color);
+  }
+
+  &:first-child {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  &:last-child {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+}
+
+.menuDropdown button {
+  width: 100%;
+}
+
+.userMenuWrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.userNameWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.mobileDrawer {
+  width: min(88vw, 360px) !important;
+}
+
+.mobileNav {
+  gap: 6px;
+}
+
+.mobileNavLink {
+  color: #3a3a3a;
+  font-size: 1.5rem;
+  padding: 10px 0 !important;
+  border-bottom: 1px solid #f1f5f9;
+
+  &:hover {
+    color: var(--accent-color);
+  }
+}
+
+.mobileMenuGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.mobileMenuTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #64748b;
+}
+
+.mobileMenuAction {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 1.4rem;
+  color: #334155;
+
+  &:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+  }
+}
+
+.mobileCreateTest {
+  width: 100%;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.mobileUserDropdown {
+  margin-top: 12px;
+}
+
+@media (max-width: 991.98px) {
+  .brand {
+    font-size: 1.7rem;
+  }
+
+  .brandInner img {
+    height: 52px;
+  }
+
+  .user-info {
+    justify-content: space-between;
+    padding: 8px 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .desktopCollapse {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .navbarRoot {
+    padding: 12px 36px;
+  }
+
+  .desktopNav {
+    gap: 28px;
+  }
+}

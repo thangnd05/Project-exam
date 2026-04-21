@@ -1,0 +1,88 @@
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import DefaultLayout from './Layout/DefaultLayout';
+import routes, { publicRoutes, privateRoutes, adminRoutes } from './routes';
+import ProtectedRoute from './routes/ProtectedRoute';
+import AdminLayout from './Admin/layouts/AdminLayout';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { AuthProvider } from '~/context/AuthContext';
+import ScrollHandler from './Layout/ScrollToTopOnRouteChange';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <ScrollHandler />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          limit={3}
+        />
+        <div className="App">
+          <Routes>
+            {/* Public Routes */}
+            {publicRoutes.map((route, index) => {
+              const Page = route.component;
+              const Layout = DefaultLayout;
+              return (
+                <Route
+                  key={`public-${index}`}
+                  path={route.path}
+                  element={
+                    <Layout noContainer={route.noContainer || false}>
+                      <Page />
+                    </Layout>
+                  }
+                />
+              );
+            })}
+
+            {/* ✅ Admin Routes */}
+            {adminRoutes.map((route, index) => {
+              const Page = route.component;
+              return (
+                <Route
+                  key={`admin-${index}`}
+                  path={route.path}
+                  element={
+                    <AdminLayout>
+                      <Page />
+                    </AdminLayout>
+                  }
+                />
+              );
+            })}
+
+            {/* ✅ Private Routes */}
+            {privateRoutes.map((route, index) => {
+              const Page = route.component;
+              const Layout = DefaultLayout;
+              return (
+                <Route
+                  key={`private-${index}`}
+                  path={route.path}
+                  element={
+                    <ProtectedRoute>
+                      <Layout noContainer={route.noContainer || false}>
+                        <Page />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+              );
+            })}
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+export default App;

@@ -1,0 +1,434 @@
+/* login.module.scss - Advanced Sliding Transition */
+
+.splitContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  width: 100%;
+  font-family: var(--font-family);
+  padding: 20px;
+}
+
+/* 💠 Thẻ Card Chính - Master Container */
+.mainCard {
+  background-color: var(--bg-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  width: 1000px;
+  max-width: 95%;
+  min-height: 600px;
+  display: block; // Relative children absolute
+}
+
+/* 📝 Cấu trúc Form Container */
+.formContainer {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 50px;
+  text-align: center;
+  width: 50%;
+
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 3.2rem;
+    font-weight: 700; // Force 700 for cleaner VN font
+    margin-bottom: 20px;
+    color: var(--text-color);
+  }
+
+  .subtitle {
+    font-size: 1.4rem;
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+  }
+}
+
+/* 📥 Vị trí ban đầu */
+.signInContainer {
+  left: 0;
+  z-index: 2;
+  opacity: 1;
+}
+
+.signUpContainer {
+  left: 0;
+  width: 50%;
+  opacity: 0;
+  z-index: 1;
+}
+
+/* 🎭 Hiệu ứng khi Active (Sign Up Mode) */
+.mainCard.signUpMode {
+  .signInContainer {
+    transform: translateX(100%);
+    opacity: 0;
+    z-index: 1;
+  }
+
+  .signUpContainer {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: showEffect 0.6s forwards;
+  }
+
+  .overlayContainer {
+    transform: translateX(-100%);
+  }
+
+  .overlay {
+    transform: translateX(50%);
+  }
+}
+
+@keyframes showEffect {
+
+  0%,
+  49.99% {
+    opacity: 0;
+    z-index: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 1;
+    z-index: 5;
+  }
+}
+
+/* 🟦 OVERLAY / INFO PANELS - Double Slider Secret */
+.overlayContainer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  z-index: 100;
+}
+
+.overlay {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-act-color) 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 0 0;
+  color: var(--white);
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+}
+
+.overlayPanel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 40px;
+  text-align: center;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transform: translateX(0);
+  transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+
+  h2 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--white) !important;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  p {
+    font-size: 1.5rem;
+    line-height: 1.7;
+    margin-bottom: 35px;
+    color: var(--white);
+    opacity: 0.9;
+  }
+}
+
+.overlayLeft {
+  transform: translateX(-20%);
+}
+
+.mainCard.signUpMode .overlayLeft {
+  transform: translateX(0);
+}
+
+.overlayRight {
+  right: 0;
+  transform: translateX(0);
+}
+
+.mainCard.signUpMode .overlayRight {
+  transform: translateX(20%);
+}
+
+/* 🔤 Input Fields & Action Styles */
+.input-box {
+  width: 100%;
+  margin-bottom: 15px;
+
+  input {
+    width: 100%;
+    background-color: var(--input-bg);
+    border: 1px solid transparent;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    font-size: 1.4rem;
+    color: var(--text-color);
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+
+    &:focus {
+      background-color: var(--bg-white);
+      border-color: var(--border-color);
+      box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.1);
+    }
+  }
+}
+
+.social-login {
+  margin-bottom: 20px;
+
+  .social-btns {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .social-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-white);
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f9fafb;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+}
+
+.agreement {
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  text-align: left;
+  width: 100%;
+
+  label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.forgot-link {
+  display: block;
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin: 10px 0 25px;
+  font-weight: 500;
+
+  &:hover {
+    color: var(--accent-color);
+    text-decoration: none;
+  }
+}
+
+.login-btn {
+  border-radius: 30px;
+  border: none;
+  background: var(--accent-color);
+  color: var(--white);
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 14px 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 97, 242, 0.2);
+
+  &:hover {
+    background: var(--accent-act-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 97, 242, 0.3);
+  }
+}
+
+.ghost-btn {
+  background-color: transparent;
+  border: 2px solid var(--white);
+  color: var(--white);
+  border-radius: 30px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 12px 45px;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--white);
+    color: var(--accent-color);
+    transform: scale(1.05);
+  }
+}
+
+/* 🌀 Spinner & Messages */
+.login-message {
+  margin-bottom: 15px;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  padding: 10px 15px;
+  border-radius: var(--radius-md);
+  width: 100%;
+
+  &.error {
+    color: #ef4444;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+  }
+
+  &.success {
+    color: #10b981;
+    background: #ecfdf5;
+    border: 1px solid #bbf7d0;
+  }
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Ẩn trên máy tính */
+.mobile-switch {
+  display: none;
+  margin-top: 20px;
+  font-size: 1.4rem;
+  color: var(--text-secondary);
+
+  button {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 5px;
+  }
+}
+
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 📱 Mobile - Tối giản cho màn hình nhỏ */
+@media (max-width: 768px) {
+  .mainCard {
+    width: 100%;
+    height: auto;
+    min-height: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .formContainer {
+    position: relative;
+    width: 100%;
+    padding: 40px 20px;
+  }
+
+  .overlayContainer {
+    display: none;
+  }
+
+  .signInContainer,
+  .signUpContainer {
+    position: relative;
+    left: 0 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible;
+  }
+
+  .mainCard.signUpMode {
+    .signInContainer {
+      display: none;
+    }
+
+    .signUpContainer {
+      display: flex;
+      animation: none;
+    }
+  }
+
+  .mobile-switch {
+    display: block;
+
+  }
+
+  .overlayContainer {
+    display: none;
+  }
+
+  .formContainer {
+    width: 100% !important;
+    padding: 20px !important;
+    position: relative !important;
+    opacity: 1 !important;
+    transform: none !important;
+    display: none;
+  }
+
+  /* Chỉ hiện form đang được chọn */
+  .mainCard:not(.signUpMode) .signInContainer {
+    display: flex;
+  }
+
+  .mainCard.signUpMode .signUpContainer {
+    display: flex;
+  }
+}

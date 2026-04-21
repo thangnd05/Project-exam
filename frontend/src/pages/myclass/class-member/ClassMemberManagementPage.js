@@ -1,0 +1,492 @@
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import classNames from 'classnames/bind';
+import {
+  IoArrowBack,
+  IoPeopleOutline,
+  IoCheckmarkCircle,
+  IoTimeOutline,
+  IoPersonRemoveOutline,
+  IoPersonAddOutline,
+  IoSearchOutline,
+  IoRefreshOutline,
+  IoShieldCheckmarkOutline,
+  IoChevronDown,
+  IoChevronUp,
+} from 'react-icons/io5';
+import { Spinner, Badge, Table, Tabs, Tab } from 'react-bootstrap';
+
+import styles from './ClassMemberManagementPage.module.scss';
+import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
+import routes from '~/config/Routes';
+
+const cx = classNames.bind(styles);
+
+const ClassMemberManagementPage = () => {
+  const { classId } = useParams();
+  const navigate = useNavigate();
+
+  // State
+  const [classInfo, setClassInfo] = useState(null);
+  const [allMembers, setAllMembers] = useState([]);
+  const [pendingMembers, setPendingMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'joinedAt', direction: 'desc' });
+
+  // 🟢 Fetch class info
+  const fetchClassInfo = useCallback(async () => {
+    if (!classId) return;
+    try {
+      const res = await axios.get(`/api/classes/${classId}`);
+      setClassInfo(res.data);
+    } catch (err) {
+      console.error('Lỗi khi lấy thông tin lớp học:', err);
+      toast.error('Không thể tải thông tin lớp học');
+    }
+  }, [classId]);
+
+  // 🟢 Fetch all members
+  const fetchAllMembers = useCallback(async () => {
+    if (!classId) return;
+    try {
+      const res = await axios.get(`/api/class-members/class/${classId}`);
+      setAllMembers(res.data || []);
+    } catch (err) {
+      console.error('Lỗi khi lấy danh sách thành viên:', err);
+      toast.error('Không thể tải danh sách thành viên');
+    }
+  }, [classId]);
+
+  // 🟢 Fetch pending members
+  const fetchPendingMembers = useCallback(async () => {
+    if (!classId) return;
+    try {
+      const res = await axios.get(`/api/class-members/class/${classId}/pending`);
+      setPendingMembers(res.data || []);
+    } catch (err) {
+      console.error('Lỗi khi lấy danh sách chờ duyệt:', err);
+    }
+  }, [classId]);
+
+  // 🟢 Initial load
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchClassInfo(), fetchAllMembers(), fetchPendingMembers()]);
+      setLoading(false);
+    };
+    loadData();
+  }, [classId, fetchClassInfo, fetchAllMembers, fetchPendingMembers]);
+
+  // 🟢 Handle approve single member
+  const handleApproveMember = async (userId) => {
+    setActionLoading(true);
+    try {
+      await axios.put('/api/class-members/approve', {
+        classId: Number(classId),
+        userId: Number(userId),
+      });
+      toast.success('Duyệt học sinh thành công!');
+      await Promise.all([fetchAllMembers(), fetchPendingMembers()]);
+    } catch (err) {
+      console.error('Lỗi duyệt học sinh:', err);
+      const msg = err?.response?.data?.error || 'Không thể duyệt học sinh';
+      toast.error(msg);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // 🟢 Handle approve all
+  const handleApproveAll = async () => {
+    if (pendingMembers.length === 0) {
+      toast.warning('Không có học sinh nào đang chờ duyệt');
+      return;
+    }
+    setActionLoading(true);
+    try {
+      const res = await axios.put(`/api/class-members/approve-all/${classId}`);
+      toast.success(res.data.message || 'Đã duyệt tất cả học sinh!');
+      await Promise.all([fetchAllMembers(), fetchPendingMembers()]);
+    } catch (err) {
+      console.error('Lỗi duyệt tất cả:', err);
+      const msg = err?.response?.data?.error || 'Không thể duyệt tất cả';
+      toast.error(msg);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // 🟢 Handle remove member
+  const handleRemoveMember = async () => {
+    if (!memberToDelete) return;
+    setActionLoading(true);
+    try {
+      await axios.delete('/api/class-members/remove', {
+        data: {
+          classId: Number(classId),
+          userId: Number(memberToDelete.userId),
+        },
+      });
+      toast.success('Đã xóa học sinh khỏi lớp!');
+      setShowDeleteModal(false);
+      setMemberToDelete(null);
+      await Promise.all([fetchAllMembers(), fetchPendingMembers()]);
+    } catch (err) {
+      console.error('Lỗi xóa học sinh:', err);
+      const msg = err?.response?.data?.error || 'Không thể xóa học sinh';
+      toast.error(msg);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // 🟢 Sorting
+  const handleSort = (key) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
+  const getSortedMembers = (members) => {
+    const sorted = [...members];
+    sorted.sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+      if (sortConfig.key === 'joinedAt') {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      }
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return sorted;
+  };
+
+  // 🟢 Filter + Sort
+  const getFilteredMembers = (members) => {
+    const filtered = members.filter((m) =>
+      String(m.userId).toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    return getSortedMembers(filtered);
+  };
+
+  // 🟢 Helpers
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getStatusBadge = (status) => {
+    const statusMap = {
+      APPROVED: { variant: 'success', label: 'Đã duyệt', icon: <IoCheckmarkCircle /> },
+      PENDING: { variant: 'warning', label: 'Chờ duyệt', icon: <IoTimeOutline /> },
+    };
+    const s = statusMap[status] || { variant: 'secondary', label: status, icon: null };
+    return (
+      <Badge bg={s.variant} className={cx('status-badge')}>
+        {s.icon} {s.label}
+      </Badge>
+    );
+  };
+
+  const renderSortIcon = (key) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === 'asc' ? <IoChevronUp /> : <IoChevronDown />;
+  };
+
+  // 🟢 Render table row
+  const renderMemberRow = (member, showActions = false) => (
+    <tr key={member.id} className={cx('member-row')}>
+      <td className={cx('td-id')}>
+        <span className={cx('user-id')}>{member.userId}</span>
+      </td>
+      <td className={cx('td-joined')}>{formatDate(member.joinedAt)}</td>
+      <td className={cx('td-status')}>{getStatusBadge(member.status)}</td>
+      {showActions && (
+        <td className={cx('td-actions')}>
+          <div className={cx('action-buttons')}>
+            {member.status === 'PENDING' && (
+              <button
+                className={cx('btn-approve')}
+                onClick={() => handleApproveMember(member.userId)}
+                disabled={actionLoading}
+                title="Duyệt học sinh"
+              >
+                <IoCheckmarkCircle />
+                <span>Duyệt</span>
+              </button>
+            )}
+            <button
+              className={cx('btn-remove')}
+              onClick={() => {
+                setMemberToDelete(member);
+                setShowDeleteModal(true);
+              }}
+              disabled={actionLoading}
+              title="Xóa khỏi lớp"
+            >
+              <IoPersonRemoveOutline />
+              <span>Xóa</span>
+            </button>
+          </div>
+        </td>
+      )}
+    </tr>
+  );
+
+  // 🟢 Empty state
+  const EmptyState = ({ message, icon: Icon }) => (
+    <div className={cx('empty-state')}>
+      <div className={cx('empty-icon-wrapper')}>
+        <Icon />
+      </div>
+      <p>{message}</p>
+    </div>
+  );
+
+  // =============================================
+  // RENDER
+  // =============================================
+  if (loading) {
+    return (
+      <div className={cx('wrapper')}>
+        <div className={cx('loading-container')}>
+          <Spinner animation="grow" variant="primary" size="lg" />
+          <p>Đang tải danh sách học sinh...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const approvedMembers = allMembers.filter((m) => m.status === 'APPROVED');
+  const filteredApproved = getFilteredMembers(approvedMembers);
+  const filteredPending = getFilteredMembers(pendingMembers);
+
+  return (
+    <div className={cx('wrapper')}>
+      {/* ===== HEADER ===== */}
+      <div className={cx('page-header')}>
+        <button className={cx('btn-back')} onClick={() => navigate(-1)}>
+          <IoArrowBack />
+          <span>Quay lại</span>
+        </button>
+
+        <div className={cx('header-content')}>
+          <div className={cx('header-icon')}>
+            <IoPeopleOutline />
+          </div>
+          <div className={cx('header-text')}>
+            <h1>Quản lý học sinh</h1>
+            <p className={cx('class-name')}>
+              {classInfo?.className || `Lớp #${classId}`}
+            </p>
+          </div>
+        </div>
+
+        <div className={cx('header-stats')}>
+          <div className={cx('stat-item')}>
+            <span className={cx('stat-number')}>{approvedMembers.length}</span>
+            <span className={cx('stat-label')}>Đã duyệt</span>
+          </div>
+          <div className={cx('stat-divider')} />
+          <div className={cx('stat-item', 'pending')}>
+            <span className={cx('stat-number')}>{pendingMembers.length}</span>
+            <span className={cx('stat-label')}>Chờ duyệt</span>
+          </div>
+          <div className={cx('stat-divider')} />
+          <div className={cx('stat-item')}>
+            <span className={cx('stat-number')}>{allMembers.length}</span>
+            <span className={cx('stat-label')}>Tổng cộng</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== TOOLBAR ===== */}
+      <div className={cx('toolbar')}>
+        <div className={cx('search-box')}>
+          <IoSearchOutline className={cx('search-icon')} />
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo ID học sinh..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={cx('search-input')}
+          />
+        </div>
+
+        <div className={cx('toolbar-actions')}>
+          <button
+            className={cx('btn-refresh')}
+            onClick={() =>
+              Promise.all([fetchAllMembers(), fetchPendingMembers()]).then(() =>
+                toast.success('Đã làm mới!')
+              )
+            }
+          >
+            <IoRefreshOutline />
+            <span>Làm mới</span>
+          </button>
+
+          {pendingMembers.length > 0 && (
+            <button
+              className={cx('btn-approve-all')}
+              onClick={handleApproveAll}
+              disabled={actionLoading}
+            >
+              <IoShieldCheckmarkOutline />
+              <span>Duyệt tất cả ({pendingMembers.length})</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ===== TABS ===== */}
+      <div className={cx('tabs-container')}>
+        <Tabs defaultActiveKey="approved" className={cx('custom-tabs')}>
+          {/* TAB: Đã duyệt */}
+          <Tab
+            eventKey="approved"
+            title={
+              <span className={cx('tab-title')}>
+                <IoCheckmarkCircle />
+                Đã duyệt
+                <Badge bg="success" pill className={cx('tab-badge')}>
+                  {approvedMembers.length}
+                </Badge>
+              </span>
+            }
+          >
+            <div className={cx('tab-content-wrapper')}>
+              {filteredApproved.length === 0 ? (
+                <EmptyState
+                  message={
+                    searchTerm
+                      ? 'Không tìm thấy học sinh nào'
+                      : 'Chưa có học sinh nào được duyệt'
+                  }
+                  icon={IoPeopleOutline}
+                />
+              ) : (
+                <div className={cx('table-wrapper')}>
+                  <Table hover className={cx('members-table')}>
+                    <thead>
+                      <tr>
+                        <th
+                          className={cx('th-sortable')}
+                          onClick={() => handleSort('userId')}
+                        >
+                          ID Học sinh {renderSortIcon('userId')}
+                        </th>
+                        <th
+                          className={cx('th-sortable')}
+                          onClick={() => handleSort('joinedAt')}
+                        >
+                          Ngày tham gia {renderSortIcon('joinedAt')}
+                        </th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody>{filteredApproved.map((m) => renderMemberRow(m, true))}</tbody>
+                  </Table>
+                </div>
+              )}
+            </div>
+          </Tab>
+
+          {/* TAB: Chờ duyệt */}
+          <Tab
+            eventKey="pending"
+            title={
+              <span className={cx('tab-title')}>
+                <IoTimeOutline />
+                Chờ duyệt
+                {pendingMembers.length > 0 && (
+                  <Badge bg="warning" pill className={cx('tab-badge', 'pending')}>
+                    {pendingMembers.length}
+                  </Badge>
+                )}
+              </span>
+            }
+          >
+            <div className={cx('tab-content-wrapper')}>
+              {filteredPending.length === 0 ? (
+                <EmptyState
+                  message={
+                    searchTerm
+                      ? 'Không tìm thấy học sinh nào đang chờ'
+                      : 'Không có học sinh nào đang chờ duyệt'
+                  }
+                  icon={IoTimeOutline}
+                />
+              ) : (
+                <>
+                  <div className={cx('pending-notice')}>
+                    <IoTimeOutline />
+                    <span>
+                      Có <strong>{filteredPending.length}</strong> học sinh đang chờ được
+                      duyệt
+                    </span>
+                  </div>
+                  <div className={cx('table-wrapper')}>
+                    <Table hover className={cx('members-table')}>
+                      <thead>
+                        <tr>
+                          <th
+                            className={cx('th-sortable')}
+                            onClick={() => handleSort('userId')}
+                          >
+                            ID Học sinh {renderSortIcon('userId')}
+                          </th>
+                          <th
+                            className={cx('th-sortable')}
+                            onClick={() => handleSort('joinedAt')}
+                          >
+                            Ngày yêu cầu {renderSortIcon('joinedAt')}
+                          </th>
+                          <th>Trạng thái</th>
+                          <th>Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody>{filteredPending.map((m) => renderMemberRow(m, true))}</tbody>
+                    </Table>
+                  </div>
+                </>
+              )}
+            </div>
+          </Tab>
+        </Tabs>
+      </div>
+
+      {/* ===== DELETE CONFIRM MODAL ===== */}
+      <ConfirmDeleteModal
+        show={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setMemberToDelete(null);
+        }}
+        onConfirm={handleRemoveMember}
+        title="Xóa học sinh khỏi lớp"
+        message={`Bạn có chắc chắn muốn xóa học sinh (ID: ${memberToDelete?.userId}) khỏi lớp này?`}
+      />
+    </div>
+  );
+};
+
+export default ClassMemberManagementPage;
