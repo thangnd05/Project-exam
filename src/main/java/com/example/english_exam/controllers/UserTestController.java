@@ -35,9 +35,10 @@ public class UserTestController {
         }
     }
 
-    // ✅ Lấy theo userId
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<UserTest>> getByUser(@PathVariable Long userId) {
+    // ✅ Lấy theo user đang đăng nhập (JWT)
+    @GetMapping("/my")
+    public ResponseEntity<List<UserTest>> getByCurrentUser(HttpServletRequest httpRequest) {
+        Long userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(userTestService.findByUserId(userId));
     }
 
@@ -113,9 +114,10 @@ public class UserTestController {
     @GetMapping("/check-active")
     public ResponseEntity<?> checkActiveUserTest(
             @RequestParam Long testId,
-            @RequestParam Long userId
+            HttpServletRequest httpRequest
     ) {
         try {
+            Long userId = authUtils.getUserId(httpRequest);
             Optional<UserTest> active = userTestService.findActiveUserTest(userId, testId);
 
             Map<String, Object> response = new HashMap<>();

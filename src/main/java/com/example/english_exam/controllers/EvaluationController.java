@@ -48,11 +48,6 @@ public class EvaluationController {
         }
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<EvaluationResponse>> getByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(evaluationService.getByUser(userId));
-    }
-
     @GetMapping("/me")
     public ResponseEntity<List<EvaluationResponse>> getMyEvaluations(HttpServletRequest httpRequest) {
         return ResponseEntity.ok(evaluationService.getMyEvaluations(httpRequest));

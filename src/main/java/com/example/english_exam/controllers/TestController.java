@@ -154,10 +154,10 @@ public class TestController {
         return testService.getAllTestsByAdmin();
     }
 
-    // Lấy test theo userId cụ thể
-    @GetMapping("/user/{userId}")
-    public List<TestAdminResponse> getTestsByUser(@PathVariable Long userId) {
-        return testService.getTestsByUser(userId);
+    // Lấy test theo user đang đăng nhập (JWT)
+    @GetMapping("/my")
+    public List<TestResponse> getMyTests(HttpServletRequest request) {
+        return testService.getTestsByUser(request);
     }
 
     // Lấy tất cả tests của Admin theo examTypeId
@@ -219,8 +219,9 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     @GetMapping("/{testId}/can-start")
     public ResponseEntity<Map<String, Object>> canStartTest(
             @PathVariable Long testId,
-            @RequestParam Long userId
+            HttpServletRequest request
     ) {
+        Long userId = authUtils.getUserId(request);
         Test test = testService.getTestById(testId)
                 .orElseThrow(() -> new RuntimeException("Test not found"));
         Map<String, Object> result = testService.canStartTest(userId, test);

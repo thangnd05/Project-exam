@@ -293,7 +293,7 @@ public class UserTestService {
             return Collections.emptyList();
         }
 
-        List<UserTest> list = userTestRepository.findByTestId(testId);
+        List<UserTest> list = userTestRepository.findByTestIdAndStatus(testId, UserTest.Status.COMPLETED);
         Map<Long, UserTest> bestAttemptByUser = new HashMap<>();
         for (UserTest attempt : list) {
             Long userId = attempt.getUserId();
