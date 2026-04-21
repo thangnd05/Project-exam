@@ -1,0 +1,746 @@
+package com.project_exam.backend.services.ExamAndTest;
+
+import com.project_exam.backend.dto.request.AddQuestionsToTestRequest;
+import com.project_exam.backend.dto.request.AddRandomQuestionsToTestRequest;
+import com.project_exam.backend.dto.request.CreateTestRequest;
+import com.project_exam.backend.dto.response.AddRandomQuestionsResponse;
+import com.project_exam.backend.dto.response.*;
+import com.project_exam.backend.dto.response.admin.*;
+import com.project_exam.backend.dto.response.user.*;
+import com.project_exam.backend.models.*;
+import com.project_exam.backend.repositories.*;
+import com.project_exam.backend.util.AuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+@AllArgsConstructor
+public class TestService {
+    private final TestRepository testRepository;
+    private final QuestionRepository questionRepository;
+    private final TestPartRepository testPartRepository;
+    private final TestQuestionRepository testQuestionRepository;
+    private final AnswerService answerService;
+    private final RoleRepository  roleRepository;
+    private final UserRepository userRepository;
+    private final ExamPartRepository  examPartRepository;
+    private final PassageRepository  passageRepository;
+    private final UserTestRepository userTestRepository;
+    private final AuthUtils authUtils;
+    private final UserTestService userTestService;
+    private final ClassRepository classRepository;
+    private final ClassMemberRepository classMemberRepository;
+
+    public List<Test> getAllTests() {
+        return testRepository.findAll();
+    }
+
+    public Optional<Test> getTestById(String id) {
+        return testRepository.findById(id);
+    }
+
+    public Test save(Test test) {
+        return testRepository.save(test);
+    }
+
+    public void deleteTest(String id) {
+        testRepository.deleteById(id);
+    }
+
+    /**
+     * Cập nhật test từ CreateTestRequest (dùng chung DTO với tạo mới).
+     * Chỉ ghi đè các field được gửi lên (khác null); không đổi createdBy, createdAt.
+     */
+    public Test updateTest(String id, CreateTestRequest request) {
+
+        Test test = testRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Test không tồn tại: " + id));
+        if (request.getTitle() != null) test.setTitle(request.getTitle());
+        if (request.getDescription() != null) test.setDescription(request.getDescription());
+        if (request.getExamTypeId() != null) test.setExamTypeId(request.getExamTypeId());
+        if (request.getDurationMinutes() != null) test.setDurationMinutes(request.getDurationMinutes());
+        if (request.getBannerUrl() != null) test.setBannerUrl(request.getBannerUrl());
+        if (request.getMaxAttempts() != null) test.setMaxAttempts(request.getMaxAttempts());
+        if (request.getClassId() != null) test.setClassId(request.getClassId());
+        if (request.getChapterId() != null) test.setChapterId(request.getChapterId());
+        if (request.getAvailableFrom() != null) test.setAvailableFrom(request.getAvailableFrom());
+        if (request.getAvailableTo() != null) test.setAvailableTo(request.getAvailableTo());
+        return testRepository.save(test);
+    }
+
+    public TestResponse buildUserTestSummary(Test test, String userId) {
+
+        long attemptsUsed =
+                userTestRepository.countByTestIdAndUserId(
+                        test.getTestId(),
+                        userId
+                );
+        long totalAttempts = userTestRepository.countByTestId(test.getTestId());
+
+        Integer maxAttempts = test.getMaxAttempts();
+        Integer remainingAttempts = null;
+        boolean canDoTest = true;
+
+        if (maxAttempts != null) {
+            remainingAttempts = (int) Math.max(0, maxAttempts - attemptsUsed);
+            canDoTest = remainingAttempts > 0;
+        }
+
+        return TestResponse.builder()
+                .testId(test.getTestId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .examTypeId(test.getExamTypeId())
+                .createdBy(test.getCreatedBy())
+                .createdAt(test.getCreatedAt())
+                .bannerUrl(test.getBannerUrl())
+                .durationMinutes(test.getDurationMinutes())
+                .availableFrom(test.getAvailableFrom())
+                .availableTo(test.getAvailableTo())
+                .status(test.calculateStatus().name())
+                .maxAttempts(maxAttempts)                // giữ nguyên null
+                .attemptsUsed((int) attemptsUsed)
+                .remainingAttempts(remainingAttempts)   // null nếu không giới hạn
+                .totalAttempts(totalAttempts)
+                .canDoTest(canDoTest)                   // luôn true nếu null
+                .parts(null)
+                .build();
+    }
+
+    public List<Test> getAllTestsByAdmin() {
+        Role adminRole = roleRepository.findByRoleName("Admin");
+        if (adminRole == null) return new ArrayList<>();
+
+        List<User> adminUsers = userRepository.findByRoleId(adminRole.getRoleId());
+        if (adminUsers.isEmpty()) return new ArrayList<>();
+
+        List<Test> result = new ArrayList<>();
+        for (User admin : adminUsers) {
+            result.addAll(testRepository.findByCreatedBy(admin.getUserId()));
+        }
+        return result;
+    }
+
+    private TestAdminResponse buildAdminTestSummary(Test test) {
+        long totalAttempts = userTestRepository.countByTestId(test.getTestId());
+
+        return TestAdminResponse.builder()
+                .testId(test.getTestId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .examTypeId(test.getExamTypeId())
+                .createdBy(test.getCreatedBy())
+                .createdAt(test.getCreatedAt())
+                .bannerUrl(test.getBannerUrl())
+                .durationMinutes(test.getDurationMinutes())
+                .availableFrom(test.getAvailableFrom())
+                .availableTo(test.getAvailableTo())
+                .status(test.calculateStatus().name())
+                .maxAttempts(test.getMaxAttempts())
+                .totalAttempts(totalAttempts)
+                .classId(test.getClassId())
+                .parts(null)
+                .build();
+    }
+
+    public List<TestAdminResponse> getTestsByUser(String userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        return testRepository.findByCreatedBy(userId).stream()
+                .map(this::buildAdminTestSummary)
+                .toList();
+    }
+
+    public List<TestResponse> getTestsByUser(HttpServletRequest httpRequest) {
+        String currentUserId = authUtils.getUserId(httpRequest);
+        if (currentUserId == null) {
+            throw new RuntimeException("Không xác định được người dùng.");
+        }
+        return testRepository.findByCreatedBy(currentUserId).stream()
+                .map(test -> buildUserTestSummary(test, currentUserId))
+                .toList();
+    }
+
+    @Transactional
+    public TestResponse getTestFullById(String testId, HttpServletRequest httpRequest) {
+        // 1. Lấy thông tin người dùng và bài thi
+        String currentUserId = authUtils.getUserId(httpRequest);
+        if (currentUserId == null) throw new RuntimeException("Không xác định được người dùng.");
+
+        Test test = testRepository.findById(testId).orElseThrow(() -> new RuntimeException("Test not found"));
+        UserTest latest = userTestRepository.findTopByUserIdAndTestIdOrderByStartedAtDesc(currentUserId, testId).orElse(null);
+
+        // 2. Logic Auto-Submit
+        handleAutoSubmit(test, latest);
+
+        // 3. Kiểm tra số lượt làm bài
+        int attemptsUsed = userTestRepository.countByUserIdAndTestIdAndStatus(currentUserId, testId, UserTest.Status.COMPLETED);
+        Integer maxAttempts = test.getMaxAttempts();
+        Integer remaining = (maxAttempts != null) ? Math.max(0, maxAttempts - attemptsUsed) : null;
+        long totalAttempts = userTestRepository.countByTestId(testId);
+
+        if (maxAttempts != null && remaining <= 0) {
+            return buildLimitExceededResponse(test, attemptsUsed, remaining, totalAttempts);
+        }
+
+        // 4. Load data
+        TestUserDataBundle data = loadUserTestData(testId);
+        if (data.testParts().isEmpty()) {
+            return buildEmptyUserTestResponse(test, maxAttempts, attemptsUsed, remaining);
+        }
+
+        // 5. Shuffle seed
+        long seed = (latest != null ? latest.getUserTestId() : testId).hashCode();
+
+        // 6. Build responses
+        List<TestPartResponse> partResponses = buildUserPartResponses(data, seed);
+
+        return buildUserTestResponse(test, maxAttempts, attemptsUsed, remaining, totalAttempts, partResponses);
+    }
+
+    // ================= USER VERSION REFACTORING =================
+
+    private record TestUserDataBundle(
+            List<TestPart> testParts,
+            Map<String, List<TestQuestion>> questionsByPartId,
+            Map<String, Question> questionMap,
+            Map<String, Passage> passageMap,
+            Map<String, List<AnswerResponse>> answersByQuestionId
+    ) {}
+
+    private TestUserDataBundle loadUserTestData(String testId) {
+        List<TestPart> testParts = testPartRepository.findByTestId(testId);
+        if (testParts.isEmpty()) {
+            return new TestUserDataBundle(
+                    Collections.emptyList(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap()
+            );
+        }
+
+        List<String> partIds = testParts.stream().map(TestPart::getTestPartId).toList();
+        List<TestQuestion> allQuestions = testQuestionRepository.findByTestPartIdIn(partIds);
+        Map<String, List<TestQuestion>> questionsByPartId = allQuestions.stream()
+                .collect(Collectors.groupingBy(TestQuestion::getTestPartId));
+
+        List<String> questionIds = allQuestions.stream()
+                .map(TestQuestion::getQuestionId).distinct().toList();
+
+        Map<String, Question> questionMap = questionRepository.findAllById(questionIds).stream()
+                .collect(Collectors.toMap(Question::getQuestionId, q -> q));
+
+        Set<String> passageIds = questionMap.values().stream()
+                .map(Question::getPassageId).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<String, Passage> passageMap = passageIds.isEmpty()
+                ? Collections.emptyMap()
+                : passageRepository.findAllById(passageIds).stream()
+                        .collect(Collectors.toMap(Passage::getPassageId, p -> p));
+
+        Map<String, List<AnswerResponse>> answersByQuestionId =
+                answerService.getAnswersForMultipleQuestions(questionIds);
+
+        return new TestUserDataBundle(
+                testParts, questionsByPartId, questionMap, passageMap, answersByQuestionId
+        );
+    }
+
+    private List<TestPartResponse> buildUserPartResponses(TestUserDataBundle data, long seed) {
+        Random random = new Random(seed);
+
+        return data.testParts().stream().map(tp -> {
+            List<TestQuestion> tqList = data.questionsByPartId()
+                    .getOrDefault(tp.getTestPartId(), Collections.emptyList());
+
+            Map<String, QuestionGroupResponse> groupsMap = new LinkedHashMap<>();
+
+            for (TestQuestion tq : tqList) {
+                Question q = data.questionMap().get(tq.getQuestionId());
+                if (q == null) continue;
+
+                QuestionResponse qDto = QuestionResponse.builder()
+                        .questionId(q.getQuestionId())
+                        .examPartId(q.getExamPartId())
+                        .questionText(q.getQuestionText())
+                        .questionType(q.getQuestionType())
+                        .isBank(q.getIsBank())
+                        .testPartId(tp.getTestPartId())
+                        .answers(data.answersByQuestionId().getOrDefault(q.getQuestionId(), Collections.emptyList()))
+                        .build();
+
+                if (q.getPassageId() != null) {
+                    String groupKey = "P_" + q.getPassageId();
+                    if (!groupsMap.containsKey(groupKey)) {
+                        Passage p = data.passageMap().get(q.getPassageId());
+                        PassageResponse pDto = (p != null)
+                                ? new PassageResponse(p.getPassageId(), p.getContent(), p.getMediaUrl(), p.getPassageType())
+                                : null;
+                        groupsMap.put(groupKey, new QuestionGroupResponse(pDto, new ArrayList<>()));
+                    }
+                    groupsMap.get(groupKey).getQuestions().add(qDto);
+                } else {
+                    groupsMap.put("Q_" + q.getQuestionId(), new QuestionGroupResponse(null, new ArrayList<>(List.of(qDto))));
+                }
+            }
+
+            List<QuestionGroupResponse> finalGroups = new ArrayList<>(groupsMap.values());
+            Collections.shuffle(finalGroups, random);
+            return new TestPartResponse(tp.getTestPartId(), tp.getExamPartId(), finalGroups);
+        }).toList();
+    }
+
+    private TestResponse buildUserTestResponse(
+            Test test, Integer maxAttempts, int attemptsUsed, Integer remaining,
+            long totalAttempts, List<TestPartResponse> partResponses) {
+
+        return TestResponse.builder()
+                .testId(test.getTestId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .examTypeId(test.getExamTypeId())
+                .createdBy(test.getCreatedBy())
+                .createdAt(test.getCreatedAt())
+                .bannerUrl(test.getBannerUrl())
+                .durationMinutes(test.getDurationMinutes())
+                .availableFrom(test.getAvailableFrom())
+                .availableTo(test.getAvailableTo())
+                .status(test.calculateStatus().name())
+                .maxAttempts(maxAttempts)
+                .attemptsUsed(attemptsUsed)
+                .remainingAttempts(remaining)
+                .totalAttempts(totalAttempts)
+                .canDoTest(true)
+                .parts(partResponses)
+                .build();
+    }
+
+    // ================= END USER REFACTORING =================
+
+    private TestResponse buildEmptyUserTestResponse(Test test, Integer maxAttempts, int attemptsUsed, Integer remaining) {
+        long totalAttempts = userTestRepository.countByTestId(test.getTestId());
+        return TestResponse.builder()
+                .testId(test.getTestId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .examTypeId(test.getExamTypeId())
+                .createdBy(test.getCreatedBy())
+                .createdAt(test.getCreatedAt())
+                .bannerUrl(test.getBannerUrl())
+                .durationMinutes(test.getDurationMinutes())
+                .availableFrom(test.getAvailableFrom())
+                .availableTo(test.getAvailableTo())
+                .status(test.calculateStatus().name())
+                .maxAttempts(maxAttempts)
+                .attemptsUsed(attemptsUsed)
+                .remainingAttempts(remaining)
+                .totalAttempts(totalAttempts)
+                .canDoTest(true)
+                .parts(Collections.emptyList())
+                .build();
+    }
+
+    // Hàm bổ trợ để xử lý Auto-submit (Tách ra cho gọn code)
+private void handleAutoSubmit(Test test, UserTest latest) {
+    Integer duration = test.getDurationMinutes();
+    if (latest != null && latest.getStatus() == UserTest.Status.IN_PROGRESS && duration != null && duration > 0) {
+        LocalDateTime endTime = latest.getStartedAt().plusMinutes(duration);
+        if (test.getAvailableTo() != null && test.getAvailableTo().isBefore(endTime)) endTime = test.getAvailableTo();
+        
+        if (!LocalDateTime.now().isBefore(endTime)) {
+            try {
+                userTestService.submitTest(latest.getUserTestId());
+            } catch (Exception e) {
+                latest.setStatus(UserTest.Status.COMPLETED);
+                latest.setFinishedAt(endTime);
+                userTestRepository.save(latest);
+            }
+        }
+    }
+}
+
+// Hàm bổ trợ build Response khi hết lượt làm (Tách ra cho gọn)
+private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem, long total) {
+    return TestResponse.builder()
+            .testId(test.getTestId()).title(test.getTitle()).description(test.getDescription())
+            .status("FORBIDDEN").maxAttempts(test.getMaxAttempts())
+            .attemptsUsed(used).remainingAttempts(rem).totalAttempts(total)
+            .canDoTest(false).build();
+}
+
+// ================= ADMIN VERSION REFACTORING =================
+
+    public TestAdminResponse getTestFullByIdAdmin(String testId) {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new RuntimeException("Test not found"));
+        long totalAttempts = userTestRepository.countByTestId(testId);
+
+        TestAdminDataBundle data = loadAdminTestData(test.getTestId());
+
+        if (data.testParts().isEmpty()) {
+            return buildEmptyAdminResponse(test, totalAttempts);
+        }
+
+        List<TestPartAdminResponse> partResponses = buildAdminPartResponses(data);
+
+        return buildAdminTestResponse(test, totalAttempts, data, partResponses);
+    }
+
+    private record TestAdminDataBundle(
+            List<TestPart> testParts,
+            Map<String, List<TestQuestion>> questionsByPartId,
+            Map<String, Question> questionMap,
+            Map<String, Passage> passageMap,
+            Map<String, ExamPart> examPartMap,
+            Map<String, List<AnswerAdminResponse>> answersByQuestionId
+    ) {}
+
+    private TestAdminDataBundle loadAdminTestData(String testId) {
+        List<TestPart> testParts = testPartRepository.findByTestId(testId);
+        if (testParts.isEmpty()) {
+            return new TestAdminDataBundle(
+                    Collections.emptyList(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap(),
+                    Collections.emptyMap()
+            );
+        }
+
+        List<String> partIds = testParts.stream().map(TestPart::getTestPartId).toList();
+        List<TestQuestion> allQuestions = testQuestionRepository.findByTestPartIdIn(partIds);
+        Map<String, List<TestQuestion>> questionsByPartId = allQuestions.stream()
+                .collect(Collectors.groupingBy(TestQuestion::getTestPartId));
+
+        List<String> questionIds = allQuestions.stream()
+                .map(TestQuestion::getQuestionId).distinct().toList();
+
+        Map<String, Question> questionMap = questionRepository.findAllById(questionIds).stream()
+                .collect(Collectors.toMap(Question::getQuestionId, q -> q));
+
+        Set<String> passageIds = questionMap.values().stream()
+                .map(Question::getPassageId).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<String, Passage> passageMap = passageRepository.findAllById(passageIds).stream()
+                .collect(Collectors.toMap(Passage::getPassageId, p -> p));
+
+        Set<String> examPartIds = questionMap.values().stream()
+                .map(Question::getExamPartId).collect(Collectors.toSet());
+        Map<String, ExamPart> examPartMap = examPartRepository.findAllById(examPartIds).stream()
+                .collect(Collectors.toMap(ExamPart::getExamPartId, e -> e));
+
+        Map<String, List<AnswerAdminResponse>> answersByQuestionId =
+                answerService.getAnswersForMultipleQuestionsForAdmin(questionIds);
+
+        return new TestAdminDataBundle(
+                testParts, questionsByPartId, questionMap,
+                passageMap, examPartMap, answersByQuestionId
+        );
+    }
+
+    private List<TestPartAdminResponse> buildAdminPartResponses(TestAdminDataBundle data) {
+        return data.testParts().stream().map(tp -> {
+            List<TestQuestion> tqList = data.questionsByPartId()
+                    .getOrDefault(tp.getTestPartId(), Collections.emptyList());
+
+            Map<String, List<Question>> groupedByPassage = tqList.stream()
+                    .map(tq -> data.questionMap().get(tq.getQuestionId()))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.groupingBy(
+                            q -> q.getPassageId() == null ? "NO_PASSAGE" : q.getPassageId().toString(),
+                            LinkedHashMap::new,
+                            Collectors.toList()
+                    ));
+
+            List<QuestionGroupAdminResponse> groupResponses = groupedByPassage.entrySet().stream()
+                    .map(entry -> buildQuestionGroupAdmin(entry.getKey(), entry.getValue(), data))
+                    .toList();
+
+            return new TestPartAdminResponse(tp.getTestPartId(), tp.getExamPartId(), groupResponses);
+        }).toList();
+    }
+
+    private QuestionGroupAdminResponse buildQuestionGroupAdmin(
+            String passageId, List<Question> questionsInGroup, TestAdminDataBundle data) {
+
+        PassageResponse passageResponse = null;
+        if (!"NO_PASSAGE".equals(passageId)) {
+            Passage p = data.passageMap().get(passageId.toString());
+            if (p != null) {
+                passageResponse = new PassageResponse(
+                        p.getPassageId(), p.getContent(), p.getMediaUrl(), p.getPassageType()
+                );
+            }
+        }
+
+        List<QuestionAdminResponse> questionResponses = questionsInGroup.stream()
+                .map(q -> buildQuestionAdminResponse(q, data))
+                .toList();
+
+        return new QuestionGroupAdminResponse(passageResponse, questionResponses);
+    }
+
+    private QuestionAdminResponse buildQuestionAdminResponse(Question q, TestAdminDataBundle data) {
+        List<AnswerAdminResponse> answers = data.answersByQuestionId()
+                .getOrDefault(q.getQuestionId(), Collections.emptyList());
+
+        String examTypeId = Optional.ofNullable(data.examPartMap().get(q.getExamPartId()))
+                .map(ExamPart::getExamTypeId).orElse(null);
+
+        return QuestionAdminResponse.builder()
+                .questionId(q.getQuestionId())
+                .examPartId(q.getExamPartId())
+                .questionText(q.getQuestionText())
+                .questionType(q.getQuestionType())
+                .explanation(q.getExplanation())
+                .examTypeId(examTypeId)
+                .classId(q.getClassId())
+                .isBank(q.getIsBank())
+                .answers(answers)
+                .build();
+    }
+
+    private TestAdminResponse buildAdminTestResponse(
+            Test test, long totalAttempts, TestAdminDataBundle data,
+            List<TestPartAdminResponse> partResponses) {
+
+        return TestAdminResponse.builder()
+                .testId(test.getTestId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .examTypeId(test.getExamTypeId())
+                .createdBy(test.getCreatedBy())
+                .createdAt(test.getCreatedAt())
+                .bannerUrl(test.getBannerUrl())
+                .durationMinutes(test.getDurationMinutes())
+                .availableFrom(test.getAvailableFrom())
+                .availableTo(test.getAvailableTo())
+                .status(test.calculateStatus().name())
+                .maxAttempts(test.getMaxAttempts())
+                .totalAttempts(totalAttempts)
+                .classId(test.getClassId())
+                .parts(partResponses)
+                .build();
+    }
+
+    private TestAdminResponse buildEmptyAdminResponse(Test test, long totalAttempts) {
+        return TestAdminResponse.builder()
+                .testId(test.getTestId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .examTypeId(test.getExamTypeId())
+                .createdBy(test.getCreatedBy())
+                .createdAt(test.getCreatedAt())
+                .bannerUrl(test.getBannerUrl())
+                .durationMinutes(test.getDurationMinutes())
+                .availableFrom(test.getAvailableFrom())
+                .availableTo(test.getAvailableTo())
+                .status(test.calculateStatus().name())
+                .maxAttempts(test.getMaxAttempts())
+                .totalAttempts(totalAttempts)
+                .classId(test.getClassId())
+                .parts(Collections.emptyList())
+                .build();
+    }
+
+    // ================= END ADMIN REFACTORING =================
+
+    
+    public Map<String, Object> canStartTest(String userId, Test test) {
+        LocalDateTime now = LocalDateTime.now();
+        Map<String, Object> result = new HashMap<>();
+
+        if (test.getAvailableFrom() != null && test.getAvailableFrom().isAfter(now)) {
+            result.put("canStart", false);
+            result.put("message", "Bài kiểm tra chưa bắt đầu");
+            return result;
+        }
+
+        if (test.getAvailableTo() != null && test.getAvailableTo().isBefore(now)) {
+            result.put("canStart", false);
+            result.put("message", "Bài kiểm tra đã kết thúc");
+            return result;
+        }
+
+        int attemptsUsed = userTestRepository.countByUserIdAndTestIdAndStatus(
+                userId,
+                test.getTestId(),
+                UserTest.Status.COMPLETED
+        );        Integer maxAttempts = test.getMaxAttempts();
+
+        if (maxAttempts != null && attemptsUsed >= maxAttempts) {
+            result.put("canStart", false);
+            result.put("message", "Bạn đã hết số lượt làm bài");
+            return result;
+        }
+
+        result.put("canStart", true);
+        result.put("message", "OK");
+        return result;
+    }
+
+    public List<Test> getTestByClassId(String classId, HttpServletRequest request) {
+        // 🧩 Lấy user hiện tại từ token
+        String currentUserId = authUtils.getUserId(request);
+        if (currentUserId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "🔒 Bạn cần đăng nhập để xem bài kiểm tra.");
+        }
+
+        // 🧩 Kiểm tra quyền truy cập lớp
+        boolean isMember = classMemberRepository.existsByClassIdAndUserId(classId, currentUserId);
+        boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
+
+        if (!isMember && !isTeacher) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "❌ Bạn không có quyền xem bài kiểm tra của lớp này!");
+        }
+
+        // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
+        return testRepository.findByClassId(classId);
+    }
+
+    public List<Test> getTestByClassIdAndChapterId(String classId,String chapterId, HttpServletRequest request) {
+        // 🧩 Lấy user hiện tại từ token
+        String currentUserId = authUtils.getUserId(request);
+        if (currentUserId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "🔒 Bạn cần đăng nhập để xem bài kiểm tra.");
+        }
+
+        // 🧩 Kiểm tra quyền truy cập lớp
+        boolean isMember = classMemberRepository.existsByClassIdAndUserId(classId, currentUserId);
+        boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
+
+        if (!isMember && !isTeacher) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "❌ Bạn không có quyền xem bài kiểm tra của lớp này!");
+        }
+
+        // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
+        return testRepository.findByClassIdAndChapterId(classId,chapterId);
+    }
+
+    public List<Test> getTestByCreateBy(HttpServletRequest request) {
+        // 🧩 Lấy user hiện tại từ token
+        String currentUserId = authUtils.getUserId(request);
+        if (currentUserId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "🔒 Bạn cần đăng nhập để xem bài kiểm tra.");
+        }
+
+        // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
+        return testRepository.findByCreatedBy(currentUserId);
+    }
+
+    public List<TestResponse> getMyPersonalTests(HttpServletRequest request) {
+
+        String currentUserId = authUtils.getUserId(request);
+        if (currentUserId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "🔒 Bạn cần đăng nhập để xem bài kiểm tra."
+            );
+        }
+
+        List<Test> tests =
+                testRepository.findByCreatedByAndClassIdIsNullAndChapterIdIsNull(currentUserId);
+
+        return tests.stream()
+                .map(test -> buildUserTestSummary(test, currentUserId))
+                .toList();
+    }
+
+    /**
+     * Gắn câu hỏi từ kho vào part của đề (chỉ tạo bản ghi test_questions).
+     * Câu hỏi phải đã tồn tại trong kho; không tạo câu hỏi mới ở đây.
+     */
+    @Transactional
+    public void addQuestionsToTestPart(AddQuestionsToTestRequest request) {
+        if (request.getTestPartId() == null || request.getQuestionIds() == null || request.getQuestionIds().isEmpty()) {
+            throw new RuntimeException("testPartId và questionIds không được rỗng.");
+        }
+        String testPartId = request.getTestPartId();
+        TestPart testPart = testPartRepository.findById(testPartId)
+                .orElseThrow(() -> new RuntimeException("TestPart không tồn tại: " + testPartId));
+
+        for (String questionId : request.getQuestionIds()) {
+            Question question = questionRepository.findById(questionId)
+                    .orElseThrow(() -> new RuntimeException("Câu hỏi không tồn tại trong kho: " + questionId));
+            if (!question.getExamPartId().equals(testPart.getExamPartId())) {
+                throw new RuntimeException("Câu hỏi " + questionId + " không thuộc examPart của part này.");
+            }
+            if (testQuestionRepository.existsByQuestionIdAndTestPartId(questionId, testPartId)) {
+                continue;
+            }
+            TestQuestion tq = new TestQuestion();
+            tq.setTestPartId(testPartId);
+            tq.setQuestionId(questionId);
+            testQuestionRepository.save(tq);
+        }
+    }
+
+    /**
+     * Lấy câu hỏi random từ kho và gắn vào part.
+     * Cá nhân (không classId/chapterId): chỉ kho của user đăng nhập (created_by = currentUserId).
+     * Lớp: classId (+ chapterId nếu có).
+     */
+    @Transactional
+    public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId) {
+        if (request.getTestPartId() == null || request.getCount() == null || request.getCount() <= 0) {
+            throw new RuntimeException("testPartId và count (số câu) phải hợp lệ.");
+        }
+        if (request.getChapterId() != null && request.getClassId() == null) {
+            throw new RuntimeException("Khi có chapterId thì phải có classId.");
+        }
+        String testPartId = request.getTestPartId();
+        int count = request.getCount();
+        TestPart testPart = testPartRepository.findById(testPartId)
+                .orElseThrow(() -> new RuntimeException("TestPart không tồn tại: " + testPartId));
+        String examPartId = testPart.getExamPartId();
+
+        Set<String> existingIds = testQuestionRepository.findByTestPartId(testPartId).stream()
+                .map(TestQuestion::getQuestionId)
+                .collect(Collectors.toSet());
+
+        List<Question> pool;
+        if (request.getClassId() != null && request.getChapterId() != null) {
+            pool = questionRepository.findRandomQuestionsByExamPartIdAndClassIdAndChapterId(
+                    examPartId, request.getClassId(), request.getChapterId(), Pageable.ofSize(count));
+        } else if (request.getClassId() != null) {
+            pool = questionRepository.findRandomQuestionsByExamPartIdAndClassId(
+                    examPartId, request.getClassId(), Pageable.ofSize(count));
+        } else {
+            pool = questionRepository.findRandomByExamPartAndCreatedByAndClassIdIsNullAndChapterIdIsNull(
+                    examPartId, currentUserId, count);
+        }
+
+        List<String> toAdd = pool.stream()
+                .map(Question::getQuestionId)
+                .filter(id -> !existingIds.contains(id))
+                .limit(count)
+                .toList();
+
+        for (String questionId : toAdd) {
+            Question question = questionRepository.findById(questionId)
+                    .orElseThrow(() -> new RuntimeException("Câu hỏi không tồn tại: " + questionId));
+            if (!question.getExamPartId().equals(examPartId)) {
+                continue;
+            }
+            TestQuestion tq = new TestQuestion();
+            tq.setTestPartId(testPartId);
+            tq.setQuestionId(questionId);
+            testQuestionRepository.save(tq);
+        }
+        return new AddRandomQuestionsResponse(toAdd.size());
+    }
+
+}

@@ -1,0 +1,152 @@
+package com.project_exam.backend.services;
+
+import com.project_exam.backend.cloudinary.CloudinaryService;
+import com.project_exam.backend.dto.response.ProfileOverviewResponse;
+import com.project_exam.backend.dto.response.UserResponse;
+import com.project_exam.backend.models.*;
+import com.project_exam.backend.repositories.*;
+import com.project_exam.backend.util.AuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import java.util.Optional;
+
+@Service
+@AllArgsConstructor
+public class UserService {
+    private UserRepository userRepository;
+    private CloudinaryService cloudinaryService;
+    private UserTestRepository userTestRepository;
+    private UserVocabularyRepository userVocabularyRepository;
+    private ClassMemberRepository classMemberRepository;
+    private AuthUtils authUtils;
+    private RoleRepository roleRepository;
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    public Optional<User> findById(String id) {
+        return userRepository.findById(id);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public User createUser(User user) {
+
+        // ✅ Auto avatar mặc định theo username (giống Google)
+        String defaultAvatar =
+                "https://ui-avatars.com/api/?name="
+                        + user.getUserName()
+                        + "&background=random&color=fff";
+
+        user.setAvatarUrl(defaultAvatar);
+
+        return userRepository.save(user);
+    }
+
+    public User updateUser(String id, User updatedUser, MultipartFile avatar) throws IOException {
+
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // ✅ Update thông tin profile
+        existingUser.setFullName(updatedUser.getFullName());
+        existingUser.setUserName(updatedUser.getUserName());
+        existingUser.setEmail(updatedUser.getEmail());
+
+        // ✅ Upload avatar nếu có
+        if (avatar != null && !avatar.isEmpty()) {
+            String avatarUrl = cloudinaryService.uploadImage(avatar);
+            existingUser.setAvatarUrl(avatarUrl);
+        }
+
+        return userRepository.save(existingUser);
+    }
+
+    public ProfileOverviewResponse getProfileOverview(String id) {
+        String userId = id;
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        long totalAttempts = userTestRepository.countByUserId(userId);
+        long completedAttempts = userTestRepository.countByUserIdAndStatus(userId, UserTest.Status.COMPLETED);
+        long inProgressAttempts = userTestRepository.countByUserIdAndStatus(userId, UserTest.Status.IN_PROGRESS);
+
+        Role role = roleRepository.findByRoleId(user.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        String roleName = role.getRoleName();
+
+        Integer bestScore = userTestRepository.findTopByUserIdAndStatusOrderByTotalScoreDesc(userId, UserTest.Status.COMPLETED)
+                .map(UserTest::getTotalScore)
+                .orElse(0);
+
+        Double averageScore = userTestRepository.findAverageScoreByUserIdAndStatus(userId, UserTest.Status.COMPLETED);
+        LocalDateTime lastAttemptAt = userTestRepository.findTopByUserIdOrderByStartedAtDesc(userId)
+                .map(UserTest::getStartedAt)
+                .orElse(null);
+
+        long totalVocabulary = userVocabularyRepository.countByUserId(userId);
+        long learningVocabulary = userVocabularyRepository.countByUserIdAndStatus(userId, UserVocabulary.Status.learning);
+        long masteredVocabulary = userVocabularyRepository.countByUserIdAndStatus(userId, UserVocabulary.Status.mastered);
+
+        long approvedClassCount = classMemberRepository.countByUserIdAndStatus(userId, ClassMember.MemberStatus.APPROVED);
+        long pendingClassCount = classMemberRepository.countByUserIdAndStatus(userId, ClassMember.MemberStatus.PENDING);
+
+        return ProfileOverviewResponse.builder()
+                .userId(user.getUserId())
+                .userName(user.getUserName())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .avatarUrl(user.getAvatarUrl())
+                .verified(user.getVerified())
+                .roleId(user.getRoleId())
+                .roleName(roleName)
+                .createdAt(user.getCreatedAt())
+                .testStats(ProfileOverviewResponse.TestStats.builder()
+                        .totalAttempts(totalAttempts)
+                        .completedAttempts(completedAttempts)
+                        .inProgressAttempts(inProgressAttempts)
+                        .bestScore(bestScore)
+                        .averageScore(averageScore == null ? 0D : averageScore)
+                        .lastAttemptAt(lastAttemptAt)
+                        .build())
+                .vocabularyStats(ProfileOverviewResponse.VocabularyStats.builder()
+                        .totalVocabulary(totalVocabulary)
+                        .learningVocabulary(learningVocabulary)
+                        .masteredVocabulary(masteredVocabulary)
+                        .build())
+                .classStats(ProfileOverviewResponse.ClassStats.builder()
+                        .approvedClassCount(approvedClassCount)
+                        .pendingClassCount(pendingClassCount)
+                        .build())
+                .build();
+    }
+
+    public ProfileOverviewResponse getMyProfileOverview(HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        return getProfileOverview(userId);
+    }
+
+    public Optional<User> getUserCurrent(HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        return userRepository.findById(userId);
+    }
+
+    public boolean deleteUser(String id) {
+        return userRepository.findById(id).map(user -> {
+            userRepository.delete(user);
+            return true;
+        }).orElse(false);
+    }
+
+}

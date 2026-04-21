@@ -1,0 +1,12 @@
+package com.project_exam.backend.dto.request;
+
+import lombok.Data;
+
+@Data
+public class ExamPartRequest {
+    private String examTypeId;
+    private String name;
+    private String description;
+    private Integer defaultNumQuestions;
+    private String skillId;
+}

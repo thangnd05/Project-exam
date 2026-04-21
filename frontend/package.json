@@ -25,6 +25,7 @@
     "jodit-react": "^4.1.2",
     "lucide-react": "^0.563.0",
     "normalize.css": "^8.0.1",
+    "prop-types": "^15.8.1",
     "quill": "^2.0.3",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
@@ -42,6 +43,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
+    "dev": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject"
