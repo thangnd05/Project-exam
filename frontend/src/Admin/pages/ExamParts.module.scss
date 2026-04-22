@@ -55,6 +55,12 @@
   overflow: hidden;
 }
 
+.errorText {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
 .actions {
   display: inline-flex;
   gap: 8px;

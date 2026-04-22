@@ -1,14 +1,19 @@
-import React, {useMemo, useState} from 'react';
-import {Badge, Button, Form, Modal, Table} from 'react-bootstrap';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
-import {fakeExamTypes} from '../data/fakeData';
+import {
+  createExamType,
+  deleteExamType,
+  getExamTypes,
+  updateExamType,
+} from '../../api/examTypeApi';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import ExamTypeFormModal from '../../components/modals/ExamTypeFormModal';
 import styles from './ExamTypes.module.scss';
 
 const cx = classNames.bind(styles);
-
-const scoringMethodOptions = ['DEFAULT', 'SCORE', 'BANDS'];
 
 const emptyForm = {
   name: '',
@@ -17,12 +22,31 @@ const emptyForm = {
   scoring_method: 'DEFAULT',
 };
 
+const mapExamTypeFromApi = (item) => ({
+  exam_type_id: String(item.examTypeId),
+  name: item.name || '',
+  description: item.description || '',
+  duration_minutes: item.durationMinutes || 0,
+  scoring_method: item.scoringMethod || 'DEFAULT',
+});
+
+const buildExamTypePayload = (formState) => ({
+  name: formState.name.trim(),
+  description: formState.description.trim(),
+  durationMinutes: Number(formState.duration_minutes) || 0,
+  scoringMethod: formState.scoring_method,
+});
+
 function ExamTypesManagement() {
-  const [examTypes, setExamTypes] = useState(fakeExamTypes);
+  const [examTypes, setExamTypes] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingTypeId, setEditingTypeId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [deletingExamType, setDeletingExamType] = useState(null);
 
   const filteredExamTypes = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -38,9 +62,27 @@ function ExamTypesManagement() {
     });
   }, [examTypes, searchTerm]);
 
+  const fetchExamTypes = async () => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const examTypeList = await getExamTypes();
+      setExamTypes(examTypeList.map(mapExamTypeFromApi));
+    } catch (error) {
+      setErrorMessage('Không thể tải danh sách loại kỳ thi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchExamTypes();
+  }, []);
+
   const resetForm = () => {
     setFormState(emptyForm);
     setEditingTypeId(null);
+    setErrorMessage('');
   };
 
   const openCreateModal = () => {
@@ -59,46 +101,58 @@ function ExamTypesManagement() {
     setShowFormModal(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const normalizedName = formState.name.trim();
     if (!normalizedName) {
+      setErrorMessage('Tên loại kỳ thi không được để trống.');
       return;
     }
 
-    if (editingTypeId) {
-      setExamTypes((previous) =>
-        previous.map((item) =>
-          item.exam_type_id === editingTypeId
-            ? {
-                ...item,
-                ...formState,
-                name: normalizedName,
-              }
-            : item,
-        ),
-      );
-    } else {
-      const nextId =
-        examTypes.reduce((maxId, item) => Math.max(maxId, item.exam_type_id), 0) +
-        1;
-      setExamTypes((previous) => [
-        ...previous,
-        {
-          exam_type_id: nextId,
-          ...formState,
-          name: normalizedName,
-        },
-      ]);
-    }
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      const payload = buildExamTypePayload(formState);
+      if (editingTypeId) {
+        const updatedExamType = await updateExamType(editingTypeId, payload);
+        setExamTypes((previous) =>
+          previous.map((item) =>
+            item.exam_type_id === editingTypeId
+              ? mapExamTypeFromApi(updatedExamType)
+              : item,
+          ),
+        );
+      } else {
+        const createdExamType = await createExamType(payload);
+        setExamTypes((previous) => [...previous, mapExamTypeFromApi(createdExamType)]);
+      }
 
-    setShowFormModal(false);
-    resetForm();
+      setShowFormModal(false);
+      resetForm();
+    } catch (error) {
+      setErrorMessage('Không thể lưu loại kỳ thi. Vui lòng thử lại.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = (examTypeId) => {
-    setExamTypes((previous) =>
-      previous.filter((item) => item.exam_type_id !== examTypeId),
-    );
+  const handleConfirmDelete = async () => {
+    if (!deletingExamType) {
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      await deleteExamType(deletingExamType.exam_type_id);
+      setExamTypes((previous) =>
+        previous.filter((item) => item.exam_type_id !== deletingExamType.exam_type_id),
+      );
+      setDeletingExamType(null);
+    } catch (error) {
+      setErrorMessage('Không thể xóa loại kỳ thi này.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -125,6 +179,8 @@ function ExamTypesManagement() {
         </div>
       </div>
 
+      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+
       <div className={cx('tableWrapper')}>
         <Table responsive hover>
           <thead>
@@ -138,7 +194,16 @@ function ExamTypesManagement() {
             </tr>
           </thead>
           <tbody>
-            {filteredExamTypes.map((examType) => (
+            {loading && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  <Spinner size="sm" className="me-2" />
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filteredExamTypes.map((examType) => (
               <tr key={examType.exam_type_id}>
                 <td>{examType.exam_type_id}</td>
                 <td>{examType.name}</td>
@@ -153,7 +218,7 @@ function ExamTypesManagement() {
                       <Edit size={14} />
                     </button>
                     <button
-                      onClick={() => handleDelete(examType.exam_type_id)}
+                      onClick={() => setDeletingExamType(examType)}
                       title="Xóa"
                     >
                       <Trash2 size={14} />
@@ -161,99 +226,46 @@ function ExamTypesManagement() {
                   </div>
                 </td>
               </tr>
-            ))}
+              ))}
+            {!loading && filteredExamTypes.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  Không có dữ liệu.
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
 
-      <Modal
+      <ExamTypeFormModal
         show={showFormModal}
-        onHide={() => {
+        isEditing={Boolean(editingTypeId)}
+        formState={formState}
+        onChangeField={(fieldName, value) =>
+          setFormState((previous) => ({...previous, [fieldName]: value}))
+        }
+        onClose={() => {
+          if (submitting) {
+            return;
+          }
           setShowFormModal(false);
           resetForm();
         }}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editingTypeId ? 'Cập nhật loại kỳ thi' : 'Tạo loại kỳ thi'}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Group className="mb-3">
-            <Form.Label>Tên</Form.Label>
-            <Form.Control
-              value={formState.name}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  name: event.target.value,
-                }))
-              }
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Mô tả</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={formState.description}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  description: event.target.value,
-                }))
-              }
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Thời lượng (phút)</Form.Label>
-            <Form.Control
-              type="number"
-              min={1}
-              value={formState.duration_minutes}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  duration_minutes: Number(event.target.value),
-                }))
-              }
-            />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Phương thức chấm điểm</Form.Label>
-            <Form.Select
-              value={formState.scoring_method}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  scoring_method: event.target.value,
-                }))
-              }
-            >
-              {scoringMethodOptions.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              setShowFormModal(false);
-              resetForm();
-            }}
-          >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit}>
-            {editingTypeId ? 'Lưu' : 'Tạo mới'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        onSubmit={handleSubmit}
+      />
+      <ConfirmDeleteModal
+        show={Boolean(deletingExamType)}
+        onClose={() => {
+          if (submitting) {
+            return;
+          }
+          setDeletingExamType(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Xác nhận xóa loại kỳ thi"
+        message={`Bạn có chắc muốn xóa "${deletingExamType?.name || ''}" không?`}
+      />
     </div>
   );
 }

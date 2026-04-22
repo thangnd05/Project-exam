@@ -1,9 +1,9 @@
-import React, {useMemo, useState} from 'react';
-import {Badge, Form, Table} from 'react-bootstrap';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Badge, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {KeyRound, Search, ShieldAlert} from 'lucide-react';
 
-import {fakeLoginAudit} from '../data/fakeData';
+import {getLoginAuditLogs} from '../../api/adminAuditApi';
 import styles from './AuditLogs.module.scss';
 
 const cx = classNames.bind(styles);
@@ -11,10 +11,38 @@ const cx = classNames.bind(styles);
 function LoginAudit() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [loginAuditRows, setLoginAuditRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadLoginAuditLogs = async () => {
+    setLoading(true);
+    try {
+      const response = await getLoginAuditLogs({page: 0, size: 300});
+      const rows = (response.content || []).map((item) => ({
+        id: String(item.auditLogId),
+        login_time: item.createdAt || '',
+        user_name: item.action || 'Unknown',
+        user_id: item.userId ? String(item.userId) : null,
+        ip_address: item.ipAddress || '',
+        status: item.success ? 'SUCCESS' : 'FAILED',
+        failure_reason: item.success ? '' : `HTTP ${item.statusCode || ''}`.trim(),
+        user_agent: item.userAgent || '',
+      }));
+      setLoginAuditRows(rows);
+    } catch (error) {
+      setLoginAuditRows([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLoginAuditLogs();
+  }, []);
 
   const filteredRows = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
-    return fakeLoginAudit.filter((row) => {
+    return loginAuditRows.filter((row) => {
       const matchesSearch =
         q.length === 0 ||
         (row.user_name || '').toLowerCase().includes(q) ||
@@ -30,7 +58,7 @@ function LoginAudit() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchTerm, statusFilter]);
+  }, [loginAuditRows, searchTerm, statusFilter]);
 
   return (
     <div className={cx('auditLogsPage')}>
@@ -84,7 +112,16 @@ function LoginAudit() {
             </tr>
           </thead>
           <tbody>
-            {filteredRows.map((row) => (
+            {loading && (
+              <tr>
+                <td colSpan={7} className="text-center py-4">
+                  <Spinner size="sm" className="me-2" />
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filteredRows.map((row) => (
               <tr key={row.id}>
                 <td>{row.login_time}</td>
                 <td>{row.user_name}</td>
@@ -104,8 +141,8 @@ function LoginAudit() {
                   </span>
                 </td>
               </tr>
-            ))}
-            {filteredRows.length === 0 && (
+              ))}
+            {!loading && filteredRows.length === 0 && (
               <tr>
                 <td colSpan={7}>
                   <div className={cx('emptyState')}>

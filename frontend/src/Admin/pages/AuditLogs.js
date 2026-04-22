@@ -1,9 +1,10 @@
-import React, {useMemo, useState} from 'react';
-import {Badge, Form, Table} from 'react-bootstrap';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Badge, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Search, ShieldAlert} from 'lucide-react';
 
-import {fakeAuditLogs, fakeUsers} from '../data/fakeData';
+import {getAuditLogs} from '../../api/adminAuditApi';
+import {getUsers} from '../../api/userApi';
 import styles from './AuditLogs.module.scss';
 
 const cx = classNames.bind(styles);
@@ -16,18 +17,60 @@ const methodColorMap = {
   DELETE: 'danger',
 };
 
-const getAuditActorById = (userId) => {
-  return fakeUsers.find((user) => user.user_id === userId) || null;
-};
-
 function AuditLogs() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [userMap, setUserMap] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const loadAuditData = async () => {
+    setLoading(true);
+    try {
+      const [auditResponse, userData] = await Promise.all([
+        getAuditLogs({page: 0, size: 300}),
+        getUsers(),
+      ]);
+
+      const nextUserMap = userData.reduce((accumulator, user) => {
+        const userId = String(user.userId || user.user_id);
+        return {
+          ...accumulator,
+          [userId]: user,
+        };
+      }, {});
+
+      const nextAuditLogs = (auditResponse.content || []).map((item) => ({
+        audit_log_id: String(item.auditLogId),
+        user_id: item.userId ? String(item.userId) : null,
+        http_method: item.httpMethod || '',
+        endpoint: item.endpoint || '',
+        action: item.action || '',
+        resource: item.resource || '',
+        resource_id: item.resourceId || '',
+        ip_address: item.ipAddress || '',
+        success: Boolean(item.success),
+        created_at: item.createdAt || '',
+      }));
+
+      setUserMap(nextUserMap);
+      setAuditLogs(nextAuditLogs);
+    } catch (error) {
+      setAuditLogs([]);
+      setUserMap({});
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAuditData();
+  }, []);
 
   const filteredLogs = useMemo(() => {
-    return fakeAuditLogs.filter((log) => {
+    return auditLogs.filter((log) => {
       const normalizedSearch = searchTerm.trim().toLowerCase();
-      const user = log.user_id ? getAuditActorById(log.user_id) : null;
+      const user = log.user_id ? userMap[log.user_id] : null;
 
       const matchesSearch =
         normalizedSearch.length === 0 ||
@@ -43,7 +86,7 @@ function AuditLogs() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchTerm, statusFilter]);
+  }, [auditLogs, searchTerm, statusFilter, userMap]);
 
   return (
     <div className={cx('auditLogsPage')}>
@@ -87,8 +130,17 @@ function AuditLogs() {
             </tr>
           </thead>
           <tbody>
-            {filteredLogs.map((log) => {
-              const actor = log.user_id ? getAuditActorById(log.user_id) : null;
+            {loading && (
+              <tr>
+                <td colSpan={7} className="text-center py-4">
+                  <Spinner size="sm" className="me-2" />
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filteredLogs.map((log) => {
+              const actor = log.user_id ? userMap[log.user_id] : null;
               return (
                 <tr key={log.audit_log_id}>
                   <td>{log.created_at}</td>
@@ -105,7 +157,7 @@ function AuditLogs() {
                     {log.resource}
                     {log.resource_id ? ` #${log.resource_id}` : ''}
                   </td>
-                  <td>{actor?.full_name || 'Unknown'}</td>
+                  <td>{actor?.fullName || actor?.full_name || 'Unknown'}</td>
                   <td>{log.ip_address || '-'}</td>
                   <td>
                     <Badge bg={log.success ? 'success' : 'danger'}>
@@ -115,7 +167,7 @@ function AuditLogs() {
                 </tr>
               );
             })}
-            {filteredLogs.length === 0 && (
+            {!loading && filteredLogs.length === 0 && (
               <tr>
                 <td colSpan={7}>
                   <div className={cx('emptyState')}>

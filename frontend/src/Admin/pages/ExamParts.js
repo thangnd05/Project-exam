@@ -1,9 +1,12 @@
-import React, {useMemo, useState} from 'react';
-import {Badge, Button, Form, Modal, Table} from 'react-bootstrap';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
-import {fakeExamParts, fakeExamTypes, fakeSkills} from '../data/fakeData';
+import {createExamPart, deleteExamPart, getExamParts, updateExamPart} from '../../api/examPartApi';
+import {getExamTypes} from '../../api/examTypeApi';
+import {getSkills} from '../../api/skillApi';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import styles from './ExamParts.module.scss';
 
 const cx = classNames.bind(styles);
@@ -14,20 +17,39 @@ const emptyForm = {
   name: '',
   description: '',
   default_num_questions: 1,
-  has_passage: false,
-};
-
-const scoringLabelMap = {
-  1: 'Có',
-  0: 'Không',
 };
 
 function ExamPartsManagement() {
-  const [examParts, setExamParts] = useState(fakeExamParts);
+  const [examParts, setExamParts] = useState([]);
+  const [examTypes, setExamTypes] = useState([]);
+  const [skills, setSkills] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingPartId, setEditingPartId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [deletingExamPart, setDeletingExamPart] = useState(null);
+
+  const mapExamPartFromApi = (item) => ({
+    exam_part_id: String(item.examPartId),
+    exam_type_id: String(item.examTypeId),
+    skill_id: item.skillId ? String(item.skillId) : null,
+    name: item.name || '',
+    description: item.description || '',
+    default_num_questions: item.defaultNumQuestions || 0,
+  });
+
+  const mapExamTypeFromApi = (item) => ({
+    exam_type_id: String(item.examTypeId),
+    name: item.name || '',
+  });
+
+  const mapSkillFromApi = (item) => ({
+    skill_id: String(item.skillId),
+    name: item.name || '',
+  });
 
   const filteredExamParts = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -37,15 +59,37 @@ function ExamPartsManagement() {
 
     return examParts.filter((examPart) => {
       const examTypeName =
-        fakeExamTypes.find((item) => item.exam_type_id === examPart.exam_type_id)
-          ?.name || '';
+        examTypes.find((item) => item.exam_type_id === examPart.exam_type_id)?.name || '';
       return (
         examPart.name.toLowerCase().includes(keyword) ||
         (examPart.description || '').toLowerCase().includes(keyword) ||
         examTypeName.toLowerCase().includes(keyword)
       );
     });
-  }, [examParts, searchTerm]);
+  }, [examParts, examTypes, searchTerm]);
+
+  const loadData = async () => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const [examPartData, examTypeData, skillData] = await Promise.all([
+        getExamParts(),
+        getExamTypes(),
+        getSkills(),
+      ]);
+      setExamParts(examPartData.map(mapExamPartFromApi));
+      setExamTypes(examTypeData.map(mapExamTypeFromApi));
+      setSkills(skillData.map(mapSkillFromApi));
+    } catch (error) {
+      setErrorMessage('Không thể tải dữ liệu phần thi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const resetForm = () => {
     setEditingPartId(null);
@@ -65,55 +109,71 @@ function ExamPartsManagement() {
       name: examPart.name,
       description: examPart.description || '',
       default_num_questions: examPart.default_num_questions || 1,
-      has_passage: Boolean(examPart.has_passage),
     });
     setShowFormModal(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const normalizedName = formState.name.trim();
     if (!normalizedName || !formState.exam_type_id) {
+      setErrorMessage('Vui lòng nhập đầy đủ dữ liệu phần thi.');
       return;
     }
 
     const payload = {
-      ...formState,
+      examTypeId: formState.exam_type_id,
+      skillId: formState.skill_id || null,
       name: normalizedName,
-      exam_type_id: Number(formState.exam_type_id),
-      skill_id: formState.skill_id ? Number(formState.skill_id) : null,
-      default_num_questions: Number(formState.default_num_questions),
-      has_passage: formState.has_passage ? 1 : 0,
+      description: formState.description.trim(),
+      defaultNumQuestions: Number(formState.default_num_questions),
     };
 
-    if (editingPartId) {
-      setExamParts((previous) =>
-        previous.map((item) =>
-          item.exam_part_id === editingPartId ? {...item, ...payload} : item,
-        ),
-      );
-    } else {
-      const nextId =
-        examParts.reduce((maxId, item) => Math.max(maxId, item.exam_part_id), 0) +
-        1;
-      setExamParts((previous) => [
-        ...previous,
-        {exam_part_id: nextId, ...payload},
-      ]);
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      if (editingPartId) {
+        const updatedPart = await updateExamPart(editingPartId, payload);
+        setExamParts((previous) =>
+          previous.map((item) =>
+            item.exam_part_id === editingPartId ? mapExamPartFromApi(updatedPart) : item,
+          ),
+        );
+      } else {
+        const createdPart = await createExamPart(payload);
+        setExamParts((previous) => [...previous, mapExamPartFromApi(createdPart)]);
+      }
+      setShowFormModal(false);
+      resetForm();
+    } catch (error) {
+      setErrorMessage('Không thể lưu phần thi. Vui lòng thử lại.');
+    } finally {
+      setSubmitting(false);
     }
-
-    setShowFormModal(false);
-    resetForm();
   };
 
-  const handleDelete = (examPartId) => {
-    setExamParts((previous) =>
-      previous.filter((item) => item.exam_part_id !== examPartId),
-    );
+  const handleDelete = async () => {
+    if (!deletingExamPart) {
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      await deleteExamPart(deletingExamPart.exam_part_id);
+      setExamParts((previous) =>
+        previous.filter((item) => item.exam_part_id !== deletingExamPart.exam_part_id),
+      );
+      setDeletingExamPart(null);
+    } catch (error) {
+      setErrorMessage('Không thể xóa phần thi.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const getExamTypeName = (examTypeId) => {
     return (
-      fakeExamTypes.find((examType) => examType.exam_type_id === examTypeId)?.name ||
+      examTypes.find((examType) => examType.exam_type_id === examTypeId)?.name ||
       'Không xác định'
     );
   };
@@ -122,7 +182,7 @@ function ExamPartsManagement() {
     if (!skillId) {
       return '-';
     }
-    return fakeSkills.find((skill) => skill.skill_id === skillId)?.name || '-';
+    return skills.find((skill) => skill.skill_id === skillId)?.name || '-';
   };
 
   return (
@@ -148,6 +208,7 @@ function ExamPartsManagement() {
           />
         </div>
       </div>
+      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
 
       <div className={cx('tableWrapper')}>
         <Table responsive hover>
@@ -158,12 +219,20 @@ function ExamPartsManagement() {
               <th>Loại kỳ thi</th>
               <th>Skill</th>
               <th>Số câu mặc định</th>
-              <th>Có passage</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {filteredExamParts.map((examPart) => (
+            {loading && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  <Spinner size="sm" className="me-2" />
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filteredExamParts.map((examPart) => (
               <tr key={examPart.exam_part_id}>
                 <td>{examPart.exam_part_id}</td>
                 <td>{examPart.name}</td>
@@ -171,17 +240,12 @@ function ExamPartsManagement() {
                 <td>{getSkillName(examPart.skill_id)}</td>
                 <td>{examPart.default_num_questions}</td>
                 <td>
-                  <Badge bg={examPart.has_passage ? 'success' : 'secondary'}>
-                    {scoringLabelMap[examPart.has_passage]}
-                  </Badge>
-                </td>
-                <td>
                   <div className={cx('actions')}>
                     <button onClick={() => openEditModal(examPart)} title="Sửa">
                       <Edit size={14} />
                     </button>
                     <button
-                      onClick={() => handleDelete(examPart.exam_part_id)}
+                      onClick={() => setDeletingExamPart(examPart)}
                       title="Xóa"
                     >
                       <Trash2 size={14} />
@@ -189,7 +253,14 @@ function ExamPartsManagement() {
                   </div>
                 </td>
               </tr>
-            ))}
+              ))}
+            {!loading && filteredExamParts.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  Không có dữ liệu.
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
@@ -220,7 +291,7 @@ function ExamPartsManagement() {
               }
             >
               <option value="">Chọn loại kỳ thi</option>
-              {fakeExamTypes.map((item) => (
+              {examTypes.map((item) => (
                 <option key={item.exam_type_id} value={item.exam_type_id}>
                   {item.name}
                 </option>
@@ -251,7 +322,7 @@ function ExamPartsManagement() {
               }
             >
               <option value="">Không gán skill</option>
-              {fakeSkills.map((item) => (
+              {skills.map((item) => (
                 <option key={item.skill_id} value={item.skill_id}>
                   {item.name}
                 </option>
@@ -286,22 +357,14 @@ function ExamPartsManagement() {
               }
             />
           </Form.Group>
-          <Form.Check
-            type="checkbox"
-            label="Có passage"
-            checked={formState.has_passage}
-            onChange={(event) =>
-              setFormState((previous) => ({
-                ...previous,
-                has_passage: event.target.checked,
-              }))
-            }
-          />
         </Modal.Body>
         <Modal.Footer>
           <Button
             variant="secondary"
             onClick={() => {
+              if (submitting) {
+                return;
+              }
               setShowFormModal(false);
               resetForm();
             }}
@@ -313,6 +376,18 @@ function ExamPartsManagement() {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ConfirmDeleteModal
+        show={Boolean(deletingExamPart)}
+        onClose={() => {
+          if (submitting) {
+            return;
+          }
+          setDeletingExamPart(null);
+        }}
+        onConfirm={handleDelete}
+        title="Xác nhận xóa phần thi"
+        message={`Bạn có chắc muốn xóa "${deletingExamPart?.name || ''}" không?`}
+      />
     </div>
   );
 }

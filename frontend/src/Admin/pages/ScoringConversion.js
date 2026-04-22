@@ -1,19 +1,19 @@
-import React, {useMemo, useRef, useState} from 'react';
-import {Button, Form, Table} from 'react-bootstrap';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Download, Plus, Search, Trash2, Upload} from 'lucide-react';
 
-import {fakeExamTypes, fakeSkills} from '../data/fakeData';
+import {getExamTypes} from '../../api/examTypeApi';
+import {
+  createScoringConversion,
+  deleteScoringConversion,
+  getScoringConversions,
+} from '../../api/scoringConversionApi';
+import {getSkills} from '../../api/skillApi';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import styles from './ScoringConversion.module.scss';
 
 const cx = classNames.bind(styles);
-
-const initialScoringRules = [
-  {conversion_id: 1, exam_type_id: 1, skill_id: 4, num_correct: 30, converted_score: 7},
-  {conversion_id: 2, exam_type_id: 1, skill_id: 5, num_correct: 32, converted_score: 7},
-  {conversion_id: 3, exam_type_id: 3, skill_id: 4, num_correct: 75, converted_score: 380},
-  {conversion_id: 4, exam_type_id: 3, skill_id: 5, num_correct: 78, converted_score: 400},
-];
 
 const defaultFormState = {
   exam_type_id: '',
@@ -23,22 +23,68 @@ const defaultFormState = {
 };
 
 function ScoringConversionManagement() {
-  const [scoringRules, setScoringRules] = useState(initialScoringRules);
+  const [scoringRules, setScoringRules] = useState([]);
+  const [examTypes, setExamTypes] = useState([]);
+  const [skills, setSkills] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [skillFilter, setSkillFilter] = useState('all');
   const [formState, setFormState] = useState(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
   const importInputRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [deletingRule, setDeletingRule] = useState(null);
+
+  const mapExamTypeFromApi = (item) => ({
+    exam_type_id: String(item.examTypeId),
+    name: item.name || '',
+  });
+
+  const mapSkillFromApi = (item) => ({
+    skill_id: String(item.skillId),
+    name: item.name || '',
+  });
+
+  const mapScoringRuleFromApi = (item) => ({
+    conversion_id: String(item.conversionId),
+    exam_type_id: String(item.examTypeId),
+    skill_id: String(item.skillId),
+    num_correct: item.numCorrect || 0,
+    converted_score: item.convertedScore || 0,
+  });
+
+  const loadScoringData = async () => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const [scoringData, examTypeData, skillData] = await Promise.all([
+        getScoringConversions(),
+        getExamTypes(),
+        getSkills(),
+      ]);
+      setScoringRules(scoringData.map(mapScoringRuleFromApi));
+      setExamTypes(examTypeData.map(mapExamTypeFromApi));
+      setSkills(skillData.map(mapSkillFromApi));
+    } catch (error) {
+      setErrorMessage('Không thể tải dữ liệu quy đổi điểm.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadScoringData();
+  }, []);
 
   const filteredRules = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
     return scoringRules.filter((rule) => {
       const examTypeName =
-        fakeExamTypes.find((examType) => examType.exam_type_id === rule.exam_type_id)
-          ?.name || '';
+        examTypes.find((examType) => examType.exam_type_id === rule.exam_type_id)?.name ||
+        '';
       const skillName =
-        fakeSkills.find((skill) => skill.skill_id === rule.skill_id)?.name || '';
+        skills.find((skill) => skill.skill_id === rule.skill_id)?.name || '';
 
       const matchExamType =
         examTypeFilter === 'all' || String(rule.exam_type_id) === examTypeFilter;
@@ -52,16 +98,16 @@ function ScoringConversionManagement() {
 
       return matchExamType && matchSkill && matchKeyword;
     });
-  }, [examTypeFilter, keyword, scoringRules, skillFilter]);
+  }, [examTypeFilter, examTypes, keyword, scoringRules, skillFilter, skills]);
 
   const getExamTypeName = (examTypeId) => {
     return (
-      fakeExamTypes.find((examType) => examType.exam_type_id === examTypeId)?.name || '-'
+      examTypes.find((examType) => examType.exam_type_id === examTypeId)?.name || '-'
     );
   };
 
   const getSkillName = (skillId) => {
-    return fakeSkills.find((skill) => skill.skill_id === skillId)?.name || '-';
+    return skills.find((skill) => skill.skill_id === skillId)?.name || '-';
   };
 
   const isDuplicateRule = (examTypeId, skillId, numCorrect) => {
@@ -78,9 +124,9 @@ function ScoringConversionManagement() {
     setErrorMessage('');
   };
 
-  const handleAddRule = () => {
-    const examTypeId = Number(formState.exam_type_id);
-    const skillId = Number(formState.skill_id);
+  const handleAddRule = async () => {
+    const examTypeId = formState.exam_type_id;
+    const skillId = formState.skill_id;
     const numCorrect = Number(formState.num_correct);
     const convertedScore = Number(formState.converted_score);
 
@@ -94,29 +140,43 @@ function ScoringConversionManagement() {
       return;
     }
 
-    const nextConversionId =
-      scoringRules.reduce(
-        (maxConversionId, rule) => Math.max(maxConversionId, rule.conversion_id),
-        0,
-      ) + 1;
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      const createdRule = await createScoringConversion({
+        examTypeId,
+        skillId,
+        numCorrect: numCorrect,
+        convertedScore: convertedScore,
+      });
 
-    setScoringRules((previous) => [
-      ...previous,
-      {
-        conversion_id: nextConversionId,
-        exam_type_id: examTypeId,
-        skill_id: skillId,
-        num_correct: numCorrect,
-        converted_score: convertedScore,
-      },
-    ]);
-    resetForm();
+      setScoringRules((previous) => [...previous, mapScoringRuleFromApi(createdRule)]);
+      resetForm();
+    } catch (error) {
+      setErrorMessage('Không thể thêm cấu hình quy đổi.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDeleteRule = (conversionId) => {
-    setScoringRules((previous) =>
-      previous.filter((rule) => rule.conversion_id !== conversionId),
-    );
+  const handleDeleteRule = async () => {
+    if (!deletingRule) {
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      await deleteScoringConversion(deletingRule.conversion_id);
+      setScoringRules((previous) =>
+        previous.filter((rule) => rule.conversion_id !== deletingRule.conversion_id),
+      );
+      setDeletingRule(null);
+    } catch (error) {
+      setErrorMessage('Không thể xóa cấu hình quy đổi.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleExport = () => {
@@ -212,7 +272,7 @@ function ScoringConversionManagement() {
           onChange={(event) => setExamTypeFilter(event.target.value)}
         >
           <option value="all">Tất cả loại kỳ thi</option>
-          {fakeExamTypes.map((examType) => (
+          {examTypes.map((examType) => (
             <option key={examType.exam_type_id} value={examType.exam_type_id}>
               {examType.name}
             </option>
@@ -220,7 +280,7 @@ function ScoringConversionManagement() {
         </Form.Select>
         <Form.Select value={skillFilter} onChange={(event) => setSkillFilter(event.target.value)}>
           <option value="all">Tất cả kỹ năng</option>
-          {fakeSkills.map((skill) => (
+          {skills.map((skill) => (
             <option key={skill.skill_id} value={skill.skill_id}>
               {skill.name}
             </option>
@@ -238,7 +298,7 @@ function ScoringConversionManagement() {
             }
           >
             <option value="">Chọn loại kỳ thi</option>
-            {fakeExamTypes.map((examType) => (
+            {examTypes.map((examType) => (
               <option key={examType.exam_type_id} value={examType.exam_type_id}>
                 {examType.name}
               </option>
@@ -251,7 +311,7 @@ function ScoringConversionManagement() {
             }
           >
             <option value="">Chọn kỹ năng</option>
-            {fakeSkills.map((skill) => (
+            {skills.map((skill) => (
               <option key={skill.skill_id} value={skill.skill_id}>
                 {skill.name}
               </option>
@@ -297,7 +357,16 @@ function ScoringConversionManagement() {
             </tr>
           </thead>
           <tbody>
-            {filteredRules.map((rule) => (
+            {loading && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  <Spinner size="sm" className="me-2" />
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filteredRules.map((rule) => (
               <tr key={rule.conversion_id}>
                 <td>{rule.conversion_id}</td>
                 <td>{getExamTypeName(rule.exam_type_id)}</td>
@@ -308,16 +377,35 @@ function ScoringConversionManagement() {
                   <button
                     className={cx('deleteButton')}
                     title="Xóa"
-                    onClick={() => handleDeleteRule(rule.conversion_id)}
+                    onClick={() => setDeletingRule(rule)}
                   >
                     <Trash2 size={14} />
                   </button>
                 </td>
               </tr>
-            ))}
+              ))}
+            {!loading && filteredRules.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  Không có dữ liệu.
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
+      <ConfirmDeleteModal
+        show={Boolean(deletingRule)}
+        onClose={() => {
+          if (submitting) {
+            return;
+          }
+          setDeletingRule(null);
+        }}
+        onConfirm={handleDeleteRule}
+        title="Xác nhận xóa quy đổi"
+        message="Bạn có chắc muốn xóa cấu hình quy đổi này không?"
+      />
     </div>
   );
 }

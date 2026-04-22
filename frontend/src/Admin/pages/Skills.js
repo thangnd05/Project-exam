@@ -1,9 +1,10 @@
-import React, {useMemo, useState} from 'react';
-import {Button, Form, Modal, Table} from 'react-bootstrap';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
-import {fakeSkills} from '../data/fakeData';
+import {createSkill, deleteSkill, getSkills, updateSkill} from '../../api/skillApi';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import styles from './Skills.module.scss';
 
 const cx = classNames.bind(styles);
@@ -14,12 +15,38 @@ const defaultFormState = {
 };
 
 function SkillsManagement() {
-  const [skillList, setSkillList] = useState(fakeSkills);
+  const [skillList, setSkillList] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingSkillId, setEditingSkillId] = useState(null);
   const [formState, setFormState] = useState(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [deletingSkill, setDeletingSkill] = useState(null);
+
+  const mapSkillFromApi = (skill) => ({
+    skill_id: String(skill.skillId),
+    name: skill.name || '',
+    description: skill.description || '',
+  });
+
+  const loadSkills = async () => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const skillData = await getSkills();
+      setSkillList(skillData.map(mapSkillFromApi));
+    } catch (error) {
+      setErrorMessage('Không thể tải danh sách kỹ năng.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSkills();
+  }, []);
 
   const filteredSkills = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -65,7 +92,7 @@ function SkillsManagement() {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const normalizedName = formState.name.trim();
     if (!normalizedName) {
       setErrorMessage('Tên kỹ năng không được để trống.');
@@ -77,38 +104,53 @@ function SkillsManagement() {
       return;
     }
 
-    if (editingSkillId) {
-      setSkillList((previous) =>
-        previous.map((skill) =>
-          skill.skill_id === editingSkillId
-            ? {
-                ...skill,
-                name: normalizedName,
-                description: formState.description.trim(),
-              }
-            : skill,
-        ),
-      );
-    } else {
-      const nextSkillId =
-        skillList.reduce((maxSkillId, skill) => Math.max(maxSkillId, skill.skill_id), 0) +
-        1;
-      setSkillList((previous) => [
-        ...previous,
-        {
-          skill_id: nextSkillId,
-          name: normalizedName,
-          description: formState.description.trim(),
-        },
-      ]);
-    }
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      const payload = {
+        name: normalizedName,
+        description: formState.description.trim(),
+      };
 
-    setShowModal(false);
-    resetForm();
+      if (editingSkillId) {
+        const updatedSkill = await updateSkill(editingSkillId, payload);
+        setSkillList((previous) =>
+          previous.map((skill) =>
+            skill.skill_id === editingSkillId ? mapSkillFromApi(updatedSkill) : skill,
+          ),
+        );
+      } else {
+        const createdSkill = await createSkill(payload);
+        setSkillList((previous) => [...previous, mapSkillFromApi(createdSkill)]);
+      }
+
+      setShowModal(false);
+      resetForm();
+    } catch (error) {
+      setErrorMessage('Không thể lưu kỹ năng. Vui lòng thử lại.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = (skillId) => {
-    setSkillList((previous) => previous.filter((skill) => skill.skill_id !== skillId));
+  const handleDelete = async () => {
+    if (!deletingSkill) {
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      await deleteSkill(deletingSkill.skill_id);
+      setSkillList((previous) =>
+        previous.filter((skill) => skill.skill_id !== deletingSkill.skill_id),
+      );
+      setDeletingSkill(null);
+    } catch (error) {
+      setErrorMessage('Không thể xóa kỹ năng.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -132,6 +174,7 @@ function SkillsManagement() {
           placeholder="Tìm theo tên kỹ năng hoặc mô tả..."
         />
       </div>
+      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
 
       <div className={cx('tableWrapper')}>
         <Table responsive hover>
@@ -144,7 +187,16 @@ function SkillsManagement() {
             </tr>
           </thead>
           <tbody>
-            {filteredSkills.map((skill) => (
+            {loading && (
+              <tr>
+                <td colSpan={4} className="text-center py-4">
+                  <Spinner size="sm" className="me-2" />
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filteredSkills.map((skill) => (
               <tr key={skill.skill_id}>
                 <td>{skill.skill_id}</td>
                 <td>{skill.name}</td>
@@ -154,13 +206,20 @@ function SkillsManagement() {
                     <button title="Sửa" onClick={() => openEditModal(skill)}>
                       <Edit size={14} />
                     </button>
-                    <button title="Xóa" onClick={() => handleDelete(skill.skill_id)}>
+                    <button title="Xóa" onClick={() => setDeletingSkill(skill)}>
                       <Trash2 size={14} />
                     </button>
                   </div>
                 </td>
               </tr>
-            ))}
+              ))}
+            {!loading && filteredSkills.length === 0 && (
+              <tr>
+                <td colSpan={4} className="text-center py-4">
+                  Không có dữ liệu.
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
@@ -206,6 +265,9 @@ function SkillsManagement() {
           <Button
             variant="secondary"
             onClick={() => {
+              if (submitting) {
+                return;
+              }
               setShowModal(false);
               resetForm();
             }}
@@ -215,6 +277,18 @@ function SkillsManagement() {
           <Button onClick={handleSubmit}>{editingSkillId ? 'Lưu' : 'Tạo mới'}</Button>
         </Modal.Footer>
       </Modal>
+      <ConfirmDeleteModal
+        show={Boolean(deletingSkill)}
+        onClose={() => {
+          if (submitting) {
+            return;
+          }
+          setDeletingSkill(null);
+        }}
+        onConfirm={handleDelete}
+        title="Xác nhận xóa kỹ năng"
+        message={`Bạn có chắc muốn xóa "${deletingSkill?.name || ''}" không?`}
+      />
     </div>
   );
 }

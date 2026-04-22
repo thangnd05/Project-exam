@@ -1,9 +1,10 @@
-import React, {useMemo, useState} from 'react';
-import {Badge, Button, Form, Modal, Table} from 'react-bootstrap';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Badge, Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
-import {roles as roleSeedData} from '../data/fakeData';
+import {createRole, deleteRole, getRoles, updateRole} from '../../api/roleApi';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import styles from './Roles.module.scss';
 
 const cx = classNames.bind(styles);
@@ -14,11 +15,38 @@ const emptyForm = {
 };
 
 function RolesManagement() {
-  const [roleList, setRoleList] = useState(roleSeedData);
+  const [roleList, setRoleList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingRoleId, setEditingRoleId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [deletingRole, setDeletingRole] = useState(null);
+
+  const mapRoleFromApi = (role) => ({
+    role_id: String(role.roleId),
+    role_name: role.roleName || '',
+    description: role.description || '',
+  });
+
+  const loadRoles = async () => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const roleData = await getRoles();
+      setRoleList(roleData.map(mapRoleFromApi));
+    } catch (error) {
+      setErrorMessage('Không thể tải danh sách vai trò.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadRoles();
+  }, []);
 
   const filteredRoles = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -44,7 +72,7 @@ function RolesManagement() {
   };
 
   const openEditModal = (role) => {
-    setEditingRoleId(role.role_id);
+    setEditingRoleId(role.roleId);
     setFormState({
       role_name: role.role_name,
       description: role.description || '',
@@ -52,44 +80,60 @@ function RolesManagement() {
     setShowFormModal(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const normalizedRoleName = formState.role_name.trim().toUpperCase();
     const normalizedDescription = formState.description.trim();
     if (!normalizedRoleName) {
+      setErrorMessage('Tên vai trò không được để trống.');
       return;
     }
 
-    if (editingRoleId) {
-      setRoleList((previous) =>
-        previous.map((role) =>
-          role.role_id === editingRoleId
-            ? {
-                ...role,
-                role_name: normalizedRoleName,
-                description: normalizedDescription,
-              }
-            : role,
-        ),
-      );
-    } else {
-      const nextRoleId =
-        roleList.reduce((maxId, role) => Math.max(maxId, role.role_id), 0) + 1;
-      setRoleList((previous) => [
-        ...previous,
-        {
-          role_id: nextRoleId,
-          role_name: normalizedRoleName,
-          description: normalizedDescription,
-        },
-      ]);
-    }
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      const payload = {
+        roleName: normalizedRoleName,
+        description: normalizedDescription,
+      };
 
-    setShowFormModal(false);
-    resetForm();
+      if (editingRoleId) {
+        const updatedRole = await updateRole(editingRoleId, payload);
+        setRoleList((previous) =>
+          previous.map((role) =>
+            role.roleId === editingRoleId ? mapRoleFromApi(updatedRole) : role,
+          ),
+        );
+      } else {
+        const createdRole = await createRole(payload);
+        setRoleList((previous) => [...previous, mapRoleFromApi(createdRole)]);
+      }
+
+      setShowFormModal(false);
+      resetForm();
+    } catch (error) {
+      setErrorMessage('Không thể lưu vai trò.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = (roleId) => {
-    setRoleList((previous) => previous.filter((role) => role.role_id !== roleId));
+  const handleDelete = async () => {
+    if (!deletingRole) {
+      return;
+    }
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      await deleteRole(deletingRole.role_id);
+      setRoleList((previous) =>
+        previous.filter((role) => role.role_id !== deletingRole.role_id),
+      );
+      setDeletingRole(null);
+    } catch (error) {
+      setErrorMessage('Không thể xóa vai trò.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -115,6 +159,7 @@ function RolesManagement() {
           />
         </div>
       </div>
+      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
 
       <div className={cx('tableWrapper')}>
         <Table responsive hover>
@@ -127,7 +172,16 @@ function RolesManagement() {
             </tr>
           </thead>
           <tbody>
-            {filteredRoles.map((role) => (
+            {loading && (
+              <tr>
+                <td colSpan={4} className="text-center py-4">
+                  <Spinner size="sm" className="me-2" />
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filteredRoles.map((role) => (
               <tr key={role.role_id}>
                 <td>{role.role_id}</td>
                 <td>
@@ -140,7 +194,7 @@ function RolesManagement() {
                       <Edit size={14} />
                     </button>
                     <button
-                      onClick={() => handleDelete(role.role_id)}
+                      onClick={() => setDeletingRole(role)}
                       title="Xóa vai trò"
                     >
                       <Trash2 size={14} />
@@ -148,7 +202,14 @@ function RolesManagement() {
                   </div>
                 </td>
               </tr>
-            ))}
+              ))}
+            {!loading && filteredRoles.length === 0 && (
+              <tr>
+                <td colSpan={4} className="text-center py-4">
+                  Không có dữ liệu.
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
@@ -199,6 +260,9 @@ function RolesManagement() {
           <Button
             variant="secondary"
             onClick={() => {
+              if (submitting) {
+                return;
+              }
               setShowFormModal(false);
               resetForm();
             }}
@@ -210,6 +274,18 @@ function RolesManagement() {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ConfirmDeleteModal
+        show={Boolean(deletingRole)}
+        onClose={() => {
+          if (submitting) {
+            return;
+          }
+          setDeletingRole(null);
+        }}
+        onConfirm={handleDelete}
+        title="Xác nhận xóa vai trò"
+        message={`Bạn có chắc muốn xóa "${deletingRole?.role_name || ''}" không?`}
+      />
     </div>
   );
 }
