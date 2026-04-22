@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_ADMIN_URL = '/api/admin';
+const BASE_AUDIT_URL = '/api/audits';
 
 const buildParams = (params) => {
   const query = new URLSearchParams();
@@ -16,13 +16,13 @@ const buildParams = (params) => {
 export const getAuditLogs = ({page = 0, size = 100, userId} = {}) => {
   const queryString = buildParams({page, size, userId});
   return axios
-    .get(`${BASE_ADMIN_URL}/audits${queryString ? `?${queryString}` : ''}`)
+    .get(`${BASE_AUDIT_URL}${queryString ? `?${queryString}` : ''}`)
     .then((response) => response.data);
 };
 
 export const getLoginAuditLogs = ({page = 0, size = 100, userId} = {}) => {
   const queryString = buildParams({page, size, userId});
   return axios
-    .get(`${BASE_ADMIN_URL}/login-audits${queryString ? `?${queryString}` : ''}`)
+    .get(`${BASE_AUDIT_URL}/login${queryString ? `?${queryString}` : ''}`)
     .then((response) => response.data);
 };

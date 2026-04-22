@@ -40,6 +40,8 @@ const normalizeUser = (user) => ({
 
 function UsersManagement() {
   const [users, setUsers] = useState([]);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [roles, setRoles] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
@@ -51,12 +53,9 @@ function UsersManagement() {
   const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      setErrorMessage('');
+    const loadRoles = async () => {
       try {
-        const [usersData, rolesData] = await Promise.all([getUsers(), getRoles()]);
-        setUsers(usersData.map(normalizeUser));
+        const rolesData = await getRoles();
         setRoles(
           rolesData.map((role) => ({
             role_id: String(role.roleId),
@@ -65,14 +64,45 @@ function UsersManagement() {
           })),
         );
       } catch (error) {
+        setErrorMessage('Không thể tải danh sách vai trò.');
+      }
+    };
+
+    loadRoles();
+  }, []);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      setLoading(true);
+      setErrorMessage('');
+      try {
+        const verifiedFilter =
+          statusFilter === 'verified'
+            ? true
+            : statusFilter === 'unverified'
+              ? false
+              : undefined;
+
+        const userPage = await getUsers({
+          page: Math.max(currentPage - 1, 0),
+          size: ITEMS_PER_PAGE,
+          keyword: searchTerm,
+          roleId: roleFilter,
+          verified: verifiedFilter,
+        });
+
+        setUsers((userPage.content || []).map(normalizeUser));
+        setTotalElements(userPage.totalElements || 0);
+        setTotalPages(Math.max(userPage.totalPages || 1, 1));
+      } catch (error) {
         setErrorMessage('Không thể tải danh sách người dùng.');
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
-  }, []);
+    loadUsers();
+  }, [currentPage, roleFilter, searchTerm, statusFilter]);
 
   const roleNameById = useMemo(() => {
     const roleMap = {};
@@ -82,33 +112,14 @@ function UsersManagement() {
     return roleMap;
   }, [roles]);
 
-  const filteredUsers = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-    return users.filter((user) => {
-      const matchesSearch =
-        user.full_name.toLowerCase().includes(normalizedSearch) ||
-        user.email.toLowerCase().includes(normalizedSearch) ||
-        user.user_name.toLowerCase().includes(normalizedSearch);
-      const matchesRole = roleFilter === 'all' || user.role_id === roleFilter;
-      const matchesStatus =
-        statusFilter === 'all' ||
-        (statusFilter === 'verified' && user.verified === true) ||
-        (statusFilter === 'unverified' && user.verified === false);
-      return matchesSearch && matchesRole && matchesStatus;
-    });
-  }, [users, roleFilter, statusFilter, searchTerm]);
-
-  const totalUsers = users.length;
+  const totalUsers = totalElements;
   const totalTeachers = users.filter(
     (user) => roleNameById[user.role_id] === 'TEACHER',
   ).length;
   const verifiedUsers = users.filter((user) => user.verified === true).length;
-
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
-  const indexOfLastItem = safeCurrentPage * ITEMS_PER_PAGE;
-  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
-  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const indexOfFirstItem = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
+  const indexOfLastItem = indexOfFirstItem + users.length;
 
   const handleDeleteUser = async () => {
     if (!userToDelete) {
@@ -118,9 +129,8 @@ function UsersManagement() {
     setErrorMessage('');
     try {
       await deleteUser(userToDelete.user_id);
-      setUsers((previous) =>
-        previous.filter((user) => user.user_id !== userToDelete.user_id),
-      );
+      setUsers((previous) => previous.filter((user) => user.user_id !== userToDelete.user_id));
+      setTotalElements((previous) => Math.max(previous - 1, 0));
       setUserToDelete(null);
     } catch (error) {
       setErrorMessage('Không thể xóa người dùng.');
@@ -287,7 +297,7 @@ function UsersManagement() {
                 </tr>
               ) : null}
               {!loading &&
-                currentUsers.map((user) => {
+                users.map((user) => {
                   const roleName = roleNameById[user.role_id] || 'USER';
                   return (
                     <tr key={user.user_id}>
@@ -338,7 +348,7 @@ function UsersManagement() {
                     </tr>
                   );
                 })}
-              {!loading && currentUsers.length === 0 ? (
+              {!loading && users.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="text-center py-4">
                     Không có dữ liệu.
@@ -351,8 +361,8 @@ function UsersManagement() {
 
         <div className={cx('pagination')}>
           <span className={cx('paginationInfo')}>
-            Hiển thị {filteredUsers.length === 0 ? 0 : indexOfFirstItem + 1}-
-            {Math.min(indexOfLastItem, filteredUsers.length)} trong {filteredUsers.length}{' '}
+            Hiển thị {totalElements === 0 ? 0 : indexOfFirstItem + 1}-
+            {totalElements === 0 ? 0 : indexOfLastItem} trong {totalElements}{' '}
             người dùng
           </span>
           <div className={cx('paginationBtns')}>

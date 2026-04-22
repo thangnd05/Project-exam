@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 public class AuditLogResponse {
     private String auditLogId;
     private String userId;
+    private String userName;
+    private String fullName;
     private String httpMethod;
     private String endpoint;
     private String action;

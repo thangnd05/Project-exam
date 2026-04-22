@@ -1,6 +1,7 @@
 package com.project_exam.backend.controllers;
 
 import com.project_exam.backend.dto.response.ProfileOverviewResponse;
+import com.project_exam.backend.dto.response.UserPageResponse;
 import com.project_exam.backend.models.User;
 import com.project_exam.backend.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +27,17 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.findAll());
+    }
+
+    @GetMapping("/paged")
+    public ResponseEntity<UserPageResponse> getUsersPaged(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String roleId,
+            @RequestParam(required = false) Boolean verified
+    ) {
+        return ResponseEntity.ok(userService.findAllPaged(page, size, keyword, roleId, verified));
     }
 
     // Lấy user theo id

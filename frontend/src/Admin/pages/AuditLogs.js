@@ -1,10 +1,9 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Search, ShieldAlert} from 'lucide-react';
+import {ChevronLeft, ChevronRight, Search, ShieldAlert} from 'lucide-react';
 
 import {getAuditLogs} from '../../api/adminAuditApi';
-import {getUsers} from '../../api/userApi';
 import {formatDateTime} from '../../utils/format-date-time';
 import styles from './AuditLogs.module.scss';
 
@@ -19,31 +18,29 @@ const methodColorMap = {
 };
 
 function AuditLogs() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [auditLogs, setAuditLogs] = useState([]);
-  const [userMap, setUserMap] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const loadAuditData = async () => {
+  const ITEMS_PER_PAGE = 20;
+
+  const loadAuditData = async (page) => {
     setLoading(true);
     try {
-      const [auditResponse, userData] = await Promise.all([
-        getAuditLogs({page: 0, size: 300}),
-        getUsers(),
-      ]);
-
-      const nextUserMap = userData.reduce((accumulator, user) => {
-        const userId = String(user.userId || user.user_id);
-        return {
-          ...accumulator,
-          [userId]: user,
-        };
-      }, {});
+      const auditResponse = await getAuditLogs({
+        page: Math.max(page - 1, 0),
+        size: ITEMS_PER_PAGE,
+      });
 
       const nextAuditLogs = (auditResponse.content || []).map((item) => ({
         audit_log_id: String(item.auditLogId),
         user_id: item.userId ? String(item.userId) : null,
+        user_name: item.userName || '',
+        full_name: item.fullName || '',
         http_method: item.httpMethod || '',
         endpoint: item.endpoint || '',
         action: item.action || '',
@@ -52,30 +49,32 @@ function AuditLogs() {
         created_at: item.createdAt || '',
       }));
 
-      setUserMap(nextUserMap);
       setAuditLogs(nextAuditLogs);
+      setTotalElements(auditResponse.totalElements || 0);
+      setTotalPages(Math.max(auditResponse.totalPages || 1, 1));
     } catch (error) {
       setAuditLogs([]);
-      setUserMap({});
+      setTotalElements(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadAuditData();
-  }, []);
+    loadAuditData(currentPage);
+  }, [currentPage]);
 
   const filteredLogs = useMemo(() => {
     return auditLogs.filter((log) => {
       const normalizedSearch = searchTerm.trim().toLowerCase();
-      const user = log.user_id ? userMap[log.user_id] : null;
 
       const matchesSearch =
         normalizedSearch.length === 0 ||
         log.action.toLowerCase().includes(normalizedSearch) ||
         log.endpoint.toLowerCase().includes(normalizedSearch) ||
-        (user?.full_name || '').toLowerCase().includes(normalizedSearch);
+        (log.full_name || '').toLowerCase().includes(normalizedSearch) ||
+        (log.user_name || '').toLowerCase().includes(normalizedSearch);
 
       const matchesStatus =
         statusFilter === 'all' ||
@@ -84,7 +83,7 @@ function AuditLogs() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [auditLogs, searchTerm, statusFilter, userMap]);
+  }, [auditLogs, searchTerm, statusFilter]);
 
   return (
     <div className={cx('auditLogsPage')}>
@@ -137,7 +136,6 @@ function AuditLogs() {
             )}
             {!loading &&
               filteredLogs.map((log) => {
-              const actor = log.user_id ? userMap[log.user_id] : null;
               return (
                 <tr key={log.audit_log_id}>
                   <td>{formatDateTime(log.created_at)}</td>
@@ -150,7 +148,7 @@ function AuditLogs() {
                       <span>{log.endpoint}</span>
                     </div>
                   </td>
-                  <td>{actor?.fullName || actor?.full_name || 'Unknown'}</td>
+                  <td>{log.full_name || log.user_name || 'Unknown'}</td>
                   <td>{log.ip_address || '-'}</td>
                   <td>
                     <Badge bg={log.success ? 'success' : 'danger'}>
@@ -172,6 +170,34 @@ function AuditLogs() {
             )}
           </tbody>
         </Table>
+      </div>
+      <div className={cx('pagination')}>
+        <span className={cx('paginationInfo')}>
+          Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-
+          {totalElements === 0
+            ? 0
+            : Math.min((currentPage - 1) * ITEMS_PER_PAGE + auditLogs.length, totalElements)}{' '}
+          trong {totalElements} bản ghi
+        </span>
+        <div className={cx('paginationBtns')}>
+          <button
+            className={cx('pageBtn')}
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((previous) => previous - 1)}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className={cx('pageNumber')}>
+            {currentPage}/{totalPages}
+          </span>
+          <button
+            className={cx('pageBtn')}
+            disabled={currentPage >= totalPages}
+            onClick={() => setCurrentPage((previous) => previous + 1)}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );

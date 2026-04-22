@@ -2,12 +2,18 @@ package com.project_exam.backend.services;
 
 import com.project_exam.backend.cloudinary.CloudinaryService;
 import com.project_exam.backend.dto.response.ProfileOverviewResponse;
+import com.project_exam.backend.dto.response.UserPageResponse;
 import com.project_exam.backend.dto.response.UserResponse;
 import com.project_exam.backend.models.*;
 import com.project_exam.backend.repositories.*;
 import com.project_exam.backend.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +36,43 @@ public class UserService {
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public UserPageResponse findAllPaged(Integer page, Integer size, String keyword, String roleId, Boolean verified) {
+        int safePage = page == null || page < 0 ? 0 : page;
+        int safeSize = size == null || size <= 0 ? 20 : Math.min(size, 100);
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Specification<User> specification = Specification.where(null);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            String normalizedKeyword = "%" + keyword.trim().toLowerCase() + "%";
+            specification = specification.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("fullName")), normalizedKeyword),
+                    cb.like(cb.lower(root.get("userName")), normalizedKeyword),
+                    cb.like(cb.lower(root.get("email")), normalizedKeyword)
+            ));
+        }
+
+        if (roleId != null && !roleId.trim().isEmpty()) {
+            specification = specification.and((root, query, cb) -> cb.equal(root.get("roleId"), roleId));
+        }
+
+        if (verified != null) {
+            specification = specification.and((root, query, cb) -> cb.equal(root.get("verified"), verified));
+        }
+
+        Page<User> userPage = userRepository.findAll(specification, pageable);
+
+        UserPageResponse response = new UserPageResponse();
+        response.setContent(userPage.getContent());
+        response.setCurrentPage(userPage.getNumber());
+        response.setSize(userPage.getSize());
+        response.setTotalElements(userPage.getTotalElements());
+        response.setTotalPages(userPage.getTotalPages());
+        response.setHasNext(userPage.hasNext());
+        return response;
     }
 
     public Optional<User> findById(String id) {

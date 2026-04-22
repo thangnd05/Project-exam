@@ -66,6 +66,40 @@
   padding: 18px;
 }
 
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.paginationInfo {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.paginationBtns {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageBtn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pageNumber {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
 @media (max-width: 768px) {
   .filters {
     grid-template-columns: 1fr;
