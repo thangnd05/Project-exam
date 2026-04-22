@@ -62,7 +62,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Transactional
-    public void processOAuthPostLogin(String email, String name) {
+    public void processOAuthPostLogin(String email, String name, String pictureUrl) {
         // 1. Kiểm tra xem Email này đã tồn tại trong DB chưa
         Optional<User> existUser = userRepository.findByEmail(email);
 
@@ -95,6 +95,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             }
 
             newUser.setRoleId(userRole.getRoleId());
+            newUser.setAvatarUrl(resolveOAuthAvatar(name, pictureUrl));
 
             userRepository.save(newUser);
 
@@ -104,9 +105,18 @@ public class CustomUserDetailsService implements UserDetailsService {
             User user = existUser.get();
             // Ví dụ: Cập nhật tên mới nhất từ Google
             user.setFullName(name);
+            user.setAvatarUrl(resolveOAuthAvatar(name, pictureUrl));
             userRepository.save(user);
             System.out.println("--- User đã tồn tại, chỉ cập nhật thông tin: " + email);
         }
+    }
+
+    private String resolveOAuthAvatar(String name, String pictureUrl) {
+        if (pictureUrl != null && !pictureUrl.isBlank()) {
+            return pictureUrl;
+        }
+        String safeName = (name == null || name.isBlank()) ? "User" : name.trim().replace(" ", "+");
+        return "https://ui-avatars.com/api/?name=" + safeName + "&background=random&color=fff";
     }
 
 }

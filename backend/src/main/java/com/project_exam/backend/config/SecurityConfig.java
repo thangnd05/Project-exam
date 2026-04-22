@@ -99,9 +99,10 @@ public class SecurityConfig {
 
                             String email = oAuth2User.getAttribute("email");
                             String name = oAuth2User.getAttribute("name");
+                            String picture = oAuth2User.getAttribute("picture");
 
                             customUserDetailsService
-                                    .processOAuthPostLogin(email, name);
+                                    .processOAuthPostLogin(email, name, picture);
 
                             User user = userRepository.findByEmail(email)
                                     .orElseThrow();

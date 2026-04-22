@@ -42,10 +42,16 @@ public class DataLoader implements CommandLineRunner {
             user.setRoleId(adminRole.getRoleId());
             user.setCreatedAt(LocalDateTime.now());
             user.setVerified(true);
+            user.setAvatarUrl(buildDefaultAvatar(user.getFullName()));
             userRepository.save(user);
 
         }
 
         System.out.println("DataLoader: Default role and admin user created (if not exist).");
+    }
+
+    private String buildDefaultAvatar(String name) {
+        String safeName = (name == null || name.isBlank()) ? "Admin" : name.trim().replace(" ", "+");
+        return "https://ui-avatars.com/api/?name=" + safeName + "&background=random&color=fff";
     }
 }
