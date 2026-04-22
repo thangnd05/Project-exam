@@ -34,7 +34,7 @@ const normalizeUser = (user) => ({
   full_name: user.fullName ?? user.full_name ?? '',
   email: user.email ?? '',
   role_id: String(user.roleId ?? user.role_id ?? ''),
-  verified: Number(user.verified ?? 0),
+  verified: Boolean(user.verified),
   created_at: user.createdAt ?? user.created_at ?? null,
 });
 
@@ -92,8 +92,8 @@ function UsersManagement() {
       const matchesRole = roleFilter === 'all' || user.role_id === roleFilter;
       const matchesStatus =
         statusFilter === 'all' ||
-        (statusFilter === 'verified' && user.verified === 1) ||
-        (statusFilter === 'unverified' && user.verified === 0);
+        (statusFilter === 'verified' && user.verified === true) ||
+        (statusFilter === 'unverified' && user.verified === false);
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [users, roleFilter, statusFilter, searchTerm]);
@@ -102,7 +102,7 @@ function UsersManagement() {
   const totalTeachers = users.filter(
     (user) => roleNameById[user.role_id] === 'TEACHER',
   ).length;
-  const verifiedUsers = users.filter((user) => user.verified === 1).length;
+  const verifiedUsers = users.filter((user) => user.verified === true).length;
 
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages);

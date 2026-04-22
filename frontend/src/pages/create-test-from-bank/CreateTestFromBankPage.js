@@ -223,7 +223,7 @@ const CreateTestFromBankPage = () => {
       const testRes = await axios.post('/api/tests', {
         title: testInfo.title.trim(),
         description: testInfo.description || null,
-        examTypeId: Number(testInfo.examTypeId),
+        examTypeId: testInfo.examTypeId,
         durationMinutes: testInfo.durationMinutes && Number(testInfo.durationMinutes) > 0 ? Number(testInfo.durationMinutes) : null,
         maxAttempts: testInfo.maxAttempts && Number(testInfo.maxAttempts) > 0 ? Number(testInfo.maxAttempts) : null,
         bannerUrl: testInfo.bannerUrl || null,
@@ -242,8 +242,8 @@ const CreateTestFromBankPage = () => {
         if (numQuestions <= 0) continue;
 
         const partRes = await axios.post('/api/test-parts', {
-          testId: Number(newTestId),
-          examPartId: Number(part.examPartId),
+          testId: String(newTestId),
+          examPartId: String(part.examPartId),
           numQuestions,
         });
         const newPartId = partRes.data.testPartId ?? partRes.data.id;
@@ -251,13 +251,13 @@ const CreateTestFromBankPage = () => {
 
         if (cfg.mode === SELECTION_MODES.RANDOM) {
           await axios.post('/api/tests/parts/random-questions', {
-            testPartId: Number(newPartId),
+            testPartId: String(newPartId),
             count: numQuestions,
           });
         } else {
           await axios.post('/api/tests/parts/questions', {
-            testPartId: Number(newPartId),
-            questionIds: (cfg.selectedIds || []).map(Number),
+            testPartId: String(newPartId),
+            questionIds: (cfg.selectedIds || []).map(String),
           });
         }
       }

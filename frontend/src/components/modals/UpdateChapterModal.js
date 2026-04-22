@@ -38,7 +38,7 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}) {
     setSubmitting(true);
     try {
       const payload = {
-        classId: Number(classId),
+        classId: String(classId),
         title: title.trim(),
         description: description.trim(),
       };

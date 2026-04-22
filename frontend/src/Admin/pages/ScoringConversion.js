@@ -208,15 +208,15 @@ function ScoringConversionManagement() {
         .filter(
           (item) =>
             item &&
-            Number(item.exam_type_id) &&
-            Number(item.skill_id) &&
+            String(item.exam_type_id || item.examTypeId || '').trim() &&
+            String(item.skill_id || item.skillId || '').trim() &&
             !Number.isNaN(Number(item.num_correct)) &&
             !Number.isNaN(Number(item.converted_score)),
         )
         .map((item, index) => ({
-          conversion_id: index + 1,
-          exam_type_id: Number(item.exam_type_id),
-          skill_id: Number(item.skill_id),
+          conversion_id: String(item.conversion_id || item.conversionId || index + 1),
+          exam_type_id: String(item.exam_type_id || item.examTypeId),
+          skill_id: String(item.skill_id || item.skillId),
           num_correct: Number(item.num_correct),
           converted_score: Number(item.converted_score),
         }));

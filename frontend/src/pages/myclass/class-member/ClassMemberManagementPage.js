@@ -87,8 +87,8 @@ const ClassMemberManagementPage = () => {
     setActionLoading(true);
     try {
       await axios.put('/api/class-members/approve', {
-        classId: Number(classId),
-        userId: Number(userId),
+        classId: String(classId),
+        userId: String(userId),
       });
       toast.success('Duyệt học sinh thành công!');
       await Promise.all([fetchAllMembers(), fetchPendingMembers()]);
@@ -128,8 +128,8 @@ const ClassMemberManagementPage = () => {
     try {
       await axios.delete('/api/class-members/remove', {
         data: {
-          classId: Number(classId),
-          userId: Number(memberToDelete.userId),
+          classId: String(classId),
+          userId: String(memberToDelete.userId),
         },
       });
       toast.success('Đã xóa học sinh khỏi lớp!');

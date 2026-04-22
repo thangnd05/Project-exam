@@ -52,7 +52,7 @@ function JoinClassModal({ show, onClose }) {
         try {
             // ✅ Call API join class (đúng như JoinClassPage)
             await axios.post("/api/class-members/join", {
-                classId: Number(code),
+                classId: code.trim(),
             });
 
             setType("success");

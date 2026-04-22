@@ -42,7 +42,7 @@ export const useTestSubmission = ({
                 const testRes = await axios.post('/api/tests', {
                     title: testInfo.title,
                     description: testInfo.description,
-                    examTypeId: Number(testInfo.examTypeId),
+                    examTypeId: String(testInfo.examTypeId),
                     durationMinutes:
                         testInfo.durationMinutes && Number(testInfo.durationMinutes) > 0
                             ? Number(testInfo.durationMinutes)
@@ -58,13 +58,13 @@ export const useTestSubmission = ({
                     availableTo: testInfo.availableTo
                         ? testInfo.availableTo + ':00'
                         : null,
-                    classId: mode === 'class' ? Number(classId) : null,
-                    chapterId: mode === 'class' ? Number(chapterId) : null,
+                    classId: mode === 'class' ? String(classId) : null,
+                    chapterId: mode === 'class' ? String(chapterId) : null,
                 });
                 const newTestId = testRes.data.testId || testRes.data.id;
                 const partRes = await axios.post('/api/test-parts', {
-                    testId: Number(newTestId),
-                    examPartId: Number(testInfo.examPartId),
+                    testId: String(newTestId),
+                    examPartId: String(testInfo.examPartId),
                     numQuestions: questions.length,
                 });
                 const newPartId = partRes.data.testPartId || partRes.data.id;
@@ -75,11 +75,11 @@ export const useTestSubmission = ({
                         const hasMediaUrl = !!q.mediaUrl?.trim();
                         const passageType = q.passageType || 'LISTENING';
                         const payload = {
-                            testPartId: Number(newPartId),
+                            testPartId: String(newPartId),
                             questionText: q.questionText,
                             questionType: q.questionType,
-                            classId: mode === 'class' ? Number(classId) : null,
-                            chapterId: mode === 'class' ? Number(chapterId) : null,
+                            classId: mode === 'class' ? String(classId) : null,
+                            chapterId: mode === 'class' ? String(chapterId) : null,
                             answers: q.answers,
                             passage: (hasMedia || hasMediaUrl)
                                 ? { passageType, content: '', mediaUrl: q.mediaUrl?.trim() || null }
@@ -104,9 +104,9 @@ export const useTestSubmission = ({
             } else if (creatorType === CREATOR_TYPES.BULK) {
                 const formData = new FormData();
                 const payload = {
-                    examPartId: Number(testInfo.examPartId),
-                    classId: mode === 'class' && classId ? Number(classId) : null,
-                    chapterId: mode === 'class' && chapterId ? Number(chapterId) : null,
+                    examPartId: String(testInfo.examPartId),
+                    classId: mode === 'class' && classId ? String(classId) : null,
+                    chapterId: mode === 'class' && chapterId ? String(chapterId) : null,
                     questions: questions.map((q) => ({
                         questionType: q.questionType,
                         questionText: q.questionText,
@@ -136,9 +136,9 @@ export const useTestSubmission = ({
             } else if (creatorType === CREATOR_TYPES.PASSAGE) {
                 const formData = new FormData();
                 const requestData = {
-                    examPartId: Number(testInfo.examPartId),
-                    classId: mode === 'class' && classId ? Number(classId) : null,
-                    chapterId: mode === 'class' && chapterId ? Number(chapterId) : null,
+                    examPartId: String(testInfo.examPartId),
+                    classId: mode === 'class' && classId ? String(classId) : null,
+                    chapterId: mode === 'class' && chapterId ? String(chapterId) : null,
                     groups: groups.map((group) => ({
                         passage: {
                             passageType: group.passage.passageType,

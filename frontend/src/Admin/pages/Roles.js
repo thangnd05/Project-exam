@@ -72,7 +72,7 @@ function RolesManagement() {
   };
 
   const openEditModal = (role) => {
-    setEditingRoleId(role.roleId);
+    setEditingRoleId(role.role_id);
     setFormState({
       role_name: role.role_name,
       description: role.description || '',
@@ -100,7 +100,7 @@ function RolesManagement() {
         const updatedRole = await updateRole(editingRoleId, payload);
         setRoleList((previous) =>
           previous.map((role) =>
-            role.roleId === editingRoleId ? mapRoleFromApi(updatedRole) : role,
+            role.role_id === editingRoleId ? mapRoleFromApi(updatedRole) : role,
           ),
         );
       } else {

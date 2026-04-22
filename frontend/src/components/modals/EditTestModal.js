@@ -93,7 +93,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     const payload = {
       title: formData.title.trim(),
       description: formData.description || null,
-      examTypeId: Number(formData.examTypeId),
+      examTypeId: String(formData.examTypeId),
       durationMinutes:
         formData.durationMinutes && Number(formData.durationMinutes) > 0
           ? Number(formData.durationMinutes)
@@ -107,8 +107,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
         ? formData.availableFrom + ':00'
         : null,
       availableTo: formData.availableTo ? formData.availableTo + ':00' : null,
-      classId: test.classId || null,
-      chapterId: test.chapterId || null,
+      classId: test.classId ? String(test.classId) : null,
+      chapterId: test.chapterId ? String(test.chapterId) : null,
     };
 
     try {

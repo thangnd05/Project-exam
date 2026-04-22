@@ -21,7 +21,7 @@ function LoginAudit() {
       const rows = (response.content || []).map((item) => ({
         id: String(item.auditLogId),
         login_time: item.createdAt || '',
-        user_name: item.action || 'Unknown',
+        action: item.action || '',
         user_id: item.userId ? String(item.userId) : null,
         ip_address: item.ipAddress || '',
         status: item.success ? 'SUCCESS' : 'FAILED',
@@ -45,7 +45,7 @@ function LoginAudit() {
     return loginAuditRows.filter((row) => {
       const matchesSearch =
         q.length === 0 ||
-        (row.user_name || '').toLowerCase().includes(q) ||
+        (row.action || '').toLowerCase().includes(q) ||
         (row.ip_address || '').toLowerCase().includes(q) ||
         (row.user_agent || '').toLowerCase().includes(q) ||
         String(row.user_id ?? '').includes(q) ||
@@ -83,6 +83,7 @@ function LoginAudit() {
           <Form.Control
             type="text"
             placeholder="Tìm theo tên đăng nhập, IP, user agent, lý do..."
+            placeholder="Tìm theo user ID, action, IP, user agent, lý do..."
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
           />
@@ -103,7 +104,7 @@ function LoginAudit() {
           <thead>
             <tr>
               <th>Thời gian</th>
-              <th>Tên đăng nhập</th>
+              <th>Action</th>
               <th>User ID</th>
               <th>IP</th>
               <th>Trạng thái</th>
@@ -124,7 +125,7 @@ function LoginAudit() {
               filteredRows.map((row) => (
               <tr key={row.id}>
                 <td>{row.login_time}</td>
-                <td>{row.user_name}</td>
+                <td>{row.action || '—'}</td>
                 <td>{row.user_id ?? '—'}</td>
                 <td>{row.ip_address || '—'}</td>
                 <td>
