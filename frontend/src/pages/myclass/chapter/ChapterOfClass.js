@@ -31,6 +31,7 @@ const ChapterOfClass = () => {
 
   const [chapters, setChapters] = useState([]);
   const [className, setClassName] = useState('');
+  const [classQr, setClassQr] = useState('');
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [showCreateChapter, setShowCreateChapter] = useState(false);
@@ -96,6 +97,7 @@ const ChapterOfClass = () => {
         if (res.data?.className) {
           setClassName(res.data.className);
         }
+        setClassQr(res.data?.classQr || '');
       } catch (err) {
         console.error('❌ Lỗi load class info:', err);
       }
@@ -125,7 +127,7 @@ const ChapterOfClass = () => {
         <PageHeader
           title={className || 'Chương trình học tập'}
           label="Danh sách nội dung học tập"
-          badgeLabel={`Mã lớp: ${classId}`}
+          badgeLabel={`Mã classQr: ${classQr}`}
           actionText="Tạo chương mới"
           actionIcon={IoAdd}
           onAction={() => setShowCreateChapter(true)}

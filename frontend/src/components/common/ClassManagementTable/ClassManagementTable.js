@@ -32,7 +32,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }) =
                 {clazz.isTeacher ? 'Giáo viên' : 'Học sinh'}
               </td>
               <td className={cx('class-id')}>
-                {clazz.classId}
+                {clazz.classQr}
               </td>
               <td>
                 <div className={cx('action-group')}>

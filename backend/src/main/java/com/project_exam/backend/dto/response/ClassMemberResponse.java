@@ -10,6 +10,7 @@ public class ClassMemberResponse {
     private String id;
     private String classId;
     private String userId;
+    private String fullName;
     private ClassMember.MemberStatus status;
     private LocalDateTime joinedAt;
 }

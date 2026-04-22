@@ -20,6 +20,9 @@ public class ClassEntity {
     @Column(name = "class_name", nullable = false, length = 100)
     private String className;
 
+    @Column(name = "class_qr", nullable = false, unique = true, length = 12)
+    private String classQr;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

@@ -43,7 +43,7 @@ function JoinClassModal({ show, onClose }) {
         // 🟡 Validate input
         if (!code.trim()) {
             setType("danger");
-            setMessage("⚠️ Vui lòng nhập mã lớp!");
+            setMessage("Vui lòng nhập mã classQr!");
             return;
         }
 
@@ -52,11 +52,11 @@ function JoinClassModal({ show, onClose }) {
         try {
             // ✅ Call API join class (đúng như JoinClassPage)
             await axios.post("/api/class-members/join", {
-                classId: code.trim(),
+                classQr: code.trim().toUpperCase(),
             });
 
             setType("success");
-            setMessage("🎉 Gửi yêu cầu tham gia lớp thành công!");
+            setMessage(" Gửi yêu cầu tham gia lớp thành công!");
 
             // Reset + close modal
             setTimeout(() => {
@@ -103,7 +103,7 @@ function JoinClassModal({ show, onClose }) {
             )}
 
                 <div className={cx("formGroup")}>
-                    <label className={cx("label")}>Mã lớp học</label>
+                    <label className={cx("label")}>Mã classQr</label>
 
                     <div className={cx("inputWrapper")}>
                         <span className={cx("inputIcon")}>
@@ -113,7 +113,7 @@ function JoinClassModal({ show, onClose }) {
                         <input
                             type="text"
                             className={cx("inputControl")}
-                            placeholder="Ví dụ: 123"
+                            placeholder="Ví dụ: AB12CD34"
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
                             disabled={loading}
@@ -122,7 +122,7 @@ function JoinClassModal({ show, onClose }) {
 
                     <div className={cx("tip")}>
                         <FaInfoCircle />
-                        <span>Liên hệ giáo viên để lấy mã lớp chính xác.</span>
+                        <span>Liên hệ giáo viên để lấy mã classQr chính xác.</span>
                     </div>
                 </div>
         </CommonFormModal>

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class ClassResponse {
     private String classId;
+    private String classQr;
     private String className;
     private String description;
     private String teacherId;

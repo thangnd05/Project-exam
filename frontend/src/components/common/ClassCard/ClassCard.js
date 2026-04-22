@@ -12,6 +12,8 @@ import styles from './ClassCard.module.scss';
 const cx = classNames.bind(styles);
 
 const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }) => {
+  const classQr = classData.classQr ;
+
   return (
     <div
       className={cx('class-card', role === 'teacher' ? 'teaching-card' : 'learning-card')}
@@ -30,10 +32,10 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
 
       <div className={cx('info-item')}>
         <IoPeopleOutline />
-        <span>{role === 'teacher' ? 'Mã Lớp: ' : 'ID Lớp: '}</span>
+        <span>Mã lớp:</span>
         <span className={cx('class-id')}>
           <IoKeyOutline size={14} />
-          {classData.classId}
+          {classQr}
         </span>
       </div>
 

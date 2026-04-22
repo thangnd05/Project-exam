@@ -29,8 +29,11 @@ public class ClassMemberService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ClassMemberResponse joinClass(String classId, HttpServletRequest request) {
+    public ClassMemberResponse joinClassByQr(String classQr, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
+        ClassEntity clazz = classRepository.findByClassQr(classQr)
+                .orElseThrow(() -> new RuntimeException("Class not found with QR: " + classQr));
+        String classId = clazz.getClassId();
 
         if (classMemberRepository.existsByClassIdAndUserId(classId, currentUserId)) {
             throw new RuntimeException("You have already requested or joined this class!");
@@ -103,6 +106,19 @@ public class ClassMemberService {
         res.setId(m.getId());
         res.setClassId(m.getClassId());
         res.setUserId(m.getUserId());
+        String fullName = userRepository.findById(m.getUserId())
+                .map(user -> {
+                    if (user.getFullName() != null && !user.getFullName().isBlank()) {
+                        return user.getFullName();
+                    }
+                    if (user.getUserName() != null && !user.getUserName().isBlank()) {
+                        return user.getUserName();
+                    }
+                    return null;
+                })
+                .filter(name -> name != null && !name.isBlank())
+                .orElse("Học sinh");
+        res.setFullName(fullName);
         res.setStatus(m.getStatus());
         res.setJoinedAt(m.getJoinedAt());
         return res;
@@ -151,6 +167,7 @@ public class ClassMemberService {
 
             return new ClassStudentResponse(
                     clazz.getClassId(),
+                    clazz.getClassQr(),
                     clazz.getClassName(),
                     teacherName
             );
@@ -161,6 +178,7 @@ public class ClassMemberService {
         List<ClassStudentResponse> teachingResponses = teachingClasses.stream()
                 .map(clazz -> new ClassStudentResponse(
                         clazz.getClassId(),
+                        clazz.getClassQr(),
                         clazz.getClassName(),
                         userRepository.findById(clazz.getTeacherId())
                                 .map(User::getFullName)

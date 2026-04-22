@@ -452,20 +452,14 @@
 }
 
 .td-id {
-  width: 120px;
+  width: 220px;
 }
 
 .user-id {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #f1f5f9;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-family: 'Inter', monospace;
+  display: block;
   font-weight: 700;
-  font-size: var(--font-size-sm);
-  color: #475569;
+  font-size: var(--font-size-base);
+  color: var(--dark-color);
 }
 
 .td-joined {

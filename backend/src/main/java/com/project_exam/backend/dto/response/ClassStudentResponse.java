@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ClassStudentResponse {
     private String classId;
+    private String classQr;
     private String className;
     private String teacherName;
 }

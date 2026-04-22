@@ -24,11 +24,11 @@ public class ClassMemberController {
     @PostMapping("/join")
     public ResponseEntity<?> joinClass(@RequestBody ClassMemberJoinRequest body, HttpServletRequest request) {
         try {
-            String classId = body.getClassId();
-            if (classId == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "classId is required"));
+            String classQr = body.getClassQr();
+            if (classQr == null || classQr.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "classQr is required"));
             }
-            ClassMemberResponse member = classMemberService.joinClass(classId, request);
+            ClassMemberResponse member = classMemberService.joinClassByQr(classQr.trim(), request);
             return ResponseEntity.status(HttpStatus.CREATED).body(member);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -108,9 +108,6 @@ public class ClassMemberController {
             Map<String, Object> myClasses = classMemberService.getClassesOfCurrentStudent(request);
             List<?> teaching = (List<?>) myClasses.get("teachingClasses");
             List<?> learning = (List<?>) myClasses.get("learningClasses");
-            if ((teaching == null || teaching.isEmpty()) && (learning == null || learning.isEmpty())) {
-                return ResponseEntity.ok(Map.of("message", "Bạn chưa có lớp học nào."));
-            }
             return ResponseEntity.ok(myClasses);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));

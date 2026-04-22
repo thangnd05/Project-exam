@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -36,6 +36,7 @@ public class ClassService {
         ClassEntity clazz = ClassEntity.builder()
                 .classId(randomId)
                 .className(request.getClassName())
+                .classQr(generateUniqueClassQr())
                 .description(request.getDescription())
                 .teacherId(currentUserId)
                 .createdAt(LocalDateTime.now())
@@ -54,7 +55,7 @@ public class ClassService {
     public List<ClassSimpleResponse> getMyClasses(HttpServletRequest request) {
         String teacherId = authUtils.getUserId(request);
         return classRepository.findByTeacherId(teacherId).stream()
-                .map(c -> new ClassSimpleResponse(c.getClassId(), c.getClassName()))
+                .map(c -> new ClassSimpleResponse(c.getClassId(), c.getClassQr(), c.getClassName()))
                 .toList();
     }
 
@@ -96,10 +97,19 @@ public class ClassService {
     private ClassResponse toResponse(ClassEntity c) {
         ClassResponse res = new ClassResponse();
         res.setClassId(c.getClassId());
+        res.setClassQr(c.getClassQr());
         res.setClassName(c.getClassName());
         res.setDescription(c.getDescription());
         res.setTeacherId(c.getTeacherId());
         res.setCreatedAt(c.getCreatedAt());
         return res;
+    }
+
+    private String generateUniqueClassQr() {
+        String candidate;
+        do {
+            candidate = UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase(Locale.ROOT);
+        } while (classRepository.existsByClassQr(candidate));
+        return candidate;
     }
 }

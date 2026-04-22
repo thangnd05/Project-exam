@@ -158,6 +158,10 @@ const ClassMemberManagementPage = () => {
     sorted.sort((a, b) => {
       let aVal = a[sortConfig.key];
       let bVal = b[sortConfig.key];
+      if (sortConfig.key === 'fullName') {
+        aVal = String(aVal || '').toLowerCase();
+        bVal = String(bVal || '').toLowerCase();
+      }
       if (sortConfig.key === 'joinedAt') {
         aVal = new Date(aVal).getTime();
         bVal = new Date(bVal).getTime();
@@ -172,7 +176,9 @@ const ClassMemberManagementPage = () => {
   // 🟢 Filter + Sort
   const getFilteredMembers = (members) => {
     const filtered = members.filter((m) =>
-      String(m.userId).toLowerCase().includes(searchTerm.toLowerCase())
+      `${m.fullName || ''}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
     );
     return getSortedMembers(filtered);
   };
@@ -212,7 +218,7 @@ const ClassMemberManagementPage = () => {
   const renderMemberRow = (member, showActions = false) => (
     <tr key={member.id} className={cx('member-row')}>
       <td className={cx('td-id')}>
-        <span className={cx('user-id')}>{member.userId}</span>
+        <span className={cx('user-id')}>{member.fullName || 'Chưa cập nhật tên'}</span>
       </td>
       <td className={cx('td-joined')}>{formatDate(member.joinedAt)}</td>
       <td className={cx('td-status')}>{getStatusBadge(member.status)}</td>
@@ -321,7 +327,7 @@ const ClassMemberManagementPage = () => {
           <IoSearchOutline className={cx('search-icon')} />
           <input
             type="text"
-            placeholder="Tìm kiếm theo ID học sinh..."
+            placeholder="Tìm kiếm theo tên học sinh..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={cx('search-input')}
@@ -387,9 +393,9 @@ const ClassMemberManagementPage = () => {
                       <tr>
                         <th
                           className={cx('th-sortable')}
-                          onClick={() => handleSort('userId')}
+                          onClick={() => handleSort('fullName')}
                         >
-                          ID Học sinh {renderSortIcon('userId')}
+                          Họ và tên học sinh {renderSortIcon('fullName')}
                         </th>
                         <th
                           className={cx('th-sortable')}
@@ -448,9 +454,9 @@ const ClassMemberManagementPage = () => {
                         <tr>
                           <th
                             className={cx('th-sortable')}
-                            onClick={() => handleSort('userId')}
+                            onClick={() => handleSort('fullName')}
                           >
-                            ID Học sinh {renderSortIcon('userId')}
+                            Họ và tên học sinh {renderSortIcon('fullName')}
                           </th>
                           <th
                             className={cx('th-sortable')}
@@ -481,7 +487,9 @@ const ClassMemberManagementPage = () => {
         }}
         onConfirm={handleRemoveMember}
         title="Xóa học sinh khỏi lớp"
-        message={`Bạn có chắc chắn muốn xóa học sinh (ID: ${memberToDelete?.userId}) khỏi lớp này?`}
+        message={`Bạn có chắc chắn muốn xóa học sinh "${
+          memberToDelete?.fullName || memberToDelete?.userId
+        }" khỏi lớp này?`}
       />
     </div>
   );
