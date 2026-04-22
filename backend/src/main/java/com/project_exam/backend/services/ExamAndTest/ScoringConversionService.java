@@ -21,6 +21,23 @@ public class ScoringConversionService {
                 .toList();
     }
 
+    public List<ScoringConversionResponse> findByFilters(String examTypeId, String skillId) {
+        List<ScoringConversion> conversions;
+        if (examTypeId != null && !examTypeId.isBlank() && skillId != null && !skillId.isBlank()) {
+            conversions = scoringConversionRepository.findByExamTypeIdAndSkillId(examTypeId, skillId);
+        } else if (skillId != null && !skillId.isBlank()) {
+            conversions = scoringConversionRepository.findBySkillId(skillId);
+        } else if (examTypeId != null && !examTypeId.isBlank()) {
+            conversions = scoringConversionRepository.findByExamTypeId(examTypeId);
+        } else {
+            conversions = scoringConversionRepository.findAll();
+        }
+
+        return conversions.stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     public ScoringConversionResponse findById(String id) {
         ScoringConversion c = scoringConversionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Scoring conversion không tồn tại"));

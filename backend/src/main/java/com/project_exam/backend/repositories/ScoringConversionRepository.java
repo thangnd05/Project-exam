@@ -10,4 +10,6 @@ import java.util.List;
 public interface ScoringConversionRepository extends JpaRepository<ScoringConversion, String> {
     Optional<ScoringConversion> findByExamTypeIdAndSkillIdAndNumCorrect(String examTypeId, String skillId, Integer numCorrect);
     List<ScoringConversion> findByExamTypeIdAndSkillId(String examTypeId, String skillId);
+    List<ScoringConversion> findBySkillId(String skillId);
+    List<ScoringConversion> findByExamTypeId(String examTypeId);
 }

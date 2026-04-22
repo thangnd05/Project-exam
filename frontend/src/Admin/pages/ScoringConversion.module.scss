@@ -38,8 +38,30 @@
 
 .filters {
   display: grid;
-  grid-template-columns: 1fr 220px 220px;
+  grid-template-columns: 1fr 220px;
   gap: 10px;
+}
+
+.skillTabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.skillTab {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.875rem;
+  color: #374151;
+  transition: all 0.2s ease;
+
+  &.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+  }
 }
 
 .searchContainer {

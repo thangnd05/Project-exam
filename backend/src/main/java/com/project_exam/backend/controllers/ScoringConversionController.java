@@ -18,8 +18,11 @@ public class ScoringConversionController {
     private final ScoringConversionService scoringConversionService;
 
     @GetMapping
-    public ResponseEntity<List<ScoringConversionResponse>> getAll() {
-        return ResponseEntity.ok(scoringConversionService.findAll());
+    public ResponseEntity<List<ScoringConversionResponse>> getAll(
+            @RequestParam(required = false) String examTypeId,
+            @RequestParam(required = false) String skillId
+    ) {
+        return ResponseEntity.ok(scoringConversionService.findByFilters(examTypeId, skillId));
     }
 
     @GetMapping("/{id}")

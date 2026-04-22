@@ -8,6 +8,7 @@ import {
   createScoringConversion,
   deleteScoringConversion,
   getScoringConversions,
+  getScoringConversionsBySkill,
 } from '../../api/scoringConversionApi';
 import {getSkills} from '../../api/skillApi';
 import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
@@ -28,7 +29,7 @@ function ScoringConversionManagement() {
   const [skills, setSkills] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
-  const [skillFilter, setSkillFilter] = useState('all');
+  const [activeSkillId, setActiveSkillId] = useState('all');
   const [formState, setFormState] = useState(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
   const importInputRef = useRef(null);
@@ -54,16 +55,11 @@ function ScoringConversionManagement() {
     converted_score: item.convertedScore || 0,
   });
 
-  const loadScoringData = async () => {
+  const loadMetadata = async () => {
     setLoading(true);
     setErrorMessage('');
     try {
-      const [scoringData, examTypeData, skillData] = await Promise.all([
-        getScoringConversions(),
-        getExamTypes(),
-        getSkills(),
-      ]);
-      setScoringRules(scoringData.map(mapScoringRuleFromApi));
+      const [examTypeData, skillData] = await Promise.all([getExamTypes(), getSkills()]);
       setExamTypes(examTypeData.map(mapExamTypeFromApi));
       setSkills(skillData.map(mapSkillFromApi));
     } catch (error) {
@@ -74,8 +70,34 @@ function ScoringConversionManagement() {
   };
 
   useEffect(() => {
-    loadScoringData();
+    loadMetadata();
   }, []);
+
+  const loadScoringRules = async (skillId, examTypeId) => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const scoringData =
+        skillId && skillId !== 'all'
+          ? await getScoringConversionsBySkill(skillId, examTypeId)
+          : await getScoringConversions();
+      setScoringRules(scoringData.map(mapScoringRuleFromApi));
+    } catch (error) {
+      setErrorMessage('Không thể tải dữ liệu quy đổi điểm.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadScoringRules(activeSkillId, examTypeFilter);
+  }, [activeSkillId, examTypeFilter]);
+
+  useEffect(() => {
+    if (activeSkillId !== 'all') {
+      setFormState((previous) => ({...previous, skill_id: activeSkillId}));
+    }
+  }, [activeSkillId]);
 
   const filteredRules = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -88,7 +110,6 @@ function ScoringConversionManagement() {
 
       const matchExamType =
         examTypeFilter === 'all' || String(rule.exam_type_id) === examTypeFilter;
-      const matchSkill = skillFilter === 'all' || String(rule.skill_id) === skillFilter;
       const matchKeyword =
         normalizedKeyword.length === 0 ||
         examTypeName.toLowerCase().includes(normalizedKeyword) ||
@@ -96,9 +117,9 @@ function ScoringConversionManagement() {
         String(rule.num_correct).includes(normalizedKeyword) ||
         String(rule.converted_score).includes(normalizedKeyword);
 
-      return matchExamType && matchSkill && matchKeyword;
+      return matchExamType && matchKeyword;
     });
-  }, [examTypeFilter, examTypes, keyword, scoringRules, skillFilter, skills]);
+  }, [examTypeFilter, examTypes, keyword, scoringRules, skills]);
 
   const getExamTypeName = (examTypeId) => {
     return (
@@ -150,7 +171,8 @@ function ScoringConversionManagement() {
         convertedScore: convertedScore,
       });
 
-      setScoringRules((previous) => [...previous, mapScoringRuleFromApi(createdRule)]);
+      const normalizedCreatedRule = mapScoringRuleFromApi(createdRule);
+      setScoringRules((previous) => [...previous, normalizedCreatedRule]);
       resetForm();
     } catch (error) {
       setErrorMessage('Không thể thêm cấu hình quy đổi.');
@@ -278,14 +300,25 @@ function ScoringConversionManagement() {
             </option>
           ))}
         </Form.Select>
-        <Form.Select value={skillFilter} onChange={(event) => setSkillFilter(event.target.value)}>
-          <option value="all">Tất cả kỹ năng</option>
-          {skills.map((skill) => (
-            <option key={skill.skill_id} value={skill.skill_id}>
-              {skill.name}
-            </option>
-          ))}
-        </Form.Select>
+      </div>
+      <div className={cx('skillTabs')}>
+        <button
+          type="button"
+          className={cx('skillTab', {active: activeSkillId === 'all'})}
+          onClick={() => setActiveSkillId('all')}
+        >
+          Tất cả kỹ năng
+        </button>
+        {skills.map((skill) => (
+          <button
+            key={skill.skill_id}
+            type="button"
+            className={cx('skillTab', {active: activeSkillId === skill.skill_id})}
+            onClick={() => setActiveSkillId(skill.skill_id)}
+          >
+            {skill.name}
+          </button>
+        ))}
       </div>
 
       <div className={cx('createBox')}>
