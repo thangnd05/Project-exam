@@ -10,31 +10,29 @@ const cx = classNames.bind(styles);
 
 const parseOptionalId = (value) => {
   const trimmed = String(value).trim();
-  if (trimmed === '') {
-    return null;
-  }
-  const n = Number(trimmed);
-  return Number.isFinite(n) ? n : null;
+  return trimmed === '' ? null : trimmed;
 };
 
 const emptyForm = {
   title: '',
   description: '',
-  exam_type_id: 1,
+  exam_type_id: String(fakeExamTypes[0]?.exam_type_id ?? ''),
   duration_minutes: 60,
   max_attempts: 1,
   class_id: '',
   chapter_id: '',
-  created_by: 2,
+  created_by: String(fakeUsers[0]?.user_id ?? ''),
 };
 
 const getExamTypeName = (examTypeId) => {
-  const found = fakeExamTypes.find((item) => item.exam_type_id === examTypeId);
+  const found = fakeExamTypes.find(
+    (item) => String(item.exam_type_id) === String(examTypeId),
+  );
   return found?.name ?? `ID ${examTypeId}`;
 };
 
 const getCreatorName = (userId) => {
-  const found = fakeUsers.find((user) => user.user_id === userId);
+  const found = fakeUsers.find((user) => String(user.user_id) === String(userId));
   return found?.full_name ?? `User #${userId}`;
 };
 
@@ -104,12 +102,12 @@ function TestsManagement() {
                 ...item,
                 title: normalizedTitle,
                 description: formState.description.trim() || null,
-                exam_type_id: Number(formState.exam_type_id),
+                exam_type_id: String(formState.exam_type_id),
                 duration_minutes: duration,
                 max_attempts: maxAttempts,
                 class_id: classId,
                 chapter_id: chapterId,
-                created_by: Number(formState.created_by),
+                created_by: String(formState.created_by),
               }
             : item,
         ),
@@ -124,12 +122,12 @@ function TestsManagement() {
           test_id: nextId,
           title: normalizedTitle,
           description: formState.description.trim() || null,
-          exam_type_id: Number(formState.exam_type_id),
+          exam_type_id: String(formState.exam_type_id),
           duration_minutes: duration,
           max_attempts: maxAttempts,
           class_id: classId,
           chapter_id: chapterId,
-          created_by: Number(formState.created_by),
+          created_by: String(formState.created_by),
           created_at: today,
         },
       ]);
@@ -260,7 +258,7 @@ function TestsManagement() {
               onChange={(event) =>
                 setFormState((previous) => ({
                   ...previous,
-                  exam_type_id: Number(event.target.value),
+                  exam_type_id: event.target.value,
                 }))
               }
             >
@@ -337,7 +335,7 @@ function TestsManagement() {
               onChange={(event) =>
                 setFormState((previous) => ({
                   ...previous,
-                  created_by: Number(event.target.value),
+                  created_by: event.target.value,
                 }))
               }
             >

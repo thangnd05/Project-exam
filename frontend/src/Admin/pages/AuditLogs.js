@@ -5,6 +5,7 @@ import {Search, ShieldAlert} from 'lucide-react';
 
 import {getAuditLogs} from '../../api/adminAuditApi';
 import {getUsers} from '../../api/userApi';
+import {formatDateTime} from '../../utils/format-date-time';
 import styles from './AuditLogs.module.scss';
 
 const cx = classNames.bind(styles);
@@ -46,8 +47,6 @@ function AuditLogs() {
         http_method: item.httpMethod || '',
         endpoint: item.endpoint || '',
         action: item.action || '',
-        resource: item.resource || '',
-        resource_id: item.resourceId || '',
         ip_address: item.ipAddress || '',
         success: Boolean(item.success),
         created_at: item.createdAt || '',
@@ -76,7 +75,6 @@ function AuditLogs() {
         normalizedSearch.length === 0 ||
         log.action.toLowerCase().includes(normalizedSearch) ||
         log.endpoint.toLowerCase().includes(normalizedSearch) ||
-        log.resource.toLowerCase().includes(normalizedSearch) ||
         (user?.full_name || '').toLowerCase().includes(normalizedSearch);
 
       const matchesStatus =
@@ -120,19 +118,18 @@ function AuditLogs() {
         <Table responsive hover className={cx('logsTable')}>
           <thead>
             <tr>
-              <th>Thoi gian</th>
-              <th>Action</th>
+              <th>Thời gian</th>
+              <th>Hành động</th>
               <th>API</th>
-              <th>Tai nguyen</th>
-              <th>Actor</th>
+              <th>Người thực hiện</th>
               <th>IP</th>
-              <th>Trang thai</th>
+              <th>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={7} className="text-center py-4">
+                <td colSpan={6} className="text-center py-4">
                   <Spinner size="sm" className="me-2" />
                   Đang tải dữ liệu...
                 </td>
@@ -143,7 +140,7 @@ function AuditLogs() {
               const actor = log.user_id ? userMap[log.user_id] : null;
               return (
                 <tr key={log.audit_log_id}>
-                  <td>{log.created_at}</td>
+                  <td>{formatDateTime(log.created_at)}</td>
                   <td>{log.action}</td>
                   <td>
                     <div className={cx('apiCell')}>
@@ -152,10 +149,6 @@ function AuditLogs() {
                       </Badge>
                       <span>{log.endpoint}</span>
                     </div>
-                  </td>
-                  <td>
-                    {log.resource}
-                    {log.resource_id ? ` #${log.resource_id}` : ''}
                   </td>
                   <td>{actor?.fullName || actor?.full_name || 'Unknown'}</td>
                   <td>{log.ip_address || '-'}</td>
@@ -169,7 +162,7 @@ function AuditLogs() {
             })}
             {!loading && filteredLogs.length === 0 && (
               <tr>
-                <td colSpan={7}>
+                <td colSpan={6}>
                   <div className={cx('emptyState')}>
                     <ShieldAlert size={18} />
                     <span>Khong co log phu hop bo loc hien tai.</span>

@@ -1,32 +1,66 @@
-import React, {useMemo, useState} from 'react';
-import {Badge, Button, Form, Table} from 'react-bootstrap';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Badge, Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {EyeOff, Search, Trash2} from 'lucide-react';
+import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
-import {fakeEvaluations, fakeUsers} from '../data/fakeData';
+import {
+  createEvaluation,
+  deleteEvaluation,
+  getEvaluations,
+  updateEvaluation,
+} from '../../api/evaluationApi';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import styles from './Evaluations.module.scss';
 
 const cx = classNames.bind(styles);
 
-const normalizeEvaluations = (evaluations) => {
-  return evaluations.map((evaluation) => ({
-    ...evaluation,
-    is_hidden: false,
-  }));
+const emptyForm = {
+  content: '',
+  rating: 5,
 };
 
+const normalizeEvaluation = (evaluation) => ({
+  id: String(evaluation.id),
+  content: evaluation.content || '',
+  rating: Number(evaluation.rating || 0),
+  created_at: evaluation.createdAt || null,
+  user_id: evaluation.userId ? String(evaluation.userId) : '',
+  username: evaluation.username || 'Ẩn danh',
+});
+
 function EvaluationsManagement() {
-  const [evaluationList, setEvaluationList] = useState(
-    normalizeEvaluations(fakeEvaluations),
-  );
+  const [evaluationList, setEvaluationList] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingEvaluationId, setEditingEvaluationId] = useState(null);
+  const [deletingEvaluation, setDeletingEvaluation] = useState(null);
+  const [formState, setFormState] = useState(emptyForm);
+
+  const loadEvaluations = async () => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const evaluationData = await getEvaluations();
+      setEvaluationList(evaluationData.map(normalizeEvaluation));
+    } catch (error) {
+      setErrorMessage('Không thể tải danh sách đánh giá.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadEvaluations();
+  }, []);
 
   const filteredEvaluations = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
     return evaluationList.filter((evaluation) => {
-      const user = fakeUsers.find((item) => item.user_id === evaluation.user_id);
-      const userText = `${user?.full_name || ''} ${user?.user_name || ''}`.toLowerCase();
+      const userText = `${evaluation.username} ${evaluation.user_id}`.toLowerCase();
       const matchKeyword =
         normalizedKeyword.length === 0 ||
         evaluation.content.toLowerCase().includes(normalizedKeyword) ||
@@ -37,27 +71,103 @@ function EvaluationsManagement() {
     });
   }, [evaluationList, keyword, ratingFilter]);
 
-  const handleHide = (evaluationId) => {
-    setEvaluationList((previous) =>
-      previous.map((evaluation) =>
-        evaluation.id === evaluationId
-          ? {...evaluation, is_hidden: !evaluation.is_hidden}
-          : evaluation,
-      ),
-    );
+  const resetForm = () => {
+    setEditingEvaluationId(null);
+    setFormState(emptyForm);
   };
 
-  const handleDelete = (evaluationId) => {
-    setEvaluationList((previous) =>
-      previous.filter((evaluation) => evaluation.id !== evaluationId),
-    );
+  const openCreateModal = () => {
+    resetForm();
+    setShowFormModal(true);
+  };
+
+  const openEditModal = (evaluation) => {
+    setEditingEvaluationId(evaluation.id);
+    setFormState({
+      content: evaluation.content,
+      rating: evaluation.rating,
+    });
+    setShowFormModal(true);
+  };
+
+  const handleSubmit = async () => {
+    const normalizedContent = formState.content.trim();
+    if (!normalizedContent) {
+      setErrorMessage('Nội dung đánh giá không được để trống.');
+      return;
+    }
+
+    const normalizedRating = Math.max(1, Math.min(5, Number(formState.rating) || 0));
+    if (!normalizedRating) {
+      setErrorMessage('Rating phải nằm trong khoảng 1-5.');
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      const payload = {
+        content: normalizedContent,
+        rating: normalizedRating,
+      };
+
+      if (editingEvaluationId) {
+        const updatedEvaluation = await updateEvaluation(editingEvaluationId, payload);
+        setEvaluationList((previous) =>
+          previous.map((evaluation) =>
+            evaluation.id === editingEvaluationId
+              ? normalizeEvaluation(updatedEvaluation)
+              : evaluation,
+          ),
+        );
+      } else {
+        const createdEvaluation = await createEvaluation(payload);
+        setEvaluationList((previous) => [
+          normalizeEvaluation(createdEvaluation),
+          ...previous,
+        ]);
+      }
+
+      setShowFormModal(false);
+      resetForm();
+    } catch (error) {
+      setErrorMessage('Không thể lưu đánh giá.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingEvaluation) {
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      await deleteEvaluation(deletingEvaluation.id);
+      setEvaluationList((previous) =>
+        previous.filter((evaluation) => evaluation.id !== deletingEvaluation.id),
+      );
+      setDeletingEvaluation(null);
+    } catch (error) {
+      setErrorMessage('Không thể xóa đánh giá.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className={cx('evaluationsPage')}>
       <div className={cx('pageHeader')}>
-        <h1>Duyệt đánh giá</h1>
-        <p>Lọc theo rating, ẩn đánh giá không phù hợp hoặc xóa khỏi hệ thống.</p>
+        <div>
+          <h1>Quản lý đánh giá</h1>
+          <p>Quản lý đánh giá theo CRUD, không dùng bước duyệt.</p>
+        </div>
+        <Button onClick={openCreateModal} className={cx('createBtn')}>
+          <Plus size={16} />
+          Thêm đánh giá
+        </Button>
       </div>
 
       <div className={cx('filters')}>
@@ -83,6 +193,8 @@ function EvaluationsManagement() {
         </Form.Select>
       </div>
 
+      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+
       <div className={cx('tableWrapper')}>
         <Table responsive hover>
           <thead>
@@ -92,39 +204,48 @@ function EvaluationsManagement() {
               <th>Rating</th>
               <th>Nội dung</th>
               <th>Ngày tạo</th>
-              <th>Trạng thái</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {filteredEvaluations.map((evaluation) => {
-              const user = fakeUsers.find((item) => item.user_id === evaluation.user_id);
-              return (
+            {loading && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  <Spinner size="sm" className="me-2" />
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filteredEvaluations.map((evaluation) => (
                 <tr key={evaluation.id}>
                   <td>{evaluation.id}</td>
-                  <td>{user?.full_name || 'Ẩn danh'}</td>
-                  <td>{evaluation.rating}/5</td>
-                  <td>{evaluation.content}</td>
-                  <td>{evaluation.created_at || '-'}</td>
                   <td>
-                    <Badge bg={evaluation.is_hidden ? 'secondary' : 'success'}>
-                      {evaluation.is_hidden ? 'Đã ẩn' : 'Hiển thị'}
-                    </Badge>
+                    <div>{evaluation.username}</div>
+                  </td>
+                  <td>
+                    <Badge bg="secondary">{evaluation.rating}/5</Badge>
+                  </td>
+                  <td>{evaluation.content}</td>
+                  <td>
+                    {evaluation.created_at
+                      ? new Date(evaluation.created_at).toLocaleString('vi-VN')
+                      : '-'}
                   </td>
                   <td>
                     <div className={cx('actionButtons')}>
                       <Button
-                        variant="outline-secondary"
+                        variant="outline-primary"
                         size="sm"
-                        onClick={() => handleHide(evaluation.id)}
+                        onClick={() => openEditModal(evaluation)}
                       >
-                        <EyeOff size={14} />
-                        {evaluation.is_hidden ? 'Bỏ ẩn' : 'Ẩn'}
+                        <Edit size={14} />
+                        Sửa
                       </Button>
                       <Button
                         variant="outline-danger"
                         size="sm"
-                        onClick={() => handleDelete(evaluation.id)}
+                        onClick={() => setDeletingEvaluation(evaluation)}
                       >
                         <Trash2 size={14} />
                         Xóa
@@ -132,11 +253,99 @@ function EvaluationsManagement() {
                     </div>
                   </td>
                 </tr>
-              );
-            })}
+              ))}
+            {!loading && filteredEvaluations.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  Không có dữ liệu.
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>
+
+      <Modal
+        show={showFormModal}
+        onHide={() => {
+          if (submitting) {
+            return;
+          }
+          setShowFormModal(false);
+          resetForm();
+        }}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {editingEvaluationId ? 'Cập nhật đánh giá' : 'Tạo đánh giá'}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-3">
+            <Form.Label>Rating</Form.Label>
+            <Form.Select
+              value={formState.rating}
+              onChange={(event) =>
+                setFormState((previous) => ({
+                  ...previous,
+                  rating: Number(event.target.value),
+                }))
+              }
+            >
+              <option value={5}>5 sao</option>
+              <option value={4}>4 sao</option>
+              <option value={3}>3 sao</option>
+              <option value={2}>2 sao</option>
+              <option value={1}>1 sao</option>
+            </Form.Select>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Nội dung</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={4}
+              value={formState.content}
+              onChange={(event) =>
+                setFormState((previous) => ({
+                  ...previous,
+                  content: event.target.value,
+                }))
+              }
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              if (submitting) {
+                return;
+              }
+              setShowFormModal(false);
+              resetForm();
+            }}
+          >
+            Hủy
+          </Button>
+          <Button onClick={handleSubmit}>
+            {editingEvaluationId ? 'Lưu' : 'Tạo mới'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <ConfirmDeleteModal
+        show={Boolean(deletingEvaluation)}
+        onClose={() => {
+          if (submitting) {
+            return;
+          }
+          setDeletingEvaluation(null);
+        }}
+        onConfirm={handleDelete}
+        title="Xác nhận xóa đánh giá"
+        message="Bạn có chắc muốn xóa đánh giá này không?"
+      />
     </div>
   );
 }

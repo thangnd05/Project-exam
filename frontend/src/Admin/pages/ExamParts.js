@@ -38,7 +38,7 @@ function ExamPartsManagement() {
     skill_id: item.skillId ? String(item.skillId) : null,
     name: item.name || '',
     description: item.description || '',
-    default_num_questions: item.defaultNumQuestions || 0,
+    default_num_questions: item.defaultNumQuestions ,
   });
 
   const mapExamTypeFromApi = (item) => ({

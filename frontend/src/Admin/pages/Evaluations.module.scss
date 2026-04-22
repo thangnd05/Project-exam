@@ -5,6 +5,11 @@
 }
 
 .pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
   h1 {
     margin: 0;
     font-size: 1.6rem;
@@ -14,6 +19,12 @@
     margin: 6px 0 0;
     color: #6b7280;
   }
+}
+
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .filters {
@@ -58,6 +69,12 @@
     align-items: center;
     gap: 6px;
   }
+}
+
+.errorText {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 1024px) {

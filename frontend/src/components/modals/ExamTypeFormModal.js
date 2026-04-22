@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, Form, Modal} from 'react-bootstrap';
 
-const scoringMethodOptions = ['DEFAULT', 'SCORE', 'BANDS'];
+const scoringMethodOptions = ['DEFAULT', 'TOEIC_SCALE', 'IELTS_BAND'];
 
 function ExamTypeFormModal({
   show,

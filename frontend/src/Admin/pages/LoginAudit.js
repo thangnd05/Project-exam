@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import {KeyRound, Search, ShieldAlert} from 'lucide-react';
 
 import {getLoginAuditLogs} from '../../api/adminAuditApi';
+import {formatDateTime} from '../../utils/format-date-time';
 import styles from './AuditLogs.module.scss';
 
 const cx = classNames.bind(styles);
@@ -82,7 +83,6 @@ function LoginAudit() {
           <Search size={16} className={cx('searchIcon')} />
           <Form.Control
             type="text"
-            placeholder="Tìm theo tên đăng nhập, IP, user agent, lý do..."
             placeholder="Tìm theo user ID, action, IP, user agent, lý do..."
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
@@ -124,7 +124,7 @@ function LoginAudit() {
             {!loading &&
               filteredRows.map((row) => (
               <tr key={row.id}>
-                <td>{row.login_time}</td>
+                <td>{formatDateTime(row.login_time)}</td>
                 <td>{row.action || '—'}</td>
                 <td>{row.user_id ?? '—'}</td>
                 <td>{row.ip_address || '—'}</td>
