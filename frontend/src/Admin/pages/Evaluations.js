@@ -1,7 +1,7 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Badge, Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {ChevronLeft, ChevronRight, Edit, Plus, Search, Trash2} from 'lucide-react';
 
 import {
   createEvaluation,
@@ -29,7 +29,11 @@ const normalizeEvaluation = (evaluation) => ({
 });
 
 function EvaluationsManagement() {
+  const ITEMS_PER_PAGE = 10;
   const [evaluationList, setEvaluationList] = useState([]);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [keyword, setKeyword] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
   const [loading, setLoading] = useState(false);
@@ -40,36 +44,32 @@ function EvaluationsManagement() {
   const [deletingEvaluation, setDeletingEvaluation] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
 
-  const loadEvaluations = async () => {
+  const loadEvaluations = async (page) => {
     setLoading(true);
     setErrorMessage('');
     try {
-      const evaluationData = await getEvaluations();
-      setEvaluationList(evaluationData.map(normalizeEvaluation));
+      const evaluationPage = await getEvaluations({
+        page: Math.max(page - 1, 0),
+        size: ITEMS_PER_PAGE,
+        keyword,
+        rating: ratingFilter,
+      });
+      setEvaluationList((evaluationPage.content || []).map(normalizeEvaluation));
+      setTotalElements(evaluationPage.totalElements || 0);
+      setTotalPages(Math.max(evaluationPage.totalPages || 1, 1));
     } catch (error) {
       setErrorMessage('Không thể tải danh sách đánh giá.');
+      setEvaluationList([]);
+      setTotalElements(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadEvaluations();
-  }, []);
-
-  const filteredEvaluations = useMemo(() => {
-    const normalizedKeyword = keyword.trim().toLowerCase();
-    return evaluationList.filter((evaluation) => {
-      const userText = `${evaluation.username} ${evaluation.user_id}`.toLowerCase();
-      const matchKeyword =
-        normalizedKeyword.length === 0 ||
-        evaluation.content.toLowerCase().includes(normalizedKeyword) ||
-        userText.includes(normalizedKeyword);
-      const matchRating =
-        ratingFilter === 'all' || String(evaluation.rating) === ratingFilter;
-      return matchKeyword && matchRating;
-    });
-  }, [evaluationList, keyword, ratingFilter]);
+    loadEvaluations(currentPage);
+  }, [currentPage, keyword, ratingFilter]);
 
   const resetForm = () => {
     setEditingEvaluationId(null);
@@ -175,13 +175,19 @@ function EvaluationsManagement() {
           <Search size={16} className={cx('searchIcon')} />
           <Form.Control
             value={keyword}
-            onChange={(event) => setKeyword(event.target.value)}
+            onChange={(event) => {
+              setKeyword(event.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Tìm theo nội dung hoặc người dùng..."
           />
         </div>
         <Form.Select
           value={ratingFilter}
-          onChange={(event) => setRatingFilter(event.target.value)}
+          onChange={(event) => {
+            setRatingFilter(event.target.value);
+            setCurrentPage(1);
+          }}
           className={cx('ratingFilter')}
         >
           <option value="all">Tất cả rating</option>
@@ -217,7 +223,7 @@ function EvaluationsManagement() {
               </tr>
             )}
             {!loading &&
-              filteredEvaluations.map((evaluation) => (
+              evaluationList.map((evaluation) => (
                 <tr key={evaluation.id}>
                   <td>{evaluation.id}</td>
                   <td>
@@ -254,7 +260,7 @@ function EvaluationsManagement() {
                   </td>
                 </tr>
               ))}
-            {!loading && filteredEvaluations.length === 0 && (
+            {!loading && evaluationList.length === 0 && (
               <tr>
                 <td colSpan={6} className="text-center py-4">
                   Không có dữ liệu.
@@ -263,6 +269,34 @@ function EvaluationsManagement() {
             )}
           </tbody>
         </Table>
+      </div>
+      <div className={cx('pagination')}>
+        <span className={cx('paginationInfo')}>
+          Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-
+          {totalElements === 0
+            ? 0
+            : Math.min((currentPage - 1) * ITEMS_PER_PAGE + evaluationList.length, totalElements)}{' '}
+          trong {totalElements} bản ghi
+        </span>
+        <div className={cx('paginationBtns')}>
+          <button
+            className={cx('pageBtn')}
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((previous) => previous - 1)}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className={cx('pageNumber')}>
+            {currentPage}/{totalPages}
+          </span>
+          <button
+            className={cx('pageBtn')}
+            disabled={currentPage >= totalPages}
+            onClick={() => setCurrentPage((previous) => previous + 1)}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
       </div>
 
       <Modal

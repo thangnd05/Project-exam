@@ -2,8 +2,20 @@ import axios from 'axios';
 
 const BASE_URL = '/api/evaluations';
 
-export const getEvaluations = () => {
-  return axios.get(BASE_URL).then((response) => response.data);
+export const getEvaluations = ({page = 0, size = 10, keyword, rating} = {}) => {
+  const params = new URLSearchParams();
+  params.set('page', String(page));
+  params.set('size', String(size));
+  if (keyword && keyword.trim()) {
+    params.set('keyword', keyword.trim());
+  }
+  if (rating && rating !== 'all') {
+    params.set('rating', String(rating));
+  }
+
+  return axios
+    .get(`${BASE_URL}/paged?${params.toString()}`)
+    .then((response) => response.data);
 };
 
 export const createEvaluation = (payload) => {

@@ -1,6 +1,7 @@
 package com.project_exam.backend.controllers;
 
 import com.project_exam.backend.dto.request.EvaluationRequest;
+import com.project_exam.backend.dto.response.EvaluationPageResponse;
 import com.project_exam.backend.dto.response.EvaluationResponse;
 import com.project_exam.backend.services.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,16 @@ public class EvaluationController {
     @GetMapping
     public ResponseEntity<List<EvaluationResponse>> getAll() {
         return ResponseEntity.ok(evaluationService.getAll());
+    }
+
+    @GetMapping("/paged")
+    public ResponseEntity<EvaluationPageResponse> getAllPaged(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer rating
+    ) {
+        return ResponseEntity.ok(evaluationService.getAllPaged(page, size, keyword, rating));
     }
 
     @GetMapping("/{id}")

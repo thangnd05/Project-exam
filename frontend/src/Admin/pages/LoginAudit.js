@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {KeyRound, Search, ShieldAlert} from 'lucide-react';
+import {ChevronLeft, ChevronRight, KeyRound, Search, ShieldAlert} from 'lucide-react';
 
 import {getLoginAuditLogs} from '../../api/adminAuditApi';
 import {formatDateTime} from '../../utils/format-date-time';
@@ -10,15 +10,22 @@ import styles from './AuditLogs.module.scss';
 const cx = classNames.bind(styles);
 
 function LoginAudit() {
+  const ITEMS_PER_PAGE = 20;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [loginAuditRows, setLoginAuditRows] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const loadLoginAuditLogs = async () => {
+  const loadLoginAuditLogs = async (page) => {
     setLoading(true);
     try {
-      const response = await getLoginAuditLogs({page: 0, size: 300});
+      const response = await getLoginAuditLogs({
+        page: Math.max(page - 1, 0),
+        size: ITEMS_PER_PAGE,
+      });
       const rows = (response.content || []).map((item) => ({
         id: String(item.auditLogId),
         login_time: item.createdAt || '',
@@ -30,16 +37,20 @@ function LoginAudit() {
         user_agent: item.userAgent || '',
       }));
       setLoginAuditRows(rows);
+      setTotalElements(response.totalElements || 0);
+      setTotalPages(Math.max(response.totalPages || 1, 1));
     } catch (error) {
       setLoginAuditRows([]);
+      setTotalElements(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadLoginAuditLogs();
-  }, []);
+    loadLoginAuditLogs(currentPage);
+  }, [currentPage]);
 
   const filteredRows = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
@@ -155,6 +166,34 @@ function LoginAudit() {
             )}
           </tbody>
         </Table>
+      </div>
+      <div className={cx('pagination')}>
+        <span className={cx('paginationInfo')}>
+          Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-
+          {totalElements === 0
+            ? 0
+            : Math.min((currentPage - 1) * ITEMS_PER_PAGE + loginAuditRows.length, totalElements)}{' '}
+          trong {totalElements} bản ghi
+        </span>
+        <div className={cx('paginationBtns')}>
+          <button
+            className={cx('pageBtn')}
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((previous) => previous - 1)}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className={cx('pageNumber')}>
+            {currentPage}/{totalPages}
+          </span>
+          <button
+            className={cx('pageBtn')}
+            disabled={currentPage >= totalPages}
+            onClick={() => setCurrentPage((previous) => previous + 1)}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );
