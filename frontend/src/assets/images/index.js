@@ -2,7 +2,8 @@ const images = {
     noImage: require('./no-image.png'),
     avtImage: require('./avtImage.jpg'),
     logo: require('./logo.png'),
-    membership: require('./vip-member-banner.webp')
+    membership: require('./vip-member-banner.webp'),
+    logoW: require('./logoW.png')
 };
 
 export const SearchIcon = ({ width = '2.4rem', height = '2.4rem', className }) => (
