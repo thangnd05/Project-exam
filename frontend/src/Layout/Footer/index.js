@@ -23,7 +23,7 @@ function Footer() {
           <Col lg={4} md={12} className="mb-4 mb-lg-0">
             <div className={styles.brandContainer}>
               <div className={styles.logoWrapper}>
-                <img src={images.logo} alt="Logo" />
+                <img src={images.logoW} alt="Logo" />
               </div>
               <div className={styles.brandInfo}>
                 <h3 className={styles.brandName}>WinDe</h3>

@@ -224,13 +224,13 @@ function Header() {
           >
             <div className={cx('brandInner')}>
               <Image
-                src={images.logo}
+                src={images.logoW}
                 alt="logo"
-                height="70"
+                height="30"
                 loading="lazy"
                 className={cx('logo-brand')}
               />
-              {name}
+              <span className={cx('brandName')}>{name}</span>
             </div>
           </Navbar.Brand>
 

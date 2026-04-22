@@ -1,15 +1,30 @@
 @import '../../components/GlobalStyles/GlobalStyles.module.scss';
 
 .brand {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.9rem;
+  font-weight: 600;
   margin-right: 16px;
 }
 
 .brandInner {
   display: flex;
   align-items: center;
-  min-width: 140px;
+  gap: 8px;
+  min-width: 148px;
+}
+
+.logo-brand {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brandName {
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.2px;
+  color: #1f2937;
 }
 
 .navbarRoot {
@@ -329,11 +344,11 @@
 
 @media (max-width: 991.98px) {
   .brand {
-    font-size: 1.7rem;
+    font-size: 1.65rem;
   }
 
-  .brandInner img {
-    height: 52px;
+  .logo-brand {
+    height: 24px;
   }
 
   .user-info {
