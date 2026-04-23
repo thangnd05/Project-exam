@@ -9,7 +9,6 @@ const cx = classNames.bind(styles);
 const ACCEPT_BY_TYPE = {
     LISTENING: 'audio/*',
     READING: 'image/*',
-    DOCUMENT: '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
 const QuestionBlock = ({
@@ -57,7 +56,6 @@ const QuestionBlock = ({
                         >
                             <option value="LISTENING">Nghe (audio)</option>
                             <option value="READING">Đọc (ảnh)</option>
-                            <option value="DOCUMENT">Tài liệu (PDF/DOCX)</option>
                         </select>
                         <input
                             type="file"

@@ -18,8 +18,6 @@ const cxCreate = classNames.bind(createStyles);
 const ACCEPT_BY_TYPE = {
   LISTENING: 'audio/*',
   READING: 'image/*',
-  DOCUMENT:
-    '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
 const getMediaItemsFromQuestion = (questionDetail) => {
@@ -352,7 +350,7 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
 
               <Col md={12}>
                 <label className={cx('formLabel')}>
-                  Upload thêm file (ảnh / audio / tài liệu)
+                  Upload thêm file (ảnh / audio)
                 </label>
                 <input
                   type="file"

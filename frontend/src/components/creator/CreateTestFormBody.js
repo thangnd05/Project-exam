@@ -256,41 +256,49 @@ const CreateTestFormBody = ({
               </select>
             </div>
           </Col>
-          {activeCreatorType === CREATOR_TYPES.TEST && (
+          {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
             <>
-              <Col md={3}>
-                <div className={cx('formGroupModern')}>
-                  <label><IoTimeOutline /> Thời gian (phút)</label>
-                  <input type="number" className={cx('inputModern')} value={testInfo.durationMinutes} onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })} />
-                </div>
-              </Col>
-              <Col md={3}>
-                <div className={cx('formGroupModern')}>
-                  <label><IoRocketOutline /> Lượt làm tối đa</label>
-                  <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
-                </div>
-              </Col>
-              <Col md={6}>
-                <div className={cx('formGroupModern')}>
-                  <label><IoCalendarOutline /> Thời gian bắt đầu</label>
-                  <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableFrom} onChange={(e) => setTestInfo({ ...testInfo, availableFrom: e.target.value })} />
-                </div>
-              </Col>
-              <Col md={6}>
-                <div className={cx('formGroupModern')}>
-                  <label><IoCalendarOutline /> Thời gian kết thúc</label>
-                  <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableTo} onChange={(e) => setTestInfo({ ...testInfo, availableTo: e.target.value })} />
-                </div>
-              </Col>
+              {activeCreatorType === CREATOR_TYPES.TEST && (
+                <>
+                  <Col md={3}>
+                    <div className={cx('formGroupModern')}>
+                      <label><IoTimeOutline /> Thời gian (phút)</label>
+                      <input type="number" className={cx('inputModern')} value={testInfo.durationMinutes} onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })} />
+                    </div>
+                  </Col>
+                  <Col md={3}>
+                    <div className={cx('formGroupModern')}>
+                      <label><IoRocketOutline /> Lượt làm tối đa</label>
+                      <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
+                    </div>
+                  </Col>
+                  <Col md={6}>
+                    <div className={cx('formGroupModern')}>
+                      <label><IoCalendarOutline /> Thời gian bắt đầu</label>
+                      <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableFrom} onChange={(e) => setTestInfo({ ...testInfo, availableFrom: e.target.value })} />
+                    </div>
+                  </Col>
+                  <Col md={6}>
+                    <div className={cx('formGroupModern')}>
+                      <label><IoCalendarOutline /> Thời gian kết thúc</label>
+                      <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableTo} onChange={(e) => setTestInfo({ ...testInfo, availableTo: e.target.value })} />
+                    </div>
+                  </Col>
+                  <Col md={12}>
+                    <div className={cx('formGroupModern')}>
+                      <label><IoInformationCircleOutline /> Mô tả</label>
+                      <textarea className={cx('inputModern')} rows={2} value={testInfo.description} onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })} />
+                    </div>
+                  </Col>
+                </>
+              )}
               <Col md={12}>
                 <div className={cx('formGroupModern')}>
-                  <label><IoInformationCircleOutline /> Mô tả</label>
-                  <textarea className={cx('inputModern')} rows={2} value={testInfo.description} onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })} />
-                </div>
-              </Col>
-              <Col md={12}>
-                <div className={cx('formGroupModern')}>
-                  <label>Upload file Word để tạo câu hỏi nhanh (DOC/DOCX)</label>
+                  <label>
+                    {activeCreatorType === CREATOR_TYPES.BULK
+                      ? 'Upload file Word để import câu hỏi số lượng lớn vào kho (DOC/DOCX)'
+                      : 'Upload file Word để tạo câu hỏi nhanh (DOC/DOCX)'}
+                  </label>
                   <input
                     type="file"
                     accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -359,7 +367,6 @@ const CreateTestFormBody = ({
                     <select className={cx('inputModern')} style={{ width: 'auto' }} value={group.passage.passageType} onChange={(e) => setGroupPassageType(gIndex, e.target.value)}>
                       <option value="LISTENING">Nghe (audio)</option>
                       <option value="READING">Đọc (ảnh)</option>
-                      <option value="DOCUMENT">Tài liệu (PDF/DOCX)</option>
                     </select>
                     <input type="file" multiple accept={ACCEPT_BY_TYPE[group.passage.passageType] || ACCEPT_BY_TYPE.READING} className={cx('inputModern')} style={{ width: 'auto' }} onChange={(e) => { addGroupMediaFiles(gIndex, e.target.files); e.target.value = ''; }} />
                   </div>
