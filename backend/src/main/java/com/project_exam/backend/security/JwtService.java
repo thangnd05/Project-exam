@@ -35,7 +35,7 @@ public class JwtService {
     // Khởi tạo key từ secretKey
     @PostConstruct
     private void init() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64URL.decode(secretKey);
         this.cachedSigningKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
