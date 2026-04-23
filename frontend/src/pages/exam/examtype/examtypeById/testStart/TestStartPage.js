@@ -19,6 +19,11 @@ import styles from './TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
+const getApiErrorMessage = (error, fallbackMessage) =>
+  error?.response?.data?.message ||
+  error?.response?.data?.error ||
+  fallbackMessage;
+
 function TestStartPage() {
   const { testId } = useParams();
   const navigate = useNavigate();
@@ -234,7 +239,13 @@ function TestStartPage() {
         state: { score: res.data.totalScore },
       });
     } catch (err) {
-      alert('Nộp bài thất bại! Vui lòng thử lại.');
+      if (err?.response?.status === 409) {
+        sessionStorage.removeItem(`userTest-${testId}`);
+        sessionStorage.removeItem(`userTestState-${testId}`);
+        navigate(`/tests/result/${userTestId}`);
+        return;
+      }
+      alert(getApiErrorMessage(err, 'Nộp bài thất bại! Vui lòng thử lại.'));
     } finally {
       setIsSubmitting(false);
     }

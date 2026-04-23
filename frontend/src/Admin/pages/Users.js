@@ -29,12 +29,15 @@ const roleColors = {
 const ITEMS_PER_PAGE = 10;
 
 const normalizeUser = (user) => ({
-  user_id: String(user.userId ?? user.user_id),
-  user_name: user.userName ?? user.user_name ?? '',
-  full_name: user.fullName ?? user.full_name ?? '',
+  user_id: String(user.userId ?? user.user_id ?? user.id ?? ''),
+  user_name: user.userName ?? user.user_name ?? user.username ?? '',
+  full_name: user.fullName ?? user.full_name ?? user.username ?? '',
   email: user.email ?? '',
   role_id: String(user.roleId ?? user.role_id ?? ''),
-  verified: Boolean(user.verified),
+  verified:
+    typeof user.verified === 'boolean'
+      ? user.verified
+      : user.isVerified ?? null,
   created_at: user.createdAt ?? user.created_at ?? null,
 });
 
@@ -323,10 +326,20 @@ function UsersManagement() {
                       <td>{user.email}</td>
                       <td>
                         <Badge
-                          bg={user.verified ? 'success' : 'warning'}
+                          bg={
+                            user.verified === true
+                              ? 'success'
+                              : user.verified === false
+                                ? 'warning'
+                                : 'secondary'
+                          }
                           className={cx('statusBadge')}
                         >
-                          {user.verified ? 'Đã xác thực' : 'Chưa xác thực'}
+                          {user.verified === true
+                            ? 'Đã xác thực'
+                            : user.verified === false
+                              ? 'Chưa xác thực'
+                              : 'Không có dữ liệu'}
                         </Badge>
                       </td>
                       <td>

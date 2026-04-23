@@ -13,6 +13,11 @@ const parseOptionalId = (value) => {
   return trimmed === '' ? null : trimmed;
 };
 
+const getUserIdValue = (user) => user?.id ?? user?.userId ?? user?.user_id ?? null;
+
+const getUserDisplayName = (user) =>
+  user?.fullName ?? user?.full_name ?? user?.username ?? user?.userName ?? null;
+
 const createEmptyForm = (examTypes = []) => ({
   title: '',
   description: '',
@@ -228,8 +233,11 @@ function TestsManagement() {
                     : '—'}
                 </td>
                 <td>
-                  {users.find((user) => String(user.userId) === String(test.createdBy))
-                    ?.fullName || `User #${test.createdBy || '--'}`}
+                  {getUserDisplayName(
+                    users.find(
+                      (user) => String(getUserIdValue(user)) === String(test.createdBy),
+                    ),
+                  ) || `User #${test.createdBy || '--'}`}
                 </td>
                 <td>
                   <div className={cx('actions')}>
