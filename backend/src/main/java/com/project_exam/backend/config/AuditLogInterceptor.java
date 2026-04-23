@@ -53,6 +53,10 @@ public class AuditLogInterceptor implements HandlerInterceptor {
     }
 
     private String extractUserIdSafely(HttpServletRequest request) {
+        Object auditUserId = request.getAttribute("AUDIT_USER_ID");
+        if (auditUserId != null) {
+            return String.valueOf(auditUserId);
+        }
         try {
             return authUtils.getUserId(request);
         } catch (Exception exception) {

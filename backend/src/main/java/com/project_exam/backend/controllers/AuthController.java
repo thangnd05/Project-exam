@@ -29,8 +29,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request,
+                                              HttpServletRequest httpRequest,
                                               HttpServletResponse response) {
-        return ResponseEntity.ok(authService.login(request.getIdentifier(), request.getPassword(), response));
+        UserResponse userResponse = authService.login(request.getIdentifier(), request.getPassword(), response);
+        httpRequest.setAttribute("AUDIT_USER_ID", userResponse.getId());
+        return ResponseEntity.ok(userResponse);
     }
 
     @PostMapping("/register")
