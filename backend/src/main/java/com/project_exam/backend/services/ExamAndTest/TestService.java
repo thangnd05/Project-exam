@@ -118,7 +118,7 @@ public class TestService {
     }
 
     public List<Test> getAllTestsByAdmin() {
-        Role adminRole = roleRepository.findByRoleName("Admin");
+        Role adminRole = roleRepository.findByRoleName("ADMIN");
         if (adminRole == null) return new ArrayList<>();
 
         List<User> adminUsers = userRepository.findByRoleId(adminRole.getRoleId());
