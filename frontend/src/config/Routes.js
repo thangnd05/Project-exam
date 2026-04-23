@@ -53,6 +53,7 @@ const routes = {
 
   oauth2Redirect: '/oauth2/redirect',
 
+  notFoundPage: '/not-found',
   notFound: '*',
 };
 

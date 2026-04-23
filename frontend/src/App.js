@@ -52,9 +52,11 @@ function App() {
                   key={`admin-${index}`}
                   path={route.path}
                   element={
-                    <AdminLayout>
-                      <Page />
-                    </AdminLayout>
+                    <ProtectedRoute requiredRoleName="ADMIN">
+                      <AdminLayout>
+                        <Page />
+                      </AdminLayout>
+                    </ProtectedRoute>
                   }
                 />
               );

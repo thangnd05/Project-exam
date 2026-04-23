@@ -51,6 +51,7 @@ export const publicRoutes = [
   {path: routes.service, component: Service},
   {path: routes.about, component: About},
   {path: routes.verifyEmail, component: VerifyEmailPage},
+  {path: routes.notFoundPage, component: NotFoundPage},
   {path: routes.notFound, component: NotFoundPage},
 ];
 

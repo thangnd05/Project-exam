@@ -1,9 +1,9 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
+import axios from 'axios';
 import {Badge, Button, Form, Modal, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Edit, Search, Trash2} from 'lucide-react';
 
-import {fakeExamTypes, fakeTests, fakeUsers} from '../data/fakeData';
 import styles from './Tests.module.scss';
 
 const cx = classNames.bind(styles);
@@ -13,35 +13,70 @@ const parseOptionalId = (value) => {
   return trimmed === '' ? null : trimmed;
 };
 
-const emptyForm = {
+const createEmptyForm = (examTypes = []) => ({
   title: '',
   description: '',
-  exam_type_id: String(fakeExamTypes[0]?.exam_type_id ?? ''),
-  duration_minutes: 60,
-  max_attempts: 1,
-  class_id: '',
-  chapter_id: '',
-  created_by: String(fakeUsers[0]?.user_id ?? ''),
-};
-
-const getExamTypeName = (examTypeId) => {
-  const found = fakeExamTypes.find(
-    (item) => String(item.exam_type_id) === String(examTypeId),
-  );
-  return found?.name ?? `ID ${examTypeId}`;
-};
-
-const getCreatorName = (userId) => {
-  const found = fakeUsers.find((user) => String(user.user_id) === String(userId));
-  return found?.full_name ?? `User #${userId}`;
-};
+  examTypeId: String(examTypes[0]?.examTypeId ?? ''),
+  durationMinutes: 60,
+  maxAttempts: 1,
+  classId: '',
+  chapterId: '',
+});
 
 function TestsManagement() {
-  const [tests, setTests] = useState(fakeTests);
+  const [tests, setTests] = useState([]);
+  const [examTypes, setExamTypes] = useState([]);
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingTestId, setEditingTestId] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
+  const [formState, setFormState] = useState(createEmptyForm());
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const fetchTests = async () => {
+    const response = await axios.get('/api/tests/admin');
+    const testList = Array.isArray(response.data) ? response.data : [];
+    setTests(testList);
+  };
+
+  useEffect(() => {
+    const loadPageData = async () => {
+      setLoading(true);
+      setErrorMessage('');
+      try {
+        const [testsResponse, examTypesResponse, usersResponse] = await Promise.all([
+          axios.get('/api/tests/admin'),
+          axios.get('/api/exam-types'),
+          axios.get('/api/users/paged?page=0&size=200'),
+        ]);
+
+        setTests(Array.isArray(testsResponse.data) ? testsResponse.data : []);
+        setExamTypes(
+          Array.isArray(examTypesResponse.data) ? examTypesResponse.data : [],
+        );
+        setUsers(
+          Array.isArray(usersResponse.data?.content) ? usersResponse.data.content : [],
+        );
+      } catch (error) {
+        setErrorMessage('Không thể tải dữ liệu đề thi từ hệ thống.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPageData();
+  }, []);
+
+  useEffect(() => {
+    if (examTypes.length > 0 && !formState.examTypeId) {
+      setFormState((previous) => ({
+        ...previous,
+        examTypeId: String(examTypes[0].examTypeId),
+      }));
+    }
+  }, [examTypes, formState.examTypeId]);
 
   const filteredTests = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -49,96 +84,86 @@ function TestsManagement() {
       return tests;
     }
     return tests.filter((test) => {
-      const typeName = getExamTypeName(test.exam_type_id).toLowerCase();
+      const typeName = (
+        examTypes.find(
+          (item) => String(item.examTypeId) === String(test.examTypeId),
+        )?.name || `ID ${test.examTypeId}`
+      ).toLowerCase();
       return (
         test.title.toLowerCase().includes(keyword) ||
         (test.description || '').toLowerCase().includes(keyword) ||
         typeName.includes(keyword)
       );
     });
-  }, [tests, searchTerm]);
+  }, [tests, searchTerm, examTypes]);
 
   const resetForm = () => {
-    setFormState(emptyForm);
+    setFormState(createEmptyForm(examTypes));
     setEditingTestId(null);
   };
 
-  const openCreateModal = () => {
-    resetForm();
-    setShowFormModal(true);
-  };
-
   const openEditModal = (test) => {
-    setEditingTestId(test.test_id);
+    setEditingTestId(test.testId);
     setFormState({
       title: test.title,
       description: test.description || '',
-      exam_type_id: test.exam_type_id,
-      duration_minutes: test.duration_minutes,
-      max_attempts: test.max_attempts,
-      class_id: test.class_id ?? '',
-      chapter_id: test.chapter_id ?? '',
-      created_by: test.created_by,
+      examTypeId: String(test.examTypeId || ''),
+      durationMinutes: test.durationMinutes || 60,
+      maxAttempts: test.maxAttempts || 1,
+      classId: test.classId ?? '',
+      chapterId: test.chapterId ?? '',
     });
     setShowFormModal(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!editingTestId) {
+      return;
+    }
+
     const normalizedTitle = formState.title.trim();
     if (!normalizedTitle) {
       return;
     }
 
-    const classId = parseOptionalId(formState.class_id);
-    const chapterId = parseOptionalId(formState.chapter_id);
-    const duration = Math.max(1, Number(formState.duration_minutes) || 60);
-    const maxAttempts = Math.max(1, Number(formState.max_attempts) || 1);
+    const payload = {
+      title: normalizedTitle,
+      description: formState.description.trim() || null,
+      examTypeId: String(formState.examTypeId),
+      durationMinutes: Math.max(1, Number(formState.durationMinutes) || 60),
+      maxAttempts: Math.max(1, Number(formState.maxAttempts) || 1),
+      classId: parseOptionalId(formState.classId),
+      chapterId: parseOptionalId(formState.chapterId),
+      availableFrom: null,
+      availableTo: null,
+      bannerUrl: null,
+    };
 
-    if (editingTestId) {
-      setTests((previous) =>
-        previous.map((item) =>
-          item.test_id === editingTestId
-            ? {
-                ...item,
-                title: normalizedTitle,
-                description: formState.description.trim() || null,
-                exam_type_id: String(formState.exam_type_id),
-                duration_minutes: duration,
-                max_attempts: maxAttempts,
-                class_id: classId,
-                chapter_id: chapterId,
-                created_by: String(formState.created_by),
-              }
-            : item,
-        ),
-      );
-    } else {
-      const nextId =
-        tests.reduce((maxId, item) => Math.max(maxId, item.test_id), 0) + 1;
-      const today = new Date().toISOString().slice(0, 10);
-      setTests((previous) => [
-        ...previous,
-        {
-          test_id: nextId,
-          title: normalizedTitle,
-          description: formState.description.trim() || null,
-          exam_type_id: String(formState.exam_type_id),
-          duration_minutes: duration,
-          max_attempts: maxAttempts,
-          class_id: classId,
-          chapter_id: chapterId,
-          created_by: String(formState.created_by),
-          created_at: today,
-        },
-      ]);
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      await axios.put(`/api/tests/${editingTestId}`, payload);
+      await fetchTests();
+      setShowFormModal(false);
+      resetForm();
+    } catch (error) {
+      setErrorMessage('Không thể lưu đề thi. Vui lòng thử lại.');
+    } finally {
+      setSubmitting(false);
     }
-
-    setShowFormModal(false);
-    resetForm();
   };
 
-  const handleDelete = (testId) => {
-    setTests((previous) => previous.filter((item) => item.test_id !== testId));
+  const handleDelete = async (testId) => {
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      await axios.delete(`/api/tests/${testId}`);
+      setTests((previous) => previous.filter((item) => item.testId !== testId));
+    } catch (error) {
+      setErrorMessage('Không thể xóa đề thi.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -146,12 +171,8 @@ function TestsManagement() {
       <div className={cx('pageHeader')}>
         <div>
           <h1>Quản lý đề thi</h1>
-          <p>Tạo, sửa, xóa đề thi theo loại kỳ thi (dữ liệu demo trên trình duyệt).</p>
+          <p>Sửa, xóa đề thi theo loại kỳ thi.</p>
         </div>
-        <Button onClick={openCreateModal} className={cx('createBtn')}>
-          <Plus size={16} />
-          Thêm đề thi
-        </Button>
       </div>
 
       <div className={cx('filterBar')}>
@@ -166,6 +187,7 @@ function TestsManagement() {
       </div>
 
       <div className={cx('tableWrapper')}>
+        {errorMessage ? <p className="text-danger mb-2">{errorMessage}</p> : null}
         <Table responsive hover>
           <thead>
             <tr>
@@ -180,21 +202,35 @@ function TestsManagement() {
             </tr>
           </thead>
           <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={8} className="text-center py-3">
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            ) : null}
             {filteredTests.map((test) => (
-              <tr key={test.test_id}>
-                <td>{test.test_id}</td>
+              <tr key={test.testId}>
+                <td>{test.testId}</td>
                 <td>{test.title}</td>
                 <td>
-                  <Badge bg="secondary">{getExamTypeName(test.exam_type_id)}</Badge>
+                  <Badge bg="secondary">
+                    {examTypes.find(
+                      (item) => String(item.examTypeId) === String(test.examTypeId),
+                    )?.name || `ID ${test.examTypeId}`}
+                  </Badge>
                 </td>
-                <td>{test.duration_minutes} phút</td>
-                <td>{test.max_attempts}</td>
+                <td>{test.durationMinutes} phút</td>
+                <td>{test.maxAttempts}</td>
                 <td>
-                  {test.class_id != null || test.chapter_id != null
-                    ? `Lớp ${test.class_id ?? '—'} / Chương ${test.chapter_id ?? '—'}`
+                  {test.classId != null || test.chapterId != null
+                    ? `Lớp ${test.classId ?? '—'} / Chương ${test.chapterId ?? '—'}`
                     : '—'}
                 </td>
-                <td>{getCreatorName(test.created_by)}</td>
+                <td>
+                  {users.find((user) => String(user.userId) === String(test.createdBy))
+                    ?.fullName || `User #${test.createdBy || '--'}`}
+                </td>
                 <td>
                   <div className={cx('actions')}>
                     <button type="button" onClick={() => openEditModal(test)} title="Sửa">
@@ -202,8 +238,9 @@ function TestsManagement() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDelete(test.test_id)}
+                      onClick={() => handleDelete(test.testId)}
                       title="Xóa"
+                      disabled={submitting}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -211,6 +248,13 @@ function TestsManagement() {
                 </td>
               </tr>
             ))}
+            {!loading && filteredTests.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="text-center py-3">
+                  Không có đề thi nào.
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </Table>
       </div>
@@ -225,7 +269,7 @@ function TestsManagement() {
         size="lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title>{editingTestId ? 'Cập nhật đề thi' : 'Tạo đề thi'}</Modal.Title>
+          <Modal.Title>Cập nhật đề thi</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-3">
@@ -254,16 +298,16 @@ function TestsManagement() {
           <Form.Group className="mb-3">
             <Form.Label>Loại kỳ thi</Form.Label>
             <Form.Select
-              value={formState.exam_type_id}
+              value={formState.examTypeId}
               onChange={(event) =>
                 setFormState((previous) => ({
                   ...previous,
-                  exam_type_id: event.target.value,
+                  examTypeId: event.target.value,
                 }))
               }
             >
-              {fakeExamTypes.map((examType) => (
-                <option key={examType.exam_type_id} value={examType.exam_type_id}>
+              {examTypes.map((examType) => (
+                <option key={examType.examTypeId} value={examType.examTypeId}>
                   {examType.name}
                 </option>
               ))}
@@ -275,11 +319,11 @@ function TestsManagement() {
               <Form.Control
                 type="number"
                 min={1}
-                value={formState.duration_minutes}
+                value={formState.durationMinutes}
                 onChange={(event) =>
                   setFormState((previous) => ({
                     ...previous,
-                    duration_minutes: Number(event.target.value),
+                    durationMinutes: Number(event.target.value),
                   }))
                 }
               />
@@ -289,11 +333,11 @@ function TestsManagement() {
               <Form.Control
                 type="number"
                 min={1}
-                value={formState.max_attempts}
+                value={formState.maxAttempts}
                 onChange={(event) =>
                   setFormState((previous) => ({
                     ...previous,
-                    max_attempts: Number(event.target.value),
+                    maxAttempts: Number(event.target.value),
                   }))
                 }
               />
@@ -306,9 +350,9 @@ function TestsManagement() {
                 type="text"
                 inputMode="numeric"
                 placeholder="Để trống nếu không gắn lớp"
-                value={formState.class_id}
+                value={formState.classId}
                 onChange={(event) =>
-                  setFormState((previous) => ({...previous, class_id: event.target.value}))
+                  setFormState((previous) => ({...previous, classId: event.target.value}))
                 }
               />
             </Form.Group>
@@ -318,34 +362,16 @@ function TestsManagement() {
                 type="text"
                 inputMode="numeric"
                 placeholder="Để trống nếu không gắn chương"
-                value={formState.chapter_id}
+                value={formState.chapterId}
                 onChange={(event) =>
                   setFormState((previous) => ({
                     ...previous,
-                    chapter_id: event.target.value,
+                    chapterId: event.target.value,
                   }))
                 }
               />
             </Form.Group>
           </div>
-          <Form.Group>
-            <Form.Label>Người tạo</Form.Label>
-            <Form.Select
-              value={formState.created_by}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  created_by: event.target.value,
-                }))
-              }
-            >
-              {fakeUsers.map((user) => (
-                <option key={user.user_id} value={user.user_id}>
-                  {user.full_name} ({user.user_name})
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -357,7 +383,9 @@ function TestsManagement() {
           >
             Hủy
           </Button>
-          <Button onClick={handleSubmit}>{editingTestId ? 'Lưu' : 'Tạo mới'}</Button>
+          <Button onClick={handleSubmit} disabled={submitting || loading}>
+            Lưu
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>
