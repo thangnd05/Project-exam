@@ -221,7 +221,7 @@ function TestStartPage() {
     try {
       const payload = Object.entries(userAnswers).map(([qid, ans]) => ({
         userTestId,
-        questionId: parseInt(qid),
+        questionId: String(qid),
         selectedAnswerId: ans.selectedAnswerId || null,
         answerText: ans.answerText || null,
       }));

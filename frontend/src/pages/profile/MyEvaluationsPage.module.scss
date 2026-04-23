@@ -109,6 +109,84 @@
   word-break: break-word;
 }
 
+.editSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ratingPicker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.starButton {
+  border: 0;
+  background: transparent;
+  padding: 2px;
+  cursor: pointer;
+  line-height: 0;
+  font-size: 2rem;
+}
+
+.editTextarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #334155;
+  font-size: 1.35rem;
+  min-height: 100px;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  }
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.actionBtn {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.saveBtn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.cancelBtn {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
+.editBtn {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.deleteBtn {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
@@ -118,5 +196,9 @@
   .itemHeader {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .actionRow {
+    width: 100%;
   }
 }

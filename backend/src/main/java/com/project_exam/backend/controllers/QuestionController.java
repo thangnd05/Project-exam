@@ -223,6 +223,21 @@ public class QuestionController {
         }
     }
 
+    @PostMapping(value = "/preview/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> previewQuestionsFromDocument(
+            @RequestPart("file") MultipartFile file
+    ) {
+        try {
+            List<NormalQuestionRequest> responses = questionService.previewQuestionsFromDocument(file);
+            return ResponseEntity.ok(responses);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Preview câu hỏi từ Word thất bại",
+                    "detail", e.getMessage()
+            ));
+        }
+    }
+
     // =================== UPDATE ===================
 
     /** Cập nhật câu hỏi (JSON). Body: QuestionCreateRequest (patch). */

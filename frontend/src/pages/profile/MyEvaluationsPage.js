@@ -4,6 +4,8 @@ import classNames from 'classnames/bind';
 import {Alert, Spinner} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {IoArrowBackOutline, IoCalendarOutline, IoStar} from 'react-icons/io5';
+import {toast} from 'react-toastify';
+import {deleteEvaluation, updateEvaluation} from '~/api/evaluationApi';
 import routes from '~/config/Routes';
 import styles from './MyEvaluationsPage.module.scss';
 
@@ -21,6 +23,10 @@ function MyEvaluationsPage() {
   const [evaluations, setEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [editingEvaluationId, setEditingEvaluationId] = useState(null);
+  const [editRating, setEditRating] = useState(0);
+  const [editContent, setEditContent] = useState('');
+  const [actionLoadingId, setActionLoadingId] = useState(null);
 
   const fetchMyEvaluations = async () => {
     setLoading(true);
@@ -39,6 +45,79 @@ function MyEvaluationsPage() {
   useEffect(() => {
     fetchMyEvaluations();
   }, []);
+
+  const startEditEvaluation = (evaluation) => {
+    setEditingEvaluationId(evaluation.id);
+    setEditRating(Number(evaluation.rating || 0));
+    setEditContent(evaluation.content || '');
+  };
+
+  const cancelEditEvaluation = () => {
+    setEditingEvaluationId(null);
+    setEditRating(0);
+    setEditContent('');
+  };
+
+  const handleUpdateEvaluation = async (evaluationId) => {
+    const trimmedContent = editContent.trim();
+    if (!editRating || editRating < 1 || editRating > 5) {
+      toast.error('Vui lòng chọn số sao từ 1 đến 5.');
+      return;
+    }
+    if (!trimmedContent) {
+      toast.error('Nội dung đánh giá không được để trống.');
+      return;
+    }
+
+    setActionLoadingId(evaluationId);
+
+    try {
+      const updatedEvaluation = await updateEvaluation(evaluationId, {
+        rating: editRating,
+        content: trimmedContent,
+      });
+
+      setEvaluations((previousEvaluations) =>
+        previousEvaluations.map((evaluation) =>
+          evaluation.id === evaluationId
+            ? {...evaluation, ...updatedEvaluation}
+            : evaluation,
+        ),
+      );
+      toast.success('Cập nhật đánh giá thành công.');
+      cancelEditEvaluation();
+    } catch (error) {
+      toast.error('Không thể cập nhật đánh giá. Vui lòng thử lại.');
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleDeleteEvaluation = async (evaluationId) => {
+    const confirmed = window.confirm(
+      'Bạn có chắc chắn muốn xóa đánh giá này không?',
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setActionLoadingId(evaluationId);
+
+    try {
+      await deleteEvaluation(evaluationId);
+      setEvaluations((previousEvaluations) =>
+        previousEvaluations.filter((evaluation) => evaluation.id !== evaluationId),
+      );
+      if (editingEvaluationId === evaluationId) {
+        cancelEditEvaluation();
+      }
+      toast.success('Đã xóa đánh giá thành công.');
+    } catch (error) {
+      toast.error('Không thể xóa đánh giá. Vui lòng thử lại.');
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
 
   return (
     <div className={cx('wrapper')}>
@@ -101,7 +180,82 @@ function MyEvaluationsPage() {
                     {formatDateTime(evaluation.createdAt)}
                   </span>
                 </div>
-                <p className={cx('content')}>{evaluation.content || '--'}</p>
+
+                {editingEvaluationId === evaluation.id ? (
+                  <div className={cx('editSection')}>
+                    <div className={cx('ratingPicker')}>
+                      {Array.from({length: 5}).map((_, index) => {
+                        const starValue = index + 1;
+                        return (
+                          <button
+                            key={`${evaluation.id}-edit-star-${starValue}`}
+                            type="button"
+                            className={cx('starButton')}
+                            onClick={() => setEditRating(starValue)}
+                            aria-label={`Đánh giá ${starValue} sao`}
+                          >
+                            <IoStar
+                              className={cx(
+                                starValue <= editRating
+                                  ? 'starActive'
+                                  : 'starInactive',
+                              )}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <textarea
+                      className={cx('editTextarea')}
+                      value={editContent}
+                      onChange={(event) => setEditContent(event.target.value)}
+                      placeholder="Nhập nội dung đánh giá..."
+                      rows={4}
+                    />
+
+                    <div className={cx('actionRow')}>
+                      <button
+                        type="button"
+                        className={cx('actionBtn', 'saveBtn')}
+                        onClick={() => handleUpdateEvaluation(evaluation.id)}
+                        disabled={actionLoadingId === evaluation.id}
+                      >
+                        {actionLoadingId === evaluation.id ? 'Đang lưu...' : 'Lưu'}
+                      </button>
+                      <button
+                        type="button"
+                        className={cx('actionBtn', 'cancelBtn')}
+                        onClick={cancelEditEvaluation}
+                        disabled={actionLoadingId === evaluation.id}
+                      >
+                        Hủy
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className={cx('content')}>{evaluation.content || '--'}</p>
+                    <div className={cx('actionRow')}>
+                      <button
+                        type="button"
+                        className={cx('actionBtn', 'editBtn')}
+                        onClick={() => startEditEvaluation(evaluation)}
+                        disabled={actionLoadingId === evaluation.id}
+                      >
+                        Sửa đánh giá
+                      </button>
+                      <button
+                        type="button"
+                        className={cx('actionBtn', 'deleteBtn')}
+                        onClick={() => handleDeleteEvaluation(evaluation.id)}
+                        disabled={actionLoadingId === evaluation.id}
+                      >
+                        {actionLoadingId === evaluation.id ? 'Đang xóa...' : 'Xóa đánh giá'}
+                      </button>
+                    </div>
+                  </>
+                )}
               </article>
             ))}
           </div>

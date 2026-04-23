@@ -56,7 +56,10 @@ const CreateTestFormBody = ({
     testInfo,
     setTestInfo,
     questions,
+    setQuestions,
     groups,
+    documentFile,
+    setDocumentFile,
     loading,
     notification,
     handleExamTypeChange,
@@ -98,6 +101,64 @@ const CreateTestFormBody = ({
     if (success) {
       if (embedded) toast.success(activeCreatorType === CREATOR_TYPES.TEST ? 'Đã tạo đề thi thành công! 🚀' : 'Đã lưu thành công!');
       onSuccess?.();
+    }
+  };
+
+  const handleDocumentFileChange = (event) => {
+    const selectedFile = event.target.files?.[0] || null;
+    setDocumentFile(selectedFile);
+    if (selectedFile) {
+      handlePreviewQuestionsFromDocument(selectedFile);
+    }
+  };
+
+  const handlePreviewQuestionsFromDocument = async (fileInput = documentFile) => {
+    if (!fileInput) {
+      toast.warning('Vui lòng chọn file Word trước khi nạp câu hỏi.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', fileInput);
+
+      const response = await axios.post('/api/questions/preview/document', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const parsedQuestions = Array.isArray(response.data) ? response.data : [];
+      if (parsedQuestions.length === 0) {
+        toast.warning('Không tìm thấy câu hỏi hợp lệ trong file Word.');
+        return;
+      }
+
+      const normalizedQuestions = parsedQuestions.map((question) => ({
+        questionText: question.questionText || '',
+        questionType: question.questionType || 'MCQ',
+        mediaFiles: [],
+        mediaUrl: '',
+        passageType: 'LISTENING',
+        answers: ['A', 'B', 'C', 'D'].map((label) => {
+          const matchedAnswer = (question.answers || []).find(
+            (answer) => answer.answerLabel === label,
+          );
+          return {
+            answerLabel: label,
+            answerText: matchedAnswer?.answerText || '',
+            isCorrect: Boolean(matchedAnswer?.isCorrect),
+          };
+        }),
+      }));
+
+      setQuestions(normalizedQuestions);
+      setDocumentFile(null);
+      toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi từ Word.`);
+    } catch (error) {
+      const message =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        'Không thể nạp câu hỏi từ Word.';
+      toast.error(message);
     }
   };
 
@@ -225,6 +286,22 @@ const CreateTestFormBody = ({
                 <div className={cx('formGroupModern')}>
                   <label><IoInformationCircleOutline /> Mô tả</label>
                   <textarea className={cx('inputModern')} rows={2} value={testInfo.description} onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })} />
+                </div>
+              </Col>
+              <Col md={12}>
+                <div className={cx('formGroupModern')}>
+                  <label>Upload file Word để tạo câu hỏi nhanh (DOC/DOCX)</label>
+                  <input
+                    type="file"
+                    accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    className={cx('inputModern')}
+                    onChange={handleDocumentFileChange}
+                  />
+                  {documentFile && (
+                    <small className="text-muted d-block mt-2">
+                      Đang nạp từ file: {documentFile.name}
+                    </small>
+                  )}
                 </div>
               </Col>
             </>

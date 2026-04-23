@@ -55,6 +55,7 @@ export const useCreateTest = ({
 
   const [questions, setQuestions] = useState([JSON.parse(JSON.stringify(emptyQuestion))]);
   const [groups, setGroups] = useState([createInitialGroup()]);
+  const [documentFile, setDocumentFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({});
 
@@ -67,8 +68,10 @@ export const useCreateTest = ({
     testInfo,
     questions,
     groups,
+    documentFile,
     setQuestions,
     setGroups,
+    setDocumentFile,
     setLoading,
     setNotification,
     emptyQuestion,
@@ -225,7 +228,10 @@ export const useCreateTest = ({
     testInfo,
     setTestInfo,
     questions,
+    setQuestions,
     groups,
+    documentFile,
+    setDocumentFile,
     loading,
     notification,
     handleExamTypeChange,

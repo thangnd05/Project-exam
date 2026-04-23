@@ -265,6 +265,13 @@ public class QuestionService {
         return questionRepository.countByClassIdAndCreatedByAndIsBankTrue(resolvedClassId, currentUserId);
     }
 
+    public List<NormalQuestionRequest> previewQuestionsFromDocument(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("Vui lòng chọn file Word.");
+        }
+        return questionDocumentImportService.parseQuestionsFromDocument(file);
+    }
+
     @Transactional
     public List<QuestionAdminResponse> importQuestionsFromDocument(
             MultipartFile file,

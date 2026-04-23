@@ -8,19 +8,39 @@ export const useTestSubmission = ({
     testInfo,
     questions,
     groups,
+    documentFile,
     setQuestions,
     setGroups,
+    setDocumentFile,
     setLoading,
     setNotification,
     emptyQuestion,
     createInitialGroup,
 }) => {
+    const hasValidManualQuestion = (question) => {
+        if (!question?.questionText?.trim()) {
+            return false;
+        }
+        const hasValidCorrectAnswer = (question.answers || []).some(
+            (answer) => answer.isCorrect && answer.answerText?.trim(),
+        );
+        return hasValidCorrectAnswer;
+    };
+
     const handleSubmit = async (creatorType) => {
         if (creatorType === CREATOR_TYPES.TEST) {
             if (!testInfo.title || !testInfo.examTypeId || !testInfo.examPartId) {
                 setNotification({
                     type: 'warning',
                     message: 'Vui lòng điền đủ thông tin!',
+                });
+                return false;
+            }
+            const hasAnyManualQuestion = questions.some(hasValidManualQuestion);
+            if (!documentFile && !hasAnyManualQuestion) {
+                setNotification({
+                    type: 'warning',
+                    message: 'Vui lòng nhập ít nhất 1 câu hỏi hợp lệ hoặc upload file Word.',
                 });
                 return false;
             }
@@ -68,8 +88,25 @@ export const useTestSubmission = ({
                     numQuestions: questions.length,
                 });
                 const newPartId = partRes.data.testPartId || partRes.data.id;
+
+                if (documentFile) {
+                    const documentFormData = new FormData();
+                    documentFormData.append('file', documentFile);
+                    documentFormData.append('testPartId', String(newPartId));
+                    if (mode === 'class' && classId) {
+                        documentFormData.append('classId', String(classId));
+                    }
+                    if (mode === 'class' && chapterId) {
+                        documentFormData.append('chapterId', String(chapterId));
+                    }
+                    await axios.post('/api/questions/create-and-attach/document', documentFormData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                }
+
+                const manualQuestions = questions.filter(hasValidManualQuestion);
                 await Promise.all(
-                    questions.map((q) => {
+                    manualQuestions.map((q) => {
                         const formData = new FormData();
                         const hasMedia = q.mediaFiles && q.mediaFiles.length > 0;
                         const hasMediaUrl = !!q.mediaUrl?.trim();
@@ -101,6 +138,7 @@ export const useTestSubmission = ({
                     message: '🎉 Tạo đề thi thành công!',
                 });
                 setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
+                setDocumentFile(null);
             } else if (creatorType === CREATOR_TYPES.BULK) {
                 const formData = new FormData();
                 const payload = {
@@ -171,7 +209,10 @@ export const useTestSubmission = ({
             }
             return true;
         } catch (error) {
-            const msg = error.response?.data?.message || error.message;
+            const msg =
+                error.response?.data?.detail ||
+                error.response?.data?.message ||
+                error.message;
             setNotification({ type: 'danger', message: '❌ ' + msg });
             return false;
         } finally {
