@@ -41,7 +41,7 @@ function TestStartPage() {
     if (!url) return null;
     const cleanUrl = url.trim();
     if (cleanUrl.startsWith('http')) return cleanUrl;
-    const backendUrl = axios.defaults.baseURL || 'http://localhost:8080';
+    const backendUrl = axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '';
     return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl
       }`;
   };

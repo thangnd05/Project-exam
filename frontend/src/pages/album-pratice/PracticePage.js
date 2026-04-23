@@ -22,6 +22,7 @@ import styles from './PracticePage.module.scss';
 const cx = classNames.bind(styles);
 
 const PracticePage = () => {
+    const backendBaseUrl = (axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
     const {albumId} = useParams();
     const [question, setQuestion] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -259,7 +260,7 @@ const PracticePage = () => {
                                 className={cx('audioPlayer')}
                             >
                                 <source
-                                    src={`http://localhost:8080/api/tts?text=${encodeURIComponent(question.word || '')}`}
+                                    src={`${backendBaseUrl}/api/tts?text=${encodeURIComponent(question.word || '')}`}
                                     type="audio/mpeg"
                                 />
                             </audio>

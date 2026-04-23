@@ -33,8 +33,9 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const GOOGLE_AUTH_URL = "http://localhost:8080/oauth2/authorization/google";
-  const FACEBOOK_AUTH_URL = "http://localhost:8080/oauth2/authorization/facebook";
+  const backendBaseUrl = (axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
+  const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
+  const FACEBOOK_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/facebook`;
 
   useEffect(() => {
     // 1. Xử lý logic chuyển Tab (Login/Register) như đã nói ở câu trước

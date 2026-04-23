@@ -31,6 +31,7 @@ import styles from './AlbumDeltaPage.module.scss';
 const cx = classNames.bind(styles);
 
 const AlbumDetailPage = () => {
+  const backendBaseUrl = (axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
   const { albumId } = useParams();
   const [vocabularies, setVocabularies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -102,7 +103,7 @@ const AlbumDetailPage = () => {
   };
 
   const playAudio = (word) => {
-    const ttsUrl = `http://localhost:8080/api/tts?text=${encodeURIComponent(word)}`;
+    const ttsUrl = `${backendBaseUrl}/api/tts?text=${encodeURIComponent(word)}`;
     const audio = new Audio(ttsUrl);
     audio.play();
   };
