@@ -6,7 +6,6 @@ import com.project_exam.backend.dto.response.ClassSimpleResponse;
 import com.project_exam.backend.dto.response.user.TestResponse;
 import com.project_exam.backend.services.ClassService;
 import com.project_exam.backend.services.ExamAndTest.TestService;
-import com.project_exam.backend.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,6 @@ public class ClassController {
 
     private final ClassService classService;
     private final TestService testService;
-    private final AuthUtils authUtils;
 
     @PostMapping
     public ResponseEntity<?> createClass(@RequestBody ClassRequest request, HttpServletRequest httpRequest) {
@@ -98,16 +96,7 @@ public class ClassController {
             @PathVariable String classId,
             @PathVariable String chapterId,
             HttpServletRequest request) {
-        String userId = null;
-        try {
-            userId = authUtils.getUserId(request);
-        } catch (Exception ignored) {
-        }
-        final String userIdFinal = userId;
-        List<TestResponse> responses = testService.getTestByClassIdAndChapterId(classId, chapterId, request)
-                .stream()
-                .map(t -> testService.buildUserTestSummary(t, userIdFinal))
-                .toList();
+        List<TestResponse> responses = testService.getTestByClassIdAndChapterId(classId, chapterId, request);
         if (responses.isEmpty()) {
             return ResponseEntity.ok(Map.of("message", "Không có bài test nào trong lớp này"));
         }

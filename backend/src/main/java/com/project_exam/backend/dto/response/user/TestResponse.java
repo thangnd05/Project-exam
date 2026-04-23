@@ -17,6 +17,8 @@ public class TestResponse {
     private LocalDateTime createdAt;
     private String bannerUrl;
     private Integer durationMinutes;
+    private String classId;
+    private String chapterId;
     private LocalDateTime availableFrom;
     private LocalDateTime availableTo;
     private String status;

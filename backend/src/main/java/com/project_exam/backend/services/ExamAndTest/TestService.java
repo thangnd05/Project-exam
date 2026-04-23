@@ -41,8 +41,10 @@ public class TestService {
     private final ClassRepository classRepository;
     private final ClassMemberRepository classMemberRepository;
 
-    public List<Test> getAllTests() {
-        return testRepository.findAll();
+    public List<TestResponse> getAllTests() {
+        return testRepository.findAll().stream()
+                .map(test -> buildUserTestSummary(test, null))
+                .toList();
     }
 
     public Optional<Test> getTestById(String id) {
@@ -80,11 +82,13 @@ public class TestService {
 
     public TestResponse buildUserTestSummary(Test test, String userId) {
 
-        long attemptsUsed =
-                userTestRepository.countByTestIdAndUserId(
-                        test.getTestId(),
-                        userId
-                );
+        long attemptsUsed = 0;
+        if (userId != null) {
+            attemptsUsed = userTestRepository.countByTestIdAndUserId(
+                    test.getTestId(),
+                    userId
+            );
+        }
         long totalAttempts = userTestRepository.countByTestId(test.getTestId());
 
         Integer maxAttempts = test.getMaxAttempts();
@@ -93,7 +97,7 @@ public class TestService {
 
         if (maxAttempts != null) {
             remainingAttempts = (int) Math.max(0, maxAttempts - attemptsUsed);
-            canDoTest = remainingAttempts > 0;
+            canDoTest = userId == null || remainingAttempts > 0;
         }
 
         return TestResponse.builder()
@@ -117,7 +121,7 @@ public class TestService {
                 .build();
     }
 
-    public List<Test> getAllTestsByAdmin() {
+    public List<TestAdminResponse> getAllTestsByAdmin() {
         Role adminRole = roleRepository.findByRoleName("ADMIN");
         if (adminRole == null) return new ArrayList<>();
 
@@ -128,7 +132,9 @@ public class TestService {
         for (User admin : adminUsers) {
             result.addAll(testRepository.findByCreatedBy(admin.getUserId()));
         }
-        return result;
+        return result.stream()
+                .map(this::buildAdminTestSummary)
+                .toList();
     }
 
     private TestAdminResponse buildAdminTestSummary(Test test) {
@@ -315,6 +321,8 @@ public class TestService {
                 .createdAt(test.getCreatedAt())
                 .bannerUrl(test.getBannerUrl())
                 .durationMinutes(test.getDurationMinutes())
+                .classId(test.getClassId())
+                .chapterId(test.getChapterId())
                 .availableFrom(test.getAvailableFrom())
                 .availableTo(test.getAvailableTo())
                 .status(test.calculateStatus().name())
@@ -375,6 +383,7 @@ private void handleAutoSubmit(Test test, UserTest latest) {
 private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem, long total) {
     return TestResponse.builder()
             .testId(test.getTestId()).title(test.getTitle()).description(test.getDescription())
+            .classId(test.getClassId()).chapterId(test.getChapterId())
             .status("FORBIDDEN").maxAttempts(test.getMaxAttempts())
             .attemptsUsed(used).remainingAttempts(rem).totalAttempts(total)
             .canDoTest(false).build();
@@ -592,7 +601,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         return result;
     }
 
-    public List<Test> getTestByClassId(String classId, HttpServletRequest request) {
+    public List<TestResponse> getTestByClassId(String classId, HttpServletRequest request) {
         // 🧩 Lấy user hiện tại từ token
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
@@ -608,10 +617,12 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
-        return testRepository.findByClassId(classId);
+        return testRepository.findByClassId(classId).stream()
+                .map(test -> buildUserTestSummary(test, currentUserId))
+                .toList();
     }
 
-    public List<Test> getTestByClassIdAndChapterId(String classId,String chapterId, HttpServletRequest request) {
+    public List<TestResponse> getTestByClassIdAndChapterId(String classId,String chapterId, HttpServletRequest request) {
         // 🧩 Lấy user hiện tại từ token
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
@@ -627,10 +638,12 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
-        return testRepository.findByClassIdAndChapterId(classId,chapterId);
+        return testRepository.findByClassIdAndChapterId(classId,chapterId).stream()
+                .map(test -> buildUserTestSummary(test, currentUserId))
+                .toList();
     }
 
-    public List<Test> getTestByCreateBy(HttpServletRequest request) {
+    public List<TestResponse> getTestByCreateBy(HttpServletRequest request) {
         // 🧩 Lấy user hiện tại từ token
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
@@ -638,7 +651,9 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
-        return testRepository.findByCreatedBy(currentUserId);
+        return testRepository.findByCreatedBy(currentUserId).stream()
+                .map(test -> buildUserTestSummary(test, currentUserId))
+                .toList();
     }
 
     public List<TestResponse> getMyPersonalTests(HttpServletRequest request) {

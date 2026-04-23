@@ -30,7 +30,7 @@ public class TestController {
 
     // Lấy tất cả tests
     @GetMapping
-    public ResponseEntity<List<Test>> getAllTests() {
+    public ResponseEntity<List<TestResponse>> getAllTests() {
         return ResponseEntity.ok(testService.getAllTests()); // 200 OK
     }
 
@@ -63,7 +63,7 @@ public class TestController {
     }
 
     @PostMapping
-    public ResponseEntity<Test> createTest(@RequestBody CreateTestRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<TestResponse> createTest(@RequestBody CreateTestRequest request, HttpServletRequest httpRequest) {
         try {
             // 1. Lấy userId người tạo từ token (Dùng authUtils bạn đã có)
             String currentUserId = authUtils.getUserId(httpRequest);
@@ -87,8 +87,9 @@ public class TestController {
 
             // 3. Lưu vào database thông qua service
             Test savedTest = testService.save(test);
+            TestResponse response = testService.buildUserTestSummary(savedTest, currentUserId);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedTest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -121,10 +122,10 @@ public class TestController {
 
     // Cập nhật test (dùng chung CreateTestRequest; chỉ ghi đè field gửi lên, không đổi createdBy/createdAt)
     @PutMapping("/{id}")
-    public ResponseEntity<Test> updateTest(@PathVariable String id, @RequestBody CreateTestRequest request) {
+    public ResponseEntity<TestResponse> updateTest(@PathVariable String id, @RequestBody CreateTestRequest request) {
         try {
             Test updated = testService.updateTest(id, request);
-            return ResponseEntity.ok(updated);
+            return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
         } catch (RuntimeException e) {
             if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
                 return ResponseEntity.notFound().build();
@@ -145,7 +146,7 @@ public class TestController {
     }
 
     @GetMapping("/admin")
-    public List<Test> getAllTestsByAdmin() {
+    public List<TestAdminResponse> getAllTestsByAdmin() {
         return testService.getAllTestsByAdmin();
     }
 
@@ -165,8 +166,8 @@ Bước 3: .filter(t -> t.getExamTypeId().equals(examTypeId)) - Lọc chỉ gi�
 Bước 4: .toList() - Chuyển stream kết quả thành List
      */
     @GetMapping("/admin/by-exam-type/{examTypeId}")
-    public ResponseEntity<List<Test>> getAdminTestsByExamType(@PathVariable String examTypeId) {
-        List<Test> adminTests = testService.getAllTestsByAdmin()
+    public ResponseEntity<List<TestAdminResponse>> getAdminTestsByExamType(@PathVariable String examTypeId) {
+        List<TestAdminResponse> adminTests = testService.getAllTestsByAdmin()
                 .stream()
                 .filter(t -> t.getExamTypeId().equals(examTypeId))
                 .toList();
@@ -176,32 +177,12 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     // Lấy danh sách test theo examTypeId cho user
     @GetMapping("/user/by-exam-type/{examTypeId}")
     public ResponseEntity<List<TestResponse>> getTestsByExamType(
-            @PathVariable String examTypeId,
-            HttpServletRequest request
+            @PathVariable String examTypeId
     ) {
-
-        final String currentUserId;
-
-        try {
-            currentUserId = authUtils.getUserId(request);
-        } catch (Exception e) {
-            // ❌ Chưa đăng nhập
-            List<TestResponse> responses = testService.getAllTestsByAdmin()
-                    .stream()
-                    .filter(t -> t.getExamTypeId().equals(examTypeId))
-                    .filter(t -> t.getClassId() == null)
-                    .map(test -> testService.buildUserTestSummary(test, null))
-                    .toList();
-
-            return ResponseEntity.ok(responses);
-        }
-
-        // ✅ Đã đăng nhập
-        List<TestResponse> responses = testService.getAllTestsByAdmin()
+        List<TestResponse> responses = testService.getAllTests()
                 .stream()
                 .filter(t -> t.getExamTypeId().equals(examTypeId))
                 .filter(t -> t.getClassId() == null)
-                .map(test -> testService.buildUserTestSummary(test, currentUserId))
                 .toList();
 
         return ResponseEntity.ok(responses);
@@ -229,14 +210,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
             @PathVariable String classId,
             HttpServletRequest request
     ) {
-
-        String currentUserId = authUtils.getUserId(request);
-
-        List<TestResponse> responses = testService
-                .getTestByClassId(classId, request)
-                .stream()
-                .map(test -> testService.buildUserTestSummary(test, currentUserId))
-                .toList();
+        List<TestResponse> responses = testService.getTestByClassId(classId, request);
 
         if (responses.isEmpty()) {
             return ResponseEntity.ok(Map.of("message", "Không có bài test nào trong lớp này"));
@@ -247,14 +221,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
 
     @GetMapping("/my-all-test")
     public ResponseEntity<?> getTestsCreateBy(HttpServletRequest request) {
-
-        String currentUserId = authUtils.getUserId(request);
-
-        List<TestResponse> responses = testService
-                .getTestByCreateBy(request)
-                .stream()
-                .map(test -> testService.buildUserTestSummary(test, currentUserId))
-                .toList();
+        List<TestResponse> responses = testService.getTestByCreateBy(request);
 
         if (responses.isEmpty()) {
             return ResponseEntity.ok(Map.of("message", "Không có bài test nào trong lớp này"));
