@@ -1,8 +1,9 @@
 package com.project_exam.backend.controllers;
 
+import com.project_exam.backend.dto.request.UserUpsertRequest;
 import com.project_exam.backend.dto.response.ProfileOverviewResponse;
 import com.project_exam.backend.dto.response.UserPageResponse;
-import com.project_exam.backend.models.User;
+import com.project_exam.backend.dto.response.UserResponse;
 import com.project_exam.backend.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,8 +25,8 @@ public class UserController {
 
     // Lấy danh sách user
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.findAllResponses());
     }
 
     @GetMapping("/paged")
@@ -42,15 +42,17 @@ public class UserController {
 
     // Lấy user theo id
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable String id) {
-        return userService.findById(id)
+    public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
+        return userService.findResponseById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/me/info-user")
-    public ResponseEntity<Optional<User>> getUserInfo(HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(userService.getUserCurrent(httpRequest));
+    public ResponseEntity<UserResponse> getUserInfo(HttpServletRequest httpRequest) {
+        return userService.getUserCurrentResponse(httpRequest)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/me/profile-overview")
@@ -60,24 +62,23 @@ public class UserController {
 
     // Tạo mới user
     @PostMapping
-    public ResponseEntity<User> createUser(
-            @RequestBody User user
+    public ResponseEntity<UserResponse> createUser(
+            @RequestBody UserUpsertRequest request
     ) {
-        return ResponseEntity.ok(userService.createUser(user));
+        return ResponseEntity.ok(userService.createUser(request));
     }
 
     // Cập nhật user
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<User> updateUser(
+    public ResponseEntity<UserResponse> updateUser(
             @PathVariable String id,
             @RequestPart("user") String userJson,
             @RequestPart(value = "avatar", required = false) MultipartFile avatar
     ) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
-        User updatedUser = mapper.readValue(userJson, User.class);
-
-        return ResponseEntity.ok(userService.updateUser(id, updatedUser, avatar));
+        UserUpsertRequest request = mapper.readValue(userJson, UserUpsertRequest.class);
+        return ResponseEntity.ok(userService.updateUser(id, request, avatar));
     }
 
     // Xóa user

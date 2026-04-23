@@ -21,14 +21,28 @@ function ExamTypePage() {
   const [examTypes, setExamTypes] = useState([]);
   const navigate = useNavigate();
 
+  const normalizeExamTypes = (payload) => {
+    if (Array.isArray(payload)) {
+      return payload;
+    }
+    if (payload && Array.isArray(payload.data)) {
+      return payload.data;
+    }
+    if (payload && Array.isArray(payload.content)) {
+      return payload.content;
+    }
+    return [];
+  };
+
   useEffect(() => {
     axios
       .get('/api/exam-types')
       .then((response) => {
-        setExamTypes(response.data);
+        setExamTypes(normalizeExamTypes(response.data));
       })
       .catch((error) => {
         console.error('Lỗi khi lấy exam types:', error);
+        setExamTypes([]);
       });
   }, []);
 

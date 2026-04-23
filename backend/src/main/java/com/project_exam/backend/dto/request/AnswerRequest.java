@@ -12,4 +12,12 @@ public class AnswerRequest {
     private String answerText;
     private Boolean isCorrect;
     private String answerLabel; // ví dụ: A, B, C, D
+    private String questionId;
+
+    public AnswerRequest(String answerId, String answerText, Boolean isCorrect, String answerLabel) {
+        this.answerId = answerId;
+        this.answerText = answerText;
+        this.isCorrect = isCorrect;
+        this.answerLabel = answerLabel;
+    }
 }

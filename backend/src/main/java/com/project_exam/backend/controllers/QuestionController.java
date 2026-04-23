@@ -3,7 +3,6 @@ package com.project_exam.backend.controllers;
 import com.project_exam.backend.dto.request.*;
 import com.project_exam.backend.dto.response.admin.QuestionAdminResponse;
 import com.project_exam.backend.dto.response.user.QuestionResponse;
-import com.project_exam.backend.models.Question;
 import com.project_exam.backend.services.ExamAndTest.QuestionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,8 +30,8 @@ public class QuestionController {
     // =================== GET ===================
 
     @GetMapping
-    public ResponseEntity<List<Question>> getAllQuestions() {
-        return ResponseEntity.ok(questionService.findAll());
+    public ResponseEntity<List<QuestionAdminResponse>> getAllQuestions() {
+        return ResponseEntity.ok(questionService.findAllAdminSummaries());
     }
 
     @GetMapping("/{id}")

@@ -30,14 +30,39 @@ public class UserTestService {
     private final ScoringConversionRepository scoringConversionRepository;
     private final QuestionRepository questionRepository;
     private final ExamPartRepository examPartRepository;
+    private final TestPartRepository testPartRepository;
+    private final TestQuestionRepository testQuestionRepository;
     private final UserRepository userRepository;
 
+    public UserTestResponse toResponse(UserTest userTest) {
+        return UserTestResponse.builder()
+                .userTestId(userTest.getUserTestId())
+                .userId(userTest.getUserId())
+                .testId(userTest.getTestId())
+                .startedAt(userTest.getStartedAt())
+                .finishedAt(userTest.getFinishedAt())
+                .totalScore(userTest.getTotalScore())
+                .status(userTest.getStatus() != null ? userTest.getStatus().name() : null)
+                .durationTaken(
+                        userTest.getFinishedAt() != null && userTest.getStartedAt() != null
+                                ? Duration.between(userTest.getStartedAt(), userTest.getFinishedAt()).getSeconds()
+                                : null
+                )
+                .build();
+    }
+
     @Transactional
-    public UserTest submitTest(String userTestId) {
+    public UserTest submitTest(String userTestId, String currentUserId) {
         log.debug("Submitting test with UserTestId={}", userTestId);
 
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new RuntimeException("UserTest not found"));
+        if (!Objects.equals(userTest.getUserId(), currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền nộp bài thi này");
+        }
+        if (userTest.getStatus() == UserTest.Status.COMPLETED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã được nộp");
+        }
 
         userTest.setFinishedAt(LocalDateTime.now());
         userTest.setStatus(UserTest.Status.COMPLETED); // 🟢 Cập nhật trạng thái đã nộp
@@ -57,12 +82,13 @@ public class UserTestService {
 
         String scoringMethod = examType.getScoringMethod() != null ? examType.getScoringMethod().toLowerCase() : "default";
         log.debug("DEBUG: Scoring method for ExamType ID {} is '{}'", examType.getExamTypeId(), scoringMethod);
+        int totalQuestionsInTest = calculateTotalQuestionsInTest(userTest.getTestId());
 
         int totalScore;
         if ("toeic_scale".equalsIgnoreCase(scoringMethod)) {
             totalScore = scoreToeicOptimal(userAnswers, test, examType);
         } else {
-            totalScore = scoreDefault(userAnswers);
+            totalScore = scoreDefault(userAnswers, totalQuestionsInTest);
         }
 
         log.debug("Total score for UserTestId={} is {}", userTestId, totalScore);
@@ -70,16 +96,17 @@ public class UserTestService {
         return userTestRepository.save(userTest);
     }
 
-    private int scoreDefault(List<UserAnswer> userAnswers) {
+    private int scoreDefault(List<UserAnswer> userAnswers, int totalQuestionsInTest) {
         if (userAnswers.isEmpty()) {
             return 0;
         }
 
-        Set<String> questionIds = userAnswers.stream()
+        List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
+        Set<String> questionIds = uniqueAnswers.stream()
                 .map(UserAnswer::getQuestionId)
                 .collect(Collectors.toSet());
 
-        int totalQuestions = questionIds.size();
+        int totalQuestions = totalQuestionsInTest > 0 ? totalQuestionsInTest : questionIds.size();
         if (totalQuestions == 0) {
             return 0;
         }
@@ -92,7 +119,7 @@ public class UserTestService {
                 .collect(Collectors.toMap(Answer::getQuestionId, answer -> answer));
 
         int correctCount = 0;
-        for (UserAnswer userAnswer : userAnswers) {
+        for (UserAnswer userAnswer : uniqueAnswers) {
             String qId = userAnswer.getQuestionId();
             Question question = questionMap.get(qId);
             Answer correctAnswer = correctAnswersMap.get(qId);
@@ -124,9 +151,10 @@ public class UserTestService {
 
     private int scoreToeicOptimal(List<UserAnswer> userAnswers, Test test, ExamType examType) {
         log.debug("===== START TOEIC SCORING DEBUG =====");
+        List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
 
         // 1. Lấy thông tin Question đầy đủ
-        List<String> allQuestionIds = userAnswers.stream().map(UserAnswer::getQuestionId).toList();
+        List<String> allQuestionIds = uniqueAnswers.stream().map(UserAnswer::getQuestionId).toList();
         List<Question> questions = questionRepository.findAllById(allQuestionIds);
         Map<String, Question> questionMap = questions.stream()
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q));
@@ -144,7 +172,7 @@ public class UserTestService {
 
         Map<String, Integer> skillCorrectCount = new HashMap<>();
 
-        for (UserAnswer ua : userAnswers) {
+        for (UserAnswer ua : uniqueAnswers) {
             String questionId = ua.getQuestionId();
             Question question = questionMap.get(questionId);
             Answer correctAnswer = correctAnswersMap.get(questionId);
@@ -202,12 +230,63 @@ public class UserTestService {
         return totalScore;
     }
 
+    private List<UserAnswer> deduplicateByQuestionId(List<UserAnswer> userAnswers) {
+        if (userAnswers == null || userAnswers.isEmpty()) {
+            return List.of();
+        }
+        Map<String, UserAnswer> uniqueByQuestionId = new LinkedHashMap<>();
+        for (UserAnswer userAnswer : userAnswers) {
+            if (userAnswer.getQuestionId() == null) {
+                continue;
+            }
+            uniqueByQuestionId.putIfAbsent(userAnswer.getQuestionId(), userAnswer);
+        }
+        return new ArrayList<>(uniqueByQuestionId.values());
+    }
+
+    private int calculateTotalQuestionsInTest(String testId) {
+        List<String> testPartIds = testPartRepository.findByTestId(testId).stream()
+                .map(TestPart::getTestPartId)
+                .toList();
+        if (testPartIds.isEmpty()) {
+            return 0;
+        }
+        return (int) testQuestionRepository.findByTestPartIdIn(testPartIds).stream()
+                .map(TestQuestion::getQuestionId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .count();
+    }
+
     // --- Các phương thức CRUD khác ---
     public List<UserTest> findAll() { return userTestRepository.findAll(); }
+    public List<UserTestResponse> findAllResponses() {
+        return findAll().stream().map(this::toResponse).toList();
+    }
     public Optional<UserTest> findById(String id) { return userTestRepository.findById(id); }
     public List<UserTest> findByUserId(String userId) { return userTestRepository.findByUserId(userId); }
+    public List<UserTestResponse> findResponsesByUserId(String userId) {
+        return findByUserId(userId).stream().map(this::toResponse).toList();
+    }
     public List<UserTest> findByTestId(String testId) { return userTestRepository.findByTestId(testId); }
+    public List<UserTestResponse> findResponsesByTestId(String testId) {
+        return findByTestId(testId).stream().map(this::toResponse).toList();
+    }
     public UserTest save(UserTest userTest) { return userTestRepository.save(userTest); }
+    public UserTestResponse saveResponse(UserTest userTest) { return toResponse(save(userTest)); }
+    @Transactional
+    public UserTestResponse updateStatusByOwner(String userTestId, String currentUserId, UserTest.Status status) {
+        UserTest userTest = userTestRepository.findById(userTestId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
+        if (!Objects.equals(userTest.getUserId(), currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền cập nhật bài thi này");
+        }
+        if (userTest.getStatus() == UserTest.Status.COMPLETED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã nộp, không thể cập nhật trạng thái");
+        }
+        userTest.setStatus(status);
+        return toResponse(userTestRepository.save(userTest));
+    }
     public boolean delete(String id) {
         return userTestRepository.findById(id).map(u -> {
             userTestRepository.delete(u);

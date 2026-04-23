@@ -1,53 +1,101 @@
 package com.project_exam.backend.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // 🔹 Lỗi gửi mail (SMTP)
     @ExceptionHandler(MailException.class)
-    public Map<String, Object> handleMailException(MailException ex) {
-        // In lỗi chi tiết ra console
-        ex.printStackTrace();
-
-        return Map.of(
-                "status", HttpStatus.SERVICE_UNAVAILABLE.value(),
-                "message", "Không thể kết nối đến máy chủ email. Vui lòng thử lại sau.",
-                "error", ex.getClass().getSimpleName(),
-                "details", ex.getMessage() // 🧩 thêm dòng này để FE xem chi tiết
+    public ResponseEntity<ApiErrorResponse> handleMailException(MailException ex, HttpServletRequest request) {
+        log.error("MailException: {}", ex.getMessage(), ex);
+        return buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Không thể kết nối đến máy chủ email. Vui lòng thử lại sau.",
+                request
         );
     }
 
-    // 🔹 Lỗi logic chung (vd: username hoặc email đã tồn tại, chưa verify, sai mật khẩu...)
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiErrorResponse> handleResponseStatusException(
+            ResponseStatusException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("ResponseStatusException: {}", ex.getMessage());
+        String reason = ex.getReason() != null ? ex.getReason() : "Yêu cầu không hợp lệ";
+        return buildErrorResponse(HttpStatus.valueOf(ex.getStatusCode().value()), reason, request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleValidationException(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+        if (message.isBlank()) {
+            message = "Dữ liệu đầu vào không hợp lệ";
+        }
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, message, request);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorResponse> handleNotReadableException(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Request body không hợp lệ", request);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("DataIntegrityViolationException: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.CONFLICT, "Dữ liệu bị trùng hoặc vi phạm ràng buộc", request);
+    }
+
     @ExceptionHandler(RuntimeException.class)
-    public Map<String, Object> handleRuntimeException(RuntimeException ex) {
-        // Ghi log rõ ràng hơn
-        System.err.println("❌ RuntimeException: " + ex.getMessage());
-        ex.printStackTrace();
-
-        return Map.of(
-                "status", HttpStatus.BAD_REQUEST.value(),
-                "message", ex.getMessage(),
-                "error", ex.getClass().getSimpleName()
-        );
+    public ResponseEntity<ApiErrorResponse> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
+        log.warn("RuntimeException: {}", ex.getMessage(), ex);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
-    // 🔹 Bắt tất cả lỗi còn lại
     @ExceptionHandler(Exception.class)
-    public Map<String, Object> handleAllExceptions(Exception ex) {
-        System.err.println("🔥 Unhandled Exception: " + ex.getMessage());
-        ex.printStackTrace();
+    public ResponseEntity<ApiErrorResponse> handleAllExceptions(Exception ex, HttpServletRequest request) {
+        log.error("Unhandled Exception: {}", ex.getMessage(), ex);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi hệ thống! Vui lòng thử lại sau.", request);
+    }
 
-        return Map.of(
-                "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "message", "Lỗi hệ thống! Vui lòng thử lại sau.",
-                "error", ex.getClass().getSimpleName()
-        );
+    private ResponseEntity<ApiErrorResponse> buildErrorResponse(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request
+    ) {
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(message)
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(status).body(response);
     }
 }

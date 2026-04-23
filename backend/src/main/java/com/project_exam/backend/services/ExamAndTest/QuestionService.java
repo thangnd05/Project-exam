@@ -43,6 +43,24 @@ public class QuestionService {
         return questionRepository.findAll();
     }
 
+    public List<QuestionAdminResponse> findAllAdminSummaries() {
+        return findAll().stream()
+                .map(question -> QuestionAdminResponse.builder()
+                        .questionId(question.getQuestionId())
+                        .examPartId(question.getExamPartId())
+                        .questionText(question.getQuestionText())
+                        .questionType(question.getQuestionType())
+                        .explanation(question.getExplanation())
+                        .classId(question.getClassId())
+                        .isBank(question.getIsBank())
+                        .examTypeId(null)
+                        .passage(null)
+                        .passageMedia(List.of())
+                        .answers(List.of())
+                        .build())
+                .toList();
+    }
+
     public Optional<Question> findById(String id) {
         return questionRepository.findById(id);
     }

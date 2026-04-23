@@ -1,6 +1,7 @@
 package com.project_exam.backend.controllers;
 
-import com.project_exam.backend.models.Passage;
+import com.project_exam.backend.dto.request.PassageRequest;
+import com.project_exam.backend.dto.response.PassageResponse;
 import com.project_exam.backend.services.ExamAndTest.PassageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,29 +17,26 @@ public class PassageController {
     private final PassageService passageService;
 
     @GetMapping
-    public ResponseEntity<List<Passage>> getAllPassages() {
-        return ResponseEntity.ok(passageService.findAll());
+    public ResponseEntity<List<PassageResponse>> getAllPassages() {
+        return ResponseEntity.ok(passageService.findAllResponses());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Passage> getPassageById(@PathVariable String id) {
-        return passageService.findById(id)
+    public ResponseEntity<PassageResponse> getPassageById(@PathVariable String id) {
+        return passageService.findResponseById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Passage> createPassage(@RequestBody Passage passage) {
-        return ResponseEntity.ok(passageService.save(passage));
+    public ResponseEntity<PassageResponse> createPassage(@RequestBody PassageRequest request) {
+        return ResponseEntity.ok(passageService.create(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Passage> updatePassage(@PathVariable String id, @RequestBody Passage updatedPassage) {
-        return passageService.findById(id)
-                .map(existing -> {
-                    updatedPassage.setPassageId(id);
-                    return ResponseEntity.ok(passageService.save(updatedPassage));
-                })
+    public ResponseEntity<PassageResponse> updatePassage(@PathVariable String id, @RequestBody PassageRequest request) {
+        return passageService.update(id, request)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 

@@ -16,6 +16,24 @@ import java.util.stream.Collectors;
 public class AnswerService {
     private final AnswerRepository answerRepository;
 
+    private AnswerAdminResponse toAdminResponse(Answer answer) {
+        return AnswerAdminResponse.builder()
+                .answerId(answer.getAnswerId())
+                .answerText(answer.getAnswerText())
+                .answerLabel(answer.getAnswerLabel())
+                .isCorrect(answer.getIsCorrect())
+                .build();
+    }
+
+    private Answer toEntity(AnswerRequest request, String questionId) {
+        Answer answer = new Answer();
+        answer.setQuestionId(questionId);
+        answer.setAnswerText(request.getAnswerText());
+        answer.setAnswerLabel(request.getAnswerLabel());
+        answer.setIsCorrect(request.getIsCorrect());
+        return answer;
+    }
+
     @Transactional
     public List<Answer> syncAnswers(String questionId, List<AnswerRequest> requests) {
         if (requests == null) return new ArrayList<>();
@@ -73,8 +91,20 @@ public class AnswerService {
         return answerRepository.findAll();
     }
 
+    public List<AnswerAdminResponse> findAllResponses() {
+        return findAll().stream()
+                .map(this::toAdminResponse)
+                .toList();
+    }
+
     public List<Answer> findByQuestionId(String questionId) {
         return answerRepository.findByQuestionId(questionId);
+    }
+
+    public List<AnswerAdminResponse> findResponsesByQuestionId(String questionId) {
+        return findByQuestionId(questionId).stream()
+                .map(this::toAdminResponse)
+                .toList();
     }
 
     public Answer save(Answer answer) {
@@ -83,6 +113,20 @@ public class AnswerService {
 
     public Optional<Answer> findById(String id) {
         return answerRepository.findById(id);
+    }
+
+    public AnswerAdminResponse createFromRequest(AnswerRequest request) {
+        Answer saved = save(toEntity(request, request.getQuestionId()));
+        return toAdminResponse(saved);
+    }
+
+    public Optional<AnswerAdminResponse> updateFromRequest(String id, AnswerRequest request) {
+        return findById(id)
+                .map(existing -> {
+                    Answer updatedAnswer = toEntity(request, existing.getQuestionId());
+                    updatedAnswer.setAnswerId(id);
+                    return toAdminResponse(save(updatedAnswer));
+                });
     }
 
     public void deleteById(String id) {

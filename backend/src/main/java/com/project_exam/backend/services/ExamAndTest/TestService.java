@@ -369,7 +369,7 @@ private void handleAutoSubmit(Test test, UserTest latest) {
         
         if (!LocalDateTime.now().isBefore(endTime)) {
             try {
-                userTestService.submitTest(latest.getUserTestId());
+                userTestService.submitTest(latest.getUserTestId(), latest.getUserId());
             } catch (Exception e) {
                 latest.setStatus(UserTest.Status.COMPLETED);
                 latest.setFinishedAt(endTime);

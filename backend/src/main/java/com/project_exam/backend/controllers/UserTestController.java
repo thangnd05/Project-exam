@@ -1,5 +1,7 @@
 package com.project_exam.backend.controllers;
 
+import com.project_exam.backend.dto.request.StartUserTestRequest;
+import com.project_exam.backend.dto.request.UserTestUpdateRequest;
 import com.project_exam.backend.dto.response.UserTestResponse;
 import com.project_exam.backend.models.UserTest;
 import com.project_exam.backend.services.ExamAndTest.UserTestService;
@@ -9,7 +11,6 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -23,71 +24,60 @@ public class UserTestController {
 
     // ✅ Lấy tất cả user test
     @GetMapping
-    public ResponseEntity<List<UserTest>> getAll() {
-        return ResponseEntity.ok(userTestService.findAll());
+    public ResponseEntity<List<UserTestResponse>> getAll() {
+        return ResponseEntity.ok(userTestService.findAllResponses());
     }
 
     // ✅ Lấy theo ID
     @GetMapping("/{userTestId}")
     public ResponseEntity<UserTestResponse> getUserTestById(@PathVariable String userTestId) {
-        try {
-            return ResponseEntity.ok(userTestService.getMeta(userTestId));
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(userTestService.getMeta(userTestId));
     }
 
     // ✅ Lấy theo user đang đăng nhập (JWT)
     @GetMapping("/my")
-    public ResponseEntity<List<UserTest>> getByCurrentUser(HttpServletRequest httpRequest) {
+    public ResponseEntity<List<UserTestResponse>> getByCurrentUser(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(userTestService.findByUserId(userId));
+        return ResponseEntity.ok(userTestService.findResponsesByUserId(userId));
     }
 
     // ✅ Lấy theo testId
     @GetMapping("/test/{testId}")
-    public ResponseEntity<List<UserTest>> getByTest(@PathVariable String testId) {
-        return ResponseEntity.ok(userTestService.findByTestId(testId));
+    public ResponseEntity<List<UserTestResponse>> getByTest(@PathVariable String testId) {
+        return ResponseEntity.ok(userTestService.findResponsesByTestId(testId));
     }
 
     // ✅ Tạo hoặc bắt đầu bài test mới
     @PostMapping
-    public ResponseEntity<?> startUserTest(@RequestBody Map<String, String> request,
+    public ResponseEntity<?> startUserTest(@RequestBody StartUserTestRequest request,
                                            HttpServletRequest httpRequest) {
-        try {
-            String testId = request.get("testId");
-
-            if (testId == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Missing testId"));
-            }
-
-            // ✅ Lấy userId từ JWT token
-            String userId = authUtils.getUserId(httpRequest);;
-            if (userId == null) {
-                return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
-            }
-
-            // ✅ Tạo hoặc tái sử dụng UserTest
-            UserTest userTest = userTestService.startUserTest(testId, userId);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Bắt đầu làm bài thành công");
-            response.put("userTestId", userTest.getUserTestId());
-            response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        if (request == null || request.getTestId() == null || request.getTestId().isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Missing testId"));
         }
+
+        String userId = authUtils.getUserId(httpRequest);
+        UserTest userTest = userTestService.startUserTest(request.getTestId(), userId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Bắt đầu làm bài thành công");
+        response.put("userTestId", userTest.getUserTestId());
+        response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
+
+        return ResponseEntity.ok(response);
     }
 
     // ✅ Cập nhật UserTest
     @PutMapping("/{id}")
-    public ResponseEntity<UserTest> update(@PathVariable String id, @RequestBody UserTest userTest) {
-        userTest.setUserTestId(id);
-        return ResponseEntity.ok(userTestService.save(userTest));
+    public ResponseEntity<UserTestResponse> update(
+            @PathVariable String id,
+            @RequestBody UserTestUpdateRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        if (request == null || request.getStatus() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userTestService.updateStatusByOwner(id, userId, request.getStatus()));
     }
 
     // ✅ Xóa UserTest
@@ -103,13 +93,13 @@ public class UserTestController {
 
     // ✅ Nộp bài thi
     @PostMapping("/{userTestId}/submit")
-    public ResponseEntity<UserTest> submitTest(@PathVariable String userTestId) {
-        try {
-            UserTest submittedTest = userTestService.submitTest(userTestId);
-            return ResponseEntity.ok(submittedTest);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<UserTestResponse> submitTest(
+            @PathVariable String userTestId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        UserTest submittedTest = userTestService.submitTest(userTestId, userId);
+        return ResponseEntity.ok(userTestService.toResponse(submittedTest));
     }
 
     // ✅ Kiểm tra có đang làm dở không
@@ -118,26 +108,19 @@ public class UserTestController {
             @RequestParam String testId,
             HttpServletRequest httpRequest
     ) {
-        try {
-            String userId = authUtils.getUserId(httpRequest);
-            Optional<UserTest> active = userTestService.findActiveUserTest(userId, testId);
+        String userId = authUtils.getUserId(httpRequest);
+        Optional<UserTest> active = userTestService.findActiveUserTest(userId, testId);
 
-            Map<String, Object> response = new HashMap<>();
-            if (active.isPresent()) {
-                UserTest userTest = active.get();
-                response.put("userTestId", userTest.getUserTestId());
-                response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
-            } else {
-                response.put("userTestId", null);
-                response.put("status", "NONE");
-            }
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        Map<String, Object> response = new HashMap<>();
+        if (active.isPresent()) {
+            UserTest userTest = active.get();
+            response.put("userTestId", userTest.getUserTestId());
+            response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
+        } else {
+            response.put("userTestId", null);
+            response.put("status", "NONE");
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/my/by-test/{testId}")

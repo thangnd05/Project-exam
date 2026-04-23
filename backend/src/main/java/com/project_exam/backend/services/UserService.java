@@ -1,6 +1,7 @@
 package com.project_exam.backend.services;
 
 import com.project_exam.backend.cloudinary.CloudinaryService;
+import com.project_exam.backend.dto.request.UserUpsertRequest;
 import com.project_exam.backend.dto.response.ProfileOverviewResponse;
 import com.project_exam.backend.dto.response.UserPageResponse;
 import com.project_exam.backend.dto.response.UserResponse;
@@ -15,7 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,9 +37,42 @@ public class UserService {
     private ClassMemberRepository classMemberRepository;
     private AuthUtils authUtils;
     private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
+
+    private UserResponse toResponse(User user) {
+        return new UserResponse(
+                user.getUserId(),
+                user.getUserName(),
+                user.getEmail(),
+                user.getRoleId(),
+                user.getAvatarUrl()
+        );
+    }
+
+    private User toEntity(UserUpsertRequest request) {
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password không được để trống");
+        }
+        User user = new User();
+        user.setUserName(request.getUserName());
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRoleId(request.getRoleId());
+        if (request.getVerified() != null) {
+            user.setVerified(request.getVerified());
+        }
+        return user;
+    }
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public List<UserResponse> findAllResponses() {
+        return findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public UserPageResponse findAllPaged(Integer page, Integer size, String keyword, String roleId, Boolean verified) {
@@ -66,7 +103,7 @@ public class UserService {
         Page<User> userPage = userRepository.findAll(specification, pageable);
 
         UserPageResponse response = new UserPageResponse();
-        response.setContent(userPage.getContent());
+        response.setContent(userPage.getContent().stream().map(this::toResponse).toList());
         response.setCurrentPage(userPage.getNumber());
         response.setSize(userPage.getSize());
         response.setTotalElements(userPage.getTotalElements());
@@ -77,6 +114,10 @@ public class UserService {
 
     public Optional<User> findById(String id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<UserResponse> findResponseById(String id) {
+        return findById(id).map(this::toResponse);
     }
 
     public User save(User user) {
@@ -96,6 +137,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public UserResponse createUser(UserUpsertRequest request) {
+        return toResponse(createUser(toEntity(request)));
+    }
+
     public User updateUser(String id, User updatedUser, MultipartFile avatar) throws IOException {
 
         User existingUser = userRepository.findById(id)
@@ -113,6 +158,14 @@ public class UserService {
         }
 
         return userRepository.save(existingUser);
+    }
+
+    public UserResponse updateUser(String id, UserUpsertRequest request, MultipartFile avatar) throws IOException {
+        User updatedUser = new User();
+        updatedUser.setFullName(request.getFullName());
+        updatedUser.setUserName(request.getUserName());
+        updatedUser.setEmail(request.getEmail());
+        return toResponse(updateUser(id, updatedUser, avatar));
     }
 
     public ProfileOverviewResponse getProfileOverview(String id) {
@@ -183,6 +236,10 @@ public class UserService {
     public Optional<User> getUserCurrent(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return userRepository.findById(userId);
+    }
+
+    public Optional<UserResponse> getUserCurrentResponse(HttpServletRequest httpRequest) {
+        return getUserCurrent(httpRequest).map(this::toResponse);
     }
 
     public boolean deleteUser(String id) {

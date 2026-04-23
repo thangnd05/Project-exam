@@ -2,9 +2,10 @@ package com.project_exam.backend.controllers;
 
 import com.project_exam.backend.dto.request.UserAnswerRequest;
 import com.project_exam.backend.dto.response.ResultSummaryDto;
-import com.project_exam.backend.models.UserAnswer;
-import com.project_exam.backend.services.ExamAndTest.AnswerService;
+import com.project_exam.backend.dto.response.UserAnswerResponse;
 import com.project_exam.backend.services.ExamAndTest.UserAnswerService;
+import com.project_exam.backend.util.AuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,39 +18,44 @@ import java.util.List;
 public class UserAnswerController {
 
     private final UserAnswerService userAnswerService;
-    private final AnswerService answerService;
+    private final AuthUtils authUtils;
 
     @GetMapping
-    public ResponseEntity<List<UserAnswer>> getAll() {
-        return ResponseEntity.ok(userAnswerService.findAll());
+    public ResponseEntity<List<UserAnswerResponse>> getAll() {
+        return ResponseEntity.ok(userAnswerService.findAllResponses());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserAnswer> getById(@PathVariable String id) {
-        return userAnswerService.findById(id)
+    public ResponseEntity<UserAnswerResponse> getById(@PathVariable String id) {
+        return userAnswerService.findResponseById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/user-test/{userTestId}")
-    public ResponseEntity<List<UserAnswer>> getByUserTest(@PathVariable String userTestId) {
-        return ResponseEntity.ok(userAnswerService.findByUserTestId(userTestId));
+    public ResponseEntity<List<UserAnswerResponse>> getByUserTest(@PathVariable String userTestId) {
+        return ResponseEntity.ok(userAnswerService.findResponsesByUserTestId(userTestId));
     }
 
     @GetMapping("/question/{questionId}")
-    public ResponseEntity<List<UserAnswer>> getByQuestion(@PathVariable String questionId) {
-        return ResponseEntity.ok(userAnswerService.findByQuestionId(questionId));
+    public ResponseEntity<List<UserAnswerResponse>> getByQuestion(@PathVariable String questionId) {
+        return ResponseEntity.ok(userAnswerService.findResponsesByQuestionId(questionId));
     }
 
     @PostMapping
-    public ResponseEntity<UserAnswer> create(@RequestBody UserAnswer userAnswer) {
-        return ResponseEntity.ok(userAnswerService.save(userAnswer));
+    public ResponseEntity<UserAnswerResponse> create(@RequestBody UserAnswerRequest request, HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userAnswerService.create(request, userId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserAnswer> update(@PathVariable String id, @RequestBody UserAnswer userAnswer) {
-        userAnswer.setUserAnswerId(id);
-        return ResponseEntity.ok(userAnswerService.save(userAnswer));
+    public ResponseEntity<UserAnswerResponse> update(
+            @PathVariable String id,
+            @RequestBody UserAnswerRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userAnswerService.update(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
@@ -63,24 +69,16 @@ public class UserAnswerController {
     }
 
     @PostMapping("/batch")
-    public ResponseEntity<?> saveUserAnswers(@RequestBody List<UserAnswerRequest> requests) {
-        for (UserAnswerRequest a : requests) {
-            UserAnswer ua = new UserAnswer();
-            ua.setUserTestId(a.getUserTestId());
-            ua.setQuestionId(a.getQuestionId());
-            ua.setSelectedAnswerId(a.getSelectedAnswerId());
-            ua.setAnswerText(a.getAnswerText());
-
-            userAnswerService.save(ua);
-        }
-
-        return ResponseEntity.ok("Saved all answers!");
+    public ResponseEntity<?> saveUserAnswers(@RequestBody List<UserAnswerRequest> requests, HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        List<UserAnswerResponse> responses = userAnswerService.upsertBatch(requests, userId);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/user-test/{userTestId}/result")
-    public ResponseEntity<ResultSummaryDto> getResult(@PathVariable String userTestId) {
-        // ✅ Chỉ cần gọi phương thức service và trả về kết quả
-        ResultSummaryDto result = userAnswerService.getResultSummary(userTestId);
+    public ResponseEntity<ResultSummaryDto> getResult(@PathVariable String userTestId, HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        ResultSummaryDto result = userAnswerService.getResultSummary(userTestId, userId);
         return ResponseEntity.ok(result);
     }
 
