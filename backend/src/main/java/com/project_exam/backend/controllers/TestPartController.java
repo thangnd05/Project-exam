@@ -3,6 +3,7 @@ package com.project_exam.backend.controllers;
 import com.project_exam.backend.dto.request.TestPartRequest;
 import com.project_exam.backend.dto.response.TestPartSimpleResponse;
 import com.project_exam.backend.services.ExamAndTest.TestPartService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,26 +36,21 @@ public class TestPartController {
 
     // TẠO MỚI DÙNG DTO
     @PostMapping
-    public ResponseEntity<?> createTestPart(@RequestBody TestPartRequest request) {
-        try {
-            return ResponseEntity.ok(testPartService.saveResponse(request));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<TestPartSimpleResponse> createTestPart(@Valid @RequestBody TestPartRequest request) {
+        return ResponseEntity.ok(testPartService.saveResponse(request));
     }
 
     // CẬP NHẬT DÙNG DTO
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTestPart(@PathVariable String id, @RequestBody TestPartRequest request) {
-        try {
-            return ResponseEntity.ok(testPartService.updateResponse(id, request));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<TestPartSimpleResponse> updateTestPart(
+            @PathVariable String id,
+            @Valid @RequestBody TestPartRequest request
+    ) {
+        return ResponseEntity.ok(testPartService.updateResponse(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTestPart(@PathVariable String id) {
+    public ResponseEntity<Void> deleteTestPart(@PathVariable String id) {
         testPartService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

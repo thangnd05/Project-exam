@@ -5,6 +5,7 @@ import com.project_exam.backend.dto.request.ClassMemberJoinRequest;
 import com.project_exam.backend.dto.response.ClassMemberResponse;
 import com.project_exam.backend.services.ClassMemberService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,58 +23,49 @@ public class ClassMemberController {
     private final ClassMemberService classMemberService;
 
     @PostMapping("/join")
-    public ResponseEntity<?> joinClass(@RequestBody ClassMemberJoinRequest body, HttpServletRequest request) {
-        try {
-            String classQr = body.getClassQr();
-            if (classQr == null || classQr.isBlank()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "classQr is required"));
-            }
-            ClassMemberResponse member = classMemberService.joinClassByQr(classQr.trim(), request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(member);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    public ResponseEntity<ClassMemberResponse> joinClass(
+            @Valid @RequestBody ClassMemberJoinRequest body,
+            HttpServletRequest request
+    ) {
+        String classQr = body.getClassQr();
+        if (classQr == null || classQr.isBlank()) {
+            return ResponseEntity.badRequest().build();
         }
+        ClassMemberResponse member = classMemberService.joinClassByQr(classQr.trim(), request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(member);
     }
 
     @DeleteMapping("/leave")
-    public ResponseEntity<?> leaveClass(@RequestBody ClassMemberJoinRequest body, HttpServletRequest request) {
-        try {
-            String classId = body.getClassId();
-            if (classId == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "classId is required"));
-            }
-            classMemberService.leaveClass(classId, request);
-            return ResponseEntity.ok(Map.of("message", "You have left the class successfully"));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    public ResponseEntity<Map<String, String>> leaveClass(
+            @Valid @RequestBody ClassMemberJoinRequest body,
+            HttpServletRequest request
+    ) {
+        String classId = body.getClassId();
+        if (classId == null) {
+            return ResponseEntity.badRequest().build();
         }
+        classMemberService.leaveClass(classId, request);
+        return ResponseEntity.ok(Map.of("message", "You have left the class successfully"));
     }
 
     @PutMapping("/approve")
-    public ResponseEntity<?> approveSingle(@RequestBody ClassMemberActionRequest body, HttpServletRequest request) {
-        try {
-            String classId = body.getClassId();
-            String userId = body.getUserId();
-            if (classId == null || userId == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "classId and userId are required"));
-            }
-            classMemberService.approveSingle(classId, userId, request);
-            return ResponseEntity.ok(Map.of("message", "Member approved successfully"));
-        } catch (RuntimeException e) {
-            int status = e.getMessage() != null && e.getMessage().contains("authorized") ? 403 : 400;
-            return ResponseEntity.status(status).body(Map.of("error", e.getMessage()));
+    public ResponseEntity<Map<String, String>> approveSingle(
+            @Valid @RequestBody ClassMemberActionRequest body,
+            HttpServletRequest request
+    ) {
+        String classId = body.getClassId();
+        String userId = body.getUserId();
+        if (classId == null || userId == null) {
+            return ResponseEntity.badRequest().build();
         }
+        classMemberService.approveSingle(classId, userId, request);
+        return ResponseEntity.ok(Map.of("message", "Member approved successfully"));
     }
 
     @PutMapping("/approve-all/{classId}")
-    public ResponseEntity<?> approveAll(@PathVariable String classId, HttpServletRequest request) {
-        try {
-            int count = classMemberService.approveAll(classId, request);
-            return ResponseEntity.ok(Map.of("message", "Approved " + count + " pending members"));
-        } catch (RuntimeException e) {
-            int status = e.getMessage() != null && e.getMessage().contains("authorized") ? 403 : 400;
-            return ResponseEntity.status(status).body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<Map<String, String>> approveAll(@PathVariable String classId, HttpServletRequest request) {
+        int count = classMemberService.approveAll(classId, request);
+        return ResponseEntity.ok(Map.of("message", "Approved " + count + " pending members"));
     }
 
     @GetMapping("/class/{classId}")
@@ -87,30 +79,22 @@ public class ClassMemberController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<?> removeMember(@RequestBody ClassMemberActionRequest body, HttpServletRequest request) {
-        try {
-            String classId = body.getClassId();
-            String userId = body.getUserId();
-            if (classId == null || userId == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "classId and userId are required"));
-            }
-            classMemberService.removeMember(classId, userId, request);
-            return ResponseEntity.ok(Map.of("message", "Member removed successfully"));
-        } catch (RuntimeException e) {
-            int status = e.getMessage() != null && e.getMessage().contains("authorized") ? 403 : 400;
-            return ResponseEntity.status(status).body(Map.of("error", e.getMessage()));
+    public ResponseEntity<Map<String, String>> removeMember(
+            @Valid @RequestBody ClassMemberActionRequest body,
+            HttpServletRequest request
+    ) {
+        String classId = body.getClassId();
+        String userId = body.getUserId();
+        if (classId == null || userId == null) {
+            return ResponseEntity.badRequest().build();
         }
+        classMemberService.removeMember(classId, userId, request);
+        return ResponseEntity.ok(Map.of("message", "Member removed successfully"));
     }
 
     @GetMapping("/my-classes")
-    public ResponseEntity<?> getMyClasses(HttpServletRequest request) {
-        try {
-            Map<String, Object> myClasses = classMemberService.getClassesOfCurrentStudent(request);
-            List<?> teaching = (List<?>) myClasses.get("teachingClasses");
-            List<?> learning = (List<?>) myClasses.get("learningClasses");
-            return ResponseEntity.ok(myClasses);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<Map<String, Object>> getMyClasses(HttpServletRequest request) {
+        Map<String, Object> myClasses = classMemberService.getClassesOfCurrentStudent(request);
+        return ResponseEntity.ok(myClasses);
     }
 }

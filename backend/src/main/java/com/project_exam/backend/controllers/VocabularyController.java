@@ -2,17 +2,15 @@ package com.project_exam.backend.controllers;
 
 import com.project_exam.backend.dto.request.VocabularyRequest;
 import com.project_exam.backend.dto.response.VocabularyResponse;
-import com.project_exam.backend.models.Vocabulary;
 import com.project_exam.backend.repositories.VocabularyAlbumRepository;
 import com.project_exam.backend.services.LearningVoca.VocabularyService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/vocabularies")
@@ -32,21 +30,17 @@ public class VocabularyController {
     }
 
     @PostMapping
-    public ResponseEntity<VocabularyResponse> create(@RequestBody VocabularyRequest request) {
+    public ResponseEntity<VocabularyResponse> create(@Valid @RequestBody VocabularyRequest request) {
         return ResponseEntity.ok(service.createVocabulary(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<VocabularyResponse> update(
             @PathVariable String id,
-            @RequestBody VocabularyRequest request
+            @Valid @RequestBody VocabularyRequest request
     ) {
-        try {
-            VocabularyResponse response = service.updateVocabulary(id, request);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        VocabularyResponse response = service.updateVocabulary(id, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

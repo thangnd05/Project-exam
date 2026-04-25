@@ -3,6 +3,7 @@ package com.project_exam.backend.controllers;
 import com.project_exam.backend.dto.request.SkillRequest;
 import com.project_exam.backend.dto.response.SkillResponse;
 import com.project_exam.backend.services.ExamAndTest.SkillService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,43 +25,25 @@ public class SkillController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SkillResponse> getById(@PathVariable String id) {
-        try {
-            return ResponseEntity.ok(skillService.findById(id));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            throw e;
-        }
+        return ResponseEntity.ok(skillService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<SkillResponse> create(@RequestBody SkillRequest request) {
+    public ResponseEntity<SkillResponse> create(@Valid @RequestBody SkillRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(skillService.create(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SkillResponse> update(@PathVariable String id, @RequestBody SkillRequest request) {
-        try {
-            return ResponseEntity.ok(skillService.update(id, request));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<SkillResponse> update(
+            @PathVariable String id,
+            @Valid @RequestBody SkillRequest request
+    ) {
+        return ResponseEntity.ok(skillService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
-        try {
-            skillService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+        skillService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

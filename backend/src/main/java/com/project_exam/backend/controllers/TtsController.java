@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/api/tts")
 public class TtsController {
 
-    @CrossOrigin(origins = "*") // ✅ Cho phép FE phát audio (nếu chạy ở port khác)
     @GetMapping
     public void getTts(@RequestParam String text, HttpServletResponse response) throws IOException {
         String encoded = java.net.URLEncoder.encode(text, StandardCharsets.UTF_8);
@@ -38,7 +37,7 @@ public class TtsController {
         try (var input = connection.getInputStream()) {
             StreamUtils.copy(input, response.getOutputStream());
             response.flushBuffer(); // ✅ đảm bảo dữ liệu gửi đi ngay lập tức
-        } catch (Exception e) {
+        } catch (IOException exception) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Không phát được âm thanh");
         }
     }

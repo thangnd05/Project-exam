@@ -7,6 +7,7 @@ import com.project_exam.backend.models.UserTest;
 import com.project_exam.backend.services.ExamAndTest.UserTestService;
 import com.project_exam.backend.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -49,8 +50,10 @@ public class UserTestController {
 
     // ✅ Tạo hoặc bắt đầu bài test mới
     @PostMapping
-    public ResponseEntity<?> startUserTest(@RequestBody StartUserTestRequest request,
-                                           HttpServletRequest httpRequest) {
+    public ResponseEntity<Map<String, Object>> startUserTest(
+            @Valid @RequestBody StartUserTestRequest request,
+            HttpServletRequest httpRequest
+    ) {
         if (request == null || request.getTestId() == null || request.getTestId().isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Missing testId"));
         }
@@ -70,7 +73,7 @@ public class UserTestController {
     @PutMapping("/{id}")
     public ResponseEntity<UserTestResponse> update(
             @PathVariable String id,
-            @RequestBody UserTestUpdateRequest request,
+            @Valid @RequestBody UserTestUpdateRequest request,
             HttpServletRequest httpRequest
     ) {
         if (request == null || request.getStatus() == null) {
@@ -82,13 +85,12 @@ public class UserTestController {
 
     // ✅ Xóa UserTest
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        return userTestService.findById(id)
-                .map(existing -> {
-                    userTestService.delete(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        if (userTestService.findById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        userTestService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     // ✅ Nộp bài thi
@@ -104,7 +106,7 @@ public class UserTestController {
 
     // ✅ Kiểm tra có đang làm dở không
     @GetMapping("/check-active")
-    public ResponseEntity<?> checkActiveUserTest(
+    public ResponseEntity<Map<String, Object>> checkActiveUserTest(
             @RequestParam String testId,
             HttpServletRequest httpRequest
     ) {

@@ -5,6 +5,7 @@ import com.project_exam.backend.dto.response.EvaluationPageResponse;
 import com.project_exam.backend.dto.response.EvaluationResponse;
 import com.project_exam.backend.services.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +23,10 @@ public class EvaluationController {
     @PostMapping
     public ResponseEntity<EvaluationResponse> create(
             HttpServletRequest httpRequest,
-            @RequestBody EvaluationRequest request
+            @Valid @RequestBody EvaluationRequest request
     ) {
-        try {
-            EvaluationResponse created = evaluationService.create(httpRequest, request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        EvaluationResponse created = evaluationService.create(httpRequest, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping
@@ -49,14 +46,7 @@ public class EvaluationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EvaluationResponse> getById(@PathVariable String id) {
-        try {
-            return ResponseEntity.ok(evaluationService.getById(id));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("not found")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(evaluationService.getById(id));
     }
 
     @GetMapping("/me")
@@ -67,28 +57,14 @@ public class EvaluationController {
     @PutMapping("/{id}")
     public ResponseEntity<EvaluationResponse> update(
             @PathVariable String id,
-            @RequestBody EvaluationRequest request
+            @Valid @RequestBody EvaluationRequest request
     ) {
-        try {
-            return ResponseEntity.ok(evaluationService.update(id, request));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("not found")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(evaluationService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
-        try {
-            evaluationService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("not found")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+        evaluationService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

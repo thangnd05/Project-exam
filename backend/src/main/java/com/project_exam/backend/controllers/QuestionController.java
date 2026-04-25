@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
 import java.util.List;
-
 import java.util.Map;
 
 @RestController
@@ -36,12 +35,8 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<QuestionAdminResponse> getQuestionById(@PathVariable String id) {
-        try {
-            QuestionAdminResponse response = questionService.getQuestionDetailAdmin(id);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        QuestionAdminResponse response = questionService.getQuestionDetailAdmin(id);
+        return ResponseEntity.ok(response);
     }
 
     /** Cá nhân: không gửi classId/chapterId (lấy theo user JWT). Lớp: gửi classId (+ chapterId). */
@@ -101,39 +96,17 @@ public class QuestionController {
     public ResponseEntity<List<QuestionAdminResponse>> createBulkQuestionsToBankNoPassage(
             @RequestPart("request") String requestJson,
             HttpServletRequest httpRequest
-    ) {
-
-        try {
-
-            // 1️⃣ Parse JSON
-            BulkCreateQuestionsToBankRequest request =
-                    objectMapper.readValue(
-                            requestJson,
-                            BulkCreateQuestionsToBankRequest.class
-                    );
-
-            // 2️⃣ Lấy toàn bộ file
-            MultipartHttpServletRequest multipartRequest =
-                    (MultipartHttpServletRequest) httpRequest;
-
-            Map<String, MultipartFile> files =
-                    multipartRequest.getFileMap();
-
-            // 3️⃣ Gọi service
-            List<QuestionAdminResponse> responses =
-                    questionService.createBulkQuestionsToBankNoPassage(
-                            request,
-                            httpRequest,
-                            files
-                    );
-
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(responses);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    ) throws IOException {
+        BulkCreateQuestionsToBankRequest request =
+                objectMapper.readValue(requestJson, BulkCreateQuestionsToBankRequest.class);
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) httpRequest;
+        List<QuestionAdminResponse> responses =
+                questionService.createBulkQuestionsToBankNoPassage(
+                        request,
+                        httpRequest,
+                        multipartRequest.getFileMap()
+                );
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
     @PostMapping(value = "/bulk-with-passage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -141,16 +114,12 @@ public class QuestionController {
             @RequestParam("request") String requestJson,
             @RequestParam(value = "audio", required = false) MultipartFile audioFile,
             HttpServletRequest httpRequest
-    ) {
-        try {
-            BulkQuestionWithPassageRequest request = objectMapper.readValue(requestJson, BulkQuestionWithPassageRequest.class);
-            List<QuestionAdminResponse> responses = questionService.createBulkQuestionsToBank(request, httpRequest, audioFile);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    ) throws IOException {
+        BulkQuestionWithPassageRequest request =
+                objectMapper.readValue(requestJson, BulkQuestionWithPassageRequest.class);
+        List<QuestionAdminResponse> responses =
+                questionService.createBulkQuestionsToBank(request, httpRequest, audioFile);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
     @PostMapping(value = "/create-and-attach", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -173,68 +142,47 @@ public class QuestionController {
     }
 
     @PostMapping(value = "/create-and-attach/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createQuestionsFromDocumentAndAttachToTest(
+    public ResponseEntity<List<QuestionAdminResponse>> createQuestionsFromDocumentAndAttachToTest(
             @RequestPart("file") MultipartFile file,
             @RequestParam String testPartId,
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
             HttpServletRequest httpRequest
-    ) {
-        try {
-            List<QuestionAdminResponse> responses = questionService.createQuestionsFromDocumentAndAttachToTest(
-                    file,
-                    testPartId,
-                    classId,
-                    chapterId,
-                    httpRequest
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Tạo nhanh câu hỏi từ Word thất bại",
-                    "detail", e.getMessage()
-            ));
-        }
+    ) throws IOException {
+        List<QuestionAdminResponse> responses = questionService.createQuestionsFromDocumentAndAttachToTest(
+                file,
+                testPartId,
+                classId,
+                chapterId,
+                httpRequest
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
     @PostMapping(value = "/import/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> importQuestionsFromDocument(
+    public ResponseEntity<List<QuestionAdminResponse>> importQuestionsFromDocument(
             @RequestPart("file") MultipartFile file,
             @RequestParam String examPartId,
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
             HttpServletRequest httpRequest
-    ) {
-        try {
-            List<QuestionAdminResponse> responses = questionService.importQuestionsFromDocument(
-                    file,
-                    examPartId,
-                    classId,
-                    chapterId,
-                    httpRequest
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Import câu hỏi thất bại",
-                    "detail", e.getMessage()
-            ));
-        }
+    ) throws IOException {
+        List<QuestionAdminResponse> responses = questionService.importQuestionsFromDocument(
+                file,
+                examPartId,
+                classId,
+                chapterId,
+                httpRequest
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
     @PostMapping(value = "/preview/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> previewQuestionsFromDocument(
+    public ResponseEntity<List<NormalQuestionRequest>> previewQuestionsFromDocument(
             @RequestPart("file") MultipartFile file
-    ) {
-        try {
-            List<NormalQuestionRequest> responses = questionService.previewQuestionsFromDocument(file);
-            return ResponseEntity.ok(responses);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Preview câu hỏi từ Word thất bại",
-                    "detail", e.getMessage()
-            ));
-        }
+    ) throws IOException {
+        List<NormalQuestionRequest> responses = questionService.previewQuestionsFromDocument(file);
+        return ResponseEntity.ok(responses);
     }
 
     // =================== UPDATE ===================

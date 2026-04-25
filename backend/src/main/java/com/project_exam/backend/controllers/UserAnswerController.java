@@ -6,6 +6,7 @@ import com.project_exam.backend.dto.response.UserAnswerResponse;
 import com.project_exam.backend.services.ExamAndTest.UserAnswerService;
 import com.project_exam.backend.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,10 @@ public class UserAnswerController {
     }
 
     @PostMapping
-    public ResponseEntity<UserAnswerResponse> create(@RequestBody UserAnswerRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<UserAnswerResponse> create(
+            @Valid @RequestBody UserAnswerRequest request,
+            HttpServletRequest httpRequest
+    ) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(userAnswerService.create(request, userId));
     }
@@ -51,7 +55,7 @@ public class UserAnswerController {
     @PutMapping("/{id}")
     public ResponseEntity<UserAnswerResponse> update(
             @PathVariable String id,
-            @RequestBody UserAnswerRequest request,
+            @Valid @RequestBody UserAnswerRequest request,
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
@@ -59,17 +63,19 @@ public class UserAnswerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        return userAnswerService.findById(id)
-                .map(existing -> {
-                    userAnswerService.delete(id);
-                    return ResponseEntity.noContent().build(); // 204 No Content
-                })
-                .orElse(ResponseEntity.notFound().build()); // 404 Not Found
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        if (userAnswerService.findById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        userAnswerService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/batch")
-    public ResponseEntity<?> saveUserAnswers(@RequestBody List<UserAnswerRequest> requests, HttpServletRequest httpRequest) {
+    public ResponseEntity<List<UserAnswerResponse>> saveUserAnswers(
+            @Valid @RequestBody List<UserAnswerRequest> requests,
+            HttpServletRequest httpRequest
+    ) {
         String userId = authUtils.getUserId(httpRequest);
         List<UserAnswerResponse> responses = userAnswerService.upsertBatch(requests, userId);
         return ResponseEntity.ok(responses);

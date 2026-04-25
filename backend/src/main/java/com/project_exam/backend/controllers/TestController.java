@@ -10,6 +10,7 @@ import com.project_exam.backend.models.Test;
 import com.project_exam.backend.services.ExamAndTest.TestService;
 import com.project_exam.backend.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,21 +40,11 @@ public class TestController {
             @PathVariable String testId,
             HttpServletRequest httpRequest
     ) {
-        try {
-            // ✅ Gọi service: userId tự lấy từ token bên trong service
-            TestResponse response = testService.getTestFullById(testId, httpRequest);
-
-            if (response == null) {
-                return ResponseEntity.notFound().build();
-            }
-
-            return ResponseEntity.ok(response);
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        TestResponse response = testService.getTestFullById(testId, httpRequest);
+        if (response == null) {
+            throw new RuntimeException("Không tìm thấy bài test");
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/admintest/{testId}")
@@ -63,86 +54,65 @@ public class TestController {
     }
 
     @PostMapping
-    public ResponseEntity<TestResponse> createTest(@RequestBody CreateTestRequest request, HttpServletRequest httpRequest) {
-        try {
-            // 1. Lấy userId người tạo từ token (Dùng authUtils bạn đã có)
-            String currentUserId = authUtils.getUserId(httpRequest);
-
-            // 2. Map dữ liệu từ DTO sang Model
-            Test test = new Test();
-            test.setTitle(request.getTitle());
-            test.setDescription(request.getDescription());
-            test.setExamTypeId(request.getExamTypeId());
-            test.setDurationMinutes(request.getDurationMinutes());
-            test.setBannerUrl(request.getBannerUrl());
-            test.setMaxAttempts(request.getMaxAttempts());
-            test.setClassId(request.getClassId());
-            test.setChapterId(request.getChapterId());
-            test.setAvailableFrom(request.getAvailableFrom());
-            test.setAvailableTo(request.getAvailableTo());
-
-            // Gán thông tin hệ thống
-            test.setCreatedBy(currentUserId);
-            test.setCreatedAt(LocalDateTime.now());
-
-            // 3. Lưu vào database thông qua service
-            Test savedTest = testService.save(test);
-            TestResponse response = testService.buildUserTestSummary(savedTest, currentUserId);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<TestResponse> createTest(
+            @Valid @RequestBody CreateTestRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        String currentUserId = authUtils.getUserId(httpRequest);
+        Test test = new Test();
+        test.setTitle(request.getTitle());
+        test.setDescription(request.getDescription());
+        test.setExamTypeId(request.getExamTypeId());
+        test.setDurationMinutes(request.getDurationMinutes());
+        test.setBannerUrl(request.getBannerUrl());
+        test.setMaxAttempts(request.getMaxAttempts());
+        test.setClassId(request.getClassId());
+        test.setChapterId(request.getChapterId());
+        test.setAvailableFrom(request.getAvailableFrom());
+        test.setAvailableTo(request.getAvailableTo());
+        test.setCreatedBy(currentUserId);
+        test.setCreatedAt(LocalDateTime.now());
+        Test savedTest = testService.save(test);
+        TestResponse response = testService.buildUserTestSummary(savedTest, currentUserId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /** Gắn câu hỏi từ kho vào part của đề (chỉ tạo test_questions). Không tạo câu hỏi mới. */
     @PostMapping("/parts/questions")
-    public ResponseEntity<Void> addQuestionsToTestPart(@RequestBody AddQuestionsToTestRequest request) {
-        try {
-            testService.addQuestionsToTestPart(request);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Void> addQuestionsToTestPart(@Valid @RequestBody AddQuestionsToTestRequest request) {
+        testService.addQuestionsToTestPart(request);
+        return ResponseEntity.noContent().build();
     }
 
     /** Lấy câu hỏi random từ kho và gắn vào part. Cá nhân: không gửi classId/chapterId (theo user JWT). Lớp: gửi classId (+ chapterId). */
     @PostMapping("/parts/random-questions")
     public ResponseEntity<AddRandomQuestionsResponse> addRandomQuestionsToTestPart(
-            @RequestBody AddRandomQuestionsToTestRequest request,
-            HttpServletRequest httpRequest) {
-        try {
-            String currentUserId = authUtils.getUserId(httpRequest);
-            AddRandomQuestionsResponse response = testService.addRandomQuestionsToTestPart(request, currentUserId);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+            @Valid @RequestBody AddRandomQuestionsToTestRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        String currentUserId = authUtils.getUserId(httpRequest);
+        AddRandomQuestionsResponse response = testService.addRandomQuestionsToTestPart(request, currentUserId);
+        return ResponseEntity.ok(response);
     }
 
     // Cập nhật test (dùng chung CreateTestRequest; chỉ ghi đè field gửi lên, không đổi createdBy/createdAt)
     @PutMapping("/{id}")
-    public ResponseEntity<TestResponse> updateTest(@PathVariable String id, @RequestBody CreateTestRequest request) {
-        try {
-            Test updated = testService.updateTest(id, request);
-            return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<TestResponse> updateTest(
+            @PathVariable String id,
+            @Valid @RequestBody CreateTestRequest request
+    ) {
+        Test updated = testService.updateTest(id, request);
+        return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
     }
 
     // Xoá test
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTest(@PathVariable String id) {
-        return testService.getTestById(id)
-                .map(existing -> {
-                    testService.deleteTest(id);
-                    return ResponseEntity.noContent().build(); // 204 No Content
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build()); // 404 Not Found
+    public ResponseEntity<Void> deleteTest(@PathVariable String id) {
+        if (testService.getTestById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        testService.deleteTest(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/admin")
@@ -206,27 +176,17 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     }
 
     @GetMapping("/by-class/{classId}")
-    public ResponseEntity<?> getTestsByClass(
+    public ResponseEntity<List<TestResponse>> getTestsByClass(
             @PathVariable String classId,
             HttpServletRequest request
     ) {
         List<TestResponse> responses = testService.getTestByClassId(classId, request);
-
-        if (responses.isEmpty()) {
-            return ResponseEntity.ok(Map.of("message", "Không có bài test nào trong lớp này"));
-        }
-
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/my-all-test")
-    public ResponseEntity<?> getTestsCreateBy(HttpServletRequest request) {
+    public ResponseEntity<List<TestResponse>> getTestsCreateBy(HttpServletRequest request) {
         List<TestResponse> responses = testService.getTestByCreateBy(request);
-
-        if (responses.isEmpty()) {
-            return ResponseEntity.ok(Map.of("message", "Không có bài test nào trong lớp này"));
-        }
-
         return ResponseEntity.ok(responses);
     }
 

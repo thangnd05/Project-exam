@@ -3,6 +3,7 @@ package com.project_exam.backend.controllers;
 import com.project_exam.backend.dto.request.ExamPartRequest;
 import com.project_exam.backend.dto.response.ExamPartResponse;
 import com.project_exam.backend.services.ExamAndTest.ExamPartService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,43 +30,25 @@ public class ExamPartController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ExamPartResponse> getExamPartById(@PathVariable String id) {
-        try {
-            return ResponseEntity.ok(examPartService.findById(id));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(examPartService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<ExamPartResponse> createExamPart(@RequestBody ExamPartRequest request) {
+    public ResponseEntity<ExamPartResponse> createExamPart(@Valid @RequestBody ExamPartRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(examPartService.create(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ExamPartResponse> updateExamPart(@PathVariable String id, @RequestBody ExamPartRequest request) {
-        try {
-            return ResponseEntity.ok(examPartService.update(id, request));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<ExamPartResponse> updateExamPart(
+            @PathVariable String id,
+            @Valid @RequestBody ExamPartRequest request
+    ) {
+        return ResponseEntity.ok(examPartService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExamPart(@PathVariable String id) {
-        try {
-            examPartService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+        examPartService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

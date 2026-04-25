@@ -7,6 +7,7 @@ import com.project_exam.backend.dto.response.UserResponse;
 import com.project_exam.backend.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ public class UserController {
     // Tạo mới user
     @PostMapping
     public ResponseEntity<UserResponse> createUser(
-            @RequestBody UserUpsertRequest request
+            @Valid @RequestBody UserUpsertRequest request
     ) {
         return ResponseEntity.ok(userService.createUser(request));
     }
@@ -83,12 +84,11 @@ public class UserController {
 
     // Xóa user
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id) {
-        return userService.findById(id)
-                .map(existing -> {
-                    userService.deleteUser(id);
-                    return ResponseEntity.noContent().build(); // 204 No Content
-                })
-                .orElse(ResponseEntity.notFound().build()); // 404 Not Found
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        if (userService.findById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

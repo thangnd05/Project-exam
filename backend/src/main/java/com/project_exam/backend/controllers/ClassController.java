@@ -7,14 +7,13 @@ import com.project_exam.backend.dto.response.user.TestResponse;
 import com.project_exam.backend.services.ClassService;
 import com.project_exam.backend.services.ExamAndTest.TestService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/classes")
@@ -25,41 +24,27 @@ public class ClassController {
     private final TestService testService;
 
     @PostMapping
-    public ResponseEntity<?> createClass(@RequestBody ClassRequest request, HttpServletRequest httpRequest) {
-        try {
-            ClassResponse created = classService.createClass(request, httpRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<ClassResponse> createClass(
+            @Valid @RequestBody ClassRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        ClassResponse created = classService.createClass(request, httpRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/my")
-    public ResponseEntity<?> getMyClasses(HttpServletRequest request) {
-        try {
-            List<ClassSimpleResponse> responses = classService.getMyClasses(request);
-            return ResponseEntity.ok(responses);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<List<ClassSimpleResponse>> getMyClasses(HttpServletRequest request) {
+        List<ClassSimpleResponse> responses = classService.getMyClasses(request);
+        return ResponseEntity.ok(responses);
     }
 
     @PutMapping("/{classId}")
-    public ResponseEntity<?> updateClass(
+    public ResponseEntity<ClassResponse> updateClass(
             @PathVariable String classId,
-            @RequestBody ClassRequest request,
+            @Valid @RequestBody ClassRequest request,
             HttpServletRequest httpRequest) {
-        try {
-            ClassResponse result = classService.updateClass(classId, request, httpRequest);
-            return ResponseEntity.ok(result);
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("authorized")) {
-                return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
-            }
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        ClassResponse result = classService.updateClass(classId, request, httpRequest);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/teacher/{teacherId}")
@@ -68,38 +53,27 @@ public class ClassController {
     }
 
     @GetMapping("/{classId}")
-    public ResponseEntity<?> getById(@PathVariable String classId) {
-        try {
-            return ResponseEntity.ok(classService.getById(classId));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<ClassResponse> getById(@PathVariable String classId) {
+        return ResponseEntity.ok(classService.getById(classId));
     }
 
     @DeleteMapping("/{classId}")
-    public ResponseEntity<?> deleteClass(@PathVariable String classId, HttpServletRequest request) {
-        try {
-            String teacherId = classService.getCurrentTeacherId(request);
-            ClassResponse clazz = classService.getById(classId);
-            if (!clazz.getTeacherId().equals(teacherId)) {
-                return ResponseEntity.status(403).body(Map.of("error", "You do not own this class"));
-            }
-            classService.deleteClass(classId);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+    public ResponseEntity<Void> deleteClass(@PathVariable String classId, HttpServletRequest request) {
+        String teacherId = classService.getCurrentTeacherId(request);
+        ClassResponse clazz = classService.getById(classId);
+        if (!clazz.getTeacherId().equals(teacherId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        classService.deleteClass(classId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{classId}/chapters/{chapterId}/tests")
-    public ResponseEntity<?> getTestsByClassAndChapter(
+    public ResponseEntity<List<TestResponse>> getTestsByClassAndChapter(
             @PathVariable String classId,
             @PathVariable String chapterId,
             HttpServletRequest request) {
         List<TestResponse> responses = testService.getTestByClassIdAndChapterId(classId, chapterId, request);
-        if (responses.isEmpty()) {
-            return ResponseEntity.ok(Map.of("message", "Không có bài test nào trong lớp này"));
-        }
         return ResponseEntity.ok(responses);
     }
 }

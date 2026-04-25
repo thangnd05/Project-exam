@@ -4,6 +4,7 @@ import com.project_exam.backend.dto.request.UserVocabularyRequest;
 import com.project_exam.backend.dto.response.UserVocabularyResponse;
 import com.project_exam.backend.services.LearningVoca.UserVocabularyService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,53 +26,28 @@ public class UserVocabularyController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserVocabularyResponse> getById(@PathVariable String id) {
-        try {
-            return ResponseEntity.ok(service.findById(id));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
     public ResponseEntity<UserVocabularyResponse> create(
-            @RequestBody UserVocabularyRequest request,
+            @Valid @RequestBody UserVocabularyRequest request,
             HttpServletRequest httpRequest) {
-        try {
-            UserVocabularyResponse created = service.create(request, httpRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        UserVocabularyResponse created = service.create(request, httpRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserVocabularyResponse> update(
             @PathVariable String id,
-            @RequestBody UserVocabularyRequest request) {
-        try {
-            return ResponseEntity.ok(service.update(id, request));
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+            @Valid @RequestBody UserVocabularyRequest request) {
+        return ResponseEntity.ok(service.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
-        try {
-            service.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            if (e.getMessage() != null && e.getMessage().contains("không tồn tại")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.badRequest().build();
-        }
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete-all")

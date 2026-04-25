@@ -3,6 +3,7 @@ package com.project_exam.backend.controllers;
 import com.project_exam.backend.dto.request.TestQuestionRequest;
 import com.project_exam.backend.dto.response.TestQuestionResponse;
 import com.project_exam.backend.services.ExamAndTest.TestQuestionService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class TestQuestionController {
 
     // Tạo mới test question
     @PostMapping
-    public ResponseEntity<TestQuestionResponse> createTestQuestion(@RequestBody TestQuestionRequest request) {
+    public ResponseEntity<TestQuestionResponse> createTestQuestion(@Valid @RequestBody TestQuestionRequest request) {
         return ResponseEntity.ok(testQuestionService.createTestQuestion(request));
     }
 
@@ -40,7 +41,7 @@ public class TestQuestionController {
     @PutMapping("/{id}")
     public ResponseEntity<TestQuestionResponse> updateTestQuestion(
             @PathVariable String id,
-            @RequestBody TestQuestionRequest request) {
+            @Valid @RequestBody TestQuestionRequest request) {
         return testQuestionService.updateTestQuestion(id, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -48,12 +49,11 @@ public class TestQuestionController {
 
     // Xóa test question
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTestQuestion(@PathVariable String id) {
-        return testQuestionService.getTestQuestionById(id)
-                .map(existing -> {
-                    testQuestionService.deleteTestQuestionById(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Void> deleteTestQuestion(@PathVariable String id) {
+        if (testQuestionService.getTestQuestionById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        testQuestionService.deleteTestQuestionById(id);
+        return ResponseEntity.noContent().build();
     }
 }
