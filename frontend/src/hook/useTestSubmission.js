@@ -22,7 +22,7 @@ export const useTestSubmission = ({
             return false;
         }
         const hasValidCorrectAnswer = (question.answers || []).some(
-            (answer) => answer.isCorrect && answer.answerText?.trim(),
+            (answer) => Boolean(answer?.isCorrect),
         );
         return hasValidCorrectAnswer;
     };

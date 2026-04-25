@@ -62,17 +62,23 @@ public class SecurityConfig {
                 new JwtAuthenticationFilter(jwtService, userDetailsService);
 
         http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers(
-                                "/api/auth/**",
-                                "/oauth2/**",
-                                "/login/oauth2/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        )
-                )
+                // .csrf(csrf -> csrf
+                //         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                //         .ignoringRequestMatchers(
+                //                 "/api/auth/**",
+                //                 "/api/evaluations/**",
+                //                 "/api/questions/preview/document",
+                //                 "/api/questions/create-and-attach/document",
+                //                 "/api/questions/import/document",
+                //                 "/oauth2/**",
+                //                 "/login/oauth2/**",
+                //                 "/v3/api-docs/**",
+                //                 "/swagger-ui/**",
+                //                 "/swagger-ui.html"
+                //         )
+                // )
+
+                .csrf(csrf -> csrf.disable()) // Tắt CSRF vì ta dùng JWT qua Header
                 .cors(cors -> {})
 
                 // 🔥 QUAN TRỌNG: API = STATELESS JWT
