@@ -138,11 +138,11 @@ public class SecurityConfig {
                             String accessToken =
                                     jwtService.generateToken(userDetails, claims);
 
-                            Cookie cookie = new Cookie("accessToken", accessToken);
-                            cookie.setHttpOnly(true);
-                            cookie.setPath("/");
-                            cookie.setMaxAge(24 * 60 * 60);
-                            response.addCookie(cookie);
+                            // Sử dụng chuỗi build thủ công để thêm SameSite=None và Secure
+                                String cookieValue = "accessToken=" + accessToken 
+                                + "; HttpOnly; Path=/; Max-Age=" + (24 * 60 * 60)
+                                + "; SameSite=None; Secure";
+                        response.addHeader("Set-Cookie", cookieValue);
 
                             // 🔥🔥🔥 DÒNG QUYẾT ĐỊNH
                             SecurityContextHolder.clearContext();
