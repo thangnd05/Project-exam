@@ -114,22 +114,18 @@ public class AuthService {
         // set accessToken vào cookie HttpOnly
         String cookieValue = URLEncoder.encode(newAccessToken, StandardCharsets.UTF_8);
         int cookieMax = (int) ((jwtService.extractClaim(newAccessToken, Claims::getExpiration).getTime() - System.currentTimeMillis()) / 1000);
-        if (cookieMax <= 0) cookieMax = 3600;
-
-        String setCookie = "accessToken=" + cookieValue +
-                "; HttpOnly; Path=/; Max-Age=" + cookieMax + "; SameSite=Strict; Secure";
-        response.addHeader("Set-Cookie", setCookie);
+        if (cookieMax <= 0) {
+            cookieMax = 3600;
+        }
+        response.addHeader("Set-Cookie", buildAccessTokenCookie(cookieValue, cookieMax));
 
         // Chỉ trả về message
         return Map.of("message", "Cấp access token mới thành công");
     }
 
     public void logout(HttpServletResponse response) {
-        // 1. Xóa accessToken của bạn
-        String delAccessToken = "accessToken=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure";
-
-        // 2. Xóa JSESSIONID của Spring Security
-        String delJSession = "JSESSIONID=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax";
+        String delAccessToken = buildAccessTokenCookie("", 0);
+        String delJSession = "JSESSIONID=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure";
 
         response.addHeader("Set-Cookie", delAccessToken);
         response.addHeader("Set-Cookie", delJSession);
@@ -138,13 +134,16 @@ public class AuthService {
     private void setAccessTokenCookie(String accessToken, HttpServletResponse response) {
         String cookieValue = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
         int cookieMax = (int) ((jwtService.extractClaim(accessToken, Claims::getExpiration).getTime() - System.currentTimeMillis()) / 1000);
-        if (cookieMax <= 0) cookieMax = 3600;
+        if (cookieMax <= 0) {
+            cookieMax = 3600;
+        }
+        response.addHeader("Set-Cookie", buildAccessTokenCookie(cookieValue, cookieMax));
+    }
 
-        String setCookie = "accessToken=" + cookieValue +
-                "; HttpOnly; Path=/; Max-Age=" + cookieMax +
-                "; SameSite=None" +  // ✅ Cho phép cross-site
-                "; Secure";          // ⚠️ Giữ true nếu HTTPS, false nếu localhost
-        response.addHeader("Set-Cookie", setCookie);
+    private String buildAccessTokenCookie(String cookieValue, int cookieMaxAge) {
+        return "accessToken=" + cookieValue
+                + "; HttpOnly; Path=/; Max-Age=" + cookieMaxAge
+                + "; SameSite=None; Secure";
     }
 
     @Transactional
@@ -254,7 +253,7 @@ public class AuthService {
             return new UserTokenInfo(userId, roleId);
 
         } catch (Exception e) {
-            throw new RuntimeException("❌ Failed to extract user info: " + e.getMessage());
+            throw new RuntimeException("Không thể xác định thông tin người dùng từ token.");
         }
     }
 

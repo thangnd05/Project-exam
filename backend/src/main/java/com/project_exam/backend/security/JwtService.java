@@ -144,13 +144,13 @@ public class JwtService {
         }
 
         if (token == null || token.isEmpty()) {
-            throw new RuntimeException("❌ Token not found in request");
+            throw new RuntimeException("Không tìm thấy token truy cập.");
         }
 
         try {
             return extractAllClaims(token);
         } catch (Exception e) {
-            throw new RuntimeException("⚠️ Invalid or expired token: " + e.getMessage());
+            throw new RuntimeException("Token không hợp lệ hoặc đã hết hạn.");
         }
     }
 

@@ -9,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -49,61 +48,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String token = resolveTokenFromCookie(request);
-
         if (StringUtils.hasText(token)) {
+            try {
+                token = URLDecoder.decode(token, StandardCharsets.UTF_8);
+                String username = jwtService.extractUsername(token);
 
-            // 🔥🔥🔥 FIX QUAN TRỌNG NHẤT
-            // Cookie đã được URLEncoder.encode → BẮT BUỘC decode lại
-            token = URLDecoder.decode(token, StandardCharsets.UTF_8);
-
-            String username = jwtService.extractUsername(token);
-
-            if (username != null &&
-                    SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                try {
-                    // ✅ username LUÔN là EMAIL
-                    UserDetails userDetails =
-                            userDetailsService.loadUserByUsername(username);
-
+                if (username != null
+                        && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                     if (jwtService.isTokenValid(token, userDetails)) {
-
                         UsernamePasswordAuthenticationToken authToken =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails,
                                         null,
                                         userDetails.getAuthorities()
                                 );
-
                         authToken.setDetails(
                                 new WebAuthenticationDetailsSource()
                                         .buildDetails(request)
                         );
-
-                        SecurityContextHolder
-                                .getContext()
-                                .setAuthentication(authToken);
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
-
-                } catch (UsernameNotFoundException e) {
-
-                    // ⚠️ User bị xóa hoặc token cũ → clear cookie
-                    Cookie expired = new Cookie("accessToken", null);
-                    expired.setPath("/");
-                    expired.setHttpOnly(true);
-                    expired.setMaxAge(0);
-                    expired.setSecure(true);
-                    expired.setAttribute("SameSite", "Lax");
-                    response.addCookie(expired);
-
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter()
-                            .write("Token không hợp lệ hoặc user không tồn tại");
-                    return;
                 }
+            } catch (RuntimeException ex) {
+                SecurityContextHolder.clearContext();
+                expireAccessTokenCookie(response);
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void expireAccessTokenCookie(HttpServletResponse response) {
+        String expiredAccessToken =
+                "accessToken=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure";
+        response.addHeader("Set-Cookie", expiredAccessToken);
     }
 }
