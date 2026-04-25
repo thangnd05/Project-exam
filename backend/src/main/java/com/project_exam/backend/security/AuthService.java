@@ -126,7 +126,7 @@ public class AuthService {
 
     public void logout(HttpServletResponse response) {
         // 1. Xóa accessToken của bạn
-        String delAccessToken = "accessToken=; HttpOnly; Path=/; Max-Age=0; SameSite=Secure";
+        String delAccessToken = "accessToken=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure";
 
         // 2. Xóa JSESSIONID của Spring Security
         String delJSession = "JSESSIONID=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax";

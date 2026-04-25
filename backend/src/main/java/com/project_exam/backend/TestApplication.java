@@ -18,9 +18,6 @@ public class TestApplication {
             System.setProperty(entry.getKey(), entry.getValue().trim());
         });
 
-        // 3. Debug để kiểm tra (Bạn nhớ check xem có đủ số "2005" chưa nhé)
-        System.out.println("--- DEBUG DB PASSWORD: [" + System.getProperty("SPRING_DATASOURCE_PASSWORD") + "] ---");
-
         // 4. Khởi chạy Spring Boot
         SpringApplication.run(TestApplication.class, args);
     }
