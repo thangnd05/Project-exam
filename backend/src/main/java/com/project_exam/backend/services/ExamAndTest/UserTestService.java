@@ -5,8 +5,7 @@ import com.project_exam.backend.models.*;
 import com.project_exam.backend.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class UserTestService {
-    private static final Logger log = LoggerFactory.getLogger(UserTestService.class);
 
     private final UserTestRepository userTestRepository;
     private final UserAnswerRepository userAnswerRepository;
@@ -53,8 +51,6 @@ public class UserTestService {
 
     @Transactional
     public UserTest submitTest(String userTestId, String currentUserId) {
-        log.debug("Submitting test with UserTestId={}", userTestId);
-
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new RuntimeException("UserTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
@@ -69,7 +65,6 @@ public class UserTestService {
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {
-            log.debug("No user answers found, totalScore=0");
             userTest.setTotalScore(0);
             return userTestRepository.save(userTest);
         }
@@ -81,7 +76,6 @@ public class UserTestService {
                 .orElseThrow(() -> new RuntimeException("ExamType not found"));
 
         String scoringMethod = examType.getScoringMethod() != null ? examType.getScoringMethod().toLowerCase() : "default";
-        log.debug("DEBUG: Scoring method for ExamType ID {} is '{}'", examType.getExamTypeId(), scoringMethod);
         int totalQuestionsInTest = calculateTotalQuestionsInTest(userTest.getTestId());
 
         int totalScore;
@@ -91,7 +85,6 @@ public class UserTestService {
             totalScore = scoreDefault(userAnswers, totalQuestionsInTest);
         }
 
-        log.debug("Total score for UserTestId={} is {}", userTestId, totalScore);
         userTest.setTotalScore(totalScore);
         return userTestRepository.save(userTest);
     }
@@ -150,7 +143,6 @@ public class UserTestService {
     }
 
     private int scoreToeicOptimal(List<UserAnswer> userAnswers, Test test, ExamType examType) {
-        log.debug("===== START TOEIC SCORING DEBUG =====");
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
 
         // 1. Lấy thông tin Question đầy đủ
@@ -195,7 +187,6 @@ public class UserTestService {
             if (isCorrect && skillId != null) {
                 skillCorrectCount.merge(skillId, 1, Integer::sum);
             }
-            log.debug("QuestionId: {}, Type: {}, IsCorrect: {}", questionId, question.getQuestionType(), isCorrect);
         }
 
         // 5. Quy đổi điểm
@@ -210,7 +201,6 @@ public class UserTestService {
                     .orElse(5);
 
             totalScore += convertedScore;
-            log.debug("SkillId: {}, NumCorrect: {}, ConvertedScore: {}", skillId, numCorrect, convertedScore);
         }
 
         Set<String> allSkillIdsInTest = examParts.stream().map(ExamPart::getSkillId).filter(Objects::nonNull).collect(Collectors.toSet());
@@ -221,12 +211,8 @@ public class UserTestService {
                         .map(ScoringConversion::getConvertedScore)
                         .orElse(5);
                 totalScore += convertedScore;
-                log.debug("SkillId: {}, NumCorrect: 0, ConvertedScore (0 correct): {}", skillId, convertedScore);
             }
         }
-
-        log.debug("TotalScore: {}", totalScore);
-        log.debug("===== END TOEIC SCORING DEBUG =====");
         return totalScore;
     }
 
@@ -302,7 +288,6 @@ public class UserTestService {
         // ✅ Kiểm tra xem user đã có bài thi đang làm dở chưa
         Optional<UserTest> existing = userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
         if (existing.isPresent()) {
-            log.info("✅ Reusing existing UserTest for user {} test {}", userId, testId);
             return existing.get();
         }
 
@@ -314,7 +299,6 @@ public class UserTestService {
         newTest.setStatus(UserTest.Status.IN_PROGRESS);
         newTest.setTotalScore(0);
 
-        log.info("🆕 Created new UserTest for user {} test {}", userId, testId);
         return userTestRepository.save(newTest);
     }
 
