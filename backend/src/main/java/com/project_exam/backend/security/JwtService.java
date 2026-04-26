@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
+import org.springframework.util.StringUtils; // ✅ ĐÃ THÊM DÒNG NÀY
 import javax.crypto.SecretKey;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -115,12 +115,20 @@ public class JwtService {
         return expiration != null && expiration.before(new Date());
     }
 
-    public String resolveTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
-        for (Cookie c : request.getCookies()) {
-            if ("accessToken".equals(c.getName())) {
-                return c.getValue();
+    // Trong JwtAuthenticationFilter.java
+public String resolveToken(HttpServletRequest request) {
+        // 1. Kiểm tra trong Cookie
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
             }
+        }
+        // 2. Fallback kiểm tra trong Header
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
         }
         return null;
     }
