@@ -43,6 +43,7 @@ public class UserService {
         return new UserResponse(
                 user.getUserId(),
                 user.getUserName(),
+                user.getFullName(),
                 user.getEmail(),
                 user.getRoleId(),
                 user.getAvatarUrl()

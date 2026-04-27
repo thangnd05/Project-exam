@@ -81,6 +81,7 @@ public class AuthService {
         return new UserResponse(
                 user.getUserId(),
                 user.getUserName(),
+                user.getFullName(),
                 user.getEmail(),
                 user.getRoleId(),
                 user.getAvatarUrl()
@@ -182,7 +183,7 @@ public class AuthService {
     public UserResponse me(HttpServletRequest request) {
         Claims claims = jwtService.extractAllClaimsFromRequest(request);
         User user = userRepository.findById((String) claims.get("userId")).orElseThrow();
-        return new UserResponse(user.getUserId(), user.getUserName(), user.getEmail(), user.getRoleId(), user.getAvatarUrl());
+        return new UserResponse(user.getUserId(), user.getUserName(), user.getFullName(), user.getEmail(), user.getRoleId(), user.getAvatarUrl());
     }
     
     public UserTokenInfo getCurrentUserInfo(HttpServletRequest request) {
