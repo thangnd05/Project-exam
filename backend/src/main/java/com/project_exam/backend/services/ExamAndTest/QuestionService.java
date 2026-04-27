@@ -1,5 +1,9 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.BadRequestException;
+import com.project_exam.backend.exception.ForbiddenException;
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.cloudinary.CloudinaryService;
 import com.project_exam.backend.dto.request.*;
 import com.project_exam.backend.dto.response.PassageMediaResponse;
@@ -234,18 +238,18 @@ public class QuestionService {
     private String resolveCurrentUserClassId(String currentUserId, String requestedClassId) {
         Set<String> classIds = getAccessibleClassIds(currentUserId);
         if (classIds.isEmpty()) {
-            throw new RuntimeException("Bạn chưa thuộc lớp nào.");
+            throw new BadRequestException("Bạn chưa thuộc lớp nào.");
         }
 
         if (requestedClassId != null) {
             if (!classIds.contains(requestedClassId)) {
-                throw new RuntimeException("Bạn không có quyền truy cập lớp: " + requestedClassId);
+                throw new ForbiddenException("Bạn không có quyền truy cập lớp: " + requestedClassId);
             }
             return requestedClassId;
         }
 
         if (classIds.size() > 1) {
-            throw new RuntimeException("Tài khoản thuộc nhiều lớp. Vui lòng truyền classId.");
+            throw new BadRequestException("Tài khoản thuộc nhiều lớp. Vui lòng truyền classId.");
         }
         return classIds.iterator().next();
     }
@@ -285,7 +289,7 @@ public class QuestionService {
 
     public List<NormalQuestionRequest> previewQuestionsFromDocument(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
-            throw new RuntimeException("Vui lòng chọn file Word.");
+            throw new BadRequestException("Vui lòng chọn file Word.");
         }
         return questionDocumentImportService.parseQuestionsFromDocument(file);
     }
@@ -299,10 +303,10 @@ public class QuestionService {
             HttpServletRequest httpRequest
     ) throws IOException {
         if (file == null || file.isEmpty()) {
-            throw new RuntimeException("Vui lòng chọn file Word.");
+            throw new BadRequestException("Vui lòng chọn file Word.");
         }
         if (examPartId == null) {
-            throw new RuntimeException("Thiếu examPartId.");
+            throw new BadRequestException("Thiếu examPartId.");
         }
 
         List<NormalQuestionRequest> parsedQuestions = questionDocumentImportService.parseQuestionsFromDocument(file);
@@ -325,19 +329,19 @@ public class QuestionService {
             HttpServletRequest httpRequest
     ) throws IOException {
         if (file == null || file.isEmpty()) {
-            throw new RuntimeException("Vui lòng chọn file Word.");
+            throw new BadRequestException("Vui lòng chọn file Word.");
         }
         if (testPartId == null) {
-            throw new RuntimeException("Thiếu testPartId.");
+            throw new BadRequestException("Thiếu testPartId.");
         }
 
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
-            throw new RuntimeException("Không xác định được người dùng.");
+            throw new BadRequestException("Không xác định được người dùng.");
         }
 
         TestPart testPart = testPartRepository.findById(testPartId)
-                .orElseThrow(() -> new RuntimeException("TestPart không tồn tại: " + testPartId));
+                .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
 
         List<NormalQuestionRequest> parsedQuestions = questionDocumentImportService.parseQuestionsFromDocument(file);
         if (parsedQuestions.isEmpty()) {
@@ -406,11 +410,11 @@ public class QuestionService {
                                                                 MultipartFile audioFile) throws IOException {
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
-            throw new RuntimeException("Không xác định được người dùng từ token.");
+            throw new BadRequestException("Không xác định được người dùng từ token.");
         }
         if (request.getPassage() == null || (request.getPassage().getContent() == null || request.getPassage().getContent().trim().isEmpty())
                 && (request.getPassage().getPassageType() != Passage.PassageType.LISTENING || audioFile == null || audioFile.isEmpty())) {
-            throw new RuntimeException("Bulk tạo câu hỏi theo đoạn bắt buộc phải có passage (nội dung hoặc audio cho LISTENING).");
+            throw new BadRequestException("Bulk tạo câu hỏi theo đoạn bắt buộc phải có passage (nội dung hoặc audio cho LISTENING).");
         }
 
         Passage passage = new Passage();
@@ -455,7 +459,7 @@ public class QuestionService {
 
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
-            throw new RuntimeException("Không xác định được người dùng từ token.");
+            throw new BadRequestException("Không xác định được người dùng từ token.");
         }
 
         if (request.getQuestions() == null || request.getQuestions().isEmpty()) {
@@ -569,11 +573,11 @@ public class QuestionService {
 
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
-            throw new RuntimeException("Không xác định được người dùng.");
+            throw new BadRequestException("Không xác định được người dùng.");
         }
 
         TestPart testPart = testPartRepository.findById(request.getTestPartId())
-                .orElseThrow(() -> new RuntimeException("TestPart không tồn tại: " + request.getTestPartId()));
+                .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + request.getTestPartId()));
 
         String passageId = null;
         Passage savedPassage = null;
@@ -803,7 +807,7 @@ public class QuestionService {
     public QuestionAdminResponse getQuestionDetailAdmin(String questionId) {
 
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("Question not found"));
+                .orElseThrow(() -> new NotFoundException("Question not found"));
 
         String examTypeId = examPartRepository.findById(question.getExamPartId())
                 .map(ExamPart::getExamTypeId)
@@ -870,13 +874,13 @@ public class QuestionService {
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
-            throw new RuntimeException("Không xác định được người dùng từ token.");
+            throw new BadRequestException("Không xác định được người dùng từ token.");
         }
 
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("Câu hỏi không tồn tại."));
+                .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại."));
         if (!currentUserId.equals(question.getCreatedBy())) {
-            throw new RuntimeException("Chỉ người tạo câu hỏi mới được sửa.");
+            throw new ForbiddenException("Chỉ người tạo câu hỏi mới được sửa.");
         }
 
         if (request.getExamPartId() != null) question.setExamPartId(request.getExamPartId());
@@ -938,7 +942,7 @@ public class QuestionService {
             try {
                 appendUploadedFilesToPassage(passage.getPassageId(), files.values());
             } catch (IOException e) {
-                throw new RuntimeException("Upload file thất bại: " + e.getMessage(), e);
+                throw new BadRequestException("Upload file thất bại: " + e.getMessage(), e);
             }
             passage = passageRepository.findById(passage.getPassageId()).orElse(passage);
         }
@@ -959,7 +963,7 @@ public class QuestionService {
         String currentUserId = authUtils.getUserId(httpRequest);
 
         if (currentUserId == null) {
-            throw new RuntimeException("Không xác định được người dùng.");
+            throw new BadRequestException("Không xác định được người dùng.");
         }
 
         System.out.println("========== DEBUG START ==========");

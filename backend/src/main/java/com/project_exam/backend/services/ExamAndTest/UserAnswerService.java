@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.response.ResultSummaryDto;
 import com.project_exam.backend.dto.request.UserAnswerRequest;
 import com.project_exam.backend.dto.response.UserAnswerResponse;
@@ -179,7 +181,7 @@ public class UserAnswerService {
 
         // ✅ Kiểm tra quyền xem kết quả dựa trên thời gian
         Test test = testRepository.findById(userTest.getTestId())
-            .orElseThrow(() -> new RuntimeException("Test not found"));
+            .orElseThrow(() -> new NotFoundException("Test not found"));
 
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;

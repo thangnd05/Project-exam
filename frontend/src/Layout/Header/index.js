@@ -188,7 +188,7 @@ function Header() {
               }}
             />
             <div className={cx('userNameWrapper')}>
-              <span className={cx('username')}>{user.username}</span>
+              <span className={cx('username')}>{user.userName}</span>
             </div>
           </Dropdown.Toggle>
           <Dropdown.Menu className={cx('custom-dropdown')}>

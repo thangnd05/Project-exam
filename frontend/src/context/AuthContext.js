@@ -10,7 +10,8 @@ export const AuthProvider = ({ children }) => {
   // ✅ Chuẩn hóa user từ DTO backend
   const normalizeUser = (data) => ({
     userId: data.id,
-    username: data.username,
+    userName: data.userName,
+    fullName: data.fullName,
     email: data.email,
     roleId: data.roleId,
     avatarUrl: data.avatarUrl,

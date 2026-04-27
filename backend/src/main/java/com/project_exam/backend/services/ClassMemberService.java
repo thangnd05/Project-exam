@@ -1,5 +1,9 @@
 package com.project_exam.backend.services;
 
+import com.project_exam.backend.exception.BadRequestException;
+import com.project_exam.backend.exception.ForbiddenException;
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.response.ClassMemberResponse;
 import com.project_exam.backend.dto.response.ClassStudentResponse;
 import com.project_exam.backend.models.ClassEntity;
@@ -32,11 +36,11 @@ public class ClassMemberService {
     public ClassMemberResponse joinClassByQr(String classQr, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
         ClassEntity clazz = classRepository.findByClassQr(classQr)
-                .orElseThrow(() -> new RuntimeException("Class not found with QR: " + classQr));
+                .orElseThrow(() -> new NotFoundException("Class not found with QR: " + classQr));
         String classId = clazz.getClassId();
 
         if (classMemberRepository.existsByClassIdAndUserId(classId, currentUserId)) {
-            throw new RuntimeException("You have already requested or joined this class!");
+            throw new BadRequestException("You have already requested or joined this class!");
         }
 
         ClassMember member = ClassMember.builder()
@@ -57,17 +61,17 @@ public class ClassMemberService {
 
         // 🔹 Kiểm tra lớp tồn tại
         ClassEntity clazz = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found with ID: " + classId));
+                .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
         // 🔹 Kiểm tra quyền
         if (!clazz.getTeacherId().equals(currentUserId)) {
-            throw new RuntimeException("You are not authorized to approve this class!");
+            throw new ForbiddenException("You are not authorized to approve this class!");
         }
 
         // 🔹 Tiến hành duyệt
         int updated = classMemberRepository.approveSingle(classId, userId);
         if (updated == 0) {
-            throw new RuntimeException("Member not found or already approved!");
+            throw new BadRequestException("Member not found or already approved!");
         }
     }
 
@@ -78,11 +82,11 @@ public class ClassMemberService {
 
         // 🔹 Kiểm tra lớp tồn tại
         ClassEntity clazz = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found with ID: " + classId));
+                .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
         // 🔹 Kiểm tra quyền (chỉ giáo viên tạo lớp mới được duyệt)
         if (!clazz.getTeacherId().equals(currentUserId)) {
-            throw new RuntimeException("You are not authorized to approve all members in this class!");
+            throw new ForbiddenException("You are not authorized to approve all members in this class!");
         }
 
         // 🔹 Duyệt tất cả học sinh đang chờ
@@ -137,10 +141,10 @@ public class ClassMemberService {
         String currentUserId = authUtils.getUserId(request);
 
         ClassEntity clazz = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found with ID: " + classId));
+                .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
         if (!clazz.getTeacherId().equals(currentUserId)) {
-            throw new RuntimeException("You are not authorized to remove members from this class!");
+            throw new ForbiddenException("You are not authorized to remove members from this class!");
         }
 
         classMemberRepository.removeStudent(classId, userId);

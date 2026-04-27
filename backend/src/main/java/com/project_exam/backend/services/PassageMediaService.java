@@ -1,5 +1,7 @@
 package com.project_exam.backend.services;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.PassageMediaRequest;
 import com.project_exam.backend.dto.response.PassageMediaResponse;
 import com.project_exam.backend.models.PassageMedia;
@@ -36,7 +38,7 @@ public class PassageMediaService {
     public PassageMediaResponse getById(String id) {
 
         PassageMedia media = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Media không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Media không tồn tại"));
 
         return toResponse(media);
     }
@@ -54,7 +56,7 @@ public class PassageMediaService {
     public PassageMediaResponse update(String id, PassageMediaRequest request) {
 
         PassageMedia media = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Media không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Media không tồn tại"));
 
         media.setMediaUrl(request.getMediaUrl());
         media.setMediaType(PassageMedia.MediaType.valueOf(request.getMediaType()));

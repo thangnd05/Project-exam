@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.LearningVoca;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.VocabularyAlbumRequest;
 import com.project_exam.backend.dto.response.VocabularyAlbumResponse;
 import com.project_exam.backend.models.VocabularyAlbum;
@@ -33,7 +35,7 @@ public class VocabularyAlbumService {
     // =========================
     public VocabularyAlbumResponse findById(String id) {
         VocabularyAlbum album = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Album không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
 
         return toResponse(album);
     }
@@ -64,7 +66,7 @@ public class VocabularyAlbumService {
     public VocabularyAlbumResponse update(String id, VocabularyAlbumRequest request) {
 
         VocabularyAlbum album = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Album không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
 
         album.setName(request.getName());
         album.setDescription(request.getDescription());
@@ -80,7 +82,7 @@ public class VocabularyAlbumService {
     public void delete(String id) {
 
         VocabularyAlbum album = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Album không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
 
         repository.delete(album);
     }

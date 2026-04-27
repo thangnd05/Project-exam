@@ -72,10 +72,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, "Dữ liệu bị trùng hoặc vi phạm ràng buộc", request);
     }
 
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ApiErrorResponse> handleAppException(AppException ex, HttpServletRequest request) {
+        log.warn("AppException: {}", ex.getMessage(), ex);
+        return buildErrorResponse(ex.getStatus(), ex.getMessage(), request);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiErrorResponse> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
-        log.warn("RuntimeException: {}", ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+        log.error("Unhandled RuntimeException: {}", ex.getMessage(), ex);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi hệ thống! Vui lòng thử lại sau.", request);
     }
 
     @ExceptionHandler(Exception.class)

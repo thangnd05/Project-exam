@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.LearningVoca;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.PracticeCheckRequest;
 import com.project_exam.backend.dto.response.PracticeCheckResponse;
 import com.project_exam.backend.dto.response.PracticeQuestionResponse;
@@ -94,7 +96,7 @@ public class PracticeService {
     public PracticeCheckResponse checkAnswer(HttpServletRequest request, PracticeCheckRequest req) {
         String userId = authUtils.getUserId(request);
         Vocabulary vocab = vocabularyRepository.findById(req.getVocabId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy từ vựng"));
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy từ vựng"));
 
         boolean correct = false;
 

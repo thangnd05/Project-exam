@@ -1,5 +1,9 @@
 package com.project_exam.backend.services;
 
+import com.project_exam.backend.exception.BadRequestException;
+import com.project_exam.backend.exception.ForbiddenException;
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.ChapterRequest;
 import com.project_exam.backend.dto.response.ChapterResponse;
 import com.project_exam.backend.models.Chapter;
@@ -25,10 +29,10 @@ public class ChapterService {
     private void checkTeacherPermission(String classId, String currentUserId) {
 
         ClassEntity clazz = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found"));
+                .orElseThrow(() -> new NotFoundException("Class not found"));
 
         if (!clazz.getTeacherId().equals(currentUserId)) {
-            throw new RuntimeException("Forbidden: You are not the teacher of this class");
+            throw new ForbiddenException("Forbidden: You are not the teacher of this class");
         }
     }
 
@@ -90,7 +94,7 @@ public class ChapterService {
     public ChapterResponse getById(String chapterId) {
 
         Chapter chapter = chapterRepository.findById(chapterId)
-                .orElseThrow(() -> new RuntimeException("Chapter not found"));
+                .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
         return toResponse(chapter);
     }
@@ -105,13 +109,13 @@ public class ChapterService {
         String currentUserId = authUtils.getUserId(httpRequest);
 
         Chapter chapter = chapterRepository.findById(chapterId)
-                .orElseThrow(() -> new RuntimeException("Chapter not found"));
+                .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
         checkTeacherPermission(chapter.getClassId(), currentUserId);
 
         if (request.getClassId() != null &&
                 !request.getClassId().equals(chapter.getClassId())) {
-            throw new RuntimeException("You cannot change classId of a chapter");
+            throw new BadRequestException("You cannot change classId of a chapter");
         }
 
         chapter.setTitle(request.getTitle());
@@ -128,7 +132,7 @@ public class ChapterService {
         String currentUserId = authUtils.getUserId(httpRequest);
 
         Chapter chapter = chapterRepository.findById(chapterId)
-                .orElseThrow(() -> new RuntimeException("Chapter not found"));
+                .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
         // ✅ check teacher
         checkTeacherPermission(chapter.getClassId(), currentUserId);

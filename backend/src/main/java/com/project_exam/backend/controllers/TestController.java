@@ -1,5 +1,7 @@
 package com.project_exam.backend.controllers;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.AddQuestionsToTestRequest;
 import com.project_exam.backend.dto.request.AddRandomQuestionsToTestRequest;
 import com.project_exam.backend.dto.response.AddRandomQuestionsResponse;
@@ -42,7 +44,7 @@ public class TestController {
     ) {
         TestResponse response = testService.getTestFullById(testId, httpRequest);
         if (response == null) {
-            throw new RuntimeException("Không tìm thấy bài test");
+            throw new NotFoundException("Không tìm thấy bài test");
         }
         return ResponseEntity.ok(response);
     }
@@ -165,7 +167,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     ) {
         String userId = authUtils.getUserId(request);
         Test test = testService.getTestById(testId)
-                .orElseThrow(() -> new RuntimeException("Test not found"));
+                .orElseThrow(() -> new NotFoundException("Test not found"));
         Map<String, Object> result = testService.canStartTest(userId, test);
 
         if (!(Boolean) result.get("canStart")) {

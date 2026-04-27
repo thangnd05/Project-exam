@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.ExamTypeRequest;
 import com.project_exam.backend.dto.response.ExamTypeResponse;
 import com.project_exam.backend.models.ExamType;
@@ -23,7 +25,7 @@ public class ExamTypeService {
 
     public ExamTypeResponse findById(String id) {
         ExamType type = examTypeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam type không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
         return toResponse(type);
     }
 
@@ -39,7 +41,7 @@ public class ExamTypeService {
 
     public ExamTypeResponse update(String id, ExamTypeRequest request) {
         ExamType type = examTypeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam type không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
         if (request.getName() != null) type.setName(request.getName());
         if (request.getDescription() != null) type.setDescription(request.getDescription());
         if (request.getDurationMinutes() != null) type.setDurationMinutes(request.getDurationMinutes());
@@ -50,7 +52,7 @@ public class ExamTypeService {
 
     public void delete(String id) {
         ExamType type = examTypeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam type không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
         examTypeRepository.delete(type);
     }
 

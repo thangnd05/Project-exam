@@ -1,5 +1,10 @@
 package com.project_exam.backend.security;
 
+import com.project_exam.backend.exception.BadRequestException;
+import com.project_exam.backend.exception.ConflictException;
+import com.project_exam.backend.exception.NotFoundException;
+import com.project_exam.backend.exception.UnauthorizedException;
+
 import com.project_exam.backend.dto.auth.UserTokenInfo;
 import com.project_exam.backend.dto.request.ChangePasswordRequest;
 import com.project_exam.backend.dto.request.ForgotPasswordRequest;
@@ -63,10 +68,10 @@ public class AuthService {
 
         User user = userRepository.findByUserName(identifier)
                 .or(() -> userRepository.findByEmail(identifier))
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng"));
 
         if (!user.getVerified()) {
-            throw new RuntimeException("Tài khoản chưa xác thực email");
+            throw new UnauthorizedException("Tài khoản chưa xác thực email");
         }
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(identifier);
@@ -91,17 +96,17 @@ public class AuthService {
     public Map<String, Object> refresh(String refreshToken, HttpServletResponse response) {
         String username = jwtService.extractUsername(refreshToken);
         if (username == null || !jwtService.isRefreshToken(refreshToken)) {
-            throw new RuntimeException("Refresh token không hợp lệ");
+            throw new UnauthorizedException("Refresh token không hợp lệ");
         }
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
         if (!jwtService.isTokenValid(refreshToken, userDetails)) {
-            throw new RuntimeException("Refresh token hết hạn hoặc không hợp lệ");
+            throw new UnauthorizedException("Refresh token hết hạn hoặc không hợp lệ");
         }
 
         User user = userRepository.findByUserName(username)
                 .or(() -> userRepository.findByEmail(username))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId());
@@ -147,12 +152,12 @@ public class AuthService {
     @Transactional
     public Map<String, Object> register(RegisterRequest request) {
         if (userRepository.findByUserName(request.getUserName()).isPresent())
-            throw new RuntimeException("Tên đăng nhập đã tồn tại");
+            throw new ConflictException("Tên đăng nhập đã tồn tại");
 
         Optional<User> existing = userRepository.findByEmail(request.getEmail());
         if (existing.isPresent()) {
             User existUser = existing.get();
-            if (existUser.getVerified()) throw new RuntimeException("Email đã được sử dụng");
+            if (existUser.getVerified()) throw new ConflictException("Email đã được sử dụng");
             emailVerificationRepository.deleteByUserId(existUser.getUserId());
             userRepository.delete(existUser);
         }
@@ -174,7 +179,7 @@ public class AuthService {
             emailVerificationService.createVerification(user);
         } catch (Exception e) {
             userRepository.delete(user);
-            throw new RuntimeException("Không thể gửi email xác thực.");
+            throw new BadRequestException("Không thể gửi email xác thực.");
         }
         return Map.of("message", "Đăng ký thành công! Vui lòng kiểm tra email.");
     }
@@ -191,7 +196,7 @@ public class AuthService {
             Claims claims = jwtService.extractAllClaimsFromRequest(request);
             return new UserTokenInfo((String) claims.get("userId"), (String) claims.get("roleId"));
         } catch (Exception e) {
-            throw new RuntimeException("Không thể xác định thông tin người dùng.");
+            throw new UnauthorizedException("Không thể xác định thông tin người dùng.");
         }
     }
 
@@ -214,8 +219,8 @@ public class AuthService {
 
     public AuthMessageResponse resetPassword(ResetPasswordRequest request) {
         validateNewPassword(request.getNewPassword(), request.getConfirmNewPassword());
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken()).orElseThrow(() -> new RuntimeException("Token không hợp lệ"));
-        if (Boolean.TRUE.equals(resetToken.getUsed()) || resetToken.getExpiresAt().isBefore(LocalDateTime.now())) throw new RuntimeException("Token hết hạn hoặc đã dùng");
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken()).orElseThrow(() -> new BadRequestException("Token không hợp lệ"));
+        if (Boolean.TRUE.equals(resetToken.getUsed()) || resetToken.getExpiresAt().isBefore(LocalDateTime.now())) throw new BadRequestException("Token hết hạn hoặc đã dùng");
         User user = userRepository.findById(resetToken.getUserId()).orElseThrow();
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
@@ -227,7 +232,7 @@ public class AuthService {
     public AuthMessageResponse changePassword(ChangePasswordRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         validateNewPassword(request.getNewPassword(), request.getConfirmNewPassword());
         User user = userRepository.findById(getCurrentUserInfo(httpRequest).getUserId()).orElseThrow();
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) throw new RuntimeException("Mật khẩu cũ không đúng");
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) throw new BadRequestException("Mật khẩu cũ không đúng");
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         logout(httpResponse);
@@ -235,7 +240,7 @@ public class AuthService {
     }
 
     private void validateNewPassword(String newPassword, String confirmNewPassword) {
-        if (!Objects.equals(newPassword, confirmNewPassword)) throw new RuntimeException("Mật khẩu xác nhận không khớp");
-        if (newPassword.length() < 6) throw new RuntimeException("Mật khẩu ít nhất 6 ký tự");
+        if (!Objects.equals(newPassword, confirmNewPassword)) throw new BadRequestException("Mật khẩu xác nhận không khớp");
+        if (newPassword.length() < 6) throw new BadRequestException("Mật khẩu ít nhất 6 ký tự");
     }
 }

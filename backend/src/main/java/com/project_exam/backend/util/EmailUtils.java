@@ -1,4 +1,6 @@
 //package com.project_exam.backend.util;
+
+import com.project_exam.backend.exception.BadRequestException;
 //
 //import org.springframework.stereotype.Component;
 //import org.springframework.web.client.RestTemplate;
@@ -35,7 +37,7 @@
 //
 //        } catch (Exception e) {
 //            System.err.println("❌ Lỗi gọi n8n: " + e.getMessage());
-//            throw new RuntimeException("Không thể gửi email xác thực");
+//            throw new BadRequestException("Không thể gửi email xác thực");
 //        }
 //    }
 //}

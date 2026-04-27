@@ -1,5 +1,8 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.BadRequestException;
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.TestPartRequest;
 import com.project_exam.backend.dto.response.TestPartSimpleResponse;
 import com.project_exam.backend.models.TestPart;
@@ -61,11 +64,11 @@ public class TestPartService {
     public TestPart save(TestPartRequest dto) {
         // Kiểm tra logic trước khi lưu
         if (dto.getTestId() == null) {
-            throw new RuntimeException("Test ID không được để trống!");
+            throw new BadRequestException("Test ID không được để trống!");
         }
 
         if (!testRepository.existsById(dto.getTestId())) {
-            throw new RuntimeException("Bài test không tồn tại!");
+            throw new NotFoundException("Bài test không tồn tại!");
         }
 
         // Map từ DTO sang Entity
@@ -85,7 +88,7 @@ public class TestPartService {
     @Transactional
     public TestPart update(String id, TestPartRequest dto) {
         TestPart existing = testPartRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Part để cập nhật"));
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy Part để cập nhật"));
 
         existing.setExamPartId(dto.getExamPartId());
         existing.setNumQuestions(dto.getNumQuestions());

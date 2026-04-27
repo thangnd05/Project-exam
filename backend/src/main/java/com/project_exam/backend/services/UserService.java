@@ -1,5 +1,7 @@
 package com.project_exam.backend.services;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.cloudinary.CloudinaryService;
 import com.project_exam.backend.dto.request.UserUpsertRequest;
 import com.project_exam.backend.dto.response.ProfileOverviewResponse;
@@ -145,7 +147,7 @@ public class UserService {
     public User updateUser(String id, User updatedUser, MultipartFile avatar) throws IOException {
 
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         // ✅ Update thông tin profile
         existingUser.setFullName(updatedUser.getFullName());
@@ -172,14 +174,14 @@ public class UserService {
     public ProfileOverviewResponse getProfileOverview(String id) {
         String userId = id;
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         long totalAttempts = userTestRepository.countByUserId(userId);
         long completedAttempts = userTestRepository.countByUserIdAndStatus(userId, UserTest.Status.COMPLETED);
         long inProgressAttempts = userTestRepository.countByUserIdAndStatus(userId, UserTest.Status.IN_PROGRESS);
 
         Role role = roleRepository.findByRoleId(user.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new NotFoundException("Role not found"));
 
         String roleName = role.getRoleName();
 

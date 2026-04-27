@@ -1,5 +1,8 @@
 package com.project_exam.backend.services;
 
+import com.project_exam.backend.exception.ForbiddenException;
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.ClassRequest;
 import com.project_exam.backend.dto.response.ClassResponse;
 import com.project_exam.backend.dto.response.ClassSimpleResponse;
@@ -61,14 +64,14 @@ public class ClassService {
 
     public ClassResponse getById(String classId) {
         ClassEntity clazz = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found with ID: " + classId));
+                .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
         return toResponse(clazz);
     }
 
     @Transactional
     public void deleteClass(String classId) {
         if (!classRepository.existsById(classId)) {
-            throw new RuntimeException("Class not found!");
+            throw new NotFoundException("Class not found!");
         }
         classRepository.deleteById(classId);
     }
@@ -81,10 +84,10 @@ public class ClassService {
     public ClassResponse updateClass(String classId, ClassRequest request, HttpServletRequest httpRequest) {
         String currentUserId = authUtils.getUserId(httpRequest);
         ClassEntity existing = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found with ID: " + classId));
+                .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
         if (!existing.getTeacherId().equals(currentUserId)) {
-            throw new RuntimeException("You are not authorized to update this class!");
+            throw new ForbiddenException("You are not authorized to update this class!");
         }
 
         if (request.getClassName() != null) existing.setClassName(request.getClassName());

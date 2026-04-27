@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.BadRequestException;
+
 import com.project_exam.backend.dto.request.AnswerRequest;
 import com.project_exam.backend.dto.request.NormalQuestionRequest;
 import com.project_exam.backend.models.Question;
@@ -51,7 +53,7 @@ public class QuestionDocumentImportService {
         if (filename.endsWith(".doc")) {
             return extractFromDoc(file);
         }
-        throw new RuntimeException("Chỉ hỗ trợ file Word (.docx hoặc .doc).");
+        throw new BadRequestException("Chỉ hỗ trợ file Word (.docx hoặc .doc).");
     }
 
     private String extractFromDocx(MultipartFile file) throws IOException {
@@ -98,7 +100,7 @@ public class QuestionDocumentImportService {
 
     private List<ParsedLine> toPlainLines(String rawText) {
         if (rawText == null || rawText.trim().isEmpty()) {
-            throw new RuntimeException("Không đọc được nội dung từ tài liệu.");
+            throw new BadRequestException("Không đọc được nội dung từ tài liệu.");
         }
 
         String normalizedText = rawText.replace("\r\n", "\n").replace('\r', '\n');
@@ -207,7 +209,7 @@ public class QuestionDocumentImportService {
         }
 
         if (results.isEmpty()) {
-            throw new RuntimeException("Không parse được câu hỏi hợp lệ. Dùng A-D và chọn đúng bằng 'Đáp án: A,B' hoặc tô đậm/màu đáp án đúng (docx).");
+            throw new BadRequestException("Không parse được câu hỏi hợp lệ. Dùng A-D và chọn đúng bằng 'Đáp án: A,B' hoặc tô đậm/màu đáp án đúng (docx).");
         }
 
         return results;

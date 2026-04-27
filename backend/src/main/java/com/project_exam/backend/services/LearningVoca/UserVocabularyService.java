@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.LearningVoca;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.UserVocabularyRequest;
 import com.project_exam.backend.dto.response.UserVocabularyResponse;
 import com.project_exam.backend.models.UserVocabulary;
@@ -26,7 +28,7 @@ public class UserVocabularyService {
 
     public UserVocabularyResponse findById(String id) {
         UserVocabulary uv = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User vocabulary không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("User vocabulary không tồn tại"));
         return toResponse(uv);
     }
 
@@ -40,7 +42,7 @@ public class UserVocabularyService {
 
     public UserVocabularyResponse update(String id, UserVocabularyRequest request) {
         UserVocabulary uv = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User vocabulary không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("User vocabulary không tồn tại"));
         if (request.getVocabId() != null) uv.setVocabId(request.getVocabId());
         if (request.getStatus() != null) uv.setStatus(request.getStatus());
         uv = repository.save(uv);
@@ -49,7 +51,7 @@ public class UserVocabularyService {
 
     public void delete(String id) {
         UserVocabulary uv = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User vocabulary không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("User vocabulary không tồn tại"));
         repository.delete(uv);
     }
 

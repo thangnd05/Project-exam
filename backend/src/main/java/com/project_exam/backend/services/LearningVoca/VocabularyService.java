@@ -1,5 +1,8 @@
 package com.project_exam.backend.services.LearningVoca;
 
+import com.project_exam.backend.exception.BadRequestException;
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.VocabularyRequest;
 import com.project_exam.backend.dto.response.VocabularyResponse;
 import com.project_exam.backend.models.DictionaryResult;
@@ -42,7 +45,7 @@ public class VocabularyService {
     // =========================
     public VocabularyResponse findById(String id) {
         Vocabulary vocab = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vocabulary không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Vocabulary không tồn tại"));
 
         return toResponse(vocab);
     }
@@ -52,7 +55,7 @@ public class VocabularyService {
     // =========================
     public void delete(String id) {
         Vocabulary vocab = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vocabulary không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Vocabulary không tồn tại"));
 
         repository.delete(vocab);
     }
@@ -66,7 +69,7 @@ public class VocabularyService {
 
         if (request.getAlbumId() != null) {
             album = albumRepository.findById(request.getAlbumId())
-                    .orElseThrow(() -> new RuntimeException("Album không tồn tại"));
+                    .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
         } else if (request.getNewAlbumName() != null && !request.getNewAlbumName().isEmpty()) {
             album = new VocabularyAlbum();
             album.setName(request.getNewAlbumName());
@@ -74,7 +77,7 @@ public class VocabularyService {
             album.setUserId(request.getUserId());
             album = albumRepository.save(album);
         } else {
-            throw new RuntimeException("Phải chọn album sẵn có hoặc nhập tên album mới");
+            throw new BadRequestException("Phải chọn album sẵn có hoặc nhập tên album mới");
         }
 
         Vocabulary vocab = new Vocabulary();
@@ -108,7 +111,7 @@ public class VocabularyService {
     public VocabularyResponse updateVocabulary(String vocabId, VocabularyRequest request) {
 
         Vocabulary vocab = repository.findById(vocabId)
-                .orElseThrow(() -> new RuntimeException("Vocabulary không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Vocabulary không tồn tại"));
 
         vocab.setWord(request.getWord());
         vocab.setMeaning(request.getMeaning());
@@ -146,7 +149,7 @@ public class VocabularyService {
         String currentUserId = authUtils.getUserId(request);
 
         VocabularyAlbum album = albumRepository.findById(albumId)
-                .orElseThrow(() -> new RuntimeException("Album không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
 
         if (!album.getUserId().equals(currentUserId)) {
             throw new AccessDeniedException("Bạn không có quyền truy cập album này!");

@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.ExamPartRequest;
 import com.project_exam.backend.dto.response.ExamPartResponse;
 import com.project_exam.backend.models.ExamPart;
@@ -29,7 +31,7 @@ public class ExamPartService {
 
     public ExamPartResponse findById(String id) {
         ExamPart part = examPartRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam part không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Exam part không tồn tại"));
         return toResponse(part);
     }
 
@@ -46,7 +48,7 @@ public class ExamPartService {
 
     public ExamPartResponse update(String id, ExamPartRequest request) {
         ExamPart part = examPartRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam part không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Exam part không tồn tại"));
         if (request.getExamTypeId() != null) part.setExamTypeId(request.getExamTypeId());
         if (request.getName() != null) part.setName(request.getName());
         if (request.getDescription() != null) part.setDescription(request.getDescription());
@@ -58,7 +60,7 @@ public class ExamPartService {
 
     public void delete(String id) {
         ExamPart part = examPartRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam part không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Exam part không tồn tại"));
         examPartRepository.delete(part);
     }
 

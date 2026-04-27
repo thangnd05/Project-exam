@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.ScoringConversionRequest;
 import com.project_exam.backend.dto.response.ScoringConversionResponse;
 import com.project_exam.backend.models.ScoringConversion;
@@ -40,7 +42,7 @@ public class ScoringConversionService {
 
     public ScoringConversionResponse findById(String id) {
         ScoringConversion c = scoringConversionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Scoring conversion không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Scoring conversion không tồn tại"));
         return toResponse(c);
     }
 
@@ -56,7 +58,7 @@ public class ScoringConversionService {
 
     public ScoringConversionResponse update(String id, ScoringConversionRequest request) {
         ScoringConversion c = scoringConversionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Scoring conversion không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Scoring conversion không tồn tại"));
         if (request.getExamTypeId() != null) c.setExamTypeId(request.getExamTypeId());
         if (request.getSkillId() != null) c.setSkillId(request.getSkillId());
         if (request.getNumCorrect() != null) c.setNumCorrect(request.getNumCorrect());
@@ -67,7 +69,7 @@ public class ScoringConversionService {
 
     public void delete(String id) {
         ScoringConversion c = scoringConversionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Scoring conversion không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Scoring conversion không tồn tại"));
         scoringConversionRepository.delete(c);
     }
 

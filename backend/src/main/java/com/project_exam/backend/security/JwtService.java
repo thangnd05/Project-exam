@@ -1,5 +1,7 @@
 package com.project_exam.backend.security;
 
+import com.project_exam.backend.exception.UnauthorizedException;
+
 import com.project_exam.backend.repositories.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -87,9 +89,9 @@ public class JwtService {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("Token đã hết hạn");
+            throw new UnauthorizedException("Token đã hết hạn");
         } catch (JwtException e) {
-            throw new RuntimeException("Token không hợp lệ");
+            throw new UnauthorizedException("Token không hợp lệ");
         }
     }
 
@@ -152,13 +154,13 @@ public String resolveToken(HttpServletRequest request) {
         }
 
         if (token == null || token.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy token truy cập.");
+            throw new UnauthorizedException("Không tìm thấy token truy cập.");
         }
 
         try {
             return extractAllClaims(token);
         } catch (Exception e) {
-            throw new RuntimeException("Token không hợp lệ hoặc đã hết hạn.");
+            throw new UnauthorizedException("Token không hợp lệ hoặc đã hết hạn.");
         }
     }
 

@@ -1,5 +1,7 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.response.UserTestResponse;
 import com.project_exam.backend.models.*;
 import com.project_exam.backend.repositories.*;
@@ -52,7 +54,7 @@ public class UserTestService {
     @Transactional
     public UserTest submitTest(String userTestId, String currentUserId) {
         UserTest userTest = userTestRepository.findById(userTestId)
-                .orElseThrow(() -> new RuntimeException("UserTest not found"));
+                .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền nộp bài thi này");
         }
@@ -70,10 +72,10 @@ public class UserTestService {
         }
 
         Test test = testRepository.findById(userTest.getTestId())
-                .orElseThrow(() -> new RuntimeException("Test not found"));
+                .orElseThrow(() -> new NotFoundException("Test not found"));
 
         ExamType examType = examTypeRepository.findById(test.getExamTypeId())
-                .orElseThrow(() -> new RuntimeException("ExamType not found"));
+                .orElseThrow(() -> new NotFoundException("ExamType not found"));
 
         String scoringMethod = examType.getScoringMethod() != null ? examType.getScoringMethod().toLowerCase() : "default";
         int totalQuestionsInTest = calculateTotalQuestionsInTest(userTest.getTestId());
@@ -283,7 +285,7 @@ public class UserTestService {
     @Transactional
     public UserTest startUserTest(String testId, String userId) {
         testRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException("Test not found with id: " + testId));
+                .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
 
         // ✅ Kiểm tra xem user đã có bài thi đang làm dở chưa
         Optional<UserTest> existing = userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
@@ -309,7 +311,7 @@ public class UserTestService {
     public List<UserTestResponse> getAttemptsByUserAndTest(String userId, String testId) {
 
         Test test = testRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException("Test not found"));
+                .orElseThrow(() -> new NotFoundException("Test not found"));
     
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;
@@ -344,7 +346,7 @@ public class UserTestService {
 
     public List<UserTestResponse> getAttemptsByTest(String testId) {
         Test test = testRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException("Test not found"));
+                .orElseThrow(() -> new NotFoundException("Test not found"));
     
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;

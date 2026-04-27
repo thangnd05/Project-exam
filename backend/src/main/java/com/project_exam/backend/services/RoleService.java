@@ -1,5 +1,7 @@
 package com.project_exam.backend.services;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.RoleRequest;
 import com.project_exam.backend.dto.response.RoleResponse;
 import com.project_exam.backend.models.Role;
@@ -23,7 +25,7 @@ public class RoleService {
 
     public RoleResponse findById(String id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Role không tồn tại"));
         return toResponse(role);
     }
 
@@ -37,7 +39,7 @@ public class RoleService {
 
     public RoleResponse update(String id, RoleRequest request) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Role không tồn tại"));
         if (request.getRoleName() != null) role.setRoleName(request.getRoleName());
         if (request.getDescription() != null) role.setDescription(request.getDescription());
         role = roleRepository.save(role);
@@ -46,7 +48,7 @@ public class RoleService {
 
     public void delete(String id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role không tồn tại"));
+                .orElseThrow(() -> new NotFoundException("Role không tồn tại"));
         roleRepository.delete(role);
     }
 

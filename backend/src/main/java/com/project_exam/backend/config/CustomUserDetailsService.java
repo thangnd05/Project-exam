@@ -1,5 +1,7 @@
 package com.project_exam.backend.config;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.models.Role;
 import com.project_exam.backend.models.User;
 import com.project_exam.backend.repositories.RoleRepository;
@@ -49,7 +51,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // 🔑 Lấy role name
         Role role = roleRepository.findById(user.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Role ID: " + user.getRoleId()));
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy Role ID: " + user.getRoleId()));
 
         String roleName = "ROLE_" + role.getRoleName().toUpperCase();
 
@@ -91,7 +93,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             Role userRole = roleRepository.findByRoleName("USER");
             if (userRole == null) {
                 // Nếu DB chưa có role USER, hãy tạo hoặc báo lỗi
-                throw new RuntimeException("Lỗi: Role 'USER' không tồn tại trong Database!");
+                throw new NotFoundException("Lỗi: Role 'USER' không tồn tại trong Database!");
             }
 
             newUser.setRoleId(userRole.getRoleId());

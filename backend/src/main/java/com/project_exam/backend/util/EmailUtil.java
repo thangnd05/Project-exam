@@ -1,5 +1,7 @@
 package com.project_exam.backend.util;
 
+import com.project_exam.backend.exception.BadRequestException;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +61,7 @@ public class EmailUtil {
             System.out.println("✅ Sent verification email to " + email);
         } catch (MailException e) {
             System.err.println("❌ Lỗi khi gửi mail: " + e.getMessage());
-            throw new RuntimeException("Không thể gửi email xác thực. Vui lòng kiểm tra địa chỉ email.");
+            throw new BadRequestException("Không thể gửi email xác thực. Vui lòng kiểm tra địa chỉ email.");
         }
     }
 
@@ -102,7 +104,7 @@ public class EmailUtil {
             helper.setText(content, true);
             javaMailSender.send(mimeMessage);
         } catch (Exception e) {
-            throw new RuntimeException("Không thể gửi email đặt lại mật khẩu.");
+            throw new BadRequestException("Không thể gửi email đặt lại mật khẩu.");
         }
     }
 }

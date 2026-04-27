@@ -1,5 +1,7 @@
 package com.project_exam.backend.services;
 
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.EvaluationRequest;
 import com.project_exam.backend.dto.response.EvaluationPageResponse;
 import com.project_exam.backend.dto.response.EvaluationResponse;
@@ -33,7 +35,7 @@ public class EvaluationService {
     private EvaluationResponse toResponse(Evaluation e) {
 
         User user = userRepository.findById(e.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         return new EvaluationResponse(
                 e.getId(),
@@ -127,7 +129,7 @@ public class EvaluationService {
     // ============================
     public EvaluationResponse update(String id, EvaluationRequest request) {
         Evaluation evaluation = evaluationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Evaluation not found"));
+                .orElseThrow(() -> new NotFoundException("Evaluation not found"));
         if (request.getContent() != null) evaluation.setContent(request.getContent());
         if (request.getRating() != null) evaluation.setRating(request.getRating());
         return toResponse(evaluationRepository.save(evaluation));
@@ -135,13 +137,13 @@ public class EvaluationService {
 
     public EvaluationResponse getById(String id) {
         Evaluation evaluation = evaluationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Evaluation not found"));
+                .orElseThrow(() -> new NotFoundException("Evaluation not found"));
         return toResponse(evaluation);
     }
 
     public void delete(String id) {
         Evaluation evaluation = evaluationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Evaluation not found"));
+                .orElseThrow(() -> new NotFoundException("Evaluation not found"));
         evaluationRepository.delete(evaluation);
     }
 }

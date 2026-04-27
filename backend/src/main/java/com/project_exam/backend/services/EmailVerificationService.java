@@ -1,5 +1,7 @@
 package com.project_exam.backend.services;
 
+import com.project_exam.backend.exception.BadRequestException;
+
 import com.project_exam.backend.models.EmailVerification;
 import com.project_exam.backend.models.User;
 import com.project_exam.backend.repositories.EmailVerificationRepository;
@@ -36,7 +38,7 @@ public class EmailVerificationService {
     public void createVerification(User user) {
 
         if (Boolean.TRUE.equals(user.getVerified())) {
-            throw new RuntimeException("Email đã được xác thực để sử dụng vui lòng dùng email khác để đăng ký.");
+            throw new BadRequestException("Email đã được xác thực để sử dụng vui lòng dùng email khác để đăng ký.");
         }
         try {
             String token = UUID.randomUUID().toString();
@@ -55,7 +57,7 @@ public class EmailVerificationService {
             // ⚠️ Nếu gửi email lỗi, xóa luôn user + token vừa tạo
             emailVerificationRepository.deleteByUserId(user.getUserId());
             userRepository.deleteById(user.getUserId());
-            throw new RuntimeException("Không thể gửi email xác thực. Vui lòng kiểm tra địa chỉ email.");
+            throw new BadRequestException("Không thể gửi email xác thực. Vui lòng kiểm tra địa chỉ email.");
         }
     }
 

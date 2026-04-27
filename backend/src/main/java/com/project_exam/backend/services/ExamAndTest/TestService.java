@@ -1,5 +1,8 @@
 package com.project_exam.backend.services.ExamAndTest;
 
+import com.project_exam.backend.exception.BadRequestException;
+import com.project_exam.backend.exception.NotFoundException;
+
 import com.project_exam.backend.dto.request.AddQuestionsToTestRequest;
 import com.project_exam.backend.dto.request.AddRandomQuestionsToTestRequest;
 import com.project_exam.backend.dto.request.CreateTestRequest;
@@ -66,7 +69,7 @@ public class TestService {
     public Test updateTest(String id, CreateTestRequest request) {
 
         Test test = testRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Test không tồn tại: " + id));
+                .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + id));
         if (request.getTitle() != null) test.setTitle(request.getTitle());
         if (request.getDescription() != null) test.setDescription(request.getDescription());
         if (request.getExamTypeId() != null) test.setExamTypeId(request.getExamTypeId());
@@ -171,7 +174,7 @@ public class TestService {
     public List<TestResponse> getTestsByUser(HttpServletRequest httpRequest) {
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
-            throw new RuntimeException("Không xác định được người dùng.");
+            throw new BadRequestException("Không xác định được người dùng.");
         }
         return testRepository.findByCreatedBy(currentUserId).stream()
                 .map(test -> buildUserTestSummary(test, currentUserId))
@@ -182,9 +185,9 @@ public class TestService {
     public TestResponse getTestFullById(String testId, HttpServletRequest httpRequest) {
         // 1. Lấy thông tin người dùng và bài thi
         String currentUserId = authUtils.getUserId(httpRequest);
-        if (currentUserId == null) throw new RuntimeException("Không xác định được người dùng.");
+        if (currentUserId == null) throw new BadRequestException("Không xác định được người dùng.");
 
-        Test test = testRepository.findById(testId).orElseThrow(() -> new RuntimeException("Test not found"));
+        Test test = testRepository.findById(testId).orElseThrow(() -> new NotFoundException("Test not found"));
         UserTest latest = userTestRepository.findTopByUserIdAndTestIdOrderByStartedAtDesc(currentUserId, testId).orElse(null);
 
         // 2. Logic Auto-Submit
@@ -393,7 +396,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
     public TestAdminResponse getTestFullByIdAdmin(String testId) {
         Test test = testRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException("Test not found"));
+                .orElseThrow(() -> new NotFoundException("Test not found"));
         long totalAttempts = userTestRepository.countByTestId(testId);
 
         TestAdminDataBundle data = loadAdminTestData(test.getTestId());
@@ -681,17 +684,17 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
     @Transactional
     public void addQuestionsToTestPart(AddQuestionsToTestRequest request) {
         if (request.getTestPartId() == null || request.getQuestionIds() == null || request.getQuestionIds().isEmpty()) {
-            throw new RuntimeException("testPartId và questionIds không được rỗng.");
+            throw new BadRequestException("testPartId và questionIds không được rỗng.");
         }
         String testPartId = request.getTestPartId();
         TestPart testPart = testPartRepository.findById(testPartId)
-                .orElseThrow(() -> new RuntimeException("TestPart không tồn tại: " + testPartId));
+                .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
 
         for (String questionId : request.getQuestionIds()) {
             Question question = questionRepository.findById(questionId)
-                    .orElseThrow(() -> new RuntimeException("Câu hỏi không tồn tại trong kho: " + questionId));
+                    .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại trong kho: " + questionId));
             if (!question.getExamPartId().equals(testPart.getExamPartId())) {
-                throw new RuntimeException("Câu hỏi " + questionId + " không thuộc examPart của part này.");
+                throw new BadRequestException("Câu hỏi " + questionId + " không thuộc examPart của part này.");
             }
             if (testQuestionRepository.existsByQuestionIdAndTestPartId(questionId, testPartId)) {
                 continue;
@@ -711,15 +714,15 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
     @Transactional
     public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId) {
         if (request.getTestPartId() == null || request.getCount() == null || request.getCount() <= 0) {
-            throw new RuntimeException("testPartId và count (số câu) phải hợp lệ.");
+            throw new BadRequestException("testPartId và count (số câu) phải hợp lệ.");
         }
         if (request.getChapterId() != null && request.getClassId() == null) {
-            throw new RuntimeException("Khi có chapterId thì phải có classId.");
+            throw new BadRequestException("Khi có chapterId thì phải có classId.");
         }
         String testPartId = request.getTestPartId();
         int count = request.getCount();
         TestPart testPart = testPartRepository.findById(testPartId)
-                .orElseThrow(() -> new RuntimeException("TestPart không tồn tại: " + testPartId));
+                .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
         String examPartId = testPart.getExamPartId();
 
         Set<String> existingIds = testQuestionRepository.findByTestPartId(testPartId).stream()
@@ -746,7 +749,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         for (String questionId : toAdd) {
             Question question = questionRepository.findById(questionId)
-                    .orElseThrow(() -> new RuntimeException("Câu hỏi không tồn tại: " + questionId));
+                    .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại: " + questionId));
             if (!question.getExamPartId().equals(examPartId)) {
                 continue;
             }
