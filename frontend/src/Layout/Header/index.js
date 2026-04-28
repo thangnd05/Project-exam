@@ -64,8 +64,8 @@ function Header() {
     if (isMobile) {
       return (
         <>
-          <Nav.Link as={Link} to={routes.about} className={cx('mobileNavLink')}>
-            Giới thiệu
+          <Nav.Link as={Link} to={routes.posts} className={cx('mobileNavLink')}>
+            Bài viết
           </Nav.Link>
           <Nav.Link as={Link} to={routes.myAlbums} className={cx('mobileNavLink')}>
             Từ vựng
@@ -103,8 +103,8 @@ function Header() {
 
     return (
       <>
-        <Nav.Link as={Link} to={routes.about} className={cx('home')}>
-          Giới thiệu
+        <Nav.Link as={Link} to={routes.posts} className={cx('home')}>
+          Bài viết
         </Nav.Link>
         <Nav.Link as={Link} to={routes.myAlbums} className={cx('home')}>
           Từ vựng

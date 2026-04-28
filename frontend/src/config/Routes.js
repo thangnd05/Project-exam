@@ -1,6 +1,8 @@
 const routes = {
   home: '/',
   about: '/about',
+  posts: '/posts',
+  postDetail: '/posts/:postId',
   policy: '/policy',
   service: '/service',
 

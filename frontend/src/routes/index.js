@@ -13,6 +13,8 @@ import TestByClassPage from '~/pages/myclass/testclass/TestByClassPage';
 import Policy from '~/pages/policy/policy';
 import Service from '~/pages/policy/service';
 import About from '~/pages/intro';
+import PostsPage from '~/pages/posts/PostsPage';
+import PostDetailPage from '~/pages/posts/PostDetailPage';
 import MyAlbumsPage from '~/pages/album-voca/MyAlbumPage';
 import AlbumDetailPage from '~/pages/album-delta/AlbumDeltaPage';
 import PracticePage from '~/pages/album-pratice/PracticePage';
@@ -50,6 +52,8 @@ export const publicRoutes = [
   {path: routes.policy, component: Policy},
   {path: routes.service, component: Service},
   {path: routes.about, component: About},
+  {path: routes.posts, component: PostsPage},
+  {path: routes.postDetail, component: PostDetailPage},
   {path: routes.verifyEmail, component: VerifyEmailPage},
   {path: routes.notFoundPage, component: NotFoundPage},
   {path: routes.notFound, component: NotFoundPage},
