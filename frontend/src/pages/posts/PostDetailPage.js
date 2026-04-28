@@ -4,38 +4,52 @@ import classNames from 'classnames/bind';
 import { 
   Heart, Bookmark, MessageCircle, Share2, Facebook, Linkedin, 
   Link2, ChevronRight, Copy, Check, ThumbsUp, MoreHorizontal, User,
-  ArrowRight
+  Send
 } from 'lucide-react';
 import { getPostById, getComments, addComment, getReacts, toggleReact } from '~/api/postApi';
 import { useAuth } from '~/hook/useAuth';
 import routes from '~/config/Routes';
-import styles from './posts.module.scss';
+import styles from './PostDetailPage.module.scss';
+import { Button } from 'react-bootstrap';
 
 const cx = classNames.bind(styles);
 
 const MOCK_DETAIL = {
   id: 'featured-1',
   title: 'Chiến lược ôn thi TOEIC 750+ trong 2 tháng cho người mất gốc',
-  excerpt: 'Lộ trình chi tiết từ việc hệ thống lại ngữ pháp cơ bản đến các kỹ năng làm bài Reading & Listening chuyên sâu.',
+  excerpt: '“Lộ trình chi tiết từ việc hệ thống lại ngữ pháp cơ bản đến các kỹ năng làm bài Reading & Listening chuyên sâu để đạt mục tiêu 750+.”',
   categoryName: 'Kinh nghiệm ôn thi',
   authorName: 'Hà My',
-  authorTitle: 'Cựu sinh viên ĐHNN ĐHQGHN, 8.5 IELTS, 990 TOEIC',
   authorAvatar: 'https://i.pravatar.cc/150?img=5',
-  authorBio: 'Chuyên gia đào tạo TOEIC với hơn 5 năm kinh nghiệm. Đã giúp hàng ngàn học viên chinh phục mục tiêu 750+ chỉ trong thời gian ngắn.',
+  authorBio: 'Chuyên gia đào tạo TOEIC với hơn 5 năm kinh nghiệm. Đạt 990/990 TOEIC và 8.5 IELTS. Hiện đang là giảng viên cao cấp tại EdTech Proctor, chuyên hỗ trợ sinh viên chinh phục các chứng chỉ quốc tế.',
   createdAt: '15 Tháng 5, 2024',
-  readTime: '12 phút đọc',
+  readTime: '8 min read',
   views: '4.2k',
   likes: 1200,
-  commentCount: 24,
-  coverImage: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-  coverCaption: 'Không gian học tập yên tĩnh giúp tăng 40% hiệu quả tập trung.',
-};
+  commentCount: 86,
+  content: `
+    <p>Đạt được mức điểm 750+ TOEIC không phải là một nhiệm vụ bất khả thi, ngay cả khi bạn bắt đầu từ con số 0. Chìa khóa nằm ở việc phân bổ thời gian hợp lý và nắm vững các "bẫy" thường gặp trong đề thi. Trong bài viết này, mình sẽ chia sẻ lộ trình mà mình đã áp dụng cho hàng trăm học viên tại EdTech Proctor.</p>
+    
+    <h2>Giai đoạn 1: Xây dựng nền tảng (Tuần 1-3)</h2>
+    <p>Đừng vội vã giải đề ngay lập tức. Hãy dành 3 tuần đầu tiên để củng cố 12 thì trong tiếng Anh và từ vựng thuộc 50 chủ đề phổ biến nhất của TOEIC như Office, Travel, Banking, và Healthcare.</p>
+    
+    <blockquote>"Học TOEIC không phải là học mẹo, mà là học cách sử dụng ngôn ngữ trong môi trường làm việc quốc tế chuyên nghiệp."</blockquote>
+    
+    <h3>Kỹ thuật luyện nghe Shadowing</h3>
+    <p>Một trong những phương pháp hiệu quả nhất để cải thiện Listening là Shadowing. Bạn hãy nghe một đoạn hội thoại ngắn và lặp lại ngay lập tức với cùng tốc độ và ngữ điệu của người nói.</p>
+    
+    <ul>
+      <li><b>Part 1 & 2:</b> Tập trung vào các từ khóa nghi vấn (Who, Where, When, Why).</li>
+      <li><b>Part 3 & 4:</b> Đọc trước câu hỏi và các lựa chọn để dự đoán nội dung.</li>
+      <li><b>Reading:</b> Quản lý thời gian là yếu tố sống còn. Bạn chỉ có trung bình 30 giây cho mỗi câu ở Part 5.</li>
+    </ul>
 
-const MOCK_RELATED = [
-  { id: 'rel-1', title: 'Top 5 giáo trình TOEIC "gối đầu giường" năm 2024', category: 'Tài liệu', date: '10 Tháng 5', readTime: '5 min read', img: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=400&q=80' },
-  { id: 'rel-2', title: 'Làm sao để không bị "bẫy" trong Reading Part 7?', category: 'Kỹ năng', date: '8 Tháng 5', readTime: '12 min read', img: 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=400&q=80' },
-  { id: 'rel-3', title: 'Bí kíp đạt 450+ Listening chỉ sau 30 ngày tập trung', category: 'Lộ trình', date: '5 Tháng 5', readTime: '7 min read', img: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=400&q=80' },
-];
+    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Learning context" />
+    <span class="${cx('imgCaption')}">Không gian học tập yên tĩnh giúp tăng 40% hiệu quả tập trung.</span>
+
+    <h2>Mẫu cấu trúc câu hay gặp</h2>
+  `
+};
 
 const MOCK_COMMENTS = [
   {
@@ -53,14 +67,7 @@ const MOCK_COMMENTS = [
         text: 'Chào Tuấn Anh, em có thể tìm bộ "Longman New Real TOEIC" - bộ này có phần nghe rất chuẩn để shadowing nhé. Chúc em học tốt!',
         time: '1 giờ trước',
         likes: 5,
-      },
-      {
-        id: 'r2',
-        authorName: 'Lê Minh',
-        authorAvatar: 'https://i.pravatar.cc/150?img=8',
-        text: 'Mình cũng đang học theo bộ đó, công nhận hiệu quả thật.',
-        time: '30 phút trước',
-        likes: 2,
+        isAuthor: true
       }
     ]
   },
@@ -70,9 +77,15 @@ const MOCK_COMMENTS = [
     authorAvatar: 'https://i.pravatar.cc/150?img=32',
     text: 'Mục tiêu của mình là 800, đọc xong bài này thấy tự tin hơn hẳn. Cảm ơn chị My!',
     time: '5 giờ trước',
-    likes: 8,
+    likes: 4,
     replies: []
   }
+];
+
+const MOCK_RELATED = [
+  { id: 'rel-1', title: 'Top 5 giáo trình TOEIC "gối đầu giường" năm 2024', category: 'TÀI LIỆU', date: '10 Tháng 5', readTime: '5 min read', img: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=400&q=80' },
+  { id: 'rel-2', title: 'Làm sao để không bị "bẫy" trong Reading Part 7?', category: 'KỸ NĂNG', date: '8 Tháng 5', readTime: '12 min read', img: 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=400&q=80' },
+  { id: 'rel-3', title: 'Bí kíp đạt 450+ Listening chỉ sau 30 ngày tập trung', category: 'LỘ TRÌNH', date: '5 Tháng 5', readTime: '7 min read', img: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=400&q=80' },
 ];
 
 function PostDetailPage() {
@@ -81,7 +94,6 @@ function PostDetailPage() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
-  const [showShare, setShowShare] = useState(false);
   const [copied, setCopied] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState(MOCK_COMMENTS);
@@ -100,18 +112,6 @@ function PostDetailPage() {
   const handleCopyCode = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleLike = () => {
-    setLiked(!liked);
-    // Animation logic handled by CSS class
-  };
-
-  const handleBookmark = () => {
-    setBookmarked(!bookmarked);
-    if (!bookmarked) {
-      alert('Đã lưu bài viết vào danh sách của bạn!');
-    }
   };
 
   const handleSubmitComment = (e) => {
@@ -136,45 +136,26 @@ function PostDetailPage() {
 
       <div className={cx('containerDetail')}>
         
-        {/* Floating Action Bar */}
+        {/* Floating Actions Sidebar */}
         <div className={cx('floatingBar')}>
-          <button 
-            className={cx('actionBtn', { active: liked })} 
-            onClick={handleLike}
-          >
-            <Heart size={20} fill={liked ? 'currentColor' : 'none'} className={liked ? cx('animate') : ''} />
-            <span className={cx('count')}>{MOCK_DETAIL.likes + (liked ? 1 : 0)}</span>
+          <button className={cx('actionBtn', { active: liked })} onClick={() => setLiked(!liked)}>
+            <div className={cx('iconCircle')}><Heart size={20} fill={liked ? 'currentColor' : 'none'} /></div>
+            <span className={cx('count')}>1.2k</span>
           </button>
-          
-          <button 
-            className={cx('actionBtn', { active: bookmarked })} 
-            onClick={handleBookmark}
-          >
-            <Bookmark size={20} fill={bookmarked ? 'currentColor' : 'none'} />
+          <button className={cx('actionBtn', { active: bookmarked })} onClick={() => setBookmarked(!bookmarked)}>
+            <div className={cx('iconCircle')}><Bookmark size={20} fill={bookmarked ? 'currentColor' : 'none'} /></div>
+            <span className={cx('count')}>452</span>
           </button>
-
-          <button 
-            className={cx('actionBtn')} 
-            onClick={() => document.getElementById('comments').scrollIntoView({ behavior: 'smooth' })}
-          >
-            <MessageCircle size={20} />
-            <span className={cx('count')}>{MOCK_DETAIL.commentCount}</span>
+          <button className={cx('actionBtn')} onClick={() => document.getElementById('comments').scrollIntoView({ behavior: 'smooth' })}>
+            <div className={cx('iconCircle')}><MessageCircle size={20} /></div>
+            <span className={cx('count')}>86</span>
           </button>
-
-          <div className="position-relative">
-            <button className={cx('actionBtn')} onClick={() => setShowShare(!showShare)}>
-              <Share2 size={20} />
-            </button>
-            {showShare && (
-              <div className={cx('sharePopup')}>
-                <button><Facebook size={16} /> Facebook</button>
-                <button><Linkedin size={16} /> LinkedIn</button>
-                <button onClick={() => { navigator.clipboard.writeText(window.location.href); setShowShare(false); }}>
-                  <Link2 size={16} /> Copy link
-                </button>
-              </div>
-            )}
-          </div>
+          <button className={cx('actionBtn')}>
+            <div className={cx('iconCircle')}><Share2 size={20} /></div>
+          </button>
+          <button className={cx('actionBtn')}>
+            <div className={cx('iconCircle')}><Copy size={20} /></div>
+          </button>
         </div>
 
         {/* Breadcrumbs */}
@@ -183,7 +164,7 @@ function PostDetailPage() {
           <ChevronRight size={14} />
           <Link to={routes.posts}>Blog</Link>
           <ChevronRight size={14} />
-          <Link to="#">{MOCK_DETAIL.categoryName}</Link>
+          <Link to="#">Kinh nghiệm ôn thi</Link>
           <ChevronRight size={14} />
           <span className={cx('current')}>Chiến lược ôn thi TOEIC 750+</span>
         </div>
@@ -191,7 +172,7 @@ function PostDetailPage() {
         <header className={cx('articleHeader')}>
           <span className={cx('categoryPill')}>{MOCK_DETAIL.categoryName}</span>
           <h1>{MOCK_DETAIL.title}</h1>
-          <p className={cx('excerpt')}>{MOCK_DETAIL.excerpt}</p>
+          <p className={cx('excerptDetail')}>{MOCK_DETAIL.excerpt}</p>
         </header>
 
         <div className={cx('metaRow')}>
@@ -199,74 +180,43 @@ function PostDetailPage() {
             <img src={MOCK_DETAIL.authorAvatar} alt={MOCK_DETAIL.authorName} />
             <div className={cx('authorInfo')}>
               <Link to="#">{MOCK_DETAIL.authorName}</Link>
-              <span>{MOCK_DETAIL.authorTitle}</span>
+              <button className={cx('followBtn')}>• Theo dõi</button>
             </div>
           </div>
           <div className={cx('metaSide')}>
-            {MOCK_DETAIL.createdAt} • {MOCK_DETAIL.readTime} • {MOCK_DETAIL.views} lượt xem
+            {MOCK_DETAIL.createdAt} • {MOCK_DETAIL.readTime} • {MOCK_DETAIL.views} views
           </div>
-        </div>
-
-        <div className={cx('coverWrapper')}>
-          <img src={MOCK_DETAIL.coverImage} alt="Cover" className={cx('coverImg')} />
-          <span className={cx('caption')}>{MOCK_DETAIL.coverCaption}</span>
         </div>
 
         <article className={cx('articleBody')}>
-          <p>Đạt được mức điểm 750+ TOEIC không phải là một nhiệm vụ bất khả thi, ngay cả khi bạn bắt đầu từ con số 0. Chìa khóa nằm ở việc phân bổ thời gian hợp lý và nắm vững các "bẫy" thường gặp trong đề thi. Trong bài viết này, mình sẽ chia sẻ lộ trình mà mình đã áp dụng cho hàng trăm học viên tại EdTech Proctor.</p>
+          <div dangerouslySetInnerHTML={{ __html: MOCK_DETAIL.content }} />
 
-          <h2>Giai đoạn 1: Xây dựng nền tảng (Tuần 1-3)</h2>
-          <p>Đừng vội vã giải đề ngay lập tức. Hãy dành 3 tuần đầu tiên để củng cố 12 thì trong tiếng Anh và từ vựng thuộc 50 chủ đề phổ biến nhất của TOEIC như <code>Office</code>, <code>Travel</code>, <code>Banking</code>, và <code>Healthcare</code>.</p>
-          
-          <blockquote>"Học TOEIC không phải là học mẹo, mà là học cách sử dụng ngôn ngữ trong môi trường làm việc quốc tế chuyên nghiệp."</blockquote>
-
-          <h3>Kỹ thuật luyện nghe Shadowing</h3>
-          <p>Một trong những phương pháp hiệu quả nhất để cải thiện Listening là Shadowing. Bạn hãy nghe một đoạn hội thoại ngắn và lặp lại ngay lập tức với cùng tốc độ và ngữ điệu của người nói.</p>
-          
-          <ul>
-            <li><b>Part 1 & 2:</b> Tập trung vào các từ khóa nghi vấn (Who, Where, When, Why).</li>
-            <li><b>Part 3 & 4:</b> Đọc trước câu hỏi và các lựa chọn để dự đoán nội dung.</li>
-            <li><b>Reading:</b> Quản lý thời gian là yếu tố sống còn. Bạn chỉ có trung bình 30 giây cho mỗi câu ở Part 5.</li>
-          </ul>
-
-          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Study Group" />
-
-          <h2>Giai đoạn 2: Luyện kỹ năng và chiến thuật</h2>
-          <p>Sau khi đã có nền tảng, hãy bắt đầu làm quen với các dạng bài thi. Đừng quên sử dụng phương pháp lặp lại ngắt quãng (Spaced Repetition) để ghi nhớ từ vựng lâu hơn.</p>
-          
           <pre>
-{`// Lịch học mẫu dạng Pseudo-code
-Schedule {
-  Morning: "Listening Part 1, 2 (30 mins)",
-  Afternoon: "Reading Part 5, 6 (45 mins)",
-  Evening: "Review vocabulary & Shadowing (30 mins)",
-  Status: "Consistency is key!"
-}`}
-<button className={cx('copyBtn')} onClick={handleCopyCode}>
-  {copied ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy</>}
-</button>
+{`// Cấu trúc câu điều kiện loại 2 trong Reading Part 5
+If + S + V2/ed, S + would/could + V-inf
+
+Example:
+If the manager were here,
+he would sign the contract immediately.`}
+            <button className={cx('copyBtn')} onClick={handleCopyCode}>
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
           </pre>
 
-          <h2>Giai đoạn 3: Luyện đề và chiến thuật phòng thi</h2>
-          <p>Hãy dành 2 tuần cuối cùng để giải ít nhất 5 bộ đề thi chính thức. Việc này giúp bạn làm quen với áp lực thời gian và rèn luyện tâm lý vững vàng trước khi bước vào kỳ thi thật.</p>
+          <p>Hãy nhớ rằng sự kiên trì là quan trọng nhất. Mỗi ngày chỉ cần dành ra 90 phút tập trung cao độ, bạn sẽ thấy sự khác biệt rõ rệt sau 2 tháng. Chúc các bạn sớm đạt được mức điểm mong muốn!</p>
         </article>
 
-        <div className={cx('tagsSection')}>
-          <span>Bài viết được gắn thẻ:</span>
-          <Link to="#" className={cx('tagPill')}>#toeic</Link>
-          <Link to="#" className={cx('tagPill')}>#on-thi</Link>
-          <Link to="#" className={cx('tagPill')}>#kinh-nghiem</Link>
-          <Link to="#" className={cx('tagPill')}>#tieng-anh</Link>
-        </div>
-
-        {/* Author Card */}
+        {/* Author Bio Card */}
         <div className={cx('authorCard')}>
-          <img src={MOCK_DETAIL.authorAvatar} alt="Author" />
+          <img src="https://i.pravatar.cc/150?img=5" alt="Author" />
           <div className={cx('authorBio')}>
-            <h4>{MOCK_DETAIL.authorName}</h4>
+            <h4>Về tác giả: {MOCK_DETAIL.authorName}</h4>
             <p>{MOCK_DETAIL.authorBio}</p>
+            <div className={cx('bioBtns')}>
+              <Button variant="primary" size="sm" className="rounded-pill px-4">Theo dõi</Button>
+              <Button variant="outline-secondary" size="sm" className="rounded-pill px-4">Trang cá nhân</Button>
+            </div>
           </div>
-          <button className={cx('followBtn')}>Theo dõi</button>
         </div>
 
         {/* Comments Section */}
@@ -274,15 +224,18 @@ Schedule {
           <h3>Bình luận ({MOCK_DETAIL.commentCount})</h3>
           
           <form className={cx('commentForm')} onSubmit={handleSubmitComment}>
-            <img src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=12'} alt="User" />
+            <div className="d-flex align-items-center mb-3">
+              <div className="bg-light rounded-circle p-2 me-3">
+                <User size={20} color="#64748b" />
+              </div>
+            </div>
             <div className={cx('formContent')}>
               <textarea 
-                placeholder="Viết bình luận của bạn..." 
+                placeholder="Chia sẻ suy nghĩ của bạn về bài viết này..." 
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
               <div className={cx('formActions')}>
-                <button type="button" className={cx('cancelBtn')} onClick={() => setNewComment('')}>Hủy</button>
                 <button type="submit" className={cx('submitBtn')}>Đăng bình luận</button>
               </div>
             </div>
@@ -295,14 +248,13 @@ Schedule {
                   <img src={comment.authorAvatar} alt="Avatar" className={cx('avatar')} />
                   <div className={cx('contentBox')}>
                     <div className={cx('commentMeta')}>
-                      <span>{comment.authorName}</span>
-                      <span>{comment.time}</span>
+                      <span className={cx('authorName')}>{comment.authorName}</span>
+                      <span className={cx('time')}>{comment.time}</span>
                     </div>
                     <p className={cx('text')}>{comment.text}</p>
                     <div className={cx('actions')}>
                       <button><ThumbsUp size={14} /> {comment.likes}</button>
                       <button>Trả lời</button>
-                      <button>Báo cáo</button>
                     </div>
                   </div>
                 </div>
@@ -314,12 +266,14 @@ Schedule {
                         <img src={reply.authorAvatar} alt="Avatar" className={cx('avatar')} />
                         <div className={cx('contentBox')}>
                           <div className={cx('commentMeta')}>
-                            <span>{reply.authorName}</span>
-                            <span>{reply.time}</span>
+                            <span className={cx('authorName')}>
+                              {reply.authorName}
+                              {reply.isAuthor && <span className={cx('opTag')}>Tác giả</span>}
+                            </span>
+                            <span className={cx('time')}>{reply.time}</span>
                           </div>
                           <p className={cx('text')}>{reply.text}</p>
                           <div className={cx('actions')}>
-                            <button><ThumbsUp size={14} /> {reply.likes}</button>
                             <button>Trả lời</button>
                           </div>
                         </div>
@@ -330,8 +284,6 @@ Schedule {
               </div>
             ))}
           </div>
-
-          <button className={cx('loadMore')}>Tải thêm bình luận</button>
         </section>
 
         {/* Related Posts */}
@@ -340,11 +292,11 @@ Schedule {
           <div className={cx('grid')}>
             {MOCK_RELATED.map(rel => (
               <div key={rel.id} className={cx('relatedCard')} onClick={() => navigate(routes.postDetail.replace(':postId', rel.id))}>
-                <div className={cx('imgWrapper')}>
+                <div className={cx('imgWrap')}>
                   <img src={rel.img} alt={rel.title} />
-                  <span className={cx('badge')}>{rel.category}</span>
                 </div>
-                <h4 className="mt-2">{rel.title}</h4>
+                <span className="text-primary fw-bold small mb-2 d-block">{rel.category}</span>
+                <h4>{rel.title}</h4>
                 <div className={cx('meta')}>{rel.date} • {rel.readTime}</div>
               </div>
             ))}

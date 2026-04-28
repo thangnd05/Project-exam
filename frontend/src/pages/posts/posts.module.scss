@@ -1,33 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&display=swap');
-
-:root {
-  --font-blog-heading: 'Source Serif 4', Georgia, serif;
-  --blog-reading-width: 720px;
-}
+@import '../../components/GlobalStyles/GlobalStyles.module.scss';
 
 .wrapper {
   background-color: var(--bg-body);
   padding: 40px 0 80px;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
-}
-
-.wrapperDetail {
-  background-color: var(--bg-white);
-  min-height: 100vh;
-  padding-bottom: 100px;
-  position: relative;
-}
-
-/* Reading Progress Bar */
-.progressBar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  background: var(--primary-gradient);
-  z-index: 1000;
-  transition: width 0.1s ease-out;
 }
 
 .container {
