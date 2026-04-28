@@ -1,0 +1,91 @@
+package com.project_exam.backend.modules.assessment.attempt.controller;
+
+import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerRequest;
+import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryDto;
+import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerResponse;
+import com.project_exam.backend.modules.assessment.attempt.service.UserAnswerService;
+import com.project_exam.backend.shared.util.AuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/user-answers")
+@AllArgsConstructor
+public class UserAnswerController {
+
+    private final UserAnswerService userAnswerService;
+    private final AuthUtils authUtils;
+
+    @GetMapping
+    public ResponseEntity<List<UserAnswerResponse>> getAll() {
+        return ResponseEntity.ok(userAnswerService.findAllResponses());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserAnswerResponse> getById(@PathVariable String id) {
+        return userAnswerService.findResponseById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/user-test/{userTestId}")
+    public ResponseEntity<List<UserAnswerResponse>> getByUserTest(@PathVariable String userTestId) {
+        return ResponseEntity.ok(userAnswerService.findResponsesByUserTestId(userTestId));
+    }
+
+    @GetMapping("/question/{questionId}")
+    public ResponseEntity<List<UserAnswerResponse>> getByQuestion(@PathVariable String questionId) {
+        return ResponseEntity.ok(userAnswerService.findResponsesByQuestionId(questionId));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserAnswerResponse> create(
+            @Valid @RequestBody UserAnswerRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userAnswerService.create(request, userId));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserAnswerResponse> update(
+            @PathVariable String id,
+            @Valid @RequestBody UserAnswerRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userAnswerService.update(id, request, userId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        if (userAnswerService.findById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        userAnswerService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<List<UserAnswerResponse>> saveUserAnswers(
+            @Valid @RequestBody List<UserAnswerRequest> requests,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        List<UserAnswerResponse> responses = userAnswerService.upsertBatch(requests, userId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/user-test/{userTestId}/result")
+    public ResponseEntity<ResultSummaryDto> getResult(@PathVariable String userTestId, HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        ResultSummaryDto result = userAnswerService.getResultSummary(userTestId, userId);
+        return ResponseEntity.ok(result);
+    }
+
+}
