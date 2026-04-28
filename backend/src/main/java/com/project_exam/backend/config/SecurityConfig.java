@@ -112,12 +112,14 @@ public class SecurityConfig {
                 // 6. Authorize Requests
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, 
+                        .requestMatchers(HttpMethod.GET,
                                 "/api/exam-types/**",
                                 "/api/evaluations/**",
                                 "/api/tests/**",
                                 "/api/auth/verify",
-                                "/v3/api-docs/**", 
+                                "/api/posts/**",
+                                "/api/categories/**",
+                                "/v3/api-docs/**",
                                 "/swagger-ui/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated()

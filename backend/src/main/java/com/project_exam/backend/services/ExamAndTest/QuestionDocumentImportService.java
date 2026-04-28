@@ -1,393 +1,210 @@
 package com.project_exam.backend.services.ExamAndTest;
 
 import com.project_exam.backend.exception.BadRequestException;
-
 import com.project_exam.backend.dto.request.AnswerRequest;
 import com.project_exam.backend.dto.request.NormalQuestionRequest;
 import com.project_exam.backend.models.Question;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class QuestionDocumentImportService {
-    private static final Pattern QUESTION_PREFIX_PATTERN =
+
+    // Regex nhận diện bắt đầu câu hỏi (Câu 1:, Question 1., hoặc kết thúc bằng ?) [cite: 28, 171, 253]
+    private static final Pattern QUESTION_START_PATTERN = 
             Pattern.compile("^(?:(?:[Cc][âÂ]u)|(?:[Qq]uestion))?\\s*(\\d+)?\\s*[\\.:\\-\\)]\\s*(.+)$");
-    private static final Pattern OPTION_PATTERN =
+    
+    // Regex nhận diện nhãn lựa chọn A-D [cite: 2, 22, 23]
+    private static final Pattern OPTION_PATTERN = 
             Pattern.compile("^([A-Da-d])\\s*[\\).:\\-]\\s*(.+)$");
-    private static final Pattern ANSWER_PATTERN =
-            Pattern.compile("^(?:(?:[Đđ]áp\\s*[áÁ]n)|(?:[Aa]nswer))\\s*[:\\-]?\\s*([A-Da-d\\s,;/|&]+)\\s*$");
-    private static final Pattern OPTION_TOKEN_PATTERN =
-            Pattern.compile("(?:^|\\s{2,}|\\t+)([A-Da-d])\\s*[\\).:\\-]");
+    
+    // Regex dùng để tách các đáp án nằm cùng một dòng [cite: 4, 12, 15]
+    private static final Pattern OPTION_INLINE_SPLITTER = 
+            Pattern.compile("\\s+(?=[A-Da-d]\\s*[\\).:\\-])");
 
     public List<NormalQuestionRequest> parseQuestionsFromDocument(MultipartFile file) throws IOException {
-        String filename = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase(Locale.ROOT);
-        if (filename.endsWith(".docx")) {
-            return parseQuestionsFromDocx(file);
-        }
-        String textContent = extractText(file);
-        return parseQuestionsFromTextLines(toPlainLines(textContent));
+        List<ParsedLine> allLines = extractLinesWithStyle(file);
+        return processLinesIntoQuestions(allLines);
     }
 
-    private String extractText(MultipartFile file) throws IOException {
-        String filename = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase(Locale.ROOT);
-        if (filename.endsWith(".docx")) {
-            return extractFromDocx(file);
-        }
-        if (filename.endsWith(".doc")) {
-            return extractFromDoc(file);
-        }
-        throw new BadRequestException("Chỉ hỗ trợ file Word (.docx hoặc .doc).");
-    }
+    private List<ParsedLine> extractLinesWithStyle(MultipartFile file) throws IOException {
+        List<ParsedLine> lines = new ArrayList<>();
+        String filename = file.getOriginalFilename().toLowerCase();
 
-    private String extractFromDocx(MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream();
-             XWPFDocument document = new XWPFDocument(inputStream)) {
-            StringBuilder result = new StringBuilder();
-            for (XWPFParagraph paragraph : document.getParagraphs()) {
-                String text = paragraph.getText();
-                if (text != null) {
-                    result.append(text).append('\n');
-                }
-            }
-            return result.toString();
-        }
-    }
+        try (InputStream is = file.getInputStream()) {
+            if (filename.endsWith(".docx")) {
+                XWPFDocument doc = new XWPFDocument(is);
+                for (XWPFParagraph para : doc.getParagraphs()) {
+                    String text = para.getParagraphText().trim();
+                    if (text.isEmpty()) continue;
 
-    private String extractFromDoc(MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream();
-             HWPFDocument document = new HWPFDocument(inputStream);
-             WordExtractor extractor = new WordExtractor(document)) {
-            return extractor.getText();
-        }
-    }
-
-    private List<NormalQuestionRequest> parseQuestionsFromDocx(MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream();
-             XWPFDocument document = new XWPFDocument(inputStream)) {
-            List<ParsedLine> lines = new ArrayList<>();
-            for (XWPFParagraph paragraph : document.getParagraphs()) {
-                String text = paragraph.getText();
-                if (text == null || text.trim().isEmpty()) {
-                    continue;
-                }
-                Set<String> styledLabelsInParagraph = detectStyledOptionLabels(paragraph, text.trim());
-                for (String expandedLine : expandPossibleMultiOptionLine(text.trim())) {
-                    String label = extractOptionLabel(expandedLine);
-                    boolean isStyledLine = label != null && styledLabelsInParagraph.contains(label);
-                    lines.add(new ParsedLine(expandedLine, isStyledLine));
-                }
-            }
-            return parseQuestionsFromTextLines(lines);
-        }
-    }
-
-    private List<ParsedLine> toPlainLines(String rawText) {
-        if (rawText == null || rawText.trim().isEmpty()) {
-            throw new BadRequestException("Không đọc được nội dung từ tài liệu.");
-        }
-
-        String normalizedText = rawText.replace("\r\n", "\n").replace('\r', '\n');
-        String[] lines = normalizedText.split("\n");
-        List<ParsedLine> parsedLines = new ArrayList<>();
-        for (String rawLine : lines) {
-            if (rawLine == null || rawLine.trim().isEmpty()) {
-                continue;
-            }
-            for (String expandedLine : expandPossibleMultiOptionLine(rawLine.trim())) {
-                parsedLines.add(new ParsedLine(expandedLine, false));
-            }
-        }
-        return parsedLines;
-    }
-
-    private List<String> expandPossibleMultiOptionLine(String line) {
-        List<Integer> tokenStarts = getOptionTokenStarts(line);
-        if (tokenStarts.size() < 2) {
-            return List.of(line);
-        }
-        List<String> result = new ArrayList<>();
-        for (int i = 0; i < tokenStarts.size(); i++) {
-            int start = tokenStarts.get(i);
-            int end = (i + 1 < tokenStarts.size()) ? tokenStarts.get(i + 1) : line.length();
-            String segment = line.substring(start, end).trim();
-            if (!segment.isEmpty()) {
-                result.add(segment);
-            }
-        }
-        return result;
-    }
-
-    private List<Integer> getOptionTokenStarts(String line) {
-        List<Integer> starts = new ArrayList<>();
-        Matcher matcher = OPTION_TOKEN_PATTERN.matcher(line);
-        while (matcher.find()) {
-            int labelIndex = matcher.start(1);
-            if (labelIndex >= 0) {
-                starts.add(labelIndex);
-            }
-        }
-        return starts;
-    }
-
-    private List<NormalQuestionRequest> parseQuestionsFromTextLines(List<ParsedLine> lines) {
-        List<NormalQuestionRequest> results = new ArrayList<>();
-        ParsedQuestion currentQuestion = null;
-        String currentOptionLabel = null;
-
-        for (ParsedLine parsedLine : lines) {
-            String line = parsedLine.text;
-
-            Matcher answerMatcher = ANSWER_PATTERN.matcher(line);
-            if (answerMatcher.matches()) {
-                if (currentQuestion != null) {
-                    currentQuestion.correctLabels.addAll(parseAnswerLabels(answerMatcher.group(1)));
-                }
-                continue;
-            }
-
-            Matcher optionMatcher = OPTION_PATTERN.matcher(line);
-            if (optionMatcher.matches()) {
-                if (currentQuestion == null) {
-                    continue;
-                }
-                currentOptionLabel = optionMatcher.group(1).toUpperCase(Locale.ROOT);
-                currentQuestion.options.put(currentOptionLabel, optionMatcher.group(2).trim());
-                if (parsedLine.isStyled) {
-                    currentQuestion.styledOptionLabels.add(currentOptionLabel);
-                }
-                continue;
-            }
-
-            if (looksLikeQuestionStart(line)) {
-                if (currentQuestion != null) {
-                    assignCorrectLabelsFromStyleIfPossible(currentQuestion);
-                    NormalQuestionRequest mappedQuestion = mapParsedQuestion(currentQuestion);
-                    if (mappedQuestion != null) {
-                        results.add(mappedQuestion);
+                    // 1. Phát hiện các nhãn (A, B, C, D) có định dạng đặc biệt trong đoạn này 
+                    Set<String> styledLabels = detectStyledOptionLabels(para);
+                    
+                    // 2. Tách dòng nếu có nhiều đáp án trên cùng 1 hàng 
+                    String[] segments = OPTION_INLINE_SPLITTER.split(text);
+                    for (String seg : segments) {
+                        String cleanSeg = seg.trim();
+                        if (cleanSeg.isEmpty()) continue;
+                        
+                        String label = getOptionLabel(cleanSeg);
+                        boolean isStyled = (label != null && styledLabels.contains(label));
+                        lines.add(new ParsedLine(cleanSeg, isStyled));
                     }
                 }
-                currentQuestion = new ParsedQuestion(cleanQuestionPrefix(line));
-                currentOptionLabel = null;
+            } else if (filename.endsWith(".doc")) {
+                HWPFDocument doc = new HWPFDocument(is);
+                WordExtractor extractor = new WordExtractor(doc);
+                for (String text : extractor.getParagraphText()) {
+                    if (text == null || text.trim().isEmpty()) continue;
+                    String[] segments = OPTION_INLINE_SPLITTER.split(text.trim());
+                    for (String seg : segments) {
+                        lines.add(new ParsedLine(seg.trim(), false));
+                    }
+                }
+            }
+        }
+        return lines;
+    }
+
+    private List<NormalQuestionRequest> processLinesIntoQuestions(List<ParsedLine> lines) {
+        List<NormalQuestionRequest> results = new ArrayList<>();
+        ParsedQuestion current = null;
+
+        for (ParsedLine pl : lines) {
+            String text = pl.text;
+
+            // Bước 1: Nhận diện câu hỏi mới [cite: 3, 6, 11, 14, 17]
+            if (isQuestionStart(text)) {
+                if (current != null && isValidQuestion(current)) {
+                    results.add(buildRequest(current));
+                }
+                
+                String cleanedText = cleanQuestionText(text);
+                
+                // Xử lý trường hợp Câu hỏi dính liền với đáp án A (Ví dụ: "1. What is...?A. Apple") 
+                Matcher inlineMatcher = Pattern.compile("(.+?)\\s*([A-Da-d]\\s*[\\).:\\-].+)").matcher(cleanedText);
+                if (inlineMatcher.matches()) {
+                    current = new ParsedQuestion(inlineMatcher.group(1).trim());
+                    processOption(current, inlineMatcher.group(2).trim(), pl.isStyled);
+                } else {
+                    current = new ParsedQuestion(cleanedText);
+                }
                 continue;
             }
 
-            if (currentQuestion == null) {
-                continue;
-            }
-
-            if (currentOptionLabel != null && currentQuestion.options.containsKey(currentOptionLabel)) {
-                String existing = currentQuestion.options.get(currentOptionLabel);
-                currentQuestion.options.put(currentOptionLabel, existing + " " + line);
-            } else {
-                currentQuestion.questionText = currentQuestion.questionText + " " + line;
-            }
-        }
-
-        if (currentQuestion != null) {
-            assignCorrectLabelsFromStyleIfPossible(currentQuestion);
-            NormalQuestionRequest mappedQuestion = mapParsedQuestion(currentQuestion);
-            if (mappedQuestion != null) {
-                results.add(mappedQuestion);
+            // Bước 2: Nhận diện các lựa chọn A-D [cite: 4, 12, 15]
+            if (current != null) {
+                if (processOption(current, text, pl.isStyled)) {
+                    continue;
+                }
+                // Nếu không phải nhãn A-D, thì đây là văn bản nối tiếp của câu hỏi [cite: 87, 88, 89]
+                if (current.options.isEmpty()) {
+                    current.questionText += " " + text;
+                }
             }
         }
 
-        if (results.isEmpty()) {
-            throw new BadRequestException("Không parse được câu hỏi hợp lệ. Dùng A-D và chọn đúng bằng 'Đáp án: A,B' hoặc tô đậm/màu đáp án đúng (docx).");
+        if (current != null && isValidQuestion(current)) {
+            results.add(buildRequest(current));
         }
 
         return results;
     }
 
-    private Set<String> parseAnswerLabels(String rawAnswerText) {
-        Set<String> labels = new LinkedHashSet<>();
-        if (rawAnswerText == null || rawAnswerText.isBlank()) {
-            return labels;
+    private boolean processOption(ParsedQuestion q, String text, boolean isStyled) {
+        Matcher optMatcher = OPTION_PATTERN.matcher(text);
+        if (optMatcher.matches()) {
+            String label = optMatcher.group(1).toUpperCase();
+            String content = optMatcher.group(2).trim();
+            q.options.put(label, content);
+            if (isStyled) q.correctLabels.add(label);
+            return true;
         }
-        Matcher matcher = Pattern.compile("[A-Da-d]").matcher(rawAnswerText);
-        while (matcher.find()) {
-            labels.add(matcher.group().toUpperCase(Locale.ROOT));
-        }
-        return labels;
+        return false;
     }
 
-    private void assignCorrectLabelsFromStyleIfPossible(ParsedQuestion currentQuestion) {
-        if (!currentQuestion.correctLabels.isEmpty()) {
-            return;
+    private boolean isQuestionStart(String text) {
+        String lower = text.toLowerCase();
+        // Loại bỏ các dòng tiêu đề rác [cite: 20, 119, 135, 171]
+        if (lower.startsWith("part") || lower.startsWith("reading") || lower.startsWith("choose") || lower.contains("tips")) {
+            return false;
         }
-        currentQuestion.correctLabels.addAll(currentQuestion.styledOptionLabels);
+        return text.endsWith("?") || QUESTION_START_PATTERN.matcher(text).matches();
     }
 
-    private Set<String> detectStyledOptionLabels(XWPFParagraph paragraph, String paragraphText) {
-        List<OptionSpan> optionSpans = getOptionSpans(paragraphText);
-        if (optionSpans.isEmpty()) {
-            return Set.of();
-        }
+    private String cleanQuestionText(String text) {
+        Matcher m = QUESTION_START_PATTERN.matcher(text);
+        return m.matches() ? m.group(2).trim() : text;
+    }
 
-        Set<String> styledLabels = new LinkedHashSet<>();
-        int cursor = 0;
-        for (XWPFRun run : paragraph.getRuns()) {
-            if (run == null) {
-                continue;
-            }
-            String runText = run.toString();
-            if (runText == null || runText.isBlank()) {
-                continue;
-            }
-            int start = paragraphText.indexOf(runText, cursor);
-            if (start < 0) {
-                start = paragraphText.indexOf(runText);
-            }
-            if (start < 0) {
-                continue;
-            }
-            int end = start + runText.length();
-            cursor = end;
+    private String getOptionLabel(String text) {
+        Matcher m = OPTION_PATTERN.matcher(text);
+        return m.matches() ? m.group(1).toUpperCase() : null;
+    }
 
-            if (!isStyledRun(run)) {
-                continue;
-            }
-
-            for (OptionSpan span : optionSpans) {
-                if (start < span.end && end > span.start) {
-                    styledLabels.add(span.label);
+    private Set<String> detectStyledOptionLabels(XWPFParagraph para) {
+        Set<String> styled = new HashSet<>();
+        for (XWPFRun run : para.getRuns()) {
+            if (isRunStyled(run)) {
+                String text = run.getText(0);
+                if (text != null) {
+                    Matcher m = Pattern.compile("([A-Da-d])\\s*[\\).:\\-]").matcher(text);
+                    while (m.find()) {
+                        styled.add(m.group(1).toUpperCase());
+                    }
                 }
             }
         }
-        return styledLabels;
+        return styled;
     }
 
-    private List<OptionSpan> getOptionSpans(String line) {
-        List<Integer> starts = getOptionTokenStarts(line);
-        List<OptionSpan> spans = new ArrayList<>();
-        for (int i = 0; i < starts.size(); i++) {
-            int start = starts.get(i);
-            int end = (i + 1 < starts.size()) ? starts.get(i + 1) : line.length();
-            String label = extractOptionLabel(line.substring(start, end).trim());
-            if (label != null) {
-                spans.add(new OptionSpan(label, start, end));
-            }
-        }
-        return spans;
+    private boolean isRunStyled(XWPFRun run) {
+        // Kiểm tra In đậm [cite: 77]
+        if (run.isBold()) return true;
+        
+        // Kiểm tra Màu chữ (Khác màu đen mặc định) [cite: 219, 220]
+        String color = run.getColor();
+        if (color != null && !color.equals("000000") && !color.equalsIgnoreCase("auto")) return true;
+        
+        // Kiểm tra Highlight (Tô màu nền) 
+        return run.getTextHightlightColor() != null && 
+               !run.getTextHightlightColor().toString().equalsIgnoreCase("none");
     }
 
-    private String extractOptionLabel(String line) {
-        Matcher matcher = OPTION_PATTERN.matcher(line);
-        if (!matcher.matches()) {
-            return null;
-        }
-        return matcher.group(1).toUpperCase(Locale.ROOT);
+    private boolean isValidQuestion(ParsedQuestion q) {
+        return q.options.size() >= 2 && !q.questionText.trim().isEmpty();
     }
 
-    private boolean isStyledRun(XWPFRun run) {
-        if (run.isBold()) {
-            return true;
-        }
-        if (run.getColor() != null && !run.getColor().isBlank()) {
-            return true;
-        }
-        Object highlight = run.getTextHightlightColor();
-        return highlight != null && !"none".equalsIgnoreCase(highlight.toString());
-    }
-
-    private boolean looksLikeQuestionStart(String line) {
-        if (line.endsWith("?")) {
-            return true;
-        }
-        return QUESTION_PREFIX_PATTERN.matcher(line).matches();
-    }
-
-    private String cleanQuestionPrefix(String line) {
-        Matcher matcher = QUESTION_PREFIX_PATTERN.matcher(line);
-        if (matcher.matches()) {
-            String content = matcher.group(2);
-            if (content != null && !content.trim().isEmpty()) {
-                return content.trim();
-            }
-        }
-        return line;
-    }
-
-    private NormalQuestionRequest mapParsedQuestion(ParsedQuestion parsedQuestion) {
-        if (parsedQuestion.questionText == null || parsedQuestion.questionText.trim().isEmpty()) {
-            return null;
-        }
-        if (parsedQuestion.options.size() < 2 || parsedQuestion.correctLabels.isEmpty()) {
-            return null;
-        }
-        boolean hasAtLeastOneValidCorrect = parsedQuestion.correctLabels.stream()
-                .anyMatch(parsedQuestion.options::containsKey);
-        if (!hasAtLeastOneValidCorrect) {
-            return null;
-        }
-
+    private NormalQuestionRequest buildRequest(ParsedQuestion q) {
         List<AnswerRequest> answers = new ArrayList<>();
-        for (String label : List.of("A", "B", "C", "D")) {
-            String optionText = parsedQuestion.options.get(label);
-            if (optionText == null) {
-                continue;
-            }
-            answers.add(new AnswerRequest(
-                    null,
-                    optionText.trim(),
-                    parsedQuestion.correctLabels.contains(label),
-                    label
-            ));
-        }
+        // Đảm bảo xuất đúng thứ tự A, B, C, D 
+        q.options.forEach((label, text) -> {
+            answers.add(new AnswerRequest(null, text, q.correctLabels.contains(label), label));
+        });
+        return new NormalQuestionRequest(q.questionText.trim(), Question.QuestionType.MCQ, answers);
+    }
 
-        return new NormalQuestionRequest(
-                parsedQuestion.questionText.trim(),
-                Question.QuestionType.MCQ,
-                answers
-        );
+    // Lớp hỗ trợ lưu trữ tạm thời
+    private static class ParsedLine {
+        String text;
+        boolean isStyled;
+        ParsedLine(String t, boolean s) { this.text = t; this.isStyled = s; }
     }
 
     private static class ParsedQuestion {
-        private String questionText;
-        private final Map<String, String> options = new LinkedHashMap<>();
-        private final Set<String> correctLabels = new LinkedHashSet<>();
-        private final Set<String> styledOptionLabels = new LinkedHashSet<>();
-
-        private ParsedQuestion(String questionText) {
-            this.questionText = questionText;
-        }
-    }
-
-    private static class ParsedLine {
-        private final String text;
-        private final boolean isStyled;
-
-        private ParsedLine(String text, boolean isStyled) {
-            this.text = text;
-            this.isStyled = isStyled;
-        }
-    }
-
-    private static class OptionSpan {
-        private final String label;
-        private final int start;
-        private final int end;
-
-        private OptionSpan(String label, int start, int end) {
-            this.label = label;
-            this.start = start;
-            this.end = end;
-        }
+        String questionText;
+        Map<String, String> options = new LinkedHashMap<>(); // Giữ thứ tự A, B, C, D [cite: 22]
+        Set<String> correctLabels = new HashSet<>();
+        ParsedQuestion(String txt) { this.questionText = txt; }
     }
 }
