@@ -115,53 +115,92 @@ function PostsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 9;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const initData = async () => {
-      setLoading(true);
-      try {
-        const [catsData, postsData] = await Promise.all([
-          getCategories(),
-          getPosts({ page: 0, size: 10 })
-        ]);
-        
-        setCategories(catsData || []);
-
-        if (postsData.content) {
-          setPosts(postsData.content);
-        }
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        setPosts([]);
-        setCategories([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    initData();
-  }, []);
-
-  const refreshPosts = async () => {
+  const fetchData = async (page = 0) => {
+    setLoading(true);
     try {
-      const postsData = await getPosts({ page: 0, size: 10 });
-      if (postsData.content && postsData.content.length > 0) {
+      const [catsData, postsData] = await Promise.all([
+        getCategories(),
+        getPosts({ 
+          page, 
+          size: pageSize,
+          categoryId: selectedCategory,
+          keyword: searchQuery
+        })
+      ]);
+      
+      setCategories(catsData || []);
+      if (postsData.content) {
         setPosts(postsData.content);
+        setTotalPages(postsData.totalPages);
+        setCurrentPage(postsData.currentPage);
       }
     } catch (error) {
-      console.error('Failed to refresh posts:', error);
+      console.error('Failed to fetch data:', error);
+      setPosts([]);
+      setCategories([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filteredPosts = posts.filter(post => {
-    const matchesCategory = !selectedCategory || 
-      post.categories?.some(c => c.id === selectedCategory);
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  useEffect(() => {
+    fetchData(0);
+  }, [selectedCategory, searchQuery]);
 
-  const featuredPost = filteredPosts[0] || posts[0];
-  const otherPosts = filteredPosts.filter(p => p.id !== featuredPost?.id);
+  const refreshPosts = () => fetchData(0);
+
+  const featuredPost = currentPage === 0 ? posts[0] : null;
+  const otherPosts = featuredPost ? posts.slice(1) : posts;
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    for (let i = 0; i < totalPages; i++) {
+      if (
+        i === 0 || 
+        i === totalPages - 1 || 
+        (i >= currentPage - 1 && i <= currentPage + 1)
+      ) {
+        pages.push(i);
+      } else if (pages[pages.length - 1] !== '...') {
+        pages.push('...');
+      }
+    }
+
+    return (
+      <div className={cx('pagination')}>
+        <button 
+          className={cx('pageBtn', { disabled: currentPage === 0 })}
+          onClick={() => currentPage > 0 && fetchData(currentPage - 1)}
+        >
+          <ChevronLeft size={20} />
+        </button>
+        
+        {pages.map((p, idx) => (
+          <button
+            key={idx}
+            className={cx('pageBtn', { active: p === currentPage, disabled: p === '...' })}
+            onClick={() => typeof p === 'number' && fetchData(p)}
+          >
+            {typeof p === 'number' ? p + 1 : p}
+          </button>
+        ))}
+
+        <button 
+          className={cx('pageBtn', { disabled: currentPage === totalPages - 1 })}
+          onClick={() => currentPage < totalPages - 1 && fetchData(currentPage + 1)}
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+    );
+  };
 
   const getCategoryStyles = (categoryName) => {
     switch (categoryName) {
@@ -284,15 +323,7 @@ function PostsPage() {
         </div>
 
         {/* Pagination */}
-        <div className={cx('pagination')}>
-          <button className={cx('pageBtn')}><ChevronLeft size={20} /></button>
-          <button className={cx('pageBtn', 'active')}>1</button>
-          <button className={cx('pageBtn')}>2</button>
-          <button className={cx('pageBtn')}>3</button>
-          <button className={cx('pageBtn', 'disabled')}>...</button>
-          <button className={cx('pageBtn')}>12</button>
-          <button className={cx('pageBtn')}><ChevronRight size={20} /></button>
-        </div>
+        {renderPagination()}
 
         {/* Create Post Modal */}
         <CreatePostModal 
