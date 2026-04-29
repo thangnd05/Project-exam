@@ -143,16 +143,17 @@ const CreateTestFormBody = ({
         mediaFiles: [],
         mediaUrl: '',
         passageType: 'LISTENING',
-        answers: ['A', 'B', 'C', 'D'].map((label) => {
-          const matchedAnswer = (question.answers || []).find(
-            (answer) => answer.answerLabel === label,
-          );
-          return {
+        answers: (question.answers && question.answers.length > 0)
+          ? question.answers.map((ans, idx) => ({
+            answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),
+            answerText: ans.answerText || "",
+            isCorrect: Boolean(ans.isCorrect),
+          }))
+          : ["A", "B", "C", "D"].map((label) => ({
             answerLabel: label,
-            answerText: matchedAnswer?.answerText || '',
-            isCorrect: Boolean(matchedAnswer?.isCorrect),
-          };
-        }),
+            answerText: "",
+            isCorrect: false,
+          })),
       }));
 
       setQuestions(normalizedQuestions);

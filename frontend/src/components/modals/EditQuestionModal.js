@@ -74,12 +74,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       content: '',
       mediaUrl: '',
     },
-    options: [
-      { id: null, answerLabel: 'A', content: '', isCorrect: false },
-      { id: null, answerLabel: 'B', content: '', isCorrect: false },
-      { id: null, answerLabel: 'C', content: '', isCorrect: false },
-      { id: null, answerLabel: 'D', content: '', isCorrect: false },
-    ],
+    options: [],
   });
 
   useEffect(() => {
@@ -92,24 +87,20 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
         const res = await axios.get(`/api/questions/${id}`);
         const questionDetail = res.data;
 
-        const mappedOptions = [
-          { id: null, answerLabel: 'A', content: '', isCorrect: false },
-          { id: null, answerLabel: 'B', content: '', isCorrect: false },
-          { id: null, answerLabel: 'C', content: '', isCorrect: false },
-          { id: null, answerLabel: 'D', content: '', isCorrect: false },
-        ];
-
+        let mappedOptions = [];
         if (questionDetail.answers && questionDetail.answers.length > 0) {
-          questionDetail.answers.forEach((ans, index) => {
-            if (index < 4) {
-              mappedOptions[index] = {
-                id: ans.answerId || ans.id,
-                answerLabel: ans.answerLabel,
-                content: ans.answerText || ans.content || '',
-                isCorrect: ans.isCorrect,
-              };
-            }
-          });
+          mappedOptions = questionDetail.answers.map((ans) => ({
+            id: ans.answerId || ans.id,
+            answerLabel: ans.answerLabel,
+            content: ans.answerText || ans.content || '',
+            isCorrect: ans.isCorrect,
+          }));
+        } else {
+          // Fallback if no answers
+          mappedOptions = [
+            { id: null, answerLabel: 'A', content: '', isCorrect: false },
+            { id: null, answerLabel: 'B', content: '', isCorrect: false },
+          ];
         }
 
         if (!cancelled) {
@@ -171,6 +162,33 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     } else {
       updated[idx] = { ...updated[idx], [field]: value };
     }
+    setFormData({ ...formData, options: updated });
+  };
+
+  const getAnswerLabelByIndex = (index) => String.fromCharCode(65 + index);
+
+  const addAnswer = () => {
+    if (formData.options.length >= 10) {
+      toast.warning('Tối đa 10 đáp án.');
+      return;
+    }
+    const nextLabel = getAnswerLabelByIndex(formData.options.length);
+    const newOptions = [
+      ...formData.options,
+      { id: null, answerLabel: nextLabel, content: '', isCorrect: false },
+    ];
+    setFormData({ ...formData, options: newOptions });
+  };
+
+  const removeAnswer = (idx) => {
+    if (formData.options.length <= 2) {
+      toast.warning('Tối thiểu phải có 2 đáp án.');
+      return;
+    }
+    const updated = formData.options.filter((_, i) => i !== idx).map((opt, i) => ({
+      ...opt,
+      answerLabel: getAnswerLabelByIndex(i),
+    }));
     setFormData({ ...formData, options: updated });
   };
 
@@ -477,15 +495,36 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                     <input
                       type="text"
                       className={cxCreate('inputModern', 'ms-2')}
+                      style={{ flex: 1 }}
                       value={opt.content}
                       onChange={(e) =>
                         handleOptionChange(idx, 'content', e.target.value)
                       }
                       placeholder={`Nội dung ${opt.answerLabel}...`}
                     />
+                    <Button
+                      variant="link"
+                      className="text-danger p-0 ms-2"
+                      onClick={() => removeAnswer(idx)}
+                      disabled={formData.options.length <= 2}
+                      aria-label={`Xóa đáp án ${opt.answerLabel}`}
+                    >
+                      <IoTrashOutline size={18} />
+                    </Button>
                   </div>
                 </Col>
               ))}
+
+              <Col md={12} className="mt-2">
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={addAnswer}
+                  disabled={formData.options.length >= 10}
+                >
+                  <IoCreateOutline className="me-1" /> Thêm đáp án
+                </Button>
+              </Col>
             </Row>
           </div>
         )}
