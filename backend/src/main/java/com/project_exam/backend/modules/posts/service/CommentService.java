@@ -13,7 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,24 +52,39 @@ public class CommentService {
     }
 
     /**
-     * Lấy comments dạng tree: top-level + replies lồng vào nhau (1 cấp)
+     * Lấy toàn bộ comments của post và xây dựng cấu trúc cây (đa cấp)
      */
     public List<CommentResponse> getCommentsByPost(String postId) {
         if (!postRepository.existsById(postId)) {
             throw new NotFoundException("Post không tồn tại");
         }
 
-        List<Comment> topLevel = commentRepository
-                .findByPostIdAndParentIdIsNullOrderByCreatedAtAsc(postId);
+        // 1. Lấy tất cả comments của post
+        List<Comment> allComments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
+        
+        // 2. Chuyển sang DTO (chưa có replies)
+        List<CommentResponse> allDtos = allComments.stream()
+                .map(c -> toResponse(c, new ArrayList<CommentResponse>()))
+                .collect(Collectors.toList());
 
-        return topLevel.stream().map(comment -> {
-            List<CommentResponse> replies = commentRepository
-                    .findByParentIdOrderByCreatedAtAsc(comment.getId())
-                    .stream()
-                    .map(reply -> toResponse(reply, null))
-                    .collect(Collectors.toList());
-            return toResponse(comment, replies);
-        }).collect(Collectors.toList());
+        // 3. Xây dựng cây bằng Map để đạt hiệu năng O(N)
+        Map<String, CommentResponse> dtoMap = allDtos.stream()
+                .collect(Collectors.toMap(CommentResponse::getId, dto -> dto));
+
+        List<CommentResponse> rootComments = new ArrayList<>();
+        for (CommentResponse dto : allDtos) {
+            if (dto.getParentId() == null || dto.getParentId().isBlank()) {
+                rootComments.add(dto);
+            } else {
+                CommentResponse parent = dtoMap.get(dto.getParentId());
+                if (parent != null) {
+                    if (parent.getReplies() == null) parent.setReplies(new ArrayList<CommentResponse>());
+                    parent.getReplies().add(dto);
+                }
+            }
+        }
+
+        return rootComments;
     }
 
     public CommentResponse addComment(String postId, CommentRequest request,

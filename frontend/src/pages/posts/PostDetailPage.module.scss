@@ -429,10 +429,15 @@
   }
 }
 
-.replyList {
-  margin-top: 32px;
-  padding-left: 56px;
+.commentNode {
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.subComments {
+  margin-top: 16px;
   border-left: 2px solid var(--border-color);
+  // Indentation is handled via inline style marginLeft for recursion
 }
 
 /* --- Related Posts Slider --- */

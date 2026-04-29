@@ -155,6 +155,75 @@ function PostDetailPage() {
     }
   };
 
+  const renderComment = (comment, depth = 0) => {
+    return (
+      <div key={comment.id} className={cx('commentNode')} style={{ marginLeft: depth > 0 ? '40px' : '0' }}>
+        <div className={cx('commentItem')}>
+          <img 
+            src={comment.authorAvatar || 'https://i.pravatar.cc/150?img=12'} 
+            alt="Avatar" 
+            className={cx('avatar')} 
+          />
+          <div className={cx('contentBox')}>
+            <div className={cx('commentMeta')}>
+              <span className={cx('authorName')}>{comment.authorName}</span>
+              {comment.userId === post.userId && <span className={cx('opTag')}>Tác giả</span>}
+              <span className={cx('time')}>{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
+            </div>
+            
+            {editingCommentId === comment.id ? (
+              <div className="mt-2">
+                <textarea 
+                  className="form-control mb-2" 
+                  value={editContent} 
+                  onChange={(e) => setEditContent(e.target.value)}
+                />
+                <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(comment.id)}>Lưu</button>
+                <button className="btn btn-light btn-sm" onClick={() => setEditingCommentId(null)}>Hủy</button>
+              </div>
+            ) : (
+              <p className={cx('text')}>{comment.content}</p>
+            )}
+
+            <div className={cx('actions')}>
+              <button onClick={() => {
+                setReplyingToId(comment.id);
+                setReplyContent('');
+              }}>Trả lời</button>
+              {user && user.id === comment.userId && (
+                <>
+                  <button onClick={() => {
+                    setEditingCommentId(comment.id);
+                    setEditContent(comment.content);
+                  }}>Sửa</button>
+                  <button onClick={() => handleDeleteComment(comment.id)}>Xóa</button>
+                </>
+              )}
+            </div>
+
+            {replyingToId === comment.id && (
+              <div className="mt-3">
+                <textarea 
+                  className="form-control mb-2" 
+                  placeholder="Viết câu trả lời..."
+                  value={replyContent} 
+                  onChange={(e) => setReplyContent(e.target.value)}
+                />
+                <button className="btn btn-primary btn-sm me-2" onClick={() => handleReply(comment.id)}>Gửi</button>
+                <button className="btn btn-light btn-sm" onClick={() => setReplyingToId(null)}>Hủy</button>
+              </div>
+            )}
+          </div>
+        </div>
+        {comment.replies && comment.replies.length > 0 && (
+          <div className={cx('subComments')}>
+            {comment.replies.map(reply => renderComment(reply, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (loading) return <div className="text-center py-5">Đang tải bài viết...</div>;
   if (!post) return <div className="text-center py-5">Không tìm thấy bài viết.</div>;
 
@@ -225,9 +294,12 @@ function PostDetailPage() {
 
           <form className={cx('commentForm')} onSubmit={handleSubmitComment}>
             <div className="d-flex align-items-center mb-3">
-              <div className="bg-light rounded-circle p-2 me-3">
-                <User size={20} color="#64748b" />
-              </div>
+              <img 
+                src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=12'} 
+                alt="Avatar" 
+                className={cx('avatar')} 
+                style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+              />
             </div>
             <div className={cx('formContent')}>
               <textarea
@@ -242,107 +314,7 @@ function PostDetailPage() {
           </form>
 
           <div className={cx('commentList')}>
-            {comments.map(comment => (
-              <div key={comment.id} className="w-100 mb-4">
-                <div className={cx('commentItem')}>
-                  <img src={comment.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt="Avatar" className={cx('avatar')} />
-                  <div className={cx('contentBox')}>
-                    <div className={cx('commentMeta')}>
-                      <span className={cx('authorName')}>{comment.authorName}</span>
-                      <span className={cx('time')}>{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
-                    </div>
-                    
-                    {editingCommentId === comment.id ? (
-                      <div className="mt-2">
-                        <textarea 
-                          className="form-control mb-2" 
-                          value={editContent} 
-                          onChange={(e) => setEditContent(e.target.value)}
-                        />
-                        <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(comment.id)}>Lưu</button>
-                        <button className="btn btn-light btn-sm" onClick={() => setEditingCommentId(null)}>Hủy</button>
-                      </div>
-                    ) : (
-                      <p className={cx('text')}>{comment.content}</p>
-                    )}
-
-                    <div className={cx('actions')}>
-                      <button onClick={() => {
-                        setReplyingToId(comment.id);
-                        setReplyContent('');
-                      }}>Trả lời</button>
-                      {user && user.id === comment.userId && (
-                        <>
-                          <button onClick={() => {
-                            setEditingCommentId(comment.id);
-                            setEditContent(comment.content);
-                          }}>Sửa</button>
-                          <button onClick={() => handleDeleteComment(comment.id)}>Xóa</button>
-                        </>
-                      )}
-                    </div>
-
-                    {replyingToId === comment.id && (
-                      <div className="mt-3">
-                        <textarea 
-                          className="form-control mb-2" 
-                          placeholder="Viết câu trả lời..."
-                          value={replyContent} 
-                          onChange={(e) => setReplyContent(e.target.value)}
-                        />
-                        <button className="btn btn-primary btn-sm me-2" onClick={() => handleReply(comment.id)}>Gửi</button>
-                        <button className="btn btn-light btn-sm" onClick={() => setReplyingToId(null)}>Hủy</button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {comment.replies && comment.replies.length > 0 && (
-                  <div className={cx('replyList')}>
-                    {comment.replies.map(reply => (
-                      <div key={reply.id} className={cx('commentItem')}>
-                        <img src={reply.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt="Avatar" className={cx('avatar')} />
-                        <div className={cx('contentBox')}>
-                          <div className={cx('commentMeta')}>
-                            <span className={cx('authorName')}>
-                              {reply.authorName}
-                              {reply.userId === post.userId && <span className={cx('opTag')}>Tác giả</span>}
-                            </span>
-                            <span className={cx('time')}>{new Date(reply.createdAt).toLocaleString('vi-VN')}</span>
-                          </div>
-                          
-                          {editingCommentId === reply.id ? (
-                            <div className="mt-2">
-                              <textarea 
-                                className="form-control mb-2" 
-                                value={editContent} 
-                                onChange={(e) => setEditContent(e.target.value)}
-                              />
-                              <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(reply.id)}>Lưu</button>
-                              <button className="btn btn-light btn-sm" onClick={() => setEditingCommentId(null)}>Hủy</button>
-                            </div>
-                          ) : (
-                            <p className={cx('text')}>{reply.content}</p>
-                          )}
-
-                          <div className={cx('actions')}>
-                            {user && user.id === reply.userId && (
-                              <>
-                                <button onClick={() => {
-                                  setEditingCommentId(reply.id);
-                                  setEditContent(reply.content);
-                                }}>Sửa</button>
-                                <button onClick={() => handleDeleteComment(reply.id)}>Xóa</button>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+            {comments.map(comment => renderComment(comment))}
           </div>
         </section>
 

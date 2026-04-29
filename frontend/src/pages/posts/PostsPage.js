@@ -123,7 +123,7 @@ function PostsPage() {
           <div className={cx('hero')}>
             <div className={cx('heroImageWrapper')}>
               <div className={cx('featuredBadge')}>Bài nổi bật</div>
-              <img src={featuredPost.thumbnail || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={featuredPost.title} />
+              <img src={featuredPost.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={featuredPost.title} />
             </div>
             <div className={cx('heroContent')}>
               <span className={cx('categoryTag')}>{featuredPost.categories?.[0]?.name || 'Blog'}</span>
@@ -198,7 +198,7 @@ function PostsPage() {
                 <div className={cx('cardCategory', getCategoryStyles(post.categories?.[0]?.name))}>
                   {post.categories?.[0]?.name || 'Blog'}
                 </div>
-                <img src={post.thumbnail || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={post.title} />
+                <img src={post.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={post.title} />
               </div>
               <div className={cx('cardContent')}>
                 <div className={cx('cardMeta')}>

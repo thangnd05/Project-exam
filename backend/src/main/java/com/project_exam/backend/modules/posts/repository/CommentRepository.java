@@ -12,6 +12,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, String> {
     // Top-level comments (không phải reply)
     List<Comment> findByPostIdAndParentIdIsNullOrderByCreatedAtAsc(String postId);
+    List<Comment> findByPostIdOrderByCreatedAtAsc(String postId);
     // Replies của một comment
     List<Comment> findByParentIdOrderByCreatedAtAsc(String parentId);
     long countByPostId(String postId);
