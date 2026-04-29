@@ -179,18 +179,11 @@ public class QuestionService {
                 ? List.of()
                 : mediaByPassageId.getOrDefault(question.getPassageId(), List.of());
 
-        // 🚀 Lấy danh sách đáp án và tạo bản sao để có thể xáo trộn
+        // Lấy danh sách đáp án theo đúng thứ tự hiện tại
         List<AnswerResponse> answers = new ArrayList<>(answersByQuestionId.getOrDefault(
                 question.getQuestionId(),
                 Collections.emptyList()
         ));
-
-        // 🎲 CHỐNG QUAY CÓP: Tráo thứ tự các đáp án A, B, C, D
-        // Chỉ tráo đối với câu hỏi trắc nghiệm (MCQ)
-        // Nếu là câu hỏi điền từ (FILL_BLANK), ta giữ nguyên thứ tự
-        if (question.getQuestionType() == Question.QuestionType.MCQ) {
-            Collections.shuffle(answers);
-        }
 
         return QuestionResponse.builder()
                 .questionId(question.getQuestionId())
@@ -200,7 +193,7 @@ public class QuestionService {
                 .isBank(question.getIsBank())
                 .passage(passageResponse)
                 .passageMedia(passageMedia)
-                .answers(answers) // Danh sách đã được tráo đổi thứ tự
+                .answers(answers)
                 .build();
     }
 
@@ -428,26 +421,58 @@ public class QuestionService {
     @Transactional
     public List<QuestionAdminResponse> createBulkQuestionsToBank(BulkQuestionWithPassageRequest request,
                                                                 HttpServletRequest httpRequest,
-                                                                MultipartFile audioFile) throws IOException {
+                                                                Map<String, MultipartFile> files) throws IOException {
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng từ token.");
         }
+        List<MultipartFile> uploadedFiles = files == null
+                ? List.of()
+                : files.entrySet().stream()
+                .filter(e -> !"request".equals(e.getKey()))
+                .map(Map.Entry::getValue)
+                .filter(file -> file != null && !file.isEmpty())
+                .toList();
+        boolean hasUploadedFiles = !uploadedFiles.isEmpty();
+        boolean hasMediaUrl = request.getPassage() != null
+                && request.getPassage().getMediaUrl() != null
+                && !request.getPassage().getMediaUrl().trim().isEmpty();
         if (request.getPassage() == null || (request.getPassage().getContent() == null || request.getPassage().getContent().trim().isEmpty())
-                && (request.getPassage().getPassageType() != Passage.PassageType.LISTENING || audioFile == null || audioFile.isEmpty())) {
-            throw new BadRequestException("Bulk tạo câu hỏi theo đoạn bắt buộc phải có passage (nội dung hoặc audio cho LISTENING).");
+                && !hasUploadedFiles
+                && !hasMediaUrl) {
+            throw new BadRequestException("Bulk tạo câu hỏi theo đoạn bắt buộc phải có passage (nội dung hoặc media).");
         }
 
         Passage passage = new Passage();
         passage.setContent(request.getPassage().getContent() != null ? request.getPassage().getContent() : "");
         passage.setPassageType(request.getPassage().getPassageType());
-        if (passage.getPassageType() == Passage.PassageType.LISTENING && audioFile != null && !audioFile.isEmpty()) {
-            passage.setMediaUrl(cloudinaryService.uploadAudio(audioFile));
-        } else {
+        if (hasMediaUrl) {
             passage.setMediaUrl(request.getPassage().getMediaUrl());
+        } else {
+            passage.setMediaUrl(null);
         }
         passage = passageRepository.save(passage);
         String passageId = passage.getPassageId();
+        for (MultipartFile file : uploadedFiles) {
+            String contentType = file.getContentType();
+            String uploadedUrl;
+            PassageMedia.MediaType mediaType;
+            if (contentType != null && contentType.startsWith("audio")) {
+                uploadedUrl = cloudinaryService.uploadAudio(file);
+                mediaType = PassageMedia.MediaType.AUDIO;
+            } else if (contentType != null && contentType.startsWith("image")) {
+                uploadedUrl = cloudinaryService.uploadImage(file);
+                mediaType = PassageMedia.MediaType.IMAGE;
+            } else {
+                uploadedUrl = cloudinaryService.uploadDocument(file);
+                mediaType = PassageMedia.MediaType.DOCUMENT;
+            }
+            PassageMedia media = new PassageMedia();
+            media.setPassageId(passageId);
+            media.setMediaUrl(uploadedUrl);
+            media.setMediaType(mediaType);
+            passageMediaRepository.save(media);
+        }
 
         List<QuestionAdminResponse> responses = new ArrayList<>();
         for (NormalQuestionRequest qReq : request.getQuestions()) {
@@ -1014,7 +1039,8 @@ public class QuestionService {
             if (files != null) {
 
                 List<MultipartFile> mediaFiles = files.entrySet().stream()
-                        .filter(e -> e.getKey().startsWith("media_" + finalGIndex + "_"))                        .map(Map.Entry::getValue)
+                        .filter(e -> e.getKey().startsWith("media_" + finalGIndex + "_"))
+                        .map(Map.Entry::getValue)
                         .toList();
 
                 for (MultipartFile file : mediaFiles) {
@@ -1024,12 +1050,16 @@ public class QuestionService {
                     String uploadedUrl;
                     PassageMedia.MediaType mediaType;
 
-                    if (pReq.getPassageType() == Passage.PassageType.LISTENING) {
+                    String contentType = file.getContentType();
+                    if (contentType != null && contentType.startsWith("audio")) {
                         uploadedUrl = cloudinaryService.uploadAudio(file);
                         mediaType = PassageMedia.MediaType.AUDIO;
-                    } else {
+                    } else if (contentType != null && contentType.startsWith("image")) {
                         uploadedUrl = cloudinaryService.uploadImage(file);
                         mediaType = PassageMedia.MediaType.IMAGE;
+                    } else {
+                        uploadedUrl = cloudinaryService.uploadDocument(file);
+                        mediaType = PassageMedia.MediaType.DOCUMENT;
                     }
 
                     PassageMedia media = new PassageMedia();

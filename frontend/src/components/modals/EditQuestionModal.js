@@ -1,7 +1,7 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {Modal, Button, Spinner, Row, Col} from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Modal, Button, Spinner, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
   IoCheckmarkCircleOutline,
@@ -41,7 +41,7 @@ const getMediaItemsFromQuestion = (questionDetail) => {
       mediaUrl: fallbackUrl,
       mediaType:
         (questionDetail?.passage?.passageType || '').toUpperCase() ===
-        'LISTENING'
+          'LISTENING'
           ? 'AUDIO'
           : 'IMAGE',
     });
@@ -49,7 +49,7 @@ const getMediaItemsFromQuestion = (questionDetail) => {
   return items;
 };
 
-const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
+const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -75,10 +75,10 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
       mediaUrl: '',
     },
     options: [
-      {id: null, answerLabel: 'A', content: '', isCorrect: false},
-      {id: null, answerLabel: 'B', content: '', isCorrect: false},
-      {id: null, answerLabel: 'C', content: '', isCorrect: false},
-      {id: null, answerLabel: 'D', content: '', isCorrect: false},
+      { id: null, answerLabel: 'A', content: '', isCorrect: false },
+      { id: null, answerLabel: 'B', content: '', isCorrect: false },
+      { id: null, answerLabel: 'C', content: '', isCorrect: false },
+      { id: null, answerLabel: 'D', content: '', isCorrect: false },
     ],
   });
 
@@ -93,10 +93,10 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
         const questionDetail = res.data;
 
         const mappedOptions = [
-          {id: null, answerLabel: 'A', content: '', isCorrect: false},
-          {id: null, answerLabel: 'B', content: '', isCorrect: false},
-          {id: null, answerLabel: 'C', content: '', isCorrect: false},
-          {id: null, answerLabel: 'D', content: '', isCorrect: false},
+          { id: null, answerLabel: 'A', content: '', isCorrect: false },
+          { id: null, answerLabel: 'B', content: '', isCorrect: false },
+          { id: null, answerLabel: 'C', content: '', isCorrect: false },
+          { id: null, answerLabel: 'D', content: '', isCorrect: false },
         ];
 
         if (questionDetail.answers && questionDetail.answers.length > 0) {
@@ -124,11 +124,11 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
                 : true,
             passage: questionDetail.passage
               ? {
-                  passageType: questionDetail.passage.passageType || 'READING',
-                  content: questionDetail.passage.content || '',
-                  mediaUrl: questionDetail.passage.mediaUrl || '',
-                }
-              : {passageType: 'READING', content: '', mediaUrl: ''},
+                passageType: questionDetail.passage.passageType || 'READING',
+                content: questionDetail.passage.content || '',
+                mediaUrl: questionDetail.passage.mediaUrl || '',
+              }
+              : { passageType: 'READING', content: '', mediaUrl: '' },
             options: mappedOptions,
           });
           setExistingMedia(getMediaItemsFromQuestion(questionDetail));
@@ -158,7 +158,7 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
   const handlePassageChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
-      passage: {...prev.passage, [field]: value},
+      passage: { ...prev.passage, [field]: value },
     }));
   };
 
@@ -166,12 +166,12 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
     const updated = [...formData.options];
     if (field === 'isCorrect' && value) {
       for (let i = 0; i < updated.length; i += 1) {
-        updated[i] = {...updated[i], isCorrect: i === idx};
+        updated[i] = { ...updated[i], isCorrect: i === idx };
       }
     } else {
-      updated[idx] = {...updated[idx], [field]: value};
+      updated[idx] = { ...updated[idx], [field]: value };
     }
-    setFormData({...formData, options: updated});
+    setFormData({ ...formData, options: updated });
   };
 
   const handleDeleteExistingMedia = async (item) => {
@@ -195,7 +195,7 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
       ) {
         setFormData((prev) => ({
           ...prev,
-          passage: {...prev.passage, mediaUrl: ''},
+          passage: { ...prev.passage, mediaUrl: '' },
         }));
       }
 
@@ -249,11 +249,11 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
           fd.append(`file${index}`, file);
         });
         await axios.put(`/api/questions/${questionId}`, fd, {
-          headers: {'Content-Type': 'multipart/form-data'},
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
       } else {
         await axios.put(`/api/questions/${questionId}`, payload, {
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
         });
       }
 
@@ -308,7 +308,7 @@ const EditQuestionModal = ({show, onHide, questionId, onSuccess}) => {
                   rows={3}
                   value={formData.questionText}
                   onChange={(e) =>
-                    setFormData({...formData, questionText: e.target.value})
+                    setFormData({ ...formData, questionText: e.target.value })
                   }
                 />
               </Col>

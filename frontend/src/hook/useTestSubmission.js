@@ -18,7 +18,11 @@ export const useTestSubmission = ({
     createInitialGroup,
 }) => {
     const hasValidManualQuestion = (question) => {
-        if (!question?.questionText?.trim()) {
+        const hasQuestionText = Boolean(question?.questionText?.trim());
+        const hasUploadedMedia = Array.isArray(question?.mediaFiles) && question.mediaFiles.length > 0;
+        const hasMediaUrl = Boolean(question?.mediaUrl?.trim());
+        const hasQuestionContent = hasQuestionText || hasUploadedMedia || hasMediaUrl;
+        if (!hasQuestionContent) {
             return false;
         }
         const hasValidCorrectAnswer = (question.answers || []).some(
@@ -33,14 +37,6 @@ export const useTestSubmission = ({
                 setNotification({
                     type: 'warning',
                     message: 'Vui lòng điền đủ thông tin!',
-                });
-                return false;
-            }
-            const hasAnyManualQuestion = questions.some(hasValidManualQuestion);
-            if (!documentFile && !hasAnyManualQuestion) {
-                setNotification({
-                    type: 'warning',
-                    message: 'Vui lòng nhập ít nhất 1 câu hỏi hợp lệ hoặc upload file Word.',
                 });
                 return false;
             }
@@ -59,6 +55,7 @@ export const useTestSubmission = ({
 
         try {
             if (creatorType === CREATOR_TYPES.TEST) {
+                const manualQuestions = questions.filter(hasValidManualQuestion);
                 const testRes = await axios.post('/api/tests', {
                     title: testInfo.title,
                     description: testInfo.description,
@@ -85,7 +82,7 @@ export const useTestSubmission = ({
                 const partRes = await axios.post('/api/test-parts', {
                     testId: String(newTestId),
                     examPartId: String(testInfo.examPartId),
-                    numQuestions: questions.length,
+                    numQuestions: manualQuestions.length,
                 });
                 const newPartId = partRes.data.testPartId || partRes.data.id;
 
@@ -104,7 +101,6 @@ export const useTestSubmission = ({
                     });
                 }
 
-                const manualQuestions = questions.filter(hasValidManualQuestion);
                 await Promise.all(
                     manualQuestions.map((q) => {
                         const formData = new FormData();
@@ -159,7 +155,9 @@ export const useTestSubmission = ({
 
                 questions.forEach((q, index) => {
                     if (q.mediaFiles && q.mediaFiles.length > 0) {
-                        formData.append(`media_${index}_audio`, q.mediaFiles[0]);
+                        q.mediaFiles.forEach((file, fileIndex) => {
+                            formData.append(`media_${index}_${fileIndex}`, file);
+                        });
                     }
                 });
 

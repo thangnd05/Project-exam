@@ -269,7 +269,9 @@ public class TestService {
     ) {}
 
     private TestUserDataBundle loadUserTestData(String testId) {
-        List<TestPart> testParts = testPartRepository.findByTestId(testId);
+        List<TestPart> testParts = testPartRepository.findByTestId(testId).stream()
+                .sorted(Comparator.comparing(TestPart::getTestPartId))
+                .toList();
         if (testParts.isEmpty()) {
             return new TestUserDataBundle(
                     Collections.emptyList(),
@@ -308,11 +310,12 @@ public class TestService {
     }
 
     private List<TestPartResponse> buildUserPartResponses(TestUserDataBundle data, long seed) {
-        Random random = new Random(seed);
-
         return data.testParts().stream().map(tp -> {
             List<TestQuestion> tqList = data.questionsByPartId()
-                    .getOrDefault(tp.getTestPartId(), Collections.emptyList());
+                    .getOrDefault(tp.getTestPartId(), Collections.emptyList())
+                    .stream()
+                    .sorted(Comparator.comparing(TestQuestion::getQuestionId))
+                    .toList();
 
             Map<String, QuestionGroupResponse> groupsMap = new LinkedHashMap<>();
 
@@ -346,7 +349,6 @@ public class TestService {
             }
 
             List<QuestionGroupResponse> finalGroups = new ArrayList<>(groupsMap.values());
-            Collections.shuffle(finalGroups, random);
             return new TestPartResponse(tp.getTestPartId(), tp.getExamPartId(), finalGroups);
         }).toList();
     }
@@ -755,6 +757,9 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
     public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId) {
         if (request.getTestPartId() == null || request.getCount() == null || request.getCount() <= 0) {
             throw new BadRequestException("testPartId và count (số câu) phải hợp lệ.");
+        }
+        if (request.getClassId() == null && currentUserId == null) {
+            throw new BadRequestException("Không xác định được người dùng hiện tại.");
         }
         if (request.getChapterId() != null && request.getClassId() == null) {
             throw new BadRequestException("Khi có chapterId thì phải có classId.");

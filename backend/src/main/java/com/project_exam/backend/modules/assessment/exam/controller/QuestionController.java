@@ -118,14 +118,14 @@ public class QuestionController {
 
     @PostMapping(value = "/bulk-with-passage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<QuestionAdminResponse>> createBulkQuestionsToBank(
-            @RequestParam("request") String requestJson,
-            @RequestParam(value = "audio", required = false) MultipartFile audioFile,
+            @RequestPart("request") String requestJson,
             HttpServletRequest httpRequest
     ) throws IOException {
         BulkQuestionWithPassageRequest request =
                 objectMapper.readValue(requestJson, BulkQuestionWithPassageRequest.class);
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) httpRequest;
         List<QuestionAdminResponse> responses =
-                questionService.createBulkQuestionsToBank(request, httpRequest, audioFile);
+                questionService.createBulkQuestionsToBank(request, httpRequest, multipartRequest.getFileMap());
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 

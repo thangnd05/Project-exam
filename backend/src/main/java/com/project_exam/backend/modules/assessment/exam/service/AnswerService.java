@@ -150,7 +150,13 @@ public class AnswerService {
                                         ans.getAnswerText(),
                                         ans.getAnswerLabel()
                                 ),
-                                Collectors.toList()
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        list -> list.stream()
+                                                .sorted(Comparator.comparing(AnswerResponse::getAnswerLabel,
+                                                        Comparator.nullsLast(String::compareTo)))
+                                                .toList()
+                                )
                         )
                 ));
     }
@@ -184,7 +190,13 @@ public class AnswerService {
                                         .answerLabel(a.getAnswerLabel())
                                         .isCorrect(a.getIsCorrect())
                                         .build(),
-                                Collectors.toList()
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        list -> list.stream()
+                                                .sorted(Comparator.comparing(AnswerAdminResponse::getAnswerLabel,
+                                                        Comparator.nullsLast(String::compareTo)))
+                                                .toList()
+                                )
                         )
                 ));
     }

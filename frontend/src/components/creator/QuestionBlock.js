@@ -6,10 +6,7 @@ import styles from '../modals/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-const ACCEPT_BY_TYPE = {
-    LISTENING: 'audio/*',
-    READING: 'image/*',
-};
+const ACCEPT_MEDIA = 'image/*,audio/*';
 
 const QuestionBlock = ({
     question,
@@ -47,20 +44,10 @@ const QuestionBlock = ({
                 <div className="mb-3">
                     <label className="fw-bold mb-1 d-block">Phương tiện (nếu có)</label>
                     <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                        <select
-                            className={cx('inputModern')}
-                            style={{ width: 'auto' }}
-                            value={question.passageType || 'LISTENING'}
-                            onChange={(e) => setPassageTypeFn(index, e.target.value)}
-                            aria-label="Loại phương tiện"
-                        >
-                            <option value="LISTENING">Nghe (audio)</option>
-                            <option value="READING">Đọc (ảnh)</option>
-                        </select>
                         <input
                             type="file"
                             multiple
-                            accept={ACCEPT_BY_TYPE[question.passageType] || ACCEPT_BY_TYPE.READING}
+                            accept={ACCEPT_MEDIA}
                             className={cx('inputModern')}
                             style={{ width: 'auto' }}
                             onChange={(e) => {
@@ -91,12 +78,12 @@ const QuestionBlock = ({
                                     >
                                         <Trash size={14} />
                                     </button>
-                                    {question.passageType === 'LISTENING' && file.type.startsWith('audio/') && (
+                                    {file.type.startsWith('audio/') && (
                                         <audio controls className="flex-grow-1" style={{ maxHeight: 32 }}>
                                             <source src={URL.createObjectURL(file)} />
                                         </audio>
                                     )}
-                                    {question.passageType === 'READING' && file.type.startsWith('image/') && (
+                                    {file.type.startsWith('image/') && (
                                         <img
                                             src={URL.createObjectURL(file)}
                                             alt={file.name}

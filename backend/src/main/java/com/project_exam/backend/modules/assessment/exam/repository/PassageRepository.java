@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface PassageRepository extends JpaRepository<Passage, String> {
-    @Query(value = "SELECT * FROM passages WHERE passage_type = :type ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    @Query(value = "SELECT * FROM passages WHERE passage_type = :type ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
     List<Passage> findRandomPassages(@Param("type") String type, @Param("limit") int limit);
 }

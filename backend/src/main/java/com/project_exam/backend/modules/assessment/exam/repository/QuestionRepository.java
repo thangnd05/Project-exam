@@ -14,24 +14,24 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     List<Question> findByExamPartId(String examPartId);
     List<Question> findByPassageId(String passageId);
 
-    @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
     List<Question> findRandomByExamPart(@Param("examPartId") String examPartId, @Param("limit") int limit);
 
-    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId ORDER BY function('RAND')")
+    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId ORDER BY function('RANDOM')")
     List<Question> findRandomQuestionsByExamPartId(@Param("examPartId") String examPartId, Pageable pageable);
 
     @Query("SELECT COUNT(q) FROM Question q WHERE q.examPartId = :examPartId")
     long countByExamPartId(@Param("examPartId") String examPartId);
 
     // Random 1 câu (để kiểm tra có passage hay không)
-    @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findOneRandomQuestion(@Param("examPartId") String examPartId);
 
     // ✅ Bổ sung các hàm có lọc theo classId
-    @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId AND class_id = :classId ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId AND class_id = :classId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findOneRandomQuestionByClass(@Param("examPartId") String examPartId, @Param("classId") String classId);
 
-    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId AND q.classId = :classId AND q.isBank = true ORDER BY function('RAND')")
+    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId AND q.classId = :classId AND q.isBank = true ORDER BY function('RANDOM')")
     List<Question> findRandomQuestionsByExamPartIdAndClassId(
             @Param("examPartId") String examPartId,
             @Param("classId") String classId,
@@ -75,12 +75,12 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
           AND q.classId = :classId
           AND q.chapterId = :chapterId
           AND q.isBank = true
-        ORDER BY function('RAND')
+        ORDER BY function('RANDOM')
     """)
     List<Question> findRandomQuestionsByExamPartIdAndClassIdAndChapterId(
-            String examPartId,
-            String classId,
-            String chapterId,
+            @Param("examPartId") String examPartId,
+            @Param("classId") String classId,
+            @Param("chapterId") String chapterId,
             Pageable pageable
     );
 
@@ -96,7 +96,7 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
         WHERE exam_part_id = :examPartId AND created_by = :createdBy
           AND class_id IS NULL AND chapter_id IS NULL
           AND is_bank = true
-        ORDER BY RAND() LIMIT :limit
+        ORDER BY RANDOM() LIMIT :limit
         """, nativeQuery = true)
     List<Question> findRandomByExamPartAndCreatedByAndClassIdIsNullAndChapterIdIsNull(
             @Param("examPartId") String examPartId,

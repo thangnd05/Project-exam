@@ -104,6 +104,17 @@ export const useCreateTest = ({
   const updateQuestionField = (index, field, value) => {
     const newQ = [...questions];
     newQ[index] = { ...newQ[index], [field]: value };
+
+    // If mediaUrl is updated, try to guess the type
+    if (field === 'mediaUrl' && value) {
+      const lowerVal = value.toLowerCase();
+      if (['.mp3', '.wav', '.ogg', '.m4a'].some(ext => lowerVal.endsWith(ext))) {
+        newQ[index].passageType = 'LISTENING';
+      } else if (['.jpg', '.jpeg', '.png', '.gif', '.webp'].some(ext => lowerVal.endsWith(ext))) {
+        newQ[index].passageType = 'READING';
+      }
+    }
+
     setQuestions(newQ);
   };
 
@@ -127,8 +138,16 @@ export const useCreateTest = ({
     }
 
     const newQ = [...questions];
-    if (files.some((f) => f.type.startsWith('audio/'))) newQ[index].passageType = 'LISTENING';
-    newQ[index].mediaFiles = [...(newQ[index].mediaFiles || []), ...files];
+    const allFiles = [...(newQ[index].mediaFiles || []), ...files];
+    
+    // Auto-detect type: prefer LISTENING if any audio exists, otherwise READING
+    if (allFiles.some((f) => f.type.startsWith('audio/'))) {
+      newQ[index].passageType = 'LISTENING';
+    } else if (allFiles.some((f) => f.type.startsWith('image/'))) {
+      newQ[index].passageType = 'READING';
+    }
+
+    newQ[index].mediaFiles = allFiles;
     setQuestions(newQ);
   };
 
@@ -174,8 +193,16 @@ export const useCreateTest = ({
     }
 
     const newGroups = [...groups];
-    if (files.some((f) => f.type.startsWith('audio/'))) newGroups[gIndex].passage.passageType = 'LISTENING';
-    newGroups[gIndex].passage.mediaFiles = [...(newGroups[gIndex].passage.mediaFiles || []), ...files];
+    const allFiles = [...(newGroups[gIndex].passage.mediaFiles || []), ...files];
+
+    // Auto-detect type
+    if (allFiles.some((f) => f.type.startsWith('audio/'))) {
+      newGroups[gIndex].passage.passageType = 'LISTENING';
+    } else if (allFiles.some((f) => f.type.startsWith('image/'))) {
+      newGroups[gIndex].passage.passageType = 'READING';
+    }
+
+    newGroups[gIndex].passage.mediaFiles = allFiles;
     setGroups(newGroups);
   };
 

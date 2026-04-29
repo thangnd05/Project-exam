@@ -30,6 +30,7 @@ const cx = classNames.bind(styles);
 const ACCEPT_BY_TYPE = {
   LISTENING: 'audio/*',
   READING: 'image/*',
+  MEDIA: 'image/*,audio/*',
   DOCUMENT: '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
@@ -201,121 +202,121 @@ const CreateTestFormBody = ({
       )}
 
       {activeCreatorType !== CREATOR_TYPES.BANK && (
-      <div className={cx('configCard')}>
-        <div className={cx('sectionTitle')}>
-          <IoSettingsOutline /> 1. {activeCreatorType === CREATOR_TYPES.TEST ? 'Cấu hình bài thi' : 'Thông tin chung'}
+        <div className={cx('configCard')}>
+          <div className={cx('sectionTitle')}>
+            <IoSettingsOutline /> 1. {activeCreatorType === CREATOR_TYPES.TEST ? 'Cấu hình bài thi' : 'Thông tin chung'}
+          </div>
+          <Row className="g-3">
+            {mode === 'class' && (
+              <>
+                <Col md={6}>
+                  <div className={cx('formGroupModern')}>
+                    <label><IoSchoolOutline /> Lớp học</label>
+                    <input className={cx('inputModern', 'inputDisabled')} value={className} disabled />
+                  </div>
+                </Col>
+                <Col md={6}>
+                  <div className={cx('formGroupModern')}>
+                    <label><IoBookOutline /> Chương</label>
+                    <input className={cx('inputModern', 'inputDisabled')} value={chapterName} disabled />
+                  </div>
+                </Col>
+              </>
+            )}
+            {activeCreatorType === CREATOR_TYPES.TEST && (
+              <>
+                <Col md={8}>
+                  <div className={cx('formGroupModern')}>
+                    <label>Tiêu đề đề thi</label>
+                    <input className={cx('inputModern')} value={testInfo.title} onChange={(e) => setTestInfo({ ...testInfo, title: e.target.value })} />
+                  </div>
+                </Col>
+                <Col md={4}>
+                  <div className={cx('formGroupModern')}>
+                    <label><IoImageOutline /> Link ảnh Banner</label>
+                    <input className={cx('inputModern')} value={testInfo.bannerUrl} onChange={(e) => setTestInfo({ ...testInfo, bannerUrl: e.target.value })} />
+                  </div>
+                </Col>
+              </>
+            )}
+            <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
+              <div className={cx('formGroupModern')}>
+                <label>Loại kỳ thi</label>
+                <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => handleExamTypeChange(e.target.value)}>
+                  <option value="">-- Chọn --</option>
+                  {examTypes.map((t) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
+                </select>
+              </div>
+            </Col>
+            <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
+              <div className={cx('formGroupModern')}>
+                <label>Phần thi *</label>
+                <select className={cx('inputModern')} value={testInfo.examPartId} onChange={(e) => setTestInfo({ ...testInfo, examPartId: e.target.value })} disabled={!testInfo.examTypeId}>
+                  <option value="">-- Chọn part --</option>
+                  {examParts.map((p) => <option key={p.examPartId} value={p.examPartId}>{p.name}</option>)}
+                </select>
+              </div>
+            </Col>
+            {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
+              <>
+                {activeCreatorType === CREATOR_TYPES.TEST && (
+                  <>
+                    <Col md={3}>
+                      <div className={cx('formGroupModern')}>
+                        <label><IoTimeOutline /> Thời gian (phút)</label>
+                        <input type="number" className={cx('inputModern')} value={testInfo.durationMinutes} onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })} />
+                      </div>
+                    </Col>
+                    <Col md={3}>
+                      <div className={cx('formGroupModern')}>
+                        <label><IoRocketOutline /> Lượt làm tối đa</label>
+                        <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
+                      </div>
+                    </Col>
+                    <Col md={6}>
+                      <div className={cx('formGroupModern')}>
+                        <label><IoCalendarOutline /> Thời gian bắt đầu</label>
+                        <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableFrom} onChange={(e) => setTestInfo({ ...testInfo, availableFrom: e.target.value })} />
+                      </div>
+                    </Col>
+                    <Col md={6}>
+                      <div className={cx('formGroupModern')}>
+                        <label><IoCalendarOutline /> Thời gian kết thúc</label>
+                        <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableTo} onChange={(e) => setTestInfo({ ...testInfo, availableTo: e.target.value })} />
+                      </div>
+                    </Col>
+                    <Col md={12}>
+                      <div className={cx('formGroupModern')}>
+                        <label><IoInformationCircleOutline /> Mô tả</label>
+                        <textarea className={cx('inputModern')} rows={2} value={testInfo.description} onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })} />
+                      </div>
+                    </Col>
+                  </>
+                )}
+                <Col md={12}>
+                  <div className={cx('formGroupModern')}>
+                    <label>
+                      {activeCreatorType === CREATOR_TYPES.BULK
+                        ? 'Upload file Word để import câu hỏi số lượng lớn vào kho (DOC/DOCX)'
+                        : 'Upload file Word để tạo câu hỏi nhanh (DOC/DOCX)'}
+                    </label>
+                    <input
+                      type="file"
+                      accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      className={cx('inputModern')}
+                      onChange={handleDocumentFileChange}
+                    />
+                    {documentFile && (
+                      <small className="text-muted d-block mt-2">
+                        Đang nạp từ file: {documentFile.name}
+                      </small>
+                    )}
+                  </div>
+                </Col>
+              </>
+            )}
+          </Row>
         </div>
-        <Row className="g-3">
-          {mode === 'class' && (
-            <>
-              <Col md={6}>
-                <div className={cx('formGroupModern')}>
-                  <label><IoSchoolOutline /> Lớp học</label>
-                  <input className={cx('inputModern', 'inputDisabled')} value={className} disabled />
-                </div>
-              </Col>
-              <Col md={6}>
-                <div className={cx('formGroupModern')}>
-                  <label><IoBookOutline /> Chương</label>
-                  <input className={cx('inputModern', 'inputDisabled')} value={chapterName} disabled />
-                </div>
-              </Col>
-            </>
-          )}
-          {activeCreatorType === CREATOR_TYPES.TEST && (
-            <>
-              <Col md={8}>
-                <div className={cx('formGroupModern')}>
-                  <label>Tiêu đề đề thi</label>
-                  <input className={cx('inputModern')} value={testInfo.title} onChange={(e) => setTestInfo({ ...testInfo, title: e.target.value })} />
-                </div>
-              </Col>
-              <Col md={4}>
-                <div className={cx('formGroupModern')}>
-                  <label><IoImageOutline /> Link ảnh Banner</label>
-                  <input className={cx('inputModern')} value={testInfo.bannerUrl} onChange={(e) => setTestInfo({ ...testInfo, bannerUrl: e.target.value })} />
-                </div>
-              </Col>
-            </>
-          )}
-          <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
-            <div className={cx('formGroupModern')}>
-              <label>Loại kỳ thi</label>
-              <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => handleExamTypeChange(e.target.value)}>
-                <option value="">-- Chọn --</option>
-                {examTypes.map((t) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
-              </select>
-            </div>
-          </Col>
-          <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
-            <div className={cx('formGroupModern')}>
-              <label>Phần thi *</label>
-              <select className={cx('inputModern')} value={testInfo.examPartId} onChange={(e) => setTestInfo({ ...testInfo, examPartId: e.target.value })} disabled={!testInfo.examTypeId}>
-                <option value="">-- Chọn part --</option>
-                {examParts.map((p) => <option key={p.examPartId} value={p.examPartId}>{p.name}</option>)}
-              </select>
-            </div>
-          </Col>
-          {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
-            <>
-              {activeCreatorType === CREATOR_TYPES.TEST && (
-                <>
-                  <Col md={3}>
-                    <div className={cx('formGroupModern')}>
-                      <label><IoTimeOutline /> Thời gian (phút)</label>
-                      <input type="number" className={cx('inputModern')} value={testInfo.durationMinutes} onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })} />
-                    </div>
-                  </Col>
-                  <Col md={3}>
-                    <div className={cx('formGroupModern')}>
-                      <label><IoRocketOutline /> Lượt làm tối đa</label>
-                      <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
-                    </div>
-                  </Col>
-                  <Col md={6}>
-                    <div className={cx('formGroupModern')}>
-                      <label><IoCalendarOutline /> Thời gian bắt đầu</label>
-                      <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableFrom} onChange={(e) => setTestInfo({ ...testInfo, availableFrom: e.target.value })} />
-                    </div>
-                  </Col>
-                  <Col md={6}>
-                    <div className={cx('formGroupModern')}>
-                      <label><IoCalendarOutline /> Thời gian kết thúc</label>
-                      <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableTo} onChange={(e) => setTestInfo({ ...testInfo, availableTo: e.target.value })} />
-                    </div>
-                  </Col>
-                  <Col md={12}>
-                    <div className={cx('formGroupModern')}>
-                      <label><IoInformationCircleOutline /> Mô tả</label>
-                      <textarea className={cx('inputModern')} rows={2} value={testInfo.description} onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })} />
-                    </div>
-                  </Col>
-                </>
-              )}
-              <Col md={12}>
-                <div className={cx('formGroupModern')}>
-                  <label>
-                    {activeCreatorType === CREATOR_TYPES.BULK
-                      ? 'Upload file Word để import câu hỏi số lượng lớn vào kho (DOC/DOCX)'
-                      : 'Upload file Word để tạo câu hỏi nhanh (DOC/DOCX)'}
-                  </label>
-                  <input
-                    type="file"
-                    accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    className={cx('inputModern')}
-                    onChange={handleDocumentFileChange}
-                  />
-                  {documentFile && (
-                    <small className="text-muted d-block mt-2">
-                      Đang nạp từ file: {documentFile.name}
-                    </small>
-                  )}
-                </div>
-              </Col>
-            </>
-          )}
-        </Row>
-      </div>
       )}
 
       {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
@@ -364,11 +365,7 @@ const CreateTestFormBody = ({
                 <div className={cx('formGroupModern')}>
                   <label>Phương tiện</label>
                   <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    <select className={cx('inputModern')} style={{ width: 'auto' }} value={group.passage.passageType} onChange={(e) => setGroupPassageType(gIndex, e.target.value)}>
-                      <option value="LISTENING">Nghe (audio)</option>
-                      <option value="READING">Đọc (ảnh)</option>
-                    </select>
-                    <input type="file" multiple accept={ACCEPT_BY_TYPE[group.passage.passageType] || ACCEPT_BY_TYPE.READING} className={cx('inputModern')} style={{ width: 'auto' }} onChange={(e) => { addGroupMediaFiles(gIndex, e.target.files); e.target.value = ''; }} />
+                    <input type="file" multiple accept={ACCEPT_BY_TYPE.MEDIA} className={cx('inputModern')} style={{ width: 'auto' }} onChange={(e) => { addGroupMediaFiles(gIndex, e.target.files); e.target.value = ''; }} />
                   </div>
                   {group.passage.mediaFiles?.length > 0 && (
                     <ul className="list-unstyled mb-0 mt-2">
