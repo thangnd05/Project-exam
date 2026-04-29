@@ -47,6 +47,10 @@ export const deleteComment = (commentId) => {
   return axios.delete(`/api/comments/${commentId}`).then(() => {});
 };
 
+export const updateComment = (commentId, data) => {
+  return axios.put(`/api/comments/${commentId}`, data).then((response) => response.data);
+};
+
 // --- Reacts ---
 export const getReacts = (postId) => {
   return axios.get(`${BASE_URL}/${postId}/reacts`).then((response) => response.data);

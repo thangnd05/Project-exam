@@ -11,7 +11,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '~/hook/useAuth';
 import routes from '~/config/Routes';
 import styles from './PostDetailPage.module.scss';
-import { getPosts, getPostById, getComments, addComment, getReacts, toggleReact } from '~/api/postApi';
+import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, getReacts, toggleReact } from '~/api/postApi';
 
 const cx = classNames.bind(styles);
 
@@ -26,6 +26,10 @@ function PostDetailPage() {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
   const [relatedPosts, setRelatedPosts] = useState([]);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editContent, setEditContent] = useState('');
+  const [replyingToId, setReplyingToId] = useState(null);
+  const [replyContent, setReplyContent] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -95,20 +99,60 @@ function PostDetailPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSubmitComment = (e) => {
+  const handleSubmitComment = async (e) => {
     e.preventDefault();
+    if (!user) {
+      alert('Vui lòng đăng nhập để bình luận');
+      return;
+    }
     if (!newComment.trim()) return;
-    const comment = {
-      id: Date.now(),
-      authorName: user?.userName || 'Khách',
-      authorAvatar: user?.avatarUrl || 'https://i.pravatar.cc/150?img=12',
-      text: newComment,
-      time: 'Vừa xong',
-      likes: 0,
-      replies: []
-    };
-    setComments([comment, ...comments]);
-    setNewComment('');
+
+    try {
+      await addComment(postId, { content: newComment });
+      setNewComment('');
+      // Refresh comments
+      const data = await getComments(postId);
+      setComments(data || []);
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
+  };
+
+  const handleUpdateComment = async (commentId) => {
+    if (!editContent.trim()) return;
+    try {
+      await updateComment(commentId, { content: editContent });
+      setEditingCommentId(null);
+      setEditContent('');
+      const data = await getComments(postId);
+      setComments(data || []);
+    } catch (error) {
+      console.error('Failed to update comment:', error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('Bạn có chắc muốn xóa bình luận này?')) return;
+    try {
+      await deleteComment(commentId);
+      const data = await getComments(postId);
+      setComments(data || []);
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+    }
+  };
+
+  const handleReply = async (parentId) => {
+    if (!replyContent.trim()) return;
+    try {
+      await addComment(postId, { content: replyContent, parentId });
+      setReplyingToId(null);
+      setReplyContent('');
+      const data = await getComments(postId);
+      setComments(data || []);
+    } catch (error) {
+      console.error('Failed to add reply:', error);
+    }
   };
 
   if (loading) return <div className="text-center py-5">Đang tải bài viết...</div>;
@@ -199,38 +243,98 @@ function PostDetailPage() {
 
           <div className={cx('commentList')}>
             {comments.map(comment => (
-              <div key={comment.id} className="w-100">
+              <div key={comment.id} className="w-100 mb-4">
                 <div className={cx('commentItem')}>
-                  <img src={comment.authorAvatar} alt="Avatar" className={cx('avatar')} />
+                  <img src={comment.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt="Avatar" className={cx('avatar')} />
                   <div className={cx('contentBox')}>
                     <div className={cx('commentMeta')}>
                       <span className={cx('authorName')}>{comment.authorName}</span>
-                      <span className={cx('time')}>{comment.time}</span>
+                      <span className={cx('time')}>{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
                     </div>
-                    <p className={cx('text')}>{comment.text}</p>
+                    
+                    {editingCommentId === comment.id ? (
+                      <div className="mt-2">
+                        <textarea 
+                          className="form-control mb-2" 
+                          value={editContent} 
+                          onChange={(e) => setEditContent(e.target.value)}
+                        />
+                        <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(comment.id)}>Lưu</button>
+                        <button className="btn btn-light btn-sm" onClick={() => setEditingCommentId(null)}>Hủy</button>
+                      </div>
+                    ) : (
+                      <p className={cx('text')}>{comment.content}</p>
+                    )}
+
                     <div className={cx('actions')}>
-                      <button><ThumbsUp size={14} /> {comment.likes}</button>
-                      <button>Trả lời</button>
+                      <button onClick={() => {
+                        setReplyingToId(comment.id);
+                        setReplyContent('');
+                      }}>Trả lời</button>
+                      {user && user.id === comment.userId && (
+                        <>
+                          <button onClick={() => {
+                            setEditingCommentId(comment.id);
+                            setEditContent(comment.content);
+                          }}>Sửa</button>
+                          <button onClick={() => handleDeleteComment(comment.id)}>Xóa</button>
+                        </>
+                      )}
                     </div>
+
+                    {replyingToId === comment.id && (
+                      <div className="mt-3">
+                        <textarea 
+                          className="form-control mb-2" 
+                          placeholder="Viết câu trả lời..."
+                          value={replyContent} 
+                          onChange={(e) => setReplyContent(e.target.value)}
+                        />
+                        <button className="btn btn-primary btn-sm me-2" onClick={() => handleReply(comment.id)}>Gửi</button>
+                        <button className="btn btn-light btn-sm" onClick={() => setReplyingToId(null)}>Hủy</button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {comment.replies.length > 0 && (
+                {comment.replies && comment.replies.length > 0 && (
                   <div className={cx('replyList')}>
                     {comment.replies.map(reply => (
                       <div key={reply.id} className={cx('commentItem')}>
-                        <img src={reply.authorAvatar} alt="Avatar" className={cx('avatar')} />
+                        <img src={reply.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt="Avatar" className={cx('avatar')} />
                         <div className={cx('contentBox')}>
                           <div className={cx('commentMeta')}>
                             <span className={cx('authorName')}>
                               {reply.authorName}
-                              {reply.isAuthor && <span className={cx('opTag')}>Tác giả</span>}
+                              {reply.userId === post.userId && <span className={cx('opTag')}>Tác giả</span>}
                             </span>
-                            <span className={cx('time')}>{reply.time}</span>
+                            <span className={cx('time')}>{new Date(reply.createdAt).toLocaleString('vi-VN')}</span>
                           </div>
-                          <p className={cx('text')}>{reply.text}</p>
+                          
+                          {editingCommentId === reply.id ? (
+                            <div className="mt-2">
+                              <textarea 
+                                className="form-control mb-2" 
+                                value={editContent} 
+                                onChange={(e) => setEditContent(e.target.value)}
+                              />
+                              <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(reply.id)}>Lưu</button>
+                              <button className="btn btn-light btn-sm" onClick={() => setEditingCommentId(null)}>Hủy</button>
+                            </div>
+                          ) : (
+                            <p className={cx('text')}>{reply.content}</p>
+                          )}
+
                           <div className={cx('actions')}>
-                            <button>Trả lời</button>
+                            {user && user.id === reply.userId && (
+                              <>
+                                <button onClick={() => {
+                                  setEditingCommentId(reply.id);
+                                  setEditContent(reply.content);
+                                }}>Sửa</button>
+                                <button onClick={() => handleDeleteComment(reply.id)}>Xóa</button>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>

@@ -23,12 +23,24 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final AuthUtils authUtils;
+    private final com.project_exam.backend.modules.users.repository.UserRepository userRepository;
 
     private CommentResponse toResponse(Comment c, List<CommentResponse> replies) {
+        String authorName = "Unknown";
+        String authorAvatar = null;
+        
+        var authorOpt = userRepository.findById(c.getUserId());
+        if (authorOpt.isPresent()) {
+            authorName = authorOpt.get().getFullName();
+            authorAvatar = authorOpt.get().getAvatarUrl();
+        }
+
         return CommentResponse.builder()
                 .id(c.getId())
                 .postId(c.getPostId())
                 .userId(c.getUserId())
+                .authorName(authorName)
+                .authorAvatar(authorAvatar)
                 .parentId(c.getParentId())
                 .content(c.getContent())
                 .createdAt(c.getCreatedAt())
@@ -84,6 +96,25 @@ public class CommentService {
                 .content(request.getContent().trim())
                 .build();
 
+        comment = commentRepository.save(comment);
+        return toResponse(comment, null);
+    }
+
+    @jakarta.transaction.Transactional
+    public CommentResponse updateComment(String id, CommentRequest request, HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Comment không tồn tại"));
+
+        if (!comment.getUserId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa comment này");
+        }
+
+        if (request.getContent() == null || request.getContent().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nội dung comment không được trống");
+        }
+
+        comment.setContent(request.getContent().trim());
         comment = commentRepository.save(comment);
         return toResponse(comment, null);
     }

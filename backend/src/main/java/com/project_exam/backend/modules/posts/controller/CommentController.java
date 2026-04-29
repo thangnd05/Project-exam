@@ -32,6 +32,16 @@ public class CommentController {
         return ResponseEntity.ok(commentService.addComment(postId, request, httpRequest));
     }
 
+    // ─── PUT sửa comment (auth, owner only) ──────
+    @PutMapping("/api/comments/{id}")
+    public ResponseEntity<CommentResponse> updateComment(
+            @PathVariable String id,
+            @RequestBody CommentRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(commentService.updateComment(id, request, httpRequest));
+    }
+
     // ─── DELETE xóa comment (auth, owner only) ───
     @DeleteMapping("/api/comments/{id}")
     public ResponseEntity<Void> deleteComment(
