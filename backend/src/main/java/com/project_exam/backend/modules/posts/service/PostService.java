@@ -17,6 +17,8 @@ import com.project_exam.backend.modules.posts.repository.PostCategoryRepository;
 import com.project_exam.backend.modules.posts.repository.PostImageRepository;
 import com.project_exam.backend.modules.posts.repository.PostRepository;
 import com.project_exam.backend.modules.posts.repository.ReactRepository;
+import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.users.repository.UserRepository;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,6 +47,7 @@ public class PostService {
     private final ReactRepository reactRepository;
     private final CloudinaryService cloudinaryService;
     private final AuthUtils authUtils;
+    private final UserRepository userRepository;
 
     // ─────────────────────────────────────────────
     // MAPPING
@@ -98,13 +101,24 @@ public class PostService {
                     .orElse(null);
         }
 
+        String authorName = "Unknown";
+        String authorAvatar = null;
+        Optional<User> authorOpt = userRepository.findById(post.getUserId());
+        if (authorOpt.isPresent()) {
+            authorName = authorOpt.get().getFullName();
+            authorAvatar = authorOpt.get().getAvatarUrl();
+        }
+
         return PostResponse.builder()
                 .id(post.getId())
                 .userId(post.getUserId())
+                .authorName(authorName)
+                .authorAvatar(authorAvatar)
                 .title(post.getTitle())
                 .content(post.getContent())
                 .status(post.getStatus())
                 .createdAt(post.getCreatedAt())
+                .thumbnailUrl(post.getThumbnailUrl())
                 .images(images)
                 .categories(categories)
                 .reactCounts(reactCounts)
@@ -115,18 +129,32 @@ public class PostService {
 
     private PostSummaryResponse toSummaryResponse(Post post) {
         List<PostResponse.PostImageResponse> images = getImageResponses(post.getId());
-        String thumbnail = images.isEmpty() ? null : images.get(0).getImageUrl();
+        String thumbnailUrl = post.getThumbnailUrl();
+        if (thumbnailUrl == null || thumbnailUrl.isBlank()) {
+            thumbnailUrl = images.isEmpty() ? null : images.get(0).getImageUrl();
+        }
+
         List<CategoryResponse> categories = getCategoryResponses(post.getId());
         long commentCount = commentRepository.countByPostId(post.getId());
         long totalReacts = reactRepository.findByPostId(post.getId()).size();
 
+        String authorName = "Unknown";
+        String authorAvatar = null;
+        Optional<User> authorOpt = userRepository.findById(post.getUserId());
+        if (authorOpt.isPresent()) {
+            authorName = authorOpt.get().getFullName();
+            authorAvatar = authorOpt.get().getAvatarUrl();
+        }
+
         return PostSummaryResponse.builder()
                 .id(post.getId())
                 .userId(post.getUserId())
+                .authorName(authorName)
+                .authorAvatar(authorAvatar)
                 .title(post.getTitle())
                 .status(post.getStatus())
                 .createdAt(post.getCreatedAt())
-                .thumbnail(thumbnail)
+                .thumbnailUrl(thumbnailUrl)
                 .categories(categories)
                 .commentCount(commentCount)
                 .totalReacts(totalReacts)
@@ -146,6 +174,7 @@ public class PostService {
                 .userId(userId)
                 .title(request.getTitle())
                 .content(request.getContent())
+                .thumbnailUrl(request.getThumbnailUrl())
                 .status(request.getStatus() != null ? request.getStatus() : Post.PostStatus.PENDING)
                 .build();
         post = postRepository.save(post);
@@ -172,6 +201,7 @@ public class PostService {
 
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
+        post.setThumbnailUrl(request.getThumbnailUrl());
         if (request.getStatus() != null) post.setStatus(request.getStatus());
         postRepository.save(post);
 

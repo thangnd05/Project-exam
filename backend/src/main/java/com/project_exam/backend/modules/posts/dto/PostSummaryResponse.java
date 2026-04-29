@@ -12,10 +12,12 @@ import java.util.List;
 public class PostSummaryResponse {
     private String id;
     private String userId;
+    private String authorName;
+    private String authorAvatar;
     private String title;
     private Post.PostStatus status;
     private LocalDateTime createdAt;
-    private String thumbnail; // imageUrl của ảnh đầu tiên (order = 0)
+    private String thumbnailUrl; // URL từ entity hoặc ảnh đầu tiên
     private List<CategoryResponse> categories;
     private long commentCount;
     private long totalReacts;

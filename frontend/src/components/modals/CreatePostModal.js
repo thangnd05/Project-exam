@@ -67,11 +67,21 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
     setLoading(true);
 
     try {
-      await axios.post('/api/posts', {
+      const formData = new FormData();
+      const postData = {
         title,
         content,
-        categoryId,
         thumbnailUrl: thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1350&q=80',
+        categoryIds: [categoryId],
+      };
+      
+      formData.append('post', JSON.stringify(postData));
+      // Nếu có file ảnh thật thì append vào 'images', hiện tại dùng URL nên bỏ qua
+
+      await axios.post('/api/posts', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       toast.success('🎉 Đăng bài viết thành công!');

@@ -13,10 +13,13 @@ import java.util.Map;
 public class PostResponse {
     private String id;
     private String userId;
+    private String authorName;
+    private String authorAvatar;
     private String title;
     private String content;
     private Post.PostStatus status;
     private LocalDateTime createdAt;
+    private String thumbnailUrl;
 
     private List<PostImageResponse> images;
     private List<CategoryResponse> categories;

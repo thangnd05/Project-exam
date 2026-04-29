@@ -13,6 +13,7 @@ import java.util.List;
 public class PostUpsertRequest {
     private String title;
     private String content;
+    private String thumbnailUrl;
     private Post.PostStatus status;
     private List<String> categoryIds; // IDs các categories
 }

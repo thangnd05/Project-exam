@@ -26,6 +26,9 @@ public class Post {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "thumbnail_url", length = 500)
+    private String thumbnailUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private PostStatus status = PostStatus.PENDING;

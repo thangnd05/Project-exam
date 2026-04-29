@@ -126,29 +126,15 @@ function PostsPage() {
           getPosts({ page: 0, size: 10 })
         ]);
         
-        setCategories(catsData && catsData.length > 0 ? catsData : [
-          { id: '1', name: 'Lập trình' },
-          { id: '2', name: 'Ngoại ngữ' },
-          { id: '3', name: 'Kinh nghiệm ôn thi' },
-          { id: '4', name: 'Tài liệu' },
-          { id: '5', name: 'Chia sẻ' },
-        ]);
+        setCategories(catsData || []);
 
-        if (postsData.content && postsData.content.length > 0) {
+        if (postsData.content) {
           setPosts(postsData.content);
-        } else {
-          setPosts(MOCK_POSTS);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);
-        setPosts(MOCK_POSTS);
-        setCategories([
-          { id: '1', name: 'Lập trình' },
-          { id: '2', name: 'Ngoại ngữ' },
-          { id: '3', name: 'Kinh nghiệm ôn thi' },
-          { id: '4', name: 'Tài liệu' },
-          { id: '5', name: 'Chia sẻ' },
-        ]);
+        setPosts([]);
+        setCategories([]);
       } finally {
         setLoading(false);
       }
@@ -169,10 +155,13 @@ function PostsPage() {
 
   const filteredPosts = posts.filter(post => {
     const matchesCategory = !selectedCategory || 
-      (categories.find(c => c.id === selectedCategory)?.name === post.categoryName);
+      post.categories?.some(c => c.id === selectedCategory);
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  const featuredPost = filteredPosts[0] || posts[0];
+  const otherPosts = filteredPosts.filter(p => p.id !== featuredPost?.id);
 
   const getCategoryStyles = (categoryName) => {
     switch (categoryName) {
@@ -190,34 +179,36 @@ function PostsPage() {
       <div className={cx('container')}>
         
         {/* Hero Section */}
-        <div className={cx('hero')}>
-          <div className={cx('heroImageWrapper')}>
-            <div className={cx('featuredBadge')}>Bài nổi bật</div>
-            <img src={MOCK_FEATURED.thumbnailUrl} alt={MOCK_FEATURED.title} />
-          </div>
-          <div className={cx('heroContent')}>
-            <span className={cx('categoryTag')}>{MOCK_FEATURED.categoryName}</span>
-            <h2 onClick={() => navigate(routes.postDetail.replace(':postId', MOCK_FEATURED.id))}>
-              {MOCK_FEATURED.title}
-            </h2>
-            <p className={cx('excerpt')}>{MOCK_FEATURED.summary}</p>
-            <div className={cx('authorMeta')}>
-              <div className={cx('authorInfo')}>
-                <img src={MOCK_FEATURED.authorAvatar} alt={MOCK_FEATURED.authorName} />
-                <div className={cx('nameDate')}>
-                  <span>{MOCK_FEATURED.authorName}</span>
-                  <span>15/10/2024 • 12 phút đọc</span>
+        {featuredPost && (
+          <div className={cx('hero')}>
+            <div className={cx('heroImageWrapper')}>
+              <div className={cx('featuredBadge')}>Bài nổi bật</div>
+              <img src={featuredPost.thumbnail || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={featuredPost.title} />
+            </div>
+            <div className={cx('heroContent')}>
+              <span className={cx('categoryTag')}>{featuredPost.categories?.[0]?.name || 'Blog'}</span>
+              <h2 onClick={() => navigate(routes.postDetail.replace(':postId', featuredPost.id))}>
+                {featuredPost.title}
+              </h2>
+              <p className={cx('excerpt')}>{featuredPost.summary || 'Nhấp vào để đọc chi tiết bài viết hấp dẫn này...'}</p>
+              <div className={cx('authorMeta')}>
+                <div className={cx('authorInfo')}>
+                  <img src={featuredPost.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={featuredPost.authorName} />
+                  <div className={cx('nameDate')}>
+                    <span>{featuredPost.authorName}</span>
+                    <span>{new Date(featuredPost.createdAt).toLocaleDateString('vi-VN')}</span>
+                  </div>
                 </div>
+                <button 
+                  className={cx('readMore')}
+                  onClick={() => navigate(routes.postDetail.replace(':postId', featuredPost.id))}
+                >
+                  Đọc thêm <ArrowRight size={18} />
+                </button>
               </div>
-              <button 
-                className={cx('readMore')}
-                onClick={() => navigate(routes.postDetail.replace(':postId', MOCK_FEATURED.id))}
-              >
-                Đọc thêm <ArrowRight size={18} />
-              </button>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Filter Bar */}
         <div className={cx('filterBar')}>
@@ -257,34 +248,34 @@ function PostsPage() {
 
         {/* Post Grid */}
         <div className={cx('postGrid')}>
-          {filteredPosts.map(post => (
+          {otherPosts.map(post => (
             <div 
               key={post.id} 
               className={cx('postCard')}
               onClick={() => navigate(routes.postDetail.replace(':postId', post.id))}
             >
               <div className={cx('thumbnail')}>
-                <div className={cx('cardCategory', getCategoryStyles(post.categoryName))}>
-                  {post.categoryName}
+                <div className={cx('cardCategory', getCategoryStyles(post.categories?.[0]?.name))}>
+                  {post.categories?.[0]?.name || 'Blog'}
                 </div>
-                <img src={post.thumbnailUrl} alt={post.title} />
+                <img src={post.thumbnail || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={post.title} />
               </div>
               <div className={cx('cardContent')}>
                 <div className={cx('cardMeta')}>
                   <Clock size={14} />
-                  <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')} • {post.readTime || '5 phút đọc'}</span>
+                  <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
                 </div>
                 <h3>{post.title}</h3>
-                <p className={cx('cardExcerpt')}>{post.summary}</p>
+                <p className={cx('cardExcerpt')}>{post.summary || post.title}</p>
                 <div className={cx('cardFooter')}>
                   <div className={cx('author')}>
                     <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} />
                     <span>{post.authorName}</span>
                   </div>
                   <div className={cx('stats')}>
-                    <span><Eye size={14} /> {post.views || '0'}</span>
-                    <span><Heart size={14} /> {post.likes || 0}</span>
-                    <span><MessageCircle size={14} /> {post.comments || 0}</span>
+                    <span><Eye size={14} /> 0</span>
+                    <span><Heart size={14} /> {post.totalReacts || 0}</span>
+                    <span><MessageCircle size={14} /> {post.commentCount || 0}</span>
                   </div>
                 </div>
               </div>

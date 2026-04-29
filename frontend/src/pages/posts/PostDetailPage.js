@@ -91,12 +91,38 @@ const MOCK_RELATED = [
 function PostDetailPage() {
   const { postId } = useParams();
   const { user } = useAuth();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [copied, setCopied] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState(MOCK_COMMENTS);
+  const [comments, setComments] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        setLoading(true);
+        const data = await getPostById(postId);
+        setPost(data);
+        
+        // Fetch comments
+        const commentsData = await getComments(postId);
+        setComments(commentsData || []);
+        
+        // Check if liked
+        if (data.currentUserReactType) {
+          setLiked(true);
+        }
+      } catch (error) {
+        console.error('Failed to fetch post:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, [postId]);
 
 
   const handleCopyCode = () => {
@@ -120,6 +146,9 @@ function PostDetailPage() {
     setNewComment('');
   };
 
+  if (loading) return <div className="text-center py-5">Đang tải bài viết...</div>;
+  if (!post) return <div className="text-center py-5">Không tìm thấy bài viết.</div>;
+
   return (
     <div className={cx('wrapperDetail')}>
 
@@ -129,15 +158,15 @@ function PostDetailPage() {
         <div className={cx('floatingBar')}>
           <button className={cx('actionBtn', { active: liked })} onClick={() => setLiked(!liked)}>
             <div className={cx('iconCircle')}><Heart size={20} fill={liked ? 'currentColor' : 'none'} /></div>
-            <span className={cx('count')}>1.2k</span>
+            <span className={cx('count')}>{Object.values(post.reactCounts || {}).reduce((a, b) => a + b, 0)}</span>
           </button>
           <button className={cx('actionBtn', { active: bookmarked })} onClick={() => setBookmarked(!bookmarked)}>
             <div className={cx('iconCircle')}><Bookmark size={20} fill={bookmarked ? 'currentColor' : 'none'} /></div>
-            <span className={cx('count')}>452</span>
+            <span className={cx('count')}>0</span>
           </button>
           <button className={cx('actionBtn')} onClick={() => document.getElementById('comments').scrollIntoView({ behavior: 'smooth' })}>
             <div className={cx('iconCircle')}><MessageCircle size={20} /></div>
-            <span className={cx('count')}>86</span>
+            <span className={cx('count')}>{post.commentCount || 0}</span>
           </button>
           <button className={cx('actionBtn')}>
             <div className={cx('iconCircle')}><Share2 size={20} /></div>
@@ -153,31 +182,31 @@ function PostDetailPage() {
           <ChevronRight size={14} />
           <Link to={routes.posts}>Blog</Link>
           <ChevronRight size={14} />
-          <Link to="#">Kinh nghiệm ôn thi</Link>
+          <Link to="#">{post.categories?.[0]?.name || 'Blog'}</Link>
           <ChevronRight size={14} />
-          <span className={cx('current')}>Chiến lược ôn thi TOEIC 750+</span>
+          <span className={cx('current')}>{post.title}</span>
         </div>
 
         <header className={cx('articleHeader')}>
-          <span className={cx('categoryPill')}>{MOCK_DETAIL.categoryName}</span>
-          <h1>{MOCK_DETAIL.title}</h1>
-          <p className={cx('excerptDetail')}>{MOCK_DETAIL.excerpt}</p>
+          <span className={cx('categoryPill')}>{post.categories?.[0]?.name || 'Blog'}</span>
+          <h1>{post.title}</h1>
+          <p className={cx('excerptDetail')}>{post.summary || post.title}</p>
         </header>
 
         <div className={cx('metaRow')}>
           <div className={cx('authorSide')}>
-            <img src={MOCK_DETAIL.authorAvatar} alt={MOCK_DETAIL.authorName} />
+            <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} />
             <div className={cx('authorInfo')}>
-              <Link to="#">{MOCK_DETAIL.authorName}</Link>
+              <Link to="#">{post.authorName}</Link>
             </div>
           </div>
           <div className={cx('metaSide')}>
-            {MOCK_DETAIL.createdAt} • {MOCK_DETAIL.readTime} • {MOCK_DETAIL.views} views
+            {new Date(post.createdAt).toLocaleDateString('vi-VN')} • 5 min read • 0 views
           </div>
         </div>
 
         <article className={cx('articleBody')}>
-          <div dangerouslySetInnerHTML={{ __html: MOCK_DETAIL.content }} />
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
 
           <pre>
 {`// Cấu trúc câu điều kiện loại 2 trong Reading Part 5
@@ -198,7 +227,7 @@ he would sign the contract immediately.`}
 
         {/* Comments Section */}
         <section id="comments" className={cx('commentsSection')}>
-          <h3>Bình luận ({MOCK_DETAIL.commentCount})</h3>
+          <h3>Bình luận ({post.commentCount || 0})</h3>
           
           <form className={cx('commentForm')} onSubmit={handleSubmitComment}>
             <div className="d-flex align-items-center mb-3">
