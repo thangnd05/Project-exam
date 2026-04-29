@@ -22,7 +22,7 @@
   box-shadow: var(--shadow-card);
   overflow: hidden;
   display: flex;
-  margin-bottom: 60px;
+  margin-bottom: 48px;
   border: 1px solid var(--border-color);
 
   @media (max-width: 1024px) {
@@ -33,7 +33,7 @@
 .heroImageWrapper {
   width: 55%;
   position: relative;
-  min-height: 450px;
+  min-height: 380px;
   display: flex;
 
   @media (max-width: 1024px) {
@@ -66,7 +66,7 @@
 
 .heroContent {
   width: 45%;
-  padding: 48px;
+  padding: 32px;
   display: flex;
   flex-direction: column;
 
@@ -85,7 +85,7 @@
   }
 
   h2 {
-    font-size: 3.2rem;
+    font-size: 2.6rem;
     font-weight: 700;
     line-height: 1.2;
     color: var(--text-color);
@@ -103,10 +103,10 @@
   }
 
   .excerpt {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     color: var(--text-secondary);
     line-height: 1.6;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     line-clamp: 3;
@@ -256,7 +256,7 @@
 .postGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  gap: 24px;
   margin-bottom: 60px;
 
   @media (max-width: 1024px) {
@@ -323,7 +323,7 @@
   }
 
   .cardContent {
-    padding: 24px;
+    padding: 20px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -339,7 +339,7 @@
     }
 
     h3 {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 700;
       color: var(--text-color);
       margin-bottom: 12px;

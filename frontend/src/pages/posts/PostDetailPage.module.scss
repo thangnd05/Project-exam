@@ -17,7 +17,7 @@
 .containerDetail {
   max-width: 960px;
   margin: 0 auto;
-  padding: 40px 24px;
+  padding: 32px 24px;
   position: relative;
 
   @media (max-width: 640px) {
@@ -53,7 +53,7 @@
 /* --- Article Header --- */
 .articleHeader {
   max-width: var(--blog-reading-width);
-  margin: 0 auto 40px;
+  margin: 0 auto 32px;
   text-align: left;
 
   .categoryPill {
@@ -70,7 +70,7 @@
 
   h1 {
     font-family: var(--font-blog-heading);
-    font-size: 4rem;
+    font-size: 3.2rem;
     font-weight: 700;
     line-height: 1.2;
     color: var(--text-color);
@@ -82,7 +82,7 @@
   }
 
   .excerptDetail {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     color: var(--text-secondary);
     font-style: italic;
     line-height: 1.5;
@@ -128,18 +128,6 @@
         }
       }
 
-      .followBtn {
-        color: var(--primary);
-        font-weight: 700;
-        font-size: 1.3rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
     }
   }
 
@@ -223,7 +211,7 @@
 .articleBody {
   max-width: var(--blog-reading-width);
   margin: 0 auto;
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   line-height: 1.75;
   color: var(--text-color);
 
@@ -305,57 +293,7 @@
   }
 }
 
-/* --- Author Bio Card --- */
-.authorCard {
-  max-width: var(--blog-reading-width);
-  margin: 60px auto;
-  background-color: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  display: flex;
-  gap: 24px;
-  align-items: center;
-  box-shadow: var(--shadow-sm);
 
-  @media (max-width: 640px) {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  .authorBio {
-    flex: 1;
-
-    h4 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    p {
-      font-size: 1.4rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
-
-    .bioBtns {
-      display: flex;
-      gap: 12px;
-
-      @media (max-width: 640px) {
-        justify-content: center;
-      }
-    }
-  }
-}
 
 /* --- Comment Section --- */
 .commentsSection {

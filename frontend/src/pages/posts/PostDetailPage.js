@@ -169,7 +169,6 @@ function PostDetailPage() {
             <img src={MOCK_DETAIL.authorAvatar} alt={MOCK_DETAIL.authorName} />
             <div className={cx('authorInfo')}>
               <Link to="#">{MOCK_DETAIL.authorName}</Link>
-              <button className={cx('followBtn')}>• Theo dõi</button>
             </div>
           </div>
           <div className={cx('metaSide')}>
@@ -195,18 +194,7 @@ he would sign the contract immediately.`}
           <p>Hãy nhớ rằng sự kiên trì là quan trọng nhất. Mỗi ngày chỉ cần dành ra 90 phút tập trung cao độ, bạn sẽ thấy sự khác biệt rõ rệt sau 2 tháng. Chúc các bạn sớm đạt được mức điểm mong muốn!</p>
         </article>
 
-        {/* Author Bio Card */}
-        <div className={cx('authorCard')}>
-          <img src="https://i.pravatar.cc/150?img=5" alt="Author" />
-          <div className={cx('authorBio')}>
-            <h4>Về tác giả: {MOCK_DETAIL.authorName}</h4>
-            <p>{MOCK_DETAIL.authorBio}</p>
-            <div className={cx('bioBtns')}>
-              <Button variant="primary" size="sm" className="rounded-pill px-4">Theo dõi</Button>
-              <Button variant="outline-secondary" size="sm" className="rounded-pill px-4">Trang cá nhân</Button>
-            </div>
-          </div>
-        </div>
+
 
         {/* Comments Section */}
         <section id="comments" className={cx('commentsSection')}>
