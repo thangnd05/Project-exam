@@ -23,7 +23,6 @@ import {
   Menu,
 } from 'lucide-react';
 import routes from '~/config/Routes';
-
 import styles from './AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);

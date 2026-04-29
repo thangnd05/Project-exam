@@ -91,7 +91,6 @@ const MOCK_RELATED = [
 function PostDetailPage() {
   const { postId } = useParams();
   const { user } = useAuth();
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -99,15 +98,6 @@ function PostDetailPage() {
   const [comments, setComments] = useState(MOCK_COMMENTS);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (window.scrollY / totalHeight) * 100;
-      setScrollProgress(progress);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleCopyCode = () => {
     setCopied(true);
@@ -132,7 +122,6 @@ function PostDetailPage() {
 
   return (
     <div className={cx('wrapperDetail')}>
-      <div className={cx('progressBar')} style={{ width: `${scrollProgress}%` }} />
 
       <div className={cx('containerDetail')}>
         

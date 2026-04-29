@@ -8,6 +8,7 @@ import { AuthProvider } from '~/context/AuthContext';
 import ScrollHandler from './Layout/ScrollToTopOnRouteChange';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ScrollProgressBar from '~/components/common/ScrollProgressBar';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           limit={3}
         />
         <div className="App">
+          <ScrollProgressBar />
           <Routes>
             {/* Public Routes */}
             {publicRoutes.map((route, index) => {
