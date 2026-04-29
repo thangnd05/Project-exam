@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, ArrowRight, Plus } from 'lucide-react';
 import { getPosts, getCategories } from '~/api/postApi';
 import routes from '~/config/Routes';
+import CreatePostModal from '~/components/modals/CreatePostModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);
@@ -113,6 +114,7 @@ function PostsPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -153,6 +155,17 @@ function PostsPage() {
     };
     initData();
   }, []);
+
+  const refreshPosts = async () => {
+    try {
+      const postsData = await getPosts({ page: 0, size: 10 });
+      if (postsData.content && postsData.content.length > 0) {
+        setPosts(postsData.content);
+      }
+    } catch (error) {
+      console.error('Failed to refresh posts:', error);
+    }
+  };
 
   const filteredPosts = posts.filter(post => {
     const matchesCategory = !selectedCategory || 
@@ -225,14 +238,20 @@ function PostsPage() {
               </button>
             ))}
           </div>
-          <div className={cx('searchBox')}>
-            <Search className={cx('searchIcon')} size={18} />
-            <input 
-              type="text" 
-              placeholder="Tìm bài viết..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className={cx('searchActions')}>
+            <div className={cx('searchBox')}>
+              <Search className={cx('searchIcon')} size={18} />
+              <input 
+                type="text" 
+                placeholder="Tìm bài viết..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <button className={cx('createBtn')} onClick={() => setShowCreateModal(true)}>
+              <Plus size={18} />
+              <span>Tạo bài viết</span>
+            </button>
           </div>
         </div>
 
@@ -283,6 +302,14 @@ function PostsPage() {
           <button className={cx('pageBtn')}>12</button>
           <button className={cx('pageBtn')}><ChevronRight size={20} /></button>
         </div>
+
+        {/* Create Post Modal */}
+        <CreatePostModal 
+          show={showCreateModal} 
+          onClose={() => setShowCreateModal(false)}
+          onRefresh={refreshPosts}
+          categories={categories}
+        />
 
       </div>
     </div>

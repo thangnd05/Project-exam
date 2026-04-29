@@ -223,6 +223,48 @@
   }
 }
 
+.searchActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}
+
+.createBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-gradient);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 97, 242, 0.2);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 97, 242, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 .searchBox {
   position: relative;
   min-width: 320px;

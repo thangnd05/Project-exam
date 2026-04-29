@@ -1,5 +1,5 @@
-import {IoClose} from 'react-icons/io5';
-import {Modal} from 'react-bootstrap';
+import { IoClose } from 'react-icons/io5';
+import { Modal } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import styles from './CommonFormModal.module.scss';
 
@@ -12,9 +12,10 @@ function CommonFormModal({
   icon: TitleIcon,
   children,
   footer,
+  size = 'md',
 }) {
   return (
-    <Modal show={show} onHide={onHide} centered className={cx('modalCustom')}>
+    <Modal show={show} onHide={onHide} centered size={size} className={cx('modalCustom')}>
       <div className={cx('header')}>
         <div className={cx('titleWrapper')}>
           {TitleIcon ? <TitleIcon /> : null}
