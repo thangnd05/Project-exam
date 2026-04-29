@@ -69,6 +69,8 @@ const CreateTestFormBody = ({
     updateQuestionText,
     updateQuestionField,
     updateAnswer,
+    addAnswer,
+    removeAnswer,
     addMediaFiles,
     removeMediaFile,
     setPassageType,
@@ -81,6 +83,8 @@ const CreateTestFormBody = ({
     removeGroupQuestion,
     updateGroupQuestion,
     updateGroupAnswer,
+    addGroupAnswer,
+    removeGroupAnswer,
     setGroupPassageType,
     handleSubmit,
   } = useCreateTest({ mode, classId, chapterId, creatorType: activeCreatorType });
@@ -333,6 +337,8 @@ const CreateTestFormBody = ({
               updateQuestionTextFn={updateQuestionText}
               updateQuestionFieldFn={updateQuestionField}
               updateAnswerFn={updateAnswer}
+              addAnswerFn={addAnswer}
+              removeAnswerFn={removeAnswer}
               addMediaFilesFn={addMediaFiles}
               removeMediaFileFn={removeMediaFile}
               setPassageTypeFn={setPassageType}
@@ -388,6 +394,8 @@ const CreateTestFormBody = ({
                     removeQuestionFn={(i) => removeGroupQuestion(gIndex, i)}
                     updateQuestionTextFn={(i, v) => updateGroupQuestion(gIndex, i, 'questionText', v)}
                     updateAnswerFn={(i, aIndex, field, value) => updateGroupAnswer(gIndex, i, aIndex, field, value)}
+                    addAnswerFn={(i) => addGroupAnswer(gIndex, i)}
+                    removeAnswerFn={(i, aIndex) => removeGroupAnswer(gIndex, i, aIndex)}
                     addMediaFilesFn={() => { }}
                     removeMediaFileFn={() => { }}
                     setPassageTypeFn={() => { }}

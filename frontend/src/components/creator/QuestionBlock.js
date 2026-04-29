@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { Trash } from 'lucide-react';
+import { PlusCircle, Trash } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '../modals/CreateTestModal.module.scss';
 
@@ -15,6 +15,8 @@ const QuestionBlock = ({
     updateQuestionTextFn,
     updateQuestionFieldFn,
     updateAnswerFn,
+    addAnswerFn,
+    removeAnswerFn,
     addMediaFilesFn,
     removeMediaFileFn,
     setPassageTypeFn,
@@ -113,10 +115,28 @@ const QuestionBlock = ({
                                 placeholder={`Đáp án ${ans.answerLabel}`}
                                 onChange={(e) => updateAnswerFn(index, aIndex, 'answerText', e.target.value)}
                             />
+                            <button
+                                type="button"
+                                className="btn btn-sm btn-outline-danger ms-2"
+                                onClick={() => removeAnswerFn?.(index, aIndex)}
+                                aria-label={`Xóa đáp án ${ans.answerLabel}`}
+                            >
+                                <Trash size={14} />
+                            </button>
                         </div>
                     </Col>
                 ))}
             </Row>
+            <div className="mt-3">
+                <button
+                    type="button"
+                    className={cx('btnSecondary')}
+                    onClick={() => addAnswerFn?.(index)}
+                >
+                    <PlusCircle size={16} className="me-1" />
+                    Thêm đáp án
+                </button>
+            </div>
         </div>
     );
 };

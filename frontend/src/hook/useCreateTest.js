@@ -11,6 +11,8 @@ export const CREATOR_TYPES = {
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_QUESTIONS = 40;
+const MIN_ANSWERS = 2;
+const MAX_ANSWERS = 10;
 
 const emptyQuestion = {
   questionText: '',
@@ -34,6 +36,14 @@ const createInitialGroup = () => ({
   },
   questions: [JSON.parse(JSON.stringify(emptyQuestion))],
 });
+
+const getAnswerLabelByIndex = (index) => String.fromCharCode(65 + index);
+
+const normalizeAnswerLabels = (answers) =>
+  answers.map((answer, index) => ({
+    ...answer,
+    answerLabel: getAnswerLabelByIndex(index),
+  }));
 
 export const useCreateTest = ({
   mode,
@@ -124,6 +134,40 @@ export const useCreateTest = ({
       newQ[qIndex].answers = newQ[qIndex].answers.map((a, i) => ({ ...a, isCorrect: i === aIndex }));
     else
       newQ[qIndex].answers[aIndex] = { ...newQ[qIndex].answers[aIndex], [field]: value };
+    setQuestions(newQ);
+  };
+
+  const addAnswer = (qIndex) => {
+    const newQ = [...questions];
+    const currentAnswers = newQ[qIndex].answers || [];
+    if (currentAnswers.length >= MAX_ANSWERS) {
+      setNotification({ type: 'warning', message: `Tối đa ${MAX_ANSWERS} đáp án cho mỗi câu.` });
+      return;
+    }
+    const nextAnswer = {
+      answerLabel: getAnswerLabelByIndex(currentAnswers.length),
+      answerText: '',
+      isCorrect: false,
+    };
+    newQ[qIndex].answers = [...currentAnswers, nextAnswer];
+    setQuestions(newQ);
+  };
+
+  const removeAnswer = (qIndex, aIndex) => {
+    const newQ = [...questions];
+    const currentAnswers = newQ[qIndex].answers || [];
+    if (currentAnswers.length <= MIN_ANSWERS) {
+      setNotification({ type: 'warning', message: `Mỗi câu phải có ít nhất ${MIN_ANSWERS} đáp án.` });
+      return;
+    }
+    const removedAnswer = currentAnswers[aIndex];
+    const filteredAnswers = currentAnswers.filter((_, index) => index !== aIndex);
+    const hasCorrectAnswer = filteredAnswers.some((answer) => answer.isCorrect);
+    const resetCorrectAnswers =
+      removedAnswer?.isCorrect && !hasCorrectAnswer
+        ? filteredAnswers.map((answer) => ({ ...answer, isCorrect: false }))
+        : filteredAnswers;
+    newQ[qIndex].answers = normalizeAnswerLabels(resetCorrectAnswers);
     setQuestions(newQ);
   };
 
@@ -240,6 +284,40 @@ export const useCreateTest = ({
     setGroups(newGroups);
   };
 
+  const addGroupAnswer = (gIndex, qIndex) => {
+    const newGroups = [...groups];
+    const currentAnswers = newGroups[gIndex].questions[qIndex].answers || [];
+    if (currentAnswers.length >= MAX_ANSWERS) {
+      setNotification({ type: 'warning', message: `Tối đa ${MAX_ANSWERS} đáp án cho mỗi câu.` });
+      return;
+    }
+    const nextAnswer = {
+      answerLabel: getAnswerLabelByIndex(currentAnswers.length),
+      answerText: '',
+      isCorrect: false,
+    };
+    newGroups[gIndex].questions[qIndex].answers = [...currentAnswers, nextAnswer];
+    setGroups(newGroups);
+  };
+
+  const removeGroupAnswer = (gIndex, qIndex, aIndex) => {
+    const newGroups = [...groups];
+    const currentAnswers = newGroups[gIndex].questions[qIndex].answers || [];
+    if (currentAnswers.length <= MIN_ANSWERS) {
+      setNotification({ type: 'warning', message: `Mỗi câu phải có ít nhất ${MIN_ANSWERS} đáp án.` });
+      return;
+    }
+    const removedAnswer = currentAnswers[aIndex];
+    const filteredAnswers = currentAnswers.filter((_, index) => index !== aIndex);
+    const hasCorrectAnswer = filteredAnswers.some((answer) => answer.isCorrect);
+    const resetCorrectAnswers =
+      removedAnswer?.isCorrect && !hasCorrectAnswer
+        ? filteredAnswers.map((answer) => ({ ...answer, isCorrect: false }))
+        : filteredAnswers;
+    newGroups[gIndex].questions[qIndex].answers = normalizeAnswerLabels(resetCorrectAnswers);
+    setGroups(newGroups);
+  };
+
   const setGroupPassageType = (gIndex, passageType) => {
     const newGroups = [...groups];
     newGroups[gIndex].passage = { ...newGroups[gIndex].passage, passageType, mediaFiles: [] };
@@ -267,6 +345,8 @@ export const useCreateTest = ({
     updateQuestionText,
     updateQuestionField,
     updateAnswer,
+    addAnswer,
+    removeAnswer,
     addMediaFiles,
     removeMediaFile,
     setPassageType,
@@ -279,6 +359,8 @@ export const useCreateTest = ({
     removeGroupQuestion,
     updateGroupQuestion,
     updateGroupAnswer,
+    addGroupAnswer,
+    removeGroupAnswer,
     setGroupPassageType,
     handleSubmit,
   };

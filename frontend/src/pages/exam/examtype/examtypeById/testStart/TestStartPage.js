@@ -306,28 +306,25 @@ function TestStartPage() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const hasPassageImage = (passage, fallbackObj) => {
+  const hasPassageContent = (passage, fallbackObj) => {
+    const content =
+      passage?.content ??
+      passage?.passage_content ??
+      fallbackObj?.content ??
+      fallbackObj?.passage_content;
     const mediaList =
       passage?.passageMediaList ??
       passage?.passageMedias ??
       passage?.mediaList ??
       passage?.passage_media ??
       [];
-    if (
-      Array.isArray(mediaList) &&
-      mediaList.some(
-        (m) => (m.mediaType ?? m.media_type ?? '').toUpperCase() === 'IMAGE',
-      )
-    )
-      return true;
+    if (Array.isArray(mediaList) && mediaList.length > 0) return true;
     const singleUrl =
       passage?.mediaUrl ??
       passage?.media_url ??
       fallbackObj?.mediaUrl ??
       fallbackObj?.media_url;
-    const pType =
-      passage?.passageType ?? passage?.passage_type ?? fallbackObj?.passageType;
-    return !!(singleUrl && (pType === 'READING' || pType === 'reading'));
+    return Boolean(content || singleUrl);
   };
 
   const renderPassage = (passage, fallbackObj) => {
@@ -480,7 +477,7 @@ function TestStartPage() {
   };
 
   const renderQuestionCard = (q, absoluteIndex) => {
-    const passageHasImage = hasPassageImage(q.passage, q);
+    const hasPassage = hasPassageContent(q.passage, q);
     const questionCard = renderQuestionOnly(q, absoluteIndex);
 
     return (
@@ -488,10 +485,10 @@ function TestStartPage() {
         key={q.questionId}
         id={`q-${q.questionId}`}
         className={cx('question-card-wrapper', {
-          'split-layout': passageHasImage,
+          'split-layout': hasPassage,
         })}
       >
-        {passageHasImage ? (
+        {hasPassage ? (
           <>
             <div className={cx('passage-column')} aria-label="Đọc tài liệu">
               {renderPassage(q.passage, q)}
@@ -576,13 +573,13 @@ function TestStartPage() {
                 <div className={cx('questions-list')}>
                   {/* Render question groups */}
                   {part.questionGroups?.map((group, groupIdx) => {
-                    const passageHasImage = hasPassageImage(group.passage);
+                    const hasPassage = hasPassageContent(group.passage);
                     return (
                       <div
                         key={group.passage?.passageId || groupIdx}
-                        className={cx('group-section', { 'split-layout': passageHasImage })}
+                        className={cx('group-section', { 'split-layout': hasPassage })}
                       >
-                        {passageHasImage ? (
+                        {hasPassage ? (
                           <>
                             <div className={cx('passage-column')} aria-label="Đọc tài liệu">
                               {renderPassage(group.passage)}
