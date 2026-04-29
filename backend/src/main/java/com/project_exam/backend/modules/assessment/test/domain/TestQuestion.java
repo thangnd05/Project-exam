@@ -21,4 +21,7 @@ public class TestQuestion {
 
     @Column(name = "question_id", nullable = false)
     private String questionId;
+
+    @Column(name = "display_order")
+    private Integer displayOrder;
 }

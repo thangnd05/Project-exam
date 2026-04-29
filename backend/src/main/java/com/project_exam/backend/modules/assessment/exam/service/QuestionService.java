@@ -362,6 +362,7 @@ public class QuestionService {
             return List.of();
         }
 
+        int nextDisplayOrder = testQuestionRepository.findMaxDisplayOrderByTestPartId(testPartId) + 1;
         List<QuestionAdminResponse> responses = new ArrayList<>();
         for (NormalQuestionRequest parsedQuestion : parsedQuestions) {
             Question question = new Question();
@@ -388,6 +389,7 @@ public class QuestionService {
             TestQuestion testQuestion = new TestQuestion();
             testQuestion.setTestPartId(testPartId);
             testQuestion.setQuestionId(question.getQuestionId());
+            testQuestion.setDisplayOrder(nextDisplayOrder++);
             testQuestionRepository.save(testQuestion);
 
             responses.add(buildQuestionAdminResponse(question, null, savedAnswers));
@@ -705,6 +707,7 @@ public class QuestionService {
         TestQuestion tq = new TestQuestion();
         tq.setTestPartId(request.getTestPartId());
         tq.setQuestionId(question.getQuestionId());
+        tq.setDisplayOrder(testQuestionRepository.findMaxDisplayOrderByTestPartId(request.getTestPartId()) + 1);
         testQuestionRepository.save(tq);
 
         return buildQuestionAdminResponse(question, savedPassage, savedAnswers);

@@ -21,7 +21,8 @@ public class TestQuestionService {
         return new TestQuestionResponse(
                 testQuestion.getTestQuestionId(),
                 testQuestion.getTestPartId(),
-                testQuestion.getQuestionId()
+                testQuestion.getQuestionId(),
+                testQuestion.getDisplayOrder()
         );
     }
 
@@ -29,6 +30,11 @@ public class TestQuestionService {
         TestQuestion testQuestion = new TestQuestion();
         testQuestion.setTestPartId(request.getTestPartId());
         testQuestion.setQuestionId(request.getQuestionId());
+        Integer displayOrder = request.getDisplayOrder();
+        if (displayOrder == null && request.getTestPartId() != null) {
+            displayOrder = testQuestionRepository.findMaxDisplayOrderByTestPartId(request.getTestPartId()) + 1;
+        }
+        testQuestion.setDisplayOrder(displayOrder);
         return testQuestion;
     }
 

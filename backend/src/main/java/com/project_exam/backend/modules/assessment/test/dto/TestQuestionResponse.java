@@ -13,4 +13,5 @@ public class TestQuestionResponse {
     private String testQuestionId;
     private String testPartId;
     private String questionId;
+    private Integer displayOrder;
 }

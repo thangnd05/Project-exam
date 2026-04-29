@@ -12,4 +12,5 @@ import lombok.Setter;
 public class TestQuestionRequest {
     private String testPartId;
     private String questionId;
+    private Integer displayOrder;
 }

@@ -12,6 +12,14 @@ import java.util.List;
 @Repository
 public interface TestQuestionRepository extends JpaRepository<TestQuestion, String> {
     List<TestQuestion> findByTestPartIdIn(List<String> testPartIds);
+
+    @Query("""
+            SELECT tq FROM TestQuestion tq
+            WHERE tq.testPartId IN :testPartIds
+            ORDER BY COALESCE(tq.displayOrder, 2147483647), tq.testQuestionId
+            """)
+    List<TestQuestion> findByTestPartIdInOrderByDisplayOrder(List<String> testPartIds);
+
     List<TestQuestion> findByQuestionId(String questionId);
 
     boolean existsByQuestionIdAndTestPartId(String questionId, String testPartId);
@@ -21,4 +29,14 @@ public interface TestQuestionRepository extends JpaRepository<TestQuestion, Stri
     void deleteByTestPartId(@Param("testPartId") String testPartId);
 
     List<TestQuestion> findByTestPartId(String testPartId);
+
+    @Query("""
+            SELECT tq FROM TestQuestion tq
+            WHERE tq.testPartId = :testPartId
+            ORDER BY COALESCE(tq.displayOrder, 2147483647), tq.testQuestionId
+            """)
+    List<TestQuestion> findByTestPartIdOrderByDisplayOrder(@Param("testPartId") String testPartId);
+
+    @Query("SELECT COALESCE(MAX(tq.displayOrder), 0) FROM TestQuestion tq WHERE tq.testPartId = :testPartId")
+    Integer findMaxDisplayOrderByTestPartId(@Param("testPartId") String testPartId);
 }

@@ -269,9 +269,7 @@ public class TestService {
     ) {}
 
     private TestUserDataBundle loadUserTestData(String testId) {
-        List<TestPart> testParts = testPartRepository.findByTestId(testId).stream()
-                .sorted(Comparator.comparing(TestPart::getTestPartId))
-                .toList();
+        List<TestPart> testParts = testPartRepository.findByTestId(testId);
         if (testParts.isEmpty()) {
             return new TestUserDataBundle(
                     Collections.emptyList(),
@@ -283,7 +281,7 @@ public class TestService {
         }
 
         List<String> partIds = testParts.stream().map(TestPart::getTestPartId).toList();
-        List<TestQuestion> allQuestions = testQuestionRepository.findByTestPartIdIn(partIds);
+        List<TestQuestion> allQuestions = testQuestionRepository.findByTestPartIdInOrderByDisplayOrder(partIds);
         Map<String, List<TestQuestion>> questionsByPartId = allQuestions.stream()
                 .collect(Collectors.groupingBy(TestQuestion::getTestPartId));
 
@@ -312,10 +310,7 @@ public class TestService {
     private List<TestPartResponse> buildUserPartResponses(TestUserDataBundle data, long seed) {
         return data.testParts().stream().map(tp -> {
             List<TestQuestion> tqList = data.questionsByPartId()
-                    .getOrDefault(tp.getTestPartId(), Collections.emptyList())
-                    .stream()
-                    .sorted(Comparator.comparing(TestQuestion::getQuestionId))
-                    .toList();
+                    .getOrDefault(tp.getTestPartId(), Collections.emptyList());
 
             Map<String, QuestionGroupResponse> groupsMap = new LinkedHashMap<>();
 
@@ -475,7 +470,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         List<String> partIds = testParts.stream().map(TestPart::getTestPartId).toList();
-        List<TestQuestion> allQuestions = testQuestionRepository.findByTestPartIdIn(partIds);
+        List<TestQuestion> allQuestions = testQuestionRepository.findByTestPartIdInOrderByDisplayOrder(partIds);
         Map<String, List<TestQuestion>> questionsByPartId = allQuestions.stream()
                 .collect(Collectors.groupingBy(TestQuestion::getTestPartId));
 
@@ -731,6 +726,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         String testPartId = request.getTestPartId();
         TestPart testPart = testPartRepository.findById(testPartId)
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
+        int nextDisplayOrder = testQuestionRepository.findMaxDisplayOrderByTestPartId(testPartId) + 1;
 
         for (String questionId : request.getQuestionIds()) {
             Question question = questionRepository.findById(questionId)
@@ -744,6 +740,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             TestQuestion tq = new TestQuestion();
             tq.setTestPartId(testPartId);
             tq.setQuestionId(questionId);
+            tq.setDisplayOrder(nextDisplayOrder++);
             testQuestionRepository.save(tq);
         }
     }
@@ -770,9 +767,15 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
         String examPartId = testPart.getExamPartId();
 
-        Set<String> existingIds = testQuestionRepository.findByTestPartId(testPartId).stream()
+        List<TestQuestion> existingLinks = testQuestionRepository.findByTestPartIdOrderByDisplayOrder(testPartId);
+        Set<String> existingIds = existingLinks.stream()
                 .map(TestQuestion::getQuestionId)
                 .collect(Collectors.toSet());
+        int nextDisplayOrder = existingLinks.stream()
+                .map(TestQuestion::getDisplayOrder)
+                .filter(Objects::nonNull)
+                .max(Integer::compareTo)
+                .orElse(0) + 1;
 
         List<Question> pool;
         if (request.getClassId() != null && request.getChapterId() != null) {
@@ -801,6 +804,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             TestQuestion tq = new TestQuestion();
             tq.setTestPartId(testPartId);
             tq.setQuestionId(questionId);
+            tq.setDisplayOrder(nextDisplayOrder++);
             testQuestionRepository.save(tq);
         }
         return new AddRandomQuestionsResponse(toAdd.size());
