@@ -203,6 +203,23 @@
   font-size: 1.55rem !important;
 }
 
+.questionActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deleteBtn {
+  border-radius: 9px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  font-size: 1.55rem !important;
+}
+
 .loadingWrap {
   display: flex;
   align-items: center;

@@ -9,6 +9,7 @@ import {
   IoCreateOutline,
   IoLibraryOutline,
   IoSchoolOutline,
+  IoTrashOutline,
 } from 'react-icons/io5';
 import {useBaseMetaData} from '~/hook/useBaseMetaData';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
@@ -30,6 +31,7 @@ const PersonalQuestionBankPage = () => {
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
+  const [deletingQuestionId, setDeletingQuestionId] = useState(null);
 
   const [chapters, setChapters] = useState([]);
   const [chapterConfigs, setChapterConfigs] = useState({});
@@ -244,6 +246,44 @@ const PersonalQuestionBankPage = () => {
     }
   };
 
+  const handleDeleteQuestion = async ({
+    questionId,
+    partId = null,
+    chapterId = null,
+  }) => {
+    const confirmed = window.confirm('Bạn có chắc muốn xóa câu hỏi này không?');
+    if (!confirmed) return;
+
+    setDeletingQuestionId(questionId);
+    try {
+      await axios.delete(`/api/questions/${questionId}`);
+
+      if (editingQuestionId === questionId) {
+        setEditingQuestionId(null);
+      }
+
+      if (bankScope === BANK_SCOPE.CLASS && chapterId) {
+        await loadQuestionsForChapter(chapterId);
+      } else if (partId) {
+        await loadQuestionsForPart(partId);
+      }
+
+      setNotification({
+        type: 'success',
+        message: 'Đã xóa câu hỏi thành công.',
+      });
+    } catch (error) {
+      const message =
+        error.response?.data?.message || 'Không thể xóa câu hỏi. Vui lòng thử lại.';
+      setNotification({
+        type: 'danger',
+        message,
+      });
+    } finally {
+      setDeletingQuestionId(null);
+    }
+  };
+
   return (
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
@@ -416,20 +456,39 @@ const PersonalQuestionBankPage = () => {
                                   <span className={cx('questionText')}>
                                     {q.questionText || '(Không có nội dung)'}
                                   </span>
-                                  <Button
-                                    type="button"
-                                    className={cx('editBtn')}
-                                    size="sm"
-                                    variant="outline-primary"
-                                    onClick={() => {
-                                      setEditingChapterId(chapter.chapterId);
-                                      setEditingPartId(null);
-                                      setEditingQuestionId(id);
-                                    }}
-                                    aria-label={`Sửa câu ${idx + 1}`}
-                                  >
-                                    <IoCreateOutline />
-                                  </Button>
+                                  <div className={cx('questionActions')}>
+                                    <Button
+                                      type="button"
+                                      className={cx('editBtn')}
+                                      size="sm"
+                                      variant="outline-primary"
+                                      disabled={deletingQuestionId === id}
+                                      onClick={() => {
+                                        setEditingChapterId(chapter.chapterId);
+                                        setEditingPartId(null);
+                                        setEditingQuestionId(id);
+                                      }}
+                                      aria-label={`Sửa câu ${idx + 1}`}
+                                    >
+                                      <IoCreateOutline />
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      className={cx('deleteBtn')}
+                                      size="sm"
+                                      variant="outline-danger"
+                                      disabled={deletingQuestionId === id}
+                                      onClick={() =>
+                                        handleDeleteQuestion({
+                                          questionId: id,
+                                          chapterId: chapter.chapterId,
+                                        })
+                                      }
+                                      aria-label={`Xóa câu ${idx + 1}`}
+                                    >
+                                      <IoTrashOutline />
+                                    </Button>
+                                  </div>
                                 </li>
                               );
                             })}
@@ -504,20 +563,39 @@ const PersonalQuestionBankPage = () => {
                                   <span className={cx('questionText')}>
                                     {q.questionText || '(Không có nội dung)'}
                                   </span>
-                                  <Button
-                                    type="button"
-                                    className={cx('editBtn')}
-                                    size="sm"
-                                    variant="outline-primary"
-                                    onClick={() => {
-                                      setEditingPartId(part.examPartId);
-                                      setEditingChapterId(null);
-                                      setEditingQuestionId(id);
-                                    }}
-                                    aria-label={`Sửa câu ${idx + 1}`}
-                                  >
-                                    <IoCreateOutline />
-                                  </Button>
+                                  <div className={cx('questionActions')}>
+                                    <Button
+                                      type="button"
+                                      className={cx('editBtn')}
+                                      size="sm"
+                                      variant="outline-primary"
+                                      disabled={deletingQuestionId === id}
+                                      onClick={() => {
+                                        setEditingPartId(part.examPartId);
+                                        setEditingChapterId(null);
+                                        setEditingQuestionId(id);
+                                      }}
+                                      aria-label={`Sửa câu ${idx + 1}`}
+                                    >
+                                      <IoCreateOutline />
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      className={cx('deleteBtn')}
+                                      size="sm"
+                                      variant="outline-danger"
+                                      disabled={deletingQuestionId === id}
+                                      onClick={() =>
+                                        handleDeleteQuestion({
+                                          questionId: id,
+                                          partId: part.examPartId,
+                                        })
+                                      }
+                                      aria-label={`Xóa câu ${idx + 1}`}
+                                    >
+                                      <IoTrashOutline />
+                                    </Button>
+                                  </div>
                                 </li>
                               );
                             })}
