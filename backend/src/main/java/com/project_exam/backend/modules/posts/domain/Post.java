@@ -29,10 +29,12 @@ public class Post {
     @Column(name = "thumbnail_url", length = 500)
     private String thumbnailUrl;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private PostStatus status = PostStatus.PENDING;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

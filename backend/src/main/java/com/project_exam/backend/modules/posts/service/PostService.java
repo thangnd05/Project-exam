@@ -166,8 +166,8 @@ public class PostService {
     // ─────────────────────────────────────────────
 
     @Transactional
-    public PostResponse createPost(PostUpsertRequest request, List<MultipartFile> images,
-                                   HttpServletRequest httpRequest) throws IOException {
+    public PostResponse createPost(PostUpsertRequest request,
+                                   HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
 
         Post post = Post.builder()
@@ -179,9 +179,6 @@ public class PostService {
                 .build();
         post = postRepository.save(post);
 
-        // Upload & lưu images
-        saveImages(post.getId(), images);
-
         // Gán categories
         saveCategories(post.getId(), request.getCategoryIds());
 
@@ -189,8 +186,8 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse updatePost(String id, PostUpsertRequest request, List<MultipartFile> newImages,
-                                   HttpServletRequest httpRequest) throws IOException {
+    public PostResponse updatePost(String id, PostUpsertRequest request,
+                                   HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
@@ -204,12 +201,6 @@ public class PostService {
         post.setThumbnailUrl(request.getThumbnailUrl());
         if (request.getStatus() != null) post.setStatus(request.getStatus());
         postRepository.save(post);
-
-        // Cập nhật images nếu có ảnh mới truyền vào
-        if (newImages != null && !newImages.isEmpty()) {
-            postImageRepository.deleteByPostId(id);
-            saveImages(id, newImages);
-        }
 
         // Cập nhật categories
         if (request.getCategoryIds() != null) {

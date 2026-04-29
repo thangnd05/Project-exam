@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { 
-  Heart, Bookmark, MessageCircle, Share2, Facebook, Linkedin, 
+import {
+  Heart, Bookmark, MessageCircle, Share2, Facebook, Linkedin,
   Link2, ChevronRight, Copy, Check, ThumbsUp, MoreHorizontal, User,
   Send
 } from 'lucide-react';
@@ -106,11 +106,11 @@ function PostDetailPage() {
         setLoading(true);
         const data = await getPostById(postId);
         setPost(data);
-        
+
         // Fetch comments
         const commentsData = await getComments(postId);
         setComments(commentsData || []);
-        
+
         // Check if liked
         if (data.currentUserReactType) {
           setLiked(true);
@@ -153,7 +153,7 @@ function PostDetailPage() {
     <div className={cx('wrapperDetail')}>
 
       <div className={cx('containerDetail')}>
-        
+
         {/* Floating Actions Sidebar */}
         <div className={cx('floatingBar')}>
           <button className={cx('actionBtn', { active: liked })} onClick={() => setLiked(!liked)}>
@@ -190,7 +190,6 @@ function PostDetailPage() {
         <header className={cx('articleHeader')}>
           <span className={cx('categoryPill')}>{post.categories?.[0]?.name || 'Blog'}</span>
           <h1>{post.title}</h1>
-          <p className={cx('excerptDetail')}>{post.summary || post.title}</p>
         </header>
 
         <div className={cx('metaRow')}>
@@ -207,20 +206,6 @@ function PostDetailPage() {
 
         <article className={cx('articleBody')}>
           <div dangerouslySetInnerHTML={{ __html: post.content }} />
-
-          <pre>
-{`// Cấu trúc câu điều kiện loại 2 trong Reading Part 5
-If + S + V2/ed, S + would/could + V-inf
-
-Example:
-If the manager were here,
-he would sign the contract immediately.`}
-            <button className={cx('copyBtn')} onClick={handleCopyCode}>
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
-          </pre>
-
-          <p>Hãy nhớ rằng sự kiên trì là quan trọng nhất. Mỗi ngày chỉ cần dành ra 90 phút tập trung cao độ, bạn sẽ thấy sự khác biệt rõ rệt sau 2 tháng. Chúc các bạn sớm đạt được mức điểm mong muốn!</p>
         </article>
 
 
@@ -228,7 +213,7 @@ he would sign the contract immediately.`}
         {/* Comments Section */}
         <section id="comments" className={cx('commentsSection')}>
           <h3>Bình luận ({post.commentCount || 0})</h3>
-          
+
           <form className={cx('commentForm')} onSubmit={handleSubmitComment}>
             <div className="d-flex align-items-center mb-3">
               <div className="bg-light rounded-circle p-2 me-3">
@@ -236,8 +221,8 @@ he would sign the contract immediately.`}
               </div>
             </div>
             <div className={cx('formContent')}>
-              <textarea 
-                placeholder="Chia sẻ suy nghĩ của bạn về bài viết này..." 
+              <textarea
+                placeholder="Chia sẻ suy nghĩ của bạn về bài viết này..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
@@ -264,7 +249,7 @@ he would sign the contract immediately.`}
                     </div>
                   </div>
                 </div>
-                
+
                 {comment.replies.length > 0 && (
                   <div className={cx('replyList')}>
                     {comment.replies.map(reply => (

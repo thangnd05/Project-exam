@@ -52,29 +52,23 @@ public class PostController {
         return ResponseEntity.ok(postService.getMyPosts(httpRequest));
     }
 
-    // ─── CREATE (auth) — multipart/form-data ─────
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // ─── CREATE (auth) — JSON ────────────────────
+    @PostMapping
     public ResponseEntity<PostResponse> createPost(
-            @RequestPart("post") String postJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestBody PostUpsertRequest request,
             HttpServletRequest httpRequest
-    ) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        PostUpsertRequest request = mapper.readValue(postJson, PostUpsertRequest.class);
-        return ResponseEntity.ok(postService.createPost(request, images, httpRequest));
+    ) {
+        return ResponseEntity.ok(postService.createPost(request, httpRequest));
     }
 
-    // ─── UPDATE (auth, owner only) — multipart/form-data ─
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // ─── UPDATE (auth, owner only) — JSON ────────
+    @PutMapping("/{id}")
     public ResponseEntity<PostResponse> updatePost(
             @PathVariable String id,
-            @RequestPart("post") String postJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestBody PostUpsertRequest request,
             HttpServletRequest httpRequest
-    ) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        PostUpsertRequest request = mapper.readValue(postJson, PostUpsertRequest.class);
-        return ResponseEntity.ok(postService.updatePost(id, request, images, httpRequest));
+    ) {
+        return ResponseEntity.ok(postService.updatePost(id, request, httpRequest));
     }
 
     // ─── DELETE (auth, owner only) ────────────────
