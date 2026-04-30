@@ -21,19 +21,23 @@ import java.util.regex.Pattern;
 public class QuestionDocumentImportService {
     private static final Logger log = LoggerFactory.getLogger(QuestionDocumentImportService.class);
 
-    // Regex nhận diện bắt đầu câu hỏi: Câu 101., Question 101., hoặc 101.
+    // Bắt được "21.", "Câu 21.", "Question 21.", "(21)."
     private static final Pattern QUESTION_START_PATTERN = 
-            Pattern.compile("^(?:(?:Câu|Question)\\s*)?(\\d+)\\s*[\\.:\\-\\)]\\s*(.*)$", Pattern.CASE_INSENSITIVE);
-    
-    // Regex nhận diện nhãn lựa chọn A-D
+            Pattern.compile("^\\s*(?:(?:Câu|Question)\\s*)?\\(?(\\d+)\\)?\\s*[\\.:\\-\\)]\\s*(.*)$", Pattern.CASE_INSENSITIVE);
+
+    // Nhận dạng option dạng A. / A) / A: / A- / A <text>
     private static final Pattern OPTION_PATTERN = 
             Pattern.compile("^([A-D])(?:\\s*[\\.\\):\\-]|\\s+)\\s*(.+)$", Pattern.CASE_INSENSITIVE);
-    
-    // Regex an toàn để tách các đáp án nằm cùng một dòng (ưu tiên kiểu có dấu: A. / A) / A:)
-    private static final Pattern OPTION_INLINE_SPLITTER = 
-            Pattern.compile("\\s+(?=[A-D]\\s*[\\.\\):\\-]\\s+)", Pattern.CASE_INSENSITIVE);
 
-    // Regex nhận diện nhãn đáp án xuất hiện trong run được bold
+    // Tách option inline kiểu "A. ... B. ..." hoặc phân cách bởi "|" / tab
+    private static final Pattern OPTION_INLINE_SPLITTER = 
+            Pattern.compile("\\s*(?:\\||\\t|\\s{2,})\\s*(?=[A-D](?:\\s*[\\.\\):\\-]|\\s+)\\S)", Pattern.CASE_INSENSITIVE);
+
+    // Tránh parse nhầm heading section thành option ("B. READING & WRITING")
+    private static final Pattern SECTION_HEADING_OPTION_LIKE_PATTERN =
+            Pattern.compile("^[A-D]\\.\\s*[A-Z0-9\\s&/\\-,:]+$");
+
+    // Nhận nhãn option được style ngay ở label
     private static final Pattern STYLED_OPTION_LABEL_PATTERN =
             Pattern.compile("(?<!\\S)([A-D])(?:\\s*[\\.\\):\\-]|\\s+)", Pattern.CASE_INSENSITIVE);
 
@@ -41,61 +45,85 @@ public class QuestionDocumentImportService {
         List<ParsedLine> allLines = extractLinesFromDoc(file);
         List<NormalQuestionRequest> parsedQuestions = processLinesIntoQuestions(allLines);
 
-        String filename = Optional.ofNullable(file.getOriginalFilename()).orElse("(unknown)");
-        log.info("Imported question doc '{}' -> lines={}, parsedQuestions={}", filename, allLines.size(), parsedQuestions.size());
+        log.info(
+                "Imported '{}' -> lines={}, questions={}",
+                Optional.ofNullable(file.getOriginalFilename()).orElse("(unknown)"),
+                allLines.size(),
+                parsedQuestions.size()
+        );
         return parsedQuestions;
     }
 
     private List<ParsedLine> extractLinesFromDoc(MultipartFile file) throws IOException {
         List<ParsedLine> lines = new ArrayList<>();
-        String filename = Optional.ofNullable(file.getOriginalFilename()).orElse("").toLowerCase();
+        String filename = Optional.ofNullable(file.getOriginalFilename()).orElse("").toLowerCase(Locale.ROOT);
 
         try (InputStream is = file.getInputStream()) {
             if (filename.endsWith(".docx")) {
-                XWPFDocument doc = new XWPFDocument(is);
-                for (XWPFParagraph para : doc.getParagraphs()) {
-                    String text = para.getParagraphText().trim();
-                    if (text.isEmpty()) continue;
+                XWPFDocument docx = new XWPFDocument(is);
 
-                    // Lấy các nhãn được tô đậm (đáp án đúng)
-                    Set<String> styledLabels = detectStyledOptionLabels(para);
-                    Set<String> styledTextTokens = detectStyledTextTokens(para);
-                    
-                    // Tách các đáp án inline thành các dòng riêng biệt
-                    String[] segments = OPTION_INLINE_SPLITTER.split(text);
-                    for (String seg : segments) {
-                        String cleanSeg = seg.trim();
-                        if (cleanSeg.isEmpty()) continue;
-                        
-                        String label = getOptionLabel(cleanSeg);
-                        boolean isStyled = false;
-                        if (label != null) {
-                            // Trường hợp chuẩn: run chứa chính ký tự A/B/C/D được style
-                            if (styledLabels.contains(label)) {
-                                isStyled = true;
-                            }
-                            // Trường hợp copy từ đề: chỉ nội dung đáp án được bold, không bold nhãn
-                            else if (styledLabels.isEmpty() && isOptionContentStyled(cleanSeg, styledTextTokens)) {
-                                isStyled = true;
+                for (XWPFParagraph para : docx.getParagraphs()) {
+                    processParagraph(para, lines);
+                }
+                for (XWPFTable table : docx.getTables()) {
+                    for (XWPFTableRow row : table.getRows()) {
+                        for (XWPFTableCell cell : row.getTableCells()) {
+                            for (XWPFParagraph cellPara : cell.getParagraphs()) {
+                                processParagraph(cellPara, lines);
                             }
                         }
-                        
-                        lines.add(new ParsedLine(cleanSeg, isStyled));
                     }
                 }
             } else if (filename.endsWith(".doc")) {
                 HWPFDocument doc = new HWPFDocument(is);
                 WordExtractor extractor = new WordExtractor(doc);
-                for (String text : extractor.getParagraphText()) {
-                    if (text == null || text.trim().isEmpty()) continue;
-                    String[] segments = OPTION_INLINE_SPLITTER.split(text.trim());
+                for (String paraText : extractor.getParagraphText()) {
+                    if (paraText == null) {
+                        continue;
+                    }
+                    String trimmed = paraText.trim();
+                    if (trimmed.isEmpty()) {
+                        continue;
+                    }
+                    String[] segments = OPTION_INLINE_SPLITTER.split(trimmed);
                     for (String seg : segments) {
-                        lines.add(new ParsedLine(seg.trim(), false));
+                        String clean = seg.trim();
+                        if (!clean.isEmpty()) {
+                            lines.add(new ParsedLine(clean, false));
+                        }
                     }
                 }
+            } else {
+                throw new IOException("Unsupported file type. Only .doc and .docx are accepted.");
             }
         }
         return lines;
+    }
+
+    private void processParagraph(XWPFParagraph para, List<ParsedLine> lines) {
+        String text = para.getParagraphText().trim();
+        if (text.isEmpty()) return;
+
+        Set<String> styledLabels = detectStyledOptionLabels(para);
+        Set<String> styledTextTokens = detectStyledTextTokens(para);
+        
+        // Tách các đáp án nằm cùng dòng (A. ... B. ... hoặc A | B)
+        String[] segments = OPTION_INLINE_SPLITTER.split(text);
+        for (String seg : segments) {
+            String cleanSeg = seg.trim();
+            if (cleanSeg.isEmpty()) continue;
+            
+            String label = getOptionLabel(cleanSeg);
+            boolean isStyled = false;
+            if (label != null) {
+                if (styledLabels.contains(label)) {
+                    isStyled = true;
+                } else if (styledLabels.isEmpty() && isOptionContentStyled(cleanSeg, styledTextTokens)) {
+                    isStyled = true;
+                }
+            }
+            lines.add(new ParsedLine(cleanSeg, isStyled));
+        }
     }
 
     private List<NormalQuestionRequest> processLinesIntoQuestions(List<ParsedLine> lines) {
@@ -104,8 +132,10 @@ public class QuestionDocumentImportService {
 
         for (ParsedLine pl : lines) {
             String text = pl.text;
+            if (isSkippableLine(text)) {
+                continue;
+            }
 
-            // 1. Kiểm tra nếu dòng bắt đầu bằng số thứ tự (Câu hỏi mới)
             Matcher qm = QUESTION_START_PATTERN.matcher(text);
             if (qm.matches()) {
                 if (current != null && isValidQuestion(current)) {
@@ -117,45 +147,54 @@ public class QuestionDocumentImportService {
                 continue;
             }
 
-            // 2. Kiểm tra nếu là một đáp án A, B, C, hoặc D
             Matcher om = OPTION_PATTERN.matcher(text);
             if (om.matches()) {
                 if (current != null) {
                     String label = om.group(1).toUpperCase();
-                    String content = om.group(2).trim();
-                    current.options.put(label, content);
-                    if (pl.isStyled) current.correctLabels.add(label);
+                    String optionText = om.group(2).trim();
+                    if (isSectionHeadingOptionLike(text)) {
+                        continue;
+                    }
+                    if (current.options.containsKey(label)) {
+                        log.warn(
+                                "Question no='{}' duplicated option '{}' (old='{}', new='{}') - keep old",
+                                current.questionNumber,
+                                label,
+                                current.options.get(label),
+                                optionText
+                        );
+                        continue;
+                    }
+
+                    current.options.put(label, optionText);
+                    if (pl.isStyled) {
+                        current.correctLabels.add(label);
+                    }
                 }
                 continue;
             }
 
-            // 3. Nếu là văn bản bình thường -> Nối vào nội dung câu hỏi hiện tại
             if (current != null && current.options.isEmpty()) {
                 current.questionText += " " + text;
             }
         }
 
-        // Đóng câu hỏi cuối cùng
         if (current != null && isValidQuestion(current)) {
             results.add(buildRequest(current));
         } else if (current != null) {
             logInvalidQuestion(current);
         }
-
         return results;
     }
 
     private Set<String> detectStyledOptionLabels(XWPFParagraph para) {
         Set<String> styled = new HashSet<>();
         for (XWPFRun run : para.getRuns()) {
-            // Chỉ dùng bold để tránh nhiễu do màu mặc định/theme của Word
             if (isRunAnswerStyled(run)) {
                 String text = run.getText(0);
                 if (text != null) {
                     Matcher m = STYLED_OPTION_LABEL_PATTERN.matcher(text);
-                    while (m.find()) {
-                        styled.add(m.group(1).toUpperCase());
-                    }
+                    while (m.find()) styled.add(m.group(1).toUpperCase());
                 }
             }
         }
@@ -163,7 +202,19 @@ public class QuestionDocumentImportService {
     }
 
     private boolean isRunAnswerStyled(XWPFRun run) {
-        return run.isBold();
+        return run.isBold() 
+            || isColoredRun(run) 
+            || isHighlightedRun(run) 
+            || (run.getUnderline() != UnderlinePatterns.NONE);
+    }
+
+    private boolean isColoredRun(XWPFRun run) {
+        String color = run.getColor();
+        return color != null && !color.isBlank() && !"auto".equalsIgnoreCase(color) && !"000000".equalsIgnoreCase(color);
+    }
+
+    private boolean isHighlightedRun(XWPFRun run) {
+        return run.getTextHightlightColor() != null && !"none".equalsIgnoreCase(String.valueOf(run.getTextHightlightColor()));
     }
 
     private Set<String> detectStyledTextTokens(XWPFParagraph para) {
@@ -171,12 +222,11 @@ public class QuestionDocumentImportService {
         for (XWPFRun run : para.getRuns()) {
             if (isRunAnswerStyled(run)) {
                 String runText = run.getText(0);
-                if (runText == null || runText.isBlank()) {
-                    continue;
-                }
-                String normalized = normalizeText(runText);
-                if (normalized.length() >= 2) {
-                    tokens.add(normalized);
+                if (runText != null && runText.length() >= 2) {
+                    String normalized = normalizeText(runText);
+                    if (normalized.length() >= 2) {
+                        tokens.add(normalized);
+                    }
                 }
             }
         }
@@ -184,55 +234,40 @@ public class QuestionDocumentImportService {
     }
 
     private boolean isOptionContentStyled(String optionLine, Set<String> styledTextTokens) {
-        if (styledTextTokens.isEmpty()) {
-            return false;
-        }
         Matcher m = OPTION_PATTERN.matcher(optionLine);
-        if (!m.matches()) {
-            return false;
-        }
-        String normalizedOptionContent = normalizeText(m.group(2));
-        if (normalizedOptionContent.isEmpty()) {
-            return false;
-        }
-
+        if (!m.matches()) return false;
+        String content = normalizeText(m.group(2));
         for (String token : styledTextTokens) {
-            // Chỉ so với token đủ dài để giảm false-positive
-            if (token.length() < 3) {
-                continue;
-            }
-            if (normalizedOptionContent.contains(token) || token.contains(normalizedOptionContent)) {
-                return true;
-            }
+            if (token.length() >= 3 && (content.contains(token) || token.contains(content))) return true;
         }
         return false;
     }
 
     private String normalizeText(String text) {
-        return text.toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9]+", " ")
-                .trim()
-                .replaceAll("\\s+", " ");
+        return text.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", " ").trim().replaceAll("\\s+", " ");
+    }
+
+    private boolean isSectionHeadingOptionLike(String text) {
+        return SECTION_HEADING_OPTION_LIKE_PATTERN.matcher(text).matches();
+    }
+
+    private boolean isSkippableLine(String text) {
+        String trimmed = text == null ? "" : text.trim();
+        if (trimmed.isEmpty()) {
+            return true;
+        }
+        String lower = trimmed.toLowerCase(Locale.ROOT);
+        return lower.startsWith("part ")
+                || lower.startsWith("choose the correct answer")
+                || lower.startsWith("choose a, b, c, or d")
+                || lower.startsWith("i.")
+                || lower.contains("reading & writing")
+                || lower.contains("pronunciation in the following questions");
     }
 
     private String getOptionLabel(String text) {
         Matcher m = OPTION_PATTERN.matcher(text);
         return m.matches() ? m.group(1).toUpperCase() : null;
-    }
-
-    private void logInvalidQuestion(ParsedQuestion q) {
-        String preview = q.questionText == null ? "" : q.questionText.trim();
-        if (preview.length() > 120) {
-            preview = preview.substring(0, 120) + "...";
-        }
-
-        log.warn(
-                "Skipped invalid question no='{}' optionCount={} labels={} question='{}'",
-                q.questionNumber == null ? "unknown" : q.questionNumber,
-                q.options.size(),
-                q.options.keySet(),
-                preview
-        );
     }
 
     private boolean isValidQuestion(ParsedQuestion q) {
@@ -241,11 +276,11 @@ public class QuestionDocumentImportService {
 
     private NormalQuestionRequest buildRequest(ParsedQuestion q) {
         List<AnswerRequest> answers = new ArrayList<>();
-        Set<String> normalizedCorrectLabels = normalizeCorrectLabels(q);
-        // Xuất đáp án theo đúng thứ tự A -> D
+        Set<String> correctLabels = normalizeCorrectLabels(q);
         for (String label : new String[]{"A", "B", "C", "D"}) {
             if (q.options.containsKey(label)) {
-                answers.add(new AnswerRequest(null, q.options.get(label), normalizedCorrectLabels.contains(label), label));
+                boolean isCorrect = correctLabels.contains(label);
+                answers.add(new AnswerRequest(null, q.options.get(label), isCorrect, label));
             }
         }
         return new NormalQuestionRequest(q.questionText.trim(), Question.QuestionType.MCQ, answers);
@@ -257,14 +292,27 @@ public class QuestionDocumentImportService {
         }
 
         log.warn(
-                "Question no='{}' has multiple styled answers {}. Mark none to avoid wrong auto-pick",
-                q.questionNumber == null ? "unknown" : q.questionNumber,
+                "Question no='{}' has multiple styled correct answers {} -> clear to avoid wrong import",
+                q.questionNumber,
                 q.correctLabels
         );
         return Collections.emptySet();
     }
 
-    // Helper classes
+    private void logInvalidQuestion(ParsedQuestion q) {
+        String preview = q.questionText == null ? "" : q.questionText.trim();
+        if (preview.length() > 120) {
+            preview = preview.substring(0, 120) + "...";
+        }
+        log.warn(
+                "Skip invalid question no='{}' options={} labels={} question='{}'",
+                q.questionNumber,
+                q.options.keySet(),
+                q.correctLabels,
+                preview
+        );
+    }
+
     private static class ParsedLine {
         String text;
         boolean isStyled;
@@ -274,7 +322,7 @@ public class QuestionDocumentImportService {
     private static class ParsedQuestion {
         String questionNumber;
         String questionText;
-        Map<String, String> options = new LinkedHashMap<>(); // Giữ thứ tự nạp
+        Map<String, String> options = new LinkedHashMap<>();
         Set<String> correctLabels = new HashSet<>();
         ParsedQuestion(String number, String txt) {
             this.questionNumber = number;
