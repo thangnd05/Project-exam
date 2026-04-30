@@ -178,7 +178,7 @@ export const useTestSubmission = ({
                     groups: groups.map((group) => ({
                         passage: {
                             passageType: group.passage.passageType,
-                            content: group.passage.content,
+                            content: group.passage.inputMode === 'UPLOAD' ? '' : group.passage.content,
                         },
                         questions: group.questions.map((q) => ({
                             questionText: q.questionText,
@@ -193,7 +193,7 @@ export const useTestSubmission = ({
                 };
                 formData.append('request', JSON.stringify(requestData));
                 groups.forEach((group, gIndex) => {
-                    if (group.passage.mediaFiles?.length > 0) {
+                    if (group.passage.inputMode === 'UPLOAD' && group.passage.mediaFiles?.length > 0) {
                         group.passage.mediaFiles.forEach((file, fIndex) => {
                             formData.append(`media_${gIndex}_${fIndex}`, file);
                         });

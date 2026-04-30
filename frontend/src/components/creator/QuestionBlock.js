@@ -22,6 +22,7 @@ const QuestionBlock = ({
     setPassageTypeFn,
     withMedia = true,
     minQuestions = 1,
+    radioGroupPrefix = 'q',
 }) => {
     return (
         <div className={cx('partBlock')}>
@@ -104,7 +105,7 @@ const QuestionBlock = ({
                         <div className={cx('answerItem')}>
                             <input
                                 type="radio"
-                                name={`q-${index}`}
+                                name={`${radioGroupPrefix}-${index}`}
                                 checked={ans.isCorrect}
                                 onChange={() => updateAnswerFn(index, aIndex, 'isCorrect', true)}
                             />

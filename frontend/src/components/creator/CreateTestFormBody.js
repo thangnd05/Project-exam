@@ -82,6 +82,7 @@ const CreateTestFormBody = ({
     addGroupQuestion,
     removeGroupQuestion,
     updateGroupQuestion,
+    setGroupQuestions,
     updateGroupAnswer,
     addGroupAnswer,
     removeGroupAnswer,
@@ -91,6 +92,7 @@ const CreateTestFormBody = ({
 
   const [className, setClassName] = useState('');
   const [chapterName, setChapterName] = useState('');
+  const [groupDocumentFiles, setGroupDocumentFiles] = useState({});
 
   useEffect(() => {
     if (mode === 'class' && classId) {
@@ -117,6 +119,27 @@ const CreateTestFormBody = ({
     }
   };
 
+  const normalizeParsedQuestions = (parsedQuestions = []) => (
+    parsedQuestions.map((question) => ({
+      questionText: question.questionText || '',
+      questionType: question.questionType || 'MCQ',
+      mediaFiles: [],
+      mediaUrl: '',
+      passageType: 'LISTENING',
+      answers: (question.answers && question.answers.length > 0)
+        ? question.answers.map((ans, idx) => ({
+          answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),
+          answerText: ans.answerText || "",
+          isCorrect: Boolean(ans.isCorrect),
+        }))
+        : ["A", "B", "C", "D"].map((label) => ({
+          answerLabel: label,
+          answerText: "",
+          isCorrect: false,
+        })),
+    }))
+  );
+
   const handlePreviewQuestionsFromDocument = async (fileInput = documentFile) => {
     if (!fileInput) {
       toast.warning('Vui lòng chọn file Word trước khi nạp câu hỏi.');
@@ -137,24 +160,7 @@ const CreateTestFormBody = ({
         return;
       }
 
-      const normalizedQuestions = parsedQuestions.map((question) => ({
-        questionText: question.questionText || '',
-        questionType: question.questionType || 'MCQ',
-        mediaFiles: [],
-        mediaUrl: '',
-        passageType: 'LISTENING',
-        answers: (question.answers && question.answers.length > 0)
-          ? question.answers.map((ans, idx) => ({
-            answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),
-            answerText: ans.answerText || "",
-            isCorrect: Boolean(ans.isCorrect),
-          }))
-          : ["A", "B", "C", "D"].map((label) => ({
-            answerLabel: label,
-            answerText: "",
-            isCorrect: false,
-          })),
-      }));
+      const normalizedQuestions = normalizeParsedQuestions(parsedQuestions);
 
       setQuestions(normalizedQuestions);
       setDocumentFile(null);
@@ -164,6 +170,47 @@ const CreateTestFormBody = ({
         error.response?.data?.detail ||
         error.response?.data?.message ||
         'Không thể nạp câu hỏi từ Word.';
+      toast.error(message);
+    }
+  };
+
+  const handleGroupDocumentFileChange = (gIndex, event) => {
+    const selectedFile = event.target.files?.[0] || null;
+    setGroupDocumentFiles((prev) => ({ ...prev, [gIndex]: selectedFile }));
+    if (selectedFile) {
+      handlePreviewGroupQuestionsFromDocument(gIndex, selectedFile);
+    }
+  };
+
+  const handlePreviewGroupQuestionsFromDocument = async (gIndex, fileInput = groupDocumentFiles[gIndex]) => {
+    if (!fileInput) {
+      toast.warning('Vui lòng chọn file Word trước khi nạp nhóm câu hỏi.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', fileInput);
+
+      const response = await axios.post('/api/questions/preview/document', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const parsedQuestions = Array.isArray(response.data) ? response.data : [];
+      if (parsedQuestions.length === 0) {
+        toast.warning('Không tìm thấy câu hỏi hợp lệ trong file Word.');
+        return;
+      }
+
+      const normalizedQuestions = normalizeParsedQuestions(parsedQuestions);
+      setGroupQuestions(gIndex, normalizedQuestions);
+      setGroupDocumentFiles((prev) => ({ ...prev, [gIndex]: null }));
+      toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi cho nhóm ${gIndex + 1}.`);
+    } catch (error) {
+      const message =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        'Không thể nạp nhóm câu hỏi từ Word.';
       toast.error(message);
     }
   };
@@ -334,6 +381,7 @@ const CreateTestFormBody = ({
               key={i}
               question={q}
               index={i}
+              radioGroupPrefix="single-question"
               removeQuestionFn={removeQuestion}
               updateQuestionTextFn={updateQuestionText}
               updateQuestionFieldFn={updateQuestionField}
@@ -366,32 +414,73 @@ const CreateTestFormBody = ({
               </div>
               <div className={cx('passageSection')}>
                 <div className={cx('formGroupModern')}>
-                  <label>Nội dung Passage (tùy chọn)</label>
-                  <textarea className={cx('inputModern')} rows={2} value={group.passage.content} onChange={(e) => updatePassage(gIndex, 'content', e.target.value)} placeholder="Nhập nội dung văn bản nếu có..." />
-                </div>
-                <div className={cx('formGroupModern')}>
-                  <label>Phương tiện</label>
-                  <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    <input type="file" multiple accept={ACCEPT_BY_TYPE.MEDIA} className={cx('inputModern')} style={{ width: 'auto' }} onChange={(e) => { addGroupMediaFiles(gIndex, e.target.files); e.target.value = ''; }} />
+                  <label className="mb-2 d-block">Nguồn Passage</label>
+                  <div className="d-flex align-items-center gap-4 mb-2">
+                    <label className="d-flex align-items-center gap-2 mb-0">
+                      <input
+                        type="radio"
+                        name={`passage-input-mode-${gIndex}`}
+                        checked={(group.passage.inputMode || 'TEXT') === 'TEXT'}
+                        onChange={() => updatePassage(gIndex, 'inputMode', 'TEXT')}
+                      />
+                      <span>Nội dung nhập</span>
+                    </label>
+                    <label className="d-flex align-items-center gap-2 mb-0">
+                      <input
+                        type="radio"
+                        name={`passage-input-mode-${gIndex}`}
+                        checked={(group.passage.inputMode || 'TEXT') === 'UPLOAD'}
+                        onChange={() => updatePassage(gIndex, 'inputMode', 'UPLOAD')}
+                      />
+                      <span>Upload phương tiện</span>
+                    </label>
                   </div>
-                  {group.passage.mediaFiles?.length > 0 && (
-                    <ul className="list-unstyled mb-0 mt-2">
-                      {group.passage.mediaFiles.map((file, fIdx) => (
-                        <li key={fIdx} className="d-flex align-items-center gap-2 mb-1">
-                          <span className="small text-secondary">{file.name}</span>
-                          <button type="button" className="btn btn-sm btn-outline-danger p-0 px-1" onClick={() => removeGroupMediaFile(gIndex, fIdx)}><Trash size={14} /></button>
-                        </li>
-                      ))}
-                    </ul>
+                  {(group.passage.inputMode || 'TEXT') === 'TEXT' ? (
+                    <>
+                      <label>Nội dung Passage (tùy chọn)</label>
+                      <textarea className={cx('inputModern')} rows={2} value={group.passage.content} onChange={(e) => updatePassage(gIndex, 'content', e.target.value)} placeholder="Nhập nội dung văn bản nếu có..." />
+                    </>
+                  ) : (
+                    <>
+                      <label>Phương tiện</label>
+                      <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <input type="file" multiple accept={ACCEPT_BY_TYPE.MEDIA} className={cx('inputModern')} style={{ width: 'auto' }} onChange={(e) => { addGroupMediaFiles(gIndex, e.target.files); e.target.value = ''; }} />
+                      </div>
+                      {group.passage.mediaFiles?.length > 0 && (
+                        <ul className="list-unstyled mb-0 mt-2">
+                          {group.passage.mediaFiles.map((file, fIdx) => (
+                            <li key={fIdx} className="d-flex align-items-center gap-2 mb-1">
+                              <span className="small text-secondary">{file.name}</span>
+                              <button type="button" className="btn btn-sm btn-outline-danger p-0 px-1" onClick={() => removeGroupMediaFile(gIndex, fIdx)}><Trash size={14} /></button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
               <div className={cx('questionsSection')}>
+                <div className={cx('formGroupModern')}>
+                  <label>Upload file Word để nạp câu hỏi cho nhóm này (DOC/DOCX)</label>
+                  <input
+                    type="file"
+                    accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    className={cx('inputModern')}
+                    onChange={(e) => handleGroupDocumentFileChange(gIndex, e)}
+                  />
+                  {groupDocumentFiles[gIndex] && (
+                    <small className="text-muted d-block mt-2">
+                      Đang nạp cho nhóm {gIndex + 1}: {groupDocumentFiles[gIndex].name}
+                    </small>
+                  )}
+                </div>
                 {group.questions.map((q, qIndex) => (
                   <QuestionBlock
                     key={qIndex}
                     question={q}
                     index={qIndex}
+                    radioGroupPrefix={`group-${gIndex}-question`}
                     removeQuestionFn={(i) => removeGroupQuestion(gIndex, i)}
                     updateQuestionTextFn={(i, v) => updateGroupQuestion(gIndex, i, 'questionText', v)}
                     updateAnswerFn={(i, aIndex, field, value) => updateGroupAnswer(gIndex, i, aIndex, field, value)}

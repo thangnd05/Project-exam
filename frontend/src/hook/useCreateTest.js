@@ -33,6 +33,7 @@ const createInitialGroup = () => ({
     content: '',
     passageType: 'READING',
     mediaFiles: [],
+    inputMode: 'TEXT',
   },
   questions: [JSON.parse(JSON.stringify(emptyQuestion))],
 });
@@ -223,6 +224,13 @@ export const useCreateTest = ({
     const newGroups = [...groups];
     newGroups[gIndex].passage = { ...newGroups[gIndex].passage, [field]: value };
     if (field === 'passageType') newGroups[gIndex].passage.mediaFiles = [];
+    if (field === 'inputMode') {
+      if (value === 'TEXT') {
+        newGroups[gIndex].passage.mediaFiles = [];
+      } else if (value === 'UPLOAD') {
+        newGroups[gIndex].passage.content = '';
+      }
+    }
     setGroups(newGroups);
   };
 
@@ -247,6 +255,7 @@ export const useCreateTest = ({
     }
 
     newGroups[gIndex].passage.mediaFiles = allFiles;
+    newGroups[gIndex].passage.inputMode = 'UPLOAD';
     setGroups(newGroups);
   };
 
@@ -273,6 +282,15 @@ export const useCreateTest = ({
   const updateGroupQuestion = (gIndex, qIndex, field, value) => {
     const newGroups = [...groups];
     newGroups[gIndex].questions[qIndex] = { ...newGroups[gIndex].questions[qIndex], [field]: value };
+    setGroups(newGroups);
+  };
+
+  const setGroupQuestions = (gIndex, nextQuestions) => {
+    const normalized = Array.isArray(nextQuestions) && nextQuestions.length > 0
+      ? nextQuestions
+      : [JSON.parse(JSON.stringify(emptyQuestion))];
+    const newGroups = [...groups];
+    newGroups[gIndex].questions = normalized;
     setGroups(newGroups);
   };
 
@@ -358,6 +376,7 @@ export const useCreateTest = ({
     addGroupQuestion,
     removeGroupQuestion,
     updateGroupQuestion,
+    setGroupQuestions,
     updateGroupAnswer,
     addGroupAnswer,
     removeGroupAnswer,

@@ -81,17 +81,7 @@ public class QuestionDocumentImportService {
                     if (paraText == null) {
                         continue;
                     }
-                    String trimmed = paraText.trim();
-                    if (trimmed.isEmpty()) {
-                        continue;
-                    }
-                    String[] segments = OPTION_INLINE_SPLITTER.split(trimmed);
-                    for (String seg : segments) {
-                        String clean = seg.trim();
-                        if (!clean.isEmpty()) {
-                            lines.add(new ParsedLine(clean, false));
-                        }
-                    }
+                    appendPlainLines(paraText, lines);
                 }
             } else {
                 throw new IOException("Unsupported file type. Only .doc and .docx are accepted.");
@@ -101,28 +91,54 @@ public class QuestionDocumentImportService {
     }
 
     private void processParagraph(XWPFParagraph para, List<ParsedLine> lines) {
-        String text = para.getParagraphText().trim();
-        if (text.isEmpty()) return;
+        String text = para.getParagraphText();
+        if (text == null || text.trim().isEmpty()) return;
 
         Set<String> styledLabels = detectStyledOptionLabels(para);
         Set<String> styledTextTokens = detectStyledTextTokens(para);
-        
-        // Tách các đáp án nằm cùng dòng (A. ... B. ... hoặc A | B)
-        String[] segments = OPTION_INLINE_SPLITTER.split(text);
-        for (String seg : segments) {
-            String cleanSeg = seg.trim();
-            if (cleanSeg.isEmpty()) continue;
-            
-            String label = getOptionLabel(cleanSeg);
-            boolean isStyled = false;
-            if (label != null) {
-                if (styledLabels.contains(label)) {
-                    isStyled = true;
-                } else if (styledLabels.isEmpty() && isOptionContentStyled(cleanSeg, styledTextTokens)) {
-                    isStyled = true;
+
+        // Tách theo line break trước, rồi mới tách inline option để hỗ trợ nội dung copy/paste trong cùng paragraph.
+        String[] logicalLines = text.split("\\R+");
+        for (String logicalLine : logicalLines) {
+            String cleanLine = logicalLine == null ? "" : logicalLine.trim();
+            if (cleanLine.isEmpty()) continue;
+
+            String[] segments = OPTION_INLINE_SPLITTER.split(cleanLine);
+            for (String seg : segments) {
+                String cleanSeg = seg.trim();
+                if (cleanSeg.isEmpty()) continue;
+
+                String label = getOptionLabel(cleanSeg);
+                boolean isStyled = false;
+                if (label != null) {
+                    if (styledLabels.contains(label)) {
+                        isStyled = true;
+                    } else if (styledLabels.isEmpty() && isOptionContentStyled(cleanSeg, styledTextTokens)) {
+                        isStyled = true;
+                    }
+                }
+                lines.add(new ParsedLine(cleanSeg, isStyled));
+            }
+        }
+    }
+
+    private void appendPlainLines(String text, List<ParsedLine> lines) {
+        if (text == null) {
+            return;
+        }
+        String[] logicalLines = text.split("\\R+");
+        for (String logicalLine : logicalLines) {
+            String cleanLine = logicalLine == null ? "" : logicalLine.trim();
+            if (cleanLine.isEmpty()) {
+                continue;
+            }
+            String[] segments = OPTION_INLINE_SPLITTER.split(cleanLine);
+            for (String seg : segments) {
+                String clean = seg.trim();
+                if (!clean.isEmpty()) {
+                    lines.add(new ParsedLine(clean, false));
                 }
             }
-            lines.add(new ParsedLine(cleanSeg, isStyled));
         }
     }
 
@@ -271,7 +287,7 @@ public class QuestionDocumentImportService {
     }
 
     private boolean isValidQuestion(ParsedQuestion q) {
-        return !q.options.isEmpty() && !q.questionText.trim().isEmpty();
+        return q.options.size() >= 2;
     }
 
     private NormalQuestionRequest buildRequest(ParsedQuestion q) {
@@ -283,7 +299,8 @@ public class QuestionDocumentImportService {
                 answers.add(new AnswerRequest(null, q.options.get(label), isCorrect, label));
             }
         }
-        return new NormalQuestionRequest(q.questionText.trim(), Question.QuestionType.MCQ, answers);
+        String questionText = q.questionText == null ? "" : q.questionText.trim();
+        return new NormalQuestionRequest(questionText, Question.QuestionType.MCQ, answers);
     }
 
     private Set<String> normalizeCorrectLabels(ParsedQuestion q) {
