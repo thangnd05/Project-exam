@@ -163,6 +163,27 @@
   }
 }
 
+.copyToast {
+  position: absolute;
+  left: 56px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--text-color);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+
+  @media (max-width: 1200px) {
+    top: -38px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
 .actionBtn {
   display: flex;
   flex-direction: column;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {
-  Heart, Bookmark, MessageCircle, Share2, ChevronRight, Copy, ThumbsUp, User
+  Heart, Bookmark, MessageCircle, ChevronRight, Copy, ThumbsUp, User
 } from 'lucide-react';
 import { Button } from 'react-bootstrap';
 import Slider from 'react-slick';
@@ -116,9 +116,37 @@ function PostDetailPage() {
     ]
   };
 
-  const handleCopyCode = () => {
+  const copyPostLinkToClipboard = async () => {
+    const postUrl = window.location.href;
+
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(postUrl);
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = postUrl;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  };
+
+  const showCopySuccess = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyPostLink = async () => {
+    try {
+      await copyPostLinkToClipboard();
+      showCopySuccess();
+    } catch (error) {
+      console.error('Failed to copy post link:', error);
+    }
   };
 
   const handleSubmitComment = async (e) => {
@@ -337,12 +365,10 @@ function PostDetailPage() {
             <div className={cx('iconCircle')}><MessageCircle size={20} /></div>
             <span className={cx('count')}>{post.commentCount || 0}</span>
           </button>
-          <button className={cx('actionBtn')}>
-            <div className={cx('iconCircle')}><Share2 size={20} /></div>
-          </button>
-          <button className={cx('actionBtn')}>
+          <button className={cx('actionBtn', { active: copied })} onClick={handleCopyPostLink}>
             <div className={cx('iconCircle')}><Copy size={20} /></div>
           </button>
+          {copied && <span className={cx('copyToast')}>Đã sao chép</span>}
         </div>
 
         {/* Breadcrumbs */}
