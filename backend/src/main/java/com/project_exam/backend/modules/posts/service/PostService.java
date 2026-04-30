@@ -105,7 +105,7 @@ public class PostService {
         String authorAvatar = null;
         Optional<User> authorOpt = userRepository.findById(post.getUserId());
         if (authorOpt.isPresent()) {
-            authorName = authorOpt.get().getFullName();
+            authorName = authorOpt.get().getUserName();
             authorAvatar = authorOpt.get().getAvatarUrl();
         }
 
@@ -142,7 +142,7 @@ public class PostService {
         String authorAvatar = null;
         Optional<User> authorOpt = userRepository.findById(post.getUserId());
         if (authorOpt.isPresent()) {
-            authorName = authorOpt.get().getFullName();
+            authorName = authorOpt.get().getUserName();
             authorAvatar = authorOpt.get().getAvatarUrl();
         }
 

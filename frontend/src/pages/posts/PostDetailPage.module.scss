@@ -305,6 +305,7 @@
     font-weight: 700;
     margin-bottom: 32px;
   }
+
 }
 
 .commentForm {
@@ -372,12 +373,13 @@
 
   .contentBox {
     flex: 1;
+    min-width: 0;
 
     .commentMeta {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       margin-bottom: 8px;
+      gap: 8px;
 
       .authorName {
         font-weight: 700;
@@ -393,10 +395,6 @@
         }
       }
 
-      .time {
-        font-size: 1.2rem;
-        color: var(--text-secondary);
-      }
     }
 
     .text {
@@ -409,6 +407,8 @@
     .actions {
       display: flex;
       gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
 
       button {
         background: none;
@@ -425,6 +425,11 @@
           color: var(--primary);
         }
       }
+
+      .time {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+      }
     }
   }
 }
@@ -432,12 +437,41 @@
 .commentNode {
   margin-bottom: 24px;
   width: 100%;
+  min-width: 0;
 }
 
 .subComments {
   margin-top: 16px;
   border-left: 2px solid var(--border-color);
   // Indentation is handled via inline style marginLeft for recursion
+}
+
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .commentItem {
+    gap: 10px;
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+    }
+
+    .contentBox {
+      .commentMeta {
+        flex-wrap: wrap;
+        gap: 4px 12px;
+      }
+    }
+  }
+
+  .subComments {
+    border-left-width: 1px;
+  }
 }
 
 /* --- Related Posts Slider --- */

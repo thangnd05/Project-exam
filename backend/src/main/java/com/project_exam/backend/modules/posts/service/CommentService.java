@@ -34,7 +34,7 @@ public class CommentService {
         
         var authorOpt = userRepository.findById(c.getUserId());
         if (authorOpt.isPresent()) {
-            authorName = authorOpt.get().getFullName();
+            authorName = authorOpt.get().getUserName();
             authorAvatar = authorOpt.get().getAvatarUrl();
         }
 

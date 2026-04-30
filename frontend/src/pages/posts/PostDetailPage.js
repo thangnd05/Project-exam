@@ -14,6 +14,7 @@ import styles from './PostDetailPage.module.scss';
 import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, getReacts, toggleReact } from '~/api/postApi';
 
 const cx = classNames.bind(styles);
+const MAX_REPLY_DEPTH = 4;
 
 function PostDetailPage() {
   const { postId } = useParams();
@@ -30,6 +31,7 @@ function PostDetailPage() {
   const [editContent, setEditContent] = useState('');
   const [replyingToId, setReplyingToId] = useState(null);
   const [replyContent, setReplyContent] = useState('');
+  const [replyIndentPx, setReplyIndentPx] = useState(40);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,6 +67,20 @@ function PostDetailPage() {
     };
     fetchPostData();
   }, [postId]);
+
+  useEffect(() => {
+    const computeIndent = () => {
+      if (window.innerWidth <= 576) return 12;
+      if (window.innerWidth <= 768) return 18;
+      if (window.innerWidth <= 992) return 28;
+      return 40;
+    };
+
+    const updateIndent = () => setReplyIndentPx(computeIndent());
+    updateIndent();
+    window.addEventListener('resize', updateIndent);
+    return () => window.removeEventListener('resize', updateIndent);
+  }, []);
 
 
   const sliderSettings = {
@@ -156,8 +172,12 @@ function PostDetailPage() {
   };
 
   const renderComment = (comment, depth = 0) => {
+    const visualDepth = Math.min(depth, MAX_REPLY_DEPTH);
+    const indentStep = visualDepth > 0 ? `${visualDepth * replyIndentPx}px` : '0px';
+    const mentionName = comment.authorName || 'user';
+
     return (
-      <div key={comment.id} className={cx('commentNode')} style={{ marginLeft: depth > 0 ? '40px' : '0' }}>
+      <div key={comment.id} className={cx('commentNode')} style={{ marginLeft: indentStep }}>
         <div className={cx('commentItem')}>
           <img 
             src={comment.authorAvatar || 'https://i.pravatar.cc/150?img=12'} 
@@ -168,7 +188,6 @@ function PostDetailPage() {
             <div className={cx('commentMeta')}>
               <span className={cx('authorName')}>{comment.authorName}</span>
               {comment.userId === post.userId && <span className={cx('opTag')}>Tác giả</span>}
-              <span className={cx('time')}>{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
             </div>
             
             {editingCommentId === comment.id ? (
@@ -190,6 +209,7 @@ function PostDetailPage() {
                 setReplyingToId(comment.id);
                 setReplyContent('');
               }}>Trả lời</button>
+              <span className={cx('time')}>{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
               {user && user.id === comment.userId && (
                 <>
                   <button onClick={() => {
@@ -205,7 +225,7 @@ function PostDetailPage() {
               <div className="mt-3">
                 <textarea 
                   className="form-control mb-2" 
-                  placeholder="Viết câu trả lời..."
+                  placeholder={`Viết câu trả lời cho ${mentionName}...`}
                   value={replyContent} 
                   onChange={(e) => setReplyContent(e.target.value)}
                 />
