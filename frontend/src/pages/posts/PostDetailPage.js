@@ -32,6 +32,7 @@ function PostDetailPage() {
   const [replyingToId, setReplyingToId] = useState(null);
   const [replyContent, setReplyContent] = useState('');
   const [replyIndentPx, setReplyIndentPx] = useState(40);
+  const [expandedReplies, setExpandedReplies] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,6 +82,10 @@ function PostDetailPage() {
     window.addEventListener('resize', updateIndent);
     return () => window.removeEventListener('resize', updateIndent);
   }, []);
+
+  useEffect(() => {
+    setExpandedReplies({});
+  }, [comments]);
 
 
   const sliderSettings = {
@@ -171,10 +176,18 @@ function PostDetailPage() {
     }
   };
 
+  const countNestedReplies = (comment) => {
+    if (!comment?.replies || comment.replies.length === 0) return 0;
+    return comment.replies.reduce((total, reply) => total + 1 + countNestedReplies(reply), 0);
+  };
+
   const renderComment = (comment, depth = 0) => {
-    const visualDepth = Math.min(depth, MAX_REPLY_DEPTH);
-    const indentStep = visualDepth > 0 ? `${visualDepth * replyIndentPx}px` : '0px';
+    const indentStep = depth > 0 && depth <= MAX_REPLY_DEPTH ? `${replyIndentPx}px` : '0px';
     const mentionName = comment.authorName || 'user';
+    const hasReplies = comment.replies && comment.replies.length > 0;
+    const nestedReplyCount = countNestedReplies(comment);
+    const shouldCollapsible = depth === 0 && nestedReplyCount > 3;
+    const isExpanded = shouldCollapsible ? !!expandedReplies[comment.id] : true;
 
     return (
       <div key={comment.id} className={cx('commentNode')} style={{ marginLeft: indentStep }}>
@@ -235,10 +248,36 @@ function PostDetailPage() {
             )}
           </div>
         </div>
-        {comment.replies && comment.replies.length > 0 && (
-          <div className={cx('subComments')}>
-            {comment.replies.map(reply => renderComment(reply, depth + 1))}
-          </div>
+        {shouldCollapsible && !isExpanded && (
+          <button
+            type="button"
+            className={cx('toggleRepliesBtn')}
+            onClick={() => setExpandedReplies(prev => ({ ...prev, [comment.id]: true }))}
+          >
+            Xem tất cả {nestedReplyCount} phản hồi
+          </button>
+        )}
+
+        {hasReplies && isExpanded && (
+          <>
+            <div className={cx('subComments')}>
+              {comment.replies.map(reply =>
+                renderComment(
+                  reply,
+                  depth < MAX_REPLY_DEPTH ? depth + 1 : depth
+                )
+              )}
+            </div>
+            {shouldCollapsible && isExpanded && (
+              <button
+                type="button"
+                className={cx('toggleRepliesBtn')}
+                onClick={() => setExpandedReplies(prev => ({ ...prev, [comment.id]: false }))}
+              >
+                Ẩn bớt phản hồi
+              </button>
+            )}
+          </>
         )}
       </div>
     );
