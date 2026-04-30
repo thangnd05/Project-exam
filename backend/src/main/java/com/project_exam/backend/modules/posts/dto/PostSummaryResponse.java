@@ -21,4 +21,5 @@ public class PostSummaryResponse {
     private List<CategoryResponse> categories;
     private long commentCount;
     private long totalReacts;
+    private long viewCount;
 }

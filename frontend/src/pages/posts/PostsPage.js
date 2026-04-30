@@ -213,7 +213,7 @@ function PostsPage() {
                     <span>{post.authorName}</span>
                   </div>
                   <div className={cx('stats')}>
-                    <span><Eye size={14} /> 0</span>
+                    <span><Eye size={14} /> {post.viewCount || 0}</span>
                     <span><Heart size={14} /> {post.totalReacts || 0}</span>
                     <span><MessageCircle size={14} /> {post.commentCount || 0}</span>
                   </div>

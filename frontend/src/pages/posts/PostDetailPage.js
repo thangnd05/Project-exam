@@ -22,6 +22,8 @@ function PostDetailPage() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isReacting, setIsReacting] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [copied, setCopied] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -46,10 +48,9 @@ function PostDetailPage() {
         const commentsData = await getComments(postId);
         setComments(commentsData || []);
 
-        // Check if liked
-        if (data.currentUserReactType) {
-          setLiked(true);
-        }
+        // Sync like state from backend
+        setLiked(data.currentUserReactType === 'LIKE');
+        setLikeCount(data.reactCounts?.LIKE || 0);
 
         // Fetch related posts (same category)
         if (data.categories && data.categories.length > 0) {
@@ -176,6 +177,33 @@ function PostDetailPage() {
     }
   };
 
+  const handleToggleLike = async () => {
+    if (!user) {
+      alert('Vui lòng đăng nhập để thả tim');
+      return;
+    }
+    if (isReacting) return;
+
+    const prevLiked = liked;
+    const prevLikeCount = likeCount;
+
+    setLiked(!prevLiked);
+    setLikeCount(prevLiked ? Math.max(0, prevLikeCount - 1) : prevLikeCount + 1);
+    setIsReacting(true);
+
+    try {
+      const summary = await toggleReact(postId, { type: 'LIKE' });
+      setLiked(summary.currentUserReactType === 'LIKE');
+      setLikeCount(summary.counts?.LIKE || 0);
+    } catch (error) {
+      setLiked(prevLiked);
+      setLikeCount(prevLikeCount);
+      console.error('Failed to toggle like:', error);
+    } finally {
+      setIsReacting(false);
+    }
+  };
+
   const countNestedReplies = (comment) => {
     if (!comment?.replies || comment.replies.length === 0) return 0;
     return comment.replies.reduce((total, reply) => total + 1 + countNestedReplies(reply), 0);
@@ -293,9 +321,13 @@ function PostDetailPage() {
 
         {/* Floating Actions Sidebar */}
         <div className={cx('floatingBar')}>
-          <button className={cx('actionBtn', { active: liked })} onClick={() => setLiked(!liked)}>
+          <button
+            className={cx('actionBtn', { active: liked })}
+            onClick={handleToggleLike}
+            disabled={isReacting}
+          >
             <div className={cx('iconCircle')}><Heart size={20} fill={liked ? 'currentColor' : 'none'} /></div>
-            <span className={cx('count')}>{Object.values(post.reactCounts || {}).reduce((a, b) => a + b, 0)}</span>
+            <span className={cx('count')}>{likeCount}</span>
           </button>
           <button className={cx('actionBtn', { active: bookmarked })} onClick={() => setBookmarked(!bookmarked)}>
             <div className={cx('iconCircle')}><Bookmark size={20} fill={bookmarked ? 'currentColor' : 'none'} /></div>

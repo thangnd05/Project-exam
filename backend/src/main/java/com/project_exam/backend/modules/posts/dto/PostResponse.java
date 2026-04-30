@@ -27,6 +27,7 @@ public class PostResponse {
     private Map<String, Long> reactCounts; // {"LIKE": 5, "LOVE": 3, ...}
     private String currentUserReactType;   // react type của current user (null nếu chưa react)
     private long commentCount;
+    private long viewCount;
 
     @Data
     @Builder

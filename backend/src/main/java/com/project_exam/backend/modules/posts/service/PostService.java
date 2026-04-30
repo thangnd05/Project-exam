@@ -48,6 +48,7 @@ public class PostService {
     private final CloudinaryService cloudinaryService;
     private final AuthUtils authUtils;
     private final UserRepository userRepository;
+    private final PostViewThrottleService postViewThrottleService;
 
     // ─────────────────────────────────────────────
     // MAPPING
@@ -124,6 +125,7 @@ public class PostService {
                 .reactCounts(reactCounts)
                 .currentUserReactType(currentUserReactType)
                 .commentCount(commentCount)
+                .viewCount(post.getViewCount() == null ? 0L : post.getViewCount())
                 .build();
     }
 
@@ -158,6 +160,7 @@ public class PostService {
                 .categories(categories)
                 .commentCount(commentCount)
                 .totalReacts(totalReacts)
+                .viewCount(post.getViewCount() == null ? 0L : post.getViewCount())
                 .build();
     }
 
@@ -228,10 +231,19 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @Transactional
     public PostResponse getPostById(String id, HttpServletRequest httpRequest) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
         String currentUserId = tryGetUserId(httpRequest);
+
+        boolean shouldCountView = postViewThrottleService.shouldCountView(id, currentUserId, httpRequest);
+        if (shouldCountView) {
+            long currentViews = post.getViewCount() == null ? 0L : post.getViewCount();
+            post.setViewCount(currentViews + 1);
+            postRepository.save(post);
+        }
+
         return toFullResponse(post, currentUserId);
     }
 
