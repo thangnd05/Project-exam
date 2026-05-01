@@ -353,6 +353,7 @@ export const useCreateTest = ({
     questions,
     setQuestions,
     groups,
+    setGroups,
     documentFile,
     setDocumentFile,
     loading,

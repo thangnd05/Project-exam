@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.exam.service;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.NormalQuestionRequest;
+import com.project_exam.backend.modules.assessment.exam.dto.PassageQuestionGroup;
+import com.project_exam.backend.modules.assessment.exam.dto.PassageRequest;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.xwpf.usermodel.*;
@@ -118,6 +120,11 @@ public class QuestionDocumentImportService {
     private static final Pattern EXAM_CODE_PATTERN =
             Pattern.compile("^\\s*m[aã]\\s*đ[ềe]\\s*\\d+\\s*$", Pattern.CASE_INSENSITIVE);
 
+    private static final Pattern PASSAGE_START_PATTERN = Pattern.compile(
+            "^\\s*(?:Passage|Bài\\s*đọc)\\s*(\\d+)?\\s*[:\\.\\-]?\\s*(.*)$",
+            Pattern.CASE_INSENSITIVE
+    );
+
     // =========================================================================
     // ENTRY POINT
     // =========================================================================
@@ -133,6 +140,19 @@ public class QuestionDocumentImportService {
                 parsedQuestions.size()
         );
         return parsedQuestions;
+    }
+
+    public List<PassageQuestionGroup> parsePassageQuestionsFromDocument(MultipartFile file) throws IOException {
+        List<ParsedLine> allLines = extractLinesFromDoc(file);
+        List<PassageQuestionGroup> parsedGroups = processLinesIntoPassageGroups(allLines);
+
+        log.info(
+                "Imported Passage Document '{}' -> lines={}, groups={}",
+                Optional.ofNullable(file.getOriginalFilename()).orElse("(unknown)"),
+                allLines.size(),
+                parsedGroups.size()
+        );
+        return parsedGroups;
     }
 
     // =========================================================================
@@ -418,6 +438,146 @@ public class QuestionDocumentImportService {
 
         flushCurrent(current, results);
         return results;
+    }
+
+    private void flushCurrent(ParsedQuestion current, PassageQuestionGroup currentGroup) {
+        if (current == null || currentGroup == null) {
+            return;
+        }
+        if (isValidQuestion(current)) {
+            currentGroup.getQuestions().add(buildRequest(current));
+        } else {
+            logInvalidQuestion(current);
+        }
+    }
+
+    private List<PassageQuestionGroup> processLinesIntoPassageGroups(List<ParsedLine> lines) {
+        List<PassageQuestionGroup> groups = new ArrayList<>();
+        PassageQuestionGroup currentGroup = null;
+        ParsedQuestion currentQuestion = null;
+        String lastLabel = null;
+        StringBuilder pendingText = new StringBuilder();
+
+        boolean inPassageHeader = false;
+
+        for (ParsedLine pl : lines) {
+            String text = pl.text;
+            if (isSkippableLine(text)) {
+                continue;
+            }
+
+            Matcher pm = PASSAGE_START_PATTERN.matcher(text);
+            if (pm.matches()) {
+                flushCurrent(currentQuestion, currentGroup);
+                if (currentGroup != null && !currentGroup.getQuestions().isEmpty()) {
+                    groups.add(currentGroup);
+                }
+
+                currentGroup = new PassageQuestionGroup();
+                PassageRequest pr = new PassageRequest();
+                pr.setPassageType(com.project_exam.backend.modules.assessment.exam.domain.Passage.PassageType.READING);
+                pr.setContent("");
+                currentGroup.setPassage(pr);
+                currentGroup.setQuestions(new ArrayList<>());
+                
+                pendingText.setLength(0);
+                String extraText = pm.group(2);
+                if (extraText != null && !extraText.trim().isEmpty()) {
+                    pendingText.append(extraText.trim());
+                }
+                inPassageHeader = true;
+                currentQuestion = null;
+                lastLabel = null;
+                continue;
+            }
+
+            Matcher qm = QUESTION_START_PATTERN.matcher(text);
+            if (qm.matches()) {
+                if (inPassageHeader && currentGroup != null) {
+                    currentGroup.getPassage().setContent(pendingText.toString().trim());
+                    inPassageHeader = false;
+                    pendingText.setLength(0);
+                } else {
+                    flushCurrent(currentQuestion, currentGroup);
+                    pendingText.setLength(0);
+                }
+
+                if (currentGroup == null) {
+                    currentGroup = new PassageQuestionGroup();
+                    PassageRequest pr = new PassageRequest();
+                    pr.setPassageType(com.project_exam.backend.modules.assessment.exam.domain.Passage.PassageType.READING);
+                    pr.setContent("");
+                    currentGroup.setPassage(pr);
+                    currentGroup.setQuestions(new ArrayList<>());
+                }
+
+                currentQuestion = new ParsedQuestion(qm.group(1), extractQuestionText(qm));
+                lastLabel = null;
+                continue;
+            }
+
+            Matcher om = OPTION_PATTERN.matcher(text);
+            if (om.matches() && currentQuestion != null && !inPassageHeader && !isSectionHeadingOptionLike(text)) {
+                ParsedOption parsedOption = parseOptionText(om.group(2));
+                if (isLikelyOptionLine(text, parsedOption.optionText)) {
+                    String label = om.group(1).toUpperCase(Locale.ROOT);
+
+                    if (currentQuestion.options.containsKey(label)) {
+                        boolean nearlyComplete = currentQuestion.options.size() >= ALLOWED_LABELS.size() - 1;
+                        if (nearlyComplete) {
+                            String prevNumber = currentQuestion.questionNumber;
+                            flushCurrent(currentQuestion, currentGroup);
+                            String inferredText = pendingText.toString().trim();
+                            pendingText.setLength(0);
+                            currentQuestion = new ParsedQuestion("(after_" + prevNumber + ")", inferredText);
+                            lastLabel = null;
+                        } else {
+                            String oldValue = currentQuestion.options.get(label);
+                            currentQuestion.questionText = appendLine(
+                                    currentQuestion.questionText,
+                                    oldValue,
+                                    " "
+                            );
+                            currentQuestion.options.remove(label);
+                            currentQuestion.correctLabels.remove(label);
+                        }
+                    }
+
+                    currentQuestion.options.put(label, parsedOption.optionText);
+                    lastLabel = label;
+                    if (pl.isStyled || parsedOption.isMarkedCorrect) {
+                        currentQuestion.correctLabels.add(label);
+                    }
+                    continue;
+                }
+            }
+
+            if (inPassageHeader) {
+                if (pendingText.length() > 0) {
+                    pendingText.append("\n");
+                }
+                pendingText.append(text);
+            } else if (currentQuestion != null) {
+                if (currentQuestion.options.isEmpty()) {
+                    currentQuestion.questionText = appendLine(currentQuestion.questionText, text, "\n");
+                } else if (currentQuestion.options.size() >= ALLOWED_LABELS.size()) {
+                    if (pendingText.length() > 0) {
+                        pendingText.append("\n");
+                    }
+                    pendingText.append(text);
+                } else if (lastLabel != null) {
+                    String lastValue = currentQuestion.options.getOrDefault(lastLabel, "");
+                    currentQuestion.options.put(lastLabel, appendLine(lastValue, text, " "));
+                }
+            }
+        }
+
+        flushCurrent(currentQuestion, currentGroup);
+        if (currentGroup != null && !currentGroup.getQuestions().isEmpty()) {
+            groups.add(currentGroup);
+        }
+
+        return groups;
     }
 
     private void flushCurrent(ParsedQuestion current, List<NormalQuestionRequest> results) {

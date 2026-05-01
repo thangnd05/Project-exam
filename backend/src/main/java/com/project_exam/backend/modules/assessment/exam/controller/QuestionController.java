@@ -192,6 +192,14 @@ public class QuestionController {
         return ResponseEntity.ok(responses);
     }
 
+    @PostMapping(value = "/preview/passage-document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<PassageQuestionGroup>> previewPassageQuestionsFromDocument(
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+        List<PassageQuestionGroup> responses = questionService.previewPassageQuestionsFromDocument(file);
+        return ResponseEntity.ok(responses);
+    }
+
     // =================== UPDATE ===================
 
     /** Cập nhật câu hỏi (JSON). Body: QuestionCreateRequest (patch). */

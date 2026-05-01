@@ -59,6 +59,7 @@ const CreateTestFormBody = ({
     questions,
     setQuestions,
     groups,
+    setGroups,
     documentFile,
     setDocumentFile,
     loading,
@@ -93,6 +94,7 @@ const CreateTestFormBody = ({
   const [className, setClassName] = useState('');
   const [chapterName, setChapterName] = useState('');
   const [groupDocumentFiles, setGroupDocumentFiles] = useState({});
+  const [bulkPassageFile, setBulkPassageFile] = useState(null);
 
   useEffect(() => {
     if (mode === 'class' && classId) {
@@ -211,6 +213,56 @@ const CreateTestFormBody = ({
         error.response?.data?.detail ||
         error.response?.data?.message ||
         'Không thể nạp nhóm câu hỏi từ Word.';
+      toast.error(message);
+    }
+  };
+
+  const handleBulkPassageFileChange = (event) => {
+    const selectedFile = event.target.files?.[0] || null;
+    setBulkPassageFile(selectedFile);
+    if (selectedFile) {
+      handlePreviewBulkPassageFromDocument(selectedFile);
+    }
+  };
+
+  const handlePreviewBulkPassageFromDocument = async (fileInput = bulkPassageFile) => {
+    if (!fileInput) {
+      toast.warning('Vui lòng chọn file Word trước khi nạp passage.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', fileInput);
+
+      const response = await axios.post('/api/questions/preview/passage-document', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const parsedGroups = Array.isArray(response.data) ? response.data : [];
+      if (parsedGroups.length === 0) {
+        toast.warning('Không tìm thấy passage hợp lệ trong file Word.');
+        return;
+      }
+
+      const normalizedGroups = parsedGroups.map((group) => ({
+        passage: {
+          content: group.passage?.content || '',
+          passageType: group.passage?.passageType || 'READING',
+          mediaFiles: [],
+          inputMode: 'TEXT',
+        },
+        questions: normalizeParsedQuestions(group.questions),
+      }));
+
+      setGroups(normalizedGroups);
+      setBulkPassageFile(null);
+      toast.success(`Đã nạp ${normalizedGroups.length} nhóm passage từ Word.`);
+    } catch (error) {
+      const message =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        'Không thể nạp passage từ Word.';
       toast.error(message);
     }
   };
@@ -402,6 +454,24 @@ const CreateTestFormBody = ({
           <div className={cx('sectionTitle')}>
             <IoLayersOutline /> 2. Danh sách nhóm ({groups.length})
           </div>
+
+          <div className={cx('groupCard')} style={{ borderStyle: 'dashed', backgroundColor: '#f8fafc', marginBottom: '20px' }}>
+            <div className={cx('formGroupModern', 'mb-0')}>
+              <label className="mb-2 d-block fw-bold text-primary">
+                <IoInformationCircleOutline /> Upload file Word nạp NHIỀU Passage tự động (DOC/DOCX)
+              </label>
+              <input
+                type="file"
+                accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                className={cx('inputModern')}
+                onChange={handleBulkPassageFileChange}
+              />
+              <small className="text-muted d-block mt-2">
+                File của bạn cần có dòng phân cách Passage (ví dụ: "Passage 1:", "Bài đọc 2:"). Các câu hỏi bên dưới sẽ tự động được xếp vào đúng Passage.
+              </small>
+            </div>
+          </div>
+
           {groups.map((group, gIndex) => (
             <div key={gIndex} className={cx('groupCard')}>
               <div className={cx('groupHeader')}>

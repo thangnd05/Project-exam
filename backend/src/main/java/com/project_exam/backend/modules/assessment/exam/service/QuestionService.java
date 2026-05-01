@@ -308,6 +308,13 @@ public class QuestionService {
         return questionDocumentImportService.parseQuestionsFromDocument(file);
     }
 
+    public List<PassageQuestionGroup> previewPassageQuestionsFromDocument(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new BadRequestException("Vui lòng chọn file Word.");
+        }
+        return questionDocumentImportService.parsePassageQuestionsFromDocument(file);
+    }
+
     @Transactional
     public List<QuestionAdminResponse> importQuestionsFromDocument(
             MultipartFile file,
