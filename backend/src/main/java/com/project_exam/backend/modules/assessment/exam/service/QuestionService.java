@@ -717,12 +717,23 @@ public class QuestionService {
         return (pr.getContent() != null && !pr.getContent().trim().isEmpty()) || pr.getMediaUrl() != null;
     }
 
+    private void validateQuestionAnswers(Question.QuestionType questionType, List<AnswerRequest> answers) {
+        if (questionType != Question.QuestionType.MCQ) {
+            return;
+        }
+        boolean hasCorrect = answers != null && answers.stream().anyMatch(a -> Boolean.TRUE.equals(a.getIsCorrect()));
+        if (!hasCorrect) {
+            throw new BadRequestException("Mỗi câu hỏi trắc nghiệm phải có ít nhất 1 đáp án đúng.");
+        }
+    }
+
     private List<Answer> saveAnswersForQuestion(
             String questionId,
             List<AnswerRequest> answers,
             Question.QuestionType questionType
     ) {
 
+        validateQuestionAnswers(questionType, answers);
         if (answers == null || answers.isEmpty()) return List.of();
 
         List<Answer> list = new ArrayList<>();
@@ -938,6 +949,9 @@ public class QuestionService {
         if (request.getQuestionText() != null) question.setQuestionText(request.getQuestionText());
         if (request.getQuestionType() != null) question.setQuestionType(request.getQuestionType());
         if (request.getIsBank() != null) question.setIsBank(request.getIsBank());
+        if (request.getAnswers() != null) {
+            validateQuestionAnswers(question.getQuestionType(), request.getAnswers());
+        }
 
         Passage passage = null;
         if (request.getPassage() != null && hasPassageContent(request.getPassage())) {

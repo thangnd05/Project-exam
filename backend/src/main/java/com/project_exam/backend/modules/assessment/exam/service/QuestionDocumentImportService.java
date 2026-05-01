@@ -27,11 +27,12 @@ public class QuestionDocumentImportService {
 
     // Nhận dạng option dạng A. / A) / A: / A- / A <text>
     private static final Pattern OPTION_PATTERN = 
-            Pattern.compile("^([A-D])(?:\\s*[\\.\\):\\-]|\\s+)\\s*(.+)$", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^\\s*([A-D])(?:\\s*[\\.\\):\\-]|\\s+)\\s*(.*)$", Pattern.CASE_INSENSITIVE);
 
-    // Tách option inline kiểu "A. ... B. ..." hoặc phân cách bởi "|" / tab
+    // Tách option inline kiểu "A. ... B. ..." hoặc phân cách bởi "|" / tab.
+    // Với format TOEIC "A text B text", yêu cầu label tiếp theo phải có nội dung sau nó.
     private static final Pattern OPTION_INLINE_SPLITTER = 
-            Pattern.compile("\\s*(?:\\||\\t|\\s{2,})\\s*(?=[A-D](?:\\s*[\\.\\):\\-]|\\s+)\\S)", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("\\s*(?:\\||\\t|\\s{2,}|(?<=\\S)\\s(?=[A-D](?:\\s*[\\.\\):\\-]|\\s+)\\S))\\s*", Pattern.CASE_INSENSITIVE);
 
     // Tránh parse nhầm heading section thành option ("B. READING & WRITING")
     private static final Pattern SECTION_HEADING_OPTION_LIKE_PATTERN =
@@ -39,7 +40,25 @@ public class QuestionDocumentImportService {
 
     // Nhận nhãn option được style ngay ở label
     private static final Pattern STYLED_OPTION_LABEL_PATTERN =
-            Pattern.compile("(?<!\\S)([A-D])(?:\\s*[\\.\\):\\-]|\\s+)", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^\\s*([A-D])(?:\\s*[\\.\\):\\-]|\\s|$)", Pattern.CASE_INSENSITIVE);
+
+    private static final List<String> SKIPPABLE_PREFIXES = List.of(
+            "part ",
+            "choose the correct answer",
+            "choose a, b, c, or d",
+            "i."
+    );
+
+    private static final List<String> SKIPPABLE_CONTAINS = List.of(
+            "reading & writing",
+            "pronunciation in the following questions"
+    );
+
+    private static final Pattern PAGE_FOOTER_PATTERN =
+            Pattern.compile("^\\s*trang\\s*\\d+\\s*/\\s*\\d+\\s*$", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern EXAM_CODE_PATTERN =
+            Pattern.compile("^\\s*m[aã]\\s*đ[ềe]\\s*\\d+\\s*$", Pattern.CASE_INSENSITIVE);
 
     public List<NormalQuestionRequest> parseQuestionsFromDocument(MultipartFile file) throws IOException {
         List<ParsedLine> allLines = extractLinesFromDoc(file);
@@ -61,19 +80,7 @@ public class QuestionDocumentImportService {
         try (InputStream is = file.getInputStream()) {
             if (filename.endsWith(".docx")) {
                 XWPFDocument docx = new XWPFDocument(is);
-
-                for (XWPFParagraph para : docx.getParagraphs()) {
-                    processParagraph(para, lines);
-                }
-                for (XWPFTable table : docx.getTables()) {
-                    for (XWPFTableRow row : table.getRows()) {
-                        for (XWPFTableCell cell : row.getTableCells()) {
-                            for (XWPFParagraph cellPara : cell.getParagraphs()) {
-                                processParagraph(cellPara, lines);
-                            }
-                        }
-                    }
-                }
+                extractLinesFromDocx(docx, lines);
             } else if (filename.endsWith(".doc")) {
                 HWPFDocument doc = new HWPFDocument(is);
                 WordExtractor extractor = new WordExtractor(doc);
@@ -90,13 +97,26 @@ public class QuestionDocumentImportService {
         return lines;
     }
 
+    private void extractLinesFromDocx(XWPFDocument docx, List<ParsedLine> lines) {
+        for (XWPFParagraph para : docx.getParagraphs()) {
+            processParagraph(para, lines);
+        }
+        for (XWPFTable table : docx.getTables()) {
+            for (XWPFTableRow row : table.getRows()) {
+                for (XWPFTableCell cell : row.getTableCells()) {
+                    for (XWPFParagraph cellPara : cell.getParagraphs()) {
+                        processParagraph(cellPara, lines);
+                    }
+                }
+            }
+        }
+    }
+
     private void processParagraph(XWPFParagraph para, List<ParsedLine> lines) {
         String text = para.getParagraphText();
         if (text == null || text.trim().isEmpty()) return;
 
         Set<String> styledLabels = detectStyledOptionLabels(para);
-        Set<String> styledTextTokens = detectStyledTextTokens(para);
-
         // Tách theo line break trước, rồi mới tách inline option để hỗ trợ nội dung copy/paste trong cùng paragraph.
         String[] logicalLines = text.split("\\R+");
         for (String logicalLine : logicalLines) {
@@ -111,11 +131,7 @@ public class QuestionDocumentImportService {
                 String label = getOptionLabel(cleanSeg);
                 boolean isStyled = false;
                 if (label != null) {
-                    if (styledLabels.contains(label)) {
-                        isStyled = true;
-                    } else if (styledLabels.isEmpty() && isOptionContentStyled(cleanSeg, styledTextTokens)) {
-                        isStyled = true;
-                    }
+                    isStyled = styledLabels.contains(label);
                 }
                 lines.add(new ParsedLine(cleanSeg, isStyled));
             }
@@ -167,23 +183,23 @@ public class QuestionDocumentImportService {
             if (om.matches()) {
                 if (current != null) {
                     String label = om.group(1).toUpperCase();
-                    String optionText = om.group(2).trim();
+                    ParsedOption parsedOption = parseOptionText(om.group(2));
+                    String optionText = parsedOption.optionText;
                     if (isSectionHeadingOptionLike(text)) {
                         continue;
                     }
                     if (current.options.containsKey(label)) {
                         log.warn(
-                                "Question no='{}' duplicated option '{}' (old='{}', new='{}') - keep old",
+                                "Question no='{}' duplicated option '{}' (old='{}', new='{}') - override by new",
                                 current.questionNumber,
                                 label,
                                 current.options.get(label),
                                 optionText
                         );
-                        continue;
                     }
 
                     current.options.put(label, optionText);
-                    if (pl.isStyled) {
+                    if (pl.isStyled || parsedOption.isMarkedCorrect) {
                         current.correctLabels.add(label);
                     }
                 }
@@ -191,7 +207,18 @@ public class QuestionDocumentImportService {
             }
 
             if (current != null && current.options.isEmpty()) {
-                current.questionText += " " + text;
+                if (current.questionText == null || current.questionText.isBlank()) {
+                    current.questionText = text;
+                } else {
+                    current.questionText = current.questionText + "\n" + text;
+                }
+            } else if (current != null && !current.options.isEmpty()) {
+                String lastLabel = getLastOptionLabel(current.options);
+                if (lastLabel != null) {
+                    String lastValue = current.options.getOrDefault(lastLabel, "");
+                    String appended = lastValue.isBlank() ? text : lastValue + " " + text;
+                    current.options.put(lastLabel, appended.trim());
+                }
             }
         }
 
@@ -205,14 +232,30 @@ public class QuestionDocumentImportService {
 
     private Set<String> detectStyledOptionLabels(XWPFParagraph para) {
         Set<String> styled = new HashSet<>();
+        String paragraphText = para.getParagraphText();
+        if (paragraphText == null || paragraphText.trim().isEmpty()) {
+            return styled;
+        }
+
+        Matcher paragraphOptionMatcher = OPTION_PATTERN.matcher(paragraphText.trim());
+        if (!paragraphOptionMatcher.matches()) {
+            // Chỉ xét style label cho paragraph bắt đầu bằng option, tránh dính chữ "A" tô đậm trong stem.
+            return styled;
+        }
+
         for (XWPFRun run : para.getRuns()) {
+            String text = run.getText(0);
+            if (text == null || text.isBlank()) {
+                continue;
+            }
             if (isRunAnswerStyled(run)) {
-                String text = run.getText(0);
-                if (text != null) {
-                    Matcher m = STYLED_OPTION_LABEL_PATTERN.matcher(text);
-                    while (m.find()) styled.add(m.group(1).toUpperCase());
+                Matcher m = STYLED_OPTION_LABEL_PATTERN.matcher(text);
+                if (m.find()) {
+                    styled.add(m.group(1).toUpperCase());
                 }
             }
+            // Chỉ cần kiểm tra run đầu tiên có text thực.
+            break;
         }
         return styled;
     }
@@ -233,34 +276,16 @@ public class QuestionDocumentImportService {
         return run.getTextHightlightColor() != null && !"none".equalsIgnoreCase(String.valueOf(run.getTextHightlightColor()));
     }
 
-    private Set<String> detectStyledTextTokens(XWPFParagraph para) {
-        Set<String> tokens = new HashSet<>();
-        for (XWPFRun run : para.getRuns()) {
-            if (isRunAnswerStyled(run)) {
-                String runText = run.getText(0);
-                if (runText != null && runText.length() >= 2) {
-                    String normalized = normalizeText(runText);
-                    if (normalized.length() >= 2) {
-                        tokens.add(normalized);
-                    }
-                }
-            }
+    private ParsedOption parseOptionText(String rawOptionText) {
+        if (rawOptionText == null) {
+            return new ParsedOption("", false);
         }
-        return tokens;
-    }
-
-    private boolean isOptionContentStyled(String optionLine, Set<String> styledTextTokens) {
-        Matcher m = OPTION_PATTERN.matcher(optionLine);
-        if (!m.matches()) return false;
-        String content = normalizeText(m.group(2));
-        for (String token : styledTextTokens) {
-            if (token.length() >= 3 && (content.contains(token) || token.contains(content))) return true;
+        String trimmed = rawOptionText.trim();
+        if (trimmed.endsWith("*")) {
+            String cleaned = trimmed.substring(0, trimmed.length() - 1).trim();
+            return new ParsedOption(cleaned, true);
         }
-        return false;
-    }
-
-    private String normalizeText(String text) {
-        return text.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", " ").trim().replaceAll("\\s+", " ");
+        return new ParsedOption(trimmed, false);
     }
 
     private boolean isSectionHeadingOptionLike(String text) {
@@ -272,18 +297,34 @@ public class QuestionDocumentImportService {
         if (trimmed.isEmpty()) {
             return true;
         }
+        if (PAGE_FOOTER_PATTERN.matcher(trimmed).matches() || EXAM_CODE_PATTERN.matcher(trimmed).matches()) {
+            return true;
+        }
         String lower = trimmed.toLowerCase(Locale.ROOT);
-        return lower.startsWith("part ")
-                || lower.startsWith("choose the correct answer")
-                || lower.startsWith("choose a, b, c, or d")
-                || lower.startsWith("i.")
-                || lower.contains("reading & writing")
-                || lower.contains("pronunciation in the following questions");
+        for (String prefix : SKIPPABLE_PREFIXES) {
+            if (lower.startsWith(prefix)) {
+                return true;
+            }
+        }
+        for (String keyword : SKIPPABLE_CONTAINS) {
+            if (lower.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getOptionLabel(String text) {
         Matcher m = OPTION_PATTERN.matcher(text);
         return m.matches() ? m.group(1).toUpperCase() : null;
+    }
+
+    private String getLastOptionLabel(Map<String, String> options) {
+        String last = null;
+        for (String label : options.keySet()) {
+            last = label;
+        }
+        return last;
     }
 
     private boolean isValidQuestion(ParsedQuestion q) {
@@ -300,7 +341,12 @@ public class QuestionDocumentImportService {
             }
         }
         String questionText = q.questionText == null ? "" : q.questionText.trim();
-        return new NormalQuestionRequest(questionText, Question.QuestionType.MCQ, answers);
+        NormalQuestionRequest request = new NormalQuestionRequest();
+        request.setQuestionText(questionText);
+        request.setQuestionType(Question.QuestionType.MCQ);
+        request.setAnswers(answers);
+        request.setNeedsManualCorrect(correctLabels.isEmpty());
+        return request;
     }
 
     private Set<String> normalizeCorrectLabels(ParsedQuestion q) {
@@ -344,6 +390,16 @@ public class QuestionDocumentImportService {
         ParsedQuestion(String number, String txt) {
             this.questionNumber = number;
             this.questionText = txt;
+        }
+    }
+
+    private static class ParsedOption {
+        String optionText;
+        boolean isMarkedCorrect;
+
+        ParsedOption(String optionText, boolean isMarkedCorrect) {
+            this.optionText = optionText;
+            this.isMarkedCorrect = isMarkedCorrect;
         }
     }
 }

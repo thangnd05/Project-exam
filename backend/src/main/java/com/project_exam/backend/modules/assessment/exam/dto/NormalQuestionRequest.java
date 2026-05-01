@@ -13,4 +13,8 @@ public class NormalQuestionRequest {
     private String questionText;
     private QuestionType questionType;
     private List<AnswerRequest> answers;
+    /**
+     * true khi parser không xác định được đáp án đúng, UI preview nên yêu cầu người dùng chọn tay.
+     */
+    private boolean needsManualCorrect;
 }

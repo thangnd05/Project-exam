@@ -1,5 +1,8 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { CREATOR_TYPES } from './useCreateTest';
+
+const TOAST_VALIDATION_MS = 8000;
 
 export const useTestSubmission = ({
     mode,
@@ -17,37 +20,65 @@ export const useTestSubmission = ({
     emptyQuestion,
     createInitialGroup,
 }) => {
-    const hasValidManualQuestion = (question) => {
+    const hasQuestionContent = (question) => {
         const hasQuestionText = Boolean(question?.questionText?.trim());
         const hasUploadedMedia = Array.isArray(question?.mediaFiles) && question.mediaFiles.length > 0;
         const hasMediaUrl = Boolean(question?.mediaUrl?.trim());
-        const hasQuestionContent = hasQuestionText || hasUploadedMedia || hasMediaUrl;
-        if (!hasQuestionContent) {
+        return hasQuestionText || hasUploadedMedia || hasMediaUrl;
+    };
+
+    const hasAtLeastOneCorrectAnswer = (question) =>
+        Array.isArray(question?.answers) && question.answers.some((answer) => Boolean(answer?.isCorrect));
+
+    const hasValidManualQuestion = (question) => {
+        if (!hasQuestionContent(question)) {
             return false;
         }
-        const hasValidCorrectAnswer = (question.answers || []).some(
-            (answer) => Boolean(answer?.isCorrect),
-        );
-        return hasValidCorrectAnswer;
+        return hasAtLeastOneCorrectAnswer(question);
+    };
+
+    const validateCorrectAnswerSelection = (creatorType) => {
+        if (creatorType === CREATOR_TYPES.PASSAGE) {
+            const invalidRefs = [];
+            groups.forEach((group, gIndex) => {
+                (group.questions || []).forEach((q, qIndex) => {
+                    if (hasQuestionContent(q) && !hasAtLeastOneCorrectAnswer(q)) {
+                        invalidRefs.push(`Nhóm ${gIndex + 1} - Câu ${qIndex + 1}`);
+                    }
+                });
+            });
+            return invalidRefs;
+        }
+
+        const invalidRefs = [];
+        questions.forEach((q, index) => {
+            if (hasQuestionContent(q) && !hasAtLeastOneCorrectAnswer(q)) {
+                invalidRefs.push(`Câu ${index + 1}`);
+            }
+        });
+        return invalidRefs;
     };
 
     const handleSubmit = async (creatorType) => {
         if (creatorType === CREATOR_TYPES.TEST) {
             if (!testInfo.title || !testInfo.examTypeId || !testInfo.examPartId) {
-                setNotification({
-                    type: 'warning',
-                    message: 'Vui lòng điền đủ thông tin!',
-                });
+                toast.warning('Vui lòng điền đủ thông tin!', { autoClose: TOAST_VALIDATION_MS });
                 return false;
             }
         } else {
             if (!testInfo.examPartId) {
-                setNotification({
-                    type: 'warning',
-                    message: 'Vui lòng chọn Phần thi (Part)!',
-                });
+                toast.warning('Vui lòng chọn Phần thi (Part)!', { autoClose: TOAST_VALIDATION_MS });
                 return false;
             }
+        }
+
+        const invalidQuestionRefs = validateCorrectAnswerSelection(creatorType);
+        if (invalidQuestionRefs.length > 0) {
+            toast.warning(
+                `Được để trống nội dung đáp án, nhưng mỗi câu phải chọn ít nhất 1 đáp án đúng. Vui lòng kiểm tra: ${invalidQuestionRefs.join(', ')}`,
+                { autoClose: TOAST_VALIDATION_MS },
+            );
+            return false;
         }
 
         setLoading(true);
@@ -211,7 +242,8 @@ export const useTestSubmission = ({
                 error.response?.data?.detail ||
                 error.response?.data?.message ||
                 error.message;
-            setNotification({ type: 'danger', message: '❌ ' + msg });
+            toast.error(msg, { autoClose: TOAST_VALIDATION_MS });
+            setNotification({});
             return false;
         } finally {
             setLoading(false);
