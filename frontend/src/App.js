@@ -25,6 +25,7 @@ function App() {
           draggable
           pauseOnHover
           limit={3}
+          style={{ zIndex: 99999 }}
         />
         <div className="App">
           <ScrollProgressBar />
