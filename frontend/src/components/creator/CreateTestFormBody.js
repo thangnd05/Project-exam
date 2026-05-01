@@ -414,49 +414,42 @@ const CreateTestFormBody = ({
               </div>
               <div className={cx('passageSection')}>
                 <div className={cx('formGroupModern')}>
-                  <label className="mb-2 d-block">Nguồn Passage</label>
-                  <div className="d-flex align-items-center gap-4 mb-2">
-                    <label className="d-flex align-items-center gap-2 mb-0">
-                      <input
-                        type="radio"
-                        name={`passage-input-mode-${gIndex}`}
-                        checked={(group.passage.inputMode || 'TEXT') === 'TEXT'}
-                        onChange={() => updatePassage(gIndex, 'inputMode', 'TEXT')}
-                      />
-                      <span>Nội dung nhập</span>
-                    </label>
-                    <label className="d-flex align-items-center gap-2 mb-0">
-                      <input
-                        type="radio"
-                        name={`passage-input-mode-${gIndex}`}
-                        checked={(group.passage.inputMode || 'TEXT') === 'UPLOAD'}
-                        onChange={() => updatePassage(gIndex, 'inputMode', 'UPLOAD')}
-                      />
-                      <span>Upload phương tiện</span>
-                    </label>
+                  <label className="mb-2 d-block fw-bold">Nội dung Passage (tùy chọn)</label>
+                  <textarea
+                    className={cx('inputModern')}
+                    rows={3}
+                    value={group.passage.content}
+                    onChange={(e) => updatePassage(gIndex, 'content', e.target.value)}
+                    placeholder="Nhập nội dung văn bản nếu có..."
+                  />
+                </div>
+                <div className={cx('formGroupModern')}>
+                  <label className="mb-2 d-block fw-bold">Upload phương tiện (ảnh / audio)</label>
+                  <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <input
+                      type="file"
+                      multiple
+                      accept={ACCEPT_BY_TYPE.MEDIA}
+                      className={cx('inputModern')}
+                      style={{ width: 'auto' }}
+                      onChange={(e) => { addGroupMediaFiles(gIndex, e.target.files); e.target.value = ''; }}
+                    />
                   </div>
-                  {(group.passage.inputMode || 'TEXT') === 'TEXT' ? (
-                    <>
-                      <label>Nội dung Passage (tùy chọn)</label>
-                      <textarea className={cx('inputModern')} rows={2} value={group.passage.content} onChange={(e) => updatePassage(gIndex, 'content', e.target.value)} placeholder="Nhập nội dung văn bản nếu có..." />
-                    </>
-                  ) : (
-                    <>
-                      <label>Phương tiện</label>
-                      <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                        <input type="file" multiple accept={ACCEPT_BY_TYPE.MEDIA} className={cx('inputModern')} style={{ width: 'auto' }} onChange={(e) => { addGroupMediaFiles(gIndex, e.target.files); e.target.value = ''; }} />
-                      </div>
-                      {group.passage.mediaFiles?.length > 0 && (
-                        <ul className="list-unstyled mb-0 mt-2">
-                          {group.passage.mediaFiles.map((file, fIdx) => (
-                            <li key={fIdx} className="d-flex align-items-center gap-2 mb-1">
-                              <span className="small text-secondary">{file.name}</span>
-                              <button type="button" className="btn btn-sm btn-outline-danger p-0 px-1" onClick={() => removeGroupMediaFile(gIndex, fIdx)}><Trash size={14} /></button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </>
+                  {group.passage.mediaFiles?.length > 0 && (
+                    <ul className="list-unstyled mb-0 mt-2">
+                      {group.passage.mediaFiles.map((file, fIdx) => (
+                        <li key={fIdx} className="d-flex align-items-center gap-2 mb-1">
+                          <span className="small text-secondary">{file.name}</span>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger p-0 px-1"
+                            onClick={() => removeGroupMediaFile(gIndex, fIdx)}
+                          >
+                            <Trash size={14} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </div>
               </div>

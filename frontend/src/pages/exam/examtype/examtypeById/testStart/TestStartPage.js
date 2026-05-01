@@ -360,6 +360,14 @@ function TestStartPage() {
 
     return (
       <div className={cx('passage-box')}>
+        {/* Hiển thị text content TRƯỚC ảnh/audio */}
+        {content && <div className={cx('passage-content')}>{content}</div>}
+
+        {/* Thêm đường kẻ ngang ngăn cách nếu có cả text và media */}
+        {content && (hasMediaList || singleMediaUrl) && (
+          <hr className={cx('passage-divider')} />
+        )}
+
         {hasMediaList &&
           mediaList.map((m, idx) => {
             const url = m.mediaUrl ?? m.media_url;
@@ -417,7 +425,6 @@ function TestStartPage() {
               />
             </div>
           )}
-        {content && <div className={cx('passage-content')}>{content}</div>}
       </div>
     );
   };
