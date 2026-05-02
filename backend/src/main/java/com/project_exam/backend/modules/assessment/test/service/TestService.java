@@ -778,15 +778,38 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .orElse(0) + 1;
 
         List<Question> pool;
-        if (request.getClassId() != null && request.getChapterId() != null) {
-            pool = questionRepository.findRandomQuestionsByExamPartIdAndClassIdAndChapterId(
-                    examPartId, request.getClassId(), request.getChapterId(), Pageable.ofSize(count));
-        } else if (request.getClassId() != null) {
-            pool = questionRepository.findRandomQuestionsByExamPartIdAndClassId(
-                    examPartId, request.getClassId(), Pageable.ofSize(count));
+        if (Boolean.TRUE.equals(request.getIsSequential())) {
+            int fromIdx = (request.getFromIndex() != null && request.getFromIndex() > 0) ? request.getFromIndex() : 1;
+            int toIdx = (request.getToIndex() != null && request.getToIndex() >= fromIdx) ? request.getToIndex() : fromIdx;
+            int seqLimit = toIdx - fromIdx + 1;
+            int seqOffset = fromIdx - 1;
+
+            List<Question> allQuestions;
+            if (request.getClassId() != null && request.getChapterId() != null) {
+                allQuestions = questionRepository.findByExamPartIdAndClassIdAndChapterId(
+                        examPartId, request.getClassId(), request.getChapterId());
+            } else if (request.getClassId() != null) {
+                allQuestions = questionRepository.findByExamPartIdAndClassId(
+                        examPartId, request.getClassId());
+            } else {
+                allQuestions = questionRepository.findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
+                        examPartId, currentUserId);
+            }
+            
+            int actualOffset = Math.min(seqOffset, allQuestions.size());
+            int actualLimit = Math.min(seqLimit, allQuestions.size() - actualOffset);
+            pool = allQuestions.subList(actualOffset, actualOffset + actualLimit);
         } else {
-            pool = questionRepository.findRandomByExamPartAndCreatedByAndClassIdIsNullAndChapterIdIsNull(
-                    examPartId, currentUserId, count);
+            if (request.getClassId() != null && request.getChapterId() != null) {
+                pool = questionRepository.findRandomQuestionsByExamPartIdAndClassIdAndChapterId(
+                        examPartId, request.getClassId(), request.getChapterId(), Pageable.ofSize(count));
+            } else if (request.getClassId() != null) {
+                pool = questionRepository.findRandomQuestionsByExamPartIdAndClassId(
+                        examPartId, request.getClassId(), Pageable.ofSize(count));
+            } else {
+                pool = questionRepository.findRandomByExamPartAndCreatedByAndClassIdIsNullAndChapterIdIsNull(
+                        examPartId, currentUserId, count);
+            }
         }
 
         List<String> toAdd = pool.stream()

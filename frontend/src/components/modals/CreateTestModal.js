@@ -19,7 +19,6 @@ const CreateTestModal = ({
   if (!show) return null;
 
   const handleSuccess = () => {
-    toast.success('Đã tạo đề thi thành công! 🚀');
     onSuccess?.();
     onClose();
   };

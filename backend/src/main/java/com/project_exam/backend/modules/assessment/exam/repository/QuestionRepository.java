@@ -102,4 +102,44 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
             @Param("examPartId") String examPartId,
             @Param("createdBy") String createdBy,
             @Param("limit") int limit);
+
+    @Query(value = """
+        SELECT * FROM questions
+        WHERE exam_part_id = :examPartId AND created_by = :createdBy
+          AND class_id IS NULL AND chapter_id IS NULL
+          AND is_bank = true
+        ORDER BY question_id ASC
+        LIMIT :limit OFFSET :offset
+        """, nativeQuery = true)
+    List<Question> findSequentialByExamPartAndCreatedByAndClassIdIsNullAndChapterIdIsNull(
+            @Param("examPartId") String examPartId,
+            @Param("createdBy") String createdBy,
+            @Param("limit") int limit,
+            @Param("offset") int offset);
+
+    @Query(value = """
+        SELECT * FROM questions
+        WHERE exam_part_id = :examPartId AND class_id = :classId AND is_bank = true
+        ORDER BY question_id ASC
+        LIMIT :limit OFFSET :offset
+        """, nativeQuery = true)
+    List<Question> findSequentialQuestionsByExamPartIdAndClassId(
+            @Param("examPartId") String examPartId,
+            @Param("classId") String classId,
+            @Param("limit") int limit,
+            @Param("offset") int offset);
+
+    @Query(value = """
+        SELECT * FROM questions
+        WHERE exam_part_id = :examPartId AND class_id = :classId AND chapter_id = :chapterId AND is_bank = true
+        ORDER BY question_id ASC
+        LIMIT :limit OFFSET :offset
+        """, nativeQuery = true)
+    List<Question> findSequentialQuestionsByExamPartIdAndClassIdAndChapterId(
+            @Param("examPartId") String examPartId,
+            @Param("classId") String classId,
+            @Param("chapterId") String chapterId,
+            @Param("limit") int limit,
+            @Param("offset") int offset
+    );
 }

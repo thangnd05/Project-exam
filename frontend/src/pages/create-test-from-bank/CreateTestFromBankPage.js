@@ -32,11 +32,14 @@ const cx = classNames.bind(styles);
 const SELECTION_MODES = {
   MANUAL: 'manual',
   RANDOM: 'random',
+  SEQUENTIAL: 'sequential',
 };
 
 const defaultPartConfig = () => ({
   mode: SELECTION_MODES.RANDOM,
   randomCount: '',
+  fromIndex: '',
+  toIndex: '',
   selectedIds: [],
   bankQuestions: [],
   loading: false,
@@ -190,6 +193,14 @@ const CreateTestFromBankPage = () => {
       const maxInBank = (cfg.bankQuestions || []).length;
       return Math.min(n, maxInBank);
     }
+    if (cfg.mode === SELECTION_MODES.SEQUENTIAL) {
+      const from = Math.max(1, parseInt(cfg.fromIndex, 10) || 1);
+      const to = Math.max(from, parseInt(cfg.toIndex, 10) || from);
+      const maxInBank = (cfg.bankQuestions || []).length;
+      if (from > maxInBank) return 0;
+      const actualTo = Math.min(to, maxInBank);
+      return actualTo - from + 1;
+    }
     return (cfg.selectedIds || []).length;
   };
 
@@ -199,6 +210,11 @@ const CreateTestFromBankPage = () => {
     if (cfg.mode === SELECTION_MODES.RANDOM) {
       const n = Math.max(0, parseInt(cfg.randomCount, 10) || 0);
       return n > 0 && (cfg.bankQuestions || []).length > 0;
+    }
+    if (cfg.mode === SELECTION_MODES.SEQUENTIAL) {
+      const from = parseInt(cfg.fromIndex, 10);
+      const to = parseInt(cfg.toIndex, 10);
+      return !isNaN(from) && !isNaN(to) && from > 0 && to >= from && (cfg.bankQuestions || []).length >= from;
     }
     return (cfg.selectedIds || []).length > 0;
   };
@@ -249,10 +265,13 @@ const CreateTestFromBankPage = () => {
         const newPartId = partRes.data.testPartId ?? partRes.data.id;
         if (!newPartId) throw new Error(`Không nhận được testPartId cho part ${part.name}.`);
 
-        if (cfg.mode === SELECTION_MODES.RANDOM) {
+        if (cfg.mode === SELECTION_MODES.RANDOM || cfg.mode === SELECTION_MODES.SEQUENTIAL) {
           await axios.post('/api/tests/parts/random-questions', {
             testPartId: String(newPartId),
             count: numQuestions,
+            isSequential: cfg.mode === SELECTION_MODES.SEQUENTIAL,
+            fromIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.fromIndex, 10) : undefined,
+            toIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.toIndex, 10) : undefined,
           });
         } else {
           await axios.post('/api/tests/parts/questions', {
@@ -262,7 +281,6 @@ const CreateTestFromBankPage = () => {
         }
       }
 
-      setNotification({ type: 'success', message: 'Tạo đề thi từ kho câu hỏi thành công!' });
       setTestInfo((prev) => ({ ...prev, title: '', description: '' }));
       toast.success('Đã tạo đề thi từ kho câu hỏi!');
     } catch (error) {
@@ -416,6 +434,14 @@ const CreateTestFromBankPage = () => {
                           </button>
                           <button
                             type="button"
+                            className={cx('modeTab', { active: cfg.mode === SELECTION_MODES.SEQUENTIAL })}
+                            onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.SEQUENTIAL)}
+                            aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
+                          >
+                            <IoRocketOutline size={18} /> Lấy tuần tự
+                          </button>
+                          <button
+                            type="button"
                             className={cx('modeTab', { active: cfg.mode === SELECTION_MODES.MANUAL })}
                             onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.MANUAL)}
                             aria-pressed={cfg.mode === SELECTION_MODES.MANUAL}
@@ -435,6 +461,32 @@ const CreateTestFromBankPage = () => {
                               value={cfg.randomCount}
                               onChange={(e) => updatePartConfig(part.examPartId, 'randomCount', e.target.value)}
                               aria-label={`Số câu random ${part.name}`}
+                            />
+                            <span className={cx('randomHint')}>Tối đa {maxInBank} câu trong kho</span>
+                          </div>
+                        )}
+
+                        {cfg.mode === SELECTION_MODES.SEQUENTIAL && (
+                          <div className={cx('randomRow')} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <label className={cx('randomLabel')}>Từ câu:</label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={Math.max(maxInBank, 1)}
+                              className={cx('input', 'randomInput')}
+                              value={cfg.fromIndex}
+                              onChange={(e) => updatePartConfig(part.examPartId, 'fromIndex', e.target.value)}
+                              aria-label={`Từ câu ${part.name}`}
+                            />
+                            <label className={cx('randomLabel')}>Đến câu:</label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={Math.max(maxInBank, 1)}
+                              className={cx('input', 'randomInput')}
+                              value={cfg.toIndex}
+                              onChange={(e) => updatePartConfig(part.examPartId, 'toIndex', e.target.value)}
+                              aria-label={`Đến câu ${part.name}`}
                             />
                             <span className={cx('randomHint')}>Tối đa {maxInBank} câu trong kho</span>
                           </div>
