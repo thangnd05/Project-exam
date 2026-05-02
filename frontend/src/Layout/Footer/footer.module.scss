@@ -1,5 +1,5 @@
 .footer {
-  background: linear-gradient(135deg, #0b4fd8 0%, #1178e5 50%, #1aa6c8 100%);
+  background: linear-gradient(135deg, #021a42 0%, #004db5 50%, #007cc7 100%);
   color: white;
   position: relative;
   padding: 60px 0 30px;
@@ -14,26 +14,33 @@
 /* --- Brand Section --- */
 .brandContainer {
   display: flex;
-  align-items: center;
-  gap: 30px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
 
   @media (max-width: 991px) {
-    flex-direction: column;
+    align-items: center;
     text-align: center;
     margin-bottom: 40px;
   }
 }
 
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
 .logoWrapper {
-  width: 110px;
-  height: 110px;
+  width: 60px;
+  height: 60px;
   background: white;
-  border-radius: 50%;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  padding: 18px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 10px;
   flex-shrink: 0;
 
   img {
@@ -44,30 +51,30 @@
 }
 
 .brandName {
-  font-size: 3.2rem;
+  font-size: 2.8rem;
   font-weight: 800;
   margin: 0;
 }
 
 .brandSub {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   opacity: 0.9;
-  margin: 4px 0 12px;
-}
+  margin: 0;
+  max-width: 80%;
+  line-height: 1.5;
 
-.brandInfo > .footerLink {
-  display: inline-flex;
-  margin: 4px 0 12px;
+  @media (max-width: 991px) {
+    max-width: 100%;
+  }
 }
 
 .footerLinks {
   display: flex;
-  align-items: center;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 
   @media (max-width: 991px) {
     align-items: center;
@@ -77,40 +84,35 @@
 .footerLink {
   color: rgba(255, 255, 255, 0.95);
   text-decoration: none;
-  font-size: 1.45rem;
-  font-weight: 700;
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-
-  &:visited {
-    color: rgba(255, 255, 255, 0.95);
-    opacity: 0.7;
-  }
-
-  &:active {
-    color: rgba(255, 255, 255, 0.95);
-    opacity: 0.75;
-  }
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 
   &:hover {
     opacity: 0.85;
-    transform: translateY(-1px);
-    text-decoration: underline;
+    transform: translateX(3px);
+    text-decoration: none;
   }
 }
 
 .socialIcons {
   display: flex;
   gap: 15px;
-  font-size: 2.2rem;
-
+  
   a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     color: white;
-    transition: 0.2s;
+    font-size: 1.8rem;
+    transition: all 0.3s ease;
 
     &:hover {
-      opacity: 0.8;
+      background: rgba(255, 255, 255, 0.2);
       transform: translateY(-2px);
     }
   }
@@ -120,97 +122,155 @@
   }
 }
 
-/* --- Statistics Section (Structured & Flat) --- */
+/* --- Statistics Section (Cards) --- */
 .statsWrapper {
   display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 0 20px;
+  gap: 20px;
+  height: 100%;
+  align-items: stretch;
 
-  @media (max-width: 767px) {
+  @media (max-width: 991px) {
     flex-direction: column;
-    gap: 30px;
   }
 }
 
-.statItem {
-  text-align: left;
-}
-
-.statMain {
+.statCard {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 30px 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 5px;
+  gap: 15px;
+  transition: transform 0.3s ease, background 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.statIconWrapper {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 
   .statIcon {
-    font-size: 2.8rem;
+    font-size: 2.2rem;
+    color: white;
   }
+}
 
-  .statValue {
-    font-size: 4.2rem;
-    font-weight: 800;
-  }
+.statContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .statLabel {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   opacity: 0.85;
-  padding-left: 40px;
+  margin-top: 4px;
+}
 
-  @media (max-width: 767px) {
-    padding-left: 0;
+/* --- Bottom Bar --- */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 40px 0 20px;
+}
+
+.bottomBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  @media (max-width: 991px) {
+    flex-direction: column;
+    gap: 20px;
     text-align: center;
   }
 }
 
-.verticalDivider {
-  width: 1px;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.1);
+.bottomLeft {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 
-  @media (max-width: 767px) {
-    display: none;
+  @media (max-width: 576px) {
+    flex-direction: column;
+    gap: 10px;
   }
 }
 
-/* --- Contact Bar (Solid & Rectangular) --- */
-.contactBar {
-  margin-top: 50px;
-  display: flex;
-  justify-content: flex-end;
-
-  @media (max-width: 991px) {
-    justify-content: center;
-  }
+.contactText {
+  font-size: 1.3rem;
+  opacity: 0.8;
 }
 
 .emailBox {
-  background: rgba(0, 0, 0, 0.15); // Solid-feeling dark rectangle
-  border-radius: 8px; // squared off as requested
-  padding: 12px 40px;
+  background: rgba(255, 255, 255, 0.1); 
+  border-radius: 8px; 
+  padding: 8px 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 650px;
-  justify-content: flex-end;
+  gap: 10px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.2s ease;
 
-  @media (max-width: 991px) {
-    justify-content: center;
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
 }
 
 .emailIcon {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
 }
 
 .emailText {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
 }
 
-.copyright {
-  display: none;
+.bottomRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.copyrightText {
+  font-size: 1.3rem;
+  opacity: 0.7;
+}
+
+.scrollTopBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #0061f2;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #0b4fd8;
+    transform: translateY(-3px);
+  }
 }

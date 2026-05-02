@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {Container} from 'react-bootstrap';
+import {motion} from 'framer-motion';
 import {
   IoListOutline,
   IoGridOutline,
@@ -14,6 +15,37 @@ import ClassCard from '~/components/common/ClassCard/ClassCard';
 import ClassManagementTable from '~/components/common/ClassManagementTable/ClassManagementTable';
 
 const cx = classNames.bind(styles);
+
+const sectionHeaderVariants = {
+  hidden: {opacity: 0, y: 16},
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {duration: 0.5, ease: [0.22, 1, 0.36, 1]},
+  },
+};
+
+const cardVariants = {
+  hidden: {opacity: 0, y: 24},
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: i * 0.07,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
+};
+
+const emptyVariants = {
+  hidden: {opacity: 0, scale: 0.97},
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {duration: 0.5, ease: [0.22, 1, 0.36, 1]},
+  },
+};
 
 const ClassListContainer = ({
   title,
@@ -55,55 +87,95 @@ const ClassListContainer = ({
         {viewMode === 'grid' && (
           <>
             {/* Teaching Classes */}
-            <div className={cx('section-header', 'teaching-header')}>
+            <motion.div
+              className={cx('section-header', 'teaching-header')}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{once: true, amount: 0.5}}
+              variants={sectionHeaderVariants}
+            >
               <div className={cx('icon-box')}>
                 <IoSchoolOutline />
               </div>
               <h3>Lớp tôi giảng dạy</h3>
-            </div>
+            </motion.div>
 
             <div className={cx('class-grid')}>
               {hasTeaching ? (
-                teachingClasses.map((clazz) => (
-                  <ClassCard
+                teachingClasses.map((clazz, index) => (
+                  <motion.div
                     key={clazz.classId}
-                    classData={clazz}
-                    role="teacher"
-                    onViewTests={onViewTests}
-                    onManageMembers={onManageMembers}
-                  />
+                    custom={index}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{once: true, amount: 0.2}}
+                    variants={cardVariants}
+                  >
+                    <ClassCard
+                      classData={clazz}
+                      role="teacher"
+                      onViewTests={onViewTests}
+                      onManageMembers={onManageMembers}
+                    />
+                  </motion.div>
                 ))
               ) : (
-                <div className={cx('empty-box')}>
+                <motion.div
+                  className={cx('empty-box')}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{once: true, amount: 0.4}}
+                  variants={emptyVariants}
+                >
                   <IoPeopleOutline className={cx('icon')} />
                   <h4>Bạn chưa tham gia giảng dạy lớp nào</h4>
-                </div>
+                </motion.div>
               )}
             </div>
 
             {/* Learning Classes */}
-            <div className={cx('section-header', 'learning-header')}>
+            <motion.div
+              className={cx('section-header', 'learning-header')}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{once: true, amount: 0.5}}
+              variants={sectionHeaderVariants}
+            >
               <div className={cx('icon-box')}>
                 <IoPeopleOutline />
               </div>
               <h3>Lớp tôi tham gia học</h3>
-            </div>
+            </motion.div>
 
             <div className={cx('class-grid')}>
               {hasLearning ? (
-                learningClasses.map((clazz) => (
-                  <ClassCard
+                learningClasses.map((clazz, index) => (
+                  <motion.div
                     key={clazz.classId}
-                    classData={clazz}
-                    role="student"
-                    onViewTests={onViewTests}
-                  />
+                    custom={index}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{once: true, amount: 0.2}}
+                    variants={cardVariants}
+                  >
+                    <ClassCard
+                      classData={clazz}
+                      role="student"
+                      onViewTests={onViewTests}
+                    />
+                  </motion.div>
                 ))
               ) : (
-                <div className={cx('empty-box')}>
+                <motion.div
+                  className={cx('empty-box')}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{once: true, amount: 0.4}}
+                  variants={emptyVariants}
+                >
                   <IoSchoolOutline className={cx('icon')} />
                   <h4>Bạn chưa tham gia học lớp nào</h4>
-                </div>
+                </motion.div>
               )}
             </div>
           </>

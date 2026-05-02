@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import classNames from 'classnames/bind';
+import {motion} from 'framer-motion';
 import style from './ExamTypeStyle.module.scss';
-import { FaBookOpen, FaGlobe, FaCertificate, FaGraduationCap, FaLayerGroup } from 'react-icons/fa';
+import {FaBookOpen, FaGlobe, FaCertificate, FaGraduationCap, FaLayerGroup} from 'react-icons/fa';
 
 const cx = classNames.bind(style);
 
@@ -15,6 +16,28 @@ const ICONS = {
   'VSTEP': <FaGraduationCap />,
   'ENGLISH': <FaBookOpen />,
   'default': <FaLayerGroup />
+};
+
+const headerVariants = {
+  hidden: {opacity: 0, y: 24},
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {duration: 0.7, ease: [0.22, 1, 0.36, 1]},
+  },
+};
+
+const cardVariants = {
+  hidden: {opacity: 0, y: 30},
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      delay: i * 0.1,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
 };
 
 function ExamTypePage() {
@@ -63,18 +86,29 @@ function ExamTypePage() {
   return (
     <div className={cx('exam-type-container')}>
       {/* Decorative background elements managed in CSS, but keeping structure clean */}
-      <div className={cx('header-box')}>
+      <motion.div
+        className={cx('header-box')}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{once: true, amount: 0.5}}
+        variants={headerVariants}
+      >
         <h2 className={cx('exam-type-title')}>Lựa chọn loại đề thi</h2>
         <p className={cx('exam-type-subtitle')}>Khám phá kho đề thi phong phú và đa dạng phù hợp với mọi mục tiêu ôn tập</p>
-      </div>
+      </motion.div>
 
       <div className={cx('exam-types-grid')}>
         {examTypes.map((examType, index) => (
-          <div
+          <motion.div
             key={examType.examTypeId}
             className={cx('category-card')}
             onClick={() => handleClick(examType.examTypeId)}
-            style={{ animationDelay: `${index * 0.1}s` }}
+            custom={index}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{once: true, amount: 0.2}}
+            variants={cardVariants}
+            whileHover={{y: -8}}
           >
             <div className={cx('icon-wrapper')}>
               {getIcon(examType.name)}
@@ -86,7 +120,7 @@ function ExamTypePage() {
                 <span className={cx('arrow')}>→</span>
               </span>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

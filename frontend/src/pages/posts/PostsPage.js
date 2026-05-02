@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, ArrowRight, Plus } from 'lucide-react';
 import { getPosts, getCategories } from '~/api/postApi';
 import routes from '~/config/Routes';
@@ -8,6 +9,28 @@ import CreatePostModal from '~/components/modals/CreatePostModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: i * 0.06,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
+};
 
 function PostsPage() {
   const [posts, setPosts] = useState([]);
@@ -120,7 +143,12 @@ function PostsPage() {
 
         {/* Hero Section */}
         {featuredPost && (
-          <div className={cx('hero')}>
+          <motion.div
+            className={cx('hero')}
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+          >
             <div className={cx('heroImageWrapper')}>
               <div className={cx('featuredBadge')}>Bài nổi bật</div>
               <img src={featuredPost.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={featuredPost.title} />
@@ -147,11 +175,16 @@ function PostsPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Filter Bar */}
-        <div className={cx('filterBar')}>
+        <motion.div
+          className={cx('filterBar')}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className={cx('filterPills')}>
             <button
               className={cx('pill', { active: !selectedCategory })}
@@ -184,15 +217,22 @@ function PostsPage() {
               <span>Tạo bài viết</span>
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Post Grid */}
         <div className={cx('postGrid')}>
-          {otherPosts.map(post => (
-            <div
+          <AnimatePresence mode="popLayout">
+          {otherPosts.map((post, index) => (
+            <motion.div
               key={post.id}
               className={cx('postCard')}
               onClick={() => navigate(routes.postDetail.replace(':postId', post.id))}
+              custom={index}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, y: 12, transition: { duration: 0.25 } }}
+              variants={cardVariants}
+              whileHover={{ y: -6 }}
             >
               <div className={cx('thumbnail')}>
                 <div className={cx('cardCategory', getCategoryStyles(post.categories?.[0]?.name))}>
@@ -219,8 +259,9 @@ function PostsPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
+          </AnimatePresence>
         </div>
 
         {/* Pagination */}

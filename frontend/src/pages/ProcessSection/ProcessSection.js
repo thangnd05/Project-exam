@@ -1,4 +1,5 @@
 import React from 'react';
+import {motion} from 'framer-motion';
 import {
   FaArrowRight,
   FaChartLine,
@@ -37,23 +38,71 @@ const processSteps = [
   },
 ];
 
+const headerVariants = {
+  hidden: {opacity: 0, y: 24},
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {duration: 0.7, ease: [0.22, 1, 0.36, 1]},
+  },
+};
+
+const cardVariants = {
+  hidden: {opacity: 0, y: 30},
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      delay: i * 0.15,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
+};
+
+const arrowVariants = {
+  hidden: {opacity: 0, x: -8},
+  visible: (i) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.5,
+      delay: i * 0.15 + 0.4,
+    },
+  }),
+};
+
 const ProcessSection = () => {
   return (
     <section className={cx('section', 'process-section')}>
       <div className="container">
-        <div className="text-center mb-5">
+        <motion.div
+          className="text-center mb-5"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{once: true, amount: 0.5}}
+          variants={headerVariants}
+        >
           <h2 className={cx('section-title')}>Quy trình ôn luyện</h2>
           <p className="text-muted">
             Đơn giản hóa hành trình chinh phục điểm số
           </p>
-        </div>
+        </motion.div>
         <div className={cx('processGrid')}>
           {processSteps.map((step, index) => {
             const StepIcon = step.icon;
             const hasTransition = index < processSteps.length - 1;
 
             return (
-              <div key={step.id} className={cx('processItem')}>
+              <motion.div
+                key={step.id}
+                className={cx('processItem')}
+                custom={index}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{once: true, amount: 0.3}}
+                variants={cardVariants}
+              >
                 <div className={cx('process-card')}>
                   <div className={cx('icon-box', step.iconColor)}>
                     <StepIcon />
@@ -62,11 +111,19 @@ const ProcessSection = () => {
                   <p>{step.description}</p>
                 </div>
                 {hasTransition && (
-                  <span className={cx('stepTransition')} aria-hidden="true">
+                  <motion.span
+                    className={cx('stepTransition')}
+                    aria-hidden="true"
+                    custom={index}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{once: true, amount: 0.3}}
+                    variants={arrowVariants}
+                  >
                     <FaArrowRight />
-                  </span>
+                  </motion.span>
                 )}
-              </div>
+              </motion.div>
             );
           })}
         </div>

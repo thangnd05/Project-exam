@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {motion} from 'framer-motion';
 import {FaStar, FaQuoteLeft, FaPen} from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import styles from './evaluation.module.scss';
@@ -13,6 +14,15 @@ import routes from '~/config/Routes';
 import EvaluationModal from '~/components/modals/EvaluationModal';
 
 const cx = classNames.bind(styles);
+
+const fadeUp = {
+  hidden: {opacity: 0, y: 24},
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {duration: 0.7, ease: [0.22, 1, 0.36, 1]},
+  },
+};
 
 const Evaluation = () => {
   const {user} = useAuth();
@@ -110,15 +120,27 @@ const Evaluation = () => {
   return (
     <section className={cx('section', 'reviews-section')}>
       <div className="container">
-        <div className="text-center mb-5">
+        <motion.div
+          className="text-center mb-5"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{once: true, amount: 0.5}}
+          variants={fadeUp}
+        >
           <h2 className={cx('section-title')}>Người dùng nói gì về WinDe?</h2>
           <p className="text-muted">
             Niềm tin được khẳng định qua kết quả thực tế
           </p>
-        </div>
+        </motion.div>
 
         {reviews.length > 0 ? (
-          <div className={cx('slider-container')}>
+          <motion.div
+            className={cx('slider-container')}
+            initial={{opacity: 0, y: 30}}
+            whileInView={{opacity: 1, y: 0}}
+            viewport={{once: true, amount: 0.2}}
+            transition={{duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1]}}
+          >
             <Slider {...settings}>
               {Array.isArray(reviews) &&
                 reviews.map((review) => (
@@ -159,7 +181,7 @@ const Evaluation = () => {
                   </div>
                 ))}
             </Slider>
-          </div>
+          </motion.div>
         ) : (
           <div className="text-center text-muted mb-5">
             Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá!
@@ -167,14 +189,20 @@ const Evaluation = () => {
         )}
 
         {/* NÚT MỞ MODAL */}
-        <div className="text-center mt-4">
+        <motion.div
+          className="text-center mt-4"
+          initial={{opacity: 0, y: 16}}
+          whileInView={{opacity: 1, y: 0}}
+          viewport={{once: true, amount: 0.6}}
+          transition={{duration: 0.5, delay: 0.2}}
+        >
           <button
             className={cx('btn-write-review')}
             onClick={handleWriteReviewClick}
           >
             <FaPen style={{marginRight: '8px'}} /> Viết đánh giá của bạn
           </button>
-        </div>
+        </motion.div>
       </div>
 
       {/* --- MODAL (POPUP) --- */}

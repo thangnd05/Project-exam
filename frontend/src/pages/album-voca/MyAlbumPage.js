@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner, Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
+import { motion } from 'framer-motion';
 import { IoAddCircleOutline, IoFolderOpenOutline, IoDocumentTextOutline, IoGridOutline, IoListOutline, IoAdd } from "react-icons/io5";
 import { FaBook } from "react-icons/fa";
 
@@ -17,6 +18,19 @@ import PageHeaderViewToggle from '../../components/common/PageHeader/PageHeaderV
 import AlbumManagementTable from '../../components/common/AlbumManagementTable/AlbumManagementTable';
 
 const cx = classNames.bind(styles);
+
+const albumCardVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: i * 0.06,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
+};
 
 function MyAlbumsPage() {
   const [albums, setAlbums] = useState([]);
@@ -103,7 +117,12 @@ function MyAlbumsPage() {
         {/* === Body Content === */}
         <div className={cx('content-section')}>
           {albums.length === 0 ? (
-            <div className={cx('empty-state')}>
+            <motion.div
+              className={cx('empty-state')}
+              initial={{ opacity: 0, y: 20, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            >
               <div className={cx('empty-icon')}>
                 <IoFolderOpenOutline />
               </div>
@@ -113,14 +132,19 @@ function MyAlbumsPage() {
                 <IoAddCircleOutline />
                 Tạo album ngay
               </button>
-            </div>
+            </motion.div>
           ) : viewMode === 'grid' ? (
             <div className={cx('album-grid')}>
               {albums.map((album, index) => (
-                <div
+                <motion.div
                   key={album.albumId}
                   className={cx('album-card')}
                   onClick={() => navigate(`/albums/${album.albumId}`)}
+                  custom={index}
+                  initial="hidden"
+                  animate="visible"
+                  variants={albumCardVariants}
+                  whileHover={{ y: -6 }}
                 >
                   <div className={cx('card-top')}>
                     <div className={cx('card-icon')}>
@@ -143,7 +167,7 @@ function MyAlbumsPage() {
                   <button className={cx('btn-view')}>
                     Bắt đầu học ngay
                   </button>
-                </div>
+                </motion.div>
               ))}
             </div>
           ) : (
