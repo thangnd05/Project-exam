@@ -5,6 +5,7 @@ import styles from './DefaultLayout.module.scss';
 import Header from '../Header';
 import Footer from '../Footer';
 import ScrollToTop from '../SconllToTop';
+import BackgroundDecor from '~/components/common/BackgroundDecor';
 
 const cx = classNames.bind(styles);
 
@@ -13,6 +14,7 @@ function DefaultLayout({children, noContainer = false}) {
 
   return (
     <div className={cx('wrapper')}>
+      <BackgroundDecor />
       <Header />
 
       <main className={cx('main')}>

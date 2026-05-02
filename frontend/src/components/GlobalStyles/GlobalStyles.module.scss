@@ -185,8 +185,8 @@ body {
   line-height: 1.5;
   text-rendering: optimizespeed;
   color: var(--text-color);
-  background-color: var(--bg-body);
-  /* Áp dụng nền xám sáng */
+  background-color: #f5f8fc;
+  /* Nền base hơi sáng hơn để các blob trôi nổi rõ */
   scrollbar-gutter: stable;
 }
 

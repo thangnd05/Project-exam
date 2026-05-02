@@ -1,0 +1,124 @@
+.decor {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ============================================================
+   BLOBS — 3 quả gradient mờ, mỗi quả chuyển động theo path riêng,
+   vòng lặp dài (28-40s) để cảm giác "ambient" chứ không jittery.
+   ============================================================ */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform;
+}
+
+.blob1 {
+  top: -10%;
+  left: -8%;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 97, 242, 0.28) 0%,
+    rgba(0, 97, 242, 0) 70%
+  );
+  animation: drift1 32s ease-in-out infinite;
+}
+
+.blob2 {
+  top: 40%;
+  right: -10%;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 198, 255, 0.22) 0%,
+    rgba(0, 198, 255, 0) 70%
+  );
+  animation: drift2 38s ease-in-out infinite;
+}
+
+.blob3 {
+  bottom: -12%;
+  left: 30%;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(
+    circle,
+    rgba(124, 58, 237, 0.18) 0%,
+    rgba(124, 58, 237, 0) 70%
+  );
+  animation: drift3 28s ease-in-out infinite;
+}
+
+/* ============================================================
+   GRID — chấm tĩnh nhẹ, mask radial để fade về tâm
+   ============================================================ */
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(0, 97, 242, 0.07) 1px,
+    transparent 0
+  );
+  background-size: 28px 28px;
+  mask-image: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(0, 0, 0, 0.55) 0%,
+    transparent 75%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(0, 0, 0, 0.55) 0%,
+    transparent 75%
+  );
+}
+
+/* ============================================================
+   KEYFRAMES — di chuyển và scale nhẹ
+   ============================================================ */
+@keyframes drift1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(60px, 80px) scale(1.08);
+  }
+  66% {
+    transform: translate(-40px, 40px) scale(0.95);
+  }
+}
+
+@keyframes drift2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  40% {
+    transform: translate(-80px, -50px) scale(1.06);
+  }
+  75% {
+    transform: translate(40px, 70px) scale(0.92);
+  }
+}
+
+@keyframes drift3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(50px, -60px) scale(1.1);
+  }
+}
+
+/* Tôn trọng prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .blob {
+    animation: none !important;
+  }
+}
