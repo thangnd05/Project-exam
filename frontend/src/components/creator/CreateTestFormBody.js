@@ -108,7 +108,11 @@ const CreateTestFormBody = ({
   const handleFormSubmit = async () => {
     const success = await handleSubmit();
     if (success) {
-      if (embedded) toast.success(activeCreatorType === CREATOR_TYPES.TEST ? 'Đã tạo đề thi thành công! 🚀' : 'Đã lưu thành công!');
+      toast.success(
+        activeCreatorType === CREATOR_TYPES.TEST
+          ? 'Đã tạo đề thi thành công'
+          : 'Đã lưu câu hỏi vào kho thành công'
+      );
       onSuccess?.();
     }
   };

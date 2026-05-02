@@ -97,11 +97,11 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE
     );
 
-    // A. / A) / A: / A- / A <text>
+    // A. / A) / (A) / A: / A- / A <text>
     // Negative lookahead (?![-_]{2,}) — sau separator/space, nếu là chuỗi gạch/gạch dưới
     // (fill-in-blank), KHÔNG coi là option line.
     private static final Pattern OPTION_PATTERN = Pattern.compile(
-            "^\\s*(" + ALLOWED_LABEL_CLASS + ")(?:\\s*[\\.\\):\\-](?![-_]{2,})|\\s+(?![-_]{2,}))\\s*(.*)$",
+            "^\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?(?:\\s*[\\.\\):\\-](?![-_]{2,})|\\s+(?![-_]{2,}))\\s*(.*)$",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -112,8 +112,8 @@ public class QuestionDocumentImportService {
     //   (fill-in-blank cloze), KHÔNG coi là option. Tránh "began a ------- agreement"
     //   bị tách thành option A.
     private static final Pattern OPTION_LABEL_START = Pattern.compile(
-            "(?:^|\\s)\\s*(" + ALLOWED_LABEL_CLASS + ")\\s*[\\.\\):\\-](?![-_]{2,})"
-                    + "|(?:^|\\s{2,}|\\t)\\s*(" + ALLOWED_LABEL_CLASS + ")\\s+(?![-_]{2,})",
+            "(?:^|\\s)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s*[\\.\\):\\-](?![-_]{2,})"
+                    + "|(?:^|\\s{2,}|\\t)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s+(?![-_]{2,})",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -322,6 +322,7 @@ public class QuestionDocumentImportService {
         // (Không check label đơn lẻ vì 1 ký tự quá dễ false-positive.)
         if (styledRawText.contains(label + ".")
                 || styledRawText.contains(label + ")")
+                || styledRawText.contains("(" + label + ")")
                 || styledRawText.contains(label + ":")) {
             return true;
         }
@@ -698,6 +699,12 @@ public class QuestionDocumentImportService {
         // Có dấu phân cách (A. / A) / A: / A-) -> luôn là option.
         int i = 0;
         while (i < trimmed.length() && Character.isWhitespace(trimmed.charAt(i))) {
+            i++;
+        }
+        if (i >= trimmed.length()) {
+            return false;
+        }
+        if (trimmed.charAt(i) == '(') {
             i++;
         }
         if (i >= trimmed.length()) {
