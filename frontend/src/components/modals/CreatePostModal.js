@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert } from 'react-bootstrap';
+
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import classNames from 'classnames/bind';
@@ -20,10 +20,10 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const [message, setMessage] = useState('');
-  const [type, setType] = useState('info');
+  // message state removed
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -46,11 +46,8 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
   ];
 
   const handleCreate = async () => {
-    setMessage('');
-
     if (!user) {
-      setType('warning');
-      setMessage('⚠️ Bạn cần đăng nhập trước khi tạo bài viết!');
+      toast.warning('⚠️ Bạn cần đăng nhập trước khi tạo bài viết!');
       setTimeout(() => {
         onClose();
         navigate(routes.login);
@@ -59,8 +56,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
     }
 
     if (!title.trim() || !content.trim() || !categoryId) {
-      setType('danger');
-      setMessage('⚠️ Vui lòng điền đầy đủ tiêu đề, nội dung và chọn danh mục!');
+      toast.warning('⚠️ Vui lòng điền đầy đủ tiêu đề, nội dung và chọn danh mục!');
       return;
     }
 
@@ -74,7 +70,16 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
         categoryIds: [categoryId],
       };
 
-      await axios.post('/api/posts', postData);
+      const formData = new FormData();
+      formData.append('post', JSON.stringify(postData));
+      
+      if (thumbnailFile) {
+        formData.append('thumbnail', thumbnailFile);
+      }
+
+      await axios.post('/api/posts', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
       toast.success('🎉 Đăng bài viết thành công!');
       
@@ -82,14 +87,12 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
       setContent('');
       setCategoryId('');
       setThumbnailUrl('');
+      setThumbnailFile(null);
       
       onClose();
       if (onRefresh) onRefresh();
     } catch (err) {
-      setType('danger');
-      setMessage(
-        err.response?.data?.message || '❌ Có lỗi xảy ra khi đăng bài viết!',
-      );
+      toast.error(err.response?.data?.message || '❌ Có lỗi xảy ra khi đăng bài viết!');
     } finally {
       setLoading(false);
     }
@@ -113,11 +116,6 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
         />
       }
     >
-      {message && (
-        <Alert variant={type} style={{ margin: '15px 20px', fontSize: '14px' }}>
-          {message}
-        </Alert>
-      )}
 
       <div className={cx('formGroup')}>
         <label className={cx('label')}>Tiêu đề bài viết</label>
@@ -160,20 +158,43 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
         </div>
       </div>
 
-      <div className={cx('formGroup', 'mt-4')}>
-        <label className={cx('label')}>Ảnh bìa (URL)</label>
-        <div className={cx('inputWrapper')}>
-          <span className={cx('inputIcon')}>
-            <FaImage />
-          </span>
+      <div className={cx('row', 'mt-4')}>
+        <div className={cx('col', 'formGroup')}>
+          <label className={cx('label')}>Ảnh bìa (Upload từ máy tính)</label>
           <input
-            type="text"
-            className={cx('inputControl')}
-            placeholder="Dán link ảnh bìa tại đây..."
-            value={thumbnailUrl}
-            onChange={(e) => setThumbnailUrl(e.target.value)}
+            type="file"
+            accept="image/*"
+            className="form-control"
+            onChange={(e) => setThumbnailFile(e.target.files[0])}
             disabled={loading}
+            style={{ padding: '10px', fontSize: '14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
           />
+          {thumbnailFile && (
+            <small className="text-muted d-block mt-2">Đã chọn: {thumbnailFile.name}</small>
+          )}
+        </div>
+        <div className={cx('col', 'formGroup')}>
+          <label className={cx('label')}>Hoặc dán Link (URL) ảnh bìa</label>
+          <div className={cx('inputWrapper')}>
+            <span className={cx('inputIcon')}>
+              <FaImage />
+            </span>
+            <input
+              type="text"
+              className={cx('inputControl')}
+              placeholder="Dán link ảnh bìa tại đây..."
+              value={thumbnailUrl}
+              onChange={(e) => setThumbnailUrl(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+        </div>
+      </div>
+      <div className={cx('row', 'mt-1')}>
+        <div className={cx('col')}>
+          <small className="text-primary" style={{ fontStyle: 'italic' }}>
+            * Lưu ý: Nếu bạn chọn cả Upload ảnh và dán Link URL, hệ thống sẽ ưu tiên sử dụng ảnh Upload.
+          </small>
         </div>
       </div>
 

@@ -23,6 +23,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final ObjectMapper objectMapper;
 
     // ─── GET danh sách (public) ───────────────────
     @GetMapping
@@ -52,23 +53,35 @@ public class PostController {
         return ResponseEntity.ok(postService.getMyPosts(httpRequest));
     }
 
-    // ─── CREATE (auth) — JSON ────────────────────
-    @PostMapping
+    // ─── CREATE (auth) — MULTIPART ────────────────────
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResponse> createPost(
-            @RequestBody PostUpsertRequest request,
+            @RequestPart("post") String requestJson,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnailFile,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(postService.createPost(request, httpRequest));
+        try {
+            PostUpsertRequest request = objectMapper.readValue(requestJson, PostUpsertRequest.class);
+            return ResponseEntity.ok(postService.createPost(request, thumbnailFile, httpRequest));
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    // ─── UPDATE (auth, owner only) — JSON ────────
-    @PutMapping("/{id}")
+    // ─── UPDATE (auth, owner only) — MULTIPART ────────
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResponse> updatePost(
             @PathVariable String id,
-            @RequestBody PostUpsertRequest request,
+            @RequestPart("post") String requestJson,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnailFile,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(postService.updatePost(id, request, httpRequest));
+        try {
+            PostUpsertRequest request = objectMapper.readValue(requestJson, PostUpsertRequest.class);
+            return ResponseEntity.ok(postService.updatePost(id, request, thumbnailFile, httpRequest));
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // ─── DELETE (auth, owner only) ────────────────

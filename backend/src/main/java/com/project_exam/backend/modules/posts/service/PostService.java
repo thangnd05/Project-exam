@@ -170,6 +170,7 @@ public class PostService {
 
     @Transactional
     public PostResponse createPost(PostUpsertRequest request,
+                                   MultipartFile thumbnailFile,
                                    HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
 
@@ -180,6 +181,16 @@ public class PostService {
                 .thumbnailUrl(request.getThumbnailUrl())
                 .status(request.getStatus() != null ? request.getStatus() : Post.PostStatus.PENDING)
                 .build();
+                
+        if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+            try {
+                String url = cloudinaryService.uploadImage(thumbnailFile);
+                post.setThumbnailUrl(url);
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi upload ảnh bìa");
+            }
+        }
+
         post = postRepository.save(post);
 
         // Gán categories
@@ -190,6 +201,7 @@ public class PostService {
 
     @Transactional
     public PostResponse updatePost(String id, PostUpsertRequest request,
+                                   MultipartFile thumbnailFile,
                                    HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         Post post = postRepository.findById(id)
@@ -201,7 +213,19 @@ public class PostService {
 
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
-        post.setThumbnailUrl(request.getThumbnailUrl());
+        if (request.getThumbnailUrl() != null && !request.getThumbnailUrl().isBlank()) {
+            post.setThumbnailUrl(request.getThumbnailUrl());
+        }
+        
+        if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+            try {
+                String url = cloudinaryService.uploadImage(thumbnailFile);
+                post.setThumbnailUrl(url);
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi upload ảnh bìa");
+            }
+        }
+
         if (request.getStatus() != null) post.setStatus(request.getStatus());
         postRepository.save(post);
 
