@@ -38,7 +38,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
 
             await axios.put(`/api/vocabulary-albums/${album.albumId}`, payload);
 
-            toast.success("🎉 Cập nhật Album thành công!");
+            toast.success("Cập nhật Album thành công!");
 
             onClose();
             if (onSuccess) onSuccess();
@@ -47,7 +47,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
             console.error(err);
             toast.error(
                 err.response?.data?.message ||
-                "❌ Có lỗi xảy ra khi cập nhật Album!"
+                " Có lỗi xảy ra khi cập nhật Album!"
             );
         } finally {
             setLoading(false);
@@ -72,41 +72,41 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
                 />
             )}
         >
-                <div className={cx("formGroup")}>
-                    <label className={cx("label")}>Tên Album</label>
-                    <div className={cx("inputWrapper")}>
-                        <span className={cx("inputIcon")}>
-                            <FaEdit />
-                        </span>
-                        <input
-                            type="text"
-                            className={cx("inputControl")}
-                            placeholder="Ví dụ: Từ vựng IELTS, Giao tiếp..."
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            disabled={loading}
-                            autoFocus
-                        />
-                    </div>
+            <div className={cx("formGroup")}>
+                <label className={cx("label")}>Tên Album</label>
+                <div className={cx("inputWrapper")}>
+                    <span className={cx("inputIcon")}>
+                        <FaEdit />
+                    </span>
+                    <input
+                        type="text"
+                        className={cx("inputControl")}
+                        placeholder="Ví dụ: Từ vựng IELTS, Giao tiếp..."
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        disabled={loading}
+                        autoFocus
+                    />
                 </div>
+            </div>
 
-                <div className={cx("formGroup")}>
-                    <label className={cx("label")}>Mô tả</label>
-                    <div className={cx("inputWrapper")}>
-                        <textarea
-                            className={cx("inputControl", "textarea")}
-                            placeholder="Nhập mô tả về mục tiêu của album này..."
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            disabled={loading}
-                            rows={3}
-                        />
-                    </div>
-                    <div className={cx("tip")}>
-                        <FaInfoCircle />
-                        <span>Mô tả giúp bạn ghi nhớ mục đích học tập của album.</span>
-                    </div>
+            <div className={cx("formGroup")}>
+                <label className={cx("label")}>Mô tả</label>
+                <div className={cx("inputWrapper")}>
+                    <textarea
+                        className={cx("inputControl", "textarea")}
+                        placeholder="Nhập mô tả về mục tiêu của album này..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        disabled={loading}
+                        rows={3}
+                    />
                 </div>
+                <div className={cx("tip")}>
+                    <FaInfoCircle />
+                    <span>Mô tả giúp bạn ghi nhớ mục đích học tập của album.</span>
+                </div>
+            </div>
         </CommonFormModal>
     );
 }

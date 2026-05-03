@@ -83,7 +83,7 @@ const TestResultPage = () => {
         setCanReview(!availableTo || now > availableTo);
 
       } catch (err) {
-        console.error("❌ Lỗi tải kết quả:", err);
+        console.error(" Lỗi tải kết quả:", err);
         setError("Không thể tải kết quả bài thi này");
       } finally {
         setLoading(false);
@@ -128,7 +128,7 @@ const TestResultPage = () => {
 
       setShowDetail(true);
     } catch (err) {
-      console.error("❌ Lỗi tải chi tiết:", err);
+      console.error(" Lỗi tải chi tiết:", err);
       alert("Không thể tải chi tiết câu hỏi. Vui lòng thử lại.");
     } finally {
       setDetailLoading(false);

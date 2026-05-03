@@ -68,7 +68,7 @@ function JoinClassModal({ show, onClose }) {
             setType("danger");
             setMessage(
                 err.response?.data?.message ||
-                "❌ Không có lớp nào với mã tham gia này!"
+                " Không có lớp nào với mã tham gia này!"
             );
         } finally {
             setLoading(false);
@@ -102,29 +102,29 @@ function JoinClassModal({ show, onClose }) {
                 </Alert>
             )}
 
-                <div className={cx("formGroup")}>
-                    <label className={cx("label")}>Mã classQr</label>
+            <div className={cx("formGroup")}>
+                <label className={cx("label")}>Mã classQr</label>
 
-                    <div className={cx("inputWrapper")}>
-                        <span className={cx("inputIcon")}>
-                            <FaKey />
-                        </span>
+                <div className={cx("inputWrapper")}>
+                    <span className={cx("inputIcon")}>
+                        <FaKey />
+                    </span>
 
-                        <input
-                            type="text"
-                            className={cx("inputControl")}
-                            placeholder="Ví dụ: AB12CD34"
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    <div className={cx("tip")}>
-                        <FaInfoCircle />
-                        <span>Liên hệ giáo viên để lấy mã classQr chính xác.</span>
-                    </div>
+                    <input
+                        type="text"
+                        className={cx("inputControl")}
+                        placeholder="Ví dụ: AB12CD34"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        disabled={loading}
+                    />
                 </div>
+
+                <div className={cx("tip")}>
+                    <FaInfoCircle />
+                    <span>Liên hệ giáo viên để lấy mã classQr chính xác.</span>
+                </div>
+            </div>
         </CommonFormModal>
     );
 }

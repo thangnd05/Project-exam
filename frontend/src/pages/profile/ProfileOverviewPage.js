@@ -107,7 +107,7 @@ function ProfileOverviewPage() {
     if (!profileOverview?.testStats) return [];
     return [
       { name: 'Hoàn thành', value: profileOverview.testStats.completedAttempts || 0 },
-      { name: 'Đang làm dở', value: profileOverview.testStats.inProgressAttempts || 0 }
+      { name: 'Chưa hoàn thành', value: profileOverview.testStats.inProgressAttempts || 0 }
     ];
   }, [profileOverview]);
 
@@ -328,29 +328,29 @@ function ProfileOverviewPage() {
                       {myEvaluations
                         .slice(0, PREVIEW_EVALUATION_COUNT)
                         .map((evaluation) => (
-                        <article key={evaluation.id} className={cx('evaluationItem')}>
-                          <div className={cx('evaluationHeader')}>
-                            <div className={cx('evaluationStars')}>
-                              {Array.from({ length: 5 }).map((_, index) => (
-                                <IoStar
-                                  key={`${evaluation.id}-star-${index}`}
-                                  className={cx(
-                                    index < Number(evaluation.rating || 0)
-                                      ? 'evaluationStarActive'
-                                      : 'evaluationStarInactive'
-                                  )}
-                                />
-                              ))}
+                          <article key={evaluation.id} className={cx('evaluationItem')}>
+                            <div className={cx('evaluationHeader')}>
+                              <div className={cx('evaluationStars')}>
+                                {Array.from({ length: 5 }).map((_, index) => (
+                                  <IoStar
+                                    key={`${evaluation.id}-star-${index}`}
+                                    className={cx(
+                                      index < Number(evaluation.rating || 0)
+                                        ? 'evaluationStarActive'
+                                        : 'evaluationStarInactive'
+                                    )}
+                                  />
+                                ))}
+                              </div>
+                              <span className={cx('evaluationDate')}>
+                                {formatDateTime(evaluation.createdAt)}
+                              </span>
                             </div>
-                            <span className={cx('evaluationDate')}>
-                              {formatDateTime(evaluation.createdAt)}
-                            </span>
-                          </div>
-                          <p className={cx('evaluationContent')}>
-                            {evaluation.content || '--'}
-                          </p>
-                        </article>
-                      ))}
+                            <p className={cx('evaluationContent')}>
+                              {evaluation.content || '--'}
+                            </p>
+                          </article>
+                        ))}
                       {myEvaluations.length > PREVIEW_EVALUATION_COUNT && (
                         <button
                           type="button"

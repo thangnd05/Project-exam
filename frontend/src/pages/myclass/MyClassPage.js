@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {useNavigate} from 'react-router-dom';
-import {Spinner, Alert} from 'react-bootstrap';
-import {toast} from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { Spinner, Alert } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 
 import styles from './MyClassPage.module.scss';
@@ -34,7 +34,7 @@ const MyClassesPage = () => {
           setLearningClasses(res.data.learningClasses || []);
         }
       } catch (err) {
-        console.error('❌ Lỗi khi tải danh sách lớp học:', err);
+        console.error(' Lỗi khi tải danh sách lớp học:', err);
         setMessage('Không thể kết nối đến máy chủ 😢');
       } finally {
         setLoading(false);
@@ -78,7 +78,7 @@ const MyClassesPage = () => {
       setShowDeleteModal(false);
       setSelectedClass(null);
     } catch (err) {
-      toast.error(err.response?.data?.error || '❌ Xóa lớp học thất bại!');
+      toast.error(err.response?.data?.error || ' Xóa lớp học thất bại!');
     }
   };
 
@@ -90,7 +90,7 @@ const MyClassesPage = () => {
   const handleEditSuccess = (updatedClass) => {
     setTeachingClasses((prev) =>
       prev.map((c) =>
-        c.classId === updatedClass.classId ? {...c, ...updatedClass} : c,
+        c.classId === updatedClass.classId ? { ...c, ...updatedClass } : c,
       ),
     );
   };

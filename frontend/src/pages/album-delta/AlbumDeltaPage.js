@@ -53,7 +53,7 @@ const AlbumDetailPage = () => {
       });
       setVocabularies(res.data);
     } catch (err) {
-      console.error('❌ Lỗi khi tải từ vựng:', err);
+      console.error(' Lỗi khi tải từ vựng:', err);
       setErrorMsg('Không thể tải danh sách từ vựng 😢');
     } finally {
       setLoading(false);
@@ -94,7 +94,7 @@ const AlbumDetailPage = () => {
       setVocabularies((prev) => prev.filter((v) => v.vocabId !== vocabToDelete.vocabId));
       toast.success(`Đã xóa từ "${vocabToDelete.word}" thành công!`);
     } catch (err) {
-      console.error('❌ Lỗi khi xóa:', err);
+      console.error(' Lỗi khi xóa:', err);
       toast.error('Không thể xóa từ này. Vui lòng thử lại!');
     } finally {
       setShowDeleteModal(false);

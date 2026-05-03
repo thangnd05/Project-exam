@@ -30,7 +30,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
 
             await axios.post("/api/vocabulary-albums", payload);
 
-            toast.success("🎉 Tạo Album thành công!");
+            toast.success("Tạo Album thành công!");
 
             // Reset + close modal
             setName("");
@@ -43,7 +43,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
             console.error(err);
             toast.error(
                 err.response?.data?.message ||
-                "❌ Có lỗi xảy ra khi tạo Album!"
+                "Có lỗi xảy ra khi tạo Album!"
             );
         } finally {
             setLoading(false);
@@ -67,41 +67,41 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
                 />
             )}
         >
-                <div className={cx("formGroup")}>
-                    <label className={cx("label")}>Tên Album</label>
-                    <div className={cx("inputWrapper")}>
-                        <span className={cx("inputIcon")}>
-                            <FaEdit />
-                        </span>
-                        <input
-                            type="text"
-                            className={cx("inputControl")}
-                            placeholder="Ví dụ: Từ vựng IELTS, Giao tiếp..."
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            disabled={loading}
-                            autoFocus
-                        />
-                    </div>
+            <div className={cx("formGroup")}>
+                <label className={cx("label")}>Tên Album</label>
+                <div className={cx("inputWrapper")}>
+                    <span className={cx("inputIcon")}>
+                        <FaEdit />
+                    </span>
+                    <input
+                        type="text"
+                        className={cx("inputControl")}
+                        placeholder="Ví dụ: Từ vựng IELTS, Giao tiếp..."
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        disabled={loading}
+                        autoFocus
+                    />
                 </div>
+            </div>
 
-                <div className={cx("formGroup")}>
-                    <label className={cx("label")}>Mô tả</label>
-                    <div className={cx("inputWrapper")}>
-                        <textarea
-                            className={cx("inputControl", "textarea")}
-                            placeholder="Nhập mô tả về mục tiêu của album này..."
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            disabled={loading}
-                            rows={3}
-                        />
-                    </div>
-                    <div className={cx("tip")}>
-                        <FaInfoCircle />
-                        <span>Mô tả giúp bạn ghi nhớ mục đích học tập của album.</span>
-                    </div>
+            <div className={cx("formGroup")}>
+                <label className={cx("label")}>Mô tả</label>
+                <div className={cx("inputWrapper")}>
+                    <textarea
+                        className={cx("inputControl", "textarea")}
+                        placeholder="Nhập mô tả về mục tiêu của album này..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        disabled={loading}
+                        rows={3}
+                    />
                 </div>
+                <div className={cx("tip")}>
+                    <FaInfoCircle />
+                    <span>Mô tả giúp bạn ghi nhớ mục đích học tập của album.</span>
+                </div>
+            </div>
         </CommonFormModal>
     );
 }

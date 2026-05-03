@@ -365,7 +365,7 @@ public class UserTestService {
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;
     
-        // ❌ chỉ chặn khi có giới hạn thời gian nhưng chưa hết
+        //  chỉ chặn khi có giới hạn thời gian nhưng chưa hết
         if (!isUnlimited && !isEnded) {
             return Collections.emptyList();
         }

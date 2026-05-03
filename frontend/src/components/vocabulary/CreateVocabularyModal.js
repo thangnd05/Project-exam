@@ -41,7 +41,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             onSuccess();
             onClose();
         } catch (err) {
-            console.error('❌ Lỗi khi thêm từ:', err);
+            console.error(' Lỗi khi thêm từ:', err);
             toast.error('Có lỗi xảy ra khi thêm từ mới!');
         } finally {
             setLoading(false);
@@ -65,57 +65,57 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                 />
             )}
         >
-                <div className={cx('formGroup')}>
-                    <label className={cx('label')}>Từ vựng (Tiếng Anh)</label>
-                    <div className={cx('inputWrapper')}>
-                        <span className={cx('inputIcon')}>
-                            <IoText />
-                        </span>
-                        <input
-                            type="text"
-                            name="word"
-                            className={cx('inputControl')}
-                            placeholder="Ví dụ: Excellence, Innovation..."
-                            value={newVocab.word}
-                            onChange={handleChange}
-                            disabled={loading}
-                            autoFocus
-                        />
-                    </div>
+            <div className={cx('formGroup')}>
+                <label className={cx('label')}>Từ vựng (Tiếng Anh)</label>
+                <div className={cx('inputWrapper')}>
+                    <span className={cx('inputIcon')}>
+                        <IoText />
+                    </span>
+                    <input
+                        type="text"
+                        name="word"
+                        className={cx('inputControl')}
+                        placeholder="Ví dụ: Excellence, Innovation..."
+                        value={newVocab.word}
+                        onChange={handleChange}
+                        disabled={loading}
+                        autoFocus
+                    />
                 </div>
+            </div>
 
-                <div className={cx('formGroup')}>
-                    <label className={cx('label')}>Nghĩa (Tiếng Việt)</label>
-                    <div className={cx('inputWrapper')}>
-                        <span className={cx('inputIcon')}>
-                            <IoLanguage />
-                        </span>
-                        <input
-                            type="text"
-                            name="meaning"
-                            className={cx('inputControl')}
-                            placeholder="Ví dụ: Sự xuất sắc, Đổi mới..."
-                            value={newVocab.meaning}
-                            onChange={handleChange}
-                            disabled={loading}
-                        />
-                    </div>
+            <div className={cx('formGroup')}>
+                <label className={cx('label')}>Nghĩa (Tiếng Việt)</label>
+                <div className={cx('inputWrapper')}>
+                    <span className={cx('inputIcon')}>
+                        <IoLanguage />
+                    </span>
+                    <input
+                        type="text"
+                        name="meaning"
+                        className={cx('inputControl')}
+                        placeholder="Ví dụ: Sự xuất sắc, Đổi mới..."
+                        value={newVocab.meaning}
+                        onChange={handleChange}
+                        disabled={loading}
+                    />
                 </div>
+            </div>
 
-                <div className={cx('formGroup')}>
-                    <label className={cx('label')}>Ví dụ minh họa</label>
-                    <div className={cx('inputWrapper')}>
-                        <textarea
-                            name="example"
-                            className={cx('inputControl', 'textarea')}
-                            placeholder="Nhập ví dụ giúp bạn ghi nhớ từ vựng này..."
-                            value={newVocab.example}
-                            onChange={handleChange}
-                            disabled={loading}
-                            rows={3}
-                        />
-                    </div>
+            <div className={cx('formGroup')}>
+                <label className={cx('label')}>Ví dụ minh họa</label>
+                <div className={cx('inputWrapper')}>
+                    <textarea
+                        name="example"
+                        className={cx('inputControl', 'textarea')}
+                        placeholder="Nhập ví dụ giúp bạn ghi nhớ từ vựng này..."
+                        value={newVocab.example}
+                        onChange={handleChange}
+                        disabled={loading}
+                        rows={3}
+                    />
                 </div>
+            </div>
         </CommonFormModal>
     );
 };

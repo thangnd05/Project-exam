@@ -65,11 +65,11 @@ function MyAlbumsPage() {
 
     try {
       await axios.delete(`/api/vocabulary-albums/${albumToDelete.albumId}`);
-      toast.success("🎉 Xóa Album thành công!");
+      toast.success("Xóa Album thành công!");
       fetchAlbums();
     } catch (err) {
-      console.error('❌ Lỗi xóa album:', err);
-      toast.error("❌ Có lỗi xảy ra khi xóa Album!");
+      console.error(' Lỗi xóa album:', err);
+      toast.error(" Có lỗi xảy ra khi xóa Album!");
     } finally {
       setShowDeleteModal(false);
       setAlbumToDelete(null);

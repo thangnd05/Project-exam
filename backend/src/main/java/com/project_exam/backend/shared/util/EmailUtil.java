@@ -60,7 +60,7 @@ public class EmailUtil {
             javaMailSender.send(mimeMessage);
             System.out.println("✅ Sent verification email to " + email);
         } catch (MailException e) {
-            System.err.println("❌ Lỗi khi gửi mail: " + e.getMessage());
+            System.err.println(" Lỗi khi gửi mail: " + e.getMessage());
             throw new BadRequestException("Không thể gửi email xác thực. Vui lòng kiểm tra địa chỉ email.");
         }
     }

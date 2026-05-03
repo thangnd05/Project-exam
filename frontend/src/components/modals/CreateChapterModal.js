@@ -29,14 +29,14 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }) => {
                 title: title,
                 description: description
             });
-            toast.success('🎉 Tạo chương mới thành công!');
+            toast.success('Tạo chương mới thành công!');
             setTitle('');
             setDescription('');
             onSuccess();
             onClose();
         } catch (error) {
             console.error('Failed to create chapter:', error);
-            toast.error('❌ Có lỗi xảy ra khi tạo chương mới!');
+            toast.error(' Có lỗi xảy ra khi tạo chương mới!');
         } finally {
             setSubmitting(false);
         }

@@ -1,11 +1,11 @@
-import {useState} from 'react';
-import {Alert} from 'react-bootstrap';
-import {toast} from 'react-toastify';
+import { useState } from 'react';
+import { Alert } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import classNames from 'classnames/bind';
-import {FaChalkboardTeacher, FaEdit, FaInfoCircle} from 'react-icons/fa';
-import {useAuth} from '~/hook/useAuth';
-import {useNavigate} from 'react-router-dom';
+import { FaChalkboardTeacher, FaEdit, FaInfoCircle } from 'react-icons/fa';
+import { useAuth } from '~/hook/useAuth';
+import { useNavigate } from 'react-router-dom';
 import routes from '~/config/Routes';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
@@ -13,7 +13,7 @@ import styles from '~/components/common/modal/CommonFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-function CreateClassModal({show, onClose}) {
+function CreateClassModal({ show, onClose }) {
   const [className, setClassName] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ function CreateClassModal({show, onClose}) {
   const [message, setMessage] = useState('');
   const [type, setType] = useState('info');
 
-  const {user} = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   // ✅ Create class logic
@@ -60,7 +60,7 @@ function CreateClassModal({show, onClose}) {
         description: description,
       });
 
-      toast.success('🎉 Tạo lớp học thành công!');
+      toast.success('Tạo lớp học thành công!');
 
       // Reset + close modal immediately
       setClassName('');
@@ -71,7 +71,7 @@ function CreateClassModal({show, onClose}) {
     } catch (err) {
       setType('danger');
       setMessage(
-        err.response?.data?.message || '❌ Có lỗi xảy ra khi tạo lớp học!',
+        err.response?.data?.message || ' Có lỗi xảy ra khi tạo lớp học!',
       );
     } finally {
       setLoading(false);
@@ -97,7 +97,7 @@ function CreateClassModal({show, onClose}) {
     >
       {/* ✅ Alert Message */}
       {message && (
-        <Alert variant={type} style={{margin: '15px 20px', fontSize: '14px'}}>
+        <Alert variant={type} style={{ margin: '15px 20px', fontSize: '14px' }}>
           {message}
         </Alert>
       )}

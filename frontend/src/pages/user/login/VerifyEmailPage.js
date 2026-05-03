@@ -13,7 +13,7 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     if (!token) {
       setStatus("error");
-      setMsg("❌ Thiếu token xác thực!");
+      setMsg(" Thiếu token xác thực!");
       return;
     }
 
@@ -29,7 +29,7 @@ export default function VerifyEmailPage() {
       })
       .catch((err) => {
         setStatus("error");
-        setMsg(err.response?.data?.message || "❌ Xác thực thất bại!");
+        setMsg(err.response?.data?.message || " Xác thực thất bại!");
 
         setTimeout(() => {
           navigate("/register");

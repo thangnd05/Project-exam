@@ -44,7 +44,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
         reader.onload = (e) => {
           const base64Url = e.target.result;
           setInlineImages((prev) => [...prev, { file, base64Url }]);
-          
+
           const quill = quillRef.current.getEditor();
           const range = quill.getSelection(true);
           quill.insertEmbed(range.index, 'image', base64Url);
@@ -95,16 +95,16 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
 
     try {
       let finalContent = content;
-      
+
       // Upload inline images that are still in the content
       const imagesToUpload = inlineImages.filter((img) => finalContent.includes(img.base64Url));
-      
+
       if (imagesToUpload.length > 0) {
         toast.info(`Đang tải lên ${imagesToUpload.length} ảnh trong nội dung...`, { autoClose: 2000 });
         for (const img of imagesToUpload) {
           const imgFormData = new FormData();
           imgFormData.append('image', img.file);
-          
+
           try {
             const res = await axios.post('/api/posts/upload-image', imgFormData, {
               headers: { 'Content-Type': 'multipart/form-data' },
@@ -112,7 +112,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
             const cloudUrl = res.data.url;
             finalContent = finalContent.split(img.base64Url).join(cloudUrl);
           } catch (error) {
-            toast.error(`❌ Lỗi tải ảnh ${img.file.name} lên Cloudinary!`);
+            toast.error(` Lỗi tải ảnh ${img.file.name} lên Cloudinary!`);
           }
         }
       }
@@ -126,7 +126,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
 
       const formData = new FormData();
       formData.append('post', JSON.stringify(postData));
-      
+
       if (thumbnailFile) {
         formData.append('thumbnail', thumbnailFile);
       }
@@ -135,19 +135,19 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      toast.success('🎉 Đăng bài viết thành công!');
-      
+      toast.success('Đăng bài viết thành công!');
+
       setTitle('');
       setContent('');
       setCategoryId('');
       setThumbnailUrl('');
       setThumbnailFile(null);
       setInlineImages([]);
-      
+
       onClose();
       if (onRefresh) onRefresh();
     } catch (err) {
-      toast.error(err.response?.data?.message || '❌ Có lỗi xảy ra khi đăng bài viết!');
+      toast.error(err.response?.data?.message || ' Có lỗi xảy ra khi đăng bài viết!');
     } finally {
       setLoading(false);
     }

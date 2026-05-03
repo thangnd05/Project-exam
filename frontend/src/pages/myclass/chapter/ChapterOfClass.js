@@ -1,9 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import {useParams, useNavigate} from 'react-router-dom';
-import {Container, Spinner, Alert} from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Container, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import {
   IoBookOutline,
   IoArrowBackOutline,
@@ -26,7 +26,7 @@ import routes from '~/config/Routes';
 const cx = classNames.bind(styles);
 
 const ChapterOfClass = () => {
-  const {classId} = useParams();
+  const { classId } = useParams();
   const navigate = useNavigate();
 
   const [chapters, setChapters] = useState([]);
@@ -70,7 +70,7 @@ const ChapterOfClass = () => {
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-          'Không thể xóa chương. Vui lòng thử lại.',
+        'Không thể xóa chương. Vui lòng thử lại.',
       );
     } finally {
       setShowDeleteChapter(false);
@@ -83,7 +83,7 @@ const ChapterOfClass = () => {
       const res = await axios.get(`/api/chapters/class/${classId}`);
       setChapters(res.data || []);
     } catch (err) {
-      console.error('❌ Lỗi load chapter:', err);
+      console.error(' Lỗi load chapter:', err);
       setMessage('Không thể tải danh sách chương 😢');
     } finally {
       setLoading(false);
@@ -99,7 +99,7 @@ const ChapterOfClass = () => {
         }
         setClassQr(res.data?.classQr || '');
       } catch (err) {
-        console.error('❌ Lỗi load class info:', err);
+        console.error(' Lỗi load class info:', err);
       }
     };
 
@@ -136,8 +136,8 @@ const ChapterOfClass = () => {
             activeKey={viewMode}
             onChange={setViewMode}
             options={[
-              {key: 'grid', title: 'Dạng lưới', icon: IoGridOutline},
-              {key: 'list', title: 'Dạng danh sách', icon: IoListOutline},
+              { key: 'grid', title: 'Dạng lưới', icon: IoGridOutline },
+              { key: 'list', title: 'Dạng danh sách', icon: IoListOutline },
             ]}
           />
         </PageHeader>
@@ -235,9 +235,8 @@ const ChapterOfClass = () => {
         }}
         onConfirm={handleConfirmDeleteChapter}
         title="Xác nhận xóa chương"
-        message={`Bạn có chắc chắn muốn xóa chương "${
-          selectedChapter?.title || ''
-        }"?`}
+        message={`Bạn có chắc chắn muốn xóa chương "${selectedChapter?.title || ''
+          }"?`}
       />
     </div>
   );

@@ -162,7 +162,7 @@ export const useTestSubmission = ({
                 );
                 setNotification({
                     type: 'success',
-                    message: '🎉 Tạo đề thi thành công!',
+                    message: 'Tạo đề thi thành công!',
                 });
                 setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
                 setDocumentFile(null);
@@ -197,7 +197,7 @@ export const useTestSubmission = ({
                 });
                 setNotification({
                     type: 'success',
-                    message: '🎉 Đã lưu câu hỏi vào kho!',
+                    message: 'Đã lưu câu hỏi vào kho!',
                 });
                 setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
             } else if (creatorType === CREATOR_TYPES.PASSAGE) {
@@ -233,7 +233,7 @@ export const useTestSubmission = ({
                 await axios.post('/api/questions/bulk-groups', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
-                setNotification({ type: 'success', message: '🎉 Đã lưu thành công!' });
+                setNotification({ type: 'success', message: 'Đã lưu thành công!' });
                 setGroups([createInitialGroup()]);
             }
             return true;

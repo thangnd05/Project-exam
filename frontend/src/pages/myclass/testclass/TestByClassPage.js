@@ -1,10 +1,10 @@
 import axios from 'axios';
-import {useEffect, useState, useCallback} from 'react';
-import {useParams} from 'react-router-dom';
-import {Spinner} from 'react-bootstrap';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {IoDocumentTextOutline, IoAddCircleOutline} from 'react-icons/io5';
-import {toast} from 'react-toastify';
+import { IoDocumentTextOutline, IoAddCircleOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
 
 import styles from './TestByClassPage.module.scss';
 import CreateTestModal from '~/components/modals/CreateTestModal';
@@ -14,7 +14,7 @@ import TestListContainer from '~/components/common/TestListContainer/TestListCon
 const cx = classNames.bind(styles);
 
 function TestByClassPage() {
-  const {classId, chapterId} = useParams();
+  const { classId, chapterId } = useParams();
   const [tests, setTests] = useState([]);
   const [className, setClassName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ function TestByClassPage() {
           setClassName(res.data.className);
         }
       })
-      .catch((err) => console.error('❌ Lỗi:', err));
+      .catch((err) => console.error(' Lỗi:', err));
   }, [classId]);
 
   // 🟢 Lấy danh sách bài test
@@ -48,7 +48,7 @@ function TestByClassPage() {
         }
       })
       .catch((err) => {
-        console.error('❌ Lỗi bài test:', err);
+        console.error(' Lỗi bài test:', err);
       })
       .finally(() => setLoading(false));
   }, [classId, chapterId]);
@@ -69,7 +69,7 @@ function TestByClassPage() {
       toast.success('Xóa bài kiểm tra thành công!');
       fetchTests();
     } catch (err) {
-      console.error('❌ Lỗi xóa bài test:', err);
+      console.error(' Lỗi xóa bài test:', err);
       toast.error('Không thể xóa bài kiểm tra. Vui lòng thử lại.');
     } finally {
       setShowDeleteModal(false);
@@ -101,7 +101,7 @@ function TestByClassPage() {
     return (
       <div
         className="d-flex flex-column align-items-center justify-content-center"
-        style={{minHeight: '60vh'}}
+        style={{ minHeight: '60vh' }}
       >
         <Spinner animation="grow" variant="primary" />
         <p className="mt-3 fw-bold text-primary">Đang tải phòng thi...</p>
@@ -141,7 +141,7 @@ function TestByClassPage() {
         onSuccess={() => {
           fetchTests();
           setShowCreateTestModal(false);
-          toast.success('Tạo bài kiểm tra mới thành công! 🎉');
+          toast.success('Tạo bài kiểm tra mới thành công!');
         }}
       />
 
@@ -153,9 +153,8 @@ function TestByClassPage() {
         }}
         onConfirm={handleConfirmDeleteTest}
         title="Xác nhận xóa bài kiểm tra"
-        message={`Bạn có chắc chắn muốn xóa bài kiểm tra "${
-          testToDelete?.title || 'này'
-        }"? Hành động này không thể hoàn tác.`}
+        message={`Bạn có chắc chắn muốn xóa bài kiểm tra "${testToDelete?.title || 'này'
+          }"? Hành động này không thể hoàn tác.`}
       />
     </>
   );

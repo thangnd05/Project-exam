@@ -653,7 +653,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
 
         if (!isMember && !isTeacher) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "❌ Bạn không có quyền xem bài kiểm tra của lớp này!");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xem bài kiểm tra của lớp này!");
         }
 
         // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
@@ -674,7 +674,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
 
         if (!isMember && !isTeacher) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "❌ Bạn không có quyền xem bài kiểm tra của lớp này!");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xem bài kiểm tra của lớp này!");
         }
 
         // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra

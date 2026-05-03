@@ -1,7 +1,7 @@
 import axios from 'axios';
-import {useEffect, useState} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
-import {Container, Table, Spinner} from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Container, Table, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
   IoArrowBack,
@@ -22,7 +22,7 @@ import routes from '~/config/Routes';
 const cx = classNames.bind(style);
 
 function TestHistoryPage() {
-  const {testId} = useParams();
+  const { testId } = useParams();
   const navigate = useNavigate();
 
   const [attempts, setAttempts] = useState([]);
@@ -48,7 +48,7 @@ function TestHistoryPage() {
         setAttempts(normalizedAttempts);
         setTestInfo(testRes.data);
       } catch (err) {
-        console.error('❌ Lỗi khi tải dữ liệu lịch sử:', err);
+        console.error(' Lỗi khi tải dữ liệu lịch sử:', err);
         setAttempts([]);
       } finally {
         setLoading(false);

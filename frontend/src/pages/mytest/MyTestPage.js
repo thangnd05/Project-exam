@@ -37,7 +37,7 @@ function MyTestPage() {
         else setTests([]);
       })
       .catch((err) => {
-        console.error('❌ Lỗi:', err);
+        console.error(' Lỗi:', err);
         setTests([]);
       })
       .finally(() => setLoading(false));
@@ -59,7 +59,7 @@ function MyTestPage() {
       toast.success('Xóa bài kiểm tra thành công!');
       fetchTests();
     } catch (err) {
-      console.error('❌ Lỗi xóa bài test:', err);
+      console.error(' Lỗi xóa bài test:', err);
       toast.error('Không thể xóa bài kiểm tra. Vui lòng thử lại.');
     } finally {
       setShowDeleteModal(false);
