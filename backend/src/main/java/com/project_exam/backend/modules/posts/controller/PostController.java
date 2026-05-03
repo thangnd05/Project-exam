@@ -93,4 +93,14 @@ public class PostController {
         postService.deletePost(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
+    // ─── UPLOAD IMAGE (QuillJS) ───────────────────
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image) {
+        try {
+            String url = postService.uploadImage(image);
+            return ResponseEntity.ok(java.util.Map.of("url", url));
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Upload failed"));
+        }
+    }
 }

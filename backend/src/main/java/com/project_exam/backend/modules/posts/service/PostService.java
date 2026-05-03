@@ -360,4 +360,11 @@ public class PostService {
             return null;
         }
     }
+
+    public String uploadImage(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File không hợp lệ");
+        }
+        return cloudinaryService.uploadImage(file);
+    }
 }

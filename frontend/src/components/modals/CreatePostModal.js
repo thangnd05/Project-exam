@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -22,21 +22,52 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [inlineImages, setInlineImages] = useState([]);
 
   // message state removed
 
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      ['link', 'image', 'code-block'],
-      ['clean'],
-    ],
-  };
+  const quillRef = useRef(null);
+
+  const imageHandler = useCallback(() => {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const base64Url = e.target.result;
+          setInlineImages((prev) => [...prev, { file, base64Url }]);
+          
+          const quill = quillRef.current.getEditor();
+          const range = quill.getSelection(true);
+          quill.insertEmbed(range.index, 'image', base64Url);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  }, []);
+
+  const quillModules = useMemo(() => ({
+    toolbar: {
+      container: [
+        [{ header: [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'image', 'code-block'],
+        ['clean'],
+      ],
+      handlers: {
+        image: imageHandler,
+      },
+    },
+  }), [imageHandler]);
 
   const quillFormats = [
     'header',
@@ -63,9 +94,32 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
     setLoading(true);
 
     try {
+      let finalContent = content;
+      
+      // Upload inline images that are still in the content
+      const imagesToUpload = inlineImages.filter((img) => finalContent.includes(img.base64Url));
+      
+      if (imagesToUpload.length > 0) {
+        toast.info(`Đang tải lên ${imagesToUpload.length} ảnh trong nội dung...`, { autoClose: 2000 });
+        for (const img of imagesToUpload) {
+          const imgFormData = new FormData();
+          imgFormData.append('image', img.file);
+          
+          try {
+            const res = await axios.post('/api/posts/upload-image', imgFormData, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            const cloudUrl = res.data.url;
+            finalContent = finalContent.split(img.base64Url).join(cloudUrl);
+          } catch (error) {
+            toast.error(`❌ Lỗi tải ảnh ${img.file.name} lên Cloudinary!`);
+          }
+        }
+      }
+
       const postData = {
         title,
-        content,
+        content: finalContent,
         thumbnailUrl: thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1350&q=80',
         categoryIds: [categoryId],
       };
@@ -88,6 +142,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
       setCategoryId('');
       setThumbnailUrl('');
       setThumbnailFile(null);
+      setInlineImages([]);
       
       onClose();
       if (onRefresh) onRefresh();
@@ -204,6 +259,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
         <label className={cx('label')}>Nội dung chi tiết</label>
         <div className={cx('quillWrapper')}>
           <ReactQuill
+            ref={quillRef}
             theme="snow"
             value={content}
             onChange={setContent}
