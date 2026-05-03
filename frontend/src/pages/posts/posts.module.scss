@@ -84,6 +84,11 @@
     display: inline-block;
   }
 
+  .titleLink {
+    text-decoration: none;
+    color: inherit;
+  }
+
   h2 {
     font-size: 2.6rem;
     font-weight: 700;
@@ -163,6 +168,7 @@
       border: none;
       padding: 0;
       cursor: pointer;
+      text-decoration: none;
       transition: transform 0.2s;
 
       &:hover {
@@ -175,27 +181,16 @@
 /* --- Filter Bar --- */
 .filterBar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   margin-bottom: 40px;
   gap: 20px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
 
 .filterPills {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
-  overflow-x: auto;
   padding-bottom: 4px;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 
   .pill {
     padding: 10px 24px;
@@ -226,15 +221,12 @@
 .searchActions {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
-
-  @media (max-width: 1024px) {
-    width: 100%;
-    justify-content: space-between;
-  }
+  width: 100%;
 
   @media (max-width: 640px) {
-    flex-direction: column-reverse;
+    flex-direction: column;
     align-items: stretch;
   }
 }
@@ -320,6 +312,8 @@
   flex-direction: column;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 
   &:hover {
     transform: translateY(-8px);

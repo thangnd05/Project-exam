@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, ArrowRight, Plus } from 'lucide-react';
@@ -9,6 +9,7 @@ import CreatePostModal from '~/components/modals/CreatePostModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);
+const MotionLink = motion(Link);
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -42,7 +43,6 @@ function PostsPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 9;
-  const navigate = useNavigate();
 
   const fetchData = async (page = 0) => {
     setLoading(true);
@@ -155,9 +155,9 @@ function PostsPage() {
             </div>
             <div className={cx('heroContent')}>
               <span className={cx('categoryTag')}>{featuredPost.categories?.[0]?.name || 'Blog'}</span>
-              <h2 onClick={() => navigate(routes.postDetail.replace(':postId', featuredPost.id))}>
-                {featuredPost.title}
-              </h2>
+              <Link to={routes.postDetail.replace(':postId', featuredPost.id)} className={cx('titleLink')}>
+                <h2>{featuredPost.title}</h2>
+              </Link>
               <p className={cx('excerpt')}>{featuredPost.summary || 'Nhấp vào để đọc chi tiết bài viết hấp dẫn này...'}</p>
               <div className={cx('authorMeta')}>
                 <div className={cx('authorInfo')}>
@@ -167,12 +167,12 @@ function PostsPage() {
                     <span>{new Date(featuredPost.createdAt).toLocaleDateString('vi-VN')}</span>
                   </div>
                 </div>
-                <button
+                <Link
                   className={cx('readMore')}
-                  onClick={() => navigate(routes.postDetail.replace(':postId', featuredPost.id))}
+                  to={routes.postDetail.replace(':postId', featuredPost.id)}
                 >
                   Đọc thêm <ArrowRight size={18} />
-                </button>
+                </Link>
               </div>
             </div>
           </motion.div>
@@ -185,6 +185,21 @@ function PostsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
+          <div className={cx('searchActions')}>
+            <div className={cx('searchBox')}>
+              <Search className={cx('searchIcon')} size={18} />
+              <input
+                type="text"
+                placeholder="Tìm bài viết..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <button className={cx('createBtn')} onClick={() => setShowCreateModal(true)}>
+              <Plus size={18} />
+              <span>Tạo bài viết</span>
+            </button>
+          </div>
           <div className={cx('filterPills')}>
             <button
               className={cx('pill', { active: !selectedCategory })}
@@ -202,31 +217,16 @@ function PostsPage() {
               </button>
             ))}
           </div>
-          <div className={cx('searchActions')}>
-            <div className={cx('searchBox')}>
-              <Search className={cx('searchIcon')} size={18} />
-              <input
-                type="text"
-                placeholder="Tìm bài viết..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <button className={cx('createBtn')} onClick={() => setShowCreateModal(true)}>
-              <Plus size={18} />
-              <span>Tạo bài viết</span>
-            </button>
-          </div>
         </motion.div>
 
         {/* Post Grid */}
         <div className={cx('postGrid')}>
           <AnimatePresence mode="popLayout">
           {otherPosts.map((post, index) => (
-            <motion.div
+            <MotionLink
+              to={routes.postDetail.replace(':postId', post.id)}
               key={post.id}
               className={cx('postCard')}
-              onClick={() => navigate(routes.postDetail.replace(':postId', post.id))}
               custom={index}
               initial="hidden"
               animate="visible"
@@ -259,7 +259,7 @@ function PostsPage() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </MotionLink>
           ))}
           </AnimatePresence>
         </div>
