@@ -34,6 +34,11 @@ public class VocabularyController {
         return ResponseEntity.ok(service.createVocabulary(request));
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<List<VocabularyResponse>> createBulk(@RequestBody List<VocabularyRequest> requests) {
+        return ResponseEntity.ok(service.createVocabularies(requests));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<VocabularyResponse> update(
             @PathVariable String id,

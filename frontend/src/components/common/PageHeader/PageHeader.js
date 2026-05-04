@@ -12,6 +12,9 @@ const PageHeader = ({
   onAction,
   actionText,
   actionIcon: Icon,
+  onSecondaryAction,
+  secondaryActionText,
+  secondaryActionIcon: SecondaryIcon,
   className,
   description,
   labelClassName,
@@ -30,6 +33,12 @@ const PageHeader = ({
           <button className={cx('actionBtn')} onClick={onAction}>
             {Icon && <Icon size={24} />}
             {actionText}
+          </button>
+        )}
+        {onSecondaryAction && secondaryActionText && (
+          <button className={cx('actionBtn', 'secondary')} onClick={onSecondaryAction}>
+            {SecondaryIcon && <SecondaryIcon size={24} />}
+            {secondaryActionText}
           </button>
         )}
         {children}

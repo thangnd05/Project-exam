@@ -105,6 +105,10 @@ public class VocabularyService {
         return toResponse(vocab);
     }
 
+    public List<VocabularyResponse> createVocabularies(List<VocabularyRequest> requests) {
+        return requests.stream().map(this::createVocabulary).toList();
+    }
+
     // =========================
     // UPDATE
     // =========================

@@ -10,6 +10,7 @@ import {
 import { toast } from 'react-toastify';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import CreateVocabularyModal from '~/components/vocabulary/CreateVocabularyModal';
+import BulkCreateVocabularyModal from '~/components/vocabulary/BulkCreateVocabularyModal';
 import UpdateVocabularyModal from '~/components/vocabulary/UpdateVocabularyModal';
 import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import classNames from 'classnames/bind';
@@ -23,7 +24,8 @@ import {
   IoChevronForward,
   IoListOutline,
   IoSchoolOutline,
-  IoVolumeHighOutline
+  IoVolumeHighOutline,
+  IoCodeSlashOutline
 } from 'react-icons/io5';
 
 import styles from './AlbumDeltaPage.module.scss';
@@ -37,6 +39,7 @@ const AlbumDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [vocabToDelete, setVocabToDelete] = useState(null);
@@ -134,6 +137,9 @@ const AlbumDetailPage = () => {
           onAction={() => setShowModal(true)}
           actionText="Thêm từ vựng"
           actionIcon={IoAdd}
+          onSecondaryAction={() => setShowBulkModal(true)}
+          secondaryActionText="Nhập JSON"
+          secondaryActionIcon={IoCodeSlashOutline}
         />
 
         <div className={cx('custom-actions')}>
@@ -294,6 +300,13 @@ const AlbumDetailPage = () => {
       <CreateVocabularyModal
         show={showModal}
         onClose={() => setShowModal(false)}
+        onSuccess={fetchVocabularies}
+        albumId={albumId}
+      />
+
+      <BulkCreateVocabularyModal
+        show={showBulkModal}
+        onClose={() => setShowBulkModal(false)}
         onSuccess={fetchVocabularies}
         albumId={albumId}
       />
