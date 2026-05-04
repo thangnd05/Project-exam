@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { IoRocketOutline, IoClose } from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import { toast } from 'react-toastify';
 import CreateTestFormBody from '../creator/CreateTestFormBody';
 import styles from './CreateTestModal.module.scss';
 

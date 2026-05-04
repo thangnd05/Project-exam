@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {
-  Heart, Bookmark, MessageCircle, ChevronRight, Copy, ThumbsUp, User
+  Heart, Bookmark, MessageCircle, ChevronRight, Copy
 } from 'lucide-react';
-import { Button } from 'react-bootstrap';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -248,22 +247,22 @@ function PostDetailPage() {
     return (
       <div key={comment.id} className={cx('commentNode')} style={{ marginLeft: indentStep }}>
         <div className={cx('commentItem')}>
-          <img 
-            src={comment.authorAvatar || 'https://i.pravatar.cc/150?img=12'} 
-            alt="Avatar" 
-            className={cx('avatar')} 
+          <img
+            src={comment.authorAvatar || 'https://i.pravatar.cc/150?img=12'}
+            alt="Avatar"
+            className={cx('avatar')}
           />
           <div className={cx('contentBox')}>
             <div className={cx('commentMeta')}>
               <span className={cx('authorName')}>{comment.authorName}</span>
               {comment.userId === post.userId && <span className={cx('opTag')}>Tác giả</span>}
             </div>
-            
+
             {editingCommentId === comment.id ? (
               <div className="mt-2">
-                <textarea 
-                  className="form-control mb-2" 
-                  value={editContent} 
+                <textarea
+                  className="form-control mb-2"
+                  value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                 />
                 <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(comment.id)}>Lưu</button>
@@ -292,10 +291,10 @@ function PostDetailPage() {
 
             {replyingToId === comment.id && (
               <div className="mt-3">
-                <textarea 
-                  className="form-control mb-2" 
+                <textarea
+                  className="form-control mb-2"
                   placeholder={`Viết câu trả lời cho ${mentionName}...`}
-                  value={replyContent} 
+                  value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                 />
                 <button className="btn btn-primary btn-sm me-2" onClick={() => handleReply(comment.id)}>Gửi</button>
@@ -411,10 +410,10 @@ function PostDetailPage() {
 
           <form className={cx('commentForm')} onSubmit={handleSubmitComment}>
             <div className="d-flex align-items-center mb-3">
-              <img 
-                src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=12'} 
-                alt="Avatar" 
-                className={cx('avatar')} 
+              <img
+                src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=12'}
+                alt="Avatar"
+                className={cx('avatar')}
                 style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
               />
             </div>
