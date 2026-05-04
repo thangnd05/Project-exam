@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import axios from 'axios';
+import axios from '../../api/axiosClient';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 import {IoLockClosedOutline} from 'react-icons/io5';

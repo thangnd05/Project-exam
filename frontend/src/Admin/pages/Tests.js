@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import axios from 'axios';
+import axios from '../../api/axiosClient';
 import {Badge, Button, Form, Modal, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Search, Trash2} from 'lucide-react';

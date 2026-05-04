@@ -7,7 +7,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Button, Form } from 'react-bootstrap';
-import axios from 'axios';
+import axios from '../../api/axiosClient';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {

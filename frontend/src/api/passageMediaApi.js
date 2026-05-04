@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axiosClient';
 
 const BASE = '/api/passage-media';
 

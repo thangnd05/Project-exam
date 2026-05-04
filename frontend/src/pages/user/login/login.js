@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../../../api/axiosClient';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../../hook/useAuth';
 import classNames from 'classnames/bind';

@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import axios from 'axios';
+import axios from '../api/axiosClient';
 import {Navigate, useLocation} from 'react-router-dom';
 import routes from '~/config/Routes';
 import {useAuth} from '../hook/useAuth';

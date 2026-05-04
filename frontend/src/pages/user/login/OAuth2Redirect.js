@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hook/useAuth';
-import axios from 'axios';
+import axios from '../../../api/axiosClient';
 
 function OAuth2Redirect() {
     const navigate = useNavigate();

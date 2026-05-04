@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import axios from 'axios';
+import axios from '../../api/axiosClient';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import {IoBookOutline} from 'react-icons/io5';

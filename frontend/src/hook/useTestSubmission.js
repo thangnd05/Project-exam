@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../api/axiosClient';
 import { toast } from 'react-toastify';
 import { CREATOR_TYPES } from './useCreateTest';
 

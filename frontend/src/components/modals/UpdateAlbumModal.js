@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
-import axios from "axios";
+import axios from '../../api/axiosClient';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";

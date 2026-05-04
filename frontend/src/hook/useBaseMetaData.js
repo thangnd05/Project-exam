@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../api/axiosClient';
 
 export const useBaseMetaData = (examTypeId) => {
     const [examTypes, setExamTypes] = useState([]);

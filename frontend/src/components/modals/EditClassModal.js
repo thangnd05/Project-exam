@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {Alert} from 'react-bootstrap';
 import {toast} from 'react-toastify';
-import axios from 'axios';
+import axios from '../../api/axiosClient';
 import classNames from 'classnames/bind';
 import {FaEdit, FaInfoCircle} from 'react-icons/fa';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';

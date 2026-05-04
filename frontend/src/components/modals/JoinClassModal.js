@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert } from "react-bootstrap";
-import axios from "axios";
+import axios from '../../api/axiosClient';
 import classNames from "classnames/bind";
 import { FaUsers, FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "~/hook/useAuth";

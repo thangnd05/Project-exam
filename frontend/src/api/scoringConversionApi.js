@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axiosClient';
 
 const BASE_URL = '/api/scoring-conversions';
 

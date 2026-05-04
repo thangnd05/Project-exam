@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { IoPencil, IoText, IoLanguage } from 'react-icons/io5';
-import axios from 'axios';
+import axios from '../../api/axiosClient';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';

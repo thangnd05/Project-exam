@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Button, Spinner, Row, Col } from 'react-bootstrap';
-import axios from 'axios';
+import axios from '../../api/axiosClient';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {

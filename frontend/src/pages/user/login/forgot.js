@@ -4,7 +4,7 @@ import style from './login.module.scss';
 import routes from '~/config/Routes';
 import {Form, Button} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../../api/axiosClient';
 
 const cx = classNames.bind(style);
 

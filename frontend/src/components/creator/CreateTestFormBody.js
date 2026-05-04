@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Alert, Button } from 'react-bootstrap';
-import axios from 'axios';
+import axios from '../../api/axiosClient';
 import {
   IoSettingsOutline,
   IoLayersOutline,

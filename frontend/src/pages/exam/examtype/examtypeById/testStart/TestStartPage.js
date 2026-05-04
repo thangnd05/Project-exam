@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../../../../../api/axiosClient';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';

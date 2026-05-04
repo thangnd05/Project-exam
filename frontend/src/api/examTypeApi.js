@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axiosClient';
 
 const BASE_URL = '/api/exam-types';
 const ADMIN_BASE_URL = '/api/admin/exam-types';
