@@ -46,6 +46,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final CustomUserDetailsService customUserDetailsService;
     private final UserRepository userRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
@@ -54,12 +55,14 @@ public class SecurityConfig {
             JwtService jwtService,
             UserDetailsService userDetailsService,
             CustomUserDetailsService customUserDetailsService,
-            UserRepository userRepository
+            UserRepository userRepository,
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.customUserDetailsService = customUserDetailsService;
         this.userRepository = userRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -99,7 +102,11 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
+                            Map<String, String> errorData = new HashMap<>();
+                            errorData.put("error", "Unauthorized");
+                            errorData.put("message", authException.getMessage());
+                            
+                            response.getWriter().write(objectMapper.writeValueAsString(errorData));
                         })
                 )
 
