@@ -31,8 +31,14 @@ const imageVariants = {
     transition: {duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2},
   },
 };
-
 function HeroSection() {
+  const handleScrollToExam = () => {
+    const element = document.getElementById('exam-types');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className={cx('hero')}>
       <motion.div
@@ -52,8 +58,9 @@ function HeroSection() {
           vị hơn.
         </motion.p>
         <motion.div className={cx('actions')} variants={itemVariants}>
-          <button className={cx('btn-primary')}>Bắt đầu ngay</button>
-          <button className={cx('btn-outline')}>Tìm hiểu thêm</button>
+          <button className={cx('btn-primary')} onClick={handleScrollToExam}>
+            Bắt đầu ngay
+          </button>
         </motion.div>
       </motion.div>
 

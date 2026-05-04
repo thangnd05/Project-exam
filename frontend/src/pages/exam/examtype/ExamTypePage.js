@@ -84,7 +84,7 @@ function ExamTypePage() {
   };
 
   return (
-    <div className={cx('exam-type-container')}>
+    <div id="exam-types" className={cx('exam-type-container')}>
       {/* Decorative background elements managed in CSS, but keeping structure clean */}
       <motion.div
         className={cx('header-box')}
