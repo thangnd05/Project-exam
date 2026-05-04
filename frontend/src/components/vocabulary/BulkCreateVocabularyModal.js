@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IoCloudUploadOutline, IoCodeSlashOutline } from 'react-icons/io5';
+import { IoCloudUploadOutline, IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
 import axios from '../../api/axiosClient';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -11,11 +11,54 @@ const cx = classNames.bind(styles);
 
 const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
     const [loading, setLoading] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
     const [jsonInput, setJsonInput] = useState('');
+
+    const handleStandardize = async () => {
+        if (!jsonInput.trim()) {
+            toast.warning('⚠️ Vui lòng nhập văn bản thô để chuẩn hóa!');
+            return;
+        }
+
+        setAiLoading(true);
+        try {
+            const res = await axios.post(
+                '/api/vocabularies/standardize',
+                { rawText: jsonInput },
+                { withCredentials: true }
+            );
+
+            // Backend trả về { data: "..." } — lấy text rồi loại bỏ markdown fences nếu còn
+            let cleanedJson = (res.data?.data || '')
+                .replace(/```json\n?|```/g, '')
+                .trim();
+
+            // Validate JSON trước khi set vào textarea
+            JSON.parse(cleanedJson);
+
+            setJsonInput(cleanedJson);
+            toast.success('✨ Chuẩn hóa dữ liệu thành công!');
+        } catch (err) {
+            console.error('Lỗi chuẩn hóa AI:', err);
+
+            // Phân biệt lỗi: parse JSON fail vs lỗi mạng/backend
+            let errorMsg;
+            if (err instanceof SyntaxError) {
+                errorMsg = 'AI trả về dữ liệu không hợp lệ. Vui lòng thử lại!';
+            } else {
+                errorMsg = err.response?.data?.message
+                    || err.message
+                    || 'Không thể kết nối AI. Vui lòng thử lại!';
+            }
+            toast.error(`❌ ${errorMsg}`);
+        } finally {
+            setAiLoading(false);
+        }
+    };
 
     const handleSave = async (e) => {
         e.preventDefault();
-        
+
         if (!jsonInput.trim()) {
             toast.warning('⚠️ Vui lòng nhập dữ liệu JSON!');
             return;
@@ -28,15 +71,19 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                 toast.error('❌ Dữ liệu phải là một mảng (Array) các đối tượng từ vựng!');
                 return;
             }
+            if (payload.length === 0) {
+                toast.error('❌ Mảng từ vựng không được rỗng!');
+                return;
+            }
         } catch (err) {
             toast.error('❌ Định dạng JSON không hợp lệ. Vui lòng kiểm tra lại!');
             return;
         }
 
-        // Add albumId to each item if not present
-        const processedPayload = payload.map(item => ({
+        // Gắn albumId vào từng item nếu chưa có
+        const processedPayload = payload.map((item) => ({
             ...item,
-            albumId: item.albumId || albumId
+            albumId: item.albumId || albumId,
         }));
 
         setLoading(true);
@@ -51,8 +98,10 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             onSuccess();
             onClose();
         } catch (err) {
-            console.error(' Lỗi khi nhập bulk:', err);
-            toast.error('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!');
+            console.error('Lỗi khi nhập bulk:', err);
+            const msg = err.response?.data?.message
+                || 'Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!';
+            toast.error(`❌ ${msg}`);
         } finally {
             setLoading(false);
         }
@@ -92,15 +141,28 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             <div className={cx('formGroup')}>
                 <div className="d-flex justify-content-between align-items-center mb-2">
                     <label className={cx('label', 'mb-0')}>Dữ liệu JSON</label>
-                    <button 
-                        type="button"
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => setJsonInput(exampleJson)}
-                        style={{ fontSize: '1.2rem' }}
-                    >
-                        <IoCodeSlashOutline className="me-1" />
-                        Xem mẫu JSON
-                    </button>
+                    <div className="d-flex gap-2">
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={handleStandardize}
+                            disabled={aiLoading || loading}
+                            style={{ fontSize: '1.2rem' }}
+                        >
+                            <IoFlashOutline className="me-1" />
+                            {aiLoading ? 'Đang xử lý...' : 'Chuẩn hóa bằng AI'}
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => setJsonInput(exampleJson)}
+                            disabled={aiLoading || loading}
+                            style={{ fontSize: '1.2rem' }}
+                        >
+                            <IoCodeSlashOutline className="me-1" />
+                            Xem mẫu JSON
+                        </button>
+                    </div>
                 </div>
                 <div className={cx('inputWrapper')}>
                     <textarea
@@ -108,7 +170,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                         placeholder='Dán mảng JSON vào đây: [{"word": "...", "meaning": "..."}, ...]'
                         value={jsonInput}
                         onChange={(e) => setJsonInput(e.target.value)}
-                        disabled={loading}
+                        disabled={loading || aiLoading}
                         rows={12}
                         style={{ fontFamily: 'monospace', fontSize: '1.3rem' }}
                     />
