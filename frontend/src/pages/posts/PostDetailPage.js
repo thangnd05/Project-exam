@@ -251,6 +251,7 @@ function PostDetailPage() {
             src={comment.authorAvatar || 'https://i.pravatar.cc/150?img=12'}
             alt="Avatar"
             className={cx('avatar')}
+            referrerPolicy="no-referrer"
           />
           <div className={cx('contentBox')}>
             <div className={cx('commentMeta')}>
@@ -388,7 +389,7 @@ function PostDetailPage() {
 
         <div className={cx('metaRow')}>
           <div className={cx('authorSide')}>
-            <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} />
+            <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} referrerPolicy="no-referrer" />
             <div className={cx('authorInfo')}>
               <Link to="#">{post.authorName}</Link>
             </div>
@@ -415,6 +416,7 @@ function PostDetailPage() {
                 alt="Avatar"
                 className={cx('avatar')}
                 style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                referrerPolicy="no-referrer"
               />
             </div>
             <div className={cx('formContent')}>

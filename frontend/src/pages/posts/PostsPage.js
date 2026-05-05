@@ -161,7 +161,7 @@ function PostsPage() {
               <p className={cx('excerpt')}>{featuredPost.summary || 'Nhấp vào để đọc chi tiết bài viết hấp dẫn này...'}</p>
               <div className={cx('authorMeta')}>
                 <div className={cx('authorInfo')}>
-                  <img src={featuredPost.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={featuredPost.authorName} />
+                  <img src={featuredPost.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={featuredPost.authorName} referrerPolicy="no-referrer" />
                   <div className={cx('nameDate')}>
                     <span>{featuredPost.authorName}</span>
                     <span>{new Date(featuredPost.createdAt).toLocaleDateString('vi-VN')}</span>
@@ -249,7 +249,7 @@ function PostsPage() {
                 <p className={cx('cardExcerpt')}>{post.summary || post.title}</p>
                 <div className={cx('cardFooter')}>
                   <div className={cx('author')}>
-                    <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} />
+                    <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} referrerPolicy="no-referrer" />
                     <span>{post.authorName}</span>
                   </div>
                   <div className={cx('stats')}>

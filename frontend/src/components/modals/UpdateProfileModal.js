@@ -180,7 +180,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
       <div className={cx('avatarSection')}>
         <div className={cx('avatarPreviewWrap')} onClick={triggerFileInput}>
           {avatarPreview ? (
-            <img src={avatarPreview} alt="Avatar Preview" className={cx('avatarImage')} />
+            <img src={avatarPreview} alt="Avatar Preview" className={cx('avatarImage')} referrerPolicy="no-referrer" />
           ) : (
             <div className={cx('avatarPlaceholder')}>
               <IoPersonCircleOutline size={64} color="#cbd5e1" />

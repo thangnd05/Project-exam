@@ -103,7 +103,7 @@ public class EmailVerificationService {
             return ResponseEntity.ok(Map.of("message", "Tài khoản đã được xác thực trước đó."));
         }
 
-        // 🎯 Xác thực thành công
+        //  Xác thực thành công
         user.setVerified(true);
         userRepository.save(user);
 

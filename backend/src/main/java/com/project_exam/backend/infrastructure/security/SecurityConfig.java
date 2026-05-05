@@ -79,20 +79,20 @@ public class SecurityConfig {
 
         http
                 // 2. Cấu hình CSRF với Repository tùy chỉnh
-                // .csrf(csrf -> csrf
-                //         .csrfTokenRepository(customCsrfTokenRepository(isProduction)) 
-                //         .csrfTokenRequestHandler(requestHandler)
-                //         .ignoringRequestMatchers(
-                //                 "/api/auth/login", 
-                //                 "/api/auth/register", 
-                //                 "/api/auth/refresh",
-                //                 "/api/auth/forgot-password",
-                //                 "/api/auth/reset-password",
-                //                 "/oauth2/**",
-                //                 "/login/oauth2/**"
-                //         )
-                // )
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(customCsrfTokenRepository(isProduction)) 
+                        .csrfTokenRequestHandler(requestHandler)
+                        .ignoringRequestMatchers(
+                                "/api/auth/login", 
+                                "/api/auth/register", 
+                                "/api/auth/refresh",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
+                                "/oauth2/**",
+                                "/login/oauth2/**"
+                        )
+                )
+                // .csrf(csrf -> csrf.disable())
 
                 // 3. CORS
                 .cors(cors -> {})

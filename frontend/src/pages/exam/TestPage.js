@@ -11,7 +11,7 @@ export default function TestPage() {
         <HeroSection />
       </section>
 
-      {/* 🎯 MAIN ACTION */}
+      {/*  MAIN ACTION */}
       <section className="main-section">
         <ExamTypePage />
       </section>

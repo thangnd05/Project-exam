@@ -20,6 +20,7 @@ import AlbumDetailPage from '~/pages/album-delta/AlbumDeltaPage';
 import PracticePage from '~/pages/album-pratice/PracticePage';
 import MyTestPage from '~/pages/mytest/MyTestPage';
 import VerifyEmailPage from '~/pages/user/login/VerifyEmailPage';
+import OAuth2Redirect from '~/pages/user/login/OAuth2Redirect';
 import NotFoundPage from '~/pages/error/NotFoundPage';
 import ChapterOfClass from '~/pages/myclass/chapter/ChapterOfClass';
 import ClassMemberManagementPage from '~/pages/myclass/class-member/ClassMemberManagementPage';
@@ -87,7 +88,7 @@ export const privateRoutes = [
   {path: routes.albumDelta, component: AlbumDetailPage},
   {path: routes.vocaPratice, component: PracticePage},
   {path: routes.MyTest, component: MyTestPage},
-  {path: routes.oauth2Redirect, component: MyTestPage},
+  {path: routes.oauth2Redirect, component: OAuth2Redirect},
   {path: routes.classChapterPage, component: ChapterOfClass},
   {path: routes.classMemberManagement, component: ClassMemberManagementPage},
   {path: routes.createTestFromBank, component: CreateTestFromBankPage},

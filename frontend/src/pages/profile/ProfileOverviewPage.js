@@ -149,6 +149,7 @@ function ProfileOverviewPage() {
                     src={profileOverview.avatarUrl}
                     alt={fullName}
                     className={cx('avatar')}
+                    referrerPolicy="no-referrer"
                   />
                 </div>
 

@@ -182,6 +182,7 @@ function Header() {
               src={user?.avatarUrl || images.avtImage}
               alt="Avatar"
               className={cx('avatar')}
+              referrerPolicy="no-referrer"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = images.avtImage;

@@ -157,6 +157,7 @@ const Evaluation = () => {
                           }
                           alt={review.username}
                           className={cx('avatar')}
+                          referrerPolicy="no-referrer"
                         />
                         <div className={cx('user-info')}>
                           <h4 className={cx('user-name')}>{review.username}</h4>

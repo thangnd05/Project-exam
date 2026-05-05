@@ -132,7 +132,7 @@ const AlbumDetailPage = () => {
       <Container>
         {/* === Standardized Page Header === */}
         <PageHeader
-          title={flashMode ? '🎯 Học bằng Flashcard' : '📖 Danh sách từ vựng'}
+          title={flashMode ? ' Học bằng Flashcard' : ' Danh sách từ vựng'}
           label="QUẢN LÝ TỪ VỰNG"
           onAction={() => setShowModal(true)}
           actionText="Thêm từ vựng"
