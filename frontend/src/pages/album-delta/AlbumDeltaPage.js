@@ -289,7 +289,6 @@ const AlbumDetailPage = () => {
               <div className="text-center py-5 text-muted">
                 <IoSchoolOutline size={64} className="mb-3 opacity-25" />
                 <h5>Album này còn trống</h5>
-                <p>Hãy thêm những từ vựng đầu tiên để bắt đầu học nhé!</p>
               </div>
             )}
           </div>
