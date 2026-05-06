@@ -48,6 +48,16 @@
   --author-tag-text: #b45309;
   --author-tag-border: #fcd9a5;
 
+  /* Success (xanh lá) - Trạng thái đã duyệt / hoàn thành */
+  --success-bg: #dcfce7;
+  --success-text: #166534;
+  --success-border: #bbf7d0;
+
+  /* Danger (đỏ) - Hành động phá hủy / cảnh báo nặng */
+  --danger-bg: #fef2f2;
+  --danger-text: #b91c1c;
+  --danger-border: #fecaca;
+
   /* Typography giữ nguyên */
   --font-family: 'Inter', sans-serif;
   --font-weight: 600;
