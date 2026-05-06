@@ -46,26 +46,39 @@ public class QuestionController {
         return ResponseEntity.ok(response);
     }
 
-    /** Cá nhân: không gửi classId/chapterId (lấy theo user JWT). Lớp: gửi classId (+ chapterId). */
+    /**
+     * Lấy câu hỏi theo part:
+     * - bank=admin → kho admin (do admin tạo, public cho mọi user)
+     * - Cá nhân: không gửi classId/chapterId (lấy theo user JWT)
+     * - Lớp: gửi classId (+ chapterId)
+     */
     @GetMapping("/by-part/{examPartId}")
     public ResponseEntity<List<QuestionResponse>> getQuestionsByPart(
             @PathVariable String examPartId,
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
+            @RequestParam(required = false) String bank,
             HttpServletRequest request
     ) {
+        if ("admin".equalsIgnoreCase(bank)) {
+            return ResponseEntity.ok(questionService.getAdminBankQuestionsByPart(examPartId, request));
+        }
         List<QuestionResponse> questions = questionService.getQuestionsByPart(examPartId, classId, chapterId, request);
         return ResponseEntity.ok(questions);
     }
 
-    /** Cá nhân: không gửi classId/chapterId. Lớp: gửi classId (+ chapterId). */
+    /** Đếm câu hỏi theo part. Hỗ trợ bank=admin tương tự /by-part. */
     @GetMapping("/count/by-part/{examPartId}")
     public ResponseEntity<Long> countQuestionsByPart(
             @PathVariable String examPartId,
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
+            @RequestParam(required = false) String bank,
             HttpServletRequest request
     ) {
+        if ("admin".equalsIgnoreCase(bank)) {
+            return ResponseEntity.ok(questionService.countAdminBankQuestionsByPart(examPartId, request));
+        }
         long count = questionService.countByExamPartId(examPartId, classId, chapterId, request);
         return ResponseEntity.ok(count);
     }

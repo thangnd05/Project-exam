@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -90,6 +91,31 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
 
     long countByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
             String examPartId, String createdBy);
+
+    // ========== Kho admin: do bất kỳ admin nào tạo, public cho mọi user ==========
+    @Query("""
+        SELECT q FROM Question q
+        WHERE q.examPartId = :examPartId
+          AND q.createdBy IN :creatorIds
+          AND q.classId IS NULL
+          AND q.chapterId IS NULL
+          AND q.isBank = true
+    """)
+    List<Question> findAdminBankByExamPart(
+            @Param("examPartId") String examPartId,
+            @Param("creatorIds") Collection<String> creatorIds);
+
+    @Query("""
+        SELECT COUNT(q) FROM Question q
+        WHERE q.examPartId = :examPartId
+          AND q.createdBy IN :creatorIds
+          AND q.classId IS NULL
+          AND q.chapterId IS NULL
+          AND q.isBank = true
+    """)
+    long countAdminBankByExamPart(
+            @Param("examPartId") String examPartId,
+            @Param("creatorIds") Collection<String> creatorIds);
 
     @Query(value = """
         SELECT * FROM questions

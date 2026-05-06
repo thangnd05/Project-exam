@@ -63,6 +63,8 @@ public class QuestionService {
     private final ClassMemberRepository classMemberRepository;
     private final ClassRepository classRepository;
     private final QuestionDocumentImportService questionDocumentImportService;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     public List<Question> findAll() {
         return questionRepository.findAll();
@@ -238,6 +240,42 @@ public class QuestionService {
         }
 
         return buildUserQuestionResponses(questions);
+    }
+
+    /**
+     * Lấy kho admin: câu hỏi do bất kỳ admin nào tạo, không gắn class/chapter, là kho.
+     * Bất kỳ user đăng nhập nào cũng đọc được để dùng làm nguồn tạo đề.
+     */
+    public List<QuestionResponse> getAdminBankQuestionsByPart(String examPartId, HttpServletRequest request) {
+        authUtils.getUserId(request); // bắt buộc đăng nhập
+        Set<String> adminIds = getAdminUserIds();
+        if (adminIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Question> questions = questionRepository.findAdminBankByExamPart(examPartId, adminIds);
+        if (questions.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return buildUserQuestionResponses(questions);
+    }
+
+    public long countAdminBankQuestionsByPart(String examPartId, HttpServletRequest request) {
+        authUtils.getUserId(request);
+        Set<String> adminIds = getAdminUserIds();
+        if (adminIds.isEmpty()) {
+            return 0L;
+        }
+        return questionRepository.countAdminBankByExamPart(examPartId, adminIds);
+    }
+
+    private Set<String> getAdminUserIds() {
+        Role adminRole = roleRepository.findByRoleName("ADMIN");
+        if (adminRole == null) {
+            return Collections.emptySet();
+        }
+        return userRepository.findByRoleId(adminRole.getRoleId()).stream()
+                .map(User::getUserId)
+                .collect(Collectors.toSet());
     }
 
     private Set<String> getAccessibleClassIds(String currentUserId) {

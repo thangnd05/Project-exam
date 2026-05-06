@@ -18,12 +18,13 @@ import styles from './PersonalQuestionBankPage.module.scss';
 const cx = classNames.bind(styles);
 
 const BANK_SCOPE = {
+  ADMIN: 'admin',
   PERSONAL: 'personal',
   CLASS: 'class',
 };
 
 const PersonalQuestionBankPage = () => {
-  const [bankScope, setBankScope] = useState(BANK_SCOPE.PERSONAL);
+  const [bankScope, setBankScope] = useState(BANK_SCOPE.ADMIN);
   const [classes, setClasses] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState('');
   const [examTypeId, setExamTypeId] = useState('');
@@ -52,14 +53,15 @@ const PersonalQuestionBankPage = () => {
       .catch(() => setClasses([]));
   }, []);
 
-  const loadQuestionsForPart = useCallback(async (partId) => {
+  const loadQuestionsForPart = useCallback(async (partId, scope) => {
     setPartConfigs((prev) => ({
       ...prev,
       [partId]: {...(prev[partId] || {}), loading: true},
     }));
 
     try {
-      const res = await axios.get(`/api/questions/by-part/${partId}`);
+      const params = scope === BANK_SCOPE.ADMIN ? {bank: 'admin'} : {};
+      const res = await axios.get(`/api/questions/by-part/${partId}`, {params});
       const list = Array.isArray(res.data)
         ? res.data
         : (res.data?.data ?? res.data?.questions ?? []);
@@ -88,11 +90,9 @@ const PersonalQuestionBankPage = () => {
   }, []);
 
   useEffect(() => {
-    if (
-      bankScope !== BANK_SCOPE.PERSONAL ||
-      !examTypeId ||
-      !examParts?.length
-    ) {
+    const isPartScope =
+      bankScope === BANK_SCOPE.PERSONAL || bankScope === BANK_SCOPE.ADMIN;
+    if (!isPartScope || !examTypeId || !examParts?.length) {
       setPartConfigs({});
       return;
     }
@@ -102,7 +102,7 @@ const PersonalQuestionBankPage = () => {
       initial[p.examPartId] = {expanded: false, loading: true, questions: []};
     });
     setPartConfigs(initial);
-    examParts.forEach((p) => loadQuestionsForPart(p.examPartId));
+    examParts.forEach((p) => loadQuestionsForPart(p.examPartId, bankScope));
   }, [examTypeId, examParts, bankScope, loadQuestionsForPart]);
 
   const togglePartExpanded = (partId) => {
@@ -242,7 +242,7 @@ const PersonalQuestionBankPage = () => {
     }
 
     if (editingPartId) {
-      await loadQuestionsForPart(editingPartId);
+      await loadQuestionsForPart(editingPartId, bankScope);
     }
   };
 
@@ -265,7 +265,7 @@ const PersonalQuestionBankPage = () => {
       if (bankScope === BANK_SCOPE.CLASS && chapterId) {
         await loadQuestionsForChapter(chapterId);
       } else if (partId) {
-        await loadQuestionsForPart(partId);
+        await loadQuestionsForPart(partId, bankScope);
       }
 
       setNotification({
@@ -293,13 +293,17 @@ const PersonalQuestionBankPage = () => {
             <span className={cx('titleGradient')}>
               {bankScope === BANK_SCOPE.CLASS
                 ? 'Kho câu hỏi lớp học'
-                : 'Kho câu hỏi cá nhân'}
+                : bankScope === BANK_SCOPE.ADMIN
+                  ? 'Kho đề quản trị'
+                  : 'Kho câu hỏi cá nhân'}
             </span>
           </h1>
           <p className={cx('subtitle')}>
             {bankScope === BANK_SCOPE.CLASS
               ? 'Quản lý câu hỏi theo từng Chương. Bấm bút chì để sửa nhanh câu hỏi/đáp án.'
-              : 'Quản lý câu hỏi theo từng Part. Bấm bút chì để sửa nhanh câu hỏi/đáp án.'}
+              : bankScope === BANK_SCOPE.ADMIN
+                ? 'Kho câu hỏi do quản trị viên cung cấp. Bất kỳ ai cũng có thể tham khảo và dùng làm nguồn tạo đề.'
+                : 'Quản lý câu hỏi theo từng Part. Bấm bút chì để sửa nhanh câu hỏi/đáp án.'}
           </p>
         </header>
 
@@ -320,6 +324,19 @@ const PersonalQuestionBankPage = () => {
           </div>
 
           <div className={cx('scopeSwitch')}>
+            <Button
+              type="button"
+              className={cx('scopeBtn')}
+              variant={
+                bankScope === BANK_SCOPE.ADMIN ? 'primary' : 'outline-primary'
+              }
+              onClick={() => {
+                setBankScope(BANK_SCOPE.ADMIN);
+                setSelectedClassId('');
+              }}
+            >
+              Kho đề quản trị
+            </Button>
             <Button
               type="button"
               className={cx('scopeBtn')}
@@ -364,7 +381,7 @@ const PersonalQuestionBankPage = () => {
               </select>
             )}
 
-            {bankScope === BANK_SCOPE.PERSONAL && (
+            {(bankScope === BANK_SCOPE.PERSONAL || bankScope === BANK_SCOPE.ADMIN) && (
               <select
                 className={cx('selectField')}
                 value={examTypeId}
@@ -503,12 +520,15 @@ const PersonalQuestionBankPage = () => {
           </div>
         )}
 
-        {bankScope === BANK_SCOPE.PERSONAL &&
+        {(bankScope === BANK_SCOPE.PERSONAL || bankScope === BANK_SCOPE.ADMIN) &&
           examTypeId &&
           examParts?.length > 0 && (
             <div className={cx('card')}>
               <div className={cx('sectionTitle')}>
-                <IoBookOutline /> Danh sách câu hỏi theo Part
+                <IoBookOutline />{' '}
+                {bankScope === BANK_SCOPE.ADMIN
+                  ? 'Câu hỏi quản trị theo Part'
+                  : 'Danh sách câu hỏi theo Part'}
               </div>
 
               {examParts.map((part) => {
@@ -563,39 +583,41 @@ const PersonalQuestionBankPage = () => {
                                   <span className={cx('questionText')}>
                                     {q.questionText || '(Không có nội dung)'}
                                   </span>
-                                  <div className={cx('questionActions')}>
-                                    <Button
-                                      type="button"
-                                      className={cx('editBtn')}
-                                      size="sm"
-                                      variant="outline-primary"
-                                      disabled={deletingQuestionId === id}
-                                      onClick={() => {
-                                        setEditingPartId(part.examPartId);
-                                        setEditingChapterId(null);
-                                        setEditingQuestionId(id);
-                                      }}
-                                      aria-label={`Sửa câu ${idx + 1}`}
-                                    >
-                                      <IoCreateOutline />
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      className={cx('deleteBtn')}
-                                      size="sm"
-                                      variant="outline-danger"
-                                      disabled={deletingQuestionId === id}
-                                      onClick={() =>
-                                        handleDeleteQuestion({
-                                          questionId: id,
-                                          partId: part.examPartId,
-                                        })
-                                      }
-                                      aria-label={`Xóa câu ${idx + 1}`}
-                                    >
-                                      <IoTrashOutline />
-                                    </Button>
-                                  </div>
+                                  {bankScope === BANK_SCOPE.PERSONAL && (
+                                    <div className={cx('questionActions')}>
+                                      <Button
+                                        type="button"
+                                        className={cx('editBtn')}
+                                        size="sm"
+                                        variant="outline-primary"
+                                        disabled={deletingQuestionId === id}
+                                        onClick={() => {
+                                          setEditingPartId(part.examPartId);
+                                          setEditingChapterId(null);
+                                          setEditingQuestionId(id);
+                                        }}
+                                        aria-label={`Sửa câu ${idx + 1}`}
+                                      >
+                                        <IoCreateOutline />
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        className={cx('deleteBtn')}
+                                        size="sm"
+                                        variant="outline-danger"
+                                        disabled={deletingQuestionId === id}
+                                        onClick={() =>
+                                          handleDeleteQuestion({
+                                            questionId: id,
+                                            partId: part.examPartId,
+                                          })
+                                        }
+                                        aria-label={`Xóa câu ${idx + 1}`}
+                                      >
+                                        <IoTrashOutline />
+                                      </Button>
+                                    </div>
+                                  )}
                                 </li>
                               );
                             })}
