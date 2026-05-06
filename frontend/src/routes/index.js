@@ -28,6 +28,8 @@ import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFrom
 import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBankPage';
 import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
 import MyEvaluationsPage from '~/pages/profile/MyEvaluationsPage';
+import MyPostsPage from '~/pages/profile/MyPostsPage';
+import SavedPostsPage from '~/pages/profile/SavedPostsPage';
 
 // Admin imports
 import AdminDashboard from '~/Admin/pages/Dashboard';
@@ -99,6 +101,8 @@ export const privateRoutes = [
   {path: routes.personalQuestionBank, component: PersonalQuestionBankPage},
   {path: routes.profile, component: ProfileOverviewPage},
   {path: routes.myEvaluations, component: MyEvaluationsPage},
+  {path: routes.myPosts, component: MyPostsPage},
+  {path: routes.savedPosts, component: SavedPostsPage},
 ];
 
 const appRoutes = {publicRoutes, privateRoutes, adminRoutes};

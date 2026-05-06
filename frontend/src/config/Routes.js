@@ -54,6 +54,8 @@ const routes = {
   verifyEmail: '/verify',
   profile: '/profile',
   myEvaluations: '/my-evaluations',
+  myPosts: '/my-posts',
+  savedPosts: '/saved-posts',
 
   oauth2Redirect: '/oauth2/redirect',
 

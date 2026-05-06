@@ -18,7 +18,9 @@ import {
   IoFolderOpenOutline,
   IoDesktopOutline,
   IoPencilOutline,
-  IoStar
+  IoStar,
+  IoNewspaperOutline,
+  IoBookmarkOutline
 } from 'react-icons/io5';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
@@ -216,6 +218,14 @@ function ProfileOverviewPage() {
                   <button onClick={() => navigate(routes.myEvaluations)} className={cx('actionBtn', 'btnYellow')}>
                     <IoStar className={cx('btnIcon')} />
                     <span>Đánh giá của tôi</span>
+                  </button>
+                  <button onClick={() => navigate(routes.myPosts)} className={cx('actionBtn', 'btnBlue')}>
+                    <IoNewspaperOutline className={cx('btnIcon')} />
+                    <span>Bài viết của tôi</span>
+                  </button>
+                  <button onClick={() => navigate(routes.savedPosts)} className={cx('actionBtn', 'btnGreen')}>
+                    <IoBookmarkOutline className={cx('btnIcon')} />
+                    <span>Bài đã lưu</span>
                   </button>
                 </div>
               </section>

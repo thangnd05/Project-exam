@@ -17,6 +17,7 @@ import com.project_exam.backend.modules.posts.repository.PostCategoryRepository;
 import com.project_exam.backend.modules.posts.repository.PostImageRepository;
 import com.project_exam.backend.modules.posts.repository.PostRepository;
 import com.project_exam.backend.modules.posts.repository.ReactRepository;
+import com.project_exam.backend.modules.posts.repository.SavedPostRepository;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.users.repository.UserRepository;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -45,6 +46,7 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
     private final ReactRepository reactRepository;
+    private final SavedPostRepository savedPostRepository;
     private final CloudinaryService cloudinaryService;
     private final AuthUtils authUtils;
     private final UserRepository userRepository;
@@ -96,11 +98,14 @@ public class PostService {
         long commentCount = commentRepository.countByPostId(post.getId());
 
         String currentUserReactType = null;
+        boolean currentUserSaved = false;
         if (currentUserId != null) {
             currentUserReactType = reactRepository.findByPostIdAndUserId(post.getId(), currentUserId)
                     .map(r -> r.getType().name())
                     .orElse(null);
+            currentUserSaved = savedPostRepository.existsByPostIdAndUserId(post.getId(), currentUserId);
         }
+        long saveCount = savedPostRepository.countByPostId(post.getId());
 
         String authorName = "Unknown";
         String authorAvatar = null;
@@ -126,10 +131,12 @@ public class PostService {
                 .currentUserReactType(currentUserReactType)
                 .commentCount(commentCount)
                 .viewCount(post.getViewCount() == null ? 0L : post.getViewCount())
+                .saveCount(saveCount)
+                .currentUserSaved(currentUserSaved)
                 .build();
     }
 
-    private PostSummaryResponse toSummaryResponse(Post post) {
+    public PostSummaryResponse toSummaryResponse(Post post) {
         List<PostResponse.PostImageResponse> images = getImageResponses(post.getId());
         String thumbnailUrl = post.getThumbnailUrl();
         if (thumbnailUrl == null || thumbnailUrl.isBlank()) {
@@ -276,6 +283,7 @@ public class PostService {
         postCategoryRepository.deleteByPostId(id);
         commentRepository.deleteByPostId(id);
         reactRepository.findByPostId(id).forEach(reactRepository::delete);
+        savedPostRepository.deleteByPostId(id);
         postRepository.delete(post);
     }
 

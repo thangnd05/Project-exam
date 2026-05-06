@@ -80,3 +80,16 @@ export const toggleReact = (postId, data) => {
   return axios.post(`${BASE_URL}/${postId}/reacts`, data).then((response) => response.data);
 };
 
+// --- Saved posts ---
+export const toggleSavePost = (postId) => {
+  return axios.post(`${BASE_URL}/${postId}/save`).then((response) => response.data);
+};
+
+export const getSavedPosts = () => {
+  return axios.get(`${BASE_URL}/saved`).then((response) => response.data);
+};
+
+export const getSaveStatus = (postId) => {
+  return axios.get(`${BASE_URL}/${postId}/save`).then((response) => response.data);
+};
+

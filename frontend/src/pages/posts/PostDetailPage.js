@@ -10,7 +10,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '~/hook/useAuth';
 import routes from '~/config/Routes';
 import styles from './PostDetailPage.module.scss';
-import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, getReacts, toggleReact } from '~/api/postApi';
+import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, getReacts, toggleReact, toggleSavePost } from '~/api/postApi';
 
 const cx = classNames.bind(styles);
 const MAX_REPLY_DEPTH = 4;
@@ -24,6 +24,8 @@ function PostDetailPage() {
   const [likeCount, setLikeCount] = useState(0);
   const [isReacting, setIsReacting] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [saveCount, setSaveCount] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
@@ -50,6 +52,10 @@ function PostDetailPage() {
         // Sync like state from backend
         setLiked(data.currentUserReactType === 'LIKE');
         setLikeCount(data.reactCounts?.LIKE || 0);
+
+        // Sync bookmark state
+        setBookmarked(!!data.currentUserSaved);
+        setSaveCount(data.saveCount || 0);
 
         // Fetch related posts (same category)
         if (data.categories && data.categories.length > 0) {
@@ -231,6 +237,32 @@ function PostDetailPage() {
     }
   };
 
+  const handleToggleBookmark = async () => {
+    if (!user) {
+      alert('Vui lòng đăng nhập để lưu bài viết');
+      return;
+    }
+    if (isSaving) return;
+
+    const prevSaved = bookmarked;
+    const prevCount = saveCount;
+    setBookmarked(!prevSaved);
+    setSaveCount(prevSaved ? Math.max(0, prevCount - 1) : prevCount + 1);
+    setIsSaving(true);
+
+    try {
+      const result = await toggleSavePost(postId);
+      setBookmarked(!!result.saved);
+      setSaveCount(result.saveCount || 0);
+    } catch (error) {
+      setBookmarked(prevSaved);
+      setSaveCount(prevCount);
+      console.error('Failed to toggle bookmark:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const countNestedReplies = (comment) => {
     if (!comment?.replies || comment.replies.length === 0) return 0;
     return comment.replies.reduce((total, reply) => total + 1 + countNestedReplies(reply), 0);
@@ -357,9 +389,13 @@ function PostDetailPage() {
             <div className={cx('iconCircle')}><Heart size={20} fill={liked ? 'currentColor' : 'none'} /></div>
             <span className={cx('count')}>{likeCount}</span>
           </button>
-          <button className={cx('actionBtn', { active: bookmarked })} onClick={() => setBookmarked(!bookmarked)}>
+          <button
+            className={cx('actionBtn', { active: bookmarked })}
+            onClick={handleToggleBookmark}
+            disabled={isSaving}
+          >
             <div className={cx('iconCircle')}><Bookmark size={20} fill={bookmarked ? 'currentColor' : 'none'} /></div>
-            <span className={cx('count')}>0</span>
+            <span className={cx('count')}>{saveCount}</span>
           </button>
           <button className={cx('actionBtn')} onClick={() => document.getElementById('comments').scrollIntoView({ behavior: 'smooth' })}>
             <div className={cx('iconCircle')}><MessageCircle size={20} /></div>

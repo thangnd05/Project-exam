@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
 import axios from '../../api/axiosClient';
@@ -15,7 +15,8 @@ import styles from '~/components/common/modal/CommonFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
+function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPost = null }) {
+  const isEditing = !!editingPost;
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -24,10 +25,26 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
   const [loading, setLoading] = useState(false);
   const [inlineImages, setInlineImages] = useState([]);
 
-  // message state removed
-
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Khởi tạo / reset state khi mở modal (cả create lẫn edit)
+  useEffect(() => {
+    if (!show) return;
+    if (editingPost) {
+      setTitle(editingPost.title || '');
+      setContent(editingPost.content || '');
+      setCategoryId(editingPost.categories?.[0]?.id || '');
+      setThumbnailUrl(editingPost.thumbnailUrl || '');
+    } else {
+      setTitle('');
+      setContent('');
+      setCategoryId('');
+      setThumbnailUrl('');
+    }
+    setThumbnailFile(null);
+    setInlineImages([]);
+  }, [show, editingPost]);
 
   const quillRef = useRef(null);
 
@@ -76,9 +93,9 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
     'link', 'image', 'code-block',
   ];
 
-  const handleCreate = async () => {
+  const handleSubmit = async () => {
     if (!user) {
-      toast.warning('⚠️ Bạn cần đăng nhập trước khi tạo bài viết!');
+      toast.warning('⚠️ Bạn cần đăng nhập trước khi đăng bài viết!');
       setTimeout(() => {
         onClose();
         navigate(routes.login);
@@ -131,23 +148,22 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
         formData.append('thumbnail', thumbnailFile);
       }
 
-      await axios.post('/api/posts', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-      toast.success('Đăng bài viết thành công!');
-
-      setTitle('');
-      setContent('');
-      setCategoryId('');
-      setThumbnailUrl('');
-      setThumbnailFile(null);
-      setInlineImages([]);
+      if (isEditing) {
+        await axios.put(`/api/posts/${editingPost.id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Cập nhật bài viết thành công!');
+      } else {
+        await axios.post('/api/posts', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Đăng bài viết thành công!');
+      }
 
       onClose();
       if (onRefresh) onRefresh();
     } catch (err) {
-      toast.error(err.response?.data?.message || ' Có lỗi xảy ra khi đăng bài viết!');
+      toast.error(err.response?.data?.message || (isEditing ? 'Lỗi khi cập nhật bài viết!' : 'Lỗi khi đăng bài viết!'));
     } finally {
       setLoading(false);
     }
@@ -158,16 +174,16 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [] }) {
       show={show}
       onHide={onClose}
       size="xl"
-      title="Tạo bài viết mới"
-      icon={FaPenNib}
+      title={isEditing ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
+      icon={isEditing ? FaEdit : FaPenNib}
       footer={
         <ModalActionFooter
           cancelLabel="Hủy bỏ"
-          submitLabel="Đăng bài ngay"
+          submitLabel={isEditing ? 'Lưu thay đổi' : 'Đăng bài ngay'}
           loadingLabel="Đang xử lý..."
           loading={loading}
           onCancel={onClose}
-          onSubmit={handleCreate}
+          onSubmit={handleSubmit}
         />
       }
     >

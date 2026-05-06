@@ -28,6 +28,8 @@ public class PostResponse {
     private String currentUserReactType;   // react type của current user (null nếu chưa react)
     private long commentCount;
     private long viewCount;
+    private long saveCount;
+    private boolean currentUserSaved;
 
     @Data
     @Builder
