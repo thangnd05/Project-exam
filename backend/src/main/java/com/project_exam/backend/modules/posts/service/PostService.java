@@ -173,13 +173,16 @@ public class PostService {
                                    MultipartFile thumbnailFile,
                                    HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
+        Post.PostStatus initialStatus = authUtils.isAdmin(httpRequest)
+                ? Post.PostStatus.APPROVED
+                : Post.PostStatus.PENDING;
 
         Post post = Post.builder()
                 .userId(userId)
                 .title(request.getTitle())
                 .content(request.getContent())
                 .thumbnailUrl(request.getThumbnailUrl())
-                .status(request.getStatus() != null ? request.getStatus() : Post.PostStatus.PENDING)
+                .status(initialStatus)
                 .build();
                 
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
@@ -258,30 +261,14 @@ public class PostService {
     }
 
     @Transactional
-    public int deleteAllRejected(HttpServletRequest httpRequest) {
-        if (!authUtils.isAdmin(httpRequest)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin được xóa bài viết bị từ chối");
-        }
-
-        List<Post> rejectedPosts = postRepository.findByStatus(Post.PostStatus.REJECTED);
-        for (Post post : rejectedPosts) {
-            String postId = post.getId();
-            postImageRepository.deleteByPostId(postId);
-            postCategoryRepository.deleteByPostId(postId);
-            commentRepository.deleteByPostId(postId);
-            reactRepository.findByPostId(postId).forEach(reactRepository::delete);
-            postRepository.delete(post);
-        }
-        return rejectedPosts.size();
-    }
-
-    @Transactional
     public void deletePost(String id, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
 
-        if (!post.getUserId().equals(userId)) {
+        boolean isOwner = post.getUserId().equals(userId);
+        boolean isAdmin = authUtils.isAdmin(httpRequest);
+        if (!isOwner && !isAdmin) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xóa post này");
         }
 
@@ -325,8 +312,7 @@ public class PostService {
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Specification<Post> spec = Specification.where(null);
 
-        // User thường chỉ thấy bài APPROVED. Admin có thể xem tất cả status (PENDING/REJECTED)
-        // hoặc lọc theo status truyền vào.
+        // User thường chỉ thấy bài APPROVED. Admin có thể xem mọi status hoặc lọc theo status truyền vào.
         Post.PostStatus effectiveStatus = status;
         if (!authUtils.isAdmin(httpRequest)) {
             effectiveStatus = Post.PostStatus.APPROVED;

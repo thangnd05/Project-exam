@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, ArrowRight, Plus } from 'lucide-react';
+import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, ArrowRight, Plus, Info } from 'lucide-react';
 import { getPosts, getCategories } from '~/api/postApi';
 import routes from '~/config/Routes';
 import CreatePostModal from '~/components/modals/CreatePostModal';
@@ -200,6 +200,13 @@ function PostsPage() {
               <Plus size={18} />
               <span>Tạo bài viết</span>
             </button>
+          </div>
+          <div className={cx('approvalNotice')}>
+            <Info size={16} />
+            <span>
+              Bài viết mới cần được admin duyệt trước khi hiển thị công khai.
+              Nếu sau một thời gian bài của bạn không xuất hiện ở đây, có thể bài đã bị xóa do không phù hợp.
+            </span>
           </div>
           <div className={cx('filterPills')}>
             <button

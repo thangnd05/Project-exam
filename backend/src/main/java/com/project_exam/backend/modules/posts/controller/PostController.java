@@ -85,7 +85,7 @@ public class PostController {
         }
     }
 
-    // ─── DELETE (auth, owner only) ────────────────
+    // ─── DELETE (auth, owner hoặc admin) ──────────
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(
             @PathVariable String id,
@@ -93,13 +93,6 @@ public class PostController {
     ) {
         postService.deletePost(id, httpRequest);
         return ResponseEntity.noContent().build();
-    }
-
-    // ─── DELETE ALL REJECTED (Admin) ──────────────
-    @DeleteMapping("/rejected")
-    public ResponseEntity<java.util.Map<String, Object>> deleteAllRejected(HttpServletRequest httpRequest) {
-        int count = postService.deleteAllRejected(httpRequest);
-        return ResponseEntity.ok(java.util.Map.of("deleted", count));
     }
 
     // ─── UPDATE STATUS (Admin) ────────────────────

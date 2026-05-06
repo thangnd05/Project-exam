@@ -50,8 +50,8 @@ export const updatePostStatus = (postId, status) => {
   return axios.patch(`${BASE_URL}/${postId}/status`, { status }).then((response) => response.data);
 };
 
-export const deleteAllRejectedPosts = () => {
-  return axios.delete(`${BASE_URL}/rejected`).then((response) => response.data);
+export const deletePost = (postId) => {
+  return axios.delete(`${BASE_URL}/${postId}`).then((response) => response.data);
 };
 
 // --- Comments ---

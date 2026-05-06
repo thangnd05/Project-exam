@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
-import { Search, Eye, CheckCircle, XCircle, Trash2 } from 'lucide-react';
-import { getPosts, updatePostStatus, deleteAllRejectedPosts } from '~/api/postApi';
+import { Search, Eye, CheckCircle, Trash2 } from 'lucide-react';
+import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import styles from './Posts.module.scss';
 import { Link } from 'react-router-dom';
@@ -42,25 +42,25 @@ const Posts = () => {
 
     const handleSearch = (e) => setSearchQuery(e.target.value);
 
-    const handleUpdateStatus = async (postId, newStatus) => {
-        if (!window.confirm(`Bạn có chắc muốn chuyển bài viết này sang trạng thái ${newStatus}?`)) return;
+    const handleApprove = async (postId) => {
+        if (!window.confirm('Duyệt bài viết này?')) return;
         try {
-            await updatePostStatus(postId, newStatus);
-            toast.success('Cập nhật trạng thái thành công');
+            await updatePostStatus(postId, 'APPROVED');
+            toast.success('Đã duyệt bài viết');
             fetchPosts(currentPage);
         } catch (error) {
-            toast.error('Lỗi khi cập nhật trạng thái');
+            toast.error('Lỗi khi duyệt bài viết');
         }
     };
 
-    const handleDeleteAllRejected = async () => {
-        if (!window.confirm('Xóa toàn bộ bài viết đã bị từ chối? Hành động này không thể hoàn tác.')) return;
+    const handleDelete = async (postId) => {
+        if (!window.confirm('Xóa bài viết này? Hành động không thể hoàn tác.')) return;
         try {
-            const result = await deleteAllRejectedPosts();
-            toast.success(`Đã xóa ${result?.deleted ?? 0} bài viết bị từ chối`);
-            fetchPosts(0);
+            await deletePost(postId);
+            toast.success('Đã xóa bài viết');
+            fetchPosts(currentPage);
         } catch (error) {
-            toast.error('Lỗi khi xóa bài viết bị từ chối');
+            toast.error('Lỗi khi xóa bài viết');
         }
     };
 
@@ -68,7 +68,6 @@ const Posts = () => {
         switch (status) {
             case 'APPROVED': return cx('statusBadge', 'approved');
             case 'PENDING': return cx('statusBadge', 'pending');
-            case 'REJECTED': return cx('statusBadge', 'rejected');
             default: return cx('statusBadge');
         }
     };
@@ -78,16 +77,16 @@ const Posts = () => {
             <div className={cx('header')}>
                 <div>
                     <h1>Duyệt bài viết</h1>
-                    <p>Quản lý và xét duyệt các bài viết từ người dùng</p>
+                    <p>Duyệt bài chờ duyệt hoặc xóa bài không phù hợp. Bài bị xóa sẽ biến mất khỏi danh sách của tác giả.</p>
                 </div>
             </div>
 
             <div className={cx('toolbar')}>
                 <div className={cx('searchBox')}>
                     <Search size={18} className={cx('searchIcon')} />
-                    <input 
-                        type="text" 
-                        placeholder="Tìm kiếm bài viết..." 
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm bài viết..."
                         value={searchQuery}
                         onChange={handleSearch}
                     />
@@ -106,29 +105,12 @@ const Posts = () => {
                         Đã duyệt
                     </button>
                     <button
-                        className={cx('pill', { active: statusFilter === 'REJECTED' })}
-                        onClick={() => setStatusFilter('REJECTED')}
-                    >
-                        Đã từ chối
-                    </button>
-                    <button
                         className={cx('pill', { active: statusFilter === 'ALL' })}
                         onClick={() => setStatusFilter('ALL')}
                     >
                         Tất cả
                     </button>
                 </div>
-
-                {statusFilter === 'REJECTED' && (
-                    <button
-                        className={cx('deleteAllBtn')}
-                        onClick={handleDeleteAllRejected}
-                        title="Xóa toàn bộ bài bị từ chối"
-                    >
-                        <Trash2 size={16} />
-                        <span>Xóa tất cả</span>
-                    </button>
-                )}
             </div>
 
             <div className={cx('tableContainer')}>
@@ -160,32 +142,30 @@ const Posts = () => {
                                         </td>
                                         <td>
                                             <div className={cx('actions')}>
-                                                <Link 
-                                                    to={routes.postDetail.replace(':postId', post.id)} 
-                                                    className={cx('viewBtn')} 
+                                                <Link
+                                                    to={routes.postDetail.replace(':postId', post.id)}
+                                                    className={cx('viewBtn')}
                                                     target="_blank"
                                                     title="Xem chi tiết"
                                                 >
                                                     <Eye size={16} />
                                                 </Link>
                                                 {post.status !== 'APPROVED' && (
-                                                    <button 
-                                                        className={cx('approveBtn')} 
-                                                        onClick={() => handleUpdateStatus(post.id, 'APPROVED')} 
+                                                    <button
+                                                        className={cx('approveBtn')}
+                                                        onClick={() => handleApprove(post.id)}
                                                         title="Duyệt"
                                                     >
                                                         <CheckCircle size={16} />
                                                     </button>
                                                 )}
-                                                {post.status !== 'REJECTED' && (
-                                                    <button 
-                                                        className={cx('rejectBtn')} 
-                                                        onClick={() => handleUpdateStatus(post.id, 'REJECTED')} 
-                                                        title="Từ chối"
-                                                    >
-                                                        <XCircle size={16} />
-                                                    </button>
-                                                )}
+                                                <button
+                                                    className={cx('rejectBtn')}
+                                                    onClick={() => handleDelete(post.id)}
+                                                    title="Xóa bài viết"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -199,7 +179,7 @@ const Posts = () => {
                     </table>
                 )}
             </div>
-            
+
             {/* Pagination Controls can go here */}
         </div>
     );

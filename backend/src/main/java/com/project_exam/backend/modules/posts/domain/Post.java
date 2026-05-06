@@ -44,7 +44,6 @@ public class Post {
 
     public enum PostStatus {
         PENDING,
-        APPROVED,
-        REJECTED
+        APPROVED
     }
 }

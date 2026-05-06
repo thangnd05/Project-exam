@@ -80,26 +80,6 @@
     }
 }
 
-.deleteAllBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1px solid #fecaca;
-    background: #fef2f2;
-    color: #b91c1c;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-        background: #b91c1c;
-        color: white;
-        border-color: #b91c1c;
-    }
-}
-
 .tableContainer {
     background: white;
     border-radius: 12px;
@@ -156,11 +136,6 @@
     &.approved {
         background: #dcfce3;
         color: #166534;
-    }
-
-    &.rejected {
-        background: #fee2e2;
-        color: #ef4444;
     }
 }
 
