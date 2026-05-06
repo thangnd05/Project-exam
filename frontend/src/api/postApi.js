@@ -34,6 +34,22 @@ export const getCategories = () => {
   return axios.get('/api/categories').then((response) => response.data);
 };
 
+export const createCategory = (data) => {
+  return axios.post('/api/categories', data).then((response) => response.data);
+};
+
+export const updateCategory = (categoryId, data) => {
+  return axios.put(`/api/categories/${categoryId}`, data).then((response) => response.data);
+};
+
+export const deleteCategory = (categoryId) => {
+  return axios.delete(`/api/categories/${categoryId}`).then((response) => response.data);
+};
+
+export const updatePostStatus = (postId, status) => {
+  return axios.patch(`${BASE_URL}/${postId}/status`, { status }).then((response) => response.data);
+};
+
 // --- Comments ---
 export const getComments = (postId) => {
   return axios.get(`${BASE_URL}/${postId}/comments`).then((response) => response.data);

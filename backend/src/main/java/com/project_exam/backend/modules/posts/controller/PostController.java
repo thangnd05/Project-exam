@@ -5,6 +5,7 @@ import com.project_exam.backend.modules.posts.dto.PostUpsertRequest;
 import com.project_exam.backend.modules.posts.dto.PostPageResponse;
 import com.project_exam.backend.modules.posts.dto.PostResponse;
 import com.project_exam.backend.modules.posts.dto.PostSummaryResponse;
+import com.project_exam.backend.modules.posts.dto.UpdatePostStatusRequest;
 import com.project_exam.backend.modules.posts.domain.Post;
 import com.project_exam.backend.modules.posts.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -93,6 +94,17 @@ public class PostController {
         postService.deletePost(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
+
+    // ─── UPDATE STATUS (Admin) ────────────────────
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<PostResponse> updatePostStatus(
+            @PathVariable String id,
+            @RequestBody UpdatePostStatusRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(postService.updatePostStatus(id, request.getStatus(), httpRequest));
+    }
+
     // ─── UPLOAD IMAGE (QuillJS) ───────────────────
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image) {

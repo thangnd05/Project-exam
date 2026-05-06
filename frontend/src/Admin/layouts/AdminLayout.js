@@ -21,6 +21,8 @@ import {
   Bell,
   Search,
   Menu,
+  Folder,
+  FileText,
 } from 'lucide-react';
 import routes from '~/config/Routes';
 import styles from './AdminLayout.module.scss';
@@ -68,6 +70,16 @@ const adminRoutes = [
     path: routes.adminTests,
     icon: <FileStack size={20} />,
     label: 'Quản lý đề thi',
+  },
+  {
+    path: routes.adminCategories,
+    icon: <Folder size={20} />,
+    label: 'Quản lý chuyên mục',
+  },
+  {
+    path: routes.adminPosts,
+    icon: <FileText size={20} />,
+    label: 'Duyệt bài viết',
   },
   {
     path: routes.adminAnalytics,

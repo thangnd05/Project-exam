@@ -27,6 +27,8 @@ const routes = {
   adminTests: '/admin/tests',
   adminQuestions: '/admin/questions',
   adminVocabulary: '/admin/vocabulary',
+  adminCategories: '/admin/categories',
+  adminPosts: '/admin/posts',
   adminAnalytics: '/admin/analytics',
   adminAuditLogs: '/admin/audit-logs',
   adminLoginAudit: '/admin/audit-login',

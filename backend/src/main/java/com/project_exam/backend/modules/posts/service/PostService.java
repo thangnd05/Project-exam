@@ -239,6 +239,18 @@ public class PostService {
     }
 
     @Transactional
+    public PostResponse updatePostStatus(String id, Post.PostStatus status, HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
+
+        post.setStatus(status);
+        postRepository.save(post);
+
+        return toFullResponse(post, userId);
+    }
+
+    @Transactional
     public void deletePost(String id, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         Post post = postRepository.findById(id)

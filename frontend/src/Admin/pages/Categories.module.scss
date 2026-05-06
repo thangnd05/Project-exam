@@ -1,0 +1,251 @@
+.wrapper {
+    padding: 24px;
+    background: #f8fafc;
+    min-height: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h1 {
+        font-size: 24px;
+        color: #1e293b;
+        margin: 0 0 8px 0;
+    }
+    p {
+        color: #64748b;
+        margin: 0;
+    }
+}
+
+.createBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #2563eb;
+    }
+}
+
+.toolbar {
+    margin-bottom: 24px;
+}
+
+.searchBox {
+    position: relative;
+    max-width: 400px;
+
+    .searchIcon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px 12px 10px 40px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.2s;
+
+        &:focus {
+            border-color: #3b82f6;
+        }
+    }
+}
+
+.tableContainer {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    th {
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    td {
+        color: #334155;
+    }
+}
+
+.nameCell {
+    font-weight: 500;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+
+    button {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .editBtn {
+        background: #eff6ff;
+        color: #3b82f6;
+        &:hover { background: #dbeafe; }
+    }
+
+    .deleteBtn {
+        background: #fef2f2;
+        color: #ef4444;
+        &:hover { background: #fee2e2; }
+    }
+}
+
+.empty {
+    text-align: center;
+    padding: 32px !important;
+    color: #64748b !important;
+}
+
+.loading {
+    padding: 32px;
+    text-align: center;
+    color: #64748b;
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modalHeader {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+        margin: 0;
+        font-size: 18px;
+        color: #1e293b;
+    }
+
+    .closeBtn {
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 4px;
+        
+        &:hover { color: #475569; }
+    }
+}
+
+.modalForm {
+    padding: 24px;
+
+    .formGroup {
+        margin-bottom: 20px;
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #334155;
+
+            .required {
+                color: #ef4444;
+            }
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+
+            &:focus {
+                border-color: #3b82f6;
+            }
+        }
+    }
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+
+    button {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .cancelBtn {
+        background: #f1f5f9;
+        color: #475569;
+        border: none;
+
+        &:hover { background: #e2e8f0; }
+    }
+
+    .submitBtn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+
+        &:hover { background: #2563eb; }
+    }
+}

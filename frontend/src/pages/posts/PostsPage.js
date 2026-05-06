@@ -53,7 +53,8 @@ function PostsPage() {
           page,
           size: pageSize,
           categoryId: selectedCategory,
-          keyword: searchQuery
+          keyword: searchQuery,
+          status: 'APPROVED'
         })
       ]);
 
