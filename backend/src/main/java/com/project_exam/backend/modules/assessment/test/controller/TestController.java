@@ -146,17 +146,13 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         return ResponseEntity.ok(adminTests);
     }
 
-    // Lấy danh sách test theo examTypeId cho user
+    // Lấy danh sách test theo examTypeId cho user (chỉ trả về đề do admin tạo,
+    // không lộ đề cá nhân của user khác ra danh sách chung)
     @GetMapping("/user/by-exam-type/{examTypeId}")
     public ResponseEntity<List<TestResponse>> getTestsByExamType(
             @PathVariable String examTypeId
     ) {
-        List<TestResponse> responses = testService.getAllTests()
-                .stream()
-                .filter(t -> t.getExamTypeId().equals(examTypeId))
-                .filter(t -> t.getClassId() == null)
-                .toList();
-
+        List<TestResponse> responses = testService.getAdminTestsByExamType(examTypeId);
         return ResponseEntity.ok(responses);
     }
 

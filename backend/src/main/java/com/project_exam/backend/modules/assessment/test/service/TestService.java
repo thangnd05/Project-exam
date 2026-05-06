@@ -90,6 +90,26 @@ public class TestService {
                 .toList();
     }
 
+    /**
+     * Trả về các đề thi do ADMIN tạo theo examTypeId, dùng cho danh sách chung
+     * mà mọi user đều thấy (không lộ đề cá nhân của user khác).
+     */
+    public List<TestResponse> getAdminTestsByExamType(String examTypeId) {
+        Role adminRole = roleRepository.findByRoleName("ADMIN");
+        if (adminRole == null) return new ArrayList<>();
+        Set<String> adminIds = userRepository.findByRoleId(adminRole.getRoleId()).stream()
+                .map(User::getUserId)
+                .collect(Collectors.toSet());
+        if (adminIds.isEmpty()) return new ArrayList<>();
+
+        return testRepository.findAll().stream()
+                .filter(t -> examTypeId.equals(t.getExamTypeId()))
+                .filter(t -> t.getClassId() == null)
+                .filter(t -> adminIds.contains(t.getCreatedBy()))
+                .map(test -> buildUserTestSummary(test, null))
+                .toList();
+    }
+
     public Optional<Test> getTestById(String id) {
         return testRepository.findById(id);
     }
@@ -751,11 +771,22 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
      * Lớp: classId (+ chapterId nếu có).
      */
     @Transactional
+    private Set<String> getAdminUserIdSet() {
+        Role adminRole = roleRepository.findByRoleName("ADMIN");
+        if (adminRole == null) {
+            return Collections.emptySet();
+        }
+        return userRepository.findByRoleId(adminRole.getRoleId()).stream()
+                .map(User::getUserId)
+                .collect(Collectors.toSet());
+    }
+
     public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId) {
         if (request.getTestPartId() == null || request.getCount() == null || request.getCount() <= 0) {
             throw new BadRequestException("testPartId và count (số câu) phải hợp lệ.");
         }
-        if (request.getClassId() == null && currentUserId == null) {
+        boolean useAdminBank = "admin".equalsIgnoreCase(request.getBank());
+        if (!useAdminBank && request.getClassId() == null && currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng hiện tại.");
         }
         if (request.getChapterId() != null && request.getClassId() == null) {
@@ -785,7 +816,12 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             int seqOffset = fromIdx - 1;
 
             List<Question> allQuestions;
-            if (request.getClassId() != null && request.getChapterId() != null) {
+            if (useAdminBank) {
+                Set<String> adminIds = getAdminUserIdSet();
+                allQuestions = adminIds.isEmpty()
+                        ? new ArrayList<>()
+                        : questionRepository.findAdminBankByExamPart(examPartId, adminIds);
+            } else if (request.getClassId() != null && request.getChapterId() != null) {
                 allQuestions = questionRepository.findByExamPartIdAndClassIdAndChapterId(
                         examPartId, request.getClassId(), request.getChapterId());
             } else if (request.getClassId() != null) {
@@ -795,12 +831,19 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 allQuestions = questionRepository.findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
                         examPartId, currentUserId);
             }
-            
+
             int actualOffset = Math.min(seqOffset, allQuestions.size());
             int actualLimit = Math.min(seqLimit, allQuestions.size() - actualOffset);
             pool = allQuestions.subList(actualOffset, actualOffset + actualLimit);
         } else {
-            if (request.getClassId() != null && request.getChapterId() != null) {
+            if (useAdminBank) {
+                Set<String> adminIds = getAdminUserIdSet();
+                List<Question> adminQuestions = adminIds.isEmpty()
+                        ? new ArrayList<>()
+                        : new ArrayList<>(questionRepository.findAdminBankByExamPart(examPartId, adminIds));
+                Collections.shuffle(adminQuestions);
+                pool = adminQuestions.size() > count ? adminQuestions.subList(0, count) : adminQuestions;
+            } else if (request.getClassId() != null && request.getChapterId() != null) {
                 pool = questionRepository.findRandomQuestionsByExamPartIdAndClassIdAndChapterId(
                         examPartId, request.getClassId(), request.getChapterId(), Pageable.ofSize(count));
             } else if (request.getClassId() != null) {

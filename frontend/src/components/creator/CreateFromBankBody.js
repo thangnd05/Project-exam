@@ -19,6 +19,7 @@ import {
   IoChevronDownOutline,
   IoChevronUpOutline,
   IoCreateOutline,
+  IoServerOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hook/useBaseMetaData';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
@@ -30,6 +31,11 @@ const SELECTION_MODES = {
   MANUAL: 'manual',
   RANDOM: 'random',
   SEQUENTIAL: 'sequential',
+};
+
+const BANK_SOURCES = {
+  PERSONAL: 'personal',
+  ADMIN: 'admin',
 };
 
 const defaultPartConfig = () => ({
@@ -60,17 +66,19 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
+  const [bankSource, setBankSource] = useState(BANK_SOURCES.PERSONAL);
 
   const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
 
   /* ---------- load câu hỏi theo part ---------- */
-  const loadQuestionsForPart = (examPartId) => {
+  const loadQuestionsForPart = (examPartId, source = bankSource) => {
     setPartConfigs((prev) => ({
       ...prev,
       [examPartId]: { ...prev[examPartId], loading: true },
     }));
+    const params = source === BANK_SOURCES.ADMIN ? { bank: 'admin' } : {};
     axios
-      .get(`/api/questions/by-part/${examPartId}`)
+      .get(`/api/questions/by-part/${examPartId}`, { params })
       .then((res) => {
         const list = Array.isArray(res.data) ? res.data : res.data?.data ?? res.data?.questions ?? [];
         setPartConfigs((prev) => ({
@@ -98,15 +106,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
     });
     setPartConfigs(initial);
     examParts.forEach((part) => {
-      loadQuestionsForPart(part.examPartId);
+      loadQuestionsForPart(part.examPartId, bankSource);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testInfo.examTypeId, examParts]);
+  }, [testInfo.examTypeId, examParts, bankSource]);
 
   const handleEditQuestionSuccess = () => {
     setEditingQuestionId(null);
     if (editingPartId) {
-      loadQuestionsForPart(editingPartId);
+      loadQuestionsForPart(editingPartId, bankSource);
     }
   };
 
@@ -264,6 +272,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
             isSequential: cfg.mode === SELECTION_MODES.SEQUENTIAL,
             fromIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.fromIndex, 10) : undefined,
             toIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.toIndex, 10) : undefined,
+            bank: bankSource === BANK_SOURCES.ADMIN ? 'admin' : undefined,
           });
         } else {
           await axios.post('/api/tests/parts/questions', {
@@ -376,11 +385,59 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
           </Row>
         </div>
 
-        {/* ---- 2. Cấu hình từng Part ---- */}
+        {/* ---- 2. Chọn nguồn kho ---- */}
+        <div className={cx('configCard')}>
+          <div className={cx('sectionTitle')}>
+            <IoServerOutline /> 2. Chọn nguồn kho câu hỏi
+          </div>
+          <p className={cx('bankHint')}>
+            Chọn kho lấy câu hỏi để tạo đề. <strong>Kho cá nhân</strong> chứa các câu hỏi do chính bạn lưu.
+            <strong> Kho quản trị</strong> là kho do admin cung cấp, ai cũng có thể dùng làm nguồn tạo đề.
+          </p>
+          <div
+            style={{
+              display: 'flex',
+              gap: 10,
+              flexWrap: 'wrap',
+            }}
+          >
+            <button
+              type="button"
+              className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.PERSONAL })}
+              onClick={() => setBankSource(BANK_SOURCES.PERSONAL)}
+              aria-pressed={bankSource === BANK_SOURCES.PERSONAL}
+            >
+              <IoLibraryOutline size={18} /> Kho cá nhân
+            </button>
+            <button
+              type="button"
+              className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.ADMIN })}
+              onClick={() => setBankSource(BANK_SOURCES.ADMIN)}
+              aria-pressed={bankSource === BANK_SOURCES.ADMIN}
+            >
+              <IoServerOutline size={18} /> Kho quản trị
+            </button>
+          </div>
+        </div>
+
+        {/* ---- 3. Cấu hình từng Part ---- */}
         {testInfo.examTypeId && (examParts || []).length > 0 && (
           <div className={cx('configCard')}>
             <div className={cx('sectionTitle')}>
-              <IoLibraryOutline /> 2. Cấu hình từng Part
+              <IoLibraryOutline /> 3. Cấu hình từng Part
+              <span
+                style={{
+                  marginLeft: 10,
+                  fontSize: '1.15rem',
+                  fontWeight: 600,
+                  color: bankSource === BANK_SOURCES.ADMIN ? '#1d4ed8' : '#475569',
+                  background: bankSource === BANK_SOURCES.ADMIN ? '#dbeafe' : '#f1f5f9',
+                  padding: '2px 10px',
+                  borderRadius: 999,
+                }}
+              >
+                {bankSource === BANK_SOURCES.ADMIN ? 'Kho quản trị' : 'Kho cá nhân'}
+              </span>
             </div>
             <p className={cx('bankHint')}>
               Mỗi part: <strong>Random theo số lượng</strong> (BE lấy ngẫu nhiên từ kho cá nhân) hoặc <strong>Chọn thủ công</strong>.
@@ -536,17 +593,19 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
                                           <li key={id} className={cx('bankQuestionItem', { selected: checked })}>
                                             <span className={cx('bankQuestionIndex')}>{index + 1}.</span>
                                             <span className={cx('bankQuestionText')}>{q.questionText || '(Không có nội dung)'}</span>
-                                            <button
-                                              type="button"
-                                              className={cx('bankBtnEdit')}
-                                              onClick={() => {
-                                                setEditingPartId(part.examPartId);
-                                                setEditingQuestionId(id);
-                                              }}
-                                              title="Sửa câu hỏi này"
-                                            >
-                                              <IoCreateOutline size={18} />
-                                            </button>
+                                            {bankSource === BANK_SOURCES.PERSONAL && (
+                                              <button
+                                                type="button"
+                                                className={cx('bankBtnEdit')}
+                                                onClick={() => {
+                                                  setEditingPartId(part.examPartId);
+                                                  setEditingQuestionId(id);
+                                                }}
+                                                title="Sửa câu hỏi này"
+                                              >
+                                                <IoCreateOutline size={18} />
+                                              </button>
+                                            )}
                                           </li>
                                         );
                                       })}

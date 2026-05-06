@@ -18,4 +18,6 @@ public class AddRandomQuestionsToTestRequest {
     private Integer fromIndex;
     /** Vị trí kết thúc (1-based) khi isSequential = true */
     private Integer toIndex;
+    /** Nguồn kho: "admin" để lấy từ kho do admin tạo (public). Bỏ trống = kho cá nhân/lớp. */
+    private String bank;
 }
