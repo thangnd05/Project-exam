@@ -241,6 +241,13 @@ public class PostService {
     @Transactional
     public PostResponse updatePostStatus(String id, Post.PostStatus status, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
+        if (!authUtils.isAdmin(httpRequest)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin được duyệt/từ chối bài viết");
+        }
+        if (status == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trạng thái không được để trống");
+        }
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
 
@@ -248,6 +255,24 @@ public class PostService {
         postRepository.save(post);
 
         return toFullResponse(post, userId);
+    }
+
+    @Transactional
+    public int deleteAllRejected(HttpServletRequest httpRequest) {
+        if (!authUtils.isAdmin(httpRequest)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin được xóa bài viết bị từ chối");
+        }
+
+        List<Post> rejectedPosts = postRepository.findByStatus(Post.PostStatus.REJECTED);
+        for (Post post : rejectedPosts) {
+            String postId = post.getId();
+            postImageRepository.deleteByPostId(postId);
+            postCategoryRepository.deleteByPostId(postId);
+            commentRepository.deleteByPostId(postId);
+            reactRepository.findByPostId(postId).forEach(reactRepository::delete);
+            postRepository.delete(post);
+        }
+        return rejectedPosts.size();
     }
 
     @Transactional
@@ -273,6 +298,14 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
         String currentUserId = tryGetUserId(httpRequest);
 
+        if (post.getStatus() != Post.PostStatus.APPROVED) {
+            boolean isOwner = currentUserId != null && currentUserId.equals(post.getUserId());
+            boolean isAdmin = currentUserId != null && authUtils.isAdmin(httpRequest);
+            if (!isOwner && !isAdmin) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post không tồn tại");
+            }
+        }
+
         boolean shouldCountView = postViewThrottleService.shouldCountView(id, currentUserId, httpRequest);
         if (shouldCountView) {
             long currentViews = post.getViewCount() == null ? 0L : post.getViewCount();
@@ -292,13 +325,21 @@ public class PostService {
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Specification<Post> spec = Specification.where(null);
 
+        // User thường chỉ thấy bài APPROVED. Admin có thể xem tất cả status (PENDING/REJECTED)
+        // hoặc lọc theo status truyền vào.
+        Post.PostStatus effectiveStatus = status;
+        if (!authUtils.isAdmin(httpRequest)) {
+            effectiveStatus = Post.PostStatus.APPROVED;
+        }
+
         if (keyword != null && !keyword.isBlank()) {
             String like = "%" + keyword.trim().toLowerCase() + "%";
             spec = spec.and((root, query, cb) ->
                     cb.like(cb.lower(root.get("title")), like));
         }
-        if (status != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+        if (effectiveStatus != null) {
+            final Post.PostStatus finalStatus = effectiveStatus;
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), finalStatus));
         }
         if (categoryId != null && !categoryId.isBlank()) {
             List<String> postIds = postCategoryRepository.findByCategoryId(categoryId)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
-import { Search, Eye, CheckCircle, XCircle } from 'lucide-react';
-import { getPosts, updatePostStatus } from '~/api/postApi';
+import { Search, Eye, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { getPosts, updatePostStatus, deleteAllRejectedPosts } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import styles from './Posts.module.scss';
 import { Link } from 'react-router-dom';
@@ -53,6 +53,17 @@ const Posts = () => {
         }
     };
 
+    const handleDeleteAllRejected = async () => {
+        if (!window.confirm('Xóa toàn bộ bài viết đã bị từ chối? Hành động này không thể hoàn tác.')) return;
+        try {
+            const result = await deleteAllRejectedPosts();
+            toast.success(`Đã xóa ${result?.deleted ?? 0} bài viết bị từ chối`);
+            fetchPosts(0);
+        } catch (error) {
+            toast.error('Lỗi khi xóa bài viết bị từ chối');
+        }
+    };
+
     const getStatusStyle = (status) => {
         switch (status) {
             case 'APPROVED': return cx('statusBadge', 'approved');
@@ -82,25 +93,42 @@ const Posts = () => {
                     />
                 </div>
                 <div className={cx('filterPills')}>
-                    <button 
+                    <button
                         className={cx('pill', { active: statusFilter === 'PENDING' })}
                         onClick={() => setStatusFilter('PENDING')}
                     >
                         Chờ duyệt
                     </button>
-                    <button 
+                    <button
                         className={cx('pill', { active: statusFilter === 'APPROVED' })}
                         onClick={() => setStatusFilter('APPROVED')}
                     >
                         Đã duyệt
                     </button>
-                    <button 
+                    <button
+                        className={cx('pill', { active: statusFilter === 'REJECTED' })}
+                        onClick={() => setStatusFilter('REJECTED')}
+                    >
+                        Đã từ chối
+                    </button>
+                    <button
                         className={cx('pill', { active: statusFilter === 'ALL' })}
                         onClick={() => setStatusFilter('ALL')}
                     >
                         Tất cả
                     </button>
                 </div>
+
+                {statusFilter === 'REJECTED' && (
+                    <button
+                        className={cx('deleteAllBtn')}
+                        onClick={handleDeleteAllRejected}
+                        title="Xóa toàn bộ bài bị từ chối"
+                    >
+                        <Trash2 size={16} />
+                        <span>Xóa tất cả</span>
+                    </button>
+                )}
             </div>
 
             <div className={cx('tableContainer')}>

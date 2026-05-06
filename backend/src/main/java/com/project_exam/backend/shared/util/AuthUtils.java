@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthUtils {
 
+    private static final String ADMIN_ROLE = "ADMIN";
+
     private final AuthService authService;
     private final RoleRepository roleRepository;
 
@@ -28,6 +30,18 @@ public class AuthUtils {
     // 🟢 Lấy cả user info nếu cần nhiều hơn
     public UserTokenInfo getUserInfo(HttpServletRequest request) {
         return authService.getCurrentUserInfo(request);
+    }
+
+    // 🟢 Kiểm tra request có thuộc về admin không (an toàn với guest/null roleId)
+    public boolean isAdmin(HttpServletRequest request) {
+        try {
+            String roleId = authService.getCurrentUserInfo(request).getRoleId();
+            if (roleId == null) return false;
+            Role role = roleRepository.findById(roleId).orElse(null);
+            return role != null && ADMIN_ROLE.equalsIgnoreCase(role.getRoleName());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

@@ -95,6 +95,13 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    // ─── DELETE ALL REJECTED (Admin) ──────────────
+    @DeleteMapping("/rejected")
+    public ResponseEntity<java.util.Map<String, Object>> deleteAllRejected(HttpServletRequest httpRequest) {
+        int count = postService.deleteAllRejected(httpRequest);
+        return ResponseEntity.ok(java.util.Map.of("deleted", count));
+    }
+
     // ─── UPDATE STATUS (Admin) ────────────────────
     @PatchMapping("/{id}/status")
     public ResponseEntity<PostResponse> updatePostStatus(
