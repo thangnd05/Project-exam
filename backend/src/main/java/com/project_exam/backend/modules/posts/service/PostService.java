@@ -146,6 +146,7 @@ public class PostService {
         List<CategoryResponse> categories = getCategoryResponses(post.getId());
         long commentCount = commentRepository.countByPostId(post.getId());
         long totalReacts = reactRepository.findByPostId(post.getId()).size();
+        long saveCount = savedPostRepository.countByPostId(post.getId());
 
         String authorName = "Unknown";
         String authorAvatar = null;
@@ -168,6 +169,7 @@ public class PostService {
                 .commentCount(commentCount)
                 .totalReacts(totalReacts)
                 .viewCount(post.getViewCount() == null ? 0L : post.getViewCount())
+                .saveCount(saveCount)
                 .build();
     }
 

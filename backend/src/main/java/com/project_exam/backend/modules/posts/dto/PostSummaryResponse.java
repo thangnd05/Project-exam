@@ -22,4 +22,5 @@ public class PostSummaryResponse {
     private long commentCount;
     private long totalReacts;
     private long viewCount;
+    private long saveCount;
 }

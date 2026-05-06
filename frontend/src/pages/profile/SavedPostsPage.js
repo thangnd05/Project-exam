@@ -231,6 +231,7 @@ function SavedPostsPage() {
                       <span><IoEyeOutline /> {formatCount(post.viewCount)}</span>
                       <span><IoHeartOutline /> {formatCount(post.totalReacts)}</span>
                       <span><IoChatbubbleOutline /> {formatCount(post.commentCount)}</span>
+                      <span title="Lượt lưu"><IoBookmarkOutline /> {formatCount(post.saveCount)}</span>
                     </div>
                   </div>
 
