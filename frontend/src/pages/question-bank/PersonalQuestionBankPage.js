@@ -7,12 +7,14 @@ import {
   IoChevronDownOutline,
   IoChevronUpOutline,
   IoCreateOutline,
+  IoEyeOutline,
   IoLibraryOutline,
   IoSchoolOutline,
   IoTrashOutline,
 } from 'react-icons/io5';
 import {useBaseMetaData} from '~/hook/useBaseMetaData';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
+import ViewQuestionModal from '~/components/modals/ViewQuestionModal';
 import styles from './PersonalQuestionBankPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -33,6 +35,7 @@ const PersonalQuestionBankPage = () => {
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
   const [deletingQuestionId, setDeletingQuestionId] = useState(null);
+  const [viewingQuestionId, setViewingQuestionId] = useState(null);
 
   const [chapters, setChapters] = useState([]);
   const [chapterConfigs, setChapterConfigs] = useState({});
@@ -476,6 +479,16 @@ const PersonalQuestionBankPage = () => {
                                   <div className={cx('questionActions')}>
                                     <Button
                                       type="button"
+                                      className={cx('viewBtn')}
+                                      size="sm"
+                                      variant="outline-secondary"
+                                      onClick={() => setViewingQuestionId(id)}
+                                      aria-label={`Xem câu ${idx + 1}`}
+                                    >
+                                      <IoEyeOutline />
+                                    </Button>
+                                    <Button
+                                      type="button"
                                       className={cx('editBtn')}
                                       size="sm"
                                       variant="outline-primary"
@@ -583,41 +596,53 @@ const PersonalQuestionBankPage = () => {
                                   <span className={cx('questionText')}>
                                     {q.questionText || '(Không có nội dung)'}
                                   </span>
-                                  {bankScope === BANK_SCOPE.PERSONAL && (
-                                    <div className={cx('questionActions')}>
-                                      <Button
-                                        type="button"
-                                        className={cx('editBtn')}
-                                        size="sm"
-                                        variant="outline-primary"
-                                        disabled={deletingQuestionId === id}
-                                        onClick={() => {
-                                          setEditingPartId(part.examPartId);
-                                          setEditingChapterId(null);
-                                          setEditingQuestionId(id);
-                                        }}
-                                        aria-label={`Sửa câu ${idx + 1}`}
-                                      >
-                                        <IoCreateOutline />
-                                      </Button>
-                                      <Button
-                                        type="button"
-                                        className={cx('deleteBtn')}
-                                        size="sm"
-                                        variant="outline-danger"
-                                        disabled={deletingQuestionId === id}
-                                        onClick={() =>
-                                          handleDeleteQuestion({
-                                            questionId: id,
-                                            partId: part.examPartId,
-                                          })
-                                        }
-                                        aria-label={`Xóa câu ${idx + 1}`}
-                                      >
-                                        <IoTrashOutline />
-                                      </Button>
-                                    </div>
-                                  )}
+                                  <div className={cx('questionActions')}>
+                                    <Button
+                                      type="button"
+                                      className={cx('viewBtn')}
+                                      size="sm"
+                                      variant="outline-secondary"
+                                      onClick={() => setViewingQuestionId(id)}
+                                      aria-label={`Xem câu ${idx + 1}`}
+                                    >
+                                      <IoEyeOutline />
+                                    </Button>
+                                    {bankScope === BANK_SCOPE.PERSONAL && (
+                                      <>
+                                        <Button
+                                          type="button"
+                                          className={cx('editBtn')}
+                                          size="sm"
+                                          variant="outline-primary"
+                                          disabled={deletingQuestionId === id}
+                                          onClick={() => {
+                                            setEditingPartId(part.examPartId);
+                                            setEditingChapterId(null);
+                                            setEditingQuestionId(id);
+                                          }}
+                                          aria-label={`Sửa câu ${idx + 1}`}
+                                        >
+                                          <IoCreateOutline />
+                                        </Button>
+                                        <Button
+                                          type="button"
+                                          className={cx('deleteBtn')}
+                                          size="sm"
+                                          variant="outline-danger"
+                                          disabled={deletingQuestionId === id}
+                                          onClick={() =>
+                                            handleDeleteQuestion({
+                                              questionId: id,
+                                              partId: part.examPartId,
+                                            })
+                                          }
+                                          aria-label={`Xóa câu ${idx + 1}`}
+                                        >
+                                          <IoTrashOutline />
+                                        </Button>
+                                      </>
+                                    )}
+                                  </div>
                                 </li>
                               );
                             })}
@@ -637,6 +662,12 @@ const PersonalQuestionBankPage = () => {
         onHide={() => setEditingQuestionId(null)}
         questionId={editingQuestionId}
         onSuccess={handleEditSuccess}
+      />
+
+      <ViewQuestionModal
+        show={!!viewingQuestionId}
+        onHide={() => setViewingQuestionId(null)}
+        questionId={viewingQuestionId}
       />
     </div>
   );
