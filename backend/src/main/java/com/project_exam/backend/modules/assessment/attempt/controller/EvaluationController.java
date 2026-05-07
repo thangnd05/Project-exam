@@ -57,14 +57,15 @@ public class EvaluationController {
     @PutMapping("/{id}")
     public ResponseEntity<EvaluationResponse> update(
             @PathVariable String id,
-            @Valid @RequestBody EvaluationRequest request
+            @Valid @RequestBody EvaluationRequest request,
+            HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(evaluationService.update(id, request));
+        return ResponseEntity.ok(evaluationService.update(id, request, httpRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        evaluationService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
+        evaluationService.delete(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 }

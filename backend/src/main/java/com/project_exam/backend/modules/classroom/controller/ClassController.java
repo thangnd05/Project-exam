@@ -59,12 +59,8 @@ public class ClassController {
 
     @DeleteMapping("/{classId}")
     public ResponseEntity<Void> deleteClass(@PathVariable String classId, HttpServletRequest request) {
-        String teacherId = classService.getCurrentTeacherId(request);
-        ClassResponse clazz = classService.getById(classId);
-        if (!clazz.getTeacherId().equals(teacherId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        classService.deleteClass(classId);
+        // Service tự kiểm tra teacher/admin — bỏ check thừa ở controller.
+        classService.deleteClass(classId, request);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.users.service;
 
+import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 
 import com.project_exam.backend.infrastructure.cloudinary.CloudinaryService;
@@ -259,11 +260,33 @@ public class UserService {
         return getUserCurrent(httpRequest).map(this::toResponse);
     }
 
-    public boolean deleteUser(String id) {
+    public boolean deleteUser(String id, HttpServletRequest httpRequest) {
+        // 🔒 Chỉ admin được xoá user khác. User tự xoá account của mình cũng được.
+        String currentUserId = authUtils.getUserId(httpRequest);
+        boolean isSelf = currentUserId != null && currentUserId.equals(id);
+        if (!isSelf && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn không có quyền xoá user này.");
+        }
         return userRepository.findById(id).map(user -> {
             userRepository.delete(user);
             return true;
         }).orElse(false);
+    }
+
+    /** Guard: chỉ admin được tạo user qua endpoint admin (đăng ký user mới phải qua /api/auth/register). */
+    public void requireAdminToManageUsers(HttpServletRequest httpRequest) {
+        if (!authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Chỉ admin được thao tác trực tiếp trên user.");
+        }
+    }
+
+    /** Guard cho update user: cho phép chính chủ hoặc admin. */
+    public void requireSelfOrAdminForUser(String targetUserId, HttpServletRequest httpRequest) {
+        String currentUserId = authUtils.getUserId(httpRequest);
+        boolean isSelf = currentUserId != null && currentUserId.equals(targetUserId);
+        if (!isSelf && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn chỉ có thể thao tác trên tài khoản của chính mình.");
+        }
     }
 
 }

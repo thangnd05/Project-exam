@@ -69,9 +69,14 @@ public class ClassService {
     }
 
     @Transactional
-    public void deleteClass(String classId) {
-        if (!classRepository.existsById(classId)) {
-            throw new NotFoundException("Class not found!");
+    public void deleteClass(String classId, HttpServletRequest httpRequest) {
+        ClassEntity existing = classRepository.findById(classId)
+                .orElseThrow(() -> new NotFoundException("Class not found!"));
+        // 🔒 Chỉ teacher của lớp (hoặc admin) được xoá.
+        String currentUserId = authUtils.getUserId(httpRequest);
+        boolean isTeacher = currentUserId != null && currentUserId.equals(existing.getTeacherId());
+        if (!isTeacher && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn không có quyền xoá lớp này.");
         }
         classRepository.deleteById(classId);
     }

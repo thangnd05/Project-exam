@@ -24,9 +24,10 @@ public class UserController {
 
     private final UserService userService;
 
-    // Lấy danh sách user
+    // Lấy danh sách user (admin only)
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers(HttpServletRequest httpRequest) {
+        userService.requireAdminToManageUsers(httpRequest);
         return ResponseEntity.ok(userService.findAllResponses());
     }
 
@@ -36,8 +37,10 @@ public class UserController {
             @RequestParam(defaultValue = "20") Integer size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String roleId,
-            @RequestParam(required = false) Boolean verified
+            @RequestParam(required = false) Boolean verified,
+            HttpServletRequest httpRequest
     ) {
+        userService.requireAdminToManageUsers(httpRequest);
         return ResponseEntity.ok(userService.findAllPaged(page, size, keyword, roleId, verified));
     }
 
@@ -61,34 +64,37 @@ public class UserController {
         return ResponseEntity.ok(userService.getMyProfileOverview(httpRequest));
     }
 
-    // Tạo mới user
+    // Tạo mới user (admin only — đăng ký thường đi qua /api/auth/register)
     @PostMapping
     public ResponseEntity<UserResponse> createUser(
-            @Valid @RequestBody UserUpsertRequest request
+            @Valid @RequestBody UserUpsertRequest request,
+            HttpServletRequest httpRequest
     ) {
+        userService.requireAdminToManageUsers(httpRequest);
         return ResponseEntity.ok(userService.createUser(request));
     }
 
-    // Cập nhật user
+    // Cập nhật user (chính chủ hoặc admin)
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable String id,
             @RequestPart("user") String userJson,
-            @RequestPart(value = "avatar", required = false) MultipartFile avatar
+            @RequestPart(value = "avatar", required = false) MultipartFile avatar,
+            HttpServletRequest httpRequest
     ) throws IOException {
-
+        userService.requireSelfOrAdminForUser(id, httpRequest);
         ObjectMapper mapper = new ObjectMapper();
         UserUpsertRequest request = mapper.readValue(userJson, UserUpsertRequest.class);
         return ResponseEntity.ok(userService.updateUser(id, request, avatar));
     }
 
-    // Xóa user
+    // Xóa user (chính chủ hoặc admin)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        userService.deleteUser(id);
+        userService.deleteUser(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 }

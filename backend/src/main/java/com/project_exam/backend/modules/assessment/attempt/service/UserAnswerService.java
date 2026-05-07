@@ -67,7 +67,11 @@ public class UserAnswerService {
         return userAnswerRepository.findAll();
     }
 
-    public List<UserAnswerResponse> findAllResponses() {
+    /** Chỉ admin được liệt kê toàn bộ đáp án. */
+    public List<UserAnswerResponse> findAllResponses(jakarta.servlet.http.HttpServletRequest httpRequest) {
+        if (!authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Chỉ admin được xem toàn bộ đáp án.");
+        }
         return findAll().stream()
                 .map(this::toResponse)
                 .toList();
@@ -77,8 +81,25 @@ public class UserAnswerService {
         return userAnswerRepository.findById(id);
     }
 
-    public Optional<UserAnswerResponse> findResponseById(String id) {
-        return findById(id).map(this::toResponse);
+    /** Chỉ owner attempt, chủ đề (giáo viên), hoặc admin được xem 1 đáp án. */
+    public Optional<UserAnswerResponse> findResponseById(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        return findById(id).map(ua -> {
+            if (!authUtils.isAdmin(httpRequest)) {
+                UserTest ut = userTestRepository.findById(ua.getUserTestId())
+                        .orElseThrow(() -> new NotFoundException("UserTest not found"));
+                String currentUserId = authUtils.getUserId(httpRequest);
+                boolean isAttemptOwner = currentUserId != null && currentUserId.equals(ut.getUserId());
+                boolean isTestOwner = false;
+                if (!isAttemptOwner && currentUserId != null) {
+                    Test test = testRepository.findById(ut.getTestId()).orElse(null);
+                    isTestOwner = test != null && currentUserId.equals(test.getCreatedBy());
+                }
+                if (!isAttemptOwner && !isTestOwner) {
+                    throw new ForbiddenException("Bạn không có quyền xem đáp án này.");
+                }
+            }
+            return toResponse(ua);
+        });
     }
 
     public List<UserAnswer> findByUserTestId(String userTestId) {
@@ -110,7 +131,11 @@ public class UserAnswerService {
         return userAnswerRepository.findByQuestionId(questionId);
     }
 
-    public List<UserAnswerResponse> findResponsesByQuestionId(String questionId) {
+    /** Liệt kê toàn bộ đáp án theo câu hỏi (cross-attempt) — chỉ admin. */
+    public List<UserAnswerResponse> findResponsesByQuestionId(String questionId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        if (!authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Chỉ admin được liệt kê đáp án theo câu hỏi.");
+        }
         return findByQuestionId(questionId).stream()
                 .map(this::toResponse)
                 .toList();
@@ -189,8 +214,17 @@ public class UserAnswerService {
         }
     }
 
-    public boolean delete(String id) {
+    public boolean delete(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
         return userAnswerRepository.findById(id).map(u -> {
+            // 🔒 Chỉ owner attempt hoặc admin được xoá đáp án.
+            if (!authUtils.isAdmin(httpRequest)) {
+                String currentUserId = authUtils.getUserId(httpRequest);
+                UserTest ut = userTestRepository.findById(u.getUserTestId())
+                        .orElseThrow(() -> new NotFoundException("UserTest not found"));
+                if (currentUserId == null || !currentUserId.equals(ut.getUserId())) {
+                    throw new ForbiddenException("Bạn không có quyền xoá đáp án này.");
+                }
+            }
             userAnswerRepository.delete(u);
             return true;
         }).orElse(false);

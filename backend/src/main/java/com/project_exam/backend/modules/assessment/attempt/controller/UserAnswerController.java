@@ -22,13 +22,13 @@ public class UserAnswerController {
     private final AuthUtils authUtils;
 
     @GetMapping
-    public ResponseEntity<List<UserAnswerResponse>> getAll() {
-        return ResponseEntity.ok(userAnswerService.findAllResponses());
+    public ResponseEntity<List<UserAnswerResponse>> getAll(HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(userAnswerService.findAllResponses(httpRequest));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserAnswerResponse> getById(@PathVariable String id) {
-        return userAnswerService.findResponseById(id)
+    public ResponseEntity<UserAnswerResponse> getById(@PathVariable String id, HttpServletRequest httpRequest) {
+        return userAnswerService.findResponseById(id, httpRequest)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -42,8 +42,11 @@ public class UserAnswerController {
     }
 
     @GetMapping("/question/{questionId}")
-    public ResponseEntity<List<UserAnswerResponse>> getByQuestion(@PathVariable String questionId) {
-        return ResponseEntity.ok(userAnswerService.findResponsesByQuestionId(questionId));
+    public ResponseEntity<List<UserAnswerResponse>> getByQuestion(
+            @PathVariable String questionId,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(userAnswerService.findResponsesByQuestionId(questionId, httpRequest));
     }
 
     @PostMapping
@@ -66,11 +69,11 @@ public class UserAnswerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userAnswerService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        userAnswerService.delete(id);
+        userAnswerService.delete(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 
