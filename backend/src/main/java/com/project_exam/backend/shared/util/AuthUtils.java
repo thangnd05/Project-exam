@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.auth.dto.UserTokenInfo;
 import com.project_exam.backend.modules.users.domain.Role;
 import com.project_exam.backend.modules.users.repository.RoleRepository;
 import com.project_exam.backend.modules.auth.service.AuthService;
+import com.project_exam.backend.shared.exception.ForbiddenException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,13 @@ public class AuthUtils {
             return role != null && ADMIN_ROLE.equalsIgnoreCase(role.getRoleName());
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    // 🛡 Yêu cầu admin — throw ForbiddenException nếu không phải.
+    public void requireAdmin(HttpServletRequest request) {
+        if (!isAdmin(request)) {
+            throw new ForbiddenException("Chỉ admin được thực hiện thao tác này.");
         }
     }
 

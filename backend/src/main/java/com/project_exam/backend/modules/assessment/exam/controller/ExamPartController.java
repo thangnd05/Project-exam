@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartResponse;
 import com.project_exam.backend.modules.assessment.exam.service.ExamPartService;
+import com.project_exam.backend.shared.util.AuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,12 +13,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * ExamPart là reference data hệ thống. GET mở để frontend hiển thị, CUD admin-only.
+ */
 @RestController
 @RequestMapping("/api/exam-parts")
 @AllArgsConstructor
 public class ExamPartController {
 
     private final ExamPartService examPartService;
+    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<List<ExamPartResponse>> getAllExamParts() {
@@ -34,20 +40,27 @@ public class ExamPartController {
     }
 
     @PostMapping
-    public ResponseEntity<ExamPartResponse> createExamPart(@Valid @RequestBody ExamPartRequest request) {
+    public ResponseEntity<ExamPartResponse> createExamPart(
+            @Valid @RequestBody ExamPartRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        authUtils.requireAdmin(httpRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(examPartService.create(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ExamPartResponse> updateExamPart(
             @PathVariable String id,
-            @Valid @RequestBody ExamPartRequest request
+            @Valid @RequestBody ExamPartRequest request,
+            HttpServletRequest httpRequest
     ) {
+        authUtils.requireAdmin(httpRequest);
         return ResponseEntity.ok(examPartService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExamPart(@PathVariable String id) {
+    public ResponseEntity<Void> deleteExamPart(@PathVariable String id, HttpServletRequest httpRequest) {
+        authUtils.requireAdmin(httpRequest);
         examPartService.delete(id);
         return ResponseEntity.noContent().build();
     }
