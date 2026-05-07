@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Download, Plus, Search, Trash2, Upload} from 'lucide-react';
@@ -55,7 +55,7 @@ function ScoringConversionManagement() {
     converted_score: item.convertedScore || 0,
   });
 
-  const loadMetadata = async () => {
+  const loadMetadata = useCallback(async () => {
     setLoading(true);
     setErrorMessage('');
     try {
@@ -67,13 +67,13 @@ function ScoringConversionManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadMetadata();
-  }, []);
+  }, [loadMetadata]);
 
-  const loadScoringRules = async (skillId, examTypeId) => {
+  const loadScoringRules = useCallback(async (skillId, examTypeId) => {
     setLoading(true);
     setErrorMessage('');
     try {
@@ -87,11 +87,11 @@ function ScoringConversionManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadScoringRules(activeSkillId, examTypeFilter);
-  }, [activeSkillId, examTypeFilter]);
+  }, [activeSkillId, examTypeFilter, loadScoringRules]);
 
   useEffect(() => {
     if (activeSkillId !== 'all') {

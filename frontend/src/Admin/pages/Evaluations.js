@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Badge, Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronLeft, ChevronRight, Edit, Plus, Search, Trash2} from 'lucide-react';
@@ -44,7 +44,7 @@ function EvaluationsManagement() {
   const [deletingEvaluation, setDeletingEvaluation] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
 
-  const loadEvaluations = async (page) => {
+  const loadEvaluations = useCallback(async (page) => {
     setLoading(true);
     setErrorMessage('');
     try {
@@ -65,11 +65,11 @@ function EvaluationsManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [keyword, ratingFilter]);
 
   useEffect(() => {
     loadEvaluations(currentPage);
-  }, [currentPage, keyword, ratingFilter]);
+  }, [currentPage, loadEvaluations]);
 
   const resetForm = () => {
     setEditingEvaluationId(null);

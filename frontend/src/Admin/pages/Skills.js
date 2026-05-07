@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
@@ -31,7 +31,7 @@ function SkillsManagement() {
     description: skill.description || '',
   });
 
-  const loadSkills = async () => {
+  const loadSkills = useCallback(async () => {
     setLoading(true);
     setErrorMessage('');
     try {
@@ -42,11 +42,11 @@ function SkillsManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadSkills();
-  }, []);
+  }, [loadSkills]);
 
   const filteredSkills = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();

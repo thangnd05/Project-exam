@@ -10,7 +10,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '~/hook/useAuth';
 import routes from '~/config/Routes';
 import styles from './PostDetailPage.module.scss';
-import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, getReacts, toggleReact, toggleSavePost } from '~/api/postApi';
+import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, toggleReact, toggleSavePost } from '~/api/postApi';
 
 const cx = classNames.bind(styles);
 const MAX_REPLY_DEPTH = 4;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,14 +38,12 @@ function PostsPage() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 9;
 
-  const fetchData = async (page = 0) => {
-    setLoading(true);
+  const fetchData = useCallback(async (page = 0) => {
     try {
       const [catsData, postsData] = await Promise.all([
         getCategories(),
@@ -68,14 +66,12 @@ function PostsPage() {
       console.error('Failed to fetch data:', error);
       setPosts([]);
       setCategories([]);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [selectedCategory, searchQuery]);
 
   useEffect(() => {
     fetchData(0);
-  }, [selectedCategory, searchQuery]);
+  }, [fetchData]);
 
   const refreshPosts = () => fetchData(0);
 

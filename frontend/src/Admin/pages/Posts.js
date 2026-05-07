@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames/bind';
 import { Search, Eye, CheckCircle, Trash2 } from 'lucide-react';
 import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
@@ -15,9 +15,8 @@ const Posts = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('PENDING');
     const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
 
-    const fetchPosts = async (page = 0) => {
+    const fetchPosts = useCallback(async (page = 0) => {
         setLoading(true);
         try {
             const data = await getPosts({
@@ -27,18 +26,17 @@ const Posts = () => {
                 keyword: searchQuery
             });
             setPosts(data.content || []);
-            setTotalPages(data.totalPages || 0);
             setCurrentPage(data.currentPage || 0);
         } catch (error) {
             toast.error('Lỗi khi tải danh sách bài viết');
         } finally {
             setLoading(false);
         }
-    };
+    }, [statusFilter, searchQuery]);
 
     useEffect(() => {
         fetchPosts(0);
-    }, [statusFilter, searchQuery]);
+    }, [fetchPosts]);
 
     const handleSearch = (e) => setSearchQuery(e.target.value);
 

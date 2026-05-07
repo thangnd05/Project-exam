@@ -87,7 +87,6 @@ const CreateTestFormBody = ({
     updateGroupAnswer,
     addGroupAnswer,
     removeGroupAnswer,
-    setGroupPassageType,
     handleSubmit,
   } = useCreateTest({ mode, classId, chapterId, creatorType: activeCreatorType });
 
