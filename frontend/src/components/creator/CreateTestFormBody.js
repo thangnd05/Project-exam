@@ -568,7 +568,13 @@ const CreateTestFormBody = ({
       )}
 
       {activeCreatorType === CREATOR_TYPES.BANK && (
-        <CreateFromBankBody onCancel={onCancel} onSuccess={onSuccess} />
+        <CreateFromBankBody
+          mode={mode}
+          classId={classId}
+          chapterId={chapterId}
+          onCancel={onCancel}
+          onSuccess={onSuccess}
+        />
       )}
 
       {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (

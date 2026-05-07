@@ -20,6 +20,7 @@ import {
   IoChevronUpOutline,
   IoCreateOutline,
   IoServerOutline,
+  IoSchoolOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hook/useBaseMetaData';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
@@ -36,7 +37,10 @@ const SELECTION_MODES = {
 const BANK_SOURCES = {
   PERSONAL: 'personal',
   ADMIN: 'admin',
+  CLASS: 'class',
 };
+
+const ALL_CHAPTERS = '__ALL__';
 
 const defaultPartConfig = () => ({
   mode: SELECTION_MODES.RANDOM,
@@ -49,7 +53,9 @@ const defaultPartConfig = () => ({
   expanded: true,
 });
 
-const CreateFromBankBody = ({ onCancel, onSuccess }) => {
+const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, chapterId }) => {
+  const isClassMode = mode === 'class' && !!classId;
+
   const [testInfo, setTestInfo] = useState({
     title: '',
     description: '',
@@ -66,17 +72,42 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
-  const [bankSource, setBankSource] = useState(BANK_SOURCES.PERSONAL);
+  const [bankSource, setBankSource] = useState(isClassMode ? BANK_SOURCES.CLASS : BANK_SOURCES.PERSONAL);
+  const [chapters, setChapters] = useState([]);
+  const [selectedChapterId, setSelectedChapterId] = useState(chapterId || ALL_CHAPTERS);
 
   const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
 
+  /* ---------- load chapters của lớp khi ở class mode ---------- */
+  useEffect(() => {
+    if (!isClassMode) return;
+    axios
+      .get(`/api/chapters/class/${classId}`)
+      .then((res) => {
+        const list = Array.isArray(res.data) ? res.data : [];
+        setChapters(list);
+      })
+      .catch((err) => {
+        console.error('Lỗi tải chapter:', err);
+        setChapters([]);
+      });
+  }, [isClassMode, classId]);
+
   /* ---------- load câu hỏi theo part ---------- */
-  const loadQuestionsForPart = (examPartId, source = bankSource) => {
+  const loadQuestionsForPart = (examPartId, source = bankSource, chapterFilter = selectedChapterId) => {
     setPartConfigs((prev) => ({
       ...prev,
       [examPartId]: { ...prev[examPartId], loading: true },
     }));
-    const params = source === BANK_SOURCES.ADMIN ? { bank: 'admin' } : {};
+    let params = {};
+    if (source === BANK_SOURCES.ADMIN) {
+      params = { bank: 'admin' };
+    } else if (source === BANK_SOURCES.CLASS && classId) {
+      params = { classId };
+      if (chapterFilter && chapterFilter !== ALL_CHAPTERS) {
+        params.chapterId = chapterFilter;
+      }
+    }
     axios
       .get(`/api/questions/by-part/${examPartId}`, { params })
       .then((res) => {
@@ -106,15 +137,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
     });
     setPartConfigs(initial);
     examParts.forEach((part) => {
-      loadQuestionsForPart(part.examPartId, bankSource);
+      loadQuestionsForPart(part.examPartId, bankSource, selectedChapterId);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testInfo.examTypeId, examParts, bankSource]);
+  }, [testInfo.examTypeId, examParts, bankSource, selectedChapterId]);
 
   const handleEditQuestionSuccess = () => {
     setEditingQuestionId(null);
     if (editingPartId) {
-      loadQuestionsForPart(editingPartId, bankSource);
+      loadQuestionsForPart(editingPartId, bankSource, selectedChapterId);
     }
   };
 
@@ -245,8 +276,8 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
         bannerUrl: testInfo.bannerUrl || null,
         availableFrom: testInfo.availableFrom ? testInfo.availableFrom + ':00' : null,
         availableTo: testInfo.availableTo ? testInfo.availableTo + ':00' : null,
-        classId: null,
-        chapterId: null,
+        classId: isClassMode ? classId : null,
+        chapterId: isClassMode ? (chapterId || null) : null,
       });
 
       const newTestId = testRes.data.testId ?? testRes.data.id;
@@ -266,6 +297,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
         if (!newPartId) throw new Error(`Không nhận được testPartId cho part ${part.name}.`);
 
         if (cfg.mode === SELECTION_MODES.RANDOM || cfg.mode === SELECTION_MODES.SEQUENTIAL) {
+          const useClassSource = bankSource === BANK_SOURCES.CLASS && classId;
           await axios.post('/api/tests/parts/random-questions', {
             testPartId: String(newPartId),
             count: numQuestions,
@@ -273,6 +305,8 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
             fromIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.fromIndex, 10) : undefined,
             toIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.toIndex, 10) : undefined,
             bank: bankSource === BANK_SOURCES.ADMIN ? 'admin' : undefined,
+            classId: useClassSource ? classId : undefined,
+            chapterId: useClassSource && selectedChapterId && selectedChapterId !== ALL_CHAPTERS ? selectedChapterId : undefined,
           });
         } else {
           await axios.post('/api/tests/parts/questions', {
@@ -392,6 +426,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
           </div>
           <p className={cx('bankHint')}>
             Chọn kho lấy câu hỏi để tạo đề. <strong>Kho cá nhân</strong> chứa các câu hỏi do chính bạn lưu.
+            {isClassMode && (
+              <> <strong>Kho lớp học</strong> là kho câu hỏi của lớp hiện tại — có thể lọc theo chapter.</>
+            )}
             <strong> Kho quản trị</strong> là kho do admin cung cấp, ai cũng có thể dùng làm nguồn tạo đề.
           </p>
           <div
@@ -409,6 +446,16 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
             >
               <IoLibraryOutline size={18} /> Kho cá nhân
             </button>
+            {isClassMode && (
+              <button
+                type="button"
+                className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.CLASS })}
+                onClick={() => setBankSource(BANK_SOURCES.CLASS)}
+                aria-pressed={bankSource === BANK_SOURCES.CLASS}
+              >
+                <IoSchoolOutline size={18} /> Kho lớp học
+              </button>
+            )}
             <button
               type="button"
               className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.ADMIN })}
@@ -418,6 +465,25 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
               <IoServerOutline size={18} /> Kho quản trị
             </button>
           </div>
+
+          {isClassMode && bankSource === BANK_SOURCES.CLASS && (
+            <div className={cx('formGroupModern')} style={{ marginTop: 14, maxWidth: 480 }}>
+              <label><IoBookOutline /> Lọc theo chapter</label>
+              <select
+                className={cx('inputModern')}
+                value={selectedChapterId}
+                onChange={(e) => setSelectedChapterId(e.target.value)}
+                aria-label="Chọn chapter trong lớp"
+              >
+                <option value={ALL_CHAPTERS}>Tất cả chapter của lớp</option>
+                {chapters.map((c) => (
+                  <option key={c.chapterId} value={c.chapterId}>
+                    {c.title || `Chapter ${c.chapterId}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* ---- 3. Cấu hình từng Part ---- */}
@@ -430,13 +496,23 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
                   marginLeft: 10,
                   fontSize: '1.15rem',
                   fontWeight: 600,
-                  color: bankSource === BANK_SOURCES.ADMIN ? '#1d4ed8' : '#475569',
-                  background: bankSource === BANK_SOURCES.ADMIN ? '#dbeafe' : '#f1f5f9',
+                  color: bankSource === BANK_SOURCES.ADMIN
+                    ? '#1d4ed8'
+                    : bankSource === BANK_SOURCES.CLASS ? '#047857' : '#475569',
+                  background: bankSource === BANK_SOURCES.ADMIN
+                    ? '#dbeafe'
+                    : bankSource === BANK_SOURCES.CLASS ? '#d1fae5' : '#f1f5f9',
                   padding: '2px 10px',
                   borderRadius: 999,
                 }}
               >
-                {bankSource === BANK_SOURCES.ADMIN ? 'Kho quản trị' : 'Kho cá nhân'}
+                {bankSource === BANK_SOURCES.ADMIN
+                  ? 'Kho quản trị'
+                  : bankSource === BANK_SOURCES.CLASS
+                    ? `Kho lớp học${selectedChapterId && selectedChapterId !== ALL_CHAPTERS
+                      ? ` · ${chapters.find((c) => c.chapterId === selectedChapterId)?.title || 'Chapter'}`
+                      : ' · Tất cả chapter'}`
+                    : 'Kho cá nhân'}
               </span>
             </div>
             <p className={cx('bankHint')}>
@@ -548,7 +624,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess }) => {
 
                       {/* empty */}
                       {!cfg.loading && maxInBank === 0 && (
-                        <Alert variant="info" className="mb-0 mt-2">Chưa có câu hỏi trong kho (cá nhân) cho part này.</Alert>
+                        <Alert variant="info" className="mb-0 mt-2">
+                          {bankSource === BANK_SOURCES.ADMIN
+                            ? 'Kho quản trị chưa có câu hỏi cho part này.'
+                            : bankSource === BANK_SOURCES.CLASS
+                              ? (selectedChapterId && selectedChapterId !== ALL_CHAPTERS
+                                  ? 'Kho lớp học (chapter đã chọn) chưa có câu hỏi cho part này.'
+                                  : 'Kho lớp học chưa có câu hỏi cho part này.')
+                              : 'Chưa có câu hỏi trong kho cá nhân cho part này.'}
+                        </Alert>
                       )}
 
                       {/* manual selection — giống hệt CreateTestFromBankPage */}
