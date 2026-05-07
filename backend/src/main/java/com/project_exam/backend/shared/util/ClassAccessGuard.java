@@ -1,6 +1,7 @@
 package com.project_exam.backend.shared.util;
 
 import com.project_exam.backend.modules.classroom.domain.Chapter;
+import com.project_exam.backend.modules.classroom.domain.ClassMember;
 import com.project_exam.backend.modules.classroom.repository.ChapterRepository;
 import com.project_exam.backend.modules.classroom.repository.ClassMemberRepository;
 import com.project_exam.backend.modules.classroom.repository.ClassRepository;
@@ -20,7 +21,10 @@ public class ClassAccessGuard {
     private final ChapterRepository chapterRepository;
     private final AuthUtils authUtils;
 
-    /** Member (đã APPROVED hoặc PENDING – ở repo hiện tại exists check không phân status) hoặc teacher của lớp. Admin luôn pass. */
+    /**
+     * Member đã được duyệt (APPROVED) hoặc teacher của lớp. Admin luôn pass.
+     * PENDING (mới nộp đơn join, chưa được duyệt) KHÔNG đủ quyền — phải đợi teacher approve.
+     */
     public void requireMemberOrTeacher(String classId, String userId, HttpServletRequest request) {
         if (classId == null) {
             throw new BadRequestException("classId không được để trống.");
@@ -29,9 +33,10 @@ public class ClassAccessGuard {
             throw new ForbiddenException("Chưa xác định được người dùng.");
         }
         if (request != null && authUtils.isAdmin(request)) return;
-        boolean isMember = classMemberRepository.existsByClassIdAndUserId(classId, userId);
+        boolean isApprovedMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
+                classId, userId, ClassMember.MemberStatus.APPROVED);
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, userId);
-        if (!isMember && !isTeacher) {
+        if (!isApprovedMember && !isTeacher) {
             throw new ForbiddenException("Bạn không có quyền truy cập lớp này.");
         }
     }

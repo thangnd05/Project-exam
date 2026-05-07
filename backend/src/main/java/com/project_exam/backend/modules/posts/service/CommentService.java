@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.posts.service;
 
 import com.project_exam.backend.modules.posts.dto.CommentRequest;
 import com.project_exam.backend.modules.posts.dto.CommentResponse;
+import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.posts.domain.Comment;
 import com.project_exam.backend.modules.posts.repository.CommentRepository;
@@ -125,7 +126,7 @@ public class CommentService {
                 .orElseThrow(() -> new NotFoundException("Comment không tồn tại"));
 
         if (!comment.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa comment này");
+            throw new ForbiddenException("Bạn không có quyền sửa comment này");
         }
 
         if (request.getContent() == null || request.getContent().isBlank()) {
@@ -143,7 +144,7 @@ public class CommentService {
                 .orElseThrow(() -> new NotFoundException("Comment không tồn tại"));
 
         if (!comment.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xóa comment này");
+            throw new ForbiddenException("Bạn không có quyền xóa comment này");
         }
         commentRepository.delete(comment);
     }

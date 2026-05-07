@@ -206,7 +206,7 @@ public class UserAnswerService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
 
         if (!currentUserId.equals(userTest.getUserId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền truy cập bài thi này");
+            throw new ForbiddenException("Bạn không có quyền truy cập bài thi này");
         }
 
         if (userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
@@ -235,7 +235,7 @@ public class UserAnswerService {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xem kết quả bài thi này");
+            throw new ForbiddenException("Bạn không có quyền xem kết quả bài thi này");
         }
 
         // ✅ Kiểm tra quyền xem kết quả dựa trên thời gian

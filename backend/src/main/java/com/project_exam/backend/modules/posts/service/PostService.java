@@ -20,6 +20,7 @@ import com.project_exam.backend.modules.posts.repository.ReactRepository;
 import com.project_exam.backend.modules.posts.repository.SavedPostRepository;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.users.repository.UserRepository;
+import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -220,7 +221,7 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
 
         if (!post.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa post này");
+            throw new ForbiddenException("Bạn không có quyền sửa post này");
         }
 
         post.setTitle(request.getTitle());
@@ -254,7 +255,7 @@ public class PostService {
     public PostResponse updatePostStatus(String id, Post.PostStatus status, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         if (!authUtils.isAdmin(httpRequest)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin được duyệt/từ chối bài viết");
+            throw new ForbiddenException("Chỉ admin được duyệt/từ chối bài viết");
         }
         if (status == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trạng thái không được để trống");
@@ -278,7 +279,7 @@ public class PostService {
         boolean isOwner = post.getUserId().equals(userId);
         boolean isAdmin = authUtils.isAdmin(httpRequest);
         if (!isOwner && !isAdmin) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xóa post này");
+            throw new ForbiddenException("Bạn không có quyền xóa post này");
         }
 
         postImageRepository.deleteByPostId(id);

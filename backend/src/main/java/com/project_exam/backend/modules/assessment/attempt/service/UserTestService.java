@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.attempt.service;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.users.domain.*;
@@ -75,7 +76,7 @@ public class UserTestService {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền nộp bài thi này");
+            throw new ForbiddenException("Bạn không có quyền nộp bài thi này");
         }
         if (userTest.getStatus() == UserTest.Status.COMPLETED) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã được nộp");
@@ -304,7 +305,7 @@ public class UserTestService {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền cập nhật bài thi này");
+            throw new ForbiddenException("Bạn không có quyền cập nhật bài thi này");
         }
         if (userTest.getStatus() == UserTest.Status.COMPLETED) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã nộp, không thể cập nhật trạng thái");
@@ -339,7 +340,8 @@ public class UserTestService {
 
         // 🔒 Tạo NEW attempt: phải pass mọi guard.
         if (test.getClassId() != null) {
-            boolean isMember = classMemberRepository.existsByClassIdAndUserId(test.getClassId(), userId);
+            boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
+                    test.getClassId(), userId, MemberStatus.APPROVED);
             boolean isTeacher = classRepository.existsByClassIdAndTeacherId(test.getClassId(), userId);
             if (!isMember && !isTeacher) {
                 throw new ForbiddenException("Bạn không thuộc lớp của bài kiểm tra này.");

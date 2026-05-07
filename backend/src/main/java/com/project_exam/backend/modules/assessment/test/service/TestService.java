@@ -24,6 +24,7 @@ import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
+import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
 
 // --- Assessment: Exam ---
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
@@ -694,11 +695,12 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         // 🧩 Kiểm tra quyền truy cập lớp
-        boolean isMember = classMemberRepository.existsByClassIdAndUserId(classId, currentUserId);
+        boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
+                classId, currentUserId, MemberStatus.APPROVED);
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
 
         if (!isMember && !isTeacher) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xem bài kiểm tra của lớp này!");
+            throw new ForbiddenException("Bạn không có quyền xem bài kiểm tra của lớp này!");
         }
 
         // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
@@ -715,11 +717,12 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         // 🧩 Kiểm tra quyền truy cập lớp
-        boolean isMember = classMemberRepository.existsByClassIdAndUserId(classId, currentUserId);
+        boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
+                classId, currentUserId, MemberStatus.APPROVED);
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
 
         if (!isMember && !isTeacher) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xem bài kiểm tra của lớp này!");
+            throw new ForbiddenException("Bạn không có quyền xem bài kiểm tra của lớp này!");
         }
 
         // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
@@ -783,8 +786,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         Set<String> adminIds = getAdminUserIdSet();
         Set<String> accessibleClassIds = new HashSet<>();
         if (currentUserId != null) {
-            classMemberRepository.findByUserIdAndStatus(currentUserId,
-                    com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus.APPROVED)
+            classMemberRepository.findByUserIdAndStatus(currentUserId,MemberStatus.APPROVED)
                     .forEach(m -> accessibleClassIds.add(m.getClassId()));
             classRepository.findByTeacherId(currentUserId)
                     .forEach(c -> accessibleClassIds.add(c.getClassId()));

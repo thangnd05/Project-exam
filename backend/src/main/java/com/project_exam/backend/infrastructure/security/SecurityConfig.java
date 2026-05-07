@@ -47,6 +47,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final UserRepository userRepository;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    private final AuthRateLimitFilter authRateLimitFilter;
 
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
@@ -56,13 +57,15 @@ public class SecurityConfig {
             UserDetailsService userDetailsService,
             CustomUserDetailsService customUserDetailsService,
             UserRepository userRepository,
-            com.fasterxml.jackson.databind.ObjectMapper objectMapper
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper,
+            AuthRateLimitFilter authRateLimitFilter
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.customUserDetailsService = customUserDetailsService;
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
+        this.authRateLimitFilter = authRateLimitFilter;
     }
 
     @Bean
@@ -165,7 +168,8 @@ public class SecurityConfig {
                         })
                 );
 
-        // 8. Filters order
+        // 8. Filters order — rate-limit chạy trước JWT để chặn brute-force ngay từ đầu.
+        http.addFilterBefore(authRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
