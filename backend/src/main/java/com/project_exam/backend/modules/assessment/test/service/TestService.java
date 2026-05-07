@@ -2,8 +2,10 @@ package com.project_exam.backend.modules.assessment.test.service;
 
 // --- Shared ---
 import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.util.ClassAccessGuard;
 
 // --- Assessment: Test (module này) ---
 import com.project_exam.backend.modules.assessment.test.domain.Test;
@@ -83,6 +85,7 @@ public class TestService {
     private final UserTestService userTestService;
     private final ClassRepository classRepository;
     private final ClassMemberRepository classMemberRepository;
+    private final ClassAccessGuard classAccessGuard;
 
     public List<TestResponse> getAllTests() {
         return testRepository.findAll().stream()
@@ -118,7 +121,14 @@ public class TestService {
         return testRepository.save(test);
     }
 
-    public void deleteTest(String id) {
+    public void deleteTest(String id, HttpServletRequest httpRequest) {
+        Test test = testRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + id));
+        String currentUserId = authUtils.getUserId(httpRequest);
+        boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
+        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn không có quyền xóa đề này.");
+        }
         testRepository.deleteById(id);
     }
 
@@ -126,10 +136,25 @@ public class TestService {
      * Cập nhật test từ CreateTestRequest (dùng chung DTO với tạo mới).
      * Chỉ ghi đè các field được gửi lên (khác null); không đổi createdBy, createdAt.
      */
-    public Test updateTest(String id, CreateTestRequest request) {
+    public Test updateTest(String id, CreateTestRequest request, HttpServletRequest httpRequest) {
 
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + id));
+        String currentUserId = authUtils.getUserId(httpRequest);
+        boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
+        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn không có quyền sửa đề này.");
+        }
+        // 🔒 Nếu đổi classId/chapterId, áp dụng cùng guard như khi tạo mới.
+        String effectiveClassId = request.getClassId() != null ? request.getClassId() : test.getClassId();
+        String effectiveChapterId = request.getChapterId() != null ? request.getChapterId() : test.getChapterId();
+        if (request.getClassId() != null) {
+            classAccessGuard.requireTeacher(effectiveClassId, currentUserId, httpRequest);
+        }
+        if (request.getChapterId() != null) {
+            classAccessGuard.requireChapterInClass(effectiveChapterId, effectiveClassId);
+        }
+
         if (request.getTitle() != null) test.setTitle(request.getTitle());
         if (request.getDescription() != null) test.setDescription(request.getDescription());
         if (request.getExamTypeId() != null) test.setExamTypeId(request.getExamTypeId());
@@ -739,13 +764,31 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
      * Câu hỏi phải đã tồn tại trong kho; không tạo câu hỏi mới ở đây.
      */
     @Transactional
-    public void addQuestionsToTestPart(AddQuestionsToTestRequest request) {
+    public void addQuestionsToTestPart(AddQuestionsToTestRequest request, HttpServletRequest httpRequest) {
         if (request.getTestPartId() == null || request.getQuestionIds() == null || request.getQuestionIds().isEmpty()) {
             throw new BadRequestException("testPartId và questionIds không được rỗng.");
         }
         String testPartId = request.getTestPartId();
         TestPart testPart = testPartRepository.findById(testPartId)
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
+        Test parentTest = testRepository.findById(testPart.getTestId())
+                .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
+        String currentUserId = authUtils.getUserId(httpRequest);
+        boolean isOwner = currentUserId != null && currentUserId.equals(parentTest.getCreatedBy());
+        boolean isAdmin = authUtils.isAdmin(httpRequest);
+        if (!isOwner && !isAdmin) {
+            throw new ForbiddenException("Bạn không có quyền sửa đề này.");
+        }
+        // 🔒 Pre-compute: admin-bank set & accessible classes của user (cache để tránh query mỗi câu).
+        Set<String> adminIds = getAdminUserIdSet();
+        Set<String> accessibleClassIds = new HashSet<>();
+        if (currentUserId != null) {
+            classMemberRepository.findByUserIdAndStatus(currentUserId,
+                    com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus.APPROVED)
+                    .forEach(m -> accessibleClassIds.add(m.getClassId()));
+            classRepository.findByTeacherId(currentUserId)
+                    .forEach(c -> accessibleClassIds.add(c.getClassId()));
+        }
         int nextDisplayOrder = testQuestionRepository.findMaxDisplayOrderByTestPartId(testPartId) + 1;
 
         for (String questionId : request.getQuestionIds()) {
@@ -753,6 +796,15 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                     .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại trong kho: " + questionId));
             if (!question.getExamPartId().equals(testPart.getExamPartId())) {
                 throw new BadRequestException("Câu hỏi " + questionId + " không thuộc examPart của part này.");
+            }
+            // 🔒 Validate: user phải có quyền đọc câu hỏi này (own / admin bank / lớp mình thuộc / là admin).
+            if (!isAdmin) {
+                boolean ownQuestion = currentUserId != null && currentUserId.equals(question.getCreatedBy());
+                boolean inAdminBank = question.getClassId() == null && adminIds.contains(question.getCreatedBy());
+                boolean inAccessibleClass = question.getClassId() != null && accessibleClassIds.contains(question.getClassId());
+                if (!ownQuestion && !inAdminBank && !inAccessibleClass) {
+                    throw new ForbiddenException("Bạn không có quyền sử dụng câu hỏi: " + questionId);
+                }
             }
             if (testQuestionRepository.existsByQuestionIdAndTestPartId(questionId, testPartId)) {
                 continue;
@@ -781,7 +833,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .collect(Collectors.toSet());
     }
 
-    public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId) {
+    public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId, HttpServletRequest httpRequest) {
         if (request.getTestPartId() == null || request.getCount() == null || request.getCount() <= 0) {
             throw new BadRequestException("testPartId và count (số câu) phải hợp lệ.");
         }
@@ -796,6 +848,18 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         int count = request.getCount();
         TestPart testPart = testPartRepository.findById(testPartId)
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
+        // 🔒 Verify ownership: chỉ người tạo đề (hoặc admin) mới được bơm câu hỏi vào part.
+        Test parentTest = testRepository.findById(testPart.getTestId())
+                .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
+        boolean isOwner = currentUserId != null && currentUserId.equals(parentTest.getCreatedBy());
+        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn không có quyền sửa đề này.");
+        }
+        // 🔒 Nếu lấy nguồn từ class bank, user phải là teacher (hoặc thành viên) của lớp đó và chapter phải thuộc lớp.
+        if (request.getClassId() != null) {
+            classAccessGuard.requireMemberOrTeacher(request.getClassId(), currentUserId, httpRequest);
+            classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
+        }
         String examPartId = testPart.getExamPartId();
 
         List<TestQuestion> existingLinks = testQuestionRepository.findByTestPartIdOrderByDisplayOrder(testPartId);

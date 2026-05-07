@@ -248,8 +248,8 @@ public class QuestionController {
     // =================== DELETE ===================
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable String id) {
-        questionService.deleteById(id);
+    public ResponseEntity<Void> deleteQuestion(@PathVariable String id, HttpServletRequest httpRequest) {
+        questionService.deleteById(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 

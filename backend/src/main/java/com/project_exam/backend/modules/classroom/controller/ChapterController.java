@@ -26,18 +26,24 @@ public class ChapterController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChapterResponse>> getAll() {
-        return ResponseEntity.ok(chapterService.getAll());
+    public ResponseEntity<List<ChapterResponse>> getAll(HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(chapterService.getAll(httpRequest));
     }
 
     @GetMapping("/class/{classId}")
-    public ResponseEntity<List<ChapterResponse>> getByClass(@PathVariable String classId) {
-        return ResponseEntity.ok(chapterService.getByClassId(classId));
+    public ResponseEntity<List<ChapterResponse>> getByClass(
+            @PathVariable String classId,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(chapterService.getByClassId(classId, httpRequest));
     }
 
     @GetMapping("/{chapterId}")
-    public ResponseEntity<ChapterResponse> getById(@PathVariable String chapterId) {
-        return ResponseEntity.ok(chapterService.getById(chapterId));
+    public ResponseEntity<ChapterResponse> getById(
+            @PathVariable String chapterId,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(chapterService.getById(chapterId, httpRequest));
     }
 
     @PutMapping("/{chapterId}")

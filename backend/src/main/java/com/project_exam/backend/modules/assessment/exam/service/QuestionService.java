@@ -36,6 +36,7 @@ import com.project_exam.backend.modules.vocabulary.repository.*;
 import com.project_exam.backend.modules.classroom.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -56,6 +57,7 @@ public class QuestionService {
     private final ExamPartRepository examPartRepository;
     private final TestQuestionRepository testQuestionRepository;
     private final TestPartRepository testPartRepository;
+    private final TestRepository testRepository;
     private final CloudinaryService cloudinaryService;
     private final AuthUtils authUtils;
     private final PassageMediaRepository passageMediaRepository;
@@ -65,6 +67,22 @@ public class QuestionService {
     private final QuestionDocumentImportService questionDocumentImportService;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final ClassAccessGuard classAccessGuard;
+
+    /**
+     * Khi câu hỏi được gắn vào một class/chapter, user phải là thành viên hoặc giáo viên của lớp đó
+     * (admin pass), và chapter (nếu có) phải thuộc đúng lớp.
+     */
+    private void requireClassWriteAccess(String classId, String chapterId, String currentUserId, HttpServletRequest httpRequest) {
+        if (classId == null) {
+            if (chapterId != null) {
+                throw new BadRequestException("Khi có chapterId thì phải có classId.");
+            }
+            return;
+        }
+        classAccessGuard.requireMemberOrTeacher(classId, currentUserId, httpRequest);
+        classAccessGuard.requireChapterInClass(chapterId, classId);
+    }
 
     public List<Question> findAll() {
         return questionRepository.findAll();
@@ -227,6 +245,14 @@ public class QuestionService {
     ) {
 
         String currentUserId = authUtils.getUserId(request);
+
+        // 🔒 Khi đọc kho lớp: phải là member/teacher của lớp; chapter (nếu có) phải thuộc lớp đó.
+        if (classId != null) {
+            classAccessGuard.requireMemberOrTeacher(classId, currentUserId, request);
+            classAccessGuard.requireChapterInClass(chapterId, classId);
+        } else if (chapterId != null) {
+            throw new BadRequestException("Khi có chapterId thì phải có classId.");
+        }
 
         List<Question> questions = fetchQuestions(
                 examPartId,
@@ -401,6 +427,14 @@ public class QuestionService {
 
         TestPart testPart = testPartRepository.findById(testPartId)
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
+        // 🔒 Phải sở hữu test cha.
+        Test parentTest = testRepository.findById(testPart.getTestId())
+                .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
+        if (!currentUserId.equals(parentTest.getCreatedBy()) && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn không có quyền sửa đề này.");
+        }
+        // 🔒 Nếu gắn class/chapter, user phải có quyền với lớp.
+        requireClassWriteAccess(classId, chapterId, currentUserId, httpRequest);
 
         List<NormalQuestionRequest> parsedQuestions = questionDocumentImportService.parseQuestionsFromDocument(file);
         if (parsedQuestions.isEmpty()) {
@@ -443,7 +477,14 @@ public class QuestionService {
         return responses;
     }
 
-    public void deleteById(String id) {
+    public void deleteById(String id, HttpServletRequest httpRequest) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại."));
+        String currentUserId = authUtils.getUserId(httpRequest);
+        boolean isOwner = currentUserId != null && currentUserId.equals(question.getCreatedBy());
+        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn không có quyền xoá câu hỏi này.");
+        }
         questionRepository.deleteById(id);
     }
 
@@ -453,10 +494,16 @@ public class QuestionService {
     public long countByExamPartId(String examPartId, String classId, String chapterId, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
         if (classId != null) {
+            // 🔒 Cùng guard với getQuestionsByPart.
+            classAccessGuard.requireMemberOrTeacher(classId, currentUserId, request);
+            classAccessGuard.requireChapterInClass(chapterId, classId);
             if (chapterId != null) {
                 return questionRepository.countByExamPartIdAndClassIdAndChapterId(examPartId, classId, chapterId);
             }
             return questionRepository.countByExamPartIdAndClassId(examPartId, classId);
+        }
+        if (chapterId != null) {
+            throw new BadRequestException("Khi có chapterId thì phải có classId.");
         }
         return questionRepository.countByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(examPartId, currentUserId);
     }
@@ -473,6 +520,8 @@ public class QuestionService {
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng từ token.");
         }
+        // 🔒 Nếu lưu vào kho lớp/chapter, user phải có quyền với lớp đó.
+        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
         List<MultipartFile> uploadedFiles = files == null
                 ? List.of()
                 : files.entrySet().stream()
@@ -554,6 +603,8 @@ public class QuestionService {
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng từ token.");
         }
+        // 🔒 Nếu lưu vào kho lớp/chapter, user phải có quyền với lớp đó.
+        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
 
         if (request.getQuestions() == null || request.getQuestions().isEmpty()) {
             return List.of();
@@ -671,6 +722,14 @@ public class QuestionService {
 
         TestPart testPart = testPartRepository.findById(request.getTestPartId())
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + request.getTestPartId()));
+        // 🔒 Phải sở hữu test cha (admin pass).
+        Test parentTest = testRepository.findById(testPart.getTestId())
+                .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
+        if (!currentUserId.equals(parentTest.getCreatedBy()) && !authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Bạn không có quyền sửa đề này.");
+        }
+        // 🔒 Nếu gắn class/chapter, user phải có quyền với lớp.
+        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
 
         String passageId = null;
         Passage savedPassage = null;
@@ -984,8 +1043,14 @@ public class QuestionService {
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại."));
-        if (!currentUserId.equals(question.getCreatedBy())) {
+        if (!currentUserId.equals(question.getCreatedBy()) && !authUtils.isAdmin(httpRequest)) {
             throw new ForbiddenException("Chỉ người tạo câu hỏi mới được sửa.");
+        }
+        // 🔒 Nếu đổi class/chapter, user phải có quyền với lớp đó.
+        String effectiveClassId = request.getClassId() != null ? request.getClassId() : question.getClassId();
+        String effectiveChapterId = request.getChapterId() != null ? request.getChapterId() : question.getChapterId();
+        if (request.getClassId() != null || request.getChapterId() != null) {
+            requireClassWriteAccess(effectiveClassId, effectiveChapterId, currentUserId, httpRequest);
         }
 
         if (request.getExamPartId() != null) question.setExamPartId(request.getExamPartId());
@@ -1073,6 +1138,8 @@ public class QuestionService {
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng.");
         }
+        // 🔒 Nếu lưu vào kho lớp/chapter, user phải có quyền với lớp đó.
+        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
 
         System.out.println("========== DEBUG START ==========");
         if (files != null) {

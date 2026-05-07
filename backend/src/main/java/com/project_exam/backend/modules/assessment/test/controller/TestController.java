@@ -11,6 +11,7 @@ import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.service.TestService;
 import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class TestController {
 
     private final TestService testService;
     private final AuthUtils authUtils;
+    private final ClassAccessGuard classAccessGuard;
 
     // Lấy tất cả tests
     @GetMapping
@@ -61,6 +63,15 @@ public class TestController {
             HttpServletRequest httpRequest
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
+        // 🔒 Khi đề được gắn vào lớp: user phải là teacher của lớp đó (admin pass).
+        if (request.getClassId() != null) {
+            classAccessGuard.requireTeacher(request.getClassId(), currentUserId, httpRequest);
+            classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
+        } else if (request.getChapterId() != null) {
+            // Có chapterId mà không có classId là không hợp lệ.
+            throw new com.project_exam.backend.shared.exception.BadRequestException(
+                    "Khi có chapterId thì phải có classId.");
+        }
         Test test = new Test();
         test.setTitle(request.getTitle());
         test.setDescription(request.getDescription());
@@ -81,8 +92,11 @@ public class TestController {
 
     /** Gắn câu hỏi từ kho vào part của đề (chỉ tạo test_questions). Không tạo câu hỏi mới. */
     @PostMapping("/parts/questions")
-    public ResponseEntity<Void> addQuestionsToTestPart(@Valid @RequestBody AddQuestionsToTestRequest request) {
-        testService.addQuestionsToTestPart(request);
+    public ResponseEntity<Void> addQuestionsToTestPart(
+            @Valid @RequestBody AddQuestionsToTestRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        testService.addQuestionsToTestPart(request, httpRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -93,7 +107,7 @@ public class TestController {
             HttpServletRequest httpRequest
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
-        AddRandomQuestionsResponse response = testService.addRandomQuestionsToTestPart(request, currentUserId);
+        AddRandomQuestionsResponse response = testService.addRandomQuestionsToTestPart(request, currentUserId, httpRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -101,19 +115,20 @@ public class TestController {
     @PutMapping("/{id}")
     public ResponseEntity<TestResponse> updateTest(
             @PathVariable String id,
-            @Valid @RequestBody CreateTestRequest request
+            @Valid @RequestBody CreateTestRequest request,
+            HttpServletRequest httpRequest
     ) {
-        Test updated = testService.updateTest(id, request);
+        Test updated = testService.updateTest(id, request, httpRequest);
         return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
     }
 
     // Xoá test
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTest(@PathVariable String id) {
+    public ResponseEntity<Void> deleteTest(@PathVariable String id, HttpServletRequest httpRequest) {
         if (testService.getTestById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        testService.deleteTest(id);
+        testService.deleteTest(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,0 +1,65 @@
+package com.project_exam.backend.shared.util;
+
+import com.project_exam.backend.modules.classroom.domain.Chapter;
+import com.project_exam.backend.modules.classroom.repository.ChapterRepository;
+import com.project_exam.backend.modules.classroom.repository.ClassMemberRepository;
+import com.project_exam.backend.modules.classroom.repository.ClassRepository;
+import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.shared.exception.ForbiddenException;
+import com.project_exam.backend.shared.exception.NotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class ClassAccessGuard {
+
+    private final ClassRepository classRepository;
+    private final ClassMemberRepository classMemberRepository;
+    private final ChapterRepository chapterRepository;
+    private final AuthUtils authUtils;
+
+    /** Member (đã APPROVED hoặc PENDING – ở repo hiện tại exists check không phân status) hoặc teacher của lớp. Admin luôn pass. */
+    public void requireMemberOrTeacher(String classId, String userId, HttpServletRequest request) {
+        if (classId == null) {
+            throw new BadRequestException("classId không được để trống.");
+        }
+        if (userId == null) {
+            throw new ForbiddenException("Chưa xác định được người dùng.");
+        }
+        if (request != null && authUtils.isAdmin(request)) return;
+        boolean isMember = classMemberRepository.existsByClassIdAndUserId(classId, userId);
+        boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, userId);
+        if (!isMember && !isTeacher) {
+            throw new ForbiddenException("Bạn không có quyền truy cập lớp này.");
+        }
+    }
+
+    /** Chỉ teacher của lớp mới được thao tác (tạo đề/gắn câu hỏi…). Admin luôn pass. */
+    public void requireTeacher(String classId, String userId, HttpServletRequest request) {
+        if (classId == null) {
+            throw new BadRequestException("classId không được để trống.");
+        }
+        if (userId == null) {
+            throw new ForbiddenException("Chưa xác định được người dùng.");
+        }
+        if (request != null && authUtils.isAdmin(request)) return;
+        if (!classRepository.existsByClassIdAndTeacherId(classId, userId)) {
+            throw new ForbiddenException("Bạn không phải giáo viên của lớp này.");
+        }
+    }
+
+    /** Đảm bảo chapter thuộc đúng class được chỉ định, đồng thời chapter tồn tại. */
+    public void requireChapterInClass(String chapterId, String classId) {
+        if (chapterId == null) return;
+        if (classId == null) {
+            throw new BadRequestException("Khi có chapterId thì phải có classId.");
+        }
+        Chapter chapter = chapterRepository.findById(chapterId)
+                .orElseThrow(() -> new NotFoundException("Chapter không tồn tại: " + chapterId));
+        if (!classId.equals(chapter.getClassId())) {
+            throw new ForbiddenException("Chapter không thuộc lớp được chỉ định.");
+        }
+    }
+}

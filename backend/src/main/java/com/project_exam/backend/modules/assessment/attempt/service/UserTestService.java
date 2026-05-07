@@ -1,6 +1,8 @@
 package com.project_exam.backend.modules.assessment.attempt.service;
 
+import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.util.AuthUtils;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.users.domain.*;
@@ -47,6 +49,9 @@ public class UserTestService {
     private final TestPartRepository testPartRepository;
     private final TestQuestionRepository testQuestionRepository;
     private final UserRepository userRepository;
+    private final ClassMemberRepository classMemberRepository;
+    private final ClassRepository classRepository;
+    private final AuthUtils authUtils;
 
     public UserTestResponse toResponse(UserTest userTest) {
         return UserTestResponse.builder()
@@ -262,7 +267,12 @@ public class UserTestService {
 
     // --- Các phương thức CRUD khác ---
     public List<UserTest> findAll() { return userTestRepository.findAll(); }
-    public List<UserTestResponse> findAllResponses() {
+
+    /** Chỉ admin được liệt kê toàn bộ user-tests. */
+    public List<UserTestResponse> findAllResponses(jakarta.servlet.http.HttpServletRequest httpRequest) {
+        if (!authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Chỉ admin được xem toàn bộ user-tests.");
+        }
         return findAll().stream().map(this::toResponse).toList();
     }
     public Optional<UserTest> findById(String id) { return userTestRepository.findById(id); }
@@ -271,11 +281,24 @@ public class UserTestService {
         return findByUserId(userId).stream().map(this::toResponse).toList();
     }
     public List<UserTest> findByTestId(String testId) { return userTestRepository.findByTestId(testId); }
-    public List<UserTestResponse> findResponsesByTestId(String testId) {
+
+    /** Chỉ chủ đề (hoặc admin) được xem toàn bộ attempts của một bài test. */
+    public List<UserTestResponse> findResponsesByTestId(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        requireTestOwnerOrAdmin(testId, httpRequest);
         return findByTestId(testId).stream().map(this::toResponse).toList();
     }
     public UserTest save(UserTest userTest) { return userTestRepository.save(userTest); }
     public UserTestResponse saveResponse(UserTest userTest) { return toResponse(save(userTest)); }
+
+    private void requireTestOwnerOrAdmin(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        if (authUtils.isAdmin(httpRequest)) return;
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new NotFoundException("Test not found"));
+        String currentUserId = authUtils.getUserId(httpRequest);
+        if (currentUserId == null || !currentUserId.equals(test.getCreatedBy())) {
+            throw new ForbiddenException("Bạn không có quyền xem dữ liệu của đề này.");
+        }
+    }
     @Transactional
     public UserTestResponse updateStatusByOwner(String userTestId, String currentUserId, UserTest.Status status) {
         UserTest userTest = userTestRepository.findById(userTestId)
@@ -289,8 +312,13 @@ public class UserTestService {
         userTest.setStatus(status);
         return toResponse(userTestRepository.save(userTest));
     }
-    public boolean delete(String id) {
+    public boolean delete(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
         return userTestRepository.findById(id).map(u -> {
+            String currentUserId = authUtils.getUserId(httpRequest);
+            boolean isOwner = currentUserId != null && currentUserId.equals(u.getUserId());
+            if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+                throw new ForbiddenException("Bạn không có quyền xoá bài làm này.");
+            }
             userTestRepository.delete(u);
             return true;
         }).orElse(false);
@@ -298,8 +326,33 @@ public class UserTestService {
 
     @Transactional
     public UserTest startUserTest(String testId, String userId) {
-        testRepository.findById(testId)
+        Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
+
+        // 🔒 Nếu đề gắn vào lớp, user phải là member/teacher của lớp đó.
+        if (test.getClassId() != null) {
+            boolean isMember = classMemberRepository.existsByClassIdAndUserId(test.getClassId(), userId);
+            boolean isTeacher = classRepository.existsByClassIdAndTeacherId(test.getClassId(), userId);
+            if (!isMember && !isTeacher) {
+                throw new ForbiddenException("Bạn không thuộc lớp của bài kiểm tra này.");
+            }
+        }
+        // 🔒 Chặn theo cửa sổ thời gian (NOT_STARTED / ENDED).
+        TestStatus status = test.calculateStatus();
+        if (status == TestStatus.NOT_STARTED) {
+            throw new ForbiddenException("Bài kiểm tra chưa mở.");
+        }
+        if (status == TestStatus.ENDED) {
+            throw new ForbiddenException("Bài kiểm tra đã kết thúc.");
+        }
+        // 🔒 Giới hạn lượt làm.
+        Integer maxAttempts = test.getMaxAttempts();
+        if (maxAttempts != null && maxAttempts > 0) {
+            int completedAttempts = userTestRepository.countByUserIdAndTestIdAndStatus(userId, testId, UserTest.Status.COMPLETED);
+            if (completedAttempts >= maxAttempts) {
+                throw new ForbiddenException("Bạn đã hết số lượt làm bài.");
+            }
+        }
 
         // ✅ Kiểm tra xem user đã có bài thi đang làm dở chưa
         Optional<UserTest> existing = userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
@@ -358,7 +411,9 @@ public class UserTestService {
                 .collect(Collectors.toList());
     }
 
-    public List<UserTestResponse> getAttemptsByTest(String testId) {
+    public List<UserTestResponse> getAttemptsByTest(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        // 🔒 Chỉ chủ đề (hoặc admin) được xem toàn bộ attempts của 1 bài test.
+        requireTestOwnerOrAdmin(testId, httpRequest);
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
     
@@ -427,9 +482,22 @@ public class UserTestService {
         return Duration.between(userTest.getStartedAt(), userTest.getFinishedAt()).getSeconds();
     }
 
-    public UserTestResponse getMeta(String userTestId) {
+    public UserTestResponse getMeta(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         var ut = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
+        // 🔒 Chỉ user sở hữu attempt, chủ đề (giáo viên), hoặc admin được xem.
+        if (!authUtils.isAdmin(httpRequest)) {
+            String currentUserId = authUtils.getUserId(httpRequest);
+            boolean isOwner = currentUserId != null && currentUserId.equals(ut.getUserId());
+            boolean isTestOwner = false;
+            if (!isOwner && currentUserId != null) {
+                Test test = testRepository.findById(ut.getTestId()).orElse(null);
+                isTestOwner = test != null && currentUserId.equals(test.getCreatedBy());
+            }
+            if (!isOwner && !isTestOwner) {
+                throw new ForbiddenException("Bạn không có quyền xem bài làm này.");
+            }
+        }
         return UserTestResponse.builder()
                 .userTestId(ut.getUserTestId())
                 .testId(ut.getTestId())

@@ -11,6 +11,7 @@ import com.project_exam.backend.modules.classroom.domain.ClassEntity;
 import com.project_exam.backend.modules.classroom.repository.ChapterRepository;
 import com.project_exam.backend.modules.classroom.repository.ClassRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class ChapterService {
     private final ChapterRepository chapterRepository;
     private final ClassRepository classRepository;
     private final AuthUtils authUtils;
+    private final ClassAccessGuard classAccessGuard;
 
     private void checkTeacherPermission(String classId, String currentUserId) {
 
@@ -69,9 +71,12 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ GET ALL
+    // ✅ GET ALL — chỉ admin được xem toàn bộ chapter.
     // ============================
-    public List<ChapterResponse> getAll() {
+    public List<ChapterResponse> getAll(HttpServletRequest httpRequest) {
+        if (!authUtils.isAdmin(httpRequest)) {
+            throw new ForbiddenException("Chỉ admin được xem toàn bộ chapter.");
+        }
         return chapterRepository.findAll()
                 .stream()
                 .map(this::toResponse)
@@ -81,7 +86,11 @@ public class ChapterService {
     // ============================
     // ✅ GET BY CLASS
     // ============================
-    public List<ChapterResponse> getByClassId(String classId) {
+    public List<ChapterResponse> getByClassId(String classId, HttpServletRequest httpRequest) {
+        // 🔒 Chỉ thành viên/giáo viên của lớp (hoặc admin) mới được liệt kê chapter của lớp.
+        String currentUserId = authUtils.getUserId(httpRequest);
+        classAccessGuard.requireMemberOrTeacher(classId, currentUserId, httpRequest);
+
         return chapterRepository.findByClassId(classId)
                 .stream()
                 .map(this::toResponse)
@@ -91,10 +100,14 @@ public class ChapterService {
     // ============================
     // ✅ GET BY ID
     // ============================
-    public ChapterResponse getById(String chapterId) {
+    public ChapterResponse getById(String chapterId, HttpServletRequest httpRequest) {
 
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new NotFoundException("Chapter not found"));
+
+        // 🔒 Chỉ thành viên/giáo viên của lớp chứa chapter mới được xem.
+        String currentUserId = authUtils.getUserId(httpRequest);
+        classAccessGuard.requireMemberOrTeacher(chapter.getClassId(), currentUserId, httpRequest);
 
         return toResponse(chapter);
     }

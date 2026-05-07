@@ -23,16 +23,19 @@ public class UserTestController {
     private final UserTestService userTestService;
     private final AuthUtils authUtils;
 
-    // ✅ Lấy tất cả user test
+    // ✅ Lấy tất cả user test (admin only)
     @GetMapping
-    public ResponseEntity<List<UserTestResponse>> getAll() {
-        return ResponseEntity.ok(userTestService.findAllResponses());
+    public ResponseEntity<List<UserTestResponse>> getAll(HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(userTestService.findAllResponses(httpRequest));
     }
 
     // ✅ Lấy theo ID
     @GetMapping("/{userTestId}")
-    public ResponseEntity<UserTestResponse> getUserTestById(@PathVariable String userTestId) {
-        return ResponseEntity.ok(userTestService.getMeta(userTestId));
+    public ResponseEntity<UserTestResponse> getUserTestById(
+            @PathVariable String userTestId,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(userTestService.getMeta(userTestId, httpRequest));
     }
 
     // ✅ Lấy theo user đang đăng nhập (JWT)
@@ -42,10 +45,13 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.findResponsesByUserId(userId));
     }
 
-    // ✅ Lấy theo testId
+    // ✅ Lấy theo testId (chỉ chủ đề / admin)
     @GetMapping("/test/{testId}")
-    public ResponseEntity<List<UserTestResponse>> getByTest(@PathVariable String testId) {
-        return ResponseEntity.ok(userTestService.findResponsesByTestId(testId));
+    public ResponseEntity<List<UserTestResponse>> getByTest(
+            @PathVariable String testId,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(userTestService.findResponsesByTestId(testId, httpRequest));
     }
 
     // ✅ Tạo hoặc bắt đầu bài test mới
@@ -83,13 +89,13 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.updateStatusByOwner(id, userId, request.getStatus()));
     }
 
-    // ✅ Xóa UserTest
+    // ✅ Xóa UserTest (owner hoặc admin)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userTestService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        userTestService.delete(id);
+        userTestService.delete(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -137,9 +143,10 @@ public class UserTestController {
 
     @GetMapping("/by-test/{testId}")
     public ResponseEntity<List<UserTestResponse>> getAttemptsTest(
-            @PathVariable String testId) {
-
-        List<UserTestResponse> res = userTestService.getAttemptsByTest(testId);
+            @PathVariable String testId,
+            HttpServletRequest httpRequest
+    ) {
+        List<UserTestResponse> res = userTestService.getAttemptsByTest(testId, httpRequest);
         return ResponseEntity.ok(res);
     }
 }
