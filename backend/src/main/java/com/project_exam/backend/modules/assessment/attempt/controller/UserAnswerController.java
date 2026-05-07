@@ -34,8 +34,11 @@ public class UserAnswerController {
     }
 
     @GetMapping("/user-test/{userTestId}")
-    public ResponseEntity<List<UserAnswerResponse>> getByUserTest(@PathVariable String userTestId) {
-        return ResponseEntity.ok(userAnswerService.findResponsesByUserTestId(userTestId));
+    public ResponseEntity<List<UserAnswerResponse>> getByUserTest(
+            @PathVariable String userTestId,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(userAnswerService.findResponsesByUserTestId(userTestId, httpRequest));
     }
 
     @GetMapping("/question/{questionId}")

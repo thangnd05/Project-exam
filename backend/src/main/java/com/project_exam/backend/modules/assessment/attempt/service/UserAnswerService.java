@@ -1,6 +1,8 @@
 package com.project_exam.backend.modules.assessment.attempt.service;
 
+import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.util.AuthUtils;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryDto;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerRequest;
@@ -40,6 +42,7 @@ public class UserAnswerService {
     private final TestRepository testRepository;
     private final TestPartRepository testPartRepository;
     private final TestQuestionRepository testQuestionRepository;
+    private final AuthUtils authUtils;
 
     private UserAnswerResponse toResponse(UserAnswer userAnswer) {
         return UserAnswerResponse.builder()
@@ -82,7 +85,22 @@ public class UserAnswerService {
         return userAnswerRepository.findByUserTestId(userTestId);
     }
 
-    public List<UserAnswerResponse> findResponsesByUserTestId(String userTestId) {
+    public List<UserAnswerResponse> findResponsesByUserTestId(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        // 🔒 Chỉ owner attempt, chủ đề (giáo viên), hoặc admin được xem.
+        if (!authUtils.isAdmin(httpRequest)) {
+            UserTest ut = userTestRepository.findById(userTestId)
+                    .orElseThrow(() -> new NotFoundException("UserTest not found"));
+            String currentUserId = authUtils.getUserId(httpRequest);
+            boolean isAttemptOwner = currentUserId != null && currentUserId.equals(ut.getUserId());
+            boolean isTestOwner = false;
+            if (!isAttemptOwner && currentUserId != null) {
+                Test test = testRepository.findById(ut.getTestId()).orElse(null);
+                isTestOwner = test != null && currentUserId.equals(test.getCreatedBy());
+            }
+            if (!isAttemptOwner && !isTestOwner) {
+                throw new ForbiddenException("Bạn không có quyền xem đáp án của bài làm này.");
+            }
+        }
         return findByUserTestId(userTestId).stream()
                 .map(this::toResponse)
                 .toList();

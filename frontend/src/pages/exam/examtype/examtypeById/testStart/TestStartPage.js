@@ -135,30 +135,68 @@ function TestStartPage() {
           return;
         }
 
-        if (availableTo && now > availableTo) {
+        // 🔄 Nếu không có state trong sessionStorage (vd. vừa logout/login),
+        // thử khôi phục từ server: tìm attempt đang IN_PROGRESS + answers đã lưu.
+        let serverStartedAt = null;
+        if (!restored) {
+          try {
+            const activeRes = await axios.get('/api/user-tests/check-active', { params: { testId } });
+            const activeUserTestId = activeRes.data?.userTestId;
+            if (activeUserTestId) {
+              serverStartedAt = activeRes.data?.startedAt || null;
+              const ansRes = await axios.get(`/api/user-answers/user-test/${activeUserTestId}`);
+              const answersMap = {};
+              (ansRes.data || []).forEach((a) => {
+                answersMap[a.questionId] = {
+                  selectedAnswerId: a.selectedAnswerId || null,
+                  answerText: a.answerText || null,
+                };
+              });
+              setUserTestId(activeUserTestId);
+              setUserAnswers(answersMap);
+              sessionStorage.setItem(`userTest-${testId}`, activeUserTestId);
+              restored = true;
+            }
+          } catch {
+            // ignore — sẽ rơi xuống flow tạo attempt mới
+          }
+        }
+
+        // Tính thời gian còn lại = min(duration − elapsedSinceStart, availableTo − now).
+        const computeTimeLeft = (startedAtIso) => {
+          const durationMinutes = testData.durationMinutes;
+          const durationSec = durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
+          let elapsedSec = 0;
+          if (startedAtIso) {
+            const startedMs = new Date(startedAtIso).getTime();
+            elapsedSec = Math.max(0, Math.floor((Date.now() - startedMs) / 1000));
+          }
+          let remaining = durationSec !== null ? Math.max(0, durationSec - elapsedSec) : null;
+          if (availableTo) {
+            const deadlineRemaining = Math.max(0, Math.floor((availableTo - now) / 1000));
+            if (remaining === null || deadlineRemaining < remaining) remaining = deadlineRemaining;
+          }
+          return remaining;
+        };
+
+        if (availableTo && now > availableTo && !restored) {
+          // chỉ chặn vào mới khi đã hết giờ; resume thì vẫn cho làm tiếp.
           setStatus('closed');
           return;
         }
 
         if (!restored) {
-          const durationMinutes = testData.durationMinutes;
-          let finalTime = null;
-
-          if (durationMinutes && durationMinutes > 0) {
-            finalTime = durationMinutes * 60;
-          }
-
-          if (availableTo) {
-            const diffSeconds = Math.floor((availableTo - now) / 1000);
-            const deadlineRemaining = Math.max(0, diffSeconds);
-            if (finalTime === null || deadlineRemaining < finalTime) {
-              finalTime = deadlineRemaining;
-            }
-          }
-          setTimeLeft(finalTime);
+          // Tạo attempt mới: timer = full duration (sẽ đè lại sau khi POST /api/user-tests trả startedAt).
+          setTimeLeft(computeTimeLeft(null));
           setStatus('open');
         } else {
+          // Resume: ưu tiên timeLeft từ sessionStorage (đã trừ elapsed lần trước),
+          // nếu không có (logout xoá storage) thì tính từ startedAt server-side.
           setStatus('active');
+          setTimeLeft((prev) => {
+            if (prev !== null && prev !== undefined) return prev;
+            return computeTimeLeft(serverStartedAt);
+          });
         }
       })
       .catch(() => setStatus('error'));
@@ -176,8 +214,23 @@ function TestStartPage() {
         .post('/api/user-tests', { testId: test.testId })
         .then((res) => {
           const id = res.data.userTestId;
+          const startedAtIso = res.data.startedAt;
           setUserTestId(id);
           sessionStorage.setItem(`userTest-${test.testId}`, id);
+          // Tính lại timer dựa trên startedAt server (phòng trường hợp BE trả lại attempt sẵn có).
+          if (startedAtIso) {
+            const now = new Date();
+            const availableTo = test.availableTo ? new Date(test.availableTo) : null;
+            const durationMinutes = test.durationMinutes;
+            const durationSec = durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
+            const elapsedSec = Math.max(0, Math.floor((Date.now() - new Date(startedAtIso).getTime()) / 1000));
+            let remaining = durationSec !== null ? Math.max(0, durationSec - elapsedSec) : null;
+            if (availableTo) {
+              const deadlineRemaining = Math.max(0, Math.floor((availableTo - now) / 1000));
+              if (remaining === null || deadlineRemaining < remaining) remaining = deadlineRemaining;
+            }
+            setTimeLeft(remaining);
+          }
           setStatus('active');
         })
         .catch((err) => {
@@ -200,6 +253,23 @@ function TestStartPage() {
       );
     }
   }, [userAnswers, timeLeft, userTestId, status, testId]);
+
+  // 🔄 Autosave answers lên server (debounced 2s) — để logout/đóng tab vẫn khôi phục được.
+  useEffect(() => {
+    if (status !== 'active' || !userTestId) return;
+    const entries = Object.entries(userAnswers);
+    if (entries.length === 0) return;
+    const handle = setTimeout(() => {
+      const payload = entries.map(([qid, ans]) => ({
+        userTestId,
+        questionId: String(qid),
+        selectedAnswerId: ans?.selectedAnswerId || null,
+        answerText: ans?.answerText || null,
+      }));
+      axios.post('/api/user-answers/batch', payload).catch(() => { /* swallow */ });
+    }, 2000);
+    return () => clearTimeout(handle);
+  }, [userAnswers, status, userTestId]);
 
   useEffect(() => {
     if (status === 'locked' && preCountdown !== null) {

@@ -329,7 +329,15 @@ public class UserTestService {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
 
-        // 🔒 Nếu đề gắn vào lớp, user phải là member/teacher của lớp đó.
+        // ✅ RESUME: nếu user đã có attempt đang làm dở, trả về luôn — không áp dụng
+        // các guard time-window/max-attempts nữa, vì user đã start hợp lệ trước đó.
+        // (Class membership cũng skip cho resume — user vào lớp rồi rời ra vẫn được hoàn thành.)
+        Optional<UserTest> existing = userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        // 🔒 Tạo NEW attempt: phải pass mọi guard.
         if (test.getClassId() != null) {
             boolean isMember = classMemberRepository.existsByClassIdAndUserId(test.getClassId(), userId);
             boolean isTeacher = classRepository.existsByClassIdAndTeacherId(test.getClassId(), userId);
@@ -337,7 +345,6 @@ public class UserTestService {
                 throw new ForbiddenException("Bạn không thuộc lớp của bài kiểm tra này.");
             }
         }
-        // 🔒 Chặn theo cửa sổ thời gian (NOT_STARTED / ENDED).
         TestStatus status = test.calculateStatus();
         if (status == TestStatus.NOT_STARTED) {
             throw new ForbiddenException("Bài kiểm tra chưa mở.");
@@ -345,19 +352,12 @@ public class UserTestService {
         if (status == TestStatus.ENDED) {
             throw new ForbiddenException("Bài kiểm tra đã kết thúc.");
         }
-        // 🔒 Giới hạn lượt làm.
         Integer maxAttempts = test.getMaxAttempts();
         if (maxAttempts != null && maxAttempts > 0) {
             int completedAttempts = userTestRepository.countByUserIdAndTestIdAndStatus(userId, testId, UserTest.Status.COMPLETED);
             if (completedAttempts >= maxAttempts) {
                 throw new ForbiddenException("Bạn đã hết số lượt làm bài.");
             }
-        }
-
-        // ✅ Kiểm tra xem user đã có bài thi đang làm dở chưa
-        Optional<UserTest> existing = userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
-        if (existing.isPresent()) {
-            return existing.get();
         }
 
         // ✅ Tạo mới user_test
