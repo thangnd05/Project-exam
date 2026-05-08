@@ -179,6 +179,11 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         String userId = authUtils.getUserId(request);
         Test test = testService.getTestById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
+        // 🔒 Nếu đề thuộc 1 lớp, user phải là member/teacher của lớp đó (admin pass).
+        // Tránh leak metadata + countdown của bài kiểm tra cho user ngoài lớp.
+        if (test.getClassId() != null) {
+            classAccessGuard.requireMemberOrTeacher(test.getClassId(), userId, request);
+        }
         Map<String, Object> result = testService.canStartTest(userId, test);
 
         if (!(Boolean) result.get("canStart")) {
