@@ -76,7 +76,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const [chapters, setChapters] = useState([]);
   const [selectedChapterId, setSelectedChapterId] = useState(chapterId || ALL_CHAPTERS);
 
-  const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
+  const { examTypes, examParts, questionCollections } = useBaseMetaData(testInfo.examTypeId);
 
   /* ---------- load chapters của lớp khi ở class mode ---------- */
   useEffect(() => {

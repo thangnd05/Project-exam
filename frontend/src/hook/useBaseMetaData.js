@@ -18,6 +18,8 @@ export const useBaseMetaData = (examTypeId) => {
         return [];
     };
 
+    const [questionCollections, setQuestionCollections] = useState([]);
+
     useEffect(() => {
         axios
             .get('/api/exam-types')
@@ -25,6 +27,14 @@ export const useBaseMetaData = (examTypeId) => {
             .catch((err) => {
                 console.error('Fetch exam types error:', err);
                 setExamTypes([]);
+            });
+            
+        axios
+            .get('/api/question-collections')
+            .then((res) => setQuestionCollections(normalizeList(res.data)))
+            .catch((err) => {
+                console.error('Fetch question collections error:', err);
+                setQuestionCollections([]);
             });
     }, []);
 
@@ -42,5 +52,5 @@ export const useBaseMetaData = (examTypeId) => {
             });
     }, [examTypeId]);
 
-    return { examTypes, examParts, setExamParts };
+    return { examTypes, examParts, setExamParts, questionCollections };
 };

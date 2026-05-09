@@ -62,6 +62,7 @@ export const useCreateTest = ({
     bannerUrl: '',
     availableFrom: '',
     availableTo: '',
+    collectionId: '',
   });
 
   const [questions, setQuestions] = useState([JSON.parse(JSON.stringify(emptyQuestion))]);
@@ -70,7 +71,7 @@ export const useCreateTest = ({
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({});
 
-  const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
+  const { examTypes, examParts, questionCollections } = useBaseMetaData(testInfo.examTypeId);
 
   const { handleSubmit: submitLogic } = useTestSubmission({
     mode,
@@ -383,5 +384,6 @@ export const useCreateTest = ({
     removeGroupAnswer,
     setGroupPassageType,
     handleSubmit,
+    questionCollections,
   };
 };

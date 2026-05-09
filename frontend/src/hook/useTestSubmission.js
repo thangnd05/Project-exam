@@ -145,6 +145,7 @@ export const useTestSubmission = ({
                             classId: mode === 'class' ? String(classId) : null,
                             chapterId: mode === 'class' ? String(chapterId) : null,
                             answers: q.answers,
+                            collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                             passage: (hasMedia || hasMediaUrl)
                                 ? { passageType, content: '', mediaUrl: q.mediaUrl?.trim() || null }
                                 : null,
@@ -172,9 +173,11 @@ export const useTestSubmission = ({
                     examPartId: String(testInfo.examPartId),
                     classId: mode === 'class' && classId ? String(classId) : null,
                     chapterId: mode === 'class' && chapterId ? String(chapterId) : null,
+                    collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                     questions: questions.map((q) => ({
                         questionType: q.questionType,
                         questionText: q.questionText,
+                        collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                         answers: q.answers.map((a) => ({
                             answerLabel: a.answerLabel,
                             answerText: a.answerText,
@@ -206,6 +209,7 @@ export const useTestSubmission = ({
                     examPartId: String(testInfo.examPartId),
                     classId: mode === 'class' && classId ? String(classId) : null,
                     chapterId: mode === 'class' && chapterId ? String(chapterId) : null,
+                    collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                     groups: groups.map((group) => ({
                         passage: {
                             passageType: group.passage.passageType,
@@ -214,6 +218,7 @@ export const useTestSubmission = ({
                         questions: group.questions.map((q) => ({
                             questionText: q.questionText,
                             questionType: q.questionType,
+                            collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                             answers: q.answers.map((a) => ({
                                 answerLabel: a.answerLabel,
                                 answerText: a.answerText,

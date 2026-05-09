@@ -12,6 +12,7 @@ import {
   IoBookOutline,
   IoRocketOutline,
   IoAddOutline,
+  IoLibraryOutline,
 } from 'react-icons/io5';
 import { Trash, PlusCircle } from 'lucide-react';
 import classNames from 'classnames/bind';
@@ -88,6 +89,7 @@ const CreateTestFormBody = ({
     addGroupAnswer,
     removeGroupAnswer,
     handleSubmit,
+    questionCollections,
   } = useCreateTest({ mode, classId, chapterId, creatorType: activeCreatorType });
 
   const [className, setClassName] = useState('');
@@ -364,29 +366,40 @@ const CreateTestFormBody = ({
                 </select>
               </div>
             </Col>
+            {(activeCreatorType === CREATOR_TYPES.BULK || activeCreatorType === CREATOR_TYPES.PASSAGE) && (
+              <Col md={4}>
+                <div className={cx('formGroupModern')}>
+                  <label><IoLibraryOutline /> Nhóm (Collection)</label>
+                  <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
+                    <option value="">-- Trống --</option>
+                    {questionCollections.map((c) => <option key={c.collectionId} value={c.collectionId}>{c.name}</option>)}
+                  </select>
+                </div>
+              </Col>
+            )}
             {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
               <>
                 {activeCreatorType === CREATOR_TYPES.TEST && (
                   <>
-                    <Col md={3}>
+                    <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
                       <div className={cx('formGroupModern')}>
                         <label><IoTimeOutline /> Thời gian (phút)</label>
                         <input type="number" className={cx('inputModern')} value={testInfo.durationMinutes} onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })} />
                       </div>
                     </Col>
-                    <Col md={3}>
+                    <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
                       <div className={cx('formGroupModern')}>
                         <label><IoRocketOutline /> Lượt làm tối đa</label>
                         <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
                       </div>
                     </Col>
-                    <Col md={6}>
+                    <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 6 : 4}>
                       <div className={cx('formGroupModern')}>
                         <label><IoCalendarOutline /> Thời gian bắt đầu</label>
                         <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableFrom} onChange={(e) => setTestInfo({ ...testInfo, availableFrom: e.target.value })} />
                       </div>
                     </Col>
-                    <Col md={6}>
+                    <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 6 : 4}>
                       <div className={cx('formGroupModern')}>
                         <label><IoCalendarOutline /> Thời gian kết thúc</label>
                         <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableTo} onChange={(e) => setTestInfo({ ...testInfo, availableTo: e.target.value })} />
