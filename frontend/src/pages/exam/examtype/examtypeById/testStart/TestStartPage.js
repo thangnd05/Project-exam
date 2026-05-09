@@ -662,9 +662,11 @@ function TestStartPage() {
                               {renderPassage(group.passage)}
                             </div>
                             <div className={cx('question-column')}>
-                              {group.questions?.map((q) => {
-                                return renderQuestionOnly(q, questionIndexMap[q.questionId]);
-                              })}
+                              <div className={cx('questions-frame')}>
+                                {group.questions?.map((q) => {
+                                  return renderQuestionOnly(q, questionIndexMap[q.questionId]);
+                                })}
+                              </div>
                             </div>
                           </>
                         ) : (

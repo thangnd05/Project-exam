@@ -397,20 +397,26 @@
     padding: 16px;
     max-height: calc(100vh - 160px);
     overflow-y: auto;
+    scrollbar-gutter: stable;
 
-    /* Thanh cuộn đẹp hơn */
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 #e2e8f0;
+
+    /* Thanh cuộn luôn hiển thị (track có màu) */
     &::-webkit-scrollbar {
-      width: 6px;
+      width: 10px;
     }
     &::-webkit-scrollbar-track {
-      background: transparent;
+      background: #e2e8f0;
+      border-radius: 6px;
     }
     &::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
+      background: #94a3b8;
+      border-radius: 6px;
+      border: 2px solid #e2e8f0;
     }
     &::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
+      background: #64748b;
     }
   }
 
@@ -460,42 +466,110 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 
-  /* Khi nằm cạnh passage-column (split-layout): cuộn riêng giống cột ảnh,
-     để đoạn văn / hình dài và danh sách câu hỏi không kéo lê toàn trang. */
+  /* Cột chỉ làm sticky + giới hạn chiều cao; scroll giao cho .questions-frame
+     bên trong (vì sticky + overflow:scroll cùng phần tử không vẽ scrollbar). */
   position: sticky;
   top: 72px;
   max-height: calc(100vh - 160px);
-  overflow-y: auto;
-  padding-right: 6px;
-
-  /* Thanh cuộn đẹp giống passage-column */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
 
   @media (max-width: 992px) {
-    /* Tablet/điện thoại: layout thành 1 cột → không sticky/scroll riêng nữa */
     position: static;
     max-height: none;
-    overflow: visible;
-    padding-right: 0;
     gap: 12px;
   }
 
   @media (max-width: 768px) {
     gap: 12px;
+  }
+}
+
+/* Khung gom toàn bộ câu hỏi của 1 passage thành 1 khối liền,
+   ngăn cách giữa các câu chỉ bằng đường kẻ mảnh thay vì border riêng. */
+.questions-frame {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+
+  /* Container scroll: chỉ hiện thanh trượt khi nội dung tràn quá max-height. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #e2e8f0;
+
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 6px;
+    border: 2px solid #e2e8f0;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+
+  @media (max-width: 992px) {
+    overflow: visible;
+  }
+
+  /* Gỡ style card riêng của từng câu khi nằm trong frame chung */
+  .question-card {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    padding: 14px 18px;
+    transition: background 0.2s;
+
+    &:not(:first-child) {
+      border-top: 1px solid #f1f5f9;
+    }
+
+    &:hover {
+      border-color: transparent;
+      background: #f8fafc;
+    }
+
+    .q-text {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .q-number {
+      margin-right: 6px;
+    }
+  }
+
+  /* Đáp án compact hơn để 3 câu vừa viewport mà không cần scroll */
+  .mcq-group {
+    gap: 8px;
+  }
+
+  .mcq-option {
+    padding: 8px 12px;
+    gap: 8px;
+
+    span {
+      font-size: 1.4rem;
+    }
+
+    input {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .question-card {
+      padding: 12px 14px;
+    }
   }
 }
 
