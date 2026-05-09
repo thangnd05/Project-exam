@@ -192,6 +192,29 @@
   font-size: 1.35rem;
 }
 
+.collectionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.collectionBadgeEmpty {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+  font-weight: 500;
+}
+
 .editBtn {
   border-radius: 9px !important;
   min-width: 36px !important;

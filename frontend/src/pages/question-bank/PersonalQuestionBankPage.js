@@ -41,8 +41,38 @@ const PersonalQuestionBankPage = () => {
   const [chapterConfigs, setChapterConfigs] = useState({});
   const [chaptersLoading, setChaptersLoading] = useState(false);
   const [editingChapterId, setEditingChapterId] = useState(null);
+  const [collectionsMap, setCollectionsMap] = useState({});
+  const [collectionFilter, setCollectionFilter] = useState('');
 
   const {examTypes, examParts} = useBaseMetaData(examTypeId);
+
+  useEffect(() => {
+    axios.get('/api/question-collections')
+      .then((res) => {
+        const list = Array.isArray(res.data)
+          ? res.data
+          : (res.data?.data || res.data?.content || []);
+        const map = {};
+        list.forEach((c) => {
+          if (c?.collectionId) map[c.collectionId] = c.name || '(Không tên)';
+        });
+        setCollectionsMap(map);
+      })
+      .catch(() => setCollectionsMap({}));
+  }, []);
+
+  const getCollectionName = (id) => {
+    if (!id) return '';
+    return collectionsMap[id] || '(Không xác định)';
+  };
+
+  const filterByCollection = (questions) => {
+    if (!collectionFilter) return questions;
+    if (collectionFilter === '__none__') {
+      return questions.filter((q) => !q.collectionId);
+    }
+    return questions.filter((q) => q.collectionId === collectionFilter);
+  };
 
   useEffect(() => {
     axios
@@ -399,6 +429,19 @@ const PersonalQuestionBankPage = () => {
                 ))}
               </select>
             )}
+
+            <select
+              className={cx('selectField')}
+              value={collectionFilter}
+              onChange={(e) => setCollectionFilter(e.target.value)}
+              aria-label="Lọc theo nhóm (Collection)"
+            >
+              <option value="">-- Tất cả nhóm (Collection) --</option>
+              <option value="__none__">(Chưa gắn nhóm)</option>
+              {Object.entries(collectionsMap).map(([id, name]) => (
+                <option key={id} value={id}>{name}</option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -458,15 +501,23 @@ const PersonalQuestionBankPage = () => {
                             <Spinner animation="border" size="sm" />{' '}
                             <span>Đang tải câu hỏi...</span>
                           </div>
-                        ) : cfg.questions.length === 0 ? (
-                          <Alert variant="info" className="mb-0">
-                            Chương này chưa có câu hỏi.
-                          </Alert>
-                        ) : (
+                        ) : (() => {
+                          const visibleChapterQuestions = filterByCollection(cfg.questions || []);
+                          if (visibleChapterQuestions.length === 0) {
+                            return (
+                              <Alert variant="info" className="mb-0">
+                                {collectionFilter
+                                  ? 'Không có câu hỏi nào thuộc nhóm đã chọn.'
+                                  : 'Chương này chưa có câu hỏi.'}
+                              </Alert>
+                            );
+                          }
+                          return (
                           <ul className={cx('questionList')}>
-                            {cfg.questions.map((q, idx) => {
+                            {visibleChapterQuestions.map((q, idx) => {
                               const id = q.questionId ?? q.id;
                               if (!id) return null;
+                              const collectionName = getCollectionName(q.collectionId);
 
                               return (
                                 <li key={id} className={cx('questionItem')}>
@@ -475,6 +526,15 @@ const PersonalQuestionBankPage = () => {
                                   </span>
                                   <span className={cx('questionText')}>
                                     {q.questionText || '(Không có nội dung)'}
+                                    {collectionName ? (
+                                      <span className={cx('collectionBadge')} title="Nhóm (Collection)">
+                                        <IoLibraryOutline size={12} /> {collectionName}
+                                      </span>
+                                    ) : (
+                                      <span className={cx('collectionBadge', 'collectionBadgeEmpty')} title="Chưa gắn nhóm">
+                                        Chưa gắn nhóm
+                                      </span>
+                                    )}
                                   </span>
                                   <div className={cx('questionActions')}>
                                     <Button
@@ -523,7 +583,8 @@ const PersonalQuestionBankPage = () => {
                               );
                             })}
                           </ul>
-                        )}
+                          );
+                        })()}
                       </div>
                     )}
                   </div>
@@ -550,7 +611,9 @@ const PersonalQuestionBankPage = () => {
                   loading: false,
                   questions: [],
                 };
-                const total = cfg.questions?.length || 0;
+                const visibleQuestions = filterByCollection(cfg.questions || []);
+                const total = visibleQuestions.length;
+                const totalAll = cfg.questions?.length || 0;
 
                 return (
                   <div key={part.examPartId} className={cx('partCard')}>
@@ -563,7 +626,9 @@ const PersonalQuestionBankPage = () => {
                       <span className={cx('partName')}>
                         <IoBookOutline size={20} /> {part.name}
                       </span>
-                      <span className={cx('partBadge')}>{total} câu</span>
+                      <span className={cx('partBadge')}>
+                        {collectionFilter ? `${total}/${totalAll}` : total} câu
+                      </span>
                       {cfg.expanded ? (
                         <IoChevronUpOutline size={22} />
                       ) : (
@@ -580,13 +645,16 @@ const PersonalQuestionBankPage = () => {
                           </div>
                         ) : total === 0 ? (
                           <Alert variant="info" className="mb-0">
-                            Part này chưa có câu hỏi.
+                            {collectionFilter
+                              ? 'Không có câu hỏi nào thuộc nhóm đã chọn.'
+                              : 'Part này chưa có câu hỏi.'}
                           </Alert>
                         ) : (
                           <ul className={cx('questionList')}>
-                            {cfg.questions.map((q, idx) => {
+                            {visibleQuestions.map((q, idx) => {
                               const id = q.questionId ?? q.id;
                               if (!id) return null;
+                              const collectionName = getCollectionName(q.collectionId);
 
                               return (
                                 <li key={id} className={cx('questionItem')}>
@@ -595,6 +663,15 @@ const PersonalQuestionBankPage = () => {
                                   </span>
                                   <span className={cx('questionText')}>
                                     {q.questionText || '(Không có nội dung)'}
+                                    {collectionName ? (
+                                      <span className={cx('collectionBadge')} title="Nhóm (Collection)">
+                                        <IoLibraryOutline size={12} /> {collectionName}
+                                      </span>
+                                    ) : (
+                                      <span className={cx('collectionBadge', 'collectionBadgeEmpty')} title="Chưa gắn nhóm">
+                                        Chưa gắn nhóm
+                                      </span>
+                                    )}
                                   </span>
                                   <div className={cx('questionActions')}>
                                     <Button
