@@ -98,6 +98,7 @@ public class QuestionService {
                         .explanation(question.getExplanation())
                         .classId(question.getClassId())
                         .isBank(question.getIsBank())
+                        .collectionId(question.getCollectionId())
                         .examTypeId(null)
                         .passage(null)
                         .passageMedia(List.of())
@@ -211,6 +212,7 @@ public class QuestionService {
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
                 .isBank(question.getIsBank())
+                .collectionId(question.getCollectionId())
                 .passage(passageResponse)
                 .passageMedia(passageMedia)
                 .answers(answers)
@@ -457,6 +459,9 @@ public class QuestionService {
             if (chapterId != null) {
                 question.setChapterId(chapterId);
             }
+            if (parsedQuestion.getCollectionId() != null) {
+                question.setCollectionId(parsedQuestion.getCollectionId());
+            }
             question = questionRepository.save(question);
 
             List<Answer> savedAnswers = saveAnswersForQuestion(
@@ -580,6 +585,7 @@ public class QuestionService {
             question.setCreatedBy(currentUserId);
             if (request.getClassId() != null) question.setClassId(request.getClassId());
             if (request.getChapterId() != null) question.setChapterId(request.getChapterId());
+            if (qReq.getCollectionId() != null) question.setCollectionId(qReq.getCollectionId());
             question.setIsBank(Boolean.TRUE);
             question = questionRepository.save(question);
 
@@ -630,6 +636,9 @@ public class QuestionService {
 
             if (request.getChapterId() != null)
                 question.setChapterId(request.getChapterId());
+
+            if (qReq.getCollectionId() != null)
+                question.setCollectionId(qReq.getCollectionId());
 
             question = questionRepository.save(question);
 
@@ -797,6 +806,7 @@ public class QuestionService {
 
         if (request.getClassId() != null) question.setClassId(request.getClassId());
         if (request.getChapterId() != null) question.setChapterId(request.getChapterId());
+        if (request.getCollectionId() != null) question.setCollectionId(request.getCollectionId());
 
         question = questionRepository.save(question);
 
@@ -958,10 +968,10 @@ public class QuestionService {
                 .examPartId(question.getExamPartId())
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
-                .explanation(question.getExplanation())
                 .examTypeId(examTypeId)
                 .classId(question.getClassId())
                 .isBank(question.getIsBank())
+                .collectionId(question.getCollectionId())
                 .passage(passageDto)
                 .passageMedia(passageMedia)
                 .answers(answerDtos)
@@ -1008,10 +1018,10 @@ public class QuestionService {
                 .examPartId(question.getExamPartId())
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
-                .explanation(question.getExplanation())
                 .examTypeId(examTypeId)
                 .classId(question.getClassId())
                 .isBank(question.getIsBank())
+                .collectionId(question.getCollectionId())
                 .passage(passageDto)
                 .passageMedia(passageMedia)
                 .answers(answers)

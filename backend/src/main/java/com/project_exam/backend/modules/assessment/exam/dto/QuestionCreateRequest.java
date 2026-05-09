@@ -19,5 +19,6 @@ public class QuestionCreateRequest {
     private List<AnswerRequest> answers;
     /** true = lưu vào kho; false = chỉ gắn đề (tạo gắn thẳng). Mặc định service set theo API. */
     private Boolean isBank;
+    private String collectionId;
 }
 

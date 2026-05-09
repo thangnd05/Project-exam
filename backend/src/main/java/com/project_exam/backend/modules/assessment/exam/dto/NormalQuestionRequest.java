@@ -17,4 +17,5 @@ public class NormalQuestionRequest {
      * true khi parser không xác định được đáp án đúng, UI preview nên yêu cầu người dùng chọn tay.
      */
     private boolean needsManualCorrect;
+    private String collectionId;
 }

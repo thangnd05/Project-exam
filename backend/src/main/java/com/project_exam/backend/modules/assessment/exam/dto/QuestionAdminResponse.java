@@ -22,6 +22,7 @@ public class QuestionAdminResponse {
     private final String examTypeId;
     private final String classId;
     private final Boolean isBank;
+    private final String collectionId;
 
     private final PassageResponse passage;
     private final List<PassageMediaResponse> passageMedia;

@@ -45,4 +45,7 @@ public class Question {
     @Column(name = "is_bank")
     private Boolean isBank;
 
+    @Column(name = "collection_id")
+    private String collectionId; // FK -> question_collections (nullable)
+
 }

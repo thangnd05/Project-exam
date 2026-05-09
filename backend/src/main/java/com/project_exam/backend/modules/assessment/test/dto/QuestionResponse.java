@@ -20,6 +20,7 @@ public class QuestionResponse {
     private List<PassageMediaResponse> passageMedia;
     private String testPartId;
     private List<AnswerResponse> answers;
+    private String collectionId;
 
 }
 
