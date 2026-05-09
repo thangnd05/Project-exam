@@ -6,8 +6,14 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.classroom.dto.ClassRequest;
 import com.project_exam.backend.modules.classroom.dto.ClassResponse;
 import com.project_exam.backend.modules.classroom.dto.ClassSimpleResponse;
+import com.project_exam.backend.modules.classroom.domain.Chapter;
 import com.project_exam.backend.modules.classroom.domain.ClassEntity;
+import com.project_exam.backend.modules.classroom.repository.ChapterRepository;
 import com.project_exam.backend.modules.classroom.repository.ClassRepository;
+import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
+import com.project_exam.backend.modules.assessment.test.domain.Test;
+import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
+import com.project_exam.backend.modules.assessment.test.service.TestService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +31,10 @@ import java.util.UUID;
 public class ClassService {
 
     private final ClassRepository classRepository;
+    private final ChapterRepository chapterRepository;
+    private final TestRepository testRepository;
+    private final QuestionService questionService;
+    private final TestService testService;
     private final AuthUtils authUtils;
 
     @Transactional
@@ -78,6 +88,22 @@ public class ClassService {
         if (!isTeacher && !authUtils.isAdmin(httpRequest)) {
             throw new ForbiddenException("Bạn không có quyền xoá lớp này.");
         }
+
+        // 🔥 Cascade theo thứ tự: tests → questions → chapters → class
+        // 1. Xoá toàn bộ tests gắn với class (kèm test_parts, test_questions, user_tests, user_answers).
+        List<Test> tests = testRepository.findByClassId(classId);
+        for (Test t : tests) {
+            testService.cascadeDeleteTestInternal(t.getTestId());
+        }
+
+        // 2. Xoá toàn bộ questions của class (kể cả câu thuộc các chapter của class này).
+        questionService.cascadeDeleteQuestionsByClass(classId);
+
+        // 3. Xoá toàn bộ chapters của class (đã rỗng questions sau bước 2).
+        List<Chapter> chapters = chapterRepository.findByClassId(classId);
+        if (!chapters.isEmpty()) chapterRepository.deleteAll(chapters);
+
+        // 4. Cuối cùng, xoá class.
         classRepository.deleteById(classId);
     }
 

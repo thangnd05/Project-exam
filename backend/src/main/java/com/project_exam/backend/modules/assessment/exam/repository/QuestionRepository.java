@@ -14,6 +14,8 @@ import java.util.List;
 public interface QuestionRepository extends JpaRepository<Question, String> {
     List<Question> findByExamPartId(String examPartId);
     List<Question> findByPassageId(String passageId);
+    List<Question> findByChapterId(String chapterId);
+    List<Question> findByClassId(String classId);
 
     @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
     List<Question> findRandomByExamPart(@Param("examPartId") String examPartId, @Param("limit") int limit);

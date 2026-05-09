@@ -68,6 +68,7 @@ public class QuestionService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final ClassAccessGuard classAccessGuard;
+    private final UserAnswerRepository userAnswerRepository;
 
     /**
      * Khi câu hỏi được gắn vào một class/chapter, user phải là thành viên hoặc giáo viên của lớp đó
@@ -482,6 +483,7 @@ public class QuestionService {
         return responses;
     }
 
+    @Transactional
     public void deleteById(String id, HttpServletRequest httpRequest) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại."));
@@ -490,7 +492,42 @@ public class QuestionService {
         if (!isOwner && !authUtils.isAdmin(httpRequest)) {
             throw new ForbiddenException("Bạn không có quyền xoá câu hỏi này.");
         }
-        questionRepository.deleteById(id);
+        cascadeDeleteQuestionInternal(id);
+    }
+
+    /**
+     * Cascade xoá 1 question: lịch sử bài làm (user_answers), liên kết đề (test_questions),
+     * đáp án (answers), rồi tới chính question. Dùng chung cho Chapter/Class cascade.
+     * Không kiểm tra quyền — caller phải đảm bảo.
+     */
+    @Transactional
+    public void cascadeDeleteQuestionInternal(String questionId) {
+        userAnswerRepository.deleteByQuestionId(questionId);
+        testQuestionRepository.deleteByQuestionId(questionId);
+        answerRepository.deleteByQuestionId(questionId);
+        questionRepository.deleteById(questionId);
+    }
+
+    /**
+     * Cascade xoá tất cả questions trong 1 chapter.
+     */
+    @Transactional
+    public void cascadeDeleteQuestionsByChapter(String chapterId) {
+        List<Question> questions = questionRepository.findByChapterId(chapterId);
+        for (Question q : questions) {
+            cascadeDeleteQuestionInternal(q.getQuestionId());
+        }
+    }
+
+    /**
+     * Cascade xoá tất cả questions thuộc 1 class (kể cả các câu không gắn chapter).
+     */
+    @Transactional
+    public void cascadeDeleteQuestionsByClass(String classId) {
+        List<Question> questions = questionRepository.findByClassId(classId);
+        for (Question q : questions) {
+            cascadeDeleteQuestionInternal(q.getQuestionId());
+        }
     }
 
     /**

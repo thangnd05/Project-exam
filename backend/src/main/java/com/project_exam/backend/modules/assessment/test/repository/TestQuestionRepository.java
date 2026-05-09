@@ -28,6 +28,10 @@ public interface TestQuestionRepository extends JpaRepository<TestQuestion, Stri
     @Query("DELETE FROM TestQuestion tq WHERE tq.testPartId = :testPartId")
     void deleteByTestPartId(@Param("testPartId") String testPartId);
 
+    @Modifying
+    @Query("DELETE FROM TestQuestion tq WHERE tq.questionId = :questionId")
+    void deleteByQuestionId(@Param("questionId") String questionId);
+
     List<TestQuestion> findByTestPartId(String testPartId);
 
     @Query("""

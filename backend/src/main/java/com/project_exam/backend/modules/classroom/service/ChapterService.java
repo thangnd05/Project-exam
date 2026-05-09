@@ -10,11 +10,13 @@ import com.project_exam.backend.modules.classroom.domain.Chapter;
 import com.project_exam.backend.modules.classroom.domain.ClassEntity;
 import com.project_exam.backend.modules.classroom.repository.ChapterRepository;
 import com.project_exam.backend.modules.classroom.repository.ClassRepository;
+import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +29,7 @@ public class ChapterService {
     private final ClassRepository classRepository;
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
+    private final QuestionService questionService;
 
     private void checkTeacherPermission(String classId, String currentUserId) {
 
@@ -138,8 +141,9 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ DELETE
+    // ✅ DELETE — cascade xoá toàn bộ questions thuộc chapter
     // ============================
+    @Transactional
     public void delete(HttpServletRequest httpRequest, String chapterId) {
 
         String currentUserId = authUtils.getUserId(httpRequest);
@@ -149,6 +153,9 @@ public class ChapterService {
 
         // ✅ check teacher
         checkTeacherPermission(chapter.getClassId(), currentUserId);
+
+        // 🔥 Cascade: xoá toàn bộ questions (kèm answers/test_questions/user_answers) thuộc chapter này.
+        questionService.cascadeDeleteQuestionsByChapter(chapterId);
 
         chapterRepository.deleteById(chapterId);
     }

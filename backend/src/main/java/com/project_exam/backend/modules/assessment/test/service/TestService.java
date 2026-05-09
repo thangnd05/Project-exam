@@ -41,7 +41,9 @@ import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepos
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 
 // --- Assessment: Attempt ---
+import com.project_exam.backend.modules.assessment.attempt.domain.UserAnswer;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
+import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 
@@ -82,6 +84,7 @@ public class TestService {
     private final ExamPartRepository  examPartRepository;
     private final PassageRepository  passageRepository;
     private final UserTestRepository userTestRepository;
+    private final UserAnswerRepository userAnswerRepository;
     private final AuthUtils authUtils;
     private final UserTestService userTestService;
     private final ClassRepository classRepository;
@@ -122,6 +125,7 @@ public class TestService {
         return testRepository.save(test);
     }
 
+    @Transactional
     public void deleteTest(String id, HttpServletRequest httpRequest) {
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + id));
@@ -130,7 +134,34 @@ public class TestService {
         if (!isOwner && !authUtils.isAdmin(httpRequest)) {
             throw new ForbiddenException("Bạn không có quyền xóa đề này.");
         }
-        testRepository.deleteById(id);
+        cascadeDeleteTestInternal(id);
+    }
+
+    /**
+     * Cascade xoá 1 đề: lượt làm (user_tests + user_answers), liên kết câu (test_questions),
+     * test_parts, rồi tới chính test. KHÔNG xoá questions trong kho — chúng độc lập.
+     * Không kiểm tra quyền — caller phải đảm bảo.
+     */
+    @Transactional
+    public void cascadeDeleteTestInternal(String testId) {
+        // 1. Lượt làm + đáp án người dùng
+        List<UserTest> userTests = userTestRepository.findByTestId(testId);
+        for (UserTest ut : userTests) {
+            List<UserAnswer> uas = userAnswerRepository.findByUserTestId(ut.getUserTestId());
+            if (!uas.isEmpty()) userAnswerRepository.deleteAll(uas);
+        }
+        if (!userTests.isEmpty()) userTestRepository.deleteAll(userTests);
+
+        // 2. test_questions thuộc các test_part của đề
+        List<TestPart> parts = testPartRepository.findByTestId(testId);
+        for (TestPart p : parts) {
+            testQuestionRepository.deleteByTestPartId(p.getTestPartId());
+        }
+        // 3. test_parts
+        if (!parts.isEmpty()) testPartRepository.deleteAll(parts);
+
+        // 4. test
+        testRepository.deleteById(testId);
     }
 
     /**
