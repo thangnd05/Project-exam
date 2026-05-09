@@ -56,6 +56,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   const [newFiles, setNewFiles] = useState([]);
   const [existingMedia, setExistingMedia] = useState([]);
   const [deletingMediaIds, setDeletingMediaIds] = useState([]);
+  const [questionCollections, setQuestionCollections] = useState([]);
 
   const onHideRef = useRef(onHide);
 
@@ -63,9 +64,19 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     onHideRef.current = onHide;
   }, [onHide]);
 
+  useEffect(() => {
+    axios.get('/api/question-collections')
+      .then((res) => {
+        const list = Array.isArray(res.data) ? res.data : (res.data.data || res.data.content || []);
+        setQuestionCollections(list);
+      })
+      .catch((err) => console.error('Failed to load collections', err));
+  }, []);
+
   const [formData, setFormData] = useState({
     classId: '',
     examPartId: '',
+    collectionId: '',
     questionType: 'MCQ',
     questionText: '',
     isBank: true,
@@ -109,6 +120,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
             examPartId: questionDetail.examPartId || '',
             questionType: questionDetail.questionType || 'MCQ',
             questionText: questionDetail.questionText || '',
+            collectionId: questionDetail.collectionId || '',
             isBank:
               questionDetail.isBank !== undefined
                 ? questionDetail.isBank
@@ -230,13 +242,14 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     setSaving(true);
 
     const payload = {
-      classId: formData.classId ? parseInt(formData.classId, 10) : null,
+      classId: formData.classId ? String(formData.classId) : null,
       examPartId: formData.examPartId
-        ? parseInt(formData.examPartId, 10)
+        ? String(formData.examPartId)
         : null,
       chapterId: null,
       questionType: formData.questionType,
       questionText: formData.questionText,
+      collectionId: formData.collectionId ? String(formData.collectionId) : '',
       isBank: formData.isBank,
       answers: formData.options.map((opt) => ({
         id: opt.id,
@@ -329,6 +342,20 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                     setFormData({ ...formData, questionText: e.target.value })
                   }
                 />
+              </Col>
+
+              <Col md={12}>
+                <label className={cx('formLabel')}>Nguồn (Collection)</label>
+                <select
+                  className={cxCreate('inputModern')}
+                  value={formData.collectionId}
+                  onChange={(e) => setFormData({ ...formData, collectionId: e.target.value })}
+                >
+                  <option value="">-- Không chỉ định --</option>
+                  {questionCollections.map((c) => (
+                    <option key={c.collectionId} value={c.collectionId}>{c.name}</option>
+                  ))}
+                </select>
               </Col>
 
               <Col md={12}>

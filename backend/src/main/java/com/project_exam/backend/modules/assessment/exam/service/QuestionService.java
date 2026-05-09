@@ -1069,6 +1069,12 @@ public class QuestionService {
         if (request.getQuestionText() != null) question.setQuestionText(request.getQuestionText());
         if (request.getQuestionType() != null) question.setQuestionType(request.getQuestionType());
         if (request.getIsBank() != null) question.setIsBank(request.getIsBank());
+        // collectionId: null = xóa collection; có giá trị = gán collection mới
+        if (request.getCollectionId() != null && !request.getCollectionId().isBlank()) {
+            question.setCollectionId(request.getCollectionId());
+        } else if (request.getCollectionId() != null && request.getCollectionId().isBlank()) {
+            question.setCollectionId(null);
+        }
         if (request.getAnswers() != null) {
             validateQuestionAnswers(question.getQuestionType(), request.getAnswers());
         }
@@ -1226,6 +1232,9 @@ public class QuestionService {
 
                 if (request.getChapterId() != null)
                     question.setChapterId(request.getChapterId());
+
+                if (qReq.getCollectionId() != null)
+                    question.setCollectionId(qReq.getCollectionId());
 
                 question = questionRepository.save(question);
 
