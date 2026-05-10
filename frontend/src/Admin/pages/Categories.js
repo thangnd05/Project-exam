@@ -83,7 +83,7 @@ const Categories = () => {
             <div className={cx('header')}>
                 <div>
                     <h1>Quản lý danh mục bài viết</h1>
-                    <p>Tạo và quản lý các chuyên mục blog</p>
+                    <p>Tạo và quản lý các danh mục blog</p>
                 </div>
                 <button className={cx('createBtn')} onClick={openCreateModal}>
                     <Plus size={18} /> Thêm danh mục

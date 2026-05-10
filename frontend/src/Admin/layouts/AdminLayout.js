@@ -75,7 +75,7 @@ const adminRoutes = [
   {
     path: routes.adminCategories,
     icon: <Folder size={20} />,
-    label: 'Quản lý chuyên mục',
+    label: 'Quản lý danh mục',
   },
   {
     path: routes.adminPosts,
