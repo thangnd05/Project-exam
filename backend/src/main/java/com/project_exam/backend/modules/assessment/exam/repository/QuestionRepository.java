@@ -170,4 +170,6 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
             @Param("limit") int limit,
             @Param("offset") int offset
     );
+
+    long countByCollectionId(String collectionId);
 }

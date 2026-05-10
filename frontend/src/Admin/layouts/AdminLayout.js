@@ -23,6 +23,7 @@ import {
   Menu,
   Folder,
   FileText,
+  Library,
 } from 'lucide-react';
 import routes from '~/config/Routes';
 import styles from './AdminLayout.module.scss';

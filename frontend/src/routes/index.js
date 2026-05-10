@@ -46,6 +46,7 @@ import ExamTypesManagement from '~/Admin/pages/ExamTypes';
 import ExamPartsManagement from '~/Admin/pages/ExamParts';
 import CategoriesManagement from '~/Admin/pages/Categories';
 import PostsManagement from '~/Admin/pages/Posts';
+import QuestionCollectionsManagement from '~/Admin/pages/QuestionCollections';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -80,6 +81,7 @@ export const adminRoutes = [
   {path: routes.adminLoginAudit, component: LoginAudit},
   {path: routes.adminCategories, component: CategoriesManagement},
   {path: routes.adminPosts, component: PostsManagement},
+  {path: routes.adminQuestionCollections, component: QuestionCollectionsManagement},
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập

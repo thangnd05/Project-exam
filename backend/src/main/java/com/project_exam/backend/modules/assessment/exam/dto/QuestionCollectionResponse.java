@@ -7,4 +7,6 @@ public class QuestionCollectionResponse {
     private String collectionId;
     private String name;
     private String description;
+    /** Số câu hỏi đang gắn vào collection này (để admin biết collection có đang được dùng). */
+    private Long questionCount;
 }

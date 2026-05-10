@@ -28,6 +28,7 @@ const routes = {
   adminQuestions: '/admin/questions',
   adminVocabulary: '/admin/vocabulary',
   adminCategories: '/admin/categories',
+  adminQuestionCollections: '/admin/question-collections',
   adminPosts: '/admin/posts',
   adminAnalytics: '/admin/analytics',
   adminAuditLogs: '/admin/audit-logs',
