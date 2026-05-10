@@ -30,72 +30,52 @@ import styles from './AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);
 
-const adminRoutes = [
+// 🗂️ Sidebar được nhóm theo chức năng để dễ điều hướng.
+const adminRouteGroups = [
   {
-    path: routes.adminDashboard,
-    icon: <LayoutDashboard size={20} />,
-    label: 'Dashboard',
-  },
-  {path: routes.adminUsers, icon: <Users size={20} />, label: 'Quản lý Users'},
-  {
-    path: routes.adminRoles,
-    icon: <ShieldCheck size={20} />,
-    label: 'Quản lý vai trò',
+    label: 'Tổng quan',
+    items: [
+      {path: routes.adminDashboard, icon: <LayoutDashboard size={20} />, label: 'Dashboard'},
+      {path: routes.adminAnalytics, icon: <BarChart3 size={20} />, label: 'Thống kê'},
+    ],
   },
   {
-    path: routes.adminSkills,
-    icon: <Brain size={20} />,
-    label: 'Quản lý kỹ năng',
+    label: 'Người dùng',
+    items: [
+      {path: routes.adminUsers, icon: <Users size={20} />, label: 'Quản lý Users'},
+      {path: routes.adminRoles, icon: <ShieldCheck size={20} />, label: 'Quản lý vai trò'},
+    ],
   },
   {
-    path: routes.adminScoringConversion,
-    icon: <Calculator size={20} />,
-    label: 'Quy đổi điểm',
+    label: 'Hệ thống thi cử',
+    items: [
+      {path: routes.adminExamTypes, icon: <Layers size={20} />, label: 'Loại kỳ thi'},
+      {path: routes.adminExamParts, icon: <ListChecks size={20} />, label: 'Phần thi'},
+      {path: routes.adminSkills, icon: <Brain size={20} />, label: 'Kỹ năng'},
+      {path: routes.adminQuestionCollections, icon: <Library size={20} />, label: 'Bộ sưu tập câu hỏi'},
+      {path: routes.adminScoringConversion, icon: <Calculator size={20} />, label: 'Quy đổi điểm'},
+    ],
   },
   {
-    path: routes.adminEvaluations,
-    icon: <MessageSquareWarning size={20} />,
-    label: 'Duyệt đánh giá',
+    label: 'Nội dung',
+    items: [
+      {path: routes.adminTests, icon: <FileStack size={20} />, label: 'Quản lý đề thi'},
+    ],
   },
   {
-    path: routes.adminExamTypes,
-    icon: <Layers size={20} />,
-    label: 'Quản lý loại kỳ thi',
+    label: 'Cộng đồng',
+    items: [
+      {path: routes.adminCategories, icon: <Folder size={20} />, label: 'Danh mục'},
+      {path: routes.adminPosts, icon: <FileText size={20} />, label: 'Duyệt bài viết'},
+      {path: routes.adminEvaluations, icon: <MessageSquareWarning size={20} />, label: 'Duyệt đánh giá'},
+    ],
   },
   {
-    path: routes.adminExamParts,
-    icon: <ListChecks size={20} />,
-    label: 'Quản lý phần thi',
-  },
-  {
-    path: routes.adminTests,
-    icon: <FileStack size={20} />,
-    label: 'Quản lý đề thi',
-  },
-  {
-    path: routes.adminCategories,
-    icon: <Folder size={20} />,
-    label: 'Quản lý danh mục',
-  },
-  {
-    path: routes.adminPosts,
-    icon: <FileText size={20} />,
-    label: 'Duyệt bài viết',
-  },
-  {
-    path: routes.adminAnalytics,
-    icon: <BarChart3 size={20} />,
-    label: 'Thống kê',
-  },
-  {
-    path: routes.adminAuditLogs,
-    icon: <ShieldAlert size={20} />,
-    label: 'Audit logs',
-  },
-  {
-    path: routes.adminLoginAudit,
-    icon: <KeyRound size={20} />,
-    label: 'Audit đăng nhập',
+    label: 'Bảo mật',
+    items: [
+      {path: routes.adminAuditLogs, icon: <ShieldAlert size={20} />, label: 'Audit logs'},
+      {path: routes.adminLoginAudit, icon: <KeyRound size={20} />, label: 'Audit đăng nhập'},
+    ],
   },
 ];
 
@@ -138,30 +118,32 @@ function AdminLayout({children}) {
 
           {/* Navigation */}
           <nav className={cx('nav')}>
-            <div className={cx('navSection')}>
-              {!collapsed && <span className={cx('navLabel')}>Main Menu</span>}
-              {adminRoutes.map((route) => (
-                <Link
-                  key={route.path}
-                  to={route.path}
-                  className={cx('navItem', {active: isActive(route.path)})}
-                  onClick={() => setMobileOpen(false)}
-                  title={collapsed ? route.label : ''}
-                >
-                  <span className={cx('navIcon')}>{route.icon}</span>
-                  {!collapsed && (
-                    <span className={cx('navText')}>{route.label}</span>
-                  )}
-                  {isActive(route.path) && (
-                    <motion.div
-                      layoutId="activeNav"
-                      className={cx('activeIndicator')}
-                      transition={{type: 'spring', stiffness: 500, damping: 30}}
-                    />
-                  )}
-                </Link>
-              ))}
-            </div>
+            {adminRouteGroups.map((group) => (
+              <div key={group.label} className={cx('navSection')}>
+                {!collapsed && <span className={cx('navLabel')}>{group.label}</span>}
+                {group.items.map((route) => (
+                  <Link
+                    key={route.path}
+                    to={route.path}
+                    className={cx('navItem', {active: isActive(route.path)})}
+                    onClick={() => setMobileOpen(false)}
+                    title={collapsed ? route.label : ''}
+                  >
+                    <span className={cx('navIcon')}>{route.icon}</span>
+                    {!collapsed && (
+                      <span className={cx('navText')}>{route.label}</span>
+                    )}
+                    {isActive(route.path) && (
+                      <motion.div
+                        layoutId="activeNav"
+                        className={cx('activeIndicator')}
+                        transition={{type: 'spring', stiffness: 500, damping: 30}}
+                      />
+                    )}
+                  </Link>
+                ))}
+              </div>
+            ))}
           </nav>
 
           {/* Bottom Section */}
