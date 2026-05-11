@@ -146,6 +146,7 @@ export const useTestSubmission = ({
                             chapterId: mode === 'class' ? String(chapterId) : null,
                             answers: q.answers,
                             collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
+                            explanation: q.explanation?.trim() || null,
                             passage: (hasMedia || hasMediaUrl)
                                 ? { passageType, content: '', mediaUrl: q.mediaUrl?.trim() || null }
                                 : null,
@@ -178,6 +179,7 @@ export const useTestSubmission = ({
                         questionType: q.questionType,
                         questionText: q.questionText,
                         collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
+                        explanation: q.explanation?.trim() || null,
                         answers: q.answers.map((a) => ({
                             answerLabel: a.answerLabel,
                             answerText: a.answerText,
@@ -219,6 +221,7 @@ export const useTestSubmission = ({
                             questionText: q.questionText,
                             questionType: q.questionType,
                             collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
+                            explanation: q.explanation?.trim() || null,
                             answers: q.answers.map((a) => ({
                                 answerLabel: a.answerLabel,
                                 answerText: a.answerText,

@@ -562,6 +562,7 @@ const CreateTestFormBody = ({
                     radioGroupPrefix={`group-${gIndex}-question`}
                     removeQuestionFn={(i) => removeGroupQuestion(gIndex, i)}
                     updateQuestionTextFn={(i, v) => updateGroupQuestion(gIndex, i, 'questionText', v)}
+                    updateQuestionFieldFn={(i, field, value) => updateGroupQuestion(gIndex, i, field, value)}
                     updateAnswerFn={(i, aIndex, field, value) => updateGroupAnswer(gIndex, i, aIndex, field, value)}
                     addAnswerFn={(i) => addGroupAnswer(gIndex, i)}
                     removeAnswerFn={(i, aIndex) => removeGroupAnswer(gIndex, i, aIndex)}

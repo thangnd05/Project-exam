@@ -79,6 +79,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     collectionId: '',
     questionType: 'MCQ',
     questionText: '',
+    explanation: '',
     isBank: true,
     passage: {
       passageType: 'READING',
@@ -120,6 +121,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
             examPartId: questionDetail.examPartId || '',
             questionType: questionDetail.questionType || 'MCQ',
             questionText: questionDetail.questionText || '',
+            explanation: questionDetail.explanation || '',
             collectionId: questionDetail.collectionId || '',
             isBank:
               questionDetail.isBank !== undefined
@@ -249,6 +251,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       chapterId: null,
       questionType: formData.questionType,
       questionText: formData.questionText,
+      explanation: formData.explanation || '',
       collectionId: formData.collectionId ? String(formData.collectionId) : '',
       isBank: formData.isBank,
       answers: formData.options.map((opt) => ({
@@ -551,6 +554,19 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                 >
                   <IoCreateOutline className="me-1" /> Thêm đáp án
                 </Button>
+              </Col>
+
+              <Col md={12} className="mt-3">
+                <div className={cx('sectionTitle')}>Giải thích đáp án (không bắt buộc)</div>
+                <textarea
+                  className={cxCreate('inputModern')}
+                  rows={3}
+                  value={formData.explanation}
+                  onChange={(e) =>
+                    setFormData({ ...formData, explanation: e.target.value })
+                  }
+                  placeholder="Nhập giải thích đáp án (hiển thị cho học sinh khi xem lại bài)..."
+                />
               </Col>
             </Row>
           </div>

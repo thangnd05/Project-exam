@@ -22,4 +22,5 @@ public class CreateQuestionAndAttachRequest {
     private Question.QuestionType questionType;
     private List<AnswerRequest> answers;
     private String collectionId;
+    private String explanation;
 }

@@ -452,6 +452,7 @@ public class QuestionService {
             question.setPassageId(null);
             question.setQuestionText(parsedQuestion.getQuestionText());
             question.setQuestionType(parsedQuestion.getQuestionType());
+            question.setExplanation(parsedQuestion.getExplanation());
             question.setCreatedBy(currentUserId);
             question.setIsBank(Boolean.FALSE);
             if (classId != null) {
@@ -619,6 +620,7 @@ public class QuestionService {
             question.setPassageId(passageId);
             question.setQuestionText(qReq.getQuestionText());
             question.setQuestionType(qReq.getQuestionType());
+            question.setExplanation(qReq.getExplanation());
             question.setCreatedBy(currentUserId);
             if (request.getClassId() != null) question.setClassId(request.getClassId());
             if (request.getChapterId() != null) question.setChapterId(request.getChapterId());
@@ -665,6 +667,7 @@ public class QuestionService {
             question.setPassageId(null);
             question.setQuestionText(qReq.getQuestionText());
             question.setQuestionType(qReq.getQuestionType());
+            question.setExplanation(qReq.getExplanation());
             question.setCreatedBy(currentUserId);
             question.setIsBank(Boolean.TRUE);
 
@@ -838,6 +841,7 @@ public class QuestionService {
         question.setPassageId(passageId);
         question.setQuestionText(request.getQuestionText());
         question.setQuestionType(request.getQuestionType());
+        question.setExplanation(request.getExplanation());
         question.setCreatedBy(currentUserId);
         question.setIsBank(Boolean.FALSE);
 
@@ -1005,6 +1009,7 @@ public class QuestionService {
                 .examPartId(question.getExamPartId())
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
+                .explanation(question.getExplanation())
                 .examTypeId(examTypeId)
                 .classId(question.getClassId())
                 .isBank(question.getIsBank())
@@ -1055,6 +1060,7 @@ public class QuestionService {
                 .examPartId(question.getExamPartId())
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
+                .explanation(question.getExplanation())
                 .examTypeId(examTypeId)
                 .classId(question.getClassId())
                 .isBank(question.getIsBank())
@@ -1106,6 +1112,10 @@ public class QuestionService {
         if (request.getQuestionText() != null) question.setQuestionText(request.getQuestionText());
         if (request.getQuestionType() != null) question.setQuestionType(request.getQuestionType());
         if (request.getIsBank() != null) question.setIsBank(request.getIsBank());
+        // explanation: null = giữ nguyên, chuỗi rỗng = xóa, có giá trị = cập nhật
+        if (request.getExplanation() != null) {
+            question.setExplanation(request.getExplanation().isBlank() ? null : request.getExplanation());
+        }
         // collectionId: null = xóa collection; có giá trị = gán collection mới
         if (request.getCollectionId() != null && !request.getCollectionId().isBlank()) {
             question.setCollectionId(request.getCollectionId());
@@ -1261,6 +1271,7 @@ public class QuestionService {
                 question.setPassageId(passage.getPassageId());
                 question.setQuestionText(qReq.getQuestionText());
                 question.setQuestionType(qReq.getQuestionType());
+                question.setExplanation(qReq.getExplanation());
                 question.setCreatedBy(currentUserId);
                 question.setIsBank(true);
 

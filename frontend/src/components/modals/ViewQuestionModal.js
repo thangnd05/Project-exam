@@ -263,6 +263,28 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                 })}
               </div>
             )}
+
+            {question?.explanation?.trim() && (
+              <>
+                <div className={cx('sectionTitle')} style={{ marginTop: 16 }}>
+                  Giải thích đáp án
+                </div>
+                <div
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: 10,
+                    border: '2px solid #fbbf24',
+                    background: '#fffbeb',
+                    fontSize: '1.05rem',
+                    color: '#92400e',
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {question.explanation}
+                </div>
+              </>
+            )}
           </div>
         )}
       </Modal.Body>

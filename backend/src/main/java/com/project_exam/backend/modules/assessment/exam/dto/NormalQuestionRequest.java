@@ -18,4 +18,5 @@ public class NormalQuestionRequest {
      */
     private boolean needsManualCorrect;
     private String collectionId;
+    private String explanation;
 }

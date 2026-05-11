@@ -138,6 +138,16 @@ const QuestionBlock = ({
                     Thêm đáp án
                 </button>
             </div>
+            <div className="mt-3">
+                <label className="fw-bold mb-1 d-block">Giải thích đáp án (không bắt buộc)</label>
+                <textarea
+                    className={cx('inputModern')}
+                    rows={2}
+                    placeholder="Nhập giải thích đáp án (hiển thị cho học sinh khi xem lại bài)..."
+                    value={question.explanation || ''}
+                    onChange={(e) => updateQuestionFieldFn?.(index, 'explanation', e.target.value)}
+                />
+            </div>
         </div>
     );
 };

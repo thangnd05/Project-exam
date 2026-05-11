@@ -20,6 +20,7 @@ const emptyQuestion = {
   mediaFiles: [],
   mediaUrl: '',
   passageType: 'LISTENING',
+  explanation: '',
   answers: [
     { answerLabel: 'A', answerText: '', isCorrect: false },
     { answerLabel: 'B', answerText: '', isCorrect: false },

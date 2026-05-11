@@ -493,6 +493,23 @@ function QuestionResult({ question, userAnswer, canReview }) {
           )}
         </div>
       )}
+
+      {canReview && question.explanation?.trim() && (
+        <div
+          style={{
+            marginTop: 12,
+            padding: "10px 14px",
+            borderRadius: 8,
+            border: "1px solid #fbbf24",
+            background: "#fffbeb",
+            color: "#92400e",
+            whiteSpace: "pre-wrap",
+            lineHeight: 1.5,
+          }}
+        >
+          <strong>Giải thích:</strong> {question.explanation}
+        </div>
+      )}
     </div>
   );
 }
