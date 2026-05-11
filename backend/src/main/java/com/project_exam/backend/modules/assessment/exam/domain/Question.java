@@ -2,6 +2,9 @@ package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "questions")
@@ -14,6 +17,11 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String questionId;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false,
+            columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    private Instant createdAt;
 
     @Column(nullable = false)
     private String examPartId; // FK -> exam_parts

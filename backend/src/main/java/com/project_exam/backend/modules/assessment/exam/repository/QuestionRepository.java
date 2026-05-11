@@ -44,18 +44,20 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     List<Question> findByPassageIdAndClassId(@Param("passageId") String passageId, @Param("classId") String classId);
 
     // ========== Kho theo lớp/chapter, KHÔNG cần examPartId ==========
-    List<Question> findByClassIdAndCreatedByAndIsBankTrue(String classId, String createdBy);
+    @Query("SELECT q FROM Question q WHERE q.classId = :classId AND q.createdBy = :createdBy AND q.isBank = true ORDER BY q.createdAt ASC, q.questionId ASC")
+    List<Question> findByClassIdAndCreatedByAndIsBankTrue(@Param("classId") String classId, @Param("createdBy") String createdBy);
 
-    List<Question> findByClassIdAndChapterIdAndCreatedByAndIsBankTrue(String classId, String chapterId, String createdBy);
+    @Query("SELECT q FROM Question q WHERE q.classId = :classId AND q.chapterId = :chapterId AND q.createdBy = :createdBy AND q.isBank = true ORDER BY q.createdAt ASC, q.questionId ASC")
+    List<Question> findByClassIdAndChapterIdAndCreatedByAndIsBankTrue(@Param("classId") String classId, @Param("chapterId") String chapterId, @Param("createdBy") String createdBy);
 
     long countByClassIdAndCreatedByAndIsBankTrue(String classId, String createdBy);
 
     long countByClassIdAndChapterIdAndCreatedByAndIsBankTrue(String classId, String chapterId, String createdBy);
 
-    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId AND q.classId = :classId AND q.isBank = true")
+    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId AND q.classId = :classId AND q.isBank = true ORDER BY q.createdAt ASC, q.questionId ASC")
     List<Question> findByExamPartIdAndClassId(@Param("examPartId") String examPartId, @Param("classId") String classId);
 
-    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId AND q.classId = :classId AND q.chapterId = :chapterId AND q.isBank = true")
+    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId AND q.classId = :classId AND q.chapterId = :chapterId AND q.isBank = true ORDER BY q.createdAt ASC, q.questionId ASC")
     List<Question> findByExamPartIdAndClassIdAndChapterId(
             @Param("examPartId") String examPartId,
             @Param("classId") String classId,
@@ -88,8 +90,17 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     );
 
     // ========== Cá nhân theo user đăng nhập (created_by = userId, class_id/chapter_id NULL) ==========
+    @Query("""
+        SELECT q FROM Question q
+        WHERE q.examPartId = :examPartId
+          AND q.createdBy = :createdBy
+          AND q.classId IS NULL
+          AND q.chapterId IS NULL
+          AND q.isBank = true
+        ORDER BY q.createdAt ASC, q.questionId ASC
+    """)
     List<Question> findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
-            String examPartId, String createdBy);
+            @Param("examPartId") String examPartId, @Param("createdBy") String createdBy);
 
     long countByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
             String examPartId, String createdBy);
@@ -102,6 +113,7 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
           AND q.classId IS NULL
           AND q.chapterId IS NULL
           AND q.isBank = true
+        ORDER BY q.createdAt ASC, q.questionId ASC
     """)
     List<Question> findAdminBankByExamPart(
             @Param("examPartId") String examPartId,
@@ -136,7 +148,7 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
         WHERE exam_part_id = :examPartId AND created_by = :createdBy
           AND class_id IS NULL AND chapter_id IS NULL
           AND is_bank = true
-        ORDER BY question_id ASC
+        ORDER BY created_at ASC, question_id ASC
         LIMIT :limit OFFSET :offset
         """, nativeQuery = true)
     List<Question> findSequentialByExamPartAndCreatedByAndClassIdIsNullAndChapterIdIsNull(
@@ -148,7 +160,7 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     @Query(value = """
         SELECT * FROM questions
         WHERE exam_part_id = :examPartId AND class_id = :classId AND is_bank = true
-        ORDER BY question_id ASC
+        ORDER BY created_at ASC, question_id ASC
         LIMIT :limit OFFSET :offset
         """, nativeQuery = true)
     List<Question> findSequentialQuestionsByExamPartIdAndClassId(
@@ -160,7 +172,7 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     @Query(value = """
         SELECT * FROM questions
         WHERE exam_part_id = :examPartId AND class_id = :classId AND chapter_id = :chapterId AND is_bank = true
-        ORDER BY question_id ASC
+        ORDER BY created_at ASC, question_id ASC
         LIMIT :limit OFFSET :offset
         """, nativeQuery = true)
     List<Question> findSequentialQuestionsByExamPartIdAndClassIdAndChapterId(
