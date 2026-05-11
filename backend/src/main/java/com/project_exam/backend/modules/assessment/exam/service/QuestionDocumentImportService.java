@@ -135,6 +135,14 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE
     );
 
+    // "Giải thích: ...", "Lời giải: ...", "Hướng dẫn: ...", "Explanation: ..."
+    // Marker phân tách (: . -) là optional để chấp nhận "Giải thích Paris là ...".
+    // UNICODE_CASE để case-insensitive hoạt động đúng với chữ Việt có dấu.
+    private static final Pattern EXPLANATION_START_PATTERN = Pattern.compile(
+            "^\\s*(?:Giải\\s*thích|Lời\\s*giải|Hướng\\s*dẫn|Explanation)\\s*[:\\.\\-]?\\s*(.*)$",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+    );
+
     // Whitespace chars "lạ" gặp trong Word: NBSP, ZWSP, ideographic space, NNBSP
     private static final Pattern WEIRD_WHITESPACE_PATTERN =
             Pattern.compile("[\\u00A0\\u200B\\u3000\\u202F]");
@@ -432,6 +440,9 @@ public class QuestionDocumentImportService {
         // hoặc làm passage content nếu đang trong passage header.
         private final StringBuilder pendingText = new StringBuilder();
         private boolean inPassageHeader = false;
+        // Sau khi gặp "Giải thích:", các dòng tiếp theo gom vào explanation
+        // cho đến khi gặp câu mới / passage mới / option mới.
+        private boolean inExplanation = false;
 
         LineProcessor(QuestionCollector collector) {
             this.collector = collector;
@@ -458,6 +469,7 @@ public class QuestionDocumentImportService {
             if (collector.supportsPassage()) {
                 Matcher pm = PASSAGE_START_PATTERN.matcher(text);
                 if (pm.matches()) {
+                    inExplanation = false;
                     flushCurrentQuestion();
                     collector.startPassage();
                     pendingText.setLength(0);
@@ -475,6 +487,7 @@ public class QuestionDocumentImportService {
             // (1) Câu hỏi mới explicit (có số ở đầu)
             Matcher qm = QUESTION_START_PATTERN.matcher(text);
             if (qm.matches()) {
+                inExplanation = false;
                 if (inPassageHeader) {
                     // Đóng phần passage header — pendingText là content của passage.
                     collector.setPassageContent(pendingText.toString().trim());
@@ -493,12 +506,31 @@ public class QuestionDocumentImportService {
             if (om.matches() && currentQuestion != null && !inPassageHeader && !isSectionHeadingOptionLike(text)) {
                 ParsedOption parsedOption = parseOptionText(om.group(2));
                 if (isLikelyOptionLine(text, parsedOption.optionText)) {
+                    inExplanation = false;
                     handleOptionLine(om.group(1), parsedOption, pl.isStyled);
                     return;
                 }
             }
 
-            // (3) Dòng tiếp nối
+            // (3) Mở khối giải thích — yêu cầu câu hiện tại đã có ít nhất 1 option,
+            //     tránh ngộ nhận "Giải thích:" trước khi có options là metadata khác.
+            if (currentQuestion != null && !inPassageHeader && !currentQuestion.options.isEmpty()) {
+                Matcher em = EXPLANATION_START_PATTERN.matcher(text);
+                if (em.matches()) {
+                    inExplanation = true;
+                    String tail = em.group(1) == null ? "" : em.group(1).trim();
+                    if (!tail.isEmpty()) {
+                        currentQuestion.explanation = appendLine(currentQuestion.explanation, tail, "\n");
+                    }
+                    return;
+                }
+            }
+
+            // (4) Dòng tiếp nối — trong khối giải thích thì gom vào explanation
+            if (inExplanation && currentQuestion != null) {
+                currentQuestion.explanation = appendLine(currentQuestion.explanation, text, "\n");
+                return;
+            }
             handleContinuationLine(text);
         }
 
@@ -594,6 +626,7 @@ public class QuestionDocumentImportService {
             }
             currentQuestion = null;
             lastLabel = null;
+            inExplanation = false;
         }
     }
 
@@ -984,6 +1017,12 @@ public class QuestionDocumentImportService {
         request.setQuestionType(Question.QuestionType.MCQ);
         request.setAnswers(answers);
         request.setNeedsManualCorrect(correctLabels.isEmpty());
+        if (q.explanation != null) {
+            String trimmed = q.explanation.trim();
+            if (!trimmed.isEmpty()) {
+                request.setExplanation(trimmed);
+            }
+        }
         return request;
     }
 
@@ -1032,6 +1071,7 @@ public class QuestionDocumentImportService {
     private static class ParsedQuestion {
         final String questionNumber;
         String questionText;
+        String explanation;
         final Map<String, String> options = new LinkedHashMap<>();
         final Set<String> correctLabels = new HashSet<>();
 
