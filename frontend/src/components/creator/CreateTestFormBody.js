@@ -133,6 +133,7 @@ const CreateTestFormBody = ({
       mediaFiles: [],
       mediaUrl: '',
       passageType: 'LISTENING',
+      explanation: question.explanation || '',
       answers: (question.answers && question.answers.length > 0)
         ? question.answers.map((ans, idx) => ({
           answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),

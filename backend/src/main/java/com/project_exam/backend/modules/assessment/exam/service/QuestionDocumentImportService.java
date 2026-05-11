@@ -147,6 +147,13 @@ public class QuestionDocumentImportService {
     private static final Pattern WEIRD_WHITESPACE_PATTERN =
             Pattern.compile("[\\u00A0\\u200B\\u3000\\u202F]");
 
+    // Dòng bắt đầu bằng ký tự bullet/dash — coi là 1 dòng không tách theo option label.
+    // Tránh trường hợp "• A. across (ngang qua), C. inside ..." trong giải thích bị
+    // splitLineByOptionLabels cắt thành các option giả A/C/D.
+    private static final Pattern BULLET_LINE_PATTERN = Pattern.compile(
+            "^[\\u2022\\u00B7\\u2023\\u25AA\\u25E6\\u25CB\\u25CF\\u2605\\u2606\\-*+]\\s+\\S.*$"
+    );
+
     // =========================================================================
     // ENTRY POINT
     // =========================================================================
@@ -283,6 +290,10 @@ public class QuestionDocumentImportService {
                     if (cleanLine.isEmpty()) {
                         continue;
                     }
+                    if (isBulletLine(cleanLine)) {
+                        lines.add(new ParsedLine(cleanLine, false));
+                        continue;
+                    }
                     for (String seg : splitLineByOptionLabels(cleanLine)) {
                         String cleanSeg = seg.trim();
                         if (cleanSeg.isEmpty()) {
@@ -372,6 +383,10 @@ public class QuestionDocumentImportService {
             if (cleanLine.isEmpty()) {
                 continue;
             }
+            if (isBulletLine(cleanLine)) {
+                lines.add(new ParsedLine(cleanLine, false));
+                continue;
+            }
             for (String seg : splitLineByOptionLabels(cleanLine)) {
                 String cleanSeg = seg.trim();
                 if (cleanSeg.isEmpty()) {
@@ -391,6 +406,10 @@ public class QuestionDocumentImportService {
         for (String logicalLine : text.split("\\R+")) {
             String cleanLine = cleanWhitespace(logicalLine);
             if (cleanLine.isEmpty()) {
+                continue;
+            }
+            if (isBulletLine(cleanLine)) {
+                lines.add(new ParsedLine(cleanLine, false));
                 continue;
             }
             for (String seg : splitLineByOptionLabels(cleanLine)) {
@@ -484,7 +503,7 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (1) Câu hỏi mới explicit (có số ở đầu)
+            // (1) Câu hỏi mới explicit (có số ở đầu) — luôn break inExplanation
             Matcher qm = QUESTION_START_PATTERN.matcher(text);
             if (qm.matches()) {
                 inExplanation = false;
@@ -501,18 +520,35 @@ public class QuestionDocumentImportService {
                 return;
             }
 
-            // (2) Dòng option A/B/C/D
+            // (2) Đang trong khối giải thích: gom tất cả vào explanation, KHÔNG cho phép
+            //     option pattern (A./B./C./D.) ăn dòng giải thích "• A. across (...), C. ..."
+            //     thành option giả. Chỉ "Câu N." / "Passage" mới được phép thoát ra (đã check trên).
+            if (inExplanation && currentQuestion != null) {
+                Matcher em = EXPLANATION_START_PATTERN.matcher(text);
+                if (em.matches()) {
+                    // Đang trong explanation lại gặp "Giải thích:" — coi như continuation,
+                    // chỉ append phần body.
+                    String tail = em.group(1) == null ? "" : em.group(1).trim();
+                    if (!tail.isEmpty()) {
+                        currentQuestion.explanation = appendLine(currentQuestion.explanation, tail, "\n");
+                    }
+                    return;
+                }
+                currentQuestion.explanation = appendLine(currentQuestion.explanation, text, "\n");
+                return;
+            }
+
+            // (3) Dòng option A/B/C/D
             Matcher om = OPTION_PATTERN.matcher(text);
             if (om.matches() && currentQuestion != null && !inPassageHeader && !isSectionHeadingOptionLike(text)) {
                 ParsedOption parsedOption = parseOptionText(om.group(2));
                 if (isLikelyOptionLine(text, parsedOption.optionText)) {
-                    inExplanation = false;
                     handleOptionLine(om.group(1), parsedOption, pl.isStyled);
                     return;
                 }
             }
 
-            // (3) Mở khối giải thích — yêu cầu câu hiện tại đã có ít nhất 1 option,
+            // (4) Mở khối giải thích — yêu cầu câu hiện tại đã có ít nhất 1 option,
             //     tránh ngộ nhận "Giải thích:" trước khi có options là metadata khác.
             if (currentQuestion != null && !inPassageHeader && !currentQuestion.options.isEmpty()) {
                 Matcher em = EXPLANATION_START_PATTERN.matcher(text);
@@ -526,11 +562,7 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (4) Dòng tiếp nối — trong khối giải thích thì gom vào explanation
-            if (inExplanation && currentQuestion != null) {
-                currentQuestion.explanation = appendLine(currentQuestion.explanation, text, "\n");
-                return;
-            }
+            // (5) Dòng tiếp nối thường (không phải explanation)
             handleContinuationLine(text);
         }
 
@@ -984,6 +1016,18 @@ public class QuestionDocumentImportService {
         }
         // Gom các whitespace "lạ" (NBSP, ZWSP, ideographic space, NNBSP) về space thường.
         return WEIRD_WHITESPACE_PATTERN.matcher(s).replaceAll(" ").trim();
+    }
+
+    /**
+     * Dòng bullet trong giải thích (vd: "• A. across (ngang qua), C. inside (bên trong) sai vì ...")
+     * có thể chứa "A.", "C." khiến splitLineByOptionLabels cắt thành option giả.
+     * Khi line bắt đầu bằng bullet, giữ nguyên là 1 dòng — pha LineProcessor sẽ gom vào explanation.
+     */
+    private boolean isBulletLine(String text) {
+        if (text == null || text.isEmpty()) {
+            return false;
+        }
+        return BULLET_LINE_PATTERN.matcher(text).matches();
     }
 
     private String normalizeText(String text) {
