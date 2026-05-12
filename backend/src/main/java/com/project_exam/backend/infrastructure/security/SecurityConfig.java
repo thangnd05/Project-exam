@@ -123,6 +123,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/exam-types/**",
+                                "/api/exam-categories/**",
                                 "/api/evaluations/**",
                                 "/api/tests/**",
                                 "/api/auth/verify",

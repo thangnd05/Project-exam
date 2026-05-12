@@ -49,6 +49,11 @@ public class Test {
     @Column(name ="chapter_id")
     private String chapterId;
 
+    // Phân loại bài thi (Quick Challenge / Full Mock / Recovery / Mini Quiz...)
+    // Nullable: test cũ và TOEIC legacy không bắt buộc gắn category.
+    @Column(name = "exam_category_id")
+    private String examCategoryId; // FK -> exam_categories.exam_category_id
+
     // ✅ Method tính trạng thái thực tế
     public TestStatus calculateStatus() {
         LocalDateTime now = LocalDateTime.now();

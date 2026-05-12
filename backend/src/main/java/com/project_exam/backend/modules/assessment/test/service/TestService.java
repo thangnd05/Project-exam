@@ -195,6 +195,7 @@ public class TestService {
         if (request.getMaxAttempts() != null) test.setMaxAttempts(request.getMaxAttempts());
         if (request.getClassId() != null) test.setClassId(request.getClassId());
         if (request.getChapterId() != null) test.setChapterId(request.getChapterId());
+        if (request.getExamCategoryId() != null) test.setExamCategoryId(request.getExamCategoryId());
         if (request.getAvailableFrom() != null) test.setAvailableFrom(request.getAvailableFrom());
         if (request.getAvailableTo() != null) test.setAvailableTo(request.getAvailableTo());
         return testRepository.save(test);
@@ -225,6 +226,7 @@ public class TestService {
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
+                .examCategoryId(test.getExamCategoryId())
                 .createdBy(test.getCreatedBy())
                 .createdAt(test.getCreatedAt())
                 .bannerUrl(test.getBannerUrl())
@@ -265,6 +267,7 @@ public class TestService {
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
+                .examCategoryId(test.getExamCategoryId())
                 .createdBy(test.getCreatedBy())
                 .createdAt(test.getCreatedAt())
                 .bannerUrl(test.getBannerUrl())
@@ -434,6 +437,7 @@ public class TestService {
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
+                .examCategoryId(test.getExamCategoryId())
                 .createdBy(test.getCreatedBy())
                 .createdAt(test.getCreatedAt())
                 .bannerUrl(test.getBannerUrl())
@@ -461,6 +465,7 @@ public class TestService {
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
+                .examCategoryId(test.getExamCategoryId())
                 .createdBy(test.getCreatedBy())
                 .createdAt(test.getCreatedAt())
                 .bannerUrl(test.getBannerUrl())
@@ -500,6 +505,7 @@ private void handleAutoSubmit(Test test, UserTest latest) {
 private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem, long total) {
     return TestResponse.builder()
             .testId(test.getTestId()).title(test.getTitle()).description(test.getDescription())
+            .examCategoryId(test.getExamCategoryId())
             .classId(test.getClassId()).chapterId(test.getChapterId())
             .status("FORBIDDEN").maxAttempts(test.getMaxAttempts())
             .attemptsUsed(used).remainingAttempts(rem).totalAttempts(total)
@@ -648,6 +654,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
+                .examCategoryId(test.getExamCategoryId())
                 .createdBy(test.getCreatedBy())
                 .createdAt(test.getCreatedAt())
                 .bannerUrl(test.getBannerUrl())
@@ -668,6 +675,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
+                .examCategoryId(test.getExamCategoryId())
                 .createdBy(test.getCreatedBy())
                 .createdAt(test.getCreatedAt())
                 .bannerUrl(test.getBannerUrl())

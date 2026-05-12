@@ -14,6 +14,10 @@ public class CreateTestRequest {
     private String classId;
     private String chapterId;
 
+    // Optional: phân loại bài thi (Quick Challenge / Full Mock / Recovery / Mini Quiz...).
+    // Có thể null — khi đó test mặc định là legacy/standard.
+    private String examCategoryId;
+
     // Hỗ trợ cấu hình thời gian mở/đóng đề
     private LocalDateTime availableFrom;
     private LocalDateTime availableTo;

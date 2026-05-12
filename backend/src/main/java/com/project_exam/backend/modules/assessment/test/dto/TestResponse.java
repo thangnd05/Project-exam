@@ -13,6 +13,7 @@ public class TestResponse {
     private String title;
     private String description;
     private String examTypeId;
+    private String examCategoryId;
     private String createdBy;
     private LocalDateTime createdAt;
     private String bannerUrl;
