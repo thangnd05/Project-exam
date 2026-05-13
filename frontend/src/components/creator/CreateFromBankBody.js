@@ -24,6 +24,7 @@ import {
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hook/useBaseMetaData';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
+import { getExamCategories } from '~/api/examCategoryApi';
 import styles from '../modals/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -62,10 +63,13 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     durationMinutes: '',
     maxAttempts: '',
     examTypeId: '',
+    examCategoryId: '',
     bannerUrl: '',
     availableFrom: '',
     availableTo: '',
   });
+
+  const [examCategories, setExamCategories] = useState([]);
 
   const [partConfigs, setPartConfigs] = useState({});
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -77,6 +81,13 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const [selectedChapterId, setSelectedChapterId] = useState(chapterId || ALL_CHAPTERS);
 
   const { examTypes, examParts, questionCollections } = useBaseMetaData(testInfo.examTypeId);
+
+  /* ---------- load danh sách exam category (Quick Challenge / Full Mock / Recovery...) ---------- */
+  useEffect(() => {
+    getExamCategories()
+      .then((list) => setExamCategories(Array.isArray(list) ? list : []))
+      .catch(() => setExamCategories([]));
+  }, []);
 
   /* ---------- load chapters của lớp khi ở class mode ---------- */
   useEffect(() => {
@@ -271,6 +282,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         title: testInfo.title.trim(),
         description: testInfo.description || null,
         examTypeId: testInfo.examTypeId,
+        examCategoryId: testInfo.examCategoryId || null,
         durationMinutes: testInfo.durationMinutes && Number(testInfo.durationMinutes) > 0 ? Number(testInfo.durationMinutes) : null,
         maxAttempts: testInfo.maxAttempts && Number(testInfo.maxAttempts) > 0 ? Number(testInfo.maxAttempts) : null,
         bannerUrl: testInfo.bannerUrl || null,
@@ -373,7 +385,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 />
               </div>
             </Col>
-            <Col md={6}>
+            <Col md={4}>
               <div className={cx('formGroupModern')}>
                 <label>Loại kỳ thi *</label>
                 <select
@@ -389,7 +401,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 </select>
               </div>
             </Col>
-            <Col md={6}>
+            <Col md={4}>
               <div className={cx('formGroupModern')}>
                 <label><IoRocketOutline /> Số lượt làm tối đa</label>
                 <input
@@ -401,6 +413,24 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   placeholder="Để trống = không giới hạn"
                   aria-label="Số lượt làm"
                 />
+              </div>
+            </Col>
+            <Col md={4}>
+              <div className={cx('formGroupModern')}>
+                <label>Phân loại bài thi (tuỳ chọn)</label>
+                <select
+                  className={cx('inputModern')}
+                  value={testInfo.examCategoryId}
+                  onChange={(e) => setTestInfo({ ...testInfo, examCategoryId: e.target.value })}
+                  aria-label="Phân loại bài thi"
+                >
+                  <option value="">-- Không phân loại --</option>
+                  {examCategories.map((c) => (
+                    <option key={c.examCategoryId} value={c.examCategoryId}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </Col>
             <Col md={12}>

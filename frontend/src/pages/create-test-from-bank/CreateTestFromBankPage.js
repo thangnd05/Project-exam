@@ -24,6 +24,7 @@ import {
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hook/useBaseMetaData';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
+import { getExamCategories } from '~/api/examCategoryApi';
 import styles from './CreateTestFromBankPage.module.scss';
 
 
@@ -53,10 +54,18 @@ const CreateTestFromBankPage = () => {
     durationMinutes: '',
     maxAttempts: '',
     examTypeId: '',
+    examCategoryId: '',
     bannerUrl: '',
     availableFrom: '',
     availableTo: '',
   });
+
+  const [examCategories, setExamCategories] = useState([]);
+  useEffect(() => {
+    getExamCategories()
+      .then((list) => setExamCategories(Array.isArray(list) ? list : []))
+      .catch(() => setExamCategories([]));
+  }, []);
 
   const [partConfigs, setPartConfigs] = useState({});
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -240,6 +249,7 @@ const CreateTestFromBankPage = () => {
         title: testInfo.title.trim(),
         description: testInfo.description || null,
         examTypeId: testInfo.examTypeId,
+        examCategoryId: testInfo.examCategoryId || null,
         durationMinutes: testInfo.durationMinutes && Number(testInfo.durationMinutes) > 0 ? Number(testInfo.durationMinutes) : null,
         maxAttempts: testInfo.maxAttempts && Number(testInfo.maxAttempts) > 0 ? Number(testInfo.maxAttempts) : null,
         bannerUrl: testInfo.bannerUrl || null,
@@ -345,7 +355,7 @@ const CreateTestFromBankPage = () => {
                   />
                 </div>
               </Col>
-              <Col md={6}>
+              <Col md={4}>
                 <div className={cx('formGroup')}>
                   <label>Loại kỳ thi *</label>
                   <select
@@ -361,7 +371,7 @@ const CreateTestFromBankPage = () => {
                   </select>
                 </div>
               </Col>
-              <Col md={6}>
+              <Col md={4}>
                 <div className={cx('formGroup')}>
                   <label><IoRocketOutline /> Số lượt làm tối đa</label>
                   <input
@@ -373,6 +383,24 @@ const CreateTestFromBankPage = () => {
                     placeholder="Để trống = không giới hạn"
                     aria-label="Số lượt làm"
                   />
+                </div>
+              </Col>
+              <Col md={4}>
+                <div className={cx('formGroup')}>
+                  <label>Phân loại bài thi (tuỳ chọn)</label>
+                  <select
+                    className={cx('input')}
+                    value={testInfo.examCategoryId}
+                    onChange={(e) => setTestInfo({ ...testInfo, examCategoryId: e.target.value })}
+                    aria-label="Phân loại bài thi"
+                  >
+                    <option value="">-- Không phân loại --</option>
+                    {examCategories.map((c) => (
+                      <option key={c.examCategoryId} value={c.examCategoryId}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </Col>
               <Col md={12}>
