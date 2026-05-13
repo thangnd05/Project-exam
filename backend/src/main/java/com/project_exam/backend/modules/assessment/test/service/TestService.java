@@ -27,6 +27,7 @@ import com.project_exam.backend.modules.assessment.test.repository.TestRepositor
 import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
 
 // --- Assessment: Exam ---
+import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.Passage;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
@@ -35,6 +36,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionGroupAdminResponse;
+import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.PassageRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
@@ -82,6 +84,7 @@ public class TestService {
     private final RoleRepository  roleRepository;
     private final UserRepository userRepository;
     private final ExamPartRepository  examPartRepository;
+    private final ExamCategoryRepository examCategoryRepository;
     private final PassageRepository  passageRepository;
     private final UserTestRepository userTestRepository;
     private final UserAnswerRepository userAnswerRepository;
@@ -303,36 +306,60 @@ public class TestService {
 
     @Transactional
     public TestResponse getTestFullById(String testId, HttpServletRequest httpRequest) {
-        // 1. Lấy thông tin người dùng và bài thi
-        String currentUserId = authUtils.getUserId(httpRequest);
-        if (currentUserId == null) throw new BadRequestException("Không xác định được người dùng.");
+        // 1. Lấy thông tin người dùng (guest -> null, không lỗi).
+        String currentUserId;
+        try {
+            currentUserId = authUtils.getUserId(httpRequest);
+        } catch (Exception e) {
+            currentUserId = null;
+        }
 
         Test test = testRepository.findById(testId).orElseThrow(() -> new NotFoundException("Test not found"));
-        UserTest latest = userTestRepository.findTopByUserIdAndTestIdOrderByStartedAtDesc(currentUserId, testId).orElse(null);
 
-        // 2. Logic Auto-Submit
-        handleAutoSubmit(test, latest);
+        // 2. Guest: chỉ cho xem nếu test thuộc ExamCategory có guestAllowed=true và không gắn lớp.
+        boolean isGuest = (currentUserId == null);
+        if (isGuest) {
+            boolean guestEligible = test.getClassId() == null
+                    && test.getExamCategoryId() != null
+                    && examCategoryRepository.findById(test.getExamCategoryId())
+                            .map(ExamCategory::getGuestAllowed)
+                            .orElse(false);
+            if (!guestEligible) {
+                return buildLimitExceededResponse(test, 0, 0, userTestRepository.countByTestId(testId));
+            }
+        }
 
-        // 3. Kiểm tra số lượt làm bài
-        int attemptsUsed = userTestRepository.countByUserIdAndTestIdAndStatus(currentUserId, testId, UserTest.Status.COMPLETED);
+        UserTest latest = isGuest
+                ? null
+                : userTestRepository.findTopByUserIdAndTestIdOrderByStartedAtDesc(currentUserId, testId).orElse(null);
+
+        // 3. Logic Auto-Submit — chỉ áp dụng cho user đã đăng nhập.
+        if (!isGuest) {
+            handleAutoSubmit(test, latest);
+        }
+
+        // 4. Kiểm tra số lượt làm bài — guest không bị giới hạn theo user.
+        int attemptsUsed = isGuest
+                ? 0
+                : userTestRepository.countByUserIdAndTestIdAndStatus(currentUserId, testId, UserTest.Status.COMPLETED);
         Integer maxAttempts = test.getMaxAttempts();
-        Integer remaining = (maxAttempts != null) ? Math.max(0, maxAttempts - attemptsUsed) : null;
+        Integer remaining = (!isGuest && maxAttempts != null) ? Math.max(0, maxAttempts - attemptsUsed) : null;
         long totalAttempts = userTestRepository.countByTestId(testId);
 
-        if (maxAttempts != null && remaining <= 0) {
+        if (!isGuest && maxAttempts != null && remaining <= 0) {
             return buildLimitExceededResponse(test, attemptsUsed, remaining, totalAttempts);
         }
 
-        // 4. Load data
+        // 5. Load data
         TestUserDataBundle data = loadUserTestData(testId);
         if (data.testParts().isEmpty()) {
             return buildEmptyUserTestResponse(test, maxAttempts, attemptsUsed, remaining);
         }
 
-        // 5. Shuffle seed
+        // 6. Shuffle seed
         long seed = (latest != null ? latest.getUserTestId() : testId).hashCode();
 
-        // 6. Build responses
+        // 7. Build responses
         List<TestPartResponse> partResponses = buildUserPartResponses(data, seed);
 
         return buildUserTestResponse(test, maxAttempts, attemptsUsed, remaining, totalAttempts, partResponses);
