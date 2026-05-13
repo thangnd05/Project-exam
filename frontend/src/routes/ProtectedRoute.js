@@ -4,7 +4,7 @@ import {Navigate, useLocation} from 'react-router-dom';
 import routes from '~/config/Routes';
 import {useAuth} from '../hook/useAuth';
 
-function ProtectedRoute({children, requiredRoleName}) {
+function ProtectedRoute({children, requiredRoleName, allowGuest = false}) {
   const {isAuthenticated, loading, roleId} = useAuth();
   const location = useLocation();
   const [roleChecking, setRoleChecking] = useState(false);
@@ -50,7 +50,8 @@ function ProtectedRoute({children, requiredRoleName}) {
     return <div>Đang kiểm tra đăng nhập...</div>;
   }
 
-  if (!isAuthenticated) {
+  // allowGuest=true: cho phép vào trang dù chưa đăng nhập; trang tự xử lý nhánh guest.
+  if (!isAuthenticated && !allowGuest) {
     return (
       <Navigate
         to={routes.login}

@@ -16,8 +16,12 @@ public class UserTest {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String userTestId;
 
-    @Column(nullable = false)
+    // Nullable: guest không có userId, phải dùng guestSessionId.
     private String userId; // FK -> users.user_id
+
+    // Định danh phiên cho guest (UUID do client sinh, lưu trong localStorage).
+    @Column(name = "guest_session_id", length = 64)
+    private String guestSessionId;
 
     @Column(nullable = false)
     private String testId; // FK -> tests.test_id

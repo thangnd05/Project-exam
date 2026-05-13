@@ -86,11 +86,14 @@ public class SecurityConfig {
                         .csrfTokenRepository(customCsrfTokenRepository(isProduction)) 
                         .csrfTokenRequestHandler(requestHandler)
                         .ignoringRequestMatchers(
-                                "/api/auth/login", 
-                                "/api/auth/register", 
+                                "/api/auth/login",
+                                "/api/auth/register",
                                 "/api/auth/refresh",
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
+                                "/api/user-tests/guest",
+                                "/api/user-tests/*/guest-submit",
+                                "/api/user-answers/guest/**",
                                 "/oauth2/**",
                                 "/login/oauth2/**"
                         )
@@ -131,6 +134,13 @@ public class SecurityConfig {
                                 "/api/categories/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**").permitAll()
+                        // Guest endpoints — không yêu cầu JWT, định danh bằng header X-Guest-Session.
+                        .requestMatchers(
+                                "/api/user-tests/guest",
+                                "/api/user-tests/guest/**",
+                                "/api/user-tests/*/guest-submit",
+                                "/api/user-answers/guest/**"
+                        ).permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -220,7 +230,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(origin));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN", "Accept"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN", "Accept", "X-Guest-Session"));
         config.setExposedHeaders(List.of("Set-Cookie", "Authorization", "X-XSRF-TOKEN"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

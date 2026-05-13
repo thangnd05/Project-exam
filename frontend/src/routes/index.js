@@ -87,9 +87,10 @@ export const adminRoutes = [
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập
+// allowGuest=true: trang vẫn render khi chưa đăng nhập (vd. test thuộc ExamCategory cho phép guest).
 export const privateRoutes = [
-  {path: routes.testStart, component: TestStartPage, noContainer: true},
-  {path: routes.testResult, component: TestResultPage},
+  {path: routes.testStart, component: TestStartPage, noContainer: true, allowGuest: true},
+  {path: routes.testResult, component: TestResultPage, allowGuest: true},
   {path: routes.testHistory, component: TestHistoryPage},
   {path: routes.testLeaderboard, component: TestLeaderboardPage},
   {path: routes.myClasses, component: MyClassesPage},

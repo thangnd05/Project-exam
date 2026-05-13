@@ -94,4 +94,30 @@ public class UserAnswerController {
         return ResponseEntity.ok(result);
     }
 
+    // ===== GUEST FLOW =====
+
+    @PostMapping("/guest/batch")
+    public ResponseEntity<List<UserAnswerResponse>> saveGuestAnswers(
+            @Valid @RequestBody List<UserAnswerRequest> requests,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        return ResponseEntity.ok(userAnswerService.upsertBatchForGuest(requests, guestSessionId));
+    }
+
+    @GetMapping("/guest/user-test/{userTestId}")
+    public ResponseEntity<List<UserAnswerResponse>> getGuestAnswers(
+            @PathVariable String userTestId,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        return ResponseEntity.ok(userAnswerService.findResponsesByUserTestIdForGuest(userTestId, guestSessionId));
+    }
+
+    @GetMapping("/guest/user-test/{userTestId}/result")
+    public ResponseEntity<ResultSummaryDto> getGuestResult(
+            @PathVariable String userTestId,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        return ResponseEntity.ok(userAnswerService.getGuestResultSummary(userTestId, guestSessionId));
+    }
+
 }

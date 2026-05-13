@@ -44,6 +44,7 @@ public class UserTestService {
     private final AnswerRepository answerRepository;
     private final TestRepository testRepository;
     private final ExamTypeRepository examTypeRepository;
+    private final ExamCategoryRepository examCategoryRepository;
     private final ScoringConversionRepository scoringConversionRepository;
     private final QuestionRepository questionRepository;
     private final ExamPartRepository examPartRepository;
@@ -375,6 +376,109 @@ public class UserTestService {
 
     public Optional<UserTest> findActiveUserTest(String userId, String testId) {
         return userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
+    }
+
+    public Optional<UserTest> findActiveGuestUserTest(String guestSessionId, String testId) {
+        return userTestRepository.findActiveGuestUserTest(guestSessionId, testId, UserTest.Status.IN_PROGRESS);
+    }
+
+    // ===== GUEST FLOW =====
+
+    @Transactional
+    public UserTest startGuestUserTest(String testId, String guestSessionId) {
+        if (guestSessionId == null || guestSessionId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu guest session id");
+        }
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
+
+        // 🛡 Bắt buộc test phải thuộc ExamCategory cho phép guest.
+        if (test.getExamCategoryId() == null) {
+            throw new ForbiddenException("Bài thi này yêu cầu đăng nhập.");
+        }
+        ExamCategory category = examCategoryRepository.findById(test.getExamCategoryId())
+                .orElseThrow(() -> new NotFoundException("ExamCategory not found"));
+        if (!Boolean.TRUE.equals(category.getGuestAllowed())) {
+            throw new ForbiddenException("Bài thi này yêu cầu đăng nhập.");
+        }
+        // Guest không hỗ trợ test gắn lớp.
+        if (test.getClassId() != null) {
+            throw new ForbiddenException("Bài thi của lớp yêu cầu đăng nhập.");
+        }
+
+        // ✅ RESUME: nếu guest session đã có attempt đang dở thì trả về luôn.
+        Optional<UserTest> existing = userTestRepository.findActiveGuestUserTest(
+                guestSessionId, testId, UserTest.Status.IN_PROGRESS);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        TestStatus status = test.calculateStatus();
+        if (status == TestStatus.NOT_STARTED) {
+            throw new ForbiddenException("Bài kiểm tra chưa mở.");
+        }
+        if (status == TestStatus.ENDED) {
+            throw new ForbiddenException("Bài kiểm tra đã kết thúc.");
+        }
+
+        UserTest newTest = new UserTest();
+        newTest.setUserId(null);
+        newTest.setGuestSessionId(guestSessionId);
+        newTest.setTestId(testId);
+        newTest.setStartedAt(LocalDateTime.now());
+        newTest.setStatus(UserTest.Status.IN_PROGRESS);
+        newTest.setTotalScore(0);
+        return userTestRepository.save(newTest);
+    }
+
+    @Transactional
+    public UserTest submitGuestTest(String userTestId, String guestSessionId) {
+        UserTest userTest = userTestRepository.findById(userTestId)
+                .orElseThrow(() -> new NotFoundException("UserTest not found"));
+        if (userTest.getGuestSessionId() == null
+                || !userTest.getGuestSessionId().equals(guestSessionId)) {
+            throw new ForbiddenException("Phiên guest không hợp lệ.");
+        }
+        if (userTest.getStatus() == UserTest.Status.COMPLETED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã được nộp");
+        }
+
+        userTest.setFinishedAt(LocalDateTime.now());
+        userTest.setStatus(UserTest.Status.COMPLETED);
+
+        List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
+        if (userAnswers.isEmpty()) {
+            userTest.setTotalScore(0);
+            return userTestRepository.save(userTest);
+        }
+
+        Test test = testRepository.findById(userTest.getTestId())
+                .orElseThrow(() -> new NotFoundException("Test not found"));
+        ExamType examType = examTypeRepository.findById(test.getExamTypeId())
+                .orElseThrow(() -> new NotFoundException("ExamType not found"));
+
+        String scoringMethod = examType.getScoringMethod() != null
+                ? examType.getScoringMethod().toLowerCase() : "default";
+        int totalQuestionsInTest = calculateTotalQuestionsInTest(userTest.getTestId());
+
+        int totalScore;
+        if ("toeic_scale".equalsIgnoreCase(scoringMethod)) {
+            totalScore = scoreToeicOptimal(userAnswers, test, examType);
+        } else {
+            totalScore = scoreDefault(userAnswers, totalQuestionsInTest);
+        }
+
+        userTest.setTotalScore(totalScore);
+        return userTestRepository.save(userTest);
+    }
+
+    public UserTestResponse getMetaForGuest(String userTestId, String guestSessionId) {
+        UserTest ut = userTestRepository.findById(userTestId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
+        if (ut.getGuestSessionId() == null || !ut.getGuestSessionId().equals(guestSessionId)) {
+            throw new ForbiddenException("Phiên guest không hợp lệ.");
+        }
+        return toResponse(ut);
     }
 
     public List<UserTestResponse> getAttemptsByUserAndTest(String userId, String testId) {

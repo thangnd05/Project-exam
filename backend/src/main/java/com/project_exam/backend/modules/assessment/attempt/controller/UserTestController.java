@@ -155,4 +155,65 @@ public class UserTestController {
         List<UserTestResponse> res = userTestService.getAttemptsByTest(testId, httpRequest);
         return ResponseEntity.ok(res);
     }
+
+    // ===== GUEST FLOW =====
+    // Định danh phiên: client tự sinh UUID, gửi qua header X-Guest-Session.
+
+    @PostMapping("/guest")
+    public ResponseEntity<Map<String, Object>> startGuestUserTest(
+            @Valid @RequestBody StartUserTestRequest request,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        if (request == null || request.getTestId() == null || request.getTestId().isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Missing testId"));
+        }
+        UserTest userTest = userTestService.startGuestUserTest(request.getTestId(), guestSessionId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Bắt đầu làm bài (guest) thành công");
+        response.put("userTestId", userTest.getUserTestId());
+        response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
+        response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
+        response.put("serverNow", java.time.LocalDateTime.now().toString());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{userTestId}/guest-submit")
+    public ResponseEntity<UserTestResponse> submitGuestTest(
+            @PathVariable String userTestId,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        UserTest submitted = userTestService.submitGuestTest(userTestId, guestSessionId);
+        return ResponseEntity.ok(userTestService.toResponse(submitted));
+    }
+
+    @GetMapping("/guest/check-active")
+    public ResponseEntity<Map<String, Object>> checkActiveGuestUserTest(
+            @RequestParam String testId,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        Optional<UserTest> active = userTestService.findActiveGuestUserTest(guestSessionId, testId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("serverNow", java.time.LocalDateTime.now().toString());
+        if (active.isPresent()) {
+            UserTest userTest = active.get();
+            response.put("userTestId", userTest.getUserTestId());
+            response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
+            response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
+        } else {
+            response.put("userTestId", null);
+            response.put("status", "NONE");
+            response.put("startedAt", null);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/guest/{userTestId}")
+    public ResponseEntity<UserTestResponse> getGuestUserTest(
+            @PathVariable String userTestId,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        return ResponseEntity.ok(userTestService.getMetaForGuest(userTestId, guestSessionId));
+    }
 }

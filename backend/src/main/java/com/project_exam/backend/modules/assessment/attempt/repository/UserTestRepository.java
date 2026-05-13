@@ -24,6 +24,14 @@ public interface UserTestRepository extends JpaRepository<UserTest, String> {
                                           @Param("testId") String testId,
                                           @Param("status") UserTest.Status status);
 
+    @Query("SELECT ut FROM UserTest ut WHERE ut.guestSessionId = :guestSessionId AND ut.testId = :testId AND ut.status = :status")
+    Optional<UserTest> findActiveGuestUserTest(@Param("guestSessionId") String guestSessionId,
+                                               @Param("testId") String testId,
+                                               @Param("status") UserTest.Status status);
+
+    List<UserTest> findByGuestSessionId(String guestSessionId);
+    List<UserTest> findByGuestSessionIdAndTestIdOrderByStartedAtDesc(String guestSessionId, String testId);
+
     List<UserTest> findByUserIdAndTestId(String userId, String testId);
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
     List<UserTest> findByTestIdAndStatus(String testId, UserTest.Status status);

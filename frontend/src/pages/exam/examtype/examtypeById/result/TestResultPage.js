@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from '../../../../../api/axiosClient';
 import { Container, Spinner, Alert } from "react-bootstrap";
@@ -12,6 +12,8 @@ import {
   IoLockClosedOutline,
 } from "react-icons/io5";
 
+import { AuthContext } from "~/context/AuthContext";
+import { getGuestSessionId, guestHeaders } from "~/utils/guestSession";
 import styles from "./TestResultPage.module.scss";
 
 const cx = classNames.bind(styles);
@@ -20,6 +22,12 @@ const TestResultPage = () => {
   const { userTestId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
+  const isGuest = !authLoading && !isAuthenticated;
+  const guestCfg = useMemo(
+    () => (isGuest ? { headers: guestHeaders(getGuestSessionId()) } : {}),
+    [isGuest],
+  );
 
   const [result, setResult] = useState(null);
   const [testId, setTestId] = useState(null);
@@ -55,27 +63,31 @@ const TestResultPage = () => {
   // ✅ LOAD RESULT + CHECK REVIEW TIME
   // ================================
   useEffect(() => {
+    if (authLoading) return;
     const fetchResult = async () => {
       try {
         setLoading(true);
         // 1. Lấy thông tin tổng quan bài test (Chứa startedAt, finishedAt)
-        const metaRes = await axios.get(`/api/user-tests/${userTestId}`);
-        const metaData = metaRes.data; // Đây là chỗ có startedAt, finishedAt
+        const metaUrl = isGuest
+          ? `/api/user-tests/guest/${userTestId}`
+          : `/api/user-tests/${userTestId}`;
+        const metaRes = await axios.get(metaUrl, guestCfg);
+        const metaData = metaRes.data;
         setTestId(metaData.testId);
 
         // 2. Lấy kết quả điểm số, số câu đúng/sai
-        const res = await axios.get(
-          `/api/user-answers/user-test/${userTestId}/result`
-        );
+        const resultUrl = isGuest
+          ? `/api/user-answers/guest/user-test/${userTestId}/result`
+          : `/api/user-answers/user-test/${userTestId}/result`;
+        const res = await axios.get(resultUrl, guestCfg);
 
-        // ✅ KHẮC PHỤC: Gộp dữ liệu từ metaData vào result
         setResult({
           ...res.data,
           startedAt: metaData.startedAt,
           finishedAt: metaData.finishedAt,
         });
 
-        // 3. Check hạn review (giữ nguyên code cũ của bạn)
+        // 3. Check hạn review (endpoint public)
         const testRes = await axios.get(`/api/tests/usertest/${metaData.testId}`);
         const testData = testRes.data;
         const now = new Date();
@@ -91,7 +103,7 @@ const TestResultPage = () => {
     };
 
     fetchResult();
-  }, [userTestId]);
+  }, [userTestId, authLoading, isGuest, guestCfg]);
 
   // ================================
   // ✅ SHOW DETAIL QUESTIONS
@@ -115,12 +127,18 @@ const TestResultPage = () => {
     setDetailLoading(true);
 
     try {
-      const metaRes = await axios.get(`/api/user-tests/${userTestId}`);
+      const metaUrl = isGuest
+        ? `/api/user-tests/guest/${userTestId}`
+        : `/api/user-tests/${userTestId}`;
+      const metaRes = await axios.get(metaUrl, guestCfg);
       const testId = metaRes.data.testId;
 
+      const answersUrl = isGuest
+        ? `/api/user-answers/guest/user-test/${userTestId}`
+        : `/api/user-answers/user-test/${userTestId}`;
       const [testRes, answersRes] = await Promise.all([
         axios.get(`/api/tests/admintest/${testId}`),
-        axios.get(`/api/user-answers/user-test/${userTestId}`),
+        axios.get(answersUrl, guestCfg),
       ]);
 
       setTest(testRes.data);

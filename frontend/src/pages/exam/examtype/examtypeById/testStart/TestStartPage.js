@@ -1,5 +1,5 @@
 import axios from '../../../../../api/axiosClient';
-import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -13,6 +13,8 @@ import {
 } from 'react-icons/io5';
 
 import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
+import { AuthContext } from '~/context/AuthContext';
+import { getOrCreateGuestSessionId, guestHeaders } from '~/utils/guestSession';
 import TestStartDashboard from './TestStartDashboard';
 import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
 import styles from './TestStartPage.module.scss';
@@ -27,6 +29,18 @@ const getApiErrorMessage = (error, fallbackMessage) =>
 function TestStartPage() {
   const { testId } = useParams();
   const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
+
+  // Guest session: chỉ khởi tạo khi đã xác định KHÔNG đăng nhập.
+  const isGuest = !authLoading && !isAuthenticated;
+  const guestSessionId = useMemo(
+    () => (isGuest ? getOrCreateGuestSessionId() : null),
+    [isGuest],
+  );
+  const guestCfg = useMemo(
+    () => (isGuest ? { headers: guestHeaders(guestSessionId) } : {}),
+    [isGuest, guestSessionId],
+  );
 
   const [userTestId, setUserTestId] = useState(null);
   const [test, setTest] = useState({ parts: [] });
@@ -92,7 +106,7 @@ function TestStartPage() {
   }, []);
 
   useEffect(() => {
-    if (!testId) return;
+    if (!testId || authLoading) return;
     const savedState = sessionStorage.getItem(`userTestState-${testId}`);
     let restored = false;
 
@@ -140,11 +154,20 @@ function TestStartPage() {
         let serverStartedAt = null;
         if (!restored) {
           try {
-            const activeRes = await axios.get('/api/user-tests/check-active', { params: { testId } });
+            const checkActiveUrl = isGuest
+              ? '/api/user-tests/guest/check-active'
+              : '/api/user-tests/check-active';
+            const activeRes = await axios.get(checkActiveUrl, {
+              params: { testId },
+              ...guestCfg,
+            });
             const activeUserTestId = activeRes.data?.userTestId;
             if (activeUserTestId) {
               serverStartedAt = activeRes.data?.startedAt || null;
-              const ansRes = await axios.get(`/api/user-answers/user-test/${activeUserTestId}`);
+              const ansUrl = isGuest
+                ? `/api/user-answers/guest/user-test/${activeUserTestId}`
+                : `/api/user-answers/user-test/${activeUserTestId}`;
+              const ansRes = await axios.get(ansUrl, guestCfg);
               const answersMap = {};
               (ansRes.data || []).forEach((a) => {
                 answersMap[a.questionId] = {
@@ -200,7 +223,7 @@ function TestStartPage() {
         }
       })
       .catch(() => setStatus('error'));
-  }, [testId, navigate, enrichTestWithPassageMedia]);
+  }, [testId, navigate, enrichTestWithPassageMedia, authLoading, isGuest, guestCfg]);
 
   useEffect(() => {
     if (status === 'open' && test?.testId) {
@@ -210,8 +233,9 @@ function TestStartPage() {
         setStatus('active');
         return;
       }
+      const startUrl = isGuest ? '/api/user-tests/guest' : '/api/user-tests';
       axios
-        .post('/api/user-tests', { testId: test.testId })
+        .post(startUrl, { testId: test.testId }, guestCfg)
         .then((res) => {
           const id = res.data.userTestId;
           const startedAtIso = res.data.startedAt;
@@ -238,7 +262,7 @@ function TestStartPage() {
           else setStatus('error');
         });
     }
-  }, [status, test]);
+  }, [status, test, isGuest, guestCfg]);
 
   useEffect(() => {
     if (status === 'active' && userTestId) {
@@ -266,10 +290,11 @@ function TestStartPage() {
         selectedAnswerId: ans?.selectedAnswerId || null,
         answerText: ans?.answerText || null,
       }));
-      axios.post('/api/user-answers/batch', payload).catch(() => { /* swallow */ });
+      const batchUrl = isGuest ? '/api/user-answers/guest/batch' : '/api/user-answers/batch';
+      axios.post(batchUrl, payload, guestCfg).catch(() => { /* swallow */ });
     }, 2000);
     return () => clearTimeout(handle);
-  }, [userAnswers, status, userTestId]);
+  }, [userAnswers, status, userTestId, isGuest, guestCfg]);
 
   useEffect(() => {
     if (status === 'locked' && preCountdown !== null) {
@@ -300,9 +325,13 @@ function TestStartPage() {
         selectedAnswerId: ans.selectedAnswerId || null,
         answerText: ans.answerText || null,
       }));
+      const batchUrl = isGuest ? '/api/user-answers/guest/batch' : '/api/user-answers/batch';
       if (payload.length > 0)
-        await axios.post('/api/user-answers/batch', payload);
-      const res = await axios.post(`/api/user-tests/${userTestId}/submit`);
+        await axios.post(batchUrl, payload, guestCfg);
+      const submitUrl = isGuest
+        ? `/api/user-tests/${userTestId}/guest-submit`
+        : `/api/user-tests/${userTestId}/submit`;
+      const res = await axios.post(submitUrl, null, guestCfg);
       sessionStorage.removeItem(`userTest-${testId}`);
       sessionStorage.removeItem(`userTestState-${testId}`);
       navigate(`/tests/result/${userTestId}`, {

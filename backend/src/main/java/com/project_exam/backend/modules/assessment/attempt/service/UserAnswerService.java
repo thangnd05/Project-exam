@@ -214,6 +214,116 @@ public class UserAnswerService {
         }
     }
 
+    // ===== GUEST FLOW =====
+
+    @Transactional
+    public List<UserAnswerResponse> upsertBatchForGuest(List<UserAnswerRequest> requests, String guestSessionId) {
+        if (requests == null || requests.isEmpty()) {
+            return List.of();
+        }
+        return requests.stream()
+                .map(request -> upsertGuestByUserTestAndQuestion(request, guestSessionId))
+                .map(this::toResponse)
+                .toList();
+    }
+
+    private UserAnswer upsertGuestByUserTestAndQuestion(UserAnswerRequest request, String guestSessionId) {
+        validateUserAnswerRequest(request);
+        validateGuestOwnershipAndInProgress(request.getUserTestId(), guestSessionId);
+
+        UserAnswer userAnswer = userAnswerRepository
+                .findByUserTestIdAndQuestionId(request.getUserTestId(), request.getQuestionId())
+                .orElseGet(UserAnswer::new);
+
+        userAnswer.setUserTestId(request.getUserTestId());
+        userAnswer.setQuestionId(request.getQuestionId());
+        userAnswer.setSelectedAnswerId(request.getSelectedAnswerId());
+        userAnswer.setAnswerText(request.getAnswerText());
+
+        return userAnswerRepository.save(userAnswer);
+    }
+
+    private void validateGuestOwnershipAndInProgress(String userTestId, String guestSessionId) {
+        if (guestSessionId == null || guestSessionId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu guest session id");
+        }
+        UserTest userTest = userTestRepository.findById(userTestId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
+        if (userTest.getGuestSessionId() == null
+                || !userTest.getGuestSessionId().equals(guestSessionId)) {
+            throw new ForbiddenException("Phiên guest không hợp lệ.");
+        }
+        if (userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã nộp, không thể sửa đáp án");
+        }
+    }
+
+    public ResultSummaryDto getGuestResultSummary(String userTestId, String guestSessionId) {
+        UserTest userTest = userTestRepository.findById(userTestId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
+        if (userTest.getGuestSessionId() == null
+                || !userTest.getGuestSessionId().equals(guestSessionId)) {
+            throw new ForbiddenException("Phiên guest không hợp lệ.");
+        }
+
+        // Guest result luôn xem được sau khi nộp — nhưng trước khi nộp trả 0.
+        if (userTest.getStatus() != UserTest.Status.COMPLETED) {
+            return new ResultSummaryDto(0, 0, 0, 0);
+        }
+
+        List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
+        if (userAnswers.isEmpty()) {
+            return new ResultSummaryDto(0, 0, 0, 0);
+        }
+        List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
+
+        Set<String> questionIds = uniqueAnswers.stream()
+                .map(UserAnswer::getQuestionId)
+                .collect(Collectors.toSet());
+
+        Map<String, Question> questionMap = questionRepository.findAllById(questionIds).stream()
+                .collect(Collectors.toMap(Question::getQuestionId, q -> q));
+
+        Map<String, Answer> correctAnswersMap = answerRepository
+                .findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(questionIds))
+                .stream()
+                .collect(Collectors.toMap(Answer::getQuestionId, answer -> answer));
+
+        long correctCount = 0;
+        for (UserAnswer userAnswer : uniqueAnswers) {
+            String qId = userAnswer.getQuestionId();
+            Question question = questionMap.get(qId);
+            Answer correctAnswer = correctAnswersMap.get(qId);
+            if (question == null || correctAnswer == null) continue;
+
+            boolean isCorrect = false;
+            if (question.getQuestionType() == Question.QuestionType.MCQ) {
+                isCorrect = userAnswer.getSelectedAnswerId() != null
+                        && userAnswer.getSelectedAnswerId().equals(correctAnswer.getAnswerId());
+            } else if (question.getQuestionType() == Question.QuestionType.FILL_BLANK) {
+                isCorrect = userAnswer.getAnswerText() != null
+                        && userAnswer.getAnswerText().trim().equalsIgnoreCase(correctAnswer.getAnswerText().trim());
+            }
+            if (isCorrect) correctCount++;
+        }
+
+        long totalQuestions = getTotalQuestionsInTest(userTest.getTestId());
+        long normalizedCorrectCount = Math.min(correctCount, totalQuestions);
+        long wrongCount = Math.max(totalQuestions - normalizedCorrectCount, 0);
+        return new ResultSummaryDto(normalizedCorrectCount, wrongCount, totalQuestions, userTest.getTotalScore());
+    }
+
+    public List<UserAnswerResponse> findResponsesByUserTestIdForGuest(String userTestId, String guestSessionId) {
+        UserTest ut = userTestRepository.findById(userTestId)
+                .orElseThrow(() -> new NotFoundException("UserTest not found"));
+        if (ut.getGuestSessionId() == null || !ut.getGuestSessionId().equals(guestSessionId)) {
+            throw new ForbiddenException("Phiên guest không hợp lệ.");
+        }
+        return findByUserTestId(userTestId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     public boolean delete(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
         return userAnswerRepository.findById(id).map(u -> {
             // 🔒 Chỉ owner attempt hoặc admin được xoá đáp án.

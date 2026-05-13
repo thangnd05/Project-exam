@@ -74,7 +74,7 @@ function App() {
                   key={`private-${index}`}
                   path={route.path}
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute allowGuest={route.allowGuest || false}>
                       <Layout noContainer={route.noContainer || false}>
                         <Page />
                       </Layout>
