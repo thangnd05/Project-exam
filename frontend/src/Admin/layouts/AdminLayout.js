@@ -24,6 +24,7 @@ import {
   Folder,
   FileText,
   Library,
+  Tag,
 } from 'lucide-react';
 import routes from '~/config/Routes';
 import styles from './AdminLayout.module.scss';
@@ -50,6 +51,7 @@ const adminRouteGroups = [
     label: 'Hệ thống thi cử',
     items: [
       {path: routes.adminExamTypes, icon: <Layers size={20} />, label: 'Loại kỳ thi'},
+      {path: routes.adminExamCategories, icon: <Tag size={20} />, label: 'Phân loại bài thi'},
       {path: routes.adminExamParts, icon: <ListChecks size={20} />, label: 'Phần thi'},
       {path: routes.adminSkills, icon: <Brain size={20} />, label: 'Kỹ năng'},
       {path: routes.adminQuestionCollections, icon: <Library size={20} />, label: 'Bộ sưu tập câu hỏi'},

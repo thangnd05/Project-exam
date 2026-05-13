@@ -43,6 +43,7 @@ import AuditLogs from '~/Admin/pages/AuditLogs';
 import LoginAudit from '~/Admin/pages/LoginAudit';
 import TestsManagement from '~/Admin/pages/Tests';
 import ExamTypesManagement from '~/Admin/pages/ExamTypes';
+import ExamCategoriesManagement from '~/Admin/pages/ExamCategories';
 import ExamPartsManagement from '~/Admin/pages/ExamParts';
 import CategoriesManagement from '~/Admin/pages/Categories';
 import PostsManagement from '~/Admin/pages/Posts';
@@ -74,6 +75,7 @@ export const adminRoutes = [
   {path: routes.adminScoringConversion, component: ScoringConversionManagement},
   {path: routes.adminEvaluations, component: EvaluationsManagement},
   {path: routes.adminExamTypes, component: ExamTypesManagement},
+  {path: routes.adminExamCategories, component: ExamCategoriesManagement},
   {path: routes.adminExamParts, component: ExamPartsManagement},
   {path: routes.adminTests, component: TestsManagement},
   {path: routes.adminAnalytics, component: AnalyticsPage},

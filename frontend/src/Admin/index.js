@@ -7,6 +7,7 @@ export { default as SkillsManagement } from './pages/Skills';
 export { default as ScoringConversionManagement } from './pages/ScoringConversion';
 export { default as EvaluationsManagement } from './pages/Evaluations';
 export { default as ExamTypesManagement } from './pages/ExamTypes';
+export { default as ExamCategoriesManagement } from './pages/ExamCategories';
 export { default as ExamPartsManagement } from './pages/ExamParts';
 export { default as QuestionsManagement } from './pages/Questions';
 export { default as VocabularyManagement } from './pages/Vocabulary';

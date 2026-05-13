@@ -21,7 +21,6 @@ public class PostResponse {
     private LocalDateTime createdAt;
     private String thumbnailUrl;
 
-    private List<PostImageResponse> images;
     private List<CategoryResponse> categories;
 
     private Map<String, Long> reactCounts; // {"LIKE": 5, "LOVE": 3, ...}
@@ -30,12 +29,4 @@ public class PostResponse {
     private long viewCount;
     private long saveCount;
     private boolean currentUserSaved;
-
-    @Data
-    @Builder
-    public static class PostImageResponse {
-        private String id;
-        private String imageUrl;
-        private Integer order;
-    }
 }

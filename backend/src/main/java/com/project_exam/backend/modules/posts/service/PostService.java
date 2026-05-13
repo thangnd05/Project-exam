@@ -4,7 +4,6 @@ import com.project_exam.backend.infrastructure.cloudinary.CloudinaryService;
 import com.project_exam.backend.modules.posts.domain.Category;
 import com.project_exam.backend.modules.posts.domain.Post;
 import com.project_exam.backend.modules.posts.domain.PostCategory;
-import com.project_exam.backend.modules.posts.domain.PostImage;
 import com.project_exam.backend.modules.posts.domain.React;
 import com.project_exam.backend.modules.posts.dto.PostUpsertRequest;
 import com.project_exam.backend.modules.posts.dto.CategoryResponse;
@@ -14,7 +13,6 @@ import com.project_exam.backend.modules.posts.dto.PostSummaryResponse;
 import com.project_exam.backend.modules.posts.repository.CategoryRepository;
 import com.project_exam.backend.modules.posts.repository.CommentRepository;
 import com.project_exam.backend.modules.posts.repository.PostCategoryRepository;
-import com.project_exam.backend.modules.posts.repository.PostImageRepository;
 import com.project_exam.backend.modules.posts.repository.PostRepository;
 import com.project_exam.backend.modules.posts.repository.ReactRepository;
 import com.project_exam.backend.modules.posts.repository.SavedPostRepository;
@@ -42,7 +40,6 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final PostImageRepository postImageRepository;
     private final PostCategoryRepository postCategoryRepository;
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
@@ -73,16 +70,6 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    private List<PostResponse.PostImageResponse> getImageResponses(String postId) {
-        return postImageRepository.findByPostIdOrderByOrder(postId).stream()
-                .map(img -> PostResponse.PostImageResponse.builder()
-                        .id(img.getId())
-                        .imageUrl(img.getImageUrl())
-                        .order(img.getOrder())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
     private Map<String, Long> buildReactCounts(String postId) {
         Map<String, Long> counts = new LinkedHashMap<>();
         for (React.ReactType type : React.ReactType.values()) {
@@ -93,7 +80,6 @@ public class PostService {
     }
 
     public PostResponse toFullResponse(Post post, String currentUserId) {
-        List<PostResponse.PostImageResponse> images = getImageResponses(post.getId());
         List<CategoryResponse> categories = getCategoryResponses(post.getId());
         Map<String, Long> reactCounts = buildReactCounts(post.getId());
         long commentCount = commentRepository.countByPostId(post.getId());
@@ -126,7 +112,6 @@ public class PostService {
                 .status(post.getStatus())
                 .createdAt(post.getCreatedAt())
                 .thumbnailUrl(post.getThumbnailUrl())
-                .images(images)
                 .categories(categories)
                 .reactCounts(reactCounts)
                 .currentUserReactType(currentUserReactType)
@@ -138,11 +123,7 @@ public class PostService {
     }
 
     public PostSummaryResponse toSummaryResponse(Post post) {
-        List<PostResponse.PostImageResponse> images = getImageResponses(post.getId());
         String thumbnailUrl = post.getThumbnailUrl();
-        if (thumbnailUrl == null || thumbnailUrl.isBlank()) {
-            thumbnailUrl = images.isEmpty() ? null : images.get(0).getImageUrl();
-        }
 
         List<CategoryResponse> categories = getCategoryResponses(post.getId());
         long commentCount = commentRepository.countByPostId(post.getId());
@@ -282,7 +263,6 @@ public class PostService {
             throw new ForbiddenException("Bạn không có quyền xóa post này");
         }
 
-        postImageRepository.deleteByPostId(id);
         postCategoryRepository.deleteByPostId(id);
         commentRepository.deleteByPostId(id);
         reactRepository.findByPostId(id).forEach(reactRepository::delete);
@@ -374,21 +354,6 @@ public class PostService {
     // ─────────────────────────────────────────────
     // HELPERS
     // ─────────────────────────────────────────────
-
-    private void saveImages(String postId, List<MultipartFile> images) throws IOException {
-        if (images == null || images.isEmpty()) return;
-        for (int i = 0; i < images.size(); i++) {
-            MultipartFile file = images.get(i);
-            if (file == null || file.isEmpty()) continue;
-            String url = cloudinaryService.uploadImage(file);
-            PostImage img = PostImage.builder()
-                    .postId(postId)
-                    .imageUrl(url)
-                    .order(i)
-                    .build();
-            postImageRepository.save(img);
-        }
-    }
 
     private void saveCategories(String postId, List<String> categoryIds) {
         if (categoryIds == null || categoryIds.isEmpty()) return;

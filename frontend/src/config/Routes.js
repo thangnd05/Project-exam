@@ -22,6 +22,7 @@ const routes = {
   adminScoringConversion: '/admin/scoring-conversion',
   adminEvaluations: '/admin/evaluations',
   adminExamTypes: '/admin/exam-types',
+  adminExamCategories: '/admin/exam-categories',
   adminExamParts: '/admin/exam-parts',
   adminClasses: '/admin/classes',
   adminTests: '/admin/tests',
