@@ -11,6 +11,7 @@ import com.project_exam.backend.shared.util.ClassAccessGuard;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
+import com.project_exam.backend.modules.assessment.test.domain.TestStatus;
 import com.project_exam.backend.modules.assessment.test.dto.AddQuestionsToTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.AddRandomQuestionsToTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
@@ -325,7 +326,10 @@ public class TestService {
                             .map(ExamCategory::getGuestAllowed)
                             .orElse(false);
             if (!guestEligible) {
-                return buildLimitExceededResponse(test, 0, 0, userTestRepository.countByTestId(testId));
+                return TestResponse.builder()
+                        .testId(test.getTestId()).title(test.getTitle())
+                        .status(TestStatus.LOGIN_REQUIRED.name()).canDoTest(false)
+                        .build();
             }
         }
 

@@ -130,6 +130,16 @@ function TestStartPage() {
         const enriched = await enrichTestWithPassageMedia(testData);
         setTest(enriched);
 
+        if (testData.status === 'LOGIN_REQUIRED') {
+          navigate('/login', {
+            state: {
+              from: { pathname: `/tests/${testId}/start` },
+              flashMessage: 'Bạn cần đăng nhập để làm bài thi này!',
+            },
+          });
+          return;
+        }
+
         if (testData.canDoTest === false || testData.status === 'FORBIDDEN') {
           setStatus('no-attempts');
           return;
