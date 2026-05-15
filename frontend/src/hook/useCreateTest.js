@@ -21,6 +21,7 @@ const emptyQuestion = {
   mediaUrl: '',
   passageType: 'LISTENING',
   explanation: '',
+  tagIds: [],
   answers: [
     { answerLabel: 'A', answerText: '', isCorrect: false },
     { answerLabel: 'B', answerText: '', isCorrect: false },
@@ -72,7 +73,7 @@ export const useCreateTest = ({
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({});
 
-  const { examTypes, examParts, questionCollections } = useBaseMetaData(testInfo.examTypeId);
+  const { examTypes, examParts, questionCollections, availableTags } = useBaseMetaData(testInfo.examTypeId);
 
   const { handleSubmit: submitLogic } = useTestSubmission({
     mode,
@@ -386,5 +387,6 @@ export const useCreateTest = ({
     setGroupPassageType,
     handleSubmit,
     questionCollections,
+    availableTags,
   };
 };

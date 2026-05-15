@@ -1,35 +1,38 @@
 .tagsPage {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1.6rem;
 }
 
 .pageHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 1.2rem;
 
   h1 {
     margin: 0;
-    font-size: 1.6rem;
+    font-size: 2.2rem;
+    font-weight: 700;
   }
 
   p {
-    margin: 6px 0 0;
+    margin: 0.4rem 0 0;
     color: #6b7280;
+    font-size: 1.4rem;
   }
 }
 
 .createBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.6rem;
+  font-size: 1.4rem;
 }
 
 .filterBar {
   display: flex;
-  gap: 12px;
+  gap: 1.2rem;
   align-items: center;
 }
 
@@ -38,56 +41,224 @@
   flex: 1;
 
   input {
-    padding-left: 34px;
+    padding-left: 3.4rem;
+    font-size: 1.4rem;
   }
 }
 
 .searchIcon {
   position: absolute;
-  left: 12px;
+  left: 1.2rem;
   top: 50%;
   transform: translateY(-50%);
   color: #9ca3af;
 }
 
-.tableWrapper {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
 .errorText {
   margin: 0;
   color: #dc2626;
-  font-size: 0.9rem;
+  font-size: 1.4rem;
 }
 
-.actions {
-  display: inline-flex;
-  gap: 8px;
+// ==================== Tree View ====================
+
+.treeWrapper {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.2rem;
+  overflow: hidden;
+}
+
+.treeToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.6rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.treeCount {
+  font-size: 1.3rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.treeToolbarActions {
+  display: flex;
+  gap: 0.8rem;
 
   button {
-    border: 1px solid #d1d5db;
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.4rem;
+    transition: background-color 0.15s;
+
+    &:hover {
+      background: #eff6ff;
+    }
+  }
+}
+
+// ==================== Root Group ====================
+
+.rootGroup {
+  &:not(:last-child) {
+    border-bottom: 2px solid #e5e7eb;
+  }
+}
+
+// ==================== Tree Node ====================
+
+.treeNode {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.6rem 1.2rem 1.2rem;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background-color: #f9fafb;
+
+    .treeNodeActions {
+      opacity: 1;
+    }
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.treeNodeLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.expandBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border: none;
+  background: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  color: #6b7280;
+  flex-shrink: 0;
+  transition: all 0.15s;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #374151;
+  }
+}
+
+.expandPlaceholder {
+  display: inline-block;
+  width: 2.8rem;
+  flex-shrink: 0;
+}
+
+.tagName {
+  font-size: 1.5rem;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.root {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #1e293b;
+  }
+}
+
+.childCount {
+  font-size: 1.2rem;
+  color: #9ca3af;
+  background: #f3f4f6;
+  padding: 0.1rem 0.7rem;
+  border-radius: 1rem;
+  flex-shrink: 0;
+}
+
+.treeNodeActions {
+  display: flex;
+  gap: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+
+  button {
+    border: 1px solid #e5e7eb;
     background: #fff;
-    border-radius: 8px;
-    width: 30px;
-    height: 30px;
+    border-radius: 0.6rem;
+    width: 3.2rem;
+    height: 3.2rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.15s;
+
+    &:hover {
+      border-color: #d1d5db;
+      background: #f9fafb;
+      color: #374151;
+    }
+
+    // Nút xóa (thứ 3)
+    &:nth-child(3):hover {
+      color: #dc2626;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    // Nút thêm con (thứ 1)
+    &:first-child:hover {
+      color: #16a34a;
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+    }
   }
 }
 
-.childRow {
-  td {
-    background-color: #f9fafb;
+// ==================== Connector Lines ====================
+
+.childrenWrapper {
+  position: relative;
+  margin-left: 2.4rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 1.6rem;
+    bottom: 1.2rem;
+    width: 1px;
+    background: #e5e7eb;
   }
 }
 
-.indent {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: #9ca3af;
+.childConnector {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -0.8rem;
+    width: 0.8rem;
+    height: 1px;
+    background: #e5e7eb;
+  }
 }

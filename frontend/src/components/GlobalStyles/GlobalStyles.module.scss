@@ -264,6 +264,20 @@ li {
   }
 }
 
+/* Tag badge cho chọn tag câu hỏi */
+:global(.tag-badge) {
+  font-size: var(--font-size-ssm) !important;
+  padding: 0.6rem 1.2rem !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: var(--radius-md) !important;
+
+  &:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+  }
+}
+
 .btn-bright-green {
   background-color: #22bd70 !important;
   color: white !important;

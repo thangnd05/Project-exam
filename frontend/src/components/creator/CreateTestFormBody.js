@@ -90,6 +90,7 @@ const CreateTestFormBody = ({
     removeGroupAnswer,
     handleSubmit,
     questionCollections,
+    availableTags,
   } = useCreateTest({ mode, classId, chapterId, creatorType: activeCreatorType });
 
   const [className, setClassName] = useState('');
@@ -460,6 +461,7 @@ const CreateTestFormBody = ({
               addMediaFilesFn={addMediaFiles}
               removeMediaFileFn={removeMediaFile}
               setPassageTypeFn={setPassageType}
+              availableTags={availableTags}
               minQuestions={questions.length}
             />
           ))}
@@ -570,6 +572,7 @@ const CreateTestFormBody = ({
                     addMediaFilesFn={() => { }}
                     removeMediaFileFn={() => { }}
                     setPassageTypeFn={() => { }}
+                    availableTags={availableTags}
                     withMedia={false}
                     minQuestions={group.questions.length}
                   />

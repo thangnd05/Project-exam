@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Badge, Button } from 'react-bootstrap';
 import { PlusCircle, Trash } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '../modals/CreateTestModal.module.scss';
@@ -20,10 +20,12 @@ const QuestionBlock = ({
     addMediaFilesFn,
     removeMediaFileFn,
     setPassageTypeFn,
+    availableTags = [],
     withMedia = true,
     minQuestions = 1,
     radioGroupPrefix = 'q',
 }) => {
+    const selectedTagIds = question.tagIds || [];
     return (
         <div className={cx('partBlock')}>
             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -37,12 +39,41 @@ const QuestionBlock = ({
                     <Trash size={18} />
                 </Button>
             </div>
+
             <input
                 className={cx('inputModern', 'mb-3')}
                 placeholder="Nhập nội dung câu hỏi..."
                 value={question.questionText}
                 onChange={(e) => updateQuestionTextFn(index, e.target.value)}
             />
+
+            {availableTags.length > 0 && (
+                <div className="mb-3">
+                    <label className="fw-bold mb-1 d-block">Tag phân loại</label>
+                    <div className="d-flex flex-wrap gap-2">
+                        {availableTags.map((tag) => {
+                            const isSelected = selectedTagIds.includes(tag.tagId);
+                            return (
+                                <Badge
+                                    key={tag.tagId}
+                                    bg={isSelected ? 'primary' : 'light'}
+                                    text={isSelected ? 'white' : 'dark'}
+                                    role="button"
+                                    className="border px-2 py-1 fw-medium tag-badge"
+                                    onClick={() => {
+                                        const next = isSelected
+                                            ? selectedTagIds.filter((id) => id !== tag.tagId)
+                                            : [...selectedTagIds, tag.tagId];
+                                        updateQuestionFieldFn?.(index, 'tagIds', next);
+                                    }}
+                                >
+                                    {tag.name}
+                                </Badge>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
             {withMedia && (
                 <div className="mb-3">
                     <label className="fw-bold mb-1 d-block">Phương tiện (nếu có)</label>

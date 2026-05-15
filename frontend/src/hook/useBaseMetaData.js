@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from '../api/axiosClient';
+import { getTagsFlatByExamType } from '../api/tagApi';
 
 export const useBaseMetaData = (examTypeId) => {
     const [examTypes, setExamTypes] = useState([]);
@@ -19,6 +20,7 @@ export const useBaseMetaData = (examTypeId) => {
     };
 
     const [questionCollections, setQuestionCollections] = useState([]);
+    const [availableTags, setAvailableTags] = useState([]);
 
     useEffect(() => {
         axios
@@ -41,6 +43,7 @@ export const useBaseMetaData = (examTypeId) => {
     useEffect(() => {
         if (!examTypeId) {
             setExamParts([]);
+            setAvailableTags([]);
             return;
         }
         axios
@@ -50,7 +53,10 @@ export const useBaseMetaData = (examTypeId) => {
                 console.error('Fetch exam parts error:', err);
                 setExamParts([]);
             });
+        getTagsFlatByExamType(examTypeId)
+            .then((tags) => setAvailableTags(Array.isArray(tags) ? tags : []))
+            .catch(() => setAvailableTags([]));
     }, [examTypeId]);
 
-    return { examTypes, examParts, setExamParts, questionCollections };
+    return { examTypes, examParts, setExamParts, questionCollections, availableTags };
 };

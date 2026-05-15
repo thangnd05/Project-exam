@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Button, Spinner, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Badge, Spinner, Row, Col } from 'react-bootstrap';
 import axios from '../../api/axiosClient';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -9,6 +9,7 @@ import {
   IoCreateOutline,
   IoTrashOutline,
 } from 'react-icons/io5';
+import { getTagsFlatByExamType } from '../../api/tagApi';
 import styles from './EditQuestionModal.module.scss';
 import createStyles from './CreateTestModal.module.scss';
 
@@ -57,6 +58,8 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   const [existingMedia, setExistingMedia] = useState([]);
   const [deletingMediaIds, setDeletingMediaIds] = useState([]);
   const [questionCollections, setQuestionCollections] = useState([]);
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedTagIds, setSelectedTagIds] = useState([]);
 
   const onHideRef = useRef(onHide);
 
@@ -137,6 +140,28 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
             options: mappedOptions,
           });
           setExistingMedia(getMediaItemsFromQuestion(questionDetail));
+
+          // Load tags: lấy danh sách tag đã gắn + danh sách tag available
+          const currentTagIds = (questionDetail.tags || []).map((t) => t.tagId);
+          setSelectedTagIds(currentTagIds);
+
+          if (questionDetail.examTypeId) {
+            getTagsFlatByExamType(questionDetail.examTypeId)
+              .then((tags) => { if (!cancelled) setAvailableTags(tags); })
+              .catch(() => {});
+          } else if (questionDetail.examPartId) {
+            // Lấy examTypeId qua examPart
+            axios.get(`/api/exam-parts/${questionDetail.examPartId}`)
+              .then((partRes) => {
+                const etId = partRes.data?.examTypeId;
+                if (etId && !cancelled) {
+                  return getTagsFlatByExamType(etId);
+                }
+                return [];
+              })
+              .then((tags) => { if (!cancelled) setAvailableTags(Array.isArray(tags) ? tags : []); })
+              .catch(() => {});
+          }
         }
       } catch (error) {
         if (!cancelled) {
@@ -261,6 +286,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
         answerText: opt.content,
         isCorrect: opt.isCorrect,
       })),
+      tagIds: selectedTagIds,
     };
 
     const hasPassage =
@@ -346,6 +372,35 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                   }
                 />
               </Col>
+
+              {availableTags.length > 0 && (
+                <Col md={12}>
+                  <label className={cx('formLabel')}>Tag phân loại</label>
+                  <div className="d-flex flex-wrap gap-2">
+                    {availableTags.map((tag) => {
+                      const isSelected = selectedTagIds.includes(tag.tagId);
+                      return (
+                        <Badge
+                          key={tag.tagId}
+                          bg={isSelected ? 'primary' : 'light'}
+                          text={isSelected ? 'white' : 'dark'}
+                          role="button"
+                          className="border px-2 py-1 fw-medium tag-badge"
+                          onClick={() =>
+                            setSelectedTagIds((prev) =>
+                              isSelected
+                                ? prev.filter((id) => id !== tag.tagId)
+                                : [...prev, tag.tagId],
+                            )
+                          }
+                        >
+                          {tag.name}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                </Col>
+              )}
 
               <Col md={12}>
                 <label className={cx('formLabel')}>Nguồn (Collection)</label>
@@ -568,6 +623,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                   placeholder="Nhập giải thích đáp án (hiển thị cho học sinh khi xem lại bài)..."
                 />
               </Col>
+
             </Row>
           </div>
         )}

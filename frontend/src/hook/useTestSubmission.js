@@ -147,6 +147,7 @@ export const useTestSubmission = ({
                             answers: q.answers,
                             collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                             explanation: q.explanation?.trim() || null,
+                            tagIds: q.tagIds?.length > 0 ? q.tagIds : null,
                             passage: (hasMedia || hasMediaUrl)
                                 ? { passageType, content: '', mediaUrl: q.mediaUrl?.trim() || null }
                                 : null,
@@ -180,6 +181,7 @@ export const useTestSubmission = ({
                         questionText: q.questionText,
                         collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                         explanation: q.explanation?.trim() || null,
+                        tagIds: q.tagIds?.length > 0 ? q.tagIds : null,
                         answers: q.answers.map((a) => ({
                             answerLabel: a.answerLabel,
                             answerText: a.answerText,
@@ -222,6 +224,7 @@ export const useTestSubmission = ({
                             questionType: q.questionType,
                             collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                             explanation: q.explanation?.trim() || null,
+                            tagIds: q.tagIds?.length > 0 ? q.tagIds : null,
                             answers: q.answers.map((a) => ({
                                 answerLabel: a.answerLabel,
                                 answerText: a.answerText,
