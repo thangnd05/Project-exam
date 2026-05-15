@@ -15,6 +15,7 @@ export { default as AnalyticsPage } from './pages/Analytics';
 export { default as AuditLogs } from './pages/AuditLogs';
 export { default as LoginAudit } from './pages/LoginAudit';
 export { default as TestsManagement } from './pages/Tests';
+export { default as TagsManagement } from './pages/Tags';
 
 // Export fake data for use in components
 export * from './data/fakeData';
