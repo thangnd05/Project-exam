@@ -1,0 +1,69 @@
+package com.project_exam.backend.modules.assessment.exam.controller;
+
+import com.project_exam.backend.modules.assessment.exam.dto.TagRequest;
+import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
+import com.project_exam.backend.modules.assessment.exam.service.TagService;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/tags")
+@AllArgsConstructor
+public class TagController {
+
+    private final TagService tagService;
+
+    // =================== CREATE ===================
+
+    @PostMapping
+    public ResponseEntity<TagResponse> createTag(@RequestBody TagRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(tagService.createTag(request));
+    }
+
+    // =================== UPDATE ===================
+
+    @PutMapping("/{tagId}")
+    public ResponseEntity<TagResponse> updateTag(@PathVariable String tagId,
+                                                 @RequestBody TagRequest request) {
+        return ResponseEntity.ok(tagService.updateTag(tagId, request));
+    }
+
+    // =================== DELETE ===================
+
+    @DeleteMapping("/{tagId}")
+    public ResponseEntity<Void> deleteTag(@PathVariable String tagId) {
+        tagService.deleteTag(tagId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // =================== GET ===================
+
+    /**
+     * Lấy danh sách tag theo examTypeId dạng cây (tree).
+     */
+    @GetMapping("/tree/{examTypeId}")
+    public ResponseEntity<List<TagResponse>> getTagTree(@PathVariable String examTypeId) {
+        return ResponseEntity.ok(tagService.getTagTreeByExamType(examTypeId));
+    }
+
+    /**
+     * Lấy danh sách tag phẳng (flat) theo examTypeId.
+     */
+    @GetMapping("/flat/{examTypeId}")
+    public ResponseEntity<List<TagResponse>> getTagsFlat(@PathVariable String examTypeId) {
+        return ResponseEntity.ok(tagService.getTagsFlatByExamType(examTypeId));
+    }
+
+    /**
+     * Lấy danh sách tag của một câu hỏi.
+     */
+    @GetMapping("/question/{questionId}")
+    public ResponseEntity<List<TagResponse>> getTagsByQuestion(@PathVariable String questionId) {
+        return ResponseEntity.ok(tagService.getTagsByQuestionId(questionId));
+    }
+
+}

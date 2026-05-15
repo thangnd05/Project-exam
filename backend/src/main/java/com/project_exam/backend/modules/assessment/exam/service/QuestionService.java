@@ -69,6 +69,8 @@ public class QuestionService {
     private final UserRepository userRepository;
     private final ClassAccessGuard classAccessGuard;
     private final UserAnswerRepository userAnswerRepository;
+    private final TagService tagService;
+    private final QuestionTagRepository questionTagRepository;
 
     /**
      * Khi câu hỏi được gắn vào một class/chapter, user phải là thành viên hoặc giáo viên của lớp đó
@@ -104,6 +106,7 @@ public class QuestionService {
                         .passage(null)
                         .passageMedia(List.of())
                         .answers(List.of())
+                        .tags(tagService.getTagsByQuestionId(question.getQuestionId()))
                         .build())
                 .toList();
     }
@@ -478,6 +481,10 @@ public class QuestionService {
             testQuestion.setDisplayOrder(nextDisplayOrder++);
             testQuestionRepository.save(testQuestion);
 
+            if (parsedQuestion.getTagIds() != null && !parsedQuestion.getTagIds().isEmpty()) {
+                tagService.syncQuestionTags(question.getQuestionId(), parsedQuestion.getTagIds());
+            }
+
             responses.add(buildQuestionAdminResponse(question, null, savedAnswers));
         }
 
@@ -506,6 +513,7 @@ public class QuestionService {
         userAnswerRepository.deleteByQuestionId(questionId);
         testQuestionRepository.deleteByQuestionId(questionId);
         answerRepository.deleteByQuestionId(questionId);
+        questionTagRepository.deleteByQuestionId(questionId);
         questionRepository.deleteById(questionId);
     }
 
@@ -629,6 +637,9 @@ public class QuestionService {
             question = questionRepository.save(question);
 
             List<Answer> savedAnswers = saveAnswersForQuestion(question.getQuestionId(), qReq.getAnswers(), qReq.getQuestionType());
+            if (qReq.getTagIds() != null && !qReq.getTagIds().isEmpty()) {
+                tagService.syncQuestionTags(question.getQuestionId(), qReq.getTagIds());
+            }
             responses.add(buildQuestionAdminResponse(question, passage, savedAnswers));
         }
         return responses;
@@ -744,6 +755,10 @@ public class QuestionService {
                     qReq.getAnswers(),
                     qReq.getQuestionType()
             );
+
+            if (qReq.getTagIds() != null && !qReq.getTagIds().isEmpty()) {
+                tagService.syncQuestionTags(question.getQuestionId(), qReq.getTagIds());
+            }
 
             responses.add(
                     buildQuestionAdminResponse(question, null, savedAnswers)
@@ -864,6 +879,10 @@ public class QuestionService {
         tq.setQuestionId(question.getQuestionId());
         tq.setDisplayOrder(testQuestionRepository.findMaxDisplayOrderByTestPartId(request.getTestPartId()) + 1);
         testQuestionRepository.save(tq);
+
+        if (request.getTagIds() != null && !request.getTagIds().isEmpty()) {
+            tagService.syncQuestionTags(question.getQuestionId(), request.getTagIds());
+        }
 
         return buildQuestionAdminResponse(question, savedPassage, savedAnswers);
     }
@@ -1017,6 +1036,7 @@ public class QuestionService {
                 .passage(passageDto)
                 .passageMedia(passageMedia)
                 .answers(answerDtos)
+                .tags(tagService.getTagsByQuestionId(question.getQuestionId()))
                 .build();
     }
 
@@ -1068,6 +1088,7 @@ public class QuestionService {
                 .passage(passageDto)
                 .passageMedia(passageMedia)
                 .answers(answers)
+                .tags(tagService.getTagsByQuestionId(questionId))
                 .build();
     }
 
@@ -1186,6 +1207,10 @@ public class QuestionService {
         question = questionRepository.save(question);
         List<Answer> updatedAnswers = answerService.syncAnswers(questionId, request.getAnswers());
 
+        if (request.getTagIds() != null) {
+            tagService.syncQuestionTags(questionId, request.getTagIds());
+        }
+
         return buildQuestionAdminResponse(question, passage, updatedAnswers);
     }
 
@@ -1292,6 +1317,10 @@ public class QuestionService {
                                 qReq.getAnswers(),
                                 qReq.getQuestionType()
                         );
+
+                if (qReq.getTagIds() != null && !qReq.getTagIds().isEmpty()) {
+                    tagService.syncQuestionTags(question.getQuestionId(), qReq.getTagIds());
+                }
 
                 allResponses.add(
                         buildQuestionAdminResponse(

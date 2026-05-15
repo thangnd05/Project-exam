@@ -28,4 +28,6 @@ public class QuestionAdminResponse {
     private final List<PassageMediaResponse> passageMedia;
 
     private final List<AnswerAdminResponse> answers;
+
+    private final List<TagResponse> tags;
 }

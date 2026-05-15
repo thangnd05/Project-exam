@@ -23,4 +23,5 @@ public class CreateQuestionAndAttachRequest {
     private List<AnswerRequest> answers;
     private String collectionId;
     private String explanation;
+    private List<String> tagIds; // optional: danh sách tag gắn cho câu hỏi
 }

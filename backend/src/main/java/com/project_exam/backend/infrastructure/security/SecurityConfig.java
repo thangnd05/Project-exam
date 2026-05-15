@@ -132,6 +132,7 @@ public class SecurityConfig {
                                 "/api/auth/verify",
                                 "/api/posts/**",
                                 "/api/categories/**",
+                                "/api/tags/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**").permitAll()
                         // Guest endpoints — không yêu cầu JWT, định danh bằng header X-Guest-Session.

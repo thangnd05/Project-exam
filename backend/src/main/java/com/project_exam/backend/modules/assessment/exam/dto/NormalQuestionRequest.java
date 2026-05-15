@@ -19,4 +19,5 @@ public class NormalQuestionRequest {
     private boolean needsManualCorrect;
     private String collectionId;
     private String explanation;
+    private List<String> tagIds; // optional: danh sách tag gắn cho câu hỏi
 }
