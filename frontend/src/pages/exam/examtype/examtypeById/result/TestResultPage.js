@@ -302,116 +302,125 @@ const TestResultPage = () => {
   return (
     <div className={cx("wrapper")}>
       <Container>
-        {/* ================= RESULT CARD ================= */}
-        <div className={cx("result-card")}>
-          <div className={cx("icon-success")}>
-            <IoCheckmarkCircle />
-          </div>
+        {/* ================= SPLIT LAYOUT ================= */}
+        <div className={cx("result-layout")}>
 
-          <h1>Hoàn thành bài thi!</h1>
-
-          {/* SCORE */}
-          <div className={cx("score-display")}>
-            <span className={cx("label")}>Điểm số</span>
-            <div className={cx("points")}>
-              {result?.totalScore?.toFixed(2) ||
-                location.state?.score?.toFixed(2) ||
-                "0.00"}
-            </div>
-          </div>
-
-          {/* STATS */}
-          <div className={cx("stats-grid")}>
-            <div className={cx("stat-item", "correct")}>
-              <IoCheckmarkCircle size={24} />
-              <span className={cx("stat-val")}>{result?.correct || 0}</span>
-              <span className={cx("stat-label")}>Câu đúng</span>
-            </div>
-
-            <div className={cx("stat-item", "wrong")}>
-              <IoStatsChartOutline size={24} />
-              <span className={cx("stat-val")}>{result?.wrong || 0}</span>
-              <span className={cx("stat-label")}>Câu sai</span>
-            </div>
-
-            <div className={cx("stat-item", "total")}>
-              <IoSchoolOutline size={24} />
-              <span className={cx("stat-val")}>{result?.total || 0}</span>
-              <span className={cx("stat-label")}>Tổng số câu</span>
-            </div>
-
-            <div className={cx("stat-item")}>
-              <IoTimeOutline size={24} />
-              <span className={cx("stat-val")}>
-                {formatTime(result?.startedAt, result?.finishedAt)}
-              </span>
-              <span className={cx("stat-label")}>Thời gian</span>
-            </div>
-          </div>
-
-          {/* ACTIONS */}
-          <div className={cx("actions")}>
-            {!canReview && (
-              <div className={cx("lock-message")}>
-                <IoLockClosedOutline />
-                <span>
-                  Đáp án sẽ hiển thị sau khi thời gian làm bài kết thúc.
-                </span>
+          {/* LEFT: Kết quả */}
+          <div className={cx("result-left")}>
+            <div className={cx("result-card")}>
+              <div className={cx("icon-success")}>
+                <IoCheckmarkCircle />
               </div>
-            )}
 
-            <button
-              className={cx("btn-detail", { "is-locked": !canReview })}
-              onClick={handleShowDetail}
-              disabled={detailLoading}
-            >
-              {detailLoading ? (
-                <Spinner animation="border" size="sm" />
-              ) : !canReview ? (
-                <IoLockClosedOutline />
-              ) : (
-                <IoStatsChartOutline />
-              )}
+              <h1>Hoàn thành bài thi!</h1>
 
-              {showDetail ? "Ẩn chi tiết" : "Xem đáp án & giải thích"}
-            </button>
+              {/* SCORE */}
+              <div className={cx("score-display")}>
+                <span className={cx("label")}>Điểm số</span>
+                <div className={cx("points")}>
+                  {result?.totalScore?.toFixed(2) ||
+                    location.state?.score?.toFixed(2) ||
+                    "0.00"}
+                </div>
+              </div>
 
-            <button className={cx("btn-home")} onClick={() => navigate("/")}>
-              <IoHomeOutline /> Trang chủ
-            </button>
+              {/* STATS */}
+              <div className={cx("stats-grid")}>
+                <div className={cx("stat-item", "correct")}>
+                  <IoCheckmarkCircle size={24} />
+                  <span className={cx("stat-val")}>{result?.correct || 0}</span>
+                  <span className={cx("stat-label")}>Câu đúng</span>
+                </div>
 
-            <button
-              className={cx("btn-review")}
-              onClick={() => navigate(`/tests/history/${testId}`)}
-            >
-              <IoSchoolOutline /> Lịch sử bài thi
-            </button>
+                <div className={cx("stat-item", "wrong")}>
+                  <IoStatsChartOutline size={24} />
+                  <span className={cx("stat-val")}>{result?.wrong || 0}</span>
+                  <span className={cx("stat-label")}>Câu sai</span>
+                </div>
+
+                <div className={cx("stat-item", "total")}>
+                  <IoSchoolOutline size={24} />
+                  <span className={cx("stat-val")}>{result?.total || 0}</span>
+                  <span className={cx("stat-label")}>Tổng số câu</span>
+                </div>
+
+                <div className={cx("stat-item")}>
+                  <IoTimeOutline size={24} />
+                  <span className={cx("stat-val")}>
+                    {formatTime(result?.startedAt, result?.finishedAt)}
+                  </span>
+                  <span className={cx("stat-label")}>Thời gian</span>
+                </div>
+              </div>
+
+              {/* ACTIONS */}
+              <div className={cx("actions")}>
+                {!canReview && (
+                  <div className={cx("lock-message")}>
+                    <IoLockClosedOutline />
+                    <span>
+                      Đáp án sẽ hiển thị sau khi thời gian làm bài kết thúc.
+                    </span>
+                  </div>
+                )}
+
+                <button
+                  className={cx("btn-detail", { "is-locked": !canReview })}
+                  onClick={handleShowDetail}
+                  disabled={detailLoading}
+                >
+                  {detailLoading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : !canReview ? (
+                    <IoLockClosedOutline />
+                  ) : (
+                    <IoStatsChartOutline />
+                  )}
+
+                  {showDetail ? "Ẩn chi tiết" : "Xem đáp án & giải thích"}
+                </button>
+
+                <button className={cx("btn-home")} onClick={() => navigate("/")}>
+                  <IoHomeOutline /> Trang chủ
+                </button>
+
+                <button
+                  className={cx("btn-review")}
+                  onClick={() => navigate(`/tests/history/${testId}`)}
+                >
+                  <IoSchoolOutline /> Lịch sử bài thi
+                </button>
+              </div>
+            </div>
           </div>
+
+          {/* RIGHT: Chẩn đoán */}
+          {enhanced && (
+            <div className={cx("result-right")}>
+              <div className={cx("diagnosis-card")}>
+                <ReadinessGauge
+                  readinessScore={enhanced.readinessScore}
+                  readinessLevel={enhanced.readinessLevel}
+                  percentile={enhanced.percentile}
+                  passed={enhanced.passed}
+                  level={enhanced.level}
+                  examCategoryCode={enhanced.examCategoryCode}
+                />
+
+                <SkillBreakdownChart
+                  skillBreakdown={enhanced.skillBreakdown}
+                  partBreakdown={enhanced.partBreakdown}
+                />
+
+                <RecoveryPlan
+                  recommendations={enhanced.recommendations}
+                  readinessScore={enhanced.readinessScore}
+                />
+              </div>
+            </div>
+          )}
+
         </div>
-
-        {/* ================= ENHANCED DIAGNOSIS ================= */}
-        {enhanced && (
-          <div className={cx("result-card")} style={{ marginTop: 20 }}>
-            <ReadinessGauge
-              readinessScore={enhanced.readinessScore}
-              readinessLevel={enhanced.readinessLevel}
-              percentile={enhanced.percentile}
-              passed={enhanced.passed}
-              level={enhanced.level}
-              examCategoryCode={enhanced.examCategoryCode}
-            />
-
-            <SkillBreakdownChart
-              skillBreakdown={enhanced.skillBreakdown}
-              partBreakdown={enhanced.partBreakdown}
-            />
-
-            <RecoveryPlan
-              recommendations={enhanced.recommendations}
-              readinessScore={enhanced.readinessScore}
-            />
-          </div>
-        )}
 
         {/* ================= DETAIL SECTION ================= */}
         {showDetail && test && (
