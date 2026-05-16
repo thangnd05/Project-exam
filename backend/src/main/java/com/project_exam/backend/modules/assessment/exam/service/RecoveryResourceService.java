@@ -53,6 +53,7 @@ public class RecoveryResourceService {
         resource.setCreatedBy(currentUserId);
 
         if (file != null && !file.isEmpty()) {
+            resource.setOriginalFileName(file.getOriginalFilename());
             String uploadedUrl = uploadFile(file);
             resource.setUrl(uploadedUrl);
             resource.setCloudinaryPublicId(extractPublicId(uploadedUrl));
@@ -92,6 +93,7 @@ public class RecoveryResourceService {
             if (resource.getCloudinaryPublicId() != null) {
                 try { cloudinaryService.deleteFile(resource.getCloudinaryPublicId()); } catch (Exception ignored) {}
             }
+            resource.setOriginalFileName(file.getOriginalFilename());
             String uploadedUrl = uploadFile(file);
             resource.setUrl(uploadedUrl);
             resource.setCloudinaryPublicId(extractPublicId(uploadedUrl));
@@ -208,6 +210,7 @@ public class RecoveryResourceService {
                 .title(resource.getTitle())
                 .description(resource.getDescription())
                 .url(resource.getUrl())
+                .originalFileName(resource.getOriginalFileName())
                 .createdBy(resource.getCreatedBy())
                 .createdAt(resource.getCreatedAt())
                 .tags(tags)

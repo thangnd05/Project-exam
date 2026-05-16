@@ -13,6 +13,7 @@ public class RecoveryResourceResponse {
     private final String title;
     private final String description;
     private final String url;
+    private final String originalFileName;
     private final String createdBy;
     private final Instant createdAt;
     private final List<TagResponse> tags;

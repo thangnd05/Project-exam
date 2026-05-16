@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Edit, ExternalLink, Plus, Search, Trash2} from 'lucide-react';
+import {Download, Edit, ExternalLink, Plus, Search, Trash2} from 'lucide-react';
 
 import {getExamTypes} from '../../api/examTypeApi';
 import {getTagsFlatByExamType} from '../../api/tagApi';
@@ -162,6 +162,24 @@ function RecoveryResourcesManagement() {
     }
   };
 
+  const handleDownload = async (url, originalFileName) => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = originalFileName || 'download';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch {
+      // Fallback: mở tab mới
+      window.open(url, '_blank');
+    }
+  };
+
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('vi-VN');
@@ -243,16 +261,31 @@ function RecoveryResourcesManagement() {
                 </div>
               )}
 
+              {r.originalFileName && (
+                <div className={cx('cardFileName')}>
+                  {r.originalFileName}
+                </div>
+              )}
+
               <div className={cx('cardFooter')}>
                 <span>{formatDate(r.createdAt)}</span>
-                <a
-                  href={r.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={cx('viewLink')}
-                >
-                  Mở tài liệu <ExternalLink size={14} />
-                </a>
+                <div className="d-flex gap-3">
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={cx('viewLink')}
+                  >
+                    Xem <ExternalLink size={14} />
+                  </a>
+                  <button
+                    type="button"
+                    className={cx('viewLink')}
+                    onClick={() => handleDownload(r.url, r.originalFileName)}
+                  >
+                    Tải về <Download size={14} />
+                  </button>
+                </div>
               </div>
             </div>
           ))}

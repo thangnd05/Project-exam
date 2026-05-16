@@ -161,6 +161,17 @@
   gap: 0.4rem;
 }
 
+.cardFileName {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  background: #f8fafc;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .cardFooter {
   display: flex;
   justify-content: space-between;
@@ -176,6 +187,13 @@
   color: var(--accent-color);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 
   &:hover {
     text-decoration: underline;
