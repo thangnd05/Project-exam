@@ -25,10 +25,6 @@ public class RecoveryResource {
     private String description;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ResourceType resourceType;
-
-    @Column(nullable = false)
     private String url;
 
     @Column(name = "cloudinary_public_id")
@@ -41,9 +37,5 @@ public class RecoveryResource {
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private Instant createdAt;
-
-    public enum ResourceType {
-        VIDEO, DOCUMENT, LINK
-    }
 
 }

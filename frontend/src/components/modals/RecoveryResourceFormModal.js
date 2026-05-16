@@ -1,12 +1,6 @@
 import React from 'react';
 import {Badge, Button, Form, Modal} from 'react-bootstrap';
 
-const RESOURCE_TYPES = [
-  {value: 'VIDEO', label: 'Video'},
-  {value: 'DOCUMENT', label: 'Tài liệu (PDF, Doc...)'},
-  {value: 'LINK', label: 'Đường dẫn ngoài'},
-];
-
 function RecoveryResourceFormModal({
   show,
   isEditing,
@@ -49,53 +43,29 @@ function RecoveryResourceFormModal({
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Loại tài liệu</Form.Label>
-          <Form.Select
-            value={formState.resourceType}
-            onChange={(e) => onChangeField('resourceType', e.target.value)}
-          >
-            {RESOURCE_TYPES.map((rt) => (
-              <option key={rt.value} value={rt.value}>{rt.label}</option>
-            ))}
-          </Form.Select>
+          <Form.Label>Upload file</Form.Label>
+          <Form.Control
+            type="file"
+            onChange={(e) => onFileChange(e.target.files[0] || null)}
+          />
+          {selectedFile && (
+            <Form.Text className="text-muted">{selectedFile.name}</Form.Text>
+          )}
+          {isEditing && !selectedFile && formState.url && (
+            <Form.Text className="text-muted d-block mt-1">
+              File hiện tại: <a href={formState.url} target="_blank" rel="noreferrer">Xem file</a>
+            </Form.Text>
+          )}
         </Form.Group>
 
-        {formState.resourceType === 'LINK' ? (
-          <Form.Group className="mb-3">
-            <Form.Label>URL</Form.Label>
-            <Form.Control
-              value={formState.url}
-              onChange={(e) => onChangeField('url', e.target.value)}
-              placeholder="https://..."
-            />
-          </Form.Group>
-        ) : (
-          <Form.Group className="mb-3">
-            <Form.Label>Upload file {formState.resourceType === 'VIDEO' ? '(video/audio)' : '(PDF, Doc...)'}</Form.Label>
-            <Form.Control
-              type="file"
-              accept={formState.resourceType === 'VIDEO' ? 'video/*,audio/*' : '.pdf,.doc,.docx'}
-              onChange={(e) => onFileChange(e.target.files[0] || null)}
-            />
-            {selectedFile && (
-              <Form.Text className="text-muted">{selectedFile.name}</Form.Text>
-            )}
-            {isEditing && !selectedFile && formState.url && (
-              <Form.Text className="text-muted d-block mt-1">
-                File hiện tại: <a href={formState.url} target="_blank" rel="noreferrer">Xem file</a>
-              </Form.Text>
-            )}
-            <Form.Group className="mt-2">
-              <Form.Label className="small text-muted">Hoặc nhập URL thủ công</Form.Label>
-              <Form.Control
-                size="sm"
-                value={formState.url}
-                onChange={(e) => onChangeField('url', e.target.value)}
-                placeholder="https://..."
-              />
-            </Form.Group>
-          </Form.Group>
-        )}
+        <Form.Group className="mb-3">
+          <Form.Label>Hoặc nhập URL</Form.Label>
+          <Form.Control
+            value={formState.url}
+            onChange={(e) => onChangeField('url', e.target.value)}
+            placeholder="https://..."
+          />
+        </Form.Group>
 
         {availableTags.length > 0 && (
           <Form.Group className="mb-3">

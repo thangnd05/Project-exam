@@ -9,6 +9,4 @@ public interface RecoveryResourceRepository extends JpaRepository<RecoveryResour
 
     List<RecoveryResource> findByCreatedBy(String createdBy);
 
-    List<RecoveryResource> findByResourceType(RecoveryResource.ResourceType resourceType);
-
 }

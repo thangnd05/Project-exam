@@ -46,36 +46,16 @@ public class RecoveryResourceService {
         if (request.getTitle() == null || request.getTitle().isBlank()) {
             throw new BadRequestException("Tiêu đề không được để trống.");
         }
-        if (request.getResourceType() == null) {
-            throw new BadRequestException("Loại tài liệu không được để trống.");
-        }
 
         RecoveryResource resource = new RecoveryResource();
         resource.setTitle(request.getTitle().trim());
         resource.setDescription(request.getDescription());
-        resource.setResourceType(request.getResourceType());
         resource.setCreatedBy(currentUserId);
 
-        // Upload file hoặc dùng URL
         if (file != null && !file.isEmpty()) {
-            String uploadedUrl;
-            String publicId;
-            switch (request.getResourceType()) {
-                case VIDEO -> {
-                    uploadedUrl = cloudinaryService.uploadAudio(file);
-                    publicId = extractPublicId(uploadedUrl);
-                }
-                case DOCUMENT -> {
-                    uploadedUrl = cloudinaryService.uploadDocument(file);
-                    publicId = extractPublicId(uploadedUrl);
-                }
-                default -> {
-                    uploadedUrl = cloudinaryService.uploadDocument(file);
-                    publicId = extractPublicId(uploadedUrl);
-                }
-            }
+            String uploadedUrl = uploadFile(file);
             resource.setUrl(uploadedUrl);
-            resource.setCloudinaryPublicId(publicId);
+            resource.setCloudinaryPublicId(extractPublicId(uploadedUrl));
         } else if (request.getUrl() != null && !request.getUrl().isBlank()) {
             resource.setUrl(request.getUrl().trim());
         } else {
@@ -83,8 +63,6 @@ public class RecoveryResourceService {
         }
 
         resource = resourceRepository.save(resource);
-
-        // Gắn tags
         syncResourceTags(resource.getResourceId(), request.getTagIds());
 
         return toResponse(resource);
@@ -108,21 +86,13 @@ public class RecoveryResourceService {
         if (request.getDescription() != null) {
             resource.setDescription(request.getDescription());
         }
-        if (request.getResourceType() != null) {
-            resource.setResourceType(request.getResourceType());
-        }
 
-        // Upload file mới -> xóa file cũ trên Cloudinary
         if (file != null && !file.isEmpty()) {
+            // Xóa file cũ trên Cloudinary
             if (resource.getCloudinaryPublicId() != null) {
                 try { cloudinaryService.deleteFile(resource.getCloudinaryPublicId()); } catch (Exception ignored) {}
             }
-            String uploadedUrl;
-            switch (resource.getResourceType()) {
-                case VIDEO -> uploadedUrl = cloudinaryService.uploadAudio(file);
-                case DOCUMENT -> uploadedUrl = cloudinaryService.uploadDocument(file);
-                default -> uploadedUrl = cloudinaryService.uploadDocument(file);
-            }
+            String uploadedUrl = uploadFile(file);
             resource.setUrl(uploadedUrl);
             resource.setCloudinaryPublicId(extractPublicId(uploadedUrl));
         } else if (request.getUrl() != null && !request.getUrl().isBlank()) {
@@ -145,7 +115,6 @@ public class RecoveryResourceService {
         RecoveryResource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new NotFoundException("Tài liệu không tồn tại: " + resourceId));
 
-        // Xóa file trên Cloudinary
         if (resource.getCloudinaryPublicId() != null) {
             try { cloudinaryService.deleteFile(resource.getCloudinaryPublicId()); } catch (Exception ignored) {}
         }
@@ -168,9 +137,6 @@ public class RecoveryResourceService {
         return toResponse(resource);
     }
 
-    /**
-     * Tìm tài liệu theo danh sách tagIds (phải match TẤT CẢ tags).
-     */
     public List<RecoveryResourceResponse> getResourcesByTags(List<String> tagIds) {
         if (tagIds == null || tagIds.isEmpty()) {
             return getAllResources();
@@ -183,9 +149,6 @@ public class RecoveryResourceService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Tìm tài liệu theo 1 tag (dùng cho chẩn đoán: tag nào yếu -> gợi ý tài liệu).
-     */
     public List<RecoveryResourceResponse> getResourcesByTagId(String tagId) {
         List<ResourceTag> resourceTags = resourceTagRepository.findByTagId(tagId);
         return resourceTags.stream()
@@ -196,6 +159,20 @@ public class RecoveryResourceService {
     }
 
     // ==================== HELPERS ====================
+
+    /**
+     * Upload file lên Cloudinary, tự detect loại từ content type.
+     */
+    private String uploadFile(MultipartFile file) throws IOException {
+        String contentType = file.getContentType();
+        if (contentType != null && (contentType.startsWith("audio/") || contentType.startsWith("video/"))) {
+            return cloudinaryService.uploadAudio(file);
+        } else if (contentType != null && contentType.startsWith("image/")) {
+            return cloudinaryService.uploadImage(file);
+        } else {
+            return cloudinaryService.uploadDocument(file);
+        }
+    }
 
     @Transactional
     public void syncResourceTags(String resourceId, List<String> tagIds) {
@@ -230,7 +207,6 @@ public class RecoveryResourceService {
                 .resourceId(resource.getResourceId())
                 .title(resource.getTitle())
                 .description(resource.getDescription())
-                .resourceType(resource.getResourceType())
                 .url(resource.getUrl())
                 .createdBy(resource.getCreatedBy())
                 .createdAt(resource.getCreatedAt())
@@ -240,15 +216,12 @@ public class RecoveryResourceService {
 
     private String extractPublicId(String url) {
         if (url == null) return null;
-        // Cloudinary URL: .../upload/v123456/folder/filename.ext
         int uploadIdx = url.indexOf("/upload/");
         if (uploadIdx < 0) return null;
         String afterUpload = url.substring(uploadIdx + 8);
-        // Bỏ version prefix (v123456/)
         if (afterUpload.matches("^v\\d+/.*")) {
             afterUpload = afterUpload.substring(afterUpload.indexOf('/') + 1);
         }
-        // Bỏ extension
         int dotIdx = afterUpload.lastIndexOf('.');
         return dotIdx > 0 ? afterUpload.substring(0, dotIdx) : afterUpload;
     }

@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Edit, ExternalLink, FileText, Film, Link2, Plus, Search, Trash2} from 'lucide-react';
+import {Edit, ExternalLink, Plus, Search, Trash2} from 'lucide-react';
 
 import {getExamTypes} from '../../api/examTypeApi';
 import {getTagsFlatByExamType} from '../../api/tagApi';
@@ -20,21 +20,8 @@ const cx = classNames.bind(styles);
 const emptyForm = {
   title: '',
   description: '',
-  resourceType: 'LINK',
   url: '',
   tagIds: [],
-};
-
-const TYPE_ICON = {
-  VIDEO: <Film size={16} />,
-  DOCUMENT: <FileText size={16} />,
-  LINK: <Link2 size={16} />,
-};
-
-const TYPE_LABEL = {
-  VIDEO: 'Video',
-  DOCUMENT: 'Tài liệu',
-  LINK: 'Link',
 };
 
 function RecoveryResourcesManagement() {
@@ -43,7 +30,6 @@ function RecoveryResourcesManagement() {
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [availableTags, setAvailableTags] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
@@ -53,7 +39,6 @@ function RecoveryResourcesManagement() {
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingResource, setDeletingResource] = useState(null);
 
-  // Load exam types
   useEffect(() => {
     getExamTypes()
       .then((list) => {
@@ -64,7 +49,6 @@ function RecoveryResourcesManagement() {
       .catch(() => {});
   }, []);
 
-  // Load tags khi đổi exam type
   useEffect(() => {
     if (!selectedExamTypeId) { setAvailableTags([]); return; }
     getTagsFlatByExamType(selectedExamTypeId)
@@ -72,7 +56,6 @@ function RecoveryResourcesManagement() {
       .catch(() => setAvailableTags([]));
   }, [selectedExamTypeId]);
 
-  // Load resources
   const fetchResources = useCallback(async () => {
     setLoading(true);
     setErrorMessage('');
@@ -88,23 +71,16 @@ function RecoveryResourcesManagement() {
 
   useEffect(() => { fetchResources(); }, [fetchResources]);
 
-  // Filter
   const filteredResources = useMemo(() => {
-    let list = resources;
-    if (filterType) {
-      list = list.filter((r) => r.resourceType === filterType);
-    }
     const keyword = searchTerm.trim().toLowerCase();
-    if (keyword) {
-      list = list.filter(
-        (r) =>
-          r.title.toLowerCase().includes(keyword) ||
-          (r.description || '').toLowerCase().includes(keyword) ||
-          (r.tags || []).some((t) => t.name.toLowerCase().includes(keyword)),
-      );
-    }
-    return list;
-  }, [resources, filterType, searchTerm]);
+    if (!keyword) return resources;
+    return resources.filter(
+      (r) =>
+        r.title.toLowerCase().includes(keyword) ||
+        (r.description || '').toLowerCase().includes(keyword) ||
+        (r.tags || []).some((t) => t.name.toLowerCase().includes(keyword)),
+    );
+  }, [resources, searchTerm]);
 
   const resetForm = () => {
     setFormState(emptyForm);
@@ -123,7 +99,6 @@ function RecoveryResourcesManagement() {
     setFormState({
       title: resource.title,
       description: resource.description || '',
-      resourceType: resource.resourceType,
       url: resource.url || '',
       tagIds: (resource.tags || []).map((t) => t.tagId),
     });
@@ -144,11 +119,9 @@ function RecoveryResourcesManagement() {
       setErrorMessage('Tiêu đề không được để trống.');
       return;
     }
-    if (formState.resourceType !== 'LINK' && !selectedFile && !formState.url.trim()) {
-      if (!editingId) {
-        setErrorMessage('Vui lòng upload file hoặc cung cấp URL.');
-        return;
-      }
+    if (!selectedFile && !formState.url.trim() && !editingId) {
+      setErrorMessage('Vui lòng upload file hoặc cung cấp URL.');
+      return;
     }
     setSubmitting(true);
     setErrorMessage('');
@@ -156,7 +129,6 @@ function RecoveryResourcesManagement() {
       const payload = {
         title: formState.title.trim(),
         description: formState.description.trim(),
-        resourceType: formState.resourceType,
         url: formState.url.trim() || null,
         tagIds: formState.tagIds,
       };
@@ -218,16 +190,6 @@ function RecoveryResourcesManagement() {
             <option key={et.id} value={et.id}>{et.name}</option>
           ))}
         </Form.Select>
-        <Form.Select
-          style={{maxWidth: 180}}
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-        >
-          <option value="">Tất cả loại</option>
-          <option value="VIDEO">Video</option>
-          <option value="DOCUMENT">Tài liệu</option>
-          <option value="LINK">Link</option>
-        </Form.Select>
         <div className={cx('searchBox')}>
           <Search size={16} className={cx('searchIcon')} />
           <Form.Control
@@ -270,12 +232,6 @@ function RecoveryResourcesManagement() {
               {r.description && (
                 <p className={cx('cardDescription')}>{r.description}</p>
               )}
-
-              <div className={cx('cardMeta')}>
-                <Badge bg="info" className="d-inline-flex align-items-center gap-1">
-                  {TYPE_ICON[r.resourceType]} {TYPE_LABEL[r.resourceType]}
-                </Badge>
-              </div>
 
               {r.tags && r.tags.length > 0 && (
                 <div className={cx('cardTags')}>
