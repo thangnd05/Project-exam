@@ -15,4 +15,6 @@ public interface QuestionTagRepository extends JpaRepository<QuestionTag, String
 
     void deleteByTagId(String tagId);
 
+    List<QuestionTag> findByQuestionIdIn(java.util.Collection<String> questionIds);
+
 }

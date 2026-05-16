@@ -47,4 +47,8 @@ public interface UserTestRepository extends JpaRepository<UserTest, String> {
     @Query("SELECT AVG(ut.totalScore) FROM UserTest ut WHERE ut.userId = :userId AND ut.status = :status")
     Double findAverageScoreByUserIdAndStatus(@Param("userId") String userId, @Param("status") UserTest.Status status);
 
+    long countByTestIdAndStatusAndTotalScoreLessThanEqual(String testId, UserTest.Status status, Integer score);
+
+    long countByTestIdAndStatus(String testId, UserTest.Status status);
+
 }

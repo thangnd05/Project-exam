@@ -14,6 +14,10 @@ import {
 
 import { AuthContext } from "~/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/utils/guestSession";
+import { getEnhancedResult, getGuestEnhancedResult } from "~/api/enhancedResultApi";
+import SkillBreakdownChart from "~/components/result/SkillBreakdownChart";
+import ReadinessGauge from "~/components/result/ReadinessGauge";
+import RecoveryPlan from "~/components/result/RecoveryPlan";
 import styles from "./TestResultPage.module.scss";
 
 const cx = classNames.bind(styles);
@@ -33,6 +37,8 @@ const TestResultPage = () => {
   const [testId, setTestId] = useState(null);
   const [test, setTest] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]);
+
+  const [enhanced, setEnhanced] = useState(null);
 
   const [showDetail, setShowDetail] = useState(false);
   const [canReview, setCanReview] = useState(false);
@@ -93,6 +99,16 @@ const TestResultPage = () => {
         const now = new Date();
         const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
         setCanReview(!availableTo || now > availableTo);
+
+        // 4. Fetch enhanced result (non-blocking)
+        try {
+          const enhancedRes = isGuest
+            ? await getGuestEnhancedResult(userTestId)
+            : await getEnhancedResult(userTestId);
+          setEnhanced(enhancedRes.data);
+        } catch (enhErr) {
+          console.warn("Enhanced result not available:", enhErr);
+        }
 
       } catch (err) {
         console.error(" Lỗi tải kết quả:", err);
@@ -372,6 +388,30 @@ const TestResultPage = () => {
             </button>
           </div>
         </div>
+
+        {/* ================= ENHANCED DIAGNOSIS ================= */}
+        {enhanced && (
+          <div className={cx("result-card")} style={{ marginTop: 20 }}>
+            <ReadinessGauge
+              readinessScore={enhanced.readinessScore}
+              readinessLevel={enhanced.readinessLevel}
+              percentile={enhanced.percentile}
+              passed={enhanced.passed}
+              level={enhanced.level}
+              examCategoryCode={enhanced.examCategoryCode}
+            />
+
+            <SkillBreakdownChart
+              skillBreakdown={enhanced.skillBreakdown}
+              partBreakdown={enhanced.partBreakdown}
+            />
+
+            <RecoveryPlan
+              recommendations={enhanced.recommendations}
+              readinessScore={enhanced.readinessScore}
+            />
+          </div>
+        )}
 
         {/* ================= DETAIL SECTION ================= */}
         {showDetail && test && (

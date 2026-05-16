@@ -19,4 +19,6 @@ public interface ResourceTagRepository extends JpaRepository<ResourceTag, String
     @Query("SELECT rt.resourceId FROM ResourceTag rt WHERE rt.tagId IN :tagIds GROUP BY rt.resourceId HAVING COUNT(DISTINCT rt.tagId) = :tagCount")
     List<String> findResourceIdsMatchingAllTags(List<String> tagIds, long tagCount);
 
+    List<ResourceTag> findByTagIdIn(java.util.Collection<String> tagIds);
+
 }

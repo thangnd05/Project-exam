@@ -2,8 +2,10 @@ package com.project_exam.backend.modules.assessment.attempt.controller;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerRequest;
 import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryDto;
+import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerResponse;
 import com.project_exam.backend.modules.assessment.attempt.service.UserAnswerService;
+import com.project_exam.backend.modules.assessment.attempt.service.EnhancedResultService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,6 +21,7 @@ import java.util.List;
 public class UserAnswerController {
 
     private final UserAnswerService userAnswerService;
+    private final EnhancedResultService enhancedResultService;
     private final AuthUtils authUtils;
 
     @GetMapping
@@ -94,6 +97,13 @@ public class UserAnswerController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/user-test/{userTestId}/result/enhanced")
+    public ResponseEntity<EnhancedResultDto> getEnhancedResult(
+            @PathVariable String userTestId, HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(enhancedResultService.getEnhancedResult(userTestId, userId));
+    }
+
     // ===== GUEST FLOW =====
 
     @PostMapping("/guest/batch")
@@ -118,6 +128,14 @@ public class UserAnswerController {
             @RequestHeader("X-Guest-Session") String guestSessionId
     ) {
         return ResponseEntity.ok(userAnswerService.getGuestResultSummary(userTestId, guestSessionId));
+    }
+
+    @GetMapping("/guest/user-test/{userTestId}/result/enhanced")
+    public ResponseEntity<EnhancedResultDto> getGuestEnhancedResult(
+            @PathVariable String userTestId,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        return ResponseEntity.ok(enhancedResultService.getGuestEnhancedResult(userTestId, guestSessionId));
     }
 
 }
