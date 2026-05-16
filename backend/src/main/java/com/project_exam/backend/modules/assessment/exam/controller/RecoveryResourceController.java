@@ -1,0 +1,99 @@
+package com.project_exam.backend.modules.assessment.exam.controller;
+
+import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceRequest;
+import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResponse;
+import com.project_exam.backend.modules.assessment.exam.service.RecoveryResourceService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/recovery-resources")
+@AllArgsConstructor
+public class RecoveryResourceController {
+
+    private final RecoveryResourceService resourceService;
+    private final ObjectMapper objectMapper;
+
+    // =================== CREATE ===================
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<RecoveryResourceResponse> createResource(
+            @RequestPart("request") String requestJson,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpServletRequest httpRequest
+    ) throws IOException {
+        RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(resourceService.createResource(request, file, httpRequest));
+    }
+
+    // =================== UPDATE ===================
+
+    @PutMapping(value = "/{resourceId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<RecoveryResourceResponse> updateResource(
+            @PathVariable String resourceId,
+            @RequestPart("request") String requestJson,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpServletRequest httpRequest
+    ) throws IOException {
+        RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
+        return ResponseEntity.ok(resourceService.updateResource(resourceId, request, file, httpRequest));
+    }
+
+    @PutMapping("/{resourceId}")
+    public ResponseEntity<RecoveryResourceResponse> updateResourceJson(
+            @PathVariable String resourceId,
+            @RequestBody RecoveryResourceRequest request,
+            HttpServletRequest httpRequest
+    ) throws IOException {
+        return ResponseEntity.ok(resourceService.updateResource(resourceId, request, null, httpRequest));
+    }
+
+    // =================== DELETE ===================
+
+    @DeleteMapping("/{resourceId}")
+    public ResponseEntity<Void> deleteResource(@PathVariable String resourceId) {
+        resourceService.deleteResource(resourceId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // =================== GET ===================
+
+    @GetMapping
+    public ResponseEntity<List<RecoveryResourceResponse>> getAllResources() {
+        return ResponseEntity.ok(resourceService.getAllResources());
+    }
+
+    @GetMapping("/{resourceId}")
+    public ResponseEntity<RecoveryResourceResponse> getResourceById(@PathVariable String resourceId) {
+        return ResponseEntity.ok(resourceService.getResourceById(resourceId));
+    }
+
+    /**
+     * Tìm tài liệu theo tag (dùng cho chẩn đoán: tag yếu -> gợi ý tài liệu ôn tập).
+     */
+    @GetMapping("/by-tag/{tagId}")
+    public ResponseEntity<List<RecoveryResourceResponse>> getResourcesByTag(@PathVariable String tagId) {
+        return ResponseEntity.ok(resourceService.getResourcesByTagId(tagId));
+    }
+
+    /**
+     * Tìm tài liệu match tất cả tags (query param: ?tagIds=id1,id2,id3).
+     */
+    @GetMapping("/by-tags")
+    public ResponseEntity<List<RecoveryResourceResponse>> getResourcesByTags(
+            @RequestParam List<String> tagIds
+    ) {
+        return ResponseEntity.ok(resourceService.getResourcesByTags(tagIds));
+    }
+
+}

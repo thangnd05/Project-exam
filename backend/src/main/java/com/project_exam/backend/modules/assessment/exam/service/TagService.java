@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.TagRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionTagRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -22,6 +23,7 @@ public class TagService {
 
     private final TagRepository tagRepository;
     private final QuestionTagRepository questionTagRepository;
+    private final ResourceTagRepository resourceTagRepository;
     private final ExamTypeRepository examTypeRepository;
 
     // ==================== CRUD ====================
@@ -92,6 +94,7 @@ public class TagService {
             deleteTagRecursive(child.getTagId());
         }
         questionTagRepository.deleteByTagId(tagId);
+        resourceTagRepository.deleteByTagId(tagId);
         tagRepository.deleteById(tagId);
     }
 
