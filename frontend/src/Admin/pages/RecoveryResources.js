@@ -16,6 +16,7 @@ import RecoveryResourceFormModal from '../../components/modals/RecoveryResourceF
 import styles from './RecoveryResources.module.scss';
 
 const cx = classNames.bind(styles);
+const API_BASE = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
 
 const emptyForm = {
   title: '',
@@ -271,19 +272,19 @@ function RecoveryResourcesManagement() {
                 <span>{formatDate(r.createdAt)}</span>
                 <div className="d-flex gap-3">
                   <a
-                    href={r.url}
+                    href={`${API_BASE}/api/recovery-resources/${r.resourceId}/view`}
                     target="_blank"
                     rel="noreferrer"
                     className={cx('viewLink')}
                   >
-                    Xem <ExternalLink size={14} />
+                    <ExternalLink size={14} /> Xem
                   </a>
                   <button
                     type="button"
                     className={cx('viewLink')}
                     onClick={() => handleDownload(r.url, r.originalFileName)}
                   >
-                    Tải về <Download size={14} />
+                    <Download size={14} /> Tải về
                   </button>
                 </div>
               </div>

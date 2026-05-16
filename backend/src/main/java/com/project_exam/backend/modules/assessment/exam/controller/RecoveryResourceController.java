@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.exam.service.RecoveryResource
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URLConnection;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/recovery-resources")
@@ -94,6 +99,43 @@ public class RecoveryResourceController {
             @RequestParam List<String> tagIds
     ) {
         return ResponseEntity.ok(resourceService.getResourcesByTags(tagIds));
+    }
+
+    /**
+     * Proxy xem file: fetch từ Cloudinary, trả về đúng Content-Type + inline
+     * để trình duyệt mở trực tiếp (PDF render, ảnh hiện, audio/video phát).
+     */
+    @GetMapping("/{resourceId}/view")
+    public ResponseEntity<byte[]> viewResource(@PathVariable String resourceId) throws IOException {
+        RecoveryResourceResponse resource = resourceService.getResourceById(resourceId);
+        String url = resource.getUrl();
+        String fileName = resource.getOriginalFileName();
+
+        // Detect content type từ tên file gốc
+        String contentType = null;
+        if (fileName != null) {
+            contentType = URLConnection.guessContentTypeFromName(fileName);
+        }
+        if (contentType == null && url != null) {
+            contentType = URLConnection.guessContentTypeFromName(url);
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        // Fetch file từ Cloudinary
+        try (InputStream in = URI.create(url).toURL().openStream()) {
+            byte[] data = in.readAllBytes();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(contentType));
+            headers.setContentLength(data.length);
+            // inline = mở trực tiếp, không trigger download
+            headers.set(HttpHeaders.CONTENT_DISPOSITION,
+                    "inline; filename=\"" + (fileName != null ? fileName : "file") + "\"");
+
+            return new ResponseEntity<>(data, headers, HttpStatus.OK);
+        }
     }
 
 }
