@@ -26,6 +26,7 @@ import {
   Library,
   Tag,
   Tags,
+  BookOpen,
 } from 'lucide-react';
 import routes from '~/config/Routes';
 import styles from './AdminLayout.module.scss';
@@ -64,6 +65,7 @@ const adminRouteGroups = [
     label: 'Nội dung',
     items: [
       {path: routes.adminTests, icon: <FileStack size={20} />, label: 'Quản lý đề thi'},
+      {path: routes.adminRecoveryResources, icon: <BookOpen size={20} />, label: 'Kho tài liệu'},
     ],
   },
   {

@@ -49,6 +49,7 @@ import CategoriesManagement from '~/Admin/pages/Categories';
 import PostsManagement from '~/Admin/pages/Posts';
 import QuestionCollectionsManagement from '~/Admin/pages/QuestionCollections';
 import TagsManagement from '~/Admin/pages/Tags';
+import RecoveryResourcesManagement from '~/Admin/pages/RecoveryResources';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -86,6 +87,7 @@ export const adminRoutes = [
   {path: routes.adminPosts, component: PostsManagement},
   {path: routes.adminQuestionCollections, component: QuestionCollectionsManagement},
   {path: routes.adminTags, component: TagsManagement},
+  {path: routes.adminRecoveryResources, component: RecoveryResourcesManagement},
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập

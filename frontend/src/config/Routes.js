@@ -23,6 +23,7 @@ const routes = {
   adminEvaluations: '/admin/evaluations',
   adminExamTypes: '/admin/exam-types',
   adminTags: '/admin/tags',
+  adminRecoveryResources: '/admin/recovery-resources',
   adminExamCategories: '/admin/exam-categories',
   adminExamParts: '/admin/exam-parts',
   adminClasses: '/admin/classes',
