@@ -50,6 +50,8 @@ import PostsManagement from '~/Admin/pages/Posts';
 import QuestionCollectionsManagement from '~/Admin/pages/QuestionCollections';
 import TagsManagement from '~/Admin/pages/Tags';
 import RecoveryResourcesManagement from '~/Admin/pages/RecoveryResources';
+import MilestonesManagement from '~/Admin/pages/Milestones';
+import UserTargetTestPage from '~/pages/user/UserTargetTestPage';
 
 // ✅ Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -88,6 +90,7 @@ export const adminRoutes = [
   {path: routes.adminQuestionCollections, component: QuestionCollectionsManagement},
   {path: routes.adminTags, component: TagsManagement},
   {path: routes.adminRecoveryResources, component: RecoveryResourcesManagement},
+  {path: routes.adminMilestones, component: MilestonesManagement},
 ];
 
 // ✅ Các trang yêu cầu phải đăng nhập
@@ -109,6 +112,7 @@ export const privateRoutes = [
   {path: routes.createTestFromBank, component: CreateTestFromBankPage},
   {path: routes.personalQuestionBank, component: PersonalQuestionBankPage},
   {path: routes.profile, component: ProfileOverviewPage},
+  {path: routes.myTarget, component: UserTargetTestPage},
   {path: routes.myEvaluations, component: MyEvaluationsPage},
   {path: routes.myPosts, component: MyPostsPage},
   {path: routes.savedPosts, component: SavedPostsPage},

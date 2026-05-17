@@ -27,6 +27,7 @@ import {
   Tag,
   Tags,
   BookOpen,
+  Target,
 } from 'lucide-react';
 import routes from '~/config/Routes';
 import styles from './AdminLayout.module.scss';
@@ -59,6 +60,7 @@ const adminRouteGroups = [
       {path: routes.adminSkills, icon: <Brain size={20} />, label: 'Kỹ năng'},
       {path: routes.adminQuestionCollections, icon: <Library size={20} />, label: 'Bộ sưu tập câu hỏi'},
       {path: routes.adminScoringConversion, icon: <Calculator size={20} />, label: 'Quy đổi điểm'},
+      {path: routes.adminMilestones, icon: <Target size={20} />, label: 'Mốc điểm mục tiêu'},
     ],
   },
   {

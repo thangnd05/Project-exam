@@ -17,6 +17,7 @@ export { default as LoginAudit } from './pages/LoginAudit';
 export { default as TestsManagement } from './pages/Tests';
 export { default as TagsManagement } from './pages/Tags';
 export { default as RecoveryResourcesManagement } from './pages/RecoveryResources';
+export { default as MilestonesManagement } from './pages/Milestones';
 
 // Export fake data for use in components
 export * from './data/fakeData';
