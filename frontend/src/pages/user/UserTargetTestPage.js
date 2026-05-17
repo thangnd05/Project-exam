@@ -98,11 +98,10 @@ function UserTargetTestPage() {
       const data = await getUserTarget(selectedExamTypeId);
       setCurrentTarget(data);
       setTargetScore(String(data.targetScore || ''));
+      // Parts đã lưu sẵn — load vào customParts để hiện giá trị user đã set
       const cp = {};
       (data.partRequirements || []).forEach((p) => {
-        if (p.customized) {
-          cp[p.examPartId] = p.requiredPercentage;
-        }
+        cp[p.examPartId] = p.requiredPercentage;
       });
       setCustomParts(cp);
     } catch {
@@ -148,18 +147,18 @@ function UserTargetTestPage() {
     setLoading(true);
     setMessage('');
     try {
-      const customPartsArray = Object.entries(customParts)
-        .filter(([, val]) => val !== '' && val !== undefined)
-        .map(([examPartId, customPercentage]) => ({
-          examPartId,
-          customPercentage: Number(customPercentage),
-        }));
+      // Gửi TẤT CẢ parts: custom override hoặc default từ milestone/chia đều
+      const allParts = partRequirements.map((pr) => ({
+        examPartId: pr.examPartId,
+        customPercentage: customParts[pr.examPartId] !== undefined
+          ? Number(customParts[pr.examPartId])
+          : pr.requiredPercentage,
+      }));
 
       const result = await createOrUpdateUserTarget({
         examTypeId: selectedExamTypeId,
         targetScore: Number(targetScore),
-        examTargetMilestoneId: matchedMilestone?.examTargetMilestoneId || null,
-        customParts: customPartsArray.length > 0 ? customPartsArray : null,
+        customParts: allParts,
       });
       setCurrentTarget(result);
       setMessage('Đã lưu mục tiêu thành công!');
@@ -207,7 +206,7 @@ function UserTargetTestPage() {
       <p className={cx('subtitle')}>
         Nhập điểm mục tiêu. Nếu trùng mốc admin đã cấu hình, % từng phần sẽ được gợi ý
         tự động. Nếu không, hệ thống chia đều % và khuyến khích người dùng tìm hiểu kỹ
-        mục tiêu bản thân sau đó chỉnh lại số câu.
+        mục tiêu bản thân sau đó chỉnh lại yêu cầu từng phần thi.
       </p>
 
       {/* Chọn exam type */}
@@ -397,9 +396,6 @@ function UserTargetTestPage() {
         <div className={cx('currentTarget')}>
           <p className={cx('currentTargetTitle')}>
             Mục tiêu hiện tại: {currentTarget.targetScore} điểm
-            {currentTarget.milestoneMatched && currentTarget.milestoneDescription &&
-              ` — ${currentTarget.milestoneDescription}`}
-            {!currentTarget.milestoneMatched && ' (tự do)'}
           </p>
           <div className={cx('currentTargetParts')}>
             {(currentTarget.partRequirements || []).map((p) => {
@@ -408,7 +404,7 @@ function UserTargetTestPage() {
               return (
                 <span
                   key={p.examPartId}
-                  className={cx('partBadge', { customized: p.customized })}
+                  className={cx('partBadge')}
                 >
                   {getPartName(p.examPartId)}: {num}/{total} ({p.requiredPercentage}%)
                 </span>

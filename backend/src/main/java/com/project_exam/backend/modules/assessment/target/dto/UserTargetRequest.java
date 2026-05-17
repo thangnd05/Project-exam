@@ -13,7 +13,5 @@ public class UserTargetRequest {
     @NotNull
     private Integer targetScore;
 
-    private String examTargetMilestoneId; // optional — null nếu user nhập score tự do
-
     private List<UserPartRequirementDto> customParts;
 }

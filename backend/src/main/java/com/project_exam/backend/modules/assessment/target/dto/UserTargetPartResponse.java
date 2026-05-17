@@ -6,5 +6,4 @@ import lombok.Data;
 public class UserTargetPartResponse {
     private String examPartId;
     private Integer requiredPercentage;
-    private boolean customized;
 }

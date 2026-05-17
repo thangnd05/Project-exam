@@ -10,9 +10,5 @@ public class UserTargetResponse {
     private String userId;
     private String examTypeId;
     private Integer targetScore;
-    private String examTargetMilestoneId;
-    private Integer milestoneScore;
-    private String milestoneDescription;
-    private boolean milestoneMatched; // true nếu target trùng với milestone admin
     private List<UserTargetPartResponse> partRequirements;
 }

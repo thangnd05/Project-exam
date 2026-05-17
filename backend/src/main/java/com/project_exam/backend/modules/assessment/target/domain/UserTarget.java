@@ -27,9 +27,6 @@ public class UserTarget {
     @Column(name = "target_score", nullable = false)
     private Integer targetScore;
 
-    @Column(name = "exam_target_milestone_id")
-    private String examTargetMilestoneId; // nullable — null nếu user nhập score tự do
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
