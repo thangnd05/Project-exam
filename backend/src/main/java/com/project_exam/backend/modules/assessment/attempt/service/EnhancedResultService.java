@@ -12,6 +12,10 @@ import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
+import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
+import com.project_exam.backend.modules.assessment.target.repository.UserTargetPartRepository;
+import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
+import com.project_exam.backend.modules.assessment.target.domain.UserTargetPart;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import lombok.AllArgsConstructor;
@@ -41,6 +45,8 @@ public class EnhancedResultService {
     private final RecoveryResourceRepository recoveryResourceRepository;
     private final ScoringConversionRepository scoringConversionRepository;
     private final TagRepository tagRepository;
+    private final UserTargetRepository userTargetRepository;
+    private final UserTargetPartRepository userTargetPartRepository;
 
     public EnhancedResultDto getEnhancedResult(String userTestId, String currentUserId) {
         UserTest userTest = userTestRepository.findById(userTestId)
@@ -164,11 +170,24 @@ public class EnhancedResultService {
                 : tagRepository.findAllById(allTagIds).stream()
                 .collect(Collectors.toMap(Tag::getTagId, t -> t));
 
-        // 7. Build Part breakdown (tầng 2.5 + tầng 3)
-        List<PartBreakdownDto> partBreakdown = buildPartBreakdown(
-                questionMap, correctnessMap, examPartMap, skillMap, tagsByQuestion, tagMap);
+        // 7. Load Target
+        Optional<UserTarget> userTargetOpt = test.getExamTypeId() != null ?
+                userTargetRepository.findByUserIdAndExamTypeId(userTest.getUserId(), test.getExamTypeId()) :
+                Optional.empty();
 
-        // 8. Build Skill breakdown (tầng 2) - aggregate from parts
+        Map<String, Integer> targetParts = new HashMap<>();
+        if (userTargetOpt.isPresent()) {
+            List<UserTargetPart> targetPartEntities = userTargetPartRepository.findByUserTargetId(userTargetOpt.get().getUserTargetId());
+            for (UserTargetPart p : targetPartEntities) {
+                targetParts.put(p.getExamPartId(), p.getCustomPercentage());
+            }
+        }
+
+        // 8. Build Part breakdown (tầng 2.5 + tầng 3)
+        List<PartBreakdownDto> partBreakdown = buildPartBreakdown(
+                questionMap, correctnessMap, examPartMap, skillMap, tagsByQuestion, tagMap, targetParts);
+
+        // 9. Build Skill breakdown (tầng 2) - aggregate from parts
         List<SkillBreakdownDto> skillBreakdown = buildSkillBreakdown(
                 partBreakdown, test.getExamTypeId(), skillMap);
 
@@ -190,7 +209,7 @@ public class EnhancedResultService {
         // 12. Pass/fail
         boolean passed = overallPercentage >= 70;
 
-        // 13. Build recovery recommendations
+        // 14. Build recovery recommendations
         List<RecoveryRecommendationDto> recommendations = buildRecommendations(
                 partBreakdown, tagMap, allTagIds);
 
@@ -198,7 +217,10 @@ public class EnhancedResultService {
                 .correct(normalizedCorrect)
                 .wrong(totalWrong)
                 .total(totalQuestions)
-                .totalScore(userTest.getTotalScore() != null ? userTest.getTotalScore() : 0)                .examCategoryCode(examCategoryCode)
+                .totalScore(userTest.getTotalScore() != null ? userTest.getTotalScore() : 0)
+                .examCategoryCode(examCategoryCode)
+                .hasTarget(userTargetOpt.isPresent())
+                .targetScore(userTargetOpt.map(UserTarget::getTargetScore).orElse(null))
                 .skillBreakdown(skillBreakdown)
                 .partBreakdown(partBreakdown)
                 .readinessScore(readinessScore)
@@ -229,7 +251,8 @@ public class EnhancedResultService {
             Map<String, ExamPart> examPartMap,
             Map<String, Skill> skillMap,
             Map<String, List<QuestionTag>> tagsByQuestion,
-            Map<String, Tag> tagMap) {
+            Map<String, Tag> tagMap,
+            Map<String, Integer> targetParts) {
 
         // Group questions by examPartId
         Map<String, List<String>> questionsByPart = new HashMap<>();
@@ -263,6 +286,14 @@ public class EnhancedResultService {
 
             int total = correct + wrong;
             double percentage = total > 0 ? (double) correct / total * 100 : 0;
+            double percentageRounded = Math.round(percentage * 10.0) / 10.0;
+
+            Double targetPercentage = null;
+            Boolean isTargetMet = null;
+            if (targetParts.containsKey(partId)) {
+                targetPercentage = targetParts.get(partId).doubleValue();
+                isTargetMet = percentageRounded >= targetPercentage;
+            }
 
             // Tầng 3: Tag breakdown cho tất cả câu hỏi trong part
             List<TagBreakdownDto> weakTags = buildTagBreakdown(
@@ -276,7 +307,9 @@ public class EnhancedResultService {
                     .correct(correct)
                     .wrong(wrong)
                     .total(total)
-                    .percentage(Math.round(percentage * 10.0) / 10.0)
+                    .percentage(percentageRounded)
+                    .targetPercentage(targetPercentage)
+                    .isTargetMet(isTargetMet)
                     .weakTags(weakTags)
                     .build());
         }
@@ -429,8 +462,19 @@ public class EnhancedResultService {
 
         for (PartBreakdownDto part : partBreakdown) {
             if (part.getWeakTags() == null) continue;
+            
+            boolean shouldFocus = false;
+            if (part.getIsTargetMet() != null) {
+                shouldFocus = !part.getIsTargetMet();
+            } else {
+                shouldFocus = part.getPercentage() < 60;
+            }
+
+            if (!shouldFocus) continue;
+
             for (TagBreakdownDto tag : part.getWeakTags()) {
-                if (tag.getPercentage() < 60) {
+                double threshold = part.getTargetPercentage() != null ? part.getTargetPercentage() : 60.0;
+                if (tag.getPercentage() < threshold) {
                     weakTagIds.add(tag.getTagId());
                     tagToSkillName.put(tag.getTagId(), part.getSkillName());
                 }

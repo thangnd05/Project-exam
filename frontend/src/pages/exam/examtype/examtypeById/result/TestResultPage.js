@@ -405,6 +405,9 @@ const TestResultPage = () => {
                   passed={enhanced.passed}
                   level={enhanced.level}
                   examCategoryCode={enhanced.examCategoryCode}
+                  hasTarget={enhanced.hasTarget}
+                  targetScore={enhanced.targetScore}
+                  totalScore={enhanced.totalScore}
                 />
 
                 <SkillBreakdownChart
@@ -415,6 +418,7 @@ const TestResultPage = () => {
                 <RecoveryPlan
                   recommendations={enhanced.recommendations}
                   readinessScore={enhanced.readinessScore}
+                  hasTarget={enhanced.hasTarget}
                 />
               </div>
             </div>

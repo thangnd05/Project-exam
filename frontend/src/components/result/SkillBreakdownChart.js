@@ -7,7 +7,9 @@ const getBarColor = (percentage) => {
   return '#ef4444';
 };
 
-const getStatusIcon = (percentage) => {
+const getStatusIcon = (percentage, isTargetMet) => {
+  if (isTargetMet === true) return '✅';
+  if (isTargetMet === false) return '❌';
   if (percentage >= 80) return '✅';
   if (percentage >= 60) return '⚠️';
   return '❌';
@@ -81,8 +83,16 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
               >
                 <span>{part.partName}</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ color: getBarColor(part.percentage) }}>
-                    {part.correct}/{part.total} ({part.percentage}%) {getStatusIcon(part.percentage)}
+                  <span style={{ color: part.isTargetMet != null ? (part.isTargetMet ? '#22c55e' : '#ef4444') : getBarColor(part.percentage) }}>
+                    {part.correct}/{part.total} ({part.percentage}%)
+                    {part.targetPercentage != null && (
+                      <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 500 }}>
+                        {part.isTargetMet 
+                          ? `(Đạt mục tiêu ${part.targetPercentage}%)` 
+                          : `(Cần thêm ${Math.max(0, (part.targetPercentage - part.percentage)).toFixed(1).replace(/\\.0$/, '')}% để đạt ${part.targetPercentage}%)`}
+                      </span>
+                    )}
+                    {' '}{getStatusIcon(part.percentage, part.isTargetMet)}
                   </span>
                   {part.weakTags?.length > 0 && (
                     expandedParts[part.examPartId] ? <IoChevronUp size={16} /> : <IoChevronDown size={16} />
@@ -92,15 +102,29 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
 
               {/* Part progress bar */}
               <div style={{
-                background: '#e2e8f0', borderRadius: 6, height: 6, overflow: 'hidden',
+                background: '#e2e8f0', borderRadius: 6, height: 6, position: 'relative',
                 marginTop: 4,
               }}>
                 <div style={{
                   width: `${Math.min(part.percentage, 100)}%`,
-                  background: getBarColor(part.percentage),
+                  background: part.isTargetMet != null ? (part.isTargetMet ? '#22c55e' : '#ef4444') : getBarColor(part.percentage),
                   height: '100%', borderRadius: 6,
                   transition: 'width 0.6s ease',
                 }} />
+                {part.targetPercentage != null && (
+                  <div
+                    title={`Mục tiêu: ${part.targetPercentage}%`}
+                    style={{
+                      position: 'absolute',
+                      top: -3,
+                      bottom: -3,
+                      width: 2,
+                      background: '#1e293b',
+                      left: `${part.targetPercentage}%`,
+                      zIndex: 1,
+                    }}
+                  />
+                )}
               </div>
 
               {/* Tầng 3: Tag breakdown */}
@@ -118,8 +142,16 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
                       padding: '4px 0', fontSize: 13, color: '#475569',
                     }}>
                       <span>{tag.tagName}</span>
-                      <span style={{ color: getBarColor(tag.percentage), fontWeight: 600 }}>
-                        {tag.correct}/{tag.total} ({tag.percentage}%) {getStatusIcon(tag.percentage)}
+                      <span style={{ color: part.isTargetMet != null ? (tag.percentage >= part.targetPercentage ? '#22c55e' : '#ef4444') : getBarColor(tag.percentage), fontWeight: 600 }}>
+                        {tag.correct}/{tag.total} ({tag.percentage}%)
+                        {part.targetPercentage != null && (
+                          <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 500 }}>
+                            {tag.percentage >= part.targetPercentage 
+                              ? `(Đạt mục tiêu ${part.targetPercentage}%)` 
+                              : `(Cần thêm ${Math.max(0, (part.targetPercentage - tag.percentage)).toFixed(1).replace(/\\.0$/, '')}% để đạt ${part.targetPercentage}%)`}
+                          </span>
+                        )}
+                        {' '}{getStatusIcon(tag.percentage, part.isTargetMet != null ? tag.percentage >= part.targetPercentage : undefined)}
                       </span>
                     </div>
                   ))}

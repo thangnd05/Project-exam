@@ -18,5 +18,7 @@ public class PartBreakdownDto {
     private int wrong;
     private int total;
     private double percentage;
+    private Double targetPercentage; // Nullable if no target is set
+    private Boolean isTargetMet; // Nullable if no target is set
     private List<TagBreakdownDto> weakTags;
 }

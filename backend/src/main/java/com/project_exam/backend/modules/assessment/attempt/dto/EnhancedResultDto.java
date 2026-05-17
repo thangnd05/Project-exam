@@ -38,6 +38,10 @@ public class EnhancedResultDto {
     // Quick Challenge level
     private String level;
 
+    // Target tracking
+    private boolean hasTarget;
+    private Integer targetScore;
+
     // Recovery recommendations
     private List<RecoveryRecommendationDto> recommendations;
 }

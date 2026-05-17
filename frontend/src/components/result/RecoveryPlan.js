@@ -1,6 +1,6 @@
 import { IoBookOutline, IoOpenOutline } from 'react-icons/io5';
 
-function RecoveryPlan({ recommendations = [], readinessScore }) {
+function RecoveryPlan({ recommendations = [], readinessScore, hasTarget }) {
   if (!recommendations.length) return null;
 
   // Group by skillName
@@ -16,10 +16,15 @@ function RecoveryPlan({ recommendations = [], readinessScore }) {
       <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: '#1e293b' }}>
         🎯 Việc cần làm ngay
       </h3>
-      {readinessScore != null && readinessScore < 85 && (
+      {readinessScore != null && readinessScore < 85 && !hasTarget && (
         <p style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>
           Mục tiêu: tăng readiness từ <strong>{readinessScore}%</strong> lên{' '}
           <strong>{Math.min(readinessScore + 10, 100)}%</strong>
+        </p>
+      )}
+      {hasTarget && recommendations.length > 0 && (
+        <p style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>
+          <strong>Mục tiêu của bạn:</strong> Lấp đầy khoảng trống kiến thức để đạt target. Các tài liệu dưới đây được gợi ý dựa trên những phần thi bạn chưa đạt mục tiêu đề ra.
         </p>
       )}
 

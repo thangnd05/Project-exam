@@ -11,7 +11,8 @@ const CHALLENGE_LEVEL_CONFIG = {
   ADVANCED: { color: '#22c55e', bg: '#f0fdf4', label: 'Nâng cao' },
 };
 
-function ReadinessGauge({ readinessScore, readinessLevel, percentile, passed, level, examCategoryCode }) {
+
+function ReadinessGauge({ readinessScore, readinessLevel, percentile, passed, level, examCategoryCode, hasTarget, targetScore, totalScore }) {
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
 
   if (isQuickChallenge && level) {
@@ -41,12 +42,35 @@ function ReadinessGauge({ readinessScore, readinessLevel, percentile, passed, le
     );
   }
 
-  const cfg = LEVEL_CONFIG[readinessLevel] || LEVEL_CONFIG.NOT_READY;
-
-  // Circular gauge
+  // Circular gauge config
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
-  const progress = (readinessScore / 100) * circumference;
+
+  let cfg = LEVEL_CONFIG[readinessLevel] || LEVEL_CONFIG.NOT_READY;
+  let displayValue = `${readinessScore}%`;
+  let displayLabel = "Readiness";
+  let gaugePercentage = readinessScore;
+  let customTitle = cfg.label;
+  let customMessage = cfg.message;
+
+  if (hasTarget && targetScore) {
+    const isTargetMet = totalScore >= targetScore;
+    gaugePercentage = Math.min(100, Math.round((totalScore / targetScore) * 100));
+    displayValue = `${totalScore}/${targetScore}`;
+    displayLabel = "Mục tiêu";
+
+    if (isTargetMet) {
+      cfg = LEVEL_CONFIG.READY;
+      customTitle = 'Đạt mục tiêu!';
+      customMessage = `Chúc mừng! Bạn đã đạt mức điểm mục tiêu ${targetScore} đề ra.`;
+    } else {
+      cfg = LEVEL_CONFIG.NEEDS_IMPROVEMENT;
+      customTitle = 'Chưa đạt mục tiêu';
+      customMessage = `Bạn còn thiếu ${targetScore - totalScore} điểm nữa để đạt mục tiêu.`;
+    }
+  }
+
+  const progress = (gaugePercentage / 100) * circumference;
 
   return (
     <div style={{
@@ -66,23 +90,23 @@ function ReadinessGauge({ readinessScore, readinessLevel, percentile, passed, le
             transform="rotate(-90 65 65)"
             style={{ transition: 'stroke-dashoffset 1s ease' }}
           />
-          <text x="65" y="60" textAnchor="middle" fontSize="28" fontWeight="800" fill={cfg.color}>
-            {readinessScore}%
+          <text x="65" y="60" textAnchor="middle" fontSize={hasTarget ? "22" : "28"} fontWeight="800" fill={cfg.color}>
+            {displayValue}
           </text>
           <text x="65" y="80" textAnchor="middle" fontSize="11" fill="#64748b">
-            Readiness
+            {displayLabel}
           </text>
         </svg>
 
         {/* Info */}
         <div style={{ textAlign: 'left' }}>
           <h3 style={{ fontSize: 20, fontWeight: 700, color: cfg.color, marginBottom: 4 }}>
-            {cfg.label}
+            {customTitle}
           </h3>
           <p style={{ fontSize: 14, color: '#475569', maxWidth: 280, marginBottom: 8 }}>
-            {cfg.message}
+            {customMessage}
           </p>
-          {passed != null && (
+          {passed != null && !hasTarget && (
             <span style={{
               display: 'inline-block', padding: '4px 12px', borderRadius: 20,
               fontSize: 13, fontWeight: 700,
