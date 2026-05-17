@@ -29,7 +29,7 @@ function RecoveryPlan({ recommendations = [], readinessScore }) {
             fontSize: 14, fontWeight: 600, color: '#475569',
             marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid #e2e8f0',
           }}>
-            {skillName}
+            Tài liệu {skillName}
           </p>
 
           {recs.map((rec, idx) => (
@@ -46,14 +46,17 @@ function RecoveryPlan({ recommendations = [], readinessScore }) {
                 <p style={{ fontWeight: 600, fontSize: 14, color: '#1e293b', marginBottom: 2 }}>
                   {rec.resourceTitle}
                 </p>
-                {rec.tagName && (
-                  <span style={{
-                    display: 'inline-block', fontSize: 11, padding: '2px 8px',
-                    background: '#ede9fe', color: '#7c3aed', borderRadius: 12,
-                    marginBottom: 4,
-                  }}>
-                    {rec.tagName}
-                  </span>
+                {rec.tagNames && rec.tagNames.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 4 }}>
+                    {rec.tagNames.map((tag, i) => (
+                      <span key={i} style={{
+                        display: 'inline-block', fontSize: 11, padding: '2px 8px',
+                        background: '#ede9fe', color: '#7c3aed', borderRadius: 12,
+                      }}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 )}
                 {rec.resourceDescription && (
                   <p style={{ fontSize: 13, color: '#64748b', marginBottom: 0 }}>

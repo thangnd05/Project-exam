@@ -452,19 +452,30 @@ public class EnhancedResultService {
                 .findAllById(resourceIds).stream()
                 .collect(Collectors.toMap(RecoveryResource::getResourceId, r -> r));
 
-        // Build recommendations (deduplicate by resourceId)
+        // Build recommendations (deduplicate by resourceId, collect all tags)
         Map<String, RecoveryRecommendationDto> seen = new LinkedHashMap<>();
         for (ResourceTag rt : resourceTags) {
-            if (seen.containsKey(rt.getResourceId())) continue;
             RecoveryResource resource = resourceMap.get(rt.getResourceId());
             if (resource == null) continue;
 
             Tag tag = tagMap.get(rt.getTagId());
+            String tagName = tag != null ? tag.getName() : "";
+
+            if (seen.containsKey(rt.getResourceId())) {
+                RecoveryRecommendationDto existing = seen.get(rt.getResourceId());
+                if (!tagName.isEmpty() && !existing.getTagNames().contains(tagName)) {
+                    existing.getTagNames().add(tagName);
+                }
+                continue;
+            }
+
             String skillName = tagToSkillName.getOrDefault(rt.getTagId(), "");
+            List<String> tagNames = new ArrayList<>();
+            if (!tagName.isEmpty()) tagNames.add(tagName);
 
             seen.put(rt.getResourceId(), RecoveryRecommendationDto.builder()
                     .skillName(skillName)
-                    .tagName(tag != null ? tag.getName() : "")
+                    .tagNames(tagNames)
                     .resourceId(resource.getResourceId())
                     .resourceTitle(resource.getTitle())
                     .resourceUrl(resource.getUrl())
