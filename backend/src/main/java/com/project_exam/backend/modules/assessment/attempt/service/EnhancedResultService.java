@@ -214,6 +214,7 @@ public class EnhancedResultService {
                 .totalScore("QUICK_CHALLENGE".equals(examCategoryCode) ? null
                         : (userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L))
                 .examCategoryCode(examCategoryCode)
+                .examTypeId(test.getExamTypeId())
                 .hasTarget(userTargetOpt.isPresent())
                 .targetScore(userTargetOpt.map(UserTarget::getTargetScore).orElse(null))
                 .skillBreakdown(skillBreakdown)

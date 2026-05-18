@@ -18,6 +18,7 @@ public class EnhancedResultDto {
 
     // Metadata
     private String examCategoryCode;
+    private String examTypeId;
 
     // Tầng 2: breakdown theo Skill
     private List<SkillBreakdownDto> skillBreakdown;

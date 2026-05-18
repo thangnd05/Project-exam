@@ -421,6 +421,7 @@ const TestResultPage = () => {
                   totalScore={enhanced.totalScore}
                   correct={enhanced.correct}
                   total={enhanced.total}
+                  examTypeId={enhanced.examTypeId}
                 />
 
                 {enhanced.percentile != null && (

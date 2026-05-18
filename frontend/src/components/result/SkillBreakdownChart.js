@@ -7,14 +7,6 @@ const getBarColor = (percentage) => {
   return '#ef4444';
 };
 
-const getStatusIcon = (percentage, isTargetMet) => {
-  if (isTargetMet === true) return '';
-  if (isTargetMet === false) return '❌';
-  if (percentage >= 80) return '';
-  if (percentage >= 60) return '⚠️';
-  return '❌';
-};
-
 function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
   const [expandedParts, setExpandedParts] = useState({});
 
@@ -47,13 +39,8 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
             marginBottom: 6, fontWeight: 600, fontSize: 15, color: '#334155',
           }}>
             <span>{skill.skillName}</span>
-            <span style={{ color: getBarColor(skill.percentage) }}>
-              {skill.correct}/{skill.total} ({skill.percentage}%) {getStatusIcon(skill.percentage)}
-              {skill.convertedScore != null && (
-                <span style={{ marginLeft: 8, color: '#6366f1', fontWeight: 700 }}>
-                  → {skill.convertedScore}
-                </span>
-              )}
+            <span>
+              {skill.correct}/{skill.total} ({skill.percentage}%)
             </span>
           </div>
 
@@ -83,7 +70,7 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
               >
                 <span>{part.partName}</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ color: part.isTargetMet != null ? (part.isTargetMet ? '#22c55e' : '#ef4444') : getBarColor(part.percentage) }}>
+                  <span>
                     {part.correct}/{part.total} ({part.percentage}%)
                     {part.targetPercentage != null && (
                       <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 500 }}>
@@ -92,7 +79,6 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
                           : `(Cần thêm ${Math.max(0, (part.targetPercentage - part.percentage)).toFixed(1).replace(/\\.0$/, '')}% để đạt ${part.targetPercentage}%)`}
                       </span>
                     )}
-                    {' '}{getStatusIcon(part.percentage, part.isTargetMet)}
                   </span>
                   {part.weakTags?.length > 0 && (
                     expandedParts[part.examPartId] ? <IoChevronUp size={16} /> : <IoChevronDown size={16} />
@@ -142,16 +128,8 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
                       padding: '4px 0', fontSize: 13, color: '#475569',
                     }}>
                       <span>{tag.tagName}</span>
-                      <span style={{ color: part.isTargetMet != null ? (tag.percentage >= part.targetPercentage ? '#22c55e' : '#ef4444') : getBarColor(tag.percentage), fontWeight: 600 }}>
+                      <span style={{ fontWeight: 600 }}>
                         {tag.correct}/{tag.total} ({tag.percentage}%)
-                        {part.targetPercentage != null && (
-                          <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 500 }}>
-                            {tag.percentage >= part.targetPercentage
-                              ? `(Đạt mục tiêu ${part.targetPercentage}%)`
-                              : `(Cần thêm ${Math.max(0, (part.targetPercentage - tag.percentage)).toFixed(1).replace(/\\.0$/, '')}% để đạt ${part.targetPercentage}%)`}
-                          </span>
-                        )}
-                        {' '}{getStatusIcon(tag.percentage, part.isTargetMet != null ? tag.percentage >= part.targetPercentage : undefined)}
                       </span>
                     </div>
                   ))}

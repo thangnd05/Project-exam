@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 const LEVEL_CONFIG = {
   NOT_READY: { color: '#ef4444', bg: '#fef2f2', label: 'Chưa nên thi', message: 'Bạn cần củng cố nền tảng trước khi làm mock tiếp.' },
   NEEDS_IMPROVEMENT: { color: '#f59e0b', bg: '#fffbeb', label: 'Cần cải thiện', message: 'Bạn gần đạt nhưng còn lĩnh vực yếu có thể kéo tụt điểm.' },
@@ -12,7 +14,8 @@ const getQuickChallengeColor = (percentage) => {
 };
 
 
-function ReadinessGauge({ readinessScore, readinessLevel, passed, examCategoryCode, hasTarget, targetScore, totalScore, correct, total }) {
+function ReadinessGauge({ readinessScore, readinessLevel, passed, examCategoryCode, hasTarget, targetScore, totalScore, correct, total, examTypeId }) {
+  const navigate = useNavigate();
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
 
   if (isQuickChallenge) {
@@ -55,13 +58,18 @@ function ReadinessGauge({ readinessScore, readinessLevel, passed, examCategoryCo
           </div>
         </div>
 
-        <div style={{
-          marginTop: 16, padding: '12px 20px', background: '#3b82f6',
-          color: '#fff', borderRadius: 10, fontWeight: 600, cursor: 'pointer',
-          display: 'inline-block', fontSize: 15,
-        }}>
-          Làm Full Mock Exam để biết khả năng pass thật →
-        </div>
+        {examTypeId && (
+          <div
+            onClick={() => navigate(`/exam-types/${examTypeId}`)}
+            style={{
+              marginTop: 16, padding: '12px 20px', background: '#3b82f6',
+              color: '#fff', borderRadius: 10, fontWeight: 600, cursor: 'pointer',
+              display: 'inline-block', fontSize: 15,
+            }}
+          >
+            Làm Full Mock Exam để biết khả năng của bản thân →
+          </div>
+        )}
       </div>
     );
   }
