@@ -1,4 +1,8 @@
 import { IoBookOutline, IoOpenOutline } from 'react-icons/io5';
+import classNames from 'classnames/bind';
+import styles from './Result.module.scss';
+
+const cx = classNames.bind(styles);
 
 function RecoveryPlan({ recommendations = [], recoveryMessage }) {
   if (!recommendations.length) return null;
@@ -12,53 +16,43 @@ function RecoveryPlan({ recommendations = [], recoveryMessage }) {
   });
 
   return (
-    <div style={{ marginTop: 24 }}>
-      <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: '#1e293b' }}>
+    <div className={cx('sectionContainer')}>
+      <h3 className={cx('sectionTitle')} style={{ marginBottom: 4 }}>
         Việc cần làm ngay
       </h3>
       {recoveryMessage && (
-        <p style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>
+        <p className={cx('recoveryMessage')}>
           {recoveryMessage}
         </p>
       )}
 
       {Object.entries(grouped).map(([skillName, recs]) => (
-        <div key={skillName} style={{ marginBottom: 16 }}>
-          <p style={{
-            fontSize: 14, fontWeight: 600, color: '#475569',
-            marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid #e2e8f0',
-          }}>
+        <div key={skillName} className={cx('skillGroup')}>
+          <p className={cx('skillGroupTitle')}>
             Tài liệu {skillName}
           </p>
 
           {recs.map((rec, idx) => (
             <div
               key={rec.resourceId || idx}
-              style={{
-                display: 'flex', alignItems: 'flex-start', gap: 12,
-                padding: '12px 16px', marginBottom: 8,
-                background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0',
-              }}
+              className={cx('resourceCard')}
             >
-              <IoBookOutline size={20} style={{ color: '#6366f1', flexShrink: 0, marginTop: 2 }} />
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 600, fontSize: 14, color: '#1e293b', marginBottom: 2 }}>
+              <IoBookOutline size={20} className={cx('resourceIcon')} />
+              <div className={cx('resourceContent')}>
+                <p className={cx('resourceTitle')}>
                   {rec.resourceTitle}
                 </p>
                 {rec.tagNames && rec.tagNames.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 4 }}>
+                  <div className={cx('resourceTags')}>
                     {rec.tagNames.map((tag, i) => (
-                      <span key={i} style={{
-                        display: 'inline-block', fontSize: 11, padding: '2px 8px',
-                        background: '#ede9fe', color: '#7c3aed', borderRadius: 12,
-                      }}>
+                      <span key={i} className={cx('resourceTag')}>
                         {tag}
                       </span>
                     ))}
                   </div>
                 )}
                 {rec.resourceDescription && (
-                  <p style={{ fontSize: 13, color: '#64748b', marginBottom: 0 }}>
+                  <p className={cx('resourceDescription')}>
                     {rec.resourceDescription}
                   </p>
                 )}
@@ -68,12 +62,7 @@ function RecoveryPlan({ recommendations = [], recoveryMessage }) {
                   href={rec.resourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 4,
-                    padding: '6px 12px', background: '#6366f1', color: '#fff',
-                    borderRadius: 8, fontSize: 13, fontWeight: 600,
-                    textDecoration: 'none', flexShrink: 0,
-                  }}
+                  className={cx('resourceLink')}
                 >
                   <IoOpenOutline size={14} /> Xem
                 </a>

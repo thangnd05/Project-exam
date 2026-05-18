@@ -1,4 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import classNames from 'classnames/bind';
+import styles from './Result.module.scss';
+
+const cx = classNames.bind(styles);
 
 const COLOR_MAP = {
   // Quick Challenge levels
@@ -48,11 +52,8 @@ function ReadinessGauge({ enhanced }) {
   const progress = (gaugePercentage / 100) * circumference;
 
   return (
-    <div style={{
-      padding: 20, borderRadius: 16, background: effectiveBg,
-      border: `2px solid ${effectiveColor}`, textAlign: 'center', marginTop: 20,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
+    <div className={cx('gaugeContainer')} style={{ background: effectiveBg, borderColor: effectiveColor, borderWidth: 2, borderStyle: 'solid' }}>
+      <div className={cx('gaugeFlex')}>
         <svg width="130" height="130" viewBox="0 0 130 130">
           <circle cx="65" cy="65" r={radius} fill="none" stroke="#e2e8f0" strokeWidth="10" />
           <circle
@@ -72,25 +73,20 @@ function ReadinessGauge({ enhanced }) {
           </text>
         </svg>
 
-        <div style={{ textAlign: 'left' }}>
-          <h3 style={{ fontSize: 20, fontWeight: 700, color: effectiveColor, marginBottom: 4 }}>
+        <div className={cx('gaugeInfo')}>
+          <h3 className={cx('gaugeTitle')} style={{ color: effectiveColor }}>
             {gaugeTitle}
           </h3>
-          <p style={{ fontSize: 14, color: '#475569', maxWidth: 280, marginBottom: 8 }}>
+          <p className={cx('gaugeMessage')}>
             {gaugeMessage}
           </p>
           {isQuickChallenge && (
-            <p style={{ fontSize: 14, color: '#475569' }}>
+            <p className={cx('gaugeStat')}>
               Trả lời đúng <strong>{correct}/{total}</strong> câu
             </p>
           )}
           {!isQuickChallenge && passed != null && !hasTarget && (
-            <span style={{
-              display: 'inline-block', padding: '4px 12px', borderRadius: 20,
-              fontSize: 13, fontWeight: 700,
-              background: passed ? '#dcfce7' : '#fef2f2',
-              color: passed ? '#16a34a' : '#dc2626',
-            }}>
+            <span className={cx('gaugeBadge', passed ? 'gaugeBadgePass' : 'gaugeBadgeFail')}>
               {passed ? 'PASS (giả lập)' : '❌ FAIL (giả lập)'}
             </span>
           )}
@@ -99,12 +95,9 @@ function ReadinessGauge({ enhanced }) {
 
       {isQuickChallenge && examTypeId && (
         <div
+          className={cx('actionButton')}
+          style={{ backgroundColor: effectiveColor }}
           onClick={() => navigate(`/exam-types/${examTypeId}`)}
-          style={{
-            marginTop: 16, padding: '12px 20px', background: '#3b82f6',
-            color: '#fff', borderRadius: 10, fontWeight: 600, cursor: 'pointer',
-            display: 'inline-block', fontSize: 15,
-          }}
         >
           Làm Full Mock Exam để biết khả năng của bản thân →
         </div>

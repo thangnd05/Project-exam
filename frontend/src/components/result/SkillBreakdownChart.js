@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
+import classNames from 'classnames/bind';
+import styles from './Result.module.scss';
+
+const cx = classNames.bind(styles);
 
 const getBarColor = (percentage) => {
   if (percentage >= 80) return '#22c55e';
@@ -26,18 +30,15 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
   });
 
   return (
-    <div style={{ marginTop: 24 }}>
-      <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: '#1e293b' }}>
+    <div className={cx('sectionContainer')}>
+      <h3 className={cx('sectionTitle')}>
         Phân tích theo lĩnh vực
       </h3>
 
       {/* Skill level breakdown */}
       {skillBreakdown.map((skill) => (
-        <div key={skill.skillId} style={{ marginBottom: 20 }}>
-          <div style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            marginBottom: 6, fontWeight: 600, fontSize: 15, color: '#334155',
-          }}>
+        <div key={skill.skillId} className={cx('skillContainer')}>
+          <div className={cx('skillHeader')}>
             <span>{skill.skillName}</span>
             <span>
               {skill.correct}/{skill.total} ({skill.percentage}%)
@@ -45,35 +46,29 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
           </div>
 
           {/* Skill progress bar */}
-          <div style={{
-            background: '#e2e8f0', borderRadius: 8, height: 12, overflow: 'hidden',
-          }}>
-            <div style={{
-              width: `${Math.min(skill.percentage, 100)}%`,
-              background: getBarColor(skill.percentage),
-              height: '100%', borderRadius: 8,
-              transition: 'width 0.6s ease',
-            }} />
+          <div className={cx('progressBarContainer')}>
+            <div 
+              className={cx('progressBarFill')}
+              style={{
+                width: `${Math.min(skill.percentage, 100)}%`,
+                background: getBarColor(skill.percentage),
+              }} 
+            />
           </div>
 
           {/* Parts within this skill */}
           {partsBySkill[skill.skillId]?.map((part) => (
-            <div key={part.examPartId} style={{ marginTop: 10, marginLeft: 16 }}>
+            <div key={part.examPartId} className={cx('partContainer')}>
               <div
                 onClick={() => togglePart(part.examPartId)}
-                style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  cursor: 'pointer', padding: '8px 12px',
-                  background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0',
-                  fontSize: 14, color: '#475569',
-                }}
+                className={cx('partHeader')}
               >
                 <span>{part.partName}</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className={cx('partStats')}>
                   <span>
                     {part.correct}/{part.total} ({part.percentage}%)
                     {part.targetGapMessage && (
-                      <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 500 }}>
+                      <span className={cx('targetGapMessage')}>
                         {part.targetGapMessage}
                       </span>
                     )}
@@ -85,48 +80,33 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
               </div>
 
               {/* Part progress bar */}
-              <div style={{
-                background: '#e2e8f0', borderRadius: 6, height: 6, position: 'relative',
-                marginTop: 4,
-              }}>
-                <div style={{
-                  width: `${Math.min(part.percentage, 100)}%`,
-                  background: part.isTargetMet != null ? (part.isTargetMet ? '#22c55e' : '#ef4444') : getBarColor(part.percentage),
-                  height: '100%', borderRadius: 6,
-                  transition: 'width 0.6s ease',
-                }} />
+              <div className={cx('partProgressBarContainer')}>
+                <div 
+                  className={cx('partProgressBarFill')}
+                  style={{
+                    width: `${Math.min(part.percentage, 100)}%`,
+                    background: part.isTargetMet != null ? (part.isTargetMet ? '#22c55e' : '#ef4444') : getBarColor(part.percentage),
+                  }} 
+                />
                 {part.targetPercentage != null && (
                   <div
                     title={`Mục tiêu: ${part.targetPercentage}%`}
-                    style={{
-                      position: 'absolute',
-                      top: -3,
-                      bottom: -3,
-                      width: 2,
-                      background: '#1e293b',
-                      left: `${part.targetPercentage}%`,
-                      zIndex: 1,
-                    }}
+                    className={cx('targetMarker')}
+                    style={{ left: `${part.targetPercentage}%` }}
                   />
                 )}
               </div>
 
               {/* Tầng 3: Tag breakdown */}
               {expandedParts[part.examPartId] && part.weakTags?.length > 0 && (
-                <div style={{
-                  marginTop: 8, marginLeft: 12, padding: '10px 14px',
-                  background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0',
-                }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 8 }}>
+                <div className={cx('tagBreakdownContainer')}>
+                  <p className={cx('tagBreakdownTitle')}>
                     Chi tiết theo chủ đề:
                   </p>
                   {part.weakTags.map((tag) => (
-                    <div key={tag.tagId} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '4px 0', fontSize: 13, color: '#475569',
-                    }}>
+                    <div key={tag.tagId} className={cx('tagBreakdownRow')}>
                       <span>{tag.tagName}</span>
-                      <span style={{ fontWeight: 600 }}>
+                      <span className={cx('tagBreakdownStats')}>
                         {tag.correct}/{tag.total} ({tag.percentage}%)
                       </span>
                     </div>
