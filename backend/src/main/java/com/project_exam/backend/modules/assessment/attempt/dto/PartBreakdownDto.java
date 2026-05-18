@@ -20,5 +20,6 @@ public class PartBreakdownDto {
     private double percentage;
     private Double targetPercentage; // Nullable if no target is set
     private Boolean isTargetMet; // Nullable if no target is set
+    private String targetGapMessage; // Pre-computed: "(Đạt mục tiêu 60%)" or "(Cần thêm 10% để đạt 60%)"
     private List<TagBreakdownDto> weakTags;
 }

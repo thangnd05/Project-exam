@@ -320,9 +320,7 @@ const TestResultPage = () => {
                   <>
                     <span className={cx("label")}>Độ chính xác</span>
                     <div className={cx("points")}>
-                      {result?.total > 0
-                        ? Math.round((result.correct / result.total) * 100)
-                        : 0}%
+                      {enhanced?.percentage ?? 0}%
                     </div>
                   </>
                 ) : (
@@ -411,18 +409,7 @@ const TestResultPage = () => {
           {enhanced && (
             <div className={cx("result-right")}>
               <div className={cx("diagnosis-card")}>
-                <ReadinessGauge
-                  readinessScore={enhanced.readinessScore}
-                  readinessLevel={enhanced.readinessLevel}
-                  passed={enhanced.passed}
-                  examCategoryCode={enhanced.examCategoryCode}
-                  hasTarget={enhanced.hasTarget}
-                  targetScore={enhanced.targetScore}
-                  totalScore={enhanced.totalScore}
-                  correct={enhanced.correct}
-                  total={enhanced.total}
-                  examTypeId={enhanced.examTypeId}
-                />
+                <ReadinessGauge enhanced={enhanced} />
 
                 {enhanced.percentile != null && (
                   <div style={{
@@ -430,7 +417,7 @@ const TestResultPage = () => {
                     background: '#f0f9ff', border: '1px solid #bae6fd',
                     textAlign: 'center', fontSize: 14, color: '#0369a1',
                   }}>
-                    📈 Bạn làm tốt hơn <strong>{enhanced.percentile}%</strong> người đã từng làm bài này
+                    Bạn làm tốt hơn <strong>{enhanced.percentile}%</strong> người đã từng làm bài này
                   </div>
                 )}
 
@@ -441,8 +428,7 @@ const TestResultPage = () => {
 
                 <RecoveryPlan
                   recommendations={enhanced.recommendations}
-                  readinessScore={enhanced.readinessScore}
-                  hasTarget={enhanced.hasTarget}
+                  recoveryMessage={enhanced.recoveryMessage}
                 />
               </div>
             </div>

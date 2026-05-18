@@ -28,7 +28,7 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
   return (
     <div style={{ marginTop: 24 }}>
       <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: '#1e293b' }}>
-        📊 Phân tích theo lĩnh vực
+        Phân tích theo lĩnh vực
       </h3>
 
       {/* Skill level breakdown */}
@@ -72,11 +72,9 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span>
                     {part.correct}/{part.total} ({part.percentage}%)
-                    {part.targetPercentage != null && (
+                    {part.targetGapMessage && (
                       <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 500 }}>
-                        {part.isTargetMet
-                          ? `(Đạt mục tiêu ${part.targetPercentage}%)`
-                          : `(Cần thêm ${Math.max(0, (part.targetPercentage - part.percentage)).toFixed(1).replace(/\\.0$/, '')}% để đạt ${part.targetPercentage}%)`}
+                        {part.targetGapMessage}
                       </span>
                     )}
                   </span>

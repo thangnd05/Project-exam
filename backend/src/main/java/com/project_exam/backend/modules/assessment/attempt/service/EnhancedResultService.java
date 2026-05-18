@@ -203,26 +203,103 @@ public class EnhancedResultService {
         // 11. Pass/fail
         boolean passed = overallPercentage >= 70;
 
+        // 12. Compute gauge fields
+        int percentage = (int) Math.round(overallPercentage);
+        boolean isQuickChallenge = "QUICK_CHALLENGE".equals(examCategoryCode);
+        boolean hasTarget = userTargetOpt.isPresent();
+        Integer targetScore = userTargetOpt.map(UserTarget::getTargetScore).orElse(null);
+        Long totalScoreVal = isQuickChallenge ? null
+                : (userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L);
+
+        int gaugePercentage;
+        String displayValue;
+        String gaugeLabel;
+        String gaugeTitle;
+        String gaugeMessage;
+
+        if (isQuickChallenge) {
+            gaugePercentage = percentage;
+            displayValue = percentage + "%";
+            gaugeLabel = "Độ chính xác";
+            if (percentage >= 85) {
+                gaugeTitle = "Xuất sắc";
+                gaugeMessage = "Bạn nắm rất vững kiến thức phần này!";
+            } else if (percentage >= 60) {
+                gaugeTitle = "Khá tốt";
+                gaugeMessage = "Bạn đã hiểu phần lớn, cần trau dồi thêm một chút.";
+            } else if (percentage >= 30) {
+                gaugeTitle = "Tạm ổn";
+                gaugeMessage = "Bạn cần ôn lại một số kiến thức cơ bản.";
+            } else {
+                gaugeTitle = "Cần luyện thêm";
+                gaugeMessage = "Hãy dành thời gian củng cố nền tảng kiến thức.";
+            }
+        } else if (hasTarget && targetScore != null) {
+            long ts = totalScoreVal != null ? totalScoreVal : 0;
+            boolean targetMet = ts >= targetScore;
+            gaugePercentage = Math.min(100, (int) Math.round((double) ts / targetScore * 100));
+            displayValue = ts + "/" + targetScore;
+            gaugeLabel = "Mục tiêu";
+            if (targetMet) {
+                gaugeTitle = "Đạt mục tiêu!";
+                gaugeMessage = "Chúc mừng! Bạn đã đạt mức điểm mục tiêu " + targetScore + " đề ra.";
+            } else {
+                gaugeTitle = "Chưa đạt mục tiêu";
+                gaugeMessage = "Bạn còn thiếu " + (targetScore - ts) + " điểm nữa để đạt mục tiêu.";
+            }
+        } else {
+            gaugePercentage = readinessScore;
+            displayValue = readinessScore + "%";
+            gaugeLabel = "Readiness";
+            gaugeTitle = getGaugeTitle(readinessLevel);
+            gaugeMessage = getGaugeMessage(readinessLevel);
+        }
+
+        // 13. Compute isTargetMet (top-level)
+        Boolean isTargetMetResult = null;
+        if (hasTarget && targetScore != null && totalScoreVal != null) {
+            isTargetMetResult = totalScoreVal >= targetScore;
+        }
+
         // 14. Build recovery recommendations
         List<RecoveryRecommendationDto> recommendations = buildRecommendations(
                 partBreakdown, tagMap, allTagIds);
+
+        // 15. Recovery message
+        String recoveryMessage;
+        if (hasTarget && !recommendations.isEmpty()) {
+            recoveryMessage = "Mục tiêu của bạn: Lấp đầy khoảng trống kiến thức để đạt target. " +
+                    "Các tài liệu dưới đây được gợi ý dựa trên những phần thi bạn chưa đạt mục tiêu đề ra.";
+        } else if (readinessScore < 85) {
+            int nextTarget = Math.min(readinessScore + 10, 100);
+            recoveryMessage = "Mục tiêu: tăng readiness từ " + readinessScore + "% lên " + nextTarget + "%";
+        } else {
+            recoveryMessage = null;
+        }
 
         return EnhancedResultDto.builder()
                 .correct(normalizedCorrect)
                 .wrong(totalWrong)
                 .total(totalQuestions)
-                .totalScore("QUICK_CHALLENGE".equals(examCategoryCode) ? null
-                        : (userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L))
+                .totalScore(totalScoreVal)
                 .examCategoryCode(examCategoryCode)
                 .examTypeId(test.getExamTypeId())
-                .hasTarget(userTargetOpt.isPresent())
-                .targetScore(userTargetOpt.map(UserTarget::getTargetScore).orElse(null))
+                .hasTarget(hasTarget)
+                .isTargetMet(isTargetMetResult)
+                .targetScore(targetScore)
+                .percentage(percentage)
+                .gaugePercentage(gaugePercentage)
+                .displayValue(displayValue)
+                .gaugeLabel(gaugeLabel)
+                .gaugeTitle(gaugeTitle)
+                .gaugeMessage(gaugeMessage)
                 .skillBreakdown(skillBreakdown)
                 .partBreakdown(partBreakdown)
                 .readinessScore(readinessScore)
                 .readinessLevel(readinessLevel)
                 .passed(passed)
                 .percentile(percentile)
+                .recoveryMessage(recoveryMessage)
                 .recommendations(recommendations)
                 .build();
     }
@@ -285,9 +362,17 @@ public class EnhancedResultService {
 
             Double targetPercentage = null;
             Boolean isTargetMet = null;
+            String targetGapMessage = null;
             if (targetParts.containsKey(partId)) {
                 targetPercentage = targetParts.get(partId).doubleValue();
                 isTargetMet = percentageRounded >= targetPercentage;
+                if (isTargetMet) {
+                    targetGapMessage = "(Đạt mục tiêu " + targetPercentage.intValue() + "%)";
+                } else {
+                    double gap = Math.max(0, targetPercentage - percentageRounded);
+                    String gapStr = gap == Math.floor(gap) ? String.valueOf((int) gap) : String.format("%.1f", gap);
+                    targetGapMessage = "(Cần thêm " + gapStr + "% để đạt " + targetPercentage.intValue() + "%)";
+                }
             }
 
             // Tầng 3: Tag breakdown cho tất cả câu hỏi trong part
@@ -305,6 +390,7 @@ public class EnhancedResultService {
                     .percentage(percentageRounded)
                     .targetPercentage(targetPercentage)
                     .isTargetMet(isTargetMet)
+                    .targetGapMessage(targetGapMessage)
                     .weakTags(weakTags)
                     .build());
         }
@@ -438,6 +524,24 @@ public class EnhancedResultService {
         long scoreLessOrEqual = userTestRepository.countByTestIdAndStatusAndTotalScoreLessThanEqual(
                 testId, UserTest.Status.COMPLETED, totalScore);
         return (int) Math.round((double) (scoreLessOrEqual - 1) / (totalCompleted - 1) * 100);
+    }
+
+    private String getGaugeTitle(String readinessLevel) {
+        return switch (readinessLevel) {
+            case "READY" -> "Sẵn sàng cao";
+            case "ALMOST_READY" -> "Gần sẵn sàng";
+            case "NEEDS_IMPROVEMENT" -> "Cần cải thiện";
+            default -> "Chưa nên thi";
+        };
+    }
+
+    private String getGaugeMessage(String readinessLevel) {
+        return switch (readinessLevel) {
+            case "READY" -> "Bạn có thể cân nhắc đăng ký thi nếu duy trì kết quả ổn định.";
+            case "ALMOST_READY" -> "Tập trung sửa lỗi sai và làm final check.";
+            case "NEEDS_IMPROVEMENT" -> "Bạn gần đạt nhưng còn lĩnh vực yếu có thể kéo tụt điểm.";
+            default -> "Bạn cần củng cố nền tảng trước khi làm mock tiếp.";
+        };
     }
 
     private List<RecoveryRecommendationDto> buildRecommendations(
