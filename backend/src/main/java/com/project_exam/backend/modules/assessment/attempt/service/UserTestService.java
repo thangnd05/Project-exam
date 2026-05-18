@@ -331,7 +331,7 @@ public class UserTestService {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
 
-        // ✅ RESUME: nếu user đã có attempt đang làm dở, trả về luôn — không áp dụng
+        //  RESUME: nếu user đã có attempt đang làm dở, trả về luôn — không áp dụng
         // các guard time-window/max-attempts nữa, vì user đã start hợp lệ trước đó.
         // (Class membership cũng skip cho resume — user vào lớp rồi rời ra vẫn được hoàn thành.)
         Optional<UserTest> existing = userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
@@ -363,7 +363,7 @@ public class UserTestService {
             }
         }
 
-        // ✅ Tạo mới user_test
+        //  Tạo mới user_test
         UserTest newTest = new UserTest();
         newTest.setUserId(userId);
         newTest.setTestId(testId);
@@ -406,7 +406,7 @@ public class UserTestService {
             throw new ForbiddenException("Bài thi của lớp yêu cầu đăng nhập.");
         }
 
-        // ✅ RESUME: nếu guest session đã có attempt đang dở thì trả về luôn.
+        //  RESUME: nếu guest session đã có attempt đang dở thì trả về luôn.
         Optional<UserTest> existing = userTestRepository.findActiveGuestUserTest(
                 guestSessionId, testId, UserTest.Status.IN_PROGRESS);
         if (existing.isPresent()) {

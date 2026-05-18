@@ -8,9 +8,9 @@ const getBarColor = (percentage) => {
 };
 
 const getStatusIcon = (percentage, isTargetMet) => {
-  if (isTargetMet === true) return '✅';
+  if (isTargetMet === true) return '';
   if (isTargetMet === false) return '❌';
-  if (percentage >= 80) return '✅';
+  if (percentage >= 80) return '';
   if (percentage >= 60) return '⚠️';
   return '❌';
 };
@@ -87,8 +87,8 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
                     {part.correct}/{part.total} ({part.percentage}%)
                     {part.targetPercentage != null && (
                       <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 500 }}>
-                        {part.isTargetMet 
-                          ? `(Đạt mục tiêu ${part.targetPercentage}%)` 
+                        {part.isTargetMet
+                          ? `(Đạt mục tiêu ${part.targetPercentage}%)`
                           : `(Cần thêm ${Math.max(0, (part.targetPercentage - part.percentage)).toFixed(1).replace(/\\.0$/, '')}% để đạt ${part.targetPercentage}%)`}
                       </span>
                     )}
@@ -146,8 +146,8 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
                         {tag.correct}/{tag.total} ({tag.percentage}%)
                         {part.targetPercentage != null && (
                           <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 500 }}>
-                            {tag.percentage >= part.targetPercentage 
-                              ? `(Đạt mục tiêu ${part.targetPercentage}%)` 
+                            {tag.percentage >= part.targetPercentage
+                              ? `(Đạt mục tiêu ${part.targetPercentage}%)`
                               : `(Cần thêm ${Math.max(0, (part.targetPercentage - tag.percentage)).toFixed(1).replace(/\\.0$/, '')}% để đạt ${part.targetPercentage}%)`}
                           </span>
                         )}

@@ -5,32 +5,56 @@ const LEVEL_CONFIG = {
   READY: { color: '#22c55e', bg: '#f0fdf4', label: 'Sẵn sàng cao', message: 'Bạn có thể cân nhắc đăng ký thi nếu duy trì kết quả ổn định.' },
 };
 
-const CHALLENGE_LEVEL_CONFIG = {
-  BEGINNER: { color: '#ef4444', bg: '#fef2f2', label: 'Mới bắt đầu' },
-  INTERMEDIATE: { color: '#f59e0b', bg: '#fffbeb', label: 'Trung bình' },
-  ADVANCED: { color: '#22c55e', bg: '#f0fdf4', label: 'Nâng cao' },
+const getQuickChallengeColor = (percentage) => {
+  if (percentage >= 80) return { color: '#22c55e', bg: '#f0fdf4' };
+  if (percentage >= 50) return { color: '#f59e0b', bg: '#fffbeb' };
+  return { color: '#ef4444', bg: '#fef2f2' };
 };
 
 
-function ReadinessGauge({ readinessScore, readinessLevel, percentile, passed, level, examCategoryCode, hasTarget, targetScore, totalScore }) {
+function ReadinessGauge({ readinessScore, readinessLevel, passed, examCategoryCode, hasTarget, targetScore, totalScore, correct, total }) {
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
 
-  if (isQuickChallenge && level) {
-    const cfg = CHALLENGE_LEVEL_CONFIG[level] || CHALLENGE_LEVEL_CONFIG.BEGINNER;
+  if (isQuickChallenge) {
+    const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+    const { color, bg } = getQuickChallengeColor(percentage);
+
+    const radius = 54;
+    const circumference = 2 * Math.PI * radius;
+    const progress = (percentage / 100) * circumference;
+
     return (
       <div style={{
-        padding: 20, borderRadius: 16, background: cfg.bg,
-        border: `2px solid ${cfg.color}`, textAlign: 'center', marginTop: 20,
+        padding: 20, borderRadius: 16, background: bg,
+        border: `2px solid ${color}`, textAlign: 'center', marginTop: 20,
       }}>
-        <p style={{ fontSize: 14, color: '#64748b', marginBottom: 4 }}>Trình độ của bạn</p>
-        <h2 style={{ fontSize: 28, fontWeight: 800, color: cfg.color, marginBottom: 8 }}>
-          {cfg.label}
-        </h2>
-        {percentile != null && (
-          <p style={{ fontSize: 14, color: '#475569' }}>
-            Bạn cao hơn <strong>{percentile}%</strong> người đã làm bài
-          </p>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r={radius} fill="none" stroke="#e2e8f0" strokeWidth="10" />
+            <circle
+              cx="65" cy="65" r={radius} fill="none"
+              stroke={color} strokeWidth="10"
+              strokeDasharray={circumference}
+              strokeDashoffset={circumference - progress}
+              strokeLinecap="round"
+              transform="rotate(-90 65 65)"
+              style={{ transition: 'stroke-dashoffset 1s ease' }}
+            />
+            <text x="65" y="60" textAnchor="middle" fontSize="28" fontWeight="800" fill={color}>
+              {percentage}%
+            </text>
+            <text x="65" y="80" textAnchor="middle" fontSize="11" fill="#64748b">
+              Độ chính xác
+            </text>
+          </svg>
+
+          <div style={{ textAlign: 'left' }}>
+            <p style={{ fontSize: 14, color: '#475569', marginBottom: 8 }}>
+              Trả lời đúng <strong>{correct}/{total}</strong> câu
+            </p>
+          </div>
+        </div>
+
         <div style={{
           marginTop: 16, padding: '12px 20px', background: '#3b82f6',
           color: '#fff', borderRadius: 10, fontWeight: 600, cursor: 'pointer',
@@ -113,13 +137,8 @@ function ReadinessGauge({ readinessScore, readinessLevel, percentile, passed, le
               background: passed ? '#dcfce7' : '#fef2f2',
               color: passed ? '#16a34a' : '#dc2626',
             }}>
-              {passed ? '✅ PASS (giả lập)' : '❌ FAIL (giả lập)'}
+              {passed ? ' PASS (giả lập)' : '❌ FAIL (giả lập)'}
             </span>
-          )}
-          {percentile != null && (
-            <p style={{ fontSize: 14, color: '#475569', marginTop: 8 }}>
-              Bạn cao hơn <strong>{percentile}%</strong> người đã làm bài này
-            </p>
           )}
         </div>
       </div>

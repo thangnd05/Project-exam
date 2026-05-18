@@ -54,7 +54,7 @@ public class Test {
     @Column(name = "exam_category_id")
     private String examCategoryId; // FK -> exam_categories.exam_category_id
 
-    // ✅ Method tính trạng thái thực tế
+    //  Method tính trạng thái thực tế
     public TestStatus calculateStatus() {
         LocalDateTime now = LocalDateTime.now();
         if (availableFrom == null && availableTo == null) {

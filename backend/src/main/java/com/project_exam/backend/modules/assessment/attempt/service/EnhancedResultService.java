@@ -71,7 +71,7 @@ public class EnhancedResultService {
         log.info("Building enhanced result for userTestId={}, status={}", userTest.getUserTestId(), userTest.getStatus());
         if (userTest.getStatus() != UserTest.Status.COMPLETED) {
             return EnhancedResultDto.builder()
-                    .correct(0).wrong(0).total(0).totalScore(0)
+                    .correct(0).wrong(0).total(0).totalScore(0L)
                     .skillBreakdown(List.of())
                     .partBreakdown(List.of())
                     .recommendations(List.of())
@@ -95,7 +95,7 @@ public class EnhancedResultService {
 
         if (allTestQuestionIds.isEmpty()) {
             return EnhancedResultDto.builder()
-                    .correct(0).wrong(0).total(0).totalScore(userTest.getTotalScore() != null ? userTest.getTotalScore() : 0)
+                    .correct(0).wrong(0).total(0).totalScore(userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L)
                     .skillBreakdown(List.of()).partBreakdown(List.of()).recommendations(List.of())
                     .build();
         }
@@ -200,13 +200,7 @@ public class EnhancedResultService {
         // 10. Calculate percentile
         Integer percentile = calculatePercentile(userTest.getTestId(), userTest.getTotalScore());
 
-        // 11. Determine level for Quick Challenge
-        String level = null;
-        if ("QUICK_CHALLENGE".equals(examCategoryCode)) {
-            level = getQuickChallengeLevel(overallPercentage);
-        }
-
-        // 12. Pass/fail
+        // 11. Pass/fail
         boolean passed = overallPercentage >= 70;
 
         // 14. Build recovery recommendations
@@ -217,7 +211,8 @@ public class EnhancedResultService {
                 .correct(normalizedCorrect)
                 .wrong(totalWrong)
                 .total(totalQuestions)
-                .totalScore(userTest.getTotalScore() != null ? userTest.getTotalScore() : 0)
+                .totalScore("QUICK_CHALLENGE".equals(examCategoryCode) ? null
+                        : (userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L))
                 .examCategoryCode(examCategoryCode)
                 .hasTarget(userTargetOpt.isPresent())
                 .targetScore(userTargetOpt.map(UserTarget::getTargetScore).orElse(null))
@@ -227,7 +222,6 @@ public class EnhancedResultService {
                 .readinessLevel(readinessLevel)
                 .passed(passed)
                 .percentile(percentile)
-                .level(level)
                 .recommendations(recommendations)
                 .build();
     }
@@ -443,12 +437,6 @@ public class EnhancedResultService {
         long scoreLessOrEqual = userTestRepository.countByTestIdAndStatusAndTotalScoreLessThanEqual(
                 testId, UserTest.Status.COMPLETED, totalScore);
         return (int) Math.round((double) (scoreLessOrEqual - 1) / (totalCompleted - 1) * 100);
-    }
-
-    private String getQuickChallengeLevel(double percentage) {
-        if (percentage < 50) return "BEGINNER";
-        if (percentage <= 75) return "INTERMEDIATE";
-        return "ADVANCED";
     }
 
     private List<RecoveryRecommendationDto> buildRecommendations(

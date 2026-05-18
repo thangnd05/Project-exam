@@ -66,7 +66,7 @@ const TestResultPage = () => {
     return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
   };
   // ================================
-  // ✅ LOAD RESULT + CHECK REVIEW TIME
+  //  LOAD RESULT + CHECK REVIEW TIME
   // ================================
   useEffect(() => {
     if (authLoading) return;
@@ -122,7 +122,7 @@ const TestResultPage = () => {
   }, [userTestId, authLoading, isGuest, guestCfg]);
 
   // ================================
-  // ✅ SHOW DETAIL QUESTIONS
+  //  SHOW DETAIL QUESTIONS
   // ================================
   const handleShowDetail = async () => {
     if (!canReview) {
@@ -316,12 +316,25 @@ const TestResultPage = () => {
 
               {/* SCORE */}
               <div className={cx("score-display")}>
-                <span className={cx("label")}>Điểm số</span>
-                <div className={cx("points")}>
-                  {result?.totalScore?.toFixed(2) ||
-                    location.state?.score?.toFixed(2) ||
-                    "0.00"}
-                </div>
+                {enhanced?.examCategoryCode === 'QUICK_CHALLENGE' ? (
+                  <>
+                    <span className={cx("label")}>Độ chính xác</span>
+                    <div className={cx("points")}>
+                      {result?.total > 0
+                        ? Math.round((result.correct / result.total) * 100)
+                        : 0}%
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className={cx("label")}>Điểm số</span>
+                    <div className={cx("points")}>
+                      {result?.totalScore?.toFixed(2) ||
+                        location.state?.score?.toFixed(2) ||
+                        "0.00"}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* STATS */}
@@ -401,14 +414,24 @@ const TestResultPage = () => {
                 <ReadinessGauge
                   readinessScore={enhanced.readinessScore}
                   readinessLevel={enhanced.readinessLevel}
-                  percentile={enhanced.percentile}
                   passed={enhanced.passed}
-                  level={enhanced.level}
                   examCategoryCode={enhanced.examCategoryCode}
                   hasTarget={enhanced.hasTarget}
                   targetScore={enhanced.targetScore}
                   totalScore={enhanced.totalScore}
+                  correct={enhanced.correct}
+                  total={enhanced.total}
                 />
+
+                {enhanced.percentile != null && (
+                  <div style={{
+                    marginTop: 16, padding: '12px 16px', borderRadius: 12,
+                    background: '#f0f9ff', border: '1px solid #bae6fd',
+                    textAlign: 'center', fontSize: 14, color: '#0369a1',
+                  }}>
+                    📈 Bạn làm tốt hơn <strong>{enhanced.percentile}%</strong> người đã từng làm bài này
+                  </div>
+                )}
 
                 <SkillBreakdownChart
                   skillBreakdown={enhanced.skillBreakdown}

@@ -20,14 +20,14 @@ public class TtsController {
         String ttsUrl = "https://translate.google.com/translate_tts?ie=UTF-8&q="
                 + encoded + "&tl=en&client=tw-ob";
 
-        // ✅ Tạo kết nối và thêm User-Agent hợp lệ
+        //  Tạo kết nối và thêm User-Agent hợp lệ
         HttpURLConnection connection = (HttpURLConnection) new URL(ttsUrl).openConnection();
         connection.setRequestProperty("User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                         + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
         connection.connect();
 
-        // ✅ Gửi header phản hồi cho trình duyệt
+        //  Gửi header phản hồi cho trình duyệt
         response.setHeader(HttpHeaders.CONTENT_TYPE, "audio/mpeg");
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
@@ -36,7 +36,7 @@ public class TtsController {
 
         try (var input = connection.getInputStream()) {
             StreamUtils.copy(input, response.getOutputStream());
-            response.flushBuffer(); // ✅ đảm bảo dữ liệu gửi đi ngay lập tức
+            response.flushBuffer(); //  đảm bảo dữ liệu gửi đi ngay lập tức
         } catch (IOException exception) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Không phát được âm thanh");
         }

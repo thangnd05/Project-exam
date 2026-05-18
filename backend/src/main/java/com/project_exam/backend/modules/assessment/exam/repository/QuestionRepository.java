@@ -30,7 +30,7 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findOneRandomQuestion(@Param("examPartId") String examPartId);
 
-    // ✅ Bổ sung các hàm có lọc theo classId
+    //  Bổ sung các hàm có lọc theo classId
     @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId AND class_id = :classId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findOneRandomQuestionByClass(@Param("examPartId") String examPartId, @Param("classId") String classId);
 

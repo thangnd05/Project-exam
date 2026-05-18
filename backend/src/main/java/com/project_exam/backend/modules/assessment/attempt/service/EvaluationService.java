@@ -31,7 +31,7 @@ public class EvaluationService {
     private final AuthUtils authUtils;
 
     // ============================
-    // ✅ Helper convert Entity → DTO
+    //  Helper convert Entity → DTO
     // ============================
     private EvaluationResponse toResponse(Evaluation e) {
 
@@ -51,7 +51,7 @@ public class EvaluationService {
     }
 
     // ============================
-    // ✅ CREATE
+    //  CREATE
     // ============================
     public EvaluationResponse create(HttpServletRequest httpRequest, EvaluationRequest request) {
 
@@ -68,7 +68,7 @@ public class EvaluationService {
     }
 
     // ============================
-    // ✅ GET ALL
+    //  GET ALL
     // ============================
     public List<EvaluationResponse> getAll() {
         return evaluationRepository.findAll()
@@ -108,7 +108,7 @@ public class EvaluationService {
     }
 
     // ============================
-    // ✅ GET BY USER
+    //  GET BY USER
     // ============================
     public List<EvaluationResponse> getByUser(String userId) {
         return evaluationRepository.findByUserId(userId)
@@ -126,7 +126,7 @@ public class EvaluationService {
     }
 
     // ============================
-    // ✅ UPDATE
+    //  UPDATE
     // ============================
     public EvaluationResponse update(String id, EvaluationRequest request, HttpServletRequest httpRequest) {
         Evaluation evaluation = evaluationRepository.findById(id)

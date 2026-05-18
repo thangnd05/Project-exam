@@ -14,7 +14,7 @@ public class EnhancedResultDto {
     private long correct;
     private long wrong;
     private long total;
-    private long totalScore;
+    private Long totalScore;
 
     // Metadata
     private String examCategoryCode;
@@ -34,9 +34,6 @@ public class EnhancedResultDto {
 
     // Percentile
     private Integer percentile;
-
-    // Quick Challenge level
-    private String level;
 
     // Target tracking
     private boolean hasTarget;

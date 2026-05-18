@@ -23,13 +23,13 @@ public class UserTestController {
     private final UserTestService userTestService;
     private final AuthUtils authUtils;
 
-    // ✅ Lấy tất cả user test (admin only)
+    //  Lấy tất cả user test (admin only)
     @GetMapping
     public ResponseEntity<List<UserTestResponse>> getAll(HttpServletRequest httpRequest) {
         return ResponseEntity.ok(userTestService.findAllResponses(httpRequest));
     }
 
-    // ✅ Lấy theo ID
+    //  Lấy theo ID
     @GetMapping("/{userTestId}")
     public ResponseEntity<UserTestResponse> getUserTestById(
             @PathVariable String userTestId,
@@ -38,14 +38,14 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.getMeta(userTestId, httpRequest));
     }
 
-    // ✅ Lấy theo user đang đăng nhập (JWT)
+    //  Lấy theo user đang đăng nhập (JWT)
     @GetMapping("/my")
     public ResponseEntity<List<UserTestResponse>> getByCurrentUser(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(userTestService.findResponsesByUserId(userId));
     }
 
-    // ✅ Lấy theo testId (chỉ chủ đề / admin)
+    //  Lấy theo testId (chỉ chủ đề / admin)
     @GetMapping("/test/{testId}")
     public ResponseEntity<List<UserTestResponse>> getByTest(
             @PathVariable String testId,
@@ -54,7 +54,7 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.findResponsesByTestId(testId, httpRequest));
     }
 
-    // ✅ Tạo hoặc bắt đầu bài test mới
+    //  Tạo hoặc bắt đầu bài test mới
     @PostMapping
     public ResponseEntity<Map<String, Object>> startUserTest(
             @Valid @RequestBody StartUserTestRequest request,
@@ -77,7 +77,7 @@ public class UserTestController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Cập nhật UserTest
+    //  Cập nhật UserTest
     @PutMapping("/{id}")
     public ResponseEntity<UserTestResponse> update(
             @PathVariable String id,
@@ -91,7 +91,7 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.updateStatusByOwner(id, userId, request.getStatus()));
     }
 
-    // ✅ Xóa UserTest (owner hoặc admin)
+    //  Xóa UserTest (owner hoặc admin)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userTestService.findById(id).isEmpty()) {
@@ -101,7 +101,7 @@ public class UserTestController {
         return ResponseEntity.noContent().build();
     }
 
-    // ✅ Nộp bài thi
+    //  Nộp bài thi
     @PostMapping("/{userTestId}/submit")
     public ResponseEntity<UserTestResponse> submitTest(
             @PathVariable String userTestId,
@@ -112,7 +112,7 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.toResponse(submittedTest));
     }
 
-    // ✅ Kiểm tra có đang làm dở không
+    //  Kiểm tra có đang làm dở không
     @GetMapping("/check-active")
     public ResponseEntity<Map<String, Object>> checkActiveUserTest(
             @RequestParam String testId,

@@ -42,7 +42,7 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ Helper convert Entity → DTO
+    //  Helper convert Entity → DTO
     // ============================
     private ChapterResponse toResponse(Chapter c) {
         return new ChapterResponse(
@@ -55,7 +55,7 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ CREATE
+    //  CREATE
     // ============================
     public ChapterResponse create(HttpServletRequest httpRequest, ChapterRequest request) {
 
@@ -74,7 +74,7 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ GET ALL — chỉ admin được xem toàn bộ chapter.
+    //  GET ALL — chỉ admin được xem toàn bộ chapter.
     // ============================
     public List<ChapterResponse> getAll(HttpServletRequest httpRequest) {
         if (!authUtils.isAdmin(httpRequest)) {
@@ -87,7 +87,7 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ GET BY CLASS
+    //  GET BY CLASS
     // ============================
     public List<ChapterResponse> getByClassId(String classId, HttpServletRequest httpRequest) {
         // 🔒 Chỉ thành viên/giáo viên của lớp (hoặc admin) mới được liệt kê chapter của lớp.
@@ -101,7 +101,7 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ GET BY ID
+    //  GET BY ID
     // ============================
     public ChapterResponse getById(String chapterId, HttpServletRequest httpRequest) {
 
@@ -116,7 +116,7 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ UPDATE
+    //  UPDATE
     // ============================
     public ChapterResponse update(HttpServletRequest httpRequest,
                                   String chapterId,
@@ -141,7 +141,7 @@ public class ChapterService {
     }
 
     // ============================
-    // ✅ DELETE — cascade xoá toàn bộ questions thuộc chapter
+    //  DELETE — cascade xoá toàn bộ questions thuộc chapter
     // ============================
     @Transactional
     public void delete(HttpServletRequest httpRequest, String chapterId) {
@@ -151,7 +151,7 @@ public class ChapterService {
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
-        // ✅ check teacher
+        //  check teacher
         checkTeacherPermission(chapter.getClassId(), currentUserId);
 
         // 🔥 Cascade: xoá toàn bộ questions (kèm answers/test_questions/user_answers) thuộc chapter này.

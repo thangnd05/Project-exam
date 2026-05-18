@@ -16,14 +16,14 @@ function JoinClassModal({ show, onClose }) {
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // ✅ Message state
+    //  Message state
     const [message, setMessage] = useState("");
     const [type, setType] = useState("info");
 
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // ✅ Join class logic
+    //  Join class logic
     const handleJoin = async () => {
         setMessage("");
 
@@ -50,7 +50,7 @@ function JoinClassModal({ show, onClose }) {
         setLoading(true);
 
         try {
-            // ✅ Call API join class (đúng như JoinClassPage)
+            //  Call API join class (đúng như JoinClassPage)
             await axios.post("/api/class-members/join", {
                 classQr: code.trim().toUpperCase(),
             });
@@ -92,7 +92,7 @@ function JoinClassModal({ show, onClose }) {
                 />
             )}
         >
-            {/* ✅ Alert Message */}
+            {/*  Alert Message */}
             {message && (
                 <Alert
                     variant={type}

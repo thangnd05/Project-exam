@@ -72,11 +72,11 @@ function LoginPage() {
         password: loginPassword,
       });
 
-      // ✅ Backend trả thẳng UserResponse
+      //  Backend trả thẳng UserResponse
       const userData = response.data;
 
       if (userData?.id) {
-        login(userData); // ✅ truyền thẳng vào AuthContext
+        login(userData); //  truyền thẳng vào AuthContext
 
         setMessage("Đăng nhập thành công! Đang chuyển hướng...");
         setMessageType("success");

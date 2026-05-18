@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Chuẩn hóa user từ DTO backend
+  //  Chuẩn hóa user từ DTO backend
   const normalizeUser = (data) => ({
     userId: data.id,
     userName: data.userName,
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     avatarUrl: data.avatarUrl,
   });
 
-  // ✅ Lấy user hiện tại từ /me
+  //  Lấy user hiện tại từ /me
   const fetchCurrentUser = useCallback(async () => {
     try {
       const response = await axios.get('/api/auth/me');
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // ✅ Chạy khi app khởi động
+  //  Chạy khi app khởi động
   useEffect(() => {
     fetchCurrentUser();
 
@@ -49,12 +49,12 @@ export const AuthProvider = ({ children }) => {
     }
   }, [fetchCurrentUser]);
 
-  // ✅ Login (backend trả thẳng UserResponse)
+  //  Login (backend trả thẳng UserResponse)
   const login = useCallback((userData) => {
     setUser(normalizeUser(userData));
   }, []);
 
-  // ✅ Logout
+  //  Logout
   const logout = async () => {
     try {
       await axios.post('/api/auth/logout');
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ Value export ra toàn app
+  //  Value export ra toàn app
   const value = useMemo(
     () => ({
       user,

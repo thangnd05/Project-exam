@@ -122,7 +122,7 @@ public class PracticeService {
             correct = en && vi;
         }
 
-        // ✅ Cập nhật tiến trình học
+        //  Cập nhật tiến trình học
         UserVocabulary uv = userVocabularyRepository
                 .findByUserIdAndVocabId(userId, vocab.getVocabId())
                 .orElse(new UserVocabulary(userId, vocab.getVocabId()));

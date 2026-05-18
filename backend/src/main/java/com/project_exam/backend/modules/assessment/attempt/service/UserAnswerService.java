@@ -340,7 +340,7 @@ public class UserAnswerService {
         }).orElse(false);
     }
 
-    // ✅ PHƯƠNG THỨC LOGIC MỚI ĐƯỢC CHUYỂN VÀO ĐÂY
+    //  PHƯƠNG THỨC LOGIC MỚI ĐƯỢC CHUYỂN VÀO ĐÂY
     public ResultSummaryDto getResultSummary(String userTestId, String currentUserId) {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
@@ -348,7 +348,7 @@ public class UserAnswerService {
             throw new ForbiddenException("Bạn không có quyền xem kết quả bài thi này");
         }
 
-        // ✅ Kiểm tra quyền xem kết quả dựa trên thời gian
+        //  Kiểm tra quyền xem kết quả dựa trên thời gian
         Test test = testRepository.findById(userTest.getTestId())
             .orElseThrow(() -> new NotFoundException("Test not found"));
 

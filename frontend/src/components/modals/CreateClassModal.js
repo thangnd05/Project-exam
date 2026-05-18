@@ -18,14 +18,14 @@ function CreateClassModal({ show, onClose }) {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ✅ Message state
+  //  Message state
   const [message, setMessage] = useState('');
   const [type, setType] = useState('info');
 
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ Create class logic
+  //  Create class logic
   const handleCreate = async () => {
     setMessage('');
 
@@ -52,7 +52,7 @@ function CreateClassModal({ show, onClose }) {
     setLoading(true);
 
     try {
-      // ✅ Call API create class
+      //  Call API create class
       // Request body matches ClassEntity: className, description, teacherId (handled by backend or passed from frontend)
       // Backend should handle teacherId from session (as mentioned in conversation 5997355f)
       await axios.post('/api/classes', {
@@ -95,7 +95,7 @@ function CreateClassModal({ show, onClose }) {
         />
       }
     >
-      {/* ✅ Alert Message */}
+      {/*  Alert Message */}
       {message && (
         <Alert variant={type} style={{ margin: '15px 20px', fontSize: '14px' }}>
           {message}

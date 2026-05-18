@@ -144,7 +144,7 @@ public class UserService {
 
     public User createUser(User user) {
 
-        // ✅ Auto avatar mặc định theo username (giống Google)
+        //  Auto avatar mặc định theo username (giống Google)
         String defaultAvatar =
                 "https://ui-avatars.com/api/?name="
                         + user.getUserName()
@@ -164,12 +164,12 @@ public class UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // ✅ Update thông tin profile
+        //  Update thông tin profile
         existingUser.setFullName(updatedUser.getFullName());
         existingUser.setUserName(updatedUser.getUserName());
         existingUser.setEmail(updatedUser.getEmail());
 
-        // ✅ Upload avatar nếu có
+        //  Upload avatar nếu có
         if (avatar != null && !avatar.isEmpty()) {
             String avatarUrl = cloudinaryService.uploadImage(avatar);
             existingUser.setAvatarUrl(avatarUrl);

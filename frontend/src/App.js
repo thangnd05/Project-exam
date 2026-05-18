@@ -47,7 +47,7 @@ function App() {
               );
             })}
 
-            {/* ✅ Admin Routes */}
+            {/*  Admin Routes */}
             {adminRoutes.map((route, index) => {
               const Page = route.component;
               return (
@@ -65,7 +65,7 @@ function App() {
               );
             })}
 
-            {/* ✅ Private Routes */}
+            {/*  Private Routes */}
             {privateRoutes.map((route, index) => {
               const Page = route.component;
               const Layout = DefaultLayout;

@@ -41,7 +41,7 @@
   gap: 22px;
 }
 
-/* === ✅ Thêm sticky + hiệu ứng mờ vào đây === */
+/* ===  Thêm sticky + hiệu ứng mờ vào đây === */
 .wrapper {
   font-size: 1.6rem;
   position: sticky;
@@ -218,7 +218,7 @@
   z-index: 999;
 }
 
-/* ✅ Hover bridge */
+/*  Hover bridge */
 .menuDropdown::before {
   content: "";
   position: absolute;
@@ -231,7 +231,7 @@
   pointer-events: auto;
 }
 
-/* ✅ Giữ dropdown mở khi hover */
+/*  Giữ dropdown mở khi hover */
 .customMenu:hover .menuDropdown,
 .menuDropdown:hover {
   display: flex;

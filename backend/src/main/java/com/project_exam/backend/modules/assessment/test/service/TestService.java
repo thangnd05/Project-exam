@@ -773,7 +773,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             throw new ForbiddenException("Bạn không có quyền xem bài kiểm tra của lớp này!");
         }
 
-        // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
+        //  Nếu hợp lệ, trả danh sách bài kiểm tra
         return testRepository.findByClassId(classId).stream()
                 .map(test -> buildUserTestSummary(test, currentUserId))
                 .toList();
@@ -795,7 +795,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             throw new ForbiddenException("Bạn không có quyền xem bài kiểm tra của lớp này!");
         }
 
-        // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
+        //  Nếu hợp lệ, trả danh sách bài kiểm tra
         return testRepository.findByClassIdAndChapterId(classId,chapterId).stream()
                 .map(test -> buildUserTestSummary(test, currentUserId))
                 .toList();
@@ -808,7 +808,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "🔒 Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
-        // ✅ Nếu hợp lệ, trả danh sách bài kiểm tra
+        //  Nếu hợp lệ, trả danh sách bài kiểm tra
         return testRepository.findByCreatedBy(currentUserId).stream()
                 .map(test -> buildUserTestSummary(test, currentUserId))
                 .toList();

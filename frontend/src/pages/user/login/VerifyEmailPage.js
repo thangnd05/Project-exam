@@ -21,7 +21,7 @@ export default function VerifyEmailPage() {
       .get(`/api/auth/verify?token=${token}`)
       .then((res) => {
         setStatus("success");
-        setMsg(res.data.message || "✅ Xác thực thành công!");
+        setMsg(res.data.message || " Xác thực thành công!");
 
         setTimeout(() => {
           navigate("/login");

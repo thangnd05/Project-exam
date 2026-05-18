@@ -55,7 +55,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         String roleName = "ROLE_" + role.getRoleName().toUpperCase();
 
-        // ✅ Trả về đối tượng UserDetails cho Spring Security
+        //  Trả về đối tượng UserDetails cho Spring Security
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),          // dùng email để login
                 user.getPassword(),

@@ -45,7 +45,7 @@ public class EmailVerificationService {
             LocalDateTime expiry = LocalDateTime.now().plusHours(24);
 
             EmailVerification verification = new EmailVerification();
-            verification.setUserId(user.getUserId()); // ✅ dùng userId thay vì user entity
+            verification.setUserId(user.getUserId()); //  dùng userId thay vì user entity
             verification.setToken(token);
             verification.setExpiresAt(expiry);
             verification.setStatus("PENDING");
@@ -96,7 +96,7 @@ public class EmailVerificationService {
                     .body(Map.of("message", "Liên kết xác thực đã hết hạn. Tài khoản đã bị hủy, vui lòng đăng ký lại."));
         }
 
-        // ✅ Kiểm tra trạng thái đã xác thực trước đó
+        //  Kiểm tra trạng thái đã xác thực trước đó
         if ("VERIFIED".equals(ev.getStatus()) || user.getVerified()) {
             // Dọn sạch bản ghi cũ nếu vẫn còn
             emailVerificationRepository.delete(ev);
@@ -110,7 +110,7 @@ public class EmailVerificationService {
         // 🧹 Xóa token ngay sau khi xác thực
         emailVerificationRepository.delete(ev);
 
-        return ResponseEntity.ok(Map.of("message", "✅ Xác thực tài khoản thành công!"));
+        return ResponseEntity.ok(Map.of("message", " Xác thực tài khoản thành công!"));
     }
 
     /**
