@@ -18,7 +18,7 @@ const cx = classNames.bind(styles);
 const emptyForm = {
   name: '',
   description: '',
-  duration_minutes: 60,
+  duration_minutes: '',
   scoring_method: 'DEFAULT',
 };
 
@@ -26,16 +26,21 @@ const mapExamTypeFromApi = (item) => ({
   exam_type_id: String(item.examTypeId),
   name: item.name || '',
   description: item.description || '',
-  duration_minutes: item.durationMinutes || 0,
+  duration_minutes: item.durationMinutes ?? '',
   scoring_method: item.scoringMethod || 'DEFAULT',
 });
 
-const buildExamTypePayload = (formState) => ({
-  name: formState.name.trim(),
-  description: formState.description.trim(),
-  durationMinutes: Number(formState.duration_minutes) || 0,
-  scoringMethod: formState.scoring_method,
-});
+const buildExamTypePayload = (formState) => {
+  const durationValue = String(formState.duration_minutes).trim();
+  const durationMinutes = durationValue ? Number(durationValue) : null;
+
+  return {
+    name: formState.name.trim(),
+    description: formState.description.trim(),
+    durationMinutes,
+    scoringMethod: formState.scoring_method,
+  };
+};
 
 function ExamTypesManagement() {
   const [examTypes, setExamTypes] = useState([]);
@@ -95,7 +100,7 @@ function ExamTypesManagement() {
     setFormState({
       name: examType.name,
       description: examType.description || '',
-      duration_minutes: examType.duration_minutes || 60,
+      duration_minutes: examType.duration_minutes ?? '',
       scoring_method: examType.scoring_method || 'DEFAULT',
     });
     setShowFormModal(true);
@@ -103,8 +108,15 @@ function ExamTypesManagement() {
 
   const handleSubmit = async () => {
     const normalizedName = formState.name.trim();
+    const durationValue = String(formState.duration_minutes).trim();
+    const parsedDuration = durationValue ? Number(durationValue) : null;
+
     if (!normalizedName) {
       setErrorMessage('Tên loại kỳ thi không được để trống.');
+      return;
+    }
+    if (durationValue && (!Number.isFinite(parsedDuration) || parsedDuration <= 0)) {
+      setErrorMessage('Thời lượng phải là số lớn hơn 0 hoặc để trống.');
       return;
     }
 
@@ -207,7 +219,11 @@ function ExamTypesManagement() {
               <tr key={examType.exam_type_id}>
                 <td>{examType.exam_type_id}</td>
                 <td>{examType.name}</td>
-                <td>{examType.duration_minutes} phút</td>
+                <td>
+                  {examType.duration_minutes !== '' && examType.duration_minutes != null
+                    ? `${examType.duration_minutes} phút`
+                    : '-'}
+                </td>
                 <td>
                   <Badge bg="primary">{examType.scoring_method}</Badge>
                 </td>

@@ -1,7 +1,7 @@
 import axios from './axiosClient';
 
 const BASE_URL = '/api/exam-parts';
-const ADMIN_BASE_URL = '/api/admin/exam-parts';
+const ADMIN_BASE_URL = '/api/exam-parts';
 
 export const getExamParts = () => {
   return axios.get(BASE_URL).then((response) => response.data);

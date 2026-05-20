@@ -21,8 +21,9 @@ public class ExamType {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private Integer durationMinutes; // thời gian riêng cho part (nếu muốn)
+    /** Gợi ý mặc định theo loại kỳ thi; hệ thống không đọc field này cho chấm điểm hay đếm giờ (dùng {@code Test#durationMinutes}). */
+    @Column(nullable = true)
+    private Integer durationMinutes;
 
     @Column(name = "scoring_method", nullable = false, length = 50)
     private String scoringMethod = "DEFAULT";

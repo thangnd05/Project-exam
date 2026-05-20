@@ -27,6 +27,6 @@ public class ExamPart {
     @Column(name = "default_num_questions")
     private Integer defaultNumQuestions;
 
-    @Column(nullable = false)
-    private String skillId; // FK -> exam_types
+    @Column(nullable = true)
+    private String skillId; // FK -> skills (cho phép null với scoring mặc định)
 }

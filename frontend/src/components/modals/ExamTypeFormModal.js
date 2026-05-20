@@ -40,7 +40,7 @@ function ExamTypeFormModal({
             min={1}
             value={formState.duration_minutes}
             onChange={(event) =>
-              onChangeField('duration_minutes', Number(event.target.value))
+              onChangeField('duration_minutes', event.target.value)
             }
           />
         </Form.Group>
