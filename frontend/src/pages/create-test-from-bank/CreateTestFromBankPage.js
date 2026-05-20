@@ -23,6 +23,7 @@ import {
   IoCreateOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hook/useBaseMetaData';
+import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
 import { getExamCategories } from '~/api/examCategoryApi';
 import styles from './CreateTestFromBankPage.module.scss';
@@ -545,11 +546,15 @@ const CreateTestFromBankPage = () => {
                                 />
                               </div>
                               <div className={cx('groupList')}>
-                                {groups.map((gr) => {
+                                {(() => {
+                                  let listOffset = 0;
+                                  return groups.map((gr) => {
                                   const grSelected = isGroupSelected(part.examPartId, gr.groupKey);
                                   const grLabel = gr.passageId != null
                                     ? `Nhóm passage (${gr.questions.length} câu)`
                                     : `Câu độc lập (${gr.questions.length} câu)`;
+                                  const groupStartOffset = listOffset;
+                                  listOffset += gr.questions.length;
                                   return (
                                     <div key={gr.groupKey} className={cx('passageGroup', { selected: grSelected })}>
                                       <div className={cx('groupHeader')}>
@@ -567,9 +572,10 @@ const CreateTestFromBankPage = () => {
                                           const id = q.questionId ?? q.id;
                                           if (id == null) return null;
                                           const checked = (cfg.selectedIds || []).includes(id);
+                                          const displayNo = getQuestionDisplayNumber(q, groupStartOffset + index);
                                           return (
                                             <li key={id} className={cx('questionItem', { selected: checked })}>
-                                              <span className={cx('questionIndex')}>{index + 1}.</span>
+                                              <span className={cx('questionIndex')}>{displayNo}.</span>
                                               <span className={cx('questionText')}>{q.questionText || '(Không có nội dung)'}</span>
                                               <button 
                                                 type="button" 
@@ -588,7 +594,8 @@ const CreateTestFromBankPage = () => {
                                       </ul>
                                     </div>
                                   );
-                                })}
+                                });
+                                })()}
                               </div>
                             </>
                           );

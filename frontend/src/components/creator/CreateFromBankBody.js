@@ -23,6 +23,7 @@ import {
   IoSchoolOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hook/useBaseMetaData';
+import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
 import { getExamCategories } from '~/api/examCategoryApi';
 import styles from '../modals/CreateTestModal.module.scss';
@@ -681,11 +682,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                               />
                             </div>
                             <div className={cx('bankGroupList')}>
-                              {groups.map((gr) => {
+                              {(() => {
+                                let listOffset = 0;
+                                return groups.map((gr) => {
                                 const grSelected = isGroupSelected(part.examPartId, gr.groupKey);
                                 const grLabel = gr.passageId != null
                                   ? `Nhóm passage (${gr.questions.length} câu)`
                                   : `Câu độc lập (${gr.questions.length} câu)`;
+                                const groupStartOffset = listOffset;
+                                listOffset += gr.questions.length;
                                 return (
                                   <div key={gr.groupKey} className={cx('bankPassageGroup', { selected: grSelected })}>
                                     <div className={cx('bankGroupHeader')}>
@@ -703,9 +708,10 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                         const id = q.questionId ?? q.id;
                                         if (id == null) return null;
                                         const checked = (cfg.selectedIds || []).includes(id);
+                                        const displayNo = getQuestionDisplayNumber(q, groupStartOffset + index);
                                         return (
                                           <li key={id} className={cx('bankQuestionItem', { selected: checked })}>
-                                            <span className={cx('bankQuestionIndex')}>{index + 1}.</span>
+                                            <span className={cx('bankQuestionIndex')}>{displayNo}.</span>
                                             <span className={cx('bankQuestionText')}>{q.questionText || '(Không có nội dung)'}</span>
                                             {bankSource === BANK_SOURCES.PERSONAL && (
                                               <button
@@ -726,7 +732,8 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                     </ul>
                                   </div>
                                 );
-                              })}
+                              });
+                              })()}
                             </div>
                           </>
                         );

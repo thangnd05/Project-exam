@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 public class QuestionResponse {
     private String questionId;
+    private Integer questionNumber;
     private String examPartId;
     private String questionText;
     private Question.QuestionType questionType;

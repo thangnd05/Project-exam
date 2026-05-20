@@ -95,6 +95,7 @@ public class QuestionService {
         return findAll().stream()
                 .map(question -> QuestionAdminResponse.builder()
                         .questionId(question.getQuestionId())
+                        .questionNumber(question.getQuestionNumber())
                         .examPartId(question.getExamPartId())
                         .questionText(question.getQuestionText())
                         .questionType(question.getQuestionType())
@@ -212,6 +213,7 @@ public class QuestionService {
 
         return QuestionResponse.builder()
                 .questionId(question.getQuestionId())
+                .questionNumber(question.getQuestionNumber())
                 .examPartId(question.getExamPartId())
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
@@ -622,6 +624,9 @@ public class QuestionService {
         }
 
         List<QuestionAdminResponse> responses = new ArrayList<>();
+        int baseMax = resolveMaxQuestionNumber(
+                request.getExamPartId(), request.getClassId(), request.getChapterId(), currentUserId);
+        int batchIndex = 0;
         for (NormalQuestionRequest qReq : request.getQuestions()) {
             Question question = new Question();
             question.setExamPartId(request.getExamPartId());
@@ -634,6 +639,7 @@ public class QuestionService {
             if (request.getChapterId() != null) question.setChapterId(request.getChapterId());
             if (qReq.getCollectionId() != null) question.setCollectionId(qReq.getCollectionId());
             question.setIsBank(Boolean.TRUE);
+            question.setQuestionNumber(resolveBankQuestionNumber(baseMax, qReq, batchIndex++));
             question = questionRepository.save(question);
 
             List<Answer> savedAnswers = saveAnswersForQuestion(question.getQuestionId(), qReq.getAnswers(), qReq.getQuestionType());
@@ -667,6 +673,8 @@ public class QuestionService {
         }
 
         List<QuestionAdminResponse> responses = new ArrayList<>();
+        int baseMax = resolveMaxQuestionNumber(
+                request.getExamPartId(), request.getClassId(), request.getChapterId(), currentUserId);
 
         for (int i = 0; i < request.getQuestions().size(); i++) {
 
@@ -691,6 +699,7 @@ public class QuestionService {
             if (qReq.getCollectionId() != null)
                 question.setCollectionId(qReq.getCollectionId());
 
+            question.setQuestionNumber(resolveBankQuestionNumber(baseMax, qReq, i));
             question = questionRepository.save(question);
 
             // 🔥 Lấy toàn bộ file của câu hỏi này
@@ -1025,6 +1034,7 @@ public class QuestionService {
                 .toList();
         return QuestionAdminResponse.builder()
                 .questionId(question.getQuestionId())
+                .questionNumber(question.getQuestionNumber())
                 .examPartId(question.getExamPartId())
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
@@ -1077,6 +1087,7 @@ public class QuestionService {
 
         return QuestionAdminResponse.builder()
                 .questionId(question.getQuestionId())
+                .questionNumber(question.getQuestionNumber())
                 .examPartId(question.getExamPartId())
                 .questionText(question.getQuestionText())
                 .questionType(question.getQuestionType())
@@ -1238,6 +1249,9 @@ public class QuestionService {
         }
 
         List<QuestionAdminResponse> allResponses = new ArrayList<>();
+        int baseMax = resolveMaxQuestionNumber(
+                request.getExamPartId(), request.getClassId(), request.getChapterId(), currentUserId);
+        int batchIndex = 0;
 
         for (int gIndex = 0; gIndex < request.getGroups().size(); gIndex++) {
             final int finalGIndex = gIndex;
@@ -1309,6 +1323,7 @@ public class QuestionService {
                 if (qReq.getCollectionId() != null)
                     question.setCollectionId(qReq.getCollectionId());
 
+                question.setQuestionNumber(resolveBankQuestionNumber(baseMax, qReq, batchIndex++));
                 question = questionRepository.save(question);
 
                 List<Answer> savedAnswers =
@@ -1333,6 +1348,34 @@ public class QuestionService {
         }
 
         return allResponses;
+    }
+
+    private int resolveMaxQuestionNumber(
+            String examPartId,
+            String classId,
+            String chapterId,
+            String createdBy
+    ) {
+        Integer max;
+        if (classId != null && chapterId != null) {
+            max = questionRepository.findMaxQuestionNumberByExamPartAndClassAndChapter(
+                    examPartId, classId, chapterId);
+        } else if (classId != null) {
+            max = questionRepository.findMaxQuestionNumberByExamPartAndClass(examPartId, classId);
+        } else {
+            max = questionRepository.findMaxQuestionNumberPersonal(examPartId, createdBy);
+        }
+        return max == null ? 0 : max;
+    }
+
+    /**
+     * Gán số câu trong kho: max hiện tại + thứ tự từ form (questionNumber 1, 2, 3…).
+     */
+    private int resolveBankQuestionNumber(int baseMax, NormalQuestionRequest qReq, int batchIndex) {
+        if (qReq.getQuestionNumber() != null && qReq.getQuestionNumber() > 0) {
+            return baseMax + qReq.getQuestionNumber();
+        }
+        return baseMax + batchIndex + 1;
     }
 
 }

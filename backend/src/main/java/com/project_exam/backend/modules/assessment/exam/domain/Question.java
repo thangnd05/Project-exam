@@ -56,4 +56,8 @@ public class Question {
     @Column(name = "collection_id")
     private String collectionId; // FK -> question_collections (nullable)
 
+    /** Số thứ tự câu trong kho theo part + phạm vi (cá nhân/lớp/admin). */
+    @Column(name = "question_number")
+    private Integer questionNumber;
+
 }

@@ -20,4 +20,6 @@ public class NormalQuestionRequest {
     private String collectionId;
     private String explanation;
     private List<String> tagIds; // optional: danh sách tag gắn cho câu hỏi
+    /** Thứ tự tương đối từ form (1, 2, 3…); BE cộng vào max hiện có trong kho. */
+    private Integer questionNumber;
 }

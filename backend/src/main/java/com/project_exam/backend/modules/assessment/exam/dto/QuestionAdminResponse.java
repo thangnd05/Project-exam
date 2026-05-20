@@ -13,6 +13,7 @@ import java.util.List;
 public class QuestionAdminResponse {
 
     private final String questionId;
+    private final Integer questionNumber;
     private final String examPartId;
     private final String questionText;
     private final Question.QuestionType questionType;

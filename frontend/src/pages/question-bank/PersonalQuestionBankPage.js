@@ -15,6 +15,7 @@ import {
 import {useBaseMetaData} from '~/hook/useBaseMetaData';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
 import ViewQuestionModal from '~/components/modals/ViewQuestionModal';
+import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import styles from './PersonalQuestionBankPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -522,7 +523,7 @@ const PersonalQuestionBankPage = () => {
                               return (
                                 <li key={id} className={cx('questionItem')}>
                                   <span className={cx('questionIndex')}>
-                                    {idx + 1}.
+                                    {getQuestionDisplayNumber(q, idx)}.
                                   </span>
                                   <span className={cx('questionText')}>
                                     {q.questionText || '(Không có nội dung)'}
@@ -543,7 +544,7 @@ const PersonalQuestionBankPage = () => {
                                       size="sm"
                                       variant="outline-secondary"
                                       onClick={() => setViewingQuestionId(id)}
-                                      aria-label={`Xem câu ${idx + 1}`}
+                                      aria-label={`Xem câu ${getQuestionDisplayNumber(q, idx)}`}
                                     >
                                       <IoEyeOutline />
                                     </Button>
@@ -558,7 +559,7 @@ const PersonalQuestionBankPage = () => {
                                         setEditingPartId(null);
                                         setEditingQuestionId(id);
                                       }}
-                                      aria-label={`Sửa câu ${idx + 1}`}
+                                      aria-label={`Sửa câu ${getQuestionDisplayNumber(q, idx)}`}
                                     >
                                       <IoCreateOutline />
                                     </Button>
@@ -574,7 +575,7 @@ const PersonalQuestionBankPage = () => {
                                           chapterId: chapter.chapterId,
                                         })
                                       }
-                                      aria-label={`Xóa câu ${idx + 1}`}
+                                      aria-label={`Xóa câu ${getQuestionDisplayNumber(q, idx)}`}
                                     >
                                       <IoTrashOutline />
                                     </Button>
@@ -659,7 +660,7 @@ const PersonalQuestionBankPage = () => {
                               return (
                                 <li key={id} className={cx('questionItem')}>
                                   <span className={cx('questionIndex')}>
-                                    {idx + 1}.
+                                    {getQuestionDisplayNumber(q, idx)}.
                                   </span>
                                   <span className={cx('questionText')}>
                                     {q.questionText || '(Không có nội dung)'}
@@ -680,7 +681,7 @@ const PersonalQuestionBankPage = () => {
                                       size="sm"
                                       variant="outline-secondary"
                                       onClick={() => setViewingQuestionId(id)}
-                                      aria-label={`Xem câu ${idx + 1}`}
+                                      aria-label={`Xem câu ${getQuestionDisplayNumber(q, idx)}`}
                                     >
                                       <IoEyeOutline />
                                     </Button>
@@ -697,7 +698,7 @@ const PersonalQuestionBankPage = () => {
                                             setEditingChapterId(null);
                                             setEditingQuestionId(id);
                                           }}
-                                          aria-label={`Sửa câu ${idx + 1}`}
+                                          aria-label={`Sửa câu ${getQuestionDisplayNumber(q, idx)}`}
                                         >
                                           <IoCreateOutline />
                                         </Button>
@@ -713,7 +714,7 @@ const PersonalQuestionBankPage = () => {
                                               partId: part.examPartId,
                                             })
                                           }
-                                          aria-label={`Xóa câu ${idx + 1}`}
+                                          aria-label={`Xóa câu ${getQuestionDisplayNumber(q, idx)}`}
                                         >
                                           <IoTrashOutline />
                                         </Button>

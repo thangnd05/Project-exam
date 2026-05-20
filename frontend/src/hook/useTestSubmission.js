@@ -176,7 +176,8 @@ export const useTestSubmission = ({
                     classId: mode === 'class' && classId ? String(classId) : null,
                     chapterId: mode === 'class' && chapterId ? String(chapterId) : null,
                     collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
-                    questions: questions.map((q) => ({
+                    questions: questions.map((q, index) => ({
+                        questionNumber: index + 1,
                         questionType: q.questionType,
                         questionText: q.questionText,
                         collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
@@ -209,6 +210,7 @@ export const useTestSubmission = ({
                 setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
             } else if (creatorType === CREATOR_TYPES.PASSAGE) {
                 const formData = new FormData();
+                let passageQuestionOrder = 0;
                 const requestData = {
                     examPartId: String(testInfo.examPartId),
                     classId: mode === 'class' && classId ? String(classId) : null,
@@ -220,6 +222,7 @@ export const useTestSubmission = ({
                             content: group.passage.content || '',
                         },
                         questions: group.questions.map((q) => ({
+                            questionNumber: ++passageQuestionOrder,
                             questionText: q.questionText,
                             questionType: q.questionType,
                             collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
