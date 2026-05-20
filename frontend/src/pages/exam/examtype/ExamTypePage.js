@@ -4,7 +4,9 @@ import axios from '../../../api/axiosClient';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import style from './ExamTypeStyle.module.scss';
-import {FaBookOpen, FaGlobe, FaCertificate, FaGraduationCap, FaLayerGroup} from 'react-icons/fa';
+import {FaBookOpen, FaBullseye, FaGlobe, FaCertificate, FaGraduationCap, FaLayerGroup} from 'react-icons/fa';
+import {useAuth} from '../../../hook/useAuth';
+import routes from '~/config/Routes';
 
 const cx = classNames.bind(style);
 
@@ -43,6 +45,7 @@ const cardVariants = {
 function ExamTypePage() {
   const [examTypes, setExamTypes] = useState([]);
   const navigate = useNavigate();
+  const {user} = useAuth();
 
   const normalizeExamTypes = (payload) => {
     if (Array.isArray(payload)) {
@@ -71,6 +74,15 @@ function ExamTypePage() {
 
   const handleClick = (examTypeId) => {
     navigate(`/exam-types/${examTypeId}`);
+  };
+
+  const handleSetTarget = (event, examTypeId) => {
+    event.stopPropagation();
+    if (!user) {
+      navigate(routes.login);
+      return;
+    }
+    navigate(`${routes.myTarget}?examTypeId=${examTypeId}`);
   };
 
   const getIcon = (name) => {
@@ -115,10 +127,20 @@ function ExamTypePage() {
             </div>
             <div className={cx('card-info')}>
               <h4 className={cx('name')}>{examType.name}</h4>
-              <span className={cx('action-text')}>
-                Khám phá ngay
-                <span className={cx('arrow')}>→</span>
-              </span>
+              <div className={cx('cardActions')}>
+                <span className={cx('action-text')}>
+                  Khám phá ngay
+                  <span className={cx('arrow')}>→</span>
+                </span>
+                <button
+                  type="button"
+                  className={cx('targetBtn')}
+                  onClick={(event) => handleSetTarget(event, examType.examTypeId)}
+                >
+                  <FaBullseye />
+                  Mục tiêu của tôi
+                </button>
+              </div>
             </div>
           </motion.div>
         ))}

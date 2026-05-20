@@ -51,7 +51,7 @@ import QuestionCollectionsManagement from '~/Admin/pages/QuestionCollections';
 import TagsManagement from '~/Admin/pages/Tags';
 import RecoveryResourcesManagement from '~/Admin/pages/RecoveryResources';
 import MilestonesManagement from '~/Admin/pages/Milestones';
-import UserTargetTestPage from '~/pages/user/UserTargetTestPage';
+import UserTargetPage from '~/pages/user/UserTargetPage';
 
 //  Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -112,7 +112,7 @@ export const privateRoutes = [
   { path: routes.createTestFromBank, component: CreateTestFromBankPage },
   { path: routes.personalQuestionBank, component: PersonalQuestionBankPage },
   { path: routes.profile, component: ProfileOverviewPage },
-  { path: routes.myTarget, component: UserTargetTestPage },
+  { path: routes.myTarget, component: UserTargetPage },
   { path: routes.myEvaluations, component: MyEvaluationsPage },
   { path: routes.myPosts, component: MyPostsPage },
   { path: routes.savedPosts, component: SavedPostsPage },

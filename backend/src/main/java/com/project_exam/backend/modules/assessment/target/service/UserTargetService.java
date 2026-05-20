@@ -19,9 +19,16 @@ public class UserTargetService {
     private final UserTargetPartRepository userTargetPartRepository;
 
     public UserTargetResponse getByUserAndExamType(String userId, String examTypeId) {
-        UserTarget ut = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId)
-                .orElseThrow(() -> new NotFoundException("Chưa đặt mục tiêu cho loại đề này"));
-        return toResponse(ut);
+        return userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId)
+                .map(this::toResponse)
+                .orElseGet(this::emptyResponse);
+    }
+
+    private UserTargetResponse emptyResponse() {
+        UserTargetResponse res = new UserTargetResponse();
+        res.setHasTarget(false);
+        res.setPartRequirements(List.of());
+        return res;
     }
 
     @Transactional
@@ -85,6 +92,7 @@ public class UserTargetService {
 
     private UserTargetResponse toResponse(UserTarget ut) {
         UserTargetResponse res = new UserTargetResponse();
+        res.setHasTarget(true);
         res.setUserTargetId(ut.getUserTargetId());
         res.setUserId(ut.getUserId());
         res.setExamTypeId(ut.getExamTypeId());

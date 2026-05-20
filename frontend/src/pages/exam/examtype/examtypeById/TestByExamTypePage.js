@@ -1,11 +1,12 @@
 import axios from '../../../../api/axiosClient';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {
-  IoDocumentTextOutline,
-} from 'react-icons/io5';
+import { FaBullseye } from 'react-icons/fa';
+import { IoDocumentTextOutline } from 'react-icons/io5';
+import routes from '~/config/Routes';
+import { useAuth } from '../../../../hook/useAuth';
 
 import style from './TestByExamTypePage.module.scss';
 import TestListContainer from '~/components/common/TestListContainer/TestListContainer';
@@ -14,6 +15,8 @@ const cx = classNames.bind(style);
 
 function TestByExamTypePage() {
   const { examTypeId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [tests, setTests] = useState([]);
   const [examTypeName, setExamTypeName] = useState('');
@@ -71,6 +74,14 @@ function TestByExamTypePage() {
     );
   }
 
+  const handleOpenTarget = () => {
+    if (!user) {
+      navigate(routes.login);
+      return;
+    }
+    navigate(`${routes.myTarget}?examTypeId=${examTypeId}`);
+  };
+
   const emptyState = (
     <div className={cx('empty-state')}>
       <IoDocumentTextOutline className={cx('icon')} />
@@ -85,6 +96,9 @@ function TestByExamTypePage() {
     <TestListContainer
       title={examTypeName || 'Loại bài tập'}
       label="Khám phá bộ đề"
+      secondaryActionText="Mục tiêu của tôi"
+      secondaryActionIcon={FaBullseye}
+      onSecondaryAction={handleOpenTarget}
       tests={tests}
       countdowns={countdowns}
       emptyState={emptyState}

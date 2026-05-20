@@ -18,6 +18,9 @@ const TestListContainer = ({
   actionText,
   actionIcon,
   onAction,
+  secondaryActionText,
+  secondaryActionIcon,
+  onSecondaryAction,
   tests = [],
   countdowns = {},
   handleDeleteTest,
@@ -37,6 +40,9 @@ const TestListContainer = ({
           actionText={actionText}
           actionIcon={actionIcon}
           onAction={onAction}
+          secondaryActionText={secondaryActionText}
+          secondaryActionIcon={secondaryActionIcon}
+          onSecondaryAction={onSecondaryAction}
         >
           {tests.length > 0 && (
             <PageHeaderViewToggle

@@ -133,6 +133,14 @@
         transition: color 0.3s ease;
       }
 
+      .cardActions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        width: 100%;
+      }
+
       .action-text {
         font-size: 1.5rem;
         font-weight: 700;
@@ -141,6 +149,29 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s ease;
+      }
+
+      .targetBtn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border: 1px solid rgba(0, 97, 242, 0.25);
+        border-radius: 999px;
+        background: rgba(0, 97, 242, 0.08);
+        color: var(--primary, #0061f2);
+        font-size: 1.3rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        position: relative;
+        z-index: 2;
+
+        &:hover {
+          background: var(--primary, #0061f2);
+          color: #fff;
+          border-color: transparent;
+        }
       }
     }
   }

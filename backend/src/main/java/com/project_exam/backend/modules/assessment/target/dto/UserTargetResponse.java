@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class UserTargetResponse {
+    private boolean hasTarget;
     private String userTargetId;
     private String userId;
     private String examTypeId;
