@@ -15,5 +15,6 @@ public class RecoveryRecommendationDto {
     private String resourceId;
     private String resourceTitle;
     private String resourceUrl;
+    private String originalFileName;
     private String resourceDescription;
 }

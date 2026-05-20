@@ -619,6 +619,7 @@ public class EnhancedResultService {
                     .resourceId(resource.getResourceId())
                     .resourceTitle(resource.getTitle())
                     .resourceUrl(resource.getUrl())
+                    .originalFileName(resource.getOriginalFileName())
                     .resourceDescription(resource.getDescription())
                     .build());
         }
