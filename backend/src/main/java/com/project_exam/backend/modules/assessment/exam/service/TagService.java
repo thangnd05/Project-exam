@@ -49,7 +49,7 @@ public class TagService {
         Tag tag = new Tag();
         tag.setName(request.getName().trim());
         tag.setExamTypeId(request.getExamTypeId());
-        tag.setParentId(request.getParentId());
+        tag.setParentId(normalizeParentId(request.getParentId()));
         tag = tagRepository.save(tag);
 
         return toResponse(tag, List.of());
@@ -71,7 +71,7 @@ public class TagService {
             if (!parent.getExamTypeId().equals(tag.getExamTypeId())) {
                 throw new BadRequestException("Tag cha phải cùng examTypeId.");
             }
-            tag.setParentId(request.getParentId());
+            tag.setParentId(normalizeParentId(request.getParentId()));
         }
 
         tag = tagRepository.save(tag);
@@ -105,9 +105,14 @@ public class TagService {
      */
     public List<TagResponse> getTagTreeByExamType(String examTypeId) {
         List<Tag> allTags = tagRepository.findByExamTypeId(examTypeId);
-        // Lọc root tags (parentId == null) rồi build cây đệ quy
-        return allTags.stream()
-                .filter(t -> t.getParentId() == null)
+        List<Tag> rootTags = tagRepository.findByExamTypeIdAndParentIdIsNull(examTypeId);
+        // Fallback: tag cũ có parent_id = '' vẫn coi là root
+        if (rootTags.isEmpty()) {
+            rootTags = allTags.stream()
+                    .filter(t -> t.getParentId() == null || t.getParentId().isBlank())
+                    .toList();
+        }
+        return rootTags.stream()
                 .map(t -> toResponse(t, buildChildren(t.getTagId(), allTags)))
                 .collect(Collectors.toList());
     }
@@ -157,9 +162,16 @@ public class TagService {
 
     private List<TagResponse> buildChildren(String parentId, List<Tag> allTags) {
         return allTags.stream()
-                .filter(t -> parentId.equals(t.getParentId()))
+                .filter(t -> parentId != null && parentId.equals(t.getParentId()))
                 .map(t -> toResponse(t, buildChildren(t.getTagId(), allTags)))
                 .collect(Collectors.toList());
+    }
+
+    private String normalizeParentId(String parentId) {
+        if (parentId == null || parentId.isBlank()) {
+            return null;
+        }
+        return parentId.trim();
     }
 
     private TagResponse toResponse(Tag tag, List<TagResponse> children) {

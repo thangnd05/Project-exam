@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.TagRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
 import com.project_exam.backend.modules.assessment.exam.service.TagService;
+import com.project_exam.backend.shared.util.AuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,26 +18,39 @@ import java.util.List;
 public class TagController {
 
     private final TagService tagService;
+    private final AuthUtils authUtils;
 
     // =================== CREATE ===================
 
     @PostMapping
-    public ResponseEntity<TagResponse> createTag(@RequestBody TagRequest request) {
+    public ResponseEntity<TagResponse> createTag(
+            @RequestBody TagRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        authUtils.requireAdmin(httpRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(tagService.createTag(request));
     }
 
     // =================== UPDATE ===================
 
     @PutMapping("/{tagId}")
-    public ResponseEntity<TagResponse> updateTag(@PathVariable String tagId,
-                                                 @RequestBody TagRequest request) {
+    public ResponseEntity<TagResponse> updateTag(
+            @PathVariable String tagId,
+            @RequestBody TagRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        authUtils.requireAdmin(httpRequest);
         return ResponseEntity.ok(tagService.updateTag(tagId, request));
     }
 
     // =================== DELETE ===================
 
     @DeleteMapping("/{tagId}")
-    public ResponseEntity<Void> deleteTag(@PathVariable String tagId) {
+    public ResponseEntity<Void> deleteTag(
+            @PathVariable String tagId,
+            HttpServletRequest httpRequest
+    ) {
+        authUtils.requireAdmin(httpRequest);
         tagService.deleteTag(tagId);
         return ResponseEntity.noContent().build();
     }

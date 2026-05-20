@@ -120,14 +120,15 @@ function TagsManagement() {
       .catch(() => {});
   }, []);
 
-  const fetchTags = useCallback(async () => {
-    if (!selectedExamTypeId) return;
+  const fetchTags = useCallback(async (examTypeIdOverride) => {
+    const examTypeId = examTypeIdOverride || selectedExamTypeId;
+    if (!examTypeId) return;
     setLoading(true);
     setErrorMessage('');
     try {
       const [tree, flat] = await Promise.all([
-        getTagTreeByExamType(selectedExamTypeId),
-        getTagsFlatByExamType(selectedExamTypeId),
+        getTagTreeByExamType(examTypeId),
+        getTagsFlatByExamType(examTypeId),
       ]);
       setTagTree(tree);
       setFlatTags(flat);
@@ -207,6 +208,11 @@ function TagsManagement() {
   };
 
   const handleSubmit = async () => {
+    const examTypeId = formState.examTypeId || selectedExamTypeId;
+    if (!examTypeId) {
+      setErrorMessage('Vui lòng chọn loại kỳ thi.');
+      return;
+    }
     if (!formState.name.trim()) {
       setErrorMessage('Tên tag không được để trống.');
       return;
@@ -216,19 +222,34 @@ function TagsManagement() {
     try {
       const payload = {
         name: formState.name.trim(),
-        examTypeId: formState.examTypeId || selectedExamTypeId,
+        examTypeId,
         parentId: formState.parentId || null,
       };
-      if (editingTagId) {
-        await updateTag(editingTagId, payload);
-      } else {
-        await createTag(payload);
+      const savedTag = editingTagId
+        ? await updateTag(editingTagId, payload)
+        : await createTag(payload);
+
+      const targetExamTypeId = savedTag?.examTypeId || examTypeId;
+      if (targetExamTypeId !== selectedExamTypeId) {
+        setSelectedExamTypeId(targetExamTypeId);
       }
+      setSearchTerm('');
       setShowFormModal(false);
       resetForm();
-      await fetchTags();
-    } catch {
-      setErrorMessage('Không thể lưu tag. Vui lòng thử lại.');
+      await fetchTags(targetExamTypeId);
+      if (savedTag?.tagId) {
+        setExpandedIds((previous) => {
+          const next = new Set(previous);
+          next.add(savedTag.tagId);
+          if (savedTag.parentId) {
+            next.add(savedTag.parentId);
+          }
+          return next;
+        });
+      }
+    } catch (error) {
+      const apiMessage = error?.response?.data?.message;
+      setErrorMessage(apiMessage || 'Không thể lưu tag. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
@@ -306,9 +327,15 @@ function TagsManagement() {
           </div>
         )}
 
-        {!loading && tagTree.length === 0 && (
+        {!loading && flatTags.length === 0 && (
           <div className="text-center py-4 text-muted">
             Không có tag nào.
+          </div>
+        )}
+
+        {!loading && flatTags.length > 0 && tagTree.length === 0 && (
+          <div className="text-center py-4 text-muted">
+            Có {flatTags.length} tag nhưng không hiển thị được cây. Kiểm tra tag cha hợp lệ.
           </div>
         )}
 
