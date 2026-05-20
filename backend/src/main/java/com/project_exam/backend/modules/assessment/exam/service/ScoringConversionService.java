@@ -7,8 +7,11 @@ import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionRes
 import com.project_exam.backend.modules.assessment.exam.domain.ScoringConversion;
 import com.project_exam.backend.modules.assessment.exam.repository.ScoringConversionRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,13 +50,35 @@ public class ScoringConversionService {
     }
 
     public ScoringConversionResponse create(ScoringConversionRequest request) {
+        validateRequest(request);
         ScoringConversion c = new ScoringConversion();
-        c.setExamTypeId(request.getExamTypeId());
-        c.setSkillId(request.getSkillId());
+        c.setExamTypeId(request.getExamTypeId().trim());
+        c.setSkillId(request.getSkillId().trim());
         c.setNumCorrect(request.getNumCorrect());
         c.setConvertedScore(request.getConvertedScore());
         c = scoringConversionRepository.save(c);
         return toResponse(c);
+    }
+
+    public List<ScoringConversionResponse> createBulk(List<ScoringConversionRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Danh sách quy đổi không được để trống");
+        }
+
+        List<ScoringConversion> conversions = new ArrayList<>();
+        for (ScoringConversionRequest request : requests) {
+            validateRequest(request);
+            ScoringConversion conversion = new ScoringConversion();
+            conversion.setExamTypeId(request.getExamTypeId().trim());
+            conversion.setSkillId(request.getSkillId().trim());
+            conversion.setNumCorrect(request.getNumCorrect());
+            conversion.setConvertedScore(request.getConvertedScore());
+            conversions.add(conversion);
+        }
+
+        return scoringConversionRepository.saveAll(conversions).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public ScoringConversionResponse update(String id, ScoringConversionRequest request) {
@@ -81,5 +106,23 @@ public class ScoringConversionService {
         res.setNumCorrect(c.getNumCorrect());
         res.setConvertedScore(c.getConvertedScore());
         return res;
+    }
+
+    private void validateRequest(ScoringConversionRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payload quy đổi không hợp lệ");
+        }
+        if (request.getExamTypeId() == null || request.getExamTypeId().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "examTypeId là bắt buộc");
+        }
+        if (request.getSkillId() == null || request.getSkillId().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "skillId là bắt buộc");
+        }
+        if (request.getNumCorrect() == null || request.getNumCorrect() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "numCorrect phải lớn hơn hoặc bằng 0");
+        }
+        if (request.getConvertedScore() == null || request.getConvertedScore() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "convertedScore phải lớn hơn hoặc bằng 0");
+        }
     }
 }

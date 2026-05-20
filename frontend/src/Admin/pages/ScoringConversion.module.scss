@@ -32,10 +32,6 @@
   }
 }
 
-.hiddenInput {
-  display: none;
-}
-
 .filters {
   display: grid;
   grid-template-columns: 1fr 220px;
@@ -89,6 +85,28 @@
   h5 {
     margin: 0 0 12px;
   }
+}
+
+.jsonCreateBox {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+
+  h5 {
+    margin: 0 0 8px;
+  }
+
+  p {
+    margin: 0 0 12px;
+    color: #6b7280;
+  }
+}
+
+.jsonActions {
+  margin-top: 12px;
+  display: inline-flex;
+  gap: 8px;
 }
 
 .createGrid {

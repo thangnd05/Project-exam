@@ -47,6 +47,15 @@ public class ScoringConversionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(scoringConversionService.create(request));
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<List<ScoringConversionResponse>> createBulk(
+            @RequestBody List<ScoringConversionRequest> requests,
+            HttpServletRequest httpRequest
+    ) {
+        authUtils.requireAdmin(httpRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(scoringConversionService.createBulk(requests));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ScoringConversionResponse> update(
             @PathVariable String id,

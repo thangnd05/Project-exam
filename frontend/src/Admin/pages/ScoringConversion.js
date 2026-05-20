@@ -1,11 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Download, Plus, Search, Trash2, Upload} from 'lucide-react';
+import {Braces, Plus, Search, Trash2} from 'lucide-react';
 
 import {getExamTypes} from '../../api/examTypeApi';
 import {
   createScoringConversion,
+  createScoringConversionsBulk,
   deleteScoringConversion,
   getScoringConversions,
   getScoringConversionsBySkill,
@@ -31,8 +32,10 @@ function ScoringConversionManagement() {
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [activeSkillId, setActiveSkillId] = useState('all');
   const [formState, setFormState] = useState(defaultFormState);
+  const [showJsonCreateForm, setShowJsonCreateForm] = useState(false);
+  const [jsonCreateValue, setJsonCreateValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const importInputRef = useRef(null);
+  const jsonTextareaRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deletingRule, setDeletingRule] = useState(null);
@@ -201,56 +204,50 @@ function ScoringConversionManagement() {
     }
   };
 
-  const handleExport = () => {
-    const content = JSON.stringify(scoringRules, null, 2);
-    const blob = new Blob([content], {type: 'application/json'});
-    const downloadUrl = URL.createObjectURL(blob);
-    const anchorElement = document.createElement('a');
-    anchorElement.href = downloadUrl;
-    anchorElement.download = 'scoring-conversion.json';
-    anchorElement.click();
-    URL.revokeObjectURL(downloadUrl);
-  };
-
-  const handleImport = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) {
+  const handleCreateByJson = async () => {
+    if (!jsonCreateValue.trim()) {
+      setErrorMessage('Vui lòng nhập JSON trước khi tạo.');
       return;
     }
-
     try {
-      const fileContent = await file.text();
-      const parsedData = JSON.parse(fileContent);
+      const parsedData = JSON.parse(jsonCreateValue);
       if (!Array.isArray(parsedData)) {
-        setErrorMessage('File import không hợp lệ. Dữ liệu phải là mảng JSON.');
+        setErrorMessage('JSON không hợp lệ. Dữ liệu phải là mảng.');
         return;
       }
 
-      const normalizedData = parsedData
-        .filter(
-          (item) =>
-            item &&
-            String(item.exam_type_id || item.examTypeId || '').trim() &&
-            String(item.skill_id || item.skillId || '').trim() &&
-            !Number.isNaN(Number(item.num_correct)) &&
-            !Number.isNaN(Number(item.converted_score)),
-        )
-        .map((item, index) => ({
-          conversion_id: String(item.conversion_id || item.conversionId || index + 1),
-          exam_type_id: String(item.exam_type_id || item.examTypeId),
-          skill_id: String(item.skill_id || item.skillId),
-          num_correct: Number(item.num_correct),
-          converted_score: Number(item.converted_score),
-        }));
+      const normalizedPayload = parsedData.map((item) => ({
+        examTypeId: String(item?.exam_type_id ?? item?.examTypeId ?? '').trim(),
+        skillId: String(item?.skill_id ?? item?.skillId ?? '').trim(),
+        numCorrect: Number(item?.num_correct ?? item?.numCorrect),
+        convertedScore: Number(item?.converted_score ?? item?.convertedScore),
+      }));
 
-      setScoringRules(normalizedData);
+      const hasInvalidItem = normalizedPayload.some(
+        (item) =>
+          !item.examTypeId ||
+          !item.skillId ||
+          Number.isNaN(item.numCorrect) ||
+          Number.isNaN(item.convertedScore),
+      );
+      if (hasInvalidItem) {
+        setErrorMessage(
+          'JSON có phần tử thiếu dữ liệu. Cần đủ examTypeId, skillId, numCorrect, convertedScore.',
+        );
+        return;
+      }
+
+      setSubmitting(true);
+      const createdRules = await createScoringConversionsBulk(normalizedPayload);
+      const mappedCreatedRules = createdRules.map(mapScoringRuleFromApi);
+      setScoringRules((previous) => [...previous, ...mappedCreatedRules]);
+      setJsonCreateValue('');
+      setShowJsonCreateForm(false);
       setErrorMessage('');
     } catch (error) {
-      setErrorMessage('Không thể đọc file import. Vui lòng kiểm tra định dạng JSON.');
+      setErrorMessage('Không thể tạo từ JSON. Vui lòng kiểm tra định dạng và dữ liệu.');
     } finally {
-      if (importInputRef.current) {
-        importInputRef.current.value = '';
-      }
+      setSubmitting(false);
     }
   };
 
@@ -262,23 +259,52 @@ function ScoringConversionManagement() {
           <p>Thiết lập score theo exam type, kỹ năng và số câu trả lời đúng.</p>
         </div>
         <div className={cx('headerActions')}>
-          <input
-            ref={importInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImport}
-            className={cx('hiddenInput')}
-          />
-          <Button variant="outline-primary" onClick={() => importInputRef.current?.click()}>
-            <Upload size={16} />
-            Import JSON
-          </Button>
-          <Button variant="primary" onClick={handleExport}>
-            <Download size={16} />
-            Export JSON
+          <Button
+            variant="outline-primary"
+            onClick={() => {
+              setShowJsonCreateForm((previous) => !previous);
+              setErrorMessage('');
+              setTimeout(() => jsonTextareaRef.current?.focus(), 0);
+            }}
+          >
+            <Braces size={16} />
+            Tạo bằng JSON
           </Button>
         </div>
       </div>
+
+      {showJsonCreateForm && (
+        <div className={cx('jsonCreateBox')}>
+          <h5>Tạo quy đổi điểm bằng JSON</h5>
+          <p>
+            Dán mảng JSON theo format: <code>[{'{'}"examTypeId","skillId","numCorrect","convertedScore"{'}'}]</code>
+          </p>
+          <Form.Control
+            as="textarea"
+            ref={jsonTextareaRef}
+            rows={8}
+            placeholder='[{"examTypeId":"...","skillId":"...","numCorrect":0,"convertedScore":5}]'
+            value={jsonCreateValue}
+            onChange={(event) => setJsonCreateValue(event.target.value)}
+          />
+          <div className={cx('jsonActions')}>
+            <Button variant="primary" disabled={submitting} onClick={handleCreateByJson}>
+              Tạo dữ liệu
+            </Button>
+            <Button
+              variant="outline-secondary"
+              disabled={submitting}
+              onClick={() => {
+                setShowJsonCreateForm(false);
+                setJsonCreateValue('');
+                setErrorMessage('');
+              }}
+            >
+              Hủy
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className={cx('filters')}>
         <div className={cx('searchContainer')}>

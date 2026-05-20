@@ -24,6 +24,10 @@ export const createScoringConversion = (payload) => {
   return axios.post(BASE_URL, payload).then((response) => response.data);
 };
 
+export const createScoringConversionsBulk = (payload) => {
+  return axios.post(`${BASE_URL}/bulk`, payload).then((response) => response.data);
+};
+
 export const deleteScoringConversion = (conversionId) => {
   return axios.delete(`${BASE_URL}/${conversionId}`).then(() => {});
 };
