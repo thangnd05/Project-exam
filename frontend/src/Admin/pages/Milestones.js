@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Check, Pencil, Plus, Search, Trash2, X} from 'lucide-react';
@@ -18,6 +18,23 @@ import styles from './Milestones.module.scss';
 
 const cx = classNames.bind(styles);
 
+const extractPartOrder = (partName) => {
+  const normalizedName = String(partName || '').trim();
+  const matchedNumber = normalizedName.match(/\d+/);
+  return matchedNumber ? Number(matchedNumber[0]) : Number.MAX_SAFE_INTEGER;
+};
+
+const sortPartsByNameOrder = (parts) => {
+  return [...parts].sort((partA, partB) => {
+    const orderA = extractPartOrder(partA.name);
+    const orderB = extractPartOrder(partB.name);
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    return String(partA.name || '').localeCompare(String(partB.name || ''), 'vi');
+  });
+};
+
 function MilestonesManagement() {
   const [milestones, setMilestones] = useState([]);
   const [examTypes, setExamTypes] = useState([]);
@@ -25,6 +42,7 @@ function MilestonesManagement() {
   const [skills, setSkills] = useState([]);
   const [scoringConversions, setScoringConversions] = useState([]);
   const [examTypeFilter, setExamTypeFilter] = useState('');
+  const [sortMode, setSortMode] = useState('score_asc');
   const [keyword, setKeyword] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -83,8 +101,8 @@ function MilestonesManagement() {
     loadMilestones();
   }, [loadMilestones]);
 
-  const filteredParts = examParts.filter(
-    (p) => p.examTypeId === examTypeFilter,
+  const filteredParts = sortPartsByNameOrder(
+    examParts.filter((p) => p.examTypeId === examTypeFilter),
   );
 
   const filteredMilestones = milestones.filter((m) => {
@@ -95,6 +113,31 @@ function MilestonesManagement() {
       (m.description || '').toLowerCase().includes(k)
     );
   });
+
+  const displayedMilestones = useMemo(() => {
+    const sortedMilestones = [...filteredMilestones];
+    if (sortMode === 'created_desc') {
+      sortedMilestones.sort((milestoneA, milestoneB) => {
+        const createdAtA = milestoneA.createdAt ? new Date(milestoneA.createdAt).getTime() : 0;
+        const createdAtB = milestoneB.createdAt ? new Date(milestoneB.createdAt).getTime() : 0;
+        if (createdAtB !== createdAtA) {
+          return createdAtB - createdAtA;
+        }
+        return milestoneA.milestoneScore - milestoneB.milestoneScore;
+      });
+      return sortedMilestones;
+    }
+
+    sortedMilestones.sort((milestoneA, milestoneB) => {
+      if (milestoneA.milestoneScore !== milestoneB.milestoneScore) {
+        return milestoneA.milestoneScore - milestoneB.milestoneScore;
+      }
+      const createdAtA = milestoneA.createdAt ? new Date(milestoneA.createdAt).getTime() : 0;
+      const createdAtB = milestoneB.createdAt ? new Date(milestoneB.createdAt).getTime() : 0;
+      return createdAtA - createdAtB;
+    });
+    return sortedMilestones;
+  }, [filteredMilestones, sortMode]);
 
   const handleCreate = async () => {
     if (!examTypeFilter || !newScore) {
@@ -193,6 +236,19 @@ function MilestonesManagement() {
     return examParts.find((p) => p.examPartId === examPartId)?.defaultNumQuestions || 0;
   };
 
+  const sortPartRequirements = (partRequirements) => {
+    return [...(partRequirements || [])].sort((partRequirementA, partRequirementB) => {
+      const partNameA = getPartName(partRequirementA.examPartId);
+      const partNameB = getPartName(partRequirementB.examPartId);
+      const orderA = extractPartOrder(partNameA);
+      const orderB = extractPartOrder(partNameB);
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+      return String(partNameA).localeCompare(String(partNameB), 'vi');
+    });
+  };
+
   const percentToNum = (percent, total) => (total > 0 ? Math.round((percent * total) / 100) : 0);
   const numToPercent = (num, total) => (total > 0 ? Math.round((num / total) * 100) : 0);
 
@@ -271,6 +327,10 @@ function MilestonesManagement() {
             </option>
           ))}
         </Form.Select>
+        <Form.Select value={sortMode} onChange={(event) => setSortMode(event.target.value)}>
+          <option value="score_asc">Sắp xếp: Theo điểm tăng dần</option>
+          <option value="created_desc">Sắp xếp: Mốc mới tạo trước</option>
+        </Form.Select>
       </div>
 
       {examTypeFilter && (
@@ -315,7 +375,7 @@ function MilestonesManagement() {
       )}
 
       {!loading &&
-        filteredMilestones.map((m) => (
+        displayedMilestones.map((m) => (
           <div key={m.examTargetMilestoneId} className={cx('milestoneCard')}>
             <div className={cx('milestoneHeader')}>
               <div>
@@ -427,7 +487,7 @@ function MilestonesManagement() {
             ) : (
               <>
               <div className={cx('partGrid')}>
-                {(m.partRequirements || []).map((pr) => {
+                {sortPartRequirements(m.partRequirements).map((pr) => {
                   const total = getPartTotal(pr.examPartId);
                   const numCorrect = percentToNum(pr.requiredPercentage, total);
                   return (

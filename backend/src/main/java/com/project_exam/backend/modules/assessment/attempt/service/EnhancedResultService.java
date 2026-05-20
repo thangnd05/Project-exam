@@ -395,8 +395,11 @@ public class EnhancedResultService {
                     .build());
         }
 
-        // Sort by percentage ascending (weakest first)
-        parts.sort(Comparator.comparingDouble(PartBreakdownDto::getPercentage));
+        // Giữ thứ tự hiển thị theo part (Part 1 -> Part N), không sort theo % đúng.
+        parts.sort(
+                Comparator.comparingInt((PartBreakdownDto part) -> extractPartOrder(part.getPartName()))
+                        .thenComparing(PartBreakdownDto::getPartName, String.CASE_INSENSITIVE_ORDER)
+        );
         return parts;
     }
 
@@ -640,5 +643,20 @@ public class EnhancedResultService {
             uniqueByQuestionId.putIfAbsent(ua.getQuestionId(), ua);
         }
         return new ArrayList<>(uniqueByQuestionId.values());
+    }
+
+    private int extractPartOrder(String partName) {
+        if (partName == null) {
+            return Integer.MAX_VALUE;
+        }
+        String digits = partName.replaceAll("[^0-9]", "");
+        if (digits.isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+        try {
+            return Integer.parseInt(digits);
+        } catch (NumberFormatException exception) {
+            return Integer.MAX_VALUE;
+        }
     }
 }

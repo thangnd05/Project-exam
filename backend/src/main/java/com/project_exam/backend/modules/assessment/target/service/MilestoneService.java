@@ -91,6 +91,7 @@ public class MilestoneService {
         res.setExamTypeId(m.getExamTypeId());
         res.setMilestoneScore(m.getMilestoneScore());
         res.setDescription(m.getDescription());
+        res.setCreatedAt(m.getCreatedAt());
 
         List<TargetPartRequirement> parts = partRequirementRepository
                 .findByExamTargetMilestoneId(m.getExamTargetMilestoneId());
