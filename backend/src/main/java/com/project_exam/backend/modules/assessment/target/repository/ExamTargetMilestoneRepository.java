@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface ExamTargetMilestoneRepository extends JpaRepository<ExamTargetMilestone, String> {
-    List<ExamTargetMilestone> findByExamTypeIdOrderByMilestoneScoreAsc(String examTypeId);
+    List<ExamTargetMilestone> findByExamTypeIdOrderByCreatedAtAsc(String examTypeId);
 
     Optional<ExamTargetMilestone> findByExamTypeIdAndMilestoneScore(String examTypeId, Integer milestoneScore);
 }

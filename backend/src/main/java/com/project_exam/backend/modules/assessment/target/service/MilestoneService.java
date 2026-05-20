@@ -21,7 +21,7 @@ public class MilestoneService {
     private final TargetPartRequirementRepository partRequirementRepository;
 
     public List<MilestoneResponse> findByExamTypeId(String examTypeId) {
-        return milestoneRepository.findByExamTypeIdOrderByMilestoneScoreAsc(examTypeId).stream()
+        return milestoneRepository.findByExamTypeIdOrderByCreatedAtAsc(examTypeId).stream()
                 .map(this::toResponse)
                 .toList();
     }

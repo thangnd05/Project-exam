@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Check, Pencil, Plus, Search, Trash2, X} from 'lucide-react';
@@ -42,7 +42,6 @@ function MilestonesManagement() {
   const [skills, setSkills] = useState([]);
   const [scoringConversions, setScoringConversions] = useState([]);
   const [examTypeFilter, setExamTypeFilter] = useState('');
-  const [sortMode, setSortMode] = useState('score_asc');
   const [keyword, setKeyword] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -113,31 +112,6 @@ function MilestonesManagement() {
       (m.description || '').toLowerCase().includes(k)
     );
   });
-
-  const displayedMilestones = useMemo(() => {
-    const sortedMilestones = [...filteredMilestones];
-    if (sortMode === 'created_desc') {
-      sortedMilestones.sort((milestoneA, milestoneB) => {
-        const createdAtA = milestoneA.createdAt ? new Date(milestoneA.createdAt).getTime() : 0;
-        const createdAtB = milestoneB.createdAt ? new Date(milestoneB.createdAt).getTime() : 0;
-        if (createdAtB !== createdAtA) {
-          return createdAtB - createdAtA;
-        }
-        return milestoneA.milestoneScore - milestoneB.milestoneScore;
-      });
-      return sortedMilestones;
-    }
-
-    sortedMilestones.sort((milestoneA, milestoneB) => {
-      if (milestoneA.milestoneScore !== milestoneB.milestoneScore) {
-        return milestoneA.milestoneScore - milestoneB.milestoneScore;
-      }
-      const createdAtA = milestoneA.createdAt ? new Date(milestoneA.createdAt).getTime() : 0;
-      const createdAtB = milestoneB.createdAt ? new Date(milestoneB.createdAt).getTime() : 0;
-      return createdAtA - createdAtB;
-    });
-    return sortedMilestones;
-  }, [filteredMilestones, sortMode]);
 
   const handleCreate = async () => {
     if (!examTypeFilter || !newScore) {
@@ -327,10 +301,6 @@ function MilestonesManagement() {
             </option>
           ))}
         </Form.Select>
-        <Form.Select value={sortMode} onChange={(event) => setSortMode(event.target.value)}>
-          <option value="score_asc">Sắp xếp: Theo điểm tăng dần</option>
-          <option value="created_desc">Sắp xếp: Mốc mới tạo trước</option>
-        </Form.Select>
       </div>
 
       {examTypeFilter && (
@@ -375,7 +345,7 @@ function MilestonesManagement() {
       )}
 
       {!loading &&
-        displayedMilestones.map((m) => (
+        filteredMilestones.map((m) => (
           <div key={m.examTargetMilestoneId} className={cx('milestoneCard')}>
             <div className={cx('milestoneHeader')}>
               <div>
