@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import { getPlanById } from '~/api/learningPlanApi';
 import PlanPartTaskList, { groupTasksByPart } from './components/PlanPartTaskList';
+import styles from '../PersonalizedPlan.module.scss';
+
+const cx = classNames.bind(styles);
 
 const STAGE_LABELS = {
   FOUNDATION: 'Đang ôn theo Part',
@@ -9,7 +13,7 @@ const STAGE_LABELS = {
   MOCK: 'Xong ải — làm Mock',
 };
 
-const PLAN_STATUS_LABEL = {
+const STATUS_LABEL = {
   ACTIVE: 'Đang học',
   COMPLETED: 'Hoàn thành',
   REPLACED: 'Đã thay bằng plan mới',
@@ -31,15 +35,9 @@ function PlanDetailPage() {
     setLoading(true);
     setError(null);
     return getPlanById(learningPlanId)
-      .then((data) => {
-        setPlan(data);
-      })
-      .catch((err) => {
-        setError(err?.response?.data?.message || err.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .then((data) => setPlan(data))
+      .catch((err) => setError(err?.response?.data?.message || err.message))
+      .finally(() => setLoading(false));
   }, [learningPlanId]);
 
   useEffect(() => {
@@ -52,9 +50,15 @@ function PlanDetailPage() {
     }
   }, [loading, plan]);
 
-  if (loading) return <div className="container py-4">Đang tải...</div>;
+  if (loading) {
+    return <div className={cx('wrapper')}><div className={cx('loading')}>Đang tải...</div></div>;
+  }
   if (error && !plan) {
-    return <div className="container py-4"><div className="alert alert-danger">{error}</div></div>;
+    return (
+      <div className={cx('wrapper')}>
+        <div className={cx('alert', 'alertDanger')}>{error}</div>
+      </div>
+    );
   }
   if (!plan) return null;
 
@@ -65,42 +69,67 @@ function PlanDetailPage() {
   const isReplaced = plan.status === 'REPLACED';
 
   return (
-    <div className="container py-4">
-      <h2 className="mb-3">
-        Kế hoạch học
-        {plan.planSequence != null ? ` #${plan.planSequence}` : ''}
-      </h2>
+    <div className={cx('wrapper')}>
+      <div className={cx('headerBar')}>
+        <h2 className={cx('title')}>
+          Kế hoạch học
+          {plan.planSequence != null ? ` #${plan.planSequence}` : ''}
+        </h2>
+        <div className={cx('actionBar')}>
+          <Link to="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
+            Sinh plan mới
+          </Link>
+          <Link
+            to={`/learning-plans?examTypeId=${plan.examTypeId}`}
+            className={cx('btn', 'btnOutline', 'btnSm')}
+          >
+            Tất cả plan
+          </Link>
+        </div>
+      </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
 
       {isReplaced && (
-        <div className="alert alert-secondary">
-          Plan này đã được thay bằng lộ trình mới (mock sau).
+        <div className={cx('alert', 'alertWarning')}>
+          <span>Plan này đã được thay bằng lộ trình mới (mock sau).</span>
           {plan.replacedByPlanId && (
-            <>
-              {' '}
-              <Link to={`/learning-plans/${plan.replacedByPlanId}`}>Xem plan mới →</Link>
-            </>
+            <Link
+              to={`/learning-plans/${plan.replacedByPlanId}`}
+              className={cx('btn', 'btnPrimary', 'btnSm')}
+            >
+              Xem plan mới →
+            </Link>
           )}
         </div>
       )}
 
-      <div className="card mb-4">
-        <div className="card-body">
-          <p>{plan.summary}</p>
-          <ul className="list-unstyled mb-0">
+      <div className={cx('card')}>
+        <div className={cx('cardBody')}>
+          {plan.summary && (
+            <p style={{ marginBottom: '1.2rem', fontSize: 'var(--font-size-ssm)' }}>
+              {plan.summary}
+            </p>
+          )}
+          <ul className={cx('metaList')} style={{ marginBottom: 0 }}>
             <li>
-              <strong>Trạng thái plan:</strong>{' '}
-              {PLAN_STATUS_LABEL[plan.status] || plan.status}
+              <strong>Trạng thái:</strong>{' '}
+              {STATUS_LABEL[plan.status] || plan.status}
             </li>
-            <li><strong>Giai đoạn:</strong> {STAGE_LABELS[plan.planStage] || plan.planStage}</li>
+            <li>
+              <strong>Giai đoạn:</strong>{' '}
+              {STAGE_LABELS[plan.planStage] || plan.planStage}
+            </li>
             <li>
               <strong>Readiness lúc tạo plan:</strong>{' '}
               {baseline != null ? `${baseline}%` : '—'}
               {plan.readinessLevel ? ` (${plan.readinessLevel})` : ''}
             </li>
-            <li><strong>Tiến độ ải:</strong> {plan.passedTasks ?? 0}/{plan.totalTasks ?? 0} đã pass</li>
-            <li className="text-muted small">
+            <li>
+              <strong>Tiến độ ải:</strong>{' '}
+              {plan.passedTasks ?? 0}/{plan.totalTasks ?? 0} đã pass
+            </li>
+            <li className={cx('muted', 'small')}>
               Mỗi mock mới → sinh <strong>plan mới</strong> (plan cũ giữ lịch sử, không sửa đè ải).
             </li>
           </ul>
@@ -108,18 +137,17 @@ function PlanDetailPage() {
       </div>
 
       {plan.partsWithoutTasks?.length > 0 && (
-        <div className="alert alert-warning">
-          Part chưa đạt mục tiêu nhưng chưa có ải (thiếu tag trên câu hỏi):
-          {' '}
+        <div className={cx('alert', 'alertWarning')}>
+          Part chưa đạt mục tiêu nhưng chưa có ải (thiếu tag trên câu hỏi):{' '}
           <strong>{plan.partsWithoutTasks.join(', ')}</strong>
         </div>
       )}
 
       {!isReplaced && (
         <>
-          <h4 id="chon-ai-hoc" className="mb-3">
+          <h3 id="chon-ai-hoc" className={cx('sectionTitle')} style={{ fontSize: 'var(--font-size-lg)', marginTop: '2rem', marginBottom: '1.2rem' }}>
             Chọn Part và ải để học ({partGroups.length})
-          </h4>
+          </h3>
           <PlanPartTaskList
             partGroups={partGroups}
             learningPlanId={plan.learningPlanId}
@@ -127,15 +155,6 @@ function PlanDetailPage() {
           />
         </>
       )}
-
-      <div className="mt-3">
-        <Link to="/learning-plans/generate" className="btn btn-sm btn-outline-primary me-2">
-          Sinh plan mới từ mock
-        </Link>
-        <Link to={`/learning-plans?examTypeId=${plan.examTypeId}`} className="btn btn-sm btn-outline-secondary">
-          Tất cả plan
-        </Link>
-      </div>
     </div>
   );
 }

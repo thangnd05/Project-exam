@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import { getCurrentSession, submitSession } from '~/api/learningPlanApi';
 import PlanPartTaskList, { groupTasksByPart } from './components/PlanPartTaskList';
+import styles from '../PersonalizedPlan.module.scss';
+
+const cx = classNames.bind(styles);
 
 function PlanStudyPage() {
   const { learningPlanId } = useParams();
@@ -71,7 +75,9 @@ function PlanStudyPage() {
     }
   };
 
-  if (loading) return <div className="container py-4">Đang tải...</div>;
+  if (loading) {
+    return <div className={cx('wrapper')}><div className={cx('loading')}>Đang tải...</div></div>;
+  }
 
   const partGroups = session?.partGroups?.length
     ? session.partGroups
@@ -82,34 +88,40 @@ function PlanStudyPage() {
 
   if (isMockMode && !session?.sessionId) {
     return (
-      <div className="container py-4">
-        <div className="alert alert-success">{session.message}</div>
-        <Link to={`/learning-plans/${learningPlanId}`} className="btn btn-primary">
-          Về kế hoạch
-        </Link>
+      <div className={cx('wrapper')}>
+        <div className={cx('alert', 'alertSuccess')}>
+          <span>{session.message}</span>
+          <Link to={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnPrimary', 'btnSm')}>
+            Về kế hoạch
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (isPickMode && !result) {
     return (
-      <div className="container py-4">
-        <div className="mb-3">
-          <Link to={`/learning-plans/${learningPlanId}`} className="btn btn-sm btn-outline-secondary">
+      <div className={cx('wrapper')}>
+        <div className={cx('headerBar')}>
+          <Link to={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
             ← Kế hoạch
           </Link>
         </div>
 
-        {error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
 
-        <div className="card mb-3">
-          <div className="card-body">
-            <h4 className="mb-2">Chọn Part và ải để học</h4>
-            <p className="text-muted mb-2">{session.message}</p>
-            <span className="badge bg-secondary me-1">
-              Tiến độ: {session.passedTasks}/{session.totalTasks} ải
-            </span>
-            <span className="badge bg-primary">{session.planStage}</span>
+        <div className={cx('card')}>
+          <div className={cx('cardBody')}>
+            <h3 className={cx('title')} style={{ fontSize: 'var(--font-size-xl)', marginBottom: '0.8rem' }}>
+              Chọn Part và ải để học
+            </h3>
+            <p className={cx('muted')} style={{ marginBottom: '1.2rem' }}>{session.message}</p>
+            <div className={cx('actionBar')}>
+              <span className={cx('badge', 'badgeMuted')}>
+                Tiến độ: {session.passedTasks}/{session.totalTasks} ải
+              </span>
+              <span className={cx('badge', 'badgePrimary')}>{session.planStage}</span>
+            </div>
           </div>
         </div>
 
@@ -123,133 +135,123 @@ function PlanStudyPage() {
     );
   }
 
-  const activeTaskId = session?.activeTask?.taskId || taskIdFromUrl;
-
   return (
-    <div className="container py-4">
-      <div className="mb-3 d-flex flex-wrap gap-2">
-        <button type="button" className="btn btn-sm btn-outline-secondary" onClick={goToPicker}>
-          ← Chọn ải khác (trong khung Part)
+    <div className={cx('wrapper')}>
+      <div className={cx('headerBar')}>
+        <button type="button" className={cx('btn', 'btnGhost', 'btnSm')} onClick={goToPicker}>
+          ← Chọn ải khác
         </button>
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
 
       {result && (
-        <div className={`alert ${result.passed ? 'alert-success' : 'alert-warning'}`}>
-          <strong>
+        <div className={cx('resultAlert', { passed: result.passed, failed: !result.passed })}>
+          <div className={cx('resultStats')}>
             {result.correctCount}/{result.totalCount} đúng ({result.accuracy}%)
-          </strong>
-          <div className="mt-1">{result.message}</div>
-          <div className="mt-2">
+          </div>
+          <div style={{ marginBottom: '1rem' }}>{result.message}</div>
+          <div className={cx('actionBar')}>
             <button
               type="button"
-              className="btn btn-sm btn-primary me-2"
+              className={cx('btn', 'btnPrimary', 'btnSm')}
               onClick={() => loadSession(taskIdFromUrl)}
             >
               {result.passed ? 'Làm lại ải này' : 'Thử lại'}
             </button>
-            <button type="button" className="btn btn-sm btn-outline-secondary me-2" onClick={goToPicker}>
+            <button
+              type="button"
+              className={cx('btn', 'btnOutline', 'btnSm')}
+              onClick={goToPicker}
+            >
               Chọn ải khác
             </button>
           </div>
         </div>
       )}
 
-      <div className="row g-4">
-        <div className="col-lg-4 order-lg-2">
-          <div className="sticky-top" style={{ top: '1rem' }}>
-            <h5 className="mb-2 small text-muted text-uppercase">Đổi ải (trong Part)</h5>
-            <PlanPartTaskList
-              partGroups={partGroups}
-              learningPlanId={learningPlanId}
-              studyAction="button"
-              onStudyTask={startTask}
-              compact
-            />
-          </div>
-        </div>
-
-        <div className="col-lg-8 order-lg-1">
+      <div className={cx('studyLayout')}>
+        <div className={cx('studyMain')}>
           {!result && session && (
             <>
-              <div className="card mb-3 border-primary">
-                <div className="card-body">
-                  <div className="d-flex justify-content-between flex-wrap gap-2">
-                    <div>
-                      <span className="text-muted small">Đang học</span>
-                      <h4 className="mb-1">
-                        {session.activeTask?.examPartName || 'Part'}
-                        {' '}
-                        · Ải {session.activeTask?.tagName || '—'}
-                      </h4>
-                      <span className="badge bg-primary me-1">{session.planStage}</span>
-                      <span className="badge bg-secondary">
+              <div className={cx('activeTaskCard')}>
+                <div className={cx('activeTaskHead')}>
+                  <div>
+                    <div className={cx('statLabel')}>Đang học</div>
+                    <h3 className={cx('activeTaskTitle')}>
+                      {session.activeTask?.examPartName || 'Part'}
+                      {' · Ải '}{session.activeTask?.tagName || '—'}
+                    </h3>
+                    <div className={cx('actionBar')}>
+                      <span className={cx('badge', 'badgePrimary')}>{session.planStage}</span>
+                      <span className={cx('badge', 'badgeMuted')}>
                         {session.passedTasks}/{session.totalTasks} ải đã pass
                       </span>
                     </div>
-                    <div className="text-end">
-                      <div className="small text-muted">{session.message}</div>
-                      {session.activeTask && (
-                        <div className="mt-1 fw-semibold">
-                          Cần ≥{session.passAccuracyRequired}% để qua ải
-                        </div>
-                      )}
-                    </div>
                   </div>
-
-                  {session.resource && (
-                    <div className="mt-3 p-3 bg-light rounded">
-                      <h6>Bước 1: Đọc tài liệu</h6>
-                      <a href={session.resource.url} target="_blank" rel="noreferrer">
-                        {session.resource.title}
-                      </a>
-                      {session.resource.description && (
-                        <p className="small text-muted mb-0 mt-1">{session.resource.description}</p>
-                      )}
-                    </div>
-                  )}
+                  <div style={{ textAlign: 'right' }}>
+                    <div className={cx('muted', 'small')}>{session.message}</div>
+                    {session.activeTask && (
+                      <div className={cx('passRequired')} style={{ marginTop: '0.4rem' }}>
+                        Cần ≥{session.passAccuracyRequired}% để qua ải
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {session.resource && (
+                  <div className={cx('resourceBox')}>
+                    <div className={cx('resourceLabel')}>Bước 1: đọc tài liệu</div>
+                    <a
+                      href={session.resource.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={cx('resourceLink')}
+                    >
+                      {session.resource.title}
+                    </a>
+                    {session.resource.description && (
+                      <p className={cx('resourceDesc')}>{session.resource.description}</p>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <h5 className="mb-3">
+              <h4 className={cx('sectionTitle')}>
                 Bước 2: Luyện ({session.questionCount} câu)
-              </h5>
+              </h4>
 
               {(session.questions || []).map((q, idx) => (
-                <div key={q.questionId} className="card mb-3">
-                  <div className="card-body">
-                    <div className="fw-semibold mb-2">
-                      Câu {idx + 1}
-                    </div>
-                    <p>{q.questionText}</p>
-                    <div className="list-group">
-                      {(q.answers || []).map((a) => (
-                        <label
-                          key={a.answerId}
-                          className={`list-group-item list-group-item-action ${
-                            selections[q.questionId] === a.answerId ? 'active' : ''
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            className="me-2"
-                            name={`q-${q.questionId}`}
-                            checked={selections[q.questionId] === a.answerId}
-                            onChange={() => handleSelect(q.questionId, a.answerId)}
-                          />
+                <div key={q.questionId} className={cx('questionCard')}>
+                  <div className={cx('questionNo')}>Câu {idx + 1}</div>
+                  <p className={cx('questionText')}>{q.questionText}</p>
+                  <div className={cx('answerList')}>
+                    {(q.answers || []).map((a) => (
+                      <label
+                        key={a.answerId}
+                        className={cx('answerOption', {
+                          active: selections[q.questionId] === a.answerId,
+                        })}
+                      >
+                        <input
+                          type="radio"
+                          name={`q-${q.questionId}`}
+                          checked={selections[q.questionId] === a.answerId}
+                          onChange={() => handleSelect(q.questionId, a.answerId)}
+                        />
+                        <span>
                           {a.answerLabel ? `${a.answerLabel}. ` : ''}
                           {a.answerText}
-                        </label>
-                      ))}
-                    </div>
+                        </span>
+                      </label>
+                    ))}
                   </div>
                 </div>
               ))}
 
               <button
                 type="button"
-                className="btn btn-primary btn-lg"
+                className={cx('btn', 'btnPrimary', 'btnLg')}
                 disabled={submitting || !(session.questions?.length)}
                 onClick={handleSubmit}
               >
@@ -258,13 +260,18 @@ function PlanStudyPage() {
             </>
           )}
         </div>
-      </div>
 
-      {!result && session?.sessionId && (
-        <p className="small text-muted mt-3 d-lg-none">
-          Muốn học ải khác: cuộn lên khung Part bên phải hoặc về trang kế hoạch.
-        </p>
-      )}
+        <div className={cx('studySidebar')}>
+          <h5 className={cx('sectionTitle')}>Đổi ải (trong Part)</h5>
+          <PlanPartTaskList
+            partGroups={partGroups}
+            learningPlanId={learningPlanId}
+            studyAction="button"
+            onStudyTask={startTask}
+            compact
+          />
+        </div>
+      </div>
     </div>
   );
 }

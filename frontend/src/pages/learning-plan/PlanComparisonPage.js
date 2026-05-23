@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import { getExamTypes } from '~/api/examTypeApi';
 import { listPlans } from '~/api/learningPlanApi';
+import styles from '../PersonalizedPlan.module.scss';
+
+const cx = classNames.bind(styles);
 
 const STATUS_LABEL = {
   ACTIVE: 'Đang học',
@@ -10,11 +14,11 @@ const STATUS_LABEL = {
   ABANDONED: 'Đã bỏ',
 };
 
-const STATUS_BADGE = {
-  ACTIVE: 'bg-primary',
-  COMPLETED: 'bg-success',
-  REPLACED: 'bg-secondary',
-  ABANDONED: 'bg-danger',
+const STATUS_VARIANT = {
+  ACTIVE: 'badgePrimary',
+  COMPLETED: 'badgeSuccess',
+  REPLACED: 'badgeMuted',
+  ABANDONED: 'badgeDanger',
 };
 
 function formatDate(s) {
@@ -59,96 +63,83 @@ function PlanComparisonPage() {
   );
 
   return (
-    <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h2 className="mb-0">So sánh các Plan</h2>
-        <div className="d-flex gap-2">
+    <div className={cx('wrapper')}>
+      <div className={cx('headerBar')}>
+        <h2 className={cx('title')}>So sánh các Plan</h2>
+        <div className={cx('actionBar')}>
           <Link
             to={examTypeId ? `/learning-plans?examTypeId=${examTypeId}` : '/learning-plans'}
-            className="btn btn-sm btn-outline-secondary"
+            className={cx('btn', 'btnOutline', 'btnSm')}
           >
             Danh sách plan
           </Link>
           <Link
             to={examTypeId ? `/my-target/dashboard?examTypeId=${examTypeId}` : '/my-target/dashboard'}
-            className="btn btn-sm btn-outline-secondary"
+            className={cx('btn', 'btnOutline', 'btnSm')}
           >
             Tổng quan mục tiêu
           </Link>
         </div>
       </div>
 
-      <div className="mb-3" style={{ maxWidth: 360 }}>
-        <label className="form-label small text-muted">Loại kỳ thi</label>
-        <select
-          className="form-select"
-          value={examTypeId}
-          onChange={(e) => {
-            setExamTypeId(e.target.value);
-            setSearchParams({ examTypeId: e.target.value });
-          }}
-        >
-          {examTypes.map((et) => (
-            <option key={et.examTypeId} value={et.examTypeId}>{et.name}</option>
-          ))}
-        </select>
+      <div className={cx('filterRow')}>
+        <div className={cx('fieldGroup')}>
+          <label className={cx('fieldLabel')}>Loại kỳ thi</label>
+          <select
+            className={cx('select')}
+            value={examTypeId}
+            onChange={(e) => {
+              setExamTypeId(e.target.value);
+              setSearchParams({ examTypeId: e.target.value });
+            }}
+          >
+            {examTypes.map((et) => (
+              <option key={et.examTypeId} value={et.examTypeId}>{et.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
-      {loading && <div>Đang tải...</div>}
+      {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
+      {loading && <div className={cx('loading')}>Đang tải...</div>}
 
       {!loading && sorted.length === 0 && (
-        <div className="alert alert-info">
-          Chưa có plan nào cho kỳ thi này.{' '}
-          <Link to="/learning-plans/generate">Sinh plan đầu tiên →</Link>
+        <div className={cx('alert', 'alertInfo')}>
+          <span>Chưa có plan nào cho kỳ thi này.</span>
+          <Link to="/learning-plans/generate" className={cx('btn', 'btnPrimary', 'btnSm')}>
+            Sinh plan đầu tiên
+          </Link>
         </div>
       )}
 
       {sorted.length > 0 && (
         <>
-          <div className="card mb-4">
-            <div className="card-header">
-              <strong>Tiến triển readiness qua các plan</strong>
-            </div>
-            <div className="card-body">
-              <div className="d-flex align-items-end gap-3" style={{ height: 200 }}>
+          <div className={cx('card')}>
+            <div className={cx('cardHeader')}>Tiến triển readiness qua các plan</div>
+            <div className={cx('cardBody')}>
+              <div className={cx('barChart')}>
                 {sorted.map((p) => {
                   const v = p.baselineReadiness ?? p.currentReadiness ?? 0;
                   const h = (v / maxReadiness) * 100;
-                  const isActive = p.status === 'ACTIVE';
-                  const bg = isActive ? '#0d6efd' : (p.status === 'COMPLETED' ? '#198754' : '#adb5bd');
+                  const variant = p.status === 'ACTIVE'
+                    ? ''
+                    : (p.status === 'COMPLETED' ? 'success' : 'muted');
                   return (
-                    <div
-                      key={p.learningPlanId}
-                      className="d-flex flex-column align-items-center"
-                      style={{ flex: 1, minWidth: 60 }}
-                    >
-                      <div className="small fw-semibold mb-1">{v}%</div>
-                      <div
-                        style={{
-                          width: '100%',
-                          height: `${h}%`,
-                          background: bg,
-                          borderRadius: 6,
-                          minHeight: 8,
-                          transition: 'height .3s',
-                        }}
-                      />
-                      <div className="small text-muted mt-2">
-                        Plan #{p.planSequence ?? '?'}
-                      </div>
+                    <div key={p.learningPlanId} className={cx('barColumn')}>
+                      <span className={cx('barValue')}>{v}%</span>
+                      <div className={cx('barBar', variant)} style={{ height: `${h}%` }} />
+                      <span className={cx('barLabel')}>Plan #{p.planSequence ?? '?'}</span>
                     </div>
                   );
                 })}
               </div>
-              <p className="small text-muted mb-0 mt-3">
-                Readiness chính là <code>baseline_readiness</code> chốt khi tạo plan từ mock chẩn đoán.
-                Học ải không thay đổi con số này — chỉ mock mới + plan mới mới có readiness mới.
+              <p className={cx('chartNote')}>
+                Baseline_readiness chốt khi tạo plan từ mock chẩn đoán. Học ải không đổi con số này — chỉ mock mới + plan mới mới có readiness mới.
               </p>
             </div>
           </div>
 
-          <div className="row">
+          <div className={cx('timelineGrid')}>
             {sorted.map((p, idx) => {
               const prev = idx > 0 ? sorted[idx - 1] : null;
               const cur = p.baselineReadiness ?? p.currentReadiness;
@@ -156,71 +147,76 @@ function PlanComparisonPage() {
               const diff = prevReadiness != null && cur != null ? cur - prevReadiness : null;
 
               return (
-                <div className="col-md-6 col-lg-4 mb-3" key={p.learningPlanId}>
-                  <div className={`card h-100 ${p.status === 'ACTIVE' ? 'border-primary' : ''}`}>
-                    <div className="card-body">
-                      <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h5 className="mb-0">Plan #{p.planSequence ?? '?'}</h5>
-                        <span className={`badge ${STATUS_BADGE[p.status] || 'bg-secondary'}`}>
-                          {STATUS_LABEL[p.status] || p.status}
-                        </span>
-                      </div>
+                <div
+                  key={p.learningPlanId}
+                  className={cx('planCard', {
+                    active: p.status === 'ACTIVE',
+                    completed: p.status === 'COMPLETED',
+                  })}
+                >
+                  <div className={cx('planHead')}>
+                    <span className={cx('planNo')}>Plan #{p.planSequence ?? '?'}</span>
+                    <span className={cx('badge', STATUS_VARIANT[p.status] || 'badgeMuted')}>
+                      {STATUS_LABEL[p.status] || p.status}
+                    </span>
+                  </div>
 
-                      <ul className="list-unstyled small mb-3">
-                        <li>
-                          <strong>Baseline readiness:</strong>{' '}
-                          {cur != null ? `${cur}%` : '—'}
-                          {diff != null && (
-                            <span
-                              className={diff > 0 ? 'text-success' : (diff < 0 ? 'text-danger' : 'text-muted')}
-                              style={{ marginLeft: 6 }}
-                            >
-                              ({diff > 0 ? '+' : ''}{diff}% vs Plan #{prev.planSequence})
-                            </span>
-                          )}
-                        </li>
-                        <li><strong>Giai đoạn:</strong> {p.planStage || '—'}</li>
-                        <li>
-                          <strong>Ải đã pass:</strong>{' '}
-                          {p.passedTasks ?? 0}/{p.totalTasks ?? 0}
-                        </li>
-                        <li>
-                          <strong>Mock nguồn:</strong>{' '}
-                          {p.sourceUserTestId ? (
-                            <Link to={`/tests/result/${p.sourceUserTestId}`}>
-                              <code>{p.sourceUserTestId.slice(0, 8)}…</code>
-                            </Link>
-                          ) : '—'}
-                        </li>
-                        <li className="text-muted">
-                          <small>Tạo: {formatDate(p.createdAt)}</small>
-                        </li>
-                        {p.replacedByPlanId && (
-                          <li>
-                            <Link to={`/learning-plans/${p.replacedByPlanId}`}>
-                              Đã thay bằng plan kế tiếp →
-                            </Link>
-                          </li>
-                        )}
-                      </ul>
-
-                      <div className="d-flex gap-2 flex-wrap">
-                        <Link
-                          to={`/learning-plans/${p.learningPlanId}`}
-                          className="btn btn-sm btn-outline-primary"
+                  <ul className={cx('metaList')}>
+                    <li>
+                      <strong>Baseline readiness:</strong>
+                      {cur != null ? ` ${cur}%` : ' —'}
+                      {diff != null && (
+                        <span
+                          className={cx('statDelta', {
+                            up: diff > 0,
+                            down: diff < 0,
+                            flat: diff === 0,
+                          })}
                         >
-                          Xem chi tiết
+                          ({diff > 0 ? '+' : ''}{diff}% vs #{prev.planSequence})
+                        </span>
+                      )}
+                    </li>
+                    <li><strong>Giai đoạn:</strong> {p.planStage || '—'}</li>
+                    <li>
+                      <strong>Ải đã pass:</strong>{' '}
+                      {p.passedTasks ?? 0}/{p.totalTasks ?? 0}
+                    </li>
+                    <li>
+                      <strong>Mock nguồn:</strong>{' '}
+                      {p.sourceUserTestId ? (
+                        <Link to={`/tests/result/${p.sourceUserTestId}`}>
+                          <code className={cx('code')}>{p.sourceUserTestId.slice(0, 8)}…</code>
                         </Link>
-                        {p.status === 'ACTIVE' && (
-                          <Link
-                            to={`/learning-plans/${p.learningPlanId}/study`}
-                            className="btn btn-sm btn-primary"
-                          >
-                            Học tiếp
-                          </Link>
-                        )}
-                      </div>
-                    </div>
+                      ) : '—'}
+                    </li>
+                    <li className={cx('muted')}>
+                      Tạo: {formatDate(p.createdAt)}
+                    </li>
+                    {p.replacedByPlanId && (
+                      <li>
+                        <Link to={`/learning-plans/${p.replacedByPlanId}`}>
+                          Đã thay bằng plan kế tiếp →
+                        </Link>
+                      </li>
+                    )}
+                  </ul>
+
+                  <div className={cx('actionBar')}>
+                    <Link
+                      to={`/learning-plans/${p.learningPlanId}`}
+                      className={cx('btn', 'btnOutline', 'btnSm')}
+                    >
+                      Chi tiết
+                    </Link>
+                    {p.status === 'ACTIVE' && (
+                      <Link
+                        to={`/learning-plans/${p.learningPlanId}/study`}
+                        className={cx('btn', 'btnPrimary', 'btnSm')}
+                      >
+                        Học tiếp
+                      </Link>
+                    )}
                   </div>
                 </div>
               );

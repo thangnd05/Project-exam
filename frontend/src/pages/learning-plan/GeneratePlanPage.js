@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import axios from '~/api/axiosClient';
 import { generatePlan } from '~/api/learningPlanApi';
 import PlanPartTaskList from './components/PlanPartTaskList';
+import styles from '../PersonalizedPlan.module.scss';
+
+const cx = classNames.bind(styles);
 
 function GeneratePlanPage() {
   const navigate = useNavigate();
@@ -55,113 +59,115 @@ function GeneratePlanPage() {
   const formatDate = (s) => s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '-';
 
   return (
-    <div className="container py-4">
-      <h2 className="mb-3">Sinh lộ trình vượt ải</h2>
+    <div className={cx('wrapper')}>
+      <div className={cx('headerBar')}>
+        <h2 className={cx('title')}>Sinh lộ trình vượt ải</h2>
+      </div>
 
-      <p className="text-muted">
-        Một plan gồm nhiều Part (mỗi Part tách riêng, không trộn đề).
-        Trong mỗi Part: các tag yếu → đọc tài liệu → 10 câu → pass mới sang ải/Part tiếp.
+      <p className={cx('subtitle')}>
+        Một plan gồm nhiều Part (mỗi Part tách riêng, không trộn đề). Trong mỗi Part: các tag yếu → đọc tài liệu → 10 câu → pass mới sang ải/Part tiếp.
       </p>
 
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div className="mb-3">
-          <label className="form-label">Bài thi nguồn (đã COMPLETED)</label>
-          {loadingList ? (
-            <div>Đang tải danh sách bài thi...</div>
-          ) : userTests.length === 0 ? (
-            <div className="alert alert-warning">
-              Bạn chưa có bài thi nào đã hoàn thành. Hãy làm Quick Challenge hoặc Full Mock trước.
+      <div className={cx('card')}>
+        <div className={cx('cardBody')}>
+          <form onSubmit={handleSubmit}>
+            <div className={cx('fieldGroup')} style={{ width: '100%', marginBottom: '1.6rem' }}>
+              <label className={cx('fieldLabel')}>Bài thi nguồn (đã COMPLETED)</label>
+              {loadingList ? (
+                <div className={cx('muted')}>Đang tải danh sách bài thi...</div>
+              ) : userTests.length === 0 ? (
+                <div className={cx('alert', 'alertWarning')}>
+                  Bạn chưa có bài thi nào đã hoàn thành. Hãy làm Quick Challenge hoặc Full Mock trước.
+                </div>
+              ) : (
+                <select
+                  className={cx('select')}
+                  value={userTestId}
+                  onChange={(e) => setUserTestId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Chọn bài thi --</option>
+                  {userTests.map((t) => (
+                    <option key={t.userTestId} value={t.userTestId}>
+                      {formatDate(t.finishedAt)} · Score {t.totalScore ?? '—'} · testId={t.testId.slice(0, 8)}…
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
-          ) : (
-            <select
-              className="form-select"
-              value={userTestId}
-              onChange={(e) => setUserTestId(e.target.value)}
-              required
+
+            <div className={cx('filterRow')}>
+              <div className={cx('fieldGroup')}>
+                <label className={cx('fieldLabel')}>Ngày đến ngày thi (optional)</label>
+                <input
+                  type="number"
+                  className={cx('select')}
+                  value={deadlineDays}
+                  onChange={(e) => setDeadlineDays(e.target.value)}
+                  placeholder="VD: 28"
+                  min={3}
+                  max={365}
+                />
+                <small className={cx('muted')}>Chỉ ước lượng, không ép sang ải mới.</small>
+              </div>
+              <div className={cx('fieldGroup')}>
+                <label className={cx('fieldLabel')}>Target score (optional)</label>
+                <input
+                  type="number"
+                  className={cx('select')}
+                  value={targetScore}
+                  onChange={(e) => setTargetScore(e.target.value)}
+                  placeholder="VD: 750"
+                />
+                <small className={cx('muted')}>Bỏ trống → dùng UserTarget đã set.</small>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className={cx('btn', 'btnPrimary', 'btnLg')}
+              disabled={submitting || !userTestId || userTests.length === 0}
+              style={{ marginTop: '1.6rem' }}
             >
-              <option value="">-- Chọn bài thi --</option>
-              {userTests.map((t) => (
-                <option key={t.userTestId} value={t.userTestId}>
-                  {formatDate(t.finishedAt)} · Score {t.totalScore ?? '—'} · testId={t.testId.slice(0, 8)}…
-                </option>
-              ))}
-            </select>
-          )}
+              {submitting ? 'Đang sinh lộ trình...' : 'Sinh lộ trình'}
+            </button>
+          </form>
         </div>
+      </div>
 
-        <div className="row">
-          <div className="col-md-4 mb-3">
-            <label className="form-label">Ngày đến ngày thi (optional)</label>
-            <input
-              type="number"
-              className="form-control"
-              value={deadlineDays}
-              onChange={(e) => setDeadlineDays(e.target.value)}
-              placeholder="VD: 28"
-              min={3}
-              max={365}
-            />
-            <small className="text-muted">Chỉ để ước lượng, không ép sang ải mới.</small>
-          </div>
-          <div className="col-md-4 mb-3">
-            <label className="form-label">Target score (optional)</label>
-            <input
-              type="number"
-              className="form-control"
-              value={targetScore}
-              onChange={(e) => setTargetScore(e.target.value)}
-              placeholder="VD: 750"
-            />
-            <small className="text-muted">Bỏ trống → dùng UserTarget đã set.</small>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={submitting || !userTestId || userTests.length === 0}
-        >
-          {submitting ? 'Đang sinh lộ trình...' : 'Sinh lộ trình'}
-        </button>
-      </form>
-
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
 
       {result?.targetAchieved && (
-        <div className="alert alert-success">
-          <p className="mb-0">{result.summary}</p>
-          <p className="small mb-0 mt-2">
-            Bạn có thể đặt mục tiêu cao hơn trong phần Target, hoặc tiếp tục làm mock để duy trì phong độ.
-          </p>
+        <div className={cx('alert', 'alertSuccess')}>
+          <span>
+            {result.summary}
+            <br />
+            <small>Bạn có thể đặt mục tiêu cao hơn trong phần Target, hoặc tiếp tục làm mock để duy trì phong độ.</small>
+          </span>
         </div>
       )}
 
       {result && !result.targetAchieved && (
-        <div className="card">
-          <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div className={cx('card', 'cardPrimary')}>
+          <div className={cx('cardHeader')} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <strong>
-                Plan #{result.planSequence ?? '—'}:
-              </strong>
-              {' '}
-              <code>{result.learningPlanId}</code>
+              <strong>Plan #{result.planSequence ?? '—'}:</strong>{' '}
+              <code className={cx('code')}>{result.learningPlanId.slice(0, 8)}…</code>
             </div>
-            <div className="d-flex gap-2">
-              <button
-                type="button"
-                className="btn btn-sm btn-primary"
-                onClick={() => navigate(`/learning-plans/${result.learningPlanId}#chon-ai-hoc`)}
-              >
-                Chọn ải để học
-              </button>
-            </div>
+            <button
+              type="button"
+              className={cx('btn', 'btnPrimary', 'btnSm')}
+              onClick={() => navigate(`/learning-plans/${result.learningPlanId}#chon-ai-hoc`)}
+            >
+              Chọn ải để học
+            </button>
           </div>
-          <div className="card-body">
+          <div className={cx('cardBody')}>
             <p>{result.summary}</p>
-            <ul className="list-unstyled mb-3">
-              <li><strong>Trạm:</strong> {result.planStage}</li>
+            <ul className={cx('metaList')}>
+              <li><strong>Stage:</strong> {result.planStage}</li>
               <li>
-                <strong>Readiness (bài chẩn đoán):</strong>{' '}
+                <strong>Readiness (chẩn đoán):</strong>{' '}
                 {result.baselineReadiness ?? result.currentReadiness}% ({result.readinessLevel})
               </li>
               <li><strong>Target:</strong> {result.targetScore ?? 'N/A'}</li>
@@ -169,15 +175,15 @@ function GeneratePlanPage() {
             </ul>
 
             {result.partsWithoutTasks?.length > 0 && (
-              <div className="alert alert-warning small">
-                Part chưa đạt mục tiêu nhưng <strong>chưa có ải</strong> vì câu trong đề chưa gắn tag:
-                {' '}
-                {result.partsWithoutTasks.join(', ')}.
-                Gắn tag câu hỏi (admin) rồi sinh plan lại.
+              <div className={cx('alert', 'alertWarning')}>
+                Part chưa đạt mục tiêu nhưng <strong>chưa có ải</strong> vì câu trong đề chưa gắn tag:{' '}
+                {result.partsWithoutTasks.join(', ')}. Gắn tag câu hỏi (admin) rồi sinh plan lại.
               </div>
             )}
 
-            <h5 className="mt-3">Chọn Part và ải ({result.partGroups?.length || 0})</h5>
+            <h5 className={cx('sectionTitle')} style={{ marginTop: '1.6rem' }}>
+              Chọn Part và ải ({result.partGroups?.length || 0})
+            </h5>
             <PlanPartTaskList
               partGroups={result.partGroups || []}
               learningPlanId={result.learningPlanId}

@@ -1,10 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import axios from '~/api/axiosClient';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { listPlans, getPlanById } from '~/api/learningPlanApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
+import styles from '../PersonalizedPlan.module.scss';
+
+const cx = classNames.bind(styles);
 
 function pickRecommendedTask(plan) {
   if (!plan) return null;
@@ -14,7 +18,6 @@ function pickRecommendedTask(plan) {
   ];
   const active = allTasks.filter((t) => t.status === 'ACTIVE');
   if (active.length === 0) return null;
-  // Ưu tiên recommendedFirst, sau đó priorityScore desc
   const sorted = [...active].sort((a, b) => {
     if (a.recommendedFirst && !b.recommendedFirst) return -1;
     if (!a.recommendedFirst && b.recommendedFirst) return 1;
@@ -94,7 +97,6 @@ function NextStepPage() {
   }, [reload]);
 
   const recommendation = useMemo(() => {
-    // State machine quyết định gợi ý
     if (!target?.hasTarget) {
       return {
         kind: 'set-target',
@@ -168,7 +170,6 @@ function NextStepPage() {
       }
     }
 
-    // Có mock, không có ACTIVE plan → gợi ý sinh plan
     return {
       kind: 'generate-plan',
       title: 'Sinh lộ trình từ mock gần nhất',
@@ -185,70 +186,66 @@ function NextStepPage() {
   }, [target, enhanced, latestMock, activePlanDetail, examTypeId]);
 
   return (
-    <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h2 className="mb-0">Tiếp theo nên làm gì?</h2>
-        <div className="d-flex gap-2">
-          <Link
-            to={examTypeId ? `/my-target/dashboard?examTypeId=${examTypeId}` : '/my-target/dashboard'}
-            className="btn btn-sm btn-outline-secondary"
+    <div className={cx('wrapper')}>
+      <div className={cx('headerBar')}>
+        <h2 className={cx('title')}>Tiếp theo nên làm gì?</h2>
+        <Link
+          to={examTypeId ? `/my-target/dashboard?examTypeId=${examTypeId}` : '/my-target/dashboard'}
+          className={cx('btn', 'btnOutline', 'btnSm')}
+        >
+          Tổng quan mục tiêu
+        </Link>
+      </div>
+
+      <div className={cx('filterRow')}>
+        <div className={cx('fieldGroup')}>
+          <label className={cx('fieldLabel')}>Loại kỳ thi</label>
+          <select
+            className={cx('select')}
+            value={examTypeId}
+            onChange={(e) => {
+              setExamTypeId(e.target.value);
+              setSearchParams({ examTypeId: e.target.value });
+            }}
           >
-            Tổng quan mục tiêu
-          </Link>
+            {examTypes.map((et) => (
+              <option key={et.examTypeId} value={et.examTypeId}>{et.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
-      <div className="mb-3" style={{ maxWidth: 360 }}>
-        <label className="form-label small text-muted">Loại kỳ thi</label>
-        <select
-          className="form-select"
-          value={examTypeId}
-          onChange={(e) => {
-            setExamTypeId(e.target.value);
-            setSearchParams({ examTypeId: e.target.value });
-          }}
-        >
-          {examTypes.map((et) => (
-            <option key={et.examTypeId} value={et.examTypeId}>{et.name}</option>
-          ))}
-        </select>
-      </div>
-
-      {error && <div className="alert alert-danger">{error}</div>}
-      {loading && <div>Đang phân tích...</div>}
+      {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
+      {loading && <div className={cx('loading')}>Đang phân tích...</div>}
 
       {!loading && recommendation && (
-        <div className="card border-primary mb-4">
-          <div className="card-body">
-            <div className="small text-uppercase text-primary fw-bold mb-2">
-              Gợi ý cho bạn
-            </div>
-            <h3 className="mb-2">{recommendation.title}</h3>
-            <p className="text-muted">{recommendation.desc}</p>
-            <div className="d-flex gap-2 flex-wrap">
-              <Link to={recommendation.ctaTo} className="btn btn-primary btn-lg">
-                {recommendation.ctaLabel}
+        <div className={cx('recoBox')}>
+          <div className={cx('recoTag')}>Gợi ý cho bạn</div>
+          <h3 className={cx('recoTitle')}>{recommendation.title}</h3>
+          <p className={cx('recoDesc')}>{recommendation.desc}</p>
+          <div className={cx('actionBar')}>
+            <Link to={recommendation.ctaTo} className={cx('btn', 'btnPrimary', 'btnLg')}>
+              {recommendation.ctaLabel}
+            </Link>
+            {(recommendation.extras || []).map((ex, i) => (
+              <Link key={i} to={ex.to} className={cx('btn', 'btnOutline')}>
+                {ex.label}
               </Link>
-              {(recommendation.extras || []).map((ex, i) => (
-                <Link key={i} to={ex.to} className="btn btn-outline-secondary">
-                  {ex.label}
-                </Link>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       )}
 
       {!loading && (
-        <div className="card">
-          <div className="card-header"><strong>Trạng thái hiện tại</strong></div>
-          <div className="card-body">
-            <ul className="list-unstyled mb-0">
+        <div className={cx('card')}>
+          <div className={cx('cardHeader')}>Trạng thái hiện tại</div>
+          <div className={cx('cardBody')}>
+            <ul className={cx('metaList')} style={{ marginBottom: 0 }}>
               <li>
                 <strong>Target:</strong>{' '}
                 {target?.hasTarget
                   ? `${target.targetScore} điểm`
-                  : <span className="text-muted">chưa đặt</span>}
+                  : <span className={cx('muted')}>chưa đặt</span>}
               </li>
               <li>
                 <strong>Mock gần nhất:</strong>{' '}
@@ -256,7 +253,7 @@ function NextStepPage() {
                   ? `${enhanced?.totalScore ?? latestMock.totalScore ?? '—'}đ${
                       enhanced?.readinessScore != null ? ` · readiness ${enhanced.readinessScore}%` : ''
                     }`
-                  : <span className="text-muted">chưa có</span>}
+                  : <span className={cx('muted')}>chưa có</span>}
               </li>
               <li>
                 <strong>Plan đang học:</strong>{' '}
@@ -266,7 +263,7 @@ function NextStepPage() {
                     {activePlanDetail.totalTasks ?? 0} ải pass · stage {activePlanDetail.planStage}
                   </>
                 ) : (
-                  <span className="text-muted">không có</span>
+                  <span className={cx('muted')}>không có</span>
                 )}
               </li>
               <li>

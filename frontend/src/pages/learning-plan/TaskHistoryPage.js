@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import { getPlanById, getTaskSessions } from '~/api/learningPlanApi';
+import styles from '../PersonalizedPlan.module.scss';
+
+const cx = classNames.bind(styles);
 
 const TASK_STATUS_LABEL = {
   ACTIVE: 'Đang học',
@@ -9,10 +13,10 @@ const TASK_STATUS_LABEL = {
   LOCKED: 'Khoá',
 };
 
-const TIER_BADGE = {
-  HIGH: 'bg-danger',
-  MEDIUM: 'bg-warning text-dark',
-  LOW: 'bg-secondary',
+const TIER_VARIANT = {
+  HIGH: 'badgeDanger',
+  MEDIUM: 'badgeWarning',
+  LOW: 'badgeMuted',
 };
 
 function pct(v) {
@@ -64,14 +68,28 @@ function TaskHistoryPage() {
     return allTasks.find((t) => t.taskId === taskId) || null;
   }, [plan, taskId]);
 
-  if (loading) return <div className="container py-4">Đang tải...</div>;
-  if (error) return <div className="container py-4"><div className="alert alert-danger">{error}</div></div>;
+  if (loading) {
+    return (
+      <div className={cx('wrapper')}>
+        <div className={cx('loading')}>Đang tải...</div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className={cx('wrapper')}>
+        <div className={cx('alert', 'alertDanger')}>{error}</div>
+      </div>
+    );
+  }
   if (!plan || !task) {
     return (
-      <div className="container py-4">
-        <div className="alert alert-warning">
-          Không tìm thấy ải này trong plan.{' '}
-          <Link to={`/learning-plans/${learningPlanId}`}>Về plan →</Link>
+      <div className={cx('wrapper')}>
+        <div className={cx('alert', 'alertWarning')}>
+          <span>Không tìm thấy ải này trong plan.</span>
+          <Link to={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnOutline', 'btnSm')}>
+            Về plan
+          </Link>
         </div>
       </div>
     );
@@ -83,143 +101,112 @@ function TaskHistoryPage() {
   const delta = baseline != null && best != null ? best - baseline : null;
 
   return (
-    <div className="container py-4">
-      <div className="mb-3 d-flex gap-2 flex-wrap">
+    <div className={cx('wrapper')}>
+      <div className={cx('headerBar')}>
         <Link
           to={`/learning-plans/${learningPlanId}`}
-          className="btn btn-sm btn-outline-secondary"
+          className={cx('btn', 'btnGhost', 'btnSm')}
         >
           ← Plan #{plan.planSequence ?? '?'}
         </Link>
         <Link
           to={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
-          className="btn btn-sm btn-primary"
+          className={cx('btn', 'btnPrimary', 'btnSm')}
         >
           Học tiếp ải này
         </Link>
       </div>
 
-      <h2 className="mb-1">
+      <h2 className={cx('title')}>
         {task.examPartName || 'Part'} · Ải {task.tagName || '—'}
       </h2>
-      <div className="mb-3 d-flex gap-2 flex-wrap">
-        <span className={`badge ${TIER_BADGE[task.priorityTier] || 'bg-secondary'}`}>
+      <div className={cx('actionBar')} style={{ marginBottom: '2rem' }}>
+        <span className={cx('badge', TIER_VARIANT[task.priorityTier] || 'badgeMuted')}>
           {task.priorityTier || 'MEDIUM'} priority
         </span>
-        <span className="badge bg-light text-dark">
+        <span className={cx('badge', 'badgeMuted')}>
           Trạng thái: {TASK_STATUS_LABEL[task.status] || task.status}
         </span>
-        <span className="badge bg-light text-dark">
+        <span className={cx('badge', 'badgeMuted')}>
           Cần ≥ {pass}% để pass
         </span>
         {task.recommendedFirst && (
-          <span className="badge bg-info text-dark">Nên học trước</span>
+          <span className={cx('badge', 'badgePrimary')}>Nên học trước</span>
         )}
       </div>
 
-      <div className="row g-3 mb-4">
-        <div className="col-md-3">
-          <div className="card h-100">
-            <div className="card-body">
-              <div className="small text-muted">Lúc chẩn đoán</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{pct(baseline)}</div>
-              <div className="small text-muted">
-                Sai {task.wrongCountAtDiagnosis ?? '—'} câu
-              </div>
-            </div>
+      <div className={cx('statGrid')}>
+        <div className={cx('statTile')}>
+          <div className={cx('statLabel')}>Lúc chẩn đoán</div>
+          <div className={cx('statValue')}>{pct(baseline)}</div>
+          <div className={cx('statHint')}>
+            Sai {task.wrongCountAtDiagnosis ?? '—'} câu
           </div>
         </div>
-        <div className="col-md-3">
-          <div className="card h-100">
-            <div className="card-body">
-              <div className="small text-muted">Tốt nhất khi luyện</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{pct(best)}</div>
-              {delta != null && (
-                <div
-                  className={`small ${delta > 0 ? 'text-success' : (delta < 0 ? 'text-danger' : 'text-muted')}`}
-                >
-                  {delta > 0 ? '+' : ''}{delta.toFixed(1)}% vs chẩn đoán
-                </div>
-              )}
+
+        <div className={cx('statTile')}>
+          <div className={cx('statLabel')}>Tốt nhất khi luyện</div>
+          <div className={cx('statValue')}>{pct(best)}</div>
+          {delta != null && (
+            <div
+              className={cx('statHint', {
+                successText: delta > 0,
+                dangerText: delta < 0,
+                muted: delta === 0,
+              })}
+            >
+              {delta > 0 ? '+' : ''}{delta.toFixed(1)}% vs chẩn đoán
             </div>
-          </div>
+          )}
         </div>
-        <div className="col-md-3">
-          <div className="card h-100">
-            <div className="card-body">
-              <div className="small text-muted">Số lần luyện</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{task.attemptCount ?? 0}</div>
-              <div className="small text-muted">attempts</div>
-            </div>
-          </div>
+
+        <div className={cx('statTile')}>
+          <div className={cx('statLabel')}>Số lần luyện</div>
+          <div className={cx('statValue')}>{task.attemptCount ?? 0}</div>
+          <div className={cx('statHint')}>attempts</div>
         </div>
-        <div className="col-md-3">
-          <div className="card h-100">
-            <div className="card-body">
-              <div className="small text-muted">Ngưỡng pass</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{pass}%</div>
-              {best != null && (
-                <div className={`small ${best >= pass ? 'text-success' : 'text-warning'}`}>
-                  {best >= pass ? 'Đã đạt ngưỡng' : `Còn ${(pass - best).toFixed(1)}%`}
-                </div>
-              )}
+
+        <div className={cx('statTile')}>
+          <div className={cx('statLabel')}>Ngưỡng pass</div>
+          <div className={cx('statValue')}>{pass}%</div>
+          {best != null && (
+            <div className={cx('statHint', best >= pass ? 'successText' : 'warningText')}>
+              {best >= pass ? 'Đã đạt ngưỡng' : `Còn ${(pass - best).toFixed(1)}%`}
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {baseline != null && best != null && (
-        <div className="card mb-4">
-          <div className="card-header"><strong>Tiến triển (chẩn đoán → tốt nhất)</strong></div>
-          <div className="card-body">
-            <div className="position-relative" style={{ height: 36, background: '#f1f3f5', borderRadius: 6 }}>
+        <div className={cx('card')}>
+          <div className={cx('cardHeader')}>Tiến triển (chẩn đoán → tốt nhất)</div>
+          <div className={cx('cardBody')}>
+            <div className={cx('progressBar')}>
               <div
-                className="position-absolute"
-                style={{
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: `${Math.min(100, baseline)}%`,
-                  background: '#ffc107',
-                  opacity: 0.5,
-                  borderRadius: 6,
-                }}
+                className={cx('progressBaseline')}
+                style={{ width: `${Math.min(100, baseline)}%` }}
                 title={`Baseline ${pct(baseline)}`}
               />
               <div
-                className="position-absolute"
-                style={{
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: `${Math.min(100, best)}%`,
-                  background: best >= pass ? '#198754' : '#0d6efd',
-                  opacity: 0.85,
-                  borderRadius: 6,
-                }}
+                className={cx('progressBest', { reached: best >= pass })}
+                style={{ width: `${Math.min(100, best)}%` }}
                 title={`Best ${pct(best)}`}
               />
               <div
-                className="position-absolute"
-                style={{
-                  left: `${pass}%`,
-                  top: -4,
-                  bottom: -4,
-                  width: 2,
-                  background: '#dc3545',
-                }}
+                className={cx('progressPassLine')}
+                style={{ left: `${pass}%` }}
                 title={`Pass line ${pass}%`}
               />
             </div>
-            <div className="d-flex justify-content-between small text-muted mt-2">
+            <div className={cx('progressLegend')}>
               <span>0%</span>
-              <span>Pass {pass}%</span>
+              <span className={cx('dangerText')}>Pass {pass}%</span>
               <span>100%</span>
             </div>
-            <div className="small text-muted mt-2">
-              <span className="badge" style={{ background: '#ffc107', color: '#000' }}>Baseline</span>{' '}
-              {pct(baseline)} ·{' '}
-              <span className="badge" style={{ background: best >= pass ? '#198754' : '#0d6efd' }}>Best</span>{' '}
+            <div style={{ marginTop: '0.8rem', fontSize: 'var(--font-size-sm)' }}>
+              <span className={cx('badge', 'badgeWarning')}>Baseline</span>{' '}
+              {pct(baseline)}{' '}·{' '}
+              <span className={cx('badge', best >= pass ? 'badgeSuccess' : 'badgePrimary')}>Best</span>{' '}
               {pct(best)}
             </div>
           </div>
@@ -227,40 +214,44 @@ function TaskHistoryPage() {
       )}
 
       {task.studyResource && (
-        <div className="card mb-4">
-          <div className="card-header"><strong>Tài liệu được gắn cho ải</strong></div>
-          <div className="card-body">
+        <div className={cx('card')}>
+          <div className={cx('cardHeader')}>Tài liệu được gắn cho ải</div>
+          <div className={cx('cardBody')}>
             <a href={task.studyResource.url} target="_blank" rel="noreferrer">
               {task.studyResource.title}
             </a>
             {task.studyResource.description && (
-              <p className="small text-muted mb-0 mt-1">{task.studyResource.description}</p>
+              <p className={cx('muted')} style={{ marginTop: '0.4rem', marginBottom: 0, fontSize: 'var(--font-size-sm)' }}>
+                {task.studyResource.description}
+              </p>
             )}
           </div>
         </div>
       )}
 
-      <div className="card mb-3">
-        <div className="card-header"><strong>Lịch sử các lần luyện</strong></div>
+      <div className={cx('card')}>
+        <div className={cx('cardHeader')}>Lịch sử các lần luyện</div>
         {sessionsError && (
-          <div className="card-body">
-            <div className="alert alert-danger mb-0 small">{sessionsError}</div>
+          <div className={cx('cardBody')}>
+            <div className={cx('alert', 'alertDanger')} style={{ marginBottom: 0 }}>
+              {sessionsError}
+            </div>
           </div>
         )}
         {!sessionsError && sessions.length === 0 && (
-          <div className="card-body text-muted">
+          <div className={cx('cardBody', 'muted')}>
             Chưa có lần luyện nào cho ải này.
           </div>
         )}
         {!sessionsError && sessions.length > 0 && (
-          <table className="table mb-0">
+          <table className={cx('table')}>
             <thead>
               <tr>
                 <th>#</th>
                 <th>Bắt đầu</th>
                 <th>Nộp</th>
-                <th className="text-end">Số câu</th>
-                <th className="text-end">Accuracy</th>
+                <th className={cx('right')}>Số câu</th>
+                <th className={cx('right')}>Accuracy</th>
                 <th>Kết quả</th>
                 <th>Stage</th>
               </tr>
@@ -269,24 +260,24 @@ function TaskHistoryPage() {
               {sessions.map((s, idx) => (
                 <tr key={s.sessionId}>
                   <td>{sessions.length - idx}</td>
-                  <td className="small">{formatDateTime(s.startedAt)}</td>
-                  <td className="small">{formatDateTime(s.submittedAt)}</td>
-                  <td className="text-end">{s.questionCount ?? '—'}</td>
-                  <td className="text-end">
+                  <td className={cx('small')}>{formatDateTime(s.startedAt)}</td>
+                  <td className={cx('small')}>{formatDateTime(s.submittedAt)}</td>
+                  <td className={cx('right')}>{s.questionCount ?? '—'}</td>
+                  <td className={cx('right')}>
                     {s.accuracy != null ? `${s.accuracy}%` : '—'}
                   </td>
                   <td>
                     {s.status === 'IN_PROGRESS' ? (
-                      <span className="badge bg-warning text-dark">Đang làm</span>
+                      <span className={cx('badge', 'badgeWarning')}>Đang làm</span>
                     ) : s.passed === true ? (
-                      <span className="badge bg-success">Pass</span>
+                      <span className={cx('badge', 'badgeSuccess')}>Pass</span>
                     ) : s.passed === false ? (
-                      <span className="badge bg-secondary">Chưa pass</span>
+                      <span className={cx('badge', 'badgeMuted')}>Chưa pass</span>
                     ) : (
-                      <span className="text-muted small">—</span>
+                      <span className={cx('muted', 'small')}>—</span>
                     )}
                   </td>
-                  <td className="small text-muted">{s.planStage || '—'}</td>
+                  <td className={cx('small')}>{s.planStage || '—'}</td>
                 </tr>
               ))}
             </tbody>

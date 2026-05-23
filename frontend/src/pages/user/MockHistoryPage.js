@@ -1,8 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import axios from '~/api/axiosClient';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
+import styles from '../PersonalizedPlan.module.scss';
+
+const cx = classNames.bind(styles);
 
 function formatDate(s) {
   return s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '—';
@@ -65,14 +69,12 @@ function MockHistoryPage() {
     }
   };
 
-  // Tự tải enhanced cho 3 lần gần nhất để vẽ trend nhỏ
   useEffect(() => {
     if (tests.length === 0) return;
     tests.slice(0, 3).forEach((t) => loadEnhanced(t.userTestId));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tests]);
 
-  // Trend (theo thứ tự thời gian tăng dần) cho các mock đã load enhanced
   const trend = useMemo(() => {
     return [...tests].reverse()
       .map((t) => {
@@ -92,24 +94,24 @@ function MockHistoryPage() {
   const maxReadiness = Math.max(100, ...trend.map((p) => p.readinessScore || 0));
 
   return (
-    <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h2 className="mb-0">Lịch sử bài thi</h2>
-        <div className="d-flex gap-2">
-          <Link to="/my-target/dashboard" className="btn btn-sm btn-outline-secondary">
+    <div className={cx('wrapper')}>
+      <div className={cx('headerBar')}>
+        <h2 className={cx('title')}>Lịch sử bài thi</h2>
+        <div className={cx('actionBar')}>
+          <Link to="/my-target/dashboard" className={cx('btn', 'btnOutline', 'btnSm')}>
             Tổng quan mục tiêu
           </Link>
-          <Link to="/" className="btn btn-sm btn-outline-primary">
+          <Link to="/" className={cx('btn', 'btnPrimary', 'btnSm')}>
             Làm bài mới
           </Link>
         </div>
       </div>
 
-      <div className="row g-2 align-items-end mb-3">
-        <div className="col-md-4">
-          <label className="form-label small text-muted mb-1">Lọc theo kỳ thi</label>
+      <div className={cx('filterRow')}>
+        <div className={cx('fieldGroup')}>
+          <label className={cx('fieldLabel')}>Lọc theo kỳ thi</label>
           <select
-            className="form-select"
+            className={cx('select')}
             value={examTypeFilter}
             onChange={(e) => {
               setExamTypeFilter(e.target.value);
@@ -122,67 +124,63 @@ function MockHistoryPage() {
             ))}
           </select>
         </div>
-        <div className="col-md-8">
-          <p className="text-muted small mb-0">
-            Hiển thị các bài đã COMPLETED. Nhấn <strong>Tải readiness</strong> để xem độ sẵn sàng từ enhanced result.
-          </p>
-        </div>
+        <p className={cx('filterHint')}>
+          Hiển thị các bài đã COMPLETED. Nhấn <strong>Tải</strong> để xem readiness của 1 mock.
+        </p>
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
-      {loading && <div>Đang tải...</div>}
+      {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
+      {loading && <div className={cx('loading')}>Đang tải...</div>}
 
       {!loading && tests.length === 0 && (
-        <div className="alert alert-info">
-          Bạn chưa có bài thi nào đã hoàn thành.{' '}
-          <Link to="/">Làm bài đầu tiên →</Link>
+        <div className={cx('alert', 'alertInfo')}>
+          <span>Bạn chưa có bài thi nào đã hoàn thành.</span>
+          <Link to="/" className={cx('btn', 'btnPrimary', 'btnSm')}>Làm bài đầu tiên</Link>
         </div>
       )}
 
       {trend.length >= 2 && (
-        <div className="card mb-4">
-          <div className="card-header"><strong>Tiến triển readiness</strong> (sớm → muộn)</div>
-          <div className="card-body">
-            <div className="d-flex align-items-end gap-2" style={{ height: 160 }}>
+        <div className={cx('card')}>
+          <div className={cx('cardHeader')}>
+            Tiến triển readiness (sớm → muộn)
+          </div>
+          <div className={cx('cardBody')}>
+            <div className={cx('barChart')}>
               {trend.map((p) => {
-                const h = (p.readinessScore || 0) / maxReadiness * 100;
-                const bg = p.isTargetMet ? '#198754' : (p.readinessScore >= 70 ? '#0d6efd' : '#ffc107');
+                const h = ((p.readinessScore || 0) / maxReadiness) * 100;
+                const variant = p.isTargetMet
+                  ? 'success'
+                  : (p.readinessScore >= 70 ? '' : 'warning');
                 return (
                   <div
                     key={p.userTestId}
-                    className="d-flex flex-column align-items-center"
-                    style={{ flex: 1, minWidth: 40 }}
+                    className={cx('barColumn')}
                     title={`${formatDate(p.finishedAt)} · ${p.readinessScore}% · ${p.totalScore}đ`}
                   >
-                    <div
-                      style={{
-                        width: '100%',
-                        height: `${h}%`,
-                        background: bg,
-                        borderRadius: 4,
-                        transition: 'height .3s',
-                      }}
-                    />
-                    <small className="text-muted mt-1">{p.readinessScore}%</small>
-                    <small className="text-muted">{p.totalScore}đ</small>
+                    <span className={cx('barValue')}>{p.readinessScore}%</span>
+                    <div className={cx('barBar', variant)} style={{ height: `${h}%` }} />
+                    <span className={cx('barLabel')}>{p.totalScore}đ</span>
                   </div>
                 );
               })}
             </div>
+            <p className={cx('chartNote')}>
+              Cột xanh lá = mock đạt target · xanh dương = readiness ≥ 70% · vàng = dưới ngưỡng.
+            </p>
           </div>
         </div>
       )}
 
       {tests.length > 0 && (
-        <div className="card">
-          <table className="table mb-0">
+        <div className={cx('tableWrapper')}>
+          <table className={cx('table')}>
             <thead>
               <tr>
                 <th>#</th>
                 <th>Hoàn thành</th>
                 <th>Test ID</th>
-                <th className="text-end">Score</th>
-                <th className="text-end">Readiness</th>
+                <th className={cx('right')}>Score</th>
+                <th className={cx('right')}>Readiness</th>
                 <th>Mục tiêu</th>
                 <th>Thời gian</th>
                 <th></th>
@@ -195,17 +193,17 @@ function MockHistoryPage() {
                 return (
                   <tr key={t.userTestId}>
                     <td>{tests.length - idx}</td>
-                    <td className="small">{formatDate(t.finishedAt)}</td>
-                    <td className="small"><code>{t.testId?.slice(0, 8)}…</code></td>
-                    <td className="text-end">
+                    <td className={cx('small')}>{formatDate(t.finishedAt)}</td>
+                    <td><code className={cx('code')}>{t.testId?.slice(0, 8)}…</code></td>
+                    <td className={cx('right')}>
                       <strong>{enhancedLoaded ? e.totalScore : (t.totalScore ?? '—')}</strong>
                     </td>
-                    <td className="text-end">
+                    <td className={cx('right')}>
                       {enhancedLoaded ? `${e.readinessScore}%` : (
                         loadingId === t.userTestId ? '...' : (
                           <button
                             type="button"
-                            className="btn btn-link btn-sm p-0"
+                            className={cx('btn', 'btnGhost', 'btnSm')}
                             onClick={() => loadEnhanced(t.userTestId)}
                           >
                             Tải
@@ -216,19 +214,19 @@ function MockHistoryPage() {
                     <td>
                       {enhancedLoaded ? (
                         e.isTargetMet === true ? (
-                          <span className="badge bg-success">Đạt</span>
+                          <span className={cx('badge', 'badgeSuccess')}>Đạt</span>
                         ) : e.isTargetMet === false ? (
-                          <span className="badge bg-warning text-dark">Chưa đạt</span>
+                          <span className={cx('badge', 'badgeWarning')}>Chưa đạt</span>
                         ) : (
-                          <span className="text-muted small">Chưa set target</span>
+                          <span className={cx('badge', 'badgeMuted')}>Chưa set</span>
                         )
                       ) : '—'}
                     </td>
-                    <td className="small">{formatDuration(t.durationTaken)}</td>
+                    <td className={cx('small')}>{formatDuration(t.durationTaken)}</td>
                     <td>
                       <Link
                         to={`/tests/result/${t.userTestId}`}
-                        className="btn btn-sm btn-outline-primary"
+                        className={cx('btn', 'btnOutline', 'btnSm')}
                       >
                         Chẩn đoán
                       </Link>

@@ -1,16 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames/bind';
+import styles from '../../PersonalizedPlan.module.scss';
 
-const TASK_STATUS_LABEL = {
-  PASSED: { text: 'Đã đạt', className: 'success' },
-  ACTIVE: { text: 'Chưa đạt', className: 'primary' },
-  LOCKED: { text: 'Chưa đạt', className: 'secondary' },
-  SKIPPED: { text: 'Bỏ qua', className: 'light' },
+const cx = classNames.bind(styles);
+
+const TASK_STATUS = {
+  PASSED: { text: 'Đã đạt', variant: 'badgeSuccess' },
+  ACTIVE: { text: 'Chưa đạt', variant: 'badgePrimary' },
+  LOCKED: { text: 'Chưa đạt', variant: 'badgeMuted' },
+  SKIPPED: { text: 'Bỏ qua', variant: 'badgeMuted' },
+};
+
+const PRIORITY = {
+  HIGH: { text: 'Nên học trước', variant: 'badgeDanger' },
+  MEDIUM: { text: 'Ưu tiên vừa', variant: 'badgeWarning' },
+  LOW: { text: 'Tùy chọn', variant: 'badgeMuted' },
 };
 
 /**
  * Danh sách ải (tag) theo từng Part — nút "Học ải" nằm trong khung Part.
- * @param {'link'|'button'} studyAction - link: điều hướng /study?taskId=; button: gọi onStudyTask
+ * @param {'link'|'button'} studyAction
  */
 function PlanPartTaskList({
   partGroups = [],
@@ -20,29 +30,26 @@ function PlanPartTaskList({
   compact = false,
 }) {
   if (!partGroups.length) {
-    return <p className="text-muted mb-0">Chưa có ải trong kế hoạch.</p>;
+    return <p className={cx('muted')}>Chưa có ải trong kế hoạch.</p>;
   }
 
   return (
-    <div className="plan-part-task-list">
+    <div>
       {partGroups.map((group) => (
-        <div
-          key={group.examPartId}
-          className={`card mb-3 border-2 border-primary-subtle shadow-sm ${compact ? 'compact-part-card' : ''}`}
-        >
-          <div className="card-header bg-primary bg-opacity-10 d-flex justify-content-between align-items-center flex-wrap gap-2 py-2">
+        <div key={group.examPartId} className={cx('partGroup')}>
+          <div className={cx('partGroupHeader')}>
             <div>
-              <span className="text-muted small d-block">Part</span>
-              <strong className="fs-6">{group.examPartName}</strong>
+              <div className={cx('partGroupTag')}>Part</div>
+              <h4 className={cx('partGroupName')}>{group.examPartName}</h4>
             </div>
-            <span className="badge bg-info text-dark">
+            <span className={cx('badge', 'badgePrimary')}>
               {group.passedTasksInPart}/{group.totalTasksInPart} ải
               {group.passAccuracy != null ? ` · cần ≥${group.passAccuracy}%` : ''}
             </span>
           </div>
-          <div className={`card-body ${compact ? 'py-2' : 'py-3'}`}>
-            <p className="small text-muted mb-2 mb-md-3">
-              Bước 1: đọc tài liệu của ải · Bước 2: bấm Học ải để luyện (thứ tự ải tùy ý).
+          <div className={cx('partGroupBody')}>
+            <p className={cx('partGroupHint')}>
+              Bước 1: đọc tài liệu · Bước 2: bấm Học ải để luyện (thứ tự ải tùy ý).
             </p>
             {(group.tasks || []).map((t) => (
               <PartTaskRow
@@ -61,23 +68,17 @@ function PlanPartTaskList({
   );
 }
 
-const PRIORITY_BADGE = {
-  HIGH: { text: 'Nên học trước', className: 'danger' },
-  MEDIUM: { text: 'Ưu tiên vừa', className: 'warning' },
-  LOW: { text: 'Tùy chọn', className: 'secondary' },
-};
-
 function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }) {
-  const status = TASK_STATUS_LABEL[task.status] || TASK_STATUS_LABEL.ACTIVE;
+  const status = TASK_STATUS[task.status] || TASK_STATUS.ACTIVE;
   const canStudy = task.status !== 'SKIPPED';
   const resource = task.studyResource;
-  const priority = PRIORITY_BADGE[task.priorityTier] || PRIORITY_BADGE.MEDIUM;
+  const priority = PRIORITY[task.priorityTier] || PRIORITY.MEDIUM;
 
   const studyButton =
     studyAction === 'button' ? (
       <button
         type="button"
-        className="btn btn-sm btn-primary"
+        className={cx('btn', 'btnPrimary', 'btnSm')}
         disabled={!canStudy}
         onClick={() => onStudyTask?.(task.taskId)}
       >
@@ -86,7 +87,7 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
     ) : (
       <Link
         to={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
-        className={`btn btn-sm btn-primary ${!canStudy ? 'disabled' : ''}`}
+        className={cx('btn', 'btnPrimary', 'btnSm')}
         aria-disabled={!canStudy}
         onClick={(e) => {
           if (!canStudy) e.preventDefault();
@@ -97,68 +98,68 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
     );
 
   return (
-    <div
-      className={`rounded border bg-white ${compact ? 'p-2 mb-2' : 'p-3 mb-2'}`}
-    >
-      <div className="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-        <div className="min-w-0 flex-grow-1">
-        <div className="fw-semibold d-flex flex-wrap align-items-center gap-2">
-          <span>
-            <span className="text-muted me-1">Ải #{task.taskOrder}</span>
-            {task.tagName}
-          </span>
-          {task.priorityTier && (
-            <span className={`badge bg-${priority.className}`}>{priority.text}</span>
-          )}
-        </div>
-        <div className="small text-muted mt-1">
-          {task.wrongCountAtDiagnosis != null && (
-            <span className="me-2">Sai {task.wrongCountAtDiagnosis} câu (mock)</span>
-          )}
+    <div className={cx('taskRow', { compact })}>
+      <div className={cx('taskRowHead')}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className={cx('taskTitle')}>
+            <span>
+              <span className={cx('taskTitleHint')}>Ải #{task.taskOrder}</span>
+              {task.tagName}
+            </span>
+            {task.priorityTier && (
+              <span className={cx('badge', priority.variant)}>{priority.text}</span>
+            )}
+          </div>
+          <div className={cx('taskStats')}>
+            {task.wrongCountAtDiagnosis != null && (
+              <span>Sai {task.wrongCountAtDiagnosis} câu (mock)</span>
+            )}
             {task.baselineAccuracy != null && (
-              <span className="me-2">Điểm gốc {task.baselineAccuracy}%</span>
+              <span>Gốc {task.baselineAccuracy}%</span>
             )}
             {task.bestAccuracy != null && (
-              <span className="me-2">Tốt nhất {task.bestAccuracy}%</span>
+              <span>Tốt nhất {task.bestAccuracy}%</span>
             )}
             {task.passAccuracy != null && (
               <span>Pass ≥{task.passAccuracy}%</span>
             )}
           </div>
         </div>
-        <span className={`badge bg-${status.className} flex-shrink-0`}>{status.text}</span>
+        <span className={cx('badge', status.variant)}>{status.text}</span>
       </div>
 
-      <div className="mt-2 p-2 rounded bg-light border border-light">
-        <div className="small fw-semibold text-secondary mb-1">Tài liệu (đọc trước)</div>
-        {resource?.url ? (
-          <>
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noreferrer"
-              className="small d-block text-truncate"
-            >
-              {resource.title || resource.originalFileName || 'Mở tài liệu'}
-            </a>
-            {resource.description && (
-              <p className="small text-muted mb-0 mt-1">{resource.description}</p>
-            )}
-          </>
-        ) : (
-          <span className="small text-muted">
-            Chưa gắn tài liệu cho tag này (admin: Recovery Resource + tag).
-          </span>
-        )}
-      </div>
+      {!compact && (
+        <div className={cx('resourceBox')}>
+          <div className={cx('resourceLabel')}>Tài liệu (đọc trước)</div>
+          {resource?.url ? (
+            <>
+              <a
+                href={resource.url}
+                target="_blank"
+                rel="noreferrer"
+                className={cx('resourceLink')}
+              >
+                {resource.title || resource.originalFileName || 'Mở tài liệu'}
+              </a>
+              {resource.description && (
+                <p className={cx('resourceDesc')}>{resource.description}</p>
+              )}
+            </>
+          ) : (
+            <span className={cx('muted', 'small')}>
+              Chưa gắn tài liệu cho tag này (admin: Recovery Resource + tag).
+            </span>
+          )}
+        </div>
+      )}
 
-      <div className="d-flex flex-wrap gap-2 mt-2 justify-content-end">
-        {resource?.url && (
+      <div className={cx('taskActions')}>
+        {!compact && resource?.url && (
           <a
             href={resource.url}
             target="_blank"
             rel="noreferrer"
-            className="btn btn-sm btn-outline-secondary"
+            className={cx('btn', 'btnOutline', 'btnSm')}
           >
             Xem tài liệu
           </a>
