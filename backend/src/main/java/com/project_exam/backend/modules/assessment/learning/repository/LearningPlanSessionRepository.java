@@ -17,4 +17,8 @@ public interface LearningPlanSessionRepository extends JpaRepository<LearningPla
 
     List<LearningPlanSession> findByLearningPlanIdAndStatus(
             String learningPlanId, SessionStatus status);
+
+    /** Lịch sử attempt của 1 ải, mới nhất trước. */
+    List<LearningPlanSession> findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(
+            String learningPlanId, String taskId);
 }

@@ -41,13 +41,20 @@ public class UserTargetService {
             ut = existing.get();
             userTargetPartRepository.deleteByUserTargetId(ut.getUserTargetId());
             userTargetPartRepository.flush();
+            Integer oldScore = ut.getTargetScore();
             ut.setTargetScore(request.getTargetScore());
+            ut.setTargetReadiness(request.getTargetReadiness());
+            // Mục tiêu mới cao hơn → reset trạng thái đã đạt để theo dõi lại.
+            if (oldScore == null || !Objects.equals(oldScore, request.getTargetScore())) {
+                ut.setAchievedAt(null);
+            }
             ut = userTargetRepository.save(ut);
         } else {
             ut = new UserTarget();
             ut.setUserId(userId);
             ut.setExamTypeId(request.getExamTypeId());
             ut.setTargetScore(request.getTargetScore());
+            ut.setTargetReadiness(request.getTargetReadiness());
             ut = userTargetRepository.save(ut);
         }
 
@@ -97,6 +104,8 @@ public class UserTargetService {
         res.setUserId(ut.getUserId());
         res.setExamTypeId(ut.getExamTypeId());
         res.setTargetScore(ut.getTargetScore());
+        res.setTargetReadiness(ut.getTargetReadiness());
+        res.setAchievedAt(ut.getAchievedAt());
 
         List<UserTargetPart> savedParts = userTargetPartRepository
                 .findByUserTargetId(ut.getUserTargetId());

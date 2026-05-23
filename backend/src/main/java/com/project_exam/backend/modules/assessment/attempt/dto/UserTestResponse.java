@@ -13,6 +13,7 @@ public class UserTestResponse {
     private String userId;     // 🟢 thêm
     private String userName;
     private String testId;     // 🟢 thêm
+    private String examTypeId; // 🟢 thêm — để FE lọc mock theo kỳ thi
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
     private Integer totalScore;

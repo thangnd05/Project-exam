@@ -70,4 +70,15 @@ public class LearningPlanController {
         return ResponseEntity.ok(learningPlanSessionService.submitSession(
                 userId, learningPlanId, sessionId, request));
     }
+
+    @GetMapping("/{learningPlanId}/tasks/{taskId}/sessions")
+    public ResponseEntity<List<TaskSessionHistoryDto>> taskSessionHistory(
+            @PathVariable String learningPlanId,
+            @PathVariable String taskId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(learningPlanSessionService
+                .getTaskSessionHistory(userId, learningPlanId, taskId));
+    }
 }

@@ -45,9 +45,11 @@ const routes = {
 
   // 📚 Learning Plan
   generatePlan: '/learning-plans/generate',
+  planCompare: '/learning-plans/compare',
   myPlans: '/learning-plans',
   planDetail: '/learning-plans/:learningPlanId',
   planStudy: '/learning-plans/:learningPlanId/study',
+  taskHistory: '/learning-plans/:learningPlanId/tasks/:taskId/history',
 
   myAlbums: '/my-albums',
   albumDelta: '/albums/:albumId',
@@ -65,6 +67,10 @@ const routes = {
   verifyEmail: '/verify',
   profile: '/profile',
   myTarget: '/my-target',
+  targetDashboard: '/my-target/dashboard',
+  mockHistory: '/my-target/mocks',
+  targetAchieved: '/my-target/achieved',
+  nextStep: '/next-step',
   myEvaluations: '/my-evaluations',
   myPosts: '/my-posts',
   savedPosts: '/saved-posts',

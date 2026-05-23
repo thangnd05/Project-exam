@@ -52,10 +52,16 @@ import TagsManagement from '~/Admin/pages/Tags';
 import RecoveryResourcesManagement from '~/Admin/pages/RecoveryResources';
 import MilestonesManagement from '~/Admin/pages/Milestones';
 import UserTargetPage from '~/pages/user/UserTargetPage';
+import TargetDashboardPage from '~/pages/user/TargetDashboardPage';
+import MockHistoryPage from '~/pages/user/MockHistoryPage';
+import TargetAchievedPage from '~/pages/user/TargetAchievedPage';
+import NextStepPage from '~/pages/user/NextStepPage';
 import GeneratePlanPage from '~/pages/learning-plan/GeneratePlanPage';
 import PlanDetailPage from '~/pages/learning-plan/PlanDetailPage';
 import PlanStudyPage from '~/pages/learning-plan/PlanStudyPage';
 import MyPlansPage from '~/pages/learning-plan/MyPlansPage';
+import PlanComparisonPage from '~/pages/learning-plan/PlanComparisonPage';
+import TaskHistoryPage from '~/pages/learning-plan/TaskHistoryPage';
 
 //  Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -121,9 +127,15 @@ export const privateRoutes = [
   { path: routes.myPosts, component: MyPostsPage },
   { path: routes.savedPosts, component: SavedPostsPage },
   { path: routes.generatePlan, component: GeneratePlanPage },
+  { path: routes.planCompare, component: PlanComparisonPage },
   { path: routes.planDetail, component: PlanDetailPage },
   { path: routes.planStudy, component: PlanStudyPage },
+  { path: routes.taskHistory, component: TaskHistoryPage },
   { path: routes.myPlans, component: MyPlansPage },
+  { path: routes.targetDashboard, component: TargetDashboardPage },
+  { path: routes.mockHistory, component: MockHistoryPage },
+  { path: routes.targetAchieved, component: TargetAchievedPage },
+  { path: routes.nextStep, component: NextStepPage },
 ];
 
 const appRoutes = { publicRoutes, privateRoutes, adminRoutes };

@@ -56,10 +56,18 @@ public class UserTestService {
     private final AuthUtils authUtils;
 
     public UserTestResponse toResponse(UserTest userTest) {
+        String examTypeId = testRepository.findById(userTest.getTestId())
+                .map(Test::getExamTypeId)
+                .orElse(null);
+        return toResponse(userTest, examTypeId);
+    }
+
+    private UserTestResponse toResponse(UserTest userTest, String examTypeId) {
         return UserTestResponse.builder()
                 .userTestId(userTest.getUserTestId())
                 .userId(userTest.getUserId())
                 .testId(userTest.getTestId())
+                .examTypeId(examTypeId)
                 .startedAt(userTest.getStartedAt())
                 .finishedAt(userTest.getFinishedAt())
                 .totalScore(userTest.getTotalScore())
@@ -70,6 +78,24 @@ public class UserTestService {
                                 : null
                 )
                 .build();
+    }
+
+    /** Batch-load examTypeId theo testId để tránh N+1 khi map list UserTest. */
+    private Map<String, String> loadExamTypeIdsByTestId(Collection<UserTest> userTests) {
+        Set<String> testIds = userTests.stream()
+                .map(UserTest::getTestId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (testIds.isEmpty()) return Collections.emptyMap();
+        return testRepository.findAllById(testIds).stream()
+                .collect(Collectors.toMap(Test::getTestId, Test::getExamTypeId));
+    }
+
+    private List<UserTestResponse> toResponseListBatched(List<UserTest> userTests) {
+        Map<String, String> examTypeIdByTest = loadExamTypeIdsByTestId(userTests);
+        return userTests.stream()
+                .map(u -> toResponse(u, examTypeIdByTest.get(u.getTestId())))
+                .toList();
     }
 
     @Transactional
@@ -275,19 +301,19 @@ public class UserTestService {
         if (!authUtils.isAdmin(httpRequest)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ user-tests.");
         }
-        return findAll().stream().map(this::toResponse).toList();
+        return toResponseListBatched(findAll());
     }
     public Optional<UserTest> findById(String id) { return userTestRepository.findById(id); }
     public List<UserTest> findByUserId(String userId) { return userTestRepository.findByUserId(userId); }
     public List<UserTestResponse> findResponsesByUserId(String userId) {
-        return findByUserId(userId).stream().map(this::toResponse).toList();
+        return toResponseListBatched(findByUserId(userId));
     }
     public List<UserTest> findByTestId(String testId) { return userTestRepository.findByTestId(testId); }
 
     /** Chỉ chủ đề (hoặc admin) được xem toàn bộ attempts của một bài test. */
     public List<UserTestResponse> findResponsesByTestId(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         requireTestOwnerOrAdmin(testId, httpRequest);
-        return findByTestId(testId).stream().map(this::toResponse).toList();
+        return toResponseListBatched(findByTestId(testId));
     }
     public UserTest save(UserTest userTest) { return userTestRepository.save(userTest); }
     public UserTestResponse saveResponse(UserTest userTest) { return toResponse(save(userTest)); }
@@ -503,6 +529,7 @@ public class UserTestService {
                         .userId(u.getUserId())
                         .userName(userNameById.get(u.getUserId()))
                         .testId(u.getTestId())
+                        .examTypeId(test.getExamTypeId())
                         .startedAt(u.getStartedAt())
                         .finishedAt(u.getFinishedAt())
                         .totalScore(u.getTotalScore())
@@ -549,6 +576,7 @@ public class UserTestService {
                         .userId(u.getUserId())
                         .userName(userNameById.get(u.getUserId()))
                         .testId(u.getTestId())
+                        .examTypeId(test.getExamTypeId())
                         .startedAt(u.getStartedAt())
                         .finishedAt(u.getFinishedAt())
                         .totalScore(u.getTotalScore())
@@ -604,9 +632,13 @@ public class UserTestService {
                 throw new ForbiddenException("Bạn không có quyền xem bài làm này.");
             }
         }
+        String examTypeId = testRepository.findById(ut.getTestId())
+                .map(Test::getExamTypeId)
+                .orElse(null);
         return UserTestResponse.builder()
                 .userTestId(ut.getUserTestId())
                 .testId(ut.getTestId())
+                .examTypeId(examTypeId)
                 .userId(ut.getUserId())
                 .userName(resolveUserName(ut.getUserId()))
                 .startedAt(ut.getStartedAt())

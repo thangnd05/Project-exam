@@ -26,3 +26,9 @@ export const submitSession = (learningPlanId, sessionId, answers) => {
     .post(`${BASE_URL}/${learningPlanId}/sessions/${sessionId}/submit`, { answers })
     .then((res) => res.data);
 };
+
+export const getTaskSessions = (learningPlanId, taskId) => {
+  return axios
+    .get(`${BASE_URL}/${learningPlanId}/tasks/${taskId}/sessions`)
+    .then((res) => res.data);
+};

@@ -218,6 +218,34 @@ public class LearningPlanSessionService {
                 .build();
     }
 
+    /** Lịch sử các phiên luyện của một ải (1 row = 1 lần làm 10 câu). Mới nhất trước. */
+    public List<TaskSessionHistoryDto> getTaskSessionHistory(
+            String userId, String learningPlanId, String taskId) {
+        requireOwnedPlan(userId, learningPlanId);
+
+        LearningPlanTask task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhiệm vụ"));
+        if (!Objects.equals(task.getLearningPlanId(), learningPlanId)) {
+            throw new ForbiddenException("Nhiệm vụ không thuộc kế hoạch này");
+        }
+
+        List<LearningPlanSession> sessions = sessionRepository
+                .findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(learningPlanId, taskId);
+
+        return sessions.stream()
+                .map(s -> TaskSessionHistoryDto.builder()
+                        .sessionId(s.getSessionId())
+                        .planStage(s.getPlanStage() != null ? s.getPlanStage().name() : null)
+                        .status(s.getStatus() != null ? s.getStatus().name() : null)
+                        .questionCount(s.getQuestionCount())
+                        .accuracy(s.getAccuracy())
+                        .passed(s.getPassed())
+                        .startedAt(s.getStartedAt())
+                        .submittedAt(s.getSubmittedAt())
+                        .build())
+                .toList();
+    }
+
     private LearningPlan requireOwnedPlan(String userId, String learningPlanId) {
         LearningPlan plan = planRepository.findById(learningPlanId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch học"));
