@@ -43,6 +43,12 @@ const routes = {
   examTypeDetail: '/exam-types/:examTypeId',
   MyTest: '/my-tests',
 
+  // 📚 Learning Plan
+  generatePlan: '/learning-plans/generate',
+  myPlans: '/learning-plans',
+  planDetail: '/learning-plans/:learningPlanId',
+  planStudy: '/learning-plans/:learningPlanId/study',
+
   myAlbums: '/my-albums',
   albumDelta: '/albums/:albumId',
   vocaPratice: '/practice/:albumId',

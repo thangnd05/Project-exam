@@ -401,6 +401,15 @@ const TestResultPage = () => {
                 >
                   <IoSchoolOutline /> Lịch sử bài thi
                 </button>
+
+                {!isGuest && (
+                  <button
+                    className={cx("btn-review")}
+                    onClick={() => navigate(`/learning-plans/generate?userTestId=${userTestId}`)}
+                  >
+                    <IoSchoolOutline /> Tạo kế hoạch học
+                  </button>
+                )}
               </div>
             </div>
           </div>

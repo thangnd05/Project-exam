@@ -1,0 +1,61 @@
+package com.project_exam.backend.modules.assessment.learning.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.Instant;
+import java.util.List;
+
+@Getter
+@Setter
+@Builder
+public class PlanResponse {
+
+    private String learningPlanId;
+    private String userId;
+    private String examTypeId;
+    private String sourceUserTestId;
+
+    private Integer planSequence;
+    private String status;
+    private String replacedByPlanId;
+
+    /** true khi mock đã đạt target — không tạo plan mới. */
+    private Boolean targetAchieved;
+
+    private Integer targetScore;
+    private Integer deadlineDays;
+
+    /** Readiness từ bài chẩn đoán (mock/quick) — snapshot, không phải điểm quiz ải. */
+    private Integer baselineReadiness;
+
+    /** Level derived từ baselineReadiness ({@link com.project_exam.backend.modules.assessment.learning.support.ReadinessThresholds}). */
+    private String readinessLevel;
+
+    /** UserTest dùng làm nguồn baseline (có thể cập nhật sau refresh-diagnostic). */
+    private String diagnosticUserTestId;
+
+    private String planStage;
+    private String userTargetId;
+    private Integer passAccuracyDefault;
+    private Instant createdAt;
+
+    /** Câu chốt motivation hiển thị đầu trang plan. */
+    private String summary;
+
+    private Integer totalTasks;
+    private Integer passedTasks;
+    private Integer estimatedDaysRemaining;
+
+    private List<PlanTaskDto> tasks;
+
+    /** Ải nhóm theo Part — học từng Part riêng, không trộn. */
+    private List<PlanPartGroupDto> partGroups;
+
+    /** Part chưa đạt target nhưng không tạo được ải (thiếu tag trên câu). */
+    private List<String> partsWithoutTasks;
+
+    /** @deprecated Giữ tương thích; ưu tiên dùng partGroups / tasks. */
+    private List<PlanPhaseDto> phases;
+}

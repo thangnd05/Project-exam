@@ -105,6 +105,8 @@ public class UserTargetService {
             UserTargetPartResponse pr = new UserTargetPartResponse();
             pr.setExamPartId(p.getExamPartId());
             pr.setRequiredPercentage(p.getCustomPercentage());
+            pr.setCurrentScore(p.getCurrentScore());
+            pr.setLastUserTestId(p.getLastUserTestId());
             return pr;
         }).collect(Collectors.toList());
 

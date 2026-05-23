@@ -1,0 +1,81 @@
+package com.project_exam.backend.modules.assessment.target.service;
+
+import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto;
+import com.project_exam.backend.modules.assessment.attempt.dto.PartBreakdownDto;
+import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
+import com.project_exam.backend.modules.assessment.target.domain.UserTargetPart;
+import com.project_exam.backend.modules.assessment.target.repository.UserTargetPartRepository;
+import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+/**
+ * Cập nhật điểm Part từ mock — tách khỏi aim ({@code customPercentage}) và khỏi plan ải.
+ */
+@Service
+@AllArgsConstructor
+public class UserTargetProgressService {
+
+    private final UserTargetRepository userTargetRepository;
+    private final UserTargetPartRepository userTargetPartRepository;
+
+    @Transactional
+    public void syncPartScoresFromMock(
+            String userId,
+            String examTypeId,
+            String userTestId,
+            List<PartBreakdownDto> partBreakdown) {
+        if (partBreakdown == null || partBreakdown.isEmpty()) {
+            return;
+        }
+        Optional<UserTarget> targetOpt = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId);
+        if (targetOpt.isEmpty()) {
+            return;
+        }
+        String userTargetId = targetOpt.get().getUserTargetId();
+        Map<String, UserTargetPart> byPartId = userTargetPartRepository.findByUserTargetId(userTargetId)
+                .stream()
+                .collect(Collectors.toMap(UserTargetPart::getExamPartId, p -> p, (a, b) -> a));
+
+        for (PartBreakdownDto part : partBreakdown) {
+            if (part.getExamPartId() == null) {
+                continue;
+            }
+            UserTargetPart row = byPartId.get(part.getExamPartId());
+            if (row == null) {
+                continue;
+            }
+            row.setCurrentScore(BigDecimal.valueOf(part.getPercentage()).setScale(2, RoundingMode.HALF_UP));
+            row.setLastUserTestId(userTestId);
+            row.setUpdatedAt(LocalDateTime.now());
+        }
+        userTargetPartRepository.saveAll(byPartId.values());
+    }
+
+    @Transactional
+    public boolean markTargetAchievedIfMet(String userId, String examTypeId, EnhancedResultDto result) {
+        if (!result.isHasTarget() || !Boolean.TRUE.equals(result.getIsTargetMet())) {
+            return false;
+        }
+        Optional<UserTarget> targetOpt = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId);
+        if (targetOpt.isEmpty()) {
+            return false;
+        }
+        UserTarget target = targetOpt.get();
+        if (target.getAchievedAt() != null) {
+            return true;
+        }
+        target.setAchievedAt(LocalDateTime.now());
+        userTargetRepository.save(target);
+        return true;
+    }
+}

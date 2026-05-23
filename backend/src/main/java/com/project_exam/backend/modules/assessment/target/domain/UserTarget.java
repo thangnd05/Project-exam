@@ -27,6 +27,13 @@ public class UserTarget {
     @Column(name = "target_score", nullable = false)
     private Integer targetScore;
 
+    /** Mục tiêu readiness % (tùy chọn, bổ sung target_score). */
+    @Column(name = "target_readiness")
+    private Integer targetReadiness;
+
+    @Column(name = "achieved_at")
+    private LocalDateTime achievedAt;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

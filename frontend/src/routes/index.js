@@ -52,6 +52,10 @@ import TagsManagement from '~/Admin/pages/Tags';
 import RecoveryResourcesManagement from '~/Admin/pages/RecoveryResources';
 import MilestonesManagement from '~/Admin/pages/Milestones';
 import UserTargetPage from '~/pages/user/UserTargetPage';
+import GeneratePlanPage from '~/pages/learning-plan/GeneratePlanPage';
+import PlanDetailPage from '~/pages/learning-plan/PlanDetailPage';
+import PlanStudyPage from '~/pages/learning-plan/PlanStudyPage';
+import MyPlansPage from '~/pages/learning-plan/MyPlansPage';
 
 //  Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -116,6 +120,10 @@ export const privateRoutes = [
   { path: routes.myEvaluations, component: MyEvaluationsPage },
   { path: routes.myPosts, component: MyPostsPage },
   { path: routes.savedPosts, component: SavedPostsPage },
+  { path: routes.generatePlan, component: GeneratePlanPage },
+  { path: routes.planDetail, component: PlanDetailPage },
+  { path: routes.planStudy, component: PlanStudyPage },
+  { path: routes.myPlans, component: MyPlansPage },
 ];
 
 const appRoutes = { publicRoutes, privateRoutes, adminRoutes };

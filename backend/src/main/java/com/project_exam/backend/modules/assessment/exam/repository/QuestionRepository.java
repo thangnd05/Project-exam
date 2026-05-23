@@ -231,4 +231,15 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     Integer findMaxQuestionNumberAdminBank(
             @Param("examPartId") String examPartId,
             @Param("creatorIds") Collection<String> creatorIds);
+
+    @Query(value = """
+            SELECT q.* FROM questions q
+            INNER JOIN question_tags qt ON qt.question_id = q.question_id
+            WHERE qt.tag_id = :tagId AND q.exam_part_id = :examPartId
+            ORDER BY RANDOM()
+            """, nativeQuery = true)
+    List<Question> findRandomQuestionsByTagAndExamPart(
+            @Param("tagId") String tagId,
+            @Param("examPartId") String examPartId,
+            Pageable pageable);
 }
