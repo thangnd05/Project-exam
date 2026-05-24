@@ -15,6 +15,8 @@ import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 import com.project_exam.backend.modules.assessment.learning.domain.*;
 import com.project_exam.backend.modules.assessment.learning.dto.*;
 import com.project_exam.backend.modules.assessment.learning.repository.*;
+import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
+import com.project_exam.backend.modules.assessment.learning.support.LearningPlanTaskUnlockSupport;
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
@@ -34,9 +36,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class LearningPlanSessionService {
 
-    private static final int SESSION_QUESTION_COUNT = 10;
-    private static final int QUESTION_POOL_FETCH_SIZE = 80;
-
     private final LearningPlanRepository planRepository;
     private final LearningPlanTaskRepository taskRepository;
     private final LearningPlanSessionRepository sessionRepository;
@@ -51,6 +50,7 @@ public class LearningPlanSessionService {
     private final ResourceTagRepository resourceTagRepository;
     private final RecoveryResourceRepository recoveryResourceRepository;
     private final LearningPlanResourceLookup resourceLookup;
+    private final LearningPlanTaskUnlockSupport taskUnlockSupport;
 
     @Transactional
     public CurrentSessionResponse getCurrentSession(
@@ -75,13 +75,11 @@ public class LearningPlanSessionService {
         if (task.getStatus() == TaskStatus.SKIPPED) {
             throw new BadRequestException("Ải này đã bỏ qua, không thể học.");
         }
+        if (task.getStatus() == TaskStatus.LOCKED) {
+            throw new BadRequestException(lockedTaskMessage(task));
+        }
 
         abandonOtherInProgressSessions(learningPlanId, taskId);
-
-        if (task.getStatus() == TaskStatus.LOCKED) {
-            task.setStatus(TaskStatus.ACTIVE);
-            taskRepository.save(task);
-        }
 
         Optional<LearningPlanSession> inProgress = sessionRepository
                 .findFirstByLearningPlanIdAndTaskIdAndStatusOrderByStartedAtDesc(
@@ -90,8 +88,16 @@ public class LearningPlanSessionService {
             return buildSessionResponse(plan, inProgress.get());
         }
 
-        LearningPlanSession session = createTagSession(plan, task);
+        LearningPlanSession session = createQuizSession(plan, task);
         return buildSessionResponse(plan, session);
+    }
+
+    private String lockedTaskMessage(LearningPlanTask task) {
+        PlanTaskType type = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
+        if (type == PlanTaskType.PART_CAPSTONE_2) {
+            return "Hoàn thành ải tổng ôn lần 1 trước khi mở lần 2.";
+        }
+        return "Hoàn thành tất cả ải tag của Part này trước khi mở ải tổng ôn.";
     }
 
     /** Plan cũ ở trạm MIX → chuyển về FOUNDATION hoặc MOCK. */
@@ -188,6 +194,7 @@ public class LearningPlanSessionService {
                 task.setPassedAt(Instant.now());
                 taskStatus = TaskStatus.PASSED.name();
                 taskRepository.save(task);
+                taskUnlockSupport.onTaskPassed(task, learningPlanId);
             } else {
                 task.setStatus(TaskStatus.ACTIVE);
                 taskStatus = TaskStatus.ACTIVE.name();
@@ -218,7 +225,7 @@ public class LearningPlanSessionService {
                 .build();
     }
 
-    /** Lịch sử các phiên luyện của một ải (1 row = 1 lần làm 10 câu). Mới nhất trước. */
+    /** Lịch sử các phiên luyện của một ải. Mới nhất trước. */
     public List<TaskSessionHistoryDto> getTaskSessionHistory(
             String userId, String learningPlanId, String taskId) {
         requireOwnedPlan(userId, learningPlanId);
@@ -284,15 +291,22 @@ public class LearningPlanSessionService {
                 .orElse(plan.getPassAccuracyDefault() != null ? plan.getPassAccuracyDefault() : 70);
     }
 
-    private LearningPlanSession createTagSession(LearningPlan plan, LearningPlanTask task) {
-        List<String> questionIds = pickQuestionsForTag(
-                plan.getUserId(), task.getTagId(), task.getExamPartId(), SESSION_QUESTION_COUNT);
+    private LearningPlanSession createQuizSession(LearningPlan plan, LearningPlanTask task) {
+        int targetCount = resolveTargetQuestionCount(task);
+        PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
+        List<String> questionIds;
+        if (taskType == PlanTaskType.TAG) {
+            questionIds = pickQuestionsForTag(
+                    plan.getUserId(), task.getTagId(), task.getExamPartId(), targetCount);
+        } else {
+            questionIds = pickQuestionsForPart(plan.getUserId(), task.getExamPartId(), targetCount);
+        }
 
         LearningPlanSession session = new LearningPlanSession();
         session.setLearningPlanId(plan.getLearningPlanId());
         session.setTaskId(task.getTaskId());
         session.setPlanStage(PlanStage.FOUNDATION);
-        session.setResourceId(resolveResourceId(task.getTagId()));
+        session.setResourceId(taskType == PlanTaskType.TAG ? resolveResourceId(task.getTagId()) : null);
         session.setQuestionCount(questionIds.size());
         session.setStatus(SessionStatus.IN_PROGRESS);
         session = sessionRepository.save(session);
@@ -300,6 +314,18 @@ public class LearningPlanSessionService {
         saveSessionQuestions(session.getSessionId(), questionIds);
         questionIds.forEach(qid -> recordExposure(plan.getUserId(), qid));
         return session;
+    }
+
+    private int resolveTargetQuestionCount(LearningPlanTask task) {
+        if (task.getTargetQuestionCount() != null && task.getTargetQuestionCount() > 0) {
+            return task.getTargetQuestionCount();
+        }
+        PlanTaskType type = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
+        if (type == PlanTaskType.TAG) {
+            return LearningPlanQuestionTargets.TAG_TARGET;
+        }
+        ExamPart part = examPartRepository.findById(task.getExamPartId()).orElse(null);
+        return LearningPlanQuestionTargets.resolveCapstoneTarget(part);
     }
 
     private void saveSessionQuestions(String sessionId, List<String> questionIds) {
@@ -321,22 +347,21 @@ public class LearningPlanSessionService {
 
     private List<String> pickQuestionsForTag(
             String userId, String tagId, String examPartId, int count) {
+        int poolSize = LearningPlanQuestionTargets.poolFetchSize(count);
         List<Question> pool = questionRepository.findRandomQuestionsByTagAndExamPart(
-                tagId, examPartId, PageRequest.of(0, QUESTION_POOL_FETCH_SIZE));
-        if (pool.size() < count) {
-            pool = new ArrayList<>(pool);
-            List<Question> fallback = questionRepository.findRandomQuestionsByExamPartId(
-                    examPartId, PageRequest.of(0, QUESTION_POOL_FETCH_SIZE));
-            for (Question q : fallback) {
-                if (pool.stream().noneMatch(p -> p.getQuestionId().equals(q.getQuestionId()))) {
-                    pool.add(q);
-                }
-            }
-        }
-        return selectUnseen(userId, pool, count);
+                tagId, examPartId, PageRequest.of(0, poolSize));
+        return selectFromPool(userId, pool, count);
     }
 
-    private List<String> selectUnseen(String userId, List<Question> pool, int count) {
+    private List<String> pickQuestionsForPart(String userId, String examPartId, int count) {
+        int poolSize = LearningPlanQuestionTargets.poolFetchSize(count);
+        List<Question> pool = questionRepository.findRandomQuestionsByExamPartId(
+                examPartId, PageRequest.of(0, poolSize));
+        return selectFromPool(userId, pool, count);
+    }
+
+    /** Lấy tối đa {@code count} câu; nếu kho ít hơn thì lấy hết pool. */
+    private List<String> selectFromPool(String userId, List<Question> pool, int count) {
         List<String> ids = pool.stream().map(Question::getQuestionId).distinct().toList();
         Set<String> seen = new HashSet<>(exposureRepository.findSeenQuestionIds(userId, ids));
         List<String> result = pool.stream()
@@ -404,7 +429,9 @@ public class LearningPlanSessionService {
             if (taskOpt.isPresent()) {
                 LearningPlanTask task = taskOpt.get();
                 Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag =
-                        resourceLookup.findFirstByTagIds(List.of(task.getTagId()));
+                        task.getTagId() != null
+                                ? resourceLookup.findFirstByTagIds(List.of(task.getTagId()))
+                                : Map.of();
                 activeTaskDto = toTaskDto(task, resourcesByTag);
             }
         }
@@ -457,9 +484,12 @@ public class LearningPlanSessionService {
     private CurrentSessionResponse buildPickResponse(LearningPlan plan) {
         List<LearningPlanTask> taskEntities = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(
                 plan.getLearningPlanId());
+        List<String> tagIds = taskEntities.stream()
+                .map(LearningPlanTask::getTagId)
+                .filter(Objects::nonNull)
+                .toList();
         Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag =
-                resourceLookup.findFirstByTagIds(
-                        taskEntities.stream().map(LearningPlanTask::getTagId).toList());
+                resourceLookup.findFirstByTagIds(tagIds);
         List<PlanTaskDto> taskDtos = taskEntities.stream()
                 .map(t -> toTaskDto(t, resourcesByTag))
                 .toList();
@@ -494,7 +524,9 @@ public class LearningPlanSessionService {
         List<PlanPartGroupDto> groups = new ArrayList<>();
         for (Map.Entry<String, List<LearningPlanTask>> entry : byPart.entrySet()) {
             String partId = entry.getKey();
-            List<LearningPlanTask> partTasks = entry.getValue();
+            List<LearningPlanTask> partTasks = entry.getValue().stream()
+                    .sorted(Comparator.comparingInt(LearningPlanTask::getTaskOrder))
+                    .toList();
             ExamPart part = examPartRepository.findById(partId).orElse(null);
             int passedInPart = (int) partTasks.stream()
                     .filter(t -> t.getStatus() == TaskStatus.PASSED)
@@ -514,11 +546,14 @@ public class LearningPlanSessionService {
 
     private String formatSessionMessage(PlanTaskDto active) {
         if (active != null && active.getExamPartName() != null) {
+            int target = active.getTargetQuestionCount() != null
+                    ? active.getTargetQuestionCount()
+                    : LearningPlanQuestionTargets.TAG_TARGET;
             return String.format(
-                    "Đang ôn %s — tag %s (%d câu, chỉ Part này, không trộn).",
+                    "Đang ôn %s — %s (mục tiêu %d câu, chỉ Part này).",
                     active.getExamPartName(),
                     active.getTagName(),
-                    SESSION_QUESTION_COUNT);
+                    target);
         }
         return "Đọc tài liệu, sau đó làm quiz của đúng Part/tag hiện tại.";
     }
@@ -526,9 +561,10 @@ public class LearningPlanSessionService {
     private PlanTaskDto toTaskDto(
             LearningPlanTask task,
             Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag) {
-        Tag tag = tagRepository.findById(task.getTagId()).orElse(null);
+        PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
+        Tag tag = task.getTagId() != null ? tagRepository.findById(task.getTagId()).orElse(null) : null;
         ExamPart part = examPartRepository.findById(task.getExamPartId()).orElse(null);
-        PlanPhaseDto.RecommendedResourceDto studyResource = resourcesByTag != null
+        PlanPhaseDto.RecommendedResourceDto studyResource = resourcesByTag != null && task.getTagId() != null
                 ? resourcesByTag.get(task.getTagId())
                 : null;
         int priorityScore = task.getPriorityScore() != null ? task.getPriorityScore() : 0;
@@ -536,8 +572,10 @@ public class LearningPlanSessionService {
         return PlanTaskDto.builder()
                 .taskId(task.getTaskId())
                 .taskOrder(task.getTaskOrder())
+                .taskType(taskType.name())
+                .targetQuestionCount(task.getTargetQuestionCount())
                 .tagId(task.getTagId())
-                .tagName(tag != null ? tag.getName() : task.getTagId())
+                .tagName(resolveTaskDisplayName(taskType, tag, part))
                 .examPartId(task.getExamPartId())
                 .examPartName(part != null ? part.getName() : null)
                 .status(task.getStatus().name())
@@ -551,6 +589,19 @@ public class LearningPlanSessionService {
                 .wrongCountAtDiagnosis(task.getWrongCountAtDiagnosis())
                 .recommendedFirst(PlanPrioritySupport.TIER_HIGH.equals(tier))
                 .build();
+    }
+
+    private String resolveTaskDisplayName(PlanTaskType taskType, Tag tag, ExamPart part) {
+        if (taskType == PlanTaskType.PART_CAPSTONE_1) {
+            return "Tổng ôn Part — lần 1 (200%)";
+        }
+        if (taskType == PlanTaskType.PART_CAPSTONE_2) {
+            return "Tổng ôn Part — lần 2 (200%)";
+        }
+        if (tag != null) {
+            return tag.getName();
+        }
+        return part != null ? part.getName() : "Ải tag";
     }
 
     private PlanPhaseDto.RecommendedResourceDto toResourceDto(RecoveryResource r) {

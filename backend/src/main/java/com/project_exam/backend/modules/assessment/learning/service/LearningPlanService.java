@@ -17,6 +17,7 @@ import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupDto
 import com.project_exam.backend.modules.assessment.learning.dto.PlanPhaseDto;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskDto;
+import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
 import com.project_exam.backend.modules.assessment.learning.support.ReadinessThresholds;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
@@ -51,8 +52,6 @@ public class LearningPlanService {
 
     private static final int DEFAULT_PASS_ACCURACY = 70;
     private static final int DEFAULT_WEAK_TAG_THRESHOLD = 60;
-    private static final int MAX_TASKS = 20;
-    private static final int MAX_TASKS_PER_PART = 3;
     private static final int ESTIMATED_DAYS_PER_TASK = 2;
 
     private final EnhancedResultService enhancedResultService;
@@ -118,12 +117,9 @@ public class LearningPlanService {
         List<String> partsWithoutTasks = findPartsWithoutTasks(
                 partBreakdown, focusPartIds, candidates);
         if (candidates.isEmpty()) {
-            candidates = buildFallbackCandidates(partBreakdown, partRequirements, focusPartIds);
+            candidates = buildFallbackCandidates(
+                    partBreakdown, partRequirements, focusPartIds, questionIdsByPart);
         }
-        candidates = candidates.stream()
-                .sorted(Comparator.comparingInt(TaskCandidate::priorityScore).reversed())
-                .limit(MAX_TASKS)
-                .toList();
 
         int planSequence = (int) planRepository.countByUserIdAndExamTypeId(userId, examTypeId) + 1;
 
@@ -148,18 +144,27 @@ public class LearningPlanService {
         for (TaskCandidate c : candidates) {
             LearningPlanTask task = new LearningPlanTask();
             task.setLearningPlanId(plan.getLearningPlanId());
-            task.setTagId(c.tagId());
             task.setExamPartId(c.examPartId());
+            task.setTaskType(c.taskType());
+            task.setTargetQuestionCount(c.targetQuestionCount());
             task.setTaskOrder(order++);
-            task.setStatus(TaskStatus.ACTIVE);
             task.setPassAccuracy(c.passAccuracy());
             task.setBaselineAccuracy(round2(c.baselinePct()));
             task.setAttemptCount(0);
             task.setPriorityScore(c.priorityScore());
             task.setWrongCountAtDiagnosis(c.wrongCount());
+            if (c.taskType() == PlanTaskType.TAG) {
+                task.setTagId(c.tagId());
+                task.setStatus(TaskStatus.ACTIVE);
+            } else {
+                task.setTagId(null);
+                task.setStatus(TaskStatus.LOCKED);
+            }
             savedTasks.add(task);
         }
         plan.setCurrentTaskId(null);
+        savedTasks = taskRepository.saveAll(savedTasks);
+        activateCapstonesWithoutTagPrerequisite(savedTasks);
         savedTasks = taskRepository.saveAll(savedTasks);
         plan = planRepository.save(plan);
 
@@ -271,26 +276,21 @@ public class LearningPlanService {
     private List<TaskCandidate> buildFallbackCandidates(
             List<PartBreakdownDto> partBreakdown,
             Map<String, Integer> partRequirements,
-            Set<String> focusPartIds) {
+            Set<String> focusPartIds,
+            Map<String, List<String>> questionIdsByPart) {
         List<TaskCandidate> result = new ArrayList<>();
-        List<PartBreakdownDto> sorted = partBreakdown.stream()
-                .filter(p -> matchesFocus(p.getExamPartId(), focusPartIds))
-                .sorted(Comparator.comparingDouble(PartBreakdownDto::getPercentage))
-                .toList();
-        for (PartBreakdownDto part : sorted) {
-            if (Boolean.TRUE.equals(part.getIsTargetMet())) {
-                continue;
-            }
-            TagBreakdownDto weakest = weakestTag(part);
-            if (weakest == null || weakest.getTagId() == null) {
+        for (PartBreakdownDto part : partBreakdown) {
+            if (!matchesFocus(part.getExamPartId(), focusPartIds) || !partNeedsFocus(part)) {
                 continue;
             }
             int passAccuracy = partRequirements.getOrDefault(
                     part.getExamPartId(), DEFAULT_PASS_ACCURACY);
-            result.add(buildTaskCandidate(weakest, weakest.getTagId(), part, passAccuracy));
-            if (result.size() >= 5) {
-                break;
-            }
+            double threshold = part.getTargetPercentage() != null
+                    ? part.getTargetPercentage()
+                    : DEFAULT_WEAK_TAG_THRESHOLD;
+            List<String> questionIdsInPart = questionIdsByPart.getOrDefault(
+                    part.getExamPartId(), List.of());
+            result.addAll(collectTasksForPart(part, threshold, passAccuracy, questionIdsInPart));
         }
         return result;
     }
@@ -320,14 +320,13 @@ public class LearningPlanService {
         if (partTasks.isEmpty() && part.getWeakTags() != null) {
             part.getWeakTags().stream()
                     .filter(t -> t.getTagId() != null)
-                    .limit(MAX_TASKS_PER_PART)
                     .forEach(tag -> addTaskIfNew(partTasks, usedTagIds,
                             buildTaskCandidate(tag, tag.getTagId(), part, passAccuracy)));
         }
 
         if (partTasks.isEmpty() && !questionIdsInPart.isEmpty()) {
             List<String> tagIds = questionTagRepository.findDistinctTagIdsByQuestionIdIn(questionIdsInPart);
-            for (String tagId : tagIds.stream().limit(MAX_TASKS_PER_PART).toList()) {
+            for (String tagId : tagIds) {
                 addTaskIfNew(partTasks, usedTagIds,
                         buildTaskCandidate(null, tagId, part, passAccuracy));
             }
@@ -342,7 +341,14 @@ public class LearningPlanService {
         }
 
         partTasks.sort(Comparator.comparingInt(TaskCandidate::priorityScore).reversed());
-        return partTasks.stream().limit(MAX_TASKS_PER_PART).toList();
+
+        ExamPart examPart = examPartRepository.findById(part.getExamPartId()).orElse(null);
+        int capstoneTarget = LearningPlanQuestionTargets.resolveCapstoneTarget(examPart);
+        partTasks.add(buildCapstoneCandidate(
+                part, passAccuracy, PlanTaskType.PART_CAPSTONE_1, capstoneTarget));
+        partTasks.add(buildCapstoneCandidate(
+                part, passAccuracy, PlanTaskType.PART_CAPSTONE_2, capstoneTarget));
+        return partTasks;
     }
 
     private TaskCandidate buildTaskCandidate(
@@ -357,11 +363,46 @@ public class LearningPlanService {
         return new TaskCandidate(
                 resolvedTagId,
                 part.getExamPartId(),
+                PlanTaskType.TAG,
+                LearningPlanQuestionTargets.TAG_TARGET,
                 baseline,
                 partPriorityScore(part),
                 passAccuracy,
                 wrong,
                 priorityScore);
+    }
+
+    private TaskCandidate buildCapstoneCandidate(
+            PartBreakdownDto part,
+            int passAccuracy,
+            PlanTaskType capstoneType,
+            int targetQuestionCount) {
+        int capstonePriority = capstoneType == PlanTaskType.PART_CAPSTONE_1 ? 1 : 0;
+        return new TaskCandidate(
+                null,
+                part.getExamPartId(),
+                capstoneType,
+                targetQuestionCount,
+                part.getPercentage(),
+                partPriorityScore(part),
+                passAccuracy,
+                part.getWrong(),
+                capstonePriority);
+    }
+
+    private void activateCapstonesWithoutTagPrerequisite(List<LearningPlanTask> tasks) {
+        Map<String, List<LearningPlanTask>> byPart = tasks.stream()
+                .collect(Collectors.groupingBy(LearningPlanTask::getExamPartId));
+        for (List<LearningPlanTask> partTasks : byPart.values()) {
+            boolean hasTagTasks = partTasks.stream()
+                    .anyMatch(t -> t.getTaskType() == PlanTaskType.TAG);
+            if (!hasTagTasks) {
+                partTasks.stream()
+                        .filter(t -> t.getTaskType() == PlanTaskType.PART_CAPSTONE_1)
+                        .filter(t -> t.getStatus() == TaskStatus.LOCKED)
+                        .forEach(t -> t.setStatus(TaskStatus.ACTIVE));
+            }
+        }
     }
 
     private void addTaskIfNew(
@@ -406,7 +447,10 @@ public class LearningPlanService {
 
     private Map<String, PlanPhaseDto.RecommendedResourceDto> loadResourcesForTasks(
             List<LearningPlanTask> tasks) {
-        List<String> tagIds = tasks.stream().map(LearningPlanTask::getTagId).toList();
+        List<String> tagIds = tasks.stream()
+                .map(LearningPlanTask::getTagId)
+                .filter(Objects::nonNull)
+                .toList();
         return resourceLookup.findFirstByTagIds(tagIds);
     }
 
@@ -534,7 +578,7 @@ public class LearningPlanService {
             List<LearningPlanTask> tasks,
             Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag) {
         return tasks.stream()
-                .sorted(Comparator.comparingInt(LearningPlanTask::getPriorityScore).reversed())
+                .sorted(Comparator.comparingInt(LearningPlanTask::getTaskOrder))
                 .map(t -> toTaskDto(t, resourcesByTag))
                 .toList();
     }
@@ -575,7 +619,7 @@ public class LearningPlanService {
         for (Map.Entry<String, List<LearningPlanTask>> entry : byPart.entrySet()) {
             String partId = entry.getKey();
             List<LearningPlanTask> partTasks = entry.getValue().stream()
-                    .sorted(Comparator.comparingInt(LearningPlanTask::getPriorityScore).reversed())
+                    .sorted(Comparator.comparingInt(LearningPlanTask::getTaskOrder))
                     .toList();
             ExamPart part = examPartRepository.findById(partId).orElse(null);
             int passedInPart = (int) partTasks.stream()
@@ -597,9 +641,10 @@ public class LearningPlanService {
     private PlanTaskDto toTaskDto(
             LearningPlanTask task,
             Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag) {
-        Tag tag = tagRepository.findById(task.getTagId()).orElse(null);
+        PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
+        Tag tag = task.getTagId() != null ? tagRepository.findById(task.getTagId()).orElse(null) : null;
         ExamPart part = examPartRepository.findById(task.getExamPartId()).orElse(null);
-        PlanPhaseDto.RecommendedResourceDto studyResource = resourcesByTag != null
+        PlanPhaseDto.RecommendedResourceDto studyResource = resourcesByTag != null && task.getTagId() != null
                 ? resourcesByTag.get(task.getTagId())
                 : null;
         int priorityScore = task.getPriorityScore() != null ? task.getPriorityScore() : 0;
@@ -607,8 +652,10 @@ public class LearningPlanService {
         return PlanTaskDto.builder()
                 .taskId(task.getTaskId())
                 .taskOrder(task.getTaskOrder())
+                .taskType(taskType.name())
+                .targetQuestionCount(task.getTargetQuestionCount())
                 .tagId(task.getTagId())
-                .tagName(tag != null ? tag.getName() : task.getTagId())
+                .tagName(resolveTaskDisplayName(taskType, tag, part))
                 .examPartId(task.getExamPartId())
                 .examPartName(part != null ? part.getName() : null)
                 .status(task.getStatus().name())
@@ -666,9 +713,24 @@ public class LearningPlanService {
         return BigDecimal.valueOf(v).setScale(2, RoundingMode.HALF_UP);
     }
 
+    private String resolveTaskDisplayName(PlanTaskType taskType, Tag tag, ExamPart part) {
+        if (taskType == PlanTaskType.PART_CAPSTONE_1) {
+            return "Tổng ôn Part — lần 1 (200%)";
+        }
+        if (taskType == PlanTaskType.PART_CAPSTONE_2) {
+            return "Tổng ôn Part — lần 2 (200%)";
+        }
+        if (tag != null) {
+            return tag.getName();
+        }
+        return part != null ? part.getName() : "Ải tag";
+    }
+
     private record TaskCandidate(
             String tagId,
             String examPartId,
+            PlanTaskType taskType,
+            int targetQuestionCount,
             double baselinePct,
             double partPriority,
             int passAccuracy,

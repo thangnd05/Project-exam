@@ -9,9 +9,11 @@ const cx = classNames.bind(styles);
 const TASK_STATUS = {
   PASSED: { text: 'Đã đạt', variant: 'badgeSuccess' },
   ACTIVE: { text: 'Chưa đạt', variant: 'badgePrimary' },
-  LOCKED: { text: 'Chưa đạt', variant: 'badgeMuted' },
+  LOCKED: { text: 'Chưa mở', variant: 'badgeMuted' },
   SKIPPED: { text: 'Bỏ qua', variant: 'badgeMuted' },
 };
+
+const CAPSTONE_TYPES = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 
 const PRIORITY = {
   HIGH: { text: 'Nên học trước', variant: 'badgeDanger' },
@@ -73,9 +75,13 @@ function PlanPartTaskList({
 
 function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }) {
   const status = TASK_STATUS[task.status] || TASK_STATUS.ACTIVE;
-  const canStudy = task.status !== 'SKIPPED';
+  const isCapstone = CAPSTONE_TYPES.has(task.taskType);
+  const canStudy = task.status !== 'SKIPPED' && task.status !== 'LOCKED';
   const resource = task.studyResource;
   const priority = PRIORITY[task.priorityTier] || PRIORITY.MEDIUM;
+  const questionLabel = task.targetQuestionCount != null
+    ? `${task.targetQuestionCount} câu (hết kho thì lấy tối đa có)`
+    : null;
 
   const studyButton =
     studyAction === 'button' ? (
@@ -126,12 +132,22 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
             {task.passAccuracy != null && (
               <span>Pass ≥{task.passAccuracy}%</span>
             )}
+            {questionLabel && (
+              <span>{questionLabel}</span>
+            )}
           </div>
+          {task.status === 'LOCKED' && (
+            <p className={cx('muted', 'small')}>
+              {isCapstone
+                ? 'Hoàn thành các ải tag (và lần 1 nếu là lần 2) trước khi mở.'
+                : 'Ải sẽ mở khi đủ điều kiện.'}
+            </p>
+          )}
         </div>
         <span className={cx('badge', status.variant)}>{status.text}</span>
       </div>
 
-      {!compact && (
+      {!compact && !isCapstone && (
         <div className={cx('resourceBox')}>
           <div className={cx('resourceLabel')}>Tài liệu (đọc trước)</div>
           {resource?.url ? (
@@ -191,6 +207,7 @@ export function groupTasksByPart(tasks) {
     }
     const g = map.get(key);
     g.tasks.push(t);
+    g.tasks.sort((a, b) => (a.taskOrder ?? 0) - (b.taskOrder ?? 0));
     g.totalTasksInPart += 1;
     if (t.status === 'PASSED') g.passedTasksInPart += 1;
   });

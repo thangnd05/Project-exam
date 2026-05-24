@@ -21,8 +21,16 @@ public class LearningPlanTask {
     @Column(name = "learning_plan_id", nullable = false)
     private String learningPlanId;
 
-    @Column(name = "tag_id", nullable = false)
+    @Column(name = "tag_id")
     private String tagId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "task_type", nullable = false, length = 30)
+    private PlanTaskType taskType = PlanTaskType.TAG;
+
+    /** Số câu mục tiêu phiên học (50 tag / 200% Part cho capstone). */
+    @Column(name = "target_question_count")
+    private Integer targetQuestionCount;
 
     @Column(name = "exam_part_id", nullable = false)
     private String examPartId;

@@ -14,6 +14,9 @@ public class PlanTaskDto {
     private String taskId;
     private Integer taskOrder;
     private String tagId;
+    /** TAG | PART_CAPSTONE_1 | PART_CAPSTONE_2 */
+    private String taskType;
+    private Integer targetQuestionCount;
     private String tagName;
     private String examPartId;
     private String examPartName;
