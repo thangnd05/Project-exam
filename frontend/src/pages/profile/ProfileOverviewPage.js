@@ -20,8 +20,15 @@ import {
   IoPencilOutline,
   IoStar,
   IoNewspaperOutline,
-  IoBookmarkOutline
+  IoBookmarkOutline,
+  IoFlagOutline,
+  IoTrophyOutline,
+  IoRocketOutline
 } from 'react-icons/io5';
+import { getExamTypes } from '~/api/examTypeApi';
+import { getExamParts } from '~/api/examPartApi';
+import { getUserTarget } from '~/api/userTargetApi';
+import { sortPartsByLookup } from '~/utils/partOrder';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -56,6 +63,8 @@ function ProfileOverviewPage() {
   const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
   const [myEvaluations, setMyEvaluations] = useState([]);
   const [loadingEvaluations, setLoadingEvaluations] = useState(true);
+  const [myTargets, setMyTargets] = useState([]);
+  const [loadingTargets, setLoadingTargets] = useState(true);
   const PREVIEW_EVALUATION_COUNT = 3;
 
   const fetchProfileOverview = async (showLoader = true) => {
@@ -90,6 +99,51 @@ function ProfileOverviewPage() {
 
   useEffect(() => {
     fetchMyEvaluations();
+  }, []);
+
+  useEffect(() => {
+    const fetchMyTargets = async () => {
+      setLoadingTargets(true);
+      try {
+        const [examTypes, examParts] = await Promise.all([
+          getExamTypes().catch(() => []),
+          getExamParts().catch(() => []),
+        ]);
+        if (!Array.isArray(examTypes) || examTypes.length === 0) {
+          setMyTargets([]);
+          return;
+        }
+        const partNameById = new Map();
+        (examParts || []).forEach((p) => partNameById.set(p.examPartId, p.name));
+        const results = await Promise.all(
+          examTypes.map((et) =>
+            getUserTarget(et.examTypeId)
+              .then((data) =>
+                data?.hasTarget
+                  ? {
+                      ...data,
+                      examTypeName: et.name,
+                      partRequirements: sortPartsByLookup(
+                        data.partRequirements || [],
+                        examParts,
+                      ).map((p) => ({
+                        ...p,
+                        examPartName: partNameById.get(p.examPartId) || p.examPartId,
+                      })),
+                    }
+                  : null
+              )
+              .catch(() => null)
+          )
+        );
+        setMyTargets(results.filter(Boolean));
+      } catch {
+        setMyTargets([]);
+      } finally {
+        setLoadingTargets(false);
+      }
+    };
+    fetchMyTargets();
   }, []);
 
   const fullName = useMemo(() => {
@@ -320,6 +374,120 @@ function ProfileOverviewPage() {
                       <div className={cx('noDataMessage')}>Chưa có dữ liệu bài thi</div>
                     )}
                   </div>
+                </article>
+              </section>
+
+              <section className={cx('targetRow')}>
+                <article className={cx('statCard', 'targetSummaryCard')}>
+                  <div className={cx('targetHeader')}>
+                    <h3 className={cx('cardTitle')}>
+                      <IoFlagOutline />
+                      Mục tiêu của tôi
+                    </h3>
+                    <button
+                      type="button"
+                      className={cx('targetManageBtn')}
+                      onClick={() => navigate(routes.myTarget)}
+                    >
+                      <IoPencilOutline />
+                      Quản lý mục tiêu
+                    </button>
+                  </div>
+
+                  {loadingTargets ? (
+                    <div className={cx('noDataMessage')}>Đang tải mục tiêu...</div>
+                  ) : myTargets.length === 0 ? (
+                    <div className={cx('targetEmpty')}>
+                      <p className={cx('targetEmptyText')}>
+                        Bạn chưa đặt mục tiêu nào. Đặt mục tiêu để cá nhân hóa lộ trình học.
+                      </p>
+                      <button
+                        type="button"
+                        className={cx('targetEmptyBtn')}
+                        onClick={() => navigate(routes.myTarget)}
+                      >
+                        <IoRocketOutline />
+                        Đặt mục tiêu ngay
+                      </button>
+                    </div>
+                  ) : (
+                    <div className={cx('targetList')}>
+                      {myTargets.map((target) => {
+                        const readiness = Number(target.targetReadiness ?? 0);
+                        const isAchieved = Boolean(target.achievedAt);
+                        return (
+                          <article
+                            key={target.userTargetId}
+                            className={cx('targetItem', { achieved: isAchieved })}
+                          >
+                            <div className={cx('targetItemHead')}>
+                              <div className={cx('targetItemTitle')}>
+                                <span className={cx('targetExamName')}>{target.examTypeName}</span>
+                                {isAchieved && (
+                                  <span className={cx('targetAchievedBadge')}>
+                                    <IoTrophyOutline />
+                                    Đã đạt
+                                  </span>
+                                )}
+                              </div>
+                              <span className={cx('targetScore')}>
+                                {formatNumber(target.targetScore)} điểm
+                              </span>
+                            </div>
+
+                            <div className={cx('targetProgress')}>
+                              <div className={cx('targetProgressBar')}>
+                                <div
+                                  className={cx('targetProgressFill')}
+                                  style={{ width: `${Math.min(100, Math.max(0, readiness))}%` }}
+                                />
+                              </div>
+                              <span className={cx('targetProgressLabel')}>
+                                Sẵn sàng: {readiness}%
+                              </span>
+                            </div>
+
+                            {Array.isArray(target.partRequirements) && target.partRequirements.length > 0 && (
+                              <div className={cx('targetParts')}>
+                                {target.partRequirements.map((p) => (
+                                  <span key={p.examPartId} className={cx('targetPartChip')}>
+                                    {p.examPartName || p.examPartId}: {p.requiredPercentage}%
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            <div className={cx('targetActions')}>
+                              <button
+                                type="button"
+                                className={cx('targetActionBtn')}
+                                onClick={() =>
+                                  navigate(
+                                    `${routes.targetDashboard}?examTypeId=${encodeURIComponent(target.examTypeId)}`
+                                  )
+                                }
+                              >
+                                <IoStatsChartOutline />
+                                Xem dashboard
+                              </button>
+                              <button
+                                type="button"
+                                className={cx('targetActionBtn', 'targetActionBtnPrimary')}
+                                onClick={() =>
+                                  navigate(
+                                    `/learning-plans/generate?examTypeId=${encodeURIComponent(target.examTypeId)}`
+                                  )
+                                }
+                              >
+                                <IoRocketOutline />
+                                Sinh lộ trình
+                              </button>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  )}
                 </article>
               </section>
 
