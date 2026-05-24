@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getCurrentSession, submitSession } from '~/api/learningPlanApi';
-import PlanPartTaskList, { groupTasksByPart } from './components/PlanPartTaskList';
-import styles from './PersonalizedPlan.module.scss';
+import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
+import styles from '../styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

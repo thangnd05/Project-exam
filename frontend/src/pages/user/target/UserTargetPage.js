@@ -11,7 +11,7 @@ import {
   deleteUserTarget,
   getUserTarget,
 } from '~/api/userTargetApi';
-import planStyles from '../../learning-plan/PersonalizedPlan.module.scss';
+import planStyles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
 import { sortByPartOrder, sortPartsByLookup } from '~/utils/partOrder';
 

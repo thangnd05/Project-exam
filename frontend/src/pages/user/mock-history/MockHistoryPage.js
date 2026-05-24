@@ -6,7 +6,7 @@ import { getExamTypes } from '~/api/examTypeApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import MockHistoryCharts from './components/MockHistoryCharts';
-import styles from '../../learning-plan/PersonalizedPlan.module.scss';
+import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

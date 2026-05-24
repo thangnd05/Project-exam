@@ -3,9 +3,12 @@ import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getExamTypes } from '~/api/examTypeApi';
 import { listPlans } from '~/api/learningPlanApi';
-import styles from './PersonalizedPlan.module.scss';
+import PlanComparisonCharts from '../components/PlanComparisonCharts';
+import pageStyles from '../styles/PlanComparisonPage.module.scss';
+import styles from '../styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
+const pageCx = classNames.bind(pageStyles);
 
 const STATUS_LABEL = {
   ACTIVE: 'Đang học',
@@ -57,10 +60,32 @@ function PlanComparisonPage() {
     return [...plans].sort((a, b) => (a.planSequence ?? 0) - (b.planSequence ?? 0));
   }, [plans]);
 
-  const maxReadiness = Math.max(
-    100,
-    ...sorted.map((p) => p.baselineReadiness ?? p.currentReadiness ?? 0),
+  const examTypeName = useMemo(
+    () => examTypes.find((et) => et.examTypeId === examTypeId)?.name || '',
+    [examTypes, examTypeId],
   );
+
+  const chartData = useMemo(() => {
+    return sorted.map((p, idx) => {
+      const prev = idx > 0 ? sorted[idx - 1] : null;
+      const readiness = p.baselineReadiness ?? p.currentReadiness ?? 0;
+      const prevReadiness = prev
+        ? prev.baselineReadiness ?? prev.currentReadiness ?? null
+        : null;
+      const diffVsPrev =
+        prevReadiness != null ? readiness - prevReadiness : null;
+
+      return {
+        key: p.learningPlanId,
+        label: `Plan #${p.planSequence ?? '?'}`,
+        readiness,
+        status: p.status,
+        planStage: p.planStage,
+        createdAt: formatDate(p.createdAt),
+        diffVsPrev,
+      };
+    });
+  }, [sorted]);
 
   return (
     <div className={cx('wrapper')}>
@@ -114,30 +139,7 @@ function PlanComparisonPage() {
 
       {sorted.length > 0 && (
         <>
-          <div className={cx('card')}>
-            <div className={cx('cardHeader')}>Tiến triển readiness qua các plan</div>
-            <div className={cx('cardBody')}>
-              <div className={cx('barChart')}>
-                {sorted.map((p) => {
-                  const v = p.baselineReadiness ?? p.currentReadiness ?? 0;
-                  const h = (v / maxReadiness) * 100;
-                  const variant = p.status === 'ACTIVE'
-                    ? ''
-                    : (p.status === 'COMPLETED' ? 'success' : 'muted');
-                  return (
-                    <div key={p.learningPlanId} className={cx('barColumn')}>
-                      <span className={cx('barValue')}>{v}%</span>
-                      <div className={cx('barBar', variant)} style={{ height: `${h}%` }} />
-                      <span className={cx('barLabel')}>Plan #{p.planSequence ?? '?'}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className={cx('chartNote')}>
-                Baseline_readiness chốt khi tạo plan từ mock chẩn đoán. Học ải không đổi con số này — chỉ mock mới + plan mới mới có readiness mới.
-              </p>
-            </div>
-          </div>
+          <PlanComparisonCharts chartData={chartData} examTypeName={examTypeName} />
 
           <div className={cx('timelineGrid')}>
             {sorted.map((p, idx) => {
@@ -202,7 +204,7 @@ function PlanComparisonPage() {
                     )}
                   </ul>
 
-                  <div className={cx('actionBar')}>
+                  <div className={pageCx('planCardActions')}>
                     <Link
                       to={`/learning-plans/${p.learningPlanId}`}
                       className={cx('btn', 'btnOutline', 'btnSm')}

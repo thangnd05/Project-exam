@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import styles from '../PersonalizedPlan.module.scss';
-import { sortByPartOrder } from '../../../utils/partOrder';
+import styles from '../styles/PersonalizedPlan.module.scss';
+import { sortByPartOrder } from '~/utils/partOrder';
 
 const cx = classNames.bind(styles);
 

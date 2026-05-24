@@ -56,12 +56,12 @@ import TargetDashboardPage from '~/pages/user/target/TargetDashboardPage';
 import TargetAchievedPage from '~/pages/user/target/TargetAchievedPage';
 import MockHistoryPage from '~/pages/user/mock-history/MockHistoryPage';
 import NextStepPage from '~/pages/user/next-step/NextStepPage';
-import GeneratePlanPage from '~/pages/learning-plan/GeneratePlanPage';
-import PlanDetailPage from '~/pages/learning-plan/PlanDetailPage';
-import PlanStudyPage from '~/pages/learning-plan/PlanStudyPage';
-import LearningPlansRedirect from '~/pages/learning-plan/LearningPlansRedirect';
-import PlanComparisonPage from '~/pages/learning-plan/PlanComparisonPage';
-import TaskHistoryPage from '~/pages/learning-plan/TaskHistoryPage';
+import GeneratePlanPage from '~/pages/learning-plan/pages/GeneratePlanPage';
+import PlanDetailPage from '~/pages/learning-plan/pages/PlanDetailPage';
+import PlanStudyPage from '~/pages/learning-plan/pages/PlanStudyPage';
+import LearningPlansRedirect from '~/pages/learning-plan/pages/LearningPlansRedirect';
+import PlanComparisonPage from '~/pages/learning-plan/pages/PlanComparisonPage';
+import TaskHistoryPage from '~/pages/learning-plan/pages/TaskHistoryPage';
 
 //  Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [

@@ -7,7 +7,7 @@ import { getExamParts } from '~/api/examPartApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { listPlans } from '~/api/learningPlanApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
-import styles from '../../learning-plan/PersonalizedPlan.module.scss';
+import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 import { sortByPartOrder, sortPartsByLookup } from '~/utils/partOrder';
 
 const cx = classNames.bind(styles);
