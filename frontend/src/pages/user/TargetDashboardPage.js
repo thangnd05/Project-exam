@@ -107,7 +107,7 @@ function TargetDashboardPage() {
             Lịch sử Mock
           </Link>
           <Link
-            to={examTypeId ? `/learning-plans/compare?examTypeId=${examTypeId}` : '/learning-plans'}
+            to={examTypeId ? `/learning-plans/compare?examTypeId=${examTypeId}` : '/learning-plans/generate'}
             className={cx('btn', 'btnOutline', 'btnSm')}
           >
             So sánh Plan

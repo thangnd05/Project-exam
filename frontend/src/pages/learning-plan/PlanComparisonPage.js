@@ -68,7 +68,7 @@ function PlanComparisonPage() {
         <h2 className={cx('title')}>So sánh các Plan</h2>
         <div className={cx('actionBar')}>
           <Link
-            to={examTypeId ? `/learning-plans?examTypeId=${examTypeId}` : '/learning-plans'}
+            to={examTypeId ? `/learning-plans/generate?examTypeId=${examTypeId}` : '/learning-plans/generate'}
             className={cx('btn', 'btnOutline', 'btnSm')}
           >
             Danh sách plan

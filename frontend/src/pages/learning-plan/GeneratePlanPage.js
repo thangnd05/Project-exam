@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import axios from '~/api/axiosClient';
 import { generatePlan } from '~/api/learningPlanApi';
+import LearningPlanList from './components/LearningPlanList';
 import PlanPartTaskList from './components/PlanPartTaskList';
 import styles from '../PersonalizedPlan.module.scss';
 
@@ -11,6 +12,7 @@ const cx = classNames.bind(styles);
 function GeneratePlanPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const planListRef = useRef(null);
 
   const [userTests, setUserTests] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
@@ -21,6 +23,11 @@ function GeneratePlanPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+
+  const [filterExamTypeId, setFilterExamTypeId] = useState(
+    searchParams.get('examTypeId') || '',
+  );
+  const [listRefreshKey, setListRefreshKey] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -38,6 +45,17 @@ function GeneratePlanPage() {
     return () => { mounted = false; };
   }, []);
 
+  const selectedTest = useMemo(
+    () => userTests.find((t) => t.userTestId === userTestId),
+    [userTests, userTestId],
+  );
+
+  useEffect(() => {
+    if (selectedTest?.examTypeId) {
+      setFilterExamTypeId(selectedTest.examTypeId);
+    }
+  }, [userTestId, selectedTest?.examTypeId]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -49,6 +67,11 @@ function GeneratePlanPage() {
       if (targetScore !== '') payload.targetScore = Number(targetScore);
       const data = await generatePlan(payload);
       setResult(data);
+      if (data?.examTypeId) {
+        setFilterExamTypeId(data.examTypeId);
+      }
+      setListRefreshKey((k) => k + 1);
+      planListRef.current?.reload();
     } catch (err) {
       setError(err?.response?.data?.message || err.message || 'Lỗi không xác định');
     } finally {
@@ -56,7 +79,7 @@ function GeneratePlanPage() {
     }
   };
 
-  const formatDate = (s) => s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '-';
+  const formatDate = (s) => (s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '-');
 
   return (
     <div className={cx('wrapper')}>
@@ -192,6 +215,19 @@ function GeneratePlanPage() {
           </div>
         </div>
       )}
+
+      <LearningPlanList
+        ref={planListRef}
+        loadAll
+        allowAllInFilter
+        examTypeId={filterExamTypeId}
+        onExamTypeIdChange={setFilterExamTypeId}
+        initialExamTypeId={searchParams.get('examTypeId') || ''}
+        refreshKey={listRefreshKey}
+        showExamTypeBadge
+        title="Lộ trình đã sinh"
+        emptyMessage="Chưa có lộ trình nào. Sinh plan từ form phía trên sau khi hoàn thành mock."
+      />
     </div>
   );
 }

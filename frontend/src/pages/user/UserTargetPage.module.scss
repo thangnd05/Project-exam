@@ -1,0 +1,199 @@
+// Chỉ style đặc thù trang mục tiêu — biến màu/spacing từ GlobalStyles (:root).
+
+.pageSubtitle {
+  font-size: var(--font-size-base) !important;
+  line-height: 1.6;
+}
+
+.fieldLabelLarge {
+  display: block;
+  font-size: var(--font-size-ssm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: 0.6rem;
+}
+
+.scoreInputRow {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.scoreInput {
+  width: 16rem;
+  max-width: 100%;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.milestoneHint {
+  font-size: var(--font-size-base);
+
+  &.matched {
+    color: var(--success-text);
+  }
+
+  &.custom {
+    color: var(--primary);
+  }
+}
+
+.milestoneChips {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.chipsLabel {
+  font-size: var(--font-size-ssm);
+  color: var(--text-secondary);
+}
+
+.chip {
+  cursor: pointer;
+  font-size: var(--font-size-ssm);
+  transition: all 0.15s;
+
+  &.active {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: var(--primary);
+    border-color: var(--primary);
+    font-weight: var(--font-weight-semibold);
+  }
+}
+
+.partSection {
+  margin-top: 0.4rem;
+}
+
+.partSectionHint {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin: 0 0 1.2rem;
+  line-height: 1.5;
+}
+
+.partRow {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.partName {
+  flex: 1;
+  min-width: 12rem;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-color);
+}
+
+.partTotal {
+  font-weight: var(--font-weight-normal);
+  color: var(--text-secondary);
+  margin-left: 0.4rem;
+}
+
+.partInput {
+  width: 6.5rem;
+  text-align: center;
+  padding: 0.8rem 1rem;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+
+  &.custom {
+    border: 2px solid var(--primary);
+    background: linear-gradient(135deg, #eff6ff 0%, var(--bg-white) 100%);
+    box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.12);
+    color: var(--primary);
+
+    &:focus {
+      border-color: var(--accent-act-color);
+      box-shadow: 0 0 0 3px rgba(0, 198, 255, 0.2);
+    }
+  }
+}
+
+.partUnit {
+  font-size: var(--font-size-ssm);
+  color: var(--text-secondary);
+  min-width: 2.8rem;
+}
+
+.resetBtn {
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: var(--font-size-ssm);
+  font-family: var(--font-family);
+  text-decoration: underline;
+  padding: 0;
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.scoreEstimate {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  font-size: var(--font-size-base);
+
+  &.neutral {
+    background: linear-gradient(135deg, var(--success-bg) 0%, var(--bg-white) 100%);
+    border-color: var(--success-border);
+    color: var(--success-text);
+  }
+
+  &.above {
+    background: linear-gradient(135deg, #eff6ff 0%, var(--bg-white) 100%);
+    border-color: #bfdbfe;
+  }
+
+  &.below {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+    border-color: var(--primary);
+  }
+}
+
+.scoreEstimateValue {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  color: var(--text-color);
+}
+
+.scoreEstimateDiff {
+  font-size: var(--font-size-ssm);
+}
+
+.scoreEstimateDetail {
+  width: 100%;
+  font-size: var(--font-size-ssm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.currentTargetParts {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.fieldFull {
+  width: 100%;
+  min-width: 0;
+}

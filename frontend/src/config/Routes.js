@@ -46,7 +46,6 @@ const routes = {
   // 📚 Learning Plan
   generatePlan: '/learning-plans/generate',
   planCompare: '/learning-plans/compare',
-  myPlans: '/learning-plans',
   planDetail: '/learning-plans/:learningPlanId',
   planStudy: '/learning-plans/:learningPlanId/study',
   taskHistory: '/learning-plans/:learningPlanId/tasks/:taskId/history',

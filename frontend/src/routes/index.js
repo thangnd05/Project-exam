@@ -59,7 +59,7 @@ import NextStepPage from '~/pages/user/NextStepPage';
 import GeneratePlanPage from '~/pages/learning-plan/GeneratePlanPage';
 import PlanDetailPage from '~/pages/learning-plan/PlanDetailPage';
 import PlanStudyPage from '~/pages/learning-plan/PlanStudyPage';
-import MyPlansPage from '~/pages/learning-plan/MyPlansPage';
+import LearningPlansRedirect from '~/pages/learning-plan/LearningPlansRedirect';
 import PlanComparisonPage from '~/pages/learning-plan/PlanComparisonPage';
 import TaskHistoryPage from '~/pages/learning-plan/TaskHistoryPage';
 
@@ -126,12 +126,12 @@ export const privateRoutes = [
   { path: routes.myEvaluations, component: MyEvaluationsPage },
   { path: routes.myPosts, component: MyPostsPage },
   { path: routes.savedPosts, component: SavedPostsPage },
+  { path: '/learning-plans', component: LearningPlansRedirect },
   { path: routes.generatePlan, component: GeneratePlanPage },
   { path: routes.planCompare, component: PlanComparisonPage },
   { path: routes.planDetail, component: PlanDetailPage },
   { path: routes.planStudy, component: PlanStudyPage },
   { path: routes.taskHistory, component: TaskHistoryPage },
-  { path: routes.myPlans, component: MyPlansPage },
   { path: routes.targetDashboard, component: TargetDashboardPage },
   { path: routes.mockHistory, component: MockHistoryPage },
   { path: routes.targetAchieved, component: TargetAchievedPage },

@@ -954,7 +954,32 @@
   margin: 0 0 0.8rem;
 }
 
-// ----- Plan list (MyPlansPage) -----
+// ----- Plan list (LearningPlanList) -----
+.planListCard {
+  margin-top: 2.4rem;
+}
+
+.planListCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.planListCardTitle {
+  margin: 0;
+}
+
+.planListCardCount {
+  margin: 0.4rem 0 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 .planListItem {
   display: flex;
   justify-content: space-between;

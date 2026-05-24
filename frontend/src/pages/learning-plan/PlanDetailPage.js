@@ -80,7 +80,7 @@ function PlanDetailPage() {
             Sinh plan mới
           </Link>
           <Link
-            to={`/learning-plans?examTypeId=${plan.examTypeId}`}
+            to={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
             className={cx('btn', 'btnOutline', 'btnSm')}
           >
             Tất cả plan
