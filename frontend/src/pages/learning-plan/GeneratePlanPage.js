@@ -5,7 +5,7 @@ import axios from '~/api/axiosClient';
 import { generatePlan } from '~/api/learningPlanApi';
 import LearningPlanList from './components/LearningPlanList';
 import PlanPartTaskList from './components/PlanPartTaskList';
-import styles from '../PersonalizedPlan.module.scss';
+import styles from './PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

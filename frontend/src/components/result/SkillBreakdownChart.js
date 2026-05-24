@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './Result.module.scss';
+import { sortByPartOrder } from '../../utils/partOrder';
 
 const cx = classNames.bind(styles);
 
@@ -20,13 +21,16 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
     setExpandedParts((prev) => ({ ...prev, [partId]: !prev[partId] }));
   };
 
-  // Group parts by skill
+  // Group parts by skill (đã sort theo displayOrder/Part X)
   const partsBySkill = {};
   partBreakdown.forEach((part) => {
     if (!partsBySkill[part.skillId]) {
       partsBySkill[part.skillId] = [];
     }
     partsBySkill[part.skillId].push(part);
+  });
+  Object.keys(partsBySkill).forEach((skillId) => {
+    partsBySkill[skillId] = sortByPartOrder(partsBySkill[skillId], { nameKey: 'partName' });
   });
 
   return (

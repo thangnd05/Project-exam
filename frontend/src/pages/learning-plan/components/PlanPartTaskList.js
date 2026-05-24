@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import styles from '../../PersonalizedPlan.module.scss';
+import styles from '../PersonalizedPlan.module.scss';
+import { sortByPartOrder } from '../../../utils/partOrder';
 
 const cx = classNames.bind(styles);
 
@@ -33,9 +34,11 @@ function PlanPartTaskList({
     return <p className={cx('muted')}>Chưa có ải trong kế hoạch.</p>;
   }
 
+  const orderedGroups = sortByPartOrder(partGroups, { nameKey: 'examPartName' });
+
   return (
     <div>
-      {partGroups.map((group) => (
+      {orderedGroups.map((group) => (
         <div key={group.examPartId} className={cx('partGroup')}>
           <div className={cx('partGroupHeader')}>
             <div>
@@ -191,5 +194,5 @@ export function groupTasksByPart(tasks) {
     g.totalTasksInPart += 1;
     if (t.status === 'PASSED') g.passedTasksInPart += 1;
   });
-  return Array.from(map.values());
+  return sortByPartOrder(Array.from(map.values()), { nameKey: 'examPartName' });
 }

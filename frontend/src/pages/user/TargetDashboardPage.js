@@ -7,7 +7,8 @@ import { getExamParts } from '~/api/examPartApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { listPlans } from '~/api/learningPlanApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
-import styles from '../PersonalizedPlan.module.scss';
+import styles from '../learning-plan/PersonalizedPlan.module.scss';
+import { sortByPartOrder, sortPartsByLookup } from '~/utils/partOrder';
 
 const cx = classNames.bind(styles);
 
@@ -31,7 +32,7 @@ function TargetDashboardPage() {
 
   useEffect(() => {
     getExamTypes().then(setExamTypes).catch(() => {});
-    getExamParts().then(setExamParts).catch(() => {});
+    getExamParts().then((data) => setExamParts(sortByPartOrder(data))).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -237,7 +238,7 @@ function TargetDashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(target.partRequirements || []).map((p) => {
+                  {sortPartsByLookup(target.partRequirements || [], examParts).map((p) => {
                     const cur = p.currentScore != null ? Number(p.currentScore) : null;
                     const reached = cur != null && p.requiredPercentage != null
                       ? cur >= p.requiredPercentage

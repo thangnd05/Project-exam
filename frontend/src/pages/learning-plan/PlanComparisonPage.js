@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getExamTypes } from '~/api/examTypeApi';
 import { listPlans } from '~/api/learningPlanApi';
-import styles from '../PersonalizedPlan.module.scss';
+import styles from './PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

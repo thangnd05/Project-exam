@@ -11,8 +11,9 @@ import {
   deleteUserTarget,
   getUserTarget,
 } from '../../api/userTargetApi';
-import planStyles from '../PersonalizedPlan.module.scss';
+import planStyles from '../learning-plan/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
+import { sortByPartOrder, sortPartsByLookup } from '../../utils/partOrder';
 
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);
@@ -33,7 +34,7 @@ function UserTargetPage() {
 
   useEffect(() => {
     getExamTypes().then(setExamTypes).catch(() => {});
-    getExamParts().then(setExamParts).catch(() => {});
+    getExamParts().then((data) => setExamParts(sortByPartOrder(data))).catch(() => {});
     getSkills().then(setSkills).catch(() => {});
     getScoringConversions().then(setScoringConversions).catch(() => {});
   }, []);
@@ -142,10 +143,11 @@ function UserTargetPage() {
   const partRequirements = useMemo(() => {
     if (!targetScore || filteredParts.length === 0) return [];
     if (matchedMilestone && matchedMilestone.partRequirements) {
-      return matchedMilestone.partRequirements.map((pr) => ({
+      const mapped = matchedMilestone.partRequirements.map((pr) => ({
         examPartId: pr.examPartId,
         requiredPercentage: pr.requiredPercentage,
       }));
+      return sortPartsByLookup(mapped, filteredParts);
     }
     const evenPct = Math.min(100, Math.round((Number(targetScore) / 990) * 100));
     return filteredParts.map((p) => ({
@@ -234,12 +236,14 @@ function UserTargetPage() {
 
     return (
       <div className={classNames(planCx('alert'), cx('scoreEstimate', tone))}>
-        <span className={planCx('muted')}>Điểm ước tính:</span>
-        <span className={cx('scoreEstimateValue')}>{est.totalScore}</span>
-        <span className={cx('scoreEstimateDiff')} style={{ color: diffColor }}>
-          ({diff > 0 ? '+' : ''}
-          {diff} so với mục tiêu {targetScore})
-        </span>
+        <div className={cx('scoreEstimateMain')}>
+          <span className={planCx('muted')}>Điểm ước tính:</span>
+          <span className={cx('scoreEstimateValue')}>{est.totalScore}</span>
+          <span className={cx('scoreEstimateDiff')} style={{ color: diffColor }}>
+            ({diff > 0 ? '+' : ''}
+            {diff} so với mục tiêu {targetScore})
+          </span>
+        </div>
         <div className={cx('scoreEstimateDetail')}>
           {est.skillDetails
             .map((s) => `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`)
@@ -472,7 +476,7 @@ function UserTargetPage() {
             <span className={cx('currentTargetScore')}>{currentTarget.targetScore} điểm</span>
           </div>
           <div className={cx('currentTargetParts')}>
-            {(currentTarget.partRequirements || []).map((p) => {
+            {sortPartsByLookup(currentTarget.partRequirements || [], examParts).map((p) => {
               const total = getPartTotal(p.examPartId);
               const num = percentToNum(p.requiredPercentage, total);
               return (

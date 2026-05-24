@@ -2,7 +2,7 @@ import React, { forwardRef, useImperativeHandle } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';
-import styles from '../../PersonalizedPlan.module.scss';
+import styles from '../PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

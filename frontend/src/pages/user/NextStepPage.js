@@ -6,7 +6,7 @@ import { getExamTypes } from '~/api/examTypeApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { listPlans, getPlanById } from '~/api/learningPlanApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
-import styles from '../PersonalizedPlan.module.scss';
+import styles from '../learning-plan/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

@@ -1,5 +1,4 @@
-// Shared styles cho 6 trang personalized plan:
-// TargetDashboard, MockHistory, PlanComparison, TargetAchieved, TaskHistory, NextStep.
+// Shared styles luồng cá nhân hóa (lộ trình, mục tiêu, dashboard, mock history, …).
 
 .wrapper {
   max-width: 112rem;
@@ -39,11 +38,13 @@
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.8rem 1.6rem;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.8rem;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-ssm);
+  line-height: 1.25;
   font-weight: var(--font-weight-semibold);
   font-family: var(--font-family);
   color: var(--text-color);
@@ -109,13 +110,14 @@
 }
 
 .btnLg {
-  padding: 1.2rem 2.4rem;
-  font-size: var(--font-size-ssm);
+  padding: 1.1rem 2.2rem;
+  font-size: var(--font-size-base);
 }
 
 .btnSm {
-  padding: 0.5rem 1.1rem;
-  font-size: var(--font-size-xs);
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-sm);
+  min-height: 3.6rem;
 }
 
 // ----- Filter / form field -----

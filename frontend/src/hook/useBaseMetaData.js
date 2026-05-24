@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from '../api/axiosClient';
 import { getTagsFlatByExamType } from '../api/tagApi';
+import { sortByPartOrder } from '../utils/partOrder';
 
 export const useBaseMetaData = (examTypeId) => {
     const [examTypes, setExamTypes] = useState([]);
@@ -48,7 +49,7 @@ export const useBaseMetaData = (examTypeId) => {
         }
         axios
             .get(`/api/exam-parts/by-exam-type/${examTypeId}`)
-            .then((res) => setExamParts(normalizeList(res.data)))
+            .then((res) => setExamParts(sortByPartOrder(normalizeList(res.data))))
             .catch((err) => {
                 console.error('Fetch exam parts error:', err);
                 setExamParts([]);
