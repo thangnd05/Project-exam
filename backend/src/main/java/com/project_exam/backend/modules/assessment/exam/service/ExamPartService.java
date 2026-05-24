@@ -23,7 +23,7 @@ public class ExamPartService {
     private final ExamTypeRepository examTypeRepository;
 
     public List<ExamPartResponse> findAll() {
-        return examPartRepository.findAll().stream()
+        return examPartRepository.findAllOrdered().stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -50,6 +50,7 @@ public class ExamPartService {
         part.setDescription(request.getDescription());
         part.setDefaultNumQuestions(request.getDefaultNumQuestions());
         part.setSkillId(normalizedSkillId);
+        if (request.getDisplayOrder() != null) part.setDisplayOrder(request.getDisplayOrder());
         part = examPartRepository.save(part);
         return toResponse(part);
     }
@@ -69,6 +70,7 @@ public class ExamPartService {
         if (request.getDescription() != null) part.setDescription(request.getDescription());
         if (request.getDefaultNumQuestions() != null) part.setDefaultNumQuestions(request.getDefaultNumQuestions());
         if (request.getSkillId() != null) part.setSkillId(nextSkillId);
+        if (request.getDisplayOrder() != null) part.setDisplayOrder(request.getDisplayOrder());
         part = examPartRepository.save(part);
         return toResponse(part);
     }
@@ -87,6 +89,7 @@ public class ExamPartService {
         res.setDescription(p.getDescription());
         res.setDefaultNumQuestions(p.getDefaultNumQuestions());
         res.setSkillId(p.getSkillId());
+        res.setDisplayOrder(p.getDisplayOrder());
         return res;
     }
 

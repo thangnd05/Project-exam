@@ -29,4 +29,7 @@ public class ExamPart {
 
     @Column(nullable = true)
     private String skillId; // FK -> skills (cho phép null với scoring mặc định)
+
+    @Column(name = "display_order", nullable = false)
+    private Integer displayOrder = 999;
 }

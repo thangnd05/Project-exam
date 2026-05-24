@@ -9,4 +9,5 @@ public class ExamPartRequest {
     private String description;
     private Integer defaultNumQuestions;
     private String skillId;
+    private Integer displayOrder;
 }

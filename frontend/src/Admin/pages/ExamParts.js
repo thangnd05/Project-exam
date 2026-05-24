@@ -17,6 +17,7 @@ const emptyForm = {
   name: '',
   description: '',
   default_num_questions: 1,
+  display_order: 999,
 };
 
 function ExamPartsManagement() {
@@ -39,6 +40,7 @@ function ExamPartsManagement() {
     name: item.name || '',
     description: item.description || '',
     default_num_questions: item.defaultNumQuestions ,
+    display_order: item.displayOrder ?? 999,
   });
 
   const mapExamTypeFromApi = (item) => ({
@@ -109,6 +111,7 @@ function ExamPartsManagement() {
       name: examPart.name,
       description: examPart.description || '',
       default_num_questions: examPart.default_num_questions || 1,
+      display_order: examPart.display_order ?? 999,
     });
     setShowFormModal(true);
   };
@@ -126,6 +129,7 @@ function ExamPartsManagement() {
       name: normalizedName,
       description: formState.description.trim(),
       defaultNumQuestions: Number(formState.default_num_questions),
+      displayOrder: Number(formState.display_order) || 999,
     };
 
     setSubmitting(true);
@@ -140,7 +144,11 @@ function ExamPartsManagement() {
         );
       } else {
         const createdPart = await createExamPart(payload);
-        setExamParts((previous) => [...previous, mapExamPartFromApi(createdPart)]);
+        setExamParts((previous) =>
+          [...previous, mapExamPartFromApi(createdPart)].sort(
+            (a, b) => (a.display_order ?? 999) - (b.display_order ?? 999),
+          ),
+        );
       }
       setShowFormModal(false);
       resetForm();
@@ -214,6 +222,7 @@ function ExamPartsManagement() {
         <Table responsive hover>
           <thead>
             <tr>
+              <th>Thứ tự</th>
               <th>ID</th>
               <th>Tên phần thi</th>
               <th>Loại kỳ thi</th>
@@ -225,7 +234,7 @@ function ExamPartsManagement() {
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={6} className="text-center py-4">
+                <td colSpan={7} className="text-center py-4">
                   <Spinner size="sm" className="me-2" />
                   Đang tải dữ liệu...
                 </td>
@@ -234,6 +243,7 @@ function ExamPartsManagement() {
             {!loading &&
               filteredExamParts.map((examPart) => (
               <tr key={examPart.exam_part_id}>
+                <td>{examPart.display_order}</td>
                 <td>{examPart.exam_part_id}</td>
                 <td>{examPart.name}</td>
                 <td>{getExamTypeName(examPart.exam_type_id)}</td>
@@ -256,7 +266,7 @@ function ExamPartsManagement() {
               ))}
             {!loading && filteredExamParts.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center py-4">
+                <td colSpan={7} className="text-center py-4">
                   Không có dữ liệu.
                 </td>
               </tr>
@@ -342,6 +352,23 @@ function ExamPartsManagement() {
                 }))
               }
             />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Thứ tự hiển thị</Form.Label>
+            <Form.Control
+              type="number"
+              min={1}
+              value={formState.display_order}
+              onChange={(event) =>
+                setFormState((previous) => ({
+                  ...previous,
+                  display_order: event.target.value,
+                }))
+              }
+            />
+            <Form.Text className="text-muted">
+              Số càng nhỏ hiển thị càng trên (Part 1 → 1, Part 2 → 2,...).
+            </Form.Text>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Mô tả</Form.Label>

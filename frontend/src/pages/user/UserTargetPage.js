@@ -250,9 +250,9 @@ function UserTargetPage() {
   })();
 
   return (
-    <div className={planCx('wrapper')}>
+    <div className={classNames(planCx('wrapper'), cx('pageRoot'))}>
       <div className={planCx('headerBar')}>
-        <h2 className={planCx('title')}>Mục tiêu của tôi</h2>
+        <h2 className={classNames(planCx('title'), cx('pageTitle'))}>Mục tiêu của tôi</h2>
         <div className={planCx('actionBar')}>
           <Link
             to={
@@ -294,13 +294,13 @@ function UserTargetPage() {
         </div>
       )}
 
-      <div className={planCx('card')}>
-        <div className={planCx('cardHeader')}>Thiết lập mục tiêu</div>
-        <div className={planCx('cardBody')}>
+      <div className={classNames(planCx('card'), cx('setupCard'))}>
+        <div className={classNames(planCx('cardHeader'), cx('compactCardHeader'))}>Thiết lập mục tiêu</div>
+        <div className={classNames(planCx('cardBody'), cx('compactCardBody'))}>
           <div className={classNames(planCx('fieldGroup'), cx('fieldFull'))}>
             <label className={cx('fieldLabelLarge')}>Loại kỳ thi</label>
             <select
-              className={planCx('select')}
+              className={classNames(planCx('select'), cx('compactSelect'))}
               style={{ width: '100%' }}
               value={selectedExamTypeId}
               onChange={(e) => {
@@ -374,8 +374,10 @@ function UserTargetPage() {
 
           {targetScore && partRequirements.length > 0 && (
             <div className={classNames(planCx('card'), cx('partSection'))}>
-              <div className={planCx('cardHeader')}>Yêu cầu từng phần thi</div>
-              <div className={planCx('cardBody')}>
+              <div className={classNames(planCx('cardHeader'), cx('compactCardHeader'))}>
+                Yêu cầu từng phần thi
+              </div>
+              <div className={classNames(planCx('cardBody'), cx('compactCardBody'))}>
                 <p className={cx('partSectionHint')}>
                   {matchedMilestone
                     ? 'Giá trị từ cấu hình admin. Sửa ô để tuỳ chỉnh.'
@@ -464,22 +466,23 @@ function UserTargetPage() {
       </div>
 
       {hasSavedTarget && (
-        <div className={planCx('alert', 'alertSuccess')}>
-          <div>
-            <strong>Mục tiêu hiện tại: {currentTarget.targetScore} điểm</strong>
-            <div className={cx('currentTargetParts')}>
-              {(currentTarget.partRequirements || []).map((p) => {
-                const total = getPartTotal(p.examPartId);
-                const num = percentToNum(p.requiredPercentage, total);
-                return (
-                  <span key={p.examPartId} className={planCx('badge', 'badgePrimary')}>
-                    {getPartName(p.examPartId)}: {num}/{total} ({p.requiredPercentage}%)
-                  </span>
-                );
-              })}
-            </div>
+        <section className={cx('currentTargetCard')} aria-label="Mục tiêu hiện tại">
+          <div className={cx('currentTargetHeader')}>
+            <span className={cx('currentTargetLabel')}>Mục tiêu hiện tại</span>
+            <span className={cx('currentTargetScore')}>{currentTarget.targetScore} điểm</span>
           </div>
-        </div>
+          <div className={cx('currentTargetParts')}>
+            {(currentTarget.partRequirements || []).map((p) => {
+              const total = getPartTotal(p.examPartId);
+              const num = percentToNum(p.requiredPercentage, total);
+              return (
+                <span key={p.examPartId} className={cx('currentTargetBadge')}>
+                  {getPartName(p.examPartId)}: {num}/{total} ({p.requiredPercentage}%)
+                </span>
+              );
+            })}
+          </div>
+        </section>
       )}
     </div>
   );

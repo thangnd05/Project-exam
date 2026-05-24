@@ -10,4 +10,5 @@ public class ExamPartResponse {
     private String description;
     private Integer defaultNumQuestions;
     private String skillId;
+    private Integer displayOrder;
 }
