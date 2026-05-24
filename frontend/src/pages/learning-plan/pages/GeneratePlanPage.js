@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import axios from '~/api/axiosClient';
+import { getExamTypes } from '~/api/examTypeApi';
 import { generatePlan } from '~/api/learningPlanApi';
+import { getUserTarget } from '~/api/userTargetApi';
 import LearningPlanList from '../components/LearningPlanList';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import styles from '../styles/PersonalizedPlan.module.scss';
@@ -11,26 +13,52 @@ const cx = classNames.bind(styles);
 
 function GeneratePlanPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const planListRef = useRef(null);
 
   const [userTests, setUserTests] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
   const [userTestId, setUserTestId] = useState(searchParams.get('userTestId') || '');
-  const [deadlineDays, setDeadlineDays] = useState('');
-  const [targetScore, setTargetScore] = useState('');
+  // Tạm ẩn: ngày thi / target score override khi sinh plan
+  // const [deadlineDays, setDeadlineDays] = useState('');
+  // const [targetScore, setTargetScore] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
 
+  const [examTypes, setExamTypes] = useState([]);
+  const [sourceExamTypeId, setSourceExamTypeId] = useState(
+    searchParams.get('examTypeId') || '',
+  );
   const [filterExamTypeId, setFilterExamTypeId] = useState(
     searchParams.get('examTypeId') || '',
   );
   const [listRefreshKey, setListRefreshKey] = useState(0);
+  const [loadingTarget, setLoadingTarget] = useState(false);
+  const [userTarget, setUserTarget] = useState(null);
 
   useEffect(() => {
     let mounted = true;
+    getExamTypes()
+      .then((types) => {
+        if (!mounted) return;
+        const list = Array.isArray(types) ? types : [];
+        setExamTypes(list);
+        if (!sourceExamTypeId && list.length > 0) {
+          const fromUrl = searchParams.get('examTypeId');
+          const initial = fromUrl || list[0].examTypeId;
+          setSourceExamTypeId(initial);
+          setFilterExamTypeId(initial);
+        }
+      })
+      .catch(() => { /* exam types optional for list */ });
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoadingList(true);
     axios.get('/api/user-tests/my')
       .then((res) => {
         if (!mounted) return;
@@ -45,6 +73,43 @@ function GeneratePlanPage() {
     return () => { mounted = false; };
   }, []);
 
+  const filteredUserTests = useMemo(() => {
+    if (!sourceExamTypeId) return userTests;
+    return userTests.filter((t) => t.examTypeId === sourceExamTypeId);
+  }, [userTests, sourceExamTypeId]);
+
+  useEffect(() => {
+    if (!sourceExamTypeId) {
+      setUserTarget(null);
+      return undefined;
+    }
+    let mounted = true;
+    setLoadingTarget(true);
+    getUserTarget(sourceExamTypeId)
+      .then((data) => {
+        if (mounted) setUserTarget(data);
+      })
+      .catch(() => {
+        if (mounted) setUserTarget({ hasTarget: false });
+      })
+      .finally(() => {
+        if (mounted) setLoadingTarget(false);
+      });
+    return () => { mounted = false; };
+  }, [sourceExamTypeId]);
+
+  const hasTarget = Boolean(userTarget?.hasTarget);
+  /** Khóa chọn bài nguồn + nút sinh plan khi chưa có target (không khóa loại kỳ thi). */
+  const testFormLocked = !sourceExamTypeId || loadingTarget || !hasTarget;
+
+  useEffect(() => {
+    if (!userTestId) return;
+    const stillVisible = filteredUserTests.some((t) => t.userTestId === userTestId);
+    if (!stillVisible) {
+      setUserTestId('');
+    }
+  }, [sourceExamTypeId, filteredUserTests, userTestId]);
+
   const selectedTest = useMemo(
     () => userTests.find((t) => t.userTestId === userTestId),
     [userTests, userTestId],
@@ -53,8 +118,26 @@ function GeneratePlanPage() {
   useEffect(() => {
     if (selectedTest?.examTypeId) {
       setFilterExamTypeId(selectedTest.examTypeId);
+      setSourceExamTypeId(selectedTest.examTypeId);
     }
   }, [userTestId, selectedTest?.examTypeId]);
+
+  const handleSourceExamTypeChange = (nextId) => {
+    setSourceExamTypeId(nextId);
+    setFilterExamTypeId(nextId);
+    setUserTestId('');
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (nextId) next.set('examTypeId', nextId);
+      else next.delete('examTypeId');
+      return next;
+    });
+  };
+
+  const sourceExamTypeName = useMemo(
+    () => examTypes.find((et) => et.examTypeId === sourceExamTypeId)?.name || '',
+    [examTypes, sourceExamTypeId],
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,8 +146,8 @@ function GeneratePlanPage() {
     setSubmitting(true);
     try {
       const payload = { userTestId };
-      if (deadlineDays !== '') payload.deadlineDays = Number(deadlineDays);
-      if (targetScore !== '') payload.targetScore = Number(targetScore);
+      // if (deadlineDays !== '') payload.deadlineDays = Number(deadlineDays);
+      // if (targetScore !== '') payload.targetScore = Number(targetScore);
       const data = await generatePlan(payload);
       setResult(data);
       if (data?.examTypeId) {
@@ -88,19 +171,66 @@ function GeneratePlanPage() {
       </div>
 
       <p className={cx('subtitle')}>
-        Một plan gồm nhiều Part (mỗi Part tách riêng, không trộn đề). Trong mỗi Part: các tag yếu → đọc tài liệu → 10 câu → pass mới sang ải/Part tiếp.
+        Một plan gồm nhiều Part (không trộn đề). Mỗi Part: mọi tag yếu (luyện ~50 câu/tag) → hai ải tổng ôn Part (mỗi ải ~200% số câu chuẩn của Part) → pass hết thì làm mock kiểm tra.
       </p>
+
+      {sourceExamTypeId && !loadingTarget && !hasTarget && (
+        <div className={cx('alert', 'alertWarning')}>
+          <span>
+            Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;.
+            Cần mục tiêu (điểm + % từng Part) trước khi sinh lộ trình.
+          </span>
+          <Link
+            to={`/my-target?examTypeId=${encodeURIComponent(sourceExamTypeId)}`}
+            className={cx('btn', 'btnPrimary', 'btnSm')}
+          >
+            Đặt mục tiêu
+          </Link>
+        </div>
+      )}
 
       <div className={cx('card')}>
         <div className={cx('cardBody')}>
           <form onSubmit={handleSubmit}>
+            <div className={cx('filterRow')} style={{ marginBottom: '1.6rem' }}>
+              <div className={cx('fieldGroup')}>
+                <label className={cx('fieldLabel')}>Loại kỳ thi (lọc bài nguồn)</label>
+                <select
+                  className={cx('select')}
+                  value={sourceExamTypeId}
+                  onChange={(e) => handleSourceExamTypeChange(e.target.value)}
+                  disabled={examTypes.length === 0}
+                >
+                  {examTypes.length === 0 ? (
+                    <option value="">Đang tải loại kỳ thi...</option>
+                  ) : (
+                    examTypes.map((et) => (
+                      <option key={et.examTypeId} value={et.examTypeId}>
+                        {et.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+                <small className={cx('muted')}>
+                  Chỉ hiện mock/quick đã hoàn thành thuộc loại kỳ thi này.
+                </small>
+              </div>
+            </div>
+
             <div className={cx('fieldGroup')} style={{ width: '100%', marginBottom: '1.6rem' }}>
-              <label className={cx('fieldLabel')}>Bài thi nguồn (đã COMPLETED)</label>
+              <label className={cx('fieldLabel')}>
+                Bài thi nguồn (đã COMPLETED)
+                {sourceExamTypeName ? ` · ${sourceExamTypeName}` : ''}
+              </label>
               {loadingList ? (
                 <div className={cx('muted')}>Đang tải danh sách bài thi...</div>
               ) : userTests.length === 0 ? (
                 <div className={cx('alert', 'alertWarning')}>
                   Bạn chưa có bài thi nào đã hoàn thành. Hãy làm Quick Challenge hoặc Full Mock trước.
+                </div>
+              ) : filteredUserTests.length === 0 ? (
+                <div className={cx('alert', 'alertWarning')}>
+                  Chưa có bài hoàn thành cho loại kỳ thi này. Hãy làm mock thuộc &quot;{sourceExamTypeName || 'kỳ thi đã chọn'}&quot; hoặc đổi loại kỳ thi.
                 </div>
               ) : (
                 <select
@@ -108,48 +238,22 @@ function GeneratePlanPage() {
                   value={userTestId}
                   onChange={(e) => setUserTestId(e.target.value)}
                   required
+                  disabled={testFormLocked}
                 >
                   <option value="">-- Chọn bài thi --</option>
-                  {userTests.map((t) => (
+                  {filteredUserTests.map((t) => (
                     <option key={t.userTestId} value={t.userTestId}>
-                      {formatDate(t.finishedAt)} · Score {t.totalScore ?? '—'} · testId={t.testId.slice(0, 8)}…
+                      {formatDate(t.finishedAt)} · Score {t.totalScore ?? '—'} · testId={t.testId?.slice(0, 8) ?? '—'}…
                     </option>
                   ))}
                 </select>
               )}
             </div>
 
-            <div className={cx('filterRow')}>
-              <div className={cx('fieldGroup')}>
-                <label className={cx('fieldLabel')}>Ngày đến ngày thi (optional)</label>
-                <input
-                  type="number"
-                  className={cx('select')}
-                  value={deadlineDays}
-                  onChange={(e) => setDeadlineDays(e.target.value)}
-                  placeholder="VD: 28"
-                  min={3}
-                  max={365}
-                />
-                <small className={cx('muted')}>Chỉ ước lượng, không ép sang ải mới.</small>
-              </div>
-              <div className={cx('fieldGroup')}>
-                <label className={cx('fieldLabel')}>Target score (optional)</label>
-                <input
-                  type="number"
-                  className={cx('select')}
-                  value={targetScore}
-                  onChange={(e) => setTargetScore(e.target.value)}
-                  placeholder="VD: 750"
-                />
-                <small className={cx('muted')}>Bỏ trống → dùng UserTarget đã set.</small>
-              </div>
-            </div>
-
             <button
               type="submit"
               className={cx('btn', 'btnPrimary', 'btnLg')}
-              disabled={submitting || !userTestId || userTests.length === 0}
+              disabled={submitting || testFormLocked || !userTestId || filteredUserTests.length === 0}
               style={{ marginTop: '1.6rem' }}
             >
               {submitting ? 'Đang sinh lộ trình...' : 'Sinh lộ trình'}

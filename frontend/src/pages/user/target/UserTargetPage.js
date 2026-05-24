@@ -486,6 +486,18 @@ function UserTargetPage() {
               );
             })}
           </div>
+          <div className={planCx('actionBar')} style={{ marginTop: '1rem' }}>
+            <Link
+              to={
+                selectedExamTypeId
+                  ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
+                  : '/learning-plans/generate'
+              }
+              className={planCx('btn', 'btnPrimary', 'btnSm')}
+            >
+              Sinh lộ trình vượt ải
+            </Link>
+          </div>
         </section>
       )}
     </div>
