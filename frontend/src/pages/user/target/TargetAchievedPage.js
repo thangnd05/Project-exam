@@ -5,7 +5,7 @@ import axios from '~/api/axiosClient';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
-import styles from '../learning-plan/PersonalizedPlan.module.scss';
+import styles from '../../learning-plan/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

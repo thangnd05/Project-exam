@@ -1,12 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import axios from '~/api/axiosClient';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
-import styles from '../learning-plan/PersonalizedPlan.module.scss';
+import { getUserTarget } from '~/api/userTargetApi';
+import MockHistoryCharts from './components/MockHistoryCharts';
+import styles from '../../learning-plan/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
+
+const CHART_FETCH_LIMIT = 25;
 
 function formatDate(s) {
   return s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '—';
@@ -28,6 +32,8 @@ function MockHistoryPage() {
   const [error, setError] = useState(null);
   const [enhancedById, setEnhancedById] = useState({});
   const [loadingId, setLoadingId] = useState(null);
+  const [chartLoading, setChartLoading] = useState(false);
+  const [targetScore, setTargetScore] = useState(null);
 
   useEffect(() => {
     getExamTypes().then(setExamTypes).catch(() => {});
@@ -35,10 +41,11 @@ function MockHistoryPage() {
 
   useEffect(() => {
     let mounted = true;
-    axios.get('/api/user-tests/my')
+    axios
+      .get('/api/user-tests/my')
       .then((res) => {
         if (!mounted) return;
-        const arr = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        const arr = Array.isArray(res.data) ? res.data : res.data?.data || [];
         const completed = arr
           .filter((u) => u.status === 'COMPLETED' && u.finishedAt)
           .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
@@ -47,8 +54,12 @@ function MockHistoryPage() {
       .catch((err) => {
         if (mounted) setError(err?.response?.data?.message || err.message);
       })
-      .finally(() => { if (mounted) setLoading(false); });
-    return () => { mounted = false; };
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const tests = useMemo(() => {
@@ -56,7 +67,109 @@ function MockHistoryPage() {
     return allTests.filter((u) => u.examTypeId === examTypeFilter);
   }, [allTests, examTypeFilter]);
 
-  const loadEnhanced = async (userTestId) => {
+  const examTypeName = useMemo(
+    () => examTypes.find((et) => et.examTypeId === examTypeFilter)?.name || '',
+    [examTypes, examTypeFilter],
+  );
+
+  useEffect(() => {
+    if (!examTypeFilter) {
+      setTargetScore(null);
+      return;
+    }
+    let mounted = true;
+    getUserTarget(examTypeFilter)
+      .then((data) => {
+        if (!mounted) return;
+        setTargetScore(data.hasTarget ? data.targetScore : null);
+      })
+      .catch(() => {
+        if (mounted) setTargetScore(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [examTypeFilter]);
+
+  const testsForChart = useMemo(
+    () => tests.slice(0, CHART_FETCH_LIMIT),
+    [tests],
+  );
+
+  const chartTestIds = useMemo(
+    () => testsForChart.map((t) => t.userTestId).join(','),
+    [testsForChart],
+  );
+
+  useEffect(() => {
+    if (testsForChart.length === 0) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    const missing = testsForChart.filter((t) => !enhancedById[t.userTestId]);
+
+    if (missing.length === 0) {
+      return undefined;
+    }
+
+    setChartLoading(true);
+
+    (async () => {
+      const batches = await Promise.all(
+        missing.map(async (t) => {
+          try {
+            const r = await getEnhancedResult(t.userTestId);
+            return { userTestId: t.userTestId, data: r.data };
+          } catch {
+            return { userTestId: t.userTestId, data: { error: true } };
+          }
+        }),
+      );
+
+      if (cancelled) return;
+
+      setEnhancedById((prev) => {
+        const next = { ...prev };
+        batches.forEach((item) => {
+          next[item.userTestId] = item.data;
+        });
+        return next;
+      });
+      setChartLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartTestIds]);
+
+  const chartData = useMemo(() => {
+    const chronological = [...testsForChart].reverse();
+    return chronological.map((t, idx) => {
+      const e = enhancedById[t.userTestId];
+      const enhancedLoaded = e && !e.error;
+      const totalScore =
+        (enhancedLoaded ? e.totalScore : null) ?? t.totalScore ?? null;
+      const readinessScore = enhancedLoaded ? e.readinessScore : null;
+
+      return {
+        key: t.userTestId,
+        order: idx + 1,
+        dateLabel: new Date(t.finishedAt).toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+        }),
+        fullDate: formatDate(t.finishedAt),
+        totalScore,
+        readinessScore,
+        isTargetMet: enhancedLoaded ? e.isTargetMet : null,
+      };
+    });
+  }, [testsForChart, enhancedById]);
+
+  const loadEnhanced = useCallback(async (userTestId) => {
     if (enhancedById[userTestId]) return;
     setLoadingId(userTestId);
     try {
@@ -67,31 +180,9 @@ function MockHistoryPage() {
     } finally {
       setLoadingId(null);
     }
-  };
+  }, [enhancedById]);
 
-  useEffect(() => {
-    if (tests.length === 0) return;
-    tests.slice(0, 3).forEach((t) => loadEnhanced(t.userTestId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tests]);
-
-  const trend = useMemo(() => {
-    return [...tests].reverse()
-      .map((t) => {
-        const e = enhancedById[t.userTestId];
-        if (!e || e.error) return null;
-        return {
-          userTestId: t.userTestId,
-          finishedAt: t.finishedAt,
-          totalScore: e.totalScore ?? t.totalScore,
-          readinessScore: e.readinessScore,
-          isTargetMet: e.isTargetMet,
-        };
-      })
-      .filter(Boolean);
-  }, [tests, enhancedById]);
-
-  const maxReadiness = Math.max(100, ...trend.map((p) => p.readinessScore || 0));
+  const showCharts = !loading && chartData.length > 0;
 
   return (
     <div className={cx('wrapper')}>
@@ -120,12 +211,15 @@ function MockHistoryPage() {
           >
             <option value="">Tất cả</option>
             {examTypes.map((et) => (
-              <option key={et.examTypeId} value={et.examTypeId}>{et.name}</option>
+              <option key={et.examTypeId} value={et.examTypeId}>
+                {et.name}
+              </option>
             ))}
           </select>
         </div>
         <p className={cx('filterHint')}>
-          Hiển thị các bài đã COMPLETED. Nhấn <strong>Tải</strong> để xem readiness của 1 mock.
+          Biểu đồ hiển thị tối đa {CHART_FETCH_LIMIT} bài gần nhất (cũ → mới).
+          Bảng bên dưới liệt kê đầy đủ — nhấn <strong>Tải</strong> nếu thiếu readiness.
         </p>
       </div>
 
@@ -135,40 +229,19 @@ function MockHistoryPage() {
       {!loading && tests.length === 0 && (
         <div className={cx('alert', 'alertInfo')}>
           <span>Bạn chưa có bài thi nào đã hoàn thành.</span>
-          <Link to="/" className={cx('btn', 'btnPrimary', 'btnSm')}>Làm bài đầu tiên</Link>
+          <Link to="/" className={cx('btn', 'btnPrimary', 'btnSm')}>
+            Làm bài đầu tiên
+          </Link>
         </div>
       )}
 
-      {trend.length >= 2 && (
-        <div className={cx('card')}>
-          <div className={cx('cardHeader')}>
-            Tiến triển readiness (sớm → muộn)
-          </div>
-          <div className={cx('cardBody')}>
-            <div className={cx('barChart')}>
-              {trend.map((p) => {
-                const h = ((p.readinessScore || 0) / maxReadiness) * 100;
-                const variant = p.isTargetMet
-                  ? 'success'
-                  : (p.readinessScore >= 70 ? '' : 'warning');
-                return (
-                  <div
-                    key={p.userTestId}
-                    className={cx('barColumn')}
-                    title={`${formatDate(p.finishedAt)} · ${p.readinessScore}% · ${p.totalScore}đ`}
-                  >
-                    <span className={cx('barValue')}>{p.readinessScore}%</span>
-                    <div className={cx('barBar', variant)} style={{ height: `${h}%` }} />
-                    <span className={cx('barLabel')}>{p.totalScore}đ</span>
-                  </div>
-                );
-              })}
-            </div>
-            <p className={cx('chartNote')}>
-              Cột xanh lá = mock đạt target · xanh dương = readiness ≥ 70% · vàng = dưới ngưỡng.
-            </p>
-          </div>
-        </div>
+      {showCharts && (
+        <MockHistoryCharts
+          chartData={chartData}
+          targetScore={targetScore}
+          loading={chartLoading}
+          examTypeName={examTypeName || (examTypeFilter ? '' : 'Tất cả kỳ thi')}
+        />
       )}
 
       {tests.length > 0 && (
@@ -194,21 +267,27 @@ function MockHistoryPage() {
                   <tr key={t.userTestId}>
                     <td>{tests.length - idx}</td>
                     <td className={cx('small')}>{formatDate(t.finishedAt)}</td>
-                    <td><code className={cx('code')}>{t.testId?.slice(0, 8)}…</code></td>
-                    <td className={cx('right')}>
-                      <strong>{enhancedLoaded ? e.totalScore : (t.totalScore ?? '—')}</strong>
+                    <td>
+                      <code className={cx('code')}>{t.testId?.slice(0, 8)}…</code>
                     </td>
                     <td className={cx('right')}>
-                      {enhancedLoaded ? `${e.readinessScore}%` : (
-                        loadingId === t.userTestId ? '...' : (
-                          <button
-                            type="button"
-                            className={cx('btn', 'btnGhost', 'btnSm')}
-                            onClick={() => loadEnhanced(t.userTestId)}
-                          >
-                            Tải
-                          </button>
-                        )
+                      <strong>
+                        {enhancedLoaded ? e.totalScore : t.totalScore ?? '—'}
+                      </strong>
+                    </td>
+                    <td className={cx('right')}>
+                      {enhancedLoaded ? (
+                        `${e.readinessScore}%`
+                      ) : loadingId === t.userTestId ? (
+                        '...'
+                      ) : (
+                        <button
+                          type="button"
+                          className={cx('btn', 'btnGhost', 'btnSm')}
+                          onClick={() => loadEnhanced(t.userTestId)}
+                        >
+                          Tải
+                        </button>
                       )}
                     </td>
                     <td>
@@ -220,7 +299,9 @@ function MockHistoryPage() {
                         ) : (
                           <span className={cx('badge', 'badgeMuted')}>Chưa set</span>
                         )
-                      ) : '—'}
+                      ) : (
+                        '—'
+                      )}
                     </td>
                     <td className={cx('small')}>{formatDuration(t.durationTaken)}</td>
                     <td>

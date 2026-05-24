@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getMilestones } from '../../api/milestoneApi';
-import { getExamTypes } from '../../api/examTypeApi';
-import { getExamParts } from '../../api/examPartApi';
-import { getSkills } from '../../api/skillApi';
-import { getScoringConversions } from '../../api/scoringConversionApi';
+import { getMilestones } from '~/api/milestoneApi';
+import { getExamTypes } from '~/api/examTypeApi';
+import { getExamParts } from '~/api/examPartApi';
+import { getSkills } from '~/api/skillApi';
+import { getScoringConversions } from '~/api/scoringConversionApi';
 import {
   createOrUpdateUserTarget,
   deleteUserTarget,
   getUserTarget,
-} from '../../api/userTargetApi';
-import planStyles from '../learning-plan/PersonalizedPlan.module.scss';
+} from '~/api/userTargetApi';
+import planStyles from '../../learning-plan/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
-import { sortByPartOrder, sortPartsByLookup } from '../../utils/partOrder';
+import { sortByPartOrder, sortPartsByLookup } from '~/utils/partOrder';
 
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);

@@ -1,0 +1,132 @@
+.chartsSection {
+  margin-bottom: 1.6rem;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.statTile {
+  padding: 0.9rem 1rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.statTileHighlight {
+  border-left: 3px solid var(--primary);
+}
+
+.statTileLabel {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+}
+
+.statTileValue {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+}
+
+.chartCard {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 1.2rem 1.4rem 1.4rem;
+}
+
+.chartCardHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.chartCardTitle {
+  margin: 0;
+  font-size: var(--font-size-ssm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+}
+
+.chartCardMeta {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.chartCardDesc {
+  margin: 0 0 0.8rem;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.chartContainer {
+  width: 100%;
+  min-height: 32rem;
+}
+
+.chartLoading,
+.chartLoadingInline {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.chartLoading {
+  padding: 2rem;
+  text-align: center;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.chartLoadingInline {
+  margin: 0 0 0.6rem;
+}
+
+.chartLegendNote {
+  margin: 0.8rem 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.chartTooltip {
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+
+  p {
+    margin: 0.2rem 0;
+  }
+}
+
+.chartTooltipTitle {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.35rem !important;
+  color: var(--text-color);
+}
+
+.chartTooltipSuccess {
+  color: var(--success-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.chartTooltipWarn {
+  color: #b45309;
+  font-weight: var(--font-weight-medium);
+}
