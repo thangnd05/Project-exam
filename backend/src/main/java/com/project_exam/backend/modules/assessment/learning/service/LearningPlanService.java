@@ -715,10 +715,10 @@ public class LearningPlanService {
 
     private String resolveTaskDisplayName(PlanTaskType taskType, Tag tag, ExamPart part) {
         if (taskType == PlanTaskType.PART_CAPSTONE_1) {
-            return "Tổng ôn Part — lần 1 (200%)";
+            return "Ải cuôi chặng — lần 1";
         }
         if (taskType == PlanTaskType.PART_CAPSTONE_2) {
-            return "Tổng ôn Part — lần 2 (200%)";
+            return "Ải cuối chặng — lần 2";
         }
         if (tag != null) {
             return tag.getName();

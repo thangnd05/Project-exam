@@ -174,10 +174,14 @@ function PlanStudyPage() {
       {result && (
         <>
           <div className={cx('resultAlert', { passed: result.passed, failed: !result.passed })}>
-            <div className={cx('resultStats')}>
-              {result.correctCount}/{result.totalCount} đúng ({result.accuracy}%)
+            {(result.correctCount > 0 || result.totalCount > 0) && (
+              <div className={cx('resultStats')}>
+                {result.correctCount}/{result.totalCount} đúng ({result.accuracy}%)
+              </div>
+            )}
+            <div className={cx('resultStats')} style={{ marginBottom: '1rem' }}>
+              {result.message}
             </div>
-            <div style={{ marginBottom: '1rem' }}>{result.message}</div>
             <div className={cx('actionBar')}>
               <button
                 type="button"
