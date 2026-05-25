@@ -183,6 +183,14 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
             Xem tài liệu
           </a>
         )}
+        {!compact && task.status === 'PASSED' && (
+          <Link
+            to={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}&review=true`}
+            className={cx('btn', 'btnOutline', 'btnSm')}
+          >
+            Xem giải thích
+          </Link>
+        )}
         {studyButton}
       </div>
     </div>

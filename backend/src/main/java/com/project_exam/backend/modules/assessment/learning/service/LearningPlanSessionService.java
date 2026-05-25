@@ -54,7 +54,7 @@ public class LearningPlanSessionService {
 
     @Transactional
     public CurrentSessionResponse getCurrentSession(
-            String userId, String learningPlanId, String taskId) {
+            String userId, String learningPlanId, String taskId, boolean includeReview) {
         LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
 
         normalizePlanStage(plan);
@@ -72,6 +72,11 @@ public class LearningPlanSessionService {
         if (!Objects.equals(task.getLearningPlanId(), learningPlanId)) {
             throw new ForbiddenException("Nhiệm vụ không thuộc kế hoạch này");
         }
+
+        if (includeReview) {
+            return buildReviewResponse(plan, task);
+        }
+
         if (task.getStatus() == TaskStatus.SKIPPED) {
             throw new BadRequestException("Ải này đã bỏ qua, không thể học.");
         }
@@ -90,6 +95,45 @@ public class LearningPlanSessionService {
 
         LearningPlanSession session = createQuizSession(plan, task);
         return buildSessionResponse(plan, session);
+    }
+
+    private CurrentSessionResponse buildReviewResponse(LearningPlan plan, LearningPlanTask task) {
+        List<LearningPlanSession> sessions = sessionRepository
+                .findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(
+                        plan.getLearningPlanId(), task.getTaskId());
+        LearningPlanSession lastSubmitted = sessions.stream()
+                .filter(s -> s.getStatus() == SessionStatus.SUBMITTED)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Chưa có phiên học nào được nộp cho ải này."));
+
+        List<LearningPlanSessionQuestion> sessionQuestions =
+                sessionQuestionRepository.findBySessionIdOrderByDisplayOrderAsc(lastSubmitted.getSessionId());
+        List<String> questionIds = sessionQuestions.stream()
+                .map(LearningPlanSessionQuestion::getQuestionId)
+                .toList();
+        Map<String, Answer> correctByQuestion = answerRepository
+                .findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(questionIds))
+                .stream()
+                .collect(Collectors.toMap(Answer::getQuestionId, a -> a, (a, b) -> a));
+        List<LearningPlanSessionAnswer> userAnswerRows =
+                sessionAnswerRepository.findBySessionId(lastSubmitted.getSessionId());
+
+        List<SubmitSessionResponse.ReviewItem> reviewItems =
+                buildReviewItems(sessionQuestions, userAnswerRows, correctByQuestion);
+
+        int total = sessionQuestions.size();
+        int accuracy = lastSubmitted.getAccuracy() != null ? lastSubmitted.getAccuracy() : 0;
+
+        return CurrentSessionResponse.builder()
+                .mode("REVIEW")
+                .learningPlanId(plan.getLearningPlanId())
+                .planStage(plan.getPlanStage() != null ? plan.getPlanStage().name() : null)
+                .sessionId(lastSubmitted.getSessionId())
+                .totalTasks(null)
+                .passedTasks(null)
+                .message(accuracy + "% (" + (int) Math.round(accuracy / 100.0 * total) + "/" + total + " đúng)")
+                .lastReviewItems(reviewItems)
+                .build();
     }
 
     private String lockedTaskMessage(LearningPlanTask task) {
@@ -212,6 +256,9 @@ public class LearningPlanSessionService {
                 ? "Chúc mừng! Bạn đã vượt ải này."
                 : "Chưa đạt ngưỡng " + passRequired + "%. Hãy đọc lại tài liệu và thử lại.";
 
+        List<SubmitSessionResponse.ReviewItem> reviewItems =
+                buildReviewItems(sessionQuestions, rows, correctByQuestion);
+
         return SubmitSessionResponse.builder()
                 .sessionId(sessionId)
                 .correctCount(correct)
@@ -222,7 +269,56 @@ public class LearningPlanSessionService {
                 .planStage(plan.getPlanStage().name())
                 .unlockedNextTask(false)
                 .message(message)
+                .reviewItems(reviewItems)
                 .build();
+    }
+
+    private List<SubmitSessionResponse.ReviewItem> buildReviewItems(
+            List<LearningPlanSessionQuestion> sessionQuestions,
+            List<LearningPlanSessionAnswer> userAnswerRows,
+            Map<String, Answer> correctByQuestion) {
+
+        List<String> questionIds = sessionQuestions.stream()
+                .map(LearningPlanSessionQuestion::getQuestionId)
+                .toList();
+        Map<String, Question> questionMap = questionRepository.findAllById(questionIds).stream()
+                .collect(Collectors.toMap(Question::getQuestionId, q -> q, (a, b) -> a));
+        Map<String, List<Answer>> allAnswers = answerRepository
+                .findByQuestionIdIn(new ArrayList<>(questionIds)).stream()
+                .collect(Collectors.groupingBy(Answer::getQuestionId));
+        Map<String, LearningPlanSessionAnswer> userAnswerMap = userAnswerRows.stream()
+                .collect(Collectors.toMap(LearningPlanSessionAnswer::getQuestionId, a -> a, (a, b) -> a));
+
+        List<SubmitSessionResponse.ReviewItem> items = new ArrayList<>();
+        for (LearningPlanSessionQuestion sq : sessionQuestions) {
+            String qid = sq.getQuestionId();
+            Question q = questionMap.get(qid);
+            if (q == null) continue;
+
+            LearningPlanSessionAnswer userAns = userAnswerMap.get(qid);
+            Answer correct = correctByQuestion.get(qid);
+            List<Answer> answerList = allAnswers.getOrDefault(qid, List.of());
+
+            List<SubmitSessionResponse.ReviewAnswer> reviewAnswers = answerList.stream()
+                    .map(a -> SubmitSessionResponse.ReviewAnswer.builder()
+                            .answerId(a.getAnswerId())
+                            .answerText(a.getAnswerText())
+                            .answerLabel(a.getAnswerLabel())
+                            .isCorrect(Boolean.TRUE.equals(a.getIsCorrect()))
+                            .build())
+                    .toList();
+
+            items.add(SubmitSessionResponse.ReviewItem.builder()
+                    .questionId(qid)
+                    .questionText(q.getQuestionText())
+                    .answers(reviewAnswers)
+                    .selectedAnswerId(userAns != null ? userAns.getSelectedAnswerId() : null)
+                    .correctAnswerId(correct != null ? correct.getAnswerId() : null)
+                    .isCorrect(userAns != null && Boolean.TRUE.equals(userAns.getIsCorrect()))
+                    .explanation(q.getExplanation())
+                    .build());
+        }
+        return items;
     }
 
     /** Lịch sử các phiên luyện của một ải. Mới nhất trước. */

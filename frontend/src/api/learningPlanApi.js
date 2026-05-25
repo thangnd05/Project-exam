@@ -14,8 +14,10 @@ export const listPlans = (examTypeId) => {
   return axios.get(BASE_URL, { params: { examTypeId } }).then((res) => res.data);
 };
 
-export const getCurrentSession = (learningPlanId, taskId) => {
-  const params = taskId ? { taskId } : {};
+export const getCurrentSession = (learningPlanId, taskId, includeReview = false) => {
+  const params = {};
+  if (taskId) params.taskId = taskId;
+  if (includeReview) params.includeReview = true;
   return axios
     .get(`${BASE_URL}/${learningPlanId}/current-session`, { params })
     .then((res) => res.data);
@@ -32,3 +34,4 @@ export const getTaskSessions = (learningPlanId, taskId) => {
     .get(`${BASE_URL}/${learningPlanId}/tasks/${taskId}/sessions`)
     .then((res) => res.data);
 };
+

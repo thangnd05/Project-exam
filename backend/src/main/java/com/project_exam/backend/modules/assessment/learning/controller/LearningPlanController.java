@@ -52,11 +52,12 @@ public class LearningPlanController {
     public ResponseEntity<CurrentSessionResponse> currentSession(
             @PathVariable String learningPlanId,
             @RequestParam(required = false) String taskId,
+            @RequestParam(required = false, defaultValue = "false") boolean includeReview,
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(learningPlanSessionService.getCurrentSession(
-                userId, learningPlanId, taskId));
+                userId, learningPlanId, taskId, includeReview));
     }
 
     @PostMapping("/{learningPlanId}/sessions/{sessionId}/submit")

@@ -12,6 +12,7 @@ function PlanStudyPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const taskIdFromUrl = searchParams.get('taskId');
+  const isReviewMode = searchParams.get('review') === 'true';
 
   const [session, setSession] = useState(null);
   const [selections, setSelections] = useState({});
@@ -19,11 +20,13 @@ function PlanStudyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const [showReview, setShowReview] = useState(false);
 
   const loadSession = useCallback((taskId) => {
     setLoading(true);
     setError(null);
     setResult(null);
+    setShowReview(false);
     getCurrentSession(learningPlanId, taskId || undefined)
       .then((data) => {
         setSession(data);
@@ -36,8 +39,31 @@ function PlanStudyPage() {
   }, [learningPlanId]);
 
   useEffect(() => {
-    loadSession(taskIdFromUrl);
-  }, [loadSession, taskIdFromUrl]);
+    if (isReviewMode && taskIdFromUrl) {
+      setLoading(true);
+      setError(null);
+      getCurrentSession(learningPlanId, taskIdFromUrl, true)
+        .then((data) => {
+          if (data.lastReviewItems) {
+            setResult({
+              reviewItems: data.lastReviewItems,
+              passed: true,
+              accuracy: 0,
+              correctCount: 0,
+              totalCount: 0,
+              message: data.message,
+            });
+            setShowReview(true);
+          } else {
+            setError('Chưa có dữ liệu giải thích cho ải này.');
+          }
+        })
+        .catch((err) => setError(err?.response?.data?.message || err.message))
+        .finally(() => setLoading(false));
+    } else {
+      loadSession(taskIdFromUrl);
+    }
+  }, [loadSession, taskIdFromUrl, isReviewMode, learningPlanId]);
 
   const goToPicker = () => {
     navigate(`/learning-plans/${learningPlanId}`);
@@ -146,28 +172,85 @@ function PlanStudyPage() {
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
 
       {result && (
-        <div className={cx('resultAlert', { passed: result.passed, failed: !result.passed })}>
-          <div className={cx('resultStats')}>
-            {result.correctCount}/{result.totalCount} đúng ({result.accuracy}%)
+        <>
+          <div className={cx('resultAlert', { passed: result.passed, failed: !result.passed })}>
+            <div className={cx('resultStats')}>
+              {result.correctCount}/{result.totalCount} đúng ({result.accuracy}%)
+            </div>
+            <div style={{ marginBottom: '1rem' }}>{result.message}</div>
+            <div className={cx('actionBar')}>
+              <button
+                type="button"
+                className={cx('btn', 'btnPrimary', 'btnSm')}
+                onClick={() => setShowReview((prev) => !prev)}
+              >
+                {showReview ? 'Ẩn đáp án' : 'Xem đáp án & giải thích'}
+              </button>
+              <button
+                type="button"
+                className={cx('btn', 'btnOutline', 'btnSm')}
+                onClick={() => loadSession(taskIdFromUrl)}
+              >
+                {result.passed ? 'Làm lại ải này' : 'Thử lại'}
+              </button>
+              <button
+                type="button"
+                className={cx('btn', 'btnGhost', 'btnSm')}
+                onClick={goToPicker}
+              >
+                Chọn ải khác
+              </button>
+            </div>
           </div>
-          <div style={{ marginBottom: '1rem' }}>{result.message}</div>
-          <div className={cx('actionBar')}>
-            <button
-              type="button"
-              className={cx('btn', 'btnPrimary', 'btnSm')}
-              onClick={() => loadSession(taskIdFromUrl)}
-            >
-              {result.passed ? 'Làm lại ải này' : 'Thử lại'}
-            </button>
-            <button
-              type="button"
-              className={cx('btn', 'btnOutline', 'btnSm')}
-              onClick={goToPicker}
-            >
-              Chọn ải khác
-            </button>
-          </div>
-        </div>
+
+          {showReview && result.reviewItems?.length > 0 && (
+            <div className={cx('reviewSection')}>
+              {result.reviewItems.map((item, idx) => {
+                const userSelected = item.selectedAnswerId;
+                return (
+                  <div
+                    key={item.questionId}
+                    className={cx('reviewItem', {
+                      reviewCorrect: item.correct,
+                      reviewWrong: !item.correct,
+                    })}
+                  >
+                    <div className={cx('reviewQuestionNo')}>
+                      Câu {idx + 1} {item.correct ? '✓' : '✗'}
+                    </div>
+                    <div className={cx('reviewQuestionText')}>{item.questionText}</div>
+                    <div className={cx('reviewAnswerList')}>
+                      {(item.answers || []).map((a) => {
+                        const isCorrectAnswer = a.answerId === item.correctAnswerId;
+                        const isUserChoice = a.answerId === userSelected;
+                        return (
+                          <div
+                            key={a.answerId}
+                            className={cx('reviewAnswerOption', {
+                              isCorrectAnswer: isCorrectAnswer,
+                              isUserWrong: isUserChoice && !isCorrectAnswer,
+                              isUserCorrect: isUserChoice && isCorrectAnswer,
+                            })}
+                          >
+                            {a.answerLabel ? `${a.answerLabel}. ` : ''}
+                            {a.answerText}
+                            {isCorrectAnswer && ' ✓'}
+                            {isUserChoice && !isCorrectAnswer && ' (Bạn chọn)'}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {item.explanation?.trim() && (
+                      <div className={cx('reviewExplanation')}>
+                        <strong>Giải thích:</strong> {item.explanation}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
 
       <div className={cx('studyLayout')}>

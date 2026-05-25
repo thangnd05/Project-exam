@@ -261,9 +261,9 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.3rem 1rem;
+  padding: 0.35rem 1rem;
   border-radius: 999px;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.04em;
   background: var(--input-bg);
@@ -1050,4 +1050,92 @@
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
   margin-bottom: 0.4rem;
+}
+
+// ----- Review questions after submit -----
+.reviewSection {
+  margin-top: 2rem;
+}
+
+.reviewToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary);
+  border: none;
+  background: none;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.reviewItem {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1rem;
+  background: var(--bg-white);
+}
+
+.reviewQuestionNo {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.reviewQuestionText {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.8rem;
+  color: var(--text-color);
+}
+
+.reviewAnswerList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
+}
+
+.reviewAnswerOption {
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  border: 1px solid transparent;
+  background: var(--input-bg);
+
+  &.isCorrectAnswer {
+    background: #d1fae5;
+    border-color: #6ee7b7;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  &.isUserWrong {
+    background: #fee2e2;
+    border-color: #fca5a5;
+  }
+
+  &.isUserCorrect {
+    background: #d1fae5;
+    border-color: #6ee7b7;
+  }
+}
+
+.reviewExplanation {
+  margin-top: 0.6rem;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fbbf24;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  white-space: pre-wrap;
 }

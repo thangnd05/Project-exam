@@ -29,4 +29,5 @@ public class CurrentSessionResponse {
     private String message;
     private List<PlanPartGroupDto> partGroups;
     private List<PlanTaskDto> tasks;
+    private List<SubmitSessionResponse.ReviewItem> lastReviewItems;
 }
