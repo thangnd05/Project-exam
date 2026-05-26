@@ -1,37 +1,45 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { IoTrashOutline, IoWarningOutline } from 'react-icons/io5';
+import ReactDOM from 'react-dom';
+import { IoTrashOutline, IoClose, IoWarningOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './ConfirmDeleteModal.module.scss';
 
 const cx = classNames.bind(styles);
 
 const ConfirmDeleteModal = ({ show, onClose, onConfirm, title, message }) => {
-    return (
-        <Modal show={show} onHide={onClose} centered className={cx('modal')}>
-            <Modal.Header closeButton className={cx('header')}>
-                <Modal.Title className={cx('title')}>
-                    <IoWarningOutline className={cx('warning-icon')} />
-                    {title || 'Xác nhận xóa'}
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body className={cx('body')}>
-                <div className={cx('content')}>
-                    <div className={cx('trash-icon-wrapper')}>
+    if (!show) return null;
+
+    return ReactDOM.createPortal(
+        <div className={cx('overlay')} onClick={onClose}>
+            <div className={cx('content')} onClick={(e) => e.stopPropagation()}>
+                <div className={cx('header')}>
+                    <div className={cx('titleWrapper')}>
+                        <IoWarningOutline />
+                        <h3 className={cx('title')}>{title || 'Xác nhận xóa'}</h3>
+                    </div>
+                    <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label="Đóng">
+                        <IoClose />
+                    </button>
+                </div>
+                <div className={cx('body')}>
+                    <div className={cx('iconCircle')}>
                         <IoTrashOutline />
                     </div>
-                    <p>{message || 'Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.'}</p>
+                    <p className={cx('message')}>
+                        {message || 'Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.'}
+                    </p>
                 </div>
-            </Modal.Body>
-            <Modal.Footer className={cx('footer')}>
-                <Button variant="light" onClick={onClose} className={cx('btn-cancel')}>
-                    Hủy bỏ
-                </Button>
-                <Button variant="danger" onClick={onConfirm} className={cx('btn-delete')}>
-                    Đồng ý xóa
-                </Button>
-            </Modal.Footer>
-        </Modal>
+                <div className={cx('footer')}>
+                    <button type="button" className={cx('btnCancel')} onClick={onClose}>
+                        Hủy bỏ
+                    </button>
+                    <button type="button" className={cx('btnDelete')} onClick={onConfirm}>
+                        Đồng ý xóa
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body,
     );
 };
 
