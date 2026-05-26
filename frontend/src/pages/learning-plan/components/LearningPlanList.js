@@ -1,6 +1,7 @@
-import React, { forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { switchPlan, deletePlan } from '~/api/learningPlanApi';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';
 import styles from '../styles/PersonalizedPlan.module.scss';
 
@@ -62,7 +63,36 @@ const LearningPlanList = forwardRef(function LearningPlanList(
     refreshKey,
   });
 
+  const [switching, setSwitching] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+
   useImperativeHandle(ref, () => ({ reload }), [reload]);
+
+  const handleSwitch = async (planId) => {
+    if (!window.confirm('Bạn muốn chuyển sang plan này?')) return;
+    setSwitching(planId);
+    try {
+      await switchPlan(planId);
+      reload();
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Lỗi khi chuyển plan');
+    } finally {
+      setSwitching(null);
+    }
+  };
+
+  const handleDelete = async (planId) => {
+    if (!window.confirm('Xóa plan này? Toàn bộ dữ liệu ải và phiên học sẽ bị mất vĩnh viễn.')) return;
+    setDeleting(planId);
+    try {
+      await deletePlan(planId);
+      reload();
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Lỗi khi xóa plan');
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   const handleFilterChange = (value) => {
     if (isControlled) {
@@ -140,6 +170,16 @@ const LearningPlanList = forwardRef(function LearningPlanList(
             </div>
           </div>
           <div className={cx('actionBar')}>
+            {p.status !== 'ACTIVE' && (
+              <button
+                type="button"
+                className={cx('btn', 'btnSuccess', 'btnSm')}
+                disabled={switching === p.learningPlanId}
+                onClick={() => handleSwitch(p.learningPlanId)}
+              >
+                {switching === p.learningPlanId ? 'Đang chuyển...' : 'Chuyển qua'}
+              </button>
+            )}
             <Link
               to={`/learning-plans/${p.learningPlanId}#chon-ai-hoc`}
               className={cx('btn', 'btnPrimary', 'btnSm')}
@@ -152,6 +192,15 @@ const LearningPlanList = forwardRef(function LearningPlanList(
             >
               Xem
             </Link>
+            <button
+              type="button"
+              className={cx('btn', 'btnDanger', 'btnSm')}
+              disabled={p.status === 'ACTIVE' || deleting === p.learningPlanId}
+              title={p.status === 'ACTIVE' ? 'Không thể xóa plan đang học' : undefined}
+              onClick={() => handleDelete(p.learningPlanId)}
+            >
+              {deleting === p.learningPlanId ? 'Đang xóa...' : 'Xóa'}
+            </button>
           </div>
         </div>
       ))}

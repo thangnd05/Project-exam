@@ -25,4 +25,6 @@ public interface LearningPlanTaskRepository extends JpaRepository<LearningPlanTa
 
     Optional<LearningPlanTask> findFirstByLearningPlanIdAndStatusOrderByTaskOrderAsc(
             String learningPlanId, TaskStatus status);
+
+    void deleteByLearningPlanId(String learningPlanId);
 }

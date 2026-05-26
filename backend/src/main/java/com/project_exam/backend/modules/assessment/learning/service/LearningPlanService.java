@@ -21,7 +21,11 @@ import com.project_exam.backend.modules.assessment.learning.support.LearningPlan
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
 import com.project_exam.backend.modules.assessment.learning.support.ReadinessThresholds;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
+import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanPhaseRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanRepository;
+import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionAnswerRepository;
+import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionQuestionRepository;
+import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanTaskRepository;
 import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
@@ -69,6 +73,10 @@ public class LearningPlanService {
     private final TestQuestionRepository testQuestionRepository;
     private final LearningPlanResourceLookup resourceLookup;
     private final UserTargetProgressService userTargetProgressService;
+    private final LearningPlanSessionRepository sessionRepository;
+    private final LearningPlanSessionQuestionRepository sessionQuestionRepository;
+    private final LearningPlanSessionAnswerRepository sessionAnswerRepository;
+    private final LearningPlanPhaseRepository phaseRepository;
 
     @Transactional
     public PlanResponse generatePlan(String userId, GeneratePlanRequest request) {
@@ -200,6 +208,43 @@ public class LearningPlanService {
                 .stream()
                 .map(p -> getPlan(userId, p.getLearningPlanId()))
                 .toList();
+    }
+
+    @Transactional
+    public PlanResponse switchPlan(String userId, String learningPlanId) {
+        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        if (plan.getStatus() == LearningPlan.Status.ACTIVE) {
+            throw new BadRequestException("Plan này đang là plan hiện tại rồi");
+        }
+        List<LearningPlan> activePlans = planRepository.findByUserIdAndExamTypeIdAndStatus(
+                userId, plan.getExamTypeId(), LearningPlan.Status.ACTIVE);
+        for (LearningPlan old : activePlans) {
+            old.setStatus(LearningPlan.Status.REPLACED);
+            old.setReplacedByPlanId(learningPlanId);
+            planRepository.save(old);
+        }
+        plan.setStatus(LearningPlan.Status.ACTIVE);
+        plan.setReplacedByPlanId(null);
+        plan = planRepository.save(plan);
+        List<LearningPlanTask> tasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId);
+        return buildPlanResponseFromEntity(plan, tasks, loadResourcesForTasks(tasks));
+    }
+
+    @Transactional
+    public void deletePlan(String userId, String learningPlanId) {
+        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        List<LearningPlanSession> sessions = sessionRepository.findByLearningPlanId(learningPlanId);
+        if (!sessions.isEmpty()) {
+            List<String> sessionIds = sessions.stream()
+                    .map(LearningPlanSession::getSessionId)
+                    .toList();
+            sessionAnswerRepository.deleteBySessionIdIn(sessionIds);
+            sessionQuestionRepository.deleteBySessionIdIn(sessionIds);
+            sessionRepository.deleteByLearningPlanId(learningPlanId);
+        }
+        phaseRepository.deleteByLearningPlanId(learningPlanId);
+        taskRepository.deleteByLearningPlanId(learningPlanId);
+        planRepository.delete(plan);
     }
 
     private List<TaskCandidate> buildTaskCandidates(

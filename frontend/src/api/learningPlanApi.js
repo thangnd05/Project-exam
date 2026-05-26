@@ -35,3 +35,11 @@ export const getTaskSessions = (learningPlanId, taskId) => {
     .then((res) => res.data);
 };
 
+export const switchPlan = (learningPlanId) => {
+  return axios.put(`${BASE_URL}/${learningPlanId}/activate`).then((res) => res.data);
+};
+
+export const deletePlan = (learningPlanId) => {
+  return axios.delete(`${BASE_URL}/${learningPlanId}`);
+};
+

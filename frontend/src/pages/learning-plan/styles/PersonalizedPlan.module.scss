@@ -88,6 +88,17 @@
   }
 }
 
+.btnDanger {
+  background: var(--danger-text);
+  color: var(--white);
+  border-color: var(--danger-text);
+
+  &:hover {
+    color: var(--white);
+    opacity: 0.92;
+  }
+}
+
 .btnOutline {
   border-color: var(--border-color);
   background: var(--bg-white);

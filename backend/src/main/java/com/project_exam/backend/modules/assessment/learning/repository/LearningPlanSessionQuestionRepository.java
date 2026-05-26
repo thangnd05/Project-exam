@@ -8,4 +8,6 @@ import java.util.List;
 public interface LearningPlanSessionQuestionRepository extends JpaRepository<LearningPlanSessionQuestion, String> {
 
     List<LearningPlanSessionQuestion> findBySessionIdOrderByDisplayOrderAsc(String sessionId);
+
+    void deleteBySessionIdIn(List<String> sessionIds);
 }

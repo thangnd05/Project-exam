@@ -48,6 +48,25 @@ public class LearningPlanController {
         return ResponseEntity.ok(learningPlanService.listPlans(userId, examTypeId));
     }
 
+    @PutMapping("/{learningPlanId}/activate")
+    public ResponseEntity<PlanResponse> switchPlan(
+            @PathVariable String learningPlanId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(learningPlanService.switchPlan(userId, learningPlanId));
+    }
+
+    @DeleteMapping("/{learningPlanId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable String learningPlanId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        learningPlanService.deletePlan(userId, learningPlanId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{learningPlanId}/current-session")
     public ResponseEntity<CurrentSessionResponse> currentSession(
             @PathVariable String learningPlanId,
