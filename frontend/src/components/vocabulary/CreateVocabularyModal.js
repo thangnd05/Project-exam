@@ -24,7 +24,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
 
     const handleSave = async (e) => {
         if (!newVocab.word.trim() || !newVocab.meaning.trim()) {
-            toast.warning('⚠️ Vui lòng điền đầy đủ từ vựng và nghĩa!');
+            toast.warning(' Vui lòng điền đầy đủ từ vựng và nghĩa!');
             return;
         }
 

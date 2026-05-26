@@ -32,7 +32,7 @@ function CreateClassModal({ show, onClose }) {
     // 🟢 Check login
     if (!user) {
       setType('warning');
-      setMessage('⚠️ Bạn cần đăng nhập trước khi tạo lớp!');
+      setMessage(' Bạn cần đăng nhập trước khi tạo lớp!');
 
       setTimeout(() => {
         onClose();
@@ -45,7 +45,7 @@ function CreateClassModal({ show, onClose }) {
     // 🟡 Validate input
     if (!className.trim()) {
       setType('danger');
-      setMessage('⚠️ Vui lòng nhập tên lớp học!');
+      setMessage(' Vui lòng nhập tên lớp học!');
       return;
     }
 

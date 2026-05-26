@@ -45,7 +45,7 @@ function Header() {
     const handleClassAction = (e, targetRoute, modalType = null) => {
       e.preventDefault();
       if (!user) {
-        alert('⚠️ Bạn cần đăng nhập để thao tác lớp học!');
+        alert(' Bạn cần đăng nhập để thao tác lớp học!');
         navigate(routes.login);
         isMobile && handleClose();
         return;

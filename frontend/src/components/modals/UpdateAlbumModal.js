@@ -24,7 +24,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
 
     const handleUpdate = async () => {
         if (!name.trim()) {
-            toast.warning("⚠️ Vui lòng nhập tên Album!");
+            toast.warning(" Vui lòng nhập tên Album!");
             return;
         }
 

@@ -92,7 +92,7 @@ const Evaluation = () => {
 
   const handleWriteReviewClick = () => {
     if (!user) {
-      toast.warning('⚠️ Bạn cần đăng nhập để gửi đánh giá!');
+      toast.warning(' Bạn cần đăng nhập để gửi đánh giá!');
       navigate(routes.login);
       return;
     }

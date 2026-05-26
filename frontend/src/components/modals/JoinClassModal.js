@@ -30,7 +30,7 @@ function JoinClassModal({ show, onClose }) {
         // 🟢 Check login
         if (!user) {
             setType("warning");
-            setMessage("⚠️ Bạn cần đăng nhập trước khi tham gia lớp!");
+            setMessage(" Bạn cần đăng nhập trước khi tham gia lớp!");
 
             setTimeout(() => {
                 onClose();

@@ -95,7 +95,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
 
   const handleSubmit = async () => {
     if (!user) {
-      toast.warning('⚠️ Bạn cần đăng nhập trước khi đăng bài viết!');
+      toast.warning(' Bạn cần đăng nhập trước khi đăng bài viết!');
       setTimeout(() => {
         onClose();
         navigate(routes.login);
@@ -104,7 +104,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
     }
 
     if (!title.trim() || !content.trim() || !categoryId) {
-      toast.warning('⚠️ Vui lòng điền đầy đủ tiêu đề, nội dung và chọn danh mục!');
+      toast.warning(' Vui lòng điền đầy đủ tiêu đề, nội dung và chọn danh mục!');
       return;
     }
 

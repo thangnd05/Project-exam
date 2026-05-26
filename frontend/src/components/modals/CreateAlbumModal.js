@@ -16,7 +16,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
 
     const handleCreate = async () => {
         if (!name.trim()) {
-            toast.warning("⚠️ Vui lòng nhập tên Album!");
+            toast.warning(" Vui lòng nhập tên Album!");
             return;
         }
 

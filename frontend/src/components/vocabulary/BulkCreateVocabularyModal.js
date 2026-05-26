@@ -16,7 +16,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
 
     const handleStandardize = async () => {
         if (!jsonInput.trim()) {
-            toast.warning('⚠️ Vui lòng nhập văn bản thô để chuẩn hóa!');
+            toast.warning(' Vui lòng nhập văn bản thô để chuẩn hóa!');
             return;
         }
 
@@ -60,7 +60,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
         e.preventDefault();
 
         if (!jsonInput.trim()) {
-            toast.warning('⚠️ Vui lòng nhập dữ liệu JSON!');
+            toast.warning(' Vui lòng nhập dữ liệu JSON!');
             return;
         }
 

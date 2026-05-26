@@ -34,7 +34,7 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }) => {
 
     const handleUpdate = async (e) => {
         if (!editVocab.word.trim() || !editVocab.meaning.trim()) {
-            toast.warning('⚠️ Vui lòng điền đầy đủ từ vựng và nghĩa!');
+            toast.warning(' Vui lòng điền đầy đủ từ vựng và nghĩa!');
             return;
         }
 

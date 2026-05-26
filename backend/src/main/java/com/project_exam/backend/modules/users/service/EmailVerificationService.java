@@ -54,7 +54,7 @@ public class EmailVerificationService {
             emailUtil.sendVerificationEmail(user.getEmail(), token);
 
         } catch (Exception e) {
-            // ⚠️ Nếu gửi email lỗi, xóa luôn user + token vừa tạo
+            //  Nếu gửi email lỗi, xóa luôn user + token vừa tạo
             emailVerificationRepository.deleteByUserId(user.getUserId());
             userRepository.deleteById(user.getUserId());
             throw new BadRequestException("Không thể gửi email xác thực. Vui lòng kiểm tra địa chỉ email.");
