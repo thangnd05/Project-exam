@@ -1,7 +1,9 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { IoSwapHorizontalOutline } from 'react-icons/io5';
 import { switchPlan, deletePlan } from '~/api/learningPlanApi';
+import ConfirmActionModal from '~/components/modals/ConfirmActionModal';
 import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';
 import styles from '../styles/PersonalizedPlan.module.scss';
@@ -65,13 +67,16 @@ const LearningPlanList = forwardRef(function LearningPlanList(
   });
 
   const [switching, setSwitching] = useState(null);
+  const [switchTarget, setSwitchTarget] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   useImperativeHandle(ref, () => ({ reload }), [reload]);
 
-  const handleSwitch = async (planId) => {
-    if (!window.confirm('Bạn muốn chuyển sang plan này?')) return;
+  const handleSwitchConfirm = useCallback(async () => {
+    if (!switchTarget) return;
+    const planId = switchTarget.learningPlanId;
+    setSwitchTarget(null);
     setSwitching(planId);
     try {
       await switchPlan(planId);
@@ -81,7 +86,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
     } finally {
       setSwitching(null);
     }
-  };
+  }, [switchTarget, reload]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteTarget) return;
@@ -179,7 +184,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
                 type="button"
                 className={cx('btn', 'btnSuccess', 'btnSm')}
                 disabled={switching === p.learningPlanId}
-                onClick={() => handleSwitch(p.learningPlanId)}
+                onClick={() => setSwitchTarget(p)}
               >
                 {switching === p.learningPlanId ? 'Đang chuyển...' : 'Đổi kế hoạch'}
               </button>
@@ -211,18 +216,33 @@ const LearningPlanList = forwardRef(function LearningPlanList(
     </>
   );
 
-  const confirmModal = (
-    <ConfirmDeleteModal
-      show={Boolean(deleteTarget)}
-      onClose={() => setDeleteTarget(null)}
-      onConfirm={handleDeleteConfirm}
-      title="Xác nhận xóa lộ trình"
-      message={
-        deleteTarget
-          ? `Bạn có chắc muốn xóa Plan #${deleteTarget.planSequence ?? '?'}? Toàn bộ dữ liệu ải và phiên học sẽ bị mất vĩnh viễn.`
-          : ''
-      }
-    />
+  const confirmModals = (
+    <>
+      <ConfirmActionModal
+        show={Boolean(switchTarget)}
+        onClose={() => setSwitchTarget(null)}
+        onConfirm={handleSwitchConfirm}
+        title="Đổi kế hoạch học"
+        icon={IoSwapHorizontalOutline}
+        confirmText="Đồng ý chuyển"
+        message={
+          switchTarget
+            ? `Chuyển sang Plan #${switchTarget.planSequence ?? '?'}? Plan đang học hiện tại sẽ được lưu lại với trạng thái "Đã thay".`
+            : ''
+        }
+      />
+      <ConfirmDeleteModal
+        show={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        title="Xác nhận xóa lộ trình"
+        message={
+          deleteTarget
+            ? `Bạn có chắc muốn xóa Plan #${deleteTarget.planSequence ?? '?'}? Toàn bộ dữ liệu ải và phiên học sẽ bị mất vĩnh viễn.`
+            : ''
+        }
+      />
+    </>
   );
 
   if (!wrapInCard) {
@@ -232,7 +252,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
           <h3 className={cx('sectionTitle')}>{title}</h3>
         )}
         {listBody}
-        {confirmModal}
+        {confirmModals}
       </div>
     );
   }
@@ -270,9 +290,10 @@ const LearningPlanList = forwardRef(function LearningPlanList(
         </div>
       )}
       <div className={cx('cardBody')}>{listBody}</div>
-      {confirmModal}
+      {confirmModals}
     </section>
   );
 });
 
 export default LearningPlanList;
+
