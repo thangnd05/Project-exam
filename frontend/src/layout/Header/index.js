@@ -15,7 +15,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import images from '~/assets/images';
 import classNames from 'classnames/bind';
 // import Search from '../Search';
-import {useAuth} from '../../hook/useAuth';
+import {useAuth} from '../../hooks/useAuth';
 import {name} from '~/assets/images';
 import routes from '~/config/Routes';
 import {faBars} from '@fortawesome/free-solid-svg-icons';

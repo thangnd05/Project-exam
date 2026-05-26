@@ -22,7 +22,7 @@ import {
   IoChevronUpOutline,
   IoCreateOutline,
 } from 'react-icons/io5';
-import { useBaseMetaData } from '~/hook/useBaseMetaData';
+import { useBaseMetaData } from '~/hooks/useBaseMetaData';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
 import { getExamCategories } from '~/api/examCategoryApi';

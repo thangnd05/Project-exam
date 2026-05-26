@@ -3,7 +3,7 @@ import { Alert } from "react-bootstrap";
 import axios from '../../api/axiosClient';
 import classNames from "classnames/bind";
 import { FaUsers, FaKey, FaInfoCircle } from "react-icons/fa";
-import { useAuth } from "~/hook/useAuth";
+import { useAuth } from "~/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import routes from "~/config/Routes";
 import CommonFormModal from "~/components/common/modal/CommonFormModal";

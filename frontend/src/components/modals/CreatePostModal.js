@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import axios from '../../api/axiosClient';
 import classNames from 'classnames/bind';
 import { FaPenNib, FaEdit, FaImage, FaTag } from 'react-icons/fa';
-import { useAuth } from '~/hook/useAuth';
+import { useAuth } from '~/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import routes from '~/config/Routes';
 import ReactQuill from 'react-quill';

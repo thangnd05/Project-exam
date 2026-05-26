@@ -2,7 +2,7 @@ import React from 'react';
 import { IoRocketOutline, IoMusicalNotesOutline, IoLayersOutline, IoLibraryOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from '../modals/CreateTestModal.module.scss';
-import { CREATOR_TYPES } from '~/hook/useCreateTest';
+import { CREATOR_TYPES } from '~/hooks/useCreateTest';
 
 const cx = classNames.bind(styles);
 

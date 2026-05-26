@@ -4,7 +4,7 @@ import {useLocation} from 'react-router-dom';
 import styles from './DefaultLayout.module.scss';
 import Header from '../Header';
 import Footer from '../Footer';
-import ScrollToTop from '../SconllToTop';
+import ScrollToTop from '../ScrollToTop';
 import BackgroundDecor from '~/components/common/BackgroundDecor';
 
 const cx = classNames.bind(styles);

@@ -6,7 +6,7 @@ import classNames from 'classnames/bind';
 import { FaBullseye } from 'react-icons/fa';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import routes from '~/config/Routes';
-import { useAuth } from '../../../../hook/useAuth';
+import { useAuth } from '../../../../hooks/useAuth';
 
 import style from './TestByExamTypePage.module.scss';
 import TestListContainer from '~/components/common/TestListContainer/TestListContainer';

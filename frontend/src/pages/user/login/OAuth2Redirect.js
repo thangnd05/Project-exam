@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../hook/useAuth';
+import { useAuth } from '../../../hooks/useAuth';
 import axios from '../../../api/axiosClient';
 
 function OAuth2Redirect() {

@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import style from './ExamTypeStyle.module.scss';
 import {FaBookOpen, FaBullseye, FaGlobe, FaCertificate, FaGraduationCap, FaLayerGroup} from 'react-icons/fa';
-import {useAuth} from '../../../hook/useAuth';
+import {useAuth} from '../../../hooks/useAuth';
 import routes from '~/config/Routes';
 
 const cx = classNames.bind(style);

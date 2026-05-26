@@ -12,7 +12,7 @@ import {
   IoSchoolOutline,
   IoTrashOutline,
 } from 'react-icons/io5';
-import {useBaseMetaData} from '~/hook/useBaseMetaData';
+import {useBaseMetaData} from '~/hooks/useBaseMetaData';
 import EditQuestionModal from '~/components/modals/EditQuestionModal';
 import ViewQuestionModal from '~/components/modals/ViewQuestionModal';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';

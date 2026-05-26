@@ -10,7 +10,7 @@ import {
 } from 'react-icons/io5';
 
 import styles from './MyTestPage.module.scss';
-import { useAuth } from '../../hook/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import CreateTestModal from '~/components/modals/CreateTestModal';
 import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
 import TestListContainer from '~/components/common/TestListContainer/TestListContainer';

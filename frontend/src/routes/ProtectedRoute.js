@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import axios from '../api/axiosClient';
 import {Navigate, useLocation} from 'react-router-dom';
 import routes from '~/config/Routes';
-import {useAuth} from '../hook/useAuth';
+import {useAuth} from '../hooks/useAuth';
 
 function ProtectedRoute({children, requiredRoleName, allowGuest = false}) {
   const {isAuthenticated, loading, roleId} = useAuth();

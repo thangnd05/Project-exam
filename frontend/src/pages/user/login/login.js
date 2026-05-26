@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../../api/axiosClient';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../../../hook/useAuth';
+import { useAuth } from '../../../hooks/useAuth';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import { FaFacebook } from "react-icons/fa";

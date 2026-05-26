@@ -18,7 +18,7 @@ import { Trash, PlusCircle } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { useCreateTest, CREATOR_TYPES } from '~/hook/useCreateTest';
+import { useCreateTest, CREATOR_TYPES } from '~/hooks/useCreateTest';
 import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';

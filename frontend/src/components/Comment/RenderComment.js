@@ -6,7 +6,7 @@ import classNames from 'classnames/bind';
 import ReactQuill from 'react-quill';
 import DOMPurify from 'dompurify';
 
-import style from '../../Layout/comment/comment.module.scss';
+import style from '../../layout/comment/comment.module.scss';
 import "react-quill/dist/quill.snow.css";
 
 const cx = classNames.bind(style);

@@ -8,7 +8,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import axios from '../../api/axiosClient';
 import {toast} from 'react-toastify';
-import {useAuth} from '~/hook/useAuth';
+import {useAuth} from '~/hooks/useAuth';
 import {useNavigate} from 'react-router-dom';
 import routes from '~/config/Routes';
 import EvaluationModal from '~/components/modals/EvaluationModal';

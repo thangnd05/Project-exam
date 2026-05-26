@@ -7,7 +7,7 @@ import {
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { useAuth } from '~/hook/useAuth';
+import { useAuth } from '~/hooks/useAuth';
 import routes from '~/config/Routes';
 import styles from './PostDetailPage.module.scss';
 import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, toggleReact, toggleSavePost } from '~/api/postApi';

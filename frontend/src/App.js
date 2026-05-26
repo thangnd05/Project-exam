@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import DefaultLayout from './Layout/DefaultLayout';
+import DefaultLayout from './layout/DefaultLayout';
 import { publicRoutes, privateRoutes, adminRoutes } from './routes';
 import ProtectedRoute from './routes/ProtectedRoute';
-import AdminLayout from './Admin/layouts/AdminLayout';
+import AdminLayout from './admin/layouts/AdminLayout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from '~/context/AuthContext';
-import ScrollHandler from './Layout/ScrollToTopOnRouteChange';
+import ScrollHandler from './layout/ScrollToTopOnRouteChange';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ScrollProgressBar from '~/components/common/ScrollProgressBar';
