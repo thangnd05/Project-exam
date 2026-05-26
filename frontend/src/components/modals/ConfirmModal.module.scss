@@ -38,7 +38,7 @@
         align-items: center;
         gap: 12px;
 
-        svg {
+        .headerIcon {
             color: #fff;
             font-size: 2.4rem;
         }
@@ -84,14 +84,32 @@
     .iconCircle {
         width: 80px;
         height: 80px;
-        background: #fef2f2;
-        color: #ef4444;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 3.2rem;
         animation: pulse 2s ease-in-out infinite;
+
+        &.primary {
+            background: #dbeafe;
+            color: #0f6bdc;
+        }
+
+        &.danger {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        &.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        &.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
     }
 
     .message {
@@ -108,7 +126,7 @@
     gap: 12px;
 
     .btnCancel,
-    .btnDelete {
+    .btnConfirm {
         flex: 1;
         padding: 14px;
         font-weight: 700;
@@ -132,15 +150,50 @@
         }
     }
 
-    .btnDelete {
-        background: #ef4444;
+    .btnConfirm {
         color: #fff;
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 
-        &:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        &.primary {
+            background: linear-gradient(135deg, #0f6bdc 0%, #19b5fe 100%);
+            box-shadow: 0 4px 15px rgba(15, 107, 220, 0.3);
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(15, 107, 220, 0.4);
+            }
+        }
+
+        &.danger {
+            background: #ef4444;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+
+            &:hover {
+                background: #dc2626;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        &.warning {
+            background: #d97706;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+
+            &:hover {
+                background: #b45309;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(217, 119, 6, 0.4);
+            }
+        }
+
+        &.success {
+            background: #16a34a;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+
+            &:hover {
+                background: #15803d;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(22, 163, 74, 0.4);
+            }
         }
     }
 }
