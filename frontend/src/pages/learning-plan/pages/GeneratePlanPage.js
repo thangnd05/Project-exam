@@ -103,12 +103,12 @@ function GeneratePlanPage() {
   const testFormLocked = !sourceExamTypeId || loadingTarget || !hasTarget;
 
   useEffect(() => {
-    if (!userTestId) return;
+    if (!userTestId || loadingList) return;
     const stillVisible = filteredUserTests.some((t) => t.userTestId === userTestId);
     if (!stillVisible) {
       setUserTestId('');
     }
-  }, [sourceExamTypeId, filteredUserTests, userTestId]);
+  }, [sourceExamTypeId, filteredUserTests, userTestId, loadingList]);
 
   const selectedTest = useMemo(
     () => userTests.find((t) => t.userTestId === userTestId),

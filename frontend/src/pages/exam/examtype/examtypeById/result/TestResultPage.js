@@ -402,10 +402,12 @@ const TestResultPage = () => {
                   <IoSchoolOutline /> Lịch sử bài thi
                 </button>
 
-                {!isGuest && (
+                {!isGuest && (enhanced?.examCategoryCode === 'QUICK_CHALLENGE' || enhanced?.examCategoryCode === 'FULL_MOCK') && (
                   <button
                     className={cx("btn-review")}
-                    onClick={() => navigate(`/learning-plans/generate?userTestId=${userTestId}`)}
+                    onClick={() => navigate(
+                      `/learning-plans/generate?userTestId=${userTestId}${enhanced?.examTypeId ? `&examTypeId=${enhanced.examTypeId}` : ''}`
+                    )}
                   >
                     <IoSchoolOutline /> Tạo kế hoạch học
                   </button>
