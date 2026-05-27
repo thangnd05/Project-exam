@@ -19,9 +19,9 @@ import {useAuth} from '../../hooks/useAuth';
 import {name} from '~/assets/images';
 import routes from '~/config/Routes';
 import {faBars} from '@fortawesome/free-solid-svg-icons';
-import JoinClassModal from '~/components/modals/JoinClassModal';
-import CreateClassModal from '~/components/modals/CreateClassModal';
-import CreateTestModal from '~/components/modals/CreateTestModal';
+import JoinClassModal from '~/pages/myclass/modals/JoinClassModal';
+import CreateClassModal from '~/pages/myclass/modals/CreateClassModal';
+import CreateTestModal from '~/components/test/CreateTestModal';
 
 const cx = classNames.bind(style);
 

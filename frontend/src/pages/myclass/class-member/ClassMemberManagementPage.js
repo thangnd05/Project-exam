@@ -18,7 +18,7 @@ import {
 import { Spinner, Badge, Table, Tabs, Tab } from 'react-bootstrap';
 
 import styles from './ClassMemberManagementPage.module.scss';
-import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 
 const cx = classNames.bind(styles);
 

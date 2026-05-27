@@ -11,7 +11,7 @@ import {toast} from 'react-toastify';
 import {useAuth} from '~/hooks/useAuth';
 import {useNavigate} from 'react-router-dom';
 import routes from '~/config/Routes';
-import EvaluationModal from '~/components/modals/EvaluationModal';
+import EvaluationModal from './modals/EvaluationModal';
 
 const cx = classNames.bind(styles);
 

@@ -9,10 +9,10 @@ import {
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
-import CreateVocabularyModal from '~/components/vocabulary/CreateVocabularyModal';
-import BulkCreateVocabularyModal from '~/components/vocabulary/BulkCreateVocabularyModal';
-import UpdateVocabularyModal from '~/components/vocabulary/UpdateVocabularyModal';
-import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
+import CreateVocabularyModal from './modals/CreateVocabularyModal';
+import BulkCreateVocabularyModal from './modals/BulkCreateVocabularyModal';
+import UpdateVocabularyModal from './modals/UpdateVocabularyModal';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import classNames from 'classnames/bind';
 import {
   IoArrowBack,

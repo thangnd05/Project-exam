@@ -13,8 +13,8 @@ import {
   IoTrashOutline,
 } from 'react-icons/io5';
 import {useBaseMetaData} from '~/hooks/useBaseMetaData';
-import EditQuestionModal from '~/components/modals/EditQuestionModal';
-import ViewQuestionModal from '~/components/modals/ViewQuestionModal';
+import EditQuestionModal from './modals/EditQuestionModal';
+import ViewQuestionModal from './modals/ViewQuestionModal';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import styles from './PersonalQuestionBankPage.module.scss';
 

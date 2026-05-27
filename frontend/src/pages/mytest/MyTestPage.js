@@ -11,9 +11,9 @@ import {
 
 import styles from './MyTestPage.module.scss';
 import { useAuth } from '../../hooks/useAuth';
-import CreateTestModal from '~/components/modals/CreateTestModal';
-import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
-import TestListContainer from '~/components/common/TestListContainer/TestListContainer';
+import CreateTestModal from '~/components/test/CreateTestModal';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
+import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
 
 const cx = classNames.bind(styles);
 

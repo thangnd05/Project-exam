@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, ArrowRight, Plus, Info } from 'lucide-react';
 import { getPosts, getCategories } from '~/api/postApi';
 import routes from '~/config/Routes';
-import CreatePostModal from '~/components/modals/CreatePostModal';
+import CreatePostModal from './modals/CreatePostModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);

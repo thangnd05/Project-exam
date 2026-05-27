@@ -9,8 +9,8 @@ import {
   getExamCategories,
   updateExamCategory,
 } from '../../api/examCategoryApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
-import ExamCategoryFormModal from '../../components/modals/ExamCategoryFormModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ExamCategoryFormModal from '../modals/ExamCategoryFormModal';
 import styles from './ExamTypes.module.scss';
 
 const cx = classNames.bind(styles);

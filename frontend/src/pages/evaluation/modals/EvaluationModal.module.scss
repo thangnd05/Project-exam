@@ -1,0 +1,226 @@
+@import '../../../components/GlobalStyles/GlobalStyles.module.scss';
+
+/* --- MODAL (POPUP) --- */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 10001;
+    /* Higher than Header (1000) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+    background: #ffffff;
+    width: 90%;
+    max-width: 550px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.header {
+    background: #fff;
+    padding: 24px 30px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .titleWrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        svg {
+            color: var(--accent-color, #0061f2);
+            font-size: 2rem;
+        }
+
+        .title {
+            font-size: 2.22rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0 !important;
+            letter-spacing: -0.5px;
+        }
+    }
+
+    .closeBtn {
+        background: #f1f5f9;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            transform: rotate(90deg);
+        }
+    }
+}
+
+.body {
+    padding: 30px;
+
+    .formGroup {
+        margin-bottom: 24px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .label {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 10px;
+            display: block;
+        }
+    }
+
+    .ratingSelect {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        padding: 12px 20px;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+
+        .starActive,
+        .starInactive {
+            font-size: 2.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .starActive {
+            color: #fbbf24;
+        }
+
+        .starInactive {
+            color: #cbd5e0;
+        }
+
+        .starActive:hover,
+        .starInactive:hover {
+            transform: scale(1.2);
+        }
+
+        .ratingText {
+            margin-left: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+    }
+
+    .inputControl {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        font-size: 1.5rem;
+        font-family: var(--font-family, sans-serif);
+        color: #1e293b;
+        background: #f8fafc;
+        transition: all 0.3s;
+        resize: none;
+
+        &:focus {
+            outline: none;
+            border-color: var(--accent-color, #0061f2);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+        }
+    }
+
+    .tip {
+        margin-top: 12px;
+        font-size: 1.3rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        svg {
+            color: #fbbf24;
+        }
+    }
+}
+
+.footer {
+    padding: 0 30px 30px;
+    border: none;
+    display: flex;
+    gap: 12px;
+
+    .btnCancel,
+    .btnSubmit {
+        flex: 1;
+        padding: 14px;
+        border-radius: 14px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btnCancel {
+        background: #f1f5f9;
+        color: #64748b;
+
+        &:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+    }
+
+    .btnSubmit {
+        background: var(--accent-color, #0061f2);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(0, 97, 242, 0.3);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 97, 242, 0.4);
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

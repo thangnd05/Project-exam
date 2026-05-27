@@ -33,8 +33,8 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import ChangePasswordModal from '~/components/modals/ChangePasswordModal';
-import UpdateProfileModal from '~/components/modals/UpdateProfileModal';
+import ChangePasswordModal from './modals/ChangePasswordModal';
+import UpdateProfileModal from './modals/UpdateProfileModal';
 import styles from './ProfileOverviewPage.module.scss';
 import routes from '~/config/Routes';
 

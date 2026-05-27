@@ -15,7 +15,7 @@ import {
 
 import {getRoles} from '../../api/roleApi';
 import {deleteUser, getUsers} from '../../api/userApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './Users.module.scss';
 
 const cx = classNames.bind(styles);

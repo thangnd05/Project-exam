@@ -168,7 +168,7 @@ public class QuestionService {
             return Collections.emptyMap();
         }
 
-        // 🚀 TỐI ƯU: Chỉ 1 câu Query duy nhất cho tất cả Passage
+        //  TỐI ƯU: Chỉ 1 câu Query duy nhất cho tất cả Passage
         List<PassageMedia> allMedia = passageMediaRepository.findByPassageIdIn(passageIds);
 
         // Dùng Stream API để nhóm (groupingBy) media theo passageId ngay trên RAM

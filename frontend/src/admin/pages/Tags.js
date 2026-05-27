@@ -11,8 +11,8 @@ import {
   updateTag,
   deleteTag,
 } from '../../api/tagApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
-import TagFormModal from '../../components/modals/TagFormModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import TagFormModal from '../modals/TagFormModal';
 import styles from './Tags.module.scss';
 
 const cx = classNames.bind(styles);

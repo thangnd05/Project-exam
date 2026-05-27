@@ -11,8 +11,8 @@ import {
   updateResource,
   deleteResource,
 } from '../../api/recoveryResourceApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
-import RecoveryResourceFormModal from '../../components/modals/RecoveryResourceFormModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
 import styles from './RecoveryResources.module.scss';
 
 const cx = classNames.bind(styles);

@@ -12,7 +12,7 @@ import {
   getScoringConversionsBySkill,
 } from '../../api/scoringConversionApi';
 import {getSkills} from '../../api/skillApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './ScoringConversion.module.scss';
 
 const cx = classNames.bind(styles);

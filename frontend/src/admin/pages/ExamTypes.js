@@ -9,8 +9,8 @@ import {
   getExamTypes,
   updateExamType,
 } from '../../api/examTypeApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
-import ExamTypeFormModal from '../../components/modals/ExamTypeFormModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ExamTypeFormModal from '../modals/ExamTypeFormModal';
 import styles from './ExamTypes.module.scss';
 
 const cx = classNames.bind(styles);

@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.assessment.test.dto;
 import lombok.*;
 
 @Getter
-@Setter // 🚀 Thêm Setter để BE có thể gán lại nhãn A, B, C, D
+@Setter //  Thêm Setter để BE có thể gán lại nhãn A, B, C, D
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor // Thêm để hỗ trợ các thư viện mapping nếu cần

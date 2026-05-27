@@ -6,7 +6,7 @@ import {Edit, Plus, Search, Trash2} from 'lucide-react';
 import {createExamPart, deleteExamPart, getExamParts, updateExamPart} from '../../api/examPartApi';
 import {getExamTypes} from '../../api/examTypeApi';
 import {getSkills} from '../../api/skillApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './ExamParts.module.scss';
 
 const cx = classNames.bind(styles);

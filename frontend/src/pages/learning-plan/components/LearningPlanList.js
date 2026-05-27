@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
 import { switchPlan, deletePlan } from '~/api/learningPlanApi';
-import ConfirmActionModal from '~/components/modals/ConfirmActionModal';
-import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
+import ConfirmActionModal from '~/components/common/modal/ConfirmActionModal';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';
 import styles from '../styles/PersonalizedPlan.module.scss';
 

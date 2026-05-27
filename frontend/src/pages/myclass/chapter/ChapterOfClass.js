@@ -15,12 +15,12 @@ import {
 } from 'react-icons/io5';
 
 import styles from './ChapterOfClass.module.scss';
-import CreateChapterModal from '~/components/modals/CreateChapterModal';
-import UpdateChapterModal from '~/components/modals/UpdateChapterModal';
-import ConfirmDeleteModal from '~/components/modals/ConfirmDeleteModal';
+import CreateChapterModal from '../modals/CreateChapterModal';
+import UpdateChapterModal from '../modals/UpdateChapterModal';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import PageHeaderViewToggle from '~/components/common/PageHeader/PageHeaderViewToggle';
-import ChapterManagementTable from '~/components/common/ChapterManagementTable/ChapterManagementTable';
+import ChapterManagementTable from '../components/ChapterManagementTable/ChapterManagementTable';
 import routes from '~/config/Routes';
 
 const cx = classNames.bind(styles);

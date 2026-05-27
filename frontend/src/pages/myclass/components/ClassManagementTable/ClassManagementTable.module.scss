@@ -1,0 +1,134 @@
+@import '../../../../components/GlobalStyles/GlobalStyles.module.scss';
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.management-table {
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid #f1f5f9;
+  margin-bottom: 0;
+
+  thead {
+    background: #f8fafc;
+
+    th {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--dark-color);
+      padding: 16px 20px;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background 0.2s;
+
+      &:hover {
+        background: #f8fafc;
+      }
+
+      td {
+        font-size: 1.4rem;
+        padding: 16px 20px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+      }
+    }
+  }
+}
+
+.class-name {
+  min-width: 200px;
+
+  strong {
+    color: var(--dark-color);
+    font-weight: 700;
+  }
+}
+
+.class-role {
+  min-width: 120px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+
+    &.teaching {
+      background: rgba(79, 70, 229, 0.1);
+      color: #4f46e5;
+    }
+
+    &.learning {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+    }
+  }
+}
+
+.class-id {
+  font-family: 'Inter', monospace;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-action {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+
+  svg {
+    font-size: 2rem;
+  }
+
+  &.edit {
+    color: #0284c7;
+
+    &:hover {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+  }
+
+  &.delete {
+    color: #dc2626;
+
+    &:hover {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+  }
+
+  &.manage {
+    color: #16a34a;
+
+    &:hover {
+      background: #dcfce7;
+      color: #15803d;
+    }
+  }
+}

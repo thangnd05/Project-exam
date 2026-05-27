@@ -9,7 +9,7 @@ import routes from '~/config/Routes';
 import { useAuth } from '../../../../hooks/useAuth';
 
 import style from './TestByExamTypePage.module.scss';
-import TestListContainer from '~/components/common/TestListContainer/TestListContainer';
+import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
 
 const cx = classNames.bind(style);
 

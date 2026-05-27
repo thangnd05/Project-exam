@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
 import {createRole, deleteRole, getRoles, updateRole} from '../../api/roleApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './Roles.module.scss';
 
 const cx = classNames.bind(styles);

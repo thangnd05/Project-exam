@@ -9,7 +9,7 @@ import {
   getEvaluations,
   updateEvaluation,
 } from '../../api/evaluationApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './Evaluations.module.scss';
 
 const cx = classNames.bind(styles);

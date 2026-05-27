@@ -15,9 +15,9 @@ import {
 import { AuthContext } from "~/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/utils/guestSession";
 import { getEnhancedResult, getGuestEnhancedResult } from "~/api/enhancedResultApi";
-import SkillBreakdownChart from "~/components/result/SkillBreakdownChart";
-import ReadinessGauge from "~/components/result/ReadinessGauge";
-import RecoveryPlan from "~/components/result/RecoveryPlan";
+import SkillBreakdownChart from "./components/SkillBreakdownChart";
+import ReadinessGauge from "./components/ReadinessGauge";
+import RecoveryPlan from "./components/RecoveryPlan";
 import styles from "./TestResultPage.module.scss";
 
 const cx = classNames.bind(styles);

@@ -18,7 +18,7 @@ import {
 } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { getMyPosts, deletePost, getCategories, getPostById } from '~/api/postApi';
-import CreatePostModal from '~/components/modals/CreatePostModal';
+import CreatePostModal from '~/pages/posts/modals/CreatePostModal';
 import routes from '~/config/Routes';
 import styles from './PostsListPage.module.scss';
 

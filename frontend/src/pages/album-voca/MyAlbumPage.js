@@ -10,12 +10,12 @@ import { FaBook } from "react-icons/fa";
 
 import styles from './MyAlbumPage.module.scss';
 
-import CreateAlbumModal from '../../components/modals/CreateAlbumModal';
-import UpdateAlbumModal from '../../components/modals/UpdateAlbumModal';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import CreateAlbumModal from './modals/CreateAlbumModal';
+import UpdateAlbumModal from './modals/UpdateAlbumModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import PageHeader from '../../components/common/PageHeader/PageHeader';
 import PageHeaderViewToggle from '../../components/common/PageHeader/PageHeaderViewToggle';
-import AlbumManagementTable from '../../components/common/AlbumManagementTable/AlbumManagementTable';
+import AlbumManagementTable from './components/AlbumManagementTable/AlbumManagementTable';
 
 const cx = classNames.bind(styles);
 

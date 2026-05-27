@@ -7,9 +7,9 @@ import classNames from 'classnames/bind';
 
 import styles from './MyClassPage.module.scss';
 import routes from '../../config/Routes';
-import ClassListContainer from '../../components/common/ClassListContainer/ClassListContainer';
-import EditClassModal from '../../components/modals/EditClassModal';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import ClassListContainer from './components/ClassListContainer/ClassListContainer';
+import EditClassModal from './modals/EditClassModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 
 const cx = classNames.bind(styles);
 

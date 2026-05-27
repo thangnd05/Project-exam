@@ -13,7 +13,7 @@ import {
   getMilestones,
   updateMilestone,
 } from '../../api/milestoneApi';
-import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './Milestones.module.scss';
 
 const cx = classNames.bind(styles);

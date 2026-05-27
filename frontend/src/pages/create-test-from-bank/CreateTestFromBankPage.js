@@ -24,7 +24,7 @@ import {
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hooks/useBaseMetaData';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
-import EditQuestionModal from '~/components/modals/EditQuestionModal';
+import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
 import { getExamCategories } from '~/api/examCategoryApi';
 import styles from './CreateTestFromBankPage.module.scss';
 
