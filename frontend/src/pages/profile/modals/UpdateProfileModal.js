@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from '~/api/axiosClient';
+import { getMyInfo, updateUser } from '~/api/userApi';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoPersonCircleOutline, IoCameraOutline } from 'react-icons/io5';
@@ -38,8 +38,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
   const fetchUserInfo = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/users/me/info-user');
-      const data = response.data;
+      const data = await getMyInfo();
       if (data) {
         setUserInfo(data);
         setFormValues({
@@ -131,11 +130,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
         formData.append('avatar', avatarFile);
       }
 
-      await axios.put(`/api/users/${userInfo.userId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      await updateUser(userInfo.userId, formData);
 
       toast.success('Cập nhật thông tin thành công!');
       if (onUpdateSuccess) {

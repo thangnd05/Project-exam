@@ -4,7 +4,7 @@ import style from './login.module.scss';
 import routes from '~/config/Routes';
 import {Form, Button} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
-import axios from '../../../api/axiosClient';
+import { resetPassword } from '../../../api/authApi';
 
 const cx = classNames.bind(style);
 
@@ -28,17 +28,7 @@ function ResetPassWord() {
     }
 
     try {
-      // Chuẩn bị dữ liệu theo dạng x-www-form-urlencoded
-      const params = new URLSearchParams();
-      params.append('token', token);
-      params.append('newPassword', newPassword);
-
-      // Gửi yêu cầu đặt lại mật khẩu
-      await axios.post('/api/auth/reset-password', params, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
+      await resetPassword(token, newPassword);
 
       // Hiển thị thông báo thành công và chuyển hướng
       setMessage('Đặt lại mật khẩu thành công!');

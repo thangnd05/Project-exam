@@ -1,7 +1,7 @@
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
-import axios from '~/api/axiosClient';
+import { uploadPostImage, createPost, updatePost } from '~/api/postApi';
 import classNames from 'classnames/bind';
 import { FaPenNib, FaEdit, FaImage, FaTag } from 'react-icons/fa';
 import { useAuth } from '~/hooks/useAuth';
@@ -123,10 +123,8 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
           imgFormData.append('image', img.file);
 
           try {
-            const res = await axios.post('/api/posts/upload-image', imgFormData, {
-              headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            const cloudUrl = res.data.url;
+            const data = await uploadPostImage(imgFormData);
+            const cloudUrl = data.url;
             finalContent = finalContent.split(img.base64Url).join(cloudUrl);
           } catch (error) {
             toast.error(` Lỗi tải ảnh ${img.file.name} lên Cloudinary!`);
@@ -149,14 +147,10 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       }
 
       if (isEditing) {
-        await axios.put(`/api/posts/${editingPost.id}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        await updatePost(editingPost.id, formData);
         toast.success('Cập nhật bài viết thành công!');
       } else {
-        await axios.post('/api/posts', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        await createPost(formData);
         toast.success('Đăng bài viết thành công!');
       }
 

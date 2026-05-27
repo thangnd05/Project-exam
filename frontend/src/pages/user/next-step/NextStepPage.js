@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import axios from '~/api/axiosClient';
+import { getMyUserTests } from '~/api/userTestApi';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { listPlans, getPlanById } from '~/api/learningPlanApi';
@@ -66,8 +66,8 @@ function NextStepPage() {
         setActivePlanDetail(null);
       }
 
-      const res = await axios.get('/api/user-tests/my');
-      const arr = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+      const arr0 = await getMyUserTests();
+      const arr = Array.isArray(arr0) ? arr0 : (arr0?.data || []);
       const completed = arr
         .filter((u) => u.status === 'COMPLETED' && u.finishedAt)
         .filter((u) => !u.examTypeId || u.examTypeId === examTypeId)

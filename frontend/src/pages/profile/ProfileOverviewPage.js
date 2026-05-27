@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from '../../api/axiosClient';
+import { getProfileOverview } from '../../api/userApi';
+import { getMyEvaluations } from '../../api/evaluationApi';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -72,8 +73,8 @@ function ProfileOverviewPage() {
     setErrorMessage('');
 
     try {
-      const response = await axios.get('/api/users/me/profile-overview');
-      setProfileOverview(response.data || null);
+      const data = await getProfileOverview();
+      setProfileOverview(data || null);
     } catch (error) {
       setErrorMessage('Không tải được thông tin hồ sơ. Vui lòng thử lại sau.');
     } finally {
@@ -88,8 +89,8 @@ function ProfileOverviewPage() {
   const fetchMyEvaluations = async () => {
     setLoadingEvaluations(true);
     try {
-      const response = await axios.get('/api/evaluations/me');
-      setMyEvaluations(Array.isArray(response.data) ? response.data : []);
+      const data = await getMyEvaluations();
+      setMyEvaluations(Array.isArray(data) ? data : []);
     } catch (error) {
       setMyEvaluations([]);
     } finally {

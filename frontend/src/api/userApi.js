@@ -24,3 +24,18 @@ export const getUsers = ({page = 0, size = 10, keyword, roleId, verified} = {}) 
 export const deleteUser = (userId) => {
   return axios.delete(`${BASE_URL}/${userId}`).then(() => {});
 };
+
+export const getProfileOverview = () => {
+  return axios.get(`${BASE_URL}/me/profile-overview`).then((response) => response.data);
+};
+
+export const getMyInfo = () => {
+  return axios.get(`${BASE_URL}/me/info-user`).then((response) => response.data);
+};
+
+// formData là multipart (kèm avatar) — axios tự set boundary cho FormData.
+export const updateUser = (userId, formData) => {
+  return axios
+    .put(`${BASE_URL}/${userId}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+    .then((response) => response.data);
+};

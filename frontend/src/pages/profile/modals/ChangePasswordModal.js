@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import axios from '~/api/axiosClient';
+import { changePassword } from '~/api/authApi';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 import {IoLockClosedOutline} from 'react-icons/io5';
@@ -67,9 +67,9 @@ function ChangePasswordModal({show, onHide}) {
         newPassword,
         confirmNewPassword,
       };
-      const response = await axios.post('/api/auth/change-password', payload);
+      const data = await changePassword(payload);
       const successMessage =
-        response.data?.message || 'Đổi mật khẩu thành công.';
+        data?.message || 'Đổi mật khẩu thành công.';
       toast.success(successMessage);
       onHide();
       resetForm();

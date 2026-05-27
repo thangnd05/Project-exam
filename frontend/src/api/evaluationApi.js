@@ -18,6 +18,14 @@ export const getEvaluations = ({page = 0, size = 10, keyword, rating} = {}) => {
     .then((response) => response.data);
 };
 
+export const getAllEvaluations = () => {
+  return axios.get(BASE_URL).then((response) => response.data);
+};
+
+export const getMyEvaluations = () => {
+  return axios.get(`${BASE_URL}/me`).then((response) => response.data);
+};
+
 export const createEvaluation = (payload) => {
   return axios.post(BASE_URL, payload).then((response) => response.data);
 };

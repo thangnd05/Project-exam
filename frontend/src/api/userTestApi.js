@@ -2,6 +2,10 @@ import axios from './axiosClient';
 
 const BASE_URL = '/api/user-tests';
 
+export const getMyUserTests = () => {
+  return axios.get(`${BASE_URL}/my`).then((res) => res.data);
+};
+
 export const getMyAttemptsByTest = (testId) => {
   return axios.get(`${BASE_URL}/my/by-test/${testId}`).then((res) => res.data);
 };

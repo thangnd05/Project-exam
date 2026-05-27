@@ -29,6 +29,21 @@ export const getMyPosts = () => {
   return axios.get(`${BASE_URL}/me`).then((response) => response.data);
 };
 
+// --- Create / Update (multipart: kèm thumbnail/ảnh) ---
+const MULTIPART = { headers: { 'Content-Type': 'multipart/form-data' } };
+
+export const uploadPostImage = (formData) => {
+  return axios.post(`${BASE_URL}/upload-image`, formData, MULTIPART).then((response) => response.data);
+};
+
+export const createPost = (formData) => {
+  return axios.post(BASE_URL, formData, MULTIPART).then((response) => response.data);
+};
+
+export const updatePost = (postId, formData) => {
+  return axios.put(`${BASE_URL}/${postId}`, formData, MULTIPART).then((response) => response.data);
+};
+
 // --- Categories ---
 export const getCategories = () => {
   return axios.get('/api/categories').then((response) => response.data);

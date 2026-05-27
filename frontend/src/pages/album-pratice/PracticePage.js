@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {useParams} from 'react-router-dom';
 import axios from '../../api/axiosClient';
+import { generatePracticeQuestion, checkPracticeAnswer, markVocabKnown } from '../../api/practiceQuestionApi';
 import {Container, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -39,12 +40,12 @@ const PracticePage = () => {
     const fetchQuestion = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`/api/practice-questions/generate/${albumId}`);
-            if (res.status === 204 || !res.data) {
+            const data = await generatePracticeQuestion(albumId);
+            if (!data) {
                 setFinished(true);
                 setQuestion(null);
             } else {
-                setQuestion(res.data);
+                setQuestion(data);
             }
         } catch (err) {
             console.error('Lỗi lấy câu hỏi:', err);
@@ -78,9 +79,9 @@ const PracticePage = () => {
                   };
 
         try {
-            const res = await axios.post('/api/practice-questions/check', payload);
-            setResult(res.data);
-            if (res.data.correct) {
+            const data = await checkPracticeAnswer(payload);
+            setResult(data);
+            if (data.correct) {
                 setSessionScore(prev => ({...prev, correct: prev.correct + 1}));
             }
             setSessionScore(prev => ({...prev, total: prev.total + 1}));
@@ -99,11 +100,7 @@ const PracticePage = () => {
         if (!question) return;
         try {
             setMarkingKnown(true);
-            await axios.post(
-                `/api/practice-questions/mark-known/${question.vocabId}`,
-                {},
-                {withCredentials: true}
-            );
+            await markVocabKnown(question.vocabId);
             setKnownMessage('Bạn đã đánh dấu từ này là đã biết!');
             setTimeout(() => setKnownMessage(''), 2000);
             setTimeout(async () => {

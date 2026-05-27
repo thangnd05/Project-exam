@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import axios from '../../../api/axiosClient';
+import { getCurrentUser } from '../../../api/authApi';
 
 function OAuth2Redirect() {
     const navigate = useNavigate();
@@ -10,9 +10,7 @@ function OAuth2Redirect() {
     useEffect(() => {
         const syncUser = async () => {
             try {
-                const response = await axios.get('/api/auth/me');
-
-                const userData = response.data;
+                const userData = await getCurrentUser();
 
                 if (userData) {
                     login(userData);

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import axios from '../../api/axiosClient';
+import { getMyEvaluations } from '../../api/evaluationApi';
 import classNames from 'classnames/bind';
 import {Alert, Spinner} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
@@ -32,8 +32,8 @@ function MyEvaluationsPage() {
     setLoading(true);
     setErrorMessage('');
     try {
-      const response = await axios.get('/api/evaluations/me');
-      setEvaluations(Array.isArray(response.data) ? response.data : []);
+      const data = await getMyEvaluations();
+      setEvaluations(Array.isArray(data) ? data : []);
     } catch (error) {
       setErrorMessage('Không tải được danh sách đánh giá. Vui lòng thử lại sau.');
       setEvaluations([]);

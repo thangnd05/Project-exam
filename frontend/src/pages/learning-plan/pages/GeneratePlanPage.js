@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import axios from '~/api/axiosClient';
 import { getExamTypes } from '~/api/examTypeApi';
+import { getMyUserTests } from '~/api/userTestApi';
 import { generatePlan } from '~/api/learningPlanApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import LearningPlanList from '../components/LearningPlanList';
@@ -59,10 +59,10 @@ function GeneratePlanPage() {
   useEffect(() => {
     let mounted = true;
     setLoadingList(true);
-    axios.get('/api/user-tests/my')
-      .then((res) => {
+    getMyUserTests()
+      .then((result) => {
         if (!mounted) return;
-        const data = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        const data = Array.isArray(result) ? result : (result?.data || []);
         const completed = data.filter((t) => t.status === 'COMPLETED');
         setUserTests(completed);
       })

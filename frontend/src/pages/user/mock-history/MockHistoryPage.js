@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import axios from '~/api/axiosClient';
+import { getMyUserTests } from '~/api/userTestApi';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
 import { getUserTarget } from '~/api/userTargetApi';
@@ -41,11 +41,10 @@ function MockHistoryPage() {
 
   useEffect(() => {
     let mounted = true;
-    axios
-      .get('/api/user-tests/my')
-      .then((res) => {
+    getMyUserTests()
+      .then((arr0) => {
         if (!mounted) return;
-        const arr = Array.isArray(res.data) ? res.data : res.data?.data || [];
+        const arr = Array.isArray(arr0) ? arr0 : arr0?.data || [];
         const completed = arr
           .filter((u) => u.status === 'COMPLETED' && u.finishedAt)
           .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));

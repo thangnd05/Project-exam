@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useMemo, useCallback } from 'react';
-import axios from '../api/axiosClient';
+import { getCurrentUser, logout as logoutRequest } from '../api/authApi';
 
 export const AuthContext = createContext(null);
 
@@ -20,10 +20,10 @@ export const AuthProvider = ({ children }) => {
   //  Lấy user hiện tại từ /me
   const fetchCurrentUser = useCallback(async () => {
     try {
-      const response = await axios.get('/api/auth/me');
+      const data = await getCurrentUser();
 
-      if (response.data?.id) {
-        setUser(normalizeUser(response.data));
+      if (data?.id) {
+        setUser(normalizeUser(data));
       } else {
         setUser(null);
       }
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   //  Logout
   const logout = async () => {
     try {
-      await axios.post('/api/auth/logout');
+      await logoutRequest();
     } catch (err) {
       console.error('Logout error:', err);
     } finally {

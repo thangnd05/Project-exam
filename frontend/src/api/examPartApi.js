@@ -11,6 +11,10 @@ export const getExamPartById = (examPartId) => {
   return axios.get(`${BASE_URL}/${examPartId}`).then((response) => response.data);
 };
 
+export const getExamPartsByExamType = (examTypeId) => {
+  return axios.get(`${BASE_URL}/by-exam-type/${examTypeId}`).then((response) => response.data);
+};
+
 export const createExamPart = (payload) => {
   return axios.post(ADMIN_BASE_URL, payload).then((response) => response.data);
 };

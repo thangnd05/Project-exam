@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import axios from '../../../api/axiosClient';
+import { verifyEmail } from '../../../api/authApi';
 
 export default function VerifyEmailPage() {
   const [params] = useSearchParams();
@@ -17,11 +17,10 @@ export default function VerifyEmailPage() {
       return;
     }
 
-    axios
-      .get(`/api/auth/verify?token=${token}`)
-      .then((res) => {
+    verifyEmail(token)
+      .then((data) => {
         setStatus("success");
-        setMsg(res.data.message || " Xác thực thành công!");
+        setMsg(data.message || " Xác thực thành công!");
 
         setTimeout(() => {
           navigate("/login");

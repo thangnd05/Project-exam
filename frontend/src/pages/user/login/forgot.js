@@ -4,7 +4,7 @@ import style from './login.module.scss';
 import routes from '~/config/Routes';
 import {Form, Button} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
-import axios from '../../../api/axiosClient';
+import { forgotPassword } from '../../../api/authApi';
 
 const cx = classNames.bind(style);
 
@@ -23,16 +23,7 @@ function ForgotPassword() {
     setError('');
 
     try {
-      // Chuẩn bị dữ liệu theo dạng x-www-form-urlencoded
-      const params = new URLSearchParams();
-      params.append('email', email);
-
-      // Gửi yêu cầu đặt lại mật khẩu
-      await axios.post('/api/auth/forgot-password', params, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
+      await forgotPassword(email);
 
       setMessage('Hãy vào email để lấy token để có thể đổi mật khẩu.');
       setError('Token chỉ có thời lượng là 5 phút');

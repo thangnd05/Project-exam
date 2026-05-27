@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import axios from '../api/axiosClient';
+import { getRoles } from '../api/roleApi';
 import {Navigate, useLocation} from 'react-router-dom';
 import routes from '~/config/Routes';
 import {useAuth} from '../hooks/useAuth';
@@ -20,8 +20,8 @@ function ProtectedRoute({children, requiredRoleName, allowGuest = false}) {
     const checkRole = async () => {
       setRoleChecking(true);
       try {
-        const response = await axios.get('/api/roles');
-        const roles = Array.isArray(response.data) ? response.data : [];
+        const data = await getRoles();
+        const roles = Array.isArray(data) ? data : [];
         const currentRole = roles.find(
           (role) => String(role.roleId) === String(roleId),
         );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../../api/axiosClient';
+import { login as loginRequest, register as registerRequest } from '../../../api/authApi';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import classNames from 'classnames/bind';
@@ -67,13 +68,11 @@ function LoginPage() {
     setMessage("");
 
     try {
-      const response = await axios.post("/api/auth/login", {
+      //  Backend trả thẳng UserResponse
+      const userData = await loginRequest({
         identifier: loginIdentifier,
         password: loginPassword,
       });
-
-      //  Backend trả thẳng UserResponse
-      const userData = response.data;
 
       if (userData?.id) {
         login(userData); //  truyền thẳng vào AuthContext
@@ -107,14 +106,14 @@ function LoginPage() {
     setMessage('');
 
     try {
-      const response = await axios.post('/api/auth/register', {
+      const data = await registerRequest({
         userName: regUserName,
         fullName: regFullName,
         email: regEmail,
         password: regPassword,
       });
 
-      setMessage(response.data.message || 'Đăng ký thành công! Vui lòng xác thực email.');
+      setMessage(data.message || 'Đăng ký thành công! Vui lòng xác thực email.');
       setMessageType('success');
       alert('📧 Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
       setIsSignUp(false); // Switch back to login after success

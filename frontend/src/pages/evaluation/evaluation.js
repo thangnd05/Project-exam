@@ -6,7 +6,7 @@ import styles from './evaluation.module.scss';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import axios from '../../api/axiosClient';
+import { getAllEvaluations } from '../../api/evaluationApi';
 import {toast} from 'react-toastify';
 import {useAuth} from '~/hooks/useAuth';
 import {useNavigate} from 'react-router-dom';
@@ -36,14 +36,14 @@ const Evaluation = () => {
   // --- FETCH DATA ---
   const fetchReviews = async () => {
     try {
-      const response = await axios.get('/api/evaluations');
+      const data = await getAllEvaluations();
       // Đảm bảo data trả về là mảng
-      if (Array.isArray(response.data)) {
-        setReviews(response.data);
+      if (Array.isArray(data)) {
+        setReviews(data);
       } else {
         console.error(
           'API evaluations returned non-array data:',
-          response.data,
+          data,
         );
         setReviews([]);
       }

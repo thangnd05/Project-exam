@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FaStar, FaPen, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import axios from '~/api/axiosClient';
+import { createEvaluation } from '~/api/evaluationApi';
 import {toast} from 'react-toastify';
 import styles from '~/components/common/modal/PortalFormModal.module.scss';
 
@@ -24,7 +24,7 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
 
         setSubmitting(true);
         try {
-            await axios.post('/api/evaluations', {
+            await createEvaluation({
                 content: content,
                 rating: userRating
             });

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from '../api/axiosClient';
+import { getExamTypes } from '../api/examTypeApi';
+import { getQuestionCollections } from '../api/questionCollectionApi';
+import { getExamPartsByExamType } from '../api/examPartApi';
 import { getTagsFlatByExamType } from '../api/tagApi';
 import { sortByPartOrder } from '../utils/partOrder';
 
@@ -24,17 +26,15 @@ export const useBaseMetaData = (examTypeId) => {
     const [availableTags, setAvailableTags] = useState([]);
 
     useEffect(() => {
-        axios
-            .get('/api/exam-types')
-            .then((res) => setExamTypes(normalizeList(res.data)))
+        getExamTypes()
+            .then((data) => setExamTypes(normalizeList(data)))
             .catch((err) => {
                 console.error('Fetch exam types error:', err);
                 setExamTypes([]);
             });
-            
-        axios
-            .get('/api/question-collections')
-            .then((res) => setQuestionCollections(normalizeList(res.data)))
+
+        getQuestionCollections()
+            .then((data) => setQuestionCollections(normalizeList(data)))
             .catch((err) => {
                 console.error('Fetch question collections error:', err);
                 setQuestionCollections([]);
@@ -47,9 +47,8 @@ export const useBaseMetaData = (examTypeId) => {
             setAvailableTags([]);
             return;
         }
-        axios
-            .get(`/api/exam-parts/by-exam-type/${examTypeId}`)
-            .then((res) => setExamParts(sortByPartOrder(normalizeList(res.data))))
+        getExamPartsByExamType(examTypeId)
+            .then((data) => setExamParts(sortByPartOrder(normalizeList(data))))
             .catch((err) => {
                 console.error('Fetch exam parts error:', err);
                 setExamParts([]);
