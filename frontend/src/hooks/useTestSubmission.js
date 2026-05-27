@@ -1,4 +1,11 @@
-import axios from '../api/axiosClient';
+import { createTest } from '../api/testApi';
+import { createTestPart } from '../api/testPartApi';
+import {
+  createAndAttachDocument,
+  createAndAttach,
+  bulkCreateQuestions,
+  bulkCreateQuestionGroups,
+} from '../api/questionApi';
 import { toast } from 'react-toastify';
 import { CREATOR_TYPES } from './useCreateTest';
 
@@ -87,7 +94,7 @@ export const useTestSubmission = ({
         try {
             if (creatorType === CREATOR_TYPES.TEST) {
                 const manualQuestions = questions.filter(hasValidManualQuestion);
-                const testRes = await axios.post('/api/tests', {
+                const testData = await createTest({
                     title: testInfo.title,
                     description: testInfo.description,
                     examTypeId: String(testInfo.examTypeId),
@@ -109,13 +116,13 @@ export const useTestSubmission = ({
                     classId: mode === 'class' ? String(classId) : null,
                     chapterId: mode === 'class' ? String(chapterId) : null,
                 });
-                const newTestId = testRes.data.testId || testRes.data.id;
-                const partRes = await axios.post('/api/test-parts', {
+                const newTestId = testData.testId || testData.id;
+                const partData = await createTestPart({
                     testId: String(newTestId),
                     examPartId: String(testInfo.examPartId),
                     numQuestions: manualQuestions.length,
                 });
-                const newPartId = partRes.data.testPartId || partRes.data.id;
+                const newPartId = partData.testPartId || partData.id;
 
                 if (documentFile) {
                     const documentFormData = new FormData();
@@ -127,9 +134,7 @@ export const useTestSubmission = ({
                     if (mode === 'class' && chapterId) {
                         documentFormData.append('chapterId', String(chapterId));
                     }
-                    await axios.post('/api/questions/create-and-attach/document', documentFormData, {
-                        headers: { 'Content-Type': 'multipart/form-data' },
-                    });
+                    await createAndAttachDocument(documentFormData);
                 }
 
                 await Promise.all(
@@ -158,9 +163,7 @@ export const useTestSubmission = ({
                                 formData.append(`file${i}`, file),
                             );
                         }
-                        return axios.post('/api/questions/create-and-attach', formData, {
-                            headers: { 'Content-Type': 'multipart/form-data' },
-                        });
+                        return createAndAttach(formData);
                     }),
                 );
                 setNotification({
@@ -200,9 +203,7 @@ export const useTestSubmission = ({
                     }
                 });
 
-                await axios.post('/api/questions/bulk', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
+                await bulkCreateQuestions(formData);
                 setNotification({
                     type: 'success',
                     message: 'Đã lưu câu hỏi vào kho!',
@@ -244,9 +245,7 @@ export const useTestSubmission = ({
                         });
                     }
                 });
-                await axios.post('/api/questions/bulk-groups', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
+                await bulkCreateQuestionGroups(formData);
                 setNotification({ type: 'success', message: 'Đã lưu thành công!' });
                 setGroups([createInitialGroup()]);
             }

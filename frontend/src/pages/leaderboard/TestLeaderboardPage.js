@@ -1,4 +1,5 @@
-import axios from '../../api/axiosClient';
+import { getLeaderboardByTest } from '../../api/userTestApi';
+import { getUserTestInfo } from '../../api/testApi';
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Container, Spinner, Table} from 'react-bootstrap';
@@ -57,16 +58,16 @@ function TestLeaderboardPage() {
       setErrorMessage('');
 
       try {
-        const testInfoResponse = await axios.get(`/api/tests/usertest/${testId}`);
-        setTestTitle(testInfoResponse.data?.title || '');
+        const testInfo = await getUserTestInfo(testId);
+        setTestTitle(testInfo?.title || '');
       } catch (error) {
         setTestTitle('');
       }
 
       try {
-        const leaderboardResponse = await axios.get(`/api/user-tests/by-test/${testId}`);
-        const normalizedRows = Array.isArray(leaderboardResponse.data)
-          ? leaderboardResponse.data
+        const leaderboard = await getLeaderboardByTest(testId);
+        const normalizedRows = Array.isArray(leaderboard)
+          ? leaderboard
           : [];
         setRawRows(normalizedRows);
       } catch (error) {

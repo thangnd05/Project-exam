@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert } from "react-bootstrap";
-import axios from '~/api/axiosClient';
+import { joinClass } from '~/api/classMemberApi';
 import classNames from "classnames/bind";
 import { FaUsers, FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "~/hooks/useAuth";
@@ -51,7 +51,7 @@ function JoinClassModal({ show, onClose }) {
 
         try {
             //  Call API join class (đúng như JoinClassPage)
-            await axios.post("/api/class-members/join", {
+            await joinClass({
                 classQr: code.trim().toUpperCase(),
             });
 

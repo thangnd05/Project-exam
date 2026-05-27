@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
-import axios from '../../api/axiosClient';
+import { getAdminTestById, updateTest } from '../../api/testApi';
+import { getExamTypes } from '../../api/examTypeApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { IoCheckmarkCircleOutline, IoCloseOutline, IoCreateOutline } from 'react-icons/io5';
@@ -59,8 +60,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     if (!id) return;
     setLoadingDetail(true);
     try {
-      const res = await axios.get(`/api/tests/admintest/${id}`);
-      setTestDetail(res.data);
+      const data = await getAdminTestById(id);
+      setTestDetail(data);
     } catch (error) {
       console.error('Failed to load test detail', error);
       toast.error('Không tải được danh sách câu hỏi của đề');
@@ -71,11 +72,11 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
 
   const fetchExamTypes = async () => {
     try {
-      const res = await axios.get('/api/exam-types');
-      if (res.data?.data) {
-        setExamTypes(res.data.data);
-      } else if (Array.isArray(res.data)) {
-        setExamTypes(res.data);
+      const data = await getExamTypes();
+      if (data?.data) {
+        setExamTypes(data.data);
+      } else if (Array.isArray(data)) {
+        setExamTypes(data);
       }
     } catch (error) {
       console.error('Failed to load exam types', error);
@@ -112,7 +113,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     };
 
     try {
-      await axios.put(`/api/tests/${test.testId || test.id}`, payload);
+      await updateTest(test.testId || test.id, payload);
       toast.success('Cập nhật đề thi thành công!');
       onSuccess();
     } catch (error) {

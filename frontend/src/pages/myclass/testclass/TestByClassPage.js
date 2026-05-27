@@ -1,4 +1,5 @@
-import axios from '../../../api/axiosClient';
+import { getClassById, getClassChapterTests } from '../../../api/classApi';
+import { deleteTest } from '../../../api/testApi';
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
@@ -26,11 +27,10 @@ function TestByClassPage() {
   // 🟢 Lấy thông tin lớp học
   useEffect(() => {
     if (!classId) return;
-    axios
-      .get(`/api/classes/${classId}`)
-      .then((res) => {
-        if (res.data && res.data.className) {
-          setClassName(res.data.className);
+    getClassById(classId)
+      .then((data) => {
+        if (data && data.className) {
+          setClassName(data.className);
         }
       })
       .catch((err) => console.error(' Lỗi:', err));
@@ -40,11 +40,10 @@ function TestByClassPage() {
   const fetchTests = useCallback(() => {
     if (!classId || !chapterId) return;
     setLoading(true);
-    axios
-      .get(`/api/classes/${classId}/chapters/${chapterId}/tests`)
-      .then((res) => {
-        if (Array.isArray(res.data)) {
-          setTests(res.data);
+    getClassChapterTests(classId, chapterId)
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setTests(data);
         }
       })
       .catch((err) => {
@@ -65,7 +64,7 @@ function TestByClassPage() {
     }
 
     try {
-      await axios.delete(`/api/tests/${testToDelete.testId}`);
+      await deleteTest(testToDelete.testId);
       toast.success('Xóa bài kiểm tra thành công!');
       fetchTests();
     } catch (err) {

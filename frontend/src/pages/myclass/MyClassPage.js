@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../../api/axiosClient';
+import { getMyClasses } from '../../api/classMemberApi';
+import { deleteClass } from '../../api/classApi';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
@@ -26,12 +27,12 @@ const MyClassesPage = () => {
   useEffect(() => {
     const fetchMyClasses = async () => {
       try {
-        const res = await axios.get('/api/class-members/my-classes');
-        if (res.data.message) {
-          setMessage(res.data.message);
+        const data = await getMyClasses();
+        if (data.message) {
+          setMessage(data.message);
         } else {
-          setTeachingClasses(res.data.teachingClasses || []);
-          setLearningClasses(res.data.learningClasses || []);
+          setTeachingClasses(data.teachingClasses || []);
+          setLearningClasses(data.learningClasses || []);
         }
       } catch (err) {
         console.error(' Lỗi khi tải danh sách lớp học:', err);
@@ -68,7 +69,7 @@ const MyClassesPage = () => {
     if (!selectedClass) return;
 
     try {
-      await axios.delete(`/api/classes/${selectedClass.classId}`);
+      await deleteClass(selectedClass.classId);
       toast.success(' Xóa lớp học thành công!');
 
       // Remove from local state

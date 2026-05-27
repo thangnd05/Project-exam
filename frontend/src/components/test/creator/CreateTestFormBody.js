@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Alert, Button } from 'react-bootstrap';
-import axios from '~/api/axiosClient';
+import { getClassById } from '~/api/classApi';
+import { getChapterById } from '~/api/chapterApi';
+import { previewDocument, previewPassageDocument } from '~/api/questionApi';
 import {
   IoSettingsOutline,
   IoLayersOutline,
@@ -100,10 +102,10 @@ const CreateTestFormBody = ({
 
   useEffect(() => {
     if (mode === 'class' && classId) {
-      axios.get(`/api/classes/${classId}`).then((res) => setClassName(res.data?.className || `Lớp ${classId}`)).catch(() => setClassName(`Lớp ${classId}`));
+      getClassById(classId).then((data) => setClassName(data?.className || `Lớp ${classId}`)).catch(() => setClassName(`Lớp ${classId}`));
     }
     if (mode === 'class' && chapterId) {
-      axios.get(`/api/chapters/${chapterId}`).then((res) => setChapterName(res.data?.title || `Chapter ${chapterId}`)).catch(() => setChapterName(`Chapter ${chapterId}`));
+      getChapterById(chapterId).then((data) => setChapterName(data?.title || `Chapter ${chapterId}`)).catch(() => setChapterName(`Chapter ${chapterId}`));
     }
   }, [mode, classId, chapterId]);
 
@@ -159,11 +161,9 @@ const CreateTestFormBody = ({
       const formData = new FormData();
       formData.append('file', fileInput);
 
-      const response = await axios.post('/api/questions/preview/document', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const data = await previewDocument(formData);
 
-      const parsedQuestions = Array.isArray(response.data) ? response.data : [];
+      const parsedQuestions = Array.isArray(data) ? data : [];
       if (parsedQuestions.length === 0) {
         toast.warning('Không tìm thấy câu hỏi hợp lệ trong file Word.');
         return;
@@ -201,11 +201,9 @@ const CreateTestFormBody = ({
       const formData = new FormData();
       formData.append('file', fileInput);
 
-      const response = await axios.post('/api/questions/preview/document', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const data = await previewDocument(formData);
 
-      const parsedQuestions = Array.isArray(response.data) ? response.data : [];
+      const parsedQuestions = Array.isArray(data) ? data : [];
       if (parsedQuestions.length === 0) {
         toast.warning('Không tìm thấy câu hỏi hợp lệ trong file Word.');
         return;
@@ -242,11 +240,9 @@ const CreateTestFormBody = ({
       const formData = new FormData();
       formData.append('file', fileInput);
 
-      const response = await axios.post('/api/questions/preview/passage-document', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const data = await previewPassageDocument(formData);
 
-      const parsedGroups = Array.isArray(response.data) ? response.data : [];
+      const parsedGroups = Array.isArray(data) ? data : [];
       if (parsedGroups.length === 0) {
         toast.warning('Không tìm thấy passage hợp lệ trong file Word.');
         return;

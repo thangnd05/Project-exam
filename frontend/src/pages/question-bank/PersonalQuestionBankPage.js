@@ -1,6 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, Button, Spinner} from 'react-bootstrap';
-import axios from '../../api/axiosClient';
+import {
+  getQuestionsByPart,
+  getMyClassBankQuestions,
+  getMyClassBankCount,
+  deleteQuestion,
+} from '../../api/questionApi';
+import { getMyClasses } from '../../api/classApi';
+import { getChaptersByClass } from '../../api/chapterApi';
+import { getQuestionCollections } from '../../api/questionCollectionApi';
 import classNames from 'classnames/bind';
 import {
   IoBookOutline,
@@ -48,11 +56,11 @@ const PersonalQuestionBankPage = () => {
   const {examTypes, examParts} = useBaseMetaData(examTypeId);
 
   useEffect(() => {
-    axios.get('/api/question-collections')
-      .then((res) => {
-        const list = Array.isArray(res.data)
-          ? res.data
-          : (res.data?.data || res.data?.content || []);
+    getQuestionCollections()
+      .then((data) => {
+        const list = Array.isArray(data)
+          ? data
+          : (data?.data || data?.content || []);
         const map = {};
         list.forEach((c) => {
           if (c?.collectionId) map[c.collectionId] = c.name || '(Không tên)';
@@ -76,12 +84,11 @@ const PersonalQuestionBankPage = () => {
   };
 
   useEffect(() => {
-    axios
-      .get('/api/classes/my')
-      .then((res) => {
-        const data = Array.isArray(res.data)
-          ? res.data
-          : res.data?.classes || [];
+    getMyClasses()
+      .then((result) => {
+        const data = Array.isArray(result)
+          ? result
+          : result?.classes || [];
         setClasses(data);
       })
       .catch(() => setClasses([]));
@@ -95,10 +102,10 @@ const PersonalQuestionBankPage = () => {
 
     try {
       const params = scope === BANK_SCOPE.ADMIN ? {bank: 'admin'} : {};
-      const res = await axios.get(`/api/questions/by-part/${partId}`, {params});
-      const list = Array.isArray(res.data)
-        ? res.data
-        : (res.data?.data ?? res.data?.questions ?? []);
+      const data = await getQuestionsByPart(partId, params);
+      const list = Array.isArray(data)
+        ? data
+        : (data?.data ?? data?.questions ?? []);
       setPartConfigs((prev) => ({
         ...prev,
         [partId]: {
@@ -154,10 +161,8 @@ const PersonalQuestionBankPage = () => {
     }
 
     setChaptersLoading(true);
-    axios
-      .get(`/api/chapters/class/${selectedClassId}`)
-      .then((res) => {
-        const raw = res.data;
+    getChaptersByClass(selectedClassId)
+      .then((raw) => {
         const data = Array.isArray(raw)
           ? raw
           : Array.isArray(raw?.data)
@@ -177,13 +182,10 @@ const PersonalQuestionBankPage = () => {
         setChapterConfigs(initial);
 
         data.forEach((ch) => {
-          axios
-            .get('/api/questions/bank/my-class/count', {
-              params: {classId: selectedClassId, chapterId: ch.chapterId},
-            })
-            .then((countRes) => {
+          getMyClassBankCount({classId: selectedClassId, chapterId: ch.chapterId})
+            .then((count) => {
               const countVal =
-                typeof countRes.data === 'number' ? countRes.data : 0;
+                typeof count === 'number' ? count : 0;
               setChapterConfigs((prev) => ({
                 ...prev,
                 [ch.chapterId]: {
@@ -215,10 +217,7 @@ const PersonalQuestionBankPage = () => {
       }));
 
       try {
-        const res = await axios.get('/api/questions/bank/my-class', {
-          params: {classId: selectedClassId, chapterId},
-        });
-        const raw = res.data;
+        const raw = await getMyClassBankQuestions({classId: selectedClassId, chapterId});
         const list = Array.isArray(raw)
           ? raw
           : Array.isArray(raw?.data)
@@ -290,7 +289,7 @@ const PersonalQuestionBankPage = () => {
 
     setDeletingQuestionId(questionId);
     try {
-      await axios.delete(`/api/questions/${questionId}`);
+      await deleteQuestion(questionId);
 
       if (editingQuestionId === questionId) {
         setEditingQuestionId(null);

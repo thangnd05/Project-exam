@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState, useMemo } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from '../../../../../api/axiosClient';
+import { getUserTestMeta } from '../../../../../api/userTestApi';
+import { getResultByUserTest, getAnswersByUserTest } from '../../../../../api/userAnswerApi';
+import { getUserTestInfo, getAdminTestById } from '../../../../../api/testApi';
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
 import {
@@ -74,28 +77,20 @@ const TestResultPage = () => {
       try {
         setLoading(true);
         // 1. Lấy thông tin tổng quan bài test (Chứa startedAt, finishedAt)
-        const metaUrl = isGuest
-          ? `/api/user-tests/guest/${userTestId}`
-          : `/api/user-tests/${userTestId}`;
-        const metaRes = await axios.get(metaUrl, guestCfg);
-        const metaData = metaRes.data;
+        const metaData = await getUserTestMeta(userTestId, isGuest, guestCfg);
         setTestId(metaData.testId);
 
         // 2. Lấy kết quả điểm số, số câu đúng/sai
-        const resultUrl = isGuest
-          ? `/api/user-answers/guest/user-test/${userTestId}/result`
-          : `/api/user-answers/user-test/${userTestId}/result`;
-        const res = await axios.get(resultUrl, guestCfg);
+        const resultData = await getResultByUserTest(userTestId, isGuest, guestCfg);
 
         setResult({
-          ...res.data,
+          ...resultData,
           startedAt: metaData.startedAt,
           finishedAt: metaData.finishedAt,
         });
 
         // 3. Check hạn review (endpoint public)
-        const testRes = await axios.get(`/api/tests/usertest/${metaData.testId}`);
-        const testData = testRes.data;
+        const testData = await getUserTestInfo(metaData.testId);
         const now = new Date();
         const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
         setCanReview(!availableTo || now > availableTo);
@@ -143,22 +138,16 @@ const TestResultPage = () => {
     setDetailLoading(true);
 
     try {
-      const metaUrl = isGuest
-        ? `/api/user-tests/guest/${userTestId}`
-        : `/api/user-tests/${userTestId}`;
-      const metaRes = await axios.get(metaUrl, guestCfg);
-      const testId = metaRes.data.testId;
+      const metaData = await getUserTestMeta(userTestId, isGuest, guestCfg);
+      const testId = metaData.testId;
 
-      const answersUrl = isGuest
-        ? `/api/user-answers/guest/user-test/${userTestId}`
-        : `/api/user-answers/user-test/${userTestId}`;
-      const [testRes, answersRes] = await Promise.all([
-        axios.get(`/api/tests/admintest/${testId}`),
-        axios.get(answersUrl, guestCfg),
+      const [testData, answersData] = await Promise.all([
+        getAdminTestById(testId),
+        getAnswersByUserTest(userTestId, isGuest, guestCfg),
       ]);
 
-      setTest(testRes.data);
-      setUserAnswers(answersRes.data);
+      setTest(testData);
+      setUserAnswers(answersData);
 
       setShowDetail(true);
     } catch (err) {

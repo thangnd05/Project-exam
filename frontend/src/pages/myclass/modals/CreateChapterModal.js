@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaBook, FaEdit, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import axios from '~/api/axiosClient';
+import { createChapter } from '~/api/chapterApi';
 import { toast } from 'react-toastify';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
@@ -22,7 +22,7 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }) => {
 
         setSubmitting(true);
         try {
-            await axios.post('/api/chapters', {
+            await createChapter({
                 classId: classId,
                 title: title,
                 description: description

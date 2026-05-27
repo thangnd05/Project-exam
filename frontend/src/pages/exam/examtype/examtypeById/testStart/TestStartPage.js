@@ -1,4 +1,7 @@
 import axios from '../../../../../api/axiosClient';
+import { checkActiveUserTest, startUserTest, submitUserTest } from '../../../../../api/userTestApi';
+import { getAnswersByUserTest, batchSaveAnswers } from '../../../../../api/userAnswerApi';
+import { getUserTestInfo } from '../../../../../api/testApi';
 import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
@@ -123,10 +126,9 @@ function TestStartPage() {
       restored = true;
     }
 
-    axios
-      .get(`/api/tests/usertest/${testId}`)
-      .then(async (res) => {
-        const testData = { ...res.data, parts: res.data.parts || [] };
+    getUserTestInfo(testId)
+      .then(async (testInfoData) => {
+        const testData = { ...testInfoData, parts: testInfoData.parts || [] };
         const enriched = await enrichTestWithPassageMedia(testData);
         setTest(enriched);
 
@@ -164,22 +166,13 @@ function TestStartPage() {
         let serverStartedAt = null;
         if (!restored) {
           try {
-            const checkActiveUrl = isGuest
-              ? '/api/user-tests/guest/check-active'
-              : '/api/user-tests/check-active';
-            const activeRes = await axios.get(checkActiveUrl, {
-              params: { testId },
-              ...guestCfg,
-            });
-            const activeUserTestId = activeRes.data?.userTestId;
+            const active = await checkActiveUserTest(testId, isGuest, guestCfg);
+            const activeUserTestId = active?.userTestId;
             if (activeUserTestId) {
-              serverStartedAt = activeRes.data?.startedAt || null;
-              const ansUrl = isGuest
-                ? `/api/user-answers/guest/user-test/${activeUserTestId}`
-                : `/api/user-answers/user-test/${activeUserTestId}`;
-              const ansRes = await axios.get(ansUrl, guestCfg);
+              serverStartedAt = active?.startedAt || null;
+              const answers = await getAnswersByUserTest(activeUserTestId, isGuest, guestCfg);
               const answersMap = {};
-              (ansRes.data || []).forEach((a) => {
+              (answers || []).forEach((a) => {
                 answersMap[a.questionId] = {
                   selectedAnswerId: a.selectedAnswerId || null,
                   answerText: a.answerText || null,
@@ -243,12 +236,10 @@ function TestStartPage() {
         setStatus('active');
         return;
       }
-      const startUrl = isGuest ? '/api/user-tests/guest' : '/api/user-tests';
-      axios
-        .post(startUrl, { testId: test.testId }, guestCfg)
-        .then((res) => {
-          const id = res.data.userTestId;
-          const startedAtIso = res.data.startedAt;
+      startUserTest(test.testId, isGuest, guestCfg)
+        .then((data) => {
+          const id = data.userTestId;
+          const startedAtIso = data.startedAt;
           setUserTestId(id);
           sessionStorage.setItem(`userTest-${test.testId}`, id);
           // Tính lại timer dựa trên startedAt server (phòng trường hợp BE trả lại attempt sẵn có).
@@ -300,8 +291,7 @@ function TestStartPage() {
         selectedAnswerId: ans?.selectedAnswerId || null,
         answerText: ans?.answerText || null,
       }));
-      const batchUrl = isGuest ? '/api/user-answers/guest/batch' : '/api/user-answers/batch';
-      axios.post(batchUrl, payload, guestCfg).catch(() => { /* swallow */ });
+      batchSaveAnswers(payload, isGuest, guestCfg).catch(() => { /* swallow */ });
     }, 2000);
     return () => clearTimeout(handle);
   }, [userAnswers, status, userTestId, isGuest, guestCfg]);
@@ -335,17 +325,13 @@ function TestStartPage() {
         selectedAnswerId: ans.selectedAnswerId || null,
         answerText: ans.answerText || null,
       }));
-      const batchUrl = isGuest ? '/api/user-answers/guest/batch' : '/api/user-answers/batch';
       if (payload.length > 0)
-        await axios.post(batchUrl, payload, guestCfg);
-      const submitUrl = isGuest
-        ? `/api/user-tests/${userTestId}/guest-submit`
-        : `/api/user-tests/${userTestId}/submit`;
-      const res = await axios.post(submitUrl, null, guestCfg);
+        await batchSaveAnswers(payload, isGuest, guestCfg);
+      const result = await submitUserTest(userTestId, isGuest, guestCfg);
       sessionStorage.removeItem(`userTest-${testId}`);
       sessionStorage.removeItem(`userTestState-${testId}`);
       navigate(`/tests/result/${userTestId}`, {
-        state: { score: res.data.totalScore },
+        state: { score: result.totalScore },
       });
     } catch (err) {
       if (err?.response?.status === 409) {

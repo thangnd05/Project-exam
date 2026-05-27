@@ -1,4 +1,4 @@
-import axios from '../../api/axiosClient';
+import { getMyTests, deleteTest } from '../../api/testApi';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
@@ -30,10 +30,9 @@ function MyTestPage() {
 
   const fetchTests = () => {
     setLoading(true);
-    axios
-      .get('/api/tests/my-tests')
-      .then((res) => {
-        if (Array.isArray(res.data)) setTests(res.data);
+    getMyTests()
+      .then((data) => {
+        if (Array.isArray(data)) setTests(data);
         else setTests([]);
       })
       .catch((err) => {
@@ -55,7 +54,7 @@ function MyTestPage() {
     }
 
     try {
-      await axios.delete(`/api/tests/${testToDelete.testId}`);
+      await deleteTest(testToDelete.testId);
       toast.success('Xóa bài kiểm tra thành công!');
       fetchTests();
     } catch (err) {

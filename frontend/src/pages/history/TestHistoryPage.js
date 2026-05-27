@@ -1,4 +1,5 @@
-import axios from '../../api/axiosClient';
+import { getMyAttemptsByTest } from '../../api/userTestApi';
+import { getUserTestInfo } from '../../api/testApi';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Table, Spinner } from 'react-bootstrap';
@@ -35,18 +36,17 @@ function TestHistoryPage() {
     const fetchHistory = async () => {
       setLoading(true);
       try {
-        const [attemptRes, testRes] = await Promise.all([
-          axios.get(`/api/user-tests/my/by-test/${testId}`),
-          axios.get(`/api/tests/usertest/${testId}`),
+        const [attemptsPayload, testInfoData] = await Promise.all([
+          getMyAttemptsByTest(testId),
+          getUserTestInfo(testId),
         ]);
-        const attemptsPayload = attemptRes.data;
         const normalizedAttempts = Array.isArray(attemptsPayload)
           ? attemptsPayload
           : Array.isArray(attemptsPayload?.data)
             ? attemptsPayload.data
             : [];
         setAttempts(normalizedAttempts);
-        setTestInfo(testRes.data);
+        setTestInfo(testInfoData);
       } catch (err) {
         console.error(' Lỗi khi tải dữ liệu lịch sử:', err);
         setAttempts([]);

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import axios from '../../../api/axiosClient';
+import { getChaptersByClass, deleteChapter } from '../../../api/chapterApi';
+import { getClassById } from '../../../api/classApi';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -64,7 +65,7 @@ const ChapterOfClass = () => {
     }
 
     try {
-      await axios.delete(`/api/chapters/${selectedChapter.chapterId}`);
+      await deleteChapter(selectedChapter.chapterId);
       toast.success('Xóa chương thành công!');
       fetchChapters();
     } catch (error) {
@@ -80,8 +81,8 @@ const ChapterOfClass = () => {
 
   const fetchChapters = useCallback(async () => {
     try {
-      const res = await axios.get(`/api/chapters/class/${classId}`);
-      setChapters(res.data || []);
+      const data = await getChaptersByClass(classId);
+      setChapters(data || []);
     } catch (err) {
       console.error(' Lỗi load chapter:', err);
       setMessage('Không thể tải danh sách chương 😢');
@@ -93,11 +94,11 @@ const ChapterOfClass = () => {
   useEffect(() => {
     const fetchClassInfo = async () => {
       try {
-        const res = await axios.get(`/api/classes/${classId}`);
-        if (res.data?.className) {
-          setClassName(res.data.className);
+        const data = await getClassById(classId);
+        if (data?.className) {
+          setClassName(data.className);
         }
-        setClassQr(res.data?.classQr || '');
+        setClassQr(data?.classQr || '');
       } catch (err) {
         console.error(' Lỗi load class info:', err);
       }

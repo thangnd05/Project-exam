@@ -1,5 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import axios from '../../api/axiosClient';
+import { getAdminTests, updateTest, deleteTest } from '../../api/testApi';
+import { getExamTypes } from '../../api/examTypeApi';
+import { getUsers } from '../../api/userApi';
 import {Badge, Button, Form, Modal, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Search, Trash2} from 'lucide-react';
@@ -41,8 +43,8 @@ function TestsManagement() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const fetchTests = async () => {
-    const response = await axios.get('/api/tests/admin');
-    const testList = Array.isArray(response.data) ? response.data : [];
+    const data = await getAdminTests();
+    const testList = Array.isArray(data) ? data : [];
     setTests(testList);
   };
 
@@ -51,18 +53,18 @@ function TestsManagement() {
       setLoading(true);
       setErrorMessage('');
       try {
-        const [testsResponse, examTypesResponse, usersResponse] = await Promise.all([
-          axios.get('/api/tests/admin'),
-          axios.get('/api/exam-types'),
-          axios.get('/api/users/paged?page=0&size=200'),
+        const [testsData, examTypesData, usersData] = await Promise.all([
+          getAdminTests(),
+          getExamTypes(),
+          getUsers({ page: 0, size: 200 }),
         ]);
 
-        setTests(Array.isArray(testsResponse.data) ? testsResponse.data : []);
+        setTests(Array.isArray(testsData) ? testsData : []);
         setExamTypes(
-          Array.isArray(examTypesResponse.data) ? examTypesResponse.data : [],
+          Array.isArray(examTypesData) ? examTypesData : [],
         );
         setUsers(
-          Array.isArray(usersResponse.data?.content) ? usersResponse.data.content : [],
+          Array.isArray(usersData?.content) ? usersData.content : [],
         );
       } catch (error) {
         setErrorMessage('Không thể tải dữ liệu đề thi từ hệ thống.');
@@ -147,7 +149,7 @@ function TestsManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await axios.put(`/api/tests/${editingTestId}`, payload);
+      await updateTest(editingTestId, payload);
       await fetchTests();
       setShowFormModal(false);
       resetForm();
@@ -162,7 +164,7 @@ function TestsManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await axios.delete(`/api/tests/${testId}`);
+      await deleteTest(testId);
       setTests((previous) => previous.filter((item) => item.testId !== testId));
     } catch (error) {
       setErrorMessage('Không thể xóa đề thi.');

@@ -1,4 +1,5 @@
-import axios from '../../../../api/axiosClient';
+import { getTestsByExamType } from '../../../../api/testApi';
+import { getExamTypeById } from '../../../../api/examTypeApi';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
@@ -31,15 +32,13 @@ function TestByExamTypePage() {
 
     setLoading(true);
 
-    axios
-      .get(`/api/tests/user/by-exam-type/${examTypeId}`)
-      .then((res) => setTests(res.data))
+    getTestsByExamType(examTypeId)
+      .then((data) => setTests(data))
       .catch(() => setTests([]))
       .finally(() => setLoading(false));
 
-    axios
-      .get(`/api/exam-types/${examTypeId}`)
-      .then((res) => setExamTypeName(res.data.name))
+    getExamTypeById(examTypeId)
+      .then((data) => setExamTypeName(data.name))
       .catch(() => { });
   }, [examTypeId]);
 

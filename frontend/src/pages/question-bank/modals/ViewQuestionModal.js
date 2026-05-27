@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Modal, Button, Spinner, Alert} from 'react-bootstrap';
-import axios from '~/api/axiosClient';
+import { getQuestionById } from '~/api/questionApi';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
@@ -59,9 +59,9 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
     const fetchDetail = async (id) => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/questions/${id}`);
+        const data = await getQuestionById(id);
         if (!cancelled) {
-          setQuestion(res.data);
+          setQuestion(data);
         }
       } catch (error) {
         if (!cancelled) {

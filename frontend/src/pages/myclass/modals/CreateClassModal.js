@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import axios from '~/api/axiosClient';
+import { createClass } from '~/api/classApi';
 import classNames from 'classnames/bind';
 import { FaChalkboardTeacher, FaEdit, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '~/hooks/useAuth';
@@ -55,7 +55,7 @@ function CreateClassModal({ show, onClose }) {
       //  Call API create class
       // Request body matches ClassEntity: className, description, teacherId (handled by backend or passed from frontend)
       // Backend should handle teacherId from session (as mentioned in conversation 5997355f)
-      await axios.post('/api/classes', {
+      await createClass({
         className: className,
         description: description,
       });

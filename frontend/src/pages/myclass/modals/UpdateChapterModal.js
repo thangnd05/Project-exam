@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import axios from '~/api/axiosClient';
+import { updateChapter } from '~/api/chapterApi';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import {IoBookOutline} from 'react-icons/io5';
@@ -42,7 +42,7 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}) {
         title: title.trim(),
         description: description.trim(),
       };
-      await axios.put(`/api/chapters/${chapter.chapterId}`, payload);
+      await updateChapter(chapter.chapterId, payload);
       toast.success('Cập nhật chương thành công!');
       onClose();
       if (onSuccess) {

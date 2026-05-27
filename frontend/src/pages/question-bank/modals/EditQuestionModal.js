@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Button, Badge, Spinner, Row, Col } from 'react-bootstrap';
-import axios from '~/api/axiosClient';
+import { getQuestionById, updateQuestion } from '~/api/questionApi';
+import { getExamPartById } from '~/api/examPartApi';
+import { deletePassageMedia } from '~/api/passageMediaApi';
+import { getQuestionCollections } from '~/api/questionCollectionApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
@@ -68,9 +71,9 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   }, [onHide]);
 
   useEffect(() => {
-    axios.get('/api/question-collections')
-      .then((res) => {
-        const list = Array.isArray(res.data) ? res.data : (res.data.data || res.data.content || []);
+    getQuestionCollections()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : (data.data || data.content || []);
         setQuestionCollections(list);
       })
       .catch((err) => console.error('Failed to load collections', err));
@@ -99,8 +102,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     const fetchQuestionDetails = async (id) => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/questions/${id}`);
-        const questionDetail = res.data;
+        const questionDetail = await getQuestionById(id);
 
         let mappedOptions = [];
         if (questionDetail.answers && questionDetail.answers.length > 0) {
@@ -151,9 +153,9 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
               .catch(() => {});
           } else if (questionDetail.examPartId) {
             // Lấy examTypeId qua examPart
-            axios.get(`/api/exam-parts/${questionDetail.examPartId}`)
-              .then((partRes) => {
-                const etId = partRes.data?.examTypeId;
+            getExamPartById(questionDetail.examPartId)
+              .then((part) => {
+                const etId = part?.examTypeId;
                 if (etId && !cancelled) {
                   return getTagsFlatByExamType(etId);
                 }
@@ -242,7 +244,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
 
     setDeletingMediaIds((prev) => [...prev, item.id]);
     try {
-      await axios.delete(`/api/passage-media/${item.id}`);
+      await deletePassageMedia(item.id);
 
       setExistingMedia((prev) => prev.filter((m) => m.id !== item.id));
 
@@ -308,11 +310,11 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
         newFiles.forEach((file, index) => {
           fd.append(`file${index}`, file);
         });
-        await axios.put(`/api/questions/${questionId}`, fd, {
+        await updateQuestion(questionId, fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
       } else {
-        await axios.put(`/api/questions/${questionId}`, payload, {
+        await updateQuestion(questionId, payload, {
           headers: { 'Content-Type': 'application/json' },
         });
       }

@@ -1,6 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from '../../../api/axiosClient';
+import { getClassById } from '../../../api/classApi';
+import {
+  getMembersByClass,
+  getPendingByClass,
+  approveMember,
+  approveAllMembers,
+  removeMember,
+} from '../../../api/classMemberApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
@@ -41,8 +48,8 @@ const ClassMemberManagementPage = () => {
   const fetchClassInfo = useCallback(async () => {
     if (!classId) return;
     try {
-      const res = await axios.get(`/api/classes/${classId}`);
-      setClassInfo(res.data);
+      const data = await getClassById(classId);
+      setClassInfo(data);
     } catch (err) {
       console.error('Lỗi khi lấy thông tin lớp học:', err);
       toast.error('Không thể tải thông tin lớp học');
@@ -53,8 +60,8 @@ const ClassMemberManagementPage = () => {
   const fetchAllMembers = useCallback(async () => {
     if (!classId) return;
     try {
-      const res = await axios.get(`/api/class-members/class/${classId}`);
-      setAllMembers(res.data || []);
+      const data = await getMembersByClass(classId);
+      setAllMembers(data || []);
     } catch (err) {
       console.error('Lỗi khi lấy danh sách thành viên:', err);
       toast.error('Không thể tải danh sách thành viên');
@@ -65,8 +72,8 @@ const ClassMemberManagementPage = () => {
   const fetchPendingMembers = useCallback(async () => {
     if (!classId) return;
     try {
-      const res = await axios.get(`/api/class-members/class/${classId}/pending`);
-      setPendingMembers(res.data || []);
+      const data = await getPendingByClass(classId);
+      setPendingMembers(data || []);
     } catch (err) {
       console.error('Lỗi khi lấy danh sách chờ duyệt:', err);
     }
@@ -86,7 +93,7 @@ const ClassMemberManagementPage = () => {
   const handleApproveMember = async (userId) => {
     setActionLoading(true);
     try {
-      await axios.put('/api/class-members/approve', {
+      await approveMember({
         classId: String(classId),
         userId: String(userId),
       });
@@ -109,8 +116,8 @@ const ClassMemberManagementPage = () => {
     }
     setActionLoading(true);
     try {
-      const res = await axios.put(`/api/class-members/approve-all/${classId}`);
-      toast.success(res.data.message || 'Đã duyệt tất cả học sinh!');
+      const result = await approveAllMembers(classId);
+      toast.success(result.message || 'Đã duyệt tất cả học sinh!');
       await Promise.all([fetchAllMembers(), fetchPendingMembers()]);
     } catch (err) {
       console.error('Lỗi duyệt tất cả:', err);
@@ -126,11 +133,9 @@ const ClassMemberManagementPage = () => {
     if (!memberToDelete) return;
     setActionLoading(true);
     try {
-      await axios.delete('/api/class-members/remove', {
-        data: {
-          classId: String(classId),
-          userId: String(memberToDelete.userId),
-        },
+      await removeMember({
+        classId: String(classId),
+        userId: String(memberToDelete.userId),
       });
       toast.success('Đã xóa học sinh khỏi lớp!');
       setShowDeleteModal(false);

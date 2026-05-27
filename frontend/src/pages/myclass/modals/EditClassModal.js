@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {Alert} from 'react-bootstrap';
 import {toast} from 'react-toastify';
-import axios from '~/api/axiosClient';
+import { getClassById, updateClass } from '~/api/classApi';
 import classNames from 'classnames/bind';
 import {FaEdit, FaInfoCircle} from 'react-icons/fa';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
@@ -25,11 +25,10 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
 
       // Fetch full class data if description is missing
       if (classData?.classId && !classData?.description) {
-        axios
-          .get(`/api/classes/${classData.classId}`)
-          .then((res) => {
-            setClassName(res.data.className || '');
-            setDescription(res.data.description || '');
+        getClassById(classData.classId)
+          .then((data) => {
+            setClassName(data.className || '');
+            setDescription(data.description || '');
           })
           .catch((err) => {
             console.error('Error fetching class details:', err);
@@ -50,13 +49,13 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
     setLoading(true);
 
     try {
-      const res = await axios.put(`/api/classes/${classData.classId}`, {
+      const data = await updateClass(classData.classId, {
         className: className,
         description: description,
       });
 
       toast.success('Cập nhật lớp học thành công!');
-      onSuccess?.(res.data);
+      onSuccess?.(data);
       onClose();
     } catch (err) {
       setType('danger');

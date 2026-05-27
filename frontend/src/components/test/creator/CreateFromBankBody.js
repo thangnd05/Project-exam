@@ -5,7 +5,10 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
-import axios from '~/api/axiosClient';
+import { getQuestionsByPart } from '~/api/questionApi';
+import { getChaptersByClass } from '~/api/chapterApi';
+import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/api/testApi';
+import { createTestPart } from '~/api/testPartApi';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {
@@ -93,10 +96,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   /* ---------- load chapters của lớp khi ở class mode ---------- */
   useEffect(() => {
     if (!isClassMode) return;
-    axios
-      .get(`/api/chapters/class/${classId}`)
-      .then((res) => {
-        const list = Array.isArray(res.data) ? res.data : [];
+    getChaptersByClass(classId)
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
         setChapters(list);
       })
       .catch((err) => {
@@ -120,10 +122,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         params.chapterId = chapterFilter;
       }
     }
-    axios
-      .get(`/api/questions/by-part/${examPartId}`, { params })
-      .then((res) => {
-        const list = Array.isArray(res.data) ? res.data : res.data?.data ?? res.data?.questions ?? [];
+    getQuestionsByPart(examPartId, params)
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data?.data ?? data?.questions ?? [];
         setPartConfigs((prev) => ({
           ...prev,
           [examPartId]: { ...prev[examPartId], bankQuestions: list, loading: false },
@@ -279,7 +280,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     setNotification({});
 
     try {
-      const testRes = await axios.post('/api/tests', {
+      const testData = await createTest({
         title: testInfo.title.trim(),
         description: testInfo.description || null,
         examTypeId: testInfo.examTypeId,
@@ -293,7 +294,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         chapterId: isClassMode ? (chapterId || null) : null,
       });
 
-      const newTestId = testRes.data.testId ?? testRes.data.id;
+      const newTestId = testData.testId ?? testData.id;
       if (!newTestId) throw new Error('Không nhận được testId từ server.');
 
       for (const part of partsToAdd) {
@@ -301,17 +302,17 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         const numQuestions = getPartEffectiveCount(part.examPartId);
         if (numQuestions <= 0) continue;
 
-        const partRes = await axios.post('/api/test-parts', {
+        const partData = await createTestPart({
           testId: String(newTestId),
           examPartId: String(part.examPartId),
           numQuestions,
         });
-        const newPartId = partRes.data.testPartId ?? partRes.data.id;
+        const newPartId = partData.testPartId ?? partData.id;
         if (!newPartId) throw new Error(`Không nhận được testPartId cho part ${part.name}.`);
 
         if (cfg.mode === SELECTION_MODES.RANDOM || cfg.mode === SELECTION_MODES.SEQUENTIAL) {
           const useClassSource = bankSource === BANK_SOURCES.CLASS && classId;
-          await axios.post('/api/tests/parts/random-questions', {
+          await addRandomQuestionsToPart({
             testPartId: String(newPartId),
             count: numQuestions,
             isSequential: cfg.mode === SELECTION_MODES.SEQUENTIAL,
@@ -322,7 +323,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             chapterId: useClassSource && selectedChapterId && selectedChapterId !== ALL_CHAPTERS ? selectedChapterId : undefined,
           });
         } else {
-          await axios.post('/api/tests/parts/questions', {
+          await addQuestionsToPart({
             testPartId: String(newPartId),
             questionIds: (cfg.selectedIds || []).map(String),
           });
