@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from 'react-toastify';
-import axios from '~/api/axiosClient';
+import { createAlbum } from '~/api/vocabularyAlbumApi';
 import classNames from "classnames/bind";
 import { FaFolderPlus, FaEdit, FaInfoCircle } from "react-icons/fa";
 import CommonFormModal from "~/components/common/modal/CommonFormModal";
@@ -28,7 +28,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
                 description: description
             };
 
-            await axios.post("/api/vocabulary-albums", payload);
+            await createAlbum(payload);
 
             toast.success("Tạo Album thành công!");
 

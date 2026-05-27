@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { IoPencil, IoText, IoLanguage } from 'react-icons/io5';
-import axios from '~/api/axiosClient';
+import { updateVocabulary } from '~/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
@@ -41,11 +41,7 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.put(
-                `/api/vocabularies/${vocab.vocabId}`,
-                { ...editVocab, albumId: vocab.albumId },
-                { withCredentials: true }
-            );
+            await updateVocabulary(vocab.vocabId, { ...editVocab, albumId: vocab.albumId });
             toast.success(' Cập nhật từ vựng thành công!');
             onSuccess();
             onClose();

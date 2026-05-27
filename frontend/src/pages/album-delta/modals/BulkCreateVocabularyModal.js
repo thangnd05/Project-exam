@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IoCloudUploadOutline, IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
-import axios from '~/api/axiosClient';
+import { standardizeVocabularies, bulkCreateVocabularies } from '~/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
@@ -22,14 +22,10 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
 
         setAiLoading(true);
         try {
-            const res = await axios.post(
-                '/api/vocabularies/standardize',
-                { rawText: jsonInput },
-                { withCredentials: true }
-            );
+            const result = await standardizeVocabularies({ rawText: jsonInput });
 
             // Backend trả về { data: "..." } — lấy text rồi loại bỏ markdown fences nếu còn
-            let cleanedJson = (res.data?.data || '')
+            let cleanedJson = (result?.data || '')
                 .replace(/```json\n?|```/g, '')
                 .trim();
 
@@ -88,11 +84,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
 
         setLoading(true);
         try {
-            await axios.post(
-                '/api/vocabularies/bulk',
-                processedPayload,
-                { withCredentials: true }
-            );
+            await bulkCreateVocabularies(processedPayload);
             toast.success(` Đã nhập thành công ${processedPayload.length} từ vựng!`);
             setJsonInput('');
             onSuccess();

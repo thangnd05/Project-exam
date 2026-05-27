@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
-import axios from '~/api/axiosClient';
+import { updateAlbum } from '~/api/vocabularyAlbumApi';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";
@@ -36,7 +36,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
                 description: description
             };
 
-            await axios.put(`/api/vocabulary-albums/${album.albumId}`, payload);
+            await updateAlbum(album.albumId, payload);
 
             toast.success("Cập nhật Album thành công!");
 

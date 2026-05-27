@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../../api/axiosClient';
+import { getMyAlbums, deleteAlbum } from '../../api/vocabularyAlbumApi';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
@@ -46,8 +46,8 @@ function MyAlbumsPage() {
   // 🟢 Lấy danh sách album
   const fetchAlbums = async () => {
     try {
-      const res = await axios.get('/api/vocabulary-albums/my-albums');
-      setAlbums(res.data || []);
+      const data = await getMyAlbums();
+      setAlbums(data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -64,7 +64,7 @@ function MyAlbumsPage() {
     if (!albumToDelete) return;
 
     try {
-      await axios.delete(`/api/vocabulary-albums/${albumToDelete.albumId}`);
+      await deleteAlbum(albumToDelete.albumId);
       toast.success("Xóa Album thành công!");
       fetchAlbums();
     } catch (err) {

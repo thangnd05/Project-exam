@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../api/axiosClient';
+import { getVocabulariesByAlbum, deleteVocabulary } from '~/api/vocabularyApi';
 import {
   Container,
   Table,
@@ -51,10 +52,8 @@ const AlbumDetailPage = () => {
 
   const fetchVocabularies = useCallback(async () => {
     try {
-      const res = await axios.get(`/api/vocabularies/album/${albumId}`, {
-        withCredentials: true,
-      });
-      setVocabularies(res.data);
+      const data = await getVocabulariesByAlbum(albumId);
+      setVocabularies(data);
     } catch (err) {
       console.error(' Lỗi khi tải từ vựng:', err);
       setErrorMsg('Không thể tải danh sách từ vựng 😢');
@@ -91,9 +90,7 @@ const AlbumDetailPage = () => {
   const handleConfirmDelete = async () => {
     if (!vocabToDelete) return;
     try {
-      await axios.delete(`/api/vocabularies/${vocabToDelete.vocabId}`, {
-        withCredentials: true,
-      });
+      await deleteVocabulary(vocabToDelete.vocabId);
       setVocabularies((prev) => prev.filter((v) => v.vocabId !== vocabToDelete.vocabId));
       toast.success(`Đã xóa từ "${vocabToDelete.word}" thành công!`);
     } catch (err) {

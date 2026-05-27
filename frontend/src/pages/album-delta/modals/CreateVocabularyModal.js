@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IoAdd, IoText, IoLanguage } from 'react-icons/io5';
-import axios from '~/api/axiosClient';
+import { createVocabulary } from '~/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
@@ -31,11 +31,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post(
-                '/api/vocabularies',
-                { albumId, ...newVocab },
-                { withCredentials: true }
-            );
+            await createVocabulary({ albumId, ...newVocab });
             toast.success(' Thêm từ vựng thành công!');
             setNewVocab({ word: '', meaning: '', example: '' });
             onSuccess();
