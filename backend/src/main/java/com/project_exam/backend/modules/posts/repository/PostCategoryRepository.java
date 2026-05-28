@@ -12,6 +12,8 @@ import java.util.List;
 public interface PostCategoryRepository extends JpaRepository<PostCategory, String> {
     List<PostCategory> findByPostId(String postId);
     List<PostCategory> findByCategoryId(String categoryId);
+    /** Batch fetch để tránh N+1 trong list post. */
+    List<PostCategory> findByPostIdIn(java.util.Collection<String> postIds);
     @Transactional
     @Modifying
     void deleteByPostId(String postId);

@@ -8,12 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
 public interface TestRepository extends JpaRepository<Test, String> {
 
     List<Test>findByCreatedBy(String id);
+
+    /** Batch fetch test theo nhiều creator — thay loop findByCreatedBy. */
+    List<Test> findByCreatedByIn(Collection<String> userIds);
 
     List<Test>findByClassId(String classId);
 

@@ -96,9 +96,8 @@ public class TestService {
     private final ClassAccessGuard classAccessGuard;
 
     public List<TestResponse> getAllTests() {
-        return testRepository.findAll().stream()
-                .map(test -> buildUserTestSummary(test, null))
-                .toList();
+        List<Test> tests = testRepository.findAll();
+        return buildUserTestSummariesBatch(tests, null);
     }
 
     /**
@@ -113,12 +112,70 @@ public class TestService {
                 .collect(Collectors.toSet());
         if (adminIds.isEmpty()) return new ArrayList<>();
 
-        return testRepository.findAll().stream()
+        List<Test> filtered = testRepository.findAll().stream()
                 .filter(t -> examTypeId.equals(t.getExamTypeId()))
                 .filter(t -> t.getClassId() == null)
                 .filter(t -> adminIds.contains(t.getCreatedBy()))
-                .map(test -> buildUserTestSummary(test, null))
                 .toList();
+        return buildUserTestSummariesBatch(filtered, null);
+    }
+
+    /**
+     * Build list TestResponse hiệu năng cao — group count attempts thay vì query per-test.
+     * Trước: N+1 với 200 test = 400+ count query. Sau: 2 query bất kể số test.
+     */
+    private List<TestResponse> buildUserTestSummariesBatch(List<Test> tests, String userId) {
+        if (tests.isEmpty()) return List.of();
+        List<String> testIds = tests.stream().map(Test::getTestId).toList();
+
+        Map<String, Long> totalAttemptsByTest = userTestRepository.countGroupedByTestIdIn(testIds)
+                .stream()
+                .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
+
+        Map<String, Long> attemptsUsedByTest = userId != null
+                ? userTestRepository.countGroupedByTestIdInAndUserId(testIds, userId).stream()
+                        .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]))
+                : Map.of();
+
+        return tests.stream()
+                .map(test -> buildUserTestSummaryFromCounts(
+                        test, userId,
+                        attemptsUsedByTest.getOrDefault(test.getTestId(), 0L),
+                        totalAttemptsByTest.getOrDefault(test.getTestId(), 0L)))
+                .toList();
+    }
+
+    private TestResponse buildUserTestSummaryFromCounts(
+            Test test, String userId, long attemptsUsed, long totalAttempts) {
+        Integer maxAttempts = test.getMaxAttempts();
+        Integer remainingAttempts = null;
+        boolean canDoTest = true;
+
+        if (maxAttempts != null) {
+            remainingAttempts = (int) Math.max(0, maxAttempts - attemptsUsed);
+            canDoTest = userId == null || remainingAttempts > 0;
+        }
+
+        return TestResponse.builder()
+                .testId(test.getTestId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .examTypeId(test.getExamTypeId())
+                .examCategoryId(test.getExamCategoryId())
+                .createdBy(test.getCreatedBy())
+                .createdAt(test.getCreatedAt())
+                .bannerUrl(test.getBannerUrl())
+                .durationMinutes(test.getDurationMinutes())
+                .availableFrom(test.getAvailableFrom())
+                .availableTo(test.getAvailableTo())
+                .status(test.calculateStatus().name())
+                .maxAttempts(maxAttempts)
+                .attemptsUsed((int) attemptsUsed)
+                .remainingAttempts(remainingAttempts)
+                .totalAttempts(totalAttempts)
+                .canDoTest(canDoTest)
+                .parts(null)
+                .build();
     }
 
     public Optional<Test> getTestById(String id) {
@@ -254,18 +311,28 @@ public class TestService {
         List<User> adminUsers = userRepository.findByRoleId(adminRole.getRoleId());
         if (adminUsers.isEmpty()) return new ArrayList<>();
 
-        List<Test> result = new ArrayList<>();
-        for (User admin : adminUsers) {
-            result.addAll(testRepository.findByCreatedBy(admin.getUserId()));
-        }
-        return result.stream()
-                .map(this::buildAdminTestSummary)
+        List<String> adminIds = adminUsers.stream().map(User::getUserId).toList();
+        List<Test> result = testRepository.findByCreatedByIn(adminIds);
+        return buildAdminTestSummariesBatch(result);
+    }
+
+    /**
+     * Build list TestAdminResponse — group count thay N queries countByTestId.
+     */
+    private List<TestAdminResponse> buildAdminTestSummariesBatch(List<Test> tests) {
+        if (tests.isEmpty()) return List.of();
+        List<String> testIds = tests.stream().map(Test::getTestId).toList();
+        Map<String, Long> totalAttemptsByTest = userTestRepository.countGroupedByTestIdIn(testIds)
+                .stream()
+                .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
+
+        return tests.stream()
+                .map(t -> buildAdminTestSummaryFromCount(
+                        t, totalAttemptsByTest.getOrDefault(t.getTestId(), 0L)))
                 .toList();
     }
 
-    private TestAdminResponse buildAdminTestSummary(Test test) {
-        long totalAttempts = userTestRepository.countByTestId(test.getTestId());
-
+    private TestAdminResponse buildAdminTestSummaryFromCount(Test test, long totalAttempts) {
         return TestAdminResponse.builder()
                 .testId(test.getTestId())
                 .title(test.getTitle())
@@ -290,9 +357,7 @@ public class TestService {
         if (userId == null) {
             return List.of();
         }
-        return testRepository.findByCreatedBy(userId).stream()
-                .map(this::buildAdminTestSummary)
-                .toList();
+        return buildAdminTestSummariesBatch(testRepository.findByCreatedBy(userId));
     }
 
     public List<TestResponse> getTestsByUser(HttpServletRequest httpRequest) {
@@ -300,9 +365,7 @@ public class TestService {
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng.");
         }
-        return testRepository.findByCreatedBy(currentUserId).stream()
-                .map(test -> buildUserTestSummary(test, currentUserId))
-                .toList();
+        return buildUserTestSummariesBatch(testRepository.findByCreatedBy(currentUserId), currentUserId);
     }
 
     @Transactional
@@ -774,9 +837,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         //  Nếu hợp lệ, trả danh sách bài kiểm tra
-        return testRepository.findByClassId(classId).stream()
-                .map(test -> buildUserTestSummary(test, currentUserId))
-                .toList();
+        return buildUserTestSummariesBatch(testRepository.findByClassId(classId), currentUserId);
     }
 
     public List<TestResponse> getTestByClassIdAndChapterId(String classId,String chapterId, HttpServletRequest request) {
@@ -796,9 +857,8 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         //  Nếu hợp lệ, trả danh sách bài kiểm tra
-        return testRepository.findByClassIdAndChapterId(classId,chapterId).stream()
-                .map(test -> buildUserTestSummary(test, currentUserId))
-                .toList();
+        return buildUserTestSummariesBatch(
+                testRepository.findByClassIdAndChapterId(classId, chapterId), currentUserId);
     }
 
     public List<TestResponse> getTestByCreateBy(HttpServletRequest request) {
@@ -809,9 +869,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         }
 
         //  Nếu hợp lệ, trả danh sách bài kiểm tra
-        return testRepository.findByCreatedBy(currentUserId).stream()
-                .map(test -> buildUserTestSummary(test, currentUserId))
-                .toList();
+        return buildUserTestSummariesBatch(testRepository.findByCreatedBy(currentUserId), currentUserId);
     }
 
     public List<TestResponse> getMyPersonalTests(HttpServletRequest request) {
@@ -827,9 +885,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         List<Test> tests =
                 testRepository.findByCreatedByAndClassIdIsNullAndChapterIdIsNull(currentUserId);
 
-        return tests.stream()
-                .map(test -> buildUserTestSummary(test, currentUserId))
-                .toList();
+        return buildUserTestSummariesBatch(tests, currentUserId);
     }
 
     /**

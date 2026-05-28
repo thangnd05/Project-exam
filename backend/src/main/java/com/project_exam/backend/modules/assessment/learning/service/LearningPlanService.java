@@ -511,6 +511,8 @@ public class LearningPlanService {
             estimatedDays = Math.min(estimatedDays, plan.getDeadlineDays());
         }
         long passed = tasks.stream().filter(t -> t.getStatus() == TaskStatus.PASSED).count();
+        Map<String, Tag> tagMap = loadTagMap(tasks);
+        Map<String, ExamPart> partMap = loadPartMap(tasks);
 
         return PlanResponse.builder()
                 .learningPlanId(plan.getLearningPlanId())
@@ -533,8 +535,8 @@ public class LearningPlanService {
                 .totalTasks(tasks.size())
                 .passedTasks((int) passed)
                 .estimatedDaysRemaining(estimatedDays)
-                .tasks(mapTaskDtos(tasks, resourcesByTag))
-                .partGroups(buildPartGroups(tasks, resourcesByTag))
+                .tasks(mapTaskDtos(tasks, resourcesByTag, tagMap, partMap))
+                .partGroups(buildPartGroups(tasks, resourcesByTag, tagMap, partMap))
                 .partsWithoutTasks(partsWithoutTasks)
                 .phases(List.of())
                 .build();
@@ -547,6 +549,8 @@ public class LearningPlanService {
         long passed = tasks.stream().filter(t -> t.getStatus() == TaskStatus.PASSED).count();
         int remaining = (int) (tasks.size() - passed);
         int estimatedDays = remaining * ESTIMATED_DAYS_PER_TASK;
+        Map<String, Tag> tagMap = loadTagMap(tasks);
+        Map<String, ExamPart> partMap = loadPartMap(tasks);
 
         return PlanResponse.builder()
                 .learningPlanId(plan.getLearningPlanId())
@@ -574,8 +578,8 @@ public class LearningPlanService {
                 .totalTasks(tasks.size())
                 .passedTasks((int) passed)
                 .estimatedDaysRemaining(estimatedDays)
-                .tasks(mapTaskDtos(tasks, resourcesByTag))
-                .partGroups(buildPartGroups(tasks, resourcesByTag))
+                .tasks(mapTaskDtos(tasks, resourcesByTag, tagMap, partMap))
+                .partGroups(buildPartGroups(tasks, resourcesByTag, tagMap, partMap))
                 .partsWithoutTasks(List.of())
                 .phases(List.of())
                 .build();
@@ -621,11 +625,34 @@ public class LearningPlanService {
 
     private List<PlanTaskDto> mapTaskDtos(
             List<LearningPlanTask> tasks,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag) {
+            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
+            Map<String, Tag> tagMap,
+            Map<String, ExamPart> partMap) {
         return tasks.stream()
                 .sorted(Comparator.comparingInt(LearningPlanTask::getTaskOrder))
-                .map(t -> toTaskDto(t, resourcesByTag))
+                .map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap))
                 .toList();
+    }
+
+    /** Batch-load Tag/ExamPart cho list task, tránh N+1 trong toTaskDto. */
+    private Map<String, Tag> loadTagMap(List<LearningPlanTask> tasks) {
+        Set<String> tagIds = tasks.stream()
+                .map(LearningPlanTask::getTagId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (tagIds.isEmpty()) return Map.of();
+        return tagRepository.findAllById(tagIds).stream()
+                .collect(Collectors.toMap(Tag::getTagId, t -> t, (a, b) -> a));
+    }
+
+    private Map<String, ExamPart> loadPartMap(List<LearningPlanTask> tasks) {
+        Set<String> partIds = tasks.stream()
+                .map(LearningPlanTask::getExamPartId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (partIds.isEmpty()) return Map.of();
+        return examPartRepository.findAllById(partIds).stream()
+                .collect(Collectors.toMap(ExamPart::getExamPartId, p -> p, (a, b) -> a));
     }
 
     private int resolveReadinessScore(EnhancedResultDto result) {
@@ -650,7 +677,9 @@ public class LearningPlanService {
 
     private List<PlanPartGroupDto> buildPartGroups(
             List<LearningPlanTask> tasks,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag) {
+            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
+            Map<String, Tag> tagMap,
+            Map<String, ExamPart> partMap) {
         if (tasks.isEmpty()) {
             return List.of();
         }
@@ -666,7 +695,7 @@ public class LearningPlanService {
             List<LearningPlanTask> partTasks = entry.getValue().stream()
                     .sorted(Comparator.comparingInt(LearningPlanTask::getTaskOrder))
                     .toList();
-            ExamPart part = examPartRepository.findById(partId).orElse(null);
+            ExamPart part = partMap.get(partId);
             int passedInPart = (int) partTasks.stream()
                     .filter(t -> t.getStatus() == TaskStatus.PASSED)
                     .count();
@@ -677,7 +706,7 @@ public class LearningPlanService {
                     .passAccuracy(passAcc)
                     .passedTasksInPart(passedInPart)
                     .totalTasksInPart(partTasks.size())
-                    .tasks(partTasks.stream().map(t -> toTaskDto(t, resourcesByTag)).toList())
+                    .tasks(partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList())
                     .build());
         }
         return groups;
@@ -685,10 +714,12 @@ public class LearningPlanService {
 
     private PlanTaskDto toTaskDto(
             LearningPlanTask task,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag) {
+            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
+            Map<String, Tag> tagMap,
+            Map<String, ExamPart> partMap) {
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
-        Tag tag = task.getTagId() != null ? tagRepository.findById(task.getTagId()).orElse(null) : null;
-        ExamPart part = examPartRepository.findById(task.getExamPartId()).orElse(null);
+        Tag tag = task.getTagId() != null ? tagMap.get(task.getTagId()) : null;
+        ExamPart part = task.getExamPartId() != null ? partMap.get(task.getExamPartId()) : null;
         PlanPhaseDto.RecommendedResourceDto studyResource = resourcesByTag != null && task.getTagId() != null
                 ? resourcesByTag.get(task.getTagId())
                 : null;

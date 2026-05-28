@@ -51,4 +51,14 @@ public interface UserTestRepository extends JpaRepository<UserTest, String> {
 
     long countByTestIdAndStatus(String testId, UserTest.Status status);
 
+    /** Batch count attempt cho nhiều testId 1 lần — tránh N+1 trong list test. */
+    @Query("SELECT ut.testId, COUNT(ut) FROM UserTest ut WHERE ut.testId IN :testIds GROUP BY ut.testId")
+    List<Object[]> countGroupedByTestIdIn(@Param("testIds") List<String> testIds);
+
+    /** Batch count attempt của 1 user trên nhiều testId — tránh N+1 trong list test cho user. */
+    @Query("SELECT ut.testId, COUNT(ut) FROM UserTest ut "
+            + "WHERE ut.testId IN :testIds AND ut.userId = :userId GROUP BY ut.testId")
+    List<Object[]> countGroupedByTestIdInAndUserId(
+            @Param("testIds") List<String> testIds, @Param("userId") String userId);
+
 }
