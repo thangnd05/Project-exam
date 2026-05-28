@@ -191,9 +191,16 @@ public class LearningPlanSessionService {
                 .stream()
                 .collect(Collectors.toMap(Answer::getQuestionId, a -> a, (a, b) -> a));
 
+        // Dedup theo questionId — giữ entry đầu tiên, bỏ duplicate (FE bug / replay attack).
+        // Tránh đội accuracy lên sai khi cùng 1 câu xuất hiện nhiều lần.
+        Map<String, SubmitSessionRequest.AnswerItem> uniqueAnswers = new LinkedHashMap<>();
+        for (SubmitSessionRequest.AnswerItem item : request.getAnswers()) {
+            uniqueAnswers.putIfAbsent(item.getQuestionId(), item);
+        }
+
         int correct = 0;
         List<LearningPlanSessionAnswer> rows = new ArrayList<>();
-        for (SubmitSessionRequest.AnswerItem item : request.getAnswers()) {
+        for (SubmitSessionRequest.AnswerItem item : uniqueAnswers.values()) {
             if (!allowedQuestionIds.contains(item.getQuestionId())) {
                 throw new BadRequestException("Câu hỏi không thuộc phiên học hiện tại");
             }
@@ -375,6 +382,7 @@ public class LearningPlanSessionService {
                 session.setStatus(SessionStatus.SUBMITTED);
                 session.setPassed(false);
                 session.setAccuracy(0);
+                session.setAbandoned(true);
                 session.setSubmittedAt(Instant.now());
                 sessionRepository.save(session);
             }
@@ -488,7 +496,7 @@ public class LearningPlanSessionService {
     /**
      * Đếm fail streak gần nhất cho task này.
      * - Chỉ xét tối đa 5 session gần nhất (đủ vì threshold struggle là 3).
-     * - Bỏ qua session abandon (accuracy=0): không trừng phạt user vì bỏ ngang.
+     * - Bỏ qua session abandoned (user switch task giữa chừng), KHÔNG nhầm với fail thật 0%.
      * - Gặp pass hoặc session bất thường → dừng đếm (fail-safe, không gộp streak cũ).
      * Phải gọi SAU khi save session hiện tại để bao gồm cả lần submit vừa rồi.
      */
@@ -498,7 +506,7 @@ public class LearningPlanSessionService {
         int streak = 0;
         for (LearningPlanSession s : recent) {
             if (s.getStatus() != SessionStatus.SUBMITTED) break;
-            if (s.getAccuracy() != null && s.getAccuracy() == 0) continue;
+            if (Boolean.TRUE.equals(s.getAbandoned())) continue;
             if (Boolean.FALSE.equals(s.getPassed())) {
                 streak++;
             } else {

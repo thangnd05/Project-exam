@@ -44,6 +44,10 @@ public class LearningPlanSession {
     @Column(name = "passed")
     private Boolean passed;
 
+    /** True khi session bị huỷ tự động (user switch task), phân biệt với fail thật 0%. */
+    @Column(name = "abandoned", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean abandoned = false;
+
     @CreationTimestamp
     @Column(name = "started_at", nullable = false, updatable = false)
     private Instant startedAt;
