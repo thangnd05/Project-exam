@@ -19,6 +19,7 @@ import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionGroupResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
+import com.project_exam.backend.modules.assessment.test.dto.TestPageResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
@@ -64,7 +65,10 @@ import com.project_exam.backend.modules.classroom.repository.ClassRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -118,6 +122,50 @@ public class TestService {
                 .filter(t -> adminIds.contains(t.getCreatedBy()))
                 .toList();
         return buildUserTestSummariesBatch(filtered, null);
+    }
+
+    /**
+     * Bản phân trang của getAdminTestsByExamType — dùng cho danh sách test theo examType.
+     * Why: trang user có thể có rất nhiều đề admin tạo, không nên load all rồi filter in-memory.
+     */
+    public TestPageResponse getAdminTestsByExamTypePaged(String examTypeId, int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 12 : Math.min(size, 100);
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Role adminRole = roleRepository.findByRoleName("ADMIN");
+        if (adminRole == null) return emptyTestPage(safePage, safeSize);
+        Set<String> adminIds = userRepository.findByRoleId(adminRole.getRoleId()).stream()
+                .map(User::getUserId)
+                .collect(Collectors.toSet());
+        if (adminIds.isEmpty()) return emptyTestPage(safePage, safeSize);
+
+        Page<Test> testPage = testRepository
+                .findByExamTypeIdAndClassIdIsNullAndCreatedByIn(examTypeId, adminIds, pageable);
+
+        return toTestPageResponse(testPage, null);
+    }
+
+    private TestPageResponse emptyTestPage(int page, int size) {
+        TestPageResponse empty = new TestPageResponse();
+        empty.setContent(List.of());
+        empty.setCurrentPage(page);
+        empty.setSize(size);
+        empty.setTotalElements(0);
+        empty.setTotalPages(0);
+        empty.setHasNext(false);
+        return empty;
+    }
+
+    private TestPageResponse toTestPageResponse(Page<Test> testPage, String userId) {
+        TestPageResponse response = new TestPageResponse();
+        response.setContent(buildUserTestSummariesBatch(testPage.getContent(), userId));
+        response.setCurrentPage(testPage.getNumber());
+        response.setSize(testPage.getSize());
+        response.setTotalElements(testPage.getTotalElements());
+        response.setTotalPages(testPage.getTotalPages());
+        response.setHasNext(testPage.hasNext());
+        return response;
     }
 
     /**
@@ -886,6 +934,28 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 testRepository.findByCreatedByAndClassIdIsNullAndChapterIdIsNull(currentUserId);
 
         return buildUserTestSummariesBatch(tests, currentUserId);
+    }
+
+    /**
+     * Bản phân trang của getMyPersonalTests — dùng cho trang "Bài kiểm tra của tôi".
+     */
+    public TestPageResponse getMyPersonalTestsPaged(HttpServletRequest request, int page, int size) {
+        String currentUserId = authUtils.getUserId(request);
+        if (currentUserId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "🔒 Bạn cần đăng nhập để xem bài kiểm tra."
+            );
+        }
+
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 12 : Math.min(size, 100);
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Test> testPage = testRepository
+                .findByCreatedByAndClassIdIsNullAndChapterIdIsNull(currentUserId, pageable);
+
+        return toTestPageResponse(testPage, currentUserId);
     }
 
     /**

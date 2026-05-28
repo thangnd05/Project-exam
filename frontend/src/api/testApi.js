@@ -6,12 +6,22 @@ export const getAdminTests = () => {
   return axios.get(`${BASE_URL}/admin`).then((res) => res.data);
 };
 
-export const getMyTests = () => {
-  return axios.get(`${BASE_URL}/my-tests`).then((res) => res.data);
+export const getMyTests = ({ page = 0, size = 12 } = {}) => {
+  const params = new URLSearchParams();
+  params.set('page', String(page));
+  params.set('size', String(size));
+  return axios
+    .get(`${BASE_URL}/my-tests?${params.toString()}`)
+    .then((res) => res.data);
 };
 
-export const getTestsByExamType = (examTypeId) => {
-  return axios.get(`${BASE_URL}/user/by-exam-type/${examTypeId}`).then((res) => res.data);
+export const getTestsByExamType = (examTypeId, { page = 0, size = 12 } = {}) => {
+  const params = new URLSearchParams();
+  params.set('page', String(page));
+  params.set('size', String(size));
+  return axios
+    .get(`${BASE_URL}/user/by-exam-type/${examTypeId}?${params.toString()}`)
+    .then((res) => res.data);
 };
 
 export const getAdminTestById = (testId) => {

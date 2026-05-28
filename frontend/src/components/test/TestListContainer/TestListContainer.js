@@ -27,6 +27,7 @@ const TestListContainer = ({
   emptyState,
   loading,
   onRefresh,
+  footer,
 }) => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
 
@@ -88,6 +89,8 @@ const TestListContainer = ({
               </div>
             )
           )}
+
+          {footer}
         </div>
       </Container>
     </div>

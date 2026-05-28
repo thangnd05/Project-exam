@@ -7,6 +7,7 @@ import com.project_exam.backend.modules.assessment.test.dto.AddRandomQuestionsTo
 import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsResponse;
 import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
+import com.project_exam.backend.modules.assessment.test.dto.TestPageResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.service.TestService;
@@ -163,13 +164,14 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     }
 
     // Lấy danh sách test theo examTypeId cho user (chỉ trả về đề do admin tạo,
-    // không lộ đề cá nhân của user khác ra danh sách chung)
+    // không lộ đề cá nhân của user khác ra danh sách chung). Có phân trang.
     @GetMapping("/user/by-exam-type/{examTypeId}")
-    public ResponseEntity<List<TestResponse>> getTestsByExamType(
-            @PathVariable String examTypeId
+    public ResponseEntity<TestPageResponse> getTestsByExamType(
+            @PathVariable String examTypeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
     ) {
-        List<TestResponse> responses = testService.getAdminTestsByExamType(examTypeId);
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(testService.getAdminTestsByExamTypePaged(examTypeId, page, size));
     }
 
     @GetMapping("/{testId}/can-start")
@@ -210,13 +212,12 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     }
 
     @GetMapping("/my-tests")
-    public ResponseEntity<List<TestResponse>> getMyPersonalTests(
-            HttpServletRequest request
+    public ResponseEntity<TestPageResponse> getMyPersonalTests(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
     ) {
-        List<TestResponse> responses =
-                testService.getMyPersonalTests(request);
-
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(testService.getMyPersonalTestsPaged(request, page, size));
     }
 
 }

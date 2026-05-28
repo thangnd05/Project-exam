@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.test.repository;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,5 +26,10 @@ public interface TestRepository extends JpaRepository<Test, String> {
     List<Test> findByClassIdAndChapterId(String classId, String chapterId);
 
     List<Test> findByCreatedByAndClassIdIsNullAndChapterIdIsNull(String createdBy);
+
+    Page<Test> findByCreatedByAndClassIdIsNullAndChapterIdIsNull(String createdBy, Pageable pageable);
+
+    Page<Test> findByExamTypeIdAndClassIdIsNullAndCreatedByIn(
+            String examTypeId, Collection<String> createdByIds, Pageable pageable);
 
 }

@@ -1,6 +1,6 @@
 import { getTestsByExamType } from '../../../../api/testApi';
 import { getExamTypeById } from '../../../../api/examTypeApi';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -11,8 +11,10 @@ import { useAuth } from '../../../../hooks/useAuth';
 
 import style from './TestByExamTypePage.module.scss';
 import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
+import Pagination from '~/components/common/Pagination/Pagination';
 
 const cx = classNames.bind(style);
+const PAGE_SIZE = 12;
 
 function TestByExamTypePage() {
   const { examTypeId } = useParams();
@@ -23,6 +25,27 @@ function TestByExamTypePage() {
   const [examTypeName, setExamTypeName] = useState('');
   const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchTests = useCallback(
+    (page = 0) => {
+      if (!examTypeId) return;
+      setLoading(true);
+      getTestsByExamType(examTypeId, { page, size: PAGE_SIZE })
+        .then((data) => {
+          setTests(Array.isArray(data?.content) ? data.content : []);
+          setTotalPages(data?.totalPages ?? 0);
+          setCurrentPage(data?.currentPage ?? page);
+        })
+        .catch(() => {
+          setTests([]);
+          setTotalPages(0);
+        })
+        .finally(() => setLoading(false));
+    },
+    [examTypeId]
+  );
 
   useEffect(() => {
     if (!examTypeId) {
@@ -30,17 +53,12 @@ function TestByExamTypePage() {
       return;
     }
 
-    setLoading(true);
-
-    getTestsByExamType(examTypeId)
-      .then((data) => setTests(data))
-      .catch(() => setTests([]))
-      .finally(() => setLoading(false));
+    fetchTests(0);
 
     getExamTypeById(examTypeId)
       .then((data) => setExamTypeName(data.name))
       .catch(() => { });
-  }, [examTypeId]);
+  }, [examTypeId, fetchTests]);
 
   // Countdown realtime
   useEffect(() => {
@@ -61,7 +79,7 @@ function TestByExamTypePage() {
     return () => clearInterval(interval);
   }, [tests]);
 
-  if (loading) {
+  if (loading && tests.length === 0 && currentPage === 0 && totalPages === 0) {
     return (
       <div
         className="d-flex flex-column align-items-center justify-content-center"
@@ -101,6 +119,13 @@ function TestByExamTypePage() {
       tests={tests}
       countdowns={countdowns}
       emptyState={emptyState}
+      footer={
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onChange={fetchTests}
+        />
+      }
     />
   );
 }

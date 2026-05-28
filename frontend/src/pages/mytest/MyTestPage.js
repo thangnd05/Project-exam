@@ -1,5 +1,5 @@
 import { getMyTests, deleteTest } from '../../api/testApi';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
@@ -14,8 +14,10 @@ import { useAuth } from '../../hooks/useAuth';
 import CreateTestModal from '~/components/test/CreateTestModal';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
+import Pagination from '~/components/common/Pagination/Pagination';
 
 const cx = classNames.bind(styles);
+const PAGE_SIZE = 12;
 
 function MyTestPage() {
   const { user } = useAuth();
@@ -27,20 +29,24 @@ function MyTestPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [testToDelete, setTestToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchTests = () => {
+  const fetchTests = useCallback((page = 0) => {
     setLoading(true);
-    getMyTests()
+    getMyTests({ page, size: PAGE_SIZE })
       .then((data) => {
-        if (Array.isArray(data)) setTests(data);
-        else setTests([]);
+        setTests(Array.isArray(data?.content) ? data.content : []);
+        setTotalPages(data?.totalPages ?? 0);
+        setCurrentPage(data?.currentPage ?? page);
       })
       .catch((err) => {
         console.error(' Lỗi:', err);
         setTests([]);
+        setTotalPages(0);
       })
       .finally(() => setLoading(false));
-  };
+  }, []);
 
   const handleDeleteTest = (testId) => {
     const selectedTest = tests.find((testItem) => testItem.testId === testId);
@@ -56,7 +62,10 @@ function MyTestPage() {
     try {
       await deleteTest(testToDelete.testId);
       toast.success('Xóa bài kiểm tra thành công!');
-      fetchTests();
+      // Sau khi xóa, nếu trang hiện tại còn 1 item (sẽ trống sau xóa) thì lùi về trang trước.
+      const nextPage =
+        tests.length === 1 && currentPage > 0 ? currentPage - 1 : currentPage;
+      fetchTests(nextPage);
     } catch (err) {
       console.error(' Lỗi xóa bài test:', err);
       toast.error('Không thể xóa bài kiểm tra. Vui lòng thử lại.');
@@ -71,8 +80,8 @@ function MyTestPage() {
       navigate('/login');
       return;
     }
-    fetchTests();
-  }, [user, navigate]);
+    fetchTests(0);
+  }, [user, navigate, fetchTests]);
 
   // Countdown realtime
   useEffect(() => {
@@ -93,7 +102,7 @@ function MyTestPage() {
     return () => clearInterval(interval);
   }, [tests]);
 
-  if (loading) {
+  if (loading && tests.length === 0 && currentPage === 0 && totalPages === 0) {
     return (
       <div className={cx('loading-box')}>
         <Spinner animation="grow" variant="primary" size="lg" />
@@ -125,14 +134,21 @@ function MyTestPage() {
         tests={tests}
         countdowns={countdowns}
         handleDeleteTest={handleDeleteTest}
-        onRefresh={fetchTests}
+        onRefresh={() => fetchTests(currentPage)}
         emptyState={emptyState}
+        footer={
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onChange={fetchTests}
+          />
+        }
       />
 
       <CreateTestModal
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        onSuccess={fetchTests}
+        onSuccess={() => fetchTests(0)}
         mode="personal"
       />
 
