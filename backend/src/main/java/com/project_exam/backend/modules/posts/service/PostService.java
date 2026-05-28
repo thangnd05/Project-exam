@@ -335,7 +335,7 @@ public class PostService {
         Page<Post> postPage = postRepository.findAll(spec, pageable);
 
         PostPageResponse response = new PostPageResponse();
-        response.setContent(postPage.getContent().stream().map(this::toSummaryResponse).toList());
+        response.setContent(buildSummaryResponses(postPage.getContent()));
         response.setCurrentPage(postPage.getNumber());
         response.setSize(postPage.getSize());
         response.setTotalElements(postPage.getTotalElements());
@@ -346,9 +346,73 @@ public class PostService {
 
     public List<PostSummaryResponse> getMyPosts(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        return postRepository.findByUserId(userId).stream()
-                .map(this::toSummaryResponse)
-                .collect(Collectors.toList());
+        return buildSummaryResponses(postRepository.findByUserId(userId));
+    }
+
+    /**
+     * Batch-build summary cho list post — 1 query/loại thay vì N query/post.
+     * Why: getPostsPaged trước đây bắn ~5 query cho mỗi post (author, categories, count comment/react/save).
+     */
+    private List<PostSummaryResponse> buildSummaryResponses(List<Post> posts) {
+        if (posts == null || posts.isEmpty()) return List.of();
+
+        List<String> postIds = posts.stream().map(Post::getId).toList();
+        Set<String> authorIds = posts.stream()
+                .map(Post::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Map<String, User> authorMap = userRepository.findAllById(authorIds).stream()
+                .collect(Collectors.toMap(User::getUserId, u -> u));
+
+        List<PostCategory> postCategories = postCategoryRepository.findByPostIdIn(postIds);
+        Set<String> categoryIds = postCategories.stream()
+                .map(PostCategory::getCategoryId)
+                .collect(Collectors.toSet());
+        Map<String, Category> categoryMap = categoryRepository.findAllById(categoryIds).stream()
+                .collect(Collectors.toMap(Category::getId, c -> c));
+        Map<String, List<CategoryResponse>> categoriesByPostId = new HashMap<>();
+        for (PostCategory pc : postCategories) {
+            Category cat = categoryMap.get(pc.getCategoryId());
+            if (cat == null) continue;
+            categoriesByPostId
+                    .computeIfAbsent(pc.getPostId(), k -> new ArrayList<>())
+                    .add(toCategoryResponse(cat));
+        }
+
+        Map<String, Long> commentCountMap = toCountMap(commentRepository.countGroupedByPostIdIn(postIds));
+        Map<String, Long> reactCountMap = toCountMap(reactRepository.countGroupedByPostIdIn(postIds));
+        Map<String, Long> saveCountMap = toCountMap(savedPostRepository.countGroupedByPostIdIn(postIds));
+
+        return posts.stream().map(post -> {
+            User author = authorMap.get(post.getUserId());
+            String authorName = author != null ? author.getUserName() : "Unknown";
+            String authorAvatar = author != null ? author.getAvatarUrl() : null;
+
+            return PostSummaryResponse.builder()
+                    .id(post.getId())
+                    .userId(post.getUserId())
+                    .authorName(authorName)
+                    .authorAvatar(authorAvatar)
+                    .title(post.getTitle())
+                    .status(post.getStatus())
+                    .createdAt(post.getCreatedAt())
+                    .thumbnailUrl(post.getThumbnailUrl())
+                    .categories(categoriesByPostId.getOrDefault(post.getId(), List.of()))
+                    .commentCount(commentCountMap.getOrDefault(post.getId(), 0L))
+                    .totalReacts(reactCountMap.getOrDefault(post.getId(), 0L))
+                    .viewCount(post.getViewCount() == null ? 0L : post.getViewCount())
+                    .saveCount(saveCountMap.getOrDefault(post.getId(), 0L))
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    private Map<String, Long> toCountMap(List<Object[]> rows) {
+        Map<String, Long> map = new HashMap<>();
+        for (Object[] row : rows) {
+            map.put((String) row[0], ((Number) row[1]).longValue());
+        }
+        return map;
     }
 
     // ─────────────────────────────────────────────

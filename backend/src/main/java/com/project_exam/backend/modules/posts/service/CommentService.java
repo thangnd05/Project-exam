@@ -14,10 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.project_exam.backend.modules.users.domain.User;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,15 +33,14 @@ public class CommentService {
     private final com.project_exam.backend.modules.users.repository.UserRepository userRepository;
 
     private CommentResponse toResponse(Comment c, List<CommentResponse> replies) {
-        String authorName = "Unknown";
-        String authorAvatar = null;
-        
         var authorOpt = userRepository.findById(c.getUserId());
-        if (authorOpt.isPresent()) {
-            authorName = authorOpt.get().getUserName();
-            authorAvatar = authorOpt.get().getAvatarUrl();
-        }
+        String authorName = authorOpt.map(User::getUserName).orElse("Unknown");
+        String authorAvatar = authorOpt.map(User::getAvatarUrl).orElse(null);
+        return buildResponse(c, replies, authorName, authorAvatar);
+    }
 
+    private CommentResponse buildResponse(Comment c, List<CommentResponse> replies,
+                                          String authorName, String authorAvatar) {
         return CommentResponse.builder()
                 .id(c.getId())
                 .postId(c.getPostId())
@@ -62,10 +64,25 @@ public class CommentService {
 
         // 1. Lấy tất cả comments của post
         List<Comment> allComments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
-        
-        // 2. Chuyển sang DTO (chưa có replies)
+
+        // 2. Batch-load author 1 lần để tránh N+1
+        Set<String> authorIds = allComments.stream()
+                .map(Comment::getUserId)
+                .filter(id -> id != null && !id.isBlank())
+                .collect(Collectors.toSet());
+        Map<String, User> authorMap = authorIds.isEmpty()
+                ? Map.of()
+                : userRepository.findAllById(authorIds).stream()
+                        .collect(Collectors.toMap(User::getUserId, u -> u));
+
+        // 3. Chuyển sang DTO (chưa có replies)
         List<CommentResponse> allDtos = allComments.stream()
-                .map(c -> toResponse(c, new ArrayList<CommentResponse>()))
+                .map(c -> {
+                    User author = authorMap.get(c.getUserId());
+                    String name = author != null ? author.getUserName() : "Unknown";
+                    String avatar = author != null ? author.getAvatarUrl() : null;
+                    return buildResponse(c, new ArrayList<CommentResponse>(), name, avatar);
+                })
                 .collect(Collectors.toList());
 
         // 3. Xây dựng cây bằng Map để đạt hiệu năng O(N)
