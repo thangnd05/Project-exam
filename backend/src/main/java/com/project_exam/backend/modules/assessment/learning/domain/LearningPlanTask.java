@@ -54,6 +54,10 @@ public class LearningPlanTask {
     @Column(name = "attempt_count", nullable = false)
     private Integer attemptCount = 0;
 
+    /** Số session fail liên tiếp gần đây (reset về 0 khi gặp session pass). */
+    @Column(name = "consecutive_fails", nullable = false)
+    private Integer consecutiveFails = 0;
+
     @Column(name = "passed_at")
     private Instant passedAt;
 

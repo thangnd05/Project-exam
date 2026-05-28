@@ -6,6 +6,7 @@ import { getExamTypes } from '~/api/examTypeApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { listPlans, getPlanById } from '~/api/learningPlanApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
+import { buildExamTypeDetailPath } from '~/config/Routes';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -96,6 +97,8 @@ function NextStepPage() {
     reload();
   }, [reload]);
 
+  const mockTestsPath = buildExamTypeDetailPath(examTypeId);
+
   const recommendation = useMemo(() => {
     if (!target?.hasTarget) {
       return {
@@ -130,7 +133,7 @@ function NextStepPage() {
         title: 'Làm một bài Full Mock chẩn đoán',
         desc: 'Chưa có bài thi nào COMPLETED. Hệ thống cần một mock để biết điểm yếu của bạn.',
         ctaLabel: 'Chọn đề thi',
-        ctaTo: '/',
+        ctaTo: mockTestsPath,
       };
     }
 
@@ -142,7 +145,7 @@ function NextStepPage() {
           title: 'Bạn đã pass hết ải — đến lúc làm Mock kiểm tra',
           desc: `Plan #${activePlanDetail.planSequence} đã xong giai đoạn FOUNDATION. Làm một mock mới để cập nhật readiness.`,
           ctaLabel: 'Làm mock',
-          ctaTo: '/',
+          ctaTo: mockTestsPath,
           extras: [
             {
               label: `Xem Plan #${activePlanDetail.planSequence}`,
@@ -154,18 +157,30 @@ function NextStepPage() {
 
       const recommended = pickRecommendedTask(activePlanDetail);
       if (recommended) {
+        const stuck = (recommended.consecutiveFails ?? 0) >= 3;
+        const studyResourceUrl = recommended.studyResource?.url;
+        const extras = [];
+        if (stuck && studyResourceUrl) {
+          extras.push({
+            label: 'Mở tài liệu ôn',
+            to: studyResourceUrl,
+            external: true,
+          });
+        }
+        extras.push({
+          label: 'Xem toàn bộ plan',
+          to: `/learning-plans/${activePlanDetail.learningPlanId}`,
+        });
         return {
           kind: 'study-task',
           title: `Học ải: ${recommended.examPartName} · ${recommended.tagName}`,
           desc: `Ưu tiên ${recommended.priorityTier}. Cần đạt ≥ ${recommended.passAccuracy}% để pass ải. Đã sai ${recommended.wrongCountAtDiagnosis ?? '—'} câu ở mock chẩn đoán.`,
+          warning: stuck
+            ? `⚠️ Bạn đã fail ${recommended.consecutiveFails} lần liên tiếp ở ải này. Hãy đọc lại tài liệu trước khi thử lần nữa.`
+            : null,
           ctaLabel: 'Bắt đầu học',
           ctaTo: `/learning-plans/${activePlanDetail.learningPlanId}/study?taskId=${recommended.taskId}`,
-          extras: [
-            {
-              label: 'Xem toàn bộ plan',
-              to: `/learning-plans/${activePlanDetail.learningPlanId}`,
-            },
-          ],
+          extras,
         };
       }
     }
@@ -183,7 +198,7 @@ function NextStepPage() {
         },
       ],
     };
-  }, [target, enhanced, latestMock, activePlanDetail, examTypeId]);
+  }, [target, enhanced, latestMock, activePlanDetail, examTypeId, mockTestsPath]);
 
   return (
     <div className={cx('wrapper')}>
@@ -223,15 +238,42 @@ function NextStepPage() {
           <div className={cx('recoTag')}>Gợi ý cho bạn</div>
           <h3 className={cx('recoTitle')}>{recommendation.title}</h3>
           <p className={cx('recoDesc')}>{recommendation.desc}</p>
+          {recommendation.warning && (
+            <div
+              style={{
+                marginTop: 8,
+                padding: '8px 12px',
+                borderRadius: 6,
+                background: '#fff4e5',
+                border: '1px solid #f0a800',
+                color: '#7a4a00',
+                fontSize: 14,
+              }}
+            >
+              {recommendation.warning}
+            </div>
+          )}
           <div className={cx('actionBar')}>
             <Link to={recommendation.ctaTo} className={cx('btn', 'btnPrimary', 'btnLg')}>
               {recommendation.ctaLabel}
             </Link>
-            {(recommendation.extras || []).map((ex, i) => (
-              <Link key={i} to={ex.to} className={cx('btn', 'btnOutline')}>
-                {ex.label}
-              </Link>
-            ))}
+            {(recommendation.extras || []).map((ex, i) =>
+              ex.external ? (
+                <a
+                  key={i}
+                  href={ex.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cx('btn', 'btnOutline')}
+                >
+                  {ex.label}
+                </a>
+              ) : (
+                <Link key={i} to={ex.to} className={cx('btn', 'btnOutline')}>
+                  {ex.label}
+                </Link>
+              )
+            )}
           </div>
         </div>
       )}

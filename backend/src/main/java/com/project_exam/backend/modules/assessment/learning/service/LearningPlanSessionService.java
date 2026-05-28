@@ -237,12 +237,21 @@ public class LearningPlanSessionService {
                 task.setStatus(TaskStatus.PASSED);
                 task.setPassedAt(Instant.now());
                 taskStatus = TaskStatus.PASSED.name();
-                taskRepository.save(task);
-                taskUnlockSupport.onTaskPassed(task, learningPlanId);
             } else {
                 task.setStatus(TaskStatus.ACTIVE);
                 taskStatus = TaskStatus.ACTIVE.name();
-                taskRepository.save(task);
+            }
+            int consecutiveFails = countConsecutiveFails(learningPlanId, task.getTaskId());
+            task.setConsecutiveFails(consecutiveFails);
+            task.setPriorityScore(PlanPrioritySupport.recomputePriorityAfterSession(
+                    task.getWrongCountAtDiagnosis(),
+                    task.getBestAccuracy().intValue(),
+                    task.getPassAccuracy(),
+                    consecutiveFails,
+                    passed));
+            taskRepository.save(task);
+            if (passed) {
+                taskUnlockSupport.onTaskPassed(task, learningPlanId);
             }
             long totalTasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId).size();
             long passedCount = taskRepository.countByLearningPlanIdAndStatus(
@@ -476,6 +485,29 @@ public class LearningPlanSessionService {
                 .toList();
     }
 
+    /**
+     * Đếm fail streak gần nhất cho task này.
+     * - Chỉ xét tối đa 5 session gần nhất (đủ vì threshold struggle là 3).
+     * - Bỏ qua session abandon (accuracy=0): không trừng phạt user vì bỏ ngang.
+     * - Gặp pass hoặc session bất thường → dừng đếm (fail-safe, không gộp streak cũ).
+     * Phải gọi SAU khi save session hiện tại để bao gồm cả lần submit vừa rồi.
+     */
+    private int countConsecutiveFails(String learningPlanId, String taskId) {
+        List<LearningPlanSession> recent = sessionRepository
+                .findTop5ByLearningPlanIdAndTaskIdOrderByStartedAtDesc(learningPlanId, taskId);
+        int streak = 0;
+        for (LearningPlanSession s : recent) {
+            if (s.getStatus() != SessionStatus.SUBMITTED) break;
+            if (s.getAccuracy() != null && s.getAccuracy() == 0) continue;
+            if (Boolean.FALSE.equals(s.getPassed())) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }
+
     private void recordExposure(String userId, String questionId) {
         Optional<UserQuestionExposure> existing = exposureRepository.findByUserIdAndQuestionId(userId, questionId);
         if (existing.isPresent()) {
@@ -679,6 +711,7 @@ public class LearningPlanSessionService {
                 .baselineAccuracy(task.getBaselineAccuracy())
                 .bestAccuracy(task.getBestAccuracy())
                 .attemptCount(task.getAttemptCount())
+                .consecutiveFails(task.getConsecutiveFails())
                 .studyResource(studyResource)
                 .priorityScore(priorityScore)
                 .priorityTier(tier)

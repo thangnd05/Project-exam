@@ -67,6 +67,16 @@ function Header() {
           <Nav.Link as={Link} to={routes.posts} className={cx('mobileNavLink')}>
             Bài viết
           </Nav.Link>
+          {user && (
+            <Nav.Link
+              as={Link}
+              to={routes.nextStep}
+              className={cx('mobileNavLink')}
+              onClick={() => handleClose()}
+            >
+              Lộ trình
+            </Nav.Link>
+          )}
           <Nav.Link as={Link} to={routes.myAlbums} className={cx('mobileNavLink')}>
             Từ vựng
           </Nav.Link>
@@ -106,6 +116,11 @@ function Header() {
         <Nav.Link as={Link} to={routes.posts} className={cx('home')}>
           Bài viết
         </Nav.Link>
+        {user && (
+          <Nav.Link as={Link} to={routes.nextStep} className={cx('home')}>
+            Lộ trình
+          </Nav.Link>
+        )}
         <Nav.Link as={Link} to={routes.myAlbums} className={cx('home')}>
           Từ vựng
         </Nav.Link>
@@ -193,6 +208,20 @@ function Header() {
             </div>
           </Dropdown.Toggle>
           <Dropdown.Menu className={cx('custom-dropdown')}>
+            <Dropdown.Item
+              as={Link}
+              to={routes.nextStep}
+              onClick={() => isMobile && handleClose()}
+            >
+              Tiếp theo nên làm gì
+            </Dropdown.Item>
+            <Dropdown.Item
+              as={Link}
+              to={routes.targetDashboard}
+              onClick={() => isMobile && handleClose()}
+            >
+              Tổng quan mục tiêu
+            </Dropdown.Item>
             <Dropdown.Item
               as={Link}
               to={routes.profile}

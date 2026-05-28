@@ -80,4 +80,16 @@ const routes = {
   notFound: '*',
 };
 
+/** Danh sách đề theo loại kỳ thi (mock / luyện thi). */
+export function buildExamTypeDetailPath(examTypeId) {
+  if (!examTypeId) return routes.home;
+  return `/exam-types/${encodeURIComponent(examTypeId)}`;
+}
+
+/** Trang gợi ý bước tiếp theo trong lộ trình cá nhân hóa. */
+export function buildNextStepPath(examTypeId) {
+  if (!examTypeId) return routes.nextStep;
+  return `${routes.nextStep}?examTypeId=${encodeURIComponent(examTypeId)}`;
+}
+
 export default routes;

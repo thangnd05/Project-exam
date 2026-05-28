@@ -708,6 +708,7 @@ public class LearningPlanService {
                 .baselineAccuracy(task.getBaselineAccuracy())
                 .bestAccuracy(task.getBestAccuracy())
                 .attemptCount(task.getAttemptCount())
+                .consecutiveFails(task.getConsecutiveFails())
                 .studyResource(studyResource)
                 .priorityScore(priorityScore)
                 .priorityTier(tier)

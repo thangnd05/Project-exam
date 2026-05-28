@@ -22,6 +22,10 @@ public interface LearningPlanSessionRepository extends JpaRepository<LearningPla
     List<LearningPlanSession> findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(
             String learningPlanId, String taskId);
 
+    /** 5 session gần nhất của 1 ải — dùng để đếm fail streak (đủ vì threshold là 3). */
+    List<LearningPlanSession> findTop5ByLearningPlanIdAndTaskIdOrderByStartedAtDesc(
+            String learningPlanId, String taskId);
+
     List<LearningPlanSession> findByLearningPlanId(String learningPlanId);
 
     void deleteByLearningPlanId(String learningPlanId);

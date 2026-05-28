@@ -24,7 +24,8 @@ import {
   IoBookmarkOutline,
   IoFlagOutline,
   IoTrophyOutline,
-  IoRocketOutline
+  IoRocketOutline,
+  IoCompassOutline,
 } from 'react-icons/io5';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getExamParts } from '~/api/examPartApi';
@@ -37,7 +38,7 @@ import {
 import ChangePasswordModal from './modals/ChangePasswordModal';
 import UpdateProfileModal from './modals/UpdateProfileModal';
 import styles from './ProfileOverviewPage.module.scss';
-import routes from '~/config/Routes';
+import routes, { buildNextStepPath } from '~/config/Routes';
 
 const cx = classNames.bind(styles);
 
@@ -461,6 +462,14 @@ function ProfileOverviewPage() {
                             <div className={cx('targetActions')}>
                               <button
                                 type="button"
+                                className={cx('targetActionBtn', 'targetActionBtnPrimary')}
+                                onClick={() => navigate(buildNextStepPath(target.examTypeId))}
+                              >
+                                <IoCompassOutline />
+                                Tiếp theo
+                              </button>
+                              <button
+                                type="button"
                                 className={cx('targetActionBtn')}
                                 onClick={() =>
                                   navigate(
@@ -469,14 +478,14 @@ function ProfileOverviewPage() {
                                 }
                               >
                                 <IoStatsChartOutline />
-                                Xem dashboard
+                                Dashboard
                               </button>
                               <button
                                 type="button"
-                                className={cx('targetActionBtn', 'targetActionBtnPrimary')}
+                                className={cx('targetActionBtn')}
                                 onClick={() =>
                                   navigate(
-                                    `/learning-plans/generate?examTypeId=${encodeURIComponent(target.examTypeId)}`
+                                    `${routes.generatePlan}?examTypeId=${encodeURIComponent(target.examTypeId)}`
                                   )
                                 }
                               >
