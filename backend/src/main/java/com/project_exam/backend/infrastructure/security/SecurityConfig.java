@@ -170,13 +170,18 @@ public class SecurityConfig {
                             claims.put("roleId", user.getRoleId());
 
                             String accessToken = jwtService.generateToken(userDetails, claims);
+                            String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-                            // Cookie JWT đồng bộ với môi trường
-                            String cookieValue = "accessToken=" + accessToken 
+                            String sameSiteAttr = isProduction ? "; SameSite=None; Secure" : "; SameSite=Lax";
+                            String accessCookie = "accessToken=" + accessToken
                                     + "; HttpOnly; Path=/; Max-Age=" + (24 * 60 * 60)
-                                    + (isProduction ? "; SameSite=None; Secure" : "; SameSite=Lax");
-                            
-                            response.addHeader("Set-Cookie", cookieValue);
+                                    + sameSiteAttr;
+                            String refreshCookie = "refreshToken=" + refreshToken
+                                    + "; HttpOnly; Path=/api/auth/refresh; Max-Age=" + (7 * 24 * 60 * 60)
+                                    + sameSiteAttr;
+
+                            response.addHeader("Set-Cookie", accessCookie);
+                            response.addHeader("Set-Cookie", refreshCookie);
                             SecurityContextHolder.clearContext();
                             response.sendRedirect(frontendOrigin + "/oauth2/redirect");
                         })

@@ -35,6 +35,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -82,7 +83,9 @@ public class AuthService {
         claims.put("roleId", user.getRoleId());
 
         String accessToken = jwtService.generateToken(userDetails, claims);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
         setAccessTokenCookie(accessToken, response);
+        setRefreshTokenCookie(refreshToken, response);
 
         return new UserResponse(
                 user.getUserId(),
@@ -94,7 +97,17 @@ public class AuthService {
         );
     }
 
-    public Map<String, Object> refresh(String refreshToken, HttpServletResponse response) {
+    /**
+     * Refresh access token bằng refresh token đọc từ HttpOnly cookie.
+     * Why: refresh token không nên expose qua JS/body — chỉ cookie HttpOnly với Path scoped đến endpoint này.
+     * Rotation: mỗi lần refresh phát luôn refresh token mới để giảm risk replay.
+     */
+    public Map<String, Object> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = extractRefreshTokenFromCookie(request);
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new UnauthorizedException("Không tìm thấy refresh token");
+        }
+
         String username = jwtService.extractUsername(refreshToken);
         if (username == null || !jwtService.isRefreshToken(refreshToken)) {
             throw new UnauthorizedException("Refresh token không hợp lệ");
@@ -114,7 +127,9 @@ public class AuthService {
         claims.put("roleId", user.getRoleId());
 
         String newAccessToken = jwtService.generateToken(userDetails, claims);
+        String newRefreshToken = jwtService.generateRefreshToken(userDetails);
         setAccessTokenCookie(newAccessToken, response);
+        setRefreshTokenCookie(newRefreshToken, response);
 
         return Map.of("message", "Cấp access token mới thành công");
     }
@@ -122,8 +137,9 @@ public class AuthService {
     public void logout(HttpServletResponse response) {
         boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");
         String sameSiteAttr = isSecure ? "; SameSite=None; Secure" : "; SameSite=Lax";
-        
+
         response.addHeader("Set-Cookie", buildAccessTokenCookie("", 0));
+        response.addHeader("Set-Cookie", buildRefreshTokenCookie("", 0));
         response.addHeader("Set-Cookie", "JSESSIONID=; HttpOnly; Path=/; Max-Age=0" + sameSiteAttr);
         response.addHeader("Set-Cookie", "XSRF-TOKEN=; Path=/; Max-Age=0" + sameSiteAttr);
     }
@@ -137,17 +153,54 @@ public class AuthService {
 
     private String buildAccessTokenCookie(String cookieValue, int cookieMaxAge) {
         boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append("accessToken=").append(cookieValue)
           .append("; HttpOnly; Path=/; Max-Age=").append(cookieMaxAge);
-        
+
         if (isSecure) {
             sb.append("; SameSite=None; Secure");
         } else {
             sb.append("; SameSite=Lax");
         }
         return sb.toString();
+    }
+
+    private void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
+        String encodedToken = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
+        int cookieMax = (int) ((jwtService.extractClaim(refreshToken, Claims::getExpiration).getTime()
+                - System.currentTimeMillis()) / 1000);
+        if (cookieMax <= 0) cookieMax = 7 * 24 * 3600;
+        response.addHeader("Set-Cookie", buildRefreshTokenCookie(encodedToken, cookieMax));
+    }
+
+    /**
+     * Cookie cho refresh token. Path scoped đến /api/auth/refresh để các request khác
+     * không tự đính kèm refresh token → giảm bề mặt rủi ro.
+     */
+    private String buildRefreshTokenCookie(String cookieValue, int cookieMaxAge) {
+        boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("refreshToken=").append(cookieValue)
+          .append("; HttpOnly; Path=/api/auth/refresh; Max-Age=").append(cookieMaxAge);
+
+        if (isSecure) {
+            sb.append("; SameSite=None; Secure");
+        } else {
+            sb.append("; SameSite=Lax");
+        }
+        return sb.toString();
+    }
+
+    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        for (var cookie : request.getCookies()) {
+            if ("refreshToken".equals(cookie.getName())) {
+                return URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+            }
+        }
+        return null;
     }
 
     @Transactional

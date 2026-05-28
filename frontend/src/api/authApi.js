@@ -19,6 +19,10 @@ export const logout = () => {
   return axios.post(`${BASE_URL}/logout`).then((res) => res.data);
 };
 
+export const refresh = () => {
+  return axios.post(`${BASE_URL}/refresh`).then((res) => res.data);
+};
+
 export const changePassword = (payload) => {
   return axios.post(`${BASE_URL}/change-password`, payload).then((res) => res.data);
 };
