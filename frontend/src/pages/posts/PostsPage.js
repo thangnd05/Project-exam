@@ -9,7 +9,7 @@ import CreatePostModal from './modals/CreatePostModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
