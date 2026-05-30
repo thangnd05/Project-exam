@@ -210,13 +210,6 @@ function Header() {
           <Dropdown.Menu className={cx('custom-dropdown')}>
             <Dropdown.Item
               as={Link}
-              to={routes.nextStep}
-              onClick={() => isMobile && handleClose()}
-            >
-              Tiếp theo nên làm gì
-            </Dropdown.Item>
-            <Dropdown.Item
-              as={Link}
               to={routes.targetDashboard}
               onClick={() => isMobile && handleClose()}
             >

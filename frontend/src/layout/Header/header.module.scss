@@ -139,6 +139,11 @@
 
 .custom-dropdown {
   font-size: 1.6rem;
+  min-width: 200px;
+
+  :global(.dropdown-item) {
+    white-space: nowrap;
+  }
 }
 
 .custom-dropdown-item {
