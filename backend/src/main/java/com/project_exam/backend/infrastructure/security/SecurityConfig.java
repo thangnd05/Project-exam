@@ -48,6 +48,7 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
     private final AuthRateLimitFilter authRateLimitFilter;
+    private final RefreshTokenStore refreshTokenStore;
 
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
@@ -58,7 +59,8 @@ public class SecurityConfig {
             CustomUserDetailsService customUserDetailsService,
             UserRepository userRepository,
             com.fasterxml.jackson.databind.ObjectMapper objectMapper,
-            AuthRateLimitFilter authRateLimitFilter
+            AuthRateLimitFilter authRateLimitFilter,
+            RefreshTokenStore refreshTokenStore
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
@@ -66,6 +68,7 @@ public class SecurityConfig {
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
         this.authRateLimitFilter = authRateLimitFilter;
+        this.refreshTokenStore = refreshTokenStore;
     }
 
     @Bean
@@ -169,8 +172,12 @@ public class SecurityConfig {
                             claims.put("userId", user.getUserId());
                             claims.put("roleId", user.getRoleId());
 
+                            String familyId = java.util.UUID.randomUUID().toString();
+                            String jti = java.util.UUID.randomUUID().toString();
+                            refreshTokenStore.createFamily(user.getUserId(), familyId, jti);
+
                             String accessToken = jwtService.generateToken(userDetails, claims);
-                            String refreshToken = jwtService.generateRefreshToken(userDetails);
+                            String refreshToken = jwtService.generateRefreshToken(userDetails, familyId, jti);
 
                             String sameSiteAttr = isProduction ? "; SameSite=None; Secure" : "; SameSite=Lax";
                             String accessCookie = "accessToken=" + accessToken

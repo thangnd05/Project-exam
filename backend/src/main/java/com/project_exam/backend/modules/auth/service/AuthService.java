@@ -21,6 +21,7 @@ import com.project_exam.backend.modules.users.repository.RoleRepository;
 import com.project_exam.backend.modules.users.repository.UserRepository;
 import com.project_exam.backend.infrastructure.security.CustomUserDetailsService;
 import com.project_exam.backend.infrastructure.security.JwtService;
+import com.project_exam.backend.infrastructure.security.RefreshTokenStore;
 import com.project_exam.backend.modules.users.service.EmailVerificationService;
 import com.project_exam.backend.shared.util.EmailUtil;
 import io.jsonwebtoken.Claims;
@@ -59,6 +60,7 @@ public class AuthService {
     private final EmailVerificationRepository emailVerificationRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final EmailUtil emailUtil;
+    private final RefreshTokenStore refreshTokenStore;
     
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
@@ -82,8 +84,12 @@ public class AuthService {
         claims.put("userId", user.getUserId());
         claims.put("roleId", user.getRoleId());
 
+        String familyId = UUID.randomUUID().toString();
+        String jti = UUID.randomUUID().toString();
+        refreshTokenStore.createFamily(user.getUserId(), familyId, jti);
+
         String accessToken = jwtService.generateToken(userDetails, claims);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails, familyId, jti);
         setAccessTokenCookie(accessToken, response);
         setRefreshTokenCookie(refreshToken, response);
 
@@ -100,7 +106,9 @@ public class AuthService {
     /**
      * Refresh access token bằng refresh token đọc từ HttpOnly cookie.
      * Why: refresh token không nên expose qua JS/body — chỉ cookie HttpOnly với Path scoped đến endpoint này.
-     * Rotation: mỗi lần refresh phát luôn refresh token mới để giảm risk replay.
+     * Rotation thật: server-side check {fid, jti} qua RefreshTokenStore.
+     *   - jti khớp → rotate sang jti mới (cấp lại cặp access + refresh)
+     *   - jti lệch / family đã revoke → ReplayDetectedException, ép login lại
      */
     public Map<String, Object> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshTokenFromCookie(request);
@@ -118,23 +126,51 @@ public class AuthService {
             throw new UnauthorizedException("Refresh token hết hạn hoặc không hợp lệ");
         }
 
+        String familyId = jwtService.extractFamilyId(refreshToken);
+        String oldJti = jwtService.extractJti(refreshToken);
+        if (familyId == null || oldJti == null) {
+            throw new UnauthorizedException("Refresh token thiếu thông tin phiên");
+        }
+
         User user = userRepository.findByUserName(username)
                 .or(() -> userRepository.findByEmail(username))
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
+        String newJti = UUID.randomUUID().toString();
+        refreshTokenStore.rotate(user.getUserId(), familyId, oldJti, newJti);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId());
         claims.put("roleId", user.getRoleId());
 
         String newAccessToken = jwtService.generateToken(userDetails, claims);
-        String newRefreshToken = jwtService.generateRefreshToken(userDetails);
+        String newRefreshToken = jwtService.generateRefreshToken(userDetails, familyId, newJti);
         setAccessTokenCookie(newAccessToken, response);
         setRefreshTokenCookie(newRefreshToken, response);
 
         return Map.of("message", "Cấp access token mới thành công");
     }
 
-    public void logout(HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        // Revoke family ở Redis trước khi clear cookie — nếu attacker đã copy refresh token,
+        // sau khi logout token đó cũng không refresh được nữa.
+        String refreshToken = extractRefreshTokenFromCookie(request);
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            try {
+                if (jwtService.isRefreshToken(refreshToken)) {
+                    String username = jwtService.extractUsername(refreshToken);
+                    String familyId = jwtService.extractFamilyId(refreshToken);
+                    if (username != null && familyId != null) {
+                        userRepository.findByUserName(username)
+                                .or(() -> userRepository.findByEmail(username))
+                                .ifPresent(u -> refreshTokenStore.revokeFamily(u.getUserId(), familyId));
+                    }
+                }
+            } catch (Exception ignored) {
+                // Token đã hết hạn / hỏng — vẫn cho logout client-side.
+            }
+        }
+
         boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");
         String sameSiteAttr = isSecure ? "; SameSite=None; Secure" : "; SameSite=Lax";
 
@@ -280,6 +316,8 @@ public class AuthService {
         userRepository.save(user);
         resetToken.setUsed(true);
         passwordResetTokenRepository.save(resetToken);
+        // Sau reset password, mọi refresh token cũ phải vô hiệu — đề phòng attacker đã chiếm phiên.
+        refreshTokenStore.revokeAllForUser(user.getUserId());
         return new AuthMessageResponse("Đặt lại mật khẩu thành công");
     }
 
@@ -289,7 +327,9 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) throw new BadRequestException("Mật khẩu cũ không đúng");
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
-        logout(httpResponse);
+        // Đổi pass = mọi session trước đó phải bị kick (ép re-login trên mọi device).
+        refreshTokenStore.revokeAllForUser(user.getUserId());
+        logout(httpRequest, httpResponse);
         return new AuthMessageResponse("Đổi mật khẩu thành công");
     }
 

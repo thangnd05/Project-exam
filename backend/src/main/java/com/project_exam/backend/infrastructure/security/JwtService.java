@@ -56,17 +56,28 @@ public class JwtService {
         return generateToken(userDetails, new HashMap<>());
     }
 
-    // Tạo Refresh Token
-    public String generateRefreshToken(UserDetails userDetails) {
+    // Tạo Refresh Token gắn với 1 family (fid) và id riêng (jti) — phục vụ rotation/replay-detection.
+    public String generateRefreshToken(UserDetails userDetails, String familyId, String jti) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "refresh");
+        claims.put("fid", familyId);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
+                .setId(jti)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtRefreshExpiration))
                 .signWith(cachedSigningKey, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String extractFamilyId(String token) {
+        Object fid = extractAllClaims(token).get("fid");
+        return fid == null ? null : fid.toString();
+    }
+
+    public String extractJti(String token) {
+        return extractClaim(token, Claims::getId);
     }
 
     // Trích xuất username từ token
