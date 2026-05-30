@@ -1,9 +1,15 @@
+import noImage from './no-image.png';
+import avtImage from './avtImage.jpg';
+import logo from './logo.png';
+import membership from './vip-member-banner.webp';
+import logoW from './logoW.png';
+
 const images = {
-    noImage: require('./no-image.png'),
-    avtImage: require('./avtImage.jpg'),
-    logo: require('./logo.png'),
-    membership: require('./vip-member-banner.webp'),
-    logoW: require('./logoW.png')
+    noImage,
+    avtImage,
+    logo,
+    membership,
+    logoW,
 };
 
 export const SearchIcon = ({ width = '2.4rem', height = '2.4rem', className }) => (

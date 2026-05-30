@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+// Smoke test kiểm tra toolchain test (Vitest + Testing Library + jsdom) hoạt động.
+// Test "learn react" mặc định của CRA đã được thay vì không khớp app thực tế.
+test("testing library renders a node", () => {
+  render(<div>hello</div>);
+  expect(screen.getByText("hello")).toBeInTheDocument();
 });
