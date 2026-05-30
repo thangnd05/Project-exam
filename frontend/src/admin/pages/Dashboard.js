@@ -20,7 +20,12 @@ import {
     BarChart3,
     PieChart as PieChartIcon
 } from 'lucide-react';
-import ReactECharts from 'echarts-for-react';
+import {
+    WeeklyActivityArea,
+    MonthlyPerformanceCombo,
+    ExamTypeDonut,
+    SkillRadar,
+} from '../components/AdminCharts';
 
 import {
     dashboardStats,
@@ -74,215 +79,6 @@ const getActivityIcon = (type) => {
 };
 
 const AdminDashboard = () => {
-    // Chart Configurations
-    const lineChartOption = {
-        tooltip: {
-            trigger: 'axis',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderWidth: 0,
-            shadowBlur: 10,
-            shadowColor: 'rgba(0,0,0,0.1)',
-            textStyle: { color: '#1e293b' }
-        },
-        legend: {
-            data: ['Người dùng mới', 'Bài thi'],
-            bottom: 0,
-            textStyle: { color: '#64748b' }
-        },
-        grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true, top: '10%' },
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: weeklyUserRegistrations.map(d => d.day),
-            axisLine: { show: false },
-            axisTick: { show: false },
-            axisLabel: { color: '#64748b', margin: 15 }
-        },
-        yAxis: {
-            type: 'value',
-            axisLine: { show: false },
-            axisTick: { show: false },
-            splitLine: { lineStyle: { type: 'dashed', color: '#e2e8f0' } }
-        },
-        series: [
-            {
-                name: 'Người dùng mới',
-                type: 'line',
-                smooth: true,
-                symbol: 'circle',
-                symbolSize: 8,
-                data: weeklyUserRegistrations.map(d => d.users),
-                itemStyle: { color: '#3b82f6' },
-                lineStyle: { width: 3, shadowBlur: 10, shadowColor: 'rgba(59, 130, 246, 0.3)' },
-                areaStyle: {
-                    color: {
-                        type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-                        colorStops: [
-                            { offset: 0, color: 'rgba(59, 130, 246, 0.2)' },
-                            { offset: 1, color: 'rgba(59, 130, 246, 0)' }
-                        ]
-                    }
-                }
-            },
-            {
-                name: 'Bài thi',
-                type: 'line',
-                smooth: true,
-                symbol: 'circle',
-                symbolSize: 8,
-                data: weeklyUserRegistrations.map(d => d.exams),
-                itemStyle: { color: '#10b981' },
-                lineStyle: { width: 3, shadowBlur: 10, shadowColor: 'rgba(16, 185, 129, 0.3)' },
-                areaStyle: {
-                    color: {
-                        type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-                        colorStops: [
-                            { offset: 0, color: 'rgba(16, 185, 129, 0.2)' },
-                            { offset: 1, color: 'rgba(16, 185, 129, 0)' }
-                        ]
-                    }
-                }
-            }
-        ]
-    };
-
-    const barChartOption = {
-        tooltip: {
-            trigger: 'axis',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderWidth: 0,
-            shadowBlur: 10,
-            textStyle: { color: '#1e293b' }
-        },
-        legend: {
-            data: ['Số bài thi', 'Điểm TB'],
-            bottom: 0,
-            textStyle: { color: '#64748b' }
-        },
-        grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true, top: '10%' },
-        xAxis: {
-            type: 'category',
-            data: monthlyTestPerformance.map(d => d.month),
-            axisLine: { show: false },
-            axisTick: { show: false },
-            axisLabel: { color: '#64748b' }
-        },
-        yAxis: [
-            {
-                type: 'value',
-                name: 'Bài thi',
-                axisLine: { show: false },
-                axisTick: { show: false },
-                splitLine: { lineStyle: { type: 'dashed', color: '#e2e8f0' } }
-            },
-            {
-                type: 'value',
-                name: 'Điểm',
-                max: 100,
-                axisLine: { show: false },
-                axisTick: { show: false },
-                splitLine: { show: false }
-            }
-        ],
-        series: [
-            {
-                name: 'Số bài thi',
-                type: 'bar',
-                barWidth: '40%',
-                data: monthlyTestPerformance.map(d => d.tests),
-                itemStyle: {
-                    color: {
-                        type: 'linear',
-                        x: 0, y: 0, x2: 0, y2: 1,
-                        colorStops: [
-                            { offset: 0, color: '#3b82f6' },
-                            { offset: 1, color: '#60a5fa' }
-                        ]
-                    },
-                    borderRadius: [6, 6, 0, 0]
-                }
-            },
-            {
-                name: 'Điểm TB',
-                type: 'line',
-                yAxisIndex: 1,
-                smooth: true,
-                symbol: 'circle',
-                symbolSize: 8,
-                data: monthlyTestPerformance.map(d => d.avgScore),
-                itemStyle: { color: '#f59e0b' },
-                lineStyle: { width: 3 },
-                label: {
-                    show: true,
-                    position: 'top',
-                    formatter: '{c}',
-                    color: '#64748b'
-                }
-            }
-        ]
-    };
-
-    const pieChartOption = {
-        tooltip: {
-            trigger: 'item',
-            formatter: '{a} <br/>{b}: {c} ({d}%)'
-        },
-        legend: {
-            orient: 'vertical',
-            right: '5%',
-            top: 'center',
-            textStyle: { color: '#64748b' }
-        },
-        series: [
-            {
-                name: 'Loại kỳ thi',
-                type: 'pie',
-                radius: ['45%', '75%'],
-                center: ['35%', '50%'],
-                avoidLabelOverlap: false,
-                itemStyle: {
-                    borderRadius: 8,
-                    borderColor: '#fff',
-                    borderWidth: 2
-                },
-                label: { show: false },
-                emphasis: {
-                    label: {
-                        show: true,
-                        fontSize: 14,
-                        fontWeight: 'bold'
-                    }
-                },
-                data: examTypeDistribution,
-                color: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
-            }
-        ]
-    };
-
-    const radarChartOption = {
-        tooltip: {},
-        radar: {
-            indicator: skillDistribution.map(s => ({ name: s.name, max: s.max })),
-            shape: 'polygon',
-            splitNumber: 5,
-            axisName: { color: '#64748b' },
-            splitLine: { lineStyle: { color: ['rgba(59, 130, 246, 0.1)'] } },
-            splitArea: { show: false },
-            axisLine: { lineStyle: { color: 'rgba(59, 130, 246, 0.2)' } }
-        },
-        series: [{
-            name: 'Phân bố kỹ năng',
-            type: 'radar',
-            data: [{
-                value: skillDistribution.map(s => s.value),
-                name: 'Kỹ năng TB',
-                areaStyle: { color: 'rgba(59, 130, 246, 0.3)' },
-                lineStyle: { color: '#3b82f6', width: 2 },
-                symbol: 'none'
-            }]
-        }]
-    };
-
     const recentTests = fakeUserTests.slice(0, 5).map(ut => ({
         ...ut,
         user: getUserById(ut.user_id),
@@ -448,7 +244,7 @@ const AdminDashboard = () => {
                             </h3>
                         </div>
                         <div style={{ width: '100%', height: 300 }}>
-                            <ReactECharts option={lineChartOption} style={{ height: '100%', width: '100%' }} />
+                            <WeeklyActivityArea data={weeklyUserRegistrations} />
                         </div>
                     </motion.div>
                 </Col>
@@ -466,7 +262,7 @@ const AdminDashboard = () => {
                             </h3>
                         </div>
                         <div style={{ width: '100%', height: 300 }}>
-                            <ReactECharts option={pieChartOption} style={{ height: '100%', width: '100%' }} />
+                            <ExamTypeDonut data={examTypeDistribution} />
                         </div>
                     </motion.div>
                 </Col>
@@ -488,7 +284,7 @@ const AdminDashboard = () => {
                             </h3>
                         </div>
                         <div style={{ width: '100%', height: 300 }}>
-                            <ReactECharts option={barChartOption} style={{ height: '100%', width: '100%' }} />
+                            <MonthlyPerformanceCombo data={monthlyTestPerformance} />
                         </div>
                     </motion.div>
                 </Col>
@@ -506,7 +302,7 @@ const AdminDashboard = () => {
                             </h3>
                         </div>
                         <div style={{ width: '100%', height: 300 }}>
-                            <ReactECharts option={radarChartOption} style={{ height: '100%', width: '100%' }} />
+                            <SkillRadar data={skillDistribution} />
                         </div>
                     </motion.div>
                 </Col>

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { motion } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
 import {
   IoArrowBackOutline,
@@ -22,6 +23,15 @@ import styles from './PostsListPage.module.scss';
 const cx = classNames.bind(styles);
 
 const PAGE_SIZE = 5;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
 
 const formatDate = (value) => {
   if (!value) return '--';
@@ -188,10 +198,18 @@ function SavedPostsPage() {
 
         {!loading && !errorMessage && pageItems.length > 0 && (
           <div className={cx('list')}>
-            {pageItems.map((post) => {
+            {pageItems.map((post, index) => {
               const detailUrl = routes.postDetail.replace(':postId', post.id);
               return (
-                <article key={post.id} className={cx('card')}>
+                <motion.article
+                  key={post.id}
+                  className={cx('card')}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover={{ y: -4 }}
+                >
                   <Link to={detailUrl} className={cx('thumbnailLink')}>
                     {post.thumbnailUrl ? (
                       <img
@@ -249,7 +267,7 @@ function SavedPostsPage() {
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
-                </article>
+                </motion.article>
               );
             })}
           </div>

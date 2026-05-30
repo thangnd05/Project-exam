@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';
+import {motion} from 'framer-motion';
 import {IoListOutline, IoGridOutline} from 'react-icons/io5';
 
 import styles from './TestListContainer.module.scss';
@@ -10,6 +11,15 @@ import TestCard from '~/components/test/TestCard/TestCard';
 import TestManagementTable from '~/components/test/TestManagementTable/TestManagementTable';
 
 const cx = classNames.bind(styles);
+
+const cardVariants = {
+  hidden: {opacity: 0, y: 24},
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {duration: 0.5, delay: i * 0.06, ease: [0.22, 1, 0.36, 1]},
+  }),
+};
 
 const TestListContainer = ({
   title,
@@ -65,12 +75,17 @@ const TestListContainer = ({
           {tests.length > 0 ? (
             viewMode === 'grid' ? (
               <div className={cx('test-grid')}>
-                {tests.map((test) => (
-                  <TestCard
+                {tests.map((test, index) => (
+                  <motion.div
                     key={test.testId}
-                    test={test}
-                    countdowns={countdowns}
-                  />
+                    custom={index}
+                    variants={cardVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{once: true, amount: 0.15}}
+                  >
+                    <TestCard test={test} countdowns={countdowns} />
+                  </motion.div>
                 ))}
               </div>
             ) : (

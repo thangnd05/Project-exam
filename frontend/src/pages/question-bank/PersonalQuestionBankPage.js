@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, Button, Spinner} from 'react-bootstrap';
+import {AnimatePresence, motion} from 'framer-motion';
 import {
   getQuestionsByPart,
   getMyClassBankQuestions,
@@ -494,7 +495,16 @@ const PersonalQuestionBankPage = () => {
                       )}
                     </button>
 
+                    <AnimatePresence initial={false}>
                     {cfg.expanded && (
+                      <motion.div
+                        key={`chapter-body-${chapter.chapterId}`}
+                        initial={{height: 0, opacity: 0}}
+                        animate={{height: 'auto', opacity: 1}}
+                        exit={{height: 0, opacity: 0}}
+                        transition={{duration: 0.3, ease: [0.22, 1, 0.36, 1]}}
+                        style={{overflow: 'hidden'}}
+                      >
                       <div className={cx('partCardBody')}>
                         {cfg.loading ? (
                           <div className={cx('loadingWrap')}>
@@ -586,7 +596,9 @@ const PersonalQuestionBankPage = () => {
                           );
                         })()}
                       </div>
+                      </motion.div>
                     )}
+                    </AnimatePresence>
                   </div>
                 );
               })
@@ -636,7 +648,16 @@ const PersonalQuestionBankPage = () => {
                       )}
                     </button>
 
+                    <AnimatePresence initial={false}>
                     {cfg.expanded && (
+                      <motion.div
+                        key={`part-body-${part.examPartId}`}
+                        initial={{height: 0, opacity: 0}}
+                        animate={{height: 'auto', opacity: 1}}
+                        exit={{height: 0, opacity: 0}}
+                        transition={{duration: 0.3, ease: [0.22, 1, 0.36, 1]}}
+                        style={{overflow: 'hidden'}}
+                      >
                       <div className={cx('partCardBody')}>
                         {cfg.loading ? (
                           <div className={cx('loadingWrap')}>
@@ -726,7 +747,9 @@ const PersonalQuestionBankPage = () => {
                           </ul>
                         )}
                       </div>
+                      </motion.div>
                     )}
+                    </AnimatePresence>
                   </div>
                 );
               })}

@@ -3,6 +3,7 @@ import { getUserTestInfo } from '../../api/testApi';
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Container, Spinner, Table} from 'react-bootstrap';
+import {motion} from 'framer-motion';
 import classNames from 'classnames/bind';
 import {IoArrowBack, IoPodiumOutline} from 'react-icons/io5';
 
@@ -11,6 +12,15 @@ import styles from './TestLeaderboardPage.module.scss';
 import routes from '~/config/Routes';
 
 const cx = classNames.bind(styles);
+
+const rankRowVariants = {
+  hidden: {opacity: 0, x: -16},
+  visible: (i) => ({
+    opacity: 1,
+    x: 0,
+    transition: {duration: 0.4, delay: i * 0.05, ease: [0.22, 1, 0.36, 1]},
+  }),
+};
 
 const TROPHY_COLORS = {
   1: '#f59e0b',
@@ -151,8 +161,14 @@ function TestLeaderboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((entry) => (
-                  <tr key={entry.id}>
+                {rows.map((entry, index) => (
+                  <motion.tr
+                    key={entry.id}
+                    custom={index}
+                    variants={rankRowVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
                     <td data-label="Hạng">
                       <div className={cx('rankCell')}>
                         {entry.rank <= 3 ? (
@@ -180,7 +196,7 @@ function TestLeaderboardPage() {
                         ? `${entry.durationTaken}s`
                         : '---'}
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </Table>

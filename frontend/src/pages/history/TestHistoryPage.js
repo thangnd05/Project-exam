@@ -3,6 +3,7 @@ import { getUserTestInfo } from '../../api/testApi';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Table, Spinner } from 'react-bootstrap';
+import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
 import {
   IoArrowBack,
@@ -21,6 +22,15 @@ import PageHeader from '~/components/common/PageHeader/PageHeader';
 import routes from '~/config/Routes';
 
 const cx = classNames.bind(style);
+
+const rowVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
 
 function TestHistoryPage() {
   const { testId } = useParams();
@@ -143,7 +153,13 @@ function TestHistoryPage() {
               </thead>
               <tbody>
                 {attempts.map((a, i) => (
-                  <tr key={a.userTestId}>
+                  <motion.tr
+                    key={a.userTestId}
+                    custom={i}
+                    variants={rowVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
                     <td data-label="Lần" className="fw-bold text-muted">
                       #{i + 1}
                     </td>
@@ -196,7 +212,7 @@ function TestHistoryPage() {
                         </span>
                       )}
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </Table>
