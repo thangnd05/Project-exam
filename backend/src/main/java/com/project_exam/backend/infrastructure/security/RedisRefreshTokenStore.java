@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Lưu trạng thái refresh token vào Redis.
@@ -37,6 +38,15 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
     private static final String USER_KEY_PREFIX = "rt:user:";
     private static final String FIELD_USER_ID = "uid";
     private static final String FIELD_JTI = "jti";
+    private static final String FIELD_PREV_JTI = "prevJti";
+    private static final String FIELD_PREV_AT = "prevAt";
+
+    /**
+     * "Rotation grace window" — sau khi rotate, jti CŨ vẫn được chấp nhận trong khoảng này
+     * để khoan dung race condition multi-tab (cookie chưa kịp propagate giữa các tab).
+     * Why 10s: đủ cho mạng chậm, ngắn để attacker không kịp khai thác.
+     */
+    private static final long GRACE_WINDOW_MS = 10_000;
 
     private final StringRedisTemplate redis;
 
@@ -63,7 +73,7 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
     }
 
     @Override
-    public void rotate(String userId, String familyId, String oldJti, String newJti) {
+    public String rotate(String userId, String familyId, String oldJti) {
         String familyKey = familyKey(familyId);
 
         try {
@@ -82,19 +92,38 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
                 throw new ReplayDetectedException("Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.");
             }
 
-            if (!storedJti.toString().equals(oldJti)) {
-                // jti không khớp = ai đó đã rotate trước rồi mà attacker (hoặc user thật)
-                // submit lại jti cũ → replay → giết cả family.
-                log.warn("SECURITY_REFRESH_REPLAY uid={} fid={} expectedJti={} gotJti={}",
-                        userId, familyId, storedJti, oldJti);
-                revokeFamilyInternal(userId, familyId);
-                throw new ReplayDetectedException("Phát hiện phiên đăng nhập bất thường, vui lòng đăng nhập lại.");
+            String currentJti = storedJti.toString();
+
+            // Path 1: khớp jti hiện hành → ROTATE bình thường.
+            if (currentJti.equals(oldJti)) {
+                String newJti = UUID.randomUUID().toString();
+                Duration ttl = Duration.ofMillis(refreshExpirationMs);
+                redis.opsForHash().put(familyKey, FIELD_JTI, newJti);
+                // Lưu jti cũ + thời điểm để bảo vệ grace window cho request đến muộn.
+                redis.opsForHash().put(familyKey, FIELD_PREV_JTI, currentJti);
+                redis.opsForHash().put(familyKey, FIELD_PREV_AT, String.valueOf(System.currentTimeMillis()));
+                redis.expire(familyKey, ttl);
+                redis.expire(userKey(userId), ttl);
+                return newJti;
             }
 
-            // Rotate: ghi đè jti hiện hành và gia hạn TTL (sliding window).
-            redis.opsForHash().put(familyKey, FIELD_JTI, newJti);
-            redis.expire(familyKey, Duration.ofMillis(refreshExpirationMs));
-            redis.expire(userKey(userId), Duration.ofMillis(refreshExpirationMs));
+            // Path 2: khớp jti TRƯỚC trong grace window → tab/client đến muộn do race,
+            // không phải replay. Không rotate, không thay đổi state, trả jti hiện hành
+            // để cấp lại cookie với jti đúng cho client đó.
+            Object prevJti = redis.opsForHash().get(familyKey, FIELD_PREV_JTI);
+            Object prevAt = redis.opsForHash().get(familyKey, FIELD_PREV_AT);
+            if (prevJti != null && prevAt != null
+                    && prevJti.toString().equals(oldJti)
+                    && (System.currentTimeMillis() - Long.parseLong(prevAt.toString())) <= GRACE_WINDOW_MS) {
+                log.debug("REFRESH_GRACE_HIT uid={} fid={} — late client caught up", userId, familyId);
+                return currentJti;
+            }
+
+            // Path 3: jti lạ hoặc prevJti đã quá grace window → REPLAY thật → giết family.
+            log.warn("SECURITY_REFRESH_REPLAY uid={} fid={} expectedJti={} prevJti={} gotJti={}",
+                    userId, familyId, currentJti, prevJti, oldJti);
+            revokeFamilyInternal(userId, familyId);
+            throw new ReplayDetectedException("Phát hiện phiên đăng nhập bất thường, vui lòng đăng nhập lại.");
         } catch (DataAccessException ex) {
             log.error("Redis down khi rotate uid={} fid={}: {}", userId, familyId, ex.getMessage());
             throw new UnauthorizedException("Hệ thống xác thực tạm thời không khả dụng, vui lòng thử lại.");

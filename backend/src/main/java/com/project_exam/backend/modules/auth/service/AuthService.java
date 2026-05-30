@@ -136,15 +136,15 @@ public class AuthService {
                 .or(() -> userRepository.findByEmail(username))
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        String newJti = UUID.randomUUID().toString();
-        refreshTokenStore.rotate(user.getUserId(), familyId, oldJti, newJti);
+        // Store quyết định jti: rotate thật → jti mới; grace window → trả jti hiện hành.
+        String effectiveJti = refreshTokenStore.rotate(user.getUserId(), familyId, oldJti);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId());
         claims.put("roleId", user.getRoleId());
 
         String newAccessToken = jwtService.generateToken(userDetails, claims);
-        String newRefreshToken = jwtService.generateRefreshToken(userDetails, familyId, newJti);
+        String newRefreshToken = jwtService.generateRefreshToken(userDetails, familyId, effectiveJti);
         setAccessTokenCookie(newAccessToken, response);
         setRefreshTokenCookie(newRefreshToken, response);
 

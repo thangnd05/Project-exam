@@ -17,12 +17,16 @@ public interface RefreshTokenStore {
     void createFamily(String userId, String familyId, String jti);
 
     /**
-     * Rotate refresh token: kiểm tra oldJti có phải jti hiện hành của family không.
-     * Nếu khớp → ghi đè jti = newJti và gia hạn TTL (sliding window).
-     * Nếu lệch → ném {@link com.project_exam.backend.shared.exception.ReplayDetectedException}
-     * và revoke family.
+     * Rotate refresh token. 3 outcomes:
+     *  - oldJti == jti hiện hành → ROTATE: sinh jti mới, ghi đè, gia hạn TTL → trả jti mới
+     *  - oldJti == prevJti trong "grace window" (~10s) → GRACE: tab/client đến chậm do race,
+     *    KHÔNG rotate, trả về jti hiện hành để cấp lại cookie với jti đúng
+     *  - không khớp ô nào → REPLAY → revoke family +
+     *    {@link com.project_exam.backend.shared.exception.ReplayDetectedException}
+     *
+     * @return jti sẽ embed vào refresh token mới gửi xuống client.
      */
-    void rotate(String userId, String familyId, String oldJti, String newJti);
+    String rotate(String userId, String familyId, String oldJti);
 
     /** Logout 1 device: xoá family khỏi Redis và khỏi set của user. */
     void revokeFamily(String userId, String familyId);
