@@ -78,6 +78,11 @@ axiosClient.interceptors.response.use(
       return axiosClient(original);
     } catch (refreshErr) {
       flushQueue(refreshErr);
+      // Báo cho app biết session đã chết: hết hạn tự nhiên, replay detected,
+      // hoặc family bị revoke (đổi pass ở device khác / logout-all). AuthContext sẽ clear state.
+      window.dispatchEvent(new CustomEvent('auth:expired', {
+        detail: { reason: refreshErr?.response?.data?.message },
+      }));
       return Promise.reject(refreshErr);
     } finally {
       isRefreshing = false;
