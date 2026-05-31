@@ -6,6 +6,7 @@ import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
 import com.project_exam.backend.modules.assessment.exam.domain.*;
@@ -544,18 +545,22 @@ public class UserTestService {
                 .collect(Collectors.toList());
     }
 
-    public List<UserTestResponse> getAttemptsByTest(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
-        // 🔒 Chỉ chủ đề (hoặc admin) được xem toàn bộ attempts của 1 bài test.
-        requireTestOwnerOrAdmin(testId, httpRequest);
+    public TestLeaderboardResponse getAttemptsByTest(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
-    
+        // 🔒 Đề của lớp -> chỉ thành viên lớp xem; đề public theo exam_type -> mọi user đăng nhập xem được.
+        requireLeaderboardViewAccess(test, httpRequest);
+
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;
-    
+
         //  chỉ chặn khi có giới hạn thời gian nhưng chưa hết
         if (!isUnlimited && !isEnded) {
-            return Collections.emptyList();
+            return TestLeaderboardResponse.builder()
+                    .entries(Collections.emptyList())
+                    .me(null)
+                    .totalParticipants(0)
+                    .build();
         }
 
         List<UserTest> list = userTestRepository.findByTestIdAndStatus(testId, UserTest.Status.COMPLETED);
@@ -570,7 +575,7 @@ public class UserTestService {
         }
         Map<String, String> userNameById = loadUserNames(bestAttemptByUser.values());
 
-        return bestAttemptByUser.values().stream()
+        List<UserTestResponse> entries = bestAttemptByUser.values().stream()
                 .map(u -> UserTestResponse.builder()
                         .userTestId(u.getUserTestId())
                         .userId(u.getUserId())
@@ -594,6 +599,58 @@ public class UserTestService {
                                 .thenComparing(UserTestResponse::getDurationTaken, Comparator.nullsLast(Comparator.naturalOrder()))
                 )
                 .collect(Collectors.toList());
+
+        // 🏅 Hạng của chính người đang xem — tính trên TOÀN bảng (kể cả khi nằm ngoài top hiển thị).
+        TestLeaderboardResponse.MyRank me = null;
+        String viewerId = authUtils.getUserId(httpRequest);
+        if (viewerId != null) {
+            for (int i = 0; i < entries.size(); i++) {
+                UserTestResponse r = entries.get(i);
+                if (viewerId.equals(r.getUserId())) {
+                    me = TestLeaderboardResponse.MyRank.builder()
+                            .rank(i + 1)
+                            .userTestId(r.getUserTestId())
+                            .totalScore(r.getTotalScore())
+                            .durationTaken(r.getDurationTaken())
+                            .build();
+                    break;
+                }
+            }
+        }
+
+        return TestLeaderboardResponse.builder()
+                .entries(entries)
+                .me(me)
+                .totalParticipants(entries.size())
+                .build();
+    }
+
+    /**
+     * Quyền xem bảng xếp hạng của 1 đề:
+     * - Admin / người tạo đề: luôn xem được.
+     * - Đề thuộc lớp (classId != null): chỉ giáo viên lớp hoặc thành viên đã được duyệt.
+     * - Đề public theo exam_type (classId == null): mọi user đã đăng nhập đều xem được.
+     */
+    private void requireLeaderboardViewAccess(Test test, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        if (authUtils.isAdmin(httpRequest)) return;
+
+        String currentUserId = authUtils.getUserId(httpRequest);
+        if (currentUserId == null) {
+            throw new ForbiddenException("Bạn cần đăng nhập để xem bảng xếp hạng.");
+        }
+        if (currentUserId.equals(test.getCreatedBy())) return;
+
+        String classId = test.getClassId();
+        if (classId == null || classId.isBlank()) {
+            return; // đề public -> ai đăng nhập cũng xem được
+        }
+
+        boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
+        boolean isMember = classMemberRepository
+                .existsByClassIdAndUserIdAndStatus(classId, currentUserId, MemberStatus.APPROVED);
+        if (!isTeacher && !isMember) {
+            throw new ForbiddenException("Bạn không thuộc lớp này nên không xem được bảng xếp hạng.");
+        }
     }
 
     private boolean isBetterAttempt(UserTest candidate, UserTest currentBest) {

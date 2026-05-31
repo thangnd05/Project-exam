@@ -14,12 +14,10 @@ import {
   IoHourglassOutline,
   IoCloseCircleOutline,
   IoDocumentTextOutline,
-  IoPodiumOutline,
 } from 'react-icons/io5';
 
 import style from './TestHistory.module.scss';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
-import routes from '~/config/Routes';
 
 const cx = classNames.bind(style);
 
@@ -116,19 +114,6 @@ function TestHistoryPage() {
             </div>
           }
         />
-        <div className={cx('history-actions')}>
-          <button
-            type="button"
-            className={cx('btn-ranking')}
-            onClick={() =>
-              navigate(routes.testLeaderboard.replace(':testId', String(testId)))
-            }
-          >
-            <IoPodiumOutline />
-            Xem bảng xếp hạng
-          </button>
-        </div>
-
         {/* === Table Content === */}
         {attempts.length === 0 ? (
           <div className={cx('empty-state')}>

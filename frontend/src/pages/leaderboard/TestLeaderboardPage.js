@@ -61,6 +61,7 @@ function TestLeaderboardPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [testTitle, setTestTitle] = useState('');
   const [rawRows, setRawRows] = useState([]);
+  const [me, setMe] = useState(null);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -75,13 +76,18 @@ function TestLeaderboardPage() {
       }
 
       try {
-        const leaderboard = await getLeaderboardByTest(testId);
-        const normalizedRows = Array.isArray(leaderboard)
-          ? leaderboard
-          : [];
-        setRawRows(normalizedRows);
+        const data = await getLeaderboardByTest(testId);
+        // BE trả { entries, me, totalParticipants }
+        setRawRows(Array.isArray(data?.entries) ? data.entries : []);
+        setMe(data?.me ?? null);
       } catch (error) {
-        setErrorMessage('Không tải được bảng xếp hạng từ hệ thống.');
+        if (error?.response?.status === 403) {
+          setErrorMessage(
+            'Bạn không có quyền xem bảng xếp hạng của đề này (đề thuộc lớp riêng).',
+          );
+        } else {
+          setErrorMessage('Không tải được bảng xếp hạng từ hệ thống.');
+        }
       } finally {
         setLoading(false);
       }
@@ -104,7 +110,19 @@ function TestLeaderboardPage() {
     score: Number(entry.totalScore ?? entry.score ?? 0),
     durationTaken:
       typeof entry.durationTaken === 'number' ? entry.durationTaken : null,
+    isMe: me != null && entry.userTestId === me.userTestId,
   }));
+
+  // 123 -> "2:03", 3700 -> "1:01:40"
+  const formatDuration = (totalSeconds) => {
+    if (totalSeconds == null) return '---';
+    const sec = Math.max(0, Math.floor(Number(totalSeconds)));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    const pad = (n) => String(n).padStart(2, '0');
+    return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  };
 
   return (
     <div className={cx('wrapper')}>
@@ -164,6 +182,7 @@ function TestLeaderboardPage() {
                 {rows.map((entry, index) => (
                   <motion.tr
                     key={entry.id}
+                    className={cx({myRow: entry.isMe})}
                     custom={index}
                     variants={rankRowVariants}
                     initial="hidden"
@@ -185,21 +204,55 @@ function TestLeaderboardPage() {
                         )}
                       </div>
                     </td>
-                    <td data-label="Người dùng">{entry.displayName}</td>
+                    <td data-label="Người dùng">
+                      {entry.displayName}
+                      {entry.isMe && <span className={cx('youTag')}>Bạn</span>}
+                    </td>
                     <td data-label="Điểm">
                       <span className={cx('scoreBadge')}>
                         {entry.score.toFixed(2)}
                       </span>
                     </td>
                     <td data-label="Thời gian làm">
-                      {entry.durationTaken != null
-                        ? `${entry.durationTaken}s`
-                        : '---'}
+                      {formatDuration(entry.durationTaken)}
                     </td>
                   </motion.tr>
                 ))}
               </tbody>
             </Table>
+          </div>
+        )}
+
+        {/* 🏅 Hạng của bạn — ghim lại để thấy ngay mình đang top mấy (kể cả ngoài top hiển thị) */}
+        {!loading && !errorMessage && (
+          <div className={cx('myRankBar', {empty: !me})}>
+            {me ? (
+              <>
+                <div className={cx('myRankLeft')}>
+                  <span className={cx('myRankLabel')}>Hạng của bạn</span>
+                  <span className={cx('myRankValue')}>
+                    #{me.rank}
+                    <span className={cx('myRankTotal')}>
+                      / {rows.length}
+                    </span>
+                  </span>
+                </div>
+                <div className={cx('myRankRight')}>
+                  <span className={cx('myRankStat')}>
+                    <small>Điểm</small>
+                    <b>{Number(me.totalScore ?? 0).toFixed(2)}</b>
+                  </span>
+                  <span className={cx('myRankStat')}>
+                    <small>Thời gian</small>
+                    <b>{formatDuration(me.durationTaken)}</b>
+                  </span>
+                </div>
+              </>
+            ) : (
+              <span className={cx('myRankEmptyText')}>
+                Bạn chưa có kết quả trên bảng này — hãy làm bài để được xếp hạng.
+              </span>
+            )}
           </div>
         )}
       </Container>

@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.attempt.controller;
 import com.project_exam.backend.modules.assessment.attempt.dto.StartUserTestRequest;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestUpdateRequest;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 import com.project_exam.backend.shared.util.AuthUtils;
@@ -148,11 +149,11 @@ public class UserTestController {
     }
 
     @GetMapping("/by-test/{testId}")
-    public ResponseEntity<List<UserTestResponse>> getAttemptsTest(
+    public ResponseEntity<TestLeaderboardResponse> getAttemptsTest(
             @PathVariable String testId,
             HttpServletRequest httpRequest
     ) {
-        List<UserTestResponse> res = userTestService.getAttemptsByTest(testId, httpRequest);
+        TestLeaderboardResponse res = userTestService.getAttemptsByTest(testId, httpRequest);
         return ResponseEntity.ok(res);
     }
 

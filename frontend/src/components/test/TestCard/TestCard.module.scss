@@ -118,6 +118,10 @@ $brand-secondary: var(--accent-act-color);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+
+    &.hasRank {
+        grid-template-columns: 1fr 1fr auto;
+    }
 }
 
 .btn-primary-modern {
@@ -171,6 +175,25 @@ $brand-secondary: var(--accent-act-color);
     }
 }
 
+.btn-icon-modern {
+    background: white;
+    border: 1px solid #cbd5e1;
+    color: #b45309;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #fffbeb;
+        border-color: #f59e0b;
+        color: #d97706;
+    }
+}
+
 /* --- Status Colors --- */
 .status-open {
     color: #065f46 !important;
@@ -196,7 +219,8 @@ $brand-secondary: var(--accent-act-color);
         gap: 8px;
     }
 
-    .btn-group {
+    .btn-group,
+    .btn-group.hasRank {
         grid-template-columns: 1fr;
     }
 }

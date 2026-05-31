@@ -6,6 +6,7 @@ import {
     IoStatsChartOutline,
     IoPlayCircleOutline,
     IoLockClosedOutline,
+    IoTrophyOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './TestCard.module.scss';
@@ -64,6 +65,12 @@ function TestCard({ test, countdowns }) {
     const { status, statusLabel, buttonText, canStart } =
         getTestStatus(test, now, countdowns);
 
+    // Bảng xếp hạng chỉ có dữ liệu khi đề không hạn nộp HOẶC đã qua hạn
+    // (khớp đúng điều kiện ẩn bảng ở BE: isUnlimited || isEnded). Ẩn nút cho
+    // đề có deadline đang chạy để khỏi dẫn tới trang trống.
+    const showLeaderboard =
+        test.availableTo == null || now > new Date(test.availableTo);
+
     const handleStart = () => {
         if (!canStart) return;
 
@@ -120,7 +127,7 @@ function TestCard({ test, countdowns }) {
                     </div>
                 </div>
 
-                <div className={cx('btn-group')}>
+                <div className={cx('btn-group', {hasRank: showLeaderboard})}>
                     <button
                         className={cx('btn-primary-modern')}
                         onClick={handleStart}
@@ -143,6 +150,19 @@ function TestCard({ test, countdowns }) {
                         <IoStatsChartOutline />
                         Lịch sử điểm
                     </button>
+
+                    {showLeaderboard && (
+                        <button
+                            className={cx('btn-icon-modern')}
+                            title="Bảng xếp hạng"
+                            aria-label="Bảng xếp hạng"
+                            onClick={() =>
+                                navigate(`/tests/leaderboard/${test.testId}`)
+                            }
+                        >
+                            <IoTrophyOutline />
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
