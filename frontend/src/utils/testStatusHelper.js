@@ -24,7 +24,7 @@ export const getTestStatus = (test, now, countdowns) => {
 
     let status = 'open';
     let statusLabel = 'Đang diễn ra';
-    let buttonText = 'Bắt đầu làm bài';
+    let buttonText = 'Bắt đầu';
     let canStart = true;
 
     if (availableFrom && now < availableFrom) {
