@@ -33,6 +33,7 @@ import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatu
 import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamType;
+import com.project_exam.backend.modules.assessment.exam.domain.Skill;
 import com.project_exam.backend.modules.assessment.exam.domain.Passage;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsResponse;
@@ -43,6 +44,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.QuestionGroupAdminRe
 import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.SkillRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.PassageRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
@@ -94,6 +96,7 @@ public class TestService {
     private final ExamPartRepository  examPartRepository;
     private final ExamCategoryRepository examCategoryRepository;
     private final ExamTypeRepository examTypeRepository;
+    private final SkillRepository skillRepository;
     private final PassageRepository  passageRepository;
     private final UserTestRepository userTestRepository;
     private final UserAnswerRepository userAnswerRepository;
@@ -138,17 +141,60 @@ public class TestService {
     }
 
     private QuickChallengeCardResponse buildQuickChallengeCard(Test test, String examTypeName) {
-        List<QuickChallengeCardResponse.PartSummary> parts = testPartRepository.findByTestId(test.getTestId())
-                .stream()
-                .map(tp -> {
-                    ExamPart ep = examPartRepository.findById(tp.getExamPartId()).orElse(null);
-                    String name = (ep != null && ep.getName() != null) ? ep.getName() : "Phần thi";
-                    int order = (ep != null && ep.getDisplayOrder() != null) ? ep.getDisplayOrder() : 999;
-                    int numQuestions = tp.getNumQuestions() != null ? tp.getNumQuestions() : 0;
+        List<TestPart> testParts = testPartRepository.findByTestId(test.getTestId());
+
+        // Batch load ExamPart (tránh N+1)
+        Set<String> examPartIds = testParts.stream()
+                .map(TestPart::getExamPartId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<String, ExamPart> examPartMap = examPartRepository.findAllById(examPartIds).stream()
+                .collect(Collectors.toMap(ExamPart::getExamPartId, ep -> ep));
+
+        // Gom theo SKILL nếu part có kỹ năng (gọn hơn, vd 7 part TOEIC -> 2 skill Listening/Reading).
+        // Part không gắn skill thì giữ riêng theo part. agg: key -> [tổng số câu, displayOrder nhỏ nhất]
+        Map<String, int[]> agg = new LinkedHashMap<>();
+        Map<String, String> skillKeyIds = new HashMap<>(); // key (skill) -> skillId để resolve tên
+        Map<String, String> partNames = new HashMap<>();   // key (part) -> tên part
+
+        for (TestPart tp : testParts) {
+            ExamPart ep = examPartMap.get(tp.getExamPartId());
+            int numQuestions = tp.getNumQuestions() != null ? tp.getNumQuestions() : 0;
+            int order = (ep != null && ep.getDisplayOrder() != null) ? ep.getDisplayOrder() : 999;
+            String skillId = ep != null ? ep.getSkillId() : null;
+
+            String key;
+            if (skillId != null) {
+                key = "skill:" + skillId;
+                skillKeyIds.put(key, skillId);
+            } else {
+                key = "part:" + tp.getExamPartId();
+                partNames.put(key, (ep != null && ep.getName() != null) ? ep.getName() : "Phần thi");
+            }
+
+            int[] cur = agg.get(key);
+            if (cur == null) {
+                agg.put(key, new int[]{numQuestions, order});
+            } else {
+                cur[0] += numQuestions;
+                cur[1] = Math.min(cur[1], order);
+            }
+        }
+
+        // Resolve tên skill
+        Map<String, String> skillNames = skillRepository.findAllById(new HashSet<>(skillKeyIds.values())).stream()
+                .collect(Collectors.toMap(Skill::getSkillId, Skill::getName));
+
+        List<QuickChallengeCardResponse.PartSummary> parts = agg.entrySet().stream()
+                .map(e -> {
+                    String key = e.getKey();
+                    String name = skillKeyIds.containsKey(key)
+                            ? skillNames.getOrDefault(skillKeyIds.get(key), "Kỹ năng")
+                            : partNames.getOrDefault(key, "Phần thi");
                     return QuickChallengeCardResponse.PartSummary.builder()
                             .name(name)
-                            .numQuestions(numQuestions)
-                            .displayOrder(order)
+                            .numQuestions(e.getValue()[0])
+                            .displayOrder(e.getValue()[1])
                             .build();
                 })
                 .sorted(Comparator.comparingInt(QuickChallengeCardResponse.PartSummary::getDisplayOrder))

@@ -188,23 +188,29 @@
 /* --- Quick Challenge: 1 card / examType (gauge donut + thanh bar) --- */
 .quick-carousel {
   position: relative;
-  width: min(100%, 560px);
+  width: min(100%, 520px);
 
   .slide {
     padding: 6px 4px 4px;
     outline: none;
   }
 
-  /* centerMode: card phụ mờ + thu nhỏ tạo chiều sâu, card đang xem giữ nguyên */
-  :global(.slick-slide) {
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    opacity: 0.55;
-    transform: scale(0.92);
+  /* multi: card width cố định -> căn trái, card sau ló bên phải (variableWidth) */
+  &.multi .slide {
+    width: 330px;
+    padding: 6px 9px 4px;
   }
 
-  :global(.slick-slide.slick-active) {
+  /* Card đang xem rõ; card sau (không active) mờ đi + ngả xanh nhạt */
+  &.multi :global(.slick-slide) {
+    transition: opacity 0.4s ease, filter 0.4s ease;
+    opacity: 0.4;
+    filter: saturate(0.7);
+  }
+
+  &.multi :global(.slick-slide.slick-active) {
     opacity: 1;
-    transform: scale(1);
+    filter: none;
   }
 
   /* react-slick dots */
@@ -276,7 +282,7 @@
   background: linear-gradient(160deg, #ffffff 0%, #f4f8ff 100%);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
-  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 16px 36px rgba(0, 97, 242, 0.08);
 
   .card-head {
     display: flex;
@@ -491,5 +497,11 @@
   .quick-carousel {
     width: min(100%, 440px);
     margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-carousel.multi .slide {
+    width: 270px;
   }
 }

@@ -15,8 +15,11 @@ const cx = classNames.bind(styles);
 
 const MAX_BARS_SHOWN = 4;
 
-// Palette cho donut + thanh bar (lặp lại theo index part)
-const PART_COLORS = ['#0061f2', '#00c6ff', '#22bd70', '#f59e0b', '#ef4444', '#8b5cf6'];
+// Màu xen kẽ theo cùng tông xanh: mục lẻ (Part 1,3,5...) đậm, mục chẵn (Part 2,4,6...) nhạt.
+// idx 0-based -> idx chẵn = mục lẻ = đậm; idx lẻ = mục chẵn = nhạt.
+const COLOR_DARK = '#0061f2';
+const COLOR_LIGHT = '#7fb1ff';
+const partColor = (idx) => (idx % 2 === 0 ? COLOR_DARK : COLOR_LIGHT);
 
 const containerVariants = {
   hidden: {opacity: 0},
@@ -53,7 +56,7 @@ const buildRingGradient = (parts, total) => {
     const start = (acc / total) * 100;
     acc += part.numQuestions;
     const end = (acc / total) * 100;
-    return `${PART_COLORS[idx % PART_COLORS.length]} ${start}% ${end}%`;
+    return `${partColor(idx)} ${start}% ${end}%`;
   });
   return `conic-gradient(${stops.join(', ')})`;
 };
@@ -139,17 +142,10 @@ function HeroSection() {
     speed: 400,
     slidesToShow: 1,
     slidesToScroll: 1,
-    // centerMode -> card kế tiếp ló ra phía sau tạo chiều sâu
-    centerMode: multi,
-    centerPadding: multi ? '90px' : '0px',
+    // variableWidth -> card căn trái, card kế tiếp ló ra bên phải (không mờ 2 bên)
+    variableWidth: multi,
     prevArrow: <PrevArrow />,
     nextArrow: <NextArrow />,
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {centerPadding: multi ? '30px' : '0px'},
-      },
-    ],
   };
 
   return (
@@ -195,7 +191,7 @@ function HeroSection() {
             <div className={cx('skeleton-btn')} />
           </div>
         ) : hasQuick ? (
-          <div className={cx('quick-carousel')}>
+          <div className={cx('quick-carousel', {multi})}>
             <Slider {...sliderSettings}>
               {cards.map((test) => {
                 const parts = test.parts || [];
@@ -230,7 +226,7 @@ function HeroSection() {
                             const pct = total
                               ? Math.round((part.numQuestions / total) * 100)
                               : 0;
-                            const color = PART_COLORS[idx % PART_COLORS.length];
+                            const color = partColor(idx);
                             return (
                               <li key={idx} className={cx('bar-item')}>
                                 <div className={cx('bar-top')}>
@@ -255,7 +251,7 @@ function HeroSection() {
                           })}
                           {restCount > 0 && (
                             <li className={cx('bar-more')}>
-                              + {restCount} phần khác
+                              + {restCount} mục khác
                             </li>
                           )}
                         </ul>
