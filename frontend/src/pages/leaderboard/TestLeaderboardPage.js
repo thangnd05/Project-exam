@@ -62,6 +62,7 @@ function TestLeaderboardPage() {
   const [testTitle, setTestTitle] = useState('');
   const [rawRows, setRawRows] = useState([]);
   const [me, setMe] = useState(null);
+  const [totalParticipants, setTotalParticipants] = useState(0);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -78,8 +79,14 @@ function TestLeaderboardPage() {
       try {
         const data = await getLeaderboardByTest(testId);
         // BE trả { entries, me, totalParticipants }
-        setRawRows(Array.isArray(data?.entries) ? data.entries : []);
+        const list = Array.isArray(data?.entries) ? data.entries : [];
+        setRawRows(list);
         setMe(data?.me ?? null);
+        setTotalParticipants(
+          typeof data?.totalParticipants === 'number'
+            ? data.totalParticipants
+            : list.length,
+        );
       } catch (error) {
         if (error?.response?.status === 403) {
           setErrorMessage(
@@ -149,7 +156,7 @@ function TestLeaderboardPage() {
           badgeLabel={
             <div className="d-flex align-items-center gap-2">
               <IoPodiumOutline />
-              <span>{rows.length} người tham gia</span>
+              <span>{totalParticipants} người tham gia</span>
             </div>
           }
         />
@@ -169,6 +176,11 @@ function TestLeaderboardPage() {
           </div>
         ) : (
           <div className={cx('tableContainer')}>
+            {totalParticipants > rows.length && (
+              <div className={cx('topNote')}>
+                Hiển thị top {rows.length} / {totalParticipants} người
+              </div>
+            )}
             <Table responsive hover>
               <thead>
                 <tr>
@@ -233,7 +245,7 @@ function TestLeaderboardPage() {
                   <span className={cx('myRankValue')}>
                     #{me.rank}
                     <span className={cx('myRankTotal')}>
-                      / {rows.length}
+                      / {totalParticipants}
                     </span>
                   </span>
                 </div>

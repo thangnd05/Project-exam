@@ -4,6 +4,7 @@ import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
@@ -55,6 +56,8 @@ public class UserTestService {
     private final ClassMemberRepository classMemberRepository;
     private final ClassRepository classRepository;
     private final AuthUtils authUtils;
+    
+    private static final int LEADERBOARD_TOP_LIMIT = 100;
 
     public UserTestResponse toResponse(UserTest userTest) {
         String examTypeId = testRepository.findById(userTest.getTestId())
@@ -545,7 +548,7 @@ public class UserTestService {
                 .collect(Collectors.toList());
     }
 
-    public TestLeaderboardResponse getAttemptsByTest(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public TestLeaderboardResponse getAttemptsByTest(String testId,HttpServletRequest httpRequest) {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
         // 🔒 Đề của lớp -> chỉ thành viên lớp xem; đề public theo exam_type -> mọi user đăng nhập xem được.
@@ -575,7 +578,8 @@ public class UserTestService {
         }
         Map<String, String> userNameById = loadUserNames(bestAttemptByUser.values());
 
-        List<UserTestResponse> entries = bestAttemptByUser.values().stream()
+        // Toàn bộ bảng đã xếp hạng (chưa cắt) — dùng để tính hạng thật của người xem.
+        List<UserTestResponse> ranked = bestAttemptByUser.values().stream()
                 .map(u -> UserTestResponse.builder()
                         .userTestId(u.getUserTestId())
                         .userId(u.getUserId())
@@ -604,8 +608,8 @@ public class UserTestService {
         TestLeaderboardResponse.MyRank me = null;
         String viewerId = authUtils.getUserId(httpRequest);
         if (viewerId != null) {
-            for (int i = 0; i < entries.size(); i++) {
-                UserTestResponse r = entries.get(i);
+            for (int i = 0; i < ranked.size(); i++) {
+                UserTestResponse r = ranked.get(i);
                 if (viewerId.equals(r.getUserId())) {
                     me = TestLeaderboardResponse.MyRank.builder()
                             .rank(i + 1)
@@ -618,10 +622,15 @@ public class UserTestService {
             }
         }
 
+        // Chỉ trả top N để giảm payload/độ nặng khi render; me vẫn giữ hạng thật ở trên.
+        List<UserTestResponse> entries = ranked.size() > LEADERBOARD_TOP_LIMIT
+                ? new ArrayList<>(ranked.subList(0, LEADERBOARD_TOP_LIMIT))
+                : ranked;
+
         return TestLeaderboardResponse.builder()
                 .entries(entries)
                 .me(me)
-                .totalParticipants(entries.size())
+                .totalParticipants(ranked.size())
                 .build();
     }
 
