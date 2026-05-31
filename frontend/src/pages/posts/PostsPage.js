@@ -2,23 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, ArrowRight, Plus, Info } from 'lucide-react';
+import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, Plus, Info } from 'lucide-react';
 import { getPosts, getCategories } from '~/api/postApi';
 import routes from '~/config/Routes';
+import PageHeader from '~/components/common/PageHeader/PageHeader';
 import CreatePostModal from './modals/CreatePostModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);
 const MotionLink = motion.create(Link);
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  },
-};
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -74,9 +66,6 @@ function PostsPage() {
   }, [fetchData]);
 
   const refreshPosts = () => fetchData(0);
-
-  const featuredPost = currentPage === 0 ? posts[0] : null;
-  const otherPosts = featuredPost ? posts.slice(1) : posts;
 
   const renderPagination = () => {
     if (totalPages <= 1) return null;
@@ -138,42 +127,14 @@ function PostsPage() {
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
 
-        {/* Hero Section */}
-        {featuredPost && (
-          <motion.div
-            className={cx('hero')}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-          >
-            <div className={cx('heroImageWrapper')}>
-              <div className={cx('featuredBadge')}>Bài nổi bật</div>
-              <img src={featuredPost.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={featuredPost.title} />
-            </div>
-            <div className={cx('heroContent')}>
-              <span className={cx('categoryTag')}>{featuredPost.categories?.[0]?.name || 'Blog'}</span>
-              <Link to={routes.postDetail.replace(':postId', featuredPost.id)} className={cx('titleLink')}>
-                <h2>{featuredPost.title}</h2>
-              </Link>
-              <p className={cx('excerpt')}>{featuredPost.summary || 'Nhấp vào để đọc chi tiết bài viết hấp dẫn này...'}</p>
-              <div className={cx('authorMeta')}>
-                <div className={cx('authorInfo')}>
-                  <img src={featuredPost.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={featuredPost.authorName} referrerPolicy="no-referrer" />
-                  <div className={cx('nameDate')}>
-                    <span>{featuredPost.authorName}</span>
-                    <span>{new Date(featuredPost.createdAt).toLocaleDateString('vi-VN')}</span>
-                  </div>
-                </div>
-                <Link
-                  className={cx('readMore')}
-                  to={routes.postDetail.replace(':postId', featuredPost.id)}
-                >
-                  Đọc thêm <ArrowRight size={18} />
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Header */}
+        <PageHeader
+          label="BLOG"
+          title="Bài viết"
+          actionText="Tạo bài viết"
+          actionIcon={Plus}
+          onAction={() => setShowCreateModal(true)}
+        />
 
         {/* Filter Bar */}
         <motion.div
@@ -192,10 +153,6 @@ function PostsPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className={cx('createBtn')} onClick={() => setShowCreateModal(true)}>
-              <Plus size={18} />
-              <span>Tạo bài viết</span>
-            </button>
           </div>
           <div className={cx('approvalNotice')}>
             <Info size={16} />
@@ -226,7 +183,7 @@ function PostsPage() {
         {/* Post Grid */}
         <div className={cx('postGrid')}>
           <AnimatePresence mode="popLayout">
-          {otherPosts.map((post, index) => (
+          {posts.map((post, index) => (
             <MotionLink
               to={routes.postDetail.replace(':postId', post.id)}
               key={post.id}
