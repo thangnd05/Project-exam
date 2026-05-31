@@ -87,6 +87,16 @@ function HeroSection() {
   const navigate = useNavigate();
   const [quickTests, setQuickTests] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Peek (card sau ló phải) chỉ ở desktop; mobile -> 1 card full-width
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window === 'undefined' ? true : window.innerWidth > 992,
+  );
+
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth > 992);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -135,15 +145,16 @@ function HeroSection() {
   const hasQuick = !loading && cards.length > 0;
 
   const multi = cards.length > 1;
+  const peek = multi && isDesktop; // desktop nhiều card -> ló card sau; mobile -> 1 card full
   const sliderSettings = {
     dots: true,
-    arrows: multi,
+    arrows: peek,
     infinite: multi,
     speed: 400,
     slidesToShow: 1,
     slidesToScroll: 1,
-    // variableWidth -> card căn trái, card kế tiếp ló ra bên phải (không mờ 2 bên)
-    variableWidth: multi,
+    // variableWidth -> card căn trái, card kế tiếp ló ra bên phải (chỉ desktop)
+    variableWidth: peek,
     prevArrow: <PrevArrow />,
     nextArrow: <NextArrow />,
   };
@@ -163,11 +174,9 @@ function HeroSection() {
           Chào mừng đến với {name}
         </motion.h1>
         <motion.p className={cx('desc')} variants={itemVariants}>
-          <strong>{name}</strong> – Người đồng hành cùng bạn trên hành trình
-          chinh phục tri thức. Chúng tôi mang đến giải pháp hỗ trợ thông minh và
-          cá nhân hóa, không chỉ cung cấp nguồn bài tập chọn lọc mà còn giúp bạn
-          tự xây dựng kho câu hỏi riêng để việc ôn luyện trở nên thực tế và thú
-          vị hơn.
+          <strong>{name}</strong> – nền tảng luyện đề giúp cá nhân hóa lộ trình học tập của bạn. 
+          Hãy bắt đầu bằng một bài kiểm tra nhanh bên cạnh để hệ thống chẩn đoán năng lực, từ đó xác định 
+          mục tiêu và xây dựng lộ trình ôn luyện tối ưu nhất!
         </motion.p>
         <motion.div className={cx('actions')} variants={itemVariants}>
           <button className={cx('btn-primary')} onClick={handleScrollToExam}>
@@ -191,8 +200,8 @@ function HeroSection() {
             <div className={cx('skeleton-btn')} />
           </div>
         ) : hasQuick ? (
-          <div className={cx('quick-carousel', {multi})}>
-            <Slider {...sliderSettings}>
+          <div className={cx('quick-carousel', {peek})}>
+            <Slider key={peek ? 'peek' : 'plain'} {...sliderSettings}>
               {cards.map((test) => {
                 const parts = test.parts || [];
                 const total = test.totalQuestions || 0;

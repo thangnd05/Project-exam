@@ -16,25 +16,25 @@ const processSteps = [
     id: 1,
     icon: FaSearch,
     iconColor: 'blue',
-    title: '1. Chọn đề thi',
+    title: '1. Làm bài thử',
     description:
-      'Tìm kiếm đề thi phù hợp với trình độ và mục tiêu từ kho dữ liệu.',
+      'Trải nghiệm giao diện thi thực tế với hệ thống bấm giờ và chấm điểm tự động ngay khi nộp bài.',
   },
   {
     id: 2,
     icon: FaLaptopCode,
     iconColor: 'orange',
-    title: '2. Làm bài thi',
+    title: '2. Nhận chẩn đoán',
     description:
-      'Giao diện thi thực tế, bấm giờ và chấm điểm tự động ngay lập tức.',
+      'Phân tích chi tiết kết quả, chỉ ra điểm mạnh, điểm yếu và mức độ đạt mục tiêu của bạn.',
   },
   {
     id: 3,
     icon: FaChartLine,
     iconColor: 'green',
-    title: '3. Xem phân tích',
+    title: '3. Luyện theo kế hoạch',
     description:
-      'Xem lại lỗi sai và lời giải chi tiết để rút kinh nghiệm cho lần sau.',
+      'Nhận lộ trình ôn luyện tối ưu, tập trung sửa các lỗi sai thường gặp để cải thiện điểm số nhanh chóng.',
   },
 ];
 

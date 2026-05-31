@@ -10,7 +10,9 @@
   border-radius: 18px;
 
   @media (max-width: 992px) {
-    grid-template-columns: 1fr;
+    /* minmax(0,1fr) chứ KHÔNG phải 1fr: 1fr = minmax(auto,1fr) -> cột lấy min-content
+       của carousel (slick-track rất rộng) làm cột phình ra, đẩy nội dung ra ngoài màn. */
+    grid-template-columns: minmax(0, 1fr);
     text-align: center;
     padding: 24px 14px 18px;
     min-height: auto;
@@ -142,6 +144,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  min-width: 0; /* cho phép co lại dưới min-content của slick-track */
 
   .mockup-screen {
     position: relative;
@@ -195,20 +198,21 @@
     outline: none;
   }
 
-  /* multi: card width cố định -> căn trái, card sau ló bên phải (variableWidth) */
-  &.multi .slide {
+  /* peek (chỉ desktop, nhiều card): width cố định -> căn trái, card sau ló bên phải.
+     Mobile (không .peek) slide full-width nhờ variableWidth tắt qua JS. */
+  &.peek .slide {
     width: 330px;
     padding: 6px 9px 4px;
   }
 
   /* Card đang xem rõ; card sau (không active) mờ đi + ngả xanh nhạt */
-  &.multi :global(.slick-slide) {
+  &.peek :global(.slick-slide) {
     transition: opacity 0.4s ease, filter 0.4s ease;
     opacity: 0.4;
     filter: saturate(0.7);
   }
 
-  &.multi :global(.slick-slide.slick-active) {
+  &.peek :global(.slick-slide.slick-active) {
     opacity: 1;
     filter: none;
   }
@@ -497,11 +501,5 @@
   .quick-carousel {
     width: min(100%, 440px);
     margin: 0 auto;
-  }
-}
-
-@media (max-width: 480px) {
-  .quick-carousel.multi .slide {
-    width: 270px;
   }
 }
