@@ -20,6 +20,7 @@ import com.project_exam.backend.modules.assessment.test.dto.QuestionGroupRespons
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPageResponse;
+import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
@@ -31,6 +32,7 @@ import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatu
 // --- Assessment: Exam ---
 import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
+import com.project_exam.backend.modules.assessment.exam.domain.ExamType;
 import com.project_exam.backend.modules.assessment.exam.domain.Passage;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsResponse;
@@ -40,6 +42,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminRespons
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionGroupAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.PassageRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
@@ -90,6 +93,7 @@ public class TestService {
     private final UserRepository userRepository;
     private final ExamPartRepository  examPartRepository;
     private final ExamCategoryRepository examCategoryRepository;
+    private final ExamTypeRepository examTypeRepository;
     private final PassageRepository  passageRepository;
     private final UserTestRepository userTestRepository;
     private final UserAnswerRepository userAnswerRepository;
@@ -102,6 +106,70 @@ public class TestService {
     public List<TestResponse> getAllTests() {
         List<Test> tests = testRepository.findAll();
         return buildUserTestSummariesBatch(tests, null);
+    }
+
+    /**
+     * Danh sách bài Quick Challenge cho Hero landing page (guest xem được).
+     * Trả về test + các part (tên + số câu), bỏ qua bài đã hết hạn (ENDED).
+     * Cố tình không kèm % / điểm — chỉ preview cấu trúc bài để user chọn làm.
+     */
+    public List<QuickChallengeCardResponse> getQuickChallengeTests() {
+        String categoryId = examCategoryRepository.findByCode("QUICK_CHALLENGE")
+                .map(ExamCategory::getExamCategoryId)
+                .orElse(null);
+        if (categoryId == null) {
+            return List.of(); // chưa seed category -> hero tự fallback ảnh
+        }
+        List<Test> tests = testRepository.findByExamCategoryId(categoryId).stream()
+                .filter(t -> t.calculateStatus() != TestStatus.ENDED)
+                .toList();
+
+        // Batch map examTypeId -> name để dựng tab phân loại (tránh N+1)
+        Set<String> examTypeIds = tests.stream()
+                .map(Test::getExamTypeId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<String, String> examTypeNames = examTypeRepository.findAllById(examTypeIds).stream()
+                .collect(Collectors.toMap(ExamType::getExamTypeId, ExamType::getName));
+
+        return tests.stream()
+                .map(t -> buildQuickChallengeCard(t, examTypeNames.get(t.getExamTypeId())))
+                .toList();
+    }
+
+    private QuickChallengeCardResponse buildQuickChallengeCard(Test test, String examTypeName) {
+        List<QuickChallengeCardResponse.PartSummary> parts = testPartRepository.findByTestId(test.getTestId())
+                .stream()
+                .map(tp -> {
+                    ExamPart ep = examPartRepository.findById(tp.getExamPartId()).orElse(null);
+                    String name = (ep != null && ep.getName() != null) ? ep.getName() : "Phần thi";
+                    int order = (ep != null && ep.getDisplayOrder() != null) ? ep.getDisplayOrder() : 999;
+                    int numQuestions = tp.getNumQuestions() != null ? tp.getNumQuestions() : 0;
+                    return QuickChallengeCardResponse.PartSummary.builder()
+                            .name(name)
+                            .numQuestions(numQuestions)
+                            .displayOrder(order)
+                            .build();
+                })
+                .sorted(Comparator.comparingInt(QuickChallengeCardResponse.PartSummary::getDisplayOrder))
+                .toList();
+
+        int totalQuestions = parts.stream()
+                .mapToInt(QuickChallengeCardResponse.PartSummary::getNumQuestions)
+                .sum();
+
+        return QuickChallengeCardResponse.builder()
+                .testId(test.getTestId())
+                .title(test.getTitle())
+                .description(test.getDescription())
+                .durationMinutes(test.getDurationMinutes())
+                .bannerUrl(test.getBannerUrl())
+                .examTypeId(test.getExamTypeId())
+                .examTypeName(examTypeName != null ? examTypeName : "Khác")
+                .status(test.calculateStatus().name())
+                .totalQuestions(totalQuestions)
+                .parts(parts)
+                .build();
     }
 
     /**

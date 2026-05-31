@@ -24,6 +24,11 @@ export const getTestsByExamType = (examTypeId, { page = 0, size = 12 } = {}) => 
     .then((res) => res.data);
 };
 
+// Danh sách bài Quick Challenge cho Hero landing page (public, guest gọi được)
+export const getQuickChallengeTests = () => {
+  return axios.get(`${BASE_URL}/quick-challenge`).then((res) => res.data);
+};
+
 export const getAdminTestById = (testId) => {
   return axios.get(`${BASE_URL}/admintest/${testId}`).then((res) => res.data);
 };

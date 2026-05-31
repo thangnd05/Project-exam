@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.test.dto.AddQuestionsToTestRe
 import com.project_exam.backend.modules.assessment.test.dto.AddRandomQuestionsToTestRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsResponse;
 import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
+import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPageResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
@@ -172,6 +173,12 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
             @RequestParam(defaultValue = "12") int size
     ) {
         return ResponseEntity.ok(testService.getAdminTestsByExamTypePaged(examTypeId, page, size));
+    }
+
+    // Danh sách bài Quick Challenge cho Hero landing page (public, guest xem được)
+    @GetMapping("/quick-challenge")
+    public ResponseEntity<List<QuickChallengeCardResponse>> getQuickChallengeTests() {
+        return ResponseEntity.ok(testService.getQuickChallengeTests());
     }
 
     @GetMapping("/{testId}/can-start")
