@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '~/config/queryClient';
 import DefaultLayout from './layout/DefaultLayout';
 import { publicRoutes, privateRoutes, adminRoutes } from './routes';
 import ProtectedRoute from './routes/ProtectedRoute';
@@ -14,6 +16,7 @@ import ScrollProgressBar from '~/components/common/ScrollProgressBar';
 
 function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <StreakProvider>
       <Router
@@ -97,6 +100,7 @@ function App() {
       </Router>
       </StreakProvider>
     </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
