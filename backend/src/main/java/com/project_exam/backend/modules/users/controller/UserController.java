@@ -2,7 +2,7 @@ package com.project_exam.backend.modules.users.controller;
 
 import com.project_exam.backend.modules.users.dto.UserUpsertRequest;
 import com.project_exam.backend.modules.users.dto.ProfileOverviewResponse;
-import com.project_exam.backend.modules.users.dto.UserPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.dto.UserResponse;
 import com.project_exam.backend.modules.users.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/paged")
-    public ResponseEntity<UserPageResponse> getUsersPaged(
+    public ResponseEntity<PageResponse<UserResponse>> getUsersPaged(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size,
             @RequestParam(required = false) String keyword,

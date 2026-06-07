@@ -7,7 +7,7 @@ import com.project_exam.backend.modules.posts.domain.PostCategory;
 import com.project_exam.backend.modules.posts.domain.React;
 import com.project_exam.backend.modules.posts.dto.PostUpsertRequest;
 import com.project_exam.backend.modules.posts.dto.CategoryResponse;
-import com.project_exam.backend.modules.posts.dto.PostPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.posts.dto.PostResponse;
 import com.project_exam.backend.modules.posts.dto.PostSummaryResponse;
 import com.project_exam.backend.modules.posts.repository.CategoryRepository;
@@ -294,7 +294,7 @@ public class PostService {
         return toFullResponse(post, currentUserId);
     }
 
-    public PostPageResponse getPostsPaged(int page, int size, String keyword,
+    public PageResponse<PostSummaryResponse> getPostsPaged(int page, int size, String keyword,
                                           Post.PostStatus status, String categoryId,
                                           HttpServletRequest httpRequest) {
         int safePage = Math.max(page, 0);
@@ -322,26 +322,14 @@ public class PostService {
             List<String> postIds = postCategoryRepository.findByCategoryId(categoryId)
                     .stream().map(PostCategory::getPostId).collect(Collectors.toList());
             if (postIds.isEmpty()) {
-                PostPageResponse empty = new PostPageResponse();
-                empty.setContent(Collections.emptyList());
-                empty.setTotalElements(0);
-                empty.setTotalPages(0);
-                empty.setHasNext(false);
-                return empty;
+                return PageResponse.empty(safePage, safeSize);
             }
             spec = spec.and((root, query, cb) -> root.get("id").in(postIds));
         }
 
         Page<Post> postPage = postRepository.findAll(spec, pageable);
 
-        PostPageResponse response = new PostPageResponse();
-        response.setContent(buildSummaryResponses(postPage.getContent()));
-        response.setCurrentPage(postPage.getNumber());
-        response.setSize(postPage.getSize());
-        response.setTotalElements(postPage.getTotalElements());
-        response.setTotalPages(postPage.getTotalPages());
-        response.setHasNext(postPage.hasNext());
-        return response;
+        return PageResponse.from(postPage, buildSummaryResponses(postPage.getContent()));
     }
 
     public List<PostSummaryResponse> getMyPosts(HttpServletRequest httpRequest) {

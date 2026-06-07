@@ -7,13 +7,15 @@ import styles from './Pagination.module.scss';
 const cx = classNames.bind(styles);
 
 function Pagination({ currentPage = 0, totalPages = 0, onChange }) {
-  if (totalPages <= 1) return null;
+  // Luôn hiện thanh phân trang để dễ quan sát, kể cả khi chỉ có 1 trang
+  // (hoặc chưa có dữ liệu) -> hiện 1 nút "1", prev/next tự disable.
+  const total = Math.max(totalPages, 1);
 
   const pages = [];
-  for (let i = 0; i < totalPages; i++) {
+  for (let i = 0; i < total; i++) {
     if (
       i === 0 ||
-      i === totalPages - 1 ||
+      i === total - 1 ||
       (i >= currentPage - 1 && i <= currentPage + 1)
     ) {
       pages.push(i);
@@ -49,9 +51,9 @@ function Pagination({ currentPage = 0, totalPages = 0, onChange }) {
       ))}
 
       <button
-        className={cx('pageBtn', { disabled: currentPage >= totalPages - 1 })}
+        className={cx('pageBtn', { disabled: currentPage >= total - 1 })}
         onClick={() =>
-          currentPage < totalPages - 1 && onChange?.(currentPage + 1)
+          currentPage < total - 1 && onChange?.(currentPage + 1)
         }
       >
         <ChevronRight size={20} />

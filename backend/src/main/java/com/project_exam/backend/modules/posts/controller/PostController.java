@@ -2,7 +2,7 @@ package com.project_exam.backend.modules.posts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project_exam.backend.modules.posts.dto.PostUpsertRequest;
-import com.project_exam.backend.modules.posts.dto.PostPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.posts.dto.PostResponse;
 import com.project_exam.backend.modules.posts.dto.PostSummaryResponse;
 import com.project_exam.backend.modules.posts.dto.UpdatePostStatusRequest;
@@ -28,7 +28,7 @@ public class PostController {
 
     // ─── GET danh sách (public) ───────────────────
     @GetMapping
-    public ResponseEntity<PostPageResponse> getPosts(
+    public ResponseEntity<PageResponse<PostSummaryResponse>> getPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword,

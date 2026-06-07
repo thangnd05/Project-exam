@@ -8,7 +8,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsRe
 import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
-import com.project_exam.backend.modules.assessment.test.dto.TestPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.service.TestService;
@@ -167,7 +167,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     // Lấy danh sách test theo examTypeId cho user (chỉ trả về đề do admin tạo,
     // không lộ đề cá nhân của user khác ra danh sách chung). Có phân trang.
     @GetMapping("/user/by-exam-type/{examTypeId}")
-    public ResponseEntity<TestPageResponse> getTestsByExamType(
+    public ResponseEntity<PageResponse<TestResponse>> getTestsByExamType(
             @PathVariable String examTypeId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size
@@ -219,7 +219,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     }
 
     @GetMapping("/my-tests")
-    public ResponseEntity<TestPageResponse> getMyPersonalTests(
+    public ResponseEntity<PageResponse<TestResponse>> getMyPersonalTests(
             HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size

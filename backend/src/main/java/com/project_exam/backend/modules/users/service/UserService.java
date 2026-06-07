@@ -6,7 +6,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.infrastructure.cloudinary.CloudinaryService;
 import com.project_exam.backend.modules.users.dto.UserUpsertRequest;
 import com.project_exam.backend.modules.users.dto.ProfileOverviewResponse;
-import com.project_exam.backend.modules.users.dto.UserPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.dto.UserResponse;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
@@ -93,7 +93,7 @@ public class UserService {
                 .toList();
     }
 
-    public UserPageResponse findAllPaged(Integer page, Integer size, String keyword, String roleId, Boolean verified) {
+    public PageResponse<UserResponse> findAllPaged(Integer page, Integer size, String keyword, String roleId, Boolean verified) {
         int safePage = page == null || page < 0 ? 0 : page;
         int safeSize = size == null || size <= 0 ? 20 : Math.min(size, 100);
 
@@ -120,14 +120,7 @@ public class UserService {
 
         Page<User> userPage = userRepository.findAll(specification, pageable);
 
-        UserPageResponse response = new UserPageResponse();
-        response.setContent(userPage.getContent().stream().map(this::toResponse).toList());
-        response.setCurrentPage(userPage.getNumber());
-        response.setSize(userPage.getSize());
-        response.setTotalElements(userPage.getTotalElements());
-        response.setTotalPages(userPage.getTotalPages());
-        response.setHasNext(userPage.hasNext());
-        return response;
+        return PageResponse.from(userPage, this::toResponse);
     }
 
     public Optional<User> findById(String id) {

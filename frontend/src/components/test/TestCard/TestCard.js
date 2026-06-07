@@ -6,6 +6,7 @@ import {
     IoStatsChartOutline,
     IoPlayCircleOutline,
     IoLockClosedOutline,
+    IoCreateOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './TestCard.module.scss';
@@ -13,6 +14,7 @@ import {
     getTestStatus,
     calculateAllowedTime,
     formatDateTime,
+    formatFullDateTime,
 } from '~/utils/testStatusHelper';
 
 const cx = classNames.bind(styles);
@@ -124,6 +126,11 @@ function TestCard({ test, countdowns }) {
                         <IoHourglassOutline />
                         <span>Hạn nộp: <strong>{formatDateTime(test.availableTo)}</strong></span>
                     </div>
+                </div>
+
+                <div className={cx('info-item', 'created-line')}>
+                    <IoCreateOutline />
+                    <span>Thời gian tạo: <strong>{formatFullDateTime(test.createdAt)}</strong></span>
                 </div>
 
                 <div className={cx('btn-group', {hasRank: showLeaderboard})}>

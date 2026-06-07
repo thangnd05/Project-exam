@@ -4,7 +4,7 @@ import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationRequest;
-import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationResponse;
 import com.project_exam.backend.modules.assessment.attempt.domain.Evaluation;
 import com.project_exam.backend.modules.users.domain.User;
@@ -77,7 +77,7 @@ public class EvaluationService {
                 .toList();
     }
 
-    public EvaluationPageResponse getAllPaged(Integer page, Integer size, String keyword, Integer rating) {
+    public PageResponse<EvaluationResponse> getAllPaged(Integer page, Integer size, String keyword, Integer rating) {
         int safePage = page == null || page < 0 ? 0 : page;
         int safeSize = size == null || size <= 0 ? 20 : Math.min(size, 100);
 
@@ -97,14 +97,7 @@ public class EvaluationService {
 
         Page<Evaluation> evaluationPage = evaluationRepository.findAll(specification, pageable);
 
-        EvaluationPageResponse response = new EvaluationPageResponse();
-        response.setContent(evaluationPage.getContent().stream().map(this::toResponse).toList());
-        response.setCurrentPage(evaluationPage.getNumber());
-        response.setSize(evaluationPage.getSize());
-        response.setTotalElements(evaluationPage.getTotalElements());
-        response.setTotalPages(evaluationPage.getTotalPages());
-        response.setHasNext(evaluationPage.hasNext());
-        return response;
+        return PageResponse.from(evaluationPage, this::toResponse);
     }
 
     // ============================

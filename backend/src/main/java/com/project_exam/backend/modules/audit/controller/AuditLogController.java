@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.audit.controller;
 
-import com.project_exam.backend.modules.audit.dto.AuditLogPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
+import com.project_exam.backend.modules.audit.dto.AuditLogResponse;
 import com.project_exam.backend.modules.audit.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +19,7 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping
-    public ResponseEntity<AuditLogPageResponse> getRecentAudits(
+    public ResponseEntity<PageResponse<AuditLogResponse>> getRecentAudits(
             @RequestParam(required = false) String userId,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size
@@ -27,7 +28,7 @@ public class AuditLogController {
     }
 
     @GetMapping("/login")
-    public ResponseEntity<AuditLogPageResponse> getLoginAudits(
+    public ResponseEntity<PageResponse<AuditLogResponse>> getLoginAudits(
             @RequestParam(required = false) String userId,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size

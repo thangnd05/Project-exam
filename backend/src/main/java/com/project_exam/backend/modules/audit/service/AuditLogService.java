@@ -1,6 +1,6 @@
 package com.project_exam.backend.modules.audit.service;
 
-import com.project_exam.backend.modules.audit.dto.AuditLogPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.audit.dto.AuditLogResponse;
 import com.project_exam.backend.modules.audit.domain.AuditLog;
 import com.project_exam.backend.modules.users.domain.User;
@@ -31,7 +31,7 @@ public class AuditLogService {
         return auditLogRepository.save(auditLog);
     }
 
-    public AuditLogPageResponse getRecentLogs(String userId, int page, int size) {
+    public PageResponse<AuditLogResponse> getRecentLogs(String userId, int page, int size) {
         PageRequest pageable = buildPageRequest(page, size);
         Page<AuditLog> logPage = userId == null
                 ? auditLogRepository.findAll(pageable)
@@ -39,7 +39,7 @@ public class AuditLogService {
         return toPageResponse(logPage);
     }
 
-    public AuditLogPageResponse getLoginLogs(String userId, int page, int size) {
+    public PageResponse<AuditLogResponse> getLoginLogs(String userId, int page, int size) {
         PageRequest pageable = buildPageRequest(page, size);
         Page<AuditLog> logPage = userId == null
                 ? auditLogRepository.findByActionIn(LOGIN_ACTIONS, pageable)
@@ -58,7 +58,7 @@ public class AuditLogService {
         );
     }
 
-    private AuditLogPageResponse toPageResponse(Page<AuditLog> logPage) {
+    private PageResponse<AuditLogResponse> toPageResponse(Page<AuditLog> logPage) {
         Set<String> userIds = logPage.getContent().stream()
                 .map(AuditLog::getUserId)
                 .filter(Objects::nonNull)
@@ -67,16 +67,9 @@ public class AuditLogService {
         Map<String, User> usersById = userRepository.findAllById(userIds).stream()
                 .collect(Collectors.toMap(User::getUserId, Function.identity()));
 
-        AuditLogPageResponse response = new AuditLogPageResponse();
-        response.setContent(logPage.getContent().stream()
+        return PageResponse.from(logPage, logPage.getContent().stream()
                 .map(log -> toResponse(log, usersById.get(log.getUserId())))
                 .toList());
-        response.setCurrentPage(logPage.getNumber());
-        response.setSize(logPage.getSize());
-        response.setTotalElements(logPage.getTotalElements());
-        response.setTotalPages(logPage.getTotalPages());
-        response.setHasNext(logPage.hasNext());
-        return response;
     }
 
     private AuditLogResponse toResponse(AuditLog auditLog, User user) {

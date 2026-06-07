@@ -1,7 +1,7 @@
 package com.project_exam.backend.modules.assessment.attempt.controller;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationRequest;
-import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationPageResponse;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationResponse;
 import com.project_exam.backend.modules.assessment.attempt.service.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,7 +35,7 @@ public class EvaluationController {
     }
 
     @GetMapping("/paged")
-    public ResponseEntity<EvaluationPageResponse> getAllPaged(
+    public ResponseEntity<PageResponse<EvaluationResponse>> getAllPaged(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size,
             @RequestParam(required = false) String keyword,

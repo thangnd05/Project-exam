@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Eye, Heart, MessageCircle, Clock, ChevronLeft, ChevronRight, Plus, Info } from 'lucide-react';
+import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info } from 'lucide-react';
 import { getPosts, getCategories } from '~/api/postApi';
 import routes from '~/config/Routes';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
+import Pagination from '~/components/common/Pagination/Pagination';
 import CreatePostModal from './modals/CreatePostModal';
 import styles from './posts.module.scss';
 
@@ -66,51 +67,6 @@ function PostsPage() {
   }, [fetchData]);
 
   const refreshPosts = () => fetchData(0);
-
-  const renderPagination = () => {
-    if (totalPages <= 1) return null;
-
-    const pages = [];
-    for (let i = 0; i < totalPages; i++) {
-      if (
-        i === 0 ||
-        i === totalPages - 1 ||
-        (i >= currentPage - 1 && i <= currentPage + 1)
-      ) {
-        pages.push(i);
-      } else if (pages[pages.length - 1] !== '...') {
-        pages.push('...');
-      }
-    }
-
-    return (
-      <div className={cx('pagination')}>
-        <button
-          className={cx('pageBtn', { disabled: currentPage === 0 })}
-          onClick={() => currentPage > 0 && fetchData(currentPage - 1)}
-        >
-          <ChevronLeft size={20} />
-        </button>
-
-        {pages.map((p, idx) => (
-          <button
-            key={idx}
-            className={cx('pageBtn', { active: p === currentPage, disabled: p === '...' })}
-            onClick={() => typeof p === 'number' && fetchData(p)}
-          >
-            {typeof p === 'number' ? p + 1 : p}
-          </button>
-        ))}
-
-        <button
-          className={cx('pageBtn', { disabled: currentPage === totalPages - 1 })}
-          onClick={() => currentPage < totalPages - 1 && fetchData(currentPage + 1)}
-        >
-          <ChevronRight size={20} />
-        </button>
-      </div>
-    );
-  };
 
   const getCategoryStyles = (categoryName) => {
     switch (categoryName) {
@@ -226,7 +182,7 @@ function PostsPage() {
         </div>
 
         {/* Pagination */}
-        {renderPagination()}
+        <Pagination currentPage={currentPage} totalPages={totalPages} onChange={fetchData} />
 
         {/* Create Post Modal */}
         <CreatePostModal

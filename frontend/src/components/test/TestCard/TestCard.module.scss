@@ -113,6 +113,14 @@ $brand-secondary: var(--accent-act-color);
     }
 }
 
+// Dòng "Thời gian tạo" full-width, tách nhẹ khỏi cụm lịch mở/hạn nộp bằng đường kẻ.
+.created-line {
+    margin-top: -4px;
+    margin-bottom: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+}
+
 .btn-group {
     margin-top: auto;
     display: grid;
