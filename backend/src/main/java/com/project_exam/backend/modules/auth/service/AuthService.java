@@ -80,13 +80,15 @@ public class AuthService {
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(identifier);
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getUserId());
-        claims.put("roleId", user.getRoleId());
-
         String familyId = UUID.randomUUID().toString();
         String jti = UUID.randomUUID().toString();
         refreshTokenStore.createFamily(user.getUserId(), familyId, jti);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getUserId());
+        claims.put("roleId", user.getRoleId());
+        // fid vào accessToken (Path=/) để logout revoke đúng family — refresh cookie (Path hẹp) không tới được /logout.
+        claims.put("fid", familyId);
 
         String accessToken = jwtService.generateToken(userDetails, claims);
         String refreshToken = jwtService.generateRefreshToken(userDetails, familyId, jti);
@@ -142,6 +144,8 @@ public class AuthService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId());
         claims.put("roleId", user.getRoleId());
+        // Phải mang lại fid sau mỗi lần xoay token, nếu không accessToken mới mất fid → logout không revoke được.
+        claims.put("fid", familyId);
 
         String newAccessToken = jwtService.generateToken(userDetails, claims);
         String newRefreshToken = jwtService.generateRefreshToken(userDetails, familyId, effectiveJti);
@@ -154,21 +158,17 @@ public class AuthService {
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         // Revoke family ở Redis trước khi clear cookie — nếu attacker đã copy refresh token,
         // sau khi logout token đó cũng không refresh được nữa.
-        String refreshToken = extractRefreshTokenFromCookie(request);
-        if (refreshToken != null && !refreshToken.isBlank()) {
-            try {
-                if (jwtService.isRefreshToken(refreshToken)) {
-                    String username = jwtService.extractUsername(refreshToken);
-                    String familyId = jwtService.extractFamilyId(refreshToken);
-                    if (username != null && familyId != null) {
-                        userRepository.findByUserName(username)
-                                .or(() -> userRepository.findByEmail(username))
-                                .ifPresent(u -> refreshTokenStore.revokeFamily(u.getUserId(), familyId));
-                    }
-                }
-            } catch (Exception ignored) {
-                // Token đã hết hạn / hỏng — vẫn cho logout client-side.
+        // Đọc từ accessToken (Path=/) chứ KHÔNG từ refresh cookie: refresh cookie có Path=/api/auth/refresh
+        // nên trình duyệt không gửi kèm tới /api/auth/logout → fid được nhúng vào accessToken thay thế.
+        try {
+            Claims claims = jwtService.extractAllClaimsFromRequest(request);
+            String userId = (String) claims.get("userId");
+            String familyId = (String) claims.get("fid");
+            if (userId != null && familyId != null) {
+                refreshTokenStore.revokeFamily(userId, familyId);
             }
+        } catch (Exception ignored) {
+            // accessToken hết hạn / hỏng — vẫn cho logout client-side.
         }
 
         boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");

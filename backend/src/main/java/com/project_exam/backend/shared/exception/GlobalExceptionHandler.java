@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -61,6 +62,15 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Request body không hợp lệ", request);
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<ApiErrorResponse> handleOptimisticLockingFailureException(
+            OptimisticLockingFailureException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("OptimisticLockingFailureException: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.CONFLICT, "Bài thi đã được nộp hoặc đang được xử lý", request);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

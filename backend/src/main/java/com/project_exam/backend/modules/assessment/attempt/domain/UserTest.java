@@ -37,6 +37,9 @@ public class UserTest {
     @Column(length = 20)
     private Status status = Status.IN_PROGRESS; // 🟢 mặc định khi bắt đầu thi
 
+    @Version
+    private Long version;
+
     public enum Status {
         IN_PROGRESS,
         COMPLETED,
