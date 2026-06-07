@@ -2,6 +2,7 @@ import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {useParams} from 'react-router-dom';
 import axios from '../../api/axiosClient';
 import { generatePracticeQuestion, checkPracticeAnswer, markVocabKnown } from '../../api/practiceQuestionApi';
+import { useStreak } from '~/hooks/useStreak';
 import {Container, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -36,6 +37,7 @@ const PracticePage = () => {
     const [knownMessage, setKnownMessage] = useState('');
     const [sessionScore, setSessionScore] = useState({correct: 0, total: 0});
     const audioRef = useRef(null);
+    const { refreshStreak } = useStreak();
 
     const fetchQuestion = useCallback(async () => {
         try {
@@ -61,6 +63,37 @@ const PracticePage = () => {
         fetchQuestion();
     }, [fetchQuestion]);
 
+    // Tự động phát âm thanh lần đầu mỗi khi có câu hỏi mới
+    useEffect(() => {
+        if (!question?.word || !audioRef.current) return;
+
+        const audioEl = audioRef.current;
+        audioEl.load();
+
+        const tryPlay = () => audioEl.play();
+
+        // Thử phát ngay; nếu trình duyệt chặn (vd: vừa F5 chưa tương tác)
+        // thì chờ thao tác đầu tiên của người dùng rồi phát lại đúng câu hiện tại.
+        tryPlay()?.catch(() => {
+            const playOnInteract = () => {
+                tryPlay()?.catch(() => {});
+            };
+            window.addEventListener('pointerdown', playOnInteract, { once: true });
+            window.addEventListener('keydown', playOnInteract, { once: true });
+
+            // Cleanup nếu đổi câu trước khi người dùng kịp tương tác
+            audioEl._cleanupAutoplay = () => {
+                window.removeEventListener('pointerdown', playOnInteract);
+                window.removeEventListener('keydown', playOnInteract);
+            };
+        });
+
+        return () => {
+            audioEl._cleanupAutoplay?.();
+            audioEl._cleanupAutoplay = null;
+        };
+    }, [question]);
+
     const handleSubmit = async () => {
         if (!question) return;
 
@@ -85,6 +118,7 @@ const PracticePage = () => {
                 setSessionScore(prev => ({...prev, correct: prev.correct + 1}));
             }
             setSessionScore(prev => ({...prev, total: prev.total + 1}));
+            refreshStreak(); // 🔥 luyện từ vựng -> cập nhật streak
         } catch (err) {
             console.error('Lỗi khi chấm:', err);
         }
@@ -101,6 +135,7 @@ const PracticePage = () => {
         try {
             setMarkingKnown(true);
             await markVocabKnown(question.vocabId);
+            refreshStreak(); // 🔥 học từ vựng -> cập nhật streak
             setKnownMessage('Bạn đã đánh dấu từ này là đã biết!');
             setTimeout(() => setKnownMessage(''), 2000);
             setTimeout(async () => {

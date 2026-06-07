@@ -20,6 +20,8 @@ import com.project_exam.backend.modules.assessment.learning.support.LearningPlan
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
+import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
+import com.project_exam.backend.modules.gamification.streak.service.StreakService;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -51,6 +53,7 @@ public class LearningPlanSessionService {
     private final RecoveryResourceRepository recoveryResourceRepository;
     private final LearningPlanResourceLookup resourceLookup;
     private final LearningPlanTaskUnlockSupport taskUnlockSupport;
+    private final StreakService streakService;
 
     @Transactional
     public CurrentSessionResponse getCurrentSession(
@@ -229,6 +232,14 @@ public class LearningPlanSessionService {
         session.setPassed(passed);
         session.setSubmittedAt(Instant.now());
         sessionRepository.save(session);
+
+        // 🔥 Pass 1 ải learning plan -> ghi nhận streak (side-effect, không phá luồng)
+        if (passed) {
+            try {
+                streakService.recordActivity(userId, StreakActivityType.LESSON_PASS);
+            } catch (Exception ignored) {
+            }
+        }
 
         String taskStatus = null;
         PlanStage stage = plan.getPlanStage() != null ? plan.getPlanStage() : PlanStage.FOUNDATION;

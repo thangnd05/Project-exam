@@ -1,0 +1,56 @@
+.content {
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.body {
+  text-align: center;
+  padding: 36px 28px 30px;
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 60%);
+}
+
+.flame {
+  font-size: 64px;
+  color: #ff922b;
+  filter: drop-shadow(0 4px 12px rgba(255, 146, 43, 0.4));
+  margin-bottom: 8px;
+}
+
+.count {
+  font-size: 40px;
+  font-weight: 800;
+  color: #ff922b;
+  margin: 0;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #212529;
+  margin: 6px 0 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0 auto 22px;
+  max-width: 320px;
+}
+
+.btn {
+  min-width: 160px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 0;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffa94d 0%, #ff922b 100%);
+  box-shadow: 0 4px 14px rgba(255, 146, 43, 0.38);
+
+  &:hover,
+  &:focus,
+  &:active {
+    background: linear-gradient(135deg, #ff9c33 0%, #f97c12 100%) !important;
+    box-shadow: 0 4px 14px rgba(255, 146, 43, 0.5);
+  }
+}

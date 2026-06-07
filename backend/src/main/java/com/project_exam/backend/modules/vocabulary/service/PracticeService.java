@@ -21,6 +21,8 @@ import com.project_exam.backend.modules.assessment.attempt.repository.*;
 import com.project_exam.backend.modules.vocabulary.repository.*;
 import com.project_exam.backend.modules.classroom.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
+import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
+import com.project_exam.backend.modules.gamification.streak.service.StreakService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -46,6 +48,8 @@ public class PracticeService {
     private UserVocabularyRepository userVocabularyRepository;
 
     private final AuthUtils authUtils;
+
+    private final StreakService streakService;
 
     public Optional<PracticeQuestionResponse> generateOneRandomQuestion(HttpServletRequest request, String albumId) {
         String userId = authUtils.getUserId(request);
@@ -105,6 +109,12 @@ public class PracticeService {
         uv.setLastReviewed(LocalDateTime.now());
 
         userVocabularyRepository.save(uv);
+
+        // 🔥 Học từ vựng -> ghi nhận streak (side-effect, không phá luồng)
+        try {
+            streakService.recordActivity(currentUserId, StreakActivityType.VOCAB_PRACTICE);
+        } catch (Exception ignored) {
+        }
     }
 
     public PracticeCheckResponse checkAnswer(HttpServletRequest request, PracticeCheckRequest req) {
@@ -137,6 +147,12 @@ public class PracticeService {
 
         uv.setLastReviewed(LocalDateTime.now());
         userVocabularyRepository.save(uv);
+
+        // 🔥 Luyện từ vựng -> ghi nhận streak (side-effect, không phá luồng)
+        try {
+            streakService.recordActivity(userId, StreakActivityType.VOCAB_PRACTICE);
+        } catch (Exception ignored) {
+        }
 
         return new PracticeCheckResponse(
                 vocab.getVocabId(),

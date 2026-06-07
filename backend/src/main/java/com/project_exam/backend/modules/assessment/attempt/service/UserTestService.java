@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.attempt.service;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
+import com.project_exam.backend.modules.gamification.streak.service.StreakService;
 import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -56,6 +58,7 @@ public class UserTestService {
     private final ClassMemberRepository classMemberRepository;
     private final ClassRepository classRepository;
     private final AuthUtils authUtils;
+    private final StreakService streakService;
     
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
@@ -115,6 +118,12 @@ public class UserTestService {
 
         userTest.setFinishedAt(LocalDateTime.now());
         userTest.setStatus(UserTest.Status.COMPLETED); // 🟢 Cập nhật trạng thái đã nộp
+
+        // 🔥 Ghi nhận streak (side-effect, không được làm hỏng luồng nộp bài)
+        try {
+            streakService.recordActivity(currentUserId, StreakActivityType.TEST_SUBMIT);
+        } catch (Exception ignored) {
+        }
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {

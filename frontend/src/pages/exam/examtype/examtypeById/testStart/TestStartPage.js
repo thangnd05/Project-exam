@@ -17,6 +17,7 @@ import {
 
 import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
 import { AuthContext } from '~/context/AuthContext';
+import { useStreak } from '~/hooks/useStreak';
 import { getOrCreateGuestSessionId, guestHeaders } from '~/utils/guestSession';
 import TestStartDashboard from './TestStartDashboard';
 import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
@@ -33,6 +34,7 @@ function TestStartPage() {
   const { testId } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
+  const { refreshStreak } = useStreak();
 
   // Guest session: chỉ khởi tạo khi đã xác định KHÔNG đăng nhập.
   const isGuest = !authLoading && !isAuthenticated;
@@ -330,6 +332,7 @@ function TestStartPage() {
       const result = await submitUserTest(userTestId, isGuest, guestCfg);
       sessionStorage.removeItem(`userTest-${testId}`);
       sessionStorage.removeItem(`userTestState-${testId}`);
+      if (!isGuest) refreshStreak(); // 🔥 cập nhật streak sau khi nộp bài
       navigate(`/tests/result/${userTestId}`, {
         state: { score: result.totalScore },
       });

@@ -5,6 +5,8 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import AdminLayout from './admin/layouts/AdminLayout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from '~/context/AuthContext';
+import { StreakProvider } from '~/context/StreakContext';
+import StreakCelebration from '~/components/streak/StreakCelebration';
 import ScrollHandler from './layout/ScrollToTopOnRouteChange';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,6 +15,7 @@ import ScrollProgressBar from '~/components/common/ScrollProgressBar';
 function App() {
   return (
     <AuthProvider>
+      <StreakProvider>
       <Router
         future={{
           v7_startTransition: true,
@@ -34,6 +37,7 @@ function App() {
         />
         <div className="App">
           <ScrollProgressBar />
+          <StreakCelebration />
           <Routes>
             {/* Public Routes */}
             {publicRoutes.map((route, index) => {
@@ -91,6 +95,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </StreakProvider>
     </AuthProvider>
   );
 }

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getCurrentSession, submitSession } from '~/api/learningPlanApi';
+import { useStreak } from '~/hooks/useStreak';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import styles from '../styles/PersonalizedPlan.module.scss';
 
@@ -11,6 +12,7 @@ function PlanStudyPage() {
   const { learningPlanId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { refreshStreak } = useStreak();
   const taskIdFromUrl = searchParams.get('taskId');
   const isReviewMode = searchParams.get('review') === 'true';
 
@@ -94,6 +96,7 @@ function PlanStudyPage() {
     try {
       const res = await submitSession(learningPlanId, session.sessionId, answers);
       setResult(res);
+      if (res?.passed) refreshStreak(); // 🔥 cập nhật streak khi vượt ải
     } catch (err) {
       setError(err?.response?.data?.message || err.message);
     } finally {

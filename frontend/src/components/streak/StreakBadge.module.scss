@@ -1,0 +1,28 @@
+.streakBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #f1f3f5;
+  color: #adb5bd;
+  font-weight: 700;
+  font-size: 15px;
+  user-select: none;
+  cursor: default;
+  transition: all 0.2s ease;
+
+  .icon {
+    font-size: 16px;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #ffa94d 0%, #ff922b 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(255, 146, 43, 0.3);
+
+    .icon {
+      filter: drop-shadow(0 0 3px rgba(255, 224, 130, 0.9));
+    }
+  }
+}
