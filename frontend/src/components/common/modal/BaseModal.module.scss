@@ -102,6 +102,56 @@
       background: #94a3b8;
     }
   }
+
+  // Làm đẹp form react-bootstrap (Form.Control/Form.Select/Form.Label) bên trong modal
+  // để các modal admin trông gọn gàng như các form modal khác, không phải sửa từng field.
+  :global(.form-label) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 10px;
+  }
+
+  :global(.form-control),
+  :global(.form-select) {
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 1.5rem;
+    color: #1e293b;
+    box-shadow: none;
+    transition: all 0.2s;
+  }
+
+  :global(.form-control)::placeholder {
+    color: #94a3b8;
+  }
+
+  :global(.form-control:focus),
+  :global(.form-select:focus) {
+    border-color: var(--accent-color, #0061f2);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+  }
+
+  :global(.form-check-label) {
+    font-size: 1.5rem;
+    color: #475569;
+  }
+
+  :global(.form-check-input) {
+    cursor: pointer;
+
+    &:checked {
+      background-color: var(--accent-color, #0061f2);
+      border-color: var(--accent-color, #0061f2);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+    }
+  }
 }
 
 .footer {
