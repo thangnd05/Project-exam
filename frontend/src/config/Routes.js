@@ -37,6 +37,7 @@ const routes = {
   adminAnalytics: '/admin/analytics',
   adminAuditLogs: '/admin/audit-logs',
   adminLoginAudit: '/admin/audit-login',
+  adminCoins: '/admin/coins',
 
   testHistory: '/tests/history/:testId',
   testLeaderboard: '/tests/leaderboard/:testId',

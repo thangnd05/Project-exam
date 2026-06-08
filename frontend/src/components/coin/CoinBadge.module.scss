@@ -1,0 +1,20 @@
+.coinBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+  color: #5c3d00;
+  font-weight: 700;
+  font-size: 15px;
+  user-select: none;
+  cursor: default;
+  box-shadow: 0 2px 8px rgba(250, 176, 5, 0.3);
+  transition: all 0.2s ease;
+
+  .icon {
+    font-size: 16px;
+    filter: drop-shadow(0 0 3px rgba(255, 244, 179, 0.9));
+  }
+}

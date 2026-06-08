@@ -1,0 +1,60 @@
+package com.project_exam.backend.modules.gamification.coin.controller;
+
+import com.project_exam.backend.modules.gamification.coin.dto.CoinBalanceRequest;
+import com.project_exam.backend.modules.gamification.coin.dto.CoinUpsertRequest;
+import com.project_exam.backend.modules.gamification.coin.dto.CoinWalletResponse;
+import com.project_exam.backend.modules.gamification.coin.service.CoinService;
+import com.project_exam.backend.shared.util.AuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * Quản lý ví xu cho admin: xem danh sách, thêm/sửa/xoá số dư xu của user.
+ */
+@RestController
+@RequestMapping("/api/admin/coins")
+@AllArgsConstructor
+public class CoinAdminController {
+
+    private final CoinService coinService;
+    private final AuthUtils authUtils;
+
+    @GetMapping
+    public ResponseEntity<List<CoinWalletResponse>> getAll(HttpServletRequest httpRequest) {
+        authUtils.requireAdmin(httpRequest);
+        return ResponseEntity.ok(coinService.findAllWallets());
+    }
+
+    @PostMapping
+    public ResponseEntity<CoinWalletResponse> create(
+            @Valid @RequestBody CoinUpsertRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        authUtils.requireAdmin(httpRequest);
+        CoinWalletResponse created = coinService.create(request.getUserId(), request.getBalance());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<CoinWalletResponse> updateBalance(
+            @PathVariable String userId,
+            @Valid @RequestBody CoinBalanceRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        authUtils.requireAdmin(httpRequest);
+        return ResponseEntity.ok(coinService.updateBalance(userId, request.getBalance()));
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> delete(@PathVariable String userId, HttpServletRequest httpRequest) {
+        authUtils.requireAdmin(httpRequest);
+        coinService.delete(userId);
+        return ResponseEntity.noContent().build();
+    }
+}

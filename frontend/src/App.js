@@ -8,6 +8,7 @@ import AdminLayout from './admin/layouts/AdminLayout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from '~/context/AuthContext';
 import { StreakProvider } from '~/context/StreakContext';
+import { CoinProvider } from '~/context/CoinContext';
 import StreakCelebration from '~/components/streak/StreakCelebration';
 import ScrollHandler from './layout/ScrollToTopOnRouteChange';
 import { ToastContainer } from 'react-toastify';
@@ -19,6 +20,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <StreakProvider>
+      <CoinProvider>
       <Router
         future={{
           v7_startTransition: true,
@@ -98,6 +100,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </CoinProvider>
       </StreakProvider>
     </AuthProvider>
     </QueryClientProvider>

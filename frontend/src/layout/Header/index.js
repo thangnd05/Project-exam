@@ -23,6 +23,7 @@ import JoinClassModal from '~/pages/myclass/modals/JoinClassModal';
 import CreateClassModal from '~/pages/myclass/modals/CreateClassModal';
 import CreateTestModal from '~/components/test/CreateTestModal';
 import StreakBadge from '~/components/streak/StreakBadge';
+import CoinBadge from '~/components/coin/CoinBadge';
 
 const cx = classNames.bind(style);
 
@@ -193,6 +194,7 @@ function Header() {
           </Button>
         )}
         <StreakBadge />
+        <CoinBadge />
         <Dropdown className={cx(isMobile ? 'mobileUserDropdown' : '')}>
           <Dropdown.Toggle as="div" className={cx('user-info')}>
             <Image

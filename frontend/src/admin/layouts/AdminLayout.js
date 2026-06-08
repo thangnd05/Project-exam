@@ -28,6 +28,7 @@ import {
   Tags,
   BookOpen,
   Target,
+  Coins,
 } from 'lucide-react';
 import routes from '~/config/Routes';
 import styles from './AdminLayout.module.scss';
@@ -76,6 +77,12 @@ const adminRouteGroups = [
       {path: routes.adminCategories, icon: <Folder size={20} />, label: 'Danh mục'},
       {path: routes.adminPosts, icon: <FileText size={20} />, label: 'Duyệt bài viết'},
       {path: routes.adminEvaluations, icon: <MessageSquareWarning size={20} />, label: 'Duyệt đánh giá'},
+    ],
+  },
+  {
+    label: 'Gamification',
+    items: [
+      {path: routes.adminCoins, icon: <Coins size={20} />, label: 'Quản lý xu'},
     ],
   },
   {

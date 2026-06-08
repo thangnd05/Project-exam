@@ -51,6 +51,7 @@ import QuestionCollectionsManagement from '~/admin/pages/QuestionCollections';
 import TagsManagement from '~/admin/pages/Tags';
 import RecoveryResourcesManagement from '~/admin/pages/RecoveryResources';
 import MilestonesManagement from '~/admin/pages/Milestones';
+import CoinsManagement from '~/admin/pages/Coins';
 import UserTargetPage from '~/pages/user/target/UserTargetPage';
 import TargetDashboardPage from '~/pages/user/target/TargetDashboardPage';
 import TargetAchievedPage from '~/pages/user/target/TargetAchievedPage';
@@ -101,6 +102,7 @@ export const adminRoutes = [
   { path: routes.adminTags, component: TagsManagement },
   { path: routes.adminRecoveryResources, component: RecoveryResourcesManagement },
   { path: routes.adminMilestones, component: MilestonesManagement },
+  { path: routes.adminCoins, component: CoinsManagement },
 ];
 
 //  Các trang yêu cầu phải đăng nhập
