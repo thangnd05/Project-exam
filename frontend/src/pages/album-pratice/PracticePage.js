@@ -169,10 +169,6 @@ const PracticePage = () => {
 
     // Finished state
     if (finished) {
-        const accuracy = sessionScore.total > 0
-            ? Math.round((sessionScore.correct / sessionScore.total) * 100)
-            : 0;
-
         return (
             <div className={cx('wrapper')}>
                 <Container className={cx('finishedContainer')}>
@@ -188,23 +184,6 @@ const PracticePage = () => {
                         <p className={cx('finishedSubtitle')}>
                             Bạn đã hoàn thành tất cả từ trong album này!
                         </p>
-
-                        <div className={cx('scoreCard')}>
-                            <div className={cx('scoreItem')}>
-                                <span className={cx('scoreValue')}>{sessionScore.total}</span>
-                                <span className={cx('scoreLabel')}>Câu hỏi</span>
-                            </div>
-                            <div className={cx('scoreDivider')} />
-                            <div className={cx('scoreItem')}>
-                                <span className={cx('scoreValue', 'correct')}>{sessionScore.correct}</span>
-                                <span className={cx('scoreLabel')}>Đúng</span>
-                            </div>
-                            <div className={cx('scoreDivider')} />
-                            <div className={cx('scoreItem')}>
-                                <span className={cx('scoreValue', 'accuracy')}>{accuracy}%</span>
-                                <span className={cx('scoreLabel')}>Độ chính xác</span>
-                            </div>
-                        </div>
 
                         <button className={cx('backBtn')} onClick={() => window.history.back()}>
                             <ArrowRight size={20} className={cx('backBtnIcon')} />

@@ -52,8 +52,6 @@ const routes = {
   planStudy: '/learning-plans/:learningPlanId/study',
   taskHistory: '/learning-plans/:learningPlanId/tasks/:taskId/history',
 
-  quests: '/quests',
-
   myAlbums: '/my-albums',
   albumDelta: '/albums/:albumId',
   vocaPratice: '/practice/:albumId',

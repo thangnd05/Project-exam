@@ -64,7 +64,6 @@ import PlanStudyPage from '~/pages/learning-plan/pages/PlanStudyPage';
 import LearningPlansRedirect from '~/pages/learning-plan/pages/LearningPlansRedirect';
 import PlanComparisonPage from '~/pages/learning-plan/pages/PlanComparisonPage';
 import TaskHistoryPage from '~/pages/learning-plan/pages/TaskHistoryPage';
-import QuestsPage from '~/pages/quests/QuestsPage';
 
 //  Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -141,7 +140,6 @@ export const privateRoutes = [
   { path: routes.mockHistory, component: MockHistoryPage },
   { path: routes.targetAchieved, component: TargetAchievedPage },
   { path: routes.nextStep, component: NextStepPage },
-  { path: routes.quests, component: QuestsPage },
 ];
 
 const appRoutes = { publicRoutes, privateRoutes, adminRoutes };

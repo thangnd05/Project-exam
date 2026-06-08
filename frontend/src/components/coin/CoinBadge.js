@@ -13,7 +13,7 @@ function CoinBadge({ className }) {
   return (
     <div
       className={cx('coinBadge', className)}
-      title={`Bạn đang có ${balance} xu`}
+      title={`click để xem nhiệm vụ`}
     >
       <FontAwesomeIcon icon={faCircleDollarToSlot} className={cx('icon')} />
       <span className={cx('count')}>{balance}</span>
