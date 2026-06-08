@@ -13,6 +13,9 @@ const cx = classNames.bind(styles);
 const CONDITION_TYPES = [
   {value: 'NONE', label: 'Không cần điều kiện (tặng xu)'},
   {value: 'COMPLETE_TEST', label: 'Hoàn thành bài thi'},
+  {value: 'STREAK_DAYS', label: 'Đạt chuỗi ngày học'},
+  {value: 'CREATE_LEARNING_PLAN', label: 'Tạo lộ trình học'},
+  {value: 'COMPLETE_LEARNING_PLAN', label: 'Hoàn thành lộ trình học'},
 ];
 
 const defaultFormState = {

@@ -19,4 +19,8 @@ public interface LearningPlanRepository extends JpaRepository<LearningPlan, Stri
             String userId, String examTypeId, LearningPlan.Status status);
 
     long countByUserIdAndExamTypeId(String userId, String examTypeId);
+
+    long countByUserId(String userId);
+
+    long countByUserIdAndStatus(String userId, LearningPlan.Status status);
 }
