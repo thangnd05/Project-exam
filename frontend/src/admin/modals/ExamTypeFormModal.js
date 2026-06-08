@@ -1,5 +1,6 @@
 import React from 'react';
-import {Button, Form, Modal} from 'react-bootstrap';
+import {Button, Form} from 'react-bootstrap';
+import BaseModal from '~/components/common/modal/BaseModal';
 
 const scoringMethodOptions = ['DEFAULT', 'TOEIC_SCALE', 'IELTS_BAND'];
 
@@ -12,11 +13,20 @@ function ExamTypeFormModal({
   onSubmit,
 }) {
   return (
-    <Modal show={show} onHide={onClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>{isEditing ? 'Cập nhật loại kỳ thi' : 'Tạo loại kỳ thi'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+    <BaseModal
+      show={show}
+      onClose={onClose}
+      title={isEditing ? 'Cập nhật loại kỳ thi' : 'Tạo loại kỳ thi'}
+      maxWidth={550}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>
+            Hủy
+          </Button>
+          <Button onClick={onSubmit}>{isEditing ? 'Lưu' : 'Tạo mới'}</Button>
+        </>
+      }
+    >
         <Form.Group className="mb-3">
           <Form.Label>Tên</Form.Label>
           <Form.Control
@@ -57,14 +67,7 @@ function ExamTypeFormModal({
             ))}
           </Form.Select>
         </Form.Group>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          Hủy
-        </Button>
-        <Button onClick={onSubmit}>{isEditing ? 'Lưu' : 'Tạo mới'}</Button>
-      </Modal.Footer>
-    </Modal>
+    </BaseModal>
   );
 }
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import {Badge, Button, Form, Modal} from 'react-bootstrap';
+import {Badge, Button, Form} from 'react-bootstrap';
+import BaseModal from '~/components/common/modal/BaseModal';
 
 function RecoveryResourceFormModal({
   show,
@@ -17,11 +18,22 @@ function RecoveryResourceFormModal({
   const selectedTagIds = formState.tagIds || [];
 
   return (
-    <Modal show={show} onHide={onClose} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>{isEditing ? 'Cập nhật tài liệu' : 'Thêm tài liệu mới'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+    <BaseModal
+      show={show}
+      onClose={onClose}
+      title={isEditing ? 'Cập nhật tài liệu' : 'Thêm tài liệu mới'}
+      maxWidth={800}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={submitting}>
+            Hủy
+          </Button>
+          <Button onClick={onSubmit} disabled={submitting}>
+            {submitting ? 'Đang lưu...' : isEditing ? 'Lưu' : 'Tạo mới'}
+          </Button>
+        </>
+      }
+    >
         <Form.Group className="mb-3">
           <Form.Label>Tiêu đề</Form.Label>
           <Form.Control
@@ -89,16 +101,7 @@ function RecoveryResourceFormModal({
             </div>
           </Form.Group>
         )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose} disabled={submitting}>
-          Hủy
-        </Button>
-        <Button onClick={onSubmit} disabled={submitting}>
-          {submitting ? 'Đang lưu...' : isEditing ? 'Lưu' : 'Tạo mới'}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    </BaseModal>
   );
 }
 

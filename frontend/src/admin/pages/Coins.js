@@ -1,7 +1,9 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
+import {Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Coins, Edit, Plus, Search, Trash2} from 'lucide-react';
+
+import BaseModal from '~/components/common/modal/BaseModal';
 
 import {
   createCoinWallet,
@@ -241,72 +243,70 @@ function CoinsManagement() {
         </Table>
       </div>
 
-      <Modal
+      <BaseModal
         show={showModal}
-        onHide={() => {
+        onClose={() => {
           if (submitting) {
             return;
           }
           setShowModal(false);
           resetForm();
         }}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{editingWallet ? 'Cập nhật số xu' : 'Thêm ví xu'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Group className="mb-3">
-            <Form.Label>Người dùng</Form.Label>
-            {editingWallet ? (
-              <Form.Control value={editingWallet.userName || editingWallet.userId} disabled />
-            ) : (
-              <Form.Select
-                value={formState.userId}
-                onChange={(event) =>
-                  setFormState((previous) => ({...previous, userId: event.target.value}))
+        title={editingWallet ? 'Cập nhật số xu' : 'Thêm ví xu'}
+        maxWidth={550}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (submitting) {
+                  return;
                 }
-              >
-                <option value="">-- Chọn người dùng --</option>
-                {userOptions.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.userName} {user.email ? `(${user.email})` : ''}
-                  </option>
-                ))}
-              </Form.Select>
-            )}
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Số xu</Form.Label>
-            <Form.Control
-              type="number"
-              min={0}
-              value={formState.balance}
+                setShowModal(false);
+                resetForm();
+              }}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleSubmit} disabled={submitting}>
+              {editingWallet ? 'Lưu' : 'Tạo mới'}
+            </Button>
+          </>
+        }
+      >
+        <Form.Group className="mb-3">
+          <Form.Label>Người dùng</Form.Label>
+          {editingWallet ? (
+            <Form.Control value={editingWallet.userName || editingWallet.userId} disabled />
+          ) : (
+            <Form.Select
+              value={formState.userId}
               onChange={(event) =>
-                setFormState((previous) => ({...previous, balance: event.target.value}))
+                setFormState((previous) => ({...previous, userId: event.target.value}))
               }
-            />
-          </Form.Group>
-          {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              if (submitting) {
-                return;
-              }
-              setShowModal(false);
-              resetForm();
-            }}
-          >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit} disabled={submitting}>
-            {editingWallet ? 'Lưu' : 'Tạo mới'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+            >
+              <option value="">-- Chọn người dùng --</option>
+              {userOptions.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.userName} {user.email ? `(${user.email})` : ''}
+                </option>
+              ))}
+            </Form.Select>
+          )}
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Số xu</Form.Label>
+          <Form.Control
+            type="number"
+            min={0}
+            value={formState.balance}
+            onChange={(event) =>
+              setFormState((previous) => ({...previous, balance: event.target.value}))
+            }
+          />
+        </Form.Group>
+        {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+      </BaseModal>
 
       <ConfirmDeleteModal
         show={Boolean(deletingWallet)}

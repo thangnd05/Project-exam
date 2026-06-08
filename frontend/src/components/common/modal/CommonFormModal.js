@@ -1,35 +1,37 @@
-import { IoClose } from 'react-icons/io5';
-import { Modal } from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import styles from './CommonFormModal.module.scss';
+import BaseModal from './BaseModal';
 
-const cx = classNames.bind(styles);
+// Map size cũ (react-bootstrap) -> maxWidth của BaseModal.
+const SIZE_MAX_WIDTH = {
+  sm: 420,
+  md: 550,
+  lg: 800,
+  xl: 1140,
+};
 
+/**
+ * Khung form modal dùng chung — nay render qua BaseModal (header gradient chung).
+ * Giữ nguyên API cũ (show/onHide/title/icon/footer/size) để không phải sửa nơi gọi.
+ */
 function CommonFormModal({
   show,
   onHide,
   title,
-  icon: TitleIcon,
+  icon,
   children,
   footer,
   size = 'md',
 }) {
   return (
-    <Modal show={show} onHide={onHide} centered size={size} className={cx('modalCustom')}>
-      <div className={cx('header')}>
-        <div className={cx('titleWrapper')}>
-          {TitleIcon ? <TitleIcon /> : null}
-          <h3 className={cx('title')}>{title}</h3>
-        </div>
-
-        <button type="button" className={cx('closeBtn')} onClick={onHide}>
-          <IoClose />
-        </button>
-      </div>
-
-      <div className={cx('body')}>{children}</div>
-      {footer}
-    </Modal>
+    <BaseModal
+      show={show}
+      onClose={onHide}
+      title={title}
+      icon={icon}
+      footer={footer}
+      maxWidth={SIZE_MAX_WIDTH[size] || SIZE_MAX_WIDTH.md}
+    >
+      {children}
+    </BaseModal>
   );
 }
 

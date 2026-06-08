@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Modal, Button, Spinner, Alert} from 'react-bootstrap';
+import {Button, Spinner, Alert} from 'react-bootstrap';
+import BaseModal from '~/components/common/modal/BaseModal';
 import { getQuestionById } from '~/api/questionApi';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -88,30 +89,19 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
   const passageContent = question?.passage?.content || '';
 
   return (
-    <Modal
+    <BaseModal
       show={show}
-      onHide={onHide}
-      size="lg"
-      centered
-      className={cx('modalWrapper', 'questionModalRoot')}
-      backdropClassName={cx('questionBackdrop')}
+      onClose={onHide}
+      title="Chi tiết câu hỏi"
+      icon={IoEyeOutline}
+      maxWidth={800}
+      footer={
+        <Button variant="secondary" onClick={onHide}>
+          <IoCloseOutline size={20} className="me-1" /> Đóng
+        </Button>
+      }
     >
-      <div className={cxCreate('header')}>
-        <div className={cxCreate('titleWrapper')}>
-          <IoEyeOutline />
-          <h3 className={cxCreate('title')}>Chi tiết câu hỏi</h3>
-        </div>
-        <button
-          type="button"
-          className={cxCreate('closeBtn')}
-          onClick={onHide}
-          aria-label="Đóng"
-        >
-          <IoCloseOutline />
-        </button>
-      </div>
-
-      <Modal.Body className={cx('modalBody')}>
+      <div className={cx('modalBody')}>
         {loading ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" />
@@ -287,14 +277,8 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
             )}
           </div>
         )}
-      </Modal.Body>
-
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          <IoCloseOutline size={20} className="me-1" /> Đóng
-        </Button>
-      </Modal.Footer>
-    </Modal>
+      </div>
+    </BaseModal>
   );
 };
 

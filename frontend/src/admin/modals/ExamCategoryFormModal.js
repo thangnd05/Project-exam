@@ -1,5 +1,6 @@
 import React from 'react';
-import {Button, Form, Modal} from 'react-bootstrap';
+import {Button, Form} from 'react-bootstrap';
+import BaseModal from '~/components/common/modal/BaseModal';
 
 function ExamCategoryFormModal({
   show,
@@ -10,13 +11,20 @@ function ExamCategoryFormModal({
   onSubmit,
 }) {
   return (
-    <Modal show={show} onHide={onClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>
-          {isEditing ? 'Cập nhật phân loại bài thi' : 'Tạo phân loại bài thi'}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+    <BaseModal
+      show={show}
+      onClose={onClose}
+      title={isEditing ? 'Cập nhật phân loại bài thi' : 'Tạo phân loại bài thi'}
+      maxWidth={550}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>
+            Hủy
+          </Button>
+          <Button onClick={onSubmit}>{isEditing ? 'Lưu' : 'Tạo mới'}</Button>
+        </>
+      }
+    >
         <Form.Group className="mb-3">
           <Form.Label>Code *</Form.Label>
           <Form.Control
@@ -69,14 +77,7 @@ function ExamCategoryFormModal({
             }
           />
         </Form.Group>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          Hủy
-        </Button>
-        <Button onClick={onSubmit}>{isEditing ? 'Lưu' : 'Tạo mới'}</Button>
-      </Modal.Footer>
-    </Modal>
+    </BaseModal>
   );
 }
 

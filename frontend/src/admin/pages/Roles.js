@@ -1,9 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Badge, Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
+import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
 import {createRole, deleteRole, getRoles, updateRole} from '../../api/roleApi';
+import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './Roles.module.scss';
 
@@ -214,66 +215,62 @@ function RolesManagement() {
         </Table>
       </div>
 
-      <Modal
+      <BaseModal
         show={showFormModal}
-        onHide={() => {
+        onClose={() => {
           setShowFormModal(false);
           resetForm();
         }}
-        centered
+        title={editingRoleId ? 'Cập nhật vai trò' : 'Tạo vai trò'}
+        maxWidth={550}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (submitting) {
+                  return;
+                }
+                setShowFormModal(false);
+                resetForm();
+              }}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleSubmit}>
+              {editingRoleId ? 'Lưu' : 'Tạo mới'}
+            </Button>
+          </>
+        }
       >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editingRoleId ? 'Cập nhật vai trò' : 'Tạo vai trò'}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Group className="mb-3">
-            <Form.Label>Tên vai trò</Form.Label>
-            <Form.Control
-              value={formState.role_name}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  role_name: event.target.value,
-                }))
-              }
-              placeholder="Ví dụ: ADMIN, TEACHER"
-            />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Mô tả</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={formState.description}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  description: event.target.value,
-                }))
-              }
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              if (submitting) {
-                return;
-              }
-              setShowFormModal(false);
-              resetForm();
-            }}
-          >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit}>
-            {editingRoleId ? 'Lưu' : 'Tạo mới'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        <Form.Group className="mb-3">
+          <Form.Label>Tên vai trò</Form.Label>
+          <Form.Control
+            value={formState.role_name}
+            onChange={(event) =>
+              setFormState((previous) => ({
+                ...previous,
+                role_name: event.target.value,
+              }))
+            }
+            placeholder="Ví dụ: ADMIN, TEACHER"
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Mô tả</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            value={formState.description}
+            onChange={(event) =>
+              setFormState((previous) => ({
+                ...previous,
+                description: event.target.value,
+              }))
+            }
+          />
+        </Form.Group>
+      </BaseModal>
       <ConfirmDeleteModal
         show={Boolean(deletingRole)}
         onClose={() => {

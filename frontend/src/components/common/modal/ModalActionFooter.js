@@ -12,8 +12,9 @@ function ModalActionFooter({
   onSubmit,
   submitIcon: SubmitIcon,
 }) {
+  // Không bọc .footer ở đây nữa — khung (BaseModal) tự render vùng footer.
   return (
-    <div className={cx('footer')}>
+    <>
       <button
         type="button"
         className={cx('btnCancel')}
@@ -32,7 +33,7 @@ function ModalActionFooter({
         {SubmitIcon ? <SubmitIcon className="me-2" /> : null}
         {loading ? loadingLabel || submitLabel : submitLabel}
       </button>
-    </div>
+    </>
   );
 }
 

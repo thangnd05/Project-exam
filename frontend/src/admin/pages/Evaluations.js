@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Badge, Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
+import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronLeft, ChevronRight, Edit, Plus, Search, Trash2} from 'lucide-react';
 
@@ -9,6 +9,7 @@ import {
   getEvaluations,
   updateEvaluation,
 } from '../../api/evaluationApi';
+import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './Evaluations.module.scss';
 
@@ -299,23 +300,36 @@ function EvaluationsManagement() {
         </div>
       </div>
 
-      <Modal
+      <BaseModal
         show={showFormModal}
-        onHide={() => {
+        onClose={() => {
           if (submitting) {
             return;
           }
           setShowFormModal(false);
           resetForm();
         }}
-        centered
+        title={editingEvaluationId ? 'Cập nhật đánh giá' : 'Tạo đánh giá'}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (submitting) {
+                  return;
+                }
+                setShowFormModal(false);
+                resetForm();
+              }}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleSubmit}>
+              {editingEvaluationId ? 'Lưu' : 'Tạo mới'}
+            </Button>
+          </>
+        }
       >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editingEvaluationId ? 'Cập nhật đánh giá' : 'Tạo đánh giá'}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
           <Form.Group className="mb-3">
             <Form.Label>Rating</Form.Label>
             <Form.Select
@@ -348,25 +362,7 @@ function EvaluationsManagement() {
               }
             />
           </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              if (submitting) {
-                return;
-              }
-              setShowFormModal(false);
-              resetForm();
-            }}
-          >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit}>
-            {editingEvaluationId ? 'Lưu' : 'Tạo mới'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      </BaseModal>
 
       <ConfirmDeleteModal
         show={Boolean(deletingEvaluation)}

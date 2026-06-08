@@ -2,10 +2,11 @@ import React, {useEffect, useMemo, useState} from 'react';
 import { getAdminTests, updateTest, deleteTest } from '../../api/testApi';
 import { getExamTypes } from '../../api/examTypeApi';
 import { getUsers } from '../../api/userApi';
-import {Badge, Button, Form, Modal, Table} from 'react-bootstrap';
+import {Badge, Button, Form, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Search, Trash2} from 'lucide-react';
 
+import BaseModal from '~/components/common/modal/BaseModal';
 import styles from './Tests.module.scss';
 
 const cx = classNames.bind(styles);
@@ -269,19 +270,31 @@ function TestsManagement() {
         </Table>
       </div>
 
-      <Modal
+      <BaseModal
         show={showFormModal}
-        onHide={() => {
+        onClose={() => {
           setShowFormModal(false);
           resetForm();
         }}
-        centered
-        size="lg"
+        title="Cập nhật đề thi"
+        maxWidth={800}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowFormModal(false);
+                resetForm();
+              }}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleSubmit} disabled={submitting || loading}>
+              Lưu
+            </Button>
+          </>
+        }
       >
-        <Modal.Header closeButton>
-          <Modal.Title>Cập nhật đề thi</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
           <Form.Group className="mb-3">
             <Form.Label>Tiêu đề</Form.Label>
             <Form.Control
@@ -382,22 +395,7 @@ function TestsManagement() {
               />
             </Form.Group>
           </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              setShowFormModal(false);
-              resetForm();
-            }}
-          >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit} disabled={submitting || loading}>
-            Lưu
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      </BaseModal>
     </div>
   );
 }

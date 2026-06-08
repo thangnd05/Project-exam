@@ -1,5 +1,6 @@
 import React from 'react';
-import {Button, Form, Modal} from 'react-bootstrap';
+import {Button, Form} from 'react-bootstrap';
+import BaseModal from '~/components/common/modal/BaseModal';
 
 function TagFormModal({
   show,
@@ -12,11 +13,20 @@ function TagFormModal({
   onSubmit,
 }) {
   return (
-    <Modal show={show} onHide={onClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>{isEditing ? 'Cập nhật Tag' : 'Tạo Tag mới'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+    <BaseModal
+      show={show}
+      onClose={onClose}
+      title={isEditing ? 'Cập nhật Tag' : 'Tạo Tag mới'}
+      maxWidth={550}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>
+            Hủy
+          </Button>
+          <Button onClick={onSubmit}>{isEditing ? 'Lưu' : 'Tạo mới'}</Button>
+        </>
+      }
+    >
         <Form.Group className="mb-3">
           <Form.Label>Loại kỳ thi</Form.Label>
           <Form.Select
@@ -56,14 +66,7 @@ function TagFormModal({
             ))}
           </Form.Select>
         </Form.Group>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          Hủy
-        </Button>
-        <Button onClick={onSubmit}>{isEditing ? 'Lưu' : 'Tạo mới'}</Button>
-      </Modal.Footer>
-    </Modal>
+    </BaseModal>
   );
 }
 

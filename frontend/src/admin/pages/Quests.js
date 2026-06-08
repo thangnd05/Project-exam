@@ -1,9 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
+import {Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
 import {createQuest, deleteQuest, getQuests, updateQuest} from '../../api/questApi';
+import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './Quests.module.scss';
 
@@ -257,141 +258,137 @@ function QuestsManagement() {
         </Table>
       </div>
 
-      <Modal
+      <BaseModal
         show={showModal}
-        onHide={() => {
+        onClose={() => {
           if (submitting) {
             return;
           }
           setShowModal(false);
           resetForm();
         }}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editingQuestId ? 'Cập nhật nhiệm vụ' : 'Tạo nhiệm vụ'}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Group className="mb-3">
-            <Form.Label>Tiêu đề</Form.Label>
-            <Form.Control
-              value={formState.title}
-              onChange={(event) =>
-                setFormState((previous) => ({...previous, title: event.target.value}))
-              }
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Mô tả</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={2}
-              value={formState.description}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  description: event.target.value,
-                }))
-              }
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Số xu thưởng</Form.Label>
-            <Form.Control
-              type="number"
-              min={0}
-              value={formState.rewardCoins}
-              onChange={(event) =>
-                setFormState((previous) => ({...previous, rewardCoins: event.target.value}))
-              }
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Điều kiện</Form.Label>
-            <Form.Select
-              value={formState.conditionType}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  conditionType: event.target.value,
-                }))
-              }
+        title={editingQuestId ? 'Cập nhật nhiệm vụ' : 'Tạo nhiệm vụ'}
+        maxWidth={550}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (submitting) {
+                  return;
+                }
+                setShowModal(false);
+                resetForm();
+              }}
             >
-              {CONDITION_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          {formState.conditionType !== 'NONE' && (
-            <Form.Group className="mb-3">
-              <Form.Label>Số lần cần đạt</Form.Label>
-              <Form.Control
-                type="number"
-                min={1}
-                value={formState.conditionTarget}
-                onChange={(event) =>
-                  setFormState((previous) => ({
-                    ...previous,
-                    conditionTarget: event.target.value,
-                  }))
-                }
-              />
-            </Form.Group>
-          )}
-          <div className="d-flex gap-2 mb-3">
-            <Form.Group className="flex-fill">
-              <Form.Label>Bắt đầu</Form.Label>
-              <Form.Control
-                type="datetime-local"
-                value={formState.startAt}
-                onChange={(event) =>
-                  setFormState((previous) => ({...previous, startAt: event.target.value}))
-                }
-              />
-            </Form.Group>
-            <Form.Group className="flex-fill">
-              <Form.Label>Kết thúc</Form.Label>
-              <Form.Control
-                type="datetime-local"
-                value={formState.endAt}
-                onChange={(event) =>
-                  setFormState((previous) => ({...previous, endAt: event.target.value}))
-                }
-              />
-            </Form.Group>
-          </div>
-          <Form.Check
-            type="switch"
-            label="Đang bật"
-            checked={formState.active}
+              Hủy
+            </Button>
+            <Button onClick={handleSubmit} disabled={submitting}>
+              {editingQuestId ? 'Lưu' : 'Tạo mới'}
+            </Button>
+          </>
+        }
+      >
+        <Form.Group className="mb-3">
+          <Form.Label>Tiêu đề</Form.Label>
+          <Form.Control
+            value={formState.title}
             onChange={(event) =>
-              setFormState((previous) => ({...previous, active: event.target.checked}))
+              setFormState((previous) => ({...previous, title: event.target.value}))
             }
           />
-          {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              if (submitting) {
-                return;
-              }
-              setShowModal(false);
-              resetForm();
-            }}
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Mô tả</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={2}
+            value={formState.description}
+            onChange={(event) =>
+              setFormState((previous) => ({
+                ...previous,
+                description: event.target.value,
+              }))
+            }
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Số xu thưởng</Form.Label>
+          <Form.Control
+            type="number"
+            min={0}
+            value={formState.rewardCoins}
+            onChange={(event) =>
+              setFormState((previous) => ({...previous, rewardCoins: event.target.value}))
+            }
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Điều kiện</Form.Label>
+          <Form.Select
+            value={formState.conditionType}
+            onChange={(event) =>
+              setFormState((previous) => ({
+                ...previous,
+                conditionType: event.target.value,
+              }))
+            }
           >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit} disabled={submitting}>
-            {editingQuestId ? 'Lưu' : 'Tạo mới'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+            {CONDITION_TYPES.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+        {formState.conditionType !== 'NONE' && (
+          <Form.Group className="mb-3">
+            <Form.Label>Số lần cần đạt</Form.Label>
+            <Form.Control
+              type="number"
+              min={1}
+              value={formState.conditionTarget}
+              onChange={(event) =>
+                setFormState((previous) => ({
+                  ...previous,
+                  conditionTarget: event.target.value,
+                }))
+              }
+            />
+          </Form.Group>
+        )}
+        <div className="d-flex gap-2 mb-3">
+          <Form.Group className="flex-fill">
+            <Form.Label>Bắt đầu</Form.Label>
+            <Form.Control
+              type="datetime-local"
+              value={formState.startAt}
+              onChange={(event) =>
+                setFormState((previous) => ({...previous, startAt: event.target.value}))
+              }
+            />
+          </Form.Group>
+          <Form.Group className="flex-fill">
+            <Form.Label>Kết thúc</Form.Label>
+            <Form.Control
+              type="datetime-local"
+              value={formState.endAt}
+              onChange={(event) =>
+                setFormState((previous) => ({...previous, endAt: event.target.value}))
+              }
+            />
+          </Form.Group>
+        </div>
+        <Form.Check
+          type="switch"
+          label="Đang bật"
+          checked={formState.active}
+          onChange={(event) =>
+            setFormState((previous) => ({...previous, active: event.target.checked}))
+          }
+        />
+        {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+      </BaseModal>
 
       <ConfirmDeleteModal
         show={Boolean(deletingQuest)}

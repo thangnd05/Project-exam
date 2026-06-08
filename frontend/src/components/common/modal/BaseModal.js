@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {IoClose} from 'react-icons/io5';
 import classNames from 'classnames/bind';
@@ -24,8 +25,29 @@ function BaseModal({
   footer,
   maxWidth,
   closeOnOverlay = true,
+  closeOnEsc = true,
   children,
 }) {
+  // Đóng bằng phím ESC + khóa cuộn nền khi modal mở (giống react-bootstrap Modal).
+  useEffect(() => {
+    if (!show) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (closeOnEsc && event.key === 'Escape') {
+        onClose?.();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [show, closeOnEsc, onClose]);
+
   if (!show) return null;
 
   return ReactDOM.createPortal(

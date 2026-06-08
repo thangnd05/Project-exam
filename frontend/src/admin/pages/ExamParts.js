@@ -1,11 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
+import {Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
 import {createExamPart, deleteExamPart, getExamParts, updateExamPart} from '../../api/examPartApi';
 import {getExamTypes} from '../../api/examTypeApi';
 import {getSkills} from '../../api/skillApi';
+import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './ExamParts.module.scss';
 
@@ -275,20 +276,33 @@ function ExamPartsManagement() {
         </Table>
       </div>
 
-      <Modal
+      <BaseModal
         show={showFormModal}
-        onHide={() => {
+        onClose={() => {
           setShowFormModal(false);
           resetForm();
         }}
-        centered
+        title={editingPartId ? 'Cập nhật phần thi' : 'Tạo phần thi'}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (submitting) {
+                  return;
+                }
+                setShowFormModal(false);
+                resetForm();
+              }}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleSubmit}>
+              {editingPartId ? 'Lưu' : 'Tạo mới'}
+            </Button>
+          </>
+        }
       >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editingPartId ? 'Cập nhật phần thi' : 'Tạo phần thi'}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
           <Form.Group className="mb-3">
             <Form.Label>Loại kỳ thi</Form.Label>
             <Form.Select
@@ -384,25 +398,7 @@ function ExamPartsManagement() {
               }
             />
           </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              if (submitting) {
-                return;
-              }
-              setShowFormModal(false);
-              resetForm();
-            }}
-          >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit}>
-            {editingPartId ? 'Lưu' : 'Tạo mới'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      </BaseModal>
       <ConfirmDeleteModal
         show={Boolean(deletingExamPart)}
         onClose={() => {

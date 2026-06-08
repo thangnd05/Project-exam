@@ -1,9 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
+import {Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
 import {createSkill, deleteSkill, getSkills, updateSkill} from '../../api/skillApi';
+import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import styles from './Skills.module.scss';
 
@@ -224,59 +225,57 @@ function SkillsManagement() {
         </Table>
       </div>
 
-      <Modal
+      <BaseModal
         show={showModal}
-        onHide={() => {
+        onClose={() => {
           setShowModal(false);
           resetForm();
         }}
-        centered
+        title={editingSkillId ? 'Cập nhật kỹ năng' : 'Tạo kỹ năng'}
+        maxWidth={550}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (submitting) {
+                  return;
+                }
+                setShowModal(false);
+                resetForm();
+              }}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleSubmit}>{editingSkillId ? 'Lưu' : 'Tạo mới'}</Button>
+          </>
+        }
       >
-        <Modal.Header closeButton>
-          <Modal.Title>{editingSkillId ? 'Cập nhật kỹ năng' : 'Tạo kỹ năng'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Group className="mb-3">
-            <Form.Label>Tên kỹ năng</Form.Label>
-            <Form.Control
-              value={formState.name}
-              onChange={(event) =>
-                setFormState((previous) => ({...previous, name: event.target.value}))
-              }
-            />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Mô tả</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={formState.description}
-              onChange={(event) =>
-                setFormState((previous) => ({
-                  ...previous,
-                  description: event.target.value,
-                }))
-              }
-            />
-          </Form.Group>
-          {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              if (submitting) {
-                return;
-              }
-              setShowModal(false);
-              resetForm();
-            }}
-          >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit}>{editingSkillId ? 'Lưu' : 'Tạo mới'}</Button>
-        </Modal.Footer>
-      </Modal>
+        <Form.Group className="mb-3">
+          <Form.Label>Tên kỹ năng</Form.Label>
+          <Form.Control
+            value={formState.name}
+            onChange={(event) =>
+              setFormState((previous) => ({...previous, name: event.target.value}))
+            }
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Mô tả</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            value={formState.description}
+            onChange={(event) =>
+              setFormState((previous) => ({
+                ...previous,
+                description: event.target.value,
+              }))
+            }
+          />
+        </Form.Group>
+        {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+      </BaseModal>
       <ConfirmDeleteModal
         show={Boolean(deletingSkill)}
         onClose={() => {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
+import { Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
+import BaseModal from '~/components/common/modal/BaseModal';
 import { getAdminTestById, updateTest } from '../../api/testApi';
 import { getExamTypes } from '../../api/examTypeApi';
 import { toast } from 'react-toastify';
@@ -170,33 +171,34 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
 
   return (
     <>
-    <Modal
+    <BaseModal
       show={show}
-      onHide={onHide}
-      size="xl"
-      backdrop="static"
-      centered
-      scrollable
-      className={cx('modalWrapper')}
+      onClose={onHide}
+      title="Cập nhật bài thi"
+      icon={IoCreateOutline}
+      headerExtra={
+        <span className={cxCreate('badge')}>
+          {test?.classId ? `Lớp: ${test.classId}` : 'Cá nhân'}
+        </span>
+      }
+      maxWidth={1140}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onHide} disabled={saving}>
+            <IoCloseOutline size={20} className="me-1" /> Hủy
+          </Button>
+          <Button variant="primary" onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <Spinner size="sm" />
+            ) : (
+              <IoCheckmarkCircleOutline size={20} className="me-1" />
+            )}
+            Lưu cập nhật
+          </Button>
+        </>
+      }
     >
-      <div className={cxCreate('header')}>
-        <div className={cxCreate('titleWrapper')}>
-          <IoCreateOutline />
-          <h3 className={cxCreate('title')}>Cập nhật bài thi</h3>
-          <span className={cxCreate('badge')}>
-            {test?.classId ? `Lớp: ${test.classId}` : 'Cá nhân'}
-          </span>
-        </div>
-        <button
-          type="button"
-          className={cxCreate('closeBtn')}
-          onClick={onHide}
-          aria-label="Đóng"
-        >
-          <IoCloseOutline />
-        </button>
-      </div>
-      <Modal.Body className={cx('modalBody')}>
+      <div className={cx('modalBody')}>
         <div className={cx('formGroup')}>
           <Row className="g-3">
             <Col md={12}>
@@ -361,21 +363,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
             </Accordion>
           )}
         </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide} disabled={saving}>
-          <IoCloseOutline size={20} className="me-1" /> Hủy
-        </Button>
-        <Button variant="primary" onClick={handleSave} disabled={saving}>
-          {saving ? (
-            <Spinner size="sm" />
-          ) : (
-            <IoCheckmarkCircleOutline size={20} className="me-1" />
-          )}
-          Lưu cập nhật
-        </Button>
-      </Modal.Footer>
-    </Modal>
+      </div>
+    </BaseModal>
     <EditQuestionModal
       show={!!editingQuestionId}
       onHide={() => setEditingQuestionId(null)}

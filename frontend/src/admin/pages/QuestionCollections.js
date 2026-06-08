@@ -1,8 +1,9 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Badge, Button, Form, Modal, Spinner, Table} from 'react-bootstrap';
+import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Search, Trash2} from 'lucide-react';
 
+import BaseModal from '~/components/common/modal/BaseModal';
 import {
   createQuestionCollection,
   deleteQuestionCollection,
@@ -214,19 +215,42 @@ function QuestionCollectionsManagement() {
         </Table>
       </div>
 
-      <Modal
+      <BaseModal
         show={showModal}
-        onHide={() => {
+        onClose={() => {
           if (submitting) return;
           setShowModal(false);
           resetForm();
         }}
-        centered
+        title={editingId ? 'Cập nhật bộ sưu tập' : 'Tạo bộ sưu tập'}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (submitting) return;
+                setShowModal(false);
+                resetForm();
+              }}
+              disabled={submitting}
+            >
+              Hủy
+            </Button>
+            <Button onClick={handleSubmit} disabled={submitting}>
+              {submitting ? (
+                <>
+                  <Spinner size="sm" animation="border" className="me-2" />
+                  Đang lưu...
+                </>
+              ) : editingId ? (
+                'Lưu'
+              ) : (
+                'Tạo mới'
+              )}
+            </Button>
+          </>
+        }
       >
-        <Modal.Header closeButton>
-          <Modal.Title>{editingId ? 'Cập nhật bộ sưu tập' : 'Tạo bộ sưu tập'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
           <Form.Group className="mb-3">
             <Form.Label>Tên bộ sưu tập</Form.Label>
             <Form.Control
@@ -250,33 +274,7 @@ function QuestionCollectionsManagement() {
             />
           </Form.Group>
           {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              if (submitting) return;
-              setShowModal(false);
-              resetForm();
-            }}
-            disabled={submitting}
-          >
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit} disabled={submitting}>
-            {submitting ? (
-              <>
-                <Spinner size="sm" animation="border" className="me-2" />
-                Đang lưu...
-              </>
-            ) : editingId ? (
-              'Lưu'
-            ) : (
-              'Tạo mới'
-            )}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      </BaseModal>
       <ConfirmDeleteModal
         show={Boolean(deletingItem)}
         onClose={() => {
