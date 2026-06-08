@@ -83,6 +83,7 @@ const adminRouteGroups = [
     label: 'Gamification',
     items: [
       {path: routes.adminCoins, icon: <Coins size={20} />, label: 'Quản lý xu'},
+      {path: routes.adminQuests, icon: <Target size={20} />, label: 'Quản lý nhiệm vụ'},
     ],
   },
   {

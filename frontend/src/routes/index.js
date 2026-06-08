@@ -52,6 +52,7 @@ import TagsManagement from '~/admin/pages/Tags';
 import RecoveryResourcesManagement from '~/admin/pages/RecoveryResources';
 import MilestonesManagement from '~/admin/pages/Milestones';
 import CoinsManagement from '~/admin/pages/Coins';
+import QuestsManagement from '~/admin/pages/Quests';
 import UserTargetPage from '~/pages/user/target/UserTargetPage';
 import TargetDashboardPage from '~/pages/user/target/TargetDashboardPage';
 import TargetAchievedPage from '~/pages/user/target/TargetAchievedPage';
@@ -63,6 +64,7 @@ import PlanStudyPage from '~/pages/learning-plan/pages/PlanStudyPage';
 import LearningPlansRedirect from '~/pages/learning-plan/pages/LearningPlansRedirect';
 import PlanComparisonPage from '~/pages/learning-plan/pages/PlanComparisonPage';
 import TaskHistoryPage from '~/pages/learning-plan/pages/TaskHistoryPage';
+import QuestsPage from '~/pages/quests/QuestsPage';
 
 //  Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
@@ -103,6 +105,7 @@ export const adminRoutes = [
   { path: routes.adminRecoveryResources, component: RecoveryResourcesManagement },
   { path: routes.adminMilestones, component: MilestonesManagement },
   { path: routes.adminCoins, component: CoinsManagement },
+  { path: routes.adminQuests, component: QuestsManagement },
 ];
 
 //  Các trang yêu cầu phải đăng nhập
@@ -138,6 +141,7 @@ export const privateRoutes = [
   { path: routes.mockHistory, component: MockHistoryPage },
   { path: routes.targetAchieved, component: TargetAchievedPage },
   { path: routes.nextStep, component: NextStepPage },
+  { path: routes.quests, component: QuestsPage },
 ];
 
 const appRoutes = { publicRoutes, privateRoutes, adminRoutes };

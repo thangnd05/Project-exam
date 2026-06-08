@@ -38,6 +38,7 @@ const routes = {
   adminAuditLogs: '/admin/audit-logs',
   adminLoginAudit: '/admin/audit-login',
   adminCoins: '/admin/coins',
+  adminQuests: '/admin/quests',
 
   testHistory: '/tests/history/:testId',
   testLeaderboard: '/tests/leaderboard/:testId',
@@ -50,6 +51,8 @@ const routes = {
   planDetail: '/learning-plans/:learningPlanId',
   planStudy: '/learning-plans/:learningPlanId/study',
   taskHistory: '/learning-plans/:learningPlanId/tasks/:taskId/history',
+
+  quests: '/quests',
 
   myAlbums: '/my-albums',
   albumDelta: '/albums/:albumId',

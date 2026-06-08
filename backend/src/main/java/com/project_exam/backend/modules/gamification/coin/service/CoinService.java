@@ -25,6 +25,24 @@ public class CoinService {
     private final UserCoinRepository userCoinRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Cộng xu vào ví của user (tạo ví nếu chưa có). Trả về số dư mới.
+     * Dùng cho các nguồn "kiếm xu" (nhận nhiệm vụ...).
+     */
+    @Transactional
+    public int addCoins(String userId, int amount) {
+        UserCoin wallet = userCoinRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    UserCoin w = new UserCoin();
+                    w.setUserId(userId);
+                    w.setBalance(0);
+                    return w;
+                });
+        wallet.setBalance(wallet.getBalance() + amount);
+        wallet.setUpdatedAt(LocalDateTime.now());
+        return userCoinRepository.save(wallet).getBalance();
+    }
+
     /** Số dư xu của user đang đăng nhập — chưa có ví thì coi như 0. */
     @Transactional(readOnly = true)
     public CoinResponse getMyBalance(String userId) {
