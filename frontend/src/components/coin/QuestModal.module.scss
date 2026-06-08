@@ -1,55 +1,5 @@
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 10001;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.modalContent {
-  width: 100%;
-  max-width: 880px;
-  max-height: 88vh;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 24px 30px;
-  color: #fff;
-  background: var(--primary-gradient);
-
-  svg {
-    font-size: 2.4rem;
-  }
-}
-
-.titleWrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.title {
-  margin: 0;
-  font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
+// Khung modal (overlay/header/nút đóng/animation) dùng chung ở BaseModal.
+// File này chỉ giữ style riêng của nội dung nhiệm vụ.
 
 .balanceBadge {
   display: inline-flex;
@@ -61,34 +11,6 @@
   background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
   padding: 4px 14px;
   border-radius: 999px;
-}
-
-.closeBtn {
-  border: none;
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
-  }
-
-  svg {
-    font-size: 2rem;
-  }
-}
-
-.body {
-  padding: 22px 24px;
-  overflow-y: auto;
 }
 
 .placeholder {
@@ -221,26 +143,4 @@
   font-weight: 600;
   font-size: 1.6rem;
   color: #2f9e44;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
