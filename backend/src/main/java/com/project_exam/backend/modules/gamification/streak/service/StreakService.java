@@ -1,9 +1,12 @@
 package com.project_exam.backend.modules.gamification.streak.service;
 
+import com.project_exam.backend.modules.gamification.coin.service.CoinService;
 import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
 import com.project_exam.backend.modules.gamification.streak.domain.UserStreak;
+import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverConfigResponse;
 import com.project_exam.backend.modules.gamification.streak.dto.StreakResponse;
 import com.project_exam.backend.modules.gamification.streak.repository.UserStreakRepository;
+import com.project_exam.backend.shared.exception.BadRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,6 +23,8 @@ public class StreakService {
     private static final ZoneId VN = ZoneId.of("Asia/Ho_Chi_Minh");
 
     private final UserStreakRepository userStreakRepository;
+    private final StreakRecoverConfigService recoverConfigService;
+    private final CoinService coinService;
 
     /**
      * Ghi nhận 1 hoạt động học cho user và cập nhật chuỗi ngày.
@@ -63,46 +68,87 @@ public class StreakService {
             increased = true;
         }
 
-        return toResponse(streak, increased);
+        return buildResponse(streak, today, increased);
     }
 
     /**
      * Đọc streak để hiển thị. Nếu hoạt động gần nhất cũ hơn hôm qua thì chuỗi đã đứt
-     * -> hiển thị currentStreak = 0 (không ghi DB, longestStreak giữ nguyên).
+     * -> hiển thị currentStreak = 0 (không ghi DB, longestStreak giữ nguyên), đồng thời
+     * báo về số ngày vừa mất + có khôi phục được không.
      */
     @Transactional(readOnly = true)
     public StreakResponse getStreak(String userId) {
         UserStreak streak = userStreakRepository.findByUserId(userId).orElse(null);
+        LocalDate today = LocalDate.now(VN);
         if (streak == null) {
+            StreakRecoverConfigResponse cfg = recoverConfigService.get();
             return StreakResponse.builder()
                     .currentStreak(0)
                     .longestStreak(0)
                     .lastActivityDate(null)
                     .increased(false)
+                    .lostStreak(0)
+                    .canRecover(false)
+                    .recoverCost(cfg.getCostCoins())
                     .build();
         }
+        return buildResponse(streak, today, false);
+    }
+
+    /**
+     * Khôi phục chuỗi đã đứt: trừ xu rồi nối lại chuỗi về đúng số đã mất.
+     * Điều kiện: chuỗi đã đứt, user CHƯA học lại (currentStreak cũ còn nguyên), tính năng đang bật.
+     */
+    @Transactional
+    public StreakResponse restore(String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new BadRequestException("Phiên đăng nhập không hợp lệ");
+        }
+
+        UserStreak streak = userStreakRepository.findByUserId(userId)
+                .orElseThrow(() -> new BadRequestException("Bạn chưa có chuỗi nào để khôi phục"));
 
         LocalDate today = LocalDate.now(VN);
         LocalDate last = streak.getLastActivityDate();
-        int effectiveCurrent = streak.getCurrentStreak();
-        if (last == null || last.isBefore(today.minusDays(1))) {
-            effectiveCurrent = 0; // chuỗi đã đứt
+        boolean broken = last != null && last.isBefore(today.minusDays(1));
+        int lost = streak.getCurrentStreak();
+        if (!broken || lost <= 0) {
+            throw new BadRequestException("Chuỗi của bạn không thể khôi phục");
         }
+
+        StreakRecoverConfigResponse cfg = recoverConfigService.get();
+        if (!Boolean.TRUE.equals(cfg.getActive())) {
+            throw new BadRequestException("Tính năng khôi phục chuỗi đang tắt");
+        }
+
+        coinService.spend(userId, cfg.getCostCoins()); // ném lỗi nếu không đủ xu
+
+        // Nối lại: coi như đã học tới hôm qua -> chuỗi 'lost' sống lại, hôm nay học tiếp sẽ +1.
+        streak.setLastActivityDate(today.minusDays(1));
+        streak.setUpdatedAt(LocalDateTime.now());
+        userStreakRepository.save(streak);
+
+        return buildResponse(streak, today, false);
+    }
+
+    private StreakResponse buildResponse(UserStreak streak, LocalDate today, boolean increased) {
+        LocalDate last = streak.getLastActivityDate();
+        boolean broken = last != null && last.isBefore(today.minusDays(1));
+        int stored = streak.getCurrentStreak();
+        int effectiveCurrent = broken ? 0 : stored;
+        int lost = (broken && stored > 0) ? stored : 0;
+
+        StreakRecoverConfigResponse cfg = recoverConfigService.get();
+        boolean canRecover = lost > 0 && Boolean.TRUE.equals(cfg.getActive());
 
         return StreakResponse.builder()
                 .currentStreak(effectiveCurrent)
                 .longestStreak(streak.getLongestStreak())
                 .lastActivityDate(last)
-                .increased(false)
-                .build();
-    }
-
-    private StreakResponse toResponse(UserStreak streak, boolean increased) {
-        return StreakResponse.builder()
-                .currentStreak(streak.getCurrentStreak())
-                .longestStreak(streak.getLongestStreak())
-                .lastActivityDate(streak.getLastActivityDate())
                 .increased(increased)
+                .lostStreak(lost)
+                .canRecover(canRecover)
+                .recoverCost(cfg.getCostCoins())
                 .build();
     }
 }

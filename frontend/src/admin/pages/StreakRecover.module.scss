@@ -1,0 +1,47 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pageHeader {
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: #6b7280;
+  }
+}
+
+.placeholder {
+  padding: 40px 0;
+  text-align: center;
+  color: #6b7280;
+}
+
+.card {
+  max-width: 480px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.flameRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #f08c00;
+}
+
+.errorText {
+  color: #e03131;
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+}

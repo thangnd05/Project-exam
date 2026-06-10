@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,5 +24,12 @@ public class StreakController {
     public ResponseEntity<StreakResponse> getMyStreak(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(streakService.getStreak(userId));
+    }
+
+    // Khôi phục chuỗi đã đứt (tốn xu) cho user đang đăng nhập
+    @PostMapping("/restore")
+    public ResponseEntity<StreakResponse> restore(HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(streakService.restore(userId));
     }
 }

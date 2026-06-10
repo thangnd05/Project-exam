@@ -40,6 +40,7 @@ const routes = {
   adminCoins: '/admin/coins',
   adminQuests: '/admin/quests',
   adminCosmetics: '/admin/cosmetics',
+  adminStreakRecover: '/admin/streak-recover',
 
   testHistory: '/tests/history/:testId',
   testLeaderboard: '/tests/leaderboard/:testId',

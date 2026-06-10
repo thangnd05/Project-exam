@@ -1,0 +1,109 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Form, Spinner } from 'react-bootstrap';
+import classNames from 'classnames/bind';
+import { toast } from 'react-toastify';
+import { Flame } from 'lucide-react';
+
+import { getStreakRecoverConfig, updateStreakRecoverConfig } from '~/api/streakApi';
+import styles from './StreakRecover.module.scss';
+
+const cx = classNames.bind(styles);
+
+// Trang admin: cấu hình giá xu + bật/tắt tính năng khôi phục chuỗi ngày.
+function StreakRecoverManagement() {
+  const [costCoins, setCostCoins] = useState(50);
+  const [active, setActive] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getStreakRecoverConfig();
+      setCostCoins(data?.costCoins ?? 50);
+      setActive(data?.active !== false);
+    } catch (error) {
+      setErrorMessage('Không thể tải cấu hình.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const handleSave = async () => {
+    const cost = Number(costCoins);
+    if (Number.isNaN(cost) || cost < 0) {
+      setErrorMessage('Giá xu phải là số không âm.');
+      return;
+    }
+    setSaving(true);
+    setErrorMessage('');
+    try {
+      const data = await updateStreakRecoverConfig({ costCoins: cost, active });
+      setCostCoins(data?.costCoins ?? cost);
+      setActive(data?.active !== false);
+      toast.success('Đã lưu cấu hình khôi phục chuỗi.');
+    } catch (error) {
+      setErrorMessage(error?.response?.data?.message || 'Không thể lưu cấu hình.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className={cx('page')}>
+      <div className={cx('pageHeader')}>
+        <div>
+          <h1>Khôi phục chuỗi ngày</h1>
+          <p>Giá xu user phải trả để nối lại chuỗi đã đứt (khi chưa học lại).</p>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className={cx('placeholder')}>
+          <Spinner size="sm" className="me-2" />
+          Đang tải cấu hình...
+        </div>
+      ) : (
+        <div className={cx('card')}>
+          <div className={cx('flameRow')}>
+            <Flame size={28} />
+            <span>Cấu hình tính năng khôi phục</span>
+          </div>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Giá khôi phục (xu)</Form.Label>
+            <Form.Control
+              type="number"
+              min={0}
+              value={costCoins}
+              onChange={(e) => setCostCoins(e.target.value)}
+            />
+            <Form.Text muted>Đặt 0 nếu muốn cho khôi phục miễn phí.</Form.Text>
+          </Form.Group>
+
+          <Form.Check
+            type="switch"
+            id="streak-recover-active"
+            label="Cho phép khôi phục chuỗi"
+            checked={active}
+            onChange={(e) => setActive(e.target.checked)}
+            className="mb-3"
+          />
+
+          {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? 'Đang lưu...' : 'Lưu cấu hình'}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default StreakRecoverManagement;

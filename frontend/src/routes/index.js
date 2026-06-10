@@ -54,6 +54,7 @@ import MilestonesManagement from '~/admin/pages/Milestones';
 import CoinsManagement from '~/admin/pages/Coins';
 import QuestsManagement from '~/admin/pages/Quests';
 import CosmeticsManagement from '~/admin/pages/Cosmetics';
+import StreakRecoverManagement from '~/admin/pages/StreakRecover';
 import UserTargetPage from '~/pages/user/target/UserTargetPage';
 import TargetDashboardPage from '~/pages/user/target/TargetDashboardPage';
 import TargetAchievedPage from '~/pages/user/target/TargetAchievedPage';
@@ -107,6 +108,7 @@ export const adminRoutes = [
   { path: routes.adminCoins, component: CoinsManagement },
   { path: routes.adminQuests, component: QuestsManagement },
   { path: routes.adminCosmetics, component: CosmeticsManagement },
+  { path: routes.adminStreakRecover, component: StreakRecoverManagement },
 ];
 
 //  Các trang yêu cầu phải đăng nhập

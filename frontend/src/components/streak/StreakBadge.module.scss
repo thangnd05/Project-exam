@@ -25,4 +25,27 @@
       filter: drop-shadow(0 0 3px rgba(255, 224, 130, 0.9));
     }
   }
+
+  // Chuỗi đã đứt nhưng còn khôi phục được: giữ màu tối mặc định, chỉ thêm chấm cam báo hiệu.
+  &.recoverable {
+    position: relative;
+    cursor: pointer;
+    color: #343a40;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #ff922b;
+      box-shadow: 0 0 0 2px #fff;
+    }
+
+    &:hover {
+      background: #e9ecef;
+    }
+  }
 }
