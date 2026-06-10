@@ -13,6 +13,23 @@ import styles from './CosmeticShop.module.scss';
 
 const cx = classNames.bind(styles);
 
+// Thứ tự hiển thị các nhóm trong cửa hàng.
+const TYPE_ORDER = ['FRAME', 'BADGE'];
+
+// Gom các vật phẩm theo loại, giữ thứ tự nhóm cố định và giữ displayOrder bên trong mỗi nhóm.
+function groupByType(items) {
+  const groups = new Map();
+  items.forEach((item) => {
+    if (!groups.has(item.type)) {
+      groups.set(item.type, { type: item.type, typeLabel: item.typeLabel, items: [] });
+    }
+    groups.get(item.type).items.push(item);
+  });
+  return Array.from(groups.values()).sort(
+    (a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type),
+  );
+}
+
 // Xem trước cosmetic trên một avatar mẫu (đúng cách hiển thị thật).
 export function CosmeticPreview({ item, size = 60 }) {
   const isBadge = item.type === 'BADGE';
@@ -105,64 +122,71 @@ function CosmeticShop() {
     return <div className={cx('placeholder')}>Cửa hàng chưa có vật phẩm nào.</div>;
   }
 
+  const renderCard = (item) => {
+    const busy = busyId === item.cosmeticId;
+    const canAfford = balance >= item.costCoins;
+
+    return (
+      <div key={item.cosmeticId} className={cx('card', { equipped: item.equipped })}>
+        <CosmeticPreview item={item} />
+        <div className={cx('name')}>{item.name}</div>
+        <div className={cx('typeLabel')}>{item.typeLabel}</div>
+
+        {!item.owned ? (
+          <>
+            <div className={cx('cost')}>
+              <CircleDollarSign size={14} />
+              {item.costCoins}
+            </div>
+            <button
+              type="button"
+              className={cx('buyBtn')}
+              disabled={busy || !canAfford}
+              onClick={() => handleBuy(item)}
+            >
+              {busy ? 'Đang mua...' : canAfford ? 'Mua' : 'Không đủ xu'}
+            </button>
+          </>
+        ) : item.equipped ? (
+          <>
+            <div className={cx('ownedTag')}>
+              <Check size={14} />
+              Đang đeo
+            </div>
+            <button
+              type="button"
+              className={cx('unequipBtn')}
+              disabled={busy}
+              onClick={() => handleUnequip(item)}
+            >
+              Tháo
+            </button>
+          </>
+        ) : (
+          <>
+            <div className={cx('ownedTag')}>Đã sở hữu</div>
+            <button
+              type="button"
+              className={cx('equipBtn')}
+              disabled={busy}
+              onClick={() => handleEquip(item)}
+            >
+              {busy ? '...' : 'Đeo'}
+            </button>
+          </>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className={cx('grid')}>
-      {items.map((item) => {
-        const busy = busyId === item.cosmeticId;
-        const canAfford = balance >= item.costCoins;
-
-        return (
-          <div key={item.cosmeticId} className={cx('card', { equipped: item.equipped })}>
-            <CosmeticPreview item={item} />
-            <div className={cx('name')}>{item.name}</div>
-            <div className={cx('typeLabel')}>{item.typeLabel}</div>
-
-            {!item.owned ? (
-              <>
-                <div className={cx('cost')}>
-                  <CircleDollarSign size={14} />
-                  {item.costCoins}
-                </div>
-                <button
-                  type="button"
-                  className={cx('buyBtn')}
-                  disabled={busy || !canAfford}
-                  onClick={() => handleBuy(item)}
-                >
-                  {busy ? 'Đang mua...' : canAfford ? 'Mua' : 'Không đủ xu'}
-                </button>
-              </>
-            ) : item.equipped ? (
-              <>
-                <div className={cx('ownedTag')}>
-                  <Check size={14} />
-                  Đang đeo
-                </div>
-                <button
-                  type="button"
-                  className={cx('unequipBtn')}
-                  disabled={busy}
-                  onClick={() => handleUnequip(item)}
-                >
-                  Tháo
-                </button>
-              </>
-            ) : (
-              <>
-                <div className={cx('ownedTag')}>Đã sở hữu</div>
-                <button
-                  type="button"
-                  className={cx('equipBtn')}
-                  disabled={busy}
-                  onClick={() => handleEquip(item)}
-                >
-                  {busy ? '...' : 'Đeo'}
-                </button>
-              </>
-            )}
-          </div>
-        );
-      })}
+    <div className={cx('groups')}>
+      {groupByType(items).map((group) => (
+        <section key={group.type} className={cx('group')}>
+          <h3 className={cx('groupTitle')}>{group.typeLabel}</h3>
+          <div className={cx('grid')}>{group.items.map(renderCard)}</div>
+        </section>
+      ))}
     </div>
   );
 }
