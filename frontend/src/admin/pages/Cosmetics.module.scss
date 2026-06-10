@@ -51,6 +51,15 @@
   overflow: hidden;
 }
 
+.groupRow td {
+  background: #f8fafc;
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .previewRow {
   display: flex;
   justify-content: center;

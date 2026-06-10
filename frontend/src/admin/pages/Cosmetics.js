@@ -22,6 +22,22 @@ const TYPES = [
   {value: 'BADGE', label: 'Huy hiệu'},
 ];
 
+const TYPE_ORDER = TYPES.map((t) => t.value);
+
+// Gom vật phẩm theo loại, giữ thứ tự nhóm cố định (Khung avatar trước, Huy hiệu sau).
+function groupByType(items) {
+  const groups = new Map();
+  items.forEach((item) => {
+    if (!groups.has(item.type)) {
+      groups.set(item.type, {type: item.type, typeLabel: item.typeLabel, items: []});
+    }
+    groups.get(item.type).items.push(item);
+  });
+  return Array.from(groups.values()).sort(
+    (a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type),
+  );
+}
+
 const FRAME_STYLES = [
   {value: 'COLOR', label: 'Màu / gradient'},
   {value: 'EFFECT', label: 'Hiệu ứng CSS'},
@@ -224,30 +240,39 @@ function CosmeticsManagement() {
               </tr>
             )}
             {!loading &&
-              filtered.map((item) => (
-                <tr key={item.cosmeticId}>
-                  <td>
-                    <CosmeticPreview item={item} />
-                  </td>
-                  <td>{item.name}</td>
-                  <td>{item.typeLabel}</td>
-                  <td className={cx('coin')}>{item.costCoins}</td>
-                  <td>
-                    <span className={cx('status', item.active ? 'active' : 'inactive')}>
-                      {item.active ? 'Đang bán' : 'Tắt'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className={cx('actionButtons')}>
-                      <button title="Sửa" onClick={() => openEditModal(item)}>
-                        <Edit size={14} />
-                      </button>
-                      <button title="Xóa" onClick={() => setDeleting(item)}>
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+              groupByType(filtered).map((group) => (
+                <React.Fragment key={group.type}>
+                  <tr className={cx('groupRow')}>
+                    <td colSpan={6}>
+                      {group.typeLabel} ({group.items.length})
+                    </td>
+                  </tr>
+                  {group.items.map((item) => (
+                    <tr key={item.cosmeticId}>
+                      <td>
+                        <CosmeticPreview item={item} />
+                      </td>
+                      <td>{item.name}</td>
+                      <td>{item.typeLabel}</td>
+                      <td className={cx('coin')}>{item.costCoins}</td>
+                      <td>
+                        <span className={cx('status', item.active ? 'active' : 'inactive')}>
+                          {item.active ? 'Đang bán' : 'Tắt'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className={cx('actionButtons')}>
+                          <button title="Sửa" onClick={() => openEditModal(item)}>
+                            <Edit size={14} />
+                          </button>
+                          <button title="Xóa" onClick={() => setDeleting(item)}>
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </React.Fragment>
               ))}
             {!loading && filtered.length === 0 && (
               <tr>
