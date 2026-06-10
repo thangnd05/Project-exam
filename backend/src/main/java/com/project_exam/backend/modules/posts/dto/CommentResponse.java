@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.posts.dto;
 
+import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticResponse;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,6 +19,10 @@ public class CommentResponse {
 
     private String authorName;
     private String authorAvatar;
+
+    // Khung/huy hiệu đang đeo của tác giả (để hiển thị quanh avatar).
+    private CosmeticResponse equippedFrame;
+    private CosmeticResponse equippedBadge;
 
     // Nested replies (chỉ 1 cấp — replies của top-level comment)
     private List<CommentResponse> replies;

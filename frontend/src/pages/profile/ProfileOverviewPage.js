@@ -39,6 +39,8 @@ import ChangePasswordModal from './modals/ChangePasswordModal';
 import UpdateProfileModal from './modals/UpdateProfileModal';
 import styles from './ProfileOverviewPage.module.scss';
 import routes, { buildNextStepPath } from '~/config/Routes';
+import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
+import { useCosmetics } from '~/hooks/useCosmetics';
 
 const cx = classNames.bind(styles);
 
@@ -58,6 +60,7 @@ const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'];
 
 function ProfileOverviewPage() {
   const navigate = useNavigate();
+  const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
   const [profileOverview, setProfileOverview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -203,11 +206,12 @@ function ProfileOverviewPage() {
             <aside className={cx('leftCol')}>
               <section className={cx('profileCard')}>
                 <div className={cx('avatarWrap')}>
-                  <img
+                  <AvatarWithCosmetic
                     src={profileOverview.avatarUrl}
                     alt={fullName}
-                    className={cx('avatar')}
-                    referrerPolicy="no-referrer"
+                    size={110}
+                    frame={cosmeticFrame}
+                    badge={cosmeticBadge}
                   />
                 </div>
 

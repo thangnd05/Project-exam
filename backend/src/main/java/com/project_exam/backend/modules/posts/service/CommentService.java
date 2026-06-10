@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.gamification.cosmetic.dto.EquippedCosmeticsResponse;
+import com.project_exam.backend.modules.gamification.cosmetic.service.CosmeticService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,22 +33,27 @@ public class CommentService {
     private final PostRepository postRepository;
     private final AuthUtils authUtils;
     private final com.project_exam.backend.modules.users.repository.UserRepository userRepository;
+    private final CosmeticService cosmeticService;
 
     private CommentResponse toResponse(Comment c, List<CommentResponse> replies) {
         var authorOpt = userRepository.findById(c.getUserId());
         String authorName = authorOpt.map(User::getUserName).orElse("Unknown");
         String authorAvatar = authorOpt.map(User::getAvatarUrl).orElse(null);
-        return buildResponse(c, replies, authorName, authorAvatar);
+        EquippedCosmeticsResponse equipped = cosmeticService.getEquipped(c.getUserId());
+        return buildResponse(c, replies, authorName, authorAvatar, equipped);
     }
 
     private CommentResponse buildResponse(Comment c, List<CommentResponse> replies,
-                                          String authorName, String authorAvatar) {
+                                          String authorName, String authorAvatar,
+                                          EquippedCosmeticsResponse equipped) {
         return CommentResponse.builder()
                 .id(c.getId())
                 .postId(c.getPostId())
                 .userId(c.getUserId())
                 .authorName(authorName)
                 .authorAvatar(authorAvatar)
+                .equippedFrame(equipped != null ? equipped.getFrame() : null)
+                .equippedBadge(equipped != null ? equipped.getBadge() : null)
                 .parentId(c.getParentId())
                 .content(c.getContent())
                 .createdAt(c.getCreatedAt())
@@ -75,13 +82,17 @@ public class CommentService {
                 : userRepository.findAllById(authorIds).stream()
                         .collect(Collectors.toMap(User::getUserId, u -> u));
 
+        // Batch-load khung/huy hiệu đang đeo của các tác giả (tránh N+1).
+        Map<String, EquippedCosmeticsResponse> equippedMap = cosmeticService.getEquippedForUsers(authorIds);
+
         // 3. Chuyển sang DTO (chưa có replies)
         List<CommentResponse> allDtos = allComments.stream()
                 .map(c -> {
                     User author = authorMap.get(c.getUserId());
                     String name = author != null ? author.getUserName() : "Unknown";
                     String avatar = author != null ? author.getAvatarUrl() : null;
-                    return buildResponse(c, new ArrayList<CommentResponse>(), name, avatar);
+                    return buildResponse(c, new ArrayList<CommentResponse>(), name, avatar,
+                            equippedMap.get(c.getUserId()));
                 })
                 .collect(Collectors.toList());
 

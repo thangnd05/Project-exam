@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.posts.dto;
 
 import com.project_exam.backend.modules.posts.domain.Post;
+import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticResponse;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,6 +16,8 @@ public class PostResponse {
     private String userId;
     private String authorName;
     private String authorAvatar;
+    private CosmeticResponse equippedFrame;
+    private CosmeticResponse equippedBadge;
     private String title;
     private String content;
     private Post.PostStatus status;

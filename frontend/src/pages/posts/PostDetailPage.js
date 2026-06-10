@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {
@@ -8,6 +8,8 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '~/hooks/useAuth';
+import { useCosmetics } from '~/hooks/useCosmetics';
+import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
 import routes from '~/config/Routes';
 import styles from './PostDetailPage.module.scss';
 import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, toggleReact, toggleSavePost } from '~/api/postApi';
@@ -18,6 +20,7 @@ const MAX_REPLY_DEPTH = 4;
 function PostDetailPage() {
   const { postId } = useParams();
   const { user } = useAuth();
+  const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
@@ -74,6 +77,32 @@ function PostDetailPage() {
     };
     fetchPostData();
   }, [postId]);
+
+  // Khi cosmetic của chính mình đổi -> fetch lại để avatar tác giả (comment + bài) cập nhật ngay.
+  const skipFirstCosmeticSync = useRef(true);
+  useEffect(() => {
+    if (!postId) return;
+    if (skipFirstCosmeticSync.current) {
+      skipFirstCosmeticSync.current = false;
+      return;
+    }
+    (async () => {
+      try {
+        const [commentsData, postData] = await Promise.all([
+          getComments(postId),
+          getPostById(postId),
+        ]);
+        setComments(commentsData || []);
+        setPost((prev) =>
+          prev
+            ? { ...prev, equippedFrame: postData.equippedFrame, equippedBadge: postData.equippedBadge }
+            : prev,
+        );
+      } catch (error) {
+        // bỏ qua lỗi đồng bộ cosmetic
+      }
+    })();
+  }, [cosmeticFrame, cosmeticBadge, postId]);
 
   useEffect(() => {
     const computeIndent = () => {
@@ -279,11 +308,12 @@ function PostDetailPage() {
     return (
       <div key={comment.id} className={cx('commentNode')} style={{ marginLeft: indentStep }}>
         <div className={cx('commentItem')}>
-          <img
-            src={comment.authorAvatar || 'https://i.pravatar.cc/150?img=12'}
-            alt="Avatar"
-            className={cx('avatar')}
-            referrerPolicy="no-referrer"
+          <AvatarWithCosmetic
+            src={comment.authorAvatar}
+            fallbackSrc="https://i.pravatar.cc/150?img=12"
+            size={40}
+            frame={comment.equippedFrame}
+            badge={comment.equippedBadge}
           />
           <div className={cx('contentBox')}>
             <div className={cx('commentMeta')}>
@@ -425,7 +455,13 @@ function PostDetailPage() {
 
         <div className={cx('metaRow')}>
           <div className={cx('authorSide')}>
-            <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} referrerPolicy="no-referrer" />
+            <AvatarWithCosmetic
+              src={post.authorAvatar}
+              fallbackSrc="https://i.pravatar.cc/150?img=12"
+              size={44}
+              frame={post.equippedFrame}
+              badge={post.equippedBadge}
+            />
             <div className={cx('authorInfo')}>
               <Link to="#">{post.authorName}</Link>
             </div>
@@ -447,12 +483,12 @@ function PostDetailPage() {
 
           <form className={cx('commentForm')} onSubmit={handleSubmitComment}>
             <div className="d-flex align-items-center mb-3">
-              <img
-                src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=12'}
-                alt="Avatar"
-                className={cx('avatar')}
-                style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
-                referrerPolicy="no-referrer"
+              <AvatarWithCosmetic
+                src={user?.avatarUrl}
+                fallbackSrc="https://i.pravatar.cc/150?img=12"
+                size={40}
+                frame={cosmeticFrame}
+                badge={cosmeticBadge}
               />
             </div>
             <div className={cx('formContent')}>

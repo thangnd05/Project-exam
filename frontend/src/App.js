@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from '~/context/AuthContext';
 import { StreakProvider } from '~/context/StreakContext';
 import { CoinProvider } from '~/context/CoinContext';
+import { CosmeticProvider } from '~/context/CosmeticContext';
 import StreakCelebration from '~/components/streak/StreakCelebration';
 import ScrollHandler from './layout/ScrollToTopOnRouteChange';
 import { ToastContainer } from 'react-toastify';
@@ -21,6 +22,7 @@ function App() {
     <AuthProvider>
       <StreakProvider>
       <CoinProvider>
+      <CosmeticProvider>
       <Router
         future={{
           v7_startTransition: true,
@@ -100,6 +102,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </CosmeticProvider>
       </CoinProvider>
       </StreakProvider>
     </AuthProvider>

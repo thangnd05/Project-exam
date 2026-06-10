@@ -14,7 +14,6 @@ import style from './header.module.scss';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import images from '~/assets/images';
 import classNames from 'classnames/bind';
-// import Search from '../Search';
 import {useAuth} from '../../hooks/useAuth';
 import {name} from '~/assets/images';
 import routes from '~/config/Routes';
@@ -24,11 +23,14 @@ import CreateClassModal from '~/pages/myclass/modals/CreateClassModal';
 import CreateTestModal from '~/components/test/CreateTestModal';
 import StreakBadge from '~/components/streak/StreakBadge';
 import CoinQuestMenu from '~/components/coin/CoinQuestMenu';
+import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
+import {useCosmetics} from '~/hooks/useCosmetics';
 
 const cx = classNames.bind(style);
 
 function Header() {
   const {user, logout} = useAuth();
+  const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -197,15 +199,12 @@ function Header() {
         <CoinQuestMenu />
         <Dropdown className={cx(isMobile ? 'mobileUserDropdown' : '')}>
           <Dropdown.Toggle as="div" className={cx('user-info')}>
-            <Image
-              src={user?.avatarUrl || images.avtImage}
-              alt="Avatar"
-              className={cx('avatar')}
-              referrerPolicy="no-referrer"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = images.avtImage;
-              }}
+            <AvatarWithCosmetic
+              src={user?.avatarUrl}
+              fallbackSrc={images.avtImage}
+              size={32}
+              frame={cosmeticFrame}
+              badge={cosmeticBadge}
             />
             <div className={cx('userNameWrapper')}>
               <span className={cx('username')}>{user.userName}</span>

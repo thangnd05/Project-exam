@@ -53,6 +53,7 @@ import RecoveryResourcesManagement from '~/admin/pages/RecoveryResources';
 import MilestonesManagement from '~/admin/pages/Milestones';
 import CoinsManagement from '~/admin/pages/Coins';
 import QuestsManagement from '~/admin/pages/Quests';
+import CosmeticsManagement from '~/admin/pages/Cosmetics';
 import UserTargetPage from '~/pages/user/target/UserTargetPage';
 import TargetDashboardPage from '~/pages/user/target/TargetDashboardPage';
 import TargetAchievedPage from '~/pages/user/target/TargetAchievedPage';
@@ -105,6 +106,7 @@ export const adminRoutes = [
   { path: routes.adminMilestones, component: MilestonesManagement },
   { path: routes.adminCoins, component: CoinsManagement },
   { path: routes.adminQuests, component: QuestsManagement },
+  { path: routes.adminCosmetics, component: CosmeticsManagement },
 ];
 
 //  Các trang yêu cầu phải đăng nhập

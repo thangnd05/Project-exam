@@ -49,6 +49,7 @@ public class PostService {
     private final AuthUtils authUtils;
     private final UserRepository userRepository;
     private final PostViewThrottleService postViewThrottleService;
+    private final com.project_exam.backend.modules.gamification.cosmetic.service.CosmeticService cosmeticService;
 
     // ─────────────────────────────────────────────
     // MAPPING
@@ -101,12 +102,15 @@ public class PostService {
             authorName = authorOpt.get().getUserName();
             authorAvatar = authorOpt.get().getAvatarUrl();
         }
+        var authorCosmetics = cosmeticService.getEquipped(post.getUserId());
 
         return PostResponse.builder()
                 .id(post.getId())
                 .userId(post.getUserId())
                 .authorName(authorName)
                 .authorAvatar(authorAvatar)
+                .equippedFrame(authorCosmetics != null ? authorCosmetics.getFrame() : null)
+                .equippedBadge(authorCosmetics != null ? authorCosmetics.getBadge() : null)
                 .title(post.getTitle())
                 .content(post.getContent())
                 .status(post.getStatus())
@@ -137,12 +141,15 @@ public class PostService {
             authorName = authorOpt.get().getUserName();
             authorAvatar = authorOpt.get().getAvatarUrl();
         }
+        var authorCosmetics = cosmeticService.getEquipped(post.getUserId());
 
         return PostSummaryResponse.builder()
                 .id(post.getId())
                 .userId(post.getUserId())
                 .authorName(authorName)
                 .authorAvatar(authorAvatar)
+                .equippedFrame(authorCosmetics != null ? authorCosmetics.getFrame() : null)
+                .equippedBadge(authorCosmetics != null ? authorCosmetics.getBadge() : null)
                 .title(post.getTitle())
                 .status(post.getStatus())
                 .createdAt(post.getCreatedAt())
@@ -353,6 +360,8 @@ public class PostService {
         Map<String, User> authorMap = userRepository.findAllById(authorIds).stream()
                 .collect(Collectors.toMap(User::getUserId, u -> u));
 
+        var equippedMap = cosmeticService.getEquippedForUsers(authorIds);
+
         List<PostCategory> postCategories = postCategoryRepository.findByPostIdIn(postIds);
         Set<String> categoryIds = postCategories.stream()
                 .map(PostCategory::getCategoryId)
@@ -376,12 +385,15 @@ public class PostService {
             User author = authorMap.get(post.getUserId());
             String authorName = author != null ? author.getUserName() : "Unknown";
             String authorAvatar = author != null ? author.getAvatarUrl() : null;
+            var authorCosmetics = equippedMap.get(post.getUserId());
 
             return PostSummaryResponse.builder()
                     .id(post.getId())
                     .userId(post.getUserId())
                     .authorName(authorName)
                     .authorAvatar(authorAvatar)
+                    .equippedFrame(authorCosmetics != null ? authorCosmetics.getFrame() : null)
+                    .equippedBadge(authorCosmetics != null ? authorCosmetics.getBadge() : null)
                     .title(post.getTitle())
                     .status(post.getStatus())
                     .createdAt(post.getCreatedAt())

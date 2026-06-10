@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.gamification.coin.dto.CoinWalletResponse
 import com.project_exam.backend.modules.gamification.coin.repository.UserCoinRepository;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.users.repository.UserRepository;
+import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,22 @@ public class CoinService {
                     return w;
                 });
         wallet.setBalance(wallet.getBalance() + amount);
+        wallet.setUpdatedAt(LocalDateTime.now());
+        return userCoinRepository.save(wallet).getBalance();
+    }
+
+    /**
+     * Trừ xu khi user đổi/mua (cosmetic, mở khóa...). Trả số dư mới.
+     * Ném lỗi nếu không đủ xu. Chạy trong transaction để đọc-kiểm-ghi an toàn.
+     */
+    @Transactional
+    public int spend(String userId, int amount) {
+        UserCoin wallet = userCoinRepository.findByUserId(userId)
+                .orElseThrow(() -> new BadRequestException("Bạn chưa có xu nào"));
+        if (wallet.getBalance() < amount) {
+            throw new BadRequestException("Bạn không đủ xu");
+        }
+        wallet.setBalance(wallet.getBalance() - amount);
         wallet.setUpdatedAt(LocalDateTime.now());
         return userCoinRepository.save(wallet).getBalance();
     }

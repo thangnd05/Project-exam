@@ -29,6 +29,7 @@ import {
   BookOpen,
   Target,
   Coins,
+  Sparkles,
 } from 'lucide-react';
 import routes from '~/config/Routes';
 import styles from './AdminLayout.module.scss';
@@ -84,6 +85,7 @@ const adminRouteGroups = [
     items: [
       {path: routes.adminCoins, icon: <Coins size={20} />, label: 'Quản lý xu'},
       {path: routes.adminQuests, icon: <Target size={20} />, label: 'Quản lý nhiệm vụ'},
+      {path: routes.adminCosmetics, icon: <Sparkles size={20} />, label: 'Cửa hàng trang trí'},
     ],
   },
   {

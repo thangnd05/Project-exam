@@ -1,0 +1,110 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// Vòng khung phía sau avatar (COLOR / EFFECT). Avatar nằm trên, không bị xoay theo.
+.backRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.imgSlot {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  border-radius: 50%;
+  line-height: 0;
+}
+
+.img {
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid #fff;
+  box-sizing: border-box;
+  background: #f1f5f9;
+}
+
+.overlay {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  object-fit: contain;
+}
+
+.badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  line-height: 1;
+  user-select: none;
+}
+
+.badgeImg {
+  background: transparent;
+  box-shadow: none;
+  object-fit: contain;
+  border-radius: 0;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* ---------- Hiệu ứng CSS (EFFECT) ---------- */
+
+.effect-glow {
+  background: linear-gradient(135deg, #ffd43b, #fab005);
+  animation: cosmeticGlow 1.8s ease-in-out infinite;
+}
+
+.effect-pulse {
+  background: linear-gradient(135deg, #4dabf7, #228be6);
+  animation: cosmeticPulse 1.5s ease-in-out infinite;
+}
+
+.effect-rotate {
+  background: conic-gradient(#f59f00, #ff5252, #7048e8, #228be6, #f59f00);
+  animation: cosmeticSpin 3s linear infinite;
+}
+
+.effect-rainbow {
+  background: conic-gradient(#ff5252, #ff922b, #ffd43b, #51cf66, #22b8cf, #4dabf7, #7048e8, #ff5252);
+  animation: cosmeticSpin 4s linear infinite;
+}
+
+@keyframes cosmeticGlow {
+  0%, 100% {
+    box-shadow: 0 0 4px 1px rgba(250, 176, 5, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 13px 4px rgba(250, 176, 5, 0.95);
+  }
+}
+
+@keyframes cosmeticPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 4px 1px rgba(34, 139, 230, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px 4px rgba(34, 139, 230, 0.8);
+  }
+}
+
+@keyframes cosmeticSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
