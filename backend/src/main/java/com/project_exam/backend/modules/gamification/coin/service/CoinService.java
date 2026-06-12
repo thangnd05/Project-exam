@@ -50,14 +50,19 @@ public class CoinService {
      */
     @Transactional
     public int spend(String userId, int amount) {
-        UserCoin wallet = userCoinRepository.findByUserId(userId)
-                .orElseThrow(() -> new BadRequestException("Bạn chưa có xu nào"));
-        if (wallet.getBalance() < amount) {
-            throw new BadRequestException("Bạn không đủ xu");
+        if (amount <= 0) {
+            throw new BadRequestException("Số xu cần trừ phải lớn hơn 0");
         }
-        wallet.setBalance(wallet.getBalance() - amount);
-        wallet.setUpdatedAt(LocalDateTime.now());
-        return userCoinRepository.save(wallet).getBalance();
+        // Trừ nguyên tử ở mức DB: chỉ trừ khi balance >= amount. 0 dòng update
+        // = không đủ xu (hoặc chưa có ví). Chống double-spend khi request đồng thời.
+        int updated = userCoinRepository.deduct(userId, amount);
+        if (updated == 0) {
+            throw new BadRequestException(
+                    userCoinRepository.existsByUserId(userId) ? "Bạn không đủ xu" : "Bạn chưa có xu nào");
+        }
+        return userCoinRepository.findByUserId(userId)
+                .map(UserCoin::getBalance)
+                .orElse(0);
     }
 
     /** Số dư xu của user đang đăng nhập — chưa có ví thì coi như 0. */
