@@ -59,7 +59,8 @@ public class UserTestService {
     private final ClassRepository classRepository;
     private final AuthUtils authUtils;
     private final StreakService streakService;
-    
+    private final UserTestAccessRepository userTestAccessRepository;
+
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
     public UserTestResponse toResponse(UserTest userTest) {
@@ -402,6 +403,13 @@ public class UserTestService {
             }
         }
 
+        // 💰 Bài trả phí: phải đã mua quyền (người tạo được miễn). Resume ở trên không qua đây.
+        if (test.getCostCoins() != null && test.getCostCoins() > 0
+                && !userId.equals(test.getCreatedBy())
+                && !userTestAccessRepository.existsByUserIdAndTestId(userId, testId)) {
+            throw new ForbiddenException("Bài này cần mở khoá bằng xu trước khi làm.");
+        }
+
         //  Tạo mới user_test
         UserTest newTest = new UserTest();
         newTest.setUserId(userId);
@@ -443,6 +451,10 @@ public class UserTestService {
         // Guest không hỗ trợ test gắn lớp.
         if (test.getClassId() != null) {
             throw new ForbiddenException("Bài thi của lớp yêu cầu đăng nhập.");
+        }
+        // Guest không mua được bài trả phí (không có ví xu).
+        if (test.getCostCoins() != null && test.getCostCoins() > 0) {
+            throw new ForbiddenException("Bài trả phí yêu cầu đăng nhập và mở khoá bằng xu.");
         }
 
         //  RESUME: nếu guest session đã có attempt đang dở thì trả về luôn.

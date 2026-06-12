@@ -6,6 +6,7 @@ import {
     IoStatsChartOutline,
     IoPlayCircleOutline,
     IoLockClosedOutline,
+    IoLockOpenOutline,
     IoCreateOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
@@ -97,6 +98,17 @@ function TestCard({ test, countdowns }) {
                 <div className={cx('status-badge', `status-${status}`)}>
                     {statusLabel}
                 </div>
+
+                {test.costCoins > 0 && (
+                    <div className={cx('cost-badge', { owned: test.owned })}>
+                        {test.owned ? (
+                            <IoLockOpenOutline size={14} />
+                        ) : (
+                            <IoLockClosedOutline size={14} />
+                        )}
+                        {test.owned ? 'Đã mở khoá' : `${test.costCoins} xu`}
+                    </div>
+                )}
             </div>
 
             <div className={cx('card-body')}>

@@ -820,6 +820,49 @@
     color: var(--text-secondary);
     max-width: 500px;
   }
+
+  .state-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .state-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .state-btn-secondary {
+    background: #e2e8f0;
+    color: #475569;
+
+    &:hover:not(:disabled) {
+      background: #cbd5e1;
+    }
+  }
+
+  .state-btn-primary {
+    background: var(--primary-gradient);
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 97, 242, 0.25);
+    }
+  }
 }
 
 @keyframes pulse {

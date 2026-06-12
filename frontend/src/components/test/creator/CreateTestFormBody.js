@@ -21,6 +21,7 @@ import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useCreateTest, CREATOR_TYPES } from '~/hooks/useCreateTest';
+import CoinPriceField from '~/components/test/CoinPriceField';
 import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
@@ -391,6 +392,14 @@ const CreateTestFormBody = ({
                         <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
                       </div>
                     </Col>
+                    <CoinPriceField
+                      md={3}
+                      isPublic={mode !== 'class'}
+                      value={testInfo.costCoins}
+                      onChange={(v) => setTestInfo({ ...testInfo, costCoins: v })}
+                      groupClassName={cx('formGroupModern')}
+                      inputClassName={cx('inputModern')}
+                    />
                     <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 6 : 4}>
                       <div className={cx('formGroupModern')}>
                         <label><IoCalendarOutline /> Thời gian bắt đầu</label>

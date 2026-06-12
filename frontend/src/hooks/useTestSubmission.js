@@ -115,6 +115,11 @@ export const useTestSubmission = ({
                         : null,
                     classId: mode === 'class' ? String(classId) : null,
                     chapterId: mode === 'class' ? String(chapterId) : null,
+                    // Giá xu: BE chỉ nhận khi là admin & bài công khai; còn lại bị ép null.
+                    costCoins:
+                        testInfo.costCoins && Number(testInfo.costCoins) > 0
+                            ? Number(testInfo.costCoins)
+                            : null,
                 });
                 const newTestId = testData.testId || testData.id;
                 const partData = await createTestPart({

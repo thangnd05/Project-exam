@@ -57,6 +57,34 @@ $brand-secondary: var(--accent-act-color);
         letter-spacing: 0;
         text-transform: none;
     }
+
+    .cost-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #b45309;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(180, 83, 9, 0.3);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(2px);
+        z-index: 2;
+
+        svg {
+            flex-shrink: 0;
+        }
+
+        &.owned {
+            color: #2f9e44;
+            border-color: rgba(47, 158, 68, 0.35);
+        }
+    }
 }
 
 .card-body {

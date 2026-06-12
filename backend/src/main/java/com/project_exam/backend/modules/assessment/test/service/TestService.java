@@ -24,9 +24,13 @@ import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardRe
 import com.project_exam.backend.modules.assessment.test.dto.TestPartAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
+import com.project_exam.backend.modules.assessment.test.domain.UserTestAccess;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
+import com.project_exam.backend.modules.assessment.test.repository.UserTestAccessRepository;
+import com.project_exam.backend.modules.gamification.coin.service.CoinService;
+import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
 
 // --- Assessment: Exam ---
@@ -105,6 +109,16 @@ public class TestService {
     private final ClassRepository classRepository;
     private final ClassMemberRepository classMemberRepository;
     private final ClassAccessGuard classAccessGuard;
+    private final UserTestAccessRepository userTestAccessRepository;
+    private final CoinService coinService;
+
+    /** User có quyền làm bài chưa: miễn phí, hoặc là người tạo, hoặc đã mua. */
+    private boolean hasTestAccess(Test test, String userId) {
+        if (test.getCostCoins() == null || test.getCostCoins() <= 0) return true;
+        if (userId == null) return false;
+        if (userId.equals(test.getCreatedBy())) return true;
+        return userTestAccessRepository.existsByUserIdAndTestId(userId, test.getTestId());
+    }
 
     public List<TestResponse> getAllTests() {
         List<Test> tests = testRepository.findAll();
@@ -242,7 +256,7 @@ public class TestService {
      * Bản phân trang của getAdminTestsByExamType — dùng cho danh sách test theo examType.
      * Why: trang user có thể có rất nhiều đề admin tạo, không nên load all rồi filter in-memory.
      */
-    public PageResponse<TestResponse> getAdminTestsByExamTypePaged(String examTypeId, int page, int size) {
+    public PageResponse<TestResponse> getAdminTestsByExamTypePaged(String examTypeId, int page, int size, String userId) {
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 12 : Math.min(size, 100);
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -257,7 +271,8 @@ public class TestService {
         Page<Test> testPage = testRepository
                 .findByExamTypeIdAndClassIdIsNullAndCreatedByIn(examTypeId, adminIds, pageable);
 
-        return toTestPageResponse(testPage, null);
+        // Truyền userId để biết bài nào đã mở khoá (owner/đã mua) -> badge hiển thị đúng.
+        return toTestPageResponse(testPage, userId);
     }
 
     private PageResponse<TestResponse> toTestPageResponse(Page<Test> testPage, String userId) {
@@ -281,16 +296,24 @@ public class TestService {
                         .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]))
                 : Map.of();
 
+        // Quyền đã mua: 1 query, gom thành set để tránh N+1 khi build từng item.
+        Set<String> ownedTestIds = userId != null
+                ? userTestAccessRepository.findByUserId(userId).stream()
+                        .map(UserTestAccess::getTestId)
+                        .collect(Collectors.toSet())
+                : Set.of();
+
         return tests.stream()
                 .map(test -> buildUserTestSummaryFromCounts(
                         test, userId,
                         attemptsUsedByTest.getOrDefault(test.getTestId(), 0L),
-                        totalAttemptsByTest.getOrDefault(test.getTestId(), 0L)))
+                        totalAttemptsByTest.getOrDefault(test.getTestId(), 0L),
+                        ownedTestIds))
                 .toList();
     }
 
     private TestResponse buildUserTestSummaryFromCounts(
-            Test test, String userId, long attemptsUsed, long totalAttempts) {
+            Test test, String userId, long attemptsUsed, long totalAttempts, Set<String> ownedTestIds) {
         Integer maxAttempts = test.getMaxAttempts();
         Integer remainingAttempts = null;
         boolean canDoTest = true;
@@ -299,6 +322,11 @@ public class TestService {
             remainingAttempts = (int) Math.max(0, maxAttempts - attemptsUsed);
             canDoTest = userId == null || remainingAttempts > 0;
         }
+
+        boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
+        boolean owned = !paid
+                || (userId != null
+                        && (userId.equals(test.getCreatedBy()) || ownedTestIds.contains(test.getTestId())));
 
         return TestResponse.builder()
                 .testId(test.getTestId())
@@ -318,6 +346,9 @@ public class TestService {
                 .remainingAttempts(remainingAttempts)
                 .totalAttempts(totalAttempts)
                 .canDoTest(canDoTest)
+                .costCoins(test.getCostCoins())
+                .owned(owned)
+                .locked(paid && !owned)
                 .parts(null)
                 .build();
     }
@@ -403,6 +434,11 @@ public class TestService {
         if (request.getExamCategoryId() != null) test.setExamCategoryId(request.getExamCategoryId());
         if (request.getAvailableFrom() != null) test.setAvailableFrom(request.getAvailableFrom());
         if (request.getAvailableTo() != null) test.setAvailableTo(request.getAvailableTo());
+        // Giá xu: chỉ admin đặt được, và chỉ cho bài công khai (không gắn lớp). Đặt 0 để gỡ phí.
+        if (request.getCostCoins() != null) {
+            boolean publicTest = effectiveClassId == null;
+            test.setCostCoins(authUtils.isAdmin(httpRequest) && publicTest ? request.getCostCoins() : null);
+        }
         return testRepository.save(test);
     }
 
@@ -426,6 +462,9 @@ public class TestService {
             canDoTest = userId == null || remainingAttempts > 0;
         }
 
+        boolean owned = hasTestAccess(test, userId);
+        boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
+
         return TestResponse.builder()
                 .testId(test.getTestId())
                 .title(test.getTitle())
@@ -444,6 +483,9 @@ public class TestService {
                 .remainingAttempts(remainingAttempts)   // null nếu không giới hạn
                 .totalAttempts(totalAttempts)
                 .canDoTest(canDoTest)                   // luôn true nếu null
+                .costCoins(test.getCostCoins())
+                .owned(owned)
+                .locked(paid && !owned)
                 .parts(null)
                 .build();
     }
@@ -538,6 +580,26 @@ public class TestService {
                         .status(TestStatus.LOGIN_REQUIRED.name()).canDoTest(false)
                         .build();
             }
+        }
+
+        // 2b. Bài trả phí chưa mở khoá: KHÔNG trả đề (parts) để tránh lộ câu hỏi.
+        boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
+        if (paid && !hasTestAccess(test, currentUserId)) {
+            return TestResponse.builder()
+                    .testId(test.getTestId())
+                    .title(test.getTitle())
+                    .description(test.getDescription())
+                    .examTypeId(test.getExamTypeId())
+                    .examCategoryId(test.getExamCategoryId())
+                    .bannerUrl(test.getBannerUrl())
+                    .durationMinutes(test.getDurationMinutes())
+                    .createdBy(test.getCreatedBy())
+                    .status("PAYMENT_REQUIRED")
+                    .canDoTest(false)
+                    .costCoins(test.getCostCoins())
+                    .owned(false)
+                    .locked(true)
+                    .build();
         }
 
         UserTest latest = isGuest
@@ -690,6 +752,9 @@ public class TestService {
                 .remainingAttempts(remaining)
                 .totalAttempts(totalAttempts)
                 .canDoTest(true)
+                .costCoins(test.getCostCoins())
+                .owned(true)
+                .locked(false)
                 .parts(partResponses)
                 .build();
     }
@@ -716,6 +781,9 @@ public class TestService {
                 .remainingAttempts(remaining)
                 .totalAttempts(totalAttempts)
                 .canDoTest(true)
+                .costCoins(test.getCostCoins())
+                .owned(true)
+                .locked(false)
                 .parts(Collections.emptyList())
                 .build();
     }
@@ -747,6 +815,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             .classId(test.getClassId()).chapterId(test.getChapterId())
             .status("FORBIDDEN").maxAttempts(test.getMaxAttempts())
             .attemptsUsed(used).remainingAttempts(rem).totalAttempts(total)
+            .costCoins(test.getCostCoins()).owned(true).locked(false)
             .canDoTest(false).build();
 }
 
@@ -959,9 +1028,48 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             return result;
         }
 
+        // Bài trả phí: lộ giá + trạng thái sở hữu để FE hiển thị nút "Mở khoá".
+        boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
+        boolean owned = hasTestAccess(test, userId);
+        result.put("costCoins", test.getCostCoins());
+        result.put("owned", owned);
+        result.put("requiresPayment", paid && !owned);
+        if (paid && !owned) {
+            result.put("canStart", false);
+            result.put("message", "Bài này cần mở khoá bằng xu trước khi làm.");
+            return result;
+        }
+
         result.put("canStart", true);
         result.put("message", "OK");
         return result;
+    }
+
+    /** Mua quyền làm bài trả phí (trừ xu 1 lần, mở khoá vĩnh viễn). */
+    @Transactional
+    public TestResponse purchaseTestAccess(String userId, String testId) {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + testId));
+        Integer cost = test.getCostCoins();
+        if (cost == null || cost <= 0) {
+            throw new BadRequestException("Bài này miễn phí, không cần mua.");
+        }
+        if (test.getClassId() != null) {
+            throw new BadRequestException("Bài của lớp không bán bằng xu.");
+        }
+        if (userTestAccessRepository.existsByUserIdAndTestId(userId, testId)) {
+            throw new ConflictException("Bạn đã mở khoá bài này.");
+        }
+
+        coinService.spend(userId, cost); // ném lỗi nếu không đủ xu
+
+        UserTestAccess access = new UserTestAccess();
+        access.setUserId(userId);
+        access.setTestId(testId);
+        access.setPurchasedAt(LocalDateTime.now());
+        userTestAccessRepository.save(access);
+
+        return buildUserTestSummary(test, userId);
     }
 
     public List<TestResponse> getTestByClassId(String classId, HttpServletRequest request) {

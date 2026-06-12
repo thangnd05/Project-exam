@@ -65,6 +65,7 @@ export const useCreateTest = ({
     availableFrom: '',
     availableTo: '',
     collectionId: '',
+    costCoins: '', // giá xu (chỉ admin đặt, bài công khai)
   });
 
   const [questions, setQuestions] = useState([JSON.parse(JSON.stringify(emptyQuestion))]);

@@ -1,7 +1,8 @@
 import axios from '../../../../../api/axiosClient';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '../../../../../api/userTestApi';
 import { getAnswersByUserTest, batchSaveAnswers } from '../../../../../api/userAnswerApi';
-import { getUserTestInfo } from '../../../../../api/testApi';
+import { getUserTestInfo, purchaseTestAccess } from '../../../../../api/testApi';
+import { toast } from 'react-toastify';
 import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
@@ -18,6 +19,7 @@ import {
 import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
 import { AuthContext } from '~/context/AuthContext';
 import { useStreak } from '~/hooks/useStreak';
+import { useCoins } from '~/hooks/useCoins';
 import { getOrCreateGuestSessionId, guestHeaders } from '~/utils/guestSession';
 import TestStartDashboard from './TestStartDashboard';
 import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
@@ -35,6 +37,8 @@ function TestStartPage() {
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
   const { refreshStreak } = useStreak();
+  const { balance, refreshCoins } = useCoins();
+  const [purchasing, setPurchasing] = useState(false);
 
   // Guest session: chỉ khởi tạo khi đã xác định KHÔNG đăng nhập.
   const isGuest = !authLoading && !isAuthenticated;
@@ -110,8 +114,7 @@ function TestStartPage() {
     return { ...testData, parts: enrichedParts };
   }, []);
 
-  useEffect(() => {
-    if (!testId || authLoading) return;
+  const loadTest = useCallback(() => {
     const savedState = sessionStorage.getItem(`userTestState-${testId}`);
     let restored = false;
 
@@ -141,6 +144,11 @@ function TestStartPage() {
               flashMessage: 'Bạn cần đăng nhập để làm bài thi này!',
             },
           });
+          return;
+        }
+
+        if (testData.status === 'PAYMENT_REQUIRED') {
+          setStatus('payment');
           return;
         }
 
@@ -228,7 +236,12 @@ function TestStartPage() {
         }
       })
       .catch(() => setStatus('error'));
-  }, [testId, navigate, enrichTestWithPassageMedia, authLoading, isGuest, guestCfg]);
+  }, [testId, navigate, enrichTestWithPassageMedia, isGuest, guestCfg]);
+
+  useEffect(() => {
+    if (!testId || authLoading) return;
+    loadTest();
+  }, [testId, authLoading, loadTest]);
 
   useEffect(() => {
     if (status === 'open' && test?.testId) {
@@ -610,6 +623,21 @@ function TestStartPage() {
     );
   };
 
+  const handlePurchase = async () => {
+    setPurchasing(true);
+    try {
+      await purchaseTestAccess(testId);
+      await refreshCoins();
+      toast.success('Đã mở khoá bài kiểm tra!');
+      setStatus('loading');
+      loadTest();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Mở khoá thất bại. Vui lòng thử lại.'));
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
   if (status === 'loading')
     return (
       <div className={cx('state-box')}>
@@ -617,6 +645,37 @@ function TestStartPage() {
         <h3>Đang niêm phong đề thi...</h3>
       </div>
     );
+
+  if (status === 'payment') {
+    const cost = test.costCoins || 0;
+    const enough = balance >= cost;
+    return (
+      <div className={cx('state-box')}>
+        <IoLockClosedOutline size={80} color="#f08c00" />
+        <h3>Bài kiểm tra trả phí</h3>
+        <p>
+           Đầu tư một lần, sử dụng mãi mãi.
+        </p>
+        <div className={cx('state-actions')}>
+          <button
+            type="button"
+            className={cx('state-btn', 'state-btn-secondary')}
+            onClick={() => navigate(-1)}
+          >
+            Quay lại
+          </button>
+          <button
+            type="button"
+            className={cx('state-btn', 'state-btn-primary')}
+            disabled={purchasing || !enough}
+            onClick={handlePurchase}
+          >
+            {purchasing ? 'Đang mở khoá...' : enough ? `Mở khoá (${cost} xu)` : 'Không đủ xu'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (status === 'no-attempts')
     return (

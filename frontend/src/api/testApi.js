@@ -49,6 +49,11 @@ export const deleteTest = (testId) => {
   return axios.delete(`${BASE_URL}/${testId}`).then(() => {});
 };
 
+// Mua quyền làm bài trả phí bằng xu (mua 1 lần, mở khoá vĩnh viễn)
+export const purchaseTestAccess = (testId) => {
+  return axios.post(`${BASE_URL}/${testId}/purchase`).then((res) => res.data);
+};
+
 export const addRandomQuestionsToPart = (payload) => {
   return axios.post(`${BASE_URL}/parts/random-questions`, payload).then((res) => res.data);
 };

@@ -10,6 +10,7 @@ import { Row, Col, Spinner, Alert, Button, Form } from 'react-bootstrap';
 import { getQuestionsByPart } from '../../api/questionApi';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '../../api/testApi';
 import { createTestPart } from '../../api/testPartApi';
+import CoinPriceField from '~/components/test/CoinPriceField';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {
@@ -61,6 +62,7 @@ const CreateTestFromBankPage = () => {
     bannerUrl: '',
     availableFrom: '',
     availableTo: '',
+    costCoins: '',
   });
 
   const [examCategories, setExamCategories] = useState([]);
@@ -259,6 +261,7 @@ const CreateTestFromBankPage = () => {
         availableTo: testInfo.availableTo ? testInfo.availableTo + ':00' : null,
         classId: null,
         chapterId: null,
+        costCoins: testInfo.costCoins && Number(testInfo.costCoins) > 0 ? Number(testInfo.costCoins) : null,
       });
 
       const newTestId = testData.testId ?? testData.id;
@@ -387,6 +390,12 @@ const CreateTestFromBankPage = () => {
                   />
                 </div>
               </Col>
+              <CoinPriceField
+                value={testInfo.costCoins}
+                onChange={(v) => setTestInfo({ ...testInfo, costCoins: v })}
+                groupClassName={cx('formGroup')}
+                inputClassName={cx('input')}
+              />
               <Col md={4}>
                 <div className={cx('formGroup')}>
                   <label>Phân loại bài thi (tuỳ chọn)</label>

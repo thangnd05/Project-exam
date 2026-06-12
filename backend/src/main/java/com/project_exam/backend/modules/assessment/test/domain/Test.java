@@ -54,6 +54,11 @@ public class Test {
     @Column(name = "exam_category_id")
     private String examCategoryId; // FK -> exam_categories.exam_category_id
 
+    // Giá xu để mở khoá bài (chỉ admin đặt, chỉ áp dụng cho bài công khai).
+    // null/0 = miễn phí; >0 = user phải mua 1 lần để mở khoá vĩnh viễn.
+    @Column(name = "cost_coins")
+    private Integer costCoins;
+
     //  Method tính trạng thái thực tế
     public TestStatus calculateStatus() {
         LocalDateTime now = LocalDateTime.now();

@@ -86,6 +86,12 @@ public class TestController {
         test.setExamCategoryId(request.getExamCategoryId());
         test.setAvailableFrom(request.getAvailableFrom());
         test.setAvailableTo(request.getAvailableTo());
+        // Giá xu: chỉ admin set được, và chỉ cho bài công khai (không gắn lớp).
+        if (request.getCostCoins() != null
+                && authUtils.isAdmin(httpRequest)
+                && request.getClassId() == null) {
+            test.setCostCoins(request.getCostCoins());
+        }
         test.setCreatedBy(currentUserId);
         test.setCreatedAt(LocalDateTime.now());
         Test savedTest = testService.save(test);
@@ -123,6 +129,16 @@ public class TestController {
     ) {
         Test updated = testService.updateTest(id, request, httpRequest);
         return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
+    }
+
+    // Mua quyền làm bài trả phí bằng xu (mua 1 lần, mở khoá vĩnh viễn)
+    @PostMapping("/{testId}/purchase")
+    public ResponseEntity<TestResponse> purchaseTestAccess(
+            @PathVariable String testId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(testService.purchaseTestAccess(userId, testId));
     }
 
     // Xoá test
@@ -170,9 +186,17 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
     public ResponseEntity<PageResponse<TestResponse>> getTestsByExamType(
             @PathVariable String examTypeId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
+            @RequestParam(defaultValue = "12") int size,
+            HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(testService.getAdminTestsByExamTypePaged(examTypeId, page, size));
+        // Guest -> userId null (không lỗi); user đăng nhập -> biết bài đã mở khoá.
+        String userId;
+        try {
+            userId = authUtils.getUserId(httpRequest);
+        } catch (Exception e) {
+            userId = null;
+        }
+        return ResponseEntity.ok(testService.getAdminTestsByExamTypePaged(examTypeId, page, size, userId));
     }
 
     // Danh sách bài Quick Challenge cho Hero landing page (public, guest xem được)

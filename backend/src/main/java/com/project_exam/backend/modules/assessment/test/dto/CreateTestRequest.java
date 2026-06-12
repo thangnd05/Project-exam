@@ -21,4 +21,7 @@ public class CreateTestRequest {
     // Hỗ trợ cấu hình thời gian mở/đóng đề
     private LocalDateTime availableFrom;
     private LocalDateTime availableTo;
+
+    // Giá xu để mở khoá bài. Chỉ admin set được; user thường / bài lớp sẽ bị ép null.
+    private Integer costCoins;
 }

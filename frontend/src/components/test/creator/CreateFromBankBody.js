@@ -26,6 +26,7 @@ import {
   IoSchoolOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hooks/useBaseMetaData';
+import CoinPriceField from '~/components/test/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
 import { getExamCategories } from '~/api/examCategoryApi';
@@ -71,6 +72,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     bannerUrl: '',
     availableFrom: '',
     availableTo: '',
+    costCoins: '',
   });
 
   const [examCategories, setExamCategories] = useState([]);
@@ -292,6 +294,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         availableTo: testInfo.availableTo ? testInfo.availableTo + ':00' : null,
         classId: isClassMode ? classId : null,
         chapterId: isClassMode ? (chapterId || null) : null,
+        costCoins: testInfo.costCoins && Number(testInfo.costCoins) > 0 ? Number(testInfo.costCoins) : null,
       });
 
       const newTestId = testData.testId ?? testData.id;
@@ -417,6 +420,13 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 />
               </div>
             </Col>
+            <CoinPriceField
+              isPublic={!isClassMode}
+              value={testInfo.costCoins}
+              onChange={(v) => setTestInfo({ ...testInfo, costCoins: v })}
+              groupClassName={cx('formGroupModern')}
+              inputClassName={cx('inputModern')}
+            />
             <Col md={4}>
               <div className={cx('formGroupModern')}>
                 <label>Phân loại bài thi (tuỳ chọn)</label>
