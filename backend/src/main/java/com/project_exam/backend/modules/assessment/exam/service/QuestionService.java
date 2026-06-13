@@ -173,12 +173,12 @@ public class QuestionService {
 
         // Dùng Stream API để nhóm (groupingBy) media theo passageId ngay trên RAM
         return allMedia.stream()
-                .map(m -> new PassageMediaResponse(
-                        m.getId(),
-                        m.getPassageId(),
-                        m.getMediaUrl(),
-                        m.getMediaType().name()
-                ))
+                .map(m -> PassageMediaResponse.builder()
+                        .id(m.getId())
+                        .passageId(m.getPassageId())
+                        .mediaUrl(m.getMediaUrl())
+                        .mediaType(m.getMediaType().name())
+                        .build())
                 .collect(Collectors.groupingBy(PassageMediaResponse::getPassageId));
     }
 
@@ -192,12 +192,12 @@ public class QuestionService {
         if (question.getPassageId() != null) {
             Passage passage = passagesById.get(question.getPassageId());
             if (passage != null) {
-                passageResponse = new PassageResponse(
-                        passage.getPassageId(),
-                        passage.getContent(),
-                        passage.getMediaUrl(),
-                        passage.getPassageType()
-                );
+                passageResponse = PassageResponse.builder()
+                        .passageId(passage.getPassageId())
+                        .content(passage.getContent())
+                        .mediaUrl(passage.getMediaUrl())
+                        .passageType(passage.getPassageType())
+                        .build();
             }
         }
 
@@ -966,12 +966,12 @@ public class QuestionService {
             return List.of();
         }
         return passageMediaRepository.findByPassageId(passageId).stream()
-                .map(m -> new PassageMediaResponse(
-                        m.getId(),
-                        m.getPassageId(),
-                        m.getMediaUrl(),
-                        m.getMediaType().name()
-                ))
+                .map(m -> PassageMediaResponse.builder()
+                        .id(m.getId())
+                        .passageId(m.getPassageId())
+                        .mediaUrl(m.getMediaUrl())
+                        .mediaType(m.getMediaType().name())
+                        .build())
                 .toList();
     }
 
@@ -1013,12 +1013,12 @@ public class QuestionService {
                 .map(ExamPart::getExamTypeId).orElse(null);
         PassageResponse passageDto = null;
         if (passage != null) {
-            passageDto = new PassageResponse(
-                    passage.getPassageId(),
-                    passage.getContent(),
-                    passage.getMediaUrl(),
-                    passage.getPassageType()
-            );
+            passageDto = PassageResponse.builder()
+                    .passageId(passage.getPassageId())
+                    .content(passage.getContent())
+                    .mediaUrl(passage.getMediaUrl())
+                    .passageType(passage.getPassageType())
+                    .build();
         }
         List<PassageMediaResponse> passageMedia = passage != null
                 ? toPassageMediaResponses(passage.getPassageId())
@@ -1063,12 +1063,12 @@ public class QuestionService {
                 .flatMap(passageRepository::findById)
                 .orElse(null);
         PassageResponse passageDto = passageEntity != null
-                ? new PassageResponse(
-                passageEntity.getPassageId(),
-                passageEntity.getContent(),
-                passageEntity.getMediaUrl(),
-                passageEntity.getPassageType()
-        )
+                ? PassageResponse.builder()
+                .passageId(passageEntity.getPassageId())
+                .content(passageEntity.getContent())
+                .mediaUrl(passageEntity.getMediaUrl())
+                .passageType(passageEntity.getPassageType())
+                .build()
                 : null;
         List<PassageMediaResponse> passageMedia = passageEntity != null
                 ? toPassageMediaResponses(passageEntity.getPassageId())

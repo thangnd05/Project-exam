@@ -86,23 +86,23 @@ public class MilestoneService {
     }
 
     private MilestoneResponse toResponse(ExamTargetMilestone m) {
-        MilestoneResponse res = new MilestoneResponse();
-        res.setExamTargetMilestoneId(m.getExamTargetMilestoneId());
-        res.setExamTypeId(m.getExamTypeId());
-        res.setMilestoneScore(m.getMilestoneScore());
-        res.setDescription(m.getDescription());
-        res.setCreatedAt(m.getCreatedAt());
-
         List<TargetPartRequirement> parts = partRequirementRepository
                 .findByExamTargetMilestoneId(m.getExamTargetMilestoneId());
-        res.setPartRequirements(parts.stream().map(p -> {
-            PartRequirementResponse pr = new PartRequirementResponse();
-            pr.setTargetPartRequirementId(p.getTargetPartRequirementId());
-            pr.setExamPartId(p.getExamPartId());
-            pr.setRequiredPercentage(p.getRequiredPercentage());
-            return pr;
-        }).toList());
+        List<PartRequirementResponse> partResponses = parts.stream().map(p ->
+                PartRequirementResponse.builder()
+                        .targetPartRequirementId(p.getTargetPartRequirementId())
+                        .examPartId(p.getExamPartId())
+                        .requiredPercentage(p.getRequiredPercentage())
+                        .build()
+        ).toList();
 
-        return res;
+        return MilestoneResponse.builder()
+                .examTargetMilestoneId(m.getExamTargetMilestoneId())
+                .examTypeId(m.getExamTypeId())
+                .milestoneScore(m.getMilestoneScore())
+                .description(m.getDescription())
+                .createdAt(m.getCreatedAt())
+                .partRequirements(partResponses)
+                .build();
     }
 }

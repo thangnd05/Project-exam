@@ -95,14 +95,14 @@ public class AuthService {
         setAccessTokenCookie(accessToken, response);
         setRefreshTokenCookie(refreshToken, response);
 
-        return new UserResponse(
-                user.getUserId(),
-                user.getUserName(),
-                user.getFullName(),
-                user.getEmail(),
-                user.getRoleId(),
-                user.getAvatarUrl()
-        );
+        return UserResponse.builder()
+                .id(user.getUserId())
+                .userName(user.getUserName())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .roleId(user.getRoleId())
+                .avatarUrl(user.getAvatarUrl())
+                .build();
     }
 
     /**
@@ -278,7 +278,14 @@ public class AuthService {
     public UserResponse me(HttpServletRequest request) {
         Claims claims = jwtService.extractAllClaimsFromRequest(request);
         User user = userRepository.findById((String) claims.get("userId")).orElseThrow();
-        return new UserResponse(user.getUserId(), user.getUserName(), user.getFullName(), user.getEmail(), user.getRoleId(), user.getAvatarUrl());
+        return UserResponse.builder()
+                .id(user.getUserId())
+                .userName(user.getUserName())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .roleId(user.getRoleId())
+                .avatarUrl(user.getAvatarUrl())
+                .build();
     }
     
     public UserTokenInfo getCurrentUserInfo(HttpServletRequest request) {
@@ -304,7 +311,7 @@ public class AuthService {
             passwordResetTokenRepository.save(resetToken);
             emailUtil.sendResetPasswordEmail(user.getEmail(), token);
         }
-        return new AuthMessageResponse("Nếu email tồn tại, chúng tôi đã gửi liên kết đặt lại mật khẩu.");
+        return AuthMessageResponse.builder().message("Nếu email tồn tại, chúng tôi đã gửi liên kết đặt lại mật khẩu.").build();
     }
 
     public AuthMessageResponse resetPassword(ResetPasswordRequest request) {
@@ -318,7 +325,7 @@ public class AuthService {
         passwordResetTokenRepository.save(resetToken);
         // Sau reset password, mọi refresh token cũ phải vô hiệu — đề phòng attacker đã chiếm phiên.
         refreshTokenStore.revokeAllForUser(user.getUserId());
-        return new AuthMessageResponse("Đặt lại mật khẩu thành công");
+        return AuthMessageResponse.builder().message("Đặt lại mật khẩu thành công").build();
     }
 
     public AuthMessageResponse changePassword(ChangePasswordRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
@@ -330,7 +337,7 @@ public class AuthService {
         // Đổi pass = mọi session trước đó phải bị kick (ép re-login trên mọi device).
         refreshTokenStore.revokeAllForUser(user.getUserId());
         logout(httpRequest, httpResponse);
-        return new AuthMessageResponse("Đổi mật khẩu thành công");
+        return AuthMessageResponse.builder().message("Đổi mật khẩu thành công").build();
     }
 
     private void validateNewPassword(String newPassword, String confirmNewPassword) {

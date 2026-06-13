@@ -38,16 +38,16 @@ public class EvaluationService {
         User user = userRepository.findById(e.getUserId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        return new EvaluationResponse(
-                e.getId(),
-                e.getContent(),
-                e.getRating(),
-                e.getCreatedAt(),
+        return EvaluationResponse.builder()
+                .id(e.getId())
+                .content(e.getContent())
+                .rating(e.getRating())
+                .createdAt(e.getCreatedAt())
 
-                user.getUserId(),
-                user.getUserName(),
-                user.getAvatarUrl()
-        );
+                .userId(user.getUserId())
+                .username(user.getUserName())
+                .avatarUrl(user.getAvatarUrl())
+                .build();
     }
 
     // ============================

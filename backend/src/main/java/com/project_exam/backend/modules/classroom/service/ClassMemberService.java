@@ -106,10 +106,6 @@ public class ClassMemberService {
     }
 
     private ClassMemberResponse toResponse(ClassMember m) {
-        ClassMemberResponse res = new ClassMemberResponse();
-        res.setId(m.getId());
-        res.setClassId(m.getClassId());
-        res.setUserId(m.getUserId());
         String fullName = userRepository.findById(m.getUserId())
                 .map(user -> {
                     if (user.getFullName() != null && !user.getFullName().isBlank()) {
@@ -122,10 +118,14 @@ public class ClassMemberService {
                 })
                 .filter(name -> name != null && !name.isBlank())
                 .orElse("Học sinh");
-        res.setFullName(fullName);
-        res.setStatus(m.getStatus());
-        res.setJoinedAt(m.getJoinedAt());
-        return res;
+        return ClassMemberResponse.builder()
+                .id(m.getId())
+                .classId(m.getClassId())
+                .userId(m.getUserId())
+                .fullName(fullName)
+                .status(m.getStatus())
+                .joinedAt(m.getJoinedAt())
+                .build();
     }
 
     // 🟢 Rút khỏi lớp (student tự rời lớp)
@@ -169,25 +169,25 @@ public class ClassMemberService {
                     .map(User::getFullName)
                     .orElse("Unknown");
 
-            return new ClassStudentResponse(
-                    clazz.getClassId(),
-                    clazz.getClassQr(),
-                    clazz.getClassName(),
-                    teacherName
-            );
+            return ClassStudentResponse.builder()
+                    .classId(clazz.getClassId())
+                    .classQr(clazz.getClassQr())
+                    .className(clazz.getClassName())
+                    .teacherName(teacherName)
+                    .build();
         }).filter(Objects::nonNull).toList();
 
         // 🧩 2️⃣ Lớp mà tôi dạy (nếu là giáo viên)
         List<ClassEntity> teachingClasses = classRepository.findByTeacherId(currentUserId);
         List<ClassStudentResponse> teachingResponses = teachingClasses.stream()
-                .map(clazz -> new ClassStudentResponse(
-                        clazz.getClassId(),
-                        clazz.getClassQr(),
-                        clazz.getClassName(),
-                        userRepository.findById(clazz.getTeacherId())
+                .map(clazz -> ClassStudentResponse.builder()
+                        .classId(clazz.getClassId())
+                        .classQr(clazz.getClassQr())
+                        .className(clazz.getClassName())
+                        .teacherName(userRepository.findById(clazz.getTeacherId())
                                 .map(User::getFullName)
-                                .orElse("Unknown")
-                ))
+                                .orElse("Unknown"))
+                        .build())
                 .toList();
 
         //  3️⃣ Trả kết quả gộp

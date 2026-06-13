@@ -29,12 +29,12 @@ public class TestPartService {
     private final AuthUtils authUtils;
 
     private TestPartSimpleResponse toResponse(TestPart testPart) {
-        return new TestPartSimpleResponse(
-                testPart.getTestPartId(),
-                testPart.getTestId(),
-                testPart.getExamPartId(),
-                testPart.getNumQuestions()
-        );
+        return TestPartSimpleResponse.builder()
+                .testPartId(testPart.getTestPartId())
+                .testId(testPart.getTestId())
+                .examPartId(testPart.getExamPartId())
+                .numQuestions(testPart.getNumQuestions())
+                .build();
     }
 
     public List<TestPart> findAll() {

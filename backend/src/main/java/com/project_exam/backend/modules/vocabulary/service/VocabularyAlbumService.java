@@ -105,14 +105,12 @@ public class VocabularyAlbumService {
     // =========================
     private VocabularyAlbumResponse toResponse(VocabularyAlbum album) {
 
-        VocabularyAlbumResponse response = new VocabularyAlbumResponse();
-
-        response.setAlbumId(album.getAlbumId());
-        response.setName(album.getName());
-        response.setDescription(album.getDescription());
-        response.setUserId(album.getUserId());
-        response.setCreatedAt(album.getCreatedAt());
-
-        return response;
+        return VocabularyAlbumResponse.builder()
+                .albumId(album.getAlbumId())
+                .name(album.getName())
+                .description(album.getDescription())
+                .userId(album.getUserId())
+                .createdAt(album.getCreatedAt())
+                .build();
     }
 }

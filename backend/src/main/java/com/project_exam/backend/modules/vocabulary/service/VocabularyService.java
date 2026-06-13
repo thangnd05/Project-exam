@@ -170,16 +170,16 @@ public class VocabularyService {
     // =========================
     private VocabularyResponse toResponse(Vocabulary vocab) {
 
-        VocabularyResponse response = new VocabularyResponse();
-
-        response.setVocabId(vocab.getVocabId());
-        response.setWord(vocab.getWord());
-        response.setPhonetic(vocab.getPhonetic());
-        response.setMeaning(vocab.getMeaning());
-        response.setExample(vocab.getExample());
-        response.setAlbumId(vocab.getAlbumId());
-        response.setVoiceUrl(vocab.getVoiceUrl());
-        response.setCreatedAt(vocab.getCreatedAt());
+        VocabularyResponse response = VocabularyResponse.builder()
+                .vocabId(vocab.getVocabId())
+                .word(vocab.getWord())
+                .phonetic(vocab.getPhonetic())
+                .meaning(vocab.getMeaning())
+                .example(vocab.getExample())
+                .albumId(vocab.getAlbumId())
+                .voiceUrl(vocab.getVoiceUrl())
+                .createdAt(vocab.getCreatedAt())
+                .build();
 
         albumRepository.findById(vocab.getAlbumId()).ifPresent(album -> {
             response.setAlbumName(album.getName());

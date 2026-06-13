@@ -19,12 +19,12 @@ public class PassageService {
     }
 
     private PassageResponse toResponse(Passage passage) {
-        return new PassageResponse(
-                passage.getPassageId(),
-                passage.getContent(),
-                passage.getMediaUrl(),
-                passage.getPassageType()
-        );
+        return PassageResponse.builder()
+                .passageId(passage.getPassageId())
+                .content(passage.getContent())
+                .mediaUrl(passage.getMediaUrl())
+                .passageType(passage.getPassageType())
+                .build();
     }
 
     private Passage toEntity(PassageRequest request) {

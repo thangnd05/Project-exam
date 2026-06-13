@@ -4,6 +4,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class ChapterResponse {

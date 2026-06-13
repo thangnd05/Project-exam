@@ -25,10 +25,10 @@ public class UserTargetService {
     }
 
     private UserTargetResponse emptyResponse() {
-        UserTargetResponse res = new UserTargetResponse();
-        res.setHasTarget(false);
-        res.setPartRequirements(List.of());
-        return res;
+        return UserTargetResponse.builder()
+                .hasTarget(false)
+                .partRequirements(List.of())
+                .build();
     }
 
     @Transactional
@@ -98,28 +98,27 @@ public class UserTargetService {
     }
 
     private UserTargetResponse toResponse(UserTarget ut) {
-        UserTargetResponse res = new UserTargetResponse();
-        res.setHasTarget(true);
-        res.setUserTargetId(ut.getUserTargetId());
-        res.setUserId(ut.getUserId());
-        res.setExamTypeId(ut.getExamTypeId());
-        res.setTargetScore(ut.getTargetScore());
-        res.setTargetReadiness(ut.getTargetReadiness());
-        res.setAchievedAt(ut.getAchievedAt());
-
         List<UserTargetPart> savedParts = userTargetPartRepository
                 .findByUserTargetId(ut.getUserTargetId());
 
-        List<UserTargetPartResponse> partResponses = savedParts.stream().map(p -> {
-            UserTargetPartResponse pr = new UserTargetPartResponse();
-            pr.setExamPartId(p.getExamPartId());
-            pr.setRequiredPercentage(p.getCustomPercentage());
-            pr.setCurrentScore(p.getCurrentScore());
-            pr.setLastUserTestId(p.getLastUserTestId());
-            return pr;
-        }).collect(Collectors.toList());
+        List<UserTargetPartResponse> partResponses = savedParts.stream().map(p ->
+                UserTargetPartResponse.builder()
+                        .examPartId(p.getExamPartId())
+                        .requiredPercentage(p.getCustomPercentage())
+                        .currentScore(p.getCurrentScore())
+                        .lastUserTestId(p.getLastUserTestId())
+                        .build()
+        ).collect(Collectors.toList());
 
-        res.setPartRequirements(partResponses);
-        return res;
+        return UserTargetResponse.builder()
+                .hasTarget(true)
+                .userTargetId(ut.getUserTargetId())
+                .userId(ut.getUserId())
+                .examTypeId(ut.getExamTypeId())
+                .targetScore(ut.getTargetScore())
+                .targetReadiness(ut.getTargetReadiness())
+                .achievedAt(ut.getAchievedAt())
+                .partRequirements(partResponses)
+                .build();
     }
 }

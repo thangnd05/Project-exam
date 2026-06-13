@@ -87,14 +87,14 @@ public class ExamCategoryService {
     }
 
     private ExamCategoryResponse toResponse(ExamCategory c) {
-        ExamCategoryResponse res = new ExamCategoryResponse();
-        res.setExamCategoryId(c.getExamCategoryId());
-        res.setCode(c.getCode());
-        res.setName(c.getName());
-        res.setDescription(c.getDescription());
-        res.setGuestAllowed(c.getGuestAllowed());
-        res.setDisplayOrder(c.getDisplayOrder());
-        res.setCreatedAt(c.getCreatedAt());
-        return res;
+        return ExamCategoryResponse.builder()
+                .examCategoryId(c.getExamCategoryId())
+                .code(c.getCode())
+                .name(c.getName())
+                .description(c.getDescription())
+                .guestAllowed(c.getGuestAllowed())
+                .displayOrder(c.getDisplayOrder())
+                .createdAt(c.getCreatedAt())
+                .build();
     }
 }

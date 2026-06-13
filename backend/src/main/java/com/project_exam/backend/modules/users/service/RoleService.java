@@ -53,10 +53,10 @@ public class RoleService {
     }
 
     private RoleResponse toResponse(Role role) {
-        RoleResponse response = new RoleResponse();
-        response.setRoleId(role.getRoleId());
-        response.setRoleName(role.getRoleName());
-        response.setDescription(role.getDescription());
-        return response;
+        return RoleResponse.builder()
+                .roleId(role.getRoleId())
+                .roleName(role.getRoleName())
+                .description(role.getDescription())
+                .build();
     }
 }

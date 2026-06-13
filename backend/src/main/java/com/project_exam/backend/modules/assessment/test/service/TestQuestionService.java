@@ -18,12 +18,12 @@ public class TestQuestionService {
     }
 
     private TestQuestionResponse toResponse(TestQuestion testQuestion) {
-        return new TestQuestionResponse(
-                testQuestion.getTestQuestionId(),
-                testQuestion.getTestPartId(),
-                testQuestion.getQuestionId(),
-                testQuestion.getDisplayOrder()
-        );
+        return TestQuestionResponse.builder()
+                .testQuestionId(testQuestion.getTestQuestionId())
+                .testPartId(testQuestion.getTestPartId())
+                .questionId(testQuestion.getQuestionId())
+                .displayOrder(testQuestion.getDisplayOrder())
+                .build();
     }
 
     private TestQuestion toEntity(TestQuestionRequest request) {

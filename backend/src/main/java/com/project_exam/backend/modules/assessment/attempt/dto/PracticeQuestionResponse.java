@@ -4,7 +4,11 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter 
+@Setter 
+@Builder 
+@NoArgsConstructor
+@AllArgsConstructor
 public class PracticeQuestionResponse {
     private String vocabId;
     private String type; // MULTICHOICE hoặc LISTENING_EN

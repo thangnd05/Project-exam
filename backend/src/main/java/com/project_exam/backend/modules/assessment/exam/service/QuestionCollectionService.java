@@ -96,12 +96,12 @@ public class QuestionCollectionService {
     }
 
     private QuestionCollectionResponse toResponse(QuestionCollection collection) {
-        QuestionCollectionResponse response = new QuestionCollectionResponse();
-        response.setCollectionId(collection.getCollectionId());
-        response.setName(collection.getName());
-        response.setDescription(collection.getDescription());
-        response.setQuestionCount(questionRepository.countByCollectionId(collection.getCollectionId()));
-        return response;
+        return QuestionCollectionResponse.builder()
+                .collectionId(collection.getCollectionId())
+                .name(collection.getName())
+                .description(collection.getDescription())
+                .questionCount(questionRepository.countByCollectionId(collection.getCollectionId()))
+                .build();
     }
 
     private String normalize(String s) {

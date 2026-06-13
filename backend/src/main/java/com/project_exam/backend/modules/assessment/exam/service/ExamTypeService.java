@@ -57,12 +57,12 @@ public class ExamTypeService {
     }
 
     private ExamTypeResponse toResponse(ExamType t) {
-        ExamTypeResponse res = new ExamTypeResponse();
-        res.setExamTypeId(t.getExamTypeId());
-        res.setName(t.getName());
-        res.setDescription(t.getDescription());
-        res.setDurationMinutes(t.getDurationMinutes());
-        res.setScoringMethod(t.getScoringMethod());
-        return res;
+        return ExamTypeResponse.builder()
+                .examTypeId(t.getExamTypeId())
+                .name(t.getName())
+                .description(t.getDescription())
+                .durationMinutes(t.getDurationMinutes())
+                .scoringMethod(t.getScoringMethod())
+                .build();
     }
 }

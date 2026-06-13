@@ -60,13 +60,13 @@ public class UserVocabularyService {
     }
 
     private UserVocabularyResponse toResponse(UserVocabulary uv) {
-        UserVocabularyResponse res = new UserVocabularyResponse();
-        res.setId(uv.getId());
-        res.setUserId(uv.getUserId());
-        res.setVocabId(uv.getVocabId());
-        res.setStatus(uv.getStatus());
-        res.setLastReviewed(uv.getLastReviewed());
-        res.setCorrectCount(uv.getCorrectCount());
-        return res;
+        return UserVocabularyResponse.builder()
+                .id(uv.getId())
+                .userId(uv.getUserId())
+                .vocabId(uv.getVocabId())
+                .status(uv.getStatus())
+                .lastReviewed(uv.getLastReviewed())
+                .correctCount(uv.getCorrectCount())
+                .build();
     }
 }

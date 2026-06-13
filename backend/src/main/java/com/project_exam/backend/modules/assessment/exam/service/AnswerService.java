@@ -145,11 +145,11 @@ public class AnswerService {
                 .collect(Collectors.groupingBy(
                         Answer::getQuestionId,   // 👈 group bằng entity trước
                         Collectors.mapping(
-                                ans -> new AnswerResponse(
-                                        ans.getAnswerId(),
-                                        ans.getAnswerText(),
-                                        ans.getAnswerLabel()
-                                ),
+                                ans -> AnswerResponse.builder()
+                                        .answerId(ans.getAnswerId())
+                                        .answerText(ans.getAnswerText())
+                                        .answerLabel(ans.getAnswerLabel())
+                                        .build(),
                                 Collectors.collectingAndThen(
                                         Collectors.toList(),
                                         list -> list.stream()

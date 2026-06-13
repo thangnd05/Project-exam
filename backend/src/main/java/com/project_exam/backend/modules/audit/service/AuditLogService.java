@@ -73,21 +73,21 @@ public class AuditLogService {
     }
 
     private AuditLogResponse toResponse(AuditLog auditLog, User user) {
-        AuditLogResponse response = new AuditLogResponse();
-        response.setAuditLogId(auditLog.getAuditLogId());
-        response.setUserId(auditLog.getUserId());
-        response.setUserName(user != null ? user.getUserName() : null);
-        response.setFullName(user != null ? user.getFullName() : null);
-        response.setHttpMethod(auditLog.getHttpMethod());
-        response.setEndpoint(auditLog.getEndpoint());
-        response.setAction(auditLog.getAction());
-        response.setResource(auditLog.getResource());
-        response.setResourceId(auditLog.getResourceId());
-        response.setIpAddress(auditLog.getIpAddress());
-        response.setUserAgent(auditLog.getUserAgent());
-        response.setStatusCode(auditLog.getStatusCode());
-        response.setSuccess(auditLog.getSuccess());
-        response.setCreatedAt(auditLog.getCreatedAt());
-        return response;
+        return AuditLogResponse.builder()
+                .auditLogId(auditLog.getAuditLogId())
+                .userId(auditLog.getUserId())
+                .userName(user != null ? user.getUserName() : null)
+                .fullName(user != null ? user.getFullName() : null)
+                .httpMethod(auditLog.getHttpMethod())
+                .endpoint(auditLog.getEndpoint())
+                .action(auditLog.getAction())
+                .resource(auditLog.getResource())
+                .resourceId(auditLog.getResourceId())
+                .ipAddress(auditLog.getIpAddress())
+                .userAgent(auditLog.getUserAgent())
+                .statusCode(auditLog.getStatusCode())
+                .success(auditLog.getSuccess())
+                .createdAt(auditLog.getCreatedAt())
+                .build();
     }
 }

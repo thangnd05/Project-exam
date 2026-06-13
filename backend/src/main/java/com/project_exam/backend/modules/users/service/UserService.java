@@ -57,14 +57,14 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     private UserResponse toResponse(User user) {
-        return new UserResponse(
-                user.getUserId(),
-                user.getUserName(),
-                user.getFullName(),
-                user.getEmail(),
-                user.getRoleId(),
-                user.getAvatarUrl()
-        );
+        return UserResponse.builder()
+                .id(user.getUserId())
+                .userName(user.getUserName())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .roleId(user.getRoleId())
+                .avatarUrl(user.getAvatarUrl())
+                .build();
     }
 
     private User toEntity(UserUpsertRequest request) {

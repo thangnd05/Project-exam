@@ -45,13 +45,13 @@ public class ChapterService {
     //  Helper convert Entity → DTO
     // ============================
     private ChapterResponse toResponse(Chapter c) {
-        return new ChapterResponse(
-                c.getChapterId(),
-                c.getClassId(),
-                c.getTitle(),
-                c.getDescription(),
-                c.getCreatedAt()
-        );
+        return ChapterResponse.builder()
+                .chapterId(c.getChapterId())
+                .classId(c.getClassId())
+                .title(c.getTitle())
+                .description(c.getDescription())
+                .createdAt(c.getCreatedAt())
+                .build();
     }
 
     // ============================

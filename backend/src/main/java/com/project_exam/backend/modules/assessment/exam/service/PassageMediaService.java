@@ -71,11 +71,11 @@ public class PassageMediaService {
 
     // 🔹 MAPPER
     private PassageMediaResponse toResponse(PassageMedia media) {
-        return new PassageMediaResponse(
-                media.getId(),
-                media.getPassageId(),
-                media.getMediaUrl(),
-                media.getMediaType().name()
-        );
+        return PassageMediaResponse.builder()
+                .id(media.getId())
+                .passageId(media.getPassageId())
+                .mediaUrl(media.getMediaUrl())
+                .mediaType(media.getMediaType().name())
+                .build();
     }
 }

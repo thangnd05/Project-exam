@@ -53,10 +53,10 @@ public class SkillService {
     }
 
     private SkillResponse toResponse(Skill skill) {
-        SkillResponse response = new SkillResponse();
-        response.setSkillId(skill.getSkillId());
-        response.setName(skill.getName());
-        response.setDescription(skill.getDescription());
-        return response;
+        return SkillResponse.builder()
+                .skillId(skill.getSkillId())
+                .name(skill.getName())
+                .description(skill.getDescription())
+                .build();
     }
 }

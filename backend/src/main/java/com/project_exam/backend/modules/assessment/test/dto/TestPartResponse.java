@@ -5,15 +5,11 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class TestPartResponse {
     private String testPartId;
     private String examPartId;
     private List<QuestionGroupResponse> questionGroups; // Chuyển từ List<QuestionResponse> sang Group
-
-    public TestPartResponse(String testPartId, String examPartId, List<QuestionGroupResponse> questionGroups) {
-        this.testPartId = testPartId;
-        this.examPartId = examPartId;
-        this.questionGroups = questionGroups;
-    }
 }

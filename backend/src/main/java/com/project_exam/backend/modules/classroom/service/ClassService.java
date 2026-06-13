@@ -68,7 +68,11 @@ public class ClassService {
     public List<ClassSimpleResponse> getMyClasses(HttpServletRequest request) {
         String teacherId = authUtils.getUserId(request);
         return classRepository.findByTeacherId(teacherId).stream()
-                .map(c -> new ClassSimpleResponse(c.getClassId(), c.getClassQr(), c.getClassName()))
+                .map(c -> ClassSimpleResponse.builder()
+                        .classId(c.getClassId())
+                        .classQr(c.getClassQr())
+                        .className(c.getClassName())
+                        .build())
                 .toList();
     }
 
@@ -129,14 +133,14 @@ public class ClassService {
     }
 
     private ClassResponse toResponse(ClassEntity c) {
-        ClassResponse res = new ClassResponse();
-        res.setClassId(c.getClassId());
-        res.setClassQr(c.getClassQr());
-        res.setClassName(c.getClassName());
-        res.setDescription(c.getDescription());
-        res.setTeacherId(c.getTeacherId());
-        res.setCreatedAt(c.getCreatedAt());
-        return res;
+        return ClassResponse.builder()
+                .classId(c.getClassId())
+                .classQr(c.getClassQr())
+                .className(c.getClassName())
+                .description(c.getDescription())
+                .teacherId(c.getTeacherId())
+                .createdAt(c.getCreatedAt())
+                .build();
     }
 
     private String generateUniqueClassQr() {

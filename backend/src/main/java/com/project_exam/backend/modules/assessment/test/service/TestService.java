@@ -713,18 +713,33 @@ public class TestService {
                     if (!groupsMap.containsKey(groupKey)) {
                         Passage p = data.passageMap().get(q.getPassageId());
                         PassageResponse pDto = (p != null)
-                                ? new PassageResponse(p.getPassageId(), p.getContent(), p.getMediaUrl(), p.getPassageType())
+                                ? PassageResponse.builder()
+                                        .passageId(p.getPassageId())
+                                        .content(p.getContent())
+                                        .mediaUrl(p.getMediaUrl())
+                                        .passageType(p.getPassageType())
+                                        .build()
                                 : null;
-                        groupsMap.put(groupKey, new QuestionGroupResponse(pDto, new ArrayList<>()));
+                        groupsMap.put(groupKey, QuestionGroupResponse.builder()
+                                .passage(pDto)
+                                .questions(new ArrayList<>())
+                                .build());
                     }
                     groupsMap.get(groupKey).getQuestions().add(qDto);
                 } else {
-                    groupsMap.put("Q_" + q.getQuestionId(), new QuestionGroupResponse(null, new ArrayList<>(List.of(qDto))));
+                    groupsMap.put("Q_" + q.getQuestionId(), QuestionGroupResponse.builder()
+                            .passage(null)
+                            .questions(new ArrayList<>(List.of(qDto)))
+                            .build());
                 }
             }
 
             List<QuestionGroupResponse> finalGroups = new ArrayList<>(groupsMap.values());
-            return new TestPartResponse(tp.getTestPartId(), tp.getExamPartId(), finalGroups);
+            return TestPartResponse.builder()
+                    .testPartId(tp.getTestPartId())
+                    .examPartId(tp.getExamPartId())
+                    .questionGroups(finalGroups)
+                    .build();
         }).toList();
     }
 
@@ -908,7 +923,11 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                     .map(entry -> buildQuestionGroupAdmin(entry.getKey(), entry.getValue(), data))
                     .toList();
 
-            return new TestPartAdminResponse(tp.getTestPartId(), tp.getExamPartId(), groupResponses);
+            return TestPartAdminResponse.builder()
+                    .testPartId(tp.getTestPartId())
+                    .examPartId(tp.getExamPartId())
+                    .questionGroups(groupResponses)
+                    .build();
         }).toList();
     }
 
@@ -919,9 +938,12 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         if (!"NO_PASSAGE".equals(passageId)) {
             Passage p = data.passageMap().get(passageId.toString());
             if (p != null) {
-                passageResponse = new PassageResponse(
-                        p.getPassageId(), p.getContent(), p.getMediaUrl(), p.getPassageType()
-                );
+                passageResponse = PassageResponse.builder()
+                        .passageId(p.getPassageId())
+                        .content(p.getContent())
+                        .mediaUrl(p.getMediaUrl())
+                        .passageType(p.getPassageType())
+                        .build();
             }
         }
 
@@ -929,7 +951,10 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .map(q -> buildQuestionAdminResponse(q, data))
                 .toList();
 
-        return new QuestionGroupAdminResponse(passageResponse, questionResponses);
+        return QuestionGroupAdminResponse.builder()
+                .passage(passageResponse)
+                .questions(questionResponses)
+                .build();
     }
 
     private QuestionAdminResponse buildQuestionAdminResponse(Question q, TestAdminDataBundle data) {
@@ -1339,7 +1364,9 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             tq.setDisplayOrder(nextDisplayOrder++);
             testQuestionRepository.save(tq);
         }
-        return new AddRandomQuestionsResponse(toAdd.size());
+        return AddRandomQuestionsResponse.builder()
+                .addedCount(toAdd.size())
+                .build();
     }
 
 }

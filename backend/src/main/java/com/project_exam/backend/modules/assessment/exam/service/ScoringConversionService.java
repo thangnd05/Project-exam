@@ -99,13 +99,13 @@ public class ScoringConversionService {
     }
 
     private ScoringConversionResponse toResponse(ScoringConversion c) {
-        ScoringConversionResponse res = new ScoringConversionResponse();
-        res.setConversionId(c.getConversionId());
-        res.setExamTypeId(c.getExamTypeId());
-        res.setSkillId(c.getSkillId());
-        res.setNumCorrect(c.getNumCorrect());
-        res.setConvertedScore(c.getConvertedScore());
-        return res;
+        return ScoringConversionResponse.builder()
+                .conversionId(c.getConversionId())
+                .examTypeId(c.getExamTypeId())
+                .skillId(c.getSkillId())
+                .numCorrect(c.getNumCorrect())
+                .convertedScore(c.getConvertedScore())
+                .build();
     }
 
     private void validateRequest(ScoringConversionRequest request) {

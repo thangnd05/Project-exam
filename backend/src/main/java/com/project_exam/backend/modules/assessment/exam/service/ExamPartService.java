@@ -82,15 +82,15 @@ public class ExamPartService {
     }
 
     private ExamPartResponse toResponse(ExamPart p) {
-        ExamPartResponse res = new ExamPartResponse();
-        res.setExamPartId(p.getExamPartId());
-        res.setExamTypeId(p.getExamTypeId());
-        res.setName(p.getName());
-        res.setDescription(p.getDescription());
-        res.setDefaultNumQuestions(p.getDefaultNumQuestions());
-        res.setSkillId(p.getSkillId());
-        res.setDisplayOrder(p.getDisplayOrder());
-        return res;
+        return ExamPartResponse.builder()
+                .examPartId(p.getExamPartId())
+                .examTypeId(p.getExamTypeId())
+                .name(p.getName())
+                .description(p.getDescription())
+                .defaultNumQuestions(p.getDefaultNumQuestions())
+                .skillId(p.getSkillId())
+                .displayOrder(p.getDisplayOrder())
+                .build();
     }
 
     private String normalizeSkillId(String skillId) {
