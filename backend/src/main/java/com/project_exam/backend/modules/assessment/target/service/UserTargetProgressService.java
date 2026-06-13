@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
 import com.project_exam.backend.modules.assessment.target.domain.UserTargetPart;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetPartRepository;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * Cập nhật điểm Part từ mock — tách khỏi aim ({@code customPercentage}) và khỏi plan ải.
  */
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserTargetProgressService {
 
     private final UserTargetRepository userTargetRepository;

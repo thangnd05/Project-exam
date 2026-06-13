@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.assessment.exam.service.ExamCategoryServ
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/exam-categories")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExamCategoryController {
 
     private final ExamCategoryService examCategoryService;

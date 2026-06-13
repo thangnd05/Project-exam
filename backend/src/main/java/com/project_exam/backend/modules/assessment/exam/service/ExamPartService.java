@@ -9,7 +9,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.mapper.ExamPartMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExamPartService {
 
     private final ExamPartRepository examPartRepository;

@@ -29,7 +29,7 @@ import com.project_exam.backend.modules.vocabulary.repository.*;
 import com.project_exam.backend.modules.classroom.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 
 import org.springframework.http.HttpStatus;
@@ -42,7 +42,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserTestService {
 
     private final UserTestRepository userTestRepository;

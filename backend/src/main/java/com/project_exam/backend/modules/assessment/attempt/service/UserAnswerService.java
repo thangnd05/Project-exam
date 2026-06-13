@@ -24,7 +24,7 @@ import com.project_exam.backend.modules.assessment.attempt.repository.*;
 import com.project_exam.backend.modules.vocabulary.repository.*;
 import com.project_exam.backend.modules.classroom.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserAnswerService {
     private final UserAnswerRepository userAnswerRepository;
     private final QuestionRepository questionRepository;

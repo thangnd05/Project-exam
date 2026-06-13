@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationRespons
 import com.project_exam.backend.modules.assessment.attempt.service.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/evaluations")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EvaluationController {
 
     private final EvaluationService evaluationService;

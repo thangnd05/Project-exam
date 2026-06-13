@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.classroom.dto.ChapterRequest;
 import com.project_exam.backend.modules.classroom.dto.ChapterResponse;
 import com.project_exam.backend.modules.classroom.service.ChapterService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/chapters")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChapterController {
 
     private final ChapterService chapterService;

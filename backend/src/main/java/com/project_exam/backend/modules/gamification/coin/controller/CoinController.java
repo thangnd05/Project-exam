@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.gamification.coin.dto.CoinResponse;
 import com.project_exam.backend.modules.gamification.coin.service.CoinService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/coins")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CoinController {
 
     private final CoinService coinService;

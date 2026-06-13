@@ -28,7 +28,7 @@ import com.project_exam.backend.modules.classroom.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,18 +47,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
-    private UserRepository userRepository;
-    private CloudinaryService cloudinaryService;
-    private UserTestRepository userTestRepository;
-    private UserVocabularyRepository userVocabularyRepository;
-    private ClassMemberRepository classMemberRepository;
-    private AuthUtils authUtils;
-    private RoleRepository roleRepository;
-    private PasswordEncoder passwordEncoder;
-    private UserMapper userMapper;
-    private UserProfileMapper userProfileMapper;
+    private final UserRepository userRepository;
+    private final CloudinaryService cloudinaryService;
+    private final UserTestRepository userTestRepository;
+    private final UserVocabularyRepository userVocabularyRepository;
+    private final ClassMemberRepository classMemberRepository;
+    private final AuthUtils authUtils;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final UserProfileMapper userProfileMapper;
 
     private UserResponse toResponse(User user) {
         return userMapper.toResponse(user);

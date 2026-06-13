@@ -7,13 +7,13 @@ import com.project_exam.backend.modules.users.dto.RoleResponse;
 import com.project_exam.backend.modules.users.domain.Role;
 import com.project_exam.backend.modules.users.mapper.RoleMapper;
 import com.project_exam.backend.modules.users.repository.RoleRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RoleService {
 
     private final RoleRepository roleRepository;

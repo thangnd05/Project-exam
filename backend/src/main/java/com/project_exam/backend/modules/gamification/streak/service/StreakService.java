@@ -8,7 +8,7 @@ import com.project_exam.backend.modules.gamification.streak.dto.StreakResponse;
 import com.project_exam.backend.modules.gamification.streak.mapper.StreakMapper;
 import com.project_exam.backend.modules.gamification.streak.repository.UserStreakRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StreakService {
 
     private static final ZoneId VN = ZoneId.of("Asia/Ho_Chi_Minh");

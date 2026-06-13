@@ -7,14 +7,14 @@ import com.project_exam.backend.modules.assessment.exam.mapper.ExamCategoryMappe
 import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExamCategoryService {
 
     private final ExamCategoryRepository examCategoryRepository;

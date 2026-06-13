@@ -74,7 +74,7 @@ import com.project_exam.backend.modules.classroom.repository.ClassRepository;
 // --- Jakarta & Spring ---
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -89,7 +89,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TestService {
     private final TestRepository testRepository;
     private final QuestionRepository questionRepository;

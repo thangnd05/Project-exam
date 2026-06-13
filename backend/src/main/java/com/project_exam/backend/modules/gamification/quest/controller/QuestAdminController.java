@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.gamification.quest.service.QuestService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.List;
 /** Quản lý nhiệm vụ cho admin. */
 @RestController
 @RequestMapping("/api/admin/quests")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class QuestAdminController {
 
     private final QuestService questService;

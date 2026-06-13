@@ -7,13 +7,13 @@ import com.project_exam.backend.modules.assessment.exam.dto.SkillResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Skill;
 import com.project_exam.backend.modules.assessment.exam.mapper.SkillMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.SkillRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SkillService {
 
     private final SkillRepository skillRepository;

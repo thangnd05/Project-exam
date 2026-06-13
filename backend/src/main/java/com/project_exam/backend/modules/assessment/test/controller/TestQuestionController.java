@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.assessment.test.dto.TestQuestionRequest;
 import com.project_exam.backend.modules.assessment.test.dto.TestQuestionResponse;
 import com.project_exam.backend.modules.assessment.test.service.TestQuestionService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/test-questions")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TestQuestionController {
 
     private final TestQuestionService testQuestionService;

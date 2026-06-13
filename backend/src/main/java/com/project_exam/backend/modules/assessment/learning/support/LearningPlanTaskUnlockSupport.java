@@ -4,13 +4,13 @@ import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanT
 import com.project_exam.backend.modules.assessment.learning.domain.PlanTaskType;
 import com.project_exam.backend.modules.assessment.learning.domain.TaskStatus;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanTaskRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LearningPlanTaskUnlockSupport {
 
     private final LearningPlanTaskRepository taskRepository;

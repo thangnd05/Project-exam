@@ -10,7 +10,7 @@ import com.project_exam.backend.modules.users.repository.UserRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CoinService {
 
     private final UserCoinRepository userCoinRepository;

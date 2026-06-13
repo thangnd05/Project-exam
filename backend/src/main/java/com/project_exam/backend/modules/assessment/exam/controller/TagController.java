@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
 import com.project_exam.backend.modules.assessment.exam.service.TagService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tags")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TagController {
 
     private final TagService tagService;

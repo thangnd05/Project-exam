@@ -5,14 +5,14 @@ import com.project_exam.backend.modules.assessment.attempt.dto.PracticeCheckResp
 import com.project_exam.backend.modules.assessment.attempt.dto.PracticeQuestionResponse;
 import com.project_exam.backend.modules.vocabulary.service.PracticeService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/practice-questions")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PracticeController {
 
     private final PracticeService practiceService;

@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.ResourceTag;
 import com.project_exam.backend.modules.assessment.exam.repository.RecoveryResourceRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanPhaseDto;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 /** Tài liệu ôn (RecoveryResource) gắn tag — dùng trước khi luyện ải. */
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LearningPlanResourceLookup {
 
     private final ResourceTagRepository resourceTagRepository;

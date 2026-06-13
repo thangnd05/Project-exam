@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.gamification.quest.dto.UserQuestResponse
 import com.project_exam.backend.modules.gamification.quest.service.QuestService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/quests")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class QuestController {
 
     private final QuestService questService;

@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.vocabulary.dto.UserVocabularyResponse;
 import com.project_exam.backend.modules.vocabulary.service.UserVocabularyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user-vocabulary")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserVocabularyController {
 
     private final UserVocabularyService service;

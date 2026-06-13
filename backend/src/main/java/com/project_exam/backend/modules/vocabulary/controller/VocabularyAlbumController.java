@@ -4,14 +4,14 @@ import com.project_exam.backend.modules.vocabulary.dto.VocabularyAlbumRequest;
 import com.project_exam.backend.modules.vocabulary.dto.VocabularyAlbumResponse;
 import com.project_exam.backend.modules.vocabulary.service.VocabularyAlbumService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/vocabulary-albums")
 public class VocabularyAlbumController {
 

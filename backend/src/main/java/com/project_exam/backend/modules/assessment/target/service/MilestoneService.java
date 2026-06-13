@@ -7,7 +7,7 @@ import com.project_exam.backend.modules.assessment.target.mapper.MilestoneMapper
 import com.project_exam.backend.modules.assessment.target.repository.ExamTargetMilestoneRepository;
 import com.project_exam.backend.modules.assessment.target.repository.TargetPartRequirementRepository;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MilestoneService {
 
     private final ExamTargetMilestoneRepository milestoneRepository;

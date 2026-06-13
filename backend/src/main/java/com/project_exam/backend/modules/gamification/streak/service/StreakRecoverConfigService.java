@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverCon
 import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverConfigResponse;
 import com.project_exam.backend.modules.gamification.streak.mapper.StreakMapper;
 import com.project_exam.backend.modules.gamification.streak.repository.StreakRecoverConfigRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * nếu chưa có thì coi như mặc định (50 xu, đang bật).
  */
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StreakRecoverConfigService {
 
     private static final int DEFAULT_COST = 50;

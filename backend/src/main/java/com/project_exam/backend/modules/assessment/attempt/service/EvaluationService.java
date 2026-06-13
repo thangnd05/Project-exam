@@ -13,7 +13,7 @@ import com.project_exam.backend.modules.assessment.attempt.repository.Evaluation
 import com.project_exam.backend.modules.users.repository.UserRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EvaluationService {
 
     private final EvaluationRepository evaluationRepository;

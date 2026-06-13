@@ -14,7 +14,7 @@ import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/questions")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class QuestionController {
     private final QuestionService questionService;
     private final ObjectMapper objectMapper;

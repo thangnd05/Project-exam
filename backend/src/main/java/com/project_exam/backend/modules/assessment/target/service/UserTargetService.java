@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.assessment.target.dto.*;
 import com.project_exam.backend.modules.assessment.target.mapper.UserTargetMapper;
 import com.project_exam.backend.modules.assessment.target.repository.*;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserTargetService {
 
     private final UserTargetRepository userTargetRepository;

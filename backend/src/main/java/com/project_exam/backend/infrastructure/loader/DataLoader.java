@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.users.domain.Role;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.users.repository.RoleRepository;
 import com.project_exam.backend.modules.users.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
     private final RoleRepository roleRepository;

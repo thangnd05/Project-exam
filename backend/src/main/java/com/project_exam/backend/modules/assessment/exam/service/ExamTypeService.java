@@ -7,13 +7,13 @@ import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamType;
 import com.project_exam.backend.modules.assessment.exam.mapper.ExamTypeMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExamTypeService {
 
     private final ExamTypeRepository examTypeRepository;

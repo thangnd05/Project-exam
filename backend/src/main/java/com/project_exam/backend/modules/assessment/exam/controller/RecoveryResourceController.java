@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResp
 import com.project_exam.backend.modules.assessment.exam.service.RecoveryResourceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,7 +22,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/recovery-resources")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RecoveryResourceController {
 
     private final RecoveryResourceService resourceService;

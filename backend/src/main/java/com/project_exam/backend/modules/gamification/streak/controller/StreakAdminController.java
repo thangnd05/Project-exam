@@ -6,14 +6,14 @@ import com.project_exam.backend.modules.gamification.streak.service.StreakRecove
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /** Quản lý cấu hình khôi phục chuỗi (giá xu + bật/tắt) cho admin. */
 @RestController
 @RequestMapping("/api/admin/streak/recover-config")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StreakAdminController {
 
     private final StreakRecoverConfigService recoverConfigService;

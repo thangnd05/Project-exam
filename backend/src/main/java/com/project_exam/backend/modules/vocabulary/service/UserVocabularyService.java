@@ -9,13 +9,13 @@ import com.project_exam.backend.modules.vocabulary.mapper.UserVocabularyMapper;
 import com.project_exam.backend.modules.vocabulary.repository.UserVocabularyRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserVocabularyService {
 
     private final UserVocabularyRepository repository;

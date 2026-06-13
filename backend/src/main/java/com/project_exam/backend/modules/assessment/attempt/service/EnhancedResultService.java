@@ -18,7 +18,7 @@ import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
 import com.project_exam.backend.modules.assessment.target.domain.UserTargetPart;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EnhancedResultService {
 
     private final UserTestRepository userTestRepository;

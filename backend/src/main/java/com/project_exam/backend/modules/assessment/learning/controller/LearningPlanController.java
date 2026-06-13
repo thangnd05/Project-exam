@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.assessment.learning.service.LearningPlan
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/learning-plans")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LearningPlanController {
 
     private final LearningPlanService learningPlanService;

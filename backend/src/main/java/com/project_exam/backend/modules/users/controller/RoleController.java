@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.users.dto.RoleRequest;
 import com.project_exam.backend.modules.users.dto.RoleResponse;
 import com.project_exam.backend.modules.users.service.RoleService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RoleController {
 
     private final RoleService roleService;

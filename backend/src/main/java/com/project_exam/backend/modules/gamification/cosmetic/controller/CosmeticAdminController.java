@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.gamification.cosmetic.service.CosmeticSe
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.List;
 /** Quản lý cosmetic (khung avatar / huy hiệu) cho admin. */
 @RestController
 @RequestMapping("/api/admin/cosmetics")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CosmeticAdminController {
 
     private final CosmeticService cosmeticService;

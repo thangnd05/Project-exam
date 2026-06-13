@@ -8,7 +8,7 @@ import com.project_exam.backend.modules.gamification.quest.domain.Quest;
 import com.project_exam.backend.modules.gamification.quest.domain.QuestConditionType;
 import com.project_exam.backend.modules.gamification.streak.domain.UserStreak;
 import com.project_exam.backend.modules.gamification.streak.repository.UserStreakRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  * Thêm loại điều kiện mới: thêm 1 nhánh trong switch.
  */
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class QuestConditionEvaluator {
 
     private final UserTestRepository userTestRepository;
@@ -26,7 +26,7 @@ public class QuestConditionEvaluator {
 
     /** Kết quả: đã đạt bao nhiêu / cần bao nhiêu, đủ điều kiện chưa. */
     @Getter
-    @AllArgsConstructor
+    @RequiredArgsConstructor
     public static class Progress {
         private final int current;
         private final int target;

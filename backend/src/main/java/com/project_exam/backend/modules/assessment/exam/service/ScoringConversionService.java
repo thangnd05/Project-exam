@@ -7,7 +7,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionRes
 import com.project_exam.backend.modules.assessment.exam.domain.ScoringConversion;
 import com.project_exam.backend.modules.assessment.exam.mapper.ScoringConversionMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ScoringConversionRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ScoringConversionService {
 
     private final ScoringConversionRepository scoringConversionRepository;

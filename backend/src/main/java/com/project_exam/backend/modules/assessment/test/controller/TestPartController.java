@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.assessment.test.dto.TestPartSimpleRespon
 import com.project_exam.backend.modules.assessment.test.service.TestPartService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/test-parts")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TestPartController {
 
     private final TestPartService testPartService;

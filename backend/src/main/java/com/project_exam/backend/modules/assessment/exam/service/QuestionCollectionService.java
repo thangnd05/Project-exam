@@ -9,7 +9,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.QuestionCollectio
 import com.project_exam.backend.modules.assessment.exam.mapper.QuestionCollectionMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionCollectionRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class QuestionCollectionService {
 
     private final QuestionCollectionRepository collectionRepository;

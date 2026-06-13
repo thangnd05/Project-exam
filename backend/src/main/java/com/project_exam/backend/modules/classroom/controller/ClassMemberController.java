@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.classroom.dto.ClassMemberResponse;
 import com.project_exam.backend.modules.classroom.service.ClassMemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/class-members")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ClassMemberController {
 
     private final ClassMemberService classMemberService;
