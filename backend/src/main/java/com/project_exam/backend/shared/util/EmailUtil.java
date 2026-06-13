@@ -4,7 +4,7 @@ import com.project_exam.backend.shared.exception.BadRequestException;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 import java.io.UnsupportedEncodingException;
 
 @Component
+@RequiredArgsConstructor
 public class EmailUtil {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     public void sendVerificationEmail(String email, String token) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
