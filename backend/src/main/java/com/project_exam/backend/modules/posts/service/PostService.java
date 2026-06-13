@@ -10,6 +10,7 @@ import com.project_exam.backend.modules.posts.dto.CategoryResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.posts.dto.PostResponse;
 import com.project_exam.backend.modules.posts.dto.PostSummaryResponse;
+import com.project_exam.backend.modules.posts.mapper.CategoryMapper;
 import com.project_exam.backend.modules.posts.repository.CategoryRepository;
 import com.project_exam.backend.modules.posts.repository.CommentRepository;
 import com.project_exam.backend.modules.posts.repository.PostCategoryRepository;
@@ -50,17 +51,14 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostViewThrottleService postViewThrottleService;
     private final com.project_exam.backend.modules.gamification.cosmetic.service.CosmeticService cosmeticService;
+    private final CategoryMapper categoryMapper;
 
     // ─────────────────────────────────────────────
     // MAPPING
     // ─────────────────────────────────────────────
 
     private CategoryResponse toCategoryResponse(Category c) {
-        return CategoryResponse.builder()
-                .id(c.getId())
-                .name(c.getName())
-                .slug(c.getSlug())
-                .build();
+        return categoryMapper.toResponse(c);
     }
 
     private List<CategoryResponse> getCategoryResponses(String postId) {

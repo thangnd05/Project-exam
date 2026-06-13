@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.posts.dto.CategoryRequest;
 import com.project_exam.backend.modules.posts.dto.CategoryResponse;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.posts.domain.Category;
+import com.project_exam.backend.modules.posts.mapper.CategoryMapper;
 import com.project_exam.backend.modules.posts.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,13 +20,10 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     private CategoryResponse toResponse(Category c) {
-        return CategoryResponse.builder()
-                .id(c.getId())
-                .name(c.getName())
-                .slug(c.getSlug())
-                .build();
+        return categoryMapper.toResponse(c);
     }
 
     public List<CategoryResponse> findAll() {

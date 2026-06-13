@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.Tag;
 import com.project_exam.backend.modules.assessment.exam.domain.QuestionTag;
 import com.project_exam.backend.modules.assessment.exam.dto.TagRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
+import com.project_exam.backend.modules.assessment.exam.mapper.TagMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionTagRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
@@ -25,6 +26,7 @@ public class TagService {
     private final QuestionTagRepository questionTagRepository;
     private final ResourceTagRepository resourceTagRepository;
     private final ExamTypeRepository examTypeRepository;
+    private final TagMapper tagMapper;
 
     // ==================== CRUD ====================
 
@@ -175,13 +177,7 @@ public class TagService {
     }
 
     private TagResponse toResponse(Tag tag, List<TagResponse> children) {
-        return TagResponse.builder()
-                .tagId(tag.getTagId())
-                .name(tag.getName())
-                .examTypeId(tag.getExamTypeId())
-                .parentId(tag.getParentId())
-                .children(children)
-                .build();
+        return tagMapper.toResponse(tag, children);
     }
 
 }

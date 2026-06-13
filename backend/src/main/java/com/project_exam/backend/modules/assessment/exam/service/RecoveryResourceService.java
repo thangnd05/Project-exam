@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.ResourceTag;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
+import com.project_exam.backend.modules.assessment.exam.mapper.TagMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.RecoveryResourceRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
@@ -31,6 +32,7 @@ public class RecoveryResourceService {
     private final ResourceTagRepository resourceTagRepository;
     private final TagRepository tagRepository;
     private final TagService tagService;
+    private final TagMapper tagMapper;
     private final CloudinaryService cloudinaryService;
     private final AuthUtils authUtils;
 
@@ -196,13 +198,7 @@ public class RecoveryResourceService {
                 .stream()
                 .map(rt -> tagRepository.findById(rt.getTagId()).orElse(null))
                 .filter(Objects::nonNull)
-                .map(t -> TagResponse.builder()
-                        .tagId(t.getTagId())
-                        .name(t.getName())
-                        .examTypeId(t.getExamTypeId())
-                        .parentId(t.getParentId())
-                        .children(null)
-                        .build())
+                .map(t -> tagMapper.toResponse(t, null))
                 .collect(Collectors.toList());
 
         return RecoveryResourceResponse.builder()

@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.AnswerRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Answer;
+import com.project_exam.backend.modules.assessment.exam.mapper.AnswerMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.AnswerRepository;
 import jakarta.transaction.Transactional;
 
@@ -15,14 +16,10 @@ import java.util.stream.Collectors;
 @Service
 public class AnswerService {
     private final AnswerRepository answerRepository;
+    private final AnswerMapper answerMapper;
 
     private AnswerAdminResponse toAdminResponse(Answer answer) {
-        return AnswerAdminResponse.builder()
-                .answerId(answer.getAnswerId())
-                .answerText(answer.getAnswerText())
-                .answerLabel(answer.getAnswerLabel())
-                .isCorrect(answer.getIsCorrect())
-                .build();
+        return answerMapper.toAdminResponse(answer);
     }
 
     private Answer toEntity(AnswerRequest request, String questionId) {
@@ -84,8 +81,9 @@ public class AnswerService {
         return results;
     }
 
-    public AnswerService(AnswerRepository answerRepository) {
+    public AnswerService(AnswerRepository answerRepository, AnswerMapper answerMapper) {
         this.answerRepository = answerRepository;
+        this.answerMapper = answerMapper;
     }
     public List<Answer> findAll() {
         return answerRepository.findAll();
@@ -145,11 +143,7 @@ public class AnswerService {
                 .collect(Collectors.groupingBy(
                         Answer::getQuestionId,   // 👈 group bằng entity trước
                         Collectors.mapping(
-                                ans -> AnswerResponse.builder()
-                                        .answerId(ans.getAnswerId())
-                                        .answerText(ans.getAnswerText())
-                                        .answerLabel(ans.getAnswerLabel())
-                                        .build(),
+                                answerMapper::toResponse,
                                 Collectors.collectingAndThen(
                                         Collectors.toList(),
                                         list -> list.stream()
@@ -184,12 +178,7 @@ public class AnswerService {
                 .collect(Collectors.groupingBy(
                         Answer::getQuestionId,
                         Collectors.mapping(
-                                a -> AnswerAdminResponse.builder()
-                                        .answerId(a.getAnswerId())
-                                        .answerText(a.getAnswerText())
-                                        .answerLabel(a.getAnswerLabel())
-                                        .isCorrect(a.getIsCorrect())
-                                        .build(),
+                                answerMapper::toAdminResponse,
                                 Collectors.collectingAndThen(
                                         Collectors.toList(),
                                         list -> list.stream()

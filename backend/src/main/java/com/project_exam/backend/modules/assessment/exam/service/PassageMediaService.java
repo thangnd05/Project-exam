@@ -5,6 +5,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.PassageMedia;
+import com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.PassageMediaRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,11 @@ import java.util.stream.Collectors;
 public class PassageMediaService {
 
     private final PassageMediaRepository repository;
+    private final PassageMediaMapper passageMediaMapper;
 
-    public PassageMediaService(PassageMediaRepository repository) {
+    public PassageMediaService(PassageMediaRepository repository, PassageMediaMapper passageMediaMapper) {
         this.repository = repository;
+        this.passageMediaMapper = passageMediaMapper;
     }
 
     // 🔹 CREATE
@@ -71,11 +74,6 @@ public class PassageMediaService {
 
     // 🔹 MAPPER
     private PassageMediaResponse toResponse(PassageMedia media) {
-        return PassageMediaResponse.builder()
-                .id(media.getId())
-                .passageId(media.getPassageId())
-                .mediaUrl(media.getMediaUrl())
-                .mediaType(media.getMediaType().name())
-                .build();
+        return passageMediaMapper.toResponse(media);
     }
 }

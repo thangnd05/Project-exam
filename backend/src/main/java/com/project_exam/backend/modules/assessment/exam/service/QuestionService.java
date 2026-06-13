@@ -20,6 +20,8 @@ import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminRespons
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
+import com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper;
+import com.project_exam.backend.modules.assessment.exam.mapper.AnswerMapper;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
 import com.project_exam.backend.modules.assessment.exam.domain.*;
@@ -73,6 +75,8 @@ public class QuestionService {
     private final TagService tagService;
     private final QuestionTagRepository questionTagRepository;
     private final PassageMapper passageMapper;
+    private final PassageMediaMapper passageMediaMapper;
+    private final AnswerMapper answerMapper;
 
     /**
      * Khi câu hỏi được gắn vào một class/chapter, user phải là thành viên hoặc giáo viên của lớp đó
@@ -175,12 +179,7 @@ public class QuestionService {
 
         // Dùng Stream API để nhóm (groupingBy) media theo passageId ngay trên RAM
         return allMedia.stream()
-                .map(m -> PassageMediaResponse.builder()
-                        .id(m.getId())
-                        .passageId(m.getPassageId())
-                        .mediaUrl(m.getMediaUrl())
-                        .mediaType(m.getMediaType().name())
-                        .build())
+                .map(passageMediaMapper::toResponse)
                 .collect(Collectors.groupingBy(PassageMediaResponse::getPassageId));
     }
 
@@ -963,12 +962,7 @@ public class QuestionService {
             return List.of();
         }
         return passageMediaRepository.findByPassageId(passageId).stream()
-                .map(m -> PassageMediaResponse.builder()
-                        .id(m.getId())
-                        .passageId(m.getPassageId())
-                        .mediaUrl(m.getMediaUrl())
-                        .mediaType(m.getMediaType().name())
-                        .build())
+                .map(passageMediaMapper::toResponse)
                 .toList();
     }
 
@@ -1016,13 +1010,7 @@ public class QuestionService {
                 ? toPassageMediaResponses(passage.getPassageId())
                 : List.of();
         List<AnswerAdminResponse> answerDtos = answerEntities.stream()
-                .map(a -> AnswerAdminResponse.builder()
-                        .answerId(a.getAnswerId())
-                        .answerText(a.getAnswerText())
-                        .answerLabel(a.getAnswerLabel())
-                        .isCorrect(a.getIsCorrect())
-                        .build()
-                )
+                .map(answerMapper::toAdminResponse)
                 .toList();
         return QuestionAdminResponse.builder()
                 .questionId(question.getQuestionId())
@@ -1063,13 +1051,7 @@ public class QuestionService {
 
         List<AnswerAdminResponse> answers = answerRepository.findByQuestionId(questionId)
                 .stream()
-                .map(a -> AnswerAdminResponse.builder()
-                        .answerId(a.getAnswerId())
-                        .answerText(a.getAnswerText())
-                        .answerLabel(a.getAnswerLabel())
-                        .isCorrect(a.getIsCorrect())
-                        .build()
-                )
+                .map(answerMapper::toAdminResponse)
                 .toList();
 
         return QuestionAdminResponse.builder()
