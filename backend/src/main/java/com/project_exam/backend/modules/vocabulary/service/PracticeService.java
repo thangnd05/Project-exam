@@ -25,10 +25,9 @@ import com.project_exam.backend.modules.gamification.streak.domain.StreakActivit
 import com.project_exam.backend.modules.gamification.streak.service.StreakService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,17 +37,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PracticeService {
 
-    @Autowired
-    private VocabularyRepository vocabularyRepository;
-
-    @Autowired
-    private UserVocabularyRepository userVocabularyRepository;
-
+    private final VocabularyRepository vocabularyRepository;
+    private final UserVocabularyRepository userVocabularyRepository;
     private final AuthUtils authUtils;
-
     private final StreakService streakService;
 
     public Optional<PracticeQuestionResponse> generateOneRandomQuestion(HttpServletRequest request, String albumId) {

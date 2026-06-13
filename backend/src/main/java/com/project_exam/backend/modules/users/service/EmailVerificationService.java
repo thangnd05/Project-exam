@@ -8,7 +8,7 @@ import com.project_exam.backend.modules.auth.repository.EmailVerificationReposit
 import com.project_exam.backend.modules.users.repository.UserRepository;
 import com.project_exam.backend.shared.util.EmailUtil;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,17 +19,12 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class EmailVerificationService {
 
-    @Autowired
-    private EmailVerificationRepository emailVerificationRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-//    private EmailUtil emailUtil;
-    private EmailUtil emailUtil;
+    private final EmailVerificationRepository emailVerificationRepository;
+    private final UserRepository userRepository;
+    private final EmailUtil emailUtil;
 
     /**
      * Gửi link xác thực email khi người dùng đăng ký mới
