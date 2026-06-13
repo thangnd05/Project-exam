@@ -8,6 +8,7 @@ import com.project_exam.backend.modules.vocabulary.dto.VocabularyResponse;
 import com.project_exam.backend.modules.vocabulary.domain.DictionaryResult;
 import com.project_exam.backend.modules.vocabulary.domain.Vocabulary;
 import com.project_exam.backend.modules.vocabulary.domain.VocabularyAlbum;
+import com.project_exam.backend.modules.vocabulary.mapper.VocabularyMapper;
 import com.project_exam.backend.modules.vocabulary.repository.VocabularyAlbumRepository;
 import com.project_exam.backend.modules.vocabulary.repository.VocabularyRepository;
 import com.project_exam.backend.modules.vocabulary.service.DictionaryApiService;
@@ -29,6 +30,7 @@ public class VocabularyService {
     private final DictionaryApiService dictionaryApiService;
     private final TextToSpeechService textToSpeechService;
     private final AuthUtils authUtils;
+    private final VocabularyMapper vocabularyMapper;
 
     // =========================
     // GET ALL
@@ -170,16 +172,7 @@ public class VocabularyService {
     // =========================
     private VocabularyResponse toResponse(Vocabulary vocab) {
 
-        VocabularyResponse response = VocabularyResponse.builder()
-                .vocabId(vocab.getVocabId())
-                .word(vocab.getWord())
-                .phonetic(vocab.getPhonetic())
-                .meaning(vocab.getMeaning())
-                .example(vocab.getExample())
-                .albumId(vocab.getAlbumId())
-                .voiceUrl(vocab.getVoiceUrl())
-                .createdAt(vocab.getCreatedAt())
-                .build();
+        VocabularyResponse response = vocabularyMapper.toResponse(vocab);
 
         albumRepository.findById(vocab.getAlbumId()).ifPresent(album -> {
             response.setAlbumName(album.getName());

@@ -17,6 +17,7 @@ import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupDto
 import com.project_exam.backend.modules.assessment.learning.dto.PlanPhaseDto;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskDto;
+import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
 import com.project_exam.backend.modules.assessment.learning.support.ReadinessThresholds;
@@ -77,6 +78,7 @@ public class LearningPlanService {
     private final LearningPlanSessionQuestionRepository sessionQuestionRepository;
     private final LearningPlanSessionAnswerRepository sessionAnswerRepository;
     private final LearningPlanPhaseRepository phaseRepository;
+    private final LearningMapper learningMapper;
 
     @Transactional
     public PlanResponse generatePlan(String userId, GeneratePlanRequest request) {
@@ -514,32 +516,17 @@ public class LearningPlanService {
         Map<String, Tag> tagMap = loadTagMap(tasks);
         Map<String, ExamPart> partMap = loadPartMap(tasks);
 
-        return PlanResponse.builder()
-                .learningPlanId(plan.getLearningPlanId())
-                .userId(plan.getUserId())
-                .examTypeId(plan.getExamTypeId())
-                .sourceUserTestId(plan.getSourceUserTestId())
-                .userTargetId(plan.getUserTargetId())
-                .targetScore(plan.getTargetScore())
-                .deadlineDays(plan.getDeadlineDays())
-                .baselineReadiness(plan.getBaselineReadiness())
-                .readinessLevel(ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()))
-                .diagnosticUserTestId(plan.getSourceUserTestId())
-                .planSequence(plan.getPlanSequence())
-                .planStage(plan.getPlanStage().name())
-                .passAccuracyDefault(plan.getPassAccuracyDefault())
-                .status(plan.getStatus().name())
-                .targetAchieved(false)
-                .createdAt(plan.getCreatedAt())
-                .summary(buildSummary(result, plan.getTargetScore(), estimatedDays, taskCount, partsWithoutTasks))
-                .totalTasks(tasks.size())
-                .passedTasks((int) passed)
-                .estimatedDaysRemaining(estimatedDays)
-                .tasks(mapTaskDtos(tasks, resourcesByTag, tagMap, partMap))
-                .partGroups(buildPartGroups(tasks, resourcesByTag, tagMap, partMap))
-                .partsWithoutTasks(partsWithoutTasks)
-                .phases(List.of())
-                .build();
+        return learningMapper.toGeneratedPlanResponse(
+                plan,
+                ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()),
+                plan.getPlanStage().name(),
+                buildSummary(result, plan.getTargetScore(), estimatedDays, taskCount, partsWithoutTasks),
+                tasks.size(),
+                (int) passed,
+                estimatedDays,
+                mapTaskDtos(tasks, resourcesByTag, tagMap, partMap),
+                buildPartGroups(tasks, resourcesByTag, tagMap, partMap),
+                partsWithoutTasks);
     }
 
     private PlanResponse buildPlanResponseFromEntity(
@@ -552,56 +539,33 @@ public class LearningPlanService {
         Map<String, Tag> tagMap = loadTagMap(tasks);
         Map<String, ExamPart> partMap = loadPartMap(tasks);
 
-        return PlanResponse.builder()
-                .learningPlanId(plan.getLearningPlanId())
-                .userId(plan.getUserId())
-                .examTypeId(plan.getExamTypeId())
-                .sourceUserTestId(plan.getSourceUserTestId())
-                .userTargetId(plan.getUserTargetId())
-                .targetScore(plan.getTargetScore())
-                .deadlineDays(plan.getDeadlineDays())
-                .baselineReadiness(plan.getBaselineReadiness())
-                .readinessLevel(ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()))
-                .diagnosticUserTestId(plan.getSourceUserTestId())
-                .planSequence(plan.getPlanSequence())
-                .replacedByPlanId(plan.getReplacedByPlanId())
-                .planStage(plan.getPlanStage() != null ? plan.getPlanStage().name() : PlanStage.FOUNDATION.name())
-                .passAccuracyDefault(plan.getPassAccuracyDefault())
-                .status(plan.getStatus().name())
-                .targetAchieved(false)
-                .createdAt(plan.getCreatedAt())
-                .summary(String.format(
+        return learningMapper.toPlanResponseFromEntity(
+                plan,
+                ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()),
+                plan.getPlanStage() != null ? plan.getPlanStage().name() : PlanStage.FOUNDATION.name(),
+                String.format(
                         "Plan #%s — %d/%d ải đã pass. %s",
                         plan.getPlanSequence() != null ? plan.getPlanSequence() : "?",
                         passed, tasks.size(),
-                        stageLabel(plan.getPlanStage())))
-                .totalTasks(tasks.size())
-                .passedTasks((int) passed)
-                .estimatedDaysRemaining(estimatedDays)
-                .tasks(mapTaskDtos(tasks, resourcesByTag, tagMap, partMap))
-                .partGroups(buildPartGroups(tasks, resourcesByTag, tagMap, partMap))
-                .partsWithoutTasks(List.of())
-                .phases(List.of())
-                .build();
+                        stageLabel(plan.getPlanStage())),
+                tasks.size(),
+                (int) passed,
+                estimatedDays,
+                mapTaskDtos(tasks, resourcesByTag, tagMap, partMap),
+                buildPartGroups(tasks, resourcesByTag, tagMap, partMap));
     }
 
     private PlanResponse buildTargetAchievedResponse(
             String userId, String examTypeId, EnhancedResultDto result) {
         int readiness = resolveReadinessScore(result);
-        return PlanResponse.builder()
-                .userId(userId)
-                .examTypeId(examTypeId)
-                .targetAchieved(true)
-                .baselineReadiness(readiness)
-                .readinessLevel(ReadinessThresholds.levelFromScore(readiness))
-                .summary(String.format(
+        return learningMapper.toTargetAchievedResponse(
+                userId,
+                examTypeId,
+                readiness,
+                ReadinessThresholds.levelFromScore(readiness),
+                String.format(
                         "Bạn đã đạt mục tiêu (readiness %d%%). Có thể đặt mục tiêu cao hơn hoặc làm mock kiểm tra trước khi thi thật.",
-                        readiness))
-                .tasks(List.of())
-                .partGroups(List.of())
-                .partsWithoutTasks(List.of())
-                .phases(List.of())
-                .build();
+                        readiness));
     }
 
     private void closeActivePlans(
@@ -700,14 +664,13 @@ public class LearningPlanService {
                     .filter(t -> t.getStatus() == TaskStatus.PASSED)
                     .count();
             Integer passAcc = partTasks.isEmpty() ? null : partTasks.get(0).getPassAccuracy();
-            groups.add(PlanPartGroupDto.builder()
-                    .examPartId(partId)
-                    .examPartName(part != null ? part.getName() : partId)
-                    .passAccuracy(passAcc)
-                    .passedTasksInPart(passedInPart)
-                    .totalTasksInPart(partTasks.size())
-                    .tasks(partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList())
-                    .build());
+            groups.add(learningMapper.toPartGroup(
+                    partId,
+                    part != null ? part.getName() : partId,
+                    passAcc,
+                    passedInPart,
+                    partTasks.size(),
+                    partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList()));
         }
         return groups;
     }
@@ -725,27 +688,15 @@ public class LearningPlanService {
                 : null;
         int priorityScore = task.getPriorityScore() != null ? task.getPriorityScore() : 0;
         String tier = PlanPrioritySupport.tierFromScore(priorityScore);
-        return PlanTaskDto.builder()
-                .taskId(task.getTaskId())
-                .taskOrder(task.getTaskOrder())
-                .taskType(taskType.name())
-                .targetQuestionCount(task.getTargetQuestionCount())
-                .tagId(task.getTagId())
-                .tagName(resolveTaskDisplayName(taskType, tag, part))
-                .examPartId(task.getExamPartId())
-                .examPartName(part != null ? part.getName() : null)
-                .status(task.getStatus().name())
-                .passAccuracy(task.getPassAccuracy())
-                .baselineAccuracy(task.getBaselineAccuracy())
-                .bestAccuracy(task.getBestAccuracy())
-                .attemptCount(task.getAttemptCount())
-                .consecutiveFails(task.getConsecutiveFails())
-                .studyResource(studyResource)
-                .priorityScore(priorityScore)
-                .priorityTier(tier)
-                .wrongCountAtDiagnosis(task.getWrongCountAtDiagnosis())
-                .recommendedFirst(PlanPrioritySupport.TIER_HIGH.equals(tier))
-                .build();
+        return learningMapper.toTaskDto(
+                task,
+                taskType.name(),
+                resolveTaskDisplayName(taskType, tag, part),
+                part != null ? part.getName() : null,
+                studyResource,
+                priorityScore,
+                tier,
+                PlanPrioritySupport.TIER_HIGH.equals(tier));
     }
 
     private Integer resolveTargetScore(

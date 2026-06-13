@@ -9,6 +9,7 @@ import com.project_exam.backend.modules.users.dto.ProfileOverviewResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.dto.UserResponse;
 import com.project_exam.backend.modules.users.mapper.UserMapper;
+import com.project_exam.backend.modules.users.mapper.UserProfileMapper;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
 import com.project_exam.backend.modules.assessment.exam.domain.*;
@@ -57,6 +58,7 @@ public class UserService {
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private UserMapper userMapper;
+    private UserProfileMapper userProfileMapper;
 
     private UserResponse toResponse(User user) {
         return userMapper.toResponse(user);
@@ -204,34 +206,21 @@ public class UserService {
         long approvedClassCount = classMemberRepository.countByUserIdAndStatus(userId, ClassMember.MemberStatus.APPROVED);
         long pendingClassCount = classMemberRepository.countByUserIdAndStatus(userId, ClassMember.MemberStatus.PENDING);
 
-        return ProfileOverviewResponse.builder()
-                .userId(user.getUserId())
-                .userName(user.getUserName())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .avatarUrl(user.getAvatarUrl())
-                .verified(user.getVerified())
-                .roleId(user.getRoleId())
-                .roleName(roleName)
-                .createdAt(user.getCreatedAt())
-                .testStats(ProfileOverviewResponse.TestStats.builder()
-                        .totalAttempts(totalAttempts)
-                        .completedAttempts(completedAttempts)
-                        .inProgressAttempts(inProgressAttempts)
-                        .bestScore(bestScore)
-                        .averageScore(averageScore == null ? 0D : averageScore)
-                        .lastAttemptAt(lastAttemptAt)
-                        .build())
-                .vocabularyStats(ProfileOverviewResponse.VocabularyStats.builder()
-                        .totalVocabulary(totalVocabulary)
-                        .learningVocabulary(learningVocabulary)
-                        .masteredVocabulary(masteredVocabulary)
-                        .build())
-                .classStats(ProfileOverviewResponse.ClassStats.builder()
-                        .approvedClassCount(approvedClassCount)
-                        .pendingClassCount(pendingClassCount)
-                        .build())
-                .build();
+        return userProfileMapper.toProfileOverview(
+                user,
+                roleName,
+                totalAttempts,
+                completedAttempts,
+                inProgressAttempts,
+                bestScore,
+                averageScore == null ? 0D : averageScore,
+                lastAttemptAt,
+                totalVocabulary,
+                learningVocabulary,
+                masteredVocabulary,
+                approvedClassCount,
+                pendingClassCount
+        );
     }
 
     public ProfileOverviewResponse getMyProfileOverview(HttpServletRequest httpRequest) {

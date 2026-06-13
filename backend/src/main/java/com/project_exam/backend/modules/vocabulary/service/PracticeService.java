@@ -11,6 +11,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.*;
 import com.project_exam.backend.modules.assessment.test.domain.*;
 import com.project_exam.backend.modules.assessment.attempt.domain.*;
 import com.project_exam.backend.modules.vocabulary.domain.*;
+import com.project_exam.backend.modules.vocabulary.mapper.PracticeMapper;
 import com.project_exam.backend.modules.classroom.domain.*;
 import com.project_exam.backend.modules.audit.domain.*;
 import com.project_exam.backend.modules.users.repository.*;
@@ -44,6 +45,7 @@ public class PracticeService {
     private final UserVocabularyRepository userVocabularyRepository;
     private final AuthUtils authUtils;
     private final StreakService streakService;
+    private final PracticeMapper practiceMapper;
 
     public Optional<PracticeQuestionResponse> generateOneRandomQuestion(HttpServletRequest request, String albumId) {
         String userId = authUtils.getUserId(request);
@@ -79,17 +81,19 @@ public class PracticeService {
             options = choices;
         }
 
-        return Optional.of(PracticeQuestionResponse.builder()
-                .vocabId(vocab.getVocabId())
-                .type(type)
-                .questionText(type.equals("MULTICHOICE") ?
-                        "Chọn nghĩa đúng của từ: " + vocab.getWord() :
-                        "Nghe và nhập lại từ bạn nghe được")
-                .voiceUrl(vocab.getVoiceUrl())
-                .word(vocab.getWord())
-                .meaning(vocab.getMeaning())
-                .options(options)
-                .build());
+        String questionText = type.equals("MULTICHOICE") ?
+                "Chọn nghĩa đúng của từ: " + vocab.getWord() :
+                "Nghe và nhập lại từ bạn nghe được";
+
+        return Optional.of(practiceMapper.toQuestionResponse(
+                vocab.getVocabId(),
+                type,
+                questionText,
+                vocab.getVoiceUrl(),
+                vocab.getWord(),
+                vocab.getMeaning(),
+                options
+        ));
     }
 
         public void markWordAsKnown(HttpServletRequest httpRequest, String vocabId) {
@@ -148,12 +152,12 @@ public class PracticeService {
         } catch (Exception ignored) {
         }
 
-        return PracticeCheckResponse.builder()
-                .vocabId(vocab.getVocabId())
-                .correct(correct)
-                .status(uv.getStatus().name())
-                .correctCount(uv.getCorrectCount())
-                .build();
+        return practiceMapper.toCheckResponse(
+                vocab.getVocabId(),
+                correct,
+                uv.getStatus().name(),
+                uv.getCorrectCount()
+        );
     }
 
 }

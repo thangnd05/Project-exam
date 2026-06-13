@@ -8,6 +8,7 @@ import com.project_exam.backend.modules.classroom.dto.ChapterRequest;
 import com.project_exam.backend.modules.classroom.dto.ChapterResponse;
 import com.project_exam.backend.modules.classroom.domain.Chapter;
 import com.project_exam.backend.modules.classroom.domain.ClassEntity;
+import com.project_exam.backend.modules.classroom.mapper.ChapterMapper;
 import com.project_exam.backend.modules.classroom.repository.ChapterRepository;
 import com.project_exam.backend.modules.classroom.repository.ClassRepository;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
@@ -30,6 +31,7 @@ public class ChapterService {
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
     private final QuestionService questionService;
+    private final ChapterMapper chapterMapper;
 
     private void checkTeacherPermission(String classId, String currentUserId) {
 
@@ -45,13 +47,7 @@ public class ChapterService {
     //  Helper convert Entity → DTO
     // ============================
     private ChapterResponse toResponse(Chapter c) {
-        return ChapterResponse.builder()
-                .chapterId(c.getChapterId())
-                .classId(c.getClassId())
-                .title(c.getTitle())
-                .description(c.getDescription())
-                .createdAt(c.getCreatedAt())
-                .build();
+        return chapterMapper.toResponse(c);
     }
 
     // ============================

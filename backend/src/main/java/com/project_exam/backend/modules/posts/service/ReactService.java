@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.posts.dto.ReactRequest;
 import com.project_exam.backend.modules.posts.dto.ReactSummaryResponse;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.posts.domain.React;
+import com.project_exam.backend.modules.posts.mapper.ReactMapper;
 import com.project_exam.backend.modules.posts.repository.PostRepository;
 import com.project_exam.backend.modules.posts.repository.ReactRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
@@ -23,6 +24,7 @@ public class ReactService {
     private final ReactRepository reactRepository;
     private final PostRepository postRepository;
     private final AuthUtils authUtils;
+    private final ReactMapper reactMapper;
 
     /**
      * Toggle react:
@@ -91,11 +93,7 @@ public class ReactService {
                     .orElse(null);
         }
 
-        return ReactSummaryResponse.builder()
-                .counts(counts)
-                .currentUserReactType(currentUserReactType)
-                .total(total)
-                .build();
+        return reactMapper.toSummary(counts, currentUserReactType, total);
     }
 
     private String tryGetUserId(HttpServletRequest httpRequest) {

@@ -5,6 +5,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.users.dto.RoleRequest;
 import com.project_exam.backend.modules.users.dto.RoleResponse;
 import com.project_exam.backend.modules.users.domain.Role;
+import com.project_exam.backend.modules.users.mapper.RoleMapper;
 import com.project_exam.backend.modules.users.repository.RoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final RoleMapper roleMapper;
 
     public List<RoleResponse> findAll() {
         return roleRepository.findAll().stream()
@@ -53,10 +55,6 @@ public class RoleService {
     }
 
     private RoleResponse toResponse(Role role) {
-        return RoleResponse.builder()
-                .roleId(role.getRoleId())
-                .roleName(role.getRoleName())
-                .description(role.getDescription())
-                .build();
+        return roleMapper.toResponse(role);
     }
 }

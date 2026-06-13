@@ -5,6 +5,7 @@ import com.project_exam.backend.modules.gamification.streak.domain.StreakActivit
 import com.project_exam.backend.modules.gamification.streak.domain.UserStreak;
 import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverConfigResponse;
 import com.project_exam.backend.modules.gamification.streak.dto.StreakResponse;
+import com.project_exam.backend.modules.gamification.streak.mapper.StreakMapper;
 import com.project_exam.backend.modules.gamification.streak.repository.UserStreakRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class StreakService {
     private final UserStreakRepository userStreakRepository;
     private final StreakRecoverConfigService recoverConfigService;
     private final CoinService coinService;
+    private final StreakMapper streakMapper;
 
     /**
      * Ghi nhận 1 hoạt động học cho user và cập nhật chuỗi ngày.
@@ -82,15 +84,7 @@ public class StreakService {
         LocalDate today = LocalDate.now(VN);
         if (streak == null) {
             StreakRecoverConfigResponse cfg = recoverConfigService.get();
-            return StreakResponse.builder()
-                    .currentStreak(0)
-                    .longestStreak(0)
-                    .lastActivityDate(null)
-                    .increased(false)
-                    .lostStreak(0)
-                    .canRecover(false)
-                    .recoverCost(cfg.getCostCoins())
-                    .build();
+            return streakMapper.toEmptyResponse(cfg.getCostCoins());
         }
         return buildResponse(streak, today, false);
     }
@@ -141,14 +135,7 @@ public class StreakService {
         StreakRecoverConfigResponse cfg = recoverConfigService.get();
         boolean canRecover = lost > 0 && Boolean.TRUE.equals(cfg.getActive());
 
-        return StreakResponse.builder()
-                .currentStreak(effectiveCurrent)
-                .longestStreak(streak.getLongestStreak())
-                .lastActivityDate(last)
-                .increased(increased)
-                .lostStreak(lost)
-                .canRecover(canRecover)
-                .recoverCost(cfg.getCostCoins())
-                .build();
+        return streakMapper.toResponse(
+                streak, effectiveCurrent, increased, lost, canRecover, cfg.getCostCoins());
     }
 }

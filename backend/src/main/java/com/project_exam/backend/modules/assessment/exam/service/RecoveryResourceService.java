@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.ResourceTag;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
+import com.project_exam.backend.modules.assessment.exam.mapper.RecoveryResourceMapper;
 import com.project_exam.backend.modules.assessment.exam.mapper.TagMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.RecoveryResourceRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
@@ -33,6 +34,7 @@ public class RecoveryResourceService {
     private final TagRepository tagRepository;
     private final TagService tagService;
     private final TagMapper tagMapper;
+    private final RecoveryResourceMapper recoveryResourceMapper;
     private final CloudinaryService cloudinaryService;
     private final AuthUtils authUtils;
 
@@ -201,16 +203,7 @@ public class RecoveryResourceService {
                 .map(t -> tagMapper.toResponse(t, null))
                 .collect(Collectors.toList());
 
-        return RecoveryResourceResponse.builder()
-                .resourceId(resource.getResourceId())
-                .title(resource.getTitle())
-                .description(resource.getDescription())
-                .url(resource.getUrl())
-                .originalFileName(resource.getOriginalFileName())
-                .createdBy(resource.getCreatedBy())
-                .createdAt(resource.getCreatedAt())
-                .tags(tags)
-                .build();
+        return recoveryResourceMapper.toResponse(resource, tags);
     }
 
     private String extractPublicId(String url) {

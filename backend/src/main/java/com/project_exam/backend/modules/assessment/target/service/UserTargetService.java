@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.assessment.target.service;
 
 import com.project_exam.backend.modules.assessment.target.domain.*;
 import com.project_exam.backend.modules.assessment.target.dto.*;
+import com.project_exam.backend.modules.assessment.target.mapper.UserTargetMapper;
 import com.project_exam.backend.modules.assessment.target.repository.*;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ public class UserTargetService {
 
     private final UserTargetRepository userTargetRepository;
     private final UserTargetPartRepository userTargetPartRepository;
+    private final UserTargetMapper userTargetMapper;
 
     public UserTargetResponse getByUserAndExamType(String userId, String examTypeId) {
         return userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId)
@@ -25,10 +27,7 @@ public class UserTargetService {
     }
 
     private UserTargetResponse emptyResponse() {
-        return UserTargetResponse.builder()
-                .hasTarget(false)
-                .partRequirements(List.of())
-                .build();
+        return userTargetMapper.toEmptyResponse();
     }
 
     @Transactional
@@ -101,24 +100,10 @@ public class UserTargetService {
         List<UserTargetPart> savedParts = userTargetPartRepository
                 .findByUserTargetId(ut.getUserTargetId());
 
-        List<UserTargetPartResponse> partResponses = savedParts.stream().map(p ->
-                UserTargetPartResponse.builder()
-                        .examPartId(p.getExamPartId())
-                        .requiredPercentage(p.getCustomPercentage())
-                        .currentScore(p.getCurrentScore())
-                        .lastUserTestId(p.getLastUserTestId())
-                        .build()
-        ).collect(Collectors.toList());
+        List<UserTargetPartResponse> partResponses = savedParts.stream()
+                .map(userTargetMapper::toPartResponse)
+                .collect(Collectors.toList());
 
-        return UserTargetResponse.builder()
-                .hasTarget(true)
-                .userTargetId(ut.getUserTargetId())
-                .userId(ut.getUserId())
-                .examTypeId(ut.getExamTypeId())
-                .targetScore(ut.getTargetScore())
-                .targetReadiness(ut.getTargetReadiness())
-                .achievedAt(ut.getAchievedAt())
-                .partRequirements(partResponses)
-                .build();
+        return userTargetMapper.toResponse(ut, partResponses);
     }
 }

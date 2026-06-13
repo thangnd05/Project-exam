@@ -22,6 +22,7 @@ import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
 import com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper;
 import com.project_exam.backend.modules.assessment.exam.mapper.AnswerMapper;
+import com.project_exam.backend.modules.assessment.exam.mapper.QuestionMapper;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
 import com.project_exam.backend.modules.assessment.exam.domain.*;
@@ -77,6 +78,7 @@ public class QuestionService {
     private final PassageMapper passageMapper;
     private final PassageMediaMapper passageMediaMapper;
     private final AnswerMapper answerMapper;
+    private final QuestionMapper questionMapper;
 
     /**
      * Khi câu hỏi được gắn vào một class/chapter, user phải là thành viên hoặc giáo viên của lớp đó
@@ -99,22 +101,9 @@ public class QuestionService {
 
     public List<QuestionAdminResponse> findAllAdminSummaries() {
         return findAll().stream()
-                .map(question -> QuestionAdminResponse.builder()
-                        .questionId(question.getQuestionId())
-                        .questionNumber(question.getQuestionNumber())
-                        .examPartId(question.getExamPartId())
-                        .questionText(question.getQuestionText())
-                        .questionType(question.getQuestionType())
-                        .explanation(question.getExplanation())
-                        .classId(question.getClassId())
-                        .isBank(question.getIsBank())
-                        .collectionId(question.getCollectionId())
-                        .examTypeId(null)
-                        .passage(null)
-                        .passageMedia(List.of())
-                        .answers(List.of())
-                        .tags(tagService.getTagsByQuestionId(question.getQuestionId()))
-                        .build())
+                .map(question -> questionMapper.toAdminResponseSummary(
+                        question,
+                        tagService.getTagsByQuestionId(question.getQuestionId())))
                 .toList();
     }
 
@@ -207,18 +196,7 @@ public class QuestionService {
                 Collections.emptyList()
         ));
 
-        return QuestionResponse.builder()
-                .questionId(question.getQuestionId())
-                .questionNumber(question.getQuestionNumber())
-                .examPartId(question.getExamPartId())
-                .questionText(question.getQuestionText())
-                .questionType(question.getQuestionType())
-                .isBank(question.getIsBank())
-                .collectionId(question.getCollectionId())
-                .passage(passageResponse)
-                .passageMedia(passageMedia)
-                .answers(answers)
-                .build();
+        return questionMapper.toUserResponse(question, passageResponse, passageMedia, answers);
     }
 
     private List<QuestionResponse> buildUserQuestionResponses(List<Question> questions) {
@@ -1012,22 +990,13 @@ public class QuestionService {
         List<AnswerAdminResponse> answerDtos = answerEntities.stream()
                 .map(answerMapper::toAdminResponse)
                 .toList();
-        return QuestionAdminResponse.builder()
-                .questionId(question.getQuestionId())
-                .questionNumber(question.getQuestionNumber())
-                .examPartId(question.getExamPartId())
-                .questionText(question.getQuestionText())
-                .questionType(question.getQuestionType())
-                .explanation(question.getExplanation())
-                .examTypeId(examTypeId)
-                .classId(question.getClassId())
-                .isBank(question.getIsBank())
-                .collectionId(question.getCollectionId())
-                .passage(passageDto)
-                .passageMedia(passageMedia)
-                .answers(answerDtos)
-                .tags(tagService.getTagsByQuestionId(question.getQuestionId()))
-                .build();
+        return questionMapper.toAdminResponseFull(
+                question,
+                examTypeId,
+                passageDto,
+                passageMedia,
+                answerDtos,
+                tagService.getTagsByQuestionId(question.getQuestionId()));
     }
 
     public QuestionAdminResponse getQuestionDetailAdmin(String questionId) {
@@ -1054,22 +1023,13 @@ public class QuestionService {
                 .map(answerMapper::toAdminResponse)
                 .toList();
 
-        return QuestionAdminResponse.builder()
-                .questionId(question.getQuestionId())
-                .questionNumber(question.getQuestionNumber())
-                .examPartId(question.getExamPartId())
-                .questionText(question.getQuestionText())
-                .questionType(question.getQuestionType())
-                .explanation(question.getExplanation())
-                .examTypeId(examTypeId)
-                .classId(question.getClassId())
-                .isBank(question.getIsBank())
-                .collectionId(question.getCollectionId())
-                .passage(passageDto)
-                .passageMedia(passageMedia)
-                .answers(answers)
-                .tags(tagService.getTagsByQuestionId(questionId))
-                .build();
+        return questionMapper.toAdminResponseFull(
+                question,
+                examTypeId,
+                passageDto,
+                passageMedia,
+                answers,
+                tagService.getTagsByQuestionId(questionId));
     }
 
     /**

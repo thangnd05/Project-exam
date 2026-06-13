@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.target.service;
 import com.project_exam.backend.modules.assessment.target.domain.ExamTargetMilestone;
 import com.project_exam.backend.modules.assessment.target.domain.TargetPartRequirement;
 import com.project_exam.backend.modules.assessment.target.dto.*;
+import com.project_exam.backend.modules.assessment.target.mapper.MilestoneMapper;
 import com.project_exam.backend.modules.assessment.target.repository.ExamTargetMilestoneRepository;
 import com.project_exam.backend.modules.assessment.target.repository.TargetPartRequirementRepository;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -19,6 +20,7 @@ public class MilestoneService {
 
     private final ExamTargetMilestoneRepository milestoneRepository;
     private final TargetPartRequirementRepository partRequirementRepository;
+    private final MilestoneMapper milestoneMapper;
 
     public List<MilestoneResponse> findByExamTypeId(String examTypeId) {
         return milestoneRepository.findByExamTypeIdOrderByCreatedAtAsc(examTypeId).stream()
@@ -88,21 +90,10 @@ public class MilestoneService {
     private MilestoneResponse toResponse(ExamTargetMilestone m) {
         List<TargetPartRequirement> parts = partRequirementRepository
                 .findByExamTargetMilestoneId(m.getExamTargetMilestoneId());
-        List<PartRequirementResponse> partResponses = parts.stream().map(p ->
-                PartRequirementResponse.builder()
-                        .targetPartRequirementId(p.getTargetPartRequirementId())
-                        .examPartId(p.getExamPartId())
-                        .requiredPercentage(p.getRequiredPercentage())
-                        .build()
-        ).toList();
+        List<PartRequirementResponse> partResponses = parts.stream()
+                .map(milestoneMapper::toPartRequirementResponse)
+                .toList();
 
-        return MilestoneResponse.builder()
-                .examTargetMilestoneId(m.getExamTargetMilestoneId())
-                .examTypeId(m.getExamTypeId())
-                .milestoneScore(m.getMilestoneScore())
-                .description(m.getDescription())
-                .createdAt(m.getCreatedAt())
-                .partRequirements(partResponses)
-                .build();
+        return milestoneMapper.toResponse(m, partResponses);
     }
 }

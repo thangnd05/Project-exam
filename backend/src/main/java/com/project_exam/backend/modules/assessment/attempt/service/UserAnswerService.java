@@ -7,6 +7,7 @@ import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryDto;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerRequest;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerResponse;
+import com.project_exam.backend.modules.assessment.attempt.mapper.UserAnswerMapper;
 import com.project_exam.backend.modules.assessment.exam.domain.Answer;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
@@ -43,15 +44,10 @@ public class UserAnswerService {
     private final TestPartRepository testPartRepository;
     private final TestQuestionRepository testQuestionRepository;
     private final AuthUtils authUtils;
+    private final UserAnswerMapper userAnswerMapper;
 
     private UserAnswerResponse toResponse(UserAnswer userAnswer) {
-        return UserAnswerResponse.builder()
-                .userAnswerId(userAnswer.getUserAnswerId())
-                .userTestId(userAnswer.getUserTestId())
-                .questionId(userAnswer.getQuestionId())
-                .selectedAnswerId(userAnswer.getSelectedAnswerId())
-                .answerText(userAnswer.getAnswerText())
-                .build();
+        return userAnswerMapper.toResponse(userAnswer);
     }
 
     private UserAnswer toEntity(UserAnswerRequest request) {

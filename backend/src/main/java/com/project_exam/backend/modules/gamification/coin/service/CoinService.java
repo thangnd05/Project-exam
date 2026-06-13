@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.gamification.coin.service;
 import com.project_exam.backend.modules.gamification.coin.domain.UserCoin;
 import com.project_exam.backend.modules.gamification.coin.dto.CoinResponse;
 import com.project_exam.backend.modules.gamification.coin.dto.CoinWalletResponse;
+import com.project_exam.backend.modules.gamification.coin.mapper.CoinMapper;
 import com.project_exam.backend.modules.gamification.coin.repository.UserCoinRepository;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.users.repository.UserRepository;
@@ -25,6 +26,7 @@ public class CoinService {
 
     private final UserCoinRepository userCoinRepository;
     private final UserRepository userRepository;
+    private final CoinMapper coinMapper;
 
     /**
      * Cộng xu vào ví của user (tạo ví nếu chưa có). Trả về số dư mới.
@@ -71,7 +73,7 @@ public class CoinService {
         int balance = userCoinRepository.findByUserId(userId)
                 .map(UserCoin::getBalance)
                 .orElse(0);
-        return CoinResponse.builder().userId(userId).balance(balance).build();
+        return coinMapper.toBalanceResponse(userId, balance);
     }
 
     /** Danh sách ví xu kèm thông tin user — cho trang quản lý admin. */
@@ -88,7 +90,7 @@ public class CoinService {
                 .collect(Collectors.toMap(User::getUserId, Function.identity()));
 
         return wallets.stream()
-                .map(wallet -> toWalletResponse(wallet, userById.get(wallet.getUserId())))
+                .map(wallet -> coinMapper.toWalletResponse(wallet, userById.get(wallet.getUserId())))
                 .toList();
     }
 
@@ -106,7 +108,7 @@ public class CoinService {
         wallet.setBalance(balance);
         wallet.setUpdatedAt(LocalDateTime.now());
         wallet = userCoinRepository.save(wallet);
-        return toWalletResponse(wallet, user);
+        return coinMapper.toWalletResponse(wallet, user);
     }
 
     /** Đặt lại số dư xu của 1 user (admin). */
@@ -117,7 +119,7 @@ public class CoinService {
         wallet.setBalance(balance);
         wallet.setUpdatedAt(LocalDateTime.now());
         wallet = userCoinRepository.save(wallet);
-        return toWalletResponse(wallet, userRepository.findById(userId).orElse(null));
+        return coinMapper.toWalletResponse(wallet, userRepository.findById(userId).orElse(null));
     }
 
     /** Xoá ví xu của 1 user (admin). */
@@ -126,17 +128,5 @@ public class CoinService {
         UserCoin wallet = userCoinRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("User này chưa có ví xu"));
         userCoinRepository.delete(wallet);
-    }
-
-    private CoinWalletResponse toWalletResponse(UserCoin wallet, User user) {
-        return CoinWalletResponse.builder()
-                .userCoinId(wallet.getUserCoinId())
-                .userId(wallet.getUserId())
-                .userName(user != null ? user.getUserName() : null)
-                .fullName(user != null ? user.getFullName() : null)
-                .email(user != null ? user.getEmail() : null)
-                .balance(wallet.getBalance())
-                .updatedAt(wallet.getUpdatedAt())
-                .build();
     }
 }

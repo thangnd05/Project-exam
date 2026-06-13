@@ -5,6 +5,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.vocabulary.dto.VocabularyAlbumRequest;
 import com.project_exam.backend.modules.vocabulary.dto.VocabularyAlbumResponse;
 import com.project_exam.backend.modules.vocabulary.domain.VocabularyAlbum;
+import com.project_exam.backend.modules.vocabulary.mapper.VocabularyAlbumMapper;
 import com.project_exam.backend.modules.vocabulary.repository.VocabularyAlbumRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ public class VocabularyAlbumService {
 
     private final VocabularyAlbumRepository repository;
     private final AuthUtils authUtils;
+    private final VocabularyAlbumMapper vocabularyAlbumMapper;
 
     // =========================
     // GET ALL
@@ -104,13 +106,6 @@ public class VocabularyAlbumService {
     // MAPPER
     // =========================
     private VocabularyAlbumResponse toResponse(VocabularyAlbum album) {
-
-        return VocabularyAlbumResponse.builder()
-                .albumId(album.getAlbumId())
-                .name(album.getName())
-                .description(album.getDescription())
-                .userId(album.getUserId())
-                .createdAt(album.getCreatedAt())
-                .build();
+        return vocabularyAlbumMapper.toResponse(album);
     }
 }

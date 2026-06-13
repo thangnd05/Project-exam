@@ -5,6 +5,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.vocabulary.dto.UserVocabularyRequest;
 import com.project_exam.backend.modules.vocabulary.dto.UserVocabularyResponse;
 import com.project_exam.backend.modules.vocabulary.domain.UserVocabulary;
+import com.project_exam.backend.modules.vocabulary.mapper.UserVocabularyMapper;
 import com.project_exam.backend.modules.vocabulary.repository.UserVocabularyRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ public class UserVocabularyService {
 
     private final UserVocabularyRepository repository;
     private final AuthUtils authUtils;
+    private final UserVocabularyMapper userVocabularyMapper;
 
     public List<UserVocabularyResponse> findAll() {
         return repository.findAll().stream()
@@ -60,13 +62,6 @@ public class UserVocabularyService {
     }
 
     private UserVocabularyResponse toResponse(UserVocabulary uv) {
-        return UserVocabularyResponse.builder()
-                .id(uv.getId())
-                .userId(uv.getUserId())
-                .vocabId(uv.getVocabId())
-                .status(uv.getStatus())
-                .lastReviewed(uv.getLastReviewed())
-                .correctCount(uv.getCorrectCount())
-                .build();
+        return userVocabularyMapper.toResponse(uv);
     }
 }

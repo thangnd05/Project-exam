@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.posts.domain.Post;
 import com.project_exam.backend.modules.posts.domain.SavedPost;
 import com.project_exam.backend.modules.posts.dto.PostSummaryResponse;
 import com.project_exam.backend.modules.posts.dto.SavedPostStatusResponse;
+import com.project_exam.backend.modules.posts.mapper.SavedPostMapper;
 import com.project_exam.backend.modules.posts.repository.PostRepository;
 import com.project_exam.backend.modules.posts.repository.SavedPostRepository;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -25,6 +26,7 @@ public class SavedPostService {
     private final PostRepository postRepository;
     private final PostService postService;
     private final AuthUtils authUtils;
+    private final SavedPostMapper savedPostMapper;
 
     /**
      * Toggle save:
@@ -55,10 +57,7 @@ public class SavedPostService {
         }
 
         long count = savedPostRepository.countByPostId(postId);
-        return SavedPostStatusResponse.builder()
-                .saved(nowSaved)
-                .saveCount(count)
-                .build();
+        return savedPostMapper.toStatusResponse(nowSaved, count);
     }
 
     public SavedPostStatusResponse getStatus(String postId, HttpServletRequest httpRequest) {
@@ -68,10 +67,7 @@ public class SavedPostService {
         String userId = tryGetUserId(httpRequest);
         boolean saved = userId != null && savedPostRepository.existsByPostIdAndUserId(postId, userId);
         long count = savedPostRepository.countByPostId(postId);
-        return SavedPostStatusResponse.builder()
-                .saved(saved)
-                .saveCount(count)
-                .build();
+        return savedPostMapper.toStatusResponse(saved, count);
     }
 
     public List<PostSummaryResponse> getMySavedPosts(HttpServletRequest httpRequest) {

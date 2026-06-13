@@ -6,6 +6,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCollectionRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCollectionResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.QuestionCollection;
+import com.project_exam.backend.modules.assessment.exam.mapper.QuestionCollectionMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionCollectionRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class QuestionCollectionService {
 
     private final QuestionCollectionRepository collectionRepository;
     private final QuestionRepository questionRepository;
+    private final QuestionCollectionMapper questionCollectionMapper;
 
     public List<QuestionCollectionResponse> findAll() {
         return collectionRepository.findAll().stream()
@@ -96,12 +98,9 @@ public class QuestionCollectionService {
     }
 
     private QuestionCollectionResponse toResponse(QuestionCollection collection) {
-        return QuestionCollectionResponse.builder()
-                .collectionId(collection.getCollectionId())
-                .name(collection.getName())
-                .description(collection.getDescription())
-                .questionCount(questionRepository.countByCollectionId(collection.getCollectionId()))
-                .build();
+        // questionCount cần truy vấn DB → tính ở service, mapper chỉ ghép DTO.
+        Long questionCount = questionRepository.countByCollectionId(collection.getCollectionId());
+        return questionCollectionMapper.toResponse(collection, questionCount);
     }
 
     private String normalize(String s) {

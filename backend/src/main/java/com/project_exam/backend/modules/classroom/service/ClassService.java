@@ -8,6 +8,7 @@ import com.project_exam.backend.modules.classroom.dto.ClassResponse;
 import com.project_exam.backend.modules.classroom.dto.ClassSimpleResponse;
 import com.project_exam.backend.modules.classroom.domain.Chapter;
 import com.project_exam.backend.modules.classroom.domain.ClassEntity;
+import com.project_exam.backend.modules.classroom.mapper.ClassMapper;
 import com.project_exam.backend.modules.classroom.repository.ChapterRepository;
 import com.project_exam.backend.modules.classroom.repository.ClassRepository;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
@@ -36,6 +37,7 @@ public class ClassService {
     private final QuestionService questionService;
     private final TestService testService;
     private final AuthUtils authUtils;
+    private final ClassMapper classMapper;
 
     @Transactional
     public ClassResponse createClass(ClassRequest request, HttpServletRequest httpRequest) {
@@ -68,11 +70,7 @@ public class ClassService {
     public List<ClassSimpleResponse> getMyClasses(HttpServletRequest request) {
         String teacherId = authUtils.getUserId(request);
         return classRepository.findByTeacherId(teacherId).stream()
-                .map(c -> ClassSimpleResponse.builder()
-                        .classId(c.getClassId())
-                        .classQr(c.getClassQr())
-                        .className(c.getClassName())
-                        .build())
+                .map(classMapper::toSimpleResponse)
                 .toList();
     }
 
@@ -133,14 +131,7 @@ public class ClassService {
     }
 
     private ClassResponse toResponse(ClassEntity c) {
-        return ClassResponse.builder()
-                .classId(c.getClassId())
-                .classQr(c.getClassQr())
-                .className(c.getClassName())
-                .description(c.getDescription())
-                .teacherId(c.getTeacherId())
-                .createdAt(c.getCreatedAt())
-                .build();
+        return classMapper.toResponse(c);
     }
 
     private String generateUniqueClassQr() {

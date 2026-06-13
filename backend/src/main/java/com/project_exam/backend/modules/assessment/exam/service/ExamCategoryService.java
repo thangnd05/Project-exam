@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.exam.service;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryResponse;
+import com.project_exam.backend.modules.assessment.exam.mapper.ExamCategoryMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -17,26 +18,27 @@ import java.util.List;
 public class ExamCategoryService {
 
     private final ExamCategoryRepository examCategoryRepository;
+    private final ExamCategoryMapper examCategoryMapper;
 
     public List<ExamCategoryResponse> findAll() {
         return examCategoryRepository.findAll().stream()
                 .sorted(Comparator
                         .comparing((ExamCategory c) -> c.getDisplayOrder() == null ? Integer.MAX_VALUE : c.getDisplayOrder())
                         .thenComparing(ExamCategory::getName, Comparator.nullsLast(String::compareTo)))
-                .map(this::toResponse)
+                .map(examCategoryMapper::toResponse)
                 .toList();
     }
 
     public ExamCategoryResponse findById(String id) {
         ExamCategory category = examCategoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam category không tồn tại"));
-        return toResponse(category);
+        return examCategoryMapper.toResponse(category);
     }
 
     public ExamCategoryResponse findByCode(String code) {
         ExamCategory category = examCategoryRepository.findByCode(code)
                 .orElseThrow(() -> new NotFoundException("Exam category không tồn tại: " + code));
-        return toResponse(category);
+        return examCategoryMapper.toResponse(category);
     }
 
     public ExamCategoryResponse create(ExamCategoryRequest request) {
@@ -50,7 +52,7 @@ public class ExamCategoryService {
         category.setDescription(request.getDescription());
         applyOptionalFields(category, request);
         category = examCategoryRepository.save(category);
-        return toResponse(category);
+        return examCategoryMapper.toResponse(category);
     }
 
     public ExamCategoryResponse update(String id, ExamCategoryRequest request) {
@@ -68,7 +70,7 @@ public class ExamCategoryService {
         if (request.getDescription() != null) category.setDescription(request.getDescription());
         applyOptionalFields(category, request);
         category = examCategoryRepository.save(category);
-        return toResponse(category);
+        return examCategoryMapper.toResponse(category);
     }
 
     public void delete(String id) {
@@ -86,15 +88,4 @@ public class ExamCategoryService {
         return raw.trim().toUpperCase().replaceAll("\\s+", "_");
     }
 
-    private ExamCategoryResponse toResponse(ExamCategory c) {
-        return ExamCategoryResponse.builder()
-                .examCategoryId(c.getExamCategoryId())
-                .code(c.getCode())
-                .name(c.getName())
-                .description(c.getDescription())
-                .guestAllowed(c.getGuestAllowed())
-                .displayOrder(c.getDisplayOrder())
-                .createdAt(c.getCreatedAt())
-                .build();
-    }
 }

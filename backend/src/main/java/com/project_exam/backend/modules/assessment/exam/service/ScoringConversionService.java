@@ -5,6 +5,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.ScoringConversion;
+import com.project_exam.backend.modules.assessment.exam.mapper.ScoringConversionMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ScoringConversionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,11 @@ import java.util.List;
 public class ScoringConversionService {
 
     private final ScoringConversionRepository scoringConversionRepository;
+    private final ScoringConversionMapper scoringConversionMapper;
 
     public List<ScoringConversionResponse> findAll() {
         return scoringConversionRepository.findAll().stream()
-                .map(this::toResponse)
+                .map(scoringConversionMapper::toResponse)
                 .toList();
     }
 
@@ -39,14 +41,14 @@ public class ScoringConversionService {
         }
 
         return conversions.stream()
-                .map(this::toResponse)
+                .map(scoringConversionMapper::toResponse)
                 .toList();
     }
 
     public ScoringConversionResponse findById(String id) {
         ScoringConversion c = scoringConversionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Scoring conversion không tồn tại"));
-        return toResponse(c);
+        return scoringConversionMapper.toResponse(c);
     }
 
     public ScoringConversionResponse create(ScoringConversionRequest request) {
@@ -57,7 +59,7 @@ public class ScoringConversionService {
         c.setNumCorrect(request.getNumCorrect());
         c.setConvertedScore(request.getConvertedScore());
         c = scoringConversionRepository.save(c);
-        return toResponse(c);
+        return scoringConversionMapper.toResponse(c);
     }
 
     public List<ScoringConversionResponse> createBulk(List<ScoringConversionRequest> requests) {
@@ -77,7 +79,7 @@ public class ScoringConversionService {
         }
 
         return scoringConversionRepository.saveAll(conversions).stream()
-                .map(this::toResponse)
+                .map(scoringConversionMapper::toResponse)
                 .toList();
     }
 
@@ -89,23 +91,13 @@ public class ScoringConversionService {
         if (request.getNumCorrect() != null) c.setNumCorrect(request.getNumCorrect());
         if (request.getConvertedScore() != null) c.setConvertedScore(request.getConvertedScore());
         c = scoringConversionRepository.save(c);
-        return toResponse(c);
+        return scoringConversionMapper.toResponse(c);
     }
 
     public void delete(String id) {
         ScoringConversion c = scoringConversionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Scoring conversion không tồn tại"));
         scoringConversionRepository.delete(c);
-    }
-
-    private ScoringConversionResponse toResponse(ScoringConversion c) {
-        return ScoringConversionResponse.builder()
-                .conversionId(c.getConversionId())
-                .examTypeId(c.getExamTypeId())
-                .skillId(c.getSkillId())
-                .numCorrect(c.getNumCorrect())
-                .convertedScore(c.getConvertedScore())
-                .build();
     }
 
     private void validateRequest(ScoringConversionRequest request) {

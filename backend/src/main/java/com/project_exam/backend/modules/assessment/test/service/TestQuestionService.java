@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.test.service;
 import com.project_exam.backend.modules.assessment.test.dto.TestQuestionRequest;
 import com.project_exam.backend.modules.assessment.test.dto.TestQuestionResponse;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
+import com.project_exam.backend.modules.assessment.test.mapper.TestMapper;
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,18 +13,15 @@ import java.util.Optional;
 @Service
 public class TestQuestionService {
     private final TestQuestionRepository testQuestionRepository;
+    private final TestMapper testMapper;
 
-    public TestQuestionService(TestQuestionRepository testQuestionRepository) {
+    public TestQuestionService(TestQuestionRepository testQuestionRepository, TestMapper testMapper) {
         this.testQuestionRepository = testQuestionRepository;
+        this.testMapper = testMapper;
     }
 
     private TestQuestionResponse toResponse(TestQuestion testQuestion) {
-        return TestQuestionResponse.builder()
-                .testQuestionId(testQuestion.getTestQuestionId())
-                .testPartId(testQuestion.getTestPartId())
-                .questionId(testQuestion.getQuestionId())
-                .displayOrder(testQuestion.getDisplayOrder())
-                .build();
+        return testMapper.toTestQuestionResponse(testQuestion);
     }
 
     private TestQuestion toEntity(TestQuestionRequest request) {

@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
+import com.project_exam.backend.modules.assessment.attempt.mapper.LeaderboardMapper;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
@@ -62,6 +63,7 @@ public class UserTestService {
     private final StreakService streakService;
     private final UserTestAccessRepository userTestAccessRepository;
     private final UserTestMapper userTestMapper;
+    private final LeaderboardMapper leaderboardMapper;
 
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
@@ -552,11 +554,7 @@ public class UserTestService {
 
         //  chỉ chặn khi có giới hạn thời gian nhưng chưa hết
         if (!isUnlimited && !isEnded) {
-            return TestLeaderboardResponse.builder()
-                    .entries(Collections.emptyList())
-                    .me(null)
-                    .totalParticipants(0)
-                    .build();
+            return leaderboardMapper.toEmpty();
         }
 
         List<UserTest> list = userTestRepository.findByTestIdAndStatus(testId, UserTest.Status.COMPLETED);
@@ -588,12 +586,11 @@ public class UserTestService {
             for (int i = 0; i < ranked.size(); i++) {
                 UserTestResponse r = ranked.get(i);
                 if (viewerId.equals(r.getUserId())) {
-                    me = TestLeaderboardResponse.MyRank.builder()
-                            .rank(i + 1)
-                            .userTestId(r.getUserTestId())
-                            .totalScore(r.getTotalScore())
-                            .durationTaken(r.getDurationTaken())
-                            .build();
+                    me = leaderboardMapper.toMyRank(
+                            i + 1,
+                            r.getUserTestId(),
+                            r.getTotalScore(),
+                            r.getDurationTaken());
                     break;
                 }
             }
@@ -604,11 +601,7 @@ public class UserTestService {
                 ? new ArrayList<>(ranked.subList(0, LEADERBOARD_TOP_LIMIT))
                 : ranked;
 
-        return TestLeaderboardResponse.builder()
-                .entries(entries)
-                .me(me)
-                .totalParticipants(ranked.size())
-                .build();
+        return leaderboardMapper.toResponse(entries, me, ranked.size());
     }
 
     /**

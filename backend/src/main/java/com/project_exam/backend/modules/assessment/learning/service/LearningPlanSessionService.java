@@ -14,6 +14,7 @@ import com.project_exam.backend.modules.assessment.exam.repository.TagRepository
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 import com.project_exam.backend.modules.assessment.learning.domain.*;
 import com.project_exam.backend.modules.assessment.learning.dto.*;
+import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.repository.*;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanTaskUnlockSupport;
@@ -54,6 +55,7 @@ public class LearningPlanSessionService {
     private final LearningPlanResourceLookup resourceLookup;
     private final LearningPlanTaskUnlockSupport taskUnlockSupport;
     private final StreakService streakService;
+    private final LearningMapper learningMapper;
 
     @Transactional
     public CurrentSessionResponse getCurrentSession(
@@ -127,16 +129,11 @@ public class LearningPlanSessionService {
         int total = sessionQuestions.size();
         int accuracy = lastSubmitted.getAccuracy() != null ? lastSubmitted.getAccuracy() : 0;
 
-        return CurrentSessionResponse.builder()
-                .mode("REVIEW")
-                .learningPlanId(plan.getLearningPlanId())
-                .planStage(plan.getPlanStage() != null ? plan.getPlanStage().name() : null)
-                .sessionId(lastSubmitted.getSessionId())
-                .totalTasks(null)
-                .passedTasks(null)
-                .message(accuracy + "% (" + (int) Math.round(accuracy / 100.0 * total) + "/" + total + " đúng)")
-                .lastReviewItems(reviewItems)
-                .build();
+        return learningMapper.toReviewResponse(
+                plan,
+                lastSubmitted,
+                accuracy + "% (" + (int) Math.round(accuracy / 100.0 * total) + "/" + total + " đúng)",
+                reviewItems);
     }
 
     private String lockedTaskMessage(LearningPlanTask task) {
@@ -286,18 +283,16 @@ public class LearningPlanSessionService {
         List<SubmitSessionResponse.ReviewItem> reviewItems =
                 buildReviewItems(sessionQuestions, rows, correctByQuestion);
 
-        return SubmitSessionResponse.builder()
-                .sessionId(sessionId)
-                .correctCount(correct)
-                .totalCount(total)
-                .accuracy(accuracy)
-                .passed(passed)
-                .taskStatus(taskStatus)
-                .planStage(plan.getPlanStage().name())
-                .unlockedNextTask(false)
-                .message(message)
-                .reviewItems(reviewItems)
-                .build();
+        return learningMapper.toSubmitSessionResponse(
+                sessionId,
+                correct,
+                total,
+                accuracy,
+                passed,
+                taskStatus,
+                plan.getPlanStage().name(),
+                message,
+                reviewItems);
     }
 
     private List<SubmitSessionResponse.ReviewItem> buildReviewItems(
@@ -327,23 +322,15 @@ public class LearningPlanSessionService {
             List<Answer> answerList = allAnswers.getOrDefault(qid, List.of());
 
             List<SubmitSessionResponse.ReviewAnswer> reviewAnswers = answerList.stream()
-                    .map(a -> SubmitSessionResponse.ReviewAnswer.builder()
-                            .answerId(a.getAnswerId())
-                            .answerText(a.getAnswerText())
-                            .answerLabel(a.getAnswerLabel())
-                            .isCorrect(Boolean.TRUE.equals(a.getIsCorrect()))
-                            .build())
+                    .map(learningMapper::toReviewAnswer)
                     .toList();
 
-            items.add(SubmitSessionResponse.ReviewItem.builder()
-                    .questionId(qid)
-                    .questionText(q.getQuestionText())
-                    .answers(reviewAnswers)
-                    .selectedAnswerId(userAns != null ? userAns.getSelectedAnswerId() : null)
-                    .correctAnswerId(correct != null ? correct.getAnswerId() : null)
-                    .isCorrect(userAns != null && Boolean.TRUE.equals(userAns.getIsCorrect()))
-                    .explanation(q.getExplanation())
-                    .build());
+            items.add(learningMapper.toReviewItem(
+                    q,
+                    reviewAnswers,
+                    userAns != null ? userAns.getSelectedAnswerId() : null,
+                    correct != null ? correct.getAnswerId() : null,
+                    userAns != null && Boolean.TRUE.equals(userAns.getIsCorrect())));
         }
         return items;
     }
@@ -363,16 +350,7 @@ public class LearningPlanSessionService {
                 .findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(learningPlanId, taskId);
 
         return sessions.stream()
-                .map(s -> TaskSessionHistoryDto.builder()
-                        .sessionId(s.getSessionId())
-                        .planStage(s.getPlanStage() != null ? s.getPlanStage().name() : null)
-                        .status(s.getStatus() != null ? s.getStatus().name() : null)
-                        .questionCount(s.getQuestionCount())
-                        .accuracy(s.getAccuracy())
-                        .passed(s.getPassed())
-                        .startedAt(s.getStartedAt())
-                        .submittedAt(s.getSubmittedAt())
-                        .build())
+                .map(learningMapper::toTaskSessionHistory)
                 .toList();
     }
 
@@ -559,15 +537,8 @@ public class LearningPlanSessionService {
         for (String qid : questionIds) {
             Question q = questionMap.get(qid);
             if (q == null) continue;
-            questionDtos.add(QuestionResponse.builder()
-                    .questionId(q.getQuestionId())
-                    .questionNumber(q.getQuestionNumber())
-                    .examPartId(q.getExamPartId())
-                    .questionText(q.getQuestionText())
-                    .questionType(q.getQuestionType())
-                    .isBank(q.getIsBank())
-                    .answers(answersMap.getOrDefault(qid, List.of()))
-                    .build());
+            questionDtos.add(learningMapper.toQuestionResponse(
+                    q, answersMap.getOrDefault(qid, List.of())));
         }
 
         PlanTaskDto activeTaskDto = null;
@@ -596,21 +567,16 @@ public class LearningPlanSessionService {
                 plan.getLearningPlanId(), TaskStatus.PASSED);
         long total = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(plan.getLearningPlanId()).size();
 
-        return CurrentSessionResponse.builder()
-                .mode("QUIZ")
-                .learningPlanId(plan.getLearningPlanId())
-                .planStage(plan.getPlanStage().name())
-                .sessionId(session.getSessionId())
-                .sessionStatus(session.getStatus().name())
-                .activeTask(activeTaskDto)
-                .resource(resourceDto)
-                .questionCount(session.getQuestionCount())
-                .passAccuracyRequired(resolvePassAccuracy(plan, session))
-                .questions(questionDtos)
-                .totalTasks((int) total)
-                .passedTasks((int) passed)
-                .message(formatSessionMessage(activeTaskDto))
-                .build();
+        return learningMapper.toQuizSessionResponse(
+                plan,
+                session,
+                activeTaskDto,
+                resourceDto,
+                resolvePassAccuracy(plan, session),
+                questionDtos,
+                (int) total,
+                (int) passed,
+                formatSessionMessage(activeTaskDto));
     }
 
     private CurrentSessionResponse buildMockStageResponse(LearningPlan plan) {
@@ -618,16 +584,12 @@ public class LearningPlanSessionService {
                 plan.getLearningPlanId(), TaskStatus.PASSED);
         long total = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(plan.getLearningPlanId()).size();
 
-        return CurrentSessionResponse.builder()
-                .mode("MOCK")
-                .learningPlanId(plan.getLearningPlanId())
-                .planStage(PlanStage.MOCK.name())
-                .sessionStatus(null)
-                .questions(List.of())
-                .totalTasks((int) total)
-                .passedTasks((int) passed)
-                .message("Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.")
-                .build();
+        return learningMapper.toMockStageResponse(
+                plan,
+                PlanStage.MOCK.name(),
+                (int) total,
+                (int) passed,
+                "Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.");
     }
 
     private CurrentSessionResponse buildPickResponse(LearningPlan plan) {
@@ -647,17 +609,13 @@ public class LearningPlanSessionService {
         long passed = taskRepository.countByLearningPlanIdAndStatus(
                 plan.getLearningPlanId(), TaskStatus.PASSED);
 
-        return CurrentSessionResponse.builder()
-                .mode("PICK")
-                .learningPlanId(plan.getLearningPlanId())
-                .planStage(plan.getPlanStage().name())
-                .partGroups(buildPartGroups(taskEntities, resourcesByTag, tagMap, partMap))
-                .tasks(taskDtos)
-                .totalTasks(taskEntities.size())
-                .passedTasks((int) passed)
-                .questions(List.of())
-                .message("Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.")
-                .build();
+        return learningMapper.toPickResponse(
+                plan,
+                buildPartGroups(taskEntities, resourcesByTag, tagMap, partMap),
+                taskDtos,
+                taskEntities.size(),
+                (int) passed,
+                "Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.");
     }
 
     /** Batch-load Tag/ExamPart cho list task, tránh N+1 trong toTaskDto. */
@@ -706,14 +664,13 @@ public class LearningPlanSessionService {
                     .filter(t -> t.getStatus() == TaskStatus.PASSED)
                     .count();
             Integer passAcc = partTasks.isEmpty() ? null : partTasks.get(0).getPassAccuracy();
-            groups.add(PlanPartGroupDto.builder()
-                    .examPartId(partId)
-                    .examPartName(part != null ? part.getName() : partId)
-                    .passAccuracy(passAcc)
-                    .passedTasksInPart(passedInPart)
-                    .totalTasksInPart(partTasks.size())
-                    .tasks(partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList())
-                    .build());
+            groups.add(learningMapper.toPartGroup(
+                    partId,
+                    part != null ? part.getName() : partId,
+                    passAcc,
+                    passedInPart,
+                    partTasks.size(),
+                    partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList()));
         }
         return groups;
     }
@@ -745,27 +702,15 @@ public class LearningPlanSessionService {
                 : null;
         int priorityScore = task.getPriorityScore() != null ? task.getPriorityScore() : 0;
         String tier = PlanPrioritySupport.tierFromScore(priorityScore);
-        return PlanTaskDto.builder()
-                .taskId(task.getTaskId())
-                .taskOrder(task.getTaskOrder())
-                .taskType(taskType.name())
-                .targetQuestionCount(task.getTargetQuestionCount())
-                .tagId(task.getTagId())
-                .tagName(resolveTaskDisplayName(taskType, tag, part))
-                .examPartId(task.getExamPartId())
-                .examPartName(part != null ? part.getName() : null)
-                .status(task.getStatus().name())
-                .passAccuracy(task.getPassAccuracy())
-                .baselineAccuracy(task.getBaselineAccuracy())
-                .bestAccuracy(task.getBestAccuracy())
-                .attemptCount(task.getAttemptCount())
-                .consecutiveFails(task.getConsecutiveFails())
-                .studyResource(studyResource)
-                .priorityScore(priorityScore)
-                .priorityTier(tier)
-                .wrongCountAtDiagnosis(task.getWrongCountAtDiagnosis())
-                .recommendedFirst(PlanPrioritySupport.TIER_HIGH.equals(tier))
-                .build();
+        return learningMapper.toTaskDto(
+                task,
+                taskType.name(),
+                resolveTaskDisplayName(taskType, tag, part),
+                part != null ? part.getName() : null,
+                studyResource,
+                priorityScore,
+                tier,
+                PlanPrioritySupport.TIER_HIGH.equals(tier));
     }
 
     private String resolveTaskDisplayName(PlanTaskType taskType, Tag tag, ExamPart part) {
@@ -782,12 +727,6 @@ public class LearningPlanSessionService {
     }
 
     private PlanPhaseDto.RecommendedResourceDto toResourceDto(RecoveryResource r) {
-        return PlanPhaseDto.RecommendedResourceDto.builder()
-                .resourceId(r.getResourceId())
-                .title(r.getTitle())
-                .description(r.getDescription())
-                .url(r.getUrl())
-                .originalFileName(r.getOriginalFileName())
-                .build();
+        return learningMapper.toResourceDto(r);
     }
 }

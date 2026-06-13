@@ -8,6 +8,7 @@ import com.project_exam.backend.modules.gamification.quest.dto.QuestClaimRespons
 import com.project_exam.backend.modules.gamification.quest.dto.QuestRequest;
 import com.project_exam.backend.modules.gamification.quest.dto.QuestResponse;
 import com.project_exam.backend.modules.gamification.quest.dto.UserQuestResponse;
+import com.project_exam.backend.modules.gamification.quest.mapper.QuestMapper;
 import com.project_exam.backend.modules.gamification.quest.repository.QuestRepository;
 import com.project_exam.backend.modules.gamification.quest.repository.UserQuestClaimRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
@@ -30,6 +31,7 @@ public class QuestService {
     private final UserQuestClaimRepository claimRepository;
     private final QuestConditionEvaluator evaluator;
     private final CoinService coinService;
+    private final QuestMapper questMapper;
 
     // ---------------- User ----------------
 
@@ -81,11 +83,7 @@ public class QuestService {
         claim.setClaimedAt(now);
         claimRepository.save(claim);
 
-        return QuestClaimResponse.builder()
-                .questId(questId)
-                .rewardCoins(quest.getRewardCoins())
-                .newBalance(newBalance)
-                .build();
+        return questMapper.toClaimResponse(questId, quest.getRewardCoins(), newBalance);
     }
 
     // ---------------- Admin ----------------
@@ -144,36 +142,11 @@ public class QuestService {
     private UserQuestResponse toUserResponse(Quest quest, String userId, boolean claimed) {
         QuestConditionEvaluator.Progress progress = evaluator.evaluate(quest, userId);
         boolean eligible = !claimed && progress.isSatisfied();
-        return UserQuestResponse.builder()
-                .questId(quest.getQuestId())
-                .title(quest.getTitle())
-                .description(quest.getDescription())
-                .rewardCoins(quest.getRewardCoins())
-                .conditionType(quest.getConditionType())
-                .conditionLabel(quest.getConditionType().getLabel())
-                .currentProgress(progress.getCurrent())
-                .target(progress.getTarget())
-                .claimed(claimed)
-                .eligible(eligible)
-                .endAt(quest.getEndAt())
-                .build();
+        return questMapper.toUserResponse(
+                quest, progress.getCurrent(), progress.getTarget(), claimed, eligible);
     }
 
     private QuestResponse toAdminResponse(Quest quest) {
-        return QuestResponse.builder()
-                .questId(quest.getQuestId())
-                .title(quest.getTitle())
-                .description(quest.getDescription())
-                .rewardCoins(quest.getRewardCoins())
-                .conditionType(quest.getConditionType())
-                .conditionLabel(quest.getConditionType() == null
-                        ? null : quest.getConditionType().getLabel())
-                .conditionTarget(quest.getConditionTarget())
-                .startAt(quest.getStartAt())
-                .endAt(quest.getEndAt())
-                .active(quest.getActive())
-                .createdAt(quest.getCreatedAt())
-                .claimCount(claimRepository.countByQuestId(quest.getQuestId()))
-                .build();
+        return questMapper.toAdminResponse(quest, claimRepository.countByQuestId(quest.getQuestId()));
     }
 }

@@ -11,6 +11,7 @@ import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.posts.dto.PostResponse;
 import com.project_exam.backend.modules.posts.dto.PostSummaryResponse;
 import com.project_exam.backend.modules.posts.mapper.CategoryMapper;
+import com.project_exam.backend.modules.posts.mapper.PostMapper;
 import com.project_exam.backend.modules.posts.repository.CategoryRepository;
 import com.project_exam.backend.modules.posts.repository.CommentRepository;
 import com.project_exam.backend.modules.posts.repository.PostCategoryRepository;
@@ -52,6 +53,7 @@ public class PostService {
     private final PostViewThrottleService postViewThrottleService;
     private final com.project_exam.backend.modules.gamification.cosmetic.service.CosmeticService cosmeticService;
     private final CategoryMapper categoryMapper;
+    private final PostMapper postMapper;
 
     // ─────────────────────────────────────────────
     // MAPPING
@@ -102,26 +104,9 @@ public class PostService {
         }
         var authorCosmetics = cosmeticService.getEquipped(post.getUserId());
 
-        return PostResponse.builder()
-                .id(post.getId())
-                .userId(post.getUserId())
-                .authorName(authorName)
-                .authorAvatar(authorAvatar)
-                .equippedFrame(authorCosmetics != null ? authorCosmetics.getFrame() : null)
-                .equippedBadge(authorCosmetics != null ? authorCosmetics.getBadge() : null)
-                .title(post.getTitle())
-                .content(post.getContent())
-                .status(post.getStatus())
-                .createdAt(post.getCreatedAt())
-                .thumbnailUrl(post.getThumbnailUrl())
-                .categories(categories)
-                .reactCounts(reactCounts)
-                .currentUserReactType(currentUserReactType)
-                .commentCount(commentCount)
-                .viewCount(post.getViewCount() == null ? 0L : post.getViewCount())
-                .saveCount(saveCount)
-                .currentUserSaved(currentUserSaved)
-                .build();
+        return postMapper.toFullResponse(post, authorName, authorAvatar, authorCosmetics,
+                categories, reactCounts, currentUserReactType, commentCount, saveCount,
+                currentUserSaved);
     }
 
     public PostSummaryResponse toSummaryResponse(Post post) {
@@ -141,23 +126,8 @@ public class PostService {
         }
         var authorCosmetics = cosmeticService.getEquipped(post.getUserId());
 
-        return PostSummaryResponse.builder()
-                .id(post.getId())
-                .userId(post.getUserId())
-                .authorName(authorName)
-                .authorAvatar(authorAvatar)
-                .equippedFrame(authorCosmetics != null ? authorCosmetics.getFrame() : null)
-                .equippedBadge(authorCosmetics != null ? authorCosmetics.getBadge() : null)
-                .title(post.getTitle())
-                .status(post.getStatus())
-                .createdAt(post.getCreatedAt())
-                .thumbnailUrl(thumbnailUrl)
-                .categories(categories)
-                .commentCount(commentCount)
-                .totalReacts(totalReacts)
-                .viewCount(post.getViewCount() == null ? 0L : post.getViewCount())
-                .saveCount(saveCount)
-                .build();
+        return postMapper.toSummaryResponse(post, authorName, authorAvatar, authorCosmetics,
+                thumbnailUrl, categories, commentCount, totalReacts, saveCount);
     }
 
     // ─────────────────────────────────────────────
@@ -385,23 +355,12 @@ public class PostService {
             String authorAvatar = author != null ? author.getAvatarUrl() : null;
             var authorCosmetics = equippedMap.get(post.getUserId());
 
-            return PostSummaryResponse.builder()
-                    .id(post.getId())
-                    .userId(post.getUserId())
-                    .authorName(authorName)
-                    .authorAvatar(authorAvatar)
-                    .equippedFrame(authorCosmetics != null ? authorCosmetics.getFrame() : null)
-                    .equippedBadge(authorCosmetics != null ? authorCosmetics.getBadge() : null)
-                    .title(post.getTitle())
-                    .status(post.getStatus())
-                    .createdAt(post.getCreatedAt())
-                    .thumbnailUrl(post.getThumbnailUrl())
-                    .categories(categoriesByPostId.getOrDefault(post.getId(), List.of()))
-                    .commentCount(commentCountMap.getOrDefault(post.getId(), 0L))
-                    .totalReacts(reactCountMap.getOrDefault(post.getId(), 0L))
-                    .viewCount(post.getViewCount() == null ? 0L : post.getViewCount())
-                    .saveCount(saveCountMap.getOrDefault(post.getId(), 0L))
-                    .build();
+            return postMapper.toSummaryResponse(post, authorName, authorAvatar, authorCosmetics,
+                    post.getThumbnailUrl(),
+                    categoriesByPostId.getOrDefault(post.getId(), List.of()),
+                    commentCountMap.getOrDefault(post.getId(), 0L),
+                    reactCountMap.getOrDefault(post.getId(), 0L),
+                    saveCountMap.getOrDefault(post.getId(), 0L));
         }).collect(Collectors.toList());
     }
 

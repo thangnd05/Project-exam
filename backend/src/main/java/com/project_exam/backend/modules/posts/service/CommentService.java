@@ -5,6 +5,7 @@ import com.project_exam.backend.modules.posts.dto.CommentResponse;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.posts.domain.Comment;
+import com.project_exam.backend.modules.posts.mapper.CommentMapper;
 import com.project_exam.backend.modules.posts.repository.CommentRepository;
 import com.project_exam.backend.modules.posts.repository.PostRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
@@ -34,31 +35,14 @@ public class CommentService {
     private final AuthUtils authUtils;
     private final com.project_exam.backend.modules.users.repository.UserRepository userRepository;
     private final CosmeticService cosmeticService;
+    private final CommentMapper commentMapper;
 
     private CommentResponse toResponse(Comment c, List<CommentResponse> replies) {
         var authorOpt = userRepository.findById(c.getUserId());
         String authorName = authorOpt.map(User::getUserName).orElse("Unknown");
         String authorAvatar = authorOpt.map(User::getAvatarUrl).orElse(null);
         EquippedCosmeticsResponse equipped = cosmeticService.getEquipped(c.getUserId());
-        return buildResponse(c, replies, authorName, authorAvatar, equipped);
-    }
-
-    private CommentResponse buildResponse(Comment c, List<CommentResponse> replies,
-                                          String authorName, String authorAvatar,
-                                          EquippedCosmeticsResponse equipped) {
-        return CommentResponse.builder()
-                .id(c.getId())
-                .postId(c.getPostId())
-                .userId(c.getUserId())
-                .authorName(authorName)
-                .authorAvatar(authorAvatar)
-                .equippedFrame(equipped != null ? equipped.getFrame() : null)
-                .equippedBadge(equipped != null ? equipped.getBadge() : null)
-                .parentId(c.getParentId())
-                .content(c.getContent())
-                .createdAt(c.getCreatedAt())
-                .replies(replies)
-                .build();
+        return commentMapper.toResponse(c, replies, authorName, authorAvatar, equipped);
     }
 
     /**
@@ -91,7 +75,7 @@ public class CommentService {
                     User author = authorMap.get(c.getUserId());
                     String name = author != null ? author.getUserName() : "Unknown";
                     String avatar = author != null ? author.getAvatarUrl() : null;
-                    return buildResponse(c, new ArrayList<CommentResponse>(), name, avatar,
+                    return commentMapper.toResponse(c, new ArrayList<CommentResponse>(), name, avatar,
                             equippedMap.get(c.getUserId()));
                 })
                 .collect(Collectors.toList());

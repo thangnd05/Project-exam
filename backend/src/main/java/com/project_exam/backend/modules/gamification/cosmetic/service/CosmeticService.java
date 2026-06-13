@@ -7,6 +7,7 @@ import com.project_exam.backend.modules.gamification.cosmetic.domain.UserCosmeti
 import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticRequest;
 import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticResponse;
 import com.project_exam.backend.modules.gamification.cosmetic.dto.EquippedCosmeticsResponse;
+import com.project_exam.backend.modules.gamification.cosmetic.mapper.CosmeticMapper;
 import com.project_exam.backend.modules.gamification.cosmetic.repository.CosmeticRepository;
 import com.project_exam.backend.modules.gamification.cosmetic.repository.UserCosmeticRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
@@ -29,6 +30,7 @@ public class CosmeticService {
     private final CosmeticRepository cosmeticRepository;
     private final UserCosmeticRepository userCosmeticRepository;
     private final CoinService coinService;
+    private final CosmeticMapper cosmeticMapper;
 
     // ---------------- User ----------------
 
@@ -41,7 +43,7 @@ public class CosmeticService {
         return cosmeticRepository.findByActiveTrueOrderByDisplayOrderAscCreatedAtAsc().stream()
                 .map(cosmetic -> {
                     UserCosmetic owned = ownedById.get(cosmetic.getCosmeticId());
-                    return toResponse(cosmetic, owned != null, owned != null && Boolean.TRUE.equals(owned.getEquipped()));
+                    return cosmeticMapper.toResponse(cosmetic, owned != null, owned != null && Boolean.TRUE.equals(owned.getEquipped()));
                 })
                 .toList();
     }
@@ -62,7 +64,7 @@ public class CosmeticService {
         for (UserCosmetic uc : equipped) {
             Cosmetic c = byId.get(uc.getCosmeticId());
             if (c == null) continue;
-            CosmeticResponse res = toResponse(c, true, true);
+            CosmeticResponse res = cosmeticMapper.toResponse(c, true, true);
             if (c.getType() == CosmeticType.FRAME) builder.frame(res);
             else if (c.getType() == CosmeticType.BADGE) builder.badge(res);
         }
@@ -89,7 +91,7 @@ public class CosmeticService {
             Cosmetic c = byId.get(uc.getCosmeticId());
             if (c == null) continue;
             var builder = builders.computeIfAbsent(uc.getUserId(), k -> EquippedCosmeticsResponse.builder());
-            CosmeticResponse res = toResponse(c, true, true);
+            CosmeticResponse res = cosmeticMapper.toResponse(c, true, true);
             if (c.getType() == CosmeticType.FRAME) builder.frame(res);
             else if (c.getType() == CosmeticType.BADGE) builder.badge(res);
         }
@@ -120,7 +122,7 @@ public class CosmeticService {
         owned.setOwnedAt(LocalDateTime.now());
         userCosmeticRepository.save(owned);
 
-        return toResponse(cosmetic, true, false);
+        return cosmeticMapper.toResponse(cosmetic, true, false);
     }
 
     /** Đeo cosmetic (tự tháo cái cùng loại đang đeo). */
@@ -166,7 +168,7 @@ public class CosmeticService {
     @Transactional(readOnly = true)
     public List<CosmeticResponse> findAll() {
         return cosmeticRepository.findAllByOrderByDisplayOrderAscCreatedAtAsc().stream()
-                .map(c -> toResponse(c, null, null))
+                .map(c -> cosmeticMapper.toResponse(c, null, null))
                 .toList();
     }
 
@@ -175,7 +177,7 @@ public class CosmeticService {
         Cosmetic cosmetic = new Cosmetic();
         applyRequest(cosmetic, request);
         cosmetic.setCreatedAt(LocalDateTime.now());
-        return toResponse(cosmeticRepository.save(cosmetic), null, null);
+        return cosmeticMapper.toResponse(cosmeticRepository.save(cosmetic), null, null);
     }
 
     @Transactional
@@ -183,7 +185,7 @@ public class CosmeticService {
         Cosmetic cosmetic = cosmeticRepository.findById(cosmeticId)
                 .orElseThrow(() -> new NotFoundException("Vật phẩm không tồn tại"));
         applyRequest(cosmetic, request);
-        return toResponse(cosmeticRepository.save(cosmetic), null, null);
+        return cosmeticMapper.toResponse(cosmeticRepository.save(cosmetic), null, null);
     }
 
     @Transactional
@@ -205,23 +207,5 @@ public class CosmeticService {
         cosmetic.setImageUrl(request.getImageUrl());
         cosmetic.setActive(request.getActive() == null ? true : request.getActive());
         cosmetic.setDisplayOrder(request.getDisplayOrder() == null ? 0 : request.getDisplayOrder());
-    }
-
-    private CosmeticResponse toResponse(Cosmetic cosmetic, Boolean owned, Boolean equipped) {
-        return CosmeticResponse.builder()
-                .cosmeticId(cosmetic.getCosmeticId())
-                .name(cosmetic.getName())
-                .description(cosmetic.getDescription())
-                .type(cosmetic.getType())
-                .typeLabel(cosmetic.getType() == null ? null : cosmetic.getType().getLabel())
-                .costCoins(cosmetic.getCostCoins())
-                .assetValue(cosmetic.getAssetValue())
-                .frameStyle(cosmetic.getFrameStyle())
-                .imageUrl(cosmetic.getImageUrl())
-                .active(cosmetic.getActive())
-                .displayOrder(cosmetic.getDisplayOrder())
-                .owned(owned)
-                .equipped(equipped)
-                .build();
     }
 }

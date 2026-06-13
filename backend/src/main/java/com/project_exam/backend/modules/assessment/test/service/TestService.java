@@ -113,6 +113,7 @@ public class TestService {
     private final UserTestAccessRepository userTestAccessRepository;
     private final CoinService coinService;
     private final PassageMapper passageMapper;
+    private final com.project_exam.backend.modules.assessment.test.mapper.TestMapper testMapper;
 
     /** User có quyền làm bài chưa: miễn phí, hoặc là người tạo, hoặc đã mua. */
     private boolean hasTestAccess(Test test, String userId) {
@@ -207,11 +208,7 @@ public class TestService {
                     String name = skillKeyIds.containsKey(key)
                             ? skillNames.getOrDefault(skillKeyIds.get(key), "Kỹ năng")
                             : partNames.getOrDefault(key, "Phần thi");
-                    return QuickChallengeCardResponse.PartSummary.builder()
-                            .name(name)
-                            .numQuestions(e.getValue()[0])
-                            .displayOrder(e.getValue()[1])
-                            .build();
+                    return testMapper.toPartSummary(name, e.getValue()[0], e.getValue()[1]);
                 })
                 .sorted(Comparator.comparingInt(QuickChallengeCardResponse.PartSummary::getDisplayOrder))
                 .toList();
@@ -220,18 +217,8 @@ public class TestService {
                 .mapToInt(QuickChallengeCardResponse.PartSummary::getNumQuestions)
                 .sum();
 
-        return QuickChallengeCardResponse.builder()
-                .testId(test.getTestId())
-                .title(test.getTitle())
-                .description(test.getDescription())
-                .durationMinutes(test.getDurationMinutes())
-                .bannerUrl(test.getBannerUrl())
-                .examTypeId(test.getExamTypeId())
-                .examTypeName(examTypeName != null ? examTypeName : "Khác")
-                .status(test.calculateStatus().name())
-                .totalQuestions(totalQuestions)
-                .parts(parts)
-                .build();
+        return testMapper.toQuickChallengeCard(
+                test, examTypeName, test.calculateStatus().name(), totalQuestions, parts);
     }
 
     /**
@@ -330,29 +317,9 @@ public class TestService {
                 || (userId != null
                         && (userId.equals(test.getCreatedBy()) || ownedTestIds.contains(test.getTestId())));
 
-        return TestResponse.builder()
-                .testId(test.getTestId())
-                .title(test.getTitle())
-                .description(test.getDescription())
-                .examTypeId(test.getExamTypeId())
-                .examCategoryId(test.getExamCategoryId())
-                .createdBy(test.getCreatedBy())
-                .createdAt(test.getCreatedAt())
-                .bannerUrl(test.getBannerUrl())
-                .durationMinutes(test.getDurationMinutes())
-                .availableFrom(test.getAvailableFrom())
-                .availableTo(test.getAvailableTo())
-                .status(test.calculateStatus().name())
-                .maxAttempts(maxAttempts)
-                .attemptsUsed((int) attemptsUsed)
-                .remainingAttempts(remainingAttempts)
-                .totalAttempts(totalAttempts)
-                .canDoTest(canDoTest)
-                .costCoins(test.getCostCoins())
-                .owned(owned)
-                .locked(paid && !owned)
-                .parts(null)
-                .build();
+        return testMapper.toSummaryResponse(
+                test, maxAttempts, (int) attemptsUsed, remainingAttempts, totalAttempts,
+                canDoTest, owned, paid && !owned, test.calculateStatus().name());
     }
 
     public Optional<Test> getTestById(String id) {
@@ -467,29 +434,9 @@ public class TestService {
         boolean owned = hasTestAccess(test, userId);
         boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
 
-        return TestResponse.builder()
-                .testId(test.getTestId())
-                .title(test.getTitle())
-                .description(test.getDescription())
-                .examTypeId(test.getExamTypeId())
-                .examCategoryId(test.getExamCategoryId())
-                .createdBy(test.getCreatedBy())
-                .createdAt(test.getCreatedAt())
-                .bannerUrl(test.getBannerUrl())
-                .durationMinutes(test.getDurationMinutes())
-                .availableFrom(test.getAvailableFrom())
-                .availableTo(test.getAvailableTo())
-                .status(test.calculateStatus().name())
-                .maxAttempts(maxAttempts)                // giữ nguyên null
-                .attemptsUsed((int) attemptsUsed)
-                .remainingAttempts(remainingAttempts)   // null nếu không giới hạn
-                .totalAttempts(totalAttempts)
-                .canDoTest(canDoTest)                   // luôn true nếu null
-                .costCoins(test.getCostCoins())
-                .owned(owned)
-                .locked(paid && !owned)
-                .parts(null)
-                .build();
+        return testMapper.toSummaryResponse(
+                test, maxAttempts, (int) attemptsUsed, remainingAttempts, totalAttempts,
+                canDoTest, owned, paid && !owned, test.calculateStatus().name());
     }
 
     public List<TestAdminResponse> getAllTestsByAdmin() {
@@ -521,24 +468,7 @@ public class TestService {
     }
 
     private TestAdminResponse buildAdminTestSummaryFromCount(Test test, long totalAttempts) {
-        return TestAdminResponse.builder()
-                .testId(test.getTestId())
-                .title(test.getTitle())
-                .description(test.getDescription())
-                .examTypeId(test.getExamTypeId())
-                .examCategoryId(test.getExamCategoryId())
-                .createdBy(test.getCreatedBy())
-                .createdAt(test.getCreatedAt())
-                .bannerUrl(test.getBannerUrl())
-                .durationMinutes(test.getDurationMinutes())
-                .availableFrom(test.getAvailableFrom())
-                .availableTo(test.getAvailableTo())
-                .status(test.calculateStatus().name())
-                .maxAttempts(test.getMaxAttempts())
-                .totalAttempts(totalAttempts)
-                .classId(test.getClassId())
-                .parts(null)
-                .build();
+        return testMapper.toAdminSummaryResponse(test, totalAttempts, test.calculateStatus().name());
     }
 
     public List<TestAdminResponse> getTestsByUser(String userId) {
@@ -577,31 +507,16 @@ public class TestService {
                             .map(ExamCategory::getGuestAllowed)
                             .orElse(false);
             if (!guestEligible) {
-                return TestResponse.builder()
-                        .testId(test.getTestId()).title(test.getTitle())
-                        .status(TestStatus.LOGIN_REQUIRED.name()).canDoTest(false)
-                        .build();
+                return testMapper.toLoginRequiredResponse(
+                        test, TestStatus.LOGIN_REQUIRED.name(), false);
             }
         }
 
         // 2b. Bài trả phí chưa mở khoá: KHÔNG trả đề (parts) để tránh lộ câu hỏi.
         boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
         if (paid && !hasTestAccess(test, currentUserId)) {
-            return TestResponse.builder()
-                    .testId(test.getTestId())
-                    .title(test.getTitle())
-                    .description(test.getDescription())
-                    .examTypeId(test.getExamTypeId())
-                    .examCategoryId(test.getExamCategoryId())
-                    .bannerUrl(test.getBannerUrl())
-                    .durationMinutes(test.getDurationMinutes())
-                    .createdBy(test.getCreatedBy())
-                    .status("PAYMENT_REQUIRED")
-                    .canDoTest(false)
-                    .costCoins(test.getCostCoins())
-                    .owned(false)
-                    .locked(true)
-                    .build();
+            return testMapper.toPaymentRequiredResponse(
+                    test, "PAYMENT_REQUIRED", false, false, true);
         }
 
         UserTest latest = isGuest
@@ -700,15 +615,9 @@ public class TestService {
                 Question q = data.questionMap().get(tq.getQuestionId());
                 if (q == null) continue;
 
-                QuestionResponse qDto = QuestionResponse.builder()
-                        .questionId(q.getQuestionId())
-                        .examPartId(q.getExamPartId())
-                        .questionText(q.getQuestionText())
-                        .questionType(q.getQuestionType())
-                        .isBank(q.getIsBank())
-                        .testPartId(tp.getTestPartId())
-                        .answers(data.answersByQuestionId().getOrDefault(q.getQuestionId(), Collections.emptyList()))
-                        .build();
+                QuestionResponse qDto = testMapper.toQuestionResponse(
+                        q, tp.getTestPartId(),
+                        data.answersByQuestionId().getOrDefault(q.getQuestionId(), Collections.emptyList()));
 
                 if (q.getPassageId() != null) {
                     String groupKey = "P_" + q.getPassageId();
@@ -717,26 +626,17 @@ public class TestService {
                         PassageResponse pDto = (p != null)
                                 ? passageMapper.toResponse(p)
                                 : null;
-                        groupsMap.put(groupKey, QuestionGroupResponse.builder()
-                                .passage(pDto)
-                                .questions(new ArrayList<>())
-                                .build());
+                        groupsMap.put(groupKey, testMapper.toQuestionGroupWithPassage(pDto, new ArrayList<>()));
                     }
                     groupsMap.get(groupKey).getQuestions().add(qDto);
                 } else {
-                    groupsMap.put("Q_" + q.getQuestionId(), QuestionGroupResponse.builder()
-                            .passage(null)
-                            .questions(new ArrayList<>(List.of(qDto)))
-                            .build());
+                    groupsMap.put("Q_" + q.getQuestionId(),
+                            testMapper.toSingleQuestionGroup(new ArrayList<>(List.of(qDto))));
                 }
             }
 
             List<QuestionGroupResponse> finalGroups = new ArrayList<>(groupsMap.values());
-            return TestPartResponse.builder()
-                    .testPartId(tp.getTestPartId())
-                    .examPartId(tp.getExamPartId())
-                    .questionGroups(finalGroups)
-                    .build();
+            return testMapper.toTestPartResponse(tp, finalGroups);
         }).toList();
     }
 
@@ -744,60 +644,18 @@ public class TestService {
             Test test, Integer maxAttempts, int attemptsUsed, Integer remaining,
             long totalAttempts, List<TestPartResponse> partResponses) {
 
-        return TestResponse.builder()
-                .testId(test.getTestId())
-                .title(test.getTitle())
-                .description(test.getDescription())
-                .examTypeId(test.getExamTypeId())
-                .examCategoryId(test.getExamCategoryId())
-                .createdBy(test.getCreatedBy())
-                .createdAt(test.getCreatedAt())
-                .bannerUrl(test.getBannerUrl())
-                .durationMinutes(test.getDurationMinutes())
-                .classId(test.getClassId())
-                .chapterId(test.getChapterId())
-                .availableFrom(test.getAvailableFrom())
-                .availableTo(test.getAvailableTo())
-                .status(test.calculateStatus().name())
-                .maxAttempts(maxAttempts)
-                .attemptsUsed(attemptsUsed)
-                .remainingAttempts(remaining)
-                .totalAttempts(totalAttempts)
-                .canDoTest(true)
-                .costCoins(test.getCostCoins())
-                .owned(true)
-                .locked(false)
-                .parts(partResponses)
-                .build();
+        return testMapper.toFullResponse(
+                test, maxAttempts, attemptsUsed, remaining, totalAttempts,
+                true, true, false, test.calculateStatus().name(), partResponses);
     }
 
     // ================= END USER REFACTORING =================
 
     private TestResponse buildEmptyUserTestResponse(Test test, Integer maxAttempts, int attemptsUsed, Integer remaining) {
         long totalAttempts = userTestRepository.countByTestId(test.getTestId());
-        return TestResponse.builder()
-                .testId(test.getTestId())
-                .title(test.getTitle())
-                .description(test.getDescription())
-                .examTypeId(test.getExamTypeId())
-                .examCategoryId(test.getExamCategoryId())
-                .createdBy(test.getCreatedBy())
-                .createdAt(test.getCreatedAt())
-                .bannerUrl(test.getBannerUrl())
-                .durationMinutes(test.getDurationMinutes())
-                .availableFrom(test.getAvailableFrom())
-                .availableTo(test.getAvailableTo())
-                .status(test.calculateStatus().name())
-                .maxAttempts(maxAttempts)
-                .attemptsUsed(attemptsUsed)
-                .remainingAttempts(remaining)
-                .totalAttempts(totalAttempts)
-                .canDoTest(true)
-                .costCoins(test.getCostCoins())
-                .owned(true)
-                .locked(false)
-                .parts(Collections.emptyList())
-                .build();
+        return testMapper.toEmptyResponse(
+                test, maxAttempts, attemptsUsed, remaining, totalAttempts,
+                true, true, false, test.calculateStatus().name(), Collections.emptyList());
     }
 
     // Hàm bổ trợ để xử lý Auto-submit (Tách ra cho gọn code)
@@ -821,14 +679,8 @@ private void handleAutoSubmit(Test test, UserTest latest) {
 
 // Hàm bổ trợ build Response khi hết lượt làm (Tách ra cho gọn)
 private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem, long total) {
-    return TestResponse.builder()
-            .testId(test.getTestId()).title(test.getTitle()).description(test.getDescription())
-            .examCategoryId(test.getExamCategoryId())
-            .classId(test.getClassId()).chapterId(test.getChapterId())
-            .status("FORBIDDEN").maxAttempts(test.getMaxAttempts())
-            .attemptsUsed(used).remainingAttempts(rem).totalAttempts(total)
-            .costCoins(test.getCostCoins()).owned(true).locked(false)
-            .canDoTest(false).build();
+    return testMapper.toLimitExceededResponse(
+            test, used, rem, total, "FORBIDDEN", false, true, false);
 }
 
 // ================= ADMIN VERSION REFACTORING =================
@@ -920,11 +772,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                     .map(entry -> buildQuestionGroupAdmin(entry.getKey(), entry.getValue(), data))
                     .toList();
 
-            return TestPartAdminResponse.builder()
-                    .testPartId(tp.getTestPartId())
-                    .examPartId(tp.getExamPartId())
-                    .questionGroups(groupResponses)
-                    .build();
+            return testMapper.toTestPartAdminResponse(tp, groupResponses);
         }).toList();
     }
 
@@ -943,10 +791,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .map(q -> buildQuestionAdminResponse(q, data))
                 .toList();
 
-        return QuestionGroupAdminResponse.builder()
-                .passage(passageResponse)
-                .questions(questionResponses)
-                .build();
+        return testMapper.toQuestionGroupAdmin(passageResponse, questionResponses);
     }
 
     private QuestionAdminResponse buildQuestionAdminResponse(Question q, TestAdminDataBundle data) {
@@ -956,62 +801,20 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         String examTypeId = Optional.ofNullable(data.examPartMap().get(q.getExamPartId()))
                 .map(ExamPart::getExamTypeId).orElse(null);
 
-        return QuestionAdminResponse.builder()
-                .questionId(q.getQuestionId())
-                .examPartId(q.getExamPartId())
-                .questionText(q.getQuestionText())
-                .questionType(q.getQuestionType())
-                .explanation(q.getExplanation())
-                .examTypeId(examTypeId)
-                .classId(q.getClassId())
-                .isBank(q.getIsBank())
-                .answers(answers)
-                .build();
+        return testMapper.toQuestionAdminResponse(q, examTypeId, answers);
     }
 
     private TestAdminResponse buildAdminTestResponse(
             Test test, long totalAttempts, TestAdminDataBundle data,
             List<TestPartAdminResponse> partResponses) {
 
-        return TestAdminResponse.builder()
-                .testId(test.getTestId())
-                .title(test.getTitle())
-                .description(test.getDescription())
-                .examTypeId(test.getExamTypeId())
-                .examCategoryId(test.getExamCategoryId())
-                .createdBy(test.getCreatedBy())
-                .createdAt(test.getCreatedAt())
-                .bannerUrl(test.getBannerUrl())
-                .durationMinutes(test.getDurationMinutes())
-                .availableFrom(test.getAvailableFrom())
-                .availableTo(test.getAvailableTo())
-                .status(test.calculateStatus().name())
-                .maxAttempts(test.getMaxAttempts())
-                .totalAttempts(totalAttempts)
-                .classId(test.getClassId())
-                .parts(partResponses)
-                .build();
+        return testMapper.toAdminFullResponse(
+                test, totalAttempts, test.calculateStatus().name(), partResponses);
     }
 
     private TestAdminResponse buildEmptyAdminResponse(Test test, long totalAttempts) {
-        return TestAdminResponse.builder()
-                .testId(test.getTestId())
-                .title(test.getTitle())
-                .description(test.getDescription())
-                .examTypeId(test.getExamTypeId())
-                .examCategoryId(test.getExamCategoryId())
-                .createdBy(test.getCreatedBy())
-                .createdAt(test.getCreatedAt())
-                .bannerUrl(test.getBannerUrl())
-                .durationMinutes(test.getDurationMinutes())
-                .availableFrom(test.getAvailableFrom())
-                .availableTo(test.getAvailableTo())
-                .status(test.calculateStatus().name())
-                .maxAttempts(test.getMaxAttempts())
-                .totalAttempts(totalAttempts)
-                .classId(test.getClassId())
-                .parts(Collections.emptyList())
-                .build();
+        return testMapper.toAdminEmptyResponse(
+                test, totalAttempts, test.calculateStatus().name(), Collections.emptyList());
     }
 
     // ================= END ADMIN REFACTORING =================

@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.ExamPartRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamType;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
+import com.project_exam.backend.modules.assessment.exam.mapper.ExamPartMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import lombok.AllArgsConstructor;
@@ -21,23 +22,24 @@ public class ExamPartService {
 
     private final ExamPartRepository examPartRepository;
     private final ExamTypeRepository examTypeRepository;
+    private final ExamPartMapper examPartMapper;
 
     public List<ExamPartResponse> findAll() {
         return examPartRepository.findAllOrdered().stream()
-                .map(this::toResponse)
+                .map(examPartMapper::toResponse)
                 .toList();
     }
 
     public List<ExamPartResponse> findByExamTypeId(String examTypeId) {
         return examPartRepository.findByExamTypeId(examTypeId).stream()
-                .map(this::toResponse)
+                .map(examPartMapper::toResponse)
                 .toList();
     }
 
     public ExamPartResponse findById(String id) {
         ExamPart part = examPartRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam part không tồn tại"));
-        return toResponse(part);
+        return examPartMapper.toResponse(part);
     }
 
     public ExamPartResponse create(ExamPartRequest request) {
@@ -52,7 +54,7 @@ public class ExamPartService {
         part.setSkillId(normalizedSkillId);
         if (request.getDisplayOrder() != null) part.setDisplayOrder(request.getDisplayOrder());
         part = examPartRepository.save(part);
-        return toResponse(part);
+        return examPartMapper.toResponse(part);
     }
 
     public ExamPartResponse update(String id, ExamPartRequest request) {
@@ -72,25 +74,13 @@ public class ExamPartService {
         if (request.getSkillId() != null) part.setSkillId(nextSkillId);
         if (request.getDisplayOrder() != null) part.setDisplayOrder(request.getDisplayOrder());
         part = examPartRepository.save(part);
-        return toResponse(part);
+        return examPartMapper.toResponse(part);
     }
 
     public void delete(String id) {
         ExamPart part = examPartRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam part không tồn tại"));
         examPartRepository.delete(part);
-    }
-
-    private ExamPartResponse toResponse(ExamPart p) {
-        return ExamPartResponse.builder()
-                .examPartId(p.getExamPartId())
-                .examTypeId(p.getExamTypeId())
-                .name(p.getName())
-                .description(p.getDescription())
-                .defaultNumQuestions(p.getDefaultNumQuestions())
-                .skillId(p.getSkillId())
-                .displayOrder(p.getDisplayOrder())
-                .build();
     }
 
     private String normalizeSkillId(String skillId) {

@@ -7,6 +7,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationRequest
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationResponse;
 import com.project_exam.backend.modules.assessment.attempt.domain.Evaluation;
+import com.project_exam.backend.modules.assessment.attempt.mapper.EvaluationMapper;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.assessment.attempt.repository.EvaluationRepository;
 import com.project_exam.backend.modules.users.repository.UserRepository;
@@ -29,6 +30,7 @@ public class EvaluationService {
     private final EvaluationRepository evaluationRepository;
     private final UserRepository userRepository;
     private final AuthUtils authUtils;
+    private final EvaluationMapper evaluationMapper;
 
     // ============================
     //  Helper convert Entity → DTO
@@ -38,16 +40,7 @@ public class EvaluationService {
         User user = userRepository.findById(e.getUserId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        return EvaluationResponse.builder()
-                .id(e.getId())
-                .content(e.getContent())
-                .rating(e.getRating())
-                .createdAt(e.getCreatedAt())
-
-                .userId(user.getUserId())
-                .username(user.getUserName())
-                .avatarUrl(user.getAvatarUrl())
-                .build();
+        return evaluationMapper.toResponse(e, user);
     }
 
     // ============================

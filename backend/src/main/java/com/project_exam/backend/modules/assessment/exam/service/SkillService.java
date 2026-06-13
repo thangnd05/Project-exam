@@ -5,6 +5,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.assessment.exam.dto.SkillRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.SkillResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Skill;
+import com.project_exam.backend.modules.assessment.exam.mapper.SkillMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.SkillRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,17 +17,18 @@ import java.util.List;
 public class SkillService {
 
     private final SkillRepository skillRepository;
+    private final SkillMapper skillMapper;
 
     public List<SkillResponse> findAll() {
         return skillRepository.findAll().stream()
-                .map(this::toResponse)
+                .map(skillMapper::toResponse)
                 .toList();
     }
 
     public SkillResponse findById(String id) {
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Skill không tồn tại"));
-        return toResponse(skill);
+        return skillMapper.toResponse(skill);
     }
 
     public SkillResponse create(SkillRequest request) {
@@ -34,7 +36,7 @@ public class SkillService {
         skill.setName(request.getName());
         skill.setDescription(request.getDescription());
         skill = skillRepository.save(skill);
-        return toResponse(skill);
+        return skillMapper.toResponse(skill);
     }
 
     public SkillResponse update(String id, SkillRequest request) {
@@ -43,7 +45,7 @@ public class SkillService {
         if (request.getName() != null) skill.setName(request.getName());
         if (request.getDescription() != null) skill.setDescription(request.getDescription());
         skill = skillRepository.save(skill);
-        return toResponse(skill);
+        return skillMapper.toResponse(skill);
     }
 
     public void delete(String id) {
@@ -52,11 +54,4 @@ public class SkillService {
         skillRepository.delete(skill);
     }
 
-    private SkillResponse toResponse(Skill skill) {
-        return SkillResponse.builder()
-                .skillId(skill.getSkillId())
-                .name(skill.getName())
-                .description(skill.getDescription())
-                .build();
-    }
 }

@@ -9,6 +9,7 @@ import com.project_exam.backend.modules.assessment.test.dto.TestPartRequest;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartSimpleResponse;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestPart;
+import com.project_exam.backend.modules.assessment.test.mapper.TestMapper;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,14 +28,10 @@ public class TestPartService {
     private final TestPartRepository testPartRepository;
     private final TestRepository testRepository;
     private final AuthUtils authUtils;
+    private final TestMapper testMapper;
 
     private TestPartSimpleResponse toResponse(TestPart testPart) {
-        return TestPartSimpleResponse.builder()
-                .testPartId(testPart.getTestPartId())
-                .testId(testPart.getTestId())
-                .examPartId(testPart.getExamPartId())
-                .numQuestions(testPart.getNumQuestions())
-                .build();
+        return testMapper.toTestPartSimpleResponse(testPart);
     }
 
     public List<TestPart> findAll() {
