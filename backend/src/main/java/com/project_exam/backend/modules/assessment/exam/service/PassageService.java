@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.exam.service;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Passage;
+import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.PassageRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,18 +14,15 @@ import java.util.Optional;
 public class PassageService {
 
     private final PassageRepository passageRepository;
+    private final PassageMapper passageMapper;
 
-    public PassageService(PassageRepository passageRepository) {
+    public PassageService(PassageRepository passageRepository, PassageMapper passageMapper) {
         this.passageRepository = passageRepository;
+        this.passageMapper = passageMapper;
     }
 
     private PassageResponse toResponse(Passage passage) {
-        return PassageResponse.builder()
-                .passageId(passage.getPassageId())
-                .content(passage.getContent())
-                .mediaUrl(passage.getMediaUrl())
-                .passageType(passage.getPassageType())
-                .build();
+        return passageMapper.toResponse(passage);
     }
 
     private Passage toEntity(PassageRequest request) {

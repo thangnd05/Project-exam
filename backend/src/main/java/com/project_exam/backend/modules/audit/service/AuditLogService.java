@@ -4,6 +4,7 @@ import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.audit.dto.AuditLogResponse;
 import com.project_exam.backend.modules.audit.domain.AuditLog;
 import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.audit.mapper.AuditLogMapper;
 import com.project_exam.backend.modules.audit.repository.AuditLogRepository;
 import com.project_exam.backend.modules.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
     private final UserRepository userRepository;
+    private final AuditLogMapper auditLogMapper;
     private static final List<String> LOGIN_ACTIONS = List.of("LOGIN", "LOGOUT");
 
     public AuditLog save(AuditLog auditLog) {
@@ -68,26 +70,7 @@ public class AuditLogService {
                 .collect(Collectors.toMap(User::getUserId, Function.identity()));
 
         return PageResponse.from(logPage, logPage.getContent().stream()
-                .map(log -> toResponse(log, usersById.get(log.getUserId())))
+                .map(log -> auditLogMapper.toResponse(log, usersById.get(log.getUserId())))
                 .toList());
-    }
-
-    private AuditLogResponse toResponse(AuditLog auditLog, User user) {
-        return AuditLogResponse.builder()
-                .auditLogId(auditLog.getAuditLogId())
-                .userId(auditLog.getUserId())
-                .userName(user != null ? user.getUserName() : null)
-                .fullName(user != null ? user.getFullName() : null)
-                .httpMethod(auditLog.getHttpMethod())
-                .endpoint(auditLog.getEndpoint())
-                .action(auditLog.getAction())
-                .resource(auditLog.getResource())
-                .resourceId(auditLog.getResourceId())
-                .ipAddress(auditLog.getIpAddress())
-                .userAgent(auditLog.getUserAgent())
-                .statusCode(auditLog.getStatusCode())
-                .success(auditLog.getSuccess())
-                .createdAt(auditLog.getCreatedAt())
-                .build();
     }
 }

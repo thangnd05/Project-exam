@@ -19,6 +19,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
+import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
 import com.project_exam.backend.modules.assessment.exam.domain.*;
@@ -71,6 +72,7 @@ public class QuestionService {
     private final UserAnswerRepository userAnswerRepository;
     private final TagService tagService;
     private final QuestionTagRepository questionTagRepository;
+    private final PassageMapper passageMapper;
 
     /**
      * Khi câu hỏi được gắn vào một class/chapter, user phải là thành viên hoặc giáo viên của lớp đó
@@ -192,12 +194,7 @@ public class QuestionService {
         if (question.getPassageId() != null) {
             Passage passage = passagesById.get(question.getPassageId());
             if (passage != null) {
-                passageResponse = PassageResponse.builder()
-                        .passageId(passage.getPassageId())
-                        .content(passage.getContent())
-                        .mediaUrl(passage.getMediaUrl())
-                        .passageType(passage.getPassageType())
-                        .build();
+                passageResponse = passageMapper.toResponse(passage);
             }
         }
 
@@ -1013,12 +1010,7 @@ public class QuestionService {
                 .map(ExamPart::getExamTypeId).orElse(null);
         PassageResponse passageDto = null;
         if (passage != null) {
-            passageDto = PassageResponse.builder()
-                    .passageId(passage.getPassageId())
-                    .content(passage.getContent())
-                    .mediaUrl(passage.getMediaUrl())
-                    .passageType(passage.getPassageType())
-                    .build();
+            passageDto = passageMapper.toResponse(passage);
         }
         List<PassageMediaResponse> passageMedia = passage != null
                 ? toPassageMediaResponses(passage.getPassageId())
@@ -1063,12 +1055,7 @@ public class QuestionService {
                 .flatMap(passageRepository::findById)
                 .orElse(null);
         PassageResponse passageDto = passageEntity != null
-                ? PassageResponse.builder()
-                .passageId(passageEntity.getPassageId())
-                .content(passageEntity.getContent())
-                .mediaUrl(passageEntity.getMediaUrl())
-                .passageType(passageEntity.getPassageType())
-                .build()
+                ? passageMapper.toResponse(passageEntity)
                 : null;
         List<PassageMediaResponse> passageMedia = passageEntity != null
                 ? toPassageMediaResponses(passageEntity.getPassageId())

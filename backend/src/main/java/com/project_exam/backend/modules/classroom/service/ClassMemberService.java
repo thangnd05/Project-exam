@@ -9,6 +9,7 @@ import com.project_exam.backend.modules.classroom.dto.ClassStudentResponse;
 import com.project_exam.backend.modules.classroom.domain.ClassEntity;
 import com.project_exam.backend.modules.classroom.domain.ClassMember;
 import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
+import com.project_exam.backend.modules.classroom.mapper.ClassMemberMapper;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.classroom.repository.ClassMemberRepository;
 import com.project_exam.backend.modules.classroom.repository.ClassRepository;
@@ -31,6 +32,7 @@ public class ClassMemberService {
     private final AuthUtils authUtils;
     private final ClassRepository classRepository;
     private final UserRepository userRepository;
+    private final ClassMemberMapper classMemberMapper;
 
     @Transactional
     public ClassMemberResponse joinClassByQr(String classQr, HttpServletRequest request) {
@@ -106,26 +108,8 @@ public class ClassMemberService {
     }
 
     private ClassMemberResponse toResponse(ClassMember m) {
-        String fullName = userRepository.findById(m.getUserId())
-                .map(user -> {
-                    if (user.getFullName() != null && !user.getFullName().isBlank()) {
-                        return user.getFullName();
-                    }
-                    if (user.getUserName() != null && !user.getUserName().isBlank()) {
-                        return user.getUserName();
-                    }
-                    return null;
-                })
-                .filter(name -> name != null && !name.isBlank())
-                .orElse("Học sinh");
-        return ClassMemberResponse.builder()
-                .id(m.getId())
-                .classId(m.getClassId())
-                .userId(m.getUserId())
-                .fullName(fullName)
-                .status(m.getStatus())
-                .joinedAt(m.getJoinedAt())
-                .build();
+        User user = userRepository.findById(m.getUserId()).orElse(null);
+        return classMemberMapper.toResponse(m, user);
     }
 
     // 🟢 Rút khỏi lớp (student tự rời lớp)

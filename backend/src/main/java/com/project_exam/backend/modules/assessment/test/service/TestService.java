@@ -45,6 +45,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionGroupAdminResponse;
+import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
@@ -111,6 +112,7 @@ public class TestService {
     private final ClassAccessGuard classAccessGuard;
     private final UserTestAccessRepository userTestAccessRepository;
     private final CoinService coinService;
+    private final PassageMapper passageMapper;
 
     /** User có quyền làm bài chưa: miễn phí, hoặc là người tạo, hoặc đã mua. */
     private boolean hasTestAccess(Test test, String userId) {
@@ -713,12 +715,7 @@ public class TestService {
                     if (!groupsMap.containsKey(groupKey)) {
                         Passage p = data.passageMap().get(q.getPassageId());
                         PassageResponse pDto = (p != null)
-                                ? PassageResponse.builder()
-                                        .passageId(p.getPassageId())
-                                        .content(p.getContent())
-                                        .mediaUrl(p.getMediaUrl())
-                                        .passageType(p.getPassageType())
-                                        .build()
+                                ? passageMapper.toResponse(p)
                                 : null;
                         groupsMap.put(groupKey, QuestionGroupResponse.builder()
                                 .passage(pDto)
@@ -938,12 +935,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         if (!"NO_PASSAGE".equals(passageId)) {
             Passage p = data.passageMap().get(passageId.toString());
             if (p != null) {
-                passageResponse = PassageResponse.builder()
-                        .passageId(p.getPassageId())
-                        .content(p.getContent())
-                        .mediaUrl(p.getMediaUrl())
-                        .passageType(p.getPassageType())
-                        .build();
+                passageResponse = passageMapper.toResponse(p);
             }
         }
 
