@@ -9,6 +9,7 @@ import com.project_exam.backend.modules.classroom.dto.ClassStudentResponse;
 import com.project_exam.backend.modules.classroom.domain.ClassEntity;
 import com.project_exam.backend.modules.classroom.domain.ClassMember;
 import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
+import com.project_exam.backend.modules.classroom.mapper.ClassMapper;
 import com.project_exam.backend.modules.classroom.mapper.ClassMemberMapper;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.classroom.repository.ClassMemberRepository;
@@ -33,6 +34,7 @@ public class ClassMemberService {
     private final ClassRepository classRepository;
     private final UserRepository userRepository;
     private final ClassMemberMapper classMemberMapper;
+    private final ClassMapper classMapper;
 
     @Transactional
     public ClassMemberResponse joinClassByQr(String classQr, HttpServletRequest request) {
@@ -153,25 +155,16 @@ public class ClassMemberService {
                     .map(User::getFullName)
                     .orElse("Unknown");
 
-            return ClassStudentResponse.builder()
-                    .classId(clazz.getClassId())
-                    .classQr(clazz.getClassQr())
-                    .className(clazz.getClassName())
-                    .teacherName(teacherName)
-                    .build();
+            return classMapper.toStudentResponse(clazz, teacherName);
         }).filter(Objects::nonNull).toList();
 
         // 🧩 2️⃣ Lớp mà tôi dạy (nếu là giáo viên)
         List<ClassEntity> teachingClasses = classRepository.findByTeacherId(currentUserId);
         List<ClassStudentResponse> teachingResponses = teachingClasses.stream()
-                .map(clazz -> ClassStudentResponse.builder()
-                        .classId(clazz.getClassId())
-                        .classQr(clazz.getClassQr())
-                        .className(clazz.getClassName())
-                        .teacherName(userRepository.findById(clazz.getTeacherId())
+                .map(clazz -> classMapper.toStudentResponse(clazz,
+                        userRepository.findById(clazz.getTeacherId())
                                 .map(User::getFullName)
-                                .orElse("Unknown"))
-                        .build())
+                                .orElse("Unknown")))
                 .toList();
 
         //  3️⃣ Trả kết quả gộp

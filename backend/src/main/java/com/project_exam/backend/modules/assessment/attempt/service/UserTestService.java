@@ -9,6 +9,7 @@ import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatu
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
+import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
@@ -60,6 +61,7 @@ public class UserTestService {
     private final AuthUtils authUtils;
     private final StreakService streakService;
     private final UserTestAccessRepository userTestAccessRepository;
+    private final UserTestMapper userTestMapper;
 
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
@@ -71,21 +73,7 @@ public class UserTestService {
     }
 
     private UserTestResponse toResponse(UserTest userTest, String examTypeId) {
-        return UserTestResponse.builder()
-                .userTestId(userTest.getUserTestId())
-                .userId(userTest.getUserId())
-                .testId(userTest.getTestId())
-                .examTypeId(examTypeId)
-                .startedAt(userTest.getStartedAt())
-                .finishedAt(userTest.getFinishedAt())
-                .totalScore(userTest.getTotalScore())
-                .status(userTest.getStatus() != null ? userTest.getStatus().name() : null)
-                .durationTaken(
-                        userTest.getFinishedAt() != null && userTest.getStartedAt() != null
-                                ? Duration.between(userTest.getStartedAt(), userTest.getFinishedAt()).getSeconds()
-                                : null
-                )
-                .build();
+        return userTestMapper.toResponse(userTest, examTypeId, null);
     }
 
     /** Batch-load examTypeId theo testId để tránh N+1 khi map list UserTest. */
@@ -549,23 +537,7 @@ public class UserTestService {
         Map<String, String> userNameById = loadUserNames(list);
 
         return list.stream()
-                .map(u -> UserTestResponse.builder()
-                        .userTestId(u.getUserTestId())
-                        .userId(u.getUserId())
-                        .userName(userNameById.get(u.getUserId()))
-                        .testId(u.getTestId())
-                        .examTypeId(test.getExamTypeId())
-                        .startedAt(u.getStartedAt())
-                        .finishedAt(u.getFinishedAt())
-                        .totalScore(u.getTotalScore())
-                        .status(u.getStatus().name())
-                        .durationTaken(
-                                u.getFinishedAt() != null
-                                        ? Duration.between(u.getStartedAt(), u.getFinishedAt()).getSeconds()
-                                        : null
-                        )
-                        .build()
-                )
+                .map(u -> userTestMapper.toResponse(u, test.getExamTypeId(), userNameById.get(u.getUserId())))
                 .collect(Collectors.toList());
     }
 
@@ -601,23 +573,7 @@ public class UserTestService {
 
         // Toàn bộ bảng đã xếp hạng (chưa cắt) — dùng để tính hạng thật của người xem.
         List<UserTestResponse> ranked = bestAttemptByUser.values().stream()
-                .map(u -> UserTestResponse.builder()
-                        .userTestId(u.getUserTestId())
-                        .userId(u.getUserId())
-                        .userName(userNameById.get(u.getUserId()))
-                        .testId(u.getTestId())
-                        .examTypeId(test.getExamTypeId())
-                        .startedAt(u.getStartedAt())
-                        .finishedAt(u.getFinishedAt())
-                        .totalScore(u.getTotalScore())
-                        .status(u.getStatus().name())
-                        .durationTaken(
-                                u.getFinishedAt() != null
-                                        ? Duration.between(u.getStartedAt(), u.getFinishedAt()).getSeconds()
-                                        : null
-                        )
-                        .build()
-                )
+                .map(u -> userTestMapper.toResponse(u, test.getExamTypeId(), userNameById.get(u.getUserId())))
                 .sorted(
                         Comparator
                                 .comparing(UserTestResponse::getTotalScore, Comparator.nullsLast(Comparator.reverseOrder()))
@@ -722,18 +678,7 @@ public class UserTestService {
         String examTypeId = testRepository.findById(ut.getTestId())
                 .map(Test::getExamTypeId)
                 .orElse(null);
-        return UserTestResponse.builder()
-                .userTestId(ut.getUserTestId())
-                .testId(ut.getTestId())
-                .examTypeId(examTypeId)
-                .userId(ut.getUserId())
-                .userName(resolveUserName(ut.getUserId()))
-                .startedAt(ut.getStartedAt())
-                .finishedAt(ut.getFinishedAt())
-                .totalScore(ut.getTotalScore())
-                .status(ut.getStatus().name())
-                .durationTaken(ut.getFinishedAt() != null ? Duration.between(ut.getStartedAt(), ut.getFinishedAt()).getSeconds() : null)
-                .build();
+        return userTestMapper.toResponse(ut, examTypeId, resolveUserName(ut.getUserId()));
     }
 
     private Map<String, String> loadUserNames(Collection<UserTest> attempts) {
