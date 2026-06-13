@@ -8,6 +8,7 @@ import com.project_exam.backend.modules.users.dto.UserUpsertRequest;
 import com.project_exam.backend.modules.users.dto.ProfileOverviewResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.dto.UserResponse;
+import com.project_exam.backend.modules.users.mapper.UserMapper;
 import com.project_exam.backend.modules.users.domain.*;
 import com.project_exam.backend.modules.posts.domain.*;
 import com.project_exam.backend.modules.assessment.exam.domain.*;
@@ -55,16 +56,10 @@ public class UserService {
     private AuthUtils authUtils;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private UserMapper userMapper;
 
     private UserResponse toResponse(User user) {
-        return UserResponse.builder()
-                .id(user.getUserId())
-                .userName(user.getUserName())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .roleId(user.getRoleId())
-                .avatarUrl(user.getAvatarUrl())
-                .build();
+        return userMapper.toResponse(user);
     }
 
     private User toEntity(UserUpsertRequest request) {

@@ -12,6 +12,7 @@ import com.project_exam.backend.modules.auth.dto.RegisterRequest;
 import com.project_exam.backend.modules.auth.dto.ResetPasswordRequest;
 import com.project_exam.backend.modules.auth.dto.AuthMessageResponse;
 import com.project_exam.backend.modules.users.dto.UserResponse;
+import com.project_exam.backend.modules.users.mapper.UserMapper;
 import com.project_exam.backend.modules.auth.domain.PasswordResetToken;
 import com.project_exam.backend.modules.auth.repository.EmailVerificationRepository;
 import com.project_exam.backend.modules.auth.repository.PasswordResetTokenRepository;
@@ -56,6 +57,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final UserMapper userMapper;
     private final EmailVerificationService emailVerificationService;
     private final EmailVerificationRepository emailVerificationRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -95,14 +97,7 @@ public class AuthService {
         setAccessTokenCookie(accessToken, response);
         setRefreshTokenCookie(refreshToken, response);
 
-        return UserResponse.builder()
-                .id(user.getUserId())
-                .userName(user.getUserName())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .roleId(user.getRoleId())
-                .avatarUrl(user.getAvatarUrl())
-                .build();
+        return userMapper.toResponse(user);
     }
 
     /**
@@ -278,14 +273,7 @@ public class AuthService {
     public UserResponse me(HttpServletRequest request) {
         Claims claims = jwtService.extractAllClaimsFromRequest(request);
         User user = userRepository.findById((String) claims.get("userId")).orElseThrow();
-        return UserResponse.builder()
-                .id(user.getUserId())
-                .userName(user.getUserName())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .roleId(user.getRoleId())
-                .avatarUrl(user.getAvatarUrl())
-                .build();
+        return userMapper.toResponse(user);
     }
     
     public UserTokenInfo getCurrentUserInfo(HttpServletRequest request) {
