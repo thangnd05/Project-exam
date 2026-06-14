@@ -6,6 +6,7 @@ import {createExamPart, deleteExamPart, getExamParts, updateExamPart} from '../.
 import {getExamTypes} from '../../api/examTypeApi';
 import {getSkills} from '../../api/skillApi';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,
@@ -259,23 +260,19 @@ function ExamPartsManagement() {
         }}
         title={editingPartId ? 'Cập nhật phần thi' : 'Tạo phần thi'}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (submitting) {
-                  return;
-                }
-                setShowFormModal(false);
-                resetForm();
-              }}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit}>
-              {editingPartId ? 'Lưu' : 'Tạo mới'}
-            </Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              if (submitting) {
+                return;
+              }
+              setShowFormModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel={editingPartId ? 'Lưu' : 'Tạo mới'}
+            loading={submitting}
+          />
         }
       >
           <Form.Group className="mb-3">

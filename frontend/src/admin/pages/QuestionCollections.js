@@ -1,8 +1,9 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Badge, Button, Form, Spinner} from 'react-bootstrap';
+import {Badge, Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import {
   createQuestionCollection,
   deleteQuestionCollection,
@@ -210,31 +211,18 @@ function QuestionCollectionsManagement() {
         }}
         title={editingId ? 'Cập nhật bộ sưu tập' : 'Tạo bộ sưu tập'}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (submitting) return;
-                setShowModal(false);
-                resetForm();
-              }}
-              disabled={submitting}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit} disabled={submitting}>
-              {submitting ? (
-                <>
-                  <Spinner size="sm" animation="border" className="me-2" />
-                  Đang lưu...
-                </>
-              ) : editingId ? (
-                'Lưu'
-              ) : (
-                'Tạo mới'
-              )}
-            </Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              if (submitting) return;
+              setShowModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel={editingId ? 'Lưu' : 'Tạo mới'}
+            loadingLabel="Đang lưu..."
+            loading={submitting}
+          />
         }
       >
           <Form.Group className="mb-3">

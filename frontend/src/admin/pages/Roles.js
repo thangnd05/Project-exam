@@ -4,6 +4,7 @@ import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {createRole, deleteRole, getRoles, updateRole} from '../../api/roleApi';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,
@@ -200,23 +201,19 @@ function RolesManagement() {
         title={editingRoleId ? 'Cập nhật vai trò' : 'Tạo vai trò'}
         maxWidth={550}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (submitting) {
-                  return;
-                }
-                setShowFormModal(false);
-                resetForm();
-              }}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit}>
-              {editingRoleId ? 'Lưu' : 'Tạo mới'}
-            </Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              if (submitting) {
+                return;
+              }
+              setShowFormModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel={editingRoleId ? 'Lưu' : 'Tạo mới'}
+            loading={submitting}
+          />
         }
       >
         <Form.Group className="mb-3">

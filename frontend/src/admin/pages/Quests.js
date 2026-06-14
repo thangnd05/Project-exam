@@ -4,6 +4,7 @@ import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {createQuest, deleteQuest, getQuests, updateQuest} from '../../api/questApi';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,
@@ -264,23 +265,19 @@ function QuestsManagement() {
         title={editingQuestId ? 'Cập nhật nhiệm vụ' : 'Tạo nhiệm vụ'}
         maxWidth={550}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (submitting) {
-                  return;
-                }
-                setShowModal(false);
-                resetForm();
-              }}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit} disabled={submitting}>
-              {editingQuestId ? 'Lưu' : 'Tạo mới'}
-            </Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              if (submitting) {
+                return;
+              }
+              setShowModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel={editingQuestId ? 'Lưu' : 'Tạo mới'}
+            loading={submitting}
+          />
         }
       >
         <Form.Group className="mb-3">

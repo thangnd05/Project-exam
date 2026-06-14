@@ -9,6 +9,7 @@ import {
   updateEvaluation,
 } from '../../api/evaluationApi';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,
@@ -258,23 +259,20 @@ function EvaluationsManagement() {
         }}
         title={editingEvaluationId ? 'Cập nhật đánh giá' : 'Tạo đánh giá'}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (submitting) {
-                  return;
-                }
-                setShowFormModal(false);
-                resetForm();
-              }}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit}>
-              {editingEvaluationId ? 'Lưu' : 'Tạo mới'}
-            </Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              if (submitting) {
+                return;
+              }
+              setShowFormModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel={editingEvaluationId ? 'Lưu' : 'Tạo mới'}
+            loadingLabel="Đang lưu..."
+            loading={submitting}
+          />
         }
       >
           <Form.Group className="mb-3">

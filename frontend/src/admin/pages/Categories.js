@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import {
     AdminPageHeader,
     AdminToolbar,
@@ -130,12 +131,12 @@ const Categories = () => {
                 title={editingCategory ? 'Sửa danh mục' : 'Thêm danh mục mới'}
                 maxWidth={550}
                 footer={
-                    <>
-                        <Button variant="secondary" onClick={() => setShowModal(false)}>
-                            Hủy
-                        </Button>
-                        <Button onClick={handleSubmit}>Lưu</Button>
-                    </>
+                    <ModalActionFooter
+                        onCancel={() => setShowModal(false)}
+                        onSubmit={handleSubmit}
+                        cancelLabel="Hủy"
+                        submitLabel="Lưu"
+                    />
                 }
             >
                 <Form.Group>

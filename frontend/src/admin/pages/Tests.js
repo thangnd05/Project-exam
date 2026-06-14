@@ -2,10 +2,11 @@ import React, {useEffect, useMemo, useState} from 'react';
 import { getAdminTests, updateTest, deleteTest } from '../../api/testApi';
 import { getExamTypes } from '../../api/examTypeApi';
 import { getUsers } from '../../api/userApi';
-import {Badge, Button, Form} from 'react-bootstrap';
+import {Badge, Form} from 'react-bootstrap';
 import {Edit, Trash2} from 'lucide-react';
 
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import {
   AdminFieldError,
   AdminPageHeader,
@@ -264,20 +265,16 @@ function TestsManagement() {
         title="Cập nhật đề thi"
         maxWidth={800}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setShowFormModal(false);
-                resetForm();
-              }}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit} disabled={submitting || loading}>
-              Lưu
-            </Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              setShowFormModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel="Lưu"
+            loading={submitting || loading}
+          />
         }
       >
           <Form.Group className="mb-3">

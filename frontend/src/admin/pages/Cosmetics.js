@@ -9,6 +9,7 @@ import {
   updateCosmetic,
 } from '../../api/cosmeticApi';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
 import images from '~/assets/images';
@@ -268,21 +269,18 @@ function CosmeticsManagement() {
         title={editingId ? 'Cập nhật vật phẩm' : 'Thêm vật phẩm'}
         maxWidth={550}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (submitting) return;
-                setShowModal(false);
-                resetForm();
-              }}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit} disabled={submitting}>
-              {editingId ? 'Lưu' : 'Tạo mới'}
-            </Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              if (submitting) return;
+              setShowModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel={editingId ? 'Lưu' : 'Tạo mới'}
+            loadingLabel="Đang lưu..."
+            loading={submitting}
+          />
         }
       >
         <div className="d-flex justify-content-center mb-3">

@@ -3,6 +3,7 @@ import {Button, Form} from 'react-bootstrap';
 import {Coins, Edit, Plus, Trash2} from 'lucide-react';
 
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 
 import {
   createCoinWallet,
@@ -241,23 +242,19 @@ function CoinsManagement() {
         title={editingWallet ? 'Cập nhật số xu' : 'Thêm ví xu'}
         maxWidth={550}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (submitting) {
-                  return;
-                }
-                setShowModal(false);
-                resetForm();
-              }}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit} disabled={submitting}>
-              {editingWallet ? 'Lưu' : 'Tạo mới'}
-            </Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              if (submitting) {
+                return;
+              }
+              setShowModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel={editingWallet ? 'Lưu' : 'Tạo mới'}
+            loading={submitting}
+          />
         }
       >
         <Form.Group className="mb-3">

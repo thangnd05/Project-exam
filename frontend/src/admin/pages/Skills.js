@@ -4,6 +4,7 @@ import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {createSkill, deleteSkill, getSkills, updateSkill} from '../../api/skillApi';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,
@@ -213,21 +214,19 @@ function SkillsManagement() {
         title={editingSkillId ? 'Cập nhật kỹ năng' : 'Tạo kỹ năng'}
         maxWidth={550}
         footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (submitting) {
-                  return;
-                }
-                setShowModal(false);
-                resetForm();
-              }}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleSubmit}>{editingSkillId ? 'Lưu' : 'Tạo mới'}</Button>
-          </>
+          <ModalActionFooter
+            onCancel={() => {
+              if (submitting) {
+                return;
+              }
+              setShowModal(false);
+              resetForm();
+            }}
+            onSubmit={handleSubmit}
+            cancelLabel="Hủy"
+            submitLabel={editingSkillId ? 'Lưu' : 'Tạo mới'}
+            loading={submitting}
+          />
         }
       >
         <Form.Group className="mb-3">
