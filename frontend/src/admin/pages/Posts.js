@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames/bind';
-import { Search, Eye, CheckCircle, Trash2 } from 'lucide-react';
+import { Search, Eye, CheckCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import styles from './Posts.module.scss';
@@ -15,18 +15,24 @@ const Posts = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('PENDING');
     const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+
+    const PAGE_SIZE = 10;
 
     const fetchPosts = useCallback(async (page = 0) => {
         setLoading(true);
         try {
             const data = await getPosts({
                 page,
-                size: 10,
+                size: PAGE_SIZE,
                 status: statusFilter === 'ALL' ? undefined : statusFilter,
                 keyword: searchQuery
             });
             setPosts(data.content || []);
             setCurrentPage(data.currentPage || 0);
+            setTotalPages(data.totalPages || 0);
+            setTotalElements(data.totalElements || 0);
         } catch (error) {
             toast.error('Lỗi khi tải danh sách bài viết');
         } finally {
@@ -178,7 +184,33 @@ const Posts = () => {
                 )}
             </div>
 
-            {/* Pagination Controls can go here */}
+            {!loading && totalElements > 0 && (
+                <div className={cx('pagination')}>
+                    <span className={cx('paginationInfo')}>
+                        Hiển thị {currentPage * PAGE_SIZE + 1}-
+                        {Math.min(currentPage * PAGE_SIZE + posts.length, totalElements)} trong {totalElements} bài viết
+                    </span>
+                    <div className={cx('paginationBtns')}>
+                        <button
+                            className={cx('pageBtn')}
+                            disabled={currentPage <= 0}
+                            onClick={() => fetchPosts(currentPage - 1)}
+                        >
+                            <ChevronLeft size={16} />
+                        </button>
+                        <span className={cx('pageNumber')}>
+                            {currentPage + 1}/{totalPages}
+                        </span>
+                        <button
+                            className={cx('pageBtn')}
+                            disabled={currentPage >= totalPages - 1}
+                            onClick={() => fetchPosts(currentPage + 1)}
+                        >
+                            <ChevronRight size={16} />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -188,3 +188,53 @@
     text-align: center;
     color: #64748b;
 }
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.paginationInfo {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.paginationBtns {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pageBtn {
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+        background: #f1f5f9;
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+}
+
+.pageNumber {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 500;
+}
