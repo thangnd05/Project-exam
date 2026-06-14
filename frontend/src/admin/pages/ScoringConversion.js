@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
-import classNames from 'classnames/bind';
 import {Braces, Plus, Trash2} from 'lucide-react';
 
 import {getExamTypes} from '../../api/examTypeApi';
@@ -14,14 +13,12 @@ import {
 import {getSkills} from '../../api/skillApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {
+  AdminCard,
   AdminFieldError,
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import styles from './ScoringConversion.module.scss';
-
-const cx = classNames.bind(styles);
 
 const defaultFormState = {
   exam_type_id: '',
@@ -292,9 +289,9 @@ function ScoringConversionManagement() {
       </AdminPageHeader>
 
       {showJsonCreateForm && (
-        <div className={cx('jsonCreateBox')}>
+        <AdminCard>
           <h5>Tạo quy đổi điểm bằng JSON</h5>
-          <p>
+          <p className="text-secondary">
             Dán mảng JSON theo format: <code>[{'{'}"examTypeId","skillId","numCorrect","convertedScore"{'}'}]</code>
           </p>
           <Form.Control
@@ -305,7 +302,7 @@ function ScoringConversionManagement() {
             value={jsonCreateValue}
             onChange={(event) => setJsonCreateValue(event.target.value)}
           />
-          <div className={cx('jsonActions')}>
+          <div className="d-flex gap-2 mt-3">
             <Button variant="primary" disabled={submitting} onClick={handleCreateByJson}>
               Tạo dữ liệu
             </Button>
@@ -321,7 +318,7 @@ function ScoringConversionManagement() {
               Hủy
             </Button>
           </div>
-        </div>
+        </AdminCard>
       )}
 
       <AdminToolbar
@@ -341,29 +338,40 @@ function ScoringConversionManagement() {
           ))}
         </Form.Select>
       </AdminToolbar>
-      <div className={cx('skillTabs')}>
-        <button
+      <div className="d-flex flex-wrap gap-2">
+        <Button
           type="button"
-          className={cx('skillTab', {active: activeSkillId === 'all'})}
+          size="sm"
+          className="rounded-pill"
+          variant={activeSkillId === 'all' ? 'primary' : 'outline-secondary'}
           onClick={() => setActiveSkillId('all')}
         >
           Tất cả kỹ năng
-        </button>
+        </Button>
         {skills.map((skill) => (
-          <button
+          <Button
             key={skill.skill_id}
             type="button"
-            className={cx('skillTab', {active: activeSkillId === skill.skill_id})}
+            size="sm"
+            className="rounded-pill"
+            variant={activeSkillId === skill.skill_id ? 'primary' : 'outline-secondary'}
             onClick={() => setActiveSkillId(skill.skill_id)}
           >
             {skill.name}
-          </button>
+          </Button>
         ))}
       </div>
 
-      <div className={cx('createBox')}>
+      <AdminCard>
         <h5>Thêm cấu hình quy đổi</h5>
-        <div className={cx('createGrid')}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 150px 150px auto',
+            gap: '10px',
+            alignItems: 'center',
+          }}
+        >
           <Form.Select
             value={formState.exam_type_id}
             onChange={(event) =>
@@ -415,7 +423,7 @@ function ScoringConversionManagement() {
           </Button>
         </div>
         <AdminFieldError message={errorMessage} />
-      </div>
+      </AdminCard>
 
       <AdminTable
         showIndex
