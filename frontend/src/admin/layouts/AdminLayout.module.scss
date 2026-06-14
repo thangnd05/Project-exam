@@ -45,7 +45,9 @@ $transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     transition: $transition;
-    overflow: hidden;
+    // overflow: visible để nút thu gọn (đặt right:-12px, thò ra ngoài) không bị cắt;
+    // phần danh sách dài đã có .nav tự cuộn (overflow-y: auto).
+    overflow: visible;
 
     &.collapsed {
         width: 80px;
@@ -109,24 +111,26 @@ $transition: all 0.3s ease;
 // ============================================
 .collapseBtn {
     position: absolute;
-    right: -12px;
-    top: 70px;
-    width: 24px;
-    height: 24px;
-    background: $sidebar-bg;
-    border: 2px solid $sidebar-hover;
+    right: -14px;
+    top: 64px;
+    width: 28px;
+    height: 28px;
+    background: $primary;
+    border: 2px solid white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: $sidebar-text;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     transition: $transition;
-    z-index: 10;
+    z-index: 1100;
 
     &:hover {
         background: $sidebar-hover;
         color: white;
+        transform: scale(1.08);
     }
 }
 
@@ -447,6 +451,11 @@ $transition: all 0.3s ease;
         &.mobile-open {
             transform: translateX(0);
         }
+    }
+
+    // Drawer trên mobile luôn full, không dùng nút thu gọn.
+    .collapseBtn {
+        display: none;
     }
 
     .mainArea {

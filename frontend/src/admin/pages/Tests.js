@@ -193,7 +193,10 @@ function TestsManagement() {
     {
       key: 'durationMinutes',
       header: 'Thời lượng',
-      render: (test) => `${test.durationMinutes} phút`,
+      render: (test) =>
+        test.durationMinutes != null && test.durationMinutes !== ''
+          ? `${test.durationMinutes} phút`
+          : 'Không giới hạn',
     },
     {key: 'maxAttempts', header: 'Số lần làm tối đa'},
     {

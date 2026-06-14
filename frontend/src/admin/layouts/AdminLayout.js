@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -104,6 +104,20 @@ function AdminLayout({children}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
+  // Trên màn nhỏ (≤1024px) sidebar là drawer: ép bỏ trạng thái thu gọn để luôn hiện đầy đủ
+  // (tránh drawer mở ra chỉ còn icon), và ẩn nút thu gọn (xử lý ở CSS).
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 1024px)');
+    const sync = () => {
+      if (mql.matches) {
+        setCollapsed(false);
+      }
+    };
+    sync();
+    mql.addEventListener('change', sync);
+    return () => mql.removeEventListener('change', sync);
+  }, []);
+
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -125,7 +139,7 @@ function AdminLayout({children}) {
             <div className={cx('logoIcon')}>
               <span>E</span>
             </div>
-            {!collapsed && <span className={cx('logoText')}>EnglishAdmin</span>}
+            {!collapsed && <span className={cx('logoText')}>WinDe Manager</span>}
           </div>
 
           {/* Collapse Toggle (Desktop) */}
