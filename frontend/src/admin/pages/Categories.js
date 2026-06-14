@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Button, Form } from 'react-bootstrap';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '~/api/postApi';
 import { toast } from 'react-toastify';
+import BaseModal from '~/components/common/modal/BaseModal';
 import {
     AdminPageHeader,
     AdminToolbar,
     AdminTable,
 } from '../components/common';
-import styles from './Categories.module.scss';
-
-const cx = classNames.bind(styles);
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -65,8 +61,7 @@ const Categories = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         try {
             if (editingCategory) {
                 await updateCategory(editingCategory.id, formData);
@@ -83,12 +78,7 @@ const Categories = () => {
     };
 
     const columns = [
-        { key: 'id', header: 'ID', width: 80 },
-        {
-            key: 'name',
-            header: 'Tên danh mục',
-            render: (item) => <span className={cx('nameCell')}>{item.name}</span>,
-        },
+        { key: 'name', header: 'Tên danh mục' },
         { key: 'slug', header: 'Slug', render: (item) => item.slug || '-' },
     ];
 
@@ -134,39 +124,32 @@ const Categories = () => {
                 )}
             />
 
-            {/* Modal */}
-            {showModal && (
-                <div className={cx('modalOverlay')}>
-                    <motion.div 
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className={cx('modalContent')}
-                    >
-                        <div className={cx('modalHeader')}>
-                            <h2>{editingCategory ? 'Sửa danh mục' : 'Thêm danh mục mới'}</h2>
-                            <button className={cx('closeBtn')} onClick={() => setShowModal(false)}>
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmit} className={cx('modalForm')}>
-                            <div className={cx('formGroup')}>
-                                <label>Tên danh mục <span className={cx('required')}>*</span></label>
-                                <input 
-                                    type="text" 
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    required 
-                                    placeholder="Nhập tên danh mục..."
-                                />
-                            </div>
-                            <div className={cx('modalFooter')}>
-                                <button type="button" className={cx('cancelBtn')} onClick={() => setShowModal(false)}>Hủy</button>
-                                <button type="submit" className={cx('submitBtn')}>Lưu</button>
-                            </div>
-                        </form>
-                    </motion.div>
-                </div>
-            )}
+            <BaseModal
+                show={showModal}
+                onClose={() => setShowModal(false)}
+                title={editingCategory ? 'Sửa danh mục' : 'Thêm danh mục mới'}
+                maxWidth={550}
+                footer={
+                    <>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>
+                            Hủy
+                        </Button>
+                        <Button onClick={handleSubmit}>Lưu</Button>
+                    </>
+                }
+            >
+                <Form.Group>
+                    <Form.Label>
+                        Tên danh mục <span className="text-danger">*</span>
+                    </Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Nhập tên danh mục..."
+                    />
+                </Form.Group>
+            </BaseModal>
         </div>
     );
 };
