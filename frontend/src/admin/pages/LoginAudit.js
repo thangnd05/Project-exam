@@ -1,6 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Badge, Button, Form} from 'react-bootstrap';
-import {ChevronLeft, ChevronRight} from 'lucide-react';
+import {Badge, Form} from 'react-bootstrap';
 
 import {getLoginAuditLogs} from '../../api/adminAuditApi';
 import {formatDateTime} from '../../utils/format-date-time';
@@ -134,38 +133,13 @@ function LoginAudit() {
         loading={loading}
         emptyText="Không có bản ghi phù hợp bộ lọc hiện tại."
         getRowKey={(row) => row.id}
+        page={currentPage - 1}
+        totalPages={totalPages}
+        totalElements={totalElements}
+        pageSize={ITEMS_PER_PAGE}
+        itemLabel="bản ghi"
+        onPageChange={(p) => setCurrentPage(p + 1)}
       />
-
-      <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <span className="text-secondary small">
-          Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-
-          {totalElements === 0
-            ? 0
-            : Math.min((currentPage - 1) * ITEMS_PER_PAGE + loginAuditRows.length, totalElements)}{' '}
-          trong {totalElements} bản ghi
-        </span>
-        <div className="d-flex align-items-center gap-2">
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            disabled={currentPage <= 1}
-            onClick={() => setCurrentPage((previous) => previous - 1)}
-          >
-            <ChevronLeft size={16} />
-          </Button>
-          <span className="small fw-semibold">
-            {currentPage}/{totalPages}
-          </span>
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            disabled={currentPage >= totalPages}
-            onClick={() => setCurrentPage((previous) => previous + 1)}
-          >
-            <ChevronRight size={16} />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

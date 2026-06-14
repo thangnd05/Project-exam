@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Badge, Button, Form} from 'react-bootstrap';
-import {ChevronLeft, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {
   createEvaluation,
@@ -226,6 +226,11 @@ function EvaluationsManagement() {
         data={evaluationList}
         loading={loading}
         getRowKey={(evaluation) => evaluation.id}
+        page={currentPage - 1}
+        totalPages={totalPages}
+        totalElements={totalElements}
+        pageSize={ITEMS_PER_PAGE}
+        onPageChange={(p) => setCurrentPage(p + 1)}
         rowActions={(evaluation) => (
           <>
             <button onClick={() => openEditModal(evaluation)} title="Sửa đánh giá">
@@ -241,34 +246,6 @@ function EvaluationsManagement() {
           </>
         )}
       />
-      <div className="pagination">
-        <span className="paginationInfo">
-          Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-
-          {totalElements === 0
-            ? 0
-            : Math.min((currentPage - 1) * ITEMS_PER_PAGE + evaluationList.length, totalElements)}{' '}
-          trong {totalElements} bản ghi
-        </span>
-        <div className="paginationBtns">
-          <button
-            className="pageBtn"
-            disabled={currentPage <= 1}
-            onClick={() => setCurrentPage((previous) => previous - 1)}
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <span className="pageNumber">
-            {currentPage}/{totalPages}
-          </span>
-          <button
-            className="pageBtn"
-            disabled={currentPage >= totalPages}
-            onClick={() => setCurrentPage((previous) => previous + 1)}
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      </div>
 
       <BaseModal
         show={showFormModal}

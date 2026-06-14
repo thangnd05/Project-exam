@@ -7,7 +7,6 @@ import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Sinh danh sách trang hiển thị (0-based) có dấu "..." khi nhiều trang.
 function buildPageItems(current, total) {
   const items = [];
   for (let i = 0; i < total; i++) {
@@ -25,10 +24,13 @@ function buildPageItems(current, total) {
  *
  * columns: [{ key, header, render?(row, index), align?: 'center'|'right', width? }]
  * showIndex: true -> tự thêm cột STT (số thứ tự bắt đầu từ 1) ở đầu, thay cho cột ID.
- * rowActions?: (row, index) => ReactNode  -> render cột "Thao tác" cuối, bọc sẵn .actions
- *   (đặt các <button> icon bên trong; có thể thêm class "danger" cho nút xóa)
- * paginated: true -> phân trang client-side ngay trong bảng + chân trang.
- *   pageSize (mặc định 10), itemLabel (vd 'vai trò') cho dòng "tổng số N ...".
+ * rowActions?: (row, index) => ReactNode  -> render cột "Thao tác" cuối, bọc sẵn .actions.
+ *
+ * Phân trang — dùng CHUNG 1 chân trang cho cả 2 chế độ:
+ *  - Client-side: `paginated` + `pageSize` (mặc định 10). Bảng tự slice data.
+ *  - Server-side (controlled): truyền `onPageChange` + `page` (0-based) + `totalPages`
+ *    + `totalElements`. Bảng KHÔNG slice (data đã là 1 trang từ API).
+ *  - `itemLabel` (vd 'vai trò') cho dòng "tổng số N ...".
  */
 function AdminTable({
   columns = [],
@@ -44,32 +46,56 @@ function AdminTable({
   paginated = false,
   pageSize = 10,
   itemLabel = 'mục',
+  // Server-side (controlled) pagination:
+  page,
+  totalPages: totalPagesProp,
+  totalElements,
+  onPageChange,
 }) {
-  const [page, setPage] = useState(0);
+  const isServer = typeof onPageChange === 'function';
+  const hasPager = isServer || paginated;
+  const [internalPage, setInternalPage] = useState(0);
 
-  const total = data.length;
-  const totalPages = paginated ? Math.max(1, Math.ceil(total / pageSize)) : 1;
-  const safePage = Math.min(page, totalPages - 1);
+  const total = isServer ? totalElements || 0 : data.length;
+  const totalPages = isServer
+    ? Math.max(1, totalPagesProp || 1)
+    : Math.max(1, Math.ceil(total / pageSize));
 
-  // Giữ trang hợp lệ khi data đổi (lọc/xoá làm giảm số trang).
+  const safeInternal = Math.min(internalPage, totalPages - 1);
+  const currentPage = isServer ? page || 0 : safeInternal;
+
+  // Client mode: giữ trang hợp lệ khi data đổi (lọc/xoá làm giảm số trang).
   useEffect(() => {
-    if (page !== safePage) {
-      setPage(safePage);
+    if (!isServer && internalPage !== safeInternal) {
+      setInternalPage(safeInternal);
     }
-  }, [page, safePage]);
+  }, [isServer, internalPage, safeInternal]);
 
   const pageRows = useMemo(() => {
-    if (!paginated) {
+    if (!paginated || isServer) {
       return data;
     }
-    const start = safePage * pageSize;
+    const start = currentPage * pageSize;
     return data.slice(start, start + pageSize);
-  }, [paginated, data, safePage, pageSize]);
+  }, [paginated, isServer, data, currentPage, pageSize]);
+
+  const goTo = (target) => {
+    if (target < 0 || target > totalPages - 1 || target === currentPage) {
+      return;
+    }
+    if (isServer) {
+      onPageChange(target);
+    } else {
+      setInternalPage(target);
+    }
+  };
 
   const colSpan = columns.length + (showIndex ? 1 : 0) + (rowActions ? 1 : 0);
-  const indexOffset = paginated ? safePage * pageSize : 0;
-  const rangeStart = total === 0 ? 0 : safePage * pageSize + 1;
-  const rangeEnd = paginated ? Math.min(total, (safePage + 1) * pageSize) : total;
+  const indexOffset = hasPager ? currentPage * pageSize : 0;
+  const rangeStart = total === 0 ? 0 : currentPage * pageSize + 1;
+  const rangeEnd = isServer
+    ? Math.min(total, currentPage * pageSize + data.length)
+    : Math.min(total, (currentPage + 1) * pageSize);
 
   return (
     <div className={cx('tableWrapper')}>
@@ -134,7 +160,7 @@ function AdminTable({
         </tbody>
       </Table>
 
-      {paginated && !loading && total > 0 && (
+      {hasPager && !loading && total > 0 && (
         <div className={cx('tableFooter')}>
           <span className={cx('footerInfo')}>
             Hiển thị {rangeStart} - {rangeEnd} trên tổng số {total} {itemLabel}
@@ -142,13 +168,13 @@ function AdminTable({
           <div className={cx('pager')}>
             <button
               className={cx('pagerBtn')}
-              disabled={safePage === 0}
-              onClick={() => setPage(safePage - 1)}
+              disabled={currentPage === 0}
+              onClick={() => goTo(currentPage - 1)}
               aria-label="Trang trước"
             >
               <ChevronLeft size={16} />
             </button>
-            {buildPageItems(safePage, totalPages).map((item, idx) =>
+            {buildPageItems(currentPage, totalPages).map((item, idx) =>
               item === '...' ? (
                 <span key={`e${idx}`} className={cx('pagerBtn', 'ellipsis')}>
                   …
@@ -156,8 +182,8 @@ function AdminTable({
               ) : (
                 <button
                   key={item}
-                  className={cx('pagerBtn', {active: item === safePage})}
-                  onClick={() => setPage(item)}
+                  className={cx('pagerBtn', {active: item === currentPage})}
+                  onClick={() => goTo(item)}
                 >
                   {item + 1}
                 </button>
@@ -165,8 +191,8 @@ function AdminTable({
             )}
             <button
               className={cx('pagerBtn')}
-              disabled={safePage >= totalPages - 1}
-              onClick={() => setPage(safePage + 1)}
+              disabled={currentPage >= totalPages - 1}
+              onClick={() => goTo(currentPage + 1)}
               aria-label="Trang sau"
             >
               <ChevronRight size={16} />

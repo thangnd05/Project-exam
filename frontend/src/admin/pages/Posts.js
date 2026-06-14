@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Badge, Button } from 'react-bootstrap';
-import { Eye, CheckCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, CheckCircle, Trash2 } from 'lucide-react';
 import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import routes from '~/config/Routes';
@@ -133,6 +133,12 @@ const Posts = () => {
                 loading={loading}
                 emptyText="Không có dữ liệu bài viết"
                 getRowKey={(post) => post.id}
+                page={currentPage}
+                totalPages={totalPages}
+                totalElements={totalElements}
+                pageSize={PAGE_SIZE}
+                itemLabel="bài viết"
+                onPageChange={fetchPosts}
                 rowActions={(post) => (
                     <>
                         <button
@@ -161,36 +167,6 @@ const Posts = () => {
                     </>
                 )}
             />
-
-            {!loading && totalElements > 0 && (
-                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <span className="text-secondary small">
-                        Hiển thị {currentPage * PAGE_SIZE + 1}-
-                        {Math.min(currentPage * PAGE_SIZE + posts.length, totalElements)} trong {totalElements} bài viết
-                    </span>
-                    <div className="d-flex align-items-center gap-2">
-                        <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            disabled={currentPage <= 0}
-                            onClick={() => fetchPosts(currentPage - 1)}
-                        >
-                            <ChevronLeft size={16} />
-                        </Button>
-                        <span className="small fw-semibold">
-                            {currentPage + 1}/{totalPages}
-                        </span>
-                        <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            disabled={currentPage >= totalPages - 1}
-                            onClick={() => fetchPosts(currentPage + 1)}
-                        >
-                            <ChevronRight size={16} />
-                        </Button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

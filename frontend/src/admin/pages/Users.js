@@ -1,15 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight,
-  Shield,
-  Trash2,
-  UserCheck,
-  UserX,
-} from 'lucide-react';
+import {CheckCircle, Shield, Trash2, UserCheck, UserX} from 'lucide-react';
 
 import {getRoles} from '../../api/roleApi';
 import {deleteUser, getUsers} from '../../api/userApi';
@@ -127,8 +119,6 @@ function UsersManagement() {
   ).length;
   const verifiedUsers = users.filter((user) => user.verified === true).length;
   const safeCurrentPage = Math.min(currentPage, totalPages);
-  const indexOfFirstItem = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
-  const indexOfLastItem = indexOfFirstItem + users.length;
 
   const handleDeleteUser = async () => {
     if (!userToDelete) {
@@ -278,6 +268,12 @@ function UsersManagement() {
         data={users}
         loading={loading}
         getRowKey={(user) => user.user_id}
+        page={safeCurrentPage - 1}
+        totalPages={totalPages}
+        totalElements={totalElements}
+        pageSize={ITEMS_PER_PAGE}
+        itemLabel="người dùng"
+        onPageChange={(p) => setCurrentPage(p + 1)}
         rowActions={(user) => (
           <button
             className="danger"
@@ -288,39 +284,6 @@ function UsersManagement() {
           </button>
         )}
       />
-
-      <div className={cx('pagination')}>
-        <span className={cx('paginationInfo')}>
-          Hiển thị {totalElements === 0 ? 0 : indexOfFirstItem + 1}-
-          {totalElements === 0 ? 0 : indexOfLastItem} trong {totalElements}{' '}
-          người dùng
-        </span>
-        <div className={cx('paginationBtns')}>
-          <button
-            className={cx('pageBtn')}
-            disabled={safeCurrentPage === 1}
-            onClick={() => setCurrentPage((previous) => previous - 1)}
-          >
-            <ChevronLeft size={18} />
-          </button>
-          {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index + 1}
-              className={cx('pageBtn', {active: safeCurrentPage === index + 1})}
-              onClick={() => setCurrentPage(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            className={cx('pageBtn')}
-            disabled={safeCurrentPage === totalPages}
-            onClick={() => setCurrentPage((previous) => previous + 1)}
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
 
       <ConfirmDeleteModal
         show={Boolean(userToDelete)}
