@@ -1,14 +1,16 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Badge, Button, Form} from 'react-bootstrap';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {createRole, deleteRole, getRoles, updateRole} from '../../api/roleApi';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
-import styles from './Roles.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const emptyForm = {
   role_name: '',
@@ -137,83 +139,55 @@ function RolesManagement() {
     }
   };
 
+  const columns = [
+    {
+      key: 'role_name',
+      header: 'Tên vai trò',
+      render: (role) => <Badge bg="primary">{role.role_name}</Badge>,
+    },
+    {key: 'description', header: 'Mô tả', render: (role) => role.description || '-'},
+  ];
+
   return (
-    <div className={cx('rolesPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý vai trò</h1>
-          <p>Quản lý quyền hệ thống cho tài khoản người dùng.</p>
-        </div>
-        <Button onClick={openCreateModal} className={cx('createBtn')}>
-          <Plus size={16} />
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý vai trò"
+        description="Quản lý quyền hệ thống cho tài khoản người dùng."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm vai trò
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('filterBar')}>
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Tìm theo tên vai trò hoặc mô tả..."
-          />
-        </div>
-      </div>
-      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm theo tên vai trò hoặc mô tả..."
+      />
+      <AdminFieldError message={errorMessage} />
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tên vai trò</th>
-              <th>Mô tả</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={4} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredRoles.map((role) => (
-              <tr key={role.role_id}>
-                <td>{role.role_id}</td>
-                <td>
-                  <Badge bg="primary">{role.role_name}</Badge>
-                </td>
-                <td>{role.description || '-'}</td>
-                <td>
-                  <div className={cx('actions')}>
-                    <button onClick={() => openEditModal(role)} title="Sửa vai trò">
-                      <Edit size={14} />
-                    </button>
-                    <button
-                      onClick={() => setDeletingRole(role)}
-                      title="Xóa vai trò"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              ))}
-            {!loading && filteredRoles.length === 0 && (
-              <tr>
-                <td colSpan={4} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        columns={columns}
+        data={filteredRoles}
+        loading={loading}
+        getRowKey={(role) => role.role_id}
+        rowActions={(role) => (
+          <>
+            <button onClick={() => openEditModal(role)} title="Sửa vai trò">
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              onClick={() => setDeletingRole(role)}
+              title="Xóa vai trò"
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <BaseModal
         show={showFormModal}

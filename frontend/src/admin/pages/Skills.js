@@ -1,14 +1,16 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Button, Form} from 'react-bootstrap';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {createSkill, deleteSkill, getSkills, updateSkill} from '../../api/skillApi';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
-import styles from './Skills.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const defaultFormState = {
   name: '',
@@ -154,76 +156,51 @@ function SkillsManagement() {
     }
   };
 
+  const columns = [
+    {key: 'name', header: 'Tên kỹ năng'},
+    {key: 'description', header: 'Mô tả', render: (skill) => skill.description || '-'},
+  ];
+
   return (
-    <div className={cx('skillsPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý kỹ năng</h1>
-          <p>Quản lý danh mục kỹ năng dùng cho phần thi và quy đổi điểm.</p>
-        </div>
-        <Button className={cx('createButton')} onClick={openCreateModal}>
-          <Plus size={16} />
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý kỹ năng"
+        description="Quản lý danh mục kỹ năng dùng cho phần thi và quy đổi điểm."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm kỹ năng
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('searchContainer')}>
-        <Search size={16} className={cx('searchIcon')} />
-        <Form.Control
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-          placeholder="Tìm theo tên kỹ năng hoặc mô tả..."
-        />
-      </div>
-      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+      <AdminToolbar
+        searchValue={keyword}
+        onSearchChange={setKeyword}
+        searchPlaceholder="Tìm theo tên kỹ năng hoặc mô tả..."
+      />
+      <AdminFieldError message={errorMessage} />
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tên kỹ năng</th>
-              <th>Mô tả</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={4} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredSkills.map((skill) => (
-              <tr key={skill.skill_id}>
-                <td>{skill.skill_id}</td>
-                <td>{skill.name}</td>
-                <td>{skill.description || '-'}</td>
-                <td>
-                  <div className={cx('actionButtons')}>
-                    <button title="Sửa" onClick={() => openEditModal(skill)}>
-                      <Edit size={14} />
-                    </button>
-                    <button title="Xóa" onClick={() => setDeletingSkill(skill)}>
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              ))}
-            {!loading && filteredSkills.length === 0 && (
-              <tr>
-                <td colSpan={4} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        columns={columns}
+        data={filteredSkills}
+        loading={loading}
+        getRowKey={(skill) => skill.skill_id}
+        rowActions={(skill) => (
+          <>
+            <button title="Sửa" onClick={() => openEditModal(skill)}>
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              title="Xóa"
+              onClick={() => setDeletingSkill(skill)}
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <BaseModal
         show={showModal}
@@ -274,7 +251,7 @@ function SkillsManagement() {
             }
           />
         </Form.Group>
-        {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+        <AdminFieldError message={errorMessage} />
       </BaseModal>
       <ConfirmDeleteModal
         show={Boolean(deletingSkill)}

@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Badge, Button, Form, Spinner} from 'react-bootstrap';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import BaseModal from '~/components/common/modal/BaseModal';
 import {
@@ -11,9 +10,12 @@ import {
   updateQuestionCollection,
 } from '../../api/questionCollectionApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
-import styles from './Skills.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const defaultFormState = {
   name: '',
@@ -138,82 +140,64 @@ function QuestionCollectionsManagement() {
     }
   };
 
+  const columns = [
+    {key: 'name', header: 'Tên'},
+    {
+      key: 'description',
+      header: 'Mô tả',
+      render: (collection) => collection.description || '-',
+    },
+    {
+      key: 'question_count',
+      header: 'Số câu hỏi',
+      render: (collection) => (
+        <Badge bg={collection.question_count > 0 ? 'primary' : 'secondary'}>
+          {collection.question_count}
+        </Badge>
+      ),
+    },
+  ];
+
   return (
-    <div className={cx('skillsPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý bộ sưu tập câu hỏi</h1>
-          <p>Gom nhóm câu hỏi theo chủ đề/nguồn để dễ lọc khi tạo đề.</p>
-        </div>
-        <Button className={cx('createButton')} onClick={openCreateModal}>
-          <Plus size={16} />
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý bộ sưu tập câu hỏi"
+        description="Gom nhóm câu hỏi theo chủ đề/nguồn để dễ lọc khi tạo đề."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm bộ sưu tập
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('searchContainer')}>
-        <Search size={16} className={cx('searchIcon')} />
-        <Form.Control
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-          placeholder="Tìm theo tên bộ sưu tập hoặc mô tả..."
-        />
-      </div>
-      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+      <AdminToolbar
+        searchValue={keyword}
+        onSearchChange={setKeyword}
+        searchPlaceholder="Tìm theo tên bộ sưu tập hoặc mô tả..."
+      />
+      <AdminFieldError message={errorMessage} />
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tên</th>
-              <th>Mô tả</th>
-              <th>Số câu hỏi</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={5} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredCollections.map((collection) => (
-                <tr key={collection.collection_id}>
-                  <td>{collection.collection_id}</td>
-                  <td>{collection.name}</td>
-                  <td>{collection.description || '-'}</td>
-                  <td>
-                    <Badge bg={collection.question_count > 0 ? 'primary' : 'secondary'}>
-                      {collection.question_count}
-                    </Badge>
-                  </td>
-                  <td>
-                    <div className={cx('actionButtons')}>
-                      <button title="Sửa" onClick={() => openEditModal(collection)}>
-                        <Edit size={14} />
-                      </button>
-                      <button title="Xóa" onClick={() => setDeletingItem(collection)}>
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            {!loading && filteredCollections.length === 0 && (
-              <tr>
-                <td colSpan={5} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        columns={columns}
+        data={filteredCollections}
+        loading={loading}
+        getRowKey={(collection) => collection.collection_id}
+        rowActions={(collection) => (
+          <>
+            <button title="Sửa" onClick={() => openEditModal(collection)}>
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              title="Xóa"
+              onClick={() => setDeletingItem(collection)}
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <BaseModal
         show={showModal}
@@ -273,7 +257,7 @@ function QuestionCollectionsManagement() {
               placeholder="Mô tả ngắn về bộ sưu tập (tùy chọn)"
             />
           </Form.Group>
-          {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+          <AdminFieldError message={errorMessage} />
       </BaseModal>
       <ConfirmDeleteModal
         show={Boolean(deletingItem)}
