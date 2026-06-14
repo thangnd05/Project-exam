@@ -3,7 +3,7 @@ import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
 
-import {getExamTypes} from '../../api/examTypeApi';
+import {getStandardExamTypes} from '../../api/examTypeApi';
 import {getExamParts} from '../../api/examPartApi';
 import {getSkills} from '../../api/skillApi';
 import {getScoringConversions} from '../../api/scoringConversionApi';
@@ -61,7 +61,7 @@ function MilestonesManagement() {
 
   const loadExamTypes = useCallback(async () => {
     try {
-      const data = await getExamTypes();
+      const data = await getStandardExamTypes();
       setExamTypes(data);
       if (data.length > 0 && !examTypeFilter) {
         setExamTypeFilter(data[0].examTypeId);

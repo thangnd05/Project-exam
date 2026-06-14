@@ -33,7 +33,7 @@ function UserTargetPage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    getExamTypes().then(setExamTypes).catch(() => {});
+    getStandardExamTypes().then(setExamTypes).catch(() => {});
     getExamParts().then((data) => setExamParts(sortByPartOrder(data))).catch(() => {});
     getSkills().then(setSkills).catch(() => {});
     getScoringConversions().then(setScoringConversions).catch(() => {});
