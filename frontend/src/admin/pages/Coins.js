@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Coins, Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Button, Form} from 'react-bootstrap';
+import {Coins, Edit, Plus, Trash2} from 'lucide-react';
 
 import BaseModal from '~/components/common/modal/BaseModal';
 
@@ -13,9 +12,12 @@ import {
 } from '../../api/coinApi';
 import {getUsers} from '../../api/userApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
-import styles from './Coins.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const defaultFormState = {
   userId: '',
@@ -154,94 +156,78 @@ function CoinsManagement() {
     }
   };
 
-  return (
-    <div className={cx('coinsPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý xu</h1>
-          <p>Xem và điều chỉnh số xu của người dùng.</p>
+  const columns = [
+    {
+      key: 'user',
+      header: 'Người dùng',
+      render: (wallet) => (
+        <div className="d-flex flex-column">
+          <span className="fw-semibold">{wallet.userName || '-'}</span>
+          {wallet.fullName && <span className="text-muted small">{wallet.fullName}</span>}
         </div>
-        <Button className={cx('createButton')} onClick={openCreateModal}>
-          <Plus size={16} />
+      ),
+    },
+    {key: 'email', header: 'Email', render: (wallet) => wallet.email || '-'},
+    {
+      key: 'balance',
+      header: 'Số xu',
+      render: (wallet) => (
+        <span className="d-inline-flex align-items-center gap-1">
+          <Coins size={14} />
+          {wallet.balance}
+        </span>
+      ),
+    },
+    {
+      key: 'updatedAt',
+      header: 'Cập nhật',
+      render: (wallet) =>
+        wallet.updatedAt ? new Date(wallet.updatedAt).toLocaleString('vi-VN') : '-',
+    },
+  ];
+
+  return (
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý xu"
+        description="Xem và điều chỉnh số xu của người dùng."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm ví xu
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('searchContainer')}>
-        <Search size={16} className={cx('searchIcon')} />
-        <Form.Control
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-          placeholder="Tìm theo tên đăng nhập, họ tên hoặc email..."
-        />
-      </div>
-      {errorMessage && !showModal && <p className={cx('errorText')}>{errorMessage}</p>}
+      <AdminToolbar
+        searchValue={keyword}
+        onSearchChange={setKeyword}
+        searchPlaceholder="Tìm theo tên đăng nhập, họ tên hoặc email..."
+      />
+      {!showModal && <AdminFieldError message={errorMessage} />}
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>Người dùng</th>
-              <th>Email</th>
-              <th>Số xu</th>
-              <th>Cập nhật</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={5} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredWallets.map((wallet) => (
-                <tr key={wallet.userId}>
-                  <td>
-                    <div className={cx('userCell')}>
-                      <span className={cx('userName')}>{wallet.userName || '-'}</span>
-                      {wallet.fullName && (
-                        <span className={cx('fullName')}>{wallet.fullName}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td>{wallet.email || '-'}</td>
-                  <td>
-                    <span className={cx('coinValue')}>
-                      <Coins size={14} />
-                      {wallet.balance}
-                    </span>
-                  </td>
-                  <td>
-                    {wallet.updatedAt
-                      ? new Date(wallet.updatedAt).toLocaleString('vi-VN')
-                      : '-'}
-                  </td>
-                  <td>
-                    <div className={cx('actionButtons')}>
-                      <button title="Sửa" onClick={() => openEditModal(wallet)}>
-                        <Edit size={14} />
-                      </button>
-                      <button title="Xóa" onClick={() => setDeletingWallet(wallet)}>
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            {!loading && filteredWallets.length === 0 && (
-              <tr>
-                <td colSpan={5} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        paginated
+        itemLabel="ví"
+        columns={columns}
+        data={filteredWallets}
+        loading={loading}
+        getRowKey={(wallet) => wallet.userId}
+        rowActions={(wallet) => (
+          <>
+            <button title="Sửa" onClick={() => openEditModal(wallet)}>
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              title="Xóa"
+              onClick={() => setDeletingWallet(wallet)}
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <BaseModal
         show={showModal}
@@ -305,7 +291,7 @@ function CoinsManagement() {
             }
           />
         </Form.Group>
-        {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+        <AdminFieldError message={errorMessage} />
       </BaseModal>
 
       <ConfirmDeleteModal

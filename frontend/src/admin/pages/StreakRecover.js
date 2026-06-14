@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { Flame } from 'lucide-react';
 
 import { getStreakRecoverConfig, updateStreakRecoverConfig } from '~/api/streakApi';
+import { AdminFieldError, AdminPageHeader } from '../components/common';
 import styles from './StreakRecover.module.scss';
 
 const cx = classNames.bind(styles);
@@ -55,13 +56,11 @@ function StreakRecoverManagement() {
   };
 
   return (
-    <div className={cx('page')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Khôi phục chuỗi ngày</h1>
-          <p>Giá xu user phải trả để nối lại chuỗi đã đứt (khi chưa học lại).</p>
-        </div>
-      </div>
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Khôi phục chuỗi ngày"
+        description="Giá xu user phải trả để nối lại chuỗi đã đứt (khi chưa học lại)."
+      />
 
       {loading ? (
         <div className={cx('placeholder')}>
@@ -95,7 +94,7 @@ function StreakRecoverManagement() {
             className="mb-3"
           />
 
-          {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+          <AdminFieldError message={errorMessage} />
 
           <Button onClick={handleSave} disabled={saving}>
             {saving ? 'Đang lưu...' : 'Lưu cấu hình'}

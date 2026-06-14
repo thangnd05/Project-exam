@@ -1,10 +1,11 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Badge, Form, Spinner, Table} from 'react-bootstrap';
+import {Badge, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {ChevronLeft, ChevronRight, KeyRound, Search, ShieldAlert} from 'lucide-react';
+import {ChevronLeft, ChevronRight} from 'lucide-react';
 
 import {getLoginAuditLogs} from '../../api/adminAuditApi';
 import {formatDateTime} from '../../utils/format-date-time';
+import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
 import styles from './AuditLogs.module.scss';
 
 const cx = classNames.bind(styles);
@@ -72,101 +73,73 @@ function LoginAudit() {
     });
   }, [loginAuditRows, searchTerm, statusFilter]);
 
-  return (
-    <div className={cx('auditLogsPage')}>
-      <div className={cx('pageHeader')}>
-        <h1>
-          <KeyRound
-            size={28}
-            style={{verticalAlign: 'middle', marginRight: 8}}
-            aria-hidden
-          />
-          Audit đăng nhập
-        </h1>
-        <p>
-          Lịch sử đăng nhập thành công / thất bại (bảng login_audit — dữ liệu
-          demo).
-        </p>
-      </div>
+  const columns = [
+    {
+      key: 'login_time',
+      header: 'Thời gian',
+      render: (row) => formatDateTime(row.login_time),
+    },
+    {key: 'action', header: 'Action', render: (row) => row.action || '—'},
+    {key: 'user_id', header: 'User ID', render: (row) => row.user_id ?? '—'},
+    {key: 'ip_address', header: 'IP', render: (row) => row.ip_address || '—'},
+    {
+      key: 'status',
+      header: 'Trạng thái',
+      render: (row) => (
+        <Badge bg={row.status === 'SUCCESS' ? 'success' : 'danger'}>
+          {row.status === 'SUCCESS' ? 'Thành công' : 'Thất bại'}
+        </Badge>
+      ),
+    },
+    {
+      key: 'failure_reason',
+      header: 'Lý do thất bại',
+      render: (row) => row.failure_reason || '—',
+    },
+    {
+      key: 'user_agent',
+      header: 'User agent',
+      render: (row) => (
+        <span title={row.user_agent || ''}>
+          {(row.user_agent || '').length > 48
+            ? `${(row.user_agent || '').slice(0, 48)}…`
+            : row.user_agent || '—'}
+        </span>
+      ),
+    },
+  ];
 
-      <div className={cx('filters')}>
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            type="text"
-            placeholder="Tìm theo user ID, action, IP, user agent, lý do..."
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-          />
-        </div>
+  return (
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Audit đăng nhập"
+        description="Lịch sử đăng nhập thành công / thất bại (bảng login_audit — dữ liệu demo)."
+      />
+
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm theo user ID, action, IP, user agent, lý do..."
+      >
         <Form.Select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
-          className={cx('statusFilter')}
         >
           <option value="all">Tất cả trạng thái</option>
           <option value="success">Thành công</option>
           <option value="failed">Thất bại</option>
         </Form.Select>
-      </div>
+      </AdminToolbar>
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover className={cx('logsTable')}>
-          <thead>
-            <tr>
-              <th>Thời gian</th>
-              <th>Action</th>
-              <th>User ID</th>
-              <th>IP</th>
-              <th>Trạng thái</th>
-              <th>Lý do thất bại</th>
-              <th>User agent</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={7} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredRows.map((row) => (
-              <tr key={row.id}>
-                <td>{formatDateTime(row.login_time)}</td>
-                <td>{row.action || '—'}</td>
-                <td>{row.user_id ?? '—'}</td>
-                <td>{row.ip_address || '—'}</td>
-                <td>
-                  <Badge bg={row.status === 'SUCCESS' ? 'success' : 'danger'}>
-                    {row.status === 'SUCCESS' ? 'Thành công' : 'Thất bại'}
-                  </Badge>
-                </td>
-                <td>{row.failure_reason || '—'}</td>
-                <td>
-                  <span title={row.user_agent || ''}>
-                    {(row.user_agent || '').length > 48
-                      ? `${(row.user_agent || '').slice(0, 48)}…`
-                      : row.user_agent || '—'}
-                  </span>
-                </td>
-              </tr>
-              ))}
-            {!loading && filteredRows.length === 0 && (
-              <tr>
-                <td colSpan={7}>
-                  <div className={cx('emptyState')}>
-                    <ShieldAlert size={18} />
-                    <span>Không có bản ghi phù hợp bộ lọc hiện tại.</span>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        columns={columns}
+        data={filteredRows}
+        loading={loading}
+        emptyText="Không có bản ghi phù hợp bộ lọc hiện tại."
+        getRowKey={(row) => row.id}
+      />
+
       <div className={cx('pagination')}>
         <span className={cx('paginationInfo')}>
           Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-

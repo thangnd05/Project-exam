@@ -1,14 +1,16 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Button, Form} from 'react-bootstrap';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {createQuest, deleteQuest, getQuests, updateQuest} from '../../api/questApi';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
-import styles from './Quests.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const CONDITION_TYPES = [
   {value: 'NONE', label: 'Không cần điều kiện (tặng xu)'},
@@ -165,101 +167,90 @@ function QuestsManagement() {
   const formatDate = (value) =>
     value ? new Date(value).toLocaleString('vi-VN') : '—';
 
-  return (
-    <div className={cx('questsPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý nhiệm vụ</h1>
-          <p>Tạo nhiệm vụ thưởng xu theo sự kiện hoặc theo thời gian.</p>
+  const columns = [
+    {
+      key: 'title',
+      header: 'Tiêu đề',
+      render: (quest) => (
+        <div className="d-flex flex-column">
+          <span className="fw-semibold">{quest.title}</span>
+          {quest.description && (
+            <span className="text-muted small">{quest.description}</span>
+          )}
         </div>
-        <Button className={cx('createButton')} onClick={openCreateModal}>
-          <Plus size={16} />
+      ),
+    },
+    {
+      key: 'condition',
+      header: 'Điều kiện',
+      render: (quest) => (
+        <>
+          {quest.conditionLabel}
+          {quest.conditionType !== 'NONE' && ` (x${quest.conditionTarget})`}
+        </>
+      ),
+    },
+    {key: 'rewardCoins', header: 'Xu', render: (quest) => quest.rewardCoins},
+    {
+      key: 'time',
+      header: 'Thời gian',
+      render: (quest) => (
+        <div className="d-flex flex-column">
+          <span>Từ: {formatDate(quest.startAt)}</span>
+          <span>Đến: {formatDate(quest.endAt)}</span>
+        </div>
+      ),
+    },
+    {key: 'claimCount', header: 'Đã nhận', render: (quest) => quest.claimCount ?? 0},
+    {
+      key: 'active',
+      header: 'Trạng thái',
+      render: (quest) => (quest.active ? 'Đang bật' : 'Tắt'),
+    },
+  ];
+
+  return (
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý nhiệm vụ"
+        description="Tạo nhiệm vụ thưởng xu theo sự kiện hoặc theo thời gian."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm nhiệm vụ
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('searchContainer')}>
-        <Search size={16} className={cx('searchIcon')} />
-        <Form.Control
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-          placeholder="Tìm theo tiêu đề..."
-        />
-      </div>
-      {errorMessage && !showModal && <p className={cx('errorText')}>{errorMessage}</p>}
+      <AdminToolbar
+        searchValue={keyword}
+        onSearchChange={setKeyword}
+        searchPlaceholder="Tìm theo tiêu đề..."
+      />
+      {!showModal && <AdminFieldError message={errorMessage} />}
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>Tiêu đề</th>
-              <th>Điều kiện</th>
-              <th>Xu</th>
-              <th>Thời gian</th>
-              <th>Đã nhận</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={7} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredQuests.map((quest) => (
-                <tr key={quest.questId}>
-                  <td>
-                    <div className={cx('titleCell')}>
-                      <span className={cx('title')}>{quest.title}</span>
-                      {quest.description && (
-                        <span className={cx('desc')}>{quest.description}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    {quest.conditionLabel}
-                    {quest.conditionType !== 'NONE' && ` (x${quest.conditionTarget})`}
-                  </td>
-                  <td className={cx('coin')}>{quest.rewardCoins}</td>
-                  <td className={cx('timeCell')}>
-                    <span>Từ: {formatDate(quest.startAt)}</span>
-                    <span>Đến: {formatDate(quest.endAt)}</span>
-                  </td>
-                  <td>{quest.claimCount ?? 0}</td>
-                  <td>
-                    <span
-                      className={cx('status', quest.active ? 'active' : 'inactive')}
-                    >
-                      {quest.active ? 'Đang bật' : 'Tắt'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className={cx('actionButtons')}>
-                      <button title="Sửa" onClick={() => openEditModal(quest)}>
-                        <Edit size={14} />
-                      </button>
-                      <button title="Xóa" onClick={() => setDeletingQuest(quest)}>
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            {!loading && filteredQuests.length === 0 && (
-              <tr>
-                <td colSpan={7} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        paginated
+        itemLabel="nhiệm vụ"
+        columns={columns}
+        data={filteredQuests}
+        loading={loading}
+        getRowKey={(quest) => quest.questId}
+        rowActions={(quest) => (
+          <>
+            <button title="Sửa" onClick={() => openEditModal(quest)}>
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              title="Xóa"
+              onClick={() => setDeletingQuest(quest)}
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <BaseModal
         show={showModal}
@@ -390,7 +381,7 @@ function QuestsManagement() {
             setFormState((previous) => ({...previous, active: event.target.checked}))
           }
         />
-        {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+        <AdminFieldError message={errorMessage} />
       </BaseModal>
 
       <ConfirmDeleteModal

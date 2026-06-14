@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {ChevronLeft, ChevronRight, Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Badge, Button, Form} from 'react-bootstrap';
+import {ChevronLeft, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
 
 import {
   createEvaluation,
@@ -11,9 +10,12 @@ import {
 } from '../../api/evaluationApi';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
-import styles from './Evaluations.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const emptyForm = {
   content: '',
@@ -158,38 +160,54 @@ function EvaluationsManagement() {
     }
   };
 
+  const columns = [
+    {
+      key: 'username',
+      header: 'Người dùng',
+      render: (evaluation) => <div>{evaluation.username}</div>,
+    },
+    {
+      key: 'rating',
+      header: 'Rating',
+      render: (evaluation) => <Badge bg="secondary">{evaluation.rating}/5</Badge>,
+    },
+    {key: 'content', header: 'Nội dung', render: (evaluation) => evaluation.content},
+    {
+      key: 'created_at',
+      header: 'Ngày tạo',
+      render: (evaluation) =>
+        evaluation.created_at
+          ? new Date(evaluation.created_at).toLocaleString('vi-VN')
+          : '-',
+    },
+  ];
+
   return (
-    <div className={cx('evaluationsPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý đánh giá</h1>
-          <p>Quản lý đánh giá theo CRUD, không dùng bước duyệt.</p>
-        </div>
-        <Button onClick={openCreateModal} className={cx('createBtn')}>
-          <Plus size={16} />
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý đánh giá"
+        description="Quản lý đánh giá theo CRUD, không dùng bước duyệt."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm đánh giá
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('filters')}>
-        <div className={cx('searchContainer')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={keyword}
-            onChange={(event) => {
-              setKeyword(event.target.value);
-              setCurrentPage(1);
-            }}
-            placeholder="Tìm theo nội dung hoặc người dùng..."
-          />
-        </div>
+      <AdminToolbar
+        searchValue={keyword}
+        onSearchChange={(value) => {
+          setKeyword(value);
+          setCurrentPage(1);
+        }}
+        searchPlaceholder="Tìm theo nội dung hoặc người dùng..."
+      >
         <Form.Select
           value={ratingFilter}
           onChange={(event) => {
             setRatingFilter(event.target.value);
             setCurrentPage(1);
           }}
-          className={cx('ratingFilter')}
         >
           <option value="all">Tất cả rating</option>
           <option value="5">5 sao</option>
@@ -198,100 +216,52 @@ function EvaluationsManagement() {
           <option value="2">2 sao</option>
           <option value="1">1 sao</option>
         </Form.Select>
-      </div>
+      </AdminToolbar>
+      <AdminFieldError message={errorMessage} />
 
-      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
-
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Người dùng</th>
-              <th>Rating</th>
-              <th>Nội dung</th>
-              <th>Ngày tạo</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              evaluationList.map((evaluation) => (
-                <tr key={evaluation.id}>
-                  <td>{evaluation.id}</td>
-                  <td>
-                    <div>{evaluation.username}</div>
-                  </td>
-                  <td>
-                    <Badge bg="secondary">{evaluation.rating}/5</Badge>
-                  </td>
-                  <td>{evaluation.content}</td>
-                  <td>
-                    {evaluation.created_at
-                      ? new Date(evaluation.created_at).toLocaleString('vi-VN')
-                      : '-'}
-                  </td>
-                  <td>
-                    <div className={cx('actionButtons')}>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => openEditModal(evaluation)}
-                      >
-                        <Edit size={14} />
-                        Sửa
-                      </Button>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={() => setDeletingEvaluation(evaluation)}
-                      >
-                        <Trash2 size={14} />
-                        Xóa
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            {!loading && evaluationList.length === 0 && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
-      <div className={cx('pagination')}>
-        <span className={cx('paginationInfo')}>
+      <AdminTable
+        showIndex
+        itemLabel="đánh giá"
+        columns={columns}
+        data={evaluationList}
+        loading={loading}
+        getRowKey={(evaluation) => evaluation.id}
+        rowActions={(evaluation) => (
+          <>
+            <button onClick={() => openEditModal(evaluation)} title="Sửa đánh giá">
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              onClick={() => setDeletingEvaluation(evaluation)}
+              title="Xóa đánh giá"
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
+      <div className="pagination">
+        <span className="paginationInfo">
           Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-
           {totalElements === 0
             ? 0
             : Math.min((currentPage - 1) * ITEMS_PER_PAGE + evaluationList.length, totalElements)}{' '}
           trong {totalElements} bản ghi
         </span>
-        <div className={cx('paginationBtns')}>
+        <div className="paginationBtns">
           <button
-            className={cx('pageBtn')}
+            className="pageBtn"
             disabled={currentPage <= 1}
             onClick={() => setCurrentPage((previous) => previous - 1)}
           >
             <ChevronLeft size={16} />
           </button>
-          <span className={cx('pageNumber')}>
+          <span className="pageNumber">
             {currentPage}/{totalPages}
           </span>
           <button
-            className={cx('pageBtn')}
+            className="pageBtn"
             disabled={currentPage >= totalPages}
             onClick={() => setCurrentPage((previous) => previous + 1)}
           >

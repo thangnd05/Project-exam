@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Button, Form, Spinner, Table} from 'react-bootstrap';
+import {Button, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Braces, Plus, Search, Trash2} from 'lucide-react';
+import {Braces, Plus, Trash2} from 'lucide-react';
 
 import {getExamTypes} from '../../api/examTypeApi';
 import {
@@ -13,6 +13,12 @@ import {
 } from '../../api/scoringConversionApi';
 import {getSkills} from '../../api/skillApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 import styles from './ScoringConversion.module.scss';
 
 const cx = classNames.bind(styles);
@@ -251,27 +257,39 @@ function ScoringConversionManagement() {
     }
   };
 
+  const columns = [
+    {
+      key: 'exam_type',
+      header: 'Loại kỳ thi',
+      render: (rule) => getExamTypeName(rule.exam_type_id),
+    },
+    {key: 'skill', header: 'Kỹ năng', render: (rule) => getSkillName(rule.skill_id)},
+    {key: 'num_correct', header: 'Số câu đúng', render: (rule) => rule.num_correct},
+    {
+      key: 'converted_score',
+      header: 'Điểm quy đổi',
+      render: (rule) => rule.converted_score,
+    },
+  ];
+
   return (
-    <div className={cx('scoringPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý quy đổi điểm</h1>
-          <p>Thiết lập score theo exam type, kỹ năng và số câu trả lời đúng.</p>
-        </div>
-        <div className={cx('headerActions')}>
-          <Button
-            variant="outline-primary"
-            onClick={() => {
-              setShowJsonCreateForm((previous) => !previous);
-              setErrorMessage('');
-              setTimeout(() => jsonTextareaRef.current?.focus(), 0);
-            }}
-          >
-            <Braces size={16} />
-            Tạo bằng JSON
-          </Button>
-        </div>
-      </div>
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý quy đổi điểm"
+        description="Thiết lập score theo exam type, kỹ năng và số câu trả lời đúng."
+      >
+        <Button
+          variant="outline-primary"
+          onClick={() => {
+            setShowJsonCreateForm((previous) => !previous);
+            setErrorMessage('');
+            setTimeout(() => jsonTextareaRef.current?.focus(), 0);
+          }}
+        >
+          <Braces size={16} />
+          Tạo bằng JSON
+        </Button>
+      </AdminPageHeader>
 
       {showJsonCreateForm && (
         <div className={cx('jsonCreateBox')}>
@@ -306,15 +324,11 @@ function ScoringConversionManagement() {
         </div>
       )}
 
-      <div className={cx('filters')}>
-        <div className={cx('searchContainer')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={keyword}
-            onChange={(event) => setKeyword(event.target.value)}
-            placeholder="Tìm theo exam type, skill hoặc điểm..."
-          />
-        </div>
+      <AdminToolbar
+        searchValue={keyword}
+        onSearchChange={setKeyword}
+        searchPlaceholder="Tìm theo exam type, skill hoặc điểm..."
+      >
         <Form.Select
           value={examTypeFilter}
           onChange={(event) => setExamTypeFilter(event.target.value)}
@@ -326,7 +340,7 @@ function ScoringConversionManagement() {
             </option>
           ))}
         </Form.Select>
-      </div>
+      </AdminToolbar>
       <div className={cx('skillTabs')}>
         <button
           type="button"
@@ -400,59 +414,23 @@ function ScoringConversionManagement() {
             Thêm
           </Button>
         </div>
-        {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+        <AdminFieldError message={errorMessage} />
       </div>
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Loại kỳ thi</th>
-              <th>Kỹ năng</th>
-              <th>Số câu đúng</th>
-              <th>Điểm quy đổi</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredRules.map((rule) => (
-              <tr key={rule.conversion_id}>
-                <td>{rule.conversion_id}</td>
-                <td>{getExamTypeName(rule.exam_type_id)}</td>
-                <td>{getSkillName(rule.skill_id)}</td>
-                <td>{rule.num_correct}</td>
-                <td>{rule.converted_score}</td>
-                <td>
-                  <button
-                    className={cx('deleteButton')}
-                    title="Xóa"
-                    onClick={() => setDeletingRule(rule)}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </td>
-              </tr>
-              ))}
-            {!loading && filteredRules.length === 0 && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        paginated
+        itemLabel="mốc quy đổi"
+        columns={columns}
+        data={filteredRules}
+        loading={loading}
+        getRowKey={(rule) => rule.conversion_id}
+        rowActions={(rule) => (
+          <button className="danger" title="Xóa" onClick={() => setDeletingRule(rule)}>
+            <Trash2 size={14} />
+          </button>
+        )}
+      />
       <ConfirmDeleteModal
         show={Boolean(deletingRule)}
         onClose={() => {

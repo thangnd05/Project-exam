@@ -1,7 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Badge, Button} from 'react-bootstrap';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {
   createExamType,
@@ -11,9 +10,12 @@ import {
 } from '../../api/examTypeApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import ExamTypeFormModal from '../modals/ExamTypeFormModal';
-import styles from './ExamTypes.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const emptyForm = {
   name: '',
@@ -167,92 +169,70 @@ function ExamTypesManagement() {
     }
   };
 
+  const columns = [
+    {key: 'name', header: 'Tên', render: (examType) => examType.name || '-'},
+    {
+      key: 'duration_minutes',
+      header: 'Thời lượng',
+      render: (examType) =>
+        examType.duration_minutes !== '' && examType.duration_minutes != null
+          ? `${examType.duration_minutes} phút`
+          : '-',
+    },
+    {
+      key: 'scoring_method',
+      header: 'Chấm điểm',
+      render: (examType) => <Badge bg="primary">{examType.scoring_method}</Badge>,
+    },
+    {
+      key: 'description',
+      header: 'Mô tả',
+      render: (examType) => examType.description || '-',
+    },
+  ];
+
   return (
-    <div className={cx('examTypesPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý loại kỳ thi</h1>
-          <p>Cấu hình loại kỳ thi dùng cho hệ thống.</p>
-        </div>
-        <Button onClick={openCreateModal} className={cx('createBtn')}>
-          <Plus size={16} />
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý loại kỳ thi"
+        description="Cấu hình loại kỳ thi dùng cho hệ thống."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm loại kỳ thi
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('filterBar')}>
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Tìm theo tên, mô tả, phương thức chấm..."
-          />
-        </div>
-      </div>
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm theo tên, mô tả, phương thức chấm..."
+      />
+      <AdminFieldError message={errorMessage} />
 
-      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
-
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tên</th>
-              <th>Thời lượng</th>
-              <th>Chấm điểm</th>
-              <th>Mô tả</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredExamTypes.map((examType) => (
-              <tr key={examType.exam_type_id}>
-                <td>{examType.exam_type_id}</td>
-                <td>{examType.name}</td>
-                <td>
-                  {examType.duration_minutes !== '' && examType.duration_minutes != null
-                    ? `${examType.duration_minutes} phút`
-                    : '-'}
-                </td>
-                <td>
-                  <Badge bg="primary">{examType.scoring_method}</Badge>
-                </td>
-                <td>{examType.description || '-'}</td>
-                <td>
-                  <div className={cx('actions')}>
-                    <button onClick={() => openEditModal(examType)} title="Sửa">
-                      <Edit size={14} />
-                    </button>
-                    <button
-                      onClick={() => setDeletingExamType(examType)}
-                      title="Xóa"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              ))}
-            {!loading && filteredExamTypes.length === 0 && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        paginated
+        itemLabel="loại đề"
+        columns={columns}
+        data={filteredExamTypes}
+        loading={loading}
+        getRowKey={(examType) => examType.exam_type_id}
+        rowActions={(examType) => (
+          <>
+            <button onClick={() => openEditModal(examType)} title="Sửa">
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              onClick={() => setDeletingExamType(examType)}
+              title="Xóa"
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <ExamTypeFormModal
         show={showFormModal}

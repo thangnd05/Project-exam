@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Check, Pencil, Plus, Search, Trash2, X} from 'lucide-react';
+import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
 
 import {getExamTypes} from '../../api/examTypeApi';
 import {getExamParts} from '../../api/examPartApi';
@@ -14,6 +14,11 @@ import {
   updateMilestone,
 } from '../../api/milestoneApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminToolbar,
+} from '../components/common';
 import styles from './Milestones.module.scss';
 
 const cx = classNames.bind(styles);
@@ -271,25 +276,16 @@ function MilestonesManagement() {
 
   return (
     <div className={cx('milestonePage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Cấu hình mốc điểm mục tiêu</h1>
-          <p>
-            Thiết lập các mốc điểm và % yêu cầu từng phần thi để đánh giá
-            readiness của người dùng.
-          </p>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Cấu hình mốc điểm mục tiêu"
+        description="Thiết lập các mốc điểm và % yêu cầu từng phần thi để đánh giá readiness của người dùng."
+      />
 
-      <div className={cx('filters')}>
-        <div className={cx('searchContainer')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Tìm theo mốc điểm hoặc mô tả..."
-          />
-        </div>
+      <AdminToolbar
+        searchValue={keyword}
+        onSearchChange={setKeyword}
+        searchPlaceholder="Tìm theo mốc điểm hoặc mô tả..."
+      >
         <Form.Select
           value={examTypeFilter}
           onChange={(e) => setExamTypeFilter(e.target.value)}
@@ -301,7 +297,7 @@ function MilestonesManagement() {
             </option>
           ))}
         </Form.Select>
-      </div>
+      </AdminToolbar>
 
       {examTypeFilter && (
         <div className={cx('createBox')}>
@@ -327,7 +323,7 @@ function MilestonesManagement() {
               Thêm
             </Button>
           </div>
-          {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+          <AdminFieldError message={errorMessage} />
         </div>
       )}
 

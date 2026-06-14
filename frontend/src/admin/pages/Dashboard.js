@@ -26,6 +26,7 @@ import {
     ExamTypeDonut,
     SkillRadar,
 } from '../components/AdminCharts';
+import { AdminPageHeader } from '../components/common';
 
 import {
     dashboardStats,
@@ -88,27 +89,20 @@ const AdminDashboard = () => {
     return (
         <div className={cx('dashboard')}>
             {/* Page Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cx('pageHeader')}
+            <AdminPageHeader
+                title="Dashboard"
+                description="Tổng quan về hệ thống English Exam"
             >
-                <div>
-                    <h1>Dashboard</h1>
-                    <p>Tổng quan về hệ thống English Exam</p>
-                </div>
-                <div className={cx('headerActions')}>
-                    <span className={cx('dateBadge')}>
-                        <Calendar size={16} />
-                        {new Date().toLocaleDateString('vi-VN', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })}
-                    </span>
-                </div>
-            </motion.div>
+                <span className={cx('dateBadge')}>
+                    <Calendar size={16} />
+                    {new Date().toLocaleDateString('vi-VN', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })}
+                </span>
+            </AdminPageHeader>
 
             {/* Stats Cards */}
             <Row className={cx('statsRow')}>

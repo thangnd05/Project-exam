@@ -1,16 +1,18 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Button, Form} from 'react-bootstrap';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {createExamPart, deleteExamPart, getExamParts, updateExamPart} from '../../api/examPartApi';
 import {getExamTypes} from '../../api/examTypeApi';
 import {getSkills} from '../../api/skillApi';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
-import styles from './ExamParts.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const emptyForm = {
   exam_type_id: '',
@@ -194,87 +196,60 @@ function ExamPartsManagement() {
     return skills.find((skill) => skill.skill_id === skillId)?.name || '-';
   };
 
+  const columns = [
+    {key: 'display_order', header: 'Thứ tự', align: 'center'},
+    {key: 'name', header: 'Tên phần thi'},
+    {
+      key: 'exam_type',
+      header: 'Loại kỳ thi',
+      render: (examPart) => getExamTypeName(examPart.exam_type_id),
+    },
+    {key: 'skill', header: 'Skill', render: (examPart) => getSkillName(examPart.skill_id)},
+    {key: 'default_num_questions', header: 'Số câu mặc định', align: 'center'},
+  ];
+
   return (
-    <div className={cx('examPartsPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý phần thi</h1>
-          <p>Cấu hình các phần thi cho từng loại kỳ thi.</p>
-        </div>
-        <Button onClick={openCreateModal} className={cx('createBtn')}>
-          <Plus size={16} />
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý phần thi"
+        description="Cấu hình các phần thi cho từng loại kỳ thi."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm phần thi
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('filterBar')}>
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Tìm phần thi theo tên, mô tả, loại kỳ thi..."
-          />
-        </div>
-      </div>
-      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm phần thi theo tên, mô tả, loại kỳ thi..."
+      />
+      <AdminFieldError message={errorMessage} />
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>Thứ tự</th>
-              <th>ID</th>
-              <th>Tên phần thi</th>
-              <th>Loại kỳ thi</th>
-              <th>Skill</th>
-              <th>Số câu mặc định</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={7} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredExamParts.map((examPart) => (
-              <tr key={examPart.exam_part_id}>
-                <td>{examPart.display_order}</td>
-                <td>{examPart.exam_part_id}</td>
-                <td>{examPart.name}</td>
-                <td>{getExamTypeName(examPart.exam_type_id)}</td>
-                <td>{getSkillName(examPart.skill_id)}</td>
-                <td>{examPart.default_num_questions}</td>
-                <td>
-                  <div className={cx('actions')}>
-                    <button onClick={() => openEditModal(examPart)} title="Sửa">
-                      <Edit size={14} />
-                    </button>
-                    <button
-                      onClick={() => setDeletingExamPart(examPart)}
-                      title="Xóa"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              ))}
-            {!loading && filteredExamParts.length === 0 && (
-              <tr>
-                <td colSpan={7} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        paginated
+        itemLabel="phần thi"
+        columns={columns}
+        data={filteredExamParts}
+        loading={loading}
+        getRowKey={(examPart) => examPart.exam_part_id}
+        rowActions={(examPart) => (
+          <>
+            <button onClick={() => openEditModal(examPart)} title="Sửa">
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              onClick={() => setDeletingExamPart(examPart)}
+              title="Xóa"
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <BaseModal
         show={showFormModal}

@@ -18,6 +18,7 @@ import {
     UserGrowthBar,
     ScoreDistributionBar,
 } from '../components/AdminCharts';
+import {AdminPageHeader} from '../components/common';
 
 import {
     monthlyTestPerformance,
@@ -44,16 +45,10 @@ const AnalyticsPage = () => {
     return (
         <div className={cx('analyticsPage')}>
             {/* Page Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cx('pageHeader')}
-            >
-                <div>
-                    <h1>Thống kê & Phân tích</h1>
-                    <p>Phân tích chi tiết về hệ thống English Exam</p>
-                </div>
-            </motion.div>
+            <AdminPageHeader
+                title="Thống kê & Phân tích"
+                description="Phân tích chi tiết về hệ thống English Exam"
+            />
 
             {/* Key Metrics */}
             <Row className={cx('metricsRow')}>

@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Button, Form} from 'react-bootstrap';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {
   createCosmetic,
@@ -13,9 +12,12 @@ import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
 import images from '~/assets/images';
-import styles from './Cosmetics.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const TYPES = [
   {value: 'FRAME', label: 'Khung avatar'},
@@ -111,6 +113,12 @@ function CosmeticsManagement() {
     return items.filter((item) => (item.name || '').toLowerCase().includes(normalized));
   }, [items, keyword]);
 
+  // Gom theo loại rồi trải phẳng để hiển thị theo thứ tự nhóm cố định.
+  const orderedItems = useMemo(
+    () => groupByType(filtered).flatMap((group) => group.items),
+    [filtered],
+  );
+
   const resetForm = () => {
     setFormState(defaultFormState);
     setEditingId(null);
@@ -195,95 +203,60 @@ function CosmeticsManagement() {
     }
   };
 
+  const columns = [
+    {
+      key: 'preview',
+      header: 'Xem trước',
+      render: (item) => <CosmeticPreview item={item} />,
+    },
+    {key: 'name', header: 'Tên'},
+    {key: 'typeLabel', header: 'Loại'},
+    {key: 'costCoins', header: 'Giá xu'},
+    {
+      key: 'status',
+      header: 'Trạng thái',
+      render: (item) => (item.active ? 'Đang bán' : 'Tắt'),
+    },
+  ];
+
   return (
-    <div className={cx('page')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Cửa hàng xu — Trang trí</h1>
-          <p>Quản lý khung avatar & huy hiệu user đổi bằng xu.</p>
-        </div>
-        <Button className={cx('createButton')} onClick={openCreateModal}>
-          <Plus size={16} />
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Cửa hàng xu — Trang trí"
+        description="Quản lý khung avatar & huy hiệu user đổi bằng xu."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm vật phẩm
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('searchContainer')}>
-        <Search size={16} className={cx('searchIcon')} />
-        <Form.Control
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="Tìm theo tên..."
-        />
-      </div>
-      {errorMessage && !showModal && <p className={cx('errorText')}>{errorMessage}</p>}
+      <AdminToolbar
+        searchValue={keyword}
+        onSearchChange={setKeyword}
+        searchPlaceholder="Tìm theo tên..."
+      />
+      <AdminFieldError message={!showModal ? errorMessage : ''} />
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>Xem trước</th>
-              <th>Tên</th>
-              <th>Loại</th>
-              <th>Giá xu</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              groupByType(filtered).map((group) => (
-                <React.Fragment key={group.type}>
-                  <tr className={cx('groupRow')}>
-                    <td colSpan={6}>
-                      {group.typeLabel} ({group.items.length})
-                    </td>
-                  </tr>
-                  {group.items.map((item) => (
-                    <tr key={item.cosmeticId}>
-                      <td>
-                        <CosmeticPreview item={item} />
-                      </td>
-                      <td>{item.name}</td>
-                      <td>{item.typeLabel}</td>
-                      <td className={cx('coin')}>{item.costCoins}</td>
-                      <td>
-                        <span className={cx('status', item.active ? 'active' : 'inactive')}>
-                          {item.active ? 'Đang bán' : 'Tắt'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className={cx('actionButtons')}>
-                          <button title="Sửa" onClick={() => openEditModal(item)}>
-                            <Edit size={14} />
-                          </button>
-                          <button title="Xóa" onClick={() => setDeleting(item)}>
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </React.Fragment>
-              ))}
-            {!loading && filtered.length === 0 && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        paginated
+        itemLabel="vật phẩm"
+        columns={columns}
+        data={orderedItems}
+        loading={loading}
+        getRowKey={(item) => item.cosmeticId}
+        rowActions={(item) => (
+          <>
+            <button title="Sửa" onClick={() => openEditModal(item)}>
+              <Edit size={14} />
+            </button>
+            <button className="danger" title="Xóa" onClick={() => setDeleting(item)}>
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <BaseModal
         show={showModal}
@@ -312,7 +285,7 @@ function CosmeticsManagement() {
           </>
         }
       >
-        <div className={cx('previewRow')}>
+        <div className="d-flex justify-content-center mb-3">
           <CosmeticPreview
             item={{
               type: formState.type,
@@ -455,7 +428,7 @@ function CosmeticsManagement() {
           checked={formState.active}
           onChange={(e) => setFormState((p) => ({...p, active: e.target.checked}))}
         />
-        {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+        <AdminFieldError message={errorMessage} />
       </BaseModal>
 
       <ConfirmDeleteModal

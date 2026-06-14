@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Row, Col, Table, Badge, Button, Form } from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import { motion } from 'framer-motion';
+import { Badge, Button } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import {
     Plus,
-    Search,
     Edit,
     Trash2,
     FileQuestion,
@@ -17,10 +15,13 @@ import {
     getUserById,
     dashboardStats
 } from '../data/fakeData';
-
-import styles from './Questions.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+    AdminPageHeader,
+    AdminTable,
+    AdminToolbar,
+    StatCard,
+    StatCardGroup,
+} from '../components/common';
 
 const questionTypeLabels = {
     'MCQ': 'Trắc nghiệm',
@@ -37,8 +38,6 @@ const questionTypeColors = {
 const QuestionsManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
-    const [currentPage] = useState(1);
-    const itemsPerPage = 10;
 
     // Enrich questions with related data
     const questionsWithData = fakeQuestions.map(q => ({
@@ -53,186 +52,114 @@ const QuestionsManagement = () => {
         return matchesSearch && matchesType;
     });
 
-    // Pagination
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentQuestions = filteredQuestions.slice(indexOfFirstItem, indexOfLastItem);
-
     const handleView = () => {};
     const handleEdit = () => {};
     const handleDelete = () => {};
 
+    const columns = [
+        {
+            key: 'question_text',
+            header: 'Câu hỏi',
+            render: (q) => q.question_text,
+        },
+        {
+            key: 'question_type',
+            header: 'Loại',
+            render: (q) => (
+                <Badge bg={questionTypeColors[q.question_type]}>
+                    {questionTypeLabels[q.question_type]}
+                </Badge>
+            ),
+        },
+        {
+            key: 'creator',
+            header: 'Người tạo',
+            render: (q) => q.creator?.full_name,
+        },
+        {
+            key: 'is_bank',
+            header: 'Ngân hàng',
+            render: (q) => (
+                <Badge bg={q.is_bank ? 'success' : 'secondary'}>
+                    {q.is_bank ? 'Ngân hàng' : 'Lớp học'}
+                </Badge>
+            ),
+        },
+    ];
+
     return (
-        <div className={cx('questionsPage')}>
-            {/* Page Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cx('pageHeader')}
+        <div className="d-flex flex-column gap-3">
+            <AdminPageHeader
+                title="Quản lý Câu hỏi"
+                description="Quản lý ngân hàng câu hỏi trong hệ thống"
             >
-                <div>
-                    <h1>Quản lý Câu hỏi</h1>
-                    <p>Quản lý ngân hàng câu hỏi trong hệ thống</p>
-                </div>
-                <div className={cx('headerActions')}>
-                    <Button variant="primary" className={cx('addBtn')}>
-                        <Plus size={18} />
-                        Thêm câu hỏi
-                    </Button>
-                </div>
-            </motion.div>
+                <Button variant="primary">
+                    <Plus size={18} className="me-1" />
+                    Thêm câu hỏi
+                </Button>
+            </AdminPageHeader>
 
-            {/* Stats */}
-            <Row className={cx('statsRow')}>
-                <Col lg={4} md={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.1 }}
-                        className={cx('statCard')}
-                    >
-                        <div className={cx('statIcon')} style={{ backgroundColor: '#3b82f6' }}>
-                            <FileQuestion size={20} />
-                        </div>
-                        <div className={cx('statInfo')}>
-                            <span className={cx('statValue')}>{dashboardStats.totalQuestions}</span>
-                            <span className={cx('statLabel')}>Tổng câu hỏi</span>
-                        </div>
-                    </motion.div>
-                </Col>
-                <Col lg={4} md={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.15 }}
-                        className={cx('statCard')}
-                    >
-                        <div className={cx('statIcon')} style={{ backgroundColor: '#10b981' }}>
-                            <FileQuestion size={20} />
-                        </div>
-                        <div className={cx('statInfo')}>
-                            <span className={cx('statValue')}>
-                                {fakeQuestions.filter(q => q.question_type === 'MCQ').length}
-                            </span>
-                            <span className={cx('statLabel')}>Trắc nghiệm</span>
-                        </div>
-                    </motion.div>
-                </Col>
-                <Col lg={4} md={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className={cx('statCard')}
-                    >
-                        <div className={cx('statIcon')} style={{ backgroundColor: '#f59e0b' }}>
-                            <FileQuestion size={20} />
-                        </div>
-                        <div className={cx('statInfo')}>
-                            <span className={cx('statValue')}>
-                                {fakeQuestions.filter(q => q.question_type === 'FILL_BLANK').length}
-                            </span>
-                            <span className={cx('statLabel')}>Điền trống</span>
-                        </div>
-                    </motion.div>
-                </Col>
-            </Row>
+            <StatCardGroup>
+                <StatCard
+                    label="Tổng câu hỏi"
+                    value={dashboardStats.totalQuestions}
+                    icon={FileQuestion}
+                    tone="blue"
+                />
+                <StatCard
+                    label="Trắc nghiệm"
+                    value={fakeQuestions.filter(q => q.question_type === 'MCQ').length}
+                    icon={FileQuestion}
+                    tone="green"
+                />
+                <StatCard
+                    label="Điền trống"
+                    value={fakeQuestions.filter(q => q.question_type === 'FILL_BLANK').length}
+                    icon={FileQuestion}
+                    tone="amber"
+                />
+            </StatCardGroup>
 
-            {/* Filters */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className={cx('filtersSection')}
+            <AdminToolbar
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                searchPlaceholder="Tìm kiếm câu hỏi..."
             >
-                <div className={cx('searchBox')}>
-                    <Search size={18} className={cx('searchIcon')} />
-                    <Form.Control
-                        type="text"
-                        placeholder="Tìm kiếm câu hỏi..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className={cx('searchInput')}
-                    />
-                </div>
                 <Form.Select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className={cx('filterSelect')}
                 >
                     <option value="all">Tất cả loại</option>
                     <option value="MCQ">Trắc nghiệm</option>
                     <option value="FILL_BLANK">Điền trống</option>
                     <option value="ESSAY">Tự luận</option>
                 </Form.Select>
-            </motion.div>
+            </AdminToolbar>
 
-            {/* Table */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className={cx('tableSection')}
-            >
-                <div className={cx('tableWrapper')}>
-                    <Table responsive className={cx('questionsTable')}>
-                        <thead>
-                            <tr>
-                                <th>Câu hỏi</th>
-                                <th>Loại</th>
-                                <th>Người tạo</th>
-                                <th>Ngân hàng</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentQuestions.map((q) => (
-                                <tr key={q.question_id}>
-                                    <td>
-                                        <div className={cx('questionCell')}>
-                                            <span className={cx('questionText')}>{q.question_text}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <Badge bg={questionTypeColors[q.question_type]} className={cx('typeBadge')}>
-                                            {questionTypeLabels[q.question_type]}
-                                        </Badge>
-                                    </td>
-                                    <td>{q.creator?.full_name}</td>
-                                    <td>
-                                        <Badge bg={q.is_bank ? 'success' : 'secondary'}>
-                                            {q.is_bank ? 'Ngân hàng' : 'Lớp học'}
-                                        </Badge>
-                                    </td>
-                                    <td>
-                                        <div className={cx('actionBtns')}>
-                                            <button className={cx('actionBtn')} title="Xem" onClick={() => handleView(q)}>
-                                                <Eye size={16} />
-                                            </button>
-                                            <button className={cx('actionBtn')} title="Sao chép">
-                                                <Copy size={16} />
-                                            </button>
-                                            <button className={cx('actionBtn')} title="Sửa" onClick={() => handleEdit(q)}>
-                                                <Edit size={16} />
-                                            </button>
-                                            <button className={cx('actionBtn', 'delete')} title="Xóa" onClick={() => handleDelete(q)}>
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                </div>
-
-                {/* Pagination */}
-                <div className={cx('pagination')}>
-                    <span className={cx('paginationInfo')}>
-                        Hiển thị {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredQuestions.length)} trong {filteredQuestions.length} câu hỏi
-                    </span>
-                </div>
-            </motion.div>
+            <AdminTable
+                showIndex
+                paginated
+                itemLabel="câu hỏi"
+                columns={columns}
+                data={filteredQuestions}
+                getRowKey={(q) => q.question_id}
+                rowActions={(q) => (
+                    <>
+                        <button title="Xem" onClick={() => handleView(q)}>
+                            <Eye size={16} />
+                        </button>
+                        <button title="Sao chép">
+                            <Copy size={16} />
+                        </button>
+                        <button title="Sửa" onClick={() => handleEdit(q)}>
+                            <Edit size={16} />
+                        </button>
+                        <button className="danger" title="Xóa" onClick={() => handleDelete(q)}>
+                            <Trash2 size={16} />
+                        </button>
+                    </>
+                )}
+            />
         </div>
     );
 };

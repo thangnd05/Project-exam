@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Download, Edit, ExternalLink, Plus, Search, Trash2} from 'lucide-react';
+import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
 
 import {getExamTypes} from '../../api/examTypeApi';
 import {getTagsFlatByExamType} from '../../api/tagApi';
@@ -13,6 +13,7 @@ import {
 } from '../../api/recoveryResourceApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import styles from './RecoveryResources.module.scss';
 
 const cx = classNames.bind(styles);
@@ -188,18 +189,21 @@ function RecoveryResourcesManagement() {
 
   return (
     <div className={cx('resourcesPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Kho tài liệu ôn tập</h1>
-          <p>Quản lý bài giảng, video, tài liệu gắn với các Tag kiến thức.</p>
-        </div>
-        <Button onClick={openCreateModal} className={cx('createBtn')}>
-          <Plus size={16} />
+      <AdminPageHeader
+        title="Kho tài liệu ôn tập"
+        description="Quản lý bài giảng, video, tài liệu gắn với các Tag kiến thức."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm tài liệu
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('filterBar')}>
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm theo tiêu đề, mô tả, tag..."
+      >
         <Form.Select
           style={{maxWidth: 200}}
           value={selectedExamTypeId}
@@ -209,17 +213,9 @@ function RecoveryResourcesManagement() {
             <option key={et.id} value={et.id}>{et.name}</option>
           ))}
         </Form.Select>
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm theo tiêu đề, mô tả, tag..."
-          />
-        </div>
-      </div>
+      </AdminToolbar>
 
-      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
+      <AdminFieldError message={errorMessage} />
 
       {loading && (
         <div className="text-center py-5">

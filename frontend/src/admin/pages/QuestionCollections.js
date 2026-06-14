@@ -179,6 +179,8 @@ function QuestionCollectionsManagement() {
 
       <AdminTable
         showIndex
+        paginated
+        itemLabel="bộ sưu tập"
         columns={columns}
         data={filteredCollections}
         loading={loading}

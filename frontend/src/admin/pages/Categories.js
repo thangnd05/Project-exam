@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Search, X } from 'lucide-react';
+import { Plus, Edit, Trash2, X } from 'lucide-react';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '~/api/postApi';
 import { toast } from 'react-toastify';
+import {
+    AdminPageHeader,
+    AdminToolbar,
+    AdminTable,
+} from '../components/common';
 import styles from './Categories.module.scss';
 
 const cx = classNames.bind(styles);
@@ -32,9 +38,7 @@ const Categories = () => {
         fetchCategories();
     }, []);
 
-    const handleSearch = (e) => setSearchQuery(e.target.value);
-
-    const filteredCategories = categories.filter(c => 
+    const filteredCategories = categories.filter(c =>
         c.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -78,71 +82,57 @@ const Categories = () => {
         }
     };
 
+    const columns = [
+        { key: 'id', header: 'ID', width: 80 },
+        {
+            key: 'name',
+            header: 'Tên danh mục',
+            render: (item) => <span className={cx('nameCell')}>{item.name}</span>,
+        },
+        { key: 'slug', header: 'Slug', render: (item) => item.slug || '-' },
+    ];
+
     return (
-        <div className={cx('wrapper')}>
-            <div className={cx('header')}>
-                <div>
-                    <h1>Quản lý danh mục bài viết</h1>
-                    <p>Tạo và quản lý các danh mục blog</p>
-                </div>
-                <button className={cx('createBtn')} onClick={openCreateModal}>
-                    <Plus size={18} /> Thêm danh mục
-                </button>
-            </div>
+        <div className="d-flex flex-column gap-3">
+            <AdminPageHeader
+                title="Quản lý danh mục bài viết"
+                description="Tạo và quản lý các danh mục blog"
+            >
+                <Button onClick={openCreateModal}>
+                    <Plus size={16} className="me-1" />
+                    Thêm danh mục
+                </Button>
+            </AdminPageHeader>
 
-            <div className={cx('toolbar')}>
-                <div className={cx('searchBox')}>
-                    <Search size={18} className={cx('searchIcon')} />
-                    <input 
-                        type="text" 
-                        placeholder="Tìm kiếm danh mục..." 
-                        value={searchQuery}
-                        onChange={handleSearch}
-                    />
-                </div>
-            </div>
+            <AdminToolbar
+                searchValue={searchQuery}
+                onSearchChange={setSearchQuery}
+                searchPlaceholder="Tìm kiếm danh mục..."
+            />
 
-            <div className={cx('tableContainer')}>
-                {loading ? (
-                    <div className={cx('loading')}>Đang tải dữ liệu...</div>
-                ) : (
-                    <table className={cx('table')}>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Tên danh mục</th>
-                                <th>Slug</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredCategories.length > 0 ? (
-                                filteredCategories.map((item) => (
-                                    <tr key={item.id}>
-                                        <td>{item.id}</td>
-                                        <td className={cx('nameCell')}>{item.name}</td>
-                                        <td>{item.slug}</td>
-                                        <td>
-                                            <div className={cx('actions')}>
-                                                <button className={cx('editBtn')} onClick={() => openEditModal(item)} title="Sửa">
-                                                    <Edit size={16} />
-                                                </button>
-                                                <button className={cx('deleteBtn')} onClick={() => handleDelete(item.id)} title="Xóa">
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="4" className={cx('empty')}>Không có dữ liệu</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+            <AdminTable
+                showIndex
+                paginated
+                itemLabel="danh mục"
+                columns={columns}
+                data={filteredCategories}
+                loading={loading}
+                getRowKey={(item) => item.id}
+                rowActions={(item) => (
+                    <>
+                        <button onClick={() => openEditModal(item)} title="Sửa">
+                            <Edit size={14} />
+                        </button>
+                        <button
+                            className="danger"
+                            onClick={() => handleDelete(item.id)}
+                            title="Xóa"
+                        >
+                            <Trash2 size={14} />
+                        </button>
+                    </>
                 )}
-            </div>
+            />
 
             {/* Modal */}
             {showModal && (

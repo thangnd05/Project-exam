@@ -2,14 +2,16 @@ import React, {useEffect, useMemo, useState} from 'react';
 import { getAdminTests, updateTest, deleteTest } from '../../api/testApi';
 import { getExamTypes } from '../../api/examTypeApi';
 import { getUsers } from '../../api/userApi';
-import {Badge, Button, Form, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Search, Trash2} from 'lucide-react';
+import {Badge, Button, Form} from 'react-bootstrap';
+import {Edit, Trash2} from 'lucide-react';
 
 import BaseModal from '~/components/common/modal/BaseModal';
-import styles from './Tests.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const parseOptionalId = (value) => {
   const trimmed = String(value).trim();
@@ -174,101 +176,84 @@ function TestsManagement() {
     }
   };
 
+  const columns = [
+    {key: 'title', header: 'Tiêu đề'},
+    {
+      key: 'examTypeId',
+      header: 'Loại kỳ thi',
+      render: (test) => (
+        <Badge bg="secondary">
+          {examTypes.find(
+            (item) => String(item.examTypeId) === String(test.examTypeId),
+          )?.name || `ID ${test.examTypeId}`}
+        </Badge>
+      ),
+    },
+    {
+      key: 'durationMinutes',
+      header: 'Thời lượng',
+      render: (test) => `${test.durationMinutes} phút`,
+    },
+    {key: 'maxAttempts', header: 'Số lần làm tối đa'},
+    {
+      key: 'classChapter',
+      header: 'Lớp / chương',
+      render: (test) =>
+        test.classId != null || test.chapterId != null
+          ? `Lớp ${test.classId ?? '—'} / Chương ${test.chapterId ?? '—'}`
+          : '—',
+    },
+    {
+      key: 'createdBy',
+      header: 'Người tạo',
+      render: (test) =>
+        getUserDisplayName(
+          users.find(
+            (user) => String(getUserIdValue(user)) === String(test.createdBy),
+          ),
+        ) || `User #${test.createdBy || '--'}`,
+    },
+  ];
+
   return (
-    <div className={cx('testsPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Quản lý đề thi</h1>
-          <p>Sửa, xóa đề thi theo loại kỳ thi.</p>
-        </div>
-      </div>
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý đề thi"
+        description="Sửa, xóa đề thi theo loại kỳ thi."
+      />
 
-      <div className={cx('filterBar')}>
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Tìm theo tiêu đề, mô tả, loại kỳ thi..."
-          />
-        </div>
-      </div>
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm theo tiêu đề, mô tả, loại kỳ thi..."
+      />
+      <AdminFieldError message={errorMessage} />
 
-      <div className={cx('tableWrapper')}>
-        {errorMessage ? <p className="text-danger mb-2">{errorMessage}</p> : null}
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tiêu đề</th>
-              <th>Loại kỳ thi</th>
-              <th>Thời lượng</th>
-              <th>Số lần làm tối đa</th>
-              <th>Lớp / chương</th>
-              <th>Người tạo</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={8} className="text-center py-3">
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            ) : null}
-            {filteredTests.map((test) => (
-              <tr key={test.testId}>
-                <td>{test.testId}</td>
-                <td>{test.title}</td>
-                <td>
-                  <Badge bg="secondary">
-                    {examTypes.find(
-                      (item) => String(item.examTypeId) === String(test.examTypeId),
-                    )?.name || `ID ${test.examTypeId}`}
-                  </Badge>
-                </td>
-                <td>{test.durationMinutes} phút</td>
-                <td>{test.maxAttempts}</td>
-                <td>
-                  {test.classId != null || test.chapterId != null
-                    ? `Lớp ${test.classId ?? '—'} / Chương ${test.chapterId ?? '—'}`
-                    : '—'}
-                </td>
-                <td>
-                  {getUserDisplayName(
-                    users.find(
-                      (user) => String(getUserIdValue(user)) === String(test.createdBy),
-                    ),
-                  ) || `User #${test.createdBy || '--'}`}
-                </td>
-                <td>
-                  <div className={cx('actions')}>
-                    <button type="button" onClick={() => openEditModal(test)} title="Sửa">
-                      <Edit size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(test.testId)}
-                      title="Xóa"
-                      disabled={submitting}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {!loading && filteredTests.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="text-center py-3">
-                  Không có đề thi nào.
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        paginated
+        itemLabel="đề thi"
+        columns={columns}
+        data={filteredTests}
+        loading={loading}
+        getRowKey={(test) => test.testId}
+        rowActions={(test) => (
+          <>
+            <button type="button" onClick={() => openEditModal(test)} title="Sửa">
+              <Edit size={14} />
+            </button>
+            <button
+              type="button"
+              className="danger"
+              onClick={() => handleDelete(test.testId)}
+              title="Xóa"
+              disabled={submitting}
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <BaseModal
         show={showFormModal}

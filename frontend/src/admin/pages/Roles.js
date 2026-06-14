@@ -169,6 +169,8 @@ function RolesManagement() {
 
       <AdminTable
         showIndex
+        paginated
+        itemLabel="vai trò"
         columns={columns}
         data={filteredRoles}
         loading={loading}

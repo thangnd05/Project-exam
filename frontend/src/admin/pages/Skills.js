@@ -182,6 +182,8 @@ function SkillsManagement() {
 
       <AdminTable
         showIndex
+        paginated
+        itemLabel="kỹ năng"
         columns={columns}
         data={filteredSkills}
         loading={loading}

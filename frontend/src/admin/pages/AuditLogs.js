@@ -1,10 +1,11 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Badge, Form, Spinner, Table} from 'react-bootstrap';
+import {Badge, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {ChevronLeft, ChevronRight, Search, ShieldAlert} from 'lucide-react';
+import {ChevronLeft, ChevronRight} from 'lucide-react';
 
 import {getAuditLogs} from '../../api/adminAuditApi';
 import {formatDateTime} from '../../utils/format-date-time';
+import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
 import styles from './AuditLogs.module.scss';
 
 const cx = classNames.bind(styles);
@@ -85,23 +86,54 @@ function AuditLogs() {
     });
   }, [auditLogs, searchTerm, statusFilter]);
 
-  return (
-    <div className={cx('auditLogsPage')}>
-      <div className={cx('pageHeader')}>
-        <h1>Audit Logs</h1>
-        <p>Theo doi thao tac quan tri va su kien nhay cam trong he thong.</p>
-      </div>
-
-      <div className={cx('filters')}>
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            type="text"
-            placeholder="Tim action, endpoint, resource, nguoi thao tac..."
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-          />
+  const columns = [
+    {
+      key: 'created_at',
+      header: 'Thời gian',
+      render: (log) => formatDateTime(log.created_at),
+    },
+    {key: 'action', header: 'Hành động'},
+    {
+      key: 'endpoint',
+      header: 'API',
+      render: (log) => (
+        <div className={cx('apiCell')}>
+          <Badge bg={methodColorMap[log.http_method] || 'secondary'}>
+            {log.http_method}
+          </Badge>
+          <span>{log.endpoint}</span>
         </div>
+      ),
+    },
+    {
+      key: 'full_name',
+      header: 'Người thực hiện',
+      render: (log) => log.full_name || log.user_name || 'Unknown',
+    },
+    {key: 'ip_address', header: 'IP', render: (log) => log.ip_address || '-'},
+    {
+      key: 'success',
+      header: 'Trạng thái',
+      render: (log) => (
+        <Badge bg={log.success ? 'success' : 'danger'}>
+          {log.success ? 'Thanh cong' : 'That bai'}
+        </Badge>
+      ),
+    },
+  ];
+
+  return (
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Audit Logs"
+        description="Theo doi thao tac quan tri va su kien nhay cam trong he thong."
+      />
+
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tim action, endpoint, resource, nguoi thao tac..."
+      >
         <Form.Select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
@@ -111,66 +143,16 @@ function AuditLogs() {
           <option value="success">Thanh cong</option>
           <option value="failed">That bai</option>
         </Form.Select>
-      </div>
+      </AdminToolbar>
 
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover className={cx('logsTable')}>
-          <thead>
-            <tr>
-              <th>Thời gian</th>
-              <th>Hành động</th>
-              <th>API</th>
-              <th>Người thực hiện</th>
-              <th>IP</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filteredLogs.map((log) => {
-              return (
-                <tr key={log.audit_log_id}>
-                  <td>{formatDateTime(log.created_at)}</td>
-                  <td>{log.action}</td>
-                  <td>
-                    <div className={cx('apiCell')}>
-                      <Badge bg={methodColorMap[log.http_method] || 'secondary'}>
-                        {log.http_method}
-                      </Badge>
-                      <span>{log.endpoint}</span>
-                    </div>
-                  </td>
-                  <td>{log.full_name || log.user_name || 'Unknown'}</td>
-                  <td>{log.ip_address || '-'}</td>
-                  <td>
-                    <Badge bg={log.success ? 'success' : 'danger'}>
-                      {log.success ? 'Thanh cong' : 'That bai'}
-                    </Badge>
-                  </td>
-                </tr>
-              );
-            })}
-            {!loading && filteredLogs.length === 0 && (
-              <tr>
-                <td colSpan={6}>
-                  <div className={cx('emptyState')}>
-                    <ShieldAlert size={18} />
-                    <span>Khong co log phu hop bo loc hien tai.</span>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        columns={columns}
+        data={filteredLogs}
+        loading={loading}
+        getRowKey={(log) => log.audit_log_id}
+      />
+
       <div className={cx('pagination')}>
         <span className={cx('paginationInfo')}>
           Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-

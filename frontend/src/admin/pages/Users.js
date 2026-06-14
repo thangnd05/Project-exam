@@ -1,12 +1,10 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Badge, Col, Form, Row, Spinner, Table} from 'react-bootstrap';
+import {Badge, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {motion} from 'framer-motion';
 import {
   CheckCircle,
   ChevronLeft,
   ChevronRight,
-  Search,
   Shield,
   Trash2,
   UserCheck,
@@ -16,6 +14,14 @@ import {
 import {getRoles} from '../../api/roleApi';
 import {deleteUser, getUsers} from '../../api/userApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+  StatCard,
+  StatCardGroup,
+} from '../components/common';
 import styles from './Users.module.scss';
 
 const cx = classNames.bind(styles);
@@ -142,112 +148,107 @@ function UsersManagement() {
     }
   };
 
+  const columns = [
+    {
+      key: 'user',
+      header: 'Người dùng',
+      render: (user) => (
+        <div className={cx('userCell')}>
+          <div className={cx('userAvatar')}>
+            {(user.full_name || '?').charAt(0)}
+          </div>
+          <div className={cx('userInfo')}>
+            <span className={cx('userName')}>{user.full_name}</span>
+            <span className={cx('userUsername')}>@{user.user_name}</span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'role',
+      header: 'Vai trò',
+      render: (user) => {
+        const roleName = roleNameById[user.role_id] || 'USER';
+        return (
+          <Badge bg={roleColors[roleName] || 'secondary'}>{roleName}</Badge>
+        );
+      },
+    },
+    {key: 'email', header: 'Email', render: (user) => user.email},
+    {
+      key: 'status',
+      header: 'Trạng thái',
+      render: (user) => (
+        <Badge
+          bg={
+            user.verified === true
+              ? 'success'
+              : user.verified === false
+                ? 'warning'
+                : 'secondary'
+          }
+        >
+          {user.verified === true
+            ? 'Đã xác thực'
+            : user.verified === false
+              ? 'Chưa xác thực'
+              : 'Không có dữ liệu'}
+        </Badge>
+      ),
+    },
+    {
+      key: 'created_at',
+      header: 'Ngày tạo',
+      render: (user) =>
+        user.created_at
+          ? new Date(user.created_at).toLocaleDateString('vi-VN')
+          : '-',
+    },
+  ];
+
   return (
-    <div className={cx('usersPage')}>
-      <motion.div
-        initial={{opacity: 0, y: -20}}
-        animate={{opacity: 1, y: 0}}
-        className={cx('pageHeader')}
-      >
-        <div>
-          <h1>Quản lý Users</h1>
-          <p>Quản lý tài khoản người dùng trong hệ thống</p>
-        </div>
-      </motion.div>
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Quản lý Users"
+        description="Quản lý tài khoản người dùng trong hệ thống"
+      />
 
-      <Row className={cx('statsRow')}>
-        <Col lg={3} md={6}>
-          <motion.div
-            initial={{opacity: 0, scale: 0.9}}
-            animate={{opacity: 1, scale: 1}}
-            transition={{delay: 0.1}}
-            className={cx('statCard')}
-          >
-            <div className={cx('statIcon')} style={{backgroundColor: '#3b82f6'}}>
-              <Shield size={20} />
-            </div>
-            <div className={cx('statInfo')}>
-              <span className={cx('statValue')}>{totalUsers}</span>
-              <span className={cx('statLabel')}>Tổng Users</span>
-            </div>
-          </motion.div>
-        </Col>
-        <Col lg={3} md={6}>
-          <motion.div
-            initial={{opacity: 0, scale: 0.9}}
-            animate={{opacity: 1, scale: 1}}
-            transition={{delay: 0.15}}
-            className={cx('statCard')}
-          >
-            <div className={cx('statIcon')} style={{backgroundColor: '#f59e0b'}}>
-              <UserCheck size={20} />
-            </div>
-            <div className={cx('statInfo')}>
-              <span className={cx('statValue')}>{totalTeachers}</span>
-              <span className={cx('statLabel')}>Giáo viên</span>
-            </div>
-          </motion.div>
-        </Col>
-        <Col lg={3} md={6}>
-          <motion.div
-            initial={{opacity: 0, scale: 0.9}}
-            animate={{opacity: 1, scale: 1}}
-            transition={{delay: 0.2}}
-            className={cx('statCard')}
-          >
-            <div className={cx('statIcon')} style={{backgroundColor: '#10b981'}}>
-              <CheckCircle size={20} />
-            </div>
-            <div className={cx('statInfo')}>
-              <span className={cx('statValue')}>{verifiedUsers}</span>
-              <span className={cx('statLabel')}>Đã xác thực</span>
-            </div>
-          </motion.div>
-        </Col>
-        <Col lg={3} md={6}>
-          <motion.div
-            initial={{opacity: 0, scale: 0.9}}
-            animate={{opacity: 1, scale: 1}}
-            transition={{delay: 0.25}}
-            className={cx('statCard')}
-          >
-            <div className={cx('statIcon')} style={{backgroundColor: '#ef4444'}}>
-              <UserX size={20} />
-            </div>
-            <div className={cx('statInfo')}>
-              <span className={cx('statValue')}>{totalUsers - verifiedUsers}</span>
-              <span className={cx('statLabel')}>Chưa xác thực</span>
-            </div>
-          </motion.div>
-        </Col>
-      </Row>
+      <StatCardGroup>
+        <StatCard label="Tổng Users" value={totalUsers} icon={Shield} tone="blue" />
+        <StatCard
+          label="Giáo viên"
+          value={totalTeachers}
+          icon={UserCheck}
+          tone="amber"
+        />
+        <StatCard
+          label="Đã xác thực"
+          value={verifiedUsers}
+          icon={CheckCircle}
+          tone="green"
+        />
+        <StatCard
+          label="Chưa xác thực"
+          value={totalUsers - verifiedUsers}
+          icon={UserX}
+          tone="red"
+        />
+      </StatCardGroup>
 
-      <motion.div
-        initial={{opacity: 0, y: 20}}
-        animate={{opacity: 1, y: 0}}
-        transition={{delay: 0.3}}
-        className={cx('filtersSection')}
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={(value) => {
+          setSearchTerm(value);
+          setCurrentPage(1);
+        }}
+        searchPlaceholder="Tìm kiếm theo tên, email, username..."
       >
-        <div className={cx('searchBox')}>
-          <Search size={18} className={cx('searchIcon')} />
-          <Form.Control
-            type="text"
-            placeholder="Tìm kiếm theo tên, email, username..."
-            value={searchTerm}
-            onChange={(event) => {
-              setSearchTerm(event.target.value);
-              setCurrentPage(1);
-            }}
-            className={cx('searchInput')}
-          />
-        </div>
         <Form.Select
           value={roleFilter}
           onChange={(event) => {
             setRoleFilter(event.target.value);
             setCurrentPage(1);
           }}
-          className={cx('filterSelect')}
         >
           <option value="all">Tất cả vai trò</option>
           {roles.map((role) => (
@@ -262,149 +263,64 @@ function UsersManagement() {
             setStatusFilter(event.target.value);
             setCurrentPage(1);
           }}
-          className={cx('filterSelect')}
         >
           <option value="all">Tất cả trạng thái</option>
           <option value="verified">Đã xác thực</option>
           <option value="unverified">Chưa xác thực</option>
         </Form.Select>
-      </motion.div>
+      </AdminToolbar>
 
-      {errorMessage ? <p className="text-danger mb-3">{errorMessage}</p> : null}
+      <AdminFieldError message={errorMessage} />
 
-      <motion.div
-        initial={{opacity: 0, y: 20}}
-        animate={{opacity: 1, y: 0}}
-        transition={{delay: 0.4}}
-        className={cx('tableSection')}
-      >
-        <div className={cx('tableWrapper')}>
-          <Table responsive className={cx('usersTable')}>
-            <thead>
-              <tr>
-                <th>Người dùng</th>
-                <th>Vai trò</th>
-                <th>Email</th>
-                <th>Trạng thái</th>
-                <th>Ngày tạo</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-4">
-                    <Spinner size="sm" className="me-2" />
-                    Đang tải dữ liệu...
-                  </td>
-                </tr>
-              ) : null}
-              {!loading &&
-                users.map((user) => {
-                  const roleName = roleNameById[user.role_id] || 'USER';
-                  return (
-                    <tr key={user.user_id}>
-                      <td>
-                        <div className={cx('userCell')}>
-                          <div className={cx('userAvatar')}>
-                            {(user.full_name || '?').charAt(0)}
-                          </div>
-                          <div className={cx('userInfo')}>
-                            <span className={cx('userName')}>{user.full_name}</span>
-                            <span className={cx('userUsername')}>@{user.user_name}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <Badge
-                          bg={roleColors[roleName] || 'secondary'}
-                          className={cx('roleBadge')}
-                        >
-                          {roleName}
-                        </Badge>
-                      </td>
-                      <td>{user.email}</td>
-                      <td>
-                        <Badge
-                          bg={
-                            user.verified === true
-                              ? 'success'
-                              : user.verified === false
-                                ? 'warning'
-                                : 'secondary'
-                          }
-                          className={cx('statusBadge')}
-                        >
-                          {user.verified === true
-                            ? 'Đã xác thực'
-                            : user.verified === false
-                              ? 'Chưa xác thực'
-                              : 'Không có dữ liệu'}
-                        </Badge>
-                      </td>
-                      <td>
-                        {user.created_at
-                          ? new Date(user.created_at).toLocaleDateString('vi-VN')
-                          : '-'}
-                      </td>
-                      <td>
-                        <div className={cx('actionBtns')}>
-                          <button
-                            className={cx('actionBtn', 'delete')}
-                            title="Xóa"
-                            onClick={() => setUserToDelete(user)}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              {!loading && users.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-4">
-                    Không có dữ liệu.
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </Table>
-        </div>
+      <AdminTable
+        showIndex
+        columns={columns}
+        data={users}
+        loading={loading}
+        getRowKey={(user) => user.user_id}
+        rowActions={(user) => (
+          <button
+            className="danger"
+            title="Xóa"
+            onClick={() => setUserToDelete(user)}
+          >
+            <Trash2 size={16} />
+          </button>
+        )}
+      />
 
-        <div className={cx('pagination')}>
-          <span className={cx('paginationInfo')}>
-            Hiển thị {totalElements === 0 ? 0 : indexOfFirstItem + 1}-
-            {totalElements === 0 ? 0 : indexOfLastItem} trong {totalElements}{' '}
-            người dùng
-          </span>
-          <div className={cx('paginationBtns')}>
+      <div className={cx('pagination')}>
+        <span className={cx('paginationInfo')}>
+          Hiển thị {totalElements === 0 ? 0 : indexOfFirstItem + 1}-
+          {totalElements === 0 ? 0 : indexOfLastItem} trong {totalElements}{' '}
+          người dùng
+        </span>
+        <div className={cx('paginationBtns')}>
+          <button
+            className={cx('pageBtn')}
+            disabled={safeCurrentPage === 1}
+            onClick={() => setCurrentPage((previous) => previous - 1)}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          {[...Array(totalPages)].map((_, index) => (
             <button
-              className={cx('pageBtn')}
-              disabled={safeCurrentPage === 1}
-              onClick={() => setCurrentPage((previous) => previous - 1)}
+              key={index + 1}
+              className={cx('pageBtn', {active: safeCurrentPage === index + 1})}
+              onClick={() => setCurrentPage(index + 1)}
             >
-              <ChevronLeft size={18} />
+              {index + 1}
             </button>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index + 1}
-                className={cx('pageBtn', {active: safeCurrentPage === index + 1})}
-                onClick={() => setCurrentPage(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button
-              className={cx('pageBtn')}
-              disabled={safeCurrentPage === totalPages}
-              onClick={() => setCurrentPage((previous) => previous + 1)}
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
+          ))}
+          <button
+            className={cx('pageBtn')}
+            disabled={safeCurrentPage === totalPages}
+            onClick={() => setCurrentPage((previous) => previous + 1)}
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
-      </motion.div>
+      </div>
 
       <ConfirmDeleteModal
         show={Boolean(userToDelete)}

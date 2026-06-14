@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames/bind';
-import { Search, Eye, CheckCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, CheckCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import styles from './Posts.module.scss';
 import { Link } from 'react-router-dom';
 import routes from '~/config/Routes';
+import { AdminPageHeader, AdminToolbar } from '../components/common';
 
 const cx = classNames.bind(styles);
 
@@ -44,8 +45,6 @@ const Posts = () => {
         fetchPosts(0);
     }, [fetchPosts]);
 
-    const handleSearch = (e) => setSearchQuery(e.target.value);
-
     const handleApprove = async (postId) => {
         if (!window.confirm('Duyệt bài viết này?')) return;
         try {
@@ -78,23 +77,16 @@ const Posts = () => {
 
     return (
         <div className={cx('wrapper')}>
-            <div className={cx('header')}>
-                <div>
-                    <h1>Duyệt bài viết</h1>
-                    <p>Duyệt bài chờ duyệt hoặc xóa bài không phù hợp. Bài bị xóa sẽ biến mất khỏi danh sách của tác giả.</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title="Duyệt bài viết"
+                description="Duyệt bài chờ duyệt hoặc xóa bài không phù hợp. Bài bị xóa sẽ biến mất khỏi danh sách của tác giả."
+            />
 
-            <div className={cx('toolbar')}>
-                <div className={cx('searchBox')}>
-                    <Search size={18} className={cx('searchIcon')} />
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm bài viết..."
-                        value={searchQuery}
-                        onChange={handleSearch}
-                    />
-                </div>
+            <AdminToolbar
+                searchValue={searchQuery}
+                onSearchChange={(value) => setSearchQuery(value)}
+                searchPlaceholder="Tìm kiếm bài viết..."
+            >
                 <div className={cx('filterPills')}>
                     <button
                         className={cx('pill', { active: statusFilter === 'PENDING' })}
@@ -115,7 +107,7 @@ const Posts = () => {
                         Tất cả
                     </button>
                 </div>
-            </div>
+            </AdminToolbar>
 
             <div className={cx('tableContainer')}>
                 {loading ? (

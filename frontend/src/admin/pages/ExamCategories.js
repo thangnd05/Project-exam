@@ -1,7 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
-import classNames from 'classnames/bind';
-import {Edit, Plus, Search, Trash2} from 'lucide-react';
+import {Badge, Button} from 'react-bootstrap';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {
   createExamCategory,
@@ -11,9 +10,12 @@ import {
 } from '../../api/examCategoryApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import ExamCategoryFormModal from '../modals/ExamCategoryFormModal';
-import styles from './ExamTypes.module.scss';
-
-const cx = classNames.bind(styles);
+import {
+  AdminFieldError,
+  AdminPageHeader,
+  AdminTable,
+  AdminToolbar,
+} from '../components/common';
 
 const emptyForm = {
   code: '',
@@ -159,97 +161,69 @@ function ExamCategoriesManagement() {
     }
   };
 
+  const columns = [
+    {
+      key: 'code',
+      header: 'Code',
+      render: (item) => <Badge bg="primary">{item.code}</Badge>,
+    },
+    {key: 'name', header: 'Tên'},
+    {
+      key: 'guestAllowed',
+      header: 'Guest',
+      render: (item) =>
+        item.guestAllowed ? (
+          <Badge bg="success">Cho phép</Badge>
+        ) : (
+          <Badge bg="secondary">Không</Badge>
+        ),
+    },
+    {key: 'displayOrder', header: 'Thứ tự'},
+    {key: 'description', header: 'Mô tả', render: (item) => item.description || '-'},
+  ];
+
   return (
-    <div className={cx('examTypesPage')}>
-      <div className={cx('pageHeader')}>
-        <div>
-          <h1>Phân loại bài thi</h1>
-          <p>
-            Cấu hình các loại bài thi (Quick Challenge, Full Mock, Recovery...) — gán vào
-            Test khi tạo đề.
-          </p>
-        </div>
-        <Button onClick={openCreateModal} className={cx('createBtn')}>
-          <Plus size={16} />
+    <div className="d-flex flex-column gap-3">
+      <AdminPageHeader
+        title="Phân loại bài thi"
+        description="Cấu hình các loại bài thi (Quick Challenge, Full Mock, Recovery...) — gán vào Test khi tạo đề."
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
           Thêm phân loại
         </Button>
-      </div>
+      </AdminPageHeader>
 
-      <div className={cx('filterBar')}>
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Tìm theo code, tên, mô tả..."
-          />
-        </div>
-      </div>
+      <AdminToolbar
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm theo code, tên, mô tả..."
+      />
+      <AdminFieldError message={errorMessage} />
 
-      {errorMessage && <p className={cx('errorText')}>{errorMessage}</p>}
-
-      <div className={cx('tableWrapper')}>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>Code</th>
-              <th>Tên</th>
-              <th>Guest</th>
-              <th>Thứ tự</th>
-              <th>Mô tả</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  <Spinner size="sm" className="me-2" />
-                  Đang tải dữ liệu...
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filtered.map((item) => (
-                <tr key={item.examCategoryId}>
-                  <td>
-                    <Badge bg="primary">{item.code}</Badge>
-                  </td>
-                  <td>{item.name}</td>
-                  <td>
-                    {item.guestAllowed ? (
-                      <Badge bg="success">Cho phép</Badge>
-                    ) : (
-                      <Badge bg="secondary">Không</Badge>
-                    )}
-                  </td>
-                  <td>{item.displayOrder}</td>
-                  <td>{item.description || '-'}</td>
-                  <td>
-                    <div className={cx('actions')}>
-                      <button onClick={() => openEditModal(item)} title="Sửa">
-                        <Edit size={14} />
-                      </button>
-                      <button
-                        onClick={() => setDeletingItem(item)}
-                        title="Xóa"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            {!loading && filtered.length === 0 && (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  Không có dữ liệu.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
+      <AdminTable
+        showIndex
+        paginated
+        itemLabel="danh mục"
+        columns={columns}
+        data={filtered}
+        loading={loading}
+        getRowKey={(item) => item.examCategoryId}
+        rowActions={(item) => (
+          <>
+            <button onClick={() => openEditModal(item)} title="Sửa">
+              <Edit size={14} />
+            </button>
+            <button
+              className="danger"
+              onClick={() => setDeletingItem(item)}
+              title="Xóa"
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+      />
 
       <ExamCategoryFormModal
         show={showFormModal}
