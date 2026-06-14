@@ -1,14 +1,10 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Badge, Form} from 'react-bootstrap';
-import classNames from 'classnames/bind';
+import {Badge, Button, Form} from 'react-bootstrap';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 
 import {getLoginAuditLogs} from '../../api/adminAuditApi';
 import {formatDateTime} from '../../utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
-import styles from './AuditLogs.module.scss';
-
-const cx = classNames.bind(styles);
 
 function LoginAudit() {
   const ITEMS_PER_PAGE = 20;
@@ -140,32 +136,34 @@ function LoginAudit() {
         getRowKey={(row) => row.id}
       />
 
-      <div className={cx('pagination')}>
-        <span className={cx('paginationInfo')}>
+      <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span className="text-secondary small">
           Hiển thị {totalElements === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}-
           {totalElements === 0
             ? 0
             : Math.min((currentPage - 1) * ITEMS_PER_PAGE + loginAuditRows.length, totalElements)}{' '}
           trong {totalElements} bản ghi
         </span>
-        <div className={cx('paginationBtns')}>
-          <button
-            className={cx('pageBtn')}
+        <div className="d-flex align-items-center gap-2">
+          <Button
+            variant="outline-secondary"
+            size="sm"
             disabled={currentPage <= 1}
             onClick={() => setCurrentPage((previous) => previous - 1)}
           >
             <ChevronLeft size={16} />
-          </button>
-          <span className={cx('pageNumber')}>
+          </Button>
+          <span className="small fw-semibold">
             {currentPage}/{totalPages}
           </span>
-          <button
-            className={cx('pageBtn')}
+          <Button
+            variant="outline-secondary"
+            size="sm"
             disabled={currentPage >= totalPages}
             onClick={() => setCurrentPage((previous) => previous + 1)}
           >
             <ChevronRight size={16} />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

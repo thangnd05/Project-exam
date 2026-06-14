@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Badge } from 'react-bootstrap';
-import classNames from 'classnames/bind';
+import { Badge, Button } from 'react-bootstrap';
 import { Eye, CheckCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 import { toast } from 'react-toastify';
-import styles from './Posts.module.scss';
 import routes from '~/config/Routes';
 import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common';
 
-const cx = classNames.bind(styles);
-
 const STATUS_VARIANT = { APPROVED: 'success', PENDING: 'warning' };
+
+const STATUS_FILTERS = [
+    { value: 'PENDING', label: 'Chờ duyệt' },
+    { value: 'APPROVED', label: 'Đã duyệt' },
+    { value: 'ALL', label: 'Tất cả' },
+];
 
 const Posts = () => {
     const [posts, setPosts] = useState([]);
@@ -74,9 +76,9 @@ const Posts = () => {
             key: 'title',
             header: 'Tiêu đề',
             render: (post) => (
-                <div className={cx('titleCell')}>
-                    <div className={cx('postTitle')}>{post.title}</div>
-                    <div className={cx('postCategory')}>
+                <div>
+                    <div className="fw-semibold">{post.title}</div>
+                    <div className="small text-secondary">
                         {post.categories?.[0]?.name || 'Không có danh mục'}
                     </div>
                 </div>
@@ -98,7 +100,7 @@ const Posts = () => {
     ];
 
     return (
-        <div className={cx('wrapper')}>
+        <div className="d-flex flex-column gap-3">
             <AdminPageHeader
                 title="Duyệt bài viết"
                 description="Duyệt bài chờ duyệt hoặc xóa bài không phù hợp. Bài bị xóa sẽ biến mất khỏi danh sách của tác giả."
@@ -109,25 +111,18 @@ const Posts = () => {
                 onSearchChange={(value) => setSearchQuery(value)}
                 searchPlaceholder="Tìm kiếm bài viết..."
             >
-                <div className={cx('filterPills')}>
-                    <button
-                        className={cx('pill', { active: statusFilter === 'PENDING' })}
-                        onClick={() => setStatusFilter('PENDING')}
-                    >
-                        Chờ duyệt
-                    </button>
-                    <button
-                        className={cx('pill', { active: statusFilter === 'APPROVED' })}
-                        onClick={() => setStatusFilter('APPROVED')}
-                    >
-                        Đã duyệt
-                    </button>
-                    <button
-                        className={cx('pill', { active: statusFilter === 'ALL' })}
-                        onClick={() => setStatusFilter('ALL')}
-                    >
-                        Tất cả
-                    </button>
+                <div className="d-flex gap-2">
+                    {STATUS_FILTERS.map((item) => (
+                        <Button
+                            key={item.value}
+                            size="sm"
+                            className="rounded-pill"
+                            variant={statusFilter === item.value ? 'primary' : 'outline-secondary'}
+                            onClick={() => setStatusFilter(item.value)}
+                        >
+                            {item.label}
+                        </Button>
+                    ))}
                 </div>
             </AdminToolbar>
 
@@ -168,29 +163,31 @@ const Posts = () => {
             />
 
             {!loading && totalElements > 0 && (
-                <div className={cx('pagination')}>
-                    <span className={cx('paginationInfo')}>
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <span className="text-secondary small">
                         Hiển thị {currentPage * PAGE_SIZE + 1}-
                         {Math.min(currentPage * PAGE_SIZE + posts.length, totalElements)} trong {totalElements} bài viết
                     </span>
-                    <div className={cx('paginationBtns')}>
-                        <button
-                            className={cx('pageBtn')}
+                    <div className="d-flex align-items-center gap-2">
+                        <Button
+                            variant="outline-secondary"
+                            size="sm"
                             disabled={currentPage <= 0}
                             onClick={() => fetchPosts(currentPage - 1)}
                         >
                             <ChevronLeft size={16} />
-                        </button>
-                        <span className={cx('pageNumber')}>
+                        </Button>
+                        <span className="small fw-semibold">
                             {currentPage + 1}/{totalPages}
                         </span>
-                        <button
-                            className={cx('pageBtn')}
+                        <Button
+                            variant="outline-secondary"
+                            size="sm"
                             disabled={currentPage >= totalPages - 1}
                             onClick={() => fetchPosts(currentPage + 1)}
                         >
                             <ChevronRight size={16} />
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}

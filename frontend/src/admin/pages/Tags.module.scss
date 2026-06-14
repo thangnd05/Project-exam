@@ -1,64 +1,5 @@
-.tagsPage {
-  display: flex;
-  flex-direction: column;
-  gap: 1.6rem;
-}
-
-.pageHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.2rem;
-
-  h1 {
-    margin: 0;
-    font-size: 2.2rem;
-    font-weight: 700;
-  }
-
-  p {
-    margin: 0.4rem 0 0;
-    color: #6b7280;
-    font-size: 1.4rem;
-  }
-}
-
-.createBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 1.4rem;
-}
-
-.filterBar {
-  display: flex;
-  gap: 1.2rem;
-  align-items: center;
-}
-
-.searchBox {
-  position: relative;
-  flex: 1;
-
-  input {
-    padding-left: 3.4rem;
-    font-size: 1.4rem;
-  }
-}
-
-.searchIcon {
-  position: absolute;
-  left: 1.2rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-}
-
-.errorText {
-  margin: 0;
-  color: #dc2626;
-  font-size: 1.4rem;
-}
+// Header/toolbar/error dùng bộ admin kit (AdminPageHeader/AdminToolbar/AdminFieldError).
+// File này chỉ giữ style cho UI cây phân cấp tag (không có component kit tương đương).
 
 // ==================== Tree View ====================
 
@@ -245,20 +186,6 @@
     left: 1.6rem;
     bottom: 1.2rem;
     width: 1px;
-    background: #e5e7eb;
-  }
-}
-
-.childConnector {
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: -0.8rem;
-    width: 0.8rem;
-    height: 1px;
     background: #e5e7eb;
   }
 }
