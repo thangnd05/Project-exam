@@ -23,6 +23,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final ObjectMapper objectMapper;
 
     // Lấy danh sách user (admin only)
     @GetMapping
@@ -83,8 +84,7 @@ public class UserController {
             HttpServletRequest httpRequest
     ) throws IOException {
         userService.requireSelfOrAdminForUser(id, httpRequest);
-        ObjectMapper mapper = new ObjectMapper();
-        UserUpsertRequest request = mapper.readValue(userJson, UserUpsertRequest.class);
+        UserUpsertRequest request = objectMapper.readValue(userJson, UserUpsertRequest.class);
         return ResponseEntity.ok(userService.updateUser(id, request, avatar));
     }
 
