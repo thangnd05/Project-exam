@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Badge } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { Eye, CheckCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import styles from './Posts.module.scss';
-import { Link } from 'react-router-dom';
 import routes from '~/config/Routes';
-import { AdminPageHeader, AdminToolbar } from '../components/common';
+import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common';
 
 const cx = classNames.bind(styles);
+
+const STATUS_VARIANT = { APPROVED: 'success', PENDING: 'warning' };
 
 const Posts = () => {
     const [posts, setPosts] = useState([]);
@@ -67,13 +69,33 @@ const Posts = () => {
         }
     };
 
-    const getStatusStyle = (status) => {
-        switch (status) {
-            case 'APPROVED': return cx('statusBadge', 'approved');
-            case 'PENDING': return cx('statusBadge', 'pending');
-            default: return cx('statusBadge');
-        }
-    };
+    const columns = [
+        {
+            key: 'title',
+            header: 'Tiêu đề',
+            render: (post) => (
+                <div className={cx('titleCell')}>
+                    <div className={cx('postTitle')}>{post.title}</div>
+                    <div className={cx('postCategory')}>
+                        {post.categories?.[0]?.name || 'Không có danh mục'}
+                    </div>
+                </div>
+            ),
+        },
+        { key: 'authorName', header: 'Tác giả' },
+        {
+            key: 'createdAt',
+            header: 'Ngày tạo',
+            render: (post) => new Date(post.createdAt).toLocaleDateString('vi-VN'),
+        },
+        {
+            key: 'status',
+            header: 'Trạng thái',
+            render: (post) => (
+                <Badge bg={STATUS_VARIANT[post.status] || 'secondary'}>{post.status}</Badge>
+            ),
+        },
+    ];
 
     return (
         <div className={cx('wrapper')}>
@@ -109,72 +131,41 @@ const Posts = () => {
                 </div>
             </AdminToolbar>
 
-            <div className={cx('tableContainer')}>
-                {loading ? (
-                    <div className={cx('loading')}>Đang tải dữ liệu...</div>
-                ) : (
-                    <table className={cx('table')}>
-                        <thead>
-                            <tr>
-                                <th>Tiêu đề</th>
-                                <th>Tác giả</th>
-                                <th>Ngày tạo</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {posts.length > 0 ? (
-                                posts.map((post) => (
-                                    <tr key={post.id}>
-                                        <td className={cx('titleCell')}>
-                                            <div className={cx('postTitle')}>{post.title}</div>
-                                            <div className={cx('postCategory')}>{post.categories?.[0]?.name || 'Không có danh mục'}</div>
-                                        </td>
-                                        <td>{post.authorName}</td>
-                                        <td>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</td>
-                                        <td>
-                                            <span className={getStatusStyle(post.status)}>{post.status}</span>
-                                        </td>
-                                        <td>
-                                            <div className={cx('actions')}>
-                                                <Link
-                                                    to={routes.postDetail.replace(':postId', post.id)}
-                                                    className={cx('viewBtn')}
-                                                    target="_blank"
-                                                    title="Xem chi tiết"
-                                                >
-                                                    <Eye size={16} />
-                                                </Link>
-                                                {post.status !== 'APPROVED' && (
-                                                    <button
-                                                        className={cx('approveBtn')}
-                                                        onClick={() => handleApprove(post.id)}
-                                                        title="Duyệt"
-                                                    >
-                                                        <CheckCircle size={16} />
-                                                    </button>
-                                                )}
-                                                <button
-                                                    className={cx('rejectBtn')}
-                                                    onClick={() => handleDelete(post.id)}
-                                                    title="Xóa bài viết"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="5" className={cx('empty')}>Không có dữ liệu bài viết</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+            <AdminTable
+                showIndex
+                columns={columns}
+                data={posts}
+                loading={loading}
+                emptyText="Không có dữ liệu bài viết"
+                getRowKey={(post) => post.id}
+                rowActions={(post) => (
+                    <>
+                        <button
+                            title="Xem chi tiết"
+                            onClick={() =>
+                                window.open(
+                                    routes.postDetail.replace(':postId', post.id),
+                                    '_blank',
+                                )
+                            }
+                        >
+                            <Eye size={14} />
+                        </button>
+                        {post.status !== 'APPROVED' && (
+                            <button title="Duyệt" onClick={() => handleApprove(post.id)}>
+                                <CheckCircle size={14} />
+                            </button>
+                        )}
+                        <button
+                            className="danger"
+                            title="Xóa bài viết"
+                            onClick={() => handleDelete(post.id)}
+                        >
+                            <Trash2 size={14} />
+                        </button>
+                    </>
                 )}
-            </div>
+            />
 
             {!loading && totalElements > 0 && (
                 <div className={cx('pagination')}>

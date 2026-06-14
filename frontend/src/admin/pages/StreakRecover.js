@@ -1,14 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Form, Spinner } from 'react-bootstrap';
-import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { Flame } from 'lucide-react';
 
 import { getStreakRecoverConfig, updateStreakRecoverConfig } from '~/api/streakApi';
-import { AdminFieldError, AdminPageHeader } from '../components/common';
-import styles from './StreakRecover.module.scss';
-
-const cx = classNames.bind(styles);
+import { AdminCard, AdminFieldError, AdminPageHeader } from '../components/common';
 
 // Trang admin: cấu hình giá xu + bật/tắt tính năng khôi phục chuỗi ngày.
 function StreakRecoverManagement() {
@@ -63,13 +59,16 @@ function StreakRecoverManagement() {
       />
 
       {loading ? (
-        <div className={cx('placeholder')}>
+        <div className="text-center text-secondary py-4">
           <Spinner size="sm" className="me-2" />
           Đang tải cấu hình...
         </div>
       ) : (
-        <div className={cx('card')}>
-          <div className={cx('flameRow')}>
+        <AdminCard maxWidth={480}>
+          <div
+            className="d-flex align-items-center gap-2 mb-3 fw-bold"
+            style={{ fontSize: '1.6rem', color: '#f08c00' }}
+          >
             <Flame size={28} />
             <span>Cấu hình tính năng khôi phục</span>
           </div>
@@ -99,7 +98,7 @@ function StreakRecoverManagement() {
           <Button onClick={handleSave} disabled={saving}>
             {saving ? 'Đang lưu...' : 'Lưu cấu hình'}
           </Button>
-        </div>
+        </AdminCard>
       )}
     </div>
   );
