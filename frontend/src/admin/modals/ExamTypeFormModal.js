@@ -1,6 +1,7 @@
 import React from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 
 const scoringMethodOptions = ['DEFAULT', 'TOEIC_SCALE', 'IELTS_BAND'];
 
@@ -19,12 +20,12 @@ function ExamTypeFormModal({
       title={isEditing ? 'Cập nhật loại kỳ thi' : 'Tạo loại kỳ thi'}
       maxWidth={550}
       footer={
-        <>
-          <Button variant="secondary" onClick={onClose}>
-            Hủy
-          </Button>
-          <Button onClick={onSubmit}>{isEditing ? 'Lưu' : 'Tạo mới'}</Button>
-        </>
+        <ModalActionFooter
+          onCancel={onClose}
+          onSubmit={onSubmit}
+          cancelLabel="Hủy"
+          submitLabel={isEditing ? 'Lưu' : 'Tạo mới'}
+        />
       }
     >
         <Form.Group className="mb-3">
@@ -54,7 +55,7 @@ function ExamTypeFormModal({
             }
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Phương thức chấm điểm</Form.Label>
           <Form.Select
             value={formState.scoring_method}
@@ -66,6 +67,15 @@ function ExamTypeFormModal({
               </option>
             ))}
           </Form.Select>
+        </Form.Group>
+        <Form.Group>
+          <Form.Check
+            type="switch"
+            id="exam-type-flexible"
+            label="Loại linh hoạt (cho user tự tạo bài — ẩn khỏi dropdown loại kỳ thi chuẩn)"
+            checked={Boolean(formState.flexible)}
+            onChange={(event) => onChangeField('flexible', event.target.checked)}
+          />
         </Form.Group>
     </BaseModal>
   );

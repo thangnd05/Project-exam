@@ -8,4 +8,5 @@ public class ExamTypeRequest {
     private String description;
     private Integer durationMinutes;
     private String scoringMethod;
+    private Boolean flexible;
 }

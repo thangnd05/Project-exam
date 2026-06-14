@@ -14,6 +14,7 @@ public class ExamTypeMapper {
                 .description(t.getDescription())
                 .durationMinutes(t.getDurationMinutes())
                 .scoringMethod(t.getScoringMethod())
+                .flexible(Boolean.TRUE.equals(t.getFlexible()))
                 .build();
     }
 }

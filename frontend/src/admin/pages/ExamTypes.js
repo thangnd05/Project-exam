@@ -22,6 +22,7 @@ const emptyForm = {
   description: '',
   duration_minutes: '',
   scoring_method: 'DEFAULT',
+  flexible: false,
 };
 
 const mapExamTypeFromApi = (item) => ({
@@ -30,6 +31,7 @@ const mapExamTypeFromApi = (item) => ({
   description: item.description || '',
   duration_minutes: item.durationMinutes ?? '',
   scoring_method: item.scoringMethod || 'DEFAULT',
+  flexible: Boolean(item.flexible),
 });
 
 const buildExamTypePayload = (formState) => {
@@ -41,6 +43,7 @@ const buildExamTypePayload = (formState) => {
     description: formState.description.trim(),
     durationMinutes,
     scoringMethod: formState.scoring_method,
+    flexible: Boolean(formState.flexible),
   };
 };
 
@@ -104,6 +107,7 @@ function ExamTypesManagement() {
       description: examType.description || '',
       duration_minutes: examType.duration_minutes ?? '',
       scoring_method: examType.scoring_method || 'DEFAULT',
+      flexible: Boolean(examType.flexible),
     });
     setShowFormModal(true);
   };
@@ -183,6 +187,13 @@ function ExamTypesManagement() {
       key: 'scoring_method',
       header: 'Chấm điểm',
       render: (examType) => <Badge bg="primary">{examType.scoring_method}</Badge>,
+    },
+    {
+      key: 'flexible',
+      header: 'Linh hoạt',
+      align: 'center',
+      render: (examType) =>
+        examType.flexible ? <Badge bg="info">Linh hoạt</Badge> : '-',
     },
     {
       key: 'description',

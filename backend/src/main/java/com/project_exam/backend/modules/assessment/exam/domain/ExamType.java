@@ -28,4 +28,8 @@ public class ExamType {
     @Column(name = "scoring_method", nullable = false, length = 50)
     private String scoringMethod = "DEFAULT";
 
+    /** Loại "linh hoạt" (vd Thông Thường) cho user tự tạo bài; có thể ẩn khỏi dropdown loại kỳ thi chuẩn. */
+    @Column(name = "flexible")
+    private Boolean flexible = Boolean.FALSE;
+
 }

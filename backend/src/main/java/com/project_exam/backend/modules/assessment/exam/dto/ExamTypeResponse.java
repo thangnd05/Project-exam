@@ -15,4 +15,5 @@ public class ExamTypeResponse {
     private String description;
     private Integer durationMinutes;
     private String scoringMethod;
+    private Boolean flexible;
 }

@@ -30,6 +30,18 @@ public class ExamTypeController {
         return ResponseEntity.ok(examTypeService.findAll());
     }
 
+    /** Loại kỳ thi chuẩn (flexible=false) — dùng cho trang chọn loại đề, ẩn loại linh hoạt. */
+    @GetMapping("/standard")
+    public ResponseEntity<List<ExamTypeResponse>> getStandardExamTypes() {
+        return ResponseEntity.ok(examTypeService.findStandard());
+    }
+
+    /** Loại kỳ thi linh hoạt (flexible=true). */
+    @GetMapping("/flexible")
+    public ResponseEntity<List<ExamTypeResponse>> getFlexibleExamTypes() {
+        return ResponseEntity.ok(examTypeService.findFlexible());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ExamTypeResponse> getExamTypeById(@PathVariable String id) {
         return ResponseEntity.ok(examTypeService.findById(id));

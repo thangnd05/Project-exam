@@ -6,6 +6,16 @@ export const getExamTypes = () => {
   return axios.get(BASE_URL).then((response) => response.data);
 };
 
+// Loại kỳ thi chuẩn (flexible=false) — ẩn loại linh hoạt như "Thông Thường".
+export const getStandardExamTypes = () => {
+  return axios.get(`${BASE_URL}/standard`).then((response) => response.data);
+};
+
+// Loại kỳ thi linh hoạt (flexible=true).
+export const getFlexibleExamTypes = () => {
+  return axios.get(`${BASE_URL}/flexible`).then((response) => response.data);
+};
+
 export const getExamTypeById = (examTypeId) => {
   return axios.get(`${BASE_URL}/${examTypeId}`).then((response) => response.data);
 };

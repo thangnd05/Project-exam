@@ -25,6 +25,20 @@ public class ExamTypeService {
                 .toList();
     }
 
+    /** Loại kỳ thi chuẩn (flexible=false/null) — dùng cho trang chọn loại đề (ẩn "Thông Thường"). */
+    public List<ExamTypeResponse> findStandard() {
+        return examTypeRepository.findStandard().stream()
+                .map(examTypeMapper::toResponse)
+                .toList();
+    }
+
+    /** Loại kỳ thi linh hoạt (flexible=true). */
+    public List<ExamTypeResponse> findFlexible() {
+        return examTypeRepository.findFlexible().stream()
+                .map(examTypeMapper::toResponse)
+                .toList();
+    }
+
     public ExamTypeResponse findById(String id) {
         ExamType type = examTypeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
@@ -37,6 +51,7 @@ public class ExamTypeService {
         type.setDescription(request.getDescription());
         type.setDurationMinutes(request.getDurationMinutes());
         type.setScoringMethod(request.getScoringMethod() != null ? request.getScoringMethod() : "DEFAULT");
+        type.setFlexible(Boolean.TRUE.equals(request.getFlexible()));
         type = examTypeRepository.save(type);
         return examTypeMapper.toResponse(type);
     }
@@ -48,6 +63,7 @@ public class ExamTypeService {
         if (request.getDescription() != null) type.setDescription(request.getDescription());
         if (request.getDurationMinutes() != null) type.setDurationMinutes(request.getDurationMinutes());
         if (request.getScoringMethod() != null) type.setScoringMethod(request.getScoringMethod());
+        if (request.getFlexible() != null) type.setFlexible(request.getFlexible());
         type = examTypeRepository.save(type);
         return examTypeMapper.toResponse(type);
     }

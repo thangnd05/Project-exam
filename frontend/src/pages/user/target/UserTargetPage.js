@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getMilestones } from '~/api/milestoneApi';
-import { getExamTypes } from '~/api/examTypeApi';
+import { getStandardExamTypes } from '~/api/examTypeApi';
 import { getExamParts } from '~/api/examPartApi';
 import { getSkills } from '~/api/skillApi';
 import { getScoringConversions } from '~/api/scoringConversionApi';
