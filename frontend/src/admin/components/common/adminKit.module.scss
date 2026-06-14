@@ -5,25 +5,30 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
+  text-align: left;
 
   .title {
     margin: 0;
     font-size: 2rem;
     font-weight: var(--font-weight-bold);
     color: var(--text-color);
+    text-align: left;
   }
 
   .description {
     margin: 6px 0 0;
     color: var(--text-secondary);
     font-size: var(--font-size-ssm);
+    text-align: left;
   }
 }
 
 .headingGroup {
   min-width: 0;
+  flex: 1;
+  text-align: left;
 }
 
 .headerActions {
@@ -31,6 +36,25 @@
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+
+  // Nút CTA "Thêm ..." dùng gradient brand, bo góc, shadow nhẹ + hover nhấc lên.
+  :global(.btn-primary) {
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 10px;
+    font-weight: var(--font-weight-semibold);
+    font-size: 1.4rem;
+    padding: 9px 20px;
+    box-shadow: 0 4px 14px rgba(0, 97, 242, 0.3);
+    transition: all 0.2s ease;
+
+    &:hover,
+    &:focus,
+    &:active {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 97, 242, 0.42);
+    }
+  }
 }
 
 // ===== Toolbar (search + actions) =====
