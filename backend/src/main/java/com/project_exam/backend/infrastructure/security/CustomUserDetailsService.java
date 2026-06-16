@@ -4,6 +4,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 
 import com.project_exam.backend.modules.users.domain.Role;
 import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.users.repository.RolePermissionRepository;
 import com.project_exam.backend.modules.users.repository.RoleRepository;
 import com.project_exam.backend.modules.users.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -17,7 +18,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,11 +30,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final RolePermissionRepository rolePermissionRepository;
     private final PasswordEncoder passwordEncoder; // Thêm dòng này
 
-    public CustomUserDetailsService(UserRepository userRepository, RoleRepository roleRepository,@Lazy PasswordEncoder passwordEncoder) {
+    public CustomUserDetailsService(UserRepository userRepository, RoleRepository roleRepository,
+                                    RolePermissionRepository rolePermissionRepository,
+                                    @Lazy PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.rolePermissionRepository = rolePermissionRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -53,13 +59,19 @@ public class CustomUserDetailsService implements UserDetailsService {
         Role role = roleRepository.findById(user.getRoleId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy Role ID: " + user.getRoleId()));
 
-        String roleName = "ROLE_" + role.getRoleName().toUpperCase();
+        // 🔐 Authorities = role (ROLE_<name>, backward-compat) + từng permission code của role.
+        // Permission resolve từ DB mỗi request (nối qua bảng role_permissions) → đổi quyền có hiệu lực ngay.
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName().toUpperCase()));
+        for (String code : rolePermissionRepository.findPermissionCodesByRoleId(role.getRoleId())) {
+            authorities.add(new SimpleGrantedAuthority(code));
+        }
 
         //  Trả về đối tượng UserDetails cho Spring Security
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),          // dùng email để login
                 user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(roleName))
+                authorities
         );
     }
 
