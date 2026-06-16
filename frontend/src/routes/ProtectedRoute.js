@@ -1,50 +1,13 @@
-import {useEffect, useState} from 'react';
-import { getRoles } from '../api/roleApi';
-import {Navigate, useLocation} from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import routes from '~/config/Routes';
-import {useAuth} from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth';
 
-function ProtectedRoute({children, requiredRoleName, allowGuest = false}) {
-  const {isAuthenticated, loading, roleId} = useAuth();
+// requiredRoleName: yêu cầu đúng tên role (vd "ADMIN").
+// requiredPermission: yêu cầu một permission code (RBAC granular), vd "USER:MANAGE".
+// Cả hai đọc từ AuthContext (BE trả ở login/me) → không gọi API, không nhấp nháy.
+function ProtectedRoute({ children, requiredRoleName, requiredPermission, allowGuest = false }) {
+  const { isAuthenticated, loading, roleName, permissions } = useAuth();
   const location = useLocation();
-  const [roleChecking, setRoleChecking] = useState(false);
-  const [hasRequiredRole, setHasRequiredRole] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (!requiredRoleName || !isAuthenticated || !roleId) {
-      setHasRequiredRole(true);
-      return undefined;
-    }
-
-    const checkRole = async () => {
-      setRoleChecking(true);
-      try {
-        const data = await getRoles();
-        const roles = Array.isArray(data) ? data : [];
-        const currentRole = roles.find(
-          (role) => String(role.roleId) === String(roleId),
-        );
-        const matched = currentRole?.roleName === requiredRoleName;
-        if (!cancelled) {
-          setHasRequiredRole(Boolean(matched));
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setHasRequiredRole(false);
-        }
-      } finally {
-        if (!cancelled) {
-          setRoleChecking(false);
-        }
-      }
-    };
-
-    checkRole();
-    return () => {
-      cancelled = true;
-    };
-  }, [requiredRoleName, isAuthenticated, roleId]);
 
   if (loading) {
     return <div>Đang kiểm tra đăng nhập...</div>;
@@ -64,11 +27,14 @@ function ProtectedRoute({children, requiredRoleName, allowGuest = false}) {
     );
   }
 
-  if (requiredRoleName && roleChecking) {
-    // return <div>Đang kiểm tra quyền truy cập...</div>;
+  if (requiredRoleName && roleName !== requiredRoleName) {
+    return <Navigate to={routes.notFoundPage} replace />;
   }
 
-  if (requiredRoleName && !hasRequiredRole) {
+  if (
+    requiredPermission &&
+    !(Array.isArray(permissions) && permissions.includes(requiredPermission))
+  ) {
     return <Navigate to={routes.notFoundPage} replace />;
   }
 
