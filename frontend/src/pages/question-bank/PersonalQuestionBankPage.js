@@ -22,6 +22,7 @@ import {
   IoTrashOutline,
 } from 'react-icons/io5';
 import {useBaseMetaData} from '~/hooks/useBaseMetaData';
+import {useHasPermission} from '~/hooks/usePermission';
 import EditQuestionModal from './modals/EditQuestionModal';
 import ViewQuestionModal from './modals/ViewQuestionModal';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
@@ -36,7 +37,11 @@ const BANK_SCOPE = {
 };
 
 const PersonalQuestionBankPage = () => {
-  const [bankScope, setBankScope] = useState(BANK_SCOPE.ADMIN);
+  // Chỉ người có quyền quản lý câu hỏi mới thấy/dùng "Kho đề quản trị".
+  const canAccessAdminBank = useHasPermission('QUESTION:MANAGE');
+  const [bankScope, setBankScope] = useState(
+    canAccessAdminBank ? BANK_SCOPE.ADMIN : BANK_SCOPE.PERSONAL,
+  );
   const [classes, setClasses] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState('');
   const [examTypeId, setExamTypeId] = useState('');
@@ -55,6 +60,13 @@ const PersonalQuestionBankPage = () => {
   const [collectionFilter, setCollectionFilter] = useState('');
 
   const {examTypes, examParts} = useBaseMetaData(examTypeId);
+
+  // Nếu mất quyền (hoặc permission nạp sau render đầu) mà đang ở kho admin → chuyển về kho cá nhân.
+  useEffect(() => {
+    if (!canAccessAdminBank && bankScope === BANK_SCOPE.ADMIN) {
+      setBankScope(BANK_SCOPE.PERSONAL);
+    }
+  }, [canAccessAdminBank, bankScope]);
 
   useEffect(() => {
     getQuestionCollections()
@@ -358,19 +370,21 @@ const PersonalQuestionBankPage = () => {
           </div>
 
           <div className={cx('scopeSwitch')}>
-            <Button
-              type="button"
-              className={cx('scopeBtn')}
-              variant={
-                bankScope === BANK_SCOPE.ADMIN ? 'primary' : 'outline-primary'
-              }
-              onClick={() => {
-                setBankScope(BANK_SCOPE.ADMIN);
-                setSelectedClassId('');
-              }}
-            >
-              Kho đề quản trị
-            </Button>
+            {canAccessAdminBank && (
+              <Button
+                type="button"
+                className={cx('scopeBtn')}
+                variant={
+                  bankScope === BANK_SCOPE.ADMIN ? 'primary' : 'outline-primary'
+                }
+                onClick={() => {
+                  setBankScope(BANK_SCOPE.ADMIN);
+                  setSelectedClassId('');
+                }}
+              >
+                Kho đề quản trị
+              </Button>
+            )}
             <Button
               type="button"
               className={cx('scopeBtn')}
