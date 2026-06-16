@@ -13,6 +13,8 @@ import java.util.Optional;
 @Repository
 public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, String> {
     Optional<UserVocabulary> findByUserIdAndVocabId(String userId, String vocabId);
+    List<UserVocabulary> findByUserId(String userId);
+    void deleteByUserId(String userId);
     long countByUserId(String userId);
     long countByUserIdAndStatus(String userId, UserVocabulary.Status status);
 
