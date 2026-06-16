@@ -20,13 +20,13 @@ public class UserVocabularyController {
     private final UserVocabularyService service;
 
     @GetMapping
-    public ResponseEntity<List<UserVocabularyResponse>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<UserVocabularyResponse>> getAll(HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(service.findAllForCurrentUser(httpRequest));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserVocabularyResponse> getById(@PathVariable String id) {
-        return ResponseEntity.ok(service.findById(id));
+    public ResponseEntity<UserVocabularyResponse> getById(@PathVariable String id, HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(service.findById(id, httpRequest));
     }
 
     @PostMapping
@@ -40,19 +40,20 @@ public class UserVocabularyController {
     @PutMapping("/{id}")
     public ResponseEntity<UserVocabularyResponse> update(
             @PathVariable String id,
-            @Valid @RequestBody UserVocabularyRequest request) {
-        return ResponseEntity.ok(service.update(id, request));
+            @Valid @RequestBody UserVocabularyRequest request,
+            HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(service.update(id, request, httpRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
+        service.delete(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete-all")
-    public ResponseEntity<String> deleteAll() {
-        service.deleteAllUserVocabulary();
-        return ResponseEntity.ok("Đã xóa toàn bộ dữ liệu trong bảng user_vocabulary!");
+    public ResponseEntity<String> deleteAll(HttpServletRequest httpRequest) {
+        service.deleteAllForCurrentUser(httpRequest);
+        return ResponseEntity.ok("Đã xóa toàn bộ từ vựng của bạn!");
     }
 }

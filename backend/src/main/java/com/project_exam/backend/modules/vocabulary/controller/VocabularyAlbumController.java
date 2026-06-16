@@ -38,14 +38,15 @@ public class VocabularyAlbumController {
     @PutMapping("/{id}")
     public ResponseEntity<VocabularyAlbumResponse> update(
             @PathVariable String id,
-            @RequestBody VocabularyAlbumRequest request
+            @RequestBody VocabularyAlbumRequest request,
+            HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(service.update(id, request));
+        return ResponseEntity.ok(service.update(id, request, httpRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
+        service.delete(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 
