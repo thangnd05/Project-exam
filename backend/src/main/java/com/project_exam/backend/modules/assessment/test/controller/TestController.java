@@ -154,6 +154,7 @@ public class TestController {
 
     @GetMapping("/admin")
     public List<TestAdminResponse> getAllTestsByAdmin() {
+        authUtils.requirePermission(PermissionCatalog.TEST_MANAGE);
         return testService.getAllTestsByAdmin();
     }
 
@@ -174,6 +175,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
      */
     @GetMapping("/admin/by-exam-type/{examTypeId}")
     public ResponseEntity<List<TestAdminResponse>> getAdminTestsByExamType(@PathVariable String examTypeId) {
+        authUtils.requirePermission(PermissionCatalog.TEST_MANAGE);
         List<TestAdminResponse> adminTests = testService.getAllTestsByAdmin()
                 .stream()
                 .filter(t -> t.getExamTypeId().equals(examTypeId))
