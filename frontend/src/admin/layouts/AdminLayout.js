@@ -51,6 +51,7 @@ const adminRouteGroups = [
     items: [
       {path: routes.adminUsers, icon: <Users size={20} />, label: 'Quản lý Users'},
       {path: routes.adminRoles, icon: <ShieldCheck size={20} />, label: 'Quản lý vai trò'},
+      {path: routes.adminPermissions, icon: <KeyRound size={20} />, label: 'Phân quyền (RBAC)'},
     ],
   },
   {

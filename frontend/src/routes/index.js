@@ -35,6 +35,7 @@ import SavedPostsPage from '~/pages/profile/SavedPostsPage';
 import AdminDashboard from '~/admin/pages/Dashboard';
 import UsersManagement from '~/admin/pages/Users';
 import RolesManagement from '~/admin/pages/Roles';
+import PermissionsManagement from '~/admin/pages/Permissions';
 import SkillsManagement from '~/admin/pages/Skills';
 import ScoringConversionManagement from '~/admin/pages/ScoringConversion';
 import EvaluationsManagement from '~/admin/pages/Evaluations';
@@ -89,6 +90,7 @@ export const adminRoutes = [
   { path: routes.adminDashboard, component: AdminDashboard },
   { path: routes.adminUsers, component: UsersManagement },
   { path: routes.adminRoles, component: RolesManagement },
+  { path: routes.adminPermissions, component: PermissionsManagement },
   { path: routes.adminSkills, component: SkillsManagement },
   { path: routes.adminScoringConversion, component: ScoringConversionManagement },
   { path: routes.adminEvaluations, component: EvaluationsManagement },
