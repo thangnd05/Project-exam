@@ -18,6 +18,7 @@ import com.project_exam.backend.modules.auth.repository.EmailVerificationReposit
 import com.project_exam.backend.modules.auth.repository.PasswordResetTokenRepository;
 import com.project_exam.backend.modules.users.domain.Role;
 import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.users.repository.RolePermissionRepository;
 import com.project_exam.backend.modules.users.repository.RoleRepository;
 import com.project_exam.backend.modules.users.repository.UserRepository;
 import com.project_exam.backend.infrastructure.security.CustomUserDetailsService;
@@ -57,6 +58,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final RolePermissionRepository rolePermissionRepository;
     private final UserMapper userMapper;
     private final EmailVerificationService emailVerificationService;
     private final EmailVerificationRepository emailVerificationRepository;
@@ -97,7 +99,17 @@ public class AuthService {
         setAccessTokenCookie(accessToken, response);
         setRefreshTokenCookie(refreshToken, response);
 
-        return userMapper.toResponse(user);
+        return enrichWithRoleAndPermissions(userMapper.toResponse(user), user.getRoleId());
+    }
+
+    /** Bổ sung roleName + danh sách permission code cho luồng auth (login, /me) để FE gate UI. */
+    private UserResponse enrichWithRoleAndPermissions(UserResponse response, String roleId) {
+        if (roleId != null) {
+            Role role = roleRepository.findById(roleId).orElse(null);
+            response.setRoleName(role != null ? role.getRoleName() : null);
+            response.setPermissions(rolePermissionRepository.findPermissionCodesByRoleId(roleId));
+        }
+        return response;
     }
 
     /**
@@ -273,7 +285,7 @@ public class AuthService {
     public UserResponse me(HttpServletRequest request) {
         Claims claims = jwtService.extractAllClaimsFromRequest(request);
         User user = userRepository.findById((String) claims.get("userId")).orElseThrow();
-        return userMapper.toResponse(user);
+        return enrichWithRoleAndPermissions(userMapper.toResponse(user), user.getRoleId());
     }
     
     public UserTokenInfo getCurrentUserInfo(HttpServletRequest request) {
