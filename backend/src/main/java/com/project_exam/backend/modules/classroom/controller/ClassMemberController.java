@@ -4,6 +4,8 @@ import com.project_exam.backend.modules.classroom.dto.ClassMemberActionRequest;
 import com.project_exam.backend.modules.classroom.dto.ClassMemberJoinRequest;
 import com.project_exam.backend.modules.classroom.dto.ClassMemberResponse;
 import com.project_exam.backend.modules.classroom.service.ClassMemberService;
+import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ import java.util.Map;
 public class ClassMemberController {
 
     private final ClassMemberService classMemberService;
+    private final ClassAccessGuard classAccessGuard;
+    private final AuthUtils authUtils;
 
     @PostMapping("/join")
     public ResponseEntity<ClassMemberResponse> joinClass(
@@ -69,12 +73,22 @@ public class ClassMemberController {
     }
 
     @GetMapping("/class/{classId}")
-    public ResponseEntity<List<ClassMemberResponse>> getAllMembers(@PathVariable String classId) {
+    public ResponseEntity<List<ClassMemberResponse>> getAllMembers(
+            @PathVariable String classId,
+            HttpServletRequest request
+    ) {
+        // Chỉ thành viên đã duyệt hoặc giáo viên của lớp (admin pass) mới xem danh sách thành viên.
+        classAccessGuard.requireMemberOrTeacher(classId, authUtils.getUserId(request), request);
         return ResponseEntity.ok(classMemberService.getAllMembers(classId));
     }
 
     @GetMapping("/class/{classId}/pending")
-    public ResponseEntity<List<ClassMemberResponse>> getPendingMembers(@PathVariable String classId) {
+    public ResponseEntity<List<ClassMemberResponse>> getPendingMembers(
+            @PathVariable String classId,
+            HttpServletRequest request
+    ) {
+        // Danh sách chờ duyệt chỉ dành cho giáo viên của lớp (admin pass).
+        classAccessGuard.requireTeacher(classId, authUtils.getUserId(request), request);
         return ResponseEntity.ok(classMemberService.getPendingMembers(classId));
     }
 
