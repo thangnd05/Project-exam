@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.classroom.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
@@ -73,7 +74,7 @@ public class ChapterService {
     //  GET ALL — chỉ admin được xem toàn bộ chapter.
     // ============================
     public List<ChapterResponse> getAll(HttpServletRequest httpRequest) {
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ chapter.");
         }
         return chapterRepository.findAll()

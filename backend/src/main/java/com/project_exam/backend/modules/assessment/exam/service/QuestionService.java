@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
@@ -412,7 +413,7 @@ public class QuestionService {
         // 🔒 Phải sở hữu test cha.
         Test parentTest = testRepository.findById(testPart.getTestId())
                 .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
-        if (!currentUserId.equals(parentTest.getCreatedBy()) && !authUtils.isAdmin(httpRequest)) {
+        if (!currentUserId.equals(parentTest.getCreatedBy()) && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
         // 🔒 Nếu gắn class/chapter, user phải có quyền với lớp.
@@ -473,7 +474,7 @@ public class QuestionService {
                 .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại."));
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(question.getCreatedBy());
-        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá câu hỏi này.");
         }
         cascadeDeleteQuestionInternal(id);
@@ -772,7 +773,7 @@ public class QuestionService {
         // 🔒 Phải sở hữu test cha (admin pass).
         Test parentTest = testRepository.findById(testPart.getTestId())
                 .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
-        if (!currentUserId.equals(parentTest.getCreatedBy()) && !authUtils.isAdmin(httpRequest)) {
+        if (!currentUserId.equals(parentTest.getCreatedBy()) && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
         // 🔒 Nếu gắn class/chapter, user phải có quyền với lớp.
@@ -1057,7 +1058,7 @@ public class QuestionService {
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại."));
-        if (!currentUserId.equals(question.getCreatedBy()) && !authUtils.isAdmin(httpRequest)) {
+        if (!currentUserId.equals(question.getCreatedBy()) && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE)) {
             throw new ForbiddenException("Chỉ người tạo câu hỏi mới được sửa.");
         }
         // 🔒 Nếu đổi class/chapter, user phải có quyền với lớp đó.

@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.test.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.NotFoundException;
 
@@ -88,7 +89,7 @@ public class TestController {
         test.setAvailableTo(request.getAvailableTo());
         // Giá xu: chỉ admin set được, và chỉ cho bài công khai (không gắn lớp).
         if (request.getCostCoins() != null
-                && authUtils.isAdmin(httpRequest)
+                && authUtils.hasPermission(PermissionCatalog.TEST_MANAGE_PRICING)
                 && request.getClassId() == null) {
             test.setCostCoins(request.getCostCoins());
         }

@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.audit.controller;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.audit.dto.AuditLogResponse;
 import com.project_exam.backend.modules.audit.service.AuditLogService;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuditLogController {
 
     private final AuditLogService auditLogService;
+    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<PageResponse<AuditLogResponse>> getRecentAudits(
@@ -24,6 +27,7 @@ public class AuditLogController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size
     ) {
+        authUtils.requirePermission(PermissionCatalog.AUDIT_VIEW);
         return ResponseEntity.ok(auditLogService.getRecentLogs(userId, page, size));
     }
 
@@ -33,6 +37,7 @@ public class AuditLogController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size
     ) {
+        authUtils.requirePermission(PermissionCatalog.AUDIT_VIEW);
         return ResponseEntity.ok(auditLogService.getLoginLogs(userId, page, size));
     }
 }

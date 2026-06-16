@@ -11,6 +11,8 @@ import com.project_exam.backend.modules.classroom.dto.*;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -32,6 +34,7 @@ import java.util.Map;
 public class QuestionController {
     private final QuestionService questionService;
     private final ObjectMapper objectMapper;
+    private final AuthUtils authUtils;
 
     // =================== GET ===================
 
@@ -61,6 +64,7 @@ public class QuestionController {
             HttpServletRequest request
     ) {
         if ("admin".equalsIgnoreCase(bank)) {
+            authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
             return ResponseEntity.ok(questionService.getAdminBankQuestionsByPart(examPartId, request));
         }
         List<QuestionResponse> questions = questionService.getQuestionsByPart(examPartId, classId, chapterId, request);
@@ -77,6 +81,7 @@ public class QuestionController {
             HttpServletRequest request
     ) {
         if ("admin".equalsIgnoreCase(bank)) {
+            authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
             return ResponseEntity.ok(questionService.countAdminBankQuestionsByPart(examPartId, request));
         }
         long count = questionService.countByExamPartId(examPartId, classId, chapterId, request);

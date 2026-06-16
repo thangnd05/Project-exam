@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResponse;
 import com.project_exam.backend.modules.assessment.exam.service.RecoveryResourceService;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class RecoveryResourceController {
 
     private final RecoveryResourceService resourceService;
     private final ObjectMapper objectMapper;
+    private final AuthUtils authUtils;
 
     // =================== CREATE ===================
 
@@ -36,6 +39,7 @@ public class RecoveryResourceController {
             @RequestPart(value = "file", required = false) MultipartFile file,
             HttpServletRequest httpRequest
     ) throws IOException {
+        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(resourceService.createResource(request, file, httpRequest));
@@ -50,6 +54,7 @@ public class RecoveryResourceController {
             @RequestPart(value = "file", required = false) MultipartFile file,
             HttpServletRequest httpRequest
     ) throws IOException {
+        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
         return ResponseEntity.ok(resourceService.updateResource(resourceId, request, file, httpRequest));
     }
@@ -60,6 +65,7 @@ public class RecoveryResourceController {
             @RequestBody RecoveryResourceRequest request,
             HttpServletRequest httpRequest
     ) throws IOException {
+        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         return ResponseEntity.ok(resourceService.updateResource(resourceId, request, null, httpRequest));
     }
 
@@ -67,6 +73,7 @@ public class RecoveryResourceController {
 
     @DeleteMapping("/{resourceId}")
     public ResponseEntity<Void> deleteResource(@PathVariable String resourceId) {
+        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         resourceService.deleteResource(resourceId);
         return ResponseEntity.noContent().build();
     }

@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.posts.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.infrastructure.cloudinary.CloudinaryService;
 import com.project_exam.backend.modules.posts.domain.Category;
@@ -139,7 +140,7 @@ public class PostService {
                                    MultipartFile thumbnailFile,
                                    HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        Post.PostStatus initialStatus = authUtils.isAdmin(httpRequest)
+        Post.PostStatus initialStatus = authUtils.hasPermission(PermissionCatalog.POST_MODERATE)
                 ? Post.PostStatus.APPROVED
                 : Post.PostStatus.PENDING;
 
@@ -210,7 +211,7 @@ public class PostService {
     @Transactional
     public PostResponse updatePostStatus(String id, Post.PostStatus status, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.POST_MODERATE)) {
             throw new ForbiddenException("Chỉ admin được duyệt/từ chối bài viết");
         }
         if (status == null) {
@@ -233,7 +234,7 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
 
         boolean isOwner = post.getUserId().equals(userId);
-        boolean isAdmin = authUtils.isAdmin(httpRequest);
+        boolean isAdmin = authUtils.hasPermission(PermissionCatalog.POST_MODERATE);
         if (!isOwner && !isAdmin) {
             throw new ForbiddenException("Bạn không có quyền xóa post này");
         }
@@ -253,7 +254,7 @@ public class PostService {
 
         if (post.getStatus() != Post.PostStatus.APPROVED) {
             boolean isOwner = currentUserId != null && currentUserId.equals(post.getUserId());
-            boolean isAdmin = currentUserId != null && authUtils.isAdmin(httpRequest);
+            boolean isAdmin = currentUserId != null && authUtils.hasPermission(PermissionCatalog.POST_MODERATE);
             if (!isOwner && !isAdmin) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post không tồn tại");
             }
@@ -280,7 +281,7 @@ public class PostService {
 
         // User thường chỉ thấy bài APPROVED. Admin có thể xem mọi status hoặc lọc theo status truyền vào.
         Post.PostStatus effectiveStatus = status;
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.POST_MODERATE)) {
             effectiveStatus = Post.PostStatus.APPROVED;
         }
 

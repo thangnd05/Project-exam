@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.attempt.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -65,7 +66,7 @@ public class UserAnswerService {
 
     /** Chỉ admin được liệt kê toàn bộ đáp án. */
     public List<UserAnswerResponse> findAllResponses(jakarta.servlet.http.HttpServletRequest httpRequest) {
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ đáp án.");
         }
         return findAll().stream()
@@ -80,7 +81,7 @@ public class UserAnswerService {
     /** Chỉ owner attempt, chủ đề (giáo viên), hoặc admin được xem 1 đáp án. */
     public Optional<UserAnswerResponse> findResponseById(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
         return findById(id).map(ua -> {
-            if (!authUtils.isAdmin(httpRequest)) {
+            if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
                 UserTest ut = userTestRepository.findById(ua.getUserTestId())
                         .orElseThrow(() -> new NotFoundException("UserTest not found"));
                 String currentUserId = authUtils.getUserId(httpRequest);
@@ -104,7 +105,7 @@ public class UserAnswerService {
 
     public List<UserAnswerResponse> findResponsesByUserTestId(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         // 🔒 Chỉ owner attempt, chủ đề (giáo viên), hoặc admin được xem.
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             UserTest ut = userTestRepository.findById(userTestId)
                     .orElseThrow(() -> new NotFoundException("UserTest not found"));
             String currentUserId = authUtils.getUserId(httpRequest);
@@ -129,7 +130,7 @@ public class UserAnswerService {
 
     /** Liệt kê toàn bộ đáp án theo câu hỏi (cross-attempt) — chỉ admin. */
     public List<UserAnswerResponse> findResponsesByQuestionId(String questionId, jakarta.servlet.http.HttpServletRequest httpRequest) {
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được liệt kê đáp án theo câu hỏi.");
         }
         return findByQuestionId(questionId).stream()
@@ -323,7 +324,7 @@ public class UserAnswerService {
     public boolean delete(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
         return userAnswerRepository.findById(id).map(u -> {
             // 🔒 Chỉ owner attempt hoặc admin được xoá đáp án.
-            if (!authUtils.isAdmin(httpRequest)) {
+            if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
                 String currentUserId = authUtils.getUserId(httpRequest);
                 UserTest ut = userTestRepository.findById(u.getUserTestId())
                         .orElseThrow(() -> new NotFoundException("UserTest not found"));

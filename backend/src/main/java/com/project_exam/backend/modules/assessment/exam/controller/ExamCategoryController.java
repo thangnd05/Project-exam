@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryResponse;
@@ -45,7 +46,7 @@ public class ExamCategoryController {
             @Valid @RequestBody ExamCategoryRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(examCategoryService.create(request));
     }
 
@@ -55,13 +56,13 @@ public class ExamCategoryController {
             @Valid @RequestBody ExamCategoryRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
         return ResponseEntity.ok(examCategoryService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
         examCategoryService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartResponse;
@@ -44,7 +45,7 @@ public class ExamPartController {
             @Valid @RequestBody ExamPartRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_PART_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(examPartService.create(request));
     }
 
@@ -54,13 +55,13 @@ public class ExamPartController {
             @Valid @RequestBody ExamPartRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_PART_MANAGE);
         return ResponseEntity.ok(examPartService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExamPart(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_PART_MANAGE);
         examPartService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeResponse;
@@ -52,7 +53,7 @@ public class ExamTypeController {
             @Valid @RequestBody ExamTypeRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(examTypeService.create(request));
     }
 
@@ -62,13 +63,13 @@ public class ExamTypeController {
             @Valid @RequestBody ExamTypeRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         return ResponseEntity.ok(examTypeService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExamType(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         examTypeService.delete(id);
         return ResponseEntity.noContent().build();
     }

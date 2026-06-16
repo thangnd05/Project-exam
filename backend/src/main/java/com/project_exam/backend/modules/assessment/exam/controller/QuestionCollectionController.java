@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCollectionRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCollectionResponse;
@@ -40,7 +41,7 @@ public class QuestionCollectionController {
             @Valid @RequestBody QuestionCollectionRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.QUESTION_COLLECTION_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(collectionService.create(request));
     }
 
@@ -50,13 +51,13 @@ public class QuestionCollectionController {
             @Valid @RequestBody QuestionCollectionRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.QUESTION_COLLECTION_MANAGE);
         return ResponseEntity.ok(collectionService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.QUESTION_COLLECTION_MANAGE);
         collectionService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.test.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
@@ -77,7 +78,7 @@ public class TestPartService {
             throw new ForbiddenException("Chưa xác định được người dùng.");
         }
         boolean isOwner = currentUserId.equals(test.getCreatedBy());
-        if (!isOwner && !authUtils.isAdmin(request)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền tạo part cho đề này.");
         }
 
@@ -105,7 +106,7 @@ public class TestPartService {
 
         String currentUserId = authUtils.getUserId(request);
         boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
-        if (!isOwner && !authUtils.isAdmin(request)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa part của đề này.");
         }
 
@@ -130,7 +131,7 @@ public class TestPartService {
 
         String currentUserId = authUtils.getUserId(request);
         boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
-        if (!isOwner && !authUtils.isAdmin(request)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xóa part của đề này.");
         }
 

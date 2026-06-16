@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.attempt.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -302,7 +303,7 @@ public class UserTestService {
 
     /** Chỉ admin được liệt kê toàn bộ user-tests. */
     public List<UserTestResponse> findAllResponses(jakarta.servlet.http.HttpServletRequest httpRequest) {
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ user-tests.");
         }
         return toResponseListBatched(findAll());
@@ -323,7 +324,7 @@ public class UserTestService {
     public UserTestResponse saveResponse(UserTest userTest) { return toResponse(save(userTest)); }
 
     private void requireTestOwnerOrAdmin(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
-        if (authUtils.isAdmin(httpRequest)) return;
+        if (authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) return;
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
         String currentUserId = authUtils.getUserId(httpRequest);
@@ -348,7 +349,7 @@ public class UserTestService {
         return userTestRepository.findById(id).map(u -> {
             String currentUserId = authUtils.getUserId(httpRequest);
             boolean isOwner = currentUserId != null && currentUserId.equals(u.getUserId());
-            if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+            if (!isOwner && !authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
                 throw new ForbiddenException("Bạn không có quyền xoá bài làm này.");
             }
             userTestRepository.delete(u);
@@ -611,7 +612,7 @@ public class UserTestService {
      * - Đề public theo exam_type (classId == null): mọi user đã đăng nhập đều xem được.
      */
     private void requireLeaderboardViewAccess(Test test, jakarta.servlet.http.HttpServletRequest httpRequest) {
-        if (authUtils.isAdmin(httpRequest)) return;
+        if (authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) return;
 
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
@@ -656,7 +657,7 @@ public class UserTestService {
         var ut = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
         // 🔒 Chỉ user sở hữu attempt, chủ đề (giáo viên), hoặc admin được xem.
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             String currentUserId = authUtils.getUserId(httpRequest);
             boolean isOwner = currentUserId != null && currentUserId.equals(ut.getUserId());
             boolean isTestOwner = false;

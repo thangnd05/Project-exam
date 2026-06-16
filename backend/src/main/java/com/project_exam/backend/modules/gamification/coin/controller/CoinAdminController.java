@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.gamification.coin.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.gamification.coin.dto.CoinBalanceRequest;
 import com.project_exam.backend.modules.gamification.coin.dto.CoinUpsertRequest;
@@ -27,7 +28,7 @@ public class CoinAdminController {
 
     @GetMapping
     public ResponseEntity<List<CoinWalletResponse>> getAll(HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.COIN_MANAGE);
         return ResponseEntity.ok(coinService.findAllWallets());
     }
 
@@ -36,7 +37,7 @@ public class CoinAdminController {
             @Valid @RequestBody CoinUpsertRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.COIN_MANAGE);
         CoinWalletResponse created = coinService.create(request.getUserId(), request.getBalance());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -47,13 +48,13 @@ public class CoinAdminController {
             @Valid @RequestBody CoinBalanceRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.COIN_MANAGE);
         return ResponseEntity.ok(coinService.updateBalance(userId, request.getBalance()));
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> delete(@PathVariable String userId, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.COIN_MANAGE);
         coinService.delete(userId);
         return ResponseEntity.noContent().build();
     }

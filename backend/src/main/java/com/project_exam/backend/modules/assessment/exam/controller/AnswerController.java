@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ public class AnswerController {
 
     @GetMapping
     public ResponseEntity<List<AnswerAdminResponse>> getAllAnswer(HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.ANSWER_VIEW);
         return ResponseEntity.ok(answerService.findAllResponses());
     }
 
@@ -36,7 +37,7 @@ public class AnswerController {
             @PathVariable String questionId,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.ANSWER_VIEW);
         return ResponseEntity.ok(answerService.findResponsesByQuestionId(questionId));
     }
 
@@ -45,7 +46,7 @@ public class AnswerController {
             @Valid @RequestBody AnswerRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         return ResponseEntity.ok(answerService.createFromRequest(request));
     }
 
@@ -55,7 +56,7 @@ public class AnswerController {
             @Valid @RequestBody AnswerRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         return answerService.updateFromRequest(id, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -63,7 +64,7 @@ public class AnswerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnswer(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         if (answerService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }

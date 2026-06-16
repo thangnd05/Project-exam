@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.exam.dto.SkillRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.SkillResponse;
@@ -40,7 +41,7 @@ public class SkillController {
             @Valid @RequestBody SkillRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(skillService.create(request));
     }
 
@@ -50,13 +51,13 @@ public class SkillController {
             @Valid @RequestBody SkillRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
         return ResponseEntity.ok(skillService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
         skillService.delete(id);
         return ResponseEntity.noContent().build();
     }

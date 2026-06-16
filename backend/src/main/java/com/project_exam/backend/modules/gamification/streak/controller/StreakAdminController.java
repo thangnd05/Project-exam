@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.gamification.streak.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverConfigRequest;
 import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverConfigResponse;
@@ -21,14 +22,14 @@ public class StreakAdminController {
 
     @GetMapping
     public ResponseEntity<StreakRecoverConfigResponse> get(HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.STREAK_CONFIG_MANAGE);
         return ResponseEntity.ok(recoverConfigService.get());
     }
 
     @PutMapping
     public ResponseEntity<StreakRecoverConfigResponse> update(
             @Valid @RequestBody StreakRecoverConfigRequest request, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.STREAK_CONFIG_MANAGE);
         return ResponseEntity.ok(recoverConfigService.update(request));
     }
 }

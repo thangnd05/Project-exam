@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.exam.dto.PassageRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
@@ -41,7 +42,7 @@ public class PassageController {
             @Valid @RequestBody PassageRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         return ResponseEntity.ok(passageService.create(request));
     }
 
@@ -51,7 +52,7 @@ public class PassageController {
             @Valid @RequestBody PassageRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         return passageService.update(id, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -59,7 +60,7 @@ public class PassageController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePassage(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         if (passageService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
