@@ -1,12 +1,18 @@
 package com.project_exam.backend.modules.users.service;
 
+import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 
 import com.project_exam.backend.modules.users.dto.RoleRequest;
 import com.project_exam.backend.modules.users.dto.RoleResponse;
+import com.project_exam.backend.modules.users.domain.Permission;
 import com.project_exam.backend.modules.users.domain.Role;
+import com.project_exam.backend.modules.users.domain.RolePermission;
 import com.project_exam.backend.modules.users.mapper.RoleMapper;
+import com.project_exam.backend.modules.users.repository.PermissionRepository;
+import com.project_exam.backend.modules.users.repository.RolePermissionRepository;
 import com.project_exam.backend.modules.users.repository.RoleRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +23,8 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final RolePermissionRepository rolePermissionRepository;
     private final RoleMapper roleMapper;
 
     public List<RoleResponse> findAll() {
@@ -48,13 +56,37 @@ public class RoleService {
         return toResponse(role);
     }
 
+    @Transactional
     public void delete(String id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Role không tồn tại"));
+        // Gỡ các liên kết permission trước khi xóa role để không để lại dòng mồ côi.
+        rolePermissionRepository.deleteByRoleId(id);
         roleRepository.delete(role);
     }
 
+    /** Gán lại toàn bộ permission cho role theo danh sách code (replace, không cộng dồn). */
+    @Transactional
+    public RoleResponse updatePermissions(String roleId, List<String> codes) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new NotFoundException("Role không tồn tại"));
+        rolePermissionRepository.deleteByRoleId(roleId);
+        if (codes != null) {
+            for (String code : codes.stream().distinct().toList()) {
+                Permission permission = permissionRepository.findByCode(code)
+                        .orElseThrow(() -> new BadRequestException("Permission không tồn tại: " + code));
+                rolePermissionRepository.save(RolePermission.builder()
+                        .roleId(roleId)
+                        .permissionId(permission.getPermissionId())
+                        .build());
+            }
+        }
+        return toResponse(role);
+    }
+
     private RoleResponse toResponse(Role role) {
-        return roleMapper.toResponse(role);
+        RoleResponse response = roleMapper.toResponse(role);
+        response.setPermissions(rolePermissionRepository.findPermissionCodesByRoleId(role.getRoleId()));
+        return response;
     }
 }
