@@ -19,3 +19,10 @@ export const updateRole = (roleId, payload) => {
 export const deleteRole = (roleId) => {
   return axios.delete(`${BASE_URL}/${roleId}`).then(() => {});
 };
+
+// Gán lại danh sách permission code cho role (replace toàn bộ).
+export const updateRolePermissions = (roleId, codes) => {
+  return axios
+    .put(`${BASE_URL}/${roleId}/permissions`, { codes })
+    .then((response) => response.data);
+};

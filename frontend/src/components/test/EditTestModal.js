@@ -3,7 +3,7 @@ import { Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
 import { getAdminTestById, updateTest } from '../../api/testApi';
 import { getExamTypes } from '../../api/examTypeApi';
-import { useIsAdmin } from '~/hooks/useIsAdmin';
+import { useHasPermission } from '~/hooks/usePermission';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
@@ -22,7 +22,7 @@ const cxCreate = classNames.bind(createModalStyles);
 const cxBase = classNames.bind(baseModalStyles);
 
 const EditTestModal = ({ show, onHide, test, onSuccess }) => {
-  const isAdmin = useIsAdmin();
+  const canSetPricing = useHasPermission('TEST:MANAGE_PRICING');
   const [saving, setSaving] = useState(false);
   const [examTypes, setExamTypes] = useState([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -296,7 +296,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
               </div>
             </Col>
 
-            {isAdmin && !test?.classId && (
+            {canSetPricing && !test?.classId && (
               <Col md={4}>
                 <div className={cxCreate('formGroupModern')}>
                   <label>Giá xu (0 = miễn phí)</label>

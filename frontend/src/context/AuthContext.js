@@ -1,12 +1,15 @@
-import { createContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { createContext, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { queryClient } from '~/config/queryClient';
 import { getCurrentUser, logout as logoutRequest } from '../api/authApi';
 
 export const AuthContext = createContext(null);
 
+// Query key cho user hiện tại (gồm roleName + permissions[] do /me trả về).
+export const CURRENT_USER_QUERY_KEY = ['currentUser'];
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   // Tránh toast trùng khi nhiều request 401 cùng lúc trigger refresh fail.
   const expiredToastShownRef = useRef(false);
   // Mirror user vào ref để handler event đọc giá trị mới nhất (closure trong addEventListener).
@@ -19,31 +22,34 @@ export const AuthProvider = ({ children }) => {
     fullName: data.fullName,
     email: data.email,
     roleId: data.roleId,
+    roleName: data.roleName,
+    // Danh sách permission code (RBAC) BE trả ở luồng login/me; mặc định [] nếu thiếu.
+    permissions: Array.isArray(data.permissions) ? data.permissions : [],
     avatarUrl: data.avatarUrl,
   });
 
-  //  Lấy user hiện tại từ /me
-  const fetchCurrentUser = useCallback(async () => {
-    try {
-      const data = await getCurrentUser();
+  // Nguồn sự thật về user = React Query (/me).
+  // staleTime:0 + refetchOnWindowFocus:true → quay lại tab là tự làm mới quyền (RBAC đổi không cần F5).
+  // invalidateQueries(CURRENT_USER_QUERY_KEY) ở bất cứ đâu cũng ép nạp lại quyền ngay.
+  const { data, isLoading } = useQuery({
+    queryKey: CURRENT_USER_QUERY_KEY,
+    queryFn: getCurrentUser,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    retry: false, // /me lỗi = chưa đăng nhập, không thử lại
+  });
 
-      if (data?.id) {
-        setUser(normalizeUser(data));
-      } else {
-        setUser(null);
-      }
-    } catch (err) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const user = data?.id ? normalizeUser(data) : null;
+  const loading = isLoading;
 
-  //  Chạy khi app khởi động
+  // Làm mới quyền/thông tin user mà không cần F5 — gọi ở bất cứ đâu qua useAuth().refreshUser().
+  const refreshUser = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: CURRENT_USER_QUERY_KEY }),
+    [],
+  );
+
+  //  Chạy khi app khởi động: khởi tạo Google SDK (user đã do useQuery lo).
   useEffect(() => {
-    fetchCurrentUser();
-
-    // Google SDK fix avatar ma
     if (window.google) {
       window.google.accounts.id.initialize({
         client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
@@ -52,18 +58,18 @@ export const AuthProvider = ({ children }) => {
       });
       window.google.accounts.id.cancel();
     }
-  }, [fetchCurrentUser]);
+  }, []);
 
   // Lắng nghe sự kiện refresh fail từ axiosClient: clear state, toast 1 lần, redirect về login.
   // Why: khi BE phát hiện replay / revoke family / token hết hạn, không nên để user kẹt ở UI
   // "đã đăng nhập" mà mọi request đều 401 — phải đẩy về login ngay.
   useEffect(() => {
     const handleAuthExpired = (e) => {
-      // Bỏ qua nếu user chưa từng login (vd: fetchCurrentUser ban đầu fail khi vào app lần đầu).
+      // Bỏ qua nếu user chưa từng login (vd: /me ban đầu fail khi vào app lần đầu).
       // Why: tránh hiển thị toast "phiên hết hạn" cho visitor chưa từng đăng nhập.
       if (!userRef.current) return;
 
-      setUser(null);
+      queryClient.setQueryData(CURRENT_USER_QUERY_KEY, null);
       localStorage.clear();
       sessionStorage.clear();
 
@@ -92,23 +98,23 @@ export const AuthProvider = ({ children }) => {
     if (user) expiredToastShownRef.current = false;
   }, [user]);
 
-  //  Login (backend trả thẳng UserResponse)
+  //  Login (backend trả thẳng UserResponse gồm roleName + permissions) → nạp vào cache.
   const login = useCallback((userData) => {
-    setUser(normalizeUser(userData));
+    queryClient.setQueryData(CURRENT_USER_QUERY_KEY, userData);
   }, []);
 
   //  Logout
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await logoutRequest();
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
-      setUser(null);
+      queryClient.setQueryData(CURRENT_USER_QUERY_KEY, null);
       localStorage.clear();
       sessionStorage.clear();
     }
-  };
+  }, []);
 
   //  Value export ra toàn app
   const value = useMemo(
@@ -117,12 +123,15 @@ export const AuthProvider = ({ children }) => {
       loading,
       login,
       logout,
+      refreshUser,
       userId: user?.userId,
       roleId: user?.roleId,
+      roleName: user?.roleName,
+      permissions: user?.permissions ?? [],
       avatarUrl: user?.avatarUrl,
       isAuthenticated: !!user?.userId,
     }),
-    [user, loading, login]
+    [user, loading, login, logout, refreshUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
