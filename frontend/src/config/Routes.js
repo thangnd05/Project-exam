@@ -18,6 +18,7 @@ const routes = {
   adminDashboard: '/admin/dashboard',
   adminUsers: '/admin/users',
   adminRoles: '/admin/roles',
+  adminPermissions: '/admin/permissions',
   adminSkills: '/admin/skills',
   adminScoringConversion: '/admin/scoring-conversion',
   adminEvaluations: '/admin/evaluations',
