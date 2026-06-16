@@ -8,6 +8,7 @@ import com.project_exam.backend.modules.classroom.repository.ClassRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,7 @@ public class ClassAccessGuard {
         if (userId == null) {
             throw new ForbiddenException("Chưa xác định được người dùng.");
         }
-        if (request != null && authUtils.isAdmin(request)) return;
+        if (authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) return;
         boolean isApprovedMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
                 classId, userId, ClassMember.MemberStatus.APPROVED);
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, userId);
@@ -49,7 +50,7 @@ public class ClassAccessGuard {
         if (userId == null) {
             throw new ForbiddenException("Chưa xác định được người dùng.");
         }
-        if (request != null && authUtils.isAdmin(request)) return;
+        if (authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) return;
         if (!classRepository.existsByClassIdAndTeacherId(classId, userId)) {
             throw new ForbiddenException("Bạn không phải giáo viên của lớp này.");
         }

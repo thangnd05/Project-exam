@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.test.controller;
 import com.project_exam.backend.modules.assessment.test.dto.TestQuestionRequest;
 import com.project_exam.backend.modules.assessment.test.dto.TestQuestionResponse;
 import com.project_exam.backend.modules.assessment.test.service.TestQuestionService;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 public class TestQuestionController {
 
     private final TestQuestionService testQuestionService;
+    private final AuthUtils authUtils;
 
     // Lấy tất cả test questions
     @GetMapping
@@ -34,6 +37,7 @@ public class TestQuestionController {
     // Tạo mới test question
     @PostMapping
     public ResponseEntity<TestQuestionResponse> createTestQuestion(@Valid @RequestBody TestQuestionRequest request) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(testQuestionService.createTestQuestion(request));
     }
 
@@ -42,6 +46,7 @@ public class TestQuestionController {
     public ResponseEntity<TestQuestionResponse> updateTestQuestion(
             @PathVariable String id,
             @Valid @RequestBody TestQuestionRequest request) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return testQuestionService.updateTestQuestion(id, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -50,6 +55,7 @@ public class TestQuestionController {
     // Xóa test question
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTestQuestion(@PathVariable String id) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         if (testQuestionService.getTestQuestionById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }

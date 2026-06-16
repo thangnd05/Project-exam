@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaResponse;
@@ -29,7 +30,7 @@ public class PassageMediaController {
             @RequestBody PassageMediaRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MEDIA_MANAGE);
         return ResponseEntity.ok(service.create(request));
     }
 
@@ -53,14 +54,14 @@ public class PassageMediaController {
             @RequestBody PassageMediaRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MEDIA_MANAGE);
         return ResponseEntity.ok(service.update(id, request));
     }
 
     // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MEDIA_MANAGE);
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

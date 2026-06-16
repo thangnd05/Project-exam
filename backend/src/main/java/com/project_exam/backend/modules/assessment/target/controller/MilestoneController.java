@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.target.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.target.dto.MilestoneRequest;
 import com.project_exam.backend.modules.assessment.target.dto.MilestoneResponse;
@@ -38,7 +39,7 @@ public class MilestoneController {
             @Valid @RequestBody MilestoneRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.MILESTONE_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(milestoneService.create(request));
     }
 
@@ -48,13 +49,13 @@ public class MilestoneController {
             @Valid @RequestBody MilestoneRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.MILESTONE_MANAGE);
         return ResponseEntity.ok(milestoneService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.MILESTONE_MANAGE);
         milestoneService.delete(id);
         return ResponseEntity.noContent().build();
     }

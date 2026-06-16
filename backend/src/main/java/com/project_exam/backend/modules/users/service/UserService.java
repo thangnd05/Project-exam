@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.users.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -241,7 +242,7 @@ public class UserService {
         // 🔒 Chỉ admin được xoá user khác. User tự xoá account của mình cũng được.
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isSelf = currentUserId != null && currentUserId.equals(id);
-        if (!isSelf && !authUtils.isAdmin(httpRequest)) {
+        if (!isSelf && !authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá user này.");
         }
         return userRepository.findById(id).map(user -> {
@@ -252,7 +253,7 @@ public class UserService {
 
     /** Guard: chỉ admin được tạo user qua endpoint admin (đăng ký user mới phải qua /api/auth/register). */
     public void requireAdminToManageUsers(HttpServletRequest httpRequest) {
-        if (!authUtils.isAdmin(httpRequest)) {
+        if (!authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được thao tác trực tiếp trên user.");
         }
     }
@@ -261,7 +262,7 @@ public class UserService {
     public void requireSelfOrAdminForUser(String targetUserId, HttpServletRequest httpRequest) {
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isSelf = currentUserId != null && currentUserId.equals(targetUserId);
-        if (!isSelf && !authUtils.isAdmin(httpRequest)) {
+        if (!isSelf && !authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
             throw new ForbiddenException("Bạn chỉ có thể thao tác trên tài khoản của chính mình.");
         }
     }

@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.test.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 // --- Shared ---
 import com.project_exam.backend.shared.exception.BadRequestException;
@@ -336,7 +337,7 @@ public class TestService {
                 .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + id));
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
-        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xóa đề này.");
         }
         cascadeDeleteTestInternal(id);
@@ -379,7 +380,7 @@ public class TestService {
                 .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + id));
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
-        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
         // 🔒 Nếu đổi classId/chapterId, áp dụng cùng guard như khi tạo mới.
@@ -406,7 +407,7 @@ public class TestService {
         // Giá xu: chỉ admin đặt được, và chỉ cho bài công khai (không gắn lớp). Đặt 0 để gỡ phí.
         if (request.getCostCoins() != null) {
             boolean publicTest = effectiveClassId == null;
-            test.setCostCoins(authUtils.isAdmin(httpRequest) && publicTest ? request.getCostCoins() : null);
+            test.setCostCoins(authUtils.hasPermission(PermissionCatalog.TEST_MANAGE_PRICING) && publicTest ? request.getCostCoins() : null);
         }
         return testRepository.save(test);
     }
@@ -998,7 +999,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(parentTest.getCreatedBy());
-        boolean isAdmin = authUtils.isAdmin(httpRequest);
+        boolean isAdmin = authUtils.hasPermission(PermissionCatalog.TEST_MANAGE);
         if (!isOwner && !isAdmin) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
@@ -1022,7 +1023,10 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             // 🔒 Validate: user phải có quyền đọc câu hỏi này (own / admin bank / lớp mình thuộc / là admin).
             if (!isAdmin) {
                 boolean ownQuestion = currentUserId != null && currentUserId.equals(question.getCreatedBy());
-                boolean inAdminBank = question.getClassId() == null && adminIds.contains(question.getCreatedBy());
+                // Kho quản trị chỉ dùng được nếu có quyền QUESTION:MANAGE (đồng bộ với việc ẩn kho admin).
+                boolean inAdminBank = question.getClassId() == null
+                        && adminIds.contains(question.getCreatedBy())
+                        && authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE);
                 boolean inAccessibleClass = question.getClassId() != null && accessibleClassIds.contains(question.getClassId());
                 if (!ownQuestion && !inAdminBank && !inAccessibleClass) {
                     throw new ForbiddenException("Bạn không có quyền sử dụng câu hỏi: " + questionId);
@@ -1060,6 +1064,10 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             throw new BadRequestException("testPartId và count (số câu) phải hợp lệ.");
         }
         boolean useAdminBank = "admin".equalsIgnoreCase(request.getBank());
+        // Lấy câu hỏi ngẫu nhiên từ kho quản trị cần quyền QUESTION:MANAGE (đồng bộ với việc ẩn kho admin).
+        if (useAdminBank) {
+            authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
+        }
         if (!useAdminBank && request.getClassId() == null && currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng hiện tại.");
         }
@@ -1074,7 +1082,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         Test parentTest = testRepository.findById(testPart.getTestId())
                 .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
         boolean isOwner = currentUserId != null && currentUserId.equals(parentTest.getCreatedBy());
-        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
         // 🔒 Nếu lấy nguồn từ class bank, user phải là teacher (hoặc thành viên) của lớp đó và chapter phải thuộc lớp.

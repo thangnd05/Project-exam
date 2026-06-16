@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.assessment.exam.dto.TagRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
@@ -27,7 +28,7 @@ public class TagController {
             @RequestBody TagRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.TAG_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(tagService.createTag(request));
     }
 
@@ -39,7 +40,7 @@ public class TagController {
             @RequestBody TagRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.TAG_MANAGE);
         return ResponseEntity.ok(tagService.updateTag(tagId, request));
     }
 
@@ -50,7 +51,7 @@ public class TagController {
             @PathVariable String tagId,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.TAG_MANAGE);
         tagService.deleteTag(tagId);
         return ResponseEntity.noContent().build();
     }

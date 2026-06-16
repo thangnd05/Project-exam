@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.classroom.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -87,7 +88,7 @@ public class ClassService {
         // 🔒 Chỉ teacher của lớp (hoặc admin) được xoá.
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isTeacher = currentUserId != null && currentUserId.equals(existing.getTeacherId());
-        if (!isTeacher && !authUtils.isAdmin(httpRequest)) {
+        if (!isTeacher && !authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá lớp này.");
         }
 

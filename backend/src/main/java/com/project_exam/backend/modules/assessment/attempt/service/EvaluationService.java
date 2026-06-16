@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.assessment.attempt.service;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -120,7 +121,7 @@ public class EvaluationService {
         // 🔒 Chỉ chính chủ (hoặc admin) mới được sửa.
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
-        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đánh giá này.");
         }
         if (request.getContent() != null) evaluation.setContent(request.getContent());
@@ -140,7 +141,7 @@ public class EvaluationService {
         // 🔒 Chỉ chính chủ (hoặc admin) mới được xoá.
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
-        if (!isOwner && !authUtils.isAdmin(httpRequest)) {
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá đánh giá này.");
         }
         evaluationRepository.delete(evaluation);

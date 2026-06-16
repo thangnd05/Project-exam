@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.gamification.cosmetic.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticRequest;
 import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticResponse;
@@ -24,14 +25,14 @@ public class CosmeticAdminController {
 
     @GetMapping
     public ResponseEntity<List<CosmeticResponse>> getAll(HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.COSMETIC_MANAGE);
         return ResponseEntity.ok(cosmeticService.findAll());
     }
 
     @PostMapping
     public ResponseEntity<CosmeticResponse> create(
             @Valid @RequestBody CosmeticRequest request, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.COSMETIC_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(cosmeticService.create(request));
     }
 
@@ -40,14 +41,14 @@ public class CosmeticAdminController {
             @PathVariable String cosmeticId,
             @Valid @RequestBody CosmeticRequest request,
             HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.COSMETIC_MANAGE);
         return ResponseEntity.ok(cosmeticService.update(cosmeticId, request));
     }
 
     @DeleteMapping("/{cosmeticId}")
     public ResponseEntity<Void> delete(
             @PathVariable String cosmeticId, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.COSMETIC_MANAGE);
         cosmeticService.delete(cosmeticId);
         return ResponseEntity.noContent().build();
     }

@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.posts.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.posts.dto.CategoryRequest;
 import com.project_exam.backend.modules.posts.dto.CategoryResponse;
@@ -38,7 +39,7 @@ public class CategoryController {
             @RequestBody CategoryRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.POST_CATEGORY_MANAGE);
         return ResponseEntity.ok(categoryService.create(request));
     }
 
@@ -48,13 +49,13 @@ public class CategoryController {
             @RequestBody CategoryRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.POST_CATEGORY_MANAGE);
         return ResponseEntity.ok(categoryService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.POST_CATEGORY_MANAGE);
         categoryService.delete(id);
         return ResponseEntity.noContent().build();
     }

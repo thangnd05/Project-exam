@@ -1,4 +1,5 @@
 package com.project_exam.backend.modules.gamification.quest.controller;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.gamification.quest.dto.QuestRequest;
 import com.project_exam.backend.modules.gamification.quest.dto.QuestResponse;
@@ -24,7 +25,7 @@ public class QuestAdminController {
 
     @GetMapping
     public ResponseEntity<List<QuestResponse>> getAll(HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.QUEST_MANAGE);
         return ResponseEntity.ok(questService.findAll());
     }
 
@@ -33,7 +34,7 @@ public class QuestAdminController {
             @Valid @RequestBody QuestRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.QUEST_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(questService.create(request));
     }
 
@@ -43,13 +44,13 @@ public class QuestAdminController {
             @Valid @RequestBody QuestRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.QUEST_MANAGE);
         return ResponseEntity.ok(questService.update(questId, request));
     }
 
     @DeleteMapping("/{questId}")
     public ResponseEntity<Void> delete(@PathVariable String questId, HttpServletRequest httpRequest) {
-        authUtils.requireAdmin(httpRequest);
+        authUtils.requirePermission(PermissionCatalog.QUEST_MANAGE);
         questService.delete(questId);
         return ResponseEntity.noContent().build();
     }
