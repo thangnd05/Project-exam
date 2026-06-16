@@ -26,6 +26,7 @@ import {
   IoSchoolOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/hooks/useBaseMetaData';
+import { useHasPermission } from '~/hooks/usePermission';
 import CoinPriceField from '~/components/test/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
@@ -61,6 +62,8 @@ const defaultPartConfig = () => ({
 
 const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, chapterId }) => {
   const isClassMode = mode === 'class' && !!classId;
+  // Chỉ người có quyền quản lý câu hỏi mới được dùng "Kho quản trị" làm nguồn.
+  const canAccessAdminBank = useHasPermission('QUESTION:MANAGE');
 
   const [testInfo, setTestInfo] = useState({
     title: '',
@@ -471,7 +474,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             {isClassMode && (
               <> <strong>Kho lớp học</strong> là kho câu hỏi của lớp hiện tại — có thể lọc theo chapter.</>
             )}
-            <strong> Kho quản trị</strong> là kho do admin cung cấp, ai cũng có thể dùng làm nguồn tạo đề.
+            {canAccessAdminBank && (
+              <> <strong>Kho quản trị</strong> là kho do admin cung cấp, dùng làm nguồn tạo đề.</>
+            )}
           </p>
           <div
             style={{
@@ -498,14 +503,16 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 <IoSchoolOutline size={18} /> Kho lớp học
               </button>
             )}
-            <button
-              type="button"
-              className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.ADMIN })}
-              onClick={() => setBankSource(BANK_SOURCES.ADMIN)}
-              aria-pressed={bankSource === BANK_SOURCES.ADMIN}
-            >
-              <IoServerOutline size={18} /> Kho quản trị
-            </button>
+            {canAccessAdminBank && (
+              <button
+                type="button"
+                className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.ADMIN })}
+                onClick={() => setBankSource(BANK_SOURCES.ADMIN)}
+                aria-pressed={bankSource === BANK_SOURCES.ADMIN}
+              >
+                <IoServerOutline size={18} /> Kho quản trị
+              </button>
+            )}
           </div>
 
           {isClassMode && bankSource === BANK_SOURCES.CLASS && (
