@@ -11,6 +11,7 @@ public class PassageMapper {
         return PassageResponse.builder()
                 .passageId(passage.getPassageId())
                 .content(passage.getContent())
+                .contentTranslation(passage.getContentTranslation())
                 .mediaUrl(passage.getMediaUrl())
                 .passageType(passage.getPassageType())
                 .build();

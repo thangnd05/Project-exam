@@ -87,6 +87,7 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
   const answers = Array.isArray(question?.answers) ? question.answers : [];
   const mediaItems = collectMediaItems(question);
   const passageContent = question?.passage?.content || '';
+  const passageTranslation = question?.passage?.contentTranslation || '';
 
   return (
     <BaseModal
@@ -129,7 +130,7 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
               {question.questionText || '(Không có nội dung)'}
             </div>
 
-            {(passageContent || mediaItems.length > 0) && (
+            {(passageContent || passageTranslation || mediaItems.length > 0) && (
               <>
                 <div className={cx('sectionTitle')}>Đoạn văn / Media</div>
 
@@ -148,6 +149,27 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                   >
                     {passageContent}
                   </div>
+                )}
+
+                {passageTranslation && (
+                  <details style={{ marginBottom: 12 }}>
+                    <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#475569', marginBottom: 8 }}>
+                      Bản dịch
+                    </summary>
+                    <div
+                      style={{
+                        background: '#f8fafc',
+                        border: '1px dashed #cbd5e1',
+                        borderRadius: 12,
+                        padding: '12px 14px',
+                        fontSize: '1.3rem',
+                        color: '#475569',
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {passageTranslation}
+                    </div>
+                  </details>
                 )}
 
                 {mediaItems.length > 0 && (

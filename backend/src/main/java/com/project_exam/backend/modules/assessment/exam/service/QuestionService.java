@@ -569,6 +569,7 @@ public class QuestionService {
 
         Passage passage = new Passage();
         passage.setContent(request.getPassage().getContent() != null ? request.getPassage().getContent() : "");
+        passage.setContentTranslation(request.getPassage().getContentTranslation());
         passage.setPassageType(request.getPassage().getPassageType());
         if (hasMediaUrl) {
             passage.setMediaUrl(request.getPassage().getMediaUrl());
@@ -790,6 +791,7 @@ public class QuestionService {
             Passage passage = new Passage();
             if (hasPassageReq) {
                 passage.setContent(request.getPassage().getContent() != null ? request.getPassage().getContent() : "");
+                passage.setContentTranslation(request.getPassage().getContentTranslation());
                 passage.setPassageType(request.getPassage().getPassageType());
             } else {
                 // Mặc định nếu chỉ có file mà không có request passage
@@ -1094,6 +1096,7 @@ public class QuestionService {
                 passage = passageRepository.findById(question.getPassageId()).orElse(null);
                 if (passage != null) {
                     passage.setContent(request.getPassage().getContent() != null ? request.getPassage().getContent() : "");
+                    passage.setContentTranslation(request.getPassage().getContentTranslation());
                     passage.setPassageType(request.getPassage().getPassageType());
                     if (request.getPassage().getMediaUrl() != null) {
                         passage.setMediaUrl(request.getPassage().getMediaUrl());
@@ -1104,6 +1107,7 @@ public class QuestionService {
             if (passage == null) {
                 passage = new Passage();
                 passage.setContent(request.getPassage().getContent() != null ? request.getPassage().getContent() : "");
+                passage.setContentTranslation(request.getPassage().getContentTranslation());
                 passage.setPassageType(request.getPassage().getPassageType());
                 passage.setMediaUrl(request.getPassage().getMediaUrl());
                 passage = passageRepository.save(passage);
@@ -1192,6 +1196,7 @@ public class QuestionService {
             // 🔹 SAVE PASSAGE
             Passage passage = new Passage();
             passage.setContent(pReq.getContent() != null ? pReq.getContent() : "");
+            passage.setContentTranslation(pReq.getContentTranslation());
             passage.setPassageType(pReq.getPassageType());
 
             passage = passageRepository.save(passage);

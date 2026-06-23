@@ -144,6 +144,14 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
+    // "Dịch: ...", "Bản dịch: ...", "Dịch nghĩa: ...", "Translation: ..."
+    // Trong phần header của passage, marker này chia đoạn thành 2 phần:
+    // trước nó -> content (bản gốc), sau nó -> contentTranslation (bản dịch).
+    private static final Pattern TRANSLATION_START_PATTERN = Pattern.compile(
+            "^\\s*(?:Dịch(?:\\s*nghĩa)?|Bản\\s*dịch|Translation)\\s*[:\\.\\-]?\\s*(.*)$",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+    );
+
     // Whitespace chars "lạ" gặp trong Word: NBSP, ZWSP, ideographic space, NNBSP
     private static final Pattern WEIRD_WHITESPACE_PATTERN =
             Pattern.compile("[\\u00A0\\u200B\\u3000\\u202F]");
@@ -448,6 +456,10 @@ public class QuestionDocumentImportService {
         default void setPassageContent(String content) {
         }
 
+        /** Set bản dịch cho passage hiện tại (chỉ PassageGroupCollector quan tâm). */
+        default void setPassageTranslation(String translation) {
+        }
+
         /** True nếu collector hỗ trợ passage (để LineProcessor biết có nên match PASSAGE_START_PATTERN không). */
         default boolean supportsPassage() {
             return false;
@@ -464,7 +476,12 @@ public class QuestionDocumentImportService {
         // Dùng làm question text cho câu kế tiếp nếu câu đó thiếu số ở đầu,
         // hoặc làm passage content nếu đang trong passage header.
         private final StringBuilder pendingText = new StringBuilder();
+        // Buffer phần bản dịch của passage (các dòng sau marker "Dịch:" trong passage header).
+        private final StringBuilder pendingTranslation = new StringBuilder();
         private boolean inPassageHeader = false;
+        // True khi đang ở trong passage header VÀ đã gặp marker "Dịch:" -> các dòng tiếp
+        // theo gom vào pendingTranslation thay vì pendingText.
+        private boolean inPassageTranslation = false;
         // Sau khi gặp "Giải thích:", các dòng tiếp theo gom vào explanation
         // cho đến khi gặp câu mới / passage mới / option mới.
         private boolean inExplanation = false;
@@ -498,6 +515,8 @@ public class QuestionDocumentImportService {
                     flushCurrentQuestion();
                     collector.startPassage();
                     pendingText.setLength(0);
+                    pendingTranslation.setLength(0);
+                    inPassageTranslation = false;
                     String extraText = pm.group(2);
                     if (extraText != null && !extraText.trim().isEmpty()) {
                         pendingText.append(extraText.trim());
@@ -514,16 +533,35 @@ public class QuestionDocumentImportService {
             if (qm.matches()) {
                 inExplanation = false;
                 if (inPassageHeader) {
-                    // Đóng phần passage header — pendingText là content của passage.
+                    // Đóng phần passage header — pendingText là content, pendingTranslation là bản dịch.
                     collector.setPassageContent(pendingText.toString().trim());
+                    collector.setPassageTranslation(pendingTranslation.toString().trim());
                     inPassageHeader = false;
+                    inPassageTranslation = false;
                 } else {
                     flushCurrentQuestion();
                 }
                 pendingText.setLength(0);
+                pendingTranslation.setLength(0);
                 currentQuestion = new ParsedQuestion(qm.group(1), extractQuestionText(qm));
                 lastLabel = null;
                 return;
+            }
+
+            // (1b) Trong passage header gặp marker "Dịch:" -> chuyển sang gom phần bản dịch.
+            if (inPassageHeader) {
+                Matcher tm = TRANSLATION_START_PATTERN.matcher(text);
+                if (tm.matches()) {
+                    inPassageTranslation = true;
+                    String tail = tm.group(1) == null ? "" : tm.group(1).trim();
+                    if (!tail.isEmpty()) {
+                        if (pendingTranslation.length() > 0) {
+                            pendingTranslation.append("\n");
+                        }
+                        pendingTranslation.append(tail);
+                    }
+                    return;
+                }
             }
 
             // (2) Đang trong khối giải thích: gom tất cả vào explanation, KHÔNG cho phép
@@ -627,10 +665,12 @@ public class QuestionDocumentImportService {
 
         private void handleContinuationLine(String text) {
             if (inPassageHeader) {
-                if (pendingText.length() > 0) {
-                    pendingText.append("\n");
+                // Sau marker "Dịch:" -> gom vào bản dịch; trước đó -> content gốc.
+                StringBuilder target = inPassageTranslation ? pendingTranslation : pendingText;
+                if (target.length() > 0) {
+                    target.append("\n");
                 }
-                pendingText.append(text);
+                target.append(text);
                 return;
             }
             if (currentQuestion == null) {
@@ -705,6 +745,17 @@ public class QuestionDocumentImportService {
                 currentGroup = createEmptyGroup();
             }
             currentGroup.getPassage().setContent(content);
+        }
+
+        @Override
+        public void setPassageTranslation(String translation) {
+            if (translation == null || translation.isBlank()) {
+                return;
+            }
+            if (currentGroup == null) {
+                currentGroup = createEmptyGroup();
+            }
+            currentGroup.getPassage().setContentTranslation(translation);
         }
 
         @Override

@@ -28,6 +28,7 @@ public class PassageService {
     private Passage toEntity(PassageRequest request) {
         Passage passage = new Passage();
         passage.setContent(request.getContent());
+        passage.setContentTranslation(request.getContentTranslation());
         passage.setMediaUrl(request.getMediaUrl());
         passage.setPassageType(request.getPassageType());
         return passage;

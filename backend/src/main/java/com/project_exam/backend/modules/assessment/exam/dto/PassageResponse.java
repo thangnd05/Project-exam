@@ -11,6 +11,7 @@ import lombok.*;
 public class PassageResponse {
     private String passageId;
     private String content;
+    private String contentTranslation;
     private String mediaUrl;
     private Passage.PassageType passageType;
 }

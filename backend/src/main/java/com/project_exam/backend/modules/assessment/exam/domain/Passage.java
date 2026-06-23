@@ -19,6 +19,10 @@ public class Passage {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    // Bản dịch của content (vd: phần "Dịch:" của transcript Part 3). Có thể null.
+    @Column(columnDefinition = "TEXT")
+    private String contentTranslation;
+
     @Column(length = 255)
     private String mediaUrl; // có thể null
 

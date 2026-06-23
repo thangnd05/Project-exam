@@ -33,6 +33,7 @@ const emptyQuestion = {
 const createInitialGroup = () => ({
   passage: {
     content: '',
+    contentTranslation: '',
     passageType: 'READING',
     mediaFiles: [],
     inputMode: 'TEXT',

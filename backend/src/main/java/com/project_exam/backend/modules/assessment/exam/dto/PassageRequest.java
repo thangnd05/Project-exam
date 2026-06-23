@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class PassageRequest {
     private String content;
+    private String contentTranslation; // Optional - bản dịch của content
     private String mediaUrl; // Optional
     private Passage.PassageType passageType;
 }

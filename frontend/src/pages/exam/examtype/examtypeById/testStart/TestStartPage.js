@@ -444,6 +444,11 @@ function TestStartPage() {
       passage?.passage_content ??
       fallbackObj?.content ??
       fallbackObj?.passage_content;
+    const translation =
+      passage?.contentTranslation ??
+      passage?.content_translation ??
+      fallbackObj?.contentTranslation ??
+      fallbackObj?.content_translation;
     const pType = passage?.passageType ?? passage?.passage_type ?? 'READING';
 
     // Bảng trung gian passage_media: passage có danh sách media (nhiều audio/ảnh)
@@ -473,6 +478,16 @@ function TestStartPage() {
       <div className={cx('passage-box')}>
         {/* Hiển thị text content TRƯỚC ảnh/audio */}
         {content && <div className={cx('passage-content')}>{content}</div>}
+
+        {/* Bản dịch (thu gọn mặc định) */}
+        {translation && (
+          <details className={cx('passage-translation')} style={{ marginTop: 8 }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 600 }}>Bản dịch</summary>
+            <div className={cx('passage-content')} style={{ whiteSpace: 'pre-wrap', marginTop: 6 }}>
+              {translation}
+            </div>
+          </details>
+        )}
 
         {/* Thêm đường kẻ ngang ngăn cách nếu có cả text và media */}
         {content && (hasMediaList || singleMediaUrl) && (

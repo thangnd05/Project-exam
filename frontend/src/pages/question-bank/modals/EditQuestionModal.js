@@ -92,6 +92,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     passage: {
       passageType: 'READING',
       content: '',
+      contentTranslation: '',
       mediaUrl: '',
     },
     options: [],
@@ -138,9 +139,10 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
               ? {
                 passageType: questionDetail.passage.passageType || 'READING',
                 content: questionDetail.passage.content || '',
+                contentTranslation: questionDetail.passage.contentTranslation || '',
                 mediaUrl: questionDetail.passage.mediaUrl || '',
               }
-              : { passageType: 'READING', content: '', mediaUrl: '' },
+              : { passageType: 'READING', content: '', contentTranslation: '', mediaUrl: '' },
             options: mappedOptions,
           });
           setExistingMedia(getMediaItemsFromQuestion(questionDetail));
@@ -295,12 +297,14 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
 
     const hasPassage =
       formData.passage.content?.trim() !== '' ||
+      formData.passage.contentTranslation?.trim() !== '' ||
       formData.passage.mediaUrl?.trim() !== '';
 
     if (hasPassage) {
       payload.passage = {
         passageType: formData.passage.passageType,
         content: formData.passage.content,
+        contentTranslation: formData.passage.contentTranslation?.trim() || null,
         mediaUrl: formData.passage.mediaUrl,
       };
     }
@@ -551,6 +555,19 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                     handlePassageChange('content', e.target.value)
                   }
                   placeholder="Văn bản bài đọc / Script..."
+                />
+              </Col>
+
+              <Col md={12}>
+                <label className={cx('formLabel')}>Bản dịch Passage</label>
+                <textarea
+                  className={cxCreate('inputModern')}
+                  rows={4}
+                  value={formData.passage.contentTranslation || ''}
+                  onChange={(e) =>
+                    handlePassageChange('contentTranslation', e.target.value)
+                  }
+                  placeholder="Bản dịch của văn bản / script (tùy chọn)..."
                 />
               </Col>
 

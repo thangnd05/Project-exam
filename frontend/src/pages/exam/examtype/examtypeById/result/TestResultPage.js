@@ -188,6 +188,11 @@ const TestResultPage = () => {
       passage?.passage_content ??
       fallbackObj?.content ??
       fallbackObj?.passage_content;
+    const translation =
+      passage?.contentTranslation ??
+      passage?.content_translation ??
+      fallbackObj?.contentTranslation ??
+      fallbackObj?.content_translation;
     const pType = passage?.passageType ?? passage?.passage_type ?? "READING";
 
     const mediaList =
@@ -254,6 +259,17 @@ const TestResultPage = () => {
             </div>
           )}
         {content && <div className={cx("passage-content")}>{content}</div>}
+        {translation && (
+          <details style={{ marginTop: 8 }}>
+            <summary style={{ cursor: "pointer", fontWeight: 600 }}>Bản dịch</summary>
+            <div
+              className={cx("passage-content")}
+              style={{ whiteSpace: "pre-wrap", marginTop: 6 }}
+            >
+              {translation}
+            </div>
+          </details>
+        )}
       </div>
     );
   };

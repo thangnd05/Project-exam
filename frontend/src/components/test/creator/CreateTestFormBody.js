@@ -252,6 +252,7 @@ const CreateTestFormBody = ({
       const normalizedGroups = parsedGroups.map((group) => ({
         passage: {
           content: group.passage?.content || '',
+          contentTranslation: group.passage?.contentTranslation || '',
           passageType: group.passage?.passageType || 'READING',
           mediaFiles: [],
           inputMode: 'TEXT',
@@ -515,6 +516,16 @@ const CreateTestFormBody = ({
                     value={group.passage.content}
                     onChange={(e) => updatePassage(gIndex, 'content', e.target.value)}
                     placeholder="Nhập nội dung văn bản nếu có..."
+                  />
+                </div>
+                <div className={cx('formGroupModern')}>
+                  <label className="mb-2 d-block fw-bold">Bản dịch Passage (tùy chọn)</label>
+                  <textarea
+                    className={cx('inputModern')}
+                    rows={3}
+                    value={group.passage.contentTranslation || ''}
+                    onChange={(e) => updatePassage(gIndex, 'contentTranslation', e.target.value)}
+                    placeholder="Bản dịch của nội dung passage (phần &quot;Dịch:&quot; trong file Word)..."
                   />
                 </div>
                 <div className={cx('formGroupModern')}>
