@@ -1,7 +1,8 @@
 import React from 'react';
-import {Badge, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import TagSelector from '~/components/common/TagSelector/TagSelector';
 
 function RecoveryResourceFormModal({
   show,
@@ -82,24 +83,12 @@ function RecoveryResourceFormModal({
 
         {availableTags.length > 0 && (
           <Form.Group className="mb-3">
-            <Form.Label>Gắn Tag (liên kết kiến thức)</Form.Label>
-            <div className="d-flex flex-wrap gap-2">
-              {availableTags.map((tag) => {
-                const isSelected = selectedTagIds.includes(tag.tagId);
-                return (
-                  <Badge
-                    key={tag.tagId}
-                    bg={isSelected ? 'primary' : 'light'}
-                    text={isSelected ? 'white' : 'dark'}
-                    role="button"
-                    className="border px-2 py-1 fw-medium tag-badge"
-                    onClick={() => onToggleTag(tag.tagId)}
-                  >
-                    {tag.name}
-                  </Badge>
-                );
-              })}
-            </div>
+            <TagSelector
+              tags={availableTags}
+              selectedIds={selectedTagIds}
+              onToggle={onToggleTag}
+              label="Gắn Tag (liên kết kiến thức)"
+            />
           </Form.Group>
         )}
     </BaseModal>

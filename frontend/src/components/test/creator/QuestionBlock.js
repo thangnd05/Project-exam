@@ -1,8 +1,9 @@
 import React from 'react';
-import { Row, Col, Badge, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { PlusCircle, Trash } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
+import TagSelector from '../../common/TagSelector/TagSelector';
 
 const cx = classNames.bind(styles);
 
@@ -49,29 +50,16 @@ const QuestionBlock = ({
 
             {availableTags.length > 0 && (
                 <div className="mb-3">
-                    <label className="fw-bold mb-1 d-block">Tag phân loại</label>
-                    <div className="d-flex flex-wrap gap-2">
-                        {availableTags.map((tag) => {
-                            const isSelected = selectedTagIds.includes(tag.tagId);
-                            return (
-                                <Badge
-                                    key={tag.tagId}
-                                    bg={isSelected ? 'primary' : 'light'}
-                                    text={isSelected ? 'white' : 'dark'}
-                                    role="button"
-                                    className="border px-2 py-1 fw-medium tag-badge"
-                                    onClick={() => {
-                                        const next = isSelected
-                                            ? selectedTagIds.filter((id) => id !== tag.tagId)
-                                            : [...selectedTagIds, tag.tagId];
-                                        updateQuestionFieldFn?.(index, 'tagIds', next);
-                                    }}
-                                >
-                                    {tag.name}
-                                </Badge>
-                            );
-                        })}
-                    </div>
+                    <TagSelector
+                        tags={availableTags}
+                        selectedIds={selectedTagIds}
+                        onToggle={(tagId) => {
+                            const next = selectedTagIds.includes(tagId)
+                                ? selectedTagIds.filter((id) => id !== tagId)
+                                : [...selectedTagIds, tagId];
+                            updateQuestionFieldFn?.(index, 'tagIds', next);
+                        }}
+                    />
                 </div>
             )}
             {withMedia && (

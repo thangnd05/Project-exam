@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Badge, Spinner, Row, Col } from 'react-bootstrap';
+import { Button, Spinner, Row, Col } from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
+import TagSelector from '~/components/common/TagSelector/TagSelector';
 import { getQuestionById, updateQuestion } from '~/api/questionApi';
 import { getExamPartById } from '~/api/examPartApi';
 import { deletePassageMedia } from '~/api/passageMediaApi';
@@ -380,30 +381,17 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
 
               {availableTags.length > 0 && (
                 <Col md={12}>
-                  <label className={cx('formLabel')}>Tag phân loại</label>
-                  <div className="d-flex flex-wrap gap-2">
-                    {availableTags.map((tag) => {
-                      const isSelected = selectedTagIds.includes(tag.tagId);
-                      return (
-                        <Badge
-                          key={tag.tagId}
-                          bg={isSelected ? 'primary' : 'light'}
-                          text={isSelected ? 'white' : 'dark'}
-                          role="button"
-                          className="border px-2 py-1 fw-medium tag-badge"
-                          onClick={() =>
-                            setSelectedTagIds((prev) =>
-                              isSelected
-                                ? prev.filter((id) => id !== tag.tagId)
-                                : [...prev, tag.tagId],
-                            )
-                          }
-                        >
-                          {tag.name}
-                        </Badge>
-                      );
-                    })}
-                  </div>
+                  <TagSelector
+                    tags={availableTags}
+                    selectedIds={selectedTagIds}
+                    onToggle={(tagId) =>
+                      setSelectedTagIds((prev) =>
+                        prev.includes(tagId)
+                          ? prev.filter((id) => id !== tagId)
+                          : [...prev, tagId],
+                      )
+                    }
+                  />
                 </Col>
               )}
 
