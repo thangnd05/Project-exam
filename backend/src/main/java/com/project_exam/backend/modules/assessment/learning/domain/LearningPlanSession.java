@@ -1,13 +1,18 @@
 package com.project_exam.backend.modules.assessment.learning.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "learning_plan_sessions")
+@Table(name = "learning_plan_sessions", indexes = {
+        // learning_plan_id đã được index dẫn đầu bởi idx_learning_plan_sessions_plan_status (learning_plan_id, status)
+        @Index(name = "idx_learning_plan_sessions_task_id", columnList = "task_id"),
+        @Index(name = "idx_learning_plan_sessions_resource_id", columnList = "resource_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +20,7 @@ import java.time.Instant;
 public class LearningPlanSession {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String sessionId;
 
     @Column(name = "learning_plan_id", nullable = false)

@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
@@ -11,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Skill {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String skillId;
 
     @Column(nullable = false, unique = true, length = 100)

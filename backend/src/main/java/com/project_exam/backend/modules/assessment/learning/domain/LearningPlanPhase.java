@@ -1,12 +1,16 @@
 package com.project_exam.backend.modules.assessment.learning.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "learning_plan_phases")
+@Table(name = "learning_plan_phases", indexes = {
+        @Index(name = "idx_learning_plan_phases_learning_plan_id", columnList = "learning_plan_id"),
+        @Index(name = "idx_learning_plan_phases_exam_part_id", columnList = "exam_part_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +18,7 @@ import java.math.BigDecimal;
 public class LearningPlanPhase {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String phaseId;
 
     @Column(name = "learning_plan_id", nullable = false)

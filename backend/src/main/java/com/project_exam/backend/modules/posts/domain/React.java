@@ -1,12 +1,16 @@
 package com.project_exam.backend.modules.posts.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
 @Table(
     name = "reacts",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"})
+    uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}),
+    indexes = {
+        @Index(name = "idx_reacts_user_id", columnList = "user_id")
+    }
 )
 @Getter
 @Setter
@@ -16,7 +20,7 @@ import lombok.*;
 public class React {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String id;
 
     @Column(name = "post_id", nullable = false)

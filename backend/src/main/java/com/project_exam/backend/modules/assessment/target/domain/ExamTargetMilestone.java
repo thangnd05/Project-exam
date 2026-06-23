@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.target.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 public class ExamTargetMilestone {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String examTargetMilestoneId;
 
     @Column(name = "exam_type_id", nullable = false)

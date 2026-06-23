@@ -1,13 +1,18 @@
 package com.project_exam.backend.modules.assessment.attempt.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(
         name = "user_answers",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_test_id", "question_id"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_test_id", "question_id"}),
+        indexes = {
+                @Index(name = "idx_user_answers_question_id", columnList = "question_id"),
+                @Index(name = "idx_user_answers_selected_answer_id", columnList = "selected_answer_id")
+        }
 )
 @Getter
 @Setter
@@ -16,7 +21,7 @@ import java.time.LocalDateTime;
 public class UserAnswer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String userAnswerId;
 
     @Column(nullable = false)

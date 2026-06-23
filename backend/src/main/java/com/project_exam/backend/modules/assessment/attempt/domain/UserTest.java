@@ -1,11 +1,16 @@
 package com.project_exam.backend.modules.assessment.attempt.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_tests")
+@Table(name = "user_tests",
+        indexes = {
+                @Index(name = "idx_user_tests_user_id", columnList = "user_id"),
+                @Index(name = "idx_user_tests_test_id", columnList = "test_id")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,7 +18,7 @@ import java.time.LocalDateTime;
 public class UserTest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String userTestId;
 
     // Nullable: guest không có userId, phải dùng guestSessionId.

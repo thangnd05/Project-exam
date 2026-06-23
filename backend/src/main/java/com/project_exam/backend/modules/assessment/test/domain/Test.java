@@ -2,18 +2,25 @@ package com.project_exam.backend.modules.assessment.test.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tests")
+@Table(name = "tests",
+        indexes = {
+                @Index(name = "idx_tests_exam_type_id", columnList = "exam_type_id"),
+                @Index(name = "idx_tests_class_id", columnList = "class_id"),
+                @Index(name = "idx_tests_chapter_id", columnList = "chapter_id"),
+                @Index(name = "idx_tests_exam_category_id", columnList = "exam_category_id")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Test {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String testId;
 
     @Column(nullable = false, length = 255)

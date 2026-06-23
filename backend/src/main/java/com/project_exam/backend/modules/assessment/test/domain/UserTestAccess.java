@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.test.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "user_test_accesses",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "testId"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "testId"}),
+        indexes = {
+                @Index(name = "idx_user_test_accesses_test_id", columnList = "test_id")
+        }
 )
 @Getter
 @Setter
@@ -17,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserTestAccess {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String userTestAccessId;
 
     @Column(nullable = false)

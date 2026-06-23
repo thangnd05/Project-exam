@@ -1,11 +1,15 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
 @Table(name = "resource_tags",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"resource_id", "tag_id"}))
+       uniqueConstraints = @UniqueConstraint(columnNames = {"resource_id", "tag_id"}),
+       indexes = {
+           @Index(name = "idx_resource_tags_tag_id", columnList = "tag_id")
+       })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,7 +17,7 @@ import lombok.*;
 public class ResourceTag {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String id;
 
     @Column(name = "resource_id", nullable = false)

@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.gamification.coin.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,14 +11,16 @@ import java.time.LocalDateTime;
  * Logic kiếm/tiêu xu (nhiệm vụ, đổi thưởng) sẽ làm sau, bảng này chỉ là nơi lưu số dư.
  */
 @Entity
-@Table(name = "user_coins")
+@Table(name = "user_coins", indexes = {
+        @Index(name = "idx_user_coins_user_id", columnList = "user_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCoin {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String userCoinId;
 
     @Column(nullable = false, unique = true)

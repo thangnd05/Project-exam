@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,7 +16,7 @@ import java.time.Instant;
 public class RecoveryResource {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String resourceId;
 
     @Column(nullable = false)

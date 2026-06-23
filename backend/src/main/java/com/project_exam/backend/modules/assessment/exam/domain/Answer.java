@@ -1,17 +1,20 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
-@Table(name = "answers")
+@Table(name = "answers", indexes = {
+        @Index(name = "idx_answers_question_id", columnList = "question_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Answer {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String answerId;
 
     @Column(nullable = false)

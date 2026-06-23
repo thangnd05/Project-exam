@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.gamification.cosmetic.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "user_cosmetics",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "cosmeticId"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "cosmeticId"}),
+        indexes = {
+                @Index(name = "idx_user_cosmetics_cosmetic_id", columnList = "cosmetic_id")
+        }
 )
 @Getter
 @Setter
@@ -17,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserCosmetic {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String userCosmeticId;
 
     @Column(nullable = false)

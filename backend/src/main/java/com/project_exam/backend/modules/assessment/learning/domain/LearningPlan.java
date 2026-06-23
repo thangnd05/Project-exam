@@ -1,13 +1,21 @@
 package com.project_exam.backend.modules.assessment.learning.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "learning_plans")
+@Table(name = "learning_plans", indexes = {
+        @Index(name = "idx_learning_plans_user_id", columnList = "user_id"),
+        @Index(name = "idx_learning_plans_exam_type_id", columnList = "exam_type_id"),
+        @Index(name = "idx_learning_plans_source_user_test_id", columnList = "source_user_test_id"),
+        @Index(name = "idx_learning_plans_user_target_id", columnList = "user_target_id"),
+        @Index(name = "idx_learning_plans_current_task_id", columnList = "current_task_id"),
+        @Index(name = "idx_learning_plans_replaced_by_plan_id", columnList = "replaced_by_plan_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +23,7 @@ import java.time.Instant;
 public class LearningPlan {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String learningPlanId;
 
     @Column(name = "user_id", nullable = false)

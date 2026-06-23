@@ -1,18 +1,21 @@
 package com.project_exam.backend.modules.vocabulary.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vocabulary_album")
+@Table(name = "vocabulary_album", indexes = {
+    @Index(name = "idx_vocabulary_album_user_id", columnList = "user_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VocabularyAlbum {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String albumId;
 
     @Column(nullable = false, length = 100)

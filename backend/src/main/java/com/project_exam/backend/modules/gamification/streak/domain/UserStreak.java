@@ -1,20 +1,23 @@
 package com.project_exam.backend.modules.gamification.streak.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_streaks")
+@Table(name = "user_streaks", indexes = {
+        @Index(name = "idx_user_streaks_user_id", columnList = "user_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserStreak {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String userStreakId;
 
     @Column(nullable = false, unique = true)

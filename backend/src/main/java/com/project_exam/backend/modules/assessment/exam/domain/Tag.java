@@ -1,10 +1,14 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
-@Table(name = "tags")
+@Table(name = "tags", indexes = {
+        @Index(name = "idx_tags_exam_type_id", columnList = "exam_type_id"),
+        @Index(name = "idx_tags_parent_id", columnList = "parent_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,7 +16,7 @@ import lombok.*;
 public class Tag {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String tagId;
 
     @Column(nullable = false, length = 100)

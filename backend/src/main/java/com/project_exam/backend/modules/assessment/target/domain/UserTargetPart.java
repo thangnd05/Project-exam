@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.target.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -8,7 +9,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_target_parts",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_target_id", "exam_part_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_target_id", "exam_part_id"}),
+        indexes = {
+                @Index(name = "idx_user_target_parts_exam_part_id", columnList = "exam_part_id"),
+                @Index(name = "idx_user_target_parts_last_user_test_id", columnList = "last_user_test_id")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +21,7 @@ import java.time.LocalDateTime;
 public class UserTargetPart {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String userTargetPartId;
 
     @Column(name = "user_target_id", nullable = false)

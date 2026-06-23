@@ -1,11 +1,16 @@
 package com.project_exam.backend.modules.posts.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "comments", indexes = {
+    @Index(name = "idx_comments_post_id", columnList = "post_id"),
+    @Index(name = "idx_comments_user_id", columnList = "user_id"),
+    @Index(name = "idx_comments_parent_id", columnList = "parent_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +19,7 @@ import java.time.LocalDateTime;
 public class Comment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String id;
 
     @Column(name = "post_id", nullable = false)

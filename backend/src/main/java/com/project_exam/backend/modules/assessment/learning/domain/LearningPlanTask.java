@@ -1,13 +1,18 @@
 package com.project_exam.backend.modules.assessment.learning.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "learning_plan_tasks")
+@Table(name = "learning_plan_tasks", indexes = {
+        // learning_plan_id đã được index dẫn đầu bởi idx_learning_plan_tasks_plan (learning_plan_id, task_order)
+        @Index(name = "idx_learning_plan_tasks_tag_id", columnList = "tag_id"),
+        @Index(name = "idx_learning_plan_tasks_exam_part_id", columnList = "exam_part_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +20,7 @@ import java.time.Instant;
 public class LearningPlanTask {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String taskId;
 
     @Column(name = "learning_plan_id", nullable = false)

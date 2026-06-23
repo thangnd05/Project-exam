@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.gamification.quest.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "user_quest_claims",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "questId"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "questId"}),
+        indexes = {
+                @Index(name = "idx_user_quest_claims_quest_id", columnList = "quest_id")
+        }
 )
 @Getter
 @Setter
@@ -20,7 +24,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserQuestClaim {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String userQuestClaimId;
 
     @Column(nullable = false)

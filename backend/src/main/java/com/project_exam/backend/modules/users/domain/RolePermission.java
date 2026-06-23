@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.users.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 /**
@@ -10,7 +11,10 @@ import lombok.*;
 @Entity
 @Table(
         name = "role_permissions",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"role_id", "permission_id"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"role_id", "permission_id"}),
+        indexes = {
+                @Index(name = "idx_role_permissions_permission_id", columnList = "permission_id")
+        }
 )
 @Getter
 @Setter
@@ -19,7 +23,7 @@ import lombok.*;
 @Builder
 public class RolePermission {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String id;
 
     @Column(name = "role_id", nullable = false)

@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.users.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 /**
@@ -17,7 +18,7 @@ import lombok.*;
 @Builder
 public class Permission {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String permissionId;
 
     @Column(nullable = false, unique = true, length = 100)

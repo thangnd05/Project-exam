@@ -1,13 +1,20 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "questions")
+@Table(name = "questions", indexes = {
+        @Index(name = "idx_questions_exam_part_id", columnList = "exam_part_id"),
+        @Index(name = "idx_questions_passage_id", columnList = "passage_id"),
+        @Index(name = "idx_questions_collection_id", columnList = "collection_id"),
+        @Index(name = "idx_questions_class_id", columnList = "class_id"),
+        @Index(name = "idx_questions_chapter_id", columnList = "chapter_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +22,7 @@ import java.time.Instant;
 public class Question {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String questionId;
 
     @CreationTimestamp

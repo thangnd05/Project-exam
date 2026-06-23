@@ -1,15 +1,18 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.Data;
 
 @Entity
-@Table(name = "passage_media")
+@Table(name = "passage_media", indexes = {
+        @Index(name = "idx_passage_media_passage_id", columnList = "passage_id")
+})
 @Data
 public class PassageMedia {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String id;
 
     private String passageId;

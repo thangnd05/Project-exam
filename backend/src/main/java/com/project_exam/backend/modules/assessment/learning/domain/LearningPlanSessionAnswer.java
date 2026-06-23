@@ -1,11 +1,16 @@
 package com.project_exam.backend.modules.assessment.learning.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
 @Table(name = "learning_plan_session_answers",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"session_id", "question_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"session_id", "question_id"}),
+        indexes = {
+                @Index(name = "idx_lps_answers_question_id", columnList = "question_id"),
+                @Index(name = "idx_lps_answers_selected_answer_id", columnList = "selected_answer_id")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,7 +18,7 @@ import lombok.*;
 public class LearningPlanSessionAnswer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String id;
 
     @Column(name = "session_id", nullable = false)

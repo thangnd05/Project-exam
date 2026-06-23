@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.learning.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -8,7 +9,10 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "user_question_exposures",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "question_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "question_id"}),
+        indexes = {
+                @Index(name = "idx_user_question_exposures_question_id", columnList = "question_id")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +20,7 @@ import java.time.Instant;
 public class UserQuestionExposure {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String id;
 
     @Column(name = "user_id", nullable = false)

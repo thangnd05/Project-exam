@@ -1,12 +1,15 @@
 package com.project_exam.backend.modules.classroom.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chapters")
+@Table(name = "chapters", indexes = {
+    @Index(name = "idx_chapters_class_id", columnList = "class_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +18,7 @@ import java.time.LocalDateTime;
 public class Chapter {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     @Column(name = "chapter_id")
     private String chapterId;
 

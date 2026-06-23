@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
@@ -12,7 +13,7 @@ import lombok.*;
 public class QuestionCollection {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidV7
     private String collectionId;
 
     @Column(nullable = false, unique = true)
