@@ -121,7 +121,7 @@ function TagsManagement() {
       .catch(() => {});
   }, []);
 
-  const fetchTags = useCallback(async (examTypeIdOverride) => {
+  const fetchTags = useCallback(async (examTypeIdOverride, {preserveExpanded = false} = {}) => {
     const examTypeId = examTypeIdOverride || selectedExamTypeId;
     if (!examTypeId) return;
     setLoading(true);
@@ -133,8 +133,12 @@ function TagsManagement() {
       ]);
       setTagTree(tree);
       setFlatTags(flat);
-      // Auto-expand all root tags
-      setExpandedIds(new Set(tree.map((t) => t.tagId)));
+      // Only auto-expand all roots on a fresh load / exam-type switch.
+      // On refetch after create/delete, keep the current expansion so the
+      // whole tree doesn't pop open.
+      if (!preserveExpanded) {
+        setExpandedIds(new Set(tree.map((t) => t.tagId)));
+      }
     } catch {
       setErrorMessage('Không thể tải danh sách tag.');
     } finally {
@@ -237,7 +241,7 @@ function TagsManagement() {
       setSearchTerm('');
       setShowFormModal(false);
       resetForm();
-      await fetchTags(targetExamTypeId);
+      await fetchTags(targetExamTypeId, {preserveExpanded: true});
       if (savedTag?.tagId) {
         setExpandedIds((previous) => {
           const next = new Set(previous);
@@ -263,7 +267,7 @@ function TagsManagement() {
     try {
       await deleteTag(deletingTag.tagId);
       setDeletingTag(null);
-      await fetchTags();
+      await fetchTags(undefined, {preserveExpanded: true});
     } catch {
       setErrorMessage('Không thể xóa tag này.');
     } finally {
