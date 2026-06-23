@@ -43,6 +43,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.Passage;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
+import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionGroupAdminResponse;
@@ -114,6 +115,8 @@ public class TestService {
     private final UserTestAccessRepository userTestAccessRepository;
     private final CoinService coinService;
     private final PassageMapper passageMapper;
+    private final com.project_exam.backend.modules.assessment.exam.repository.PassageMediaRepository passageMediaRepository;
+    private final com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper passageMediaMapper;
     private final com.project_exam.backend.modules.assessment.test.mapper.TestMapper testMapper;
 
     /** User có quyền làm bài chưa: miễn phí, hoặc là người tạo, hoặc đã mua. */
@@ -563,7 +566,8 @@ public class TestService {
             Map<String, List<TestQuestion>> questionsByPartId,
             Map<String, Question> questionMap,
             Map<String, Passage> passageMap,
-            Map<String, List<AnswerResponse>> answersByQuestionId
+            Map<String, List<AnswerResponse>> answersByQuestionId,
+            Map<String, List<PassageMediaResponse>> passageMediaByPassageId
     ) {}
 
     private TestUserDataBundle loadUserTestData(String testId) {
@@ -571,6 +575,7 @@ public class TestService {
         if (testParts.isEmpty()) {
             return new TestUserDataBundle(
                     Collections.emptyList(),
+                    Collections.emptyMap(),
                     Collections.emptyMap(),
                     Collections.emptyMap(),
                     Collections.emptyMap(),
@@ -597,11 +602,15 @@ public class TestService {
                 : passageRepository.findAllById(passageIds).stream()
                         .collect(Collectors.toMap(Passage::getPassageId, p -> p));
 
+        Map<String, List<PassageMediaResponse>> passageMediaByPassageId =
+                loadPassageMediaByPassageId(passageIds);
+
         Map<String, List<AnswerResponse>> answersByQuestionId =
                 answerService.getAnswersForMultipleQuestions(questionIds);
 
         return new TestUserDataBundle(
-                testParts, questionsByPartId, questionMap, passageMap, answersByQuestionId
+                testParts, questionsByPartId, questionMap, passageMap,
+                answersByQuestionId, passageMediaByPassageId
         );
     }
 
@@ -625,7 +634,10 @@ public class TestService {
                     if (!groupsMap.containsKey(groupKey)) {
                         Passage p = data.passageMap().get(q.getPassageId());
                         PassageResponse pDto = (p != null)
-                                ? passageMapper.toResponse(p)
+                                ? passageMapper.toResponse(
+                                        p,
+                                        data.passageMediaByPassageId()
+                                                .getOrDefault(p.getPassageId(), Collections.emptyList()))
                                 : null;
                         groupsMap.put(groupKey, testMapper.toQuestionGroupWithPassage(pDto, new ArrayList<>()));
                     }
@@ -708,7 +720,8 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             Map<String, Question> questionMap,
             Map<String, Passage> passageMap,
             Map<String, ExamPart> examPartMap,
-            Map<String, List<AnswerAdminResponse>> answersByQuestionId
+            Map<String, List<AnswerAdminResponse>> answersByQuestionId,
+            Map<String, List<PassageMediaResponse>> passageMediaByPassageId
     ) {}
 
     private TestAdminDataBundle loadAdminTestData(String testId) {
@@ -716,6 +729,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         if (testParts.isEmpty()) {
             return new TestAdminDataBundle(
                     Collections.emptyList(),
+                    Collections.emptyMap(),
                     Collections.emptyMap(),
                     Collections.emptyMap(),
                     Collections.emptyMap(),
@@ -741,6 +755,9 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         Map<String, Passage> passageMap = passageRepository.findAllById(passageIds).stream()
                 .collect(Collectors.toMap(Passage::getPassageId, p -> p));
 
+        Map<String, List<PassageMediaResponse>> passageMediaByPassageId =
+                loadPassageMediaByPassageId(passageIds);
+
         Set<String> examPartIds = questionMap.values().stream()
                 .map(Question::getExamPartId).collect(Collectors.toSet());
         Map<String, ExamPart> examPartMap = examPartRepository.findAllById(examPartIds).stream()
@@ -751,8 +768,16 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         return new TestAdminDataBundle(
                 testParts, questionsByPartId, questionMap,
-                passageMap, examPartMap, answersByQuestionId
+                passageMap, examPartMap, answersByQuestionId, passageMediaByPassageId
         );
+    }
+
+    /** Batch-load audio/ảnh của các passage, gom theo passageId (rỗng nếu không có). */
+    private Map<String, List<PassageMediaResponse>> loadPassageMediaByPassageId(Set<String> passageIds) {
+        if (passageIds == null || passageIds.isEmpty()) return Collections.emptyMap();
+        return passageMediaRepository.findByPassageIdIn(passageIds).stream()
+                .map(passageMediaMapper::toResponse)
+                .collect(Collectors.groupingBy(PassageMediaResponse::getPassageId));
     }
 
     private List<TestPartAdminResponse> buildAdminPartResponses(TestAdminDataBundle data) {
@@ -784,7 +809,9 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         if (!"NO_PASSAGE".equals(passageId)) {
             Passage p = data.passageMap().get(passageId.toString());
             if (p != null) {
-                passageResponse = passageMapper.toResponse(p);
+                List<PassageMediaResponse> medias = data.passageMediaByPassageId()
+                        .getOrDefault(p.getPassageId(), Collections.emptyList());
+                passageResponse = passageMapper.toResponse(p, medias);
             }
         }
 

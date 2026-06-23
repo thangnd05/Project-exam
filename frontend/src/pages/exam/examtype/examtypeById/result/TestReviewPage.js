@@ -1,10 +1,9 @@
-import { useContext, useEffect, useState, useMemo, useCallback } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from '../../../../../api/axiosClient';
 import { getUserTestMeta } from '../../../../../api/userTestApi';
 import { getAnswersByUserTest } from '../../../../../api/userAnswerApi';
 import { getUserTestInfo, getAdminTestById } from '../../../../../api/testApi';
-import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
 import { getExamPartById } from '~/api/examPartApi';
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
@@ -28,11 +27,6 @@ const getFullMediaUrl = (url) => {
   return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
 };
 
-const hasMediaList = (p) => {
-  const list = p?.passageMedias ?? p?.passageMediaList ?? p?.passage_media;
-  return Array.isArray(list) && list.length > 0;
-};
-
 const TestReviewPage = () => {
   const { userTestId } = useParams();
   const navigate = useNavigate();
@@ -49,49 +43,6 @@ const TestReviewPage = () => {
   const [canReview, setCanReview] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // Nạp audio/ảnh từ bảng passage_media (API test không trả kèm media).
-  const enrichTestWithPassageMedia = useCallback(async (testData) => {
-    const parts = testData.parts || [];
-    const passageIdsToFetch = new Set();
-    parts.forEach((part) => {
-      (part.questionGroups || []).forEach((group) => {
-        const gpid = group.passage?.passageId ?? group.passage?.passage_id;
-        if (gpid && !hasMediaList(group.passage)) passageIdsToFetch.add(gpid);
-        (group.questions || []).forEach((q) => {
-          const qpid = q.passage?.passageId ?? q.passage?.passage_id ?? q.passageId;
-          if (qpid && !hasMediaList(q.passage)) passageIdsToFetch.add(qpid);
-        });
-      });
-    });
-    if (passageIdsToFetch.size === 0) return testData;
-
-    const ids = [...passageIdsToFetch];
-    const results = await Promise.all(
-      ids.map((id) => getPassageMediaByPassageId(id).catch(() => [])),
-    );
-    const mediaMap = Object.fromEntries(ids.map((id, i) => [id, results[i]]));
-
-    const enrichWrapper = (obj) => {
-      const pid = obj?.passage?.passageId ?? obj?.passage?.passage_id ?? obj?.passageId;
-      if (pid && mediaMap[pid]) {
-        return {
-          ...obj,
-          passage: { ...(obj.passage || { passageId: pid }), passageMedias: mediaMap[pid] },
-        };
-      }
-      return obj;
-    };
-
-    const enrichedParts = parts.map((part) => ({
-      ...part,
-      questionGroups: (part.questionGroups || []).map((group) => ({
-        ...enrichWrapper(group),
-        questions: (group.questions || []).map(enrichWrapper),
-      })),
-    }));
-    return { ...testData, parts: enrichedParts };
-  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -119,18 +70,14 @@ const TestReviewPage = () => {
           getAnswersByUserTest(userTestId, isGuest, guestCfg),
         ]);
 
-        const enriched = await enrichTestWithPassageMedia({
-          ...testData,
-          parts: testData.parts || [],
-        });
-
-        setTest(enriched);
+        const loadedTest = { ...testData, parts: testData.parts || [] };
+        setTest(loadedTest);
         setUserAnswers(answersData);
 
         // Nạp tên part từ ExamPart (admin DTO không kèm tên part).
         const examPartIds = [
           ...new Set(
-            (enriched.parts || [])
+            (loadedTest.parts || [])
               .map((p) => p.examPartId)
               .filter(Boolean),
           ),
@@ -155,7 +102,7 @@ const TestReviewPage = () => {
     };
 
     fetchDetail();
-  }, [userTestId, authLoading, isGuest, guestCfg, enrichTestWithPassageMedia]);
+  }, [userTestId, authLoading, isGuest, guestCfg]);
 
   // Passage có content hoặc media → render layout 2 cột giống bài thi.
   const hasPassageContent = (passage, fallbackObj) => {
