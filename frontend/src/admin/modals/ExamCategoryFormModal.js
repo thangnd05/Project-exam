@@ -1,6 +1,7 @@
 import React from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 
 function ExamCategoryFormModal({
   show,
@@ -17,12 +18,12 @@ function ExamCategoryFormModal({
       title={isEditing ? 'Cập nhật phân loại bài thi' : 'Tạo phân loại bài thi'}
       maxWidth={550}
       footer={
-        <>
-          <Button variant="secondary" onClick={onClose}>
-            Hủy
-          </Button>
-          <Button onClick={onSubmit}>{isEditing ? 'Lưu' : 'Tạo mới'}</Button>
-        </>
+        <ModalActionFooter
+          onCancel={onClose}
+          onSubmit={onSubmit}
+          cancelLabel="Hủy"
+          submitLabel={isEditing ? 'Lưu' : 'Tạo mới'}
+        />
       }
     >
         <Form.Group className="mb-3">

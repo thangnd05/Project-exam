@@ -1,6 +1,7 @@
 import React from 'react';
-import {Badge, Button, Form} from 'react-bootstrap';
+import {Badge, Form} from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 
 function RecoveryResourceFormModal({
   show,
@@ -24,14 +25,14 @@ function RecoveryResourceFormModal({
       title={isEditing ? 'Cập nhật tài liệu' : 'Thêm tài liệu mới'}
       maxWidth={800}
       footer={
-        <>
-          <Button variant="secondary" onClick={onClose} disabled={submitting}>
-            Hủy
-          </Button>
-          <Button onClick={onSubmit} disabled={submitting}>
-            {submitting ? 'Đang lưu...' : isEditing ? 'Lưu' : 'Tạo mới'}
-          </Button>
-        </>
+        <ModalActionFooter
+          onCancel={onClose}
+          onSubmit={onSubmit}
+          cancelLabel="Hủy"
+          submitLabel={isEditing ? 'Lưu' : 'Tạo mới'}
+          loadingLabel="Đang lưu..."
+          loading={submitting}
+        />
       }
     >
         <Form.Group className="mb-3">
