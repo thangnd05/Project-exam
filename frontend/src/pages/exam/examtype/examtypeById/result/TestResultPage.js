@@ -20,6 +20,7 @@ import { getEnhancedResult, getGuestEnhancedResult } from "~/api/enhancedResultA
 import SkillBreakdownChart from "./components/SkillBreakdownChart";
 import ReadinessGauge from "./components/ReadinessGauge";
 import RecoveryPlan from "./components/RecoveryPlan";
+import TagAnalysisTable from "./components/TagAnalysisTable";
 import styles from "./TestResultPage.module.scss";
 
 const cx = classNames.bind(styles);
@@ -284,6 +285,8 @@ const TestResultPage = () => {
           )}
 
         </div>
+
+        {enhanced && <TagAnalysisTable enhanced={enhanced} userTestId={userTestId} />}
       </Container>
     </div>
   );

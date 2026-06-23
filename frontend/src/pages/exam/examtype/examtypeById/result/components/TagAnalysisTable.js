@@ -1,0 +1,155 @@
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import classNames from "classnames/bind";
+import styles from "./TagAnalysisTable.module.scss";
+
+const cx = classNames.bind(styles);
+
+// Gom unique câu (theo questionId) để đếm tổng — tránh đếm trùng khi 1 câu nhiều tag.
+const computeTotals = (tags) => {
+  const seen = new Map();
+  tags.forEach((t) =>
+    (t.questions || []).forEach((q) => seen.set(q.questionId, q.status)),
+  );
+  let correct = 0,
+    wrong = 0,
+    skipped = 0;
+  seen.forEach((st) => {
+    if (st === "correct") correct += 1;
+    else if (st === "wrong") wrong += 1;
+    else skipped += 1;
+  });
+  return { correct, wrong, skipped, total: seen.size };
+};
+
+const accuracy = (correct, total) =>
+  total > 0 ? ((correct / total) * 100).toFixed(2) : "0.00";
+
+function TagAnalysisTable({ enhanced, userTestId }) {
+  const navigate = useNavigate();
+
+  const tabs = useMemo(() => {
+    const parts = enhanced?.partBreakdown || [];
+    const partTabs = parts.map((p) => ({
+      key: p.examPartId,
+      label: p.partName || "Phần",
+      tags: p.weakTags || [],
+    }));
+
+    // Tab "Tổng quát": gộp tag theo tagId trên toàn bài.
+    const merged = {};
+    parts.forEach((p) =>
+      (p.weakTags || []).forEach((tag) => {
+        const m =
+          merged[tag.tagId] ||
+          (merged[tag.tagId] = {
+            tagId: tag.tagId,
+            tagName: tag.tagName,
+            questions: [],
+          });
+        m.questions.push(...(tag.questions || []));
+      }),
+    );
+    const overallTags = Object.values(merged).map((m) => {
+      // dedupe câu trong từng tag (phòng câu lặp giữa các part)
+      const map = new Map();
+      m.questions.forEach((q) => map.set(q.questionId, q));
+      const questions = [...map.values()].sort(
+        (a, b) => a.questionNumber - b.questionNumber,
+      );
+      const t = computeTotals([{ questions }]);
+      return { ...m, ...t, questions };
+    });
+
+    return [...partTabs, { key: "__overall__", label: "Tổng quát", tags: overallTags }];
+  }, [enhanced]);
+
+  const [active, setActive] = useState(() => tabs[0]?.key);
+
+  const current = tabs.find((t) => t.key === active) || tabs[0];
+  const rows = useMemo(() => {
+    const list = [...(current?.tags || [])];
+    list.sort((a, b) => (a.tagName || "").localeCompare(b.tagName || "", "vi"));
+    return list;
+  }, [current]);
+
+  const totals = useMemo(() => computeTotals(current?.tags || []), [current]);
+
+  const hasData = tabs.some((t) => (t.tags || []).length > 0);
+  if (!hasData) return null;
+
+  const goToQuestion = (questionId) => {
+    navigate(`/tests/result/${userTestId}/review#rq-${questionId}`);
+  };
+
+  return (
+    <div className={cx("wrapper")}>
+      <h2 className={cx("title")}>Phân tích chi tiết</h2>
+
+      <div className={cx("tabs")}>
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            className={cx("tab", { active: t.key === current?.key })}
+            onClick={() => setActive(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className={cx("table-scroll")}>
+        <table className={cx("table")}>
+          <thead>
+            <tr>
+              <th className={cx("col-name")}>Phân loại câu hỏi</th>
+              <th>Số câu đúng</th>
+              <th>Số câu sai</th>
+              <th>Số câu bỏ qua</th>
+              <th>Độ chính xác</th>
+              <th className={cx("col-list")}>Danh sách câu hỏi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((tag) => (
+              <tr key={tag.tagId}>
+                <td className={cx("col-name")}>{tag.tagName}</td>
+                <td>{tag.correct}</td>
+                <td>{tag.wrong}</td>
+                <td>{tag.skipped}</td>
+                <td>{accuracy(tag.correct, tag.total)}%</td>
+                <td className={cx("col-list")}>
+                  <div className={cx("q-circles")}>
+                    {(tag.questions || []).map((q) => (
+                      <button
+                        key={q.questionId}
+                        type="button"
+                        className={cx("q-circle", q.status)}
+                        onClick={() => goToQuestion(q.questionId)}
+                        title={`Câu ${q.questionNumber} — xem giải thích`}
+                      >
+                        {q.questionNumber}
+                      </button>
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            ))}
+
+            <tr className={cx("total-row")}>
+              <td className={cx("col-name")}>Total</td>
+              <td>{totals.correct}</td>
+              <td>{totals.wrong}</td>
+              <td>{totals.skipped}</td>
+              <td>{accuracy(totals.correct, totals.total)}%</td>
+              <td className={cx("col-list")} />
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export default TagAnalysisTable;

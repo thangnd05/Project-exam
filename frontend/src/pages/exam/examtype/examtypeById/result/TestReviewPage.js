@@ -132,6 +132,23 @@ const TestReviewPage = () => {
     fetchDetail();
   }, [userTestId, authLoading, isGuest, guestCfg]);
 
+  // Cuộn tới câu khi mở từ bảng phân tích (URL có #rq-<questionId>).
+  useEffect(() => {
+    if (loading || !test) return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    const elId = hash.slice(1);
+    const timer = setTimeout(() => {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const y = el.getBoundingClientRect().top + window.pageYOffset - 90;
+      window.scrollTo({ top: y, behavior: "smooth" });
+      el.classList.add(styles.highlight);
+      setTimeout(() => el.classList.remove(styles.highlight), 1600);
+    }, 120);
+    return () => clearTimeout(timer);
+  }, [loading, test]);
+
   // Passage có content hoặc media → render layout 2 cột giống bài thi.
   const hasPassageContent = (passage, fallbackObj) => {
     const content =

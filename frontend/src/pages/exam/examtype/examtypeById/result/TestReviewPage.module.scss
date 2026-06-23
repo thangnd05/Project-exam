@@ -219,6 +219,20 @@
   }
 }
 
+.highlight {
+  animation: review-flash 1.6s ease;
+}
+
+@keyframes review-flash {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+  20% {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.35);
+  }
+}
+
 .answers-options {
   display: flex;
   flex-direction: column;

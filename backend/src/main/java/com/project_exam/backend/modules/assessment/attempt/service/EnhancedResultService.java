@@ -138,6 +138,21 @@ public class EnhancedResultService {
         long normalizedCorrect = Math.min(totalCorrect, totalQuestions);
         long totalWrong = totalQuestions - normalizedCorrect;
 
+        // 4b. Trạng thái từng câu (correct/wrong/skipped) + số câu theo thứ tự hiển thị.
+        Map<String, String> statusMap = new HashMap<>();
+        for (String qId : allTestQuestionIds) {
+            UserAnswer ua = answeredMap.get(qId);
+            boolean answered = ua != null
+                    && (ua.getSelectedAnswerId() != null
+                        || (ua.getAnswerText() != null && !ua.getAnswerText().isBlank()));
+            if (!answered) {
+                statusMap.put(qId, "skipped");
+            } else {
+                statusMap.put(qId, Boolean.TRUE.equals(correctnessMap.get(qId)) ? "correct" : "wrong");
+            }
+        }
+        Map<String, Integer> questionNumberMap = buildQuestionNumberMap(userTest.getTestId());
+
         // 5. Load ExamParts + Skills
         Set<String> examPartIds = questionMap.values().stream()
                 .map(Question::getExamPartId)
@@ -185,7 +200,8 @@ public class EnhancedResultService {
 
         // 8. Build Part breakdown (tầng 2.5 + tầng 3)
         List<PartBreakdownDto> partBreakdown = buildPartBreakdown(
-                questionMap, correctnessMap, examPartMap, skillMap, tagsByQuestion, tagMap, targetParts);
+                questionMap, correctnessMap, statusMap, questionNumberMap,
+                examPartMap, skillMap, tagsByQuestion, tagMap, targetParts);
 
         // 9. Build Skill breakdown (tầng 2) - aggregate from parts
         List<SkillBreakdownDto> skillBreakdown = buildSkillBreakdown(
@@ -320,6 +336,8 @@ public class EnhancedResultService {
     private List<PartBreakdownDto> buildPartBreakdown(
             Map<String, Question> questionMap,
             Map<String, Boolean> correctnessMap,
+            Map<String, String> statusMap,
+            Map<String, Integer> questionNumberMap,
             Map<String, ExamPart> examPartMap,
             Map<String, Skill> skillMap,
             Map<String, List<QuestionTag>> tagsByQuestion,
@@ -377,7 +395,7 @@ public class EnhancedResultService {
 
             // Tầng 3: Tag breakdown cho tất cả câu hỏi trong part
             List<TagBreakdownDto> weakTags = buildTagBreakdown(
-                    qIds, correctnessMap, tagsByQuestion, tagMap);
+                    qIds, statusMap, questionNumberMap, tagsByQuestion, tagMap);
 
             parts.add(PartBreakdownDto.builder()
                     .examPartId(partId)
@@ -405,24 +423,33 @@ public class EnhancedResultService {
 
     private List<TagBreakdownDto> buildTagBreakdown(
             List<String> questionIds,
-            Map<String, Boolean> correctnessMap,
+            Map<String, String> statusMap,
+            Map<String, Integer> questionNumberMap,
             Map<String, List<QuestionTag>> tagsByQuestion,
             Map<String, Tag> tagMap) {
 
-        // Aggregate correct/wrong per tag
-        Map<String, int[]> tagStats = new HashMap<>(); // tagId -> [correct, wrong]
+        // Aggregate per tag: [correct, wrong, skipped] + danh sách câu
+        Map<String, int[]> tagStats = new HashMap<>();
+        Map<String, List<TagQuestionRefDto>> tagQuestions = new HashMap<>();
 
         for (String qId : questionIds) {
             List<QuestionTag> qTags = tagsByQuestion.getOrDefault(qId, List.of());
-            Boolean isCorrect = correctnessMap.get(qId);
+            String status = statusMap.getOrDefault(qId, "skipped");
+            int number = questionNumberMap.getOrDefault(qId, 0);
 
             for (QuestionTag qt : qTags) {
-                int[] stats = tagStats.computeIfAbsent(qt.getTagId(), k -> new int[]{0, 0});
-                if (isCorrect != null && isCorrect) {
-                    stats[0]++;
-                } else {
-                    stats[1]++;
+                int[] stats = tagStats.computeIfAbsent(qt.getTagId(), k -> new int[]{0, 0, 0});
+                switch (status) {
+                    case "correct" -> stats[0]++;
+                    case "wrong" -> stats[1]++;
+                    default -> stats[2]++;
                 }
+                tagQuestions.computeIfAbsent(qt.getTagId(), k -> new ArrayList<>())
+                        .add(TagQuestionRefDto.builder()
+                                .questionId(qId)
+                                .questionNumber(number)
+                                .status(status)
+                                .build());
             }
         }
 
@@ -432,24 +459,55 @@ public class EnhancedResultService {
             int[] stats = entry.getValue();
             int correct = stats[0];
             int wrong = stats[1];
-            int total = correct + wrong;
+            int skipped = stats[2];
+            int total = correct + wrong + skipped;
             double percentage = total > 0 ? (double) correct / total * 100 : 0;
 
             Tag tag = tagMap.get(tagId);
+
+            List<TagQuestionRefDto> qs = tagQuestions.getOrDefault(tagId, new ArrayList<>());
+            qs.sort(Comparator.comparingInt(TagQuestionRefDto::getQuestionNumber));
 
             tags.add(TagBreakdownDto.builder()
                     .tagId(tagId)
                     .tagName(tag != null ? tag.getName() : "Unknown")
                     .correct(correct)
                     .wrong(wrong)
+                    .skipped(skipped)
                     .total(total)
                     .percentage(Math.round(percentage * 10.0) / 10.0)
+                    .questions(qs)
                     .build());
         }
 
         // Sort by percentage ascending (weakest first)
         tags.sort(Comparator.comparingDouble(TagBreakdownDto::getPercentage));
         return tags;
+    }
+
+    /** Map questionId -> số câu (đánh số liên tục theo thứ tự part rồi displayOrder). */
+    private Map<String, Integer> buildQuestionNumberMap(String testId) {
+        List<com.project_exam.backend.modules.assessment.test.domain.TestPart> parts =
+                testPartRepository.findByTestId(testId);
+        if (parts.isEmpty()) return Map.of();
+
+        List<String> partIds = parts.stream()
+                .map(com.project_exam.backend.modules.assessment.test.domain.TestPart::getTestPartId)
+                .toList();
+        Map<String, List<TestQuestion>> byPart = testQuestionRepository.findByTestPartIdIn(partIds).stream()
+                .collect(Collectors.groupingBy(TestQuestion::getTestPartId));
+
+        Map<String, Integer> numberMap = new HashMap<>();
+        int num = 0;
+        for (com.project_exam.backend.modules.assessment.test.domain.TestPart tp : parts) {
+            List<TestQuestion> qs = new ArrayList<>(byPart.getOrDefault(tp.getTestPartId(), List.of()));
+            qs.sort(Comparator.comparingInt(tq ->
+                    tq.getDisplayOrder() == null ? Integer.MAX_VALUE : tq.getDisplayOrder()));
+            for (TestQuestion tq : qs) {
+                numberMap.put(tq.getQuestionId(), ++num);
+            }
+        }
+        return numberMap;
     }
 
     private List<SkillBreakdownDto> buildSkillBreakdown(
