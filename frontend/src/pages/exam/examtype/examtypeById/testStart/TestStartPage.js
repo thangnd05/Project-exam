@@ -565,7 +565,9 @@ function TestStartPage() {
                   readOnly
                 />
                 <span>
-                  {a.answerLabel}. {a.answerText}
+                  {a.answerText?.trim()
+                    ? `${a.answerLabel}. ${a.answerText}`
+                    : a.answerLabel}
                 </span>
               </div>
             ))}

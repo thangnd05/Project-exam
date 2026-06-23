@@ -552,7 +552,9 @@ function QuestionResult({ question, userAnswer, canReview }) {
                   "is-user-choice": isUserSelected,
                 })}
               >
-                {a.answerLabel}. {a.answerText}
+                {a.answerText?.trim()
+                  ? `${a.answerLabel}. ${a.answerText}`
+                  : a.answerLabel}
               </div>
             );
           })}

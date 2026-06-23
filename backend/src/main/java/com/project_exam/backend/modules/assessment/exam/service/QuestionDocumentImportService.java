@@ -12,6 +12,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -269,7 +270,12 @@ public class QuestionDocumentImportService {
             Elements blocks = dom.select("p, li, td");
             List<ParsedLine> lines = new ArrayList<>();
             for (Element block : blocks) {
-                String blockText = block.text();
+                // Giữ <br/> (soft line break Shift+Enter trong Word) thành xuống dòng.
+                // block.text() gộp hết <br> thành 1 dòng, làm "Câu 7.A.B. *C.Giải thích:
+                // Where...(A)...(B)...(C)..." dính liền -> số câu bị vỡ, (A)(B)(C) trong
+                // transcript bị cắt thành option giả, "Giải thích:" dính C. nên không vào.
+                block.select("br").forEach(br -> br.replaceWith(new TextNode("\n")));
+                String blockText = block.wholeText();
                 if (blockText == null || blockText.trim().isEmpty()) {
                     continue;
                 }
@@ -805,6 +811,10 @@ public class QuestionDocumentImportService {
         while (m.find()) {
             // group 1: nhãn có dấu phân cách; group 2: nhãn không dấu phân cách
             int s = m.group(1) != null ? m.start(1) : m.start(2);
+            // Giữ dấu '(' của nhãn "(A)" cùng segment, tránh tách "(" lẻ ra dòng riêng.
+            if (s > 0 && line.charAt(s - 1) == '(') {
+                s--;
+            }
             starts.add(s);
         }
         if (starts.isEmpty()) {

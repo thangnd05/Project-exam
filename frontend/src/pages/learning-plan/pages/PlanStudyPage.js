@@ -239,8 +239,9 @@ function PlanStudyPage() {
                               isUserCorrect: isUserChoice && isCorrectAnswer,
                             })}
                           >
-                            {a.answerLabel ? `${a.answerLabel}. ` : ''}
-                            {a.answerText}
+                            {a.answerText?.trim()
+                              ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
+                              : a.answerLabel}
                             {isCorrectAnswer && ' ✓'}
                             {isUserChoice && !isCorrectAnswer && ' (Bạn chọn)'}
                           </div>
@@ -330,8 +331,9 @@ function PlanStudyPage() {
                           onChange={() => handleSelect(q.questionId, a.answerId)}
                         />
                         <span>
-                          {a.answerLabel ? `${a.answerLabel}. ` : ''}
-                          {a.answerText}
+                          {a.answerText?.trim()
+                            ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
+                            : a.answerLabel}
                         </span>
                       </label>
                     ))}

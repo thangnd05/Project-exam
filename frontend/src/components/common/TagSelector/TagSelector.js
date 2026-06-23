@@ -84,8 +84,9 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
             return <Chip key={tag.tagId} tag={tag} />;
         }
         const selCount = countSelectedDescendants(tag.tagId);
+        // Mặc định mở sẵn tất cả nhóm; chỉ đóng khi người dùng tự bấm thu gọn.
         const open =
-            openOverride[tag.tagId] !== undefined ? openOverride[tag.tagId] : selCount > 0;
+            openOverride[tag.tagId] !== undefined ? openOverride[tag.tagId] : true;
         return (
             <div key={tag.tagId} className={cx('group')}>
                 <button
