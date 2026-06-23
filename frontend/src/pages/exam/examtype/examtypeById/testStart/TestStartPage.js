@@ -444,11 +444,6 @@ function TestStartPage() {
       passage?.passage_content ??
       fallbackObj?.content ??
       fallbackObj?.passage_content;
-    const translation =
-      passage?.contentTranslation ??
-      passage?.content_translation ??
-      fallbackObj?.contentTranslation ??
-      fallbackObj?.content_translation;
     const pType = passage?.passageType ?? passage?.passage_type ?? 'READING';
 
     // Bảng trung gian passage_media: passage có danh sách media (nhiều audio/ảnh)
@@ -479,15 +474,7 @@ function TestStartPage() {
         {/* Hiển thị text content TRƯỚC ảnh/audio */}
         {content && <div className={cx('passage-content')}>{content}</div>}
 
-        {/* Bản dịch (thu gọn mặc định) */}
-        {translation && (
-          <details className={cx('passage-translation')} style={{ marginTop: 8 }}>
-            <summary style={{ cursor: 'pointer', fontWeight: 600 }}>Bản dịch</summary>
-            <div className={cx('passage-content')} style={{ whiteSpace: 'pre-wrap', marginTop: 6 }}>
-              {translation}
-            </div>
-          </details>
-        )}
+        {/* KHÔNG hiển thị bản dịch trong lúc làm bài — chỉ có ở trang xem đáp án. */}
 
         {/* Thêm đường kẻ ngang ngăn cách nếu có cả text và media */}
         {content && (hasMediaList || singleMediaUrl) && (
@@ -748,7 +735,7 @@ function TestStartPage() {
             {test.parts?.map((part, i) => (
               <div key={part.testPartId} className={cx('part-section')}>
                 <h3>
-                  Phần {i + 1}: {part.partName || 'Luyện tập'}
+                  {part.partName || `Phần ${i + 1}`}
                 </h3>
 
                 <div className={cx('questions-list')}>

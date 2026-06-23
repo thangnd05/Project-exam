@@ -11,5 +11,6 @@ import java.util.List;
 public class TestPartResponse {
     private String testPartId;
     private String examPartId;
+    private String partName; // Tên part lấy từ ExamPart.name
     private List<QuestionGroupResponse> questionGroups; // Chuyển từ List<QuestionResponse> sang Group
 }

@@ -12,14 +12,23 @@ import java.util.List;
 public class PassageMapper {
 
     public PassageResponse toResponse(Passage passage) {
-        return toResponse(passage, Collections.emptyList());
+        return toResponse(passage, Collections.emptyList(), true);
     }
 
     public PassageResponse toResponse(Passage passage, List<PassageMediaResponse> passageMedias) {
+        return toResponse(passage, passageMedias, true);
+    }
+
+    /**
+     * @param includeTranslation chỉ trả bản dịch (contentTranslation) khi true.
+     *                            Luồng làm bài (bài thi) phải để false — không lộ bản dịch.
+     */
+    public PassageResponse toResponse(
+            Passage passage, List<PassageMediaResponse> passageMedias, boolean includeTranslation) {
         return PassageResponse.builder()
                 .passageId(passage.getPassageId())
                 .content(passage.getContent())
-                .contentTranslation(passage.getContentTranslation())
+                .contentTranslation(includeTranslation ? passage.getContentTranslation() : null)
                 .mediaUrl(passage.getMediaUrl())
                 .passageType(passage.getPassageType())
                 .passageMedias(passageMedias == null ? Collections.emptyList() : passageMedias)

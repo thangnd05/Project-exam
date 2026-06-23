@@ -4,7 +4,6 @@ import axios from '../../../../../api/axiosClient';
 import { getUserTestMeta } from '../../../../../api/userTestApi';
 import { getAnswersByUserTest } from '../../../../../api/userAnswerApi';
 import { getUserTestInfo, getAdminTestById } from '../../../../../api/testApi';
-import { getExamPartById } from '~/api/examPartApi';
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
 import {
@@ -39,7 +38,6 @@ const TestReviewPage = () => {
 
   const [test, setTest] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]);
-  const [partNameMap, setPartNameMap] = useState({});
   const [canReview, setCanReview] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -73,26 +71,6 @@ const TestReviewPage = () => {
         const loadedTest = { ...testData, parts: testData.parts || [] };
         setTest(loadedTest);
         setUserAnswers(answersData);
-
-        // Nạp tên part từ ExamPart (admin DTO không kèm tên part).
-        const examPartIds = [
-          ...new Set(
-            (loadedTest.parts || [])
-              .map((p) => p.examPartId)
-              .filter(Boolean),
-          ),
-        ];
-        if (examPartIds.length > 0) {
-          const parts = await Promise.all(
-            examPartIds.map((id) => getExamPartById(id).catch(() => null)),
-          );
-          const nameMap = {};
-          examPartIds.forEach((id, idx) => {
-            const name = parts[idx]?.name;
-            if (name) nameMap[id] = name;
-          });
-          setPartNameMap(nameMap);
-        }
       } catch (err) {
         console.error(" Lỗi tải chi tiết:", err);
         setError("Không thể tải chi tiết câu hỏi. Vui lòng thử lại.");
@@ -282,7 +260,7 @@ const TestReviewPage = () => {
         {test?.parts?.map((part, i) => (
           <div key={part.testPartId || i} className={cx("part-section")}>
             <h3 className={cx("part-title")}>
-              {partNameMap[part.examPartId] || part.partName || `Phần ${i + 1}`}
+              {part.partName || `Phần ${i + 1}`}
             </h3>
 
             {part.questionGroups?.map((group, groupIndex) => {

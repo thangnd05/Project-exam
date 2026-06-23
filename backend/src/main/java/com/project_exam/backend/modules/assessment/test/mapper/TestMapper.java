@@ -346,20 +346,24 @@ public class TestMapper {
                 .build();
     }
 
-    public TestPartResponse toTestPartResponse(TestPart tp, List<QuestionGroupResponse> questionGroups) {
+    public TestPartResponse toTestPartResponse(
+            TestPart tp, String partName, List<QuestionGroupResponse> questionGroups) {
         return TestPartResponse.builder()
                 .testPartId(tp.getTestPartId())
                 .examPartId(tp.getExamPartId())
+                .partName(partName)
                 .questionGroups(questionGroups)
                 .build();
     }
 
     // ===================== Admin part / group / question =====================
 
-    public TestPartAdminResponse toTestPartAdminResponse(TestPart tp, List<QuestionGroupAdminResponse> questionGroups) {
+    public TestPartAdminResponse toTestPartAdminResponse(
+            TestPart tp, String partName, List<QuestionGroupAdminResponse> questionGroups) {
         return TestPartAdminResponse.builder()
                 .testPartId(tp.getTestPartId())
                 .examPartId(tp.getExamPartId())
+                .partName(partName)
                 .questionGroups(questionGroups)
                 .build();
     }

@@ -567,7 +567,8 @@ public class TestService {
             Map<String, Question> questionMap,
             Map<String, Passage> passageMap,
             Map<String, List<AnswerResponse>> answersByQuestionId,
-            Map<String, List<PassageMediaResponse>> passageMediaByPassageId
+            Map<String, List<PassageMediaResponse>> passageMediaByPassageId,
+            Map<String, String> examPartNameById
     ) {}
 
     private TestUserDataBundle loadUserTestData(String testId) {
@@ -575,6 +576,7 @@ public class TestService {
         if (testParts.isEmpty()) {
             return new TestUserDataBundle(
                     Collections.emptyList(),
+                    Collections.emptyMap(),
                     Collections.emptyMap(),
                     Collections.emptyMap(),
                     Collections.emptyMap(),
@@ -605,13 +607,26 @@ public class TestService {
         Map<String, List<PassageMediaResponse>> passageMediaByPassageId =
                 loadPassageMediaByPassageId(passageIds);
 
+        Map<String, String> examPartNameById = loadExamPartNames(testParts);
+
         Map<String, List<AnswerResponse>> answersByQuestionId =
                 answerService.getAnswersForMultipleQuestions(questionIds);
 
         return new TestUserDataBundle(
                 testParts, questionsByPartId, questionMap, passageMap,
-                answersByQuestionId, passageMediaByPassageId
+                answersByQuestionId, passageMediaByPassageId, examPartNameById
         );
+    }
+
+    /** Map examPartId -> tên part (ExamPart.name) cho danh sách testParts. */
+    private Map<String, String> loadExamPartNames(List<TestPart> testParts) {
+        Set<String> examPartIds = testParts.stream()
+                .map(TestPart::getExamPartId).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (examPartIds.isEmpty()) return Collections.emptyMap();
+        return examPartRepository.findAllById(examPartIds).stream()
+                .filter(e -> e.getName() != null)
+                .collect(Collectors.toMap(ExamPart::getExamPartId, ExamPart::getName));
     }
 
     private List<TestPartResponse> buildUserPartResponses(TestUserDataBundle data, long seed) {
@@ -633,11 +648,13 @@ public class TestService {
                     String groupKey = "P_" + q.getPassageId();
                     if (!groupsMap.containsKey(groupKey)) {
                         Passage p = data.passageMap().get(q.getPassageId());
+                        // Bài thi: KHÔNG trả bản dịch (includeTranslation = false).
                         PassageResponse pDto = (p != null)
                                 ? passageMapper.toResponse(
                                         p,
                                         data.passageMediaByPassageId()
-                                                .getOrDefault(p.getPassageId(), Collections.emptyList()))
+                                                .getOrDefault(p.getPassageId(), Collections.emptyList()),
+                                        false)
                                 : null;
                         groupsMap.put(groupKey, testMapper.toQuestionGroupWithPassage(pDto, new ArrayList<>()));
                     }
@@ -649,7 +666,8 @@ public class TestService {
             }
 
             List<QuestionGroupResponse> finalGroups = new ArrayList<>(groupsMap.values());
-            return testMapper.toTestPartResponse(tp, finalGroups);
+            String partName = data.examPartNameById().get(tp.getExamPartId());
+            return testMapper.toTestPartResponse(tp, partName, finalGroups);
         }).toList();
     }
 
@@ -760,6 +778,8 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         Set<String> examPartIds = questionMap.values().stream()
                 .map(Question::getExamPartId).collect(Collectors.toSet());
+        // Gồm cả examPartId của các TestPart để lấy đúng tên part kể cả khi part rỗng câu hỏi.
+        testParts.stream().map(TestPart::getExamPartId).filter(Objects::nonNull).forEach(examPartIds::add);
         Map<String, ExamPart> examPartMap = examPartRepository.findAllById(examPartIds).stream()
                 .collect(Collectors.toMap(ExamPart::getExamPartId, e -> e));
 
@@ -798,7 +818,10 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                     .map(entry -> buildQuestionGroupAdmin(entry.getKey(), entry.getValue(), data))
                     .toList();
 
-            return testMapper.toTestPartAdminResponse(tp, groupResponses);
+            ExamPart examPart = data.examPartMap().get(tp.getExamPartId());
+            String partName = examPart != null ? examPart.getName() : null;
+
+            return testMapper.toTestPartAdminResponse(tp, partName, groupResponses);
         }).toList();
     }
 
