@@ -10,6 +10,9 @@ import {
   IoArrowBackOutline,
   IoHomeOutline,
   IoVolumeHighOutline,
+  IoListOutline,
+  IoCloseOutline,
+  IoCheckmarkCircleOutline,
 } from "react-icons/io5";
 
 import { AuthContext } from "~/context/AuthContext";
@@ -24,6 +27,24 @@ const getFullMediaUrl = (url) => {
   if (cleanUrl.startsWith('http')) return cleanUrl;
   const backendUrl = axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '';
   return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
+};
+
+// Trạng thái 1 câu: correct | incorrect | unanswered (để tô màu navigator).
+const getQuestionStatus = (q, userAnswer) => {
+  const answered = !!(userAnswer && (userAnswer.selectedAnswerId || userAnswer.answerText));
+  if (!answered) return "unanswered";
+  const correct = q.answers?.find((a) => a.isCorrect);
+  if (q.questionType === "MCQ") {
+    return correct && userAnswer.selectedAnswerId === correct.answerId
+      ? "correct"
+      : "incorrect";
+  }
+  if (q.questionType === "FILL_BLANK") {
+    const got = (userAnswer.answerText || "").trim().toLowerCase();
+    const want = (correct?.answerText || "").trim().toLowerCase();
+    return want && got === want ? "correct" : "incorrect";
+  }
+  return "answered";
 };
 
 const TestReviewPage = () => {
@@ -41,6 +62,35 @@ const TestReviewPage = () => {
   const [canReview, setCanReview] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showNav, setShowNav] = useState(false);
+
+  // Flatten toàn bộ câu hỏi + trạng thái đúng/sai để dựng navigator.
+  const flatQuestions = useMemo(() => {
+    const list = [];
+    (test?.parts || []).forEach((part) => {
+      (part.questionGroups || []).forEach((group) => {
+        (group.questions || []).forEach((q) => {
+          const ua = userAnswers.find(
+            (a) => String(a.questionId) === String(q.questionId),
+          );
+          list.push({ questionId: q.questionId, status: getQuestionStatus(q, ua) });
+        });
+      });
+    });
+    return list;
+  }, [test, userAnswers]);
+
+  const correctCount = useMemo(
+    () => flatQuestions.filter((q) => q.status === "correct").length,
+    [flatQuestions],
+  );
+
+  const scrollToQuestion = (qid) => {
+    const el = document.getElementById(`rq-${qid}`);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.pageYOffset - 90;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -242,7 +292,7 @@ const TestReviewPage = () => {
 
   return (
     <div className={cx("wrapper")}>
-      <Container>
+      <Container fluid className={cx("content")}>
         <div className={cx("back-bar")}>
           <button
             className={cx("back-btn")}
@@ -305,6 +355,68 @@ const TestReviewPage = () => {
           </div>
         ))}
       </Container>
+
+      {/* --- Footer: navigator nhảy câu (tô đúng/sai) --- */}
+      {flatQuestions.length > 0 && (
+        <div className={cx("footer-actions")}>
+          {showNav && (
+            <div className={cx("footer-panel")}>
+              <div className={cx("nav-card")}>
+                <div className={cx("nav-header")}>
+                  <IoListOutline />
+                  <span>Danh sách câu hỏi</span>
+                </div>
+                <div className={cx("nav-grid")}>
+                  {flatQuestions.map((q, idx) => (
+                    <button
+                      key={q.questionId}
+                      type="button"
+                      className={cx("nav-item", q.status)}
+                      onClick={() => {
+                        scrollToQuestion(q.questionId);
+                        setShowNav(false);
+                      }}
+                      aria-label={`Câu ${idx + 1}`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                </div>
+                <div className={cx("nav-legend")}>
+                  <span className={cx("legend-item")}>
+                    <span className={cx("dot", "correct")} /> Đúng
+                  </span>
+                  <span className={cx("legend-item")}>
+                    <span className={cx("dot", "incorrect")} /> Sai
+                  </span>
+                  <span className={cx("legend-item")}>
+                    <span className={cx("dot", "unanswered")} /> Chưa làm
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          <div className={cx("footer-buttons")}>
+            <Container className={cx("footer-buttons-inner")}>
+              <button
+                type="button"
+                className={cx("btn-toggle-info", { active: showNav })}
+                onClick={() => setShowNav((v) => !v)}
+                aria-expanded={showNav}
+              >
+                {showNav ? <IoCloseOutline size={22} /> : <IoListOutline size={22} />}
+                <span>{showNav ? "Ẩn" : "Danh sách câu"}</span>
+              </button>
+              <div className={cx("footer-score")}>
+                <IoCheckmarkCircleOutline aria-hidden />
+                <span>
+                  {correctCount}/{flatQuestions.length} câu đúng
+                </span>
+              </div>
+            </Container>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -326,7 +438,7 @@ function QuestionResult({ question, userAnswer, canReview }) {
   }
 
   return (
-    <div className={cx("question-item", resultClass)}>
+    <div id={`rq-${question.questionId}`} className={cx("question-item", resultClass)}>
       <span className={cx("q-text")}>
         <strong>Câu hỏi:</strong> {question.questionText}
       </span>
