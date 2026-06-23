@@ -6,6 +6,7 @@ import TestPage from '~/pages/exam/TestPage';
 import TestByExamTypePage from '~/pages/exam/examtype/examtypeById/TestByExamTypePage';
 import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStartPage';
 import TestResultPage from '~/pages/exam/examtype/examtypeById/result/TestResultPage';
+import TestReviewPage from '~/pages/exam/examtype/examtypeById/result/TestReviewPage';
 import TestHistoryPage from '~/pages/history/TestHistoryPage';
 import TestLeaderboardPage from '~/pages/leaderboard/TestLeaderboardPage';
 import MyClassesPage from '~/pages/myclass/MyClassPage';
@@ -118,6 +119,7 @@ export const adminRoutes = [
 export const privateRoutes = [
   { path: routes.testStart, component: TestStartPage, noContainer: true, allowGuest: true },
   { path: routes.testResult, component: TestResultPage, allowGuest: true },
+  { path: routes.testReview, component: TestReviewPage, allowGuest: true },
   { path: routes.testHistory, component: TestHistoryPage },
   { path: routes.testLeaderboard, component: TestLeaderboardPage },
   { path: routes.myClasses, component: MyClassesPage },

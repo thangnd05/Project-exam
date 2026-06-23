@@ -9,6 +9,7 @@ const routes = {
   // 🧩 Test / Exam
   testStart: '/tests/:testId/start',
   testResult: '/tests/result/:userTestId',
+  testReview: '/tests/result/:userTestId/review',
   classChapterPage: '/class/:classId/chapters',
 
   createTestFromBank: '/admin/create-test-from-bank',

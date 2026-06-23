@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState, useMemo } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import axios from '../../../../../api/axiosClient';
 import { getUserTestMeta } from '../../../../../api/userTestApi';
-import { getResultByUserTest, getAnswersByUserTest } from '../../../../../api/userAnswerApi';
-import { getUserTestInfo, getAdminTestById } from '../../../../../api/testApi';
+import { getResultByUserTest } from '../../../../../api/userAnswerApi';
+import { getUserTestInfo } from '../../../../../api/testApi';
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
 import {
@@ -38,16 +37,12 @@ const TestResultPage = () => {
 
   const [result, setResult] = useState(null);
   const [testId, setTestId] = useState(null);
-  const [test, setTest] = useState(null);
-  const [userAnswers, setUserAnswers] = useState([]);
 
   const [enhanced, setEnhanced] = useState(null);
 
-  const [showDetail, setShowDetail] = useState(false);
   const [canReview, setCanReview] = useState(false);
 
   const [loading, setLoading] = useState(true);
-  const [detailLoading, setDetailLoading] = useState(false);
 
   const [error, setError] = useState("");
 
@@ -61,13 +56,6 @@ const TestResultPage = () => {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  const getFullMediaUrl = (url) => {
-    if (!url) return null;
-    const cleanUrl = url.trim();
-    if (cleanUrl.startsWith('http')) return cleanUrl;
-    const backendUrl = axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '';
-    return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
-  };
   // ================================
   //  LOAD RESULT + CHECK REVIEW TIME
   // ================================
@@ -117,161 +105,14 @@ const TestResultPage = () => {
   }, [userTestId, authLoading, isGuest, guestCfg]);
 
   // ================================
-  //  SHOW DETAIL QUESTIONS
+  //  XEM ĐÁP ÁN & GIẢI THÍCH (trang riêng)
   // ================================
-  const handleShowDetail = async () => {
+  const handleShowDetail = () => {
     if (!canReview) {
       alert("Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.");
       return;
     }
-
-    if (showDetail) {
-      setShowDetail(false);
-      return;
-    }
-
-    if (test) {
-      setShowDetail(true);
-      return;
-    }
-
-    setDetailLoading(true);
-
-    try {
-      const metaData = await getUserTestMeta(userTestId, isGuest, guestCfg);
-      const testId = metaData.testId;
-
-      const [testData, answersData] = await Promise.all([
-        getAdminTestById(testId),
-        getAnswersByUserTest(userTestId, isGuest, guestCfg),
-      ]);
-
-      setTest(testData);
-      setUserAnswers(answersData);
-
-      setShowDetail(true);
-    } catch (err) {
-      console.error(" Lỗi tải chi tiết:", err);
-      alert("Không thể tải chi tiết câu hỏi. Vui lòng thử lại.");
-    } finally {
-      setDetailLoading(false);
-    }
-  };
-
-  const hasPassageImage = (passage, fallbackObj) => {
-    const mediaList =
-      passage?.passageMediaList ??
-      passage?.passageMedias ??
-      passage?.mediaList ??
-      passage?.passage_media ??
-      [];
-    if (
-      Array.isArray(mediaList) &&
-      mediaList.some(
-        (m) => (m.mediaType ?? m.media_type ?? "").toUpperCase() === "IMAGE"
-      )
-    )
-      return true;
-    const singleUrl =
-      passage?.mediaUrl ??
-      passage?.media_url ??
-      fallbackObj?.mediaUrl ??
-      fallbackObj?.media_url;
-    const pType =
-      passage?.passageType ?? passage?.passage_type ?? fallbackObj?.passageType;
-    return !!(singleUrl && (pType === "READING" || pType === "reading"));
-  };
-
-  const renderPassage = (passage, fallbackObj) => {
-    const content =
-      passage?.content ??
-      passage?.passage_content ??
-      fallbackObj?.content ??
-      fallbackObj?.passage_content;
-    const translation =
-      passage?.contentTranslation ??
-      passage?.content_translation ??
-      fallbackObj?.contentTranslation ??
-      fallbackObj?.content_translation;
-    const pType = passage?.passageType ?? passage?.passage_type ?? "READING";
-
-    const mediaList =
-      passage?.passageMediaList ??
-      passage?.passageMedias ??
-      passage?.mediaList ??
-      passage?.passage_media ??
-      [];
-    const hasMediaList = Array.isArray(mediaList) && mediaList.length > 0;
-
-    const singleMediaUrl =
-      passage?.mediaUrl ??
-      passage?.media_url ??
-      fallbackObj?.mediaUrl ??
-      fallbackObj?.media_url ??
-      fallbackObj?.audioUrl ??
-      fallbackObj?.audio_url ??
-      fallbackObj?.passageMediaUrl;
-
-    const hasContent = !!content;
-    const hasAnyMedia = hasMediaList || !!singleMediaUrl;
-    if (!hasContent && !hasAnyMedia) return null;
-
-    return (
-      <div className={cx("passage-box")}>
-        {hasMediaList &&
-          mediaList.map((m, idx) => {
-            const url = m.mediaUrl ?? m.media_url;
-            if (!url) return null;
-            const type = (m.mediaType ?? m.media_type ?? "").toUpperCase();
-            if (type === "AUDIO") {
-              return (
-                <div key={idx} className="mb-3">
-                  <audio
-                    src={getFullMediaUrl(url)}
-                    className={cx("audio-player")}
-                    controls
-                  />
-                </div>
-              );
-            }
-            if (type === "IMAGE") {
-              return (
-                <div key={idx} className="mb-3 text-center">
-                  <img
-                    src={getFullMediaUrl(url)}
-                    alt={`Passage ${idx + 1}`}
-                    className={cx("passage-image")}
-                  />
-                </div>
-              );
-            }
-            return null;
-          })}
-        {!hasMediaList &&
-          singleMediaUrl &&
-          (pType === "LISTENING" || pType === "listening") && (
-            <div className="mb-4">
-              <audio
-                controls
-                src={getFullMediaUrl(singleMediaUrl)}
-                className={cx("audio-player")}
-              />
-            </div>
-          )}
-        {content && <div className={cx("passage-content")}>{content}</div>}
-        {translation && (
-          <details style={{ marginTop: 8 }}>
-            <summary style={{ cursor: "pointer", fontWeight: 600 }}>Bản dịch</summary>
-            <div
-              className={cx("passage-content")}
-              style={{ whiteSpace: "pre-wrap", marginTop: 6 }}
-            >
-              {translation}
-            </div>
-          </details>
-        )}
-      </div>
-    );
+    navigate(`/tests/result/${userTestId}/review`);
   };
 
   // ================================
@@ -383,17 +224,9 @@ const TestResultPage = () => {
                 <button
                   className={cx("btn-detail", { "is-locked": !canReview })}
                   onClick={handleShowDetail}
-                  disabled={detailLoading}
                 >
-                  {detailLoading ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : !canReview ? (
-                    <IoLockClosedOutline />
-                  ) : (
-                    <IoStatsChartOutline />
-                  )}
-
-                  {showDetail ? "Ẩn chi tiết" : "Xem đáp án & giải thích"}
+                  {!canReview ? <IoLockClosedOutline /> : <IoStatsChartOutline />}
+                  Xem đáp án & giải thích
                 </button>
 
                 <button className={cx("btn-home")} onClick={() => navigate("/")}>
@@ -451,166 +284,9 @@ const TestResultPage = () => {
           )}
 
         </div>
-
-        {/* ================= DETAIL SECTION ================= */}
-        {showDetail && test && (
-          <div className={cx("detail-section")}>
-            <h2 className={cx("section-title")}>Chi tiết bài làm</h2>
-
-            {test.parts?.map((part, i) => (
-              <div key={part.testPartId} className={cx("test-part")}>
-                <h3 className={cx("part-title")}>Phần {i + 1}</h3>
-
-                <div className={cx("question-groups-list")}>
-                  {part.questionGroups?.map((group, groupIndex) => {
-                    const firstQ = group.questions?.[0];
-                    const passageHasImage = hasPassageImage(group.passage, firstQ);
-
-                    return (
-                      <div
-                        key={groupIndex}
-                        className={cx("question-group-wrapper", {
-                          "split-layout": passageHasImage,
-                        })}
-                      >
-                        {passageHasImage ? (
-                          <div className={cx("split-container")}>
-                            <div className={cx("passage-column")}>
-                              {renderPassage(group.passage, firstQ)}
-                            </div>
-                            <div className={cx("question-column")}>
-                              {group.questions?.map((q) => {
-                                const userAnswer = userAnswers.find(
-                                  (ua) =>
-                                    String(ua.questionId) === String(q.questionId)
-                                );
-                                return (
-                                  <QuestionResult
-                                    key={q.questionId}
-                                    question={q}
-                                    userAnswer={userAnswer}
-                                    canReview={canReview}
-                                  />
-                                );
-                              })}
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            {renderPassage(group.passage, firstQ)}
-                            {group.questions?.map((q) => {
-                              const userAnswer = userAnswers.find(
-                                (ua) =>
-                                  String(ua.questionId) === String(q.questionId)
-                              );
-                              return (
-                                <QuestionResult
-                                  key={q.questionId}
-                                  question={q}
-                                  userAnswer={userAnswer}
-                                  canReview={canReview}
-                                />
-                              );
-                            })}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </Container>
     </div>
   );
 };
-
-// =============================
-// QUESTION COMPONENT
-// =============================
-function QuestionResult({ question, userAnswer, canReview }) {
-  const correctAnswer = question.answers?.find((a) => a.isCorrect);
-
-  let isUserCorrect = false;
-
-  if (question.questionType === "MCQ" && userAnswer && correctAnswer) {
-    isUserCorrect =
-      userAnswer.selectedAnswerId === correctAnswer.answerId;
-  }
-
-  let resultClass = "unanswered";
-  if (userAnswer) {
-    resultClass = isUserCorrect ? "correct" : "incorrect";
-  }
-
-  return (
-    <div className={cx("question-item", resultClass)}>
-      <p>
-        <strong>Câu hỏi:</strong> {question.questionText}
-      </p>
-
-      {/* MCQ */}
-      {question.questionType === "MCQ" && (
-        <div className={cx("answers-options")}>
-          {question.answers?.map((a) => {
-            const isUserSelected =
-              userAnswer?.selectedAnswerId === a.answerId;
-
-            return (
-              <div
-                key={a.answerId}
-                className={cx("answer-option", {
-                  "is-correct": canReview && a.isCorrect,
-                  "is-incorrect-choice":
-                    isUserSelected && !a.isCorrect,
-                  "is-user-choice": isUserSelected,
-                })}
-              >
-                {a.answerText?.trim()
-                  ? `${a.answerLabel}. ${a.answerText}`
-                  : a.answerLabel}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Fill blank */}
-      {question.questionType === "FILL_BLANK" && (
-        <div>
-          <p>
-            <strong>Bạn trả lời:</strong>{" "}
-            {userAnswer?.answerText || "(Chưa trả lời)"}
-          </p>
-
-          {canReview && correctAnswer && (
-            <p>
-              <strong>Đáp án đúng:</strong> {correctAnswer.answerText}
-            </p>
-          )}
-        </div>
-      )}
-
-      {canReview && question.explanation?.trim() && (
-        <div
-          style={{
-            marginTop: 12,
-            padding: "10px 14px",
-            borderRadius: 8,
-            border: "1px solid #fbbf24",
-            background: "#fffbeb",
-            color: "#92400e",
-            whiteSpace: "pre-wrap",
-            lineHeight: 1.5,
-          }}
-        >
-          <strong>Giải thích:</strong> {question.explanation}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default TestResultPage;
