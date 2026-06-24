@@ -19,6 +19,11 @@ public class PassageMedia {
 
     private String mediaUrl;
 
+    // Nội dung text của đoạn (chỉ dùng khi mediaType = TEXT — passage nhiều đoạn văn).
+    // mediaUrl để null trong trường hợp này. Dùng TEXT vì đoạn đọc hiểu dài hơn 255 ký tự.
+    @Column(columnDefinition = "TEXT")
+    private String content;
+
     @Enumerated(EnumType.STRING)
     private MediaType mediaType;
 
@@ -26,6 +31,7 @@ public class PassageMedia {
         IMAGE,
         AUDIO,
         DOCUMENT,
+        TEXT,
     }
 }
 

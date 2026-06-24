@@ -796,7 +796,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
     /** Batch-load audio/ảnh của các passage, gom theo passageId (rỗng nếu không có). */
     private Map<String, List<PassageMediaResponse>> loadPassageMediaByPassageId(Set<String> passageIds) {
         if (passageIds == null || passageIds.isEmpty()) return Collections.emptyMap();
-        return passageMediaRepository.findByPassageIdIn(passageIds).stream()
+        return passageMediaRepository.findByPassageIdInOrderByIdAsc(passageIds).stream()
                 .map(passageMediaMapper::toResponse)
                 .collect(Collectors.groupingBy(PassageMediaResponse::getPassageId));
     }

@@ -13,6 +13,7 @@ public class PassageMediaMapper {
                 .passageId(media.getPassageId())
                 .mediaUrl(media.getMediaUrl())
                 .mediaType(media.getMediaType().name())
+                .content(media.getContent())
                 .build();
     }
 }

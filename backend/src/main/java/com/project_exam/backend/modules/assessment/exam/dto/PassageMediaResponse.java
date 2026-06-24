@@ -16,4 +16,7 @@ public class PassageMediaResponse {
     private String mediaUrl;
 
     private String mediaType;
+
+    /** Nội dung text — chỉ có giá trị khi mediaType = TEXT (đoạn văn bổ sung của passage). */
+    private String content;
 }

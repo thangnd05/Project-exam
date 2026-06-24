@@ -229,6 +229,9 @@ export const useTestSubmission = ({
                             passageType: group.passage.passageType,
                             content: group.passage.content || '',
                             contentTranslation: group.passage.contentTranslation?.trim() || null,
+                            extraContents: (group.passage.extraContents || [])
+                                .map((t) => t?.trim())
+                                .filter(Boolean),
                         },
                         questions: group.questions.map((q) => ({
                             questionNumber: ++passageQuestionOrder,

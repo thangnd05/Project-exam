@@ -136,6 +136,14 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE
     );
 
+    // "Đoạn 2:", "Đoạn 3.", "Văn bản 4 -" — marker phân tách đoạn văn CON trong cùng 1 passage
+    // (passage nhiều đoạn). Bắt buộc có số + dấu phân tách để tránh nuốt nhầm câu văn bắt đầu
+    // bằng "Đoạn". Đoạn đầu -> passage.content, các đoạn sau -> passage.extraContents.
+    private static final Pattern PASSAGE_SEGMENT_PATTERN = Pattern.compile(
+            "^\\s*(?:Đoạn|Văn\\s*bản)\\s+(\\d+)\\s*[:\\.\\-]\\s*(.*)$",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+    );
+
     // "Giải thích: ...", "Lời giải: ...", "Hướng dẫn: ...", "Explanation: ..."
     // Marker phân tách (: . -) là optional để chấp nhận "Giải thích Paris là ...".
     // UNICODE_CASE để case-insensitive hoạt động đúng với chữ Việt có dấu.
@@ -468,6 +476,10 @@ public class QuestionDocumentImportService {
         default void setPassageTranslation(String translation) {
         }
 
+        /** Set các đoạn văn bổ sung (passage nhiều đoạn) cho passage hiện tại. */
+        default void setPassageExtraContents(List<String> extraContents) {
+        }
+
         /** True nếu collector hỗ trợ passage (để LineProcessor biết có nên match PASSAGE_START_PATTERN không). */
         default boolean supportsPassage() {
             return false;
@@ -486,6 +498,9 @@ public class QuestionDocumentImportService {
         private final StringBuilder pendingText = new StringBuilder();
         // Buffer phần bản dịch của passage (các dòng sau marker "Dịch:" trong passage header).
         private final StringBuilder pendingTranslation = new StringBuilder();
+        // Các đoạn văn đã "chốt" trước đoạn đang gom (pendingText), do gặp marker "Đoạn N:".
+        // Đoạn đầu tiên -> content, các đoạn sau -> extraContents.
+        private final List<String> passageSegments = new ArrayList<>();
         private boolean inPassageHeader = false;
         // True khi đang ở trong passage header VÀ đã gặp marker "Dịch:" -> các dòng tiếp
         // theo gom vào pendingTranslation thay vì pendingText.
@@ -524,6 +539,7 @@ public class QuestionDocumentImportService {
                     collector.startPassage();
                     pendingText.setLength(0);
                     pendingTranslation.setLength(0);
+                    passageSegments.clear();
                     inPassageTranslation = false;
                     String extraText = pm.group(2);
                     if (extraText != null && !extraText.trim().isEmpty()) {
@@ -541,9 +557,8 @@ public class QuestionDocumentImportService {
             if (qm.matches()) {
                 inExplanation = false;
                 if (inPassageHeader) {
-                    // Đóng phần passage header — pendingText là content, pendingTranslation là bản dịch.
-                    collector.setPassageContent(pendingText.toString().trim());
-                    collector.setPassageTranslation(pendingTranslation.toString().trim());
+                    // Đóng phần passage header — chốt các đoạn văn + bản dịch.
+                    finalizePassageSegments();
                     inPassageHeader = false;
                     inPassageTranslation = false;
                 } else {
@@ -567,6 +582,24 @@ public class QuestionDocumentImportService {
                             pendingTranslation.append("\n");
                         }
                         pendingTranslation.append(tail);
+                    }
+                    return;
+                }
+            }
+
+            // (1b-2) Marker "Đoạn N:" trong passage header (TRƯỚC "Dịch:") -> chốt đoạn đang
+            //        gom, mở đoạn mới. Cho phép passage nhiều đoạn văn (double/triple passage).
+            if (inPassageHeader && !inPassageTranslation) {
+                Matcher sm = PASSAGE_SEGMENT_PATTERN.matcher(text);
+                if (sm.matches()) {
+                    String seg = pendingText.toString().trim();
+                    if (!seg.isEmpty()) {
+                        passageSegments.add(seg);
+                    }
+                    pendingText.setLength(0);
+                    String tail = sm.group(2) == null ? "" : sm.group(2).trim();
+                    if (!tail.isEmpty()) {
+                        pendingText.append(tail);
                     }
                     return;
                 }
@@ -634,6 +667,24 @@ public class QuestionDocumentImportService {
 
             // (5) Dòng tiếp nối thường (không phải explanation)
             handleContinuationLine(text);
+        }
+
+        /**
+         * Chốt passage header: gộp các đoạn đã thu (passageSegments + pendingText hiện tại),
+         * đoạn đầu -> content, các đoạn sau -> extraContents, cộng bản dịch.
+         */
+        private void finalizePassageSegments() {
+            List<String> segments = new ArrayList<>(passageSegments);
+            String last = pendingText.toString().trim();
+            if (!last.isEmpty()) {
+                segments.add(last);
+            }
+            collector.setPassageContent(segments.isEmpty() ? "" : segments.get(0));
+            if (segments.size() > 1) {
+                collector.setPassageExtraContents(new ArrayList<>(segments.subList(1, segments.size())));
+            }
+            collector.setPassageTranslation(pendingTranslation.toString().trim());
+            passageSegments.clear();
         }
 
         private void handleOptionLine(String rawLabel, ParsedOption parsedOption, boolean isStyled) {
@@ -782,6 +833,17 @@ public class QuestionDocumentImportService {
                 currentGroup = createEmptyGroup();
             }
             currentGroup.getPassage().setContentTranslation(translation);
+        }
+
+        @Override
+        public void setPassageExtraContents(List<String> extraContents) {
+            if (extraContents == null || extraContents.isEmpty()) {
+                return;
+            }
+            if (currentGroup == null) {
+                currentGroup = createEmptyGroup();
+            }
+            currentGroup.getPassage().setExtraContents(extraContents);
         }
 
         @Override

@@ -84,6 +84,9 @@ const CreateTestFormBody = ({
     updatePassage,
     addGroupMediaFiles,
     removeGroupMediaFile,
+    addGroupPassageText,
+    updateGroupPassageText,
+    removeGroupPassageText,
     addGroupQuestion,
     removeGroupQuestion,
     updateGroupQuestion,
@@ -312,6 +315,7 @@ const CreateTestFormBody = ({
           contentTranslation: group.passage?.contentTranslation || '',
           passageType: group.passage?.passageType || 'READING',
           mediaFiles: [],
+          extraContents: Array.isArray(group.passage?.extraContents) ? group.passage.extraContents : [],
           inputMode: 'TEXT',
         },
         questions: normalizeParsedQuestions(group.questions),
@@ -550,6 +554,7 @@ const CreateTestFormBody = ({
               />
               <small className="text-muted d-block mt-2">
                 File của bạn cần có dòng phân cách Passage (ví dụ: "Passage 1:", "Bài đọc 2:"). Các câu hỏi bên dưới sẽ tự động được xếp vào đúng Passage.
+                Nếu 1 passage có NHIỀU đoạn văn, ngăn các đoạn bằng dòng "Đoạn 2:", "Đoạn 3:"… (đoạn đầu không cần đánh dấu); đặt trước dòng "Dịch:" nếu có.
               </small>
             </div>
           </div>
@@ -574,6 +579,37 @@ const CreateTestFormBody = ({
                     onChange={(e) => updatePassage(gIndex, 'content', e.target.value)}
                     placeholder="Nhập nội dung văn bản nếu có..."
                   />
+                </div>
+                {(group.passage.extraContents || []).map((text, tIdx) => (
+                  <div className={cx('formGroupModern')} key={tIdx}>
+                    <label className="mb-2 d-flex justify-content-between align-items-center fw-bold">
+                      <span>Đoạn văn bổ sung {tIdx + 2}</span>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger p-0 px-1"
+                        onClick={() => removeGroupPassageText(gIndex, tIdx)}
+                        aria-label={`Xóa đoạn văn bổ sung ${tIdx + 2}`}
+                      >
+                        <Trash size={14} />
+                      </button>
+                    </label>
+                    <textarea
+                      className={cx('inputModern')}
+                      rows={3}
+                      value={text}
+                      onChange={(e) => updateGroupPassageText(gIndex, tIdx, e.target.value)}
+                      placeholder={`Nội dung đoạn văn thứ ${tIdx + 2}...`}
+                    />
+                  </div>
+                ))}
+                <div className="mb-3">
+                  <button
+                    type="button"
+                    className={cx('btnSecondary')}
+                    onClick={() => addGroupPassageText(gIndex)}
+                  >
+                    <PlusCircle size={16} className="me-1" /> Thêm đoạn văn
+                  </button>
                 </div>
                 <div className={cx('formGroupModern')}>
                   <label className="mb-2 d-block fw-bold">Bản dịch Passage (tùy chọn)</label>

@@ -171,6 +171,20 @@ const TestReviewPage = () => {
     return Boolean(content || singleUrl);
   };
 
+  // Tách text passage theo dòng -> mỗi đoạn là 1 <p> để có khoảng cách giữa các đoạn
+  // (parser import nối các đoạn bằng "\n" đơn nên nếu không tách sẽ nhìn dính 1 khối).
+  const renderPassageText = (text, key) => (
+    <div key={key} className={cx("passage-content")}>
+      {String(text)
+        .split(/\n+/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((para, i) => (
+          <p key={i} className={cx("passage-paragraph")}>{para}</p>
+        ))}
+    </div>
+  );
+
   const renderPassage = (passage, fallbackObj) => {
     const content =
       passage?.content ??
@@ -213,12 +227,19 @@ const TestReviewPage = () => {
 
     return (
       <div className={cx("passage-box")}>
-        {/* Audio: nghe lại đoạn hội thoại */}
+        {/* Render theo ĐÚNG THỨ TỰ thêm: đoạn chính (content) trước, rồi từng item
+            trong passage_media (text / ảnh / audio) theo thứ tự id. */}
+        {content && renderPassageText(content, "main")}
+
         {hasList &&
           mediaList.map((m, idx) => {
+            const type = (m.mediaType ?? m.media_type ?? "").toUpperCase();
+            if (type === "TEXT") {
+              const t = m.content ?? m.content_text;
+              return t ? renderPassageText(t, `media-${idx}`) : null;
+            }
             const url = m.mediaUrl ?? m.media_url;
             if (!url) return null;
-            const type = (m.mediaType ?? m.media_type ?? "").toUpperCase();
             if (type === "AUDIO") {
               return (
                 <div key={idx} className="mb-3">
@@ -227,6 +248,17 @@ const TestReviewPage = () => {
                     <span>NGHE {audioCount > 1 ? `(${idx + 1})` : "ĐOẠN HỘI THOẠI"}</span>
                   </div>
                   <audio controls src={getFullMediaUrl(url)} className={cx("audio-player")} />
+                </div>
+              );
+            }
+            if (type === "IMAGE") {
+              return (
+                <div key={idx} className={cx("passage-image-box")}>
+                  <img
+                    src={getFullMediaUrl(url)}
+                    alt={`Passage ${idx + 1}`}
+                    className={cx("passage-image")}
+                  />
                 </div>
               );
             }
@@ -243,28 +275,6 @@ const TestReviewPage = () => {
               <audio controls src={getFullMediaUrl(singleMediaUrl)} className={cx("audio-player")} />
             </div>
           )}
-
-        {/* Ảnh minh hoạ */}
-        {hasList &&
-          mediaList.map((m, idx) => {
-            const url = m.mediaUrl ?? m.media_url;
-            if (!url) return null;
-            const type = (m.mediaType ?? m.media_type ?? "").toUpperCase();
-            if (type === "IMAGE") {
-              return (
-                <img
-                  key={`img-${idx}`}
-                  src={getFullMediaUrl(url)}
-                  alt={`Passage ${idx + 1}`}
-                  className={cx("passage-image")}
-                />
-              );
-            }
-            return null;
-          })}
-
-        {/* Script đoạn văn / hội thoại */}
-        {content && <div className={cx("passage-content")}>{content}</div>}
 
         {/* Bản dịch (thu gọn) */}
         {translation && (

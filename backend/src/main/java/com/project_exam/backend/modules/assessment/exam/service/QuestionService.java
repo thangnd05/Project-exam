@@ -165,7 +165,7 @@ public class QuestionService {
         }
 
         //  TỐI ƯU: Chỉ 1 câu Query duy nhất cho tất cả Passage
-        List<PassageMedia> allMedia = passageMediaRepository.findByPassageIdIn(passageIds);
+        List<PassageMedia> allMedia = passageMediaRepository.findByPassageIdInOrderByIdAsc(passageIds);
 
         // Dùng Stream API để nhóm (groupingBy) media theo passageId ngay trên RAM
         return allMedia.stream()
@@ -964,7 +964,7 @@ public class QuestionService {
         if (passageId == null) {
             return List.of();
         }
-        return passageMediaRepository.findByPassageId(passageId).stream()
+        return passageMediaRepository.findByPassageIdOrderByIdAsc(passageId).stream()
                 .map(passageMediaMapper::toResponse)
                 .toList();
     }
@@ -1222,6 +1222,19 @@ public class QuestionService {
             passage.setPassageType(pReq.getPassageType());
 
             passage = passageRepository.save(passage);
+
+            // 🔹 CÁC ĐOẠN TEXT BỔ SUNG (passage nhiều đoạn) -> passage_media type=TEXT.
+            // Lưu trước media file để UUIDv7 nhỏ hơn -> hiển thị trước ảnh/audio.
+            if (pReq.getExtraContents() != null) {
+                for (String extra : pReq.getExtraContents()) {
+                    if (extra == null || extra.trim().isEmpty()) continue;
+                    PassageMedia textMedia = new PassageMedia();
+                    textMedia.setPassageId(passage.getPassageId());
+                    textMedia.setContent(extra);
+                    textMedia.setMediaType(PassageMedia.MediaType.TEXT);
+                    passageMediaRepository.save(textMedia);
+                }
+            }
 
             // 🔹 MULTI MEDIA
             if (files != null) {

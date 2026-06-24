@@ -160,11 +160,44 @@
     margin-bottom: 16px;
   }
 
+  .passage-image-box {
+    padding: 10px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .passage-image {
+      margin-bottom: 0;
+    }
+  }
+
   .passage-content {
-    font-size: 1.6rem;
-    line-height: 1.8;
+    font-size: 1.4rem;
+    line-height: 1.5;
     white-space: pre-wrap;
-    color: #334155;
+    color: #111827;
+    margin-bottom: 16px;
+    padding: 16px 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .passage-paragraph {
+      margin: 0 0 0.9rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 
   .passage-divider {

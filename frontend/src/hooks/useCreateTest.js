@@ -37,6 +37,7 @@ const createInitialGroup = () => ({
     contentTranslation: '',
     passageType: 'READING',
     mediaFiles: [],
+    extraContents: [], // các đoạn text bổ sung (passage nhiều đoạn)
     inputMode: 'TEXT',
   },
   questions: [JSON.parse(JSON.stringify(emptyQuestion))],
@@ -271,6 +272,35 @@ export const useCreateTest = ({
     setGroups(newGroups);
   };
 
+  // Đoạn text bổ sung của passage (giống "thêm đáp án" cho câu hỏi)
+  const addGroupPassageText = (gIndex) => {
+    const newGroups = [...groups];
+    const current = newGroups[gIndex].passage.extraContents || [];
+    newGroups[gIndex].passage = {
+      ...newGroups[gIndex].passage,
+      extraContents: [...current, ''],
+    };
+    setGroups(newGroups);
+  };
+
+  const updateGroupPassageText = (gIndex, tIndex, value) => {
+    const newGroups = [...groups];
+    const current = [...(newGroups[gIndex].passage.extraContents || [])];
+    current[tIndex] = value;
+    newGroups[gIndex].passage = { ...newGroups[gIndex].passage, extraContents: current };
+    setGroups(newGroups);
+  };
+
+  const removeGroupPassageText = (gIndex, tIndex) => {
+    const newGroups = [...groups];
+    const current = newGroups[gIndex].passage.extraContents || [];
+    newGroups[gIndex].passage = {
+      ...newGroups[gIndex].passage,
+      extraContents: current.filter((_, i) => i !== tIndex),
+    };
+    setGroups(newGroups);
+  };
+
   const addGroupQuestion = (gIndex) => {
     const newGroups = [...groups];
     newGroups[gIndex].questions.push(JSON.parse(JSON.stringify(emptyQuestion)));
@@ -380,6 +410,9 @@ export const useCreateTest = ({
     updatePassage,
     addGroupMediaFiles,
     removeGroupMediaFile,
+    addGroupPassageText,
+    updateGroupPassageText,
+    removeGroupPassageText,
     addGroupQuestion,
     removeGroupQuestion,
     updateGroupQuestion,
