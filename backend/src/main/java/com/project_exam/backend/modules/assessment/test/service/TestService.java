@@ -89,6 +89,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -1152,58 +1153,46 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 .max(Integer::compareTo)
                 .orElse(0) + 1;
 
+        // Lấy TOÀN BỘ ứng viên cho part (KHÔNG limit ở DB) để có thể gom theo passage.
+        List<Question> candidates;
+        if (useAdminBank) {
+            Set<String> adminIds = getAdminUserIdSet();
+            candidates = adminIds.isEmpty()
+                    ? new ArrayList<>()
+                    : new ArrayList<>(questionRepository.findAdminBankByExamPart(examPartId, adminIds));
+        } else if (request.getClassId() != null && request.getChapterId() != null) {
+            candidates = new ArrayList<>(questionRepository.findByExamPartIdAndClassIdAndChapterId(
+                    examPartId, request.getClassId(), request.getChapterId()));
+        } else if (request.getClassId() != null) {
+            candidates = new ArrayList<>(questionRepository.findByExamPartIdAndClassId(
+                    examPartId, request.getClassId()));
+        } else {
+            candidates = new ArrayList<>(questionRepository.findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
+                    examPartId, currentUserId));
+        }
+
+        boolean sequential = Boolean.TRUE.equals(request.getIsSequential());
         List<Question> pool;
-        if (Boolean.TRUE.equals(request.getIsSequential())) {
+        if (sequential) {
             int fromIdx = (request.getFromIndex() != null && request.getFromIndex() > 0) ? request.getFromIndex() : 1;
             int toIdx = (request.getToIndex() != null && request.getToIndex() >= fromIdx) ? request.getToIndex() : fromIdx;
             int seqLimit = toIdx - fromIdx + 1;
             int seqOffset = fromIdx - 1;
-
-            List<Question> allQuestions;
-            if (useAdminBank) {
-                Set<String> adminIds = getAdminUserIdSet();
-                allQuestions = adminIds.isEmpty()
-                        ? new ArrayList<>()
-                        : questionRepository.findAdminBankByExamPart(examPartId, adminIds);
-            } else if (request.getClassId() != null && request.getChapterId() != null) {
-                allQuestions = questionRepository.findByExamPartIdAndClassIdAndChapterId(
-                        examPartId, request.getClassId(), request.getChapterId());
-            } else if (request.getClassId() != null) {
-                allQuestions = questionRepository.findByExamPartIdAndClassId(
-                        examPartId, request.getClassId());
-            } else {
-                allQuestions = questionRepository.findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
-                        examPartId, currentUserId);
-            }
-
-            int actualOffset = Math.min(seqOffset, allQuestions.size());
-            int actualLimit = Math.min(seqLimit, allQuestions.size() - actualOffset);
-            pool = allQuestions.subList(actualOffset, actualOffset + actualLimit);
+            int actualOffset = Math.min(seqOffset, candidates.size());
+            int actualLimit = Math.min(seqLimit, candidates.size() - actualOffset);
+            pool = candidates.subList(actualOffset, actualOffset + actualLimit);
         } else {
-            if (useAdminBank) {
-                Set<String> adminIds = getAdminUserIdSet();
-                List<Question> adminQuestions = adminIds.isEmpty()
-                        ? new ArrayList<>()
-                        : new ArrayList<>(questionRepository.findAdminBankByExamPart(examPartId, adminIds));
-                Collections.shuffle(adminQuestions);
-                pool = adminQuestions.size() > count ? adminQuestions.subList(0, count) : adminQuestions;
-            } else if (request.getClassId() != null && request.getChapterId() != null) {
-                pool = questionRepository.findRandomQuestionsByExamPartIdAndClassIdAndChapterId(
-                        examPartId, request.getClassId(), request.getChapterId(), Pageable.ofSize(count));
-            } else if (request.getClassId() != null) {
-                pool = questionRepository.findRandomQuestionsByExamPartIdAndClassId(
-                        examPartId, request.getClassId(), Pageable.ofSize(count));
-            } else {
-                pool = questionRepository.findRandomByExamPartAndCreatedByAndClassIdIsNullAndChapterIdIsNull(
-                        examPartId, currentUserId, count);
-            }
+            // RANDOM: gom câu theo passage rồi chọn TRỌN cụm (Part 6/7 mỗi passage 4 câu) để
+            // không bị lẻ; giữ thứ tự câu trong passage theo questionNumber.
+            pool = pickRandomQuestionsKeepingPassages(candidates, existingIds, count);
         }
 
-        List<String> toAdd = pool.stream()
+        // Sequential giữ hành vi cũ (cắt theo count); random KHÔNG cắt thêm để không vỡ cụm passage
+        // (pool đã được giới hạn ~count ở mức nguyên cụm).
+        Stream<String> idStream = pool.stream()
                 .map(Question::getQuestionId)
-                .filter(id -> !existingIds.contains(id))
-                .limit(count)
-                .toList();
+                .filter(id -> !existingIds.contains(id));
+        List<String> toAdd = sequential ? idStream.limit(count).toList() : idStream.toList();
 
         for (String questionId : toAdd) {
             Question question = questionRepository.findById(questionId)
@@ -1220,6 +1209,42 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         return AddRandomQuestionsResponse.builder()
                 .addedCount(toAdd.size())
                 .build();
+    }
+
+    /**
+     * Chọn ngẫu nhiên câu hỏi nhưng GIỮ TRỌN cụm passage.
+     *
+     * <p>Câu cùng {@code passageId} được gom thành một nhóm và luôn thêm nguyên nhóm (Part 6/7
+     * mỗi passage 4 câu) để passage không bị lẻ. Câu không thuộc passage coi như nhóm 1 phần tử.
+     * Trong mỗi passage, sắp theo {@code questionNumber} để giữ đúng thứ tự câu. Trộn ngẫu nhiên
+     * thứ tự các nhóm rồi thêm nguyên nhóm cho tới khi đạt {@code count} — có thể dôi ra ở nhóm
+     * cuối, KHÔNG bao giờ cắt giữa nhóm.</p>
+     */
+    private List<Question> pickRandomQuestionsKeepingPassages(
+            List<Question> candidates, Set<String> existingIds, int count) {
+        LinkedHashMap<String, List<Question>> passageGroups = new LinkedHashMap<>();
+        List<List<Question>> units = new ArrayList<>();
+        for (Question q : candidates) {
+            if (existingIds.contains(q.getQuestionId())) continue;
+            if (q.getPassageId() != null && !q.getPassageId().isBlank()) {
+                passageGroups.computeIfAbsent(q.getPassageId(), k -> new ArrayList<>()).add(q);
+            } else {
+                units.add(new ArrayList<>(List.of(q)));
+            }
+        }
+        for (List<Question> group : passageGroups.values()) {
+            group.sort(Comparator.comparingInt(
+                    q -> q.getQuestionNumber() == null ? Integer.MAX_VALUE : q.getQuestionNumber()));
+            units.add(group);
+        }
+        Collections.shuffle(units);
+
+        List<Question> result = new ArrayList<>();
+        for (List<Question> unit : units) {
+            if (result.size() >= count) break;
+            result.addAll(unit);
+        }
+        return result;
     }
 
 }
