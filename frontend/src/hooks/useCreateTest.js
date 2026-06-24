@@ -22,6 +22,7 @@ const emptyQuestion = {
   passageType: 'LISTENING',
   explanation: '',
   tagIds: [],
+  tagNames: [], // tên tag đọc từ file import (Word), resolve sang tagId ở BE
   answers: [
     { answerLabel: 'A', answerText: '', isCorrect: false },
     { answerLabel: 'B', answerText: '', isCorrect: false },

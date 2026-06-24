@@ -13,11 +13,13 @@ import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TagService {
@@ -158,6 +160,105 @@ public class TagService {
             qt.setTagId(tagId);
             questionTagRepository.save(qt);
         }
+    }
+
+    /**
+     * Resolve danh sách SPEC tag (đọc từ dòng "Tags:" trong file import) -> tagId,
+     * trong phạm vi 1 examType. Mỗi spec là 1 phần tử (đã tách theo ';' ở parser).
+     *
+     * <p>Cú pháp mỗi spec:</p>
+     * <ul>
+     *   <li>{@code "Cha > Con"} — chỉ rõ tag cha, khớp CHÍNH XÁC con thuộc cha đó.
+     *       Dùng khi tên con trùng ở nhiều cha (vd "danh tính người nói" có ở Part 3 lẫn Part 4).</li>
+     *   <li>{@code "Con"} — không ghi cha, thứ tự ưu tiên:
+     *     (1) con thuộc cha = Part đang import; (2) chính tag Part đó; (3) nếu tên chỉ có DUY NHẤT
+     *     1 tag thì lấy; (4) trùng nhiều cha mà không xác định được -> BỎ QUA (log warn).</li>
+     * </ul>
+     * Tên tag có thể chứa dấu phẩy (vd "Chủ đề, mục đích") — KHÔNG tách theo ','.
+     * CHỈ khớp tag CÓ SẴN, không tự tạo tag mới. Tên/cha không khớp -> bỏ qua (log warn).
+     */
+    public List<String> resolveTagIdsByNames(Collection<String> specs, String examTypeId, String partTagName) {
+        if (specs == null || specs.isEmpty() || examTypeId == null) {
+            return List.of();
+        }
+        List<Tag> all = tagRepository.findByExamTypeId(examTypeId);
+        Map<String, Tag> idToTag = new HashMap<>();
+        for (Tag t : all) idToTag.put(t.getTagId(), t);
+
+        // Tag root tương ứng Part đang import (vd "Part 3")
+        String partRootId = null;
+        if (partTagName != null && !partTagName.isBlank()) {
+            for (Tag t : all) {
+                boolean isRoot = t.getParentId() == null || t.getParentId().isBlank();
+                if (isRoot && equalsName(t, partTagName)) { partRootId = t.getTagId(); break; }
+            }
+        }
+
+        Map<String, List<Tag>> byName = new HashMap<>();
+        for (Tag t : all) {
+            if (t.getName() != null) {
+                byName.computeIfAbsent(t.getName().trim().toLowerCase(Locale.ROOT),
+                        k -> new ArrayList<>()).add(t);
+            }
+        }
+
+        List<String> ids = new ArrayList<>();
+        List<String> unmatched = new ArrayList<>();
+        List<String> ambiguous = new ArrayList<>();
+        for (String rawSpec : specs) {
+            if (rawSpec == null) continue;
+            String spec = rawSpec.trim();
+            if (spec.isEmpty()) continue;
+
+            // Tách "Cha > Con" (chỉ ở dấu '>' đầu tiên)
+            String parentName = null;
+            String childName = spec;
+            int gt = spec.indexOf('>');
+            if (gt >= 0) {
+                parentName = spec.substring(0, gt).trim();
+                childName = spec.substring(gt + 1).trim();
+            }
+            if (childName.isEmpty()) { unmatched.add(spec); continue; }
+
+            List<Tag> cands = byName.get(childName.toLowerCase(Locale.ROOT));
+            if (cands == null || cands.isEmpty()) { unmatched.add(spec); continue; }
+
+            Tag chosen = null;
+            if (parentName != null && !parentName.isEmpty()) {
+                // Khớp đúng con thuộc cha ghi rõ
+                final String pn = parentName;
+                for (Tag t : cands) {
+                    Tag p = (t.getParentId() == null) ? null : idToTag.get(t.getParentId());
+                    if (p != null && equalsName(p, pn)) { chosen = t; break; }
+                }
+                if (chosen == null) { unmatched.add(spec); continue; }
+            } else {
+                // Không ghi cha -> suy theo Part đang import
+                if (partRootId != null) {
+                    for (Tag t : cands) if (partRootId.equals(t.getParentId())) { chosen = t; break; }
+                    if (chosen == null) for (Tag t : cands) if (partRootId.equals(t.getTagId())) { chosen = t; break; }
+                }
+                if (chosen == null) {
+                    if (cands.size() == 1) chosen = cands.get(0);
+                    else { ambiguous.add(spec); continue; }
+                }
+            }
+            if (!ids.contains(chosen.getTagId())) ids.add(chosen.getTagId());
+        }
+        if (!unmatched.isEmpty()) {
+            log.warn("Import tags: bỏ qua {} spec không khớp tag có sẵn (examType={}): {}",
+                    unmatched.size(), examTypeId, unmatched);
+        }
+        if (!ambiguous.isEmpty()) {
+            log.warn("Import tags: bỏ qua {} tag trùng tên nhiều cha, chưa ghi 'Cha > Con' & không thuộc Part '{}': {}",
+                    ambiguous.size(), partTagName, ambiguous);
+        }
+        return ids;
+    }
+
+    private boolean equalsName(Tag t, String name) {
+        return t.getName() != null && name != null
+                && t.getName().trim().equalsIgnoreCase(name.trim());
     }
 
     // ==================== HELPERS ====================

@@ -130,26 +130,83 @@ const CreateTestFormBody = ({
     }
   };
 
+  // Resolve tên tag (spec "Cha > Con" hoặc "Con") -> tagId dựa trên availableTags (phẳng,
+  // {tagId, name, parentId}) để TagSelector tô sáng ngay trên màn preview. Mirror logic backend;
+  // backend vẫn resolve lại lúc lưu (trọng tài). Ưu tiên con thuộc đúng Part đang chọn.
+  const normTag = (s) => (s || '').trim().toLowerCase();
+  const resolveTagNamesToIds = (tagNames = []) => {
+    if (!tagNames.length || !availableTags.length) return [];
+    const byId = new Map(availableTags.map((t) => [t.tagId, t]));
+    const byName = new Map();
+    availableTags.forEach((t) => {
+      const k = normTag(t.name);
+      if (!byName.has(k)) byName.set(k, []);
+      byName.get(k).push(t);
+    });
+    const partName = examParts.find(
+      (p) => String(p.examPartId) === String(testInfo.examPartId),
+    )?.name || '';
+    const partRootId = availableTags.find(
+      (t) => (t.parentId == null || t.parentId === '' || !byId.has(t.parentId))
+        && normTag(t.name) === normTag(partName),
+    )?.tagId || null;
+
+    const ids = [];
+    tagNames.forEach((rawSpec) => {
+      const spec = (rawSpec || '').trim();
+      if (!spec) return;
+      let parentName = null;
+      let childName = spec;
+      const gt = spec.indexOf('>');
+      if (gt >= 0) {
+        parentName = spec.slice(0, gt).trim();
+        childName = spec.slice(gt + 1).trim();
+      }
+      const cands = byName.get(normTag(childName)) || [];
+      if (!cands.length) return;
+      let chosen = null;
+      if (parentName) {
+        chosen = cands.find((t) => {
+          const p = t.parentId ? byId.get(t.parentId) : null;
+          return p && normTag(p.name) === normTag(parentName);
+        });
+      } else if (partRootId) {
+        chosen = cands.find((t) => t.parentId === partRootId)
+          || cands.find((t) => t.tagId === partRootId);
+      }
+      if (!chosen && !parentName && cands.length === 1) chosen = cands[0];
+      if (chosen && !ids.includes(chosen.tagId)) ids.push(chosen.tagId);
+    });
+    return ids;
+  };
+
   const normalizeParsedQuestions = (parsedQuestions = []) => (
-    parsedQuestions.map((question) => ({
-      questionText: question.questionText || '',
-      questionType: question.questionType || 'MCQ',
-      mediaFiles: [],
-      mediaUrl: '',
-      passageType: 'LISTENING',
-      explanation: question.explanation || '',
-      answers: (question.answers && question.answers.length > 0)
-        ? question.answers.map((ans, idx) => ({
-          answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),
-          answerText: ans.answerText || "",
-          isCorrect: Boolean(ans.isCorrect),
-        }))
-        : ["A", "B", "C", "D"].map((label) => ({
-          answerLabel: label,
-          answerText: "",
-          isCorrect: false,
-        })),
-    }))
+    parsedQuestions.map((question) => {
+      const tagNames = question.tagNames || [];
+      const tagIds = [...(question.tagIds || []), ...resolveTagNamesToIds(tagNames)]
+        .filter((v, i, a) => a.indexOf(v) === i);
+      return {
+        questionText: question.questionText || '',
+        questionType: question.questionType || 'MCQ',
+        mediaFiles: [],
+        mediaUrl: '',
+        passageType: 'LISTENING',
+        explanation: question.explanation || '',
+        tagIds, // đã resolve để UI tô sáng
+        tagNames, // giữ tên tag parser đọc từ Word để submit (backend resolve lại)
+        answers: (question.answers && question.answers.length > 0)
+          ? question.answers.map((ans, idx) => ({
+            answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),
+            answerText: ans.answerText || "",
+            isCorrect: Boolean(ans.isCorrect),
+          }))
+          : ["A", "B", "C", "D"].map((label) => ({
+            answerLabel: label,
+            answerText: "",
+            isCorrect: false,
+          })),
+      };
+    })
   );
 
   const handlePreviewQuestionsFromDocument = async (fileInput = documentFile) => {

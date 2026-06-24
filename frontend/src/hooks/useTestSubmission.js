@@ -158,6 +158,7 @@ export const useTestSubmission = ({
                             collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                             explanation: q.explanation?.trim() || null,
                             tagIds: q.tagIds?.length > 0 ? q.tagIds : null,
+                            tagNames: q.tagNames?.length > 0 ? q.tagNames : null,
                             passage: (hasMedia || hasMediaUrl)
                                 ? { passageType, content: '', mediaUrl: q.mediaUrl?.trim() || null }
                                 : null,
@@ -191,6 +192,7 @@ export const useTestSubmission = ({
                         collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                         explanation: q.explanation?.trim() || null,
                         tagIds: q.tagIds?.length > 0 ? q.tagIds : null,
+                        tagNames: q.tagNames?.length > 0 ? q.tagNames : null,
                         answers: q.answers.map((a) => ({
                             answerLabel: a.answerLabel,
                             answerText: a.answerText,
@@ -235,6 +237,7 @@ export const useTestSubmission = ({
                             collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                             explanation: q.explanation?.trim() || null,
                             tagIds: q.tagIds?.length > 0 ? q.tagIds : null,
+                            tagNames: q.tagNames?.length > 0 ? q.tagNames : null,
                             answers: q.answers.map((a) => ({
                                 answerLabel: a.answerLabel,
                                 answerText: a.answerText,

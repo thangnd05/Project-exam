@@ -458,14 +458,41 @@ public class QuestionService {
             testQuestion.setDisplayOrder(nextDisplayOrder++);
             testQuestionRepository.save(testQuestion);
 
-            if (parsedQuestion.getTagIds() != null && !parsedQuestion.getTagIds().isEmpty()) {
-                tagService.syncQuestionTags(question.getQuestionId(), parsedQuestion.getTagIds());
-            }
+            attachImportTags(question.getQuestionId(), question.getExamPartId(), parsedQuestion.getTagIds(), parsedQuestion.getTagNames());
 
             responses.add(buildQuestionAdminResponse(question, null, savedAnswers));
         }
 
         return responses;
+    }
+
+    /**
+     * Gắn tag cho câu hỏi vừa import. Gộp tagIds (form đã chọn, nếu có) với các tên tag
+     * đọc từ dòng "Tags:" trong file (resolve sang tagId theo examType của part — chỉ khớp
+     * tag có sẵn, bỏ qua tên lạ). Chỉ sync khi danh sách cuối cùng khác rỗng.
+     */
+    private void attachImportTags(String questionId, String examPartId,
+                                  List<String> tagIds, List<String> tagNames) {
+        List<String> ids = new ArrayList<>();
+        if (tagIds != null) {
+            ids.addAll(tagIds);
+        }
+        if (tagNames != null && !tagNames.isEmpty()) {
+            ExamPart part = examPartRepository.findById(examPartId).orElse(null);
+            if (part != null) {
+                // Truyền tên Part (vd "Part 3") để resolution ưu tiên tag con đúng Part,
+                // tránh nhầm với tag con cùng tên ở Part khác.
+                ids.addAll(tagService.resolveTagIdsByNames(
+                        tagNames, part.getExamTypeId(), part.getName()));
+            }
+        }
+        List<String> distinct = ids.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        if (!distinct.isEmpty()) {
+            tagService.syncQuestionTags(questionId, distinct);
+        }
     }
 
     @Transactional
@@ -619,9 +646,7 @@ public class QuestionService {
             question = questionRepository.save(question);
 
             List<Answer> savedAnswers = saveAnswersForQuestion(question.getQuestionId(), qReq.getAnswers(), qReq.getQuestionType());
-            if (qReq.getTagIds() != null && !qReq.getTagIds().isEmpty()) {
-                tagService.syncQuestionTags(question.getQuestionId(), qReq.getTagIds());
-            }
+            attachImportTags(question.getQuestionId(), question.getExamPartId(), qReq.getTagIds(), qReq.getTagNames());
             responses.add(buildQuestionAdminResponse(question, passage, savedAnswers));
         }
         return responses;
@@ -741,9 +766,7 @@ public class QuestionService {
                     qReq.getQuestionType()
             );
 
-            if (qReq.getTagIds() != null && !qReq.getTagIds().isEmpty()) {
-                tagService.syncQuestionTags(question.getQuestionId(), qReq.getTagIds());
-            }
+            attachImportTags(question.getQuestionId(), question.getExamPartId(), qReq.getTagIds(), qReq.getTagNames());
 
             responses.add(
                     buildQuestionAdminResponse(question, null, savedAnswers)
@@ -866,9 +889,8 @@ public class QuestionService {
         tq.setDisplayOrder(testQuestionRepository.findMaxDisplayOrderByTestPartId(request.getTestPartId()) + 1);
         testQuestionRepository.save(tq);
 
-        if (request.getTagIds() != null && !request.getTagIds().isEmpty()) {
-            tagService.syncQuestionTags(question.getQuestionId(), request.getTagIds());
-        }
+        attachImportTags(question.getQuestionId(), question.getExamPartId(),
+                request.getTagIds(), request.getTagNames());
 
         return buildQuestionAdminResponse(question, savedPassage, savedAnswers);
     }
@@ -1268,9 +1290,7 @@ public class QuestionService {
                                 qReq.getQuestionType()
                         );
 
-                if (qReq.getTagIds() != null && !qReq.getTagIds().isEmpty()) {
-                    tagService.syncQuestionTags(question.getQuestionId(), qReq.getTagIds());
-                }
+                attachImportTags(question.getQuestionId(), question.getExamPartId(), qReq.getTagIds(), qReq.getTagNames());
 
                 allResponses.add(
                         buildQuestionAdminResponse(

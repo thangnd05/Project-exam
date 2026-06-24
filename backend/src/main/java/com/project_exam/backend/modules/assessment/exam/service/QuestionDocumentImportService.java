@@ -144,6 +144,14 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
+    // "Tags: Grammar, Tense", "Tag: ...", "Thẻ: ...", "Nhãn: ..."
+    // Marker (: hoặc -) BẮT BUỘC để tránh nuốt nhầm câu/giải thích bắt đầu bằng "Tag".
+    // Tên tag phân tách bằng dấu phẩy hoặc chấm phẩy.
+    private static final Pattern TAGS_START_PATTERN = Pattern.compile(
+            "^\\s*(?:Tags?|Thẻ|Nhãn)\\s*[:\\-]\\s*(.*)$",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+    );
+
     // "Dịch: ...", "Bản dịch: ...", "Dịch nghĩa: ...", "Translation: ..."
     // Trong phần header của passage, marker này chia đoạn thành 2 phần:
     // trước nó -> content (bản gốc), sau nó -> contentTranslation (bản dịch).
@@ -559,6 +567,24 @@ public class QuestionDocumentImportService {
                             pendingTranslation.append("\n");
                         }
                         pendingTranslation.append(tail);
+                    }
+                    return;
+                }
+            }
+
+            // (1c) Dòng "Tags: a, b, c" — gom tên tag cho câu hiện tại. Đặt TRƯỚC khối
+            //      explanation/option để không bị nuốt nhầm. Chỉ xử lý khi đã có câu.
+            if (currentQuestion != null && !inPassageHeader) {
+                Matcher tagm = TAGS_START_PATTERN.matcher(text);
+                if (tagm.matches()) {
+                    String body = tagm.group(1) == null ? "" : tagm.group(1).trim();
+                    // Tách nhiều tag bằng ';' (KHÔNG dùng ',' vì tên tag có thể chứa dấu phẩy,
+                    // vd "Chủ đề, mục đích"). Mỗi spec có thể là "Cha > Con" để chỉ rõ tag cha.
+                    for (String name : body.split(";")) {
+                        String n = name.trim();
+                        if (!n.isEmpty() && !currentQuestion.tagNames.contains(n)) {
+                            currentQuestion.tagNames.add(n);
+                        }
                     }
                     return;
                 }
@@ -1128,6 +1154,9 @@ public class QuestionDocumentImportService {
                 request.setExplanation(trimmed);
             }
         }
+        if (!q.tagNames.isEmpty()) {
+            request.setTagNames(new ArrayList<>(q.tagNames));
+        }
         return request;
     }
 
@@ -1179,6 +1208,7 @@ public class QuestionDocumentImportService {
         String explanation;
         final Map<String, String> options = new LinkedHashMap<>();
         final Set<String> correctLabels = new HashSet<>();
+        final List<String> tagNames = new ArrayList<>();
 
         ParsedQuestion(String number, String text) {
             this.questionNumber = number;
