@@ -185,6 +185,7 @@ function TestStartPage() {
               (answers || []).forEach((a) => {
                 answersMap[a.questionId] = {
                   selectedAnswerId: a.selectedAnswerId || null,
+                  selectedAnswerIds: a.selectedAnswerIds || null,
                   answerText: a.answerText || null,
                 };
               });
@@ -304,6 +305,7 @@ function TestStartPage() {
         userTestId,
         questionId: String(qid),
         selectedAnswerId: ans?.selectedAnswerId || null,
+        selectedAnswerIds: ans?.selectedAnswerIds || null,
         answerText: ans?.answerText || null,
       }));
       batchSaveAnswers(payload, isGuest, guestCfg).catch(() => { /* swallow */ });
@@ -325,6 +327,15 @@ function TestStartPage() {
 
 
   const handleAnswerChange = (questionId, type, value) => {
+    if (type === 'MSQ') {
+      // value = answerId vừa bấm → toggle trong danh sách đã chọn.
+      const current = userAnswers[questionId]?.selectedAnswerIds || [];
+      const next = current.includes(value)
+        ? current.filter((x) => x !== value)
+        : [...current, value];
+      setUserAnswers({ ...userAnswers, [questionId]: { selectedAnswerIds: next } });
+      return;
+    }
     const updatedAnswer =
       type === 'MCQ' ? { selectedAnswerId: value } : { answerText: value };
     setUserAnswers({ ...userAnswers, [questionId]: updatedAnswer });
@@ -338,6 +349,7 @@ function TestStartPage() {
         userTestId,
         questionId: String(qid),
         selectedAnswerId: ans.selectedAnswerId || null,
+        selectedAnswerIds: ans.selectedAnswerIds || null,
         answerText: ans.answerText || null,
       }));
       if (payload.length > 0)
@@ -583,6 +595,27 @@ function TestStartPage() {
                 </span>
               </div>
             ))}
+          </div>
+        )}
+
+        {q.questionType === 'MSQ' && (
+          <div className={cx('mcq-group')}>
+            <div className="text-muted mb-1" style={{ fontSize: '1.25rem' }}>Chọn tất cả đáp án đúng:</div>
+            {q.answers?.map((a) => {
+              const chosen = (userAnswers[q.questionId]?.selectedAnswerIds || []).includes(a.answerId);
+              return (
+                <div
+                  key={a.answerId}
+                  className={cx('mcq-option', { selected: chosen })}
+                  onClick={() => handleAnswerChange(q.questionId, 'MSQ', a.answerId)}
+                >
+                  <Form.Check type="checkbox" checked={chosen} readOnly />
+                  <span>
+                    {a.answerText?.trim() ? `${a.answerLabel}. ${a.answerText}` : a.answerLabel}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         )}
 

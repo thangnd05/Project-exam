@@ -76,17 +76,30 @@ function PlanStudyPage() {
     setResult(null);
   };
 
-  const handleSelect = (questionId, answerId) => {
-    setSelections((prev) => ({ ...prev, [questionId]: answerId }));
+  const handleSelect = (questionId, answerId, isMsq) => {
+    setSelections((prev) => {
+      if (isMsq) {
+        const cur = Array.isArray(prev[questionId]) ? prev[questionId] : [];
+        const next = cur.includes(answerId) ? cur.filter((x) => x !== answerId) : [...cur, answerId];
+        return { ...prev, [questionId]: next };
+      }
+      return { ...prev, [questionId]: answerId };
+    });
   };
 
   const handleSubmit = async () => {
     if (!session?.sessionId) return;
-    const answers = (session.questions || []).map((q) => ({
-      questionId: q.questionId,
-      selectedAnswerId: selections[q.questionId],
-    }));
-    const missing = answers.some((a) => !a.selectedAnswerId);
+    const answers = (session.questions || []).map((q) => {
+      const sel = selections[q.questionId];
+      if (q.questionType === 'MSQ') {
+        return { questionId: q.questionId, selectedAnswerIds: Array.isArray(sel) ? sel : [] };
+      }
+      return { questionId: q.questionId, selectedAnswerId: sel };
+    });
+    const missing = (session.questions || []).some((q) => {
+      const sel = selections[q.questionId];
+      return q.questionType === 'MSQ' ? !(Array.isArray(sel) && sel.length) : !sel;
+    });
     if (missing) {
       setError('Vui lòng chọn đáp án cho tất cả câu hỏi.');
       return;
@@ -213,7 +226,10 @@ function PlanStudyPage() {
           {showReview && result.reviewItems?.length > 0 && (
             <div className={cx('reviewSection')}>
               {result.reviewItems.map((item, idx) => {
-                const userSelected = item.selectedAnswerId;
+                const isMsq = item.questionType === 'MSQ';
+                const userSelectedIds = isMsq
+                  ? (item.selectedAnswerIds || [])
+                  : (item.selectedAnswerId ? [item.selectedAnswerId] : []);
                 return (
                   <div
                     key={item.questionId}
@@ -228,8 +244,11 @@ function PlanStudyPage() {
                     <div className={cx('reviewQuestionText')}>{item.questionText}</div>
                     <div className={cx('reviewAnswerList')}>
                       {(item.answers || []).map((a) => {
-                        const isCorrectAnswer = a.answerId === item.correctAnswerId;
-                        const isUserChoice = a.answerId === userSelected;
+                        // MSQ có nhiều đáp án đúng → ưu tiên cờ isCorrect của từng đáp án.
+                        const isCorrectAnswer = a.isCorrect != null
+                          ? a.isCorrect
+                          : a.answerId === item.correctAnswerId;
+                        const isUserChoice = userSelectedIds.includes(a.answerId);
                         return (
                           <div
                             key={a.answerId}
@@ -316,27 +335,35 @@ function PlanStudyPage() {
                 <div key={q.questionId} className={cx('questionCard')}>
                   <div className={cx('questionNo')}>Câu {idx + 1}</div>
                   <p className={cx('questionText')}>{q.questionText}</p>
+                  {q.questionType === 'MSQ' && (
+                    <div className="text-muted mb-1" style={{ fontSize: '1.3rem' }}>Chọn tất cả đáp án đúng:</div>
+                  )}
                   <div className={cx('answerList')}>
-                    {(q.answers || []).map((a) => (
-                      <label
-                        key={a.answerId}
-                        className={cx('answerOption', {
-                          active: selections[q.questionId] === a.answerId,
-                        })}
-                      >
-                        <input
-                          type="radio"
-                          name={`q-${q.questionId}`}
-                          checked={selections[q.questionId] === a.answerId}
-                          onChange={() => handleSelect(q.questionId, a.answerId)}
-                        />
-                        <span>
-                          {a.answerText?.trim()
-                            ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
-                            : a.answerLabel}
-                        </span>
-                      </label>
-                    ))}
+                    {(q.answers || []).map((a) => {
+                      const isMsq = q.questionType === 'MSQ';
+                      const sel = selections[q.questionId];
+                      const checked = isMsq
+                        ? Array.isArray(sel) && sel.includes(a.answerId)
+                        : sel === a.answerId;
+                      return (
+                        <label
+                          key={a.answerId}
+                          className={cx('answerOption', { active: checked })}
+                        >
+                          <input
+                            type={isMsq ? 'checkbox' : 'radio'}
+                            name={`q-${q.questionId}`}
+                            checked={checked}
+                            onChange={() => handleSelect(q.questionId, a.answerId, isMsq)}
+                          />
+                          <span>
+                            {a.answerText?.trim()
+                              ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
+                              : a.answerLabel}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 </div>
               ))}

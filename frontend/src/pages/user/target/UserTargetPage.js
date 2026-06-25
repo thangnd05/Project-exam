@@ -53,8 +53,39 @@ function UserTargetPage() {
   const percentToNum = (pct, total) => (total > 0 ? Math.round((pct * total) / 100) : 0);
   const numToPercent = (num, total) => (total > 0 ? Math.round((num / total) * 100) : 0);
 
+  // Loại kỳ thi đang chọn + phương thức chấm. AWS_SCALE = thang scaled 100–1000, không có skill.
+  const selectedExamType = examTypes.find((t) => String(t.examTypeId) === String(selectedExamTypeId));
+  const scoringMethod = (selectedExamType?.scoringMethod || 'DEFAULT').toUpperCase();
+  const isScaled = scoringMethod === 'AWS_SCALE';
+  const SCALE_MIN = 100; // điểm tối thiểu thang AWS
+  const SCALE_SPAN = 900; // 100..1000
+  const SCALE_MAX = SCALE_MIN + SCALE_SPAN;
+  const maxTargetScore = isScaled ? SCALE_MAX : 990;
+  // % cần đạt (chia đều) tương ứng với 1 điểm mục tiêu.
+  const evenPctForScore = (score) =>
+    isScaled
+      ? Math.max(0, Math.min(100, Math.round(((Number(score) - SCALE_MIN) / SCALE_SPAN) * 100)))
+      : Math.min(100, Math.round((Number(score) / 990) * 100));
+
   const estimateScore = (partsConfig, examTypeId) => {
     if (!examTypeId || !partsConfig || Object.keys(partsConfig).length === 0) return null;
+
+    // AWS / thang scaled không có skill → tính thẳng bằng công thức 100 + (đúng/tổng)*900.
+    if (isScaled) {
+      let totalCorrect = 0;
+      let totalQuestions = 0;
+      for (const [examPartId, pct] of Object.entries(partsConfig)) {
+        const part = examParts.find((p) => p.examPartId === examPartId);
+        const tot = part?.defaultNumQuestions || 0;
+        totalCorrect += percentToNum(pct, tot);
+        totalQuestions += tot;
+      }
+      const totalScore = totalQuestions > 0
+        ? Math.max(SCALE_MIN, Math.min(SCALE_MAX, SCALE_MIN + Math.round((totalCorrect / totalQuestions) * SCALE_SPAN)))
+        : SCALE_MIN;
+      return { totalScore, scaled: true, totalCorrect, totalQuestions, skillDetails: [] };
+    }
+
     const correctBySkill = {};
     for (const [examPartId, pct] of Object.entries(partsConfig)) {
       const part = examParts.find((p) => p.examPartId === examPartId);
@@ -149,7 +180,7 @@ function UserTargetPage() {
       }));
       return sortPartsByLookup(mapped, filteredParts);
     }
-    const evenPct = Math.min(100, Math.round((Number(targetScore) / 990) * 100));
+    const evenPct = evenPctForScore(targetScore);
     return filteredParts.map((p) => ({
       examPartId: p.examPartId,
       requiredPercentage: evenPct,
@@ -245,9 +276,11 @@ function UserTargetPage() {
           </span>
         </div>
         <div className={cx('scoreEstimateDetail')}>
-          {est.skillDetails
-            .map((s) => `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`)
-            .join(' | ')}
+          {est.scaled
+            ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX}, cần đạt ≥ ${targetScore})`
+            : est.skillDetails
+                .map((s) => `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`)
+                .join(' | ')}
         </div>
       </div>
     );
@@ -330,10 +363,10 @@ function UserTargetPage() {
                 <input
                   type="number"
                   className={classNames(planCx('select'), cx('scoreInput'))}
-                  placeholder="VD: 450"
+                  placeholder={isScaled ? 'VD: 700' : 'VD: 450'}
                   value={targetScore}
                   min={0}
-                  max={990}
+                  max={maxTargetScore}
                   onChange={(e) => {
                     setTargetScore(e.target.value);
                     setCustomParts({});
@@ -348,8 +381,7 @@ function UserTargetPage() {
                 )}
                 {targetScore && !matchedMilestone && (
                   <span className={cx('milestoneHint', 'custom')}>
-                    Không trùng mốc nào — chia đều{' '}
-                    {Math.min(100, Math.round((Number(targetScore) / 990) * 100))}% mỗi part
+                    Không trùng mốc nào — chia đều {evenPctForScore(targetScore)}% mỗi part
                   </span>
                 )}
               </div>
@@ -385,7 +417,7 @@ function UserTargetPage() {
                 <p className={cx('partSectionHint')}>
                   {matchedMilestone
                     ? 'Giá trị từ cấu hình admin. Sửa ô để tuỳ chỉnh.'
-                    : `Chia đều ${Math.min(100, Math.round((Number(targetScore) / 990) * 100))}%. Sửa ô để tuỳ chỉnh.`}
+                    : `Chia đều ${evenPctForScore(targetScore)}%. Sửa ô để tuỳ chỉnh.`}
                 </p>
 
                 {partRequirements.map((pr) => {

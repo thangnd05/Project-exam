@@ -30,6 +30,10 @@ public class LearningPlanSessionAnswer {
     @Column(name = "selected_answer_id")
     private String selectedAnswerId;
 
+    // MSQ: CSV các answer_id đã chọn (null với MCQ).
+    @Column(name = "selected_answer_ids", columnDefinition = "TEXT")
+    private String selectedAnswerIds;
+
     @Column(name = "is_correct", nullable = false)
     private Boolean isCorrect = false;
 }

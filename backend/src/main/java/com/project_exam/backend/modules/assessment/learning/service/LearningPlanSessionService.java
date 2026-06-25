@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.learning.service;
 import com.project_exam.backend.modules.assessment.exam.domain.Answer;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
+import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.exam.domain.RecoveryResource;
 import com.project_exam.backend.modules.assessment.exam.domain.Tag;
 import com.project_exam.backend.modules.assessment.exam.repository.AnswerRepository;
@@ -116,10 +117,10 @@ public class LearningPlanSessionService {
         List<String> questionIds = sessionQuestions.stream()
                 .map(LearningPlanSessionQuestion::getQuestionId)
                 .toList();
-        Map<String, Answer> correctByQuestion = answerRepository
+        Map<String, List<Answer>> correctByQuestion = answerRepository
                 .findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(questionIds))
                 .stream()
-                .collect(Collectors.toMap(Answer::getQuestionId, a -> a, (a, b) -> a));
+                .collect(Collectors.groupingBy(Answer::getQuestionId));
         List<LearningPlanSessionAnswer> userAnswerRows =
                 sessionAnswerRepository.findBySessionId(lastSubmitted.getSessionId());
 
@@ -186,10 +187,14 @@ public class LearningPlanSessionService {
                 .map(LearningPlanSessionQuestion::getQuestionId)
                 .collect(Collectors.toSet());
 
-        Map<String, Answer> correctByQuestion = answerRepository
+        Map<String, List<Answer>> correctByQuestion = answerRepository
                 .findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(allowedQuestionIds))
                 .stream()
-                .collect(Collectors.toMap(Answer::getQuestionId, a -> a, (a, b) -> a));
+                .collect(Collectors.groupingBy(Answer::getQuestionId));
+
+        // Cần loại câu hỏi (MCQ/MSQ/FILL) để chấm đúng.
+        Map<String, Question> questionMap = questionRepository.findAllById(allowedQuestionIds).stream()
+                .collect(Collectors.toMap(Question::getQuestionId, q -> q, (a, b) -> a));
 
         // Dedup theo questionId — giữ entry đầu tiên, bỏ duplicate (FE bug / replay attack).
         // Tránh đội accuracy lên sai khi cùng 1 câu xuất hiện nhiều lần.
@@ -204,15 +209,19 @@ public class LearningPlanSessionService {
             if (!allowedQuestionIds.contains(item.getQuestionId())) {
                 throw new BadRequestException("Câu hỏi không thuộc phiên học hiện tại");
             }
-            Answer correctAnswer = correctByQuestion.get(item.getQuestionId());
-            boolean isCorrect = correctAnswer != null
-                    && Objects.equals(correctAnswer.getAnswerId(), item.getSelectedAnswerId());
+            Question question = questionMap.get(item.getQuestionId());
+            List<Answer> correctAnswers = correctByQuestion.get(item.getQuestionId());
+            String selectedIdsCsv = AnswerGradingUtil.toCsv(item.getSelectedAnswerIds());
+            boolean isCorrect = question != null
+                    && AnswerGradingUtil.isCorrect(question.getQuestionType(),
+                            item.getSelectedAnswerId(), selectedIdsCsv, null, correctAnswers);
             if (isCorrect) correct++;
 
             LearningPlanSessionAnswer row = new LearningPlanSessionAnswer();
             row.setSessionId(sessionId);
             row.setQuestionId(item.getQuestionId());
             row.setSelectedAnswerId(item.getSelectedAnswerId());
+            row.setSelectedAnswerIds(selectedIdsCsv);
             row.setIsCorrect(isCorrect);
             rows.add(row);
             recordExposure(userId, item.getQuestionId());
@@ -298,7 +307,7 @@ public class LearningPlanSessionService {
     private List<SubmitSessionResponse.ReviewItem> buildReviewItems(
             List<LearningPlanSessionQuestion> sessionQuestions,
             List<LearningPlanSessionAnswer> userAnswerRows,
-            Map<String, Answer> correctByQuestion) {
+            Map<String, List<Answer>> correctByQuestion) {
 
         List<String> questionIds = sessionQuestions.stream()
                 .map(LearningPlanSessionQuestion::getQuestionId)
@@ -318,18 +327,25 @@ public class LearningPlanSessionService {
             if (q == null) continue;
 
             LearningPlanSessionAnswer userAns = userAnswerMap.get(qid);
-            Answer correct = correctByQuestion.get(qid);
+            List<Answer> correctList = correctByQuestion.getOrDefault(qid, List.of());
             List<Answer> answerList = allAnswers.getOrDefault(qid, List.of());
 
             List<SubmitSessionResponse.ReviewAnswer> reviewAnswers = answerList.stream()
                     .map(learningMapper::toReviewAnswer)
                     .toList();
 
+            // MSQ: gom lựa chọn của user; MCQ: fallback về selectedAnswerId đơn.
+            List<String> selectedIds = userAns == null ? List.of()
+                    : (userAns.getSelectedAnswerIds() != null
+                        ? List.copyOf(AnswerGradingUtil.parseIds(userAns.getSelectedAnswerIds()))
+                        : (userAns.getSelectedAnswerId() != null ? List.of(userAns.getSelectedAnswerId()) : List.of()));
+
             items.add(learningMapper.toReviewItem(
                     q,
                     reviewAnswers,
                     userAns != null ? userAns.getSelectedAnswerId() : null,
-                    correct != null ? correct.getAnswerId() : null,
+                    selectedIds,
+                    correctList.isEmpty() ? null : correctList.get(0).getAnswerId(),
                     userAns != null && Boolean.TRUE.equals(userAns.getIsCorrect())));
         }
         return items;

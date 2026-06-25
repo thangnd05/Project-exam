@@ -27,18 +27,31 @@ const QuestionBlock = ({
     radioGroupPrefix = 'q',
 }) => {
     const selectedTagIds = question.tagIds || [];
+    const isMsq = question.questionType === 'MSQ';
     return (
         <div className={cx('partBlock')}>
             <div className="d-flex justify-content-between align-items-center mb-2">
                 <b>Câu hỏi số {index + 1}</b>
-                <Button
-                    variant="link"
-                    className="text-danger p-0"
-                    onClick={() => removeQuestionFn(index)}
-                    disabled={minQuestions <= 1}
-                >
-                    <Trash size={18} />
-                </Button>
+                <div className="d-flex align-items-center gap-3">
+                    <label className="d-flex align-items-center gap-1 mb-0" style={{ fontSize: '1.3rem', cursor: 'pointer' }} title="Cho phép nhiều đáp án đúng (chấm đúng-hết)">
+                        <input
+                            type="checkbox"
+                            checked={isMsq}
+                            onChange={(e) =>
+                                updateQuestionFieldFn?.(index, 'questionType', e.target.checked ? 'MSQ' : 'MCQ')
+                            }
+                        />
+                        Nhiều đáp án đúng
+                    </label>
+                    <Button
+                        variant="link"
+                        className="text-danger p-0"
+                        onClick={() => removeQuestionFn(index)}
+                        disabled={minQuestions <= 1}
+                    >
+                        <Trash size={18} />
+                    </Button>
+                </div>
             </div>
 
             <input
@@ -123,10 +136,10 @@ const QuestionBlock = ({
                     <Col md={6} key={aIndex}>
                         <div className={cx('answerItem')}>
                             <input
-                                type="radio"
+                                type={isMsq ? 'checkbox' : 'radio'}
                                 name={`${radioGroupPrefix}-${index}`}
                                 checked={ans.isCorrect}
-                                onChange={() => updateAnswerFn(index, aIndex, 'isCorrect', true)}
+                                onChange={(e) => updateAnswerFn(index, aIndex, 'isCorrect', isMsq ? e.target.checked : true)}
                             />
                             <span className="ms-2 fw-bold">{ans.answerLabel}.</span>
                             <input

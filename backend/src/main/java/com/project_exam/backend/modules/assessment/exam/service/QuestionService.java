@@ -903,7 +903,8 @@ public class QuestionService {
     }
 
     private void validateQuestionAnswers(Question.QuestionType questionType, List<AnswerRequest> answers) {
-        if (questionType != Question.QuestionType.MCQ) {
+        // Cả MCQ (1 đúng) và MSQ (nhiều đúng) đều phải có ít nhất 1 đáp án đúng.
+        if (questionType != Question.QuestionType.MCQ && questionType != Question.QuestionType.MSQ) {
             return;
         }
         boolean hasCorrect = answers != null && answers.stream().anyMatch(a -> Boolean.TRUE.equals(a.getIsCorrect()));
@@ -937,7 +938,8 @@ public class QuestionService {
                     list.add(a);
                 }
             }
-            case MCQ -> {
+            case MCQ, MSQ -> {
+                // MCQ: đúng 1 đáp án; MSQ: nhiều đáp án isCorrect=true.
                 for (AnswerRequest ar : answers) {
                     Answer a = new Answer();
                     a.setQuestionId(questionId);

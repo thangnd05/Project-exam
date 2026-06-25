@@ -138,9 +138,13 @@ export const useCreateTest = ({
 
   const updateAnswer = (qIndex, aIndex, field, value) => {
     const newQ = [...questions];
-    if (field === 'isCorrect')
-      newQ[qIndex].answers = newQ[qIndex].answers.map((a, i) => ({ ...a, isCorrect: i === aIndex }));
-    else
+    if (field === 'isCorrect') {
+      // MSQ: bật/tắt độc lập từng đáp án; MCQ: chỉ 1 đáp án đúng.
+      if (newQ[qIndex].questionType === 'MSQ')
+        newQ[qIndex].answers = newQ[qIndex].answers.map((a, i) => (i === aIndex ? { ...a, isCorrect: value } : a));
+      else
+        newQ[qIndex].answers = newQ[qIndex].answers.map((a, i) => ({ ...a, isCorrect: i === aIndex }));
+    } else
       newQ[qIndex].answers[aIndex] = { ...newQ[qIndex].answers[aIndex], [field]: value };
     setQuestions(newQ);
   };
@@ -333,8 +337,12 @@ export const useCreateTest = ({
   const updateGroupAnswer = (gIndex, qIndex, aIndex, field, value) => {
     const newGroups = [...groups];
     const q = newGroups[gIndex].questions[qIndex];
-    if (field === 'isCorrect') q.answers = q.answers.map((a, i) => ({ ...a, isCorrect: i === aIndex }));
-    else q.answers[aIndex] = { ...q.answers[aIndex], [field]: value };
+    if (field === 'isCorrect') {
+      if (q.questionType === 'MSQ')
+        q.answers = q.answers.map((a, i) => (i === aIndex ? { ...a, isCorrect: value } : a));
+      else
+        q.answers = q.answers.map((a, i) => ({ ...a, isCorrect: i === aIndex }));
+    } else q.answers[aIndex] = { ...q.answers[aIndex], [field]: value };
     setGroups(newGroups);
   };
 

@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.*;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.exam.domain.*;
+import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.exam.repository.*;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
@@ -111,23 +112,23 @@ public class EnhancedResultService {
         Map<String, Question> questionMap = questionRepository.findAllById(allTestQuestionIds).stream()
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q, (q1, q2) -> q1));
 
-        Map<String, Answer> correctAnswersMap = answerRepository
+        Map<String, List<Answer>> correctAnswersMap = answerRepository
                 .findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(allTestQuestionIds)).stream()
-                .collect(Collectors.toMap(Answer::getQuestionId, a -> a, (a1, a2) -> a1));
+                .collect(Collectors.groupingBy(Answer::getQuestionId));
 
         // 5. Check correctness per question — câu không khoanh = SAI
         Map<String, Boolean> correctnessMap = new HashMap<>();
         long totalCorrect = 0;
         for (String qId : allTestQuestionIds) {
             Question question = questionMap.get(qId);
-            Answer correctAnswer = correctAnswersMap.get(qId);
+            List<Answer> correctAnswers = correctAnswersMap.get(qId);
             UserAnswer ua = answeredMap.get(qId);
 
             if (question == null) continue;
 
             boolean isCorrect = false;
-            if (ua != null && correctAnswer != null) {
-                isCorrect = checkCorrectness(ua, question, correctAnswer);
+            if (ua != null && correctAnswers != null && !correctAnswers.isEmpty()) {
+                isCorrect = checkCorrectness(ua, question, correctAnswers);
             }
             // Câu không khoanh (ua == null) → isCorrect = false (SAI)
 
@@ -322,15 +323,10 @@ public class EnhancedResultService {
 
     // --- Helper methods ---
 
-    private boolean checkCorrectness(UserAnswer ua, Question question, Answer correctAnswer) {
-        if (question.getQuestionType() == Question.QuestionType.MCQ) {
-            return ua.getSelectedAnswerId() != null
-                    && ua.getSelectedAnswerId().equals(correctAnswer.getAnswerId());
-        } else if (question.getQuestionType() == Question.QuestionType.FILL_BLANK) {
-            return ua.getAnswerText() != null
-                    && ua.getAnswerText().trim().equalsIgnoreCase(correctAnswer.getAnswerText().trim());
-        }
-        return false;
+    private boolean checkCorrectness(UserAnswer ua, Question question, List<Answer> correctAnswers) {
+        return AnswerGradingUtil.isCorrect(question.getQuestionType(),
+                ua.getSelectedAnswerId(), ua.getSelectedAnswerIds(),
+                ua.getAnswerText(), correctAnswers);
     }
 
     private List<PartBreakdownDto> buildPartBreakdown(

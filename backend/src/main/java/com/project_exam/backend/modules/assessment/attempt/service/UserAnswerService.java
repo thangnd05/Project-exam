@@ -11,6 +11,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerRespons
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserAnswerMapper;
 import com.project_exam.backend.modules.assessment.exam.domain.Answer;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
+import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestStatus;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
@@ -56,6 +57,7 @@ public class UserAnswerService {
         userAnswer.setUserTestId(request.getUserTestId());
         userAnswer.setQuestionId(request.getQuestionId());
         userAnswer.setSelectedAnswerId(request.getSelectedAnswerId());
+        userAnswer.setSelectedAnswerIds(AnswerGradingUtil.toCsv(request.getSelectedAnswerIds()));
         userAnswer.setAnswerText(request.getAnswerText());
         return userAnswer;
     }
@@ -177,6 +179,7 @@ public class UserAnswerService {
         userAnswer.setUserTestId(request.getUserTestId());
         userAnswer.setQuestionId(request.getQuestionId());
         userAnswer.setSelectedAnswerId(request.getSelectedAnswerId());
+        userAnswer.setSelectedAnswerIds(AnswerGradingUtil.toCsv(request.getSelectedAnswerIds()));
         userAnswer.setAnswerText(request.getAnswerText());
 
         return userAnswerRepository.save(userAnswer);
@@ -235,6 +238,7 @@ public class UserAnswerService {
         userAnswer.setUserTestId(request.getUserTestId());
         userAnswer.setQuestionId(request.getQuestionId());
         userAnswer.setSelectedAnswerId(request.getSelectedAnswerId());
+        userAnswer.setSelectedAnswerIds(AnswerGradingUtil.toCsv(request.getSelectedAnswerIds()));
         userAnswer.setAnswerText(request.getAnswerText());
 
         return userAnswerRepository.save(userAnswer);
@@ -281,27 +285,23 @@ public class UserAnswerService {
         Map<String, Question> questionMap = questionRepository.findAllById(questionIds).stream()
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q));
 
-        Map<String, Answer> correctAnswersMap = answerRepository
+        Map<String, List<Answer>> correctAnswersMap = answerRepository
                 .findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(questionIds))
                 .stream()
-                .collect(Collectors.toMap(Answer::getQuestionId, answer -> answer));
+                .collect(Collectors.groupingBy(Answer::getQuestionId));
 
         long correctCount = 0;
         for (UserAnswer userAnswer : uniqueAnswers) {
             String qId = userAnswer.getQuestionId();
             Question question = questionMap.get(qId);
-            Answer correctAnswer = correctAnswersMap.get(qId);
-            if (question == null || correctAnswer == null) continue;
+            List<Answer> correctAnswers = correctAnswersMap.get(qId);
+            if (question == null || correctAnswers == null || correctAnswers.isEmpty()) continue;
 
-            boolean isCorrect = false;
-            if (question.getQuestionType() == Question.QuestionType.MCQ) {
-                isCorrect = userAnswer.getSelectedAnswerId() != null
-                        && userAnswer.getSelectedAnswerId().equals(correctAnswer.getAnswerId());
-            } else if (question.getQuestionType() == Question.QuestionType.FILL_BLANK) {
-                isCorrect = userAnswer.getAnswerText() != null
-                        && userAnswer.getAnswerText().trim().equalsIgnoreCase(correctAnswer.getAnswerText().trim());
+            if (AnswerGradingUtil.isCorrect(question.getQuestionType(),
+                    userAnswer.getSelectedAnswerId(), userAnswer.getSelectedAnswerIds(),
+                    userAnswer.getAnswerText(), correctAnswers)) {
+                correctCount++;
             }
-            if (isCorrect) correctCount++;
         }
 
         long totalQuestions = getTotalQuestionsInTest(userTest.getTestId());
@@ -369,28 +369,21 @@ public class UserAnswerService {
         Map<String, Question> questionMap = questionRepository.findAllById(questionIds).stream()
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q));
 
-        Map<String, Answer> correctAnswersMap = answerRepository.findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(questionIds))
+        Map<String, List<Answer>> correctAnswersMap = answerRepository.findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(questionIds))
                 .stream()
-                .collect(Collectors.toMap(Answer::getQuestionId, answer -> answer));
+                .collect(Collectors.groupingBy(Answer::getQuestionId));
 
         long correctCount = 0;
         for (UserAnswer userAnswer : uniqueAnswers) {
             String qId = userAnswer.getQuestionId();
             Question question = questionMap.get(qId);
-            Answer correctAnswer = correctAnswersMap.get(qId);
+            List<Answer> correctAnswers = correctAnswersMap.get(qId);
 
-            if (question == null || correctAnswer == null) continue;
+            if (question == null || correctAnswers == null || correctAnswers.isEmpty()) continue;
 
-            boolean isCorrect = false;
-            if (question.getQuestionType() == Question.QuestionType.MCQ) {
-                isCorrect = userAnswer.getSelectedAnswerId() != null &&
-                        userAnswer.getSelectedAnswerId().equals(correctAnswer.getAnswerId());
-            } else if (question.getQuestionType() == Question.QuestionType.FILL_BLANK) {
-                isCorrect = userAnswer.getAnswerText() != null &&
-                        userAnswer.getAnswerText().trim().equalsIgnoreCase(correctAnswer.getAnswerText().trim());
-            }
-
-            if (isCorrect) {
+            if (AnswerGradingUtil.isCorrect(question.getQuestionType(),
+                    userAnswer.getSelectedAnswerId(), userAnswer.getSelectedAnswerIds(),
+                    userAnswer.getAnswerText(), correctAnswers)) {
                 correctCount++;
             }
         }

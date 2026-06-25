@@ -2,6 +2,8 @@ package com.project_exam.backend.modules.assessment.attempt.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,5 +14,6 @@ public class UserAnswerResponse {
     private String userTestId;
     private String questionId;
     private String selectedAnswerId;
+    private List<String> selectedAnswerIds; // MSQ
     private String answerText;
 }

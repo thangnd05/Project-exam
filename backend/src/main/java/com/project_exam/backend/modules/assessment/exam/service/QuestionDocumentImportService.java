@@ -1205,9 +1205,10 @@ public class QuestionDocumentImportService {
         String questionText = q.questionText == null ? "" : q.questionText.trim();
         NormalQuestionRequest request = new NormalQuestionRequest();
         request.setQuestionText(questionText);
-        // NOTE: hiện tại import chỉ hỗ trợ MCQ. Nếu mở rộng (T/F, multi-select)
-        // cần đổi cả ở đây và ở normalizeCorrectLabels.
-        request.setQuestionType(Question.QuestionType.MCQ);
+        // 1 đáp án đúng -> MCQ; nhiều đáp án đúng (nhiều dấu *) -> MSQ.
+        request.setQuestionType(correctLabels.size() > 1
+                ? Question.QuestionType.MSQ
+                : Question.QuestionType.MCQ);
         request.setAnswers(answers);
         request.setNeedsManualCorrect(correctLabels.isEmpty());
         if (q.explanation != null) {
@@ -1223,17 +1224,9 @@ public class QuestionDocumentImportService {
     }
 
     private Set<String> normalizeCorrectLabels(ParsedQuestion q) {
-        // MCQ single-correct: nếu có >1 đáp án bị bôi đậm thì bảo thủ -> clear hết,
-        // để người duyệt chọn tay, tránh import sai.
-        if (q.correctLabels.size() <= 1) {
-            return q.correctLabels;
-        }
-        log.warn(
-                "Question no='{}' has multiple styled correct answers {} -> clear to avoid wrong import",
-                q.questionNumber,
-                q.correctLabels
-        );
-        return Collections.emptySet();
+        // Hỗ trợ MSQ: nhiều đáp án đánh dấu (*) -> giữ nguyên cả tập (câu trở thành MSQ).
+        // 0 đáp án -> để người duyệt chọn tay (needsManualCorrect).
+        return q.correctLabels;
     }
 
     private void logInvalidQuestion(ParsedQuestion q) {

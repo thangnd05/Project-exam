@@ -24,6 +24,7 @@ import com.project_exam.backend.modules.audit.domain.*;
 import com.project_exam.backend.modules.users.repository.*;
 import com.project_exam.backend.modules.posts.repository.*;
 import com.project_exam.backend.modules.assessment.exam.repository.*;
+import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.test.repository.*;
 import com.project_exam.backend.modules.assessment.attempt.repository.*;
 import com.project_exam.backend.modules.vocabulary.repository.*;
@@ -135,6 +136,8 @@ public class UserTestService {
         int totalScore;
         if ("toeic_scale".equalsIgnoreCase(scoringMethod)) {
             totalScore = scoreToeicOptimal(userAnswers, test, examType);
+        } else if ("aws_scale".equalsIgnoreCase(scoringMethod)) {
+            totalScore = scoreAwsScale(userAnswers, totalQuestionsInTest);
         } else {
             totalScore = scoreDefault(userAnswers, totalQuestionsInTest);
         }
@@ -147,53 +150,64 @@ public class UserTestService {
         if (userAnswers.isEmpty()) {
             return 0;
         }
-
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
-        Set<String> questionIds = uniqueAnswers.stream()
-                .map(UserAnswer::getQuestionId)
-                .collect(Collectors.toSet());
-
-        int totalQuestions = totalQuestionsInTest > 0 ? totalQuestionsInTest : questionIds.size();
+        int totalQuestions = totalQuestionsInTest > 0 ? totalQuestionsInTest
+                : (int) uniqueAnswers.stream().map(UserAnswer::getQuestionId).distinct().count();
         if (totalQuestions == 0) {
             return 0;
         }
+        int correctCount = countCorrectAnswers(uniqueAnswers);
+        // Tính điểm theo thang 100: (số câu đúng / tổng số câu) * 100
+        return (int) Math.round((double) correctCount / totalQuestions * 100);
+    }
+
+    /**
+     * Thang điểm kiểu AWS (scaled 100–1000): Score = 100 + (số câu đúng / tổng câu) * 900.
+     * Tổng câu = số câu thực tế của đề (vd AWS = 65). Kết quả kẹp trong [100, 1000].
+     */
+    private int scoreAwsScale(List<UserAnswer> userAnswers, int totalQuestionsInTest) {
+        if (userAnswers.isEmpty()) {
+            return 100;
+        }
+        List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
+        int totalQuestions = totalQuestionsInTest > 0 ? totalQuestionsInTest
+                : (int) uniqueAnswers.stream().map(UserAnswer::getQuestionId).distinct().count();
+        if (totalQuestions == 0) {
+            return 100;
+        }
+        int correctCount = countCorrectAnswers(uniqueAnswers);
+        int score = 100 + (int) Math.round((double) correctCount / totalQuestions * 900);
+        return Math.max(100, Math.min(1000, score));
+    }
+
+    /** Đếm số câu đúng (MCQ/MSQ/FILL) trong danh sách đáp án (đã dedup). */
+    private int countCorrectAnswers(List<UserAnswer> uniqueAnswers) {
+        Set<String> questionIds = uniqueAnswers.stream()
+                .map(UserAnswer::getQuestionId)
+                .collect(Collectors.toSet());
+        if (questionIds.isEmpty()) return 0;
 
         Map<String, Question> questionMap = questionRepository.findAllById(questionIds).stream()
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q));
-
-        Map<String, Answer> correctAnswersMap = answerRepository.findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(questionIds))
+        Map<String, List<Answer>> correctAnswersMap = answerRepository
+                .findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(questionIds))
                 .stream()
-                .collect(Collectors.toMap(Answer::getQuestionId, answer -> answer));
+                .collect(Collectors.groupingBy(Answer::getQuestionId));
 
         int correctCount = 0;
         for (UserAnswer userAnswer : uniqueAnswers) {
-            String qId = userAnswer.getQuestionId();
-            Question question = questionMap.get(qId);
-            Answer correctAnswer = correctAnswersMap.get(qId);
-
-            if (question == null || correctAnswer == null) {
+            Question question = questionMap.get(userAnswer.getQuestionId());
+            List<Answer> correctAnswers = correctAnswersMap.get(userAnswer.getQuestionId());
+            if (question == null || correctAnswers == null || correctAnswers.isEmpty()) {
                 continue;
             }
-
-            boolean isCorrect = false;
-            if (question.getQuestionType() == Question.QuestionType.MCQ) {
-                isCorrect = userAnswer.getSelectedAnswerId() != null &&
-                        userAnswer.getSelectedAnswerId().equals(correctAnswer.getAnswerId());
-            } else if (question.getQuestionType() == Question.QuestionType.FILL_BLANK) {
-                isCorrect = userAnswer.getAnswerText() != null &&
-                        userAnswer.getAnswerText().trim().equalsIgnoreCase(correctAnswer.getAnswerText().trim());
-            } else if (question.getQuestionType() == Question.QuestionType.ESSAY) {
-                // ESSAY cần chấm tay, không tự động
-                continue;
-            }
-
-            if (isCorrect) {
+            if (AnswerGradingUtil.isCorrect(question.getQuestionType(),
+                    userAnswer.getSelectedAnswerId(), userAnswer.getSelectedAnswerIds(),
+                    userAnswer.getAnswerText(), correctAnswers)) {
                 correctCount++;
             }
         }
-
-        // Tính điểm theo thang 100: (số câu đúng / tổng số câu) * 100
-        return (int) Math.round((double) correctCount / totalQuestions * 100);
+        return correctCount;
     }
 
     private int scoreToeicOptimal(List<UserAnswer> userAnswers, Test test, ExamType examType) {
@@ -206,9 +220,9 @@ public class UserTestService {
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q));
 
         // 2. Lấy thông tin đáp án đúng đầy đủ
-        Map<String, Answer> correctAnswersMap = answerRepository.findByQuestionIdInAndIsCorrectTrue(allQuestionIds)
+        Map<String, List<Answer>> correctAnswersMap = answerRepository.findByQuestionIdInAndIsCorrectTrue(allQuestionIds)
                 .stream()
-                .collect(Collectors.toMap(Answer::getQuestionId, answer -> answer));
+                .collect(Collectors.groupingBy(Answer::getQuestionId));
 
         // 3. Lấy thông tin ExamPart và Skill
         Set<String> allExamPartIds = questions.stream().map(Question::getExamPartId).collect(Collectors.toSet());
@@ -221,19 +235,16 @@ public class UserTestService {
         for (UserAnswer ua : uniqueAnswers) {
             String questionId = ua.getQuestionId();
             Question question = questionMap.get(questionId);
-            Answer correctAnswer = correctAnswersMap.get(questionId);
+            List<Answer> correctAnswers = correctAnswersMap.get(questionId);
 
-            if (question == null || correctAnswer == null) {
+            if (question == null || correctAnswers == null || correctAnswers.isEmpty()) {
                 continue;
             }
 
-            // 4. Logic kiểm tra đúng/sai đã được nâng cấp
-            boolean isCorrect = false;
-            if (question.getQuestionType() == Question.QuestionType.MCQ) {
-                isCorrect = ua.getSelectedAnswerId() != null && ua.getSelectedAnswerId().equals(correctAnswer.getAnswerId());
-            } else if (question.getQuestionType() == Question.QuestionType.FILL_BLANK) {
-                isCorrect = ua.getAnswerText() != null && ua.getAnswerText().trim().equalsIgnoreCase(correctAnswer.getAnswerText().trim());
-            }
+            // 4. Logic kiểm tra đúng/sai (MCQ/MSQ/FILL) qua helper dùng chung
+            boolean isCorrect = AnswerGradingUtil.isCorrect(question.getQuestionType(),
+                    ua.getSelectedAnswerId(), ua.getSelectedAnswerIds(),
+                    ua.getAnswerText(), correctAnswers);
 
             String examPartId = question.getExamPartId();
             String skillId = examPartId != null ? examPartToSkillIdMap.get(examPartId) : null;
@@ -506,6 +517,8 @@ public class UserTestService {
         int totalScore;
         if ("toeic_scale".equalsIgnoreCase(scoringMethod)) {
             totalScore = scoreToeicOptimal(userAnswers, test, examType);
+        } else if ("aws_scale".equalsIgnoreCase(scoringMethod)) {
+            totalScore = scoreAwsScale(userAnswers, totalQuestionsInTest);
         } else {
             totalScore = scoreDefault(userAnswers, totalQuestionsInTest);
         }

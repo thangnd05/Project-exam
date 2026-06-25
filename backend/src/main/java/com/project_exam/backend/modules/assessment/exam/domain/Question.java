@@ -48,7 +48,10 @@ public class Question {
     private String explanation; // optional: có thể AI generate
 
     public enum QuestionType {
-        MCQ, FILL_BLANK, ESSAY
+        MCQ,        // trắc nghiệm 1 đáp án đúng
+        MSQ,        // trắc nghiệm NHIỀU đáp án đúng (chọn nhiều, chấm all-or-nothing)
+        FILL_BLANK,
+        ESSAY
     }
 
     @Column(name = "class_id")

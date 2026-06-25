@@ -343,13 +343,16 @@ public class LearningMapper {
             Question q,
             List<SubmitSessionResponse.ReviewAnswer> answers,
             String selectedAnswerId,
+            List<String> selectedAnswerIds,
             String correctAnswerId,
             boolean isCorrect) {
         return SubmitSessionResponse.ReviewItem.builder()
                 .questionId(q.getQuestionId())
                 .questionText(q.getQuestionText())
+                .questionType(q.getQuestionType() != null ? q.getQuestionType().name() : null)
                 .answers(answers)
                 .selectedAnswerId(selectedAnswerId)
+                .selectedAnswerIds(selectedAnswerIds)
                 .correctAnswerId(correctAnswerId)
                 .isCorrect(isCorrect)
                 .explanation(q.getExplanation())

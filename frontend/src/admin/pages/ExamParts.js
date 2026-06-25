@@ -33,6 +33,7 @@ function ExamPartsManagement() {
   const [examTypes, setExamTypes] = useState([]);
   const [skills, setSkills] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [examTypeFilter, setExamTypeFilter] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingPartId, setEditingPartId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
@@ -73,8 +74,12 @@ function ExamPartsManagement() {
 
   const groupedExamParts = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
+    // Lọc theo loại kỳ thi trước (nếu có chọn), rồi mới lọc theo từ khoá.
+    const scopedParts = examTypeFilter
+      ? examParts.filter((examPart) => examPart.exam_type_id === examTypeFilter)
+      : examParts;
     const filteredParts = keyword
-      ? examParts.filter((examPart) => {
+      ? scopedParts.filter((examPart) => {
           const examTypeName = getExamTypeName(examPart.exam_type_id);
           return (
             examPart.name.toLowerCase().includes(keyword) ||
@@ -82,7 +87,7 @@ function ExamPartsManagement() {
             examTypeName.toLowerCase().includes(keyword)
           );
         })
-      : examParts;
+      : scopedParts;
 
     const groups = new Map();
     filteredParts.forEach((examPart) => {
@@ -106,7 +111,7 @@ function ExamPartsManagement() {
         }),
       }))
       .sort((left, right) => left.examTypeName.localeCompare(right.examTypeName, 'vi'));
-  }, [examParts, getExamTypeName, searchTerm]);
+  }, [examParts, getExamTypeName, searchTerm, examTypeFilter]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -138,6 +143,10 @@ function ExamPartsManagement() {
 
   const openCreateModal = () => {
     resetForm();
+    // Nếu đang lọc theo 1 loại kỳ thi → tự gắn sẵn loại đó vào form tạo.
+    if (examTypeFilter) {
+      setFormState((previous) => ({ ...previous, exam_type_id: examTypeFilter }));
+    }
     setShowFormModal(true);
   };
 
@@ -258,7 +267,21 @@ function ExamPartsManagement() {
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="Tìm phần thi theo tên, mô tả, loại kỳ thi..."
-      />
+      >
+        <Form.Select
+          style={{maxWidth: 280}}
+          value={examTypeFilter}
+          onChange={(event) => setExamTypeFilter(event.target.value)}
+          aria-label="Lọc theo loại kỳ thi"
+        >
+          <option value="">-- Tất cả loại kỳ thi --</option>
+          {examTypes.map((item) => (
+            <option key={item.exam_type_id} value={item.exam_type_id}>
+              {item.name}
+            </option>
+          ))}
+        </Form.Select>
+      </AdminToolbar>
       <AdminFieldError message={errorMessage} />
 
       {loading ? (

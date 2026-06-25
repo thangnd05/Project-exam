@@ -30,10 +30,29 @@ const getFullMediaUrl = (url) => {
 };
 
 // Trạng thái 1 câu: correct | incorrect | unanswered (để tô màu navigator).
+// MSQ: tập đã chọn phải trùng khít tập đáp án đúng (all-or-nothing).
+const isMsqCorrect = (q, userAnswer) => {
+  const correctIds = (q.answers || []).filter((a) => a.isCorrect).map((a) => a.answerId).sort();
+  const chosen = [...(userAnswer?.selectedAnswerIds || [])].sort();
+  return (
+    correctIds.length > 0 &&
+    chosen.length === correctIds.length &&
+    chosen.every((x, i) => x === correctIds[i])
+  );
+};
+
 const getQuestionStatus = (q, userAnswer) => {
-  const answered = !!(userAnswer && (userAnswer.selectedAnswerId || userAnswer.answerText));
+  const answered = !!(
+    userAnswer &&
+    (userAnswer.selectedAnswerId ||
+      userAnswer.answerText ||
+      (userAnswer.selectedAnswerIds && userAnswer.selectedAnswerIds.length))
+  );
   if (!answered) return "unanswered";
   const correct = q.answers?.find((a) => a.isCorrect);
+  if (q.questionType === "MSQ") {
+    return isMsqCorrect(q, userAnswer) ? "correct" : "incorrect";
+  }
   if (q.questionType === "MCQ") {
     return correct && userAnswer.selectedAnswerId === correct.answerId
       ? "correct"
@@ -457,10 +476,18 @@ function QuestionResult({ question, userAnswer, canReview }) {
   let isUserCorrect = false;
   if (question.questionType === "MCQ" && userAnswer && correctAnswer) {
     isUserCorrect = userAnswer.selectedAnswerId === correctAnswer.answerId;
+  } else if (question.questionType === "MSQ" && userAnswer) {
+    isUserCorrect = isMsqCorrect(question, userAnswer);
   }
 
+  const answeredAny = !!(
+    userAnswer &&
+    (userAnswer.selectedAnswerId ||
+      userAnswer.answerText ||
+      (userAnswer.selectedAnswerIds && userAnswer.selectedAnswerIds.length))
+  );
   let resultClass = "unanswered";
-  if (userAnswer) {
+  if (answeredAny) {
     resultClass = isUserCorrect ? "correct" : "incorrect";
   }
 
@@ -475,6 +502,30 @@ function QuestionResult({ question, userAnswer, canReview }) {
         <div className={cx("answers-options")}>
           {question.answers?.map((a) => {
             const isUserSelected = userAnswer?.selectedAnswerId === a.answerId;
+            return (
+              <div
+                key={a.answerId}
+                className={cx("answer-option", {
+                  "is-correct": canReview && a.isCorrect,
+                  "is-incorrect-choice": isUserSelected && !a.isCorrect,
+                  "is-user-choice": isUserSelected,
+                })}
+              >
+                {a.answerText?.trim()
+                  ? `${a.answerLabel}. ${a.answerText}`
+                  : a.answerLabel}
+                {isUserSelected && <span className={cx("user-pill")}>(Bạn chọn)</span>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* MSQ — nhiều đáp án đúng */}
+      {question.questionType === "MSQ" && (
+        <div className={cx("answers-options")}>
+          {question.answers?.map((a) => {
+            const isUserSelected = (userAnswer?.selectedAnswerIds || []).includes(a.answerId);
             return (
               <div
                 key={a.answerId}

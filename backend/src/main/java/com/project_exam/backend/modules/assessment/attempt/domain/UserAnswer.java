@@ -30,7 +30,11 @@ public class UserAnswer {
     @Column(nullable = false)
     private String questionId; // FK -> questions.question_id
 
-    private String selectedAnswerId; // FK -> answers.answer_id (null nếu tự luận)
+    private String selectedAnswerId; // FK -> answers.answer_id (MCQ; null nếu tự luận/MSQ)
+
+    // Lựa chọn cho câu MSQ (nhiều đáp án): CSV các answer_id. null với MCQ/FILL/ESSAY.
+    @Column(name = "selected_answer_ids", columnDefinition = "TEXT")
+    private String selectedAnswerIds;
 
     @Column(columnDefinition = "TEXT")
     private String answerText; // cho tự luận

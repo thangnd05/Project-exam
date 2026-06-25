@@ -3,7 +3,7 @@ import {Form} from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 
-const scoringMethodOptions = ['DEFAULT', 'TOEIC_SCALE', 'IELTS_BAND'];
+const scoringMethodOptions = ['DEFAULT', 'TOEIC_SCALE', 'IELTS_BAND', 'AWS_SCALE'];
 
 function ExamTypeFormModal({
   show,
