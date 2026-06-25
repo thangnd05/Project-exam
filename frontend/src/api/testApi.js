@@ -24,6 +24,23 @@ export const getTestsByExamType = (examTypeId, { page = 0, size = 12 } = {}) => 
     .then((res) => res.data);
 };
 
+// Danh sách folder bộ đề (collection cha) của 1 loại kỳ thi, kèm số đề bên trong.
+export const getTestCollectionsByExamType = (examTypeId) => {
+  return axios
+    .get(`${BASE_URL}/collections/by-exam-type/${examTypeId}`)
+    .then((res) => res.data);
+};
+
+// Danh sách đề thuộc 1 bộ đề (gộp cả collection con), có phân trang.
+export const getTestsByCollection = (collectionId, { page = 0, size = 12 } = {}) => {
+  const params = new URLSearchParams();
+  params.set('page', String(page));
+  params.set('size', String(size));
+  return axios
+    .get(`${BASE_URL}/user/by-collection/${collectionId}?${params.toString()}`)
+    .then((res) => res.data);
+};
+
 // Danh sách bài Quick Challenge cho Hero landing page (public, guest gọi được)
 export const getQuickChallengeTests = () => {
   return axios.get(`${BASE_URL}/quick-challenge`).then((res) => res.data);

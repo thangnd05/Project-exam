@@ -1,0 +1,124 @@
+import { getTestsByCollection, getTestCollectionsByExamType } from '../../../../api/testApi';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
+import { IoArrowBack, IoDocumentTextOutline } from 'react-icons/io5';
+import routes, { buildExamTypeDetailPath } from '~/config/Routes';
+
+import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
+import Pagination from '~/components/common/Pagination/Pagination';
+
+const PAGE_SIZE = 12;
+
+// Danh sách đề trong 1 bộ đề (folder collection) — gộp cả các collection con.
+function TestByCollectionPage() {
+  const { examTypeId, collectionId } = useParams();
+  const navigate = useNavigate();
+
+  const [tests, setTests] = useState([]);
+  const [folderName, setFolderName] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [countdowns, setCountdowns] = useState({});
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchTests = useCallback(
+    (page = 0) => {
+      if (!collectionId) return;
+      setLoading(true);
+      getTestsByCollection(collectionId, { page, size: PAGE_SIZE })
+        .then((data) => {
+          setTests(Array.isArray(data?.content) ? data.content : []);
+          setTotalPages(data?.totalPages ?? 0);
+          setCurrentPage(data?.currentPage ?? page);
+        })
+        .catch(() => {
+          setTests([]);
+          setTotalPages(0);
+        })
+        .finally(() => setLoading(false));
+    },
+    [collectionId],
+  );
+
+  useEffect(() => {
+    if (!collectionId) {
+      setLoading(false);
+      return;
+    }
+    fetchTests(0);
+
+    // Lấy tên folder từ danh sách bộ đề của loại kỳ thi.
+    if (examTypeId) {
+      getTestCollectionsByExamType(examTypeId)
+        .then((data) => {
+          const found = (Array.isArray(data) ? data : []).find(
+            (f) => String(f.collectionId) === String(collectionId),
+          );
+          setFolderName(found?.name || '');
+        })
+        .catch(() => setFolderName(''));
+    }
+  }, [collectionId, examTypeId, fetchTests]);
+
+  // Countdown realtime cho đề có lịch mở.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const updated = {};
+      tests.forEach((t) => {
+        if (t.availableFrom) {
+          const diff = new Date(t.availableFrom) - now;
+          if (diff > 0) updated[t.testId] = diff;
+        }
+      });
+      setCountdowns(updated);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [tests]);
+
+  if (loading && tests.length === 0 && currentPage === 0 && totalPages === 0) {
+    return (
+      <div
+        className="d-flex flex-column align-items-center justify-content-center"
+        style={{ minHeight: '60vh' }}
+      >
+        <Spinner animation="grow" variant="info" />
+        <p className="mt-3 fw-bold text-info">Đang tải bộ đề...</p>
+      </div>
+    );
+  }
+
+  const emptyState = (
+    <div style={{ textAlign: 'center', padding: '40px 0' }}>
+      <IoDocumentTextOutline style={{ fontSize: '4rem', color: '#94a3b8' }} />
+      <h4 style={{ marginTop: 12 }}>Bộ đề này chưa có đề nào</h4>
+      <p className="text-muted">Vui lòng quay lại sau.</p>
+    </div>
+  );
+
+  const goBack = () =>
+    navigate(examTypeId ? buildExamTypeDetailPath(examTypeId) : routes.home);
+
+  return (
+    <TestListContainer
+      title={folderName || 'Bộ đề'}
+      label="Khám phá bộ đề"
+      secondaryActionText="Quay lại"
+      secondaryActionIcon={IoArrowBack}
+      onSecondaryAction={goBack}
+      tests={tests}
+      countdowns={countdowns}
+      emptyState={emptyState}
+      footer={
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onChange={fetchTests}
+        />
+      }
+    />
+  );
+}
+
+export default TestByCollectionPage;

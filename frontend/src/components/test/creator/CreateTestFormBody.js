@@ -335,6 +335,16 @@ const CreateTestFormBody = ({
   };
 
 
+  // Bộ đề/Collection lọc theo loại kỳ thi đang chọn (giữ cả collection chưa gắn examType để không ẩn dữ liệu cũ).
+  const collectionOptions = buildCollectionTree(
+    (questionCollections || []).filter(
+      (c) =>
+        !testInfo.examTypeId ||
+        !c.examTypeId ||
+        String(c.examTypeId) === String(testInfo.examTypeId),
+    ),
+  );
+
   return (
     <div className={cx('body')}>
       {notification.message && (
@@ -428,13 +438,28 @@ const CreateTestFormBody = ({
                 </select>
               </div>
             </Col>
+            {activeCreatorType === CREATOR_TYPES.TEST && (
+              <Col md={3}>
+                <div className={cx('formGroupModern')}>
+                  <label><IoLibraryOutline /> Bộ đề (Collection)</label>
+                  <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
+                    <option value="">-- Trống --</option>
+                    {collectionOptions.map((c) => (
+                      <option key={c.collectionId} value={c.collectionId}>
+                        {c.depth > 0 ? `    └ ${c.name}` : c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </Col>
+            )}
             {(activeCreatorType === CREATOR_TYPES.BULK || activeCreatorType === CREATOR_TYPES.PASSAGE) && (
               <Col md={4}>
                 <div className={cx('formGroupModern')}>
                   <label><IoLibraryOutline /> Nhóm (Collection)</label>
                   <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
                     <option value="">-- Trống --</option>
-                    {buildCollectionTree(questionCollections).map((c) => (
+                    {collectionOptions.map((c) => (
                       <option key={c.collectionId} value={c.collectionId}>
                         {c.depth > 0 ? `    └ ${c.name}` : c.name}
                       </option>

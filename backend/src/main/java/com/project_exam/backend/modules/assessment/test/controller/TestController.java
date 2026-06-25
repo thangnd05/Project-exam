@@ -11,6 +11,7 @@ import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardRe
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
+import com.project_exam.backend.modules.assessment.test.dto.TestCollectionResponse;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.service.TestService;
 import com.project_exam.backend.shared.util.AuthUtils;
@@ -85,6 +86,7 @@ public class TestController {
         test.setClassId(request.getClassId());
         test.setChapterId(request.getChapterId());
         test.setExamCategoryId(request.getExamCategoryId());
+        test.setCollectionId(request.getCollectionId());
         test.setAvailableFrom(request.getAvailableFrom());
         test.setAvailableTo(request.getAvailableTo());
         // Giá xu: chỉ admin set được, và chỉ cho bài công khai (không gắn lớp).
@@ -200,6 +202,31 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
             userId = null;
         }
         return ResponseEntity.ok(testService.getAdminTestsByExamTypePaged(examTypeId, page, size, userId));
+    }
+
+    // Danh sách folder bộ đề (collection cha) của 1 loại kỳ thi, kèm số đề bên trong.
+    @GetMapping("/collections/by-exam-type/{examTypeId}")
+    public ResponseEntity<List<TestCollectionResponse>> getTestCollectionsByExamType(
+            @PathVariable String examTypeId
+    ) {
+        return ResponseEntity.ok(testService.getTestCollectionsByExamType(examTypeId));
+    }
+
+    // Danh sách đề thuộc 1 bộ đề (gộp cả collection con), có phân trang.
+    @GetMapping("/user/by-collection/{collectionId}")
+    public ResponseEntity<PageResponse<TestResponse>> getTestsByCollection(
+            @PathVariable String collectionId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            HttpServletRequest httpRequest
+    ) {
+        String userId;
+        try {
+            userId = authUtils.getUserId(httpRequest);
+        } catch (Exception e) {
+            userId = null;
+        }
+        return ResponseEntity.ok(testService.getTestsByCollectionPaged(collectionId, page, size, userId));
     }
 
     // Danh sách bài Quick Challenge cho Hero landing page (public, guest xem được)

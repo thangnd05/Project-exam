@@ -11,4 +11,9 @@ public class QuestionCollectionRequest {
      * Cha được trỏ tới phải là collection cấp 1 (chỉ hỗ trợ 2 cấp).
      */
     private String parentId;
+    /**
+     * Loại kỳ thi cho collection cấp 1 (vd TOEIC). Chỉ áp dụng cho collection cha;
+     * collection con tự kế thừa từ cha nên field này bị bỏ qua khi có parentId.
+     */
+    private String examTypeId;
 }

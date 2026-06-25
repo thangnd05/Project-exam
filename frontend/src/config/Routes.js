@@ -47,6 +47,7 @@ const routes = {
   testHistory: '/tests/history/:testId',
   testLeaderboard: '/tests/leaderboard/:testId',
   examTypeDetail: '/exam-types/:examTypeId',
+  examTypeCollection: '/exam-types/:examTypeId/collections/:collectionId',
   MyTest: '/my-tests',
 
   // 📚 Learning Plan
@@ -90,6 +91,12 @@ const routes = {
 export function buildExamTypeDetailPath(examTypeId) {
   if (!examTypeId) return routes.home;
   return `/exam-types/${encodeURIComponent(examTypeId)}`;
+}
+
+/** Danh sách đề trong 1 bộ đề (folder collection) của loại kỳ thi. */
+export function buildExamTypeCollectionPath(examTypeId, collectionId) {
+  if (!examTypeId || !collectionId) return routes.home;
+  return `/exam-types/${encodeURIComponent(examTypeId)}/collections/${encodeURIComponent(collectionId)}`;
 }
 
 /** Trang gợi ý bước tiếp theo trong lộ trình cá nhân hóa. */

@@ -115,6 +115,8 @@ export const useTestSubmission = ({
                         : null,
                     classId: mode === 'class' ? String(classId) : null,
                     chapterId: mode === 'class' ? String(chapterId) : null,
+                    // Bộ đề (folder) mà đề thuộc về — để gom đề theo collection ở trang khám phá.
+                    collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
                     // Giá xu: BE chỉ nhận khi là admin & bài công khai; còn lại bị ép null.
                     costCoins:
                         testInfo.costCoins && Number(testInfo.costCoins) > 0

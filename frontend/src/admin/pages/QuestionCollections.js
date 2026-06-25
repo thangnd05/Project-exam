@@ -13,6 +13,7 @@ import {
 } from '../../api/questionCollectionApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
+import {getExamTypes} from '../../api/examTypeApi';
 import styles from './QuestionCollections.module.scss';
 
 const cx = classNames.bind(styles);
@@ -21,6 +22,7 @@ const defaultFormState = {
   name: '',
   description: '',
   parentId: '',
+  examTypeId: '',
 };
 
 const mapCollectionFromApi = (collection) => ({
@@ -35,13 +37,14 @@ const mapCollectionFromApi = (collection) => ({
     typeof collection.totalQuestionCount === 'number'
       ? collection.totalQuestionCount
       : (typeof collection.questionCount === 'number' ? collection.questionCount : 0),
+  exam_type_id: collection.examTypeId ? String(collection.examTypeId) : '',
 });
 
 const extractApiErrorMessage = (error, fallback) =>
   error?.response?.data?.message || error?.response?.data?.error || error?.message || fallback;
 
 // ==================== Tree Node ====================
-function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, keyword}) {
+function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, keyword, examTypeName}) {
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedIds.has(node.collection_id);
   const kw = keyword.trim().toLowerCase();
@@ -70,6 +73,9 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
             {level === 0 ? <FolderTree size={16} /> : <Library size={15} />}
           </span>
           <span className={cx('collectionName', {root: level === 0})}>{node.name}</span>
+          {level === 0 && node.exam_type_id && examTypeName(node.exam_type_id) && (
+            <span className={cx('examTypeBadge')}>{examTypeName(node.exam_type_id)}</span>
+          )}
           {hasChildren && (
             <span className={cx('childCount')}>{node.children.length} nhóm con</span>
           )}
@@ -111,6 +117,7 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
               onDelete={onDelete}
               onAddChild={onAddChild}
               keyword={keyword}
+              examTypeName={examTypeName}
             />
           ))}
         </div>
@@ -136,6 +143,7 @@ function QuestionCollectionsManagement() {
   const [submitting, setSubmitting] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
   const [expandedIds, setExpandedIds] = useState(new Set());
+  const [examTypes, setExamTypes] = useState([]);
 
   const loadCollections = useCallback(async () => {
     setLoading(true);
@@ -156,6 +164,17 @@ function QuestionCollectionsManagement() {
   useEffect(() => {
     loadCollections();
   }, [loadCollections]);
+
+  useEffect(() => {
+    getExamTypes()
+      .then((data) => setExamTypes(Array.isArray(data) ? data : (data?.data || data?.content || [])))
+      .catch(() => setExamTypes([]));
+  }, []);
+
+  const examTypeName = useCallback(
+    (id) => examTypes.find((t) => String(t.examTypeId) === String(id))?.name || '',
+    [examTypes],
+  );
 
   // Dựng cây 2 cấp từ danh sách phẳng.
   const collectionTree = useMemo(() => {
@@ -214,7 +233,8 @@ function QuestionCollectionsManagement() {
 
   const openCreateChildModal = (parent) => {
     resetForm();
-    setFormState({name: '', description: '', parentId: parent.collection_id});
+    // Con kế thừa examType của cha — set sẵn để hiển thị (BE cũng tự ép theo cha).
+    setFormState({name: '', description: '', parentId: parent.collection_id, examTypeId: parent.exam_type_id || ''});
     setShowModal(true);
   };
 
@@ -224,6 +244,7 @@ function QuestionCollectionsManagement() {
       name: collection.name,
       description: collection.description || '',
       parentId: collection.parent_id || '',
+      examTypeId: collection.exam_type_id || '',
     });
     setErrorMessage('');
     setShowModal(true);
@@ -239,11 +260,14 @@ function QuestionCollectionsManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
+      // Luôn gửi parentId (chuỗi rỗng = gỡ cha / cấp 1) để backend cập nhật đúng.
+      const payloadParentId = editingId && editingHasChildren ? '' : (formState.parentId || '');
       const payload = {
         name: normalizedName,
         description: formState.description.trim(),
-        // Luôn gửi parentId (chuỗi rỗng = gỡ cha / cấp 1) để backend cập nhật đúng.
-        parentId: editingId && editingHasChildren ? '' : (formState.parentId || ''),
+        parentId: payloadParentId,
+        // examTypeId chỉ ý nghĩa với collection cha; con để BE tự kế thừa.
+        examTypeId: payloadParentId ? '' : (formState.examTypeId || ''),
       };
 
       if (editingId) {
@@ -342,6 +366,7 @@ function QuestionCollectionsManagement() {
               onDelete={setDeletingItem}
               onAddChild={openCreateChildModal}
               keyword={keyword}
+              examTypeName={examTypeName}
             />
           ))}
       </div>
@@ -397,6 +422,31 @@ function QuestionCollectionsManagement() {
               : 'Chọn nhóm cha để gom vào, ví dụ "ETS 2026" chứa "ETS 2026 1". Chỉ hỗ trợ 2 cấp.'}
           </Form.Text>
         </Form.Group>
+        {/* examType chỉ gắn cho nhóm cấp 1; nhóm con tự kế thừa từ cha. */}
+        {!(editingHasChildren ? false : Boolean(formState.parentId)) ? (
+          <Form.Group className="mb-3">
+            <Form.Label>Loại kỳ thi (cho bộ đề)</Form.Label>
+            <Form.Select
+              value={formState.examTypeId}
+              onChange={(event) => setFormState((prev) => ({...prev, examTypeId: event.target.value}))}
+            >
+              <option value="">-- Chưa gắn loại kỳ thi --</option>
+              {examTypes.map((t) => (
+                <option key={t.examTypeId} value={t.examTypeId}>
+                  {t.name}
+                </option>
+              ))}
+            </Form.Select>
+            <Form.Text muted>
+              Gắn loại kỳ thi để bộ đề này xuất hiện như một folder ở trang "Khám phá bộ đề".
+            </Form.Text>
+          </Form.Group>
+        ) : (
+          <Form.Group className="mb-3">
+            <Form.Label>Loại kỳ thi</Form.Label>
+            <Form.Control plaintext readOnly value={examTypeName(formState.examTypeId) || 'Kế thừa từ nhóm cha'} />
+          </Form.Group>
+        )}
         <Form.Group>
           <Form.Label>Mô tả</Form.Label>
           <Form.Control

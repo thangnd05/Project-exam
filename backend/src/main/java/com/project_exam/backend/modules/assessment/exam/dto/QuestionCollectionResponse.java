@@ -27,4 +27,7 @@ public class QuestionCollectionResponse {
      * Với collection con thì bằng questionCount.
      */
     private Long totalQuestionCount;
+
+    /** Loại kỳ thi gắn với collection (cha set trực tiếp, con kế thừa từ cha). */
+    private String examTypeId;
 }

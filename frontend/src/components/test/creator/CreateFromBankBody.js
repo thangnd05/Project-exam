@@ -9,6 +9,7 @@ import { getQuestionsByPart } from '~/api/questionApi';
 import { getChaptersByClass } from '~/api/chapterApi';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/api/testApi';
 import { createTestPart } from '~/api/testPartApi';
+import { buildCollectionTree } from '~/utils/collectionTree';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {
@@ -72,6 +73,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     maxAttempts: '',
     examTypeId: '',
     examCategoryId: '',
+    collectionId: '',
     bannerUrl: '',
     availableFrom: '',
     availableTo: '',
@@ -297,6 +299,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         availableTo: testInfo.availableTo ? testInfo.availableTo + ':00' : null,
         classId: isClassMode ? classId : null,
         chapterId: isClassMode ? (chapterId || null) : null,
+        collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
         costCoins: testInfo.costCoins && Number(testInfo.costCoins) > 0 ? Number(testInfo.costCoins) : null,
       });
 
@@ -405,6 +408,28 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   <option value="">-- Chọn --</option>
                   {(examTypes || []).map((t) => (
                     <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+            </Col>
+            <Col md={4}>
+              <div className={cx('formGroupModern')}>
+                <label><IoLibraryOutline /> Bộ đề (Collection)</label>
+                <select
+                  className={cx('inputModern')}
+                  value={testInfo.collectionId || ''}
+                  onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}
+                  aria-label="Bộ đề"
+                >
+                  <option value="">-- Trống --</option>
+                  {buildCollectionTree(
+                    (questionCollections || []).filter(
+                      (c) => !testInfo.examTypeId || !c.examTypeId || String(c.examTypeId) === String(testInfo.examTypeId),
+                    ),
+                  ).map((c) => (
+                    <option key={c.collectionId} value={c.collectionId}>
+                      {c.depth > 0 ? `    └ ${c.name}` : c.name}
+                    </option>
                   ))}
                 </select>
               </div>

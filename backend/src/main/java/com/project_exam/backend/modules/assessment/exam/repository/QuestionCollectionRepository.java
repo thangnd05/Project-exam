@@ -16,4 +16,7 @@ public interface QuestionCollectionRepository extends JpaRepository<QuestionColl
     boolean existsByParentId(String parentId);
 
     long countByParentId(String parentId);
+
+    /** Các collection cha (folder bộ đề) của một loại kỳ thi. */
+    List<QuestionCollection> findByExamTypeIdAndParentIdIsNull(String examTypeId);
 }

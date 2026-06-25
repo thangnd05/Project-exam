@@ -35,4 +35,12 @@ public interface TestRepository extends JpaRepository<Test, String> {
     Page<Test> findByExamTypeIdAndClassIdIsNullAndCreatedByIn(
             String examTypeId, Collection<String> createdByIds, Pageable pageable);
 
+    // Đề admin (công khai) thuộc một tập bộ đề (collection cha + các con) — cho trang drill-in.
+    Page<Test> findByClassIdIsNullAndCreatedByInAndCollectionIdIn(
+            Collection<String> createdByIds, Collection<String> collectionIds, Pageable pageable);
+
+    // Đếm đề admin theo từng tập collection — cho số lượng hiển thị trên thẻ folder.
+    long countByClassIdIsNullAndCreatedByInAndCollectionIdIn(
+            Collection<String> createdByIds, Collection<String> collectionIds);
+
 }

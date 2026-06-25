@@ -1,12 +1,12 @@
-import { getTestsByExamType } from '../../../../api/testApi';
+import { getTestsByExamType, getTestCollectionsByExamType } from '../../../../api/testApi';
 import { getExamTypeById } from '../../../../api/examTypeApi';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { FaBullseye } from 'react-icons/fa';
-import { IoDocumentTextOutline } from 'react-icons/io5';
-import routes from '~/config/Routes';
+import { IoDocumentTextOutline, IoFolderOpenOutline, IoChevronForward } from 'react-icons/io5';
+import routes, { buildExamTypeCollectionPath } from '~/config/Routes';
 import { useAuth } from '../../../../hooks/useAuth';
 
 import style from './TestByExamTypePage.module.scss';
@@ -27,6 +27,7 @@ function TestByExamTypePage() {
   const [countdowns, setCountdowns] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [folders, setFolders] = useState([]);
 
   const fetchTests = useCallback(
     (page = 0) => {
@@ -58,6 +59,10 @@ function TestByExamTypePage() {
     getExamTypeById(examTypeId)
       .then((data) => setExamTypeName(data.name))
       .catch(() => { });
+
+    getTestCollectionsByExamType(examTypeId)
+      .then((data) => setFolders(Array.isArray(data) ? data : []))
+      .catch(() => setFolders([]));
   }, [examTypeId, fetchTests]);
 
   // Countdown realtime
@@ -109,6 +114,33 @@ function TestByExamTypePage() {
     </div>
   );
 
+  const folderSection = folders.length > 0 && (
+    <div className={cx('folder-section')}>
+      <div className={cx('folder-section-title')}>
+        <IoFolderOpenOutline /> Bộ đề
+      </div>
+      <div className={cx('folder-grid')}>
+        {folders.map((folder) => (
+          <button
+            key={folder.collectionId}
+            type="button"
+            className={cx('folder-card')}
+            onClick={() => navigate(buildExamTypeCollectionPath(examTypeId, folder.collectionId))}
+          >
+            <span className={cx('folder-card-icon')}>
+              <IoFolderOpenOutline />
+            </span>
+            <span className={cx('folder-card-body')}>
+              <span className={cx('folder-card-name')}>{folder.name}</span>
+              <span className={cx('folder-card-count')}>{folder.testCount} đề</span>
+            </span>
+            <IoChevronForward className={cx('folder-card-arrow')} />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <TestListContainer
       title={examTypeName || 'Loại bài tập'}
@@ -119,6 +151,7 @@ function TestByExamTypePage() {
       tests={tests}
       countdowns={countdowns}
       emptyState={emptyState}
+      topSlot={folderSection}
       footer={
         <Pagination
           currentPage={currentPage}

@@ -3,6 +3,8 @@ import { Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
 import { getAdminTestById, updateTest } from '../../api/testApi';
 import { getExamTypes } from '../../api/examTypeApi';
+import { getQuestionCollections } from '../../api/questionCollectionApi';
+import { buildCollectionTree } from '~/utils/collectionTree';
 import { useHasPermission } from '~/hooks/usePermission';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -25,6 +27,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
   const canSetPricing = useHasPermission('TEST:MANAGE_PRICING');
   const [saving, setSaving] = useState(false);
   const [examTypes, setExamTypes] = useState([]);
+  const [questionCollections, setQuestionCollections] = useState([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [testDetail, setTestDetail] = useState(null);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
@@ -33,6 +36,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     title: '',
     description: '',
     examTypeId: '',
+    collectionId: '',
     durationMinutes: '',
     maxAttempts: '',
     bannerUrl: '',
@@ -44,11 +48,13 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
   useEffect(() => {
     if (show) {
       fetchExamTypes();
+      fetchQuestionCollections();
       if (test) {
         setFormData({
           title: test.title || '',
           description: test.description || '',
           examTypeId: test.examType?.examTypeId || test.examTypeId || '',
+          collectionId: test.collectionId || '',
           durationMinutes: test.durationMinutes || '',
           maxAttempts: test.maxAttempts || '',
           bannerUrl: test.bannerUrl || '',
@@ -95,6 +101,30 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     }
   };
 
+  const fetchQuestionCollections = async () => {
+    try {
+      const data = await getQuestionCollections();
+      setQuestionCollections(Array.isArray(data) ? data : (data?.data || data?.content || []));
+    } catch (error) {
+      console.error('Failed to load collections', error);
+      setQuestionCollections([]);
+    }
+  };
+
+  // Bộ đề lọc theo loại kỳ thi đang chọn (giữ cả collection chưa gắn examType).
+  const collectionOptions = useMemo(
+    () =>
+      buildCollectionTree(
+        (questionCollections || []).filter(
+          (c) =>
+            !formData.examTypeId ||
+            !c.examTypeId ||
+            String(c.examTypeId) === String(formData.examTypeId),
+        ),
+      ),
+    [questionCollections, formData.examTypeId],
+  );
+
   const handleSave = async () => {
     if (!formData.title?.trim() || !formData.examTypeId) {
       toast.warning('Vui lòng nhập tên đề thi và chọn loại kỳ thi');
@@ -107,6 +137,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       title: formData.title.trim(),
       description: formData.description || null,
       examTypeId: String(formData.examTypeId),
+      // Bộ đề: chuỗi rỗng = gỡ, có giá trị = gán/đổi.
+      collectionId: formData.collectionId ? String(formData.collectionId) : '',
       durationMinutes:
         formData.durationMinutes && Number(formData.durationMinutes) > 0
           ? Number(formData.durationMinutes)
@@ -258,6 +290,26 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
                   {examTypes.map((type) => (
                     <option key={type.examTypeId} value={type.examTypeId}>
                       {type.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </Col>
+
+            <Col md={6}>
+              <div className={cxCreate('formGroupModern')}>
+                <label>Bộ đề (Collection)</label>
+                <select
+                  className={cxCreate('inputModern')}
+                  value={formData.collectionId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, collectionId: e.target.value })
+                  }
+                >
+                  <option value="">-- Trống --</option>
+                  {collectionOptions.map((c) => (
+                    <option key={c.collectionId} value={c.collectionId}>
+                      {c.depth > 0 ? `    └ ${c.name}` : c.name}
                     </option>
                   ))}
                 </select>

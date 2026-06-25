@@ -18,6 +18,9 @@ public class CreateTestRequest {
     // Có thể null — khi đó test mặc định là legacy/standard.
     private String examCategoryId;
 
+    // Bộ đề (collection) mà đề thuộc về. Optional. Lúc tạo đề, FE lọc theo examTypeId.
+    private String collectionId;
+
     // Hỗ trợ cấu hình thời gian mở/đóng đề
     private LocalDateTime availableFrom;
     private LocalDateTime availableTo;

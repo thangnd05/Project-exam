@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_tests_exam_type_id", columnList = "exam_type_id"),
                 @Index(name = "idx_tests_class_id", columnList = "class_id"),
                 @Index(name = "idx_tests_chapter_id", columnList = "chapter_id"),
-                @Index(name = "idx_tests_exam_category_id", columnList = "exam_category_id")
+                @Index(name = "idx_tests_exam_category_id", columnList = "exam_category_id"),
+                @Index(name = "idx_tests_collection_id", columnList = "collection_id")
         })
 @Getter
 @Setter
@@ -60,6 +61,11 @@ public class Test {
     // Nullable: test cũ và TOEIC legacy không bắt buộc gắn category.
     @Column(name = "exam_category_id")
     private String examCategoryId; // FK -> exam_categories.exam_category_id
+
+    // Bộ đề (folder) mà đề này thuộc về — FK -> question_collections.collection_id (nullable).
+    // Gắn vào collection con (vd "ETS 2026 1") hoặc cha; trang khám phá gom đề theo collection cha.
+    @Column(name = "collection_id")
+    private String collectionId;
 
     // Giá xu để mở khoá bài (chỉ admin đặt, chỉ áp dụng cho bài công khai).
     // null/0 = miễn phí; >0 = user phải mua 1 lần để mở khoá vĩnh viễn.

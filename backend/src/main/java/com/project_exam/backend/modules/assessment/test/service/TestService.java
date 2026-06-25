@@ -25,6 +25,7 @@ import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardRe
 import com.project_exam.backend.modules.assessment.test.dto.TestPartAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
+import com.project_exam.backend.modules.assessment.test.dto.TestCollectionResponse;
 import com.project_exam.backend.modules.assessment.test.domain.UserTestAccess;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
@@ -119,6 +120,7 @@ public class TestService {
     private final com.project_exam.backend.modules.assessment.exam.repository.PassageMediaRepository passageMediaRepository;
     private final com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper passageMediaMapper;
     private final com.project_exam.backend.modules.assessment.test.mapper.TestMapper testMapper;
+    private final com.project_exam.backend.modules.assessment.exam.repository.QuestionCollectionRepository questionCollectionRepository;
 
     /** User có quyền làm bài chưa: miễn phí, hoặc là người tạo, hoặc đã mua. */
     private boolean hasTestAccess(Test test, String userId) {
@@ -255,17 +257,69 @@ public class TestService {
         int safeSize = size <= 0 ? 12 : Math.min(size, 100);
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Role adminRole = roleRepository.findByRoleName("ADMIN");
-        if (adminRole == null) return PageResponse.empty(safePage, safeSize);
-        Set<String> adminIds = userRepository.findByRoleId(adminRole.getRoleId()).stream()
-                .map(User::getUserId)
-                .collect(Collectors.toSet());
+        Set<String> adminIds = resolveAdminIds();
         if (adminIds.isEmpty()) return PageResponse.empty(safePage, safeSize);
 
         Page<Test> testPage = testRepository
                 .findByExamTypeIdAndClassIdIsNullAndCreatedByIn(examTypeId, adminIds, pageable);
 
         // Truyền userId để biết bài nào đã mở khoá (owner/đã mua) -> badge hiển thị đúng.
+        return toTestPageResponse(testPage, userId);
+    }
+
+    /** Tập userId của tất cả admin (đề công khai = do admin tạo). Rỗng nếu chưa có admin. */
+    private Set<String> resolveAdminIds() {
+        Role adminRole = roleRepository.findByRoleName("ADMIN");
+        if (adminRole == null) return Set.of();
+        return userRepository.findByRoleId(adminRole.getRoleId()).stream()
+                .map(User::getUserId)
+                .collect(Collectors.toSet());
+    }
+
+    /** collectionId của bộ đề + tất cả collection con (2 cấp). */
+    private List<String> collectionWithChildrenIds(String collectionId) {
+        List<String> ids = new ArrayList<>();
+        ids.add(collectionId);
+        questionCollectionRepository.findByParentId(collectionId)
+                .forEach(c -> ids.add(c.getCollectionId()));
+        return ids;
+    }
+
+    /**
+     * Danh sách folder bộ đề (collection cha) của một loại kỳ thi, kèm số đề bên trong (gộp con).
+     */
+    public List<TestCollectionResponse> getTestCollectionsByExamType(String examTypeId) {
+        Set<String> adminIds = resolveAdminIds();
+        return questionCollectionRepository.findByExamTypeIdAndParentIdIsNull(examTypeId).stream()
+                .map(folder -> {
+                    long testCount = adminIds.isEmpty() ? 0L
+                            : testRepository.countByClassIdIsNullAndCreatedByInAndCollectionIdIn(
+                                    adminIds, collectionWithChildrenIds(folder.getCollectionId()));
+                    return TestCollectionResponse.builder()
+                            .collectionId(folder.getCollectionId())
+                            .name(folder.getName())
+                            .description(folder.getDescription())
+                            .testCount(testCount)
+                            .build();
+                })
+                .sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName()))
+                .toList();
+    }
+
+    /**
+     * Đề (công khai) thuộc một bộ đề: nếu collection là cha thì gộp luôn đề của các con.
+     */
+    public PageResponse<TestResponse> getTestsByCollectionPaged(
+            String collectionId, int page, int size, String userId) {
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 12 : Math.min(size, 100);
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Set<String> adminIds = resolveAdminIds();
+        if (adminIds.isEmpty()) return PageResponse.empty(safePage, safeSize);
+
+        Page<Test> testPage = testRepository.findByClassIdIsNullAndCreatedByInAndCollectionIdIn(
+                adminIds, collectionWithChildrenIds(collectionId), pageable);
         return toTestPageResponse(testPage, userId);
     }
 
@@ -406,6 +460,10 @@ public class TestService {
         if (request.getClassId() != null) test.setClassId(request.getClassId());
         if (request.getChapterId() != null) test.setChapterId(request.getChapterId());
         if (request.getExamCategoryId() != null) test.setExamCategoryId(request.getExamCategoryId());
+        // collectionId: gửi chuỗi rỗng để gỡ bộ đề, có giá trị để gán/đổi.
+        if (request.getCollectionId() != null) {
+            test.setCollectionId(request.getCollectionId().isBlank() ? null : request.getCollectionId());
+        }
         if (request.getAvailableFrom() != null) test.setAvailableFrom(request.getAvailableFrom());
         if (request.getAvailableTo() != null) test.setAvailableTo(request.getAvailableTo());
         // Giá xu: chỉ admin đặt được, và chỉ cho bài công khai (không gắn lớp). Đặt 0 để gỡ phí.

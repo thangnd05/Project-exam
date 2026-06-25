@@ -137,6 +137,18 @@
   text-overflow: ellipsis;
 }
 
+// Badge loại kỳ thi của bộ đề cha
+.examTypeBadge {
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 0.1rem 0.8rem;
+  border-radius: 1rem;
+  flex-shrink: 0;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
 // Badge số collection con (xám, giống childCount của tag)
 .childCount {
   font-size: 1.2rem;

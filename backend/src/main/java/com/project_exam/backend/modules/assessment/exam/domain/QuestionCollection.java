@@ -6,7 +6,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "question_collections", indexes = {
-        @Index(name = "idx_question_collections_parent_id", columnList = "parent_id")
+        @Index(name = "idx_question_collections_parent_id", columnList = "parent_id"),
+        @Index(name = "idx_question_collections_exam_type_id", columnList = "exam_type_id")
 })
 @Getter
 @Setter
@@ -31,4 +32,12 @@ public class QuestionCollection {
      */
     @Column(name = "parent_id")
     private String parentId;
+
+    /**
+     * Loại kỳ thi mà bộ sưu tập (cấp 1) này thuộc về — vd "ETS 2026" thuộc TOEIC.
+     * <p>Gắn ở collection cha; collection con tự kế thừa examTypeId của cha. null = chưa gắn examType.
+     * Dùng để liệt kê "examType này có những bộ đề (folder) nào".
+     */
+    @Column(name = "exam_type_id")
+    private String examTypeId;
 }

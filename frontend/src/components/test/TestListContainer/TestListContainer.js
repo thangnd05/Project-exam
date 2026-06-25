@@ -38,6 +38,7 @@ const TestListContainer = ({
   loading,
   onRefresh,
   footer,
+  topSlot,
 }) => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
 
@@ -72,6 +73,7 @@ const TestListContainer = ({
         </PageHeader>
 
         <div className={cx('content-section')}>
+          {topSlot}
           {tests.length > 0 ? (
             viewMode === 'grid' ? (
               <div className={cx('test-grid')}>

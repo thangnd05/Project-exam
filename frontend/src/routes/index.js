@@ -4,6 +4,7 @@ import ForgotPassword from '~/pages/user/login/forgot';
 import ResetPassWord from '~/pages/user/login/reset';
 import TestPage from '~/pages/exam/TestPage';
 import TestByExamTypePage from '~/pages/exam/examtype/examtypeById/TestByExamTypePage';
+import TestByCollectionPage from '~/pages/exam/examtype/examtypeById/TestByCollectionPage';
 import TestStartPage from '~/pages/exam/examtype/examtypeById/testStart/TestStartPage';
 import TestResultPage from '~/pages/exam/examtype/examtypeById/result/TestResultPage';
 import TestReviewPage from '~/pages/exam/examtype/examtypeById/result/TestReviewPage';
@@ -76,6 +77,7 @@ export const publicRoutes = [
   { path: routes.reset, component: ResetPassWord },
   { path: routes.home, component: TestPage },
   { path: routes.examTypeDetail, component: TestByExamTypePage },
+  { path: routes.examTypeCollection, component: TestByCollectionPage },
   { path: routes.policy, component: Policy },
   { path: routes.service, component: Service },
   { path: routes.about, component: About },

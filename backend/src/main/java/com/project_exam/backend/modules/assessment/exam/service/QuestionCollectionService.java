@@ -52,7 +52,10 @@ public class QuestionCollectionService {
         collection.setName(name);
         collection.setDescription(trimOrNull(request.getDescription()));
         // Gán cha (nếu có). Khi tạo mới collection chưa có con nên chỉ cần validate cha hợp lệ.
-        collection.setParentId(resolveParentId(request.getParentId(), null));
+        String parentId = resolveParentId(request.getParentId(), null);
+        collection.setParentId(parentId);
+        // Cha: examType lấy từ request; con: kế thừa examType của cha.
+        collection.setExamTypeId(resolveExamTypeId(parentId, request.getExamTypeId()));
         collection = collectionRepository.save(collection);
         return toResponse(collection);
     }
@@ -84,6 +87,19 @@ public class QuestionCollectionService {
         // parentId == null trong request nghĩa là "không đụng tới". Để gỡ cha, FE gửi chuỗi rỗng.
         if (request.getParentId() != null) {
             collection.setParentId(resolveParentId(request.getParentId(), id));
+        }
+
+        // Xác định examTypeId sau khi parentId đã chốt.
+        if (collection.getParentId() != null) {
+            // Là con → luôn kế thừa examType của cha.
+            collection.setExamTypeId(resolveExamTypeId(collection.getParentId(), null));
+        } else if (request.getExamTypeId() != null) {
+            // Là cha và request có gửi examTypeId → cập nhật, đồng thời lan truyền xuống các con.
+            String newExamTypeId = normalize(request.getExamTypeId());
+            collection.setExamTypeId(newExamTypeId);
+            List<QuestionCollection> children = collectionRepository.findByParentId(id);
+            children.forEach(c -> c.setExamTypeId(newExamTypeId));
+            if (!children.isEmpty()) collectionRepository.saveAll(children);
         }
 
         collection = collectionRepository.save(collection);
@@ -166,6 +182,18 @@ public class QuestionCollectionService {
                     "Bộ sưu tập này đang chứa bộ sưu tập con nên không thể trở thành con của bộ khác.");
         }
         return parentId;
+    }
+
+    /**
+     * examTypeId hiệu lực: collection cha lấy từ request; collection con kế thừa từ cha.
+     */
+    private String resolveExamTypeId(String parentId, String rawExamTypeId) {
+        if (parentId == null) {
+            return normalize(rawExamTypeId);
+        }
+        return collectionRepository.findById(parentId)
+                .map(QuestionCollection::getExamTypeId)
+                .orElse(null);
     }
 
     private String normalize(String s) {

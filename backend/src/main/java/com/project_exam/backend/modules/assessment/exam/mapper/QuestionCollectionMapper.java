@@ -25,6 +25,7 @@ public class QuestionCollectionMapper {
                 .parentName(parentName)
                 .childCount(childCount)
                 .totalQuestionCount(totalQuestionCount)
+                .examTypeId(collection.getExamTypeId())
                 .build();
     }
 }
