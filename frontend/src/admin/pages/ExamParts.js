@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
+import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {createExamPart, deleteExamPart, getExamParts, updateExamPart} from '../../api/examPartApi';
@@ -14,6 +15,9 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
+import styles from './ExamParts.module.scss';
+
+const cx = classNames.bind(styles);
 
 const emptyForm = {
   exam_type_id: '',
@@ -57,22 +61,52 @@ function ExamPartsManagement() {
     name: item.name || '',
   });
 
-  const filteredExamParts = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase();
-    if (!keyword) {
-      return examParts;
-    }
-
-    return examParts.filter((examPart) => {
-      const examTypeName =
-        examTypes.find((item) => item.exam_type_id === examPart.exam_type_id)?.name || '';
+  const getExamTypeName = useCallback(
+    (examTypeId) => {
       return (
-        examPart.name.toLowerCase().includes(keyword) ||
-        (examPart.description || '').toLowerCase().includes(keyword) ||
-        examTypeName.toLowerCase().includes(keyword)
+        examTypes.find((examType) => examType.exam_type_id === examTypeId)?.name ||
+        'Không xác định'
       );
+    },
+    [examTypes],
+  );
+
+  const groupedExamParts = useMemo(() => {
+    const keyword = searchTerm.trim().toLowerCase();
+    const filteredParts = keyword
+      ? examParts.filter((examPart) => {
+          const examTypeName = getExamTypeName(examPart.exam_type_id);
+          return (
+            examPart.name.toLowerCase().includes(keyword) ||
+            (examPart.description || '').toLowerCase().includes(keyword) ||
+            examTypeName.toLowerCase().includes(keyword)
+          );
+        })
+      : examParts;
+
+    const groups = new Map();
+    filteredParts.forEach((examPart) => {
+      if (!groups.has(examPart.exam_type_id)) {
+        groups.set(examPart.exam_type_id, []);
+      }
+      groups.get(examPart.exam_type_id).push(examPart);
     });
-  }, [examParts, examTypes, searchTerm]);
+
+    return [...groups.entries()]
+      .map(([examTypeId, parts]) => ({
+        examTypeId,
+        examTypeName: getExamTypeName(examTypeId),
+        parts: [...parts].sort((left, right) => {
+          const orderCompare =
+            (left.display_order ?? 999) - (right.display_order ?? 999);
+          if (orderCompare !== 0) {
+            return orderCompare;
+          }
+          return left.name.localeCompare(right.name, 'vi');
+        }),
+      }))
+      .sort((left, right) => left.examTypeName.localeCompare(right.examTypeName, 'vi'));
+  }, [examParts, getExamTypeName, searchTerm]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -148,11 +182,7 @@ function ExamPartsManagement() {
         );
       } else {
         const createdPart = await createExamPart(payload);
-        setExamParts((previous) =>
-          [...previous, mapExamPartFromApi(createdPart)].sort(
-            (a, b) => (a.display_order ?? 999) - (b.display_order ?? 999),
-          ),
-        );
+        setExamParts((previous) => [...previous, mapExamPartFromApi(createdPart)]);
       }
       setShowFormModal(false);
       resetForm();
@@ -183,13 +213,6 @@ function ExamPartsManagement() {
     }
   };
 
-  const getExamTypeName = (examTypeId) => {
-    return (
-      examTypes.find((examType) => examType.exam_type_id === examTypeId)?.name ||
-      'Không xác định'
-    );
-  };
-
   const getSkillName = (skillId) => {
     if (!skillId) {
       return '-';
@@ -200,14 +223,24 @@ function ExamPartsManagement() {
   const columns = [
     {key: 'display_order', header: 'Thứ tự', align: 'center'},
     {key: 'name', header: 'Tên phần thi'},
-    {
-      key: 'exam_type',
-      header: 'Loại kỳ thi',
-      render: (examPart) => getExamTypeName(examPart.exam_type_id),
-    },
     {key: 'skill', header: 'Skill', render: (examPart) => getSkillName(examPart.skill_id)},
     {key: 'default_num_questions', header: 'Số câu mặc định', align: 'center'},
   ];
+
+  const renderRowActions = (examPart) => (
+    <>
+      <button onClick={() => openEditModal(examPart)} title="Sửa">
+        <Edit size={14} />
+      </button>
+      <button
+        className="danger"
+        onClick={() => setDeletingExamPart(examPart)}
+        title="Xóa"
+      >
+        <Trash2 size={14} />
+      </button>
+    </>
+  );
 
   return (
     <div className="d-flex flex-column gap-3">
@@ -228,29 +261,45 @@ function ExamPartsManagement() {
       />
       <AdminFieldError message={errorMessage} />
 
-      <AdminTable
-        showIndex
-        paginated
-        itemLabel="phần thi"
-        columns={columns}
-        data={filteredExamParts}
-        loading={loading}
-        getRowKey={(examPart) => examPart.exam_part_id}
-        rowActions={(examPart) => (
-          <>
-            <button onClick={() => openEditModal(examPart)} title="Sửa">
-              <Edit size={14} />
-            </button>
-            <button
-              className="danger"
-              onClick={() => setDeletingExamPart(examPart)}
-              title="Xóa"
-            >
-              <Trash2 size={14} />
-            </button>
-          </>
-        )}
-      />
+      {loading ? (
+        <AdminTable
+          showIndex
+          columns={columns}
+          data={[]}
+          loading
+          getRowKey={(examPart) => examPart.exam_part_id}
+          rowActions={renderRowActions}
+        />
+      ) : groupedExamParts.length === 0 ? (
+        <AdminTable
+          showIndex
+          columns={columns}
+          data={[]}
+          emptyText="Không có phần thi nào."
+          getRowKey={(examPart) => examPart.exam_part_id}
+          rowActions={renderRowActions}
+        />
+      ) : (
+        <div className={cx('groupList')}>
+          {groupedExamParts.map((group) => (
+            <section key={group.examTypeId} className={cx('examTypeSection')}>
+              <div className={cx('sectionHeader')}>
+                <h3>{group.examTypeName}</h3>
+                <span className={cx('sectionMeta')}>
+                  {group.parts.length} phần thi
+                </span>
+              </div>
+              <AdminTable
+                showIndex
+                columns={columns}
+                data={group.parts}
+                getRowKey={(examPart) => examPart.exam_part_id}
+                rowActions={renderRowActions}
+              />
+            </section>
+          ))}
+        </div>
+      )}
 
       <BaseModal
         show={showFormModal}
