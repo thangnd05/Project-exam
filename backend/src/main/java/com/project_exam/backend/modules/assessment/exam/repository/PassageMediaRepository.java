@@ -15,6 +15,8 @@ public interface PassageMediaRepository extends JpaRepository<PassageMedia, Stri
 
     void deleteByPassageId(String passageId);
 
+    void deleteByPassageIdAndMediaType(String passageId, PassageMedia.MediaType mediaType);
+
     List<PassageMedia> findByPassageIdIn(Collection<String> passageIds);
 
     List<PassageMedia> findByPassageIdInOrderByIdAsc(Collection<String> passageIds);

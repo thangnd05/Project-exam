@@ -88,6 +88,10 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
   const mediaItems = collectMediaItems(question);
   const passageContent = question?.passage?.content || '';
   const passageTranslation = question?.passage?.contentTranslation || '';
+  const extraTexts = (Array.isArray(question?.passageMedia) ? question.passageMedia : [])
+    .filter((m) => (m?.mediaType || '').toUpperCase() === 'TEXT')
+    .map((m) => m?.content || '')
+    .filter(Boolean);
 
   return (
     <BaseModal
@@ -130,7 +134,7 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
               {question.questionText || '(Không có nội dung)'}
             </div>
 
-            {(passageContent || passageTranslation || mediaItems.length > 0) && (
+            {(passageContent || passageTranslation || mediaItems.length > 0 || extraTexts.length > 0) && (
               <>
                 <div className={cx('sectionTitle')}>Đoạn văn / Media</div>
 
@@ -150,6 +154,24 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                     {passageContent}
                   </div>
                 )}
+
+                {extraTexts.map((text, idx) => (
+                  <div
+                    key={`extra-${idx}`}
+                    style={{
+                      background: '#fff',
+                      border: '2px solid #e2e8f0',
+                      borderRadius: 12,
+                      padding: '12px 14px',
+                      fontSize: '1.3rem',
+                      color: '#1e293b',
+                      whiteSpace: 'pre-wrap',
+                      marginBottom: 12,
+                    }}
+                  >
+                    {text}
+                  </div>
+                ))}
 
                 {passageTranslation && (
                   <details style={{ marginBottom: 12 }}>

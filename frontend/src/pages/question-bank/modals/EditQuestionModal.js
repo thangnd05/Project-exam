@@ -60,6 +60,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   const [saving, setSaving] = useState(false);
 
   const [newFiles, setNewFiles] = useState([]);
+  const [extraContents, setExtraContents] = useState([]); // các đoạn text bổ sung của passage
   const [existingMedia, setExistingMedia] = useState([]);
   const [deletingMediaIds, setDeletingMediaIds] = useState([]);
   const [questionCollections, setQuestionCollections] = useState([]);
@@ -147,6 +148,15 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
           });
           setExistingMedia(getMediaItemsFromQuestion(questionDetail));
 
+          // Các đoạn text bổ sung (passage_media type=TEXT), giữ thứ tự theo id
+          const textSegments = (
+            Array.isArray(questionDetail.passageMedia) ? questionDetail.passageMedia : []
+          )
+            .filter((m) => (m?.mediaType || '').toUpperCase() === 'TEXT')
+            .map((m) => m?.content || '')
+            .filter((t) => t !== '');
+          setExtraContents(textSegments);
+
           // Load tags: lấy danh sách tag đã gắn + danh sách tag available
           const currentTagIds = (questionDetail.tags || []).map((t) => t.tagId);
           setSelectedTagIds(currentTagIds);
@@ -182,6 +192,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     };
 
     setNewFiles([]);
+    setExtraContents([]);
     setExistingMedia([]);
     setDeletingMediaIds([]);
     fetchQuestionDetails(questionId);
@@ -196,6 +207,18 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       ...prev,
       passage: { ...prev.passage, [field]: value },
     }));
+  };
+
+  const addExtraContent = () => {
+    setExtraContents((prev) => [...prev, '']);
+  };
+
+  const updateExtraContent = (idx, value) => {
+    setExtraContents((prev) => prev.map((t, i) => (i === idx ? value : t)));
+  };
+
+  const removeExtraContent = (idx) => {
+    setExtraContents((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleOptionChange = (idx, field, value) => {
@@ -295,10 +318,15 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       tagIds: selectedTagIds,
     };
 
+    const cleanExtraContents = extraContents
+      .map((t) => t?.trim())
+      .filter(Boolean);
+
     const hasPassage =
       formData.passage.content?.trim() !== '' ||
       formData.passage.contentTranslation?.trim() !== '' ||
-      formData.passage.mediaUrl?.trim() !== '';
+      formData.passage.mediaUrl?.trim() !== '' ||
+      cleanExtraContents.length > 0;
 
     if (hasPassage) {
       payload.passage = {
@@ -306,6 +334,8 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
         content: formData.passage.content,
         contentTranslation: formData.passage.contentTranslation?.trim() || null,
         mediaUrl: formData.passage.mediaUrl,
+        // Luôn gửi (kể cả mảng rỗng) để BE đồng bộ: xoá đoạn đã bỏ, thêm đoạn mới
+        extraContents: cleanExtraContents,
       };
     }
 
@@ -556,6 +586,39 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                   }
                   placeholder="Văn bản bài đọc / Script..."
                 />
+              </Col>
+
+              {extraContents.map((text, idx) => (
+                <Col md={12} key={idx}>
+                  <label className={cx('formLabel')} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Đoạn văn bổ sung {idx + 2}</span>
+                    <Button
+                      variant="link"
+                      className="text-danger p-0"
+                      onClick={() => removeExtraContent(idx)}
+                      aria-label={`Xóa đoạn văn bổ sung ${idx + 2}`}
+                    >
+                      <IoTrashOutline size={18} />
+                    </Button>
+                  </label>
+                  <textarea
+                    className={cxCreate('inputModern')}
+                    rows={4}
+                    value={text}
+                    onChange={(e) => updateExtraContent(idx, e.target.value)}
+                    placeholder={`Nội dung đoạn văn thứ ${idx + 2}...`}
+                  />
+                </Col>
+              ))}
+
+              <Col md={12}>
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={addExtraContent}
+                >
+                  <IoCreateOutline className="me-1" /> Thêm đoạn văn
+                </Button>
               </Col>
 
               <Col md={12}>

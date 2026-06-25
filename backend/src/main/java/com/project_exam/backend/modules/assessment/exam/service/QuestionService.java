@@ -896,7 +896,10 @@ public class QuestionService {
     }
 
     private boolean hasPassageContent(PassageRequest pr) {
-        return (pr.getContent() != null && !pr.getContent().trim().isEmpty()) || pr.getMediaUrl() != null;
+        return (pr.getContent() != null && !pr.getContent().trim().isEmpty())
+                || pr.getMediaUrl() != null
+                || (pr.getExtraContents() != null
+                        && pr.getExtraContents().stream().anyMatch(s -> s != null && !s.trim().isEmpty()));
     }
 
     private void validateQuestionAnswers(Question.QuestionType questionType, List<AnswerRequest> answers) {
@@ -1169,6 +1172,22 @@ public class QuestionService {
                 throw new BadRequestException("Upload file thất bại: " + e.getMessage(), e);
             }
             passage = passageRepository.findById(passage.getPassageId()).orElse(passage);
+        }
+
+        // Đồng bộ các đoạn text bổ sung (passage nhiều đoạn): null = giữ nguyên;
+        // có list (kể cả rỗng) = xoá hết TEXT cũ rồi tạo lại theo đúng list mới.
+        if (passage != null && request.getPassage() != null
+                && request.getPassage().getExtraContents() != null) {
+            passageMediaRepository.deleteByPassageIdAndMediaType(
+                    passage.getPassageId(), PassageMedia.MediaType.TEXT);
+            for (String extra : request.getPassage().getExtraContents()) {
+                if (extra == null || extra.trim().isEmpty()) continue;
+                PassageMedia textMedia = new PassageMedia();
+                textMedia.setPassageId(passage.getPassageId());
+                textMedia.setContent(extra);
+                textMedia.setMediaType(PassageMedia.MediaType.TEXT);
+                passageMediaRepository.save(textMedia);
+            }
         }
 
         question = questionRepository.save(question);
