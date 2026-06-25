@@ -1,12 +1,12 @@
 import { getTestsByExamType, getTestCollectionsByExamType } from '../../../../api/testApi';
-import { getExamTypeById } from '../../../../api/examTypeApi';
+import { getExamTypeById, getExamTypeChildren } from '../../../../api/examTypeApi';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { FaBullseye } from 'react-icons/fa';
-import { IoDocumentTextOutline, IoFolderOpenOutline, IoChevronForward } from 'react-icons/io5';
-import routes, { buildExamTypeCollectionPath } from '~/config/Routes';
+import { IoDocumentTextOutline, IoFolderOpenOutline, IoChevronForward, IoSchoolOutline } from 'react-icons/io5';
+import routes, { buildExamTypeCollectionPath, buildExamTypeDetailPath } from '~/config/Routes';
 import { useAuth } from '../../../../hooks/useAuth';
 
 import style from './TestByExamTypePage.module.scss';
@@ -28,6 +28,7 @@ function TestByExamTypePage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [folders, setFolders] = useState([]);
+  const [children, setChildren] = useState([]);
 
   const fetchTests = useCallback(
     (page = 0) => {
@@ -63,6 +64,11 @@ function TestByExamTypePage() {
     getTestCollectionsByExamType(examTypeId)
       .then((data) => setFolders(Array.isArray(data) ? data : []))
       .catch(() => setFolders([]));
+
+    // Nếu đây là loại kỳ thi cha (vd AWS) → có các loại con (cert) để drill-in.
+    getExamTypeChildren(examTypeId)
+      .then((data) => setChildren(Array.isArray(data) ? data : []))
+      .catch(() => setChildren([]));
   }, [examTypeId, fetchTests]);
 
   // Countdown realtime
@@ -93,6 +99,48 @@ function TestByExamTypePage() {
         <Spinner animation="grow" variant="info" />
         <p className="mt-3 fw-bold text-info">Đang tải kho bài tập...</p>
       </div>
+    );
+  }
+
+  // Loại kỳ thi cha (vd AWS) → hiện danh sách kỳ thi con (cert) để chọn, không hiện test.
+  if (children.length > 0) {
+    const childrenGrid = (
+      <div className={cx('folder-section')}>
+        <div className={cx('folder-section-title')}>
+          <IoSchoolOutline /> Các kỳ thi
+        </div>
+        <div className={cx('folder-grid')}>
+          {children.map((child) => (
+            <button
+              key={child.examTypeId}
+              type="button"
+              className={cx('folder-card')}
+              onClick={() => navigate(buildExamTypeDetailPath(child.examTypeId))}
+            >
+              <span className={cx('folder-card-icon')}>
+                <IoSchoolOutline />
+              </span>
+              <span className={cx('folder-card-body')}>
+                <span className={cx('folder-card-name')}>{child.name}</span>
+                {child.description && (
+                  <span className={cx('folder-card-count')}>{child.description}</span>
+                )}
+              </span>
+              <IoChevronForward className={cx('folder-card-arrow')} />
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+
+    return (
+      <TestListContainer
+        title={examTypeName || 'Loại kỳ thi'}
+        label="Chọn kỳ thi"
+        tests={[]}
+        emptyState={<></>}
+        topSlot={childrenGrid}
+      />
     );
   }
 

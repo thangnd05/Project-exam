@@ -425,7 +425,8 @@ const CreateTestFormBody = ({
                 <label>Loại kỳ thi</label>
                 <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => handleExamTypeChange(e.target.value)}>
                   <option value="">-- Chọn --</option>
-                  {examTypes.map((t) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
+                  {/* Chỉ cho chọn examType lá (ẩn node cha như "AWS" chỉ để gom). */}
+                  {examTypes.filter((t) => !t.childCount).map((t) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
                 </select>
               </div>
             </Col>

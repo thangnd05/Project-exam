@@ -18,4 +18,11 @@ public interface ExamTypeRepository extends JpaRepository<ExamType, String> {
     /** Loại kỳ thi linh hoạt (flexible = true, vd "Thông Thường"). */
     @Query("SELECT e FROM ExamType e WHERE e.flexible = true")
     List<ExamType> findFlexible();
+
+    /** examType con trực tiếp của 1 examType cha. */
+    List<ExamType> findByParentId(String parentId);
+
+    boolean existsByParentId(String parentId);
+
+    long countByParentId(String parentId);
 }

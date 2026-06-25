@@ -20,6 +20,11 @@ export const getExamTypeById = (examTypeId) => {
   return axios.get(`${BASE_URL}/${examTypeId}`).then((response) => response.data);
 };
 
+// Các loại kỳ thi con của 1 loại cha (drill-in vd "AWS" → các cert).
+export const getExamTypeChildren = (examTypeId) => {
+  return axios.get(`${BASE_URL}/${examTypeId}/children`).then((response) => response.data);
+};
+
 export const createExamType = (payload) => {
   return axios.post(BASE_URL, payload).then((response) => response.data);
 };

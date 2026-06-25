@@ -63,7 +63,8 @@ function ExamTypePage() {
   useEffect(() => {
     getStandardExamTypes()
       .then((data) => {
-        setExamTypes(normalizeExamTypes(data));
+        // Chỉ hiện loại kỳ thi gốc (parentId null); loại con (vd các cert AWS) xem khi bấm vào cha.
+        setExamTypes(normalizeExamTypes(data).filter((t) => !t.parentId));
       })
       .catch((error) => {
         console.error('Lỗi khi lấy exam types:', error);
@@ -128,17 +129,20 @@ function ExamTypePage() {
               <h4 className={cx('name')}>{examType.name}</h4>
               <div className={cx('cardActions')}>
                 <span className={cx('action-text')}>
-                  Khám phá ngay
+                  {examType.childCount > 0 ? 'Xem các kỳ thi' : 'Khám phá ngay'}
                   <span className={cx('arrow')}>→</span>
                 </span>
-                <button
-                  type="button"
-                  className={cx('targetBtn')}
-                  onClick={(event) => handleSetTarget(event, examType.examTypeId)}
-                >
-                  <FaBullseye />
-                  Mục tiêu của tôi
-                </button>
+                {/* Node cha (gom nhiều kỳ thi con) không phải mục tiêu cụ thể nên ẩn nút mục tiêu. */}
+                {!(examType.childCount > 0) && (
+                  <button
+                    type="button"
+                    className={cx('targetBtn')}
+                    onClick={(event) => handleSetTarget(event, examType.examTypeId)}
+                  >
+                    <FaBullseye />
+                    Mục tiêu của tôi
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>

@@ -48,6 +48,12 @@ public class ExamTypeController {
         return ResponseEntity.ok(examTypeService.findById(id));
     }
 
+    /** Các loại kỳ thi con của 1 loại cha (drill-in vd "AWS" → các cert). */
+    @GetMapping("/{id}/children")
+    public ResponseEntity<List<ExamTypeResponse>> getChildren(@PathVariable String id) {
+        return ResponseEntity.ok(examTypeService.findChildren(id));
+    }
+
     @PostMapping
     public ResponseEntity<ExamTypeResponse> createExamType(
             @Valid @RequestBody ExamTypeRequest request,

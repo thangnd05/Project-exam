@@ -9,6 +9,8 @@ function ExamTypeFormModal({
   show,
   isEditing,
   formState,
+  parentOptions = [],
+  editingHasChildren = false,
   onChangeField,
   onClose,
   onSubmit,
@@ -54,6 +56,29 @@ function ExamTypeFormModal({
               onChangeField('duration_minutes', event.target.value)
             }
           />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Thuộc nhóm cha (tùy chọn)</Form.Label>
+          {editingHasChildren ? (
+            <Form.Control plaintext readOnly value="Đang là nhóm cha (chứa loại con)" />
+          ) : (
+            <Form.Select
+              value={formState.parent_id || ''}
+              onChange={(event) => onChangeField('parent_id', event.target.value)}
+            >
+              <option value="">-- Không có (loại độc lập / gốc) --</option>
+              {parentOptions.map((t) => (
+                <option key={t.exam_type_id} value={t.exam_type_id}>
+                  {t.name}
+                </option>
+              ))}
+            </Form.Select>
+          )}
+          <Form.Text muted>
+            {editingHasChildren
+              ? 'Loại này đang chứa loại con nên không thể trở thành con của loại khác.'
+              : 'Chọn nhóm cha để gom (vd các cert AWS thuộc nhóm "AWS"). Chỉ hỗ trợ 2 cấp. Node cha không gắn test trực tiếp.'}
+          </Form.Text>
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Phương thức chấm điểm</Form.Label>

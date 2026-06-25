@@ -406,7 +406,8 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   aria-label="Loại kỳ thi"
                 >
                   <option value="">-- Chọn --</option>
-                  {(examTypes || []).map((t) => (
+                  {/* Chỉ cho chọn examType lá (ẩn node cha gom nhóm). */}
+                  {(examTypes || []).filter((t) => !t.childCount).map((t) => (
                     <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>
                   ))}
                 </select>

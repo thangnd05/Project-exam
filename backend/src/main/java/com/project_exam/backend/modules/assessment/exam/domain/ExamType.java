@@ -5,7 +5,9 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
-@Table(name = "exam_types")
+@Table(name = "exam_types", indexes = {
+        @Index(name = "idx_exam_types_parent_id", columnList = "parent_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,5 +34,14 @@ public class ExamType {
     /** Loại "linh hoạt" (vd Thông Thường) cho user tự tạo bài; có thể ẩn khỏi dropdown loại kỳ thi chuẩn. */
     @Column(name = "flexible")
     private Boolean flexible = Boolean.FALSE;
+
+    /**
+     * examType cha (FK -> exam_types.exam_type_id, nullable). null = examType gốc/lá độc lập.
+     * <p>Chỉ để gom nhóm các kỳ thi khác cấu trúc dưới 1 thương hiệu (vd "AWS" chứa 12 cert).
+     * examType cha là node gom: không có Part và không gắn test trực tiếp; chỉ examType lá mới có
+     * Part + test. Hỗ trợ tối đa 2 cấp (cha → con).
+     */
+    @Column(name = "parent_id")
+    private String parentId;
 
 }

@@ -287,7 +287,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
                   }
                 >
                   <option value="">-- Chọn loại --</option>
-                  {examTypes.map((type) => (
+                  {/* Chỉ examType lá (ẩn node cha gom nhóm). */}
+                  {examTypes.filter((type) => !type.childCount).map((type) => (
                     <option key={type.examTypeId} value={type.examTypeId}>
                       {type.name}
                     </option>

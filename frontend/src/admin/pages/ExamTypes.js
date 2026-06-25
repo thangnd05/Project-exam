@@ -1,6 +1,7 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {Badge, Button} from 'react-bootstrap';
-import {Edit, Plus, Trash2} from 'lucide-react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {Badge, Button, Spinner} from 'react-bootstrap';
+import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Plus, Trash2} from 'lucide-react';
+import classNames from 'classnames/bind';
 
 import {
   createExamType,
@@ -10,12 +11,11 @@ import {
 } from '../../api/examTypeApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import ExamTypeFormModal from '../modals/ExamTypeFormModal';
-import {
-  AdminFieldError,
-  AdminPageHeader,
-  AdminTable,
-  AdminToolbar,
-} from '../components/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
+// Dùng lại bộ style cây của trang Bộ sưu tập câu hỏi cho đồng nhất.
+import styles from './QuestionCollections.module.scss';
+
+const cx = classNames.bind(styles);
 
 const emptyForm = {
   name: '',
@@ -23,6 +23,7 @@ const emptyForm = {
   duration_minutes: '',
   scoring_method: 'DEFAULT',
   flexible: false,
+  parent_id: '',
 };
 
 const mapExamTypeFromApi = (item) => ({
@@ -32,9 +33,12 @@ const mapExamTypeFromApi = (item) => ({
   duration_minutes: item.durationMinutes ?? '',
   scoring_method: item.scoringMethod || 'DEFAULT',
   flexible: Boolean(item.flexible),
+  parent_id: item.parentId ? String(item.parentId) : '',
+  parent_name: item.parentName || '',
+  child_count: typeof item.childCount === 'number' ? item.childCount : 0,
 });
 
-const buildExamTypePayload = (formState) => {
+const buildExamTypePayload = (formState, {hasChildren} = {}) => {
   const durationValue = String(formState.duration_minutes).trim();
   const durationMinutes = durationValue ? Number(durationValue) : null;
 
@@ -44,9 +48,93 @@ const buildExamTypePayload = (formState) => {
     durationMinutes,
     scoringMethod: formState.scoring_method,
     flexible: Boolean(formState.flexible),
+    // Node đang có con thì không cho thành con của loại khác → gửi rỗng.
+    parentId: hasChildren ? '' : (formState.parent_id || ''),
   };
 };
 
+// ==================== Tree Node ====================
+function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, keyword}) {
+  const hasChildren = node.children && node.children.length > 0;
+  const isExpanded = expandedIds.has(node.exam_type_id);
+  const kw = keyword.trim().toLowerCase();
+  const matchesSearch =
+    !kw ||
+    node.name.toLowerCase().includes(kw) ||
+    (node.description || '').toLowerCase().includes(kw) ||
+    node.scoring_method.toLowerCase().includes(kw);
+  const childrenMatchSearch =
+    hasChildren &&
+    node.children.some(
+      (c) => c.name.toLowerCase().includes(kw) || (c.description || '').toLowerCase().includes(kw),
+    );
+
+  if (kw && !matchesSearch && !childrenMatchSearch) return null;
+
+  const nodeContent = (
+    <>
+      <div className={cx('treeNode')}>
+        <div className={cx('treeNodeLeft')}>
+          {hasChildren ? (
+            <button className={cx('expandBtn')} onClick={() => toggleExpand(node.exam_type_id)}>
+              {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+            </button>
+          ) : (
+            <span className={cx('expandPlaceholder')} />
+          )}
+          <span className={cx('nodeIcon')}>
+            {level === 0 ? <FolderTree size={16} /> : <Library size={15} />}
+          </span>
+          <span className={cx('collectionName', {root: level === 0})}>{node.name}</span>
+          {hasChildren && <span className={cx('childCount')}>{node.children.length} loại con</span>}
+          {node.flexible && <Badge bg="info">Linh hoạt</Badge>}
+          <Badge bg="primary">{node.scoring_method}</Badge>
+          {node.duration_minutes !== '' && node.duration_minutes != null && (
+            <span className={cx('description')}>{node.duration_minutes} phút</span>
+          )}
+          {node.description && <span className={cx('description')}>— {node.description}</span>}
+        </div>
+        <div className={cx('treeNodeActions')}>
+          {level === 0 && (
+            <button className={cx('addBtn')} onClick={() => onAddChild(node)} title="Thêm loại con">
+              <Plus size={16} />
+            </button>
+          )}
+          <button onClick={() => onEdit(node)} title="Sửa">
+            <Edit size={16} />
+          </button>
+          <button className={cx('deleteBtn')} onClick={() => onDelete(node)} title="Xóa">
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
+      {hasChildren && (isExpanded || Boolean(kw)) && (
+        <div className={cx('childrenWrapper')}>
+          {node.children.map((child) => (
+            <ExamTypeTreeNode
+              key={child.exam_type_id}
+              node={child}
+              level={level + 1}
+              expandedIds={expandedIds}
+              toggleExpand={toggleExpand}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onAddChild={onAddChild}
+              keyword={keyword}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+
+  if (level === 0) {
+    return <div className={cx('rootGroup')}>{nodeContent}</div>;
+  }
+  return nodeContent;
+}
+
+// ==================== Main Page ====================
 function ExamTypesManagement() {
   const [examTypes, setExamTypes] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,37 +145,70 @@ function ExamTypesManagement() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingExamType, setDeletingExamType] = useState(null);
+  const [expandedIds, setExpandedIds] = useState(new Set());
 
-  const filteredExamTypes = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase();
-    if (!keyword) {
-      return examTypes;
-    }
-    return examTypes.filter((examType) => {
-      return (
-        examType.name.toLowerCase().includes(keyword) ||
-        (examType.description || '').toLowerCase().includes(keyword) ||
-        examType.scoring_method.toLowerCase().includes(keyword)
-      );
-    });
-  }, [examTypes, searchTerm]);
-
-  const fetchExamTypes = async () => {
+  const fetchExamTypes = useCallback(async () => {
     setLoading(true);
     setErrorMessage('');
     try {
       const examTypeList = await getExamTypes();
-      setExamTypes(examTypeList.map(mapExamTypeFromApi));
+      const mapped = (Array.isArray(examTypeList) ? examTypeList : []).map(mapExamTypeFromApi);
+      setExamTypes(mapped);
+      setExpandedIds(new Set(mapped.filter((t) => t.child_count > 0).map((t) => t.exam_type_id)));
     } catch (error) {
       setErrorMessage('Không thể tải danh sách loại kỳ thi.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchExamTypes();
+  }, [fetchExamTypes]);
+
+  // Dựng cây 2 cấp từ danh sách phẳng.
+  const examTypeTree = useMemo(() => {
+    const byId = new Map(examTypes.map((t) => [t.exam_type_id, t]));
+    const childrenOf = new Map();
+    const roots = [];
+    examTypes.forEach((t) => {
+      if (t.parent_id && byId.has(t.parent_id)) {
+        if (!childrenOf.has(t.parent_id)) childrenOf.set(t.parent_id, []);
+        childrenOf.get(t.parent_id).push(t);
+      } else {
+        roots.push(t);
+      }
+    });
+    const byName = (a, b) => a.name.localeCompare(b.name);
+    return roots
+      .sort(byName)
+      .map((root) => ({...root, children: (childrenOf.get(root.exam_type_id) || []).sort(byName)}));
+  }, [examTypes]);
+
+  const toggleExpand = useCallback((id) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }, []);
+
+  const expandAll = useCallback(
+    () => setExpandedIds(new Set(examTypes.filter((t) => t.child_count > 0).map((t) => t.exam_type_id))),
+    [examTypes],
+  );
+  const collapseAll = useCallback(() => setExpandedIds(new Set()), []);
+
+  // Chỉ examType gốc (chưa có cha) mới được làm cha; loại chính nó khi đang sửa.
+  const parentOptions = useMemo(
+    () => examTypes.filter((t) => !t.parent_id && t.exam_type_id !== editingTypeId),
+    [examTypes, editingTypeId],
+  );
+  const editingHasChildren = useMemo(
+    () => Boolean(editingTypeId) && examTypes.some((t) => t.parent_id === editingTypeId),
+    [examTypes, editingTypeId],
+  );
 
   const resetForm = () => {
     setFormState(emptyForm);
@@ -100,6 +221,12 @@ function ExamTypesManagement() {
     setShowFormModal(true);
   };
 
+  const openCreateChildModal = (parent) => {
+    resetForm();
+    setFormState({...emptyForm, parent_id: parent.exam_type_id});
+    setShowFormModal(true);
+  };
+
   const openEditModal = (examType) => {
     setEditingTypeId(examType.exam_type_id);
     setFormState({
@@ -108,6 +235,7 @@ function ExamTypesManagement() {
       duration_minutes: examType.duration_minutes ?? '',
       scoring_method: examType.scoring_method || 'DEFAULT',
       flexible: Boolean(examType.flexible),
+      parent_id: examType.parent_id || '',
     });
     setShowFormModal(true);
   };
@@ -129,84 +257,54 @@ function ExamTypesManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      const payload = buildExamTypePayload(formState);
+      const payload = buildExamTypePayload(formState, {hasChildren: editingHasChildren});
       if (editingTypeId) {
-        const updatedExamType = await updateExamType(editingTypeId, payload);
-        setExamTypes((previous) =>
-          previous.map((item) =>
-            item.exam_type_id === editingTypeId
-              ? mapExamTypeFromApi(updatedExamType)
-              : item,
-          ),
-        );
+        await updateExamType(editingTypeId, payload);
       } else {
-        const createdExamType = await createExamType(payload);
-        setExamTypes((previous) => [...previous, mapExamTypeFromApi(createdExamType)]);
+        await createExamType(payload);
       }
-
+      // Tải lại để quan hệ cha-con + childCount luôn chính xác.
+      await fetchExamTypes();
+      if (payload.parentId) {
+        setExpandedIds((prev) => new Set(prev).add(payload.parentId));
+      }
       setShowFormModal(false);
       resetForm();
     } catch (error) {
-      setErrorMessage('Không thể lưu loại kỳ thi. Vui lòng thử lại.');
+      setErrorMessage(
+        error?.response?.data?.message || 'Không thể lưu loại kỳ thi. Vui lòng thử lại.',
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleConfirmDelete = async () => {
-    if (!deletingExamType) {
-      return;
-    }
-
+    if (!deletingExamType) return;
     setSubmitting(true);
     setErrorMessage('');
     try {
       await deleteExamType(deletingExamType.exam_type_id);
-      setExamTypes((previous) =>
-        previous.filter((item) => item.exam_type_id !== deletingExamType.exam_type_id),
-      );
       setDeletingExamType(null);
+      await fetchExamTypes();
     } catch (error) {
-      setErrorMessage('Không thể xóa loại kỳ thi này.');
+      setErrorMessage(
+        error?.response?.data?.message || 'Không thể xóa loại kỳ thi này.',
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const columns = [
-    {key: 'name', header: 'Tên', render: (examType) => examType.name || '-'},
-    {
-      key: 'duration_minutes',
-      header: 'Thời lượng',
-      render: (examType) =>
-        examType.duration_minutes !== '' && examType.duration_minutes != null
-          ? `${examType.duration_minutes} phút`
-          : '-',
-    },
-    {
-      key: 'scoring_method',
-      header: 'Chấm điểm',
-      render: (examType) => <Badge bg="primary">{examType.scoring_method}</Badge>,
-    },
-    {
-      key: 'flexible',
-      header: 'Linh hoạt',
-      align: 'center',
-      render: (examType) =>
-        examType.flexible ? <Badge bg="info">Linh hoạt</Badge> : '-',
-    },
-    {
-      key: 'description',
-      header: 'Mô tả',
-      render: (examType) => examType.description || '-',
-    },
-  ];
+  const deleteMessage = deletingExamType?.child_count > 0
+    ? `Loại "${deletingExamType?.name}" đang chứa ${deletingExamType.child_count} loại con — backend sẽ chặn xoá. Hãy xoá/tách loại con trước.`
+    : `Bạn có chắc muốn xóa "${deletingExamType?.name || ''}" không?`;
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
         title="Quản lý loại kỳ thi"
-        description="Cấu hình loại kỳ thi dùng cho hệ thống."
+        description='Cấu hình loại kỳ thi; hỗ trợ 2 cấp gom nhóm (vd "AWS" chứa các chứng chỉ con).'
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
@@ -221,41 +319,53 @@ function ExamTypesManagement() {
       />
       <AdminFieldError message={errorMessage} />
 
-      <AdminTable
-        showIndex
-        paginated
-        itemLabel="loại đề"
-        columns={columns}
-        data={filteredExamTypes}
-        loading={loading}
-        getRowKey={(examType) => examType.exam_type_id}
-        rowActions={(examType) => (
-          <>
-            <button onClick={() => openEditModal(examType)} title="Sửa">
-              <Edit size={14} />
-            </button>
-            <button
-              className="danger"
-              onClick={() => setDeletingExamType(examType)}
-              title="Xóa"
-            >
-              <Trash2 size={14} />
-            </button>
-          </>
+      <div className={cx('treeWrapper')}>
+        <div className={cx('treeToolbar')}>
+          <span className={cx('treeCount')}>{examTypes.length} loại kỳ thi</span>
+          <div className={cx('treeToolbarActions')}>
+            <button onClick={expandAll}>Mở tất cả</button>
+            <button onClick={collapseAll}>Thu gọn</button>
+          </div>
+        </div>
+
+        {loading && (
+          <div className="text-center py-4">
+            <Spinner size="sm" className="me-2" />
+            Đang tải...
+          </div>
         )}
-      />
+
+        {!loading && examTypes.length === 0 && (
+          <div className="text-center py-4 text-muted">Chưa có loại kỳ thi nào.</div>
+        )}
+
+        {!loading &&
+          examTypeTree.map((node) => (
+            <ExamTypeTreeNode
+              key={node.exam_type_id}
+              node={node}
+              level={0}
+              expandedIds={expandedIds}
+              toggleExpand={toggleExpand}
+              onEdit={openEditModal}
+              onDelete={setDeletingExamType}
+              onAddChild={openCreateChildModal}
+              keyword={searchTerm}
+            />
+          ))}
+      </div>
 
       <ExamTypeFormModal
         show={showFormModal}
         isEditing={Boolean(editingTypeId)}
         formState={formState}
+        parentOptions={parentOptions}
+        editingHasChildren={editingHasChildren}
         onChangeField={(fieldName, value) =>
           setFormState((previous) => ({...previous, [fieldName]: value}))
         }
         onClose={() => {
-          if (submitting) {
-            return;
-          }
+          if (submitting) return;
           setShowFormModal(false);
           resetForm();
         }}
@@ -264,14 +374,12 @@ function ExamTypesManagement() {
       <ConfirmDeleteModal
         show={Boolean(deletingExamType)}
         onClose={() => {
-          if (submitting) {
-            return;
-          }
+          if (submitting) return;
           setDeletingExamType(null);
         }}
         onConfirm={handleConfirmDelete}
         title="Xác nhận xóa loại kỳ thi"
-        message={`Bạn có chắc muốn xóa "${deletingExamType?.name || ''}" không?`}
+        message={deleteMessage}
       />
     </div>
   );
