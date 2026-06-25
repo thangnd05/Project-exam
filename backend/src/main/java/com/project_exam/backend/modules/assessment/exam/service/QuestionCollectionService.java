@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +51,8 @@ public class QuestionCollectionService {
         QuestionCollection collection = new QuestionCollection();
         collection.setName(name);
         collection.setDescription(trimOrNull(request.getDescription()));
+        // Gán cha (nếu có). Khi tạo mới collection chưa có con nên chỉ cần validate cha hợp lệ.
+        collection.setParentId(resolveParentId(request.getParentId(), null));
         collection = collectionRepository.save(collection);
         return toResponse(collection);
     }
@@ -78,6 +81,11 @@ public class QuestionCollectionService {
             collection.setDescription(trimOrNull(request.getDescription()));
         }
 
+        // parentId == null trong request nghĩa là "không đụng tới". Để gỡ cha, FE gửi chuỗi rỗng.
+        if (request.getParentId() != null) {
+            collection.setParentId(resolveParentId(request.getParentId(), id));
+        }
+
         collection = collectionRepository.save(collection);
         return toResponse(collection);
     }
@@ -94,13 +102,70 @@ public class QuestionCollectionService {
                             "Hãy bỏ liên kết các câu hỏi trước khi xoá."
             );
         }
+        // 🔒 Chặn xoá collection cha khi còn collection con — tránh con bị mồ côi.
+        long childCount = collectionRepository.countByParentId(id);
+        if (childCount > 0) {
+            throw new ConflictException(
+                    "Không thể xoá: bộ sưu tập đang chứa " + childCount + " bộ sưu tập con. " +
+                            "Hãy xoá hoặc tách các bộ sưu tập con trước."
+            );
+        }
         collectionRepository.delete(collection);
     }
 
     private QuestionCollectionResponse toResponse(QuestionCollection collection) {
-        // questionCount cần truy vấn DB → tính ở service, mapper chỉ ghép DTO.
-        Long questionCount = questionRepository.countByCollectionId(collection.getCollectionId());
-        return questionCollectionMapper.toResponse(collection, questionCount);
+        String id = collection.getCollectionId();
+        // Số câu gắn trực tiếp.
+        Long questionCount = questionRepository.countByCollectionId(id);
+
+        // Tên cha (nếu là collection con).
+        String parentName = null;
+        if (collection.getParentId() != null) {
+            parentName = collectionRepository.findById(collection.getParentId())
+                    .map(QuestionCollection::getName)
+                    .orElse(null);
+        }
+
+        // Con trực tiếp + tổng câu gộp con-cháu (chỉ 2 cấp nên con không có cháu).
+        List<QuestionCollection> children = collectionRepository.findByParentId(id);
+        Long childCount = (long) children.size();
+        Long totalQuestionCount = questionCount;
+        if (!children.isEmpty()) {
+            List<String> ids = new ArrayList<>();
+            ids.add(id);
+            children.forEach(c -> ids.add(c.getCollectionId()));
+            totalQuestionCount = questionRepository.countByCollectionIdIn(ids);
+        }
+
+        return questionCollectionMapper.toResponse(
+                collection, questionCount, parentName, childCount, totalQuestionCount);
+    }
+
+    /**
+     * Chuẩn hoá & validate parentId khi gán cho collection {@code selfId} (null khi tạo mới).
+     * Trả về parentId hợp lệ, hoặc null nếu là collection cấp 1.
+     * Quy tắc: cha phải tồn tại, không tự trỏ chính mình, cha phải là cấp 1 (tối đa 2 cấp),
+     * và bản thân collection không được đang có con (nếu không sẽ thành 3 cấp).
+     */
+    private String resolveParentId(String rawParentId, String selfId) {
+        String parentId = normalize(rawParentId);
+        if (parentId == null) {
+            return null; // collection cấp 1
+        }
+        if (parentId.equals(selfId)) {
+            throw new BadRequestException("Bộ sưu tập không thể là cha của chính nó.");
+        }
+        QuestionCollection parent = collectionRepository.findById(parentId)
+                .orElseThrow(() -> new BadRequestException("Bộ sưu tập cha không tồn tại."));
+        if (parent.getParentId() != null) {
+            throw new BadRequestException(
+                    "Chỉ hỗ trợ 2 cấp: không thể chọn một bộ sưu tập con làm cha.");
+        }
+        if (selfId != null && collectionRepository.existsByParentId(selfId)) {
+            throw new BadRequestException(
+                    "Bộ sưu tập này đang chứa bộ sưu tập con nên không thể trở thành con của bộ khác.");
+        }
+        return parentId;
     }
 
     private String normalize(String s) {

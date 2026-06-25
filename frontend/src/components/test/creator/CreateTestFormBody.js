@@ -27,6 +27,7 @@ import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
 import CreateFromBankBody from './CreateFromBankBody';
 import routes from '~/config/Routes';
+import { buildCollectionTree } from '~/utils/collectionTree';
 import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -433,7 +434,11 @@ const CreateTestFormBody = ({
                   <label><IoLibraryOutline /> Nhóm (Collection)</label>
                   <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
                     <option value="">-- Trống --</option>
-                    {questionCollections.map((c) => <option key={c.collectionId} value={c.collectionId}>{c.name}</option>)}
+                    {buildCollectionTree(questionCollections).map((c) => (
+                      <option key={c.collectionId} value={c.collectionId}>
+                        {c.depth > 0 ? `    └ ${c.name}` : c.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </Col>

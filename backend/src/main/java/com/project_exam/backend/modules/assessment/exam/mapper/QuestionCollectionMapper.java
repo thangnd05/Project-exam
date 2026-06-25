@@ -8,14 +8,23 @@ import org.springframework.stereotype.Component;
 public class QuestionCollectionMapper {
 
     /**
-     * Mapper thuần: {@code questionCount} cần truy vấn DB nên service tính sẵn và truyền vào.
+     * Mapper thuần: các số đếm và {@code parentName} cần truy vấn DB nên service tính sẵn và truyền vào.
      */
-    public QuestionCollectionResponse toResponse(QuestionCollection collection, Long questionCount) {
+    public QuestionCollectionResponse toResponse(
+            QuestionCollection collection,
+            Long questionCount,
+            String parentName,
+            Long childCount,
+            Long totalQuestionCount) {
         return QuestionCollectionResponse.builder()
                 .collectionId(collection.getCollectionId())
                 .name(collection.getName())
                 .description(collection.getDescription())
                 .questionCount(questionCount)
+                .parentId(collection.getParentId())
+                .parentName(parentName)
+                .childCount(childCount)
+                .totalQuestionCount(totalQuestionCount)
                 .build();
     }
 }

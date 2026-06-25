@@ -26,6 +26,7 @@ import {useHasPermission} from '~/hooks/usePermission';
 import EditQuestionModal from './modals/EditQuestionModal';
 import ViewQuestionModal from './modals/ViewQuestionModal';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
+import { buildCollectionTree, getCollectionWithDescendantIds, isParentCollection } from '~/utils/collectionTree';
 import styles from './PersonalQuestionBankPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -57,7 +58,10 @@ const PersonalQuestionBankPage = () => {
   const [chaptersLoading, setChaptersLoading] = useState(false);
   const [editingChapterId, setEditingChapterId] = useState(null);
   const [collectionsMap, setCollectionsMap] = useState({});
+  const [collectionsList, setCollectionsList] = useState([]);
   const [collectionFilter, setCollectionFilter] = useState('');
+  // Khi lọc theo nhóm cha: có gộp luôn câu của các nhóm con hay không.
+  const [includeChildCollections, setIncludeChildCollections] = useState(true);
 
   const {examTypes, examParts} = useBaseMetaData(examTypeId);
 
@@ -79,8 +83,12 @@ const PersonalQuestionBankPage = () => {
           if (c?.collectionId) map[c.collectionId] = c.name || '(Không tên)';
         });
         setCollectionsMap(map);
+        setCollectionsList(list);
       })
-      .catch(() => setCollectionsMap({}));
+      .catch(() => {
+        setCollectionsMap({});
+        setCollectionsList([]);
+      });
   }, []);
 
   const getCollectionName = (id) => {
@@ -88,10 +96,17 @@ const PersonalQuestionBankPage = () => {
     return collectionsMap[id] || '(Không xác định)';
   };
 
+  const selectedIsParent = isParentCollection(collectionsList, collectionFilter);
+
   const filterByCollection = (questions) => {
     if (!collectionFilter) return questions;
     if (collectionFilter === '__none__') {
       return questions.filter((q) => !q.collectionId);
+    }
+    // Nhóm cha + đang bật "gộp con" → lấy câu của cả nhóm cha lẫn các nhóm con.
+    if (includeChildCollections && selectedIsParent) {
+      const ids = new Set(getCollectionWithDescendantIds(collectionsList, collectionFilter));
+      return questions.filter((q) => ids.has(q.collectionId));
     }
     return questions.filter((q) => q.collectionId === collectionFilter);
   };
@@ -453,10 +468,23 @@ const PersonalQuestionBankPage = () => {
             >
               <option value="">-- Tất cả nhóm (Collection) --</option>
               <option value="__none__">(Chưa gắn nhóm)</option>
-              {Object.entries(collectionsMap).map(([id, name]) => (
-                <option key={id} value={id}>{name}</option>
+              {buildCollectionTree(collectionsList).map((c) => (
+                <option key={c.collectionId} value={c.collectionId}>
+                  {c.depth > 0 ? `    └ ${c.name}` : c.name}
+                </option>
               ))}
             </select>
+
+            {selectedIsParent && (
+              <label className={cx('includeChildrenToggle')} title="Gộp câu hỏi của các nhóm con">
+                <input
+                  type="checkbox"
+                  checked={includeChildCollections}
+                  onChange={(e) => setIncludeChildCollections(e.target.checked)}
+                />
+                <span>Gộp nhóm con</span>
+              </label>
+            )}
           </div>
         </div>
 

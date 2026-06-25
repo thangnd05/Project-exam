@@ -6,6 +6,7 @@ import { getQuestionById, updateQuestion } from '~/api/questionApi';
 import { getExamPartById } from '~/api/examPartApi';
 import { deletePassageMedia } from '~/api/passageMediaApi';
 import { getQuestionCollections } from '~/api/questionCollectionApi';
+import { buildCollectionTree } from '~/utils/collectionTree';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
@@ -437,8 +438,10 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                   onChange={(e) => setFormData({ ...formData, collectionId: e.target.value })}
                 >
                   <option value="">-- Không chỉ định --</option>
-                  {questionCollections.map((c) => (
-                    <option key={c.collectionId} value={c.collectionId}>{c.name}</option>
+                  {buildCollectionTree(questionCollections).map((c) => (
+                    <option key={c.collectionId} value={c.collectionId}>
+                      {c.depth > 0 ? `    └ ${c.name}` : c.name}
+                    </option>
                   ))}
                 </select>
               </Col>

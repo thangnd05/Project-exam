@@ -185,6 +185,9 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
 
     long countByCollectionId(String collectionId);
 
+    /** Đếm câu hỏi gắn vào bất kỳ collection nào trong danh sách (dùng để gộp con-cháu). */
+    long countByCollectionIdIn(Collection<String> collectionIds);
+
     @Query("""
         SELECT COALESCE(MAX(q.questionNumber), 0) FROM Question q
         WHERE q.examPartId = :examPartId
