@@ -50,14 +50,13 @@ function UserTargetPage() {
   const {
     isScaled,
     maxScore: maxTargetScore,
-    SCALE_MIN,
-    SCALE_MAX,
     getPartTotal,
     getPartName,
     percentToNum,
     numToPercent,
     evenPctForScore,
     estimateScore,
+    formatEstimateDetail,
   } = useMilestoneScoring({
     examTypes,
     examParts,
@@ -228,10 +227,8 @@ function UserTargetPage() {
         </div>
         <div className={cx('scoreEstimateDetail')}>
           {est.scaled
-            ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX}, cần đạt ≥ ${targetScore})`
-            : est.skillDetails
-                .map((s) => `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`)
-                .join(' | ')}
+            ? `${formatEstimateDetail(est)}, cần đạt ≥ ${targetScore}`
+            : formatEstimateDetail(est)}
         </div>
       </div>
     );

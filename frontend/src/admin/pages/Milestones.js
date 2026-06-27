@@ -113,14 +113,13 @@ function MilestonesManagement() {
   const {
     isScaled,
     maxScore,
-    SCALE_MIN,
-    SCALE_MAX,
     getPartName,
     getPartTotal,
     percentToNum,
     numToPercent,
     evenPctForScore,
     estimateScore,
+    formatEstimateDetail,
   } = useMilestoneScoring({
     examTypes,
     examParts,
@@ -240,6 +239,24 @@ function MilestonesManagement() {
     });
   };
 
+  // Khối "Điểm ước tính" dùng chung cho cả nhánh xem và chỉnh sửa.
+  const renderScoreEstimate = (partsConfig, milestoneScore) => {
+    const est = estimateScore(partsConfig);
+    if (!est) return null;
+    const diff = est.totalScore - milestoneScore;
+    return (
+      <div className={cx('scoreEstimate', {
+        over: diff > 0, under: diff < 0, match: diff === 0,
+      })}>
+        <span className={cx('scoreEstimateLabel')}>Điểm ước tính:</span>
+        <span className={cx('scoreEstimateValue')}>{est.totalScore}</span>
+        <span className={cx('scoreEstimateDiff')}>
+          ({diff > 0 ? '+' : ''}{diff} so với mốc {milestoneScore})
+        </span>
+        <span className={cx('scoreEstimateDetail')}>{formatEstimateDetail(est)}</span>
+      </div>
+    );
+  };
 
   return (
     <div className={cx('milestonePage')}>
@@ -378,29 +395,7 @@ function MilestonesManagement() {
                     );
                   })}
                 </div>
-                {(() => {
-                  const est = estimateScore(editParts);
-                  if (!est) return null;
-                  const diff = est.totalScore - m.milestoneScore;
-                  return (
-                    <div className={cx('scoreEstimate', {
-                      over: diff > 0, under: diff < 0, match: diff === 0,
-                    })}>
-                      <span className={cx('scoreEstimateLabel')}>Điểm ước tính:</span>
-                      <span className={cx('scoreEstimateValue')}>{est.totalScore}</span>
-                      <span className={cx('scoreEstimateDiff')}>
-                        ({diff > 0 ? '+' : ''}{diff} so với mốc {m.milestoneScore})
-                      </span>
-                      <span className={cx('scoreEstimateDetail')}>
-                        {est.scaled
-                          ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX})`
-                          : est.skillDetails.map((s) =>
-                              `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`
-                            ).join(' | ')}
-                      </span>
-                    </div>
-                  );
-                })()}
+                {renderScoreEstimate(editParts, m.milestoneScore)}
                 <div className={cx('editActions')}>
                   <Button
                     variant="outline-secondary"
@@ -449,27 +444,7 @@ function MilestonesManagement() {
                 (m.partRequirements || []).forEach((pr) => {
                   partsConfig[pr.examPartId] = pr.requiredPercentage;
                 });
-                const est = estimateScore(partsConfig);
-                if (!est) return null;
-                const diff = est.totalScore - m.milestoneScore;
-                return (
-                  <div className={cx('scoreEstimate', {
-                    over: diff > 0, under: diff < 0, match: diff === 0,
-                  })}>
-                    <span className={cx('scoreEstimateLabel')}>Điểm ước tính:</span>
-                    <span className={cx('scoreEstimateValue')}>{est.totalScore}</span>
-                    <span className={cx('scoreEstimateDiff')}>
-                      ({diff > 0 ? '+' : ''}{diff} so với mốc {m.milestoneScore})
-                    </span>
-                    <span className={cx('scoreEstimateDetail')}>
-                      {est.scaled
-                        ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX})`
-                        : est.skillDetails.map((s) =>
-                            `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`
-                          ).join(' | ')}
-                    </span>
-                  </div>
-                );
+                return renderScoreEstimate(partsConfig, m.milestoneScore);
               })()}
               </>
             )}

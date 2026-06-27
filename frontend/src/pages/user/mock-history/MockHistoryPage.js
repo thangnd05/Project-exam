@@ -5,16 +5,14 @@ import { getMyUserTests } from '~/api/userTestApi';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
 import { getUserTarget } from '~/api/userTargetApi';
+import { filterCompletedTests } from '~/utils/userTests';
+import { formatDateTime24 as formatDate, formatDayMonth } from '~/utils/format-date-time';
 import MockHistoryCharts from './components/MockHistoryCharts';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
 const CHART_FETCH_LIMIT = 25;
-
-function formatDate(s) {
-  return s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '—';
-}
 
 function formatDuration(seconds) {
   if (seconds == null) return '—';
@@ -44,11 +42,7 @@ function MockHistoryPage() {
     getMyUserTests()
       .then((arr0) => {
         if (!mounted) return;
-        const arr = Array.isArray(arr0) ? arr0 : arr0?.data || [];
-        const completed = arr
-          .filter((u) => u.status === 'COMPLETED' && u.finishedAt)
-          .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
-        setAllTests(completed);
+        setAllTests(filterCompletedTests(arr0));
       })
       .catch((err) => {
         if (mounted) setError(err?.response?.data?.message || err.message);
@@ -156,10 +150,7 @@ function MockHistoryPage() {
       return {
         key: t.userTestId,
         order: idx + 1,
-        dateLabel: new Date(t.finishedAt).toLocaleDateString('vi-VN', {
-          day: '2-digit',
-          month: '2-digit',
-        }),
+        dateLabel: formatDayMonth(t.finishedAt),
         fullDate: formatDate(t.finishedAt),
         totalScore,
         readinessScore,

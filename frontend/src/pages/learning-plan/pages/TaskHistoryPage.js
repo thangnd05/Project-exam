@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getPlanById, getTaskSessions } from '~/api/learningPlanApi';
+import { formatDateTime24 as formatDateTime } from '~/utils/format-date-time';
 import styles from '../styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -26,9 +27,6 @@ function pct(v) {
   return `${n.toFixed(2)}%`;
 }
 
-function formatDateTime(s) {
-  return s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '—';
-}
 
 function TaskHistoryPage() {
   const { learningPlanId, taskId } = useParams();

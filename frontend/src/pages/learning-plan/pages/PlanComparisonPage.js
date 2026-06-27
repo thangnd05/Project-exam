@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getExamTypes } from '~/api/examTypeApi';
 import { listPlans } from '~/api/learningPlanApi';
+import { formatDateTime24 as formatDate } from '~/utils/format-date-time';
 import PlanComparisonCharts from '../components/PlanComparisonCharts';
 import pageStyles from '../styles/PlanComparisonPage.module.scss';
 import styles from '../styles/PersonalizedPlan.module.scss';
@@ -24,9 +25,6 @@ const STATUS_VARIANT = {
   ABANDONED: 'badgeDanger',
 };
 
-function formatDate(s) {
-  return s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '—';
-}
 
 function PlanComparisonPage() {
   const [searchParams, setSearchParams] = useSearchParams();

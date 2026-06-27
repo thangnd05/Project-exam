@@ -5,13 +5,11 @@ import { getMyUserTests } from '~/api/userTestApi';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
+import { filterCompletedTests } from '~/utils/userTests';
+import { formatDateTime24 as formatDate } from '~/utils/format-date-time';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
-
-function formatDate(s) {
-  return s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '—';
-}
 
 function suggestNextTarget(current) {
   if (current == null) return null;
@@ -48,12 +46,7 @@ function TargetAchievedPage() {
         const t = await getUserTarget(examTypeId).catch(() => null);
         setTarget(t);
 
-        const arr0 = await getMyUserTests();
-        const arr = Array.isArray(arr0) ? arr0 : (arr0?.data || []);
-        const completed = arr
-          .filter((u) => u.status === 'COMPLETED' && u.finishedAt)
-          .filter((u) => !u.examTypeId || u.examTypeId === examTypeId)
-          .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
+        const completed = filterCompletedTests(await getMyUserTests(), examTypeId);
         const latest = completed[0] || null;
         setLatestMock(latest);
 

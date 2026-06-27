@@ -5,6 +5,8 @@ import { getExamTypes } from '~/api/examTypeApi';
 import { getMyUserTests } from '~/api/userTestApi';
 import { generatePlan } from '~/api/learningPlanApi';
 import { getUserTarget } from '~/api/userTargetApi';
+import { filterCompletedTests } from '~/utils/userTests';
+import { formatDateTime24 as formatDate } from '~/utils/format-date-time';
 import LearningPlanList from '../components/LearningPlanList';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import styles from '../styles/PersonalizedPlan.module.scss';
@@ -62,9 +64,7 @@ function GeneratePlanPage() {
     getMyUserTests()
       .then((result) => {
         if (!mounted) return;
-        const data = Array.isArray(result) ? result : (result?.data || []);
-        const completed = data.filter((t) => t.status === 'COMPLETED');
-        setUserTests(completed);
+        setUserTests(filterCompletedTests(result));
       })
       .catch((err) => {
         if (mounted) setError(err?.response?.data?.message || err.message);
@@ -162,7 +162,6 @@ function GeneratePlanPage() {
     }
   };
 
-  const formatDate = (s) => (s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '-');
 
   return (
     <div className={cx('wrapper')}>

@@ -8,6 +8,8 @@ import { getUserTarget } from '~/api/userTargetApi';
 import { listPlans } from '~/api/learningPlanApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
 import { sortByPartOrder, sortPartsByLookup } from '~/utils/partOrder';
+import { filterCompletedTests } from '~/utils/userTests';
+import { formatDateTime24 as formatDate, formatDayMonth } from '~/utils/format-date-time';
 import TargetDashboardMockSparkline from './components/TargetDashboardMockSparkline';
 import TargetDashboardPartChart from './components/TargetDashboardPartChart';
 import { getReadinessClassName, getReadinessLabel } from './utils/readiness-label';
@@ -16,10 +18,6 @@ import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 const pageCx = classNames.bind(pageStyles);
-
-function formatDate(s) {
-  return s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '—';
-}
 
 function TargetDashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -59,12 +57,7 @@ function TargetDashboardPage() {
       const ps = await listPlans(examTypeId).catch(() => []);
       setPlans(ps || []);
 
-      const arr0 = await getMyUserTests();
-      const arr = Array.isArray(arr0) ? arr0 : arr0?.data || [];
-      const completed = arr
-        .filter((u) => u.status === 'COMPLETED' && u.finishedAt)
-        .filter((u) => !u.examTypeId || u.examTypeId === examTypeId)
-        .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
+      const completed = filterCompletedTests(await getMyUserTests(), examTypeId);
       setLatestMock(completed[0] || null);
       setRecentMocks(completed.slice(0, 5));
 
@@ -141,10 +134,7 @@ function TargetDashboardPage() {
       [...recentMocks]
         .reverse()
         .map((t) => ({
-          label: new Date(t.finishedAt).toLocaleDateString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-          }),
+          label: formatDayMonth(t.finishedAt),
           score: t.totalScore ?? 0,
         })),
     [recentMocks],

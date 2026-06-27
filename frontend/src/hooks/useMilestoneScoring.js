@@ -117,6 +117,19 @@ export default function useMilestoneScoring({
     [isScaled, examParts, scoringConversions, skills, selectedExamTypeId],
   );
 
+  // Chuỗi diễn giải điểm ước tính (khác nhau giữa thang scaled và quy đổi theo skill).
+  const formatEstimateDetail = useCallback(
+    (est) => {
+      if (!est) return '';
+      return est.scaled
+        ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX})`
+        : (est.skillDetails || [])
+            .map((s) => `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`)
+            .join(' | ');
+    },
+    [],
+  );
+
   return {
     selectedExamType,
     scoringMethod,
@@ -131,5 +144,6 @@ export default function useMilestoneScoring({
     numToPercent,
     evenPctForScore,
     estimateScore,
+    formatEstimateDetail,
   };
 }

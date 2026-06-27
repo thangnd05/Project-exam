@@ -6,6 +6,7 @@ import { switchPlan, deletePlan } from '~/api/learningPlanApi';
 import ConfirmActionModal from '~/components/common/modal/ConfirmActionModal';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';
+import { formatDateTime24 as formatDate } from '~/utils/format-date-time';
 import styles from '../styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -23,10 +24,6 @@ const STATUS_LABEL = {
   REPLACED: 'Đã thay',
   ABANDONED: 'Đã bỏ',
 };
-
-const formatDate = (s) => (
-  s ? new Date(s).toLocaleString('vi-VN', { hour12: false }) : '-'
-);
 
 const LearningPlanList = forwardRef(function LearningPlanList(
   {
