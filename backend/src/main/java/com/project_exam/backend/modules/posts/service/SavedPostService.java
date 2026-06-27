@@ -79,10 +79,13 @@ public class SavedPostService {
         String userId = authUtils.getUserId(httpRequest);
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 10 : Math.min(size, 100);
-        String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        // Truyền chuỗi rỗng khi không tìm kiếm (LIKE '%%' khớp tất cả) — tránh lỗi Hibernate
+        // không suy được kiểu cho tham số null trong mệnh đề IS NULL.
+        String normalizedKeyword = (keyword == null) ? "" : keyword.trim();
 
         Pageable pageable = PageRequest.of(safePage, safeSize);
-        Page<Post> savedPage = savedPostRepository.findSavedApprovedPosts(userId, normalizedKeyword, pageable);
+        Page<Post> savedPage = savedPostRepository.findSavedApprovedPosts(
+                userId, Post.PostStatus.APPROVED, normalizedKeyword, pageable);
 
         List<PostSummaryResponse> content = savedPage.getContent().stream()
                 .map(postService::toSummaryResponse)

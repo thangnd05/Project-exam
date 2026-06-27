@@ -28,14 +28,15 @@ public interface SavedPostRepository extends JpaRepository<SavedPost, String> {
      */
     @Query(value = "SELECT p FROM SavedPost sp, Post p "
             + "WHERE p.id = sp.postId AND sp.userId = :userId "
-            + "AND p.status = com.project_exam.backend.modules.posts.domain.Post.PostStatus.APPROVED "
-            + "AND (:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
+            + "AND p.status = :status "
+            + "AND LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) "
             + "ORDER BY sp.createdAt DESC",
             countQuery = "SELECT COUNT(p) FROM SavedPost sp, Post p "
             + "WHERE p.id = sp.postId AND sp.userId = :userId "
-            + "AND p.status = com.project_exam.backend.modules.posts.domain.Post.PostStatus.APPROVED "
-            + "AND (:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+            + "AND p.status = :status "
+            + "AND LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Post> findSavedApprovedPosts(@Param("userId") String userId,
+                                      @Param("status") Post.PostStatus status,
                                       @Param("keyword") String keyword,
                                       Pageable pageable);
     void deleteByPostId(String postId);

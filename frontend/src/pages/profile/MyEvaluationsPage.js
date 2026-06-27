@@ -19,7 +19,7 @@ const formatDateTime = (value) => {
   return parsedDate.toLocaleString('vi-VN');
 };
 
-function MyEvaluationsPage() {
+function MyEvaluationsPage({ embedded = false }) {
   const navigate = useNavigate();
   const [evaluations, setEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,24 +119,26 @@ function MyEvaluationsPage() {
   };
 
   return (
-    <div className={cx('wrapper')}>
-      <div className={cx('container')}>
-        <header className={cx('header')}>
-          <div>
-            <h1 className={cx('title')}>Đánh giá của tôi</h1>
-            <p className={cx('subtitle')}>
-              Tất cả đánh giá bạn đã gửi cho hệ thống.
-            </p>
-          </div>
-          <button
-            type="button"
-            className={cx('backBtn')}
-            onClick={() => navigate(routes.profile)}
-          >
-            <IoArrowBackOutline />
-            Quay lại profile
-          </button>
-        </header>
+    <div className={cx({ wrapper: !embedded })}>
+      <div className={cx({ container: !embedded })}>
+        {!embedded && (
+          <header className={cx('header')}>
+            <div>
+              <h1 className={cx('title')}>Đánh giá của tôi</h1>
+              <p className={cx('subtitle')}>
+                Tất cả đánh giá bạn đã gửi cho hệ thống.
+              </p>
+            </div>
+            <button
+              type="button"
+              className={cx('backBtn')}
+              onClick={() => navigate(routes.profile)}
+            >
+              <IoArrowBackOutline />
+              Quay lại profile
+            </button>
+          </header>
+        )}
 
         {loading && (
           <div className={cx('loadingWrap')}>

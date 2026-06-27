@@ -37,6 +37,10 @@ import {
 } from 'recharts';
 import ChangePasswordModal from './modals/ChangePasswordModal';
 import UpdateProfileModal from './modals/UpdateProfileModal';
+import BaseModal from '~/components/common/modal/BaseModal';
+import MyEvaluationsPage from './MyEvaluationsPage';
+import MyPostsPage from './MyPostsPage';
+import SavedPostsPage from './SavedPostsPage';
 import styles from './ProfileOverviewPage.module.scss';
 import routes, { buildNextStepPath } from '~/config/Routes';
 import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
@@ -45,6 +49,13 @@ import { useCosmetics } from '~/hooks/useCosmetics';
 const cx = classNames.bind(styles);
 
 const TARGET_VISIBLE_COUNT = 2;
+
+// Các mục mở bằng modal (thay vì điều hướng sang trang riêng).
+const PROFILE_SECTIONS = {
+  evaluations: { title: 'Đánh giá của tôi', icon: IoStar, Component: MyEvaluationsPage },
+  posts: { title: 'Bài viết của tôi', icon: IoNewspaperOutline, Component: MyPostsPage },
+  saved: { title: 'Bài đã lưu', icon: IoBookmarkOutline, Component: SavedPostsPage },
+};
 
 const formatDateTime = (value) => {
   if (!value) return '--';
@@ -89,6 +100,7 @@ function ProfileOverviewPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
   const [myTargets, setMyTargets] = useState([]);
   const [loadingTargets, setLoadingTargets] = useState(true);
   const [showAllTargets, setShowAllTargets] = useState(false);
@@ -313,15 +325,15 @@ function ProfileOverviewPage() {
                     <IoFolderOpenOutline className={cx('btnIcon')} />
                     <span>Ngân hàng câu hỏi</span>
                   </button>
-                  <button onClick={() => navigate(routes.myEvaluations)} className={cx('actionBtn', 'btnYellow')}>
+                  <button onClick={() => setActiveSection('evaluations')} className={cx('actionBtn', 'btnYellow')}>
                     <IoStar className={cx('btnIcon')} />
                     <span>Đánh giá của tôi</span>
                   </button>
-                  <button onClick={() => navigate(routes.myPosts)} className={cx('actionBtn', 'btnBlue')}>
+                  <button onClick={() => setActiveSection('posts')} className={cx('actionBtn', 'btnBlue')}>
                     <IoNewspaperOutline className={cx('btnIcon')} />
                     <span>Bài viết của tôi</span>
                   </button>
-                  <button onClick={() => navigate(routes.savedPosts)} className={cx('actionBtn', 'btnGreen')}>
+                  <button onClick={() => setActiveSection('saved')} className={cx('actionBtn', 'btnGreen')}>
                     <IoBookmarkOutline className={cx('btnIcon')} />
                     <span>Bài đã lưu</span>
                   </button>
@@ -625,6 +637,22 @@ function ProfileOverviewPage() {
         show={showChangePasswordModal}
         onHide={() => setShowChangePasswordModal(false)}
       />
+
+      {activeSection && (() => {
+        const section = PROFILE_SECTIONS[activeSection];
+        const SectionComponent = section.Component;
+        return (
+          <BaseModal
+            show
+            onClose={() => setActiveSection(null)}
+            title={section.title}
+            icon={section.icon}
+            maxWidth={1040}
+          >
+            <SectionComponent embedded />
+          </BaseModal>
+        );
+      })()}
     </div>
   );
 }

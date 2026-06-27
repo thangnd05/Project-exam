@@ -47,7 +47,7 @@ const formatCount = (n) => {
   return String(v);
 };
 
-function SavedPostsPage() {
+function SavedPostsPage({ embedded = false }) {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -160,18 +160,20 @@ function SavedPostsPage() {
   };
 
   return (
-    <div className={cx('wrapper')}>
-      <div className={cx('container')}>
-        <header className={cx('pageHeader')}>
-          <div>
-            <h1 className={cx('title')}>Bài viết đã lưu</h1>
-            <p className={cx('subtitle')}>Những bài viết bạn đã đánh dấu để xem lại.</p>
-          </div>
-          <button type="button" className={cx('backLink')} onClick={() => navigate(routes.profile)}>
-            <IoArrowBackOutline />
-            Trở lại hồ sơ
-          </button>
-        </header>
+    <div className={cx({ wrapper: !embedded })}>
+      <div className={cx({ container: !embedded })}>
+        {!embedded && (
+          <header className={cx('pageHeader')}>
+            <div>
+              <h1 className={cx('title')}>Bài viết đã lưu</h1>
+              <p className={cx('subtitle')}>Những bài viết bạn đã đánh dấu để xem lại.</p>
+            </div>
+            <button type="button" className={cx('backLink')} onClick={() => navigate(routes.profile)}>
+              <IoArrowBackOutline />
+              Trở lại hồ sơ
+            </button>
+          </header>
+        )}
 
         <div className={cx('toolbar')}>
           <div className={cx('searchBox')}>
