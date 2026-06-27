@@ -5,6 +5,7 @@ import { getCategories, createCategory, updateCategory, deleteCategory } from '~
 import { toast } from 'react-toastify';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import {
     AdminPageHeader,
     AdminToolbar,
@@ -17,6 +18,7 @@ const Categories = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
+    const [deletingCategory, setDeletingCategory] = useState(null);
     const [formData, setFormData] = useState({ name: '' });
 
     const fetchCategories = async () => {
@@ -51,11 +53,12 @@ const Categories = () => {
         setShowModal(true);
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa danh mục này?')) return;
+    const handleDelete = async () => {
+        if (!deletingCategory) return;
         try {
-            await deleteCategory(id);
+            await deleteCategory(deletingCategory.id);
             toast.success('Xóa danh mục thành công');
+            setDeletingCategory(null);
             fetchCategories();
         } catch (error) {
             toast.error('Lỗi khi xóa danh mục');
@@ -116,7 +119,7 @@ const Categories = () => {
                         </button>
                         <button
                             className="danger"
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => setDeletingCategory(item)}
                             title="Xóa"
                         >
                             <Trash2 size={14} />
@@ -151,6 +154,14 @@ const Categories = () => {
                     />
                 </Form.Group>
             </BaseModal>
+
+            <ConfirmDeleteModal
+                show={Boolean(deletingCategory)}
+                onClose={() => setDeletingCategory(null)}
+                onConfirm={handleDelete}
+                title="Xác nhận xóa danh mục"
+                message={`Bạn có chắc chắn muốn xóa danh mục "${deletingCategory?.name}"? Hành động này không thể hoàn tác.`}
+            />
         </div>
     );
 };

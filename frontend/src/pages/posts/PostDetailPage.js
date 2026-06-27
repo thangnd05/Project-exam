@@ -10,6 +10,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '~/hooks/useAuth';
 import { useCosmetics } from '~/hooks/useCosmetics';
 import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import routes from '~/config/Routes';
 import styles from './PostDetailPage.module.scss';
 import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, toggleReact, toggleSavePost } from '~/api/postApi';
@@ -33,6 +34,7 @@ function PostDetailPage() {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
   const [relatedPosts, setRelatedPosts] = useState([]);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const [replyingToId, setReplyingToId] = useState(null);
@@ -215,12 +217,13 @@ function PostDetailPage() {
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Bạn có chắc muốn xóa bình luận này?')) return;
+  const handleDeleteComment = async () => {
+    if (!deletingCommentId) return;
     try {
-      await deleteComment(commentId);
+      await deleteComment(deletingCommentId);
       const data = await getComments(postId);
       setComments(data || []);
+      setDeletingCommentId(null);
     } catch (error) {
       console.error('Failed to delete comment:', error);
     }
@@ -347,7 +350,7 @@ function PostDetailPage() {
                     setEditingCommentId(comment.id);
                     setEditContent(comment.content);
                   }}>Sửa</button>
-                  <button onClick={() => handleDeleteComment(comment.id)}>Xóa</button>
+                  <button onClick={() => setDeletingCommentId(comment.id)}>Xóa</button>
                 </>
               )}
             </div>
@@ -532,6 +535,14 @@ function PostDetailPage() {
         )}
 
       </div>
+
+      <ConfirmDeleteModal
+        show={Boolean(deletingCommentId)}
+        onClose={() => setDeletingCommentId(null)}
+        onConfirm={handleDeleteComment}
+        title="Xác nhận xóa bình luận"
+        message="Bạn có chắc muốn xóa bình luận này? Hành động này không thể hoàn tác."
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Spinner, Row, Col } from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import TagSelector from '~/components/common/TagSelector/TagSelector';
 import { getQuestionById, updateQuestion } from '~/api/questionApi';
 import { getExamPartById } from '~/api/examPartApi';
@@ -64,6 +65,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   const [extraContents, setExtraContents] = useState([]); // các đoạn text bổ sung của passage
   const [existingMedia, setExistingMedia] = useState([]);
   const [deletingMediaIds, setDeletingMediaIds] = useState([]);
+  const [confirmDeleteMedia, setConfirmDeleteMedia] = useState(null);
   const [questionCollections, setQuestionCollections] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [selectedTagIds, setSelectedTagIds] = useState([]);
@@ -267,9 +269,6 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       return;
     }
 
-    const confirmed = window.confirm('Bạn chắc chắn muốn xóa media này?');
-    if (!confirmed) return;
-
     setDeletingMediaIds((prev) => [...prev, item.id]);
     try {
       await deletePassageMedia(item.id);
@@ -367,6 +366,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   };
 
   return (
+    <>
     <BaseModal
       show={show}
       onClose={onHide}
@@ -544,7 +544,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                                 variant="outline-danger"
                                 className={cx('deleteMediaBtn')}
                                 disabled={deleting || saving}
-                                onClick={() => handleDeleteExistingMedia(item)}
+                                onClick={() => setConfirmDeleteMedia(item)}
                               >
                                 {deleting ? (
                                   <Spinner size="sm" />
@@ -705,6 +705,19 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
         )}
       </div>
     </BaseModal>
+
+    <ConfirmDeleteModal
+      show={Boolean(confirmDeleteMedia)}
+      onClose={() => setConfirmDeleteMedia(null)}
+      onConfirm={() => {
+        const item = confirmDeleteMedia;
+        setConfirmDeleteMedia(null);
+        handleDeleteExistingMedia(item);
+      }}
+      title="Xác nhận xóa media"
+      message="Bạn chắc chắn muốn xóa media này? Hành động này không thể hoàn tác."
+    />
+    </>
   );
 };
 

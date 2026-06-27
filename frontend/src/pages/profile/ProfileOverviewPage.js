@@ -26,6 +26,8 @@ import {
   IoTrophyOutline,
   IoRocketOutline,
   IoCompassOutline,
+  IoChevronDownOutline,
+  IoChevronUpOutline,
 } from 'react-icons/io5';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getExamParts } from '~/api/examPartApi';
@@ -43,6 +45,8 @@ import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '~/hooks/useCosmetics';
 
 const cx = classNames.bind(styles);
+
+const TARGET_VISIBLE_COUNT = 2;
 
 const formatDateTime = (value) => {
   if (!value) return '--';
@@ -70,6 +74,7 @@ function ProfileOverviewPage() {
   const [loadingEvaluations, setLoadingEvaluations] = useState(true);
   const [myTargets, setMyTargets] = useState([]);
   const [loadingTargets, setLoadingTargets] = useState(true);
+  const [showAllTargets, setShowAllTargets] = useState(false);
   const PREVIEW_EVALUATION_COUNT = 3;
 
   const fetchProfileOverview = async (showLoader = true) => {
@@ -418,7 +423,7 @@ function ProfileOverviewPage() {
                     </div>
                   ) : (
                     <div className={cx('targetList')}>
-                      {myTargets.map((target) => {
+                      {(showAllTargets ? myTargets : myTargets.slice(0, TARGET_VISIBLE_COUNT)).map((target) => {
                         const readiness = Number(target.targetReadiness ?? 0);
                         const isAchieved = Boolean(target.achievedAt);
                         return (
@@ -500,6 +505,26 @@ function ProfileOverviewPage() {
                           </article>
                         );
                       })}
+
+                      {myTargets.length > TARGET_VISIBLE_COUNT && (
+                        <button
+                          type="button"
+                          className={cx('targetShowMoreBtn')}
+                          onClick={() => setShowAllTargets((prev) => !prev)}
+                        >
+                          {showAllTargets ? (
+                            <>
+                              Thu gọn
+                              <IoChevronUpOutline />
+                            </>
+                          ) : (
+                            <>
+                              Xem thêm {myTargets.length - TARGET_VISIBLE_COUNT} mục tiêu
+                              <IoChevronDownOutline />
+                            </>
+                          )}
+                        </button>
+                      )}
                     </div>
                   )}
                 </article>

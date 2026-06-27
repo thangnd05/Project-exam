@@ -17,6 +17,7 @@ import {
 } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { getSavedPosts, toggleSavePost } from '~/api/postApi';
+import ConfirmActionModal from '~/components/common/modal/ConfirmActionModal';
 import routes from '~/config/Routes';
 import styles from './PostsListPage.module.scss';
 
@@ -54,6 +55,7 @@ function SavedPostsPage() {
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
+  const [unsavingPost, setUnsavingPost] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -86,13 +88,15 @@ function SavedPostsPage() {
   const totalPages = Math.max(1, Math.ceil(filteredPosts.length / PAGE_SIZE));
   const pageItems = filteredPosts.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
-  const handleUnsave = async (postId) => {
-    if (!window.confirm('Bỏ lưu bài viết này?')) return;
+  const handleUnsave = async () => {
+    if (!unsavingPost) return;
+    const postId = unsavingPost.id;
     setActionLoadingId(postId);
     try {
       await toggleSavePost(postId);
       setPosts((prev) => prev.filter((p) => p.id !== postId));
       toast.success('Đã bỏ lưu');
+      setUnsavingPost(null);
     } catch (error) {
       toast.error('Không thể bỏ lưu. Vui lòng thử lại.');
     } finally {
@@ -262,7 +266,7 @@ function SavedPostsPage() {
                         <IoEyeOutline /> Xem chi tiết
                       </Dropdown.Item>
                       <Dropdown.Divider />
-                      <Dropdown.Item className={cx('dangerItem')} onClick={() => handleUnsave(post.id)}>
+                      <Dropdown.Item className={cx('dangerItem')} onClick={() => setUnsavingPost(post)}>
                         <IoBookmarkOutline /> Bỏ lưu
                       </Dropdown.Item>
                     </Dropdown.Menu>
@@ -275,6 +279,16 @@ function SavedPostsPage() {
 
         {!loading && !errorMessage && renderPagination()}
       </div>
+
+      <ConfirmActionModal
+        show={Boolean(unsavingPost)}
+        onClose={() => setUnsavingPost(null)}
+        onConfirm={handleUnsave}
+        icon={IoBookmarkOutline}
+        title="Bỏ lưu bài viết"
+        message={`Bỏ lưu bài viết "${unsavingPost?.title}"?`}
+        confirmText="Bỏ lưu"
+      />
     </div>
   );
 }

@@ -25,6 +25,7 @@ import {useBaseMetaData} from '~/hooks/useBaseMetaData';
 import {useHasPermission} from '~/hooks/usePermission';
 import EditQuestionModal from './modals/EditQuestionModal';
 import ViewQuestionModal from './modals/ViewQuestionModal';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import { buildCollectionTree, getCollectionWithDescendantIds, isParentCollection } from '~/utils/collectionTree';
 import styles from './PersonalQuestionBankPage.module.scss';
@@ -51,6 +52,7 @@ const PersonalQuestionBankPage = () => {
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
   const [deletingQuestionId, setDeletingQuestionId] = useState(null);
+  const [deleteQuestionTarget, setDeleteQuestionTarget] = useState(null);
   const [viewingQuestionId, setViewingQuestionId] = useState(null);
 
   const [chapters, setChapters] = useState([]);
@@ -307,13 +309,9 @@ const PersonalQuestionBankPage = () => {
     }
   };
 
-  const handleDeleteQuestion = async ({
-    questionId,
-    partId = null,
-    chapterId = null,
-  }) => {
-    const confirmed = window.confirm('Bạn có chắc muốn xóa câu hỏi này không?');
-    if (!confirmed) return;
+  const handleDeleteQuestion = async () => {
+    if (!deleteQuestionTarget) return;
+    const { questionId, partId = null, chapterId = null } = deleteQuestionTarget;
 
     setDeletingQuestionId(questionId);
     try {
@@ -333,6 +331,7 @@ const PersonalQuestionBankPage = () => {
         type: 'success',
         message: 'Đã xóa câu hỏi thành công.',
       });
+      setDeleteQuestionTarget(null);
     } catch (error) {
       const message =
         error.response?.data?.message || 'Không thể xóa câu hỏi. Vui lòng thử lại.';
@@ -621,7 +620,7 @@ const PersonalQuestionBankPage = () => {
                                       variant="outline-danger"
                                       disabled={deletingQuestionId === id}
                                       onClick={() =>
-                                        handleDeleteQuestion({
+                                        setDeleteQuestionTarget({
                                           questionId: id,
                                           chapterId: chapter.chapterId,
                                         })
@@ -771,7 +770,7 @@ const PersonalQuestionBankPage = () => {
                                           variant="outline-danger"
                                           disabled={deletingQuestionId === id}
                                           onClick={() =>
-                                            handleDeleteQuestion({
+                                            setDeleteQuestionTarget({
                                               questionId: id,
                                               partId: part.examPartId,
                                             })
@@ -810,6 +809,14 @@ const PersonalQuestionBankPage = () => {
         show={!!viewingQuestionId}
         onHide={() => setViewingQuestionId(null)}
         questionId={viewingQuestionId}
+      />
+
+      <ConfirmDeleteModal
+        show={Boolean(deleteQuestionTarget)}
+        onClose={() => setDeleteQuestionTarget(null)}
+        onConfirm={handleDeleteQuestion}
+        title="Xác nhận xóa câu hỏi"
+        message="Bạn có chắc muốn xóa câu hỏi này không? Hành động này không thể hoàn tác."
       />
     </div>
   );

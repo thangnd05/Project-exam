@@ -6,6 +6,7 @@ import {useNavigate} from 'react-router-dom';
 import {IoArrowBackOutline, IoCalendarOutline, IoStar} from 'react-icons/io5';
 import {toast} from 'react-toastify';
 import {deleteEvaluation, updateEvaluation} from '~/api/evaluationApi';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import routes from '~/config/Routes';
 import styles from './MyEvaluationsPage.module.scss';
 
@@ -27,6 +28,7 @@ function MyEvaluationsPage() {
   const [editRating, setEditRating] = useState(0);
   const [editContent, setEditContent] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState(null);
+  const [deletingEvaluationId, setDeletingEvaluationId] = useState(null);
 
   const fetchMyEvaluations = async () => {
     setLoading(true);
@@ -93,13 +95,9 @@ function MyEvaluationsPage() {
     }
   };
 
-  const handleDeleteEvaluation = async (evaluationId) => {
-    const confirmed = window.confirm(
-      'Bạn có chắc chắn muốn xóa đánh giá này không?',
-    );
-    if (!confirmed) {
-      return;
-    }
+  const handleDeleteEvaluation = async () => {
+    if (!deletingEvaluationId) return;
+    const evaluationId = deletingEvaluationId;
 
     setActionLoadingId(evaluationId);
 
@@ -112,6 +110,7 @@ function MyEvaluationsPage() {
         cancelEditEvaluation();
       }
       toast.success('Đã xóa đánh giá thành công.');
+      setDeletingEvaluationId(null);
     } catch (error) {
       toast.error('Không thể xóa đánh giá. Vui lòng thử lại.');
     } finally {
@@ -248,7 +247,7 @@ function MyEvaluationsPage() {
                       <button
                         type="button"
                         className={cx('actionBtn', 'deleteBtn')}
-                        onClick={() => handleDeleteEvaluation(evaluation.id)}
+                        onClick={() => setDeletingEvaluationId(evaluation.id)}
                         disabled={actionLoadingId === evaluation.id}
                       >
                         {actionLoadingId === evaluation.id ? 'Đang xóa...' : 'Xóa đánh giá'}
@@ -261,6 +260,14 @@ function MyEvaluationsPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDeleteModal
+        show={Boolean(deletingEvaluationId)}
+        onClose={() => setDeletingEvaluationId(null)}
+        onConfirm={handleDeleteEvaluation}
+        title="Xác nhận xóa đánh giá"
+        message="Bạn có chắc chắn muốn xóa đánh giá này không? Hành động này không thể hoàn tác."
+      />
     </div>
   );
 }

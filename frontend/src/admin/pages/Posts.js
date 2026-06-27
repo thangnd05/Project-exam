@@ -4,6 +4,8 @@ import { Eye, CheckCircle, Trash2 } from 'lucide-react';
 import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import routes from '~/config/Routes';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
+import ConfirmActionModal from '~/components/common/modal/ConfirmActionModal';
 import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common';
 
 const STATUS_VARIANT = { APPROVED: 'success', PENDING: 'warning' };
@@ -22,6 +24,8 @@ const Posts = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
+    const [approvingPost, setApprovingPost] = useState(null);
+    const [deletingPost, setDeletingPost] = useState(null);
 
     const PAGE_SIZE = 10;
 
@@ -49,22 +53,24 @@ const Posts = () => {
         fetchPosts(0);
     }, [fetchPosts]);
 
-    const handleApprove = async (postId) => {
-        if (!window.confirm('Duyệt bài viết này?')) return;
+    const handleApprove = async () => {
+        if (!approvingPost) return;
         try {
-            await updatePostStatus(postId, 'APPROVED');
+            await updatePostStatus(approvingPost.id, 'APPROVED');
             toast.success('Đã duyệt bài viết');
+            setApprovingPost(null);
             fetchPosts(currentPage);
         } catch (error) {
             toast.error('Lỗi khi duyệt bài viết');
         }
     };
 
-    const handleDelete = async (postId) => {
-        if (!window.confirm('Xóa bài viết này? Hành động không thể hoàn tác.')) return;
+    const handleDelete = async () => {
+        if (!deletingPost) return;
         try {
-            await deletePost(postId);
+            await deletePost(deletingPost.id);
             toast.success('Đã xóa bài viết');
+            setDeletingPost(null);
             fetchPosts(currentPage);
         } catch (error) {
             toast.error('Lỗi khi xóa bài viết');
@@ -153,19 +159,37 @@ const Posts = () => {
                             <Eye size={14} />
                         </button>
                         {post.status !== 'APPROVED' && (
-                            <button title="Duyệt" onClick={() => handleApprove(post.id)}>
+                            <button title="Duyệt" onClick={() => setApprovingPost(post)}>
                                 <CheckCircle size={14} />
                             </button>
                         )}
                         <button
                             className="danger"
                             title="Xóa bài viết"
-                            onClick={() => handleDelete(post.id)}
+                            onClick={() => setDeletingPost(post)}
                         >
                             <Trash2 size={14} />
                         </button>
                     </>
                 )}
+            />
+
+            <ConfirmActionModal
+                show={Boolean(approvingPost)}
+                onClose={() => setApprovingPost(null)}
+                onConfirm={handleApprove}
+                icon={CheckCircle}
+                title="Duyệt bài viết"
+                message={`Duyệt bài viết "${approvingPost?.title}"?`}
+                confirmText="Duyệt"
+            />
+
+            <ConfirmDeleteModal
+                show={Boolean(deletingPost)}
+                onClose={() => setDeletingPost(null)}
+                onConfirm={handleDelete}
+                title="Xác nhận xóa bài viết"
+                message={`Xóa bài viết "${deletingPost?.title}"? Hành động này không thể hoàn tác.`}
             />
         </div>
     );

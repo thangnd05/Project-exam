@@ -20,6 +20,7 @@ import {
 import { toast } from 'react-toastify';
 import { getMyPosts, deletePost, getCategories, getPostById } from '~/api/postApi';
 import CreatePostModal from '~/pages/posts/modals/CreatePostModal';
+import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import routes from '~/config/Routes';
 import styles from './PostsListPage.module.scss';
 
@@ -69,6 +70,7 @@ function MyPostsPage() {
   const [categories, setCategories] = useState([]);
   const [editingPost, setEditingPost] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [deletingPost, setDeletingPost] = useState(null);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
@@ -134,13 +136,15 @@ function MyPostsPage() {
     setEditingPost(null);
   };
 
-  const handleDelete = async (postId) => {
-    if (!window.confirm('Xóa bài viết này? Hành động không thể hoàn tác.')) return;
+  const handleDelete = async () => {
+    if (!deletingPost) return;
+    const postId = deletingPost.id;
     setActionLoadingId(postId);
     try {
       await deletePost(postId);
       setPosts((prev) => prev.filter((p) => p.id !== postId));
       toast.success('Đã xóa bài viết');
+      setDeletingPost(null);
     } catch (error) {
       toast.error('Không thể xóa bài viết. Vui lòng thử lại.');
     } finally {
@@ -318,7 +322,7 @@ function MyPostsPage() {
                         <IoEyeOutline /> Xem chi tiết
                       </Dropdown.Item>
                       <Dropdown.Divider />
-                      <Dropdown.Item className={cx('dangerItem')} onClick={() => handleDelete(post.id)}>
+                      <Dropdown.Item className={cx('dangerItem')} onClick={() => setDeletingPost(post)}>
                         <IoTrashOutline /> Xóa bài viết
                       </Dropdown.Item>
                     </Dropdown.Menu>
@@ -338,6 +342,14 @@ function MyPostsPage() {
         onRefresh={fetchData}
         categories={categories}
         editingPost={editingPost}
+      />
+
+      <ConfirmDeleteModal
+        show={Boolean(deletingPost)}
+        onClose={() => setDeletingPost(null)}
+        onConfirm={handleDelete}
+        title="Xác nhận xóa bài viết"
+        message={`Xóa bài viết "${deletingPost?.title}"? Hành động này không thể hoàn tác.`}
       />
     </div>
   );
