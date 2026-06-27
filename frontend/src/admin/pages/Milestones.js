@@ -14,6 +14,7 @@ import {
   updateMilestone,
 } from '../../api/milestoneApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import useMilestoneScoring from '../../hooks/useMilestoneScoring';
 import {
   AdminFieldError,
   AdminPageHeader,
@@ -109,6 +110,25 @@ function MilestonesManagement() {
     examParts.filter((p) => p.examTypeId === examTypeFilter),
   );
 
+  const {
+    isScaled,
+    maxScore,
+    SCALE_MIN,
+    SCALE_MAX,
+    getPartName,
+    getPartTotal,
+    percentToNum,
+    numToPercent,
+    evenPctForScore,
+    estimateScore,
+  } = useMilestoneScoring({
+    examTypes,
+    examParts,
+    skills,
+    scoringConversions,
+    selectedExamTypeId: examTypeFilter,
+  });
+
   const filteredMilestones = milestones.filter((m) => {
     if (!keyword.trim()) return true;
     const k = keyword.trim().toLowerCase();
@@ -129,7 +149,7 @@ function MilestonesManagement() {
     try {
       const partRequirements = filteredParts.map((p) => ({
         examPartId: p.examPartId,
-        requiredPercentage: Math.round((Number(newScore) / 990) * 100),
+        requiredPercentage: evenPctForScore(newScore),
       }));
 
       await createMilestone({
@@ -207,14 +227,6 @@ function MilestonesManagement() {
     }
   };
 
-  const getPartName = (examPartId) => {
-    return examParts.find((p) => p.examPartId === examPartId)?.name || examPartId;
-  };
-
-  const getPartTotal = (examPartId) => {
-    return examParts.find((p) => p.examPartId === examPartId)?.defaultNumQuestions || 0;
-  };
-
   const sortPartRequirements = (partRequirements) => {
     return [...(partRequirements || [])].sort((partRequirementA, partRequirementB) => {
       const partNameA = getPartName(partRequirementA.examPartId);
@@ -228,51 +240,6 @@ function MilestonesManagement() {
     });
   };
 
-  const percentToNum = (percent, total) => (total > 0 ? Math.round((percent * total) / 100) : 0);
-  const numToPercent = (num, total) => (total > 0 ? Math.round((num / total) * 100) : 0);
-
-  // Tính điểm ước tính từ % các part qua bảng scoring conversion
-  const estimateScore = (partsConfig) => {
-    // partsConfig: { examPartId: requiredPercentage }
-    if (!examTypeFilter || !partsConfig || Object.keys(partsConfig).length === 0) return null;
-
-    // Gom số câu đúng theo skill
-    const correctBySkill = {};
-    for (const [examPartId, pct] of Object.entries(partsConfig)) {
-      const part = examParts.find((p) => p.examPartId === examPartId);
-      if (!part) continue;
-      const numCorrect = percentToNum(pct, part.defaultNumQuestions || 0);
-      correctBySkill[part.skillId] = (correctBySkill[part.skillId] || 0) + numCorrect;
-    }
-
-    // Tra bảng scoring conversion cho mỗi skill
-    const relevantConversions = scoringConversions.filter(
-      (c) => c.examTypeId === examTypeFilter,
-    );
-    if (relevantConversions.length === 0) return null;
-
-    let totalScore = 0;
-    const skillDetails = [];
-    for (const [skillId, numCorrect] of Object.entries(correctBySkill)) {
-      const skillConversions = relevantConversions
-        .filter((c) => c.skillId === skillId)
-        .sort((a, b) => a.numCorrect - b.numCorrect);
-      if (skillConversions.length === 0) continue;
-
-      // Tìm convertedScore gần nhất (<=)
-      let matched = skillConversions[0];
-      for (const c of skillConversions) {
-        if (c.numCorrect <= numCorrect) matched = c;
-        else break;
-      }
-
-      const skillName = skills.find((s) => s.skillId === skillId)?.name || skillId;
-      totalScore += matched.convertedScore;
-      skillDetails.push({skillName, numCorrect, convertedScore: matched.convertedScore});
-    }
-
-    return {totalScore, skillDetails};
-  };
 
   return (
     <div className={cx('milestonePage')}>
@@ -305,12 +272,14 @@ function MilestonesManagement() {
           <div className={cx('createGrid')}>
             <Form.Control
               type="number"
-              placeholder="Mốc điểm (VD: 450)"
+              min={0}
+              max={maxScore}
+              placeholder={isScaled ? 'Mốc điểm (VD: 700)' : 'Mốc điểm (VD: 450)'}
               value={newScore}
               onChange={(e) => setNewScore(e.target.value)}
             />
             <span style={{alignSelf: 'center', color: '#6b7280', fontSize: '0.85rem'}}>
-              ≈ {newScore ? Math.round((Number(newScore) / 990) * 100) : 0}%
+              ≈ {newScore ? evenPctForScore(newScore) : 0}%
               mỗi part
             </span>
             <Form.Control
@@ -423,9 +392,11 @@ function MilestonesManagement() {
                         ({diff > 0 ? '+' : ''}{diff} so với mốc {m.milestoneScore})
                       </span>
                       <span className={cx('scoreEstimateDetail')}>
-                        {est.skillDetails.map((s) =>
-                          `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`
-                        ).join(' | ')}
+                        {est.scaled
+                          ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX})`
+                          : est.skillDetails.map((s) =>
+                              `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`
+                            ).join(' | ')}
                       </span>
                     </div>
                   );
@@ -491,9 +462,11 @@ function MilestonesManagement() {
                       ({diff > 0 ? '+' : ''}{diff} so với mốc {m.milestoneScore})
                     </span>
                     <span className={cx('scoreEstimateDetail')}>
-                      {est.skillDetails.map((s) =>
-                        `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`
-                      ).join(' | ')}
+                      {est.scaled
+                        ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX})`
+                        : est.skillDetails.map((s) =>
+                            `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`
+                          ).join(' | ')}
                     </span>
                   </div>
                 );

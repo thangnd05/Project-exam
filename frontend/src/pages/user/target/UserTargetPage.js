@@ -14,6 +14,7 @@ import {
 import planStyles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
 import { sortByPartOrder, sortPartsByLookup } from '~/utils/partOrder';
+import useMilestoneScoring from '~/hooks/useMilestoneScoring';
 
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);
@@ -46,74 +47,24 @@ function UserTargetPage() {
     }
   }, [searchParams]);
 
-  const getPartTotal = (examPartId) =>
-    examParts.find((p) => p.examPartId === examPartId)?.defaultNumQuestions || 0;
-  const getPartName = (examPartId) =>
-    examParts.find((p) => p.examPartId === examPartId)?.name || examPartId;
-  const percentToNum = (pct, total) => (total > 0 ? Math.round((pct * total) / 100) : 0);
-  const numToPercent = (num, total) => (total > 0 ? Math.round((num / total) * 100) : 0);
-
-  // Loại kỳ thi đang chọn + phương thức chấm. AWS_SCALE = thang scaled 100–1000, không có skill.
-  const selectedExamType = examTypes.find((t) => String(t.examTypeId) === String(selectedExamTypeId));
-  const scoringMethod = (selectedExamType?.scoringMethod || 'DEFAULT').toUpperCase();
-  const isScaled = scoringMethod === 'AWS_SCALE';
-  const SCALE_MIN = 100; // điểm tối thiểu thang AWS
-  const SCALE_SPAN = 900; // 100..1000
-  const SCALE_MAX = SCALE_MIN + SCALE_SPAN;
-  const maxTargetScore = isScaled ? SCALE_MAX : 990;
-  // % cần đạt (chia đều) tương ứng với 1 điểm mục tiêu.
-  const evenPctForScore = (score) =>
-    isScaled
-      ? Math.max(0, Math.min(100, Math.round(((Number(score) - SCALE_MIN) / SCALE_SPAN) * 100)))
-      : Math.min(100, Math.round((Number(score) / 990) * 100));
-
-  const estimateScore = (partsConfig, examTypeId) => {
-    if (!examTypeId || !partsConfig || Object.keys(partsConfig).length === 0) return null;
-
-    // AWS / thang scaled không có skill → tính thẳng bằng công thức 100 + (đúng/tổng)*900.
-    if (isScaled) {
-      let totalCorrect = 0;
-      let totalQuestions = 0;
-      for (const [examPartId, pct] of Object.entries(partsConfig)) {
-        const part = examParts.find((p) => p.examPartId === examPartId);
-        const tot = part?.defaultNumQuestions || 0;
-        totalCorrect += percentToNum(pct, tot);
-        totalQuestions += tot;
-      }
-      const totalScore = totalQuestions > 0
-        ? Math.max(SCALE_MIN, Math.min(SCALE_MAX, SCALE_MIN + Math.round((totalCorrect / totalQuestions) * SCALE_SPAN)))
-        : SCALE_MIN;
-      return { totalScore, scaled: true, totalCorrect, totalQuestions, skillDetails: [] };
-    }
-
-    const correctBySkill = {};
-    for (const [examPartId, pct] of Object.entries(partsConfig)) {
-      const part = examParts.find((p) => p.examPartId === examPartId);
-      if (!part) continue;
-      const numCorrect = percentToNum(pct, part.defaultNumQuestions || 0);
-      correctBySkill[part.skillId] = (correctBySkill[part.skillId] || 0) + numCorrect;
-    }
-    const relevantConversions = scoringConversions.filter((c) => c.examTypeId === examTypeId);
-    if (relevantConversions.length === 0) return null;
-
-    let totalScore = 0;
-    const skillDetails = [];
-    for (const [skillId, numCorrect] of Object.entries(correctBySkill)) {
-      const skillConversions = relevantConversions
-        .filter((c) => c.skillId === skillId)
-        .sort((a, b) => a.numCorrect - b.numCorrect);
-      if (skillConversions.length === 0) continue;
-      let matched = skillConversions[0];
-      for (const c of skillConversions) {
-        if (c.numCorrect <= numCorrect) matched = c;
-        else break;
-      }
-      const skillName = skills.find((s) => s.skillId === skillId)?.name || skillId;
-      totalScore += matched.convertedScore;
-      skillDetails.push({ skillName, numCorrect, convertedScore: matched.convertedScore });
-    }
-    return { totalScore, skillDetails };
-  };
+  const {
+    isScaled,
+    maxScore: maxTargetScore,
+    SCALE_MIN,
+    SCALE_MAX,
+    getPartTotal,
+    getPartName,
+    percentToNum,
+    numToPercent,
+    evenPctForScore,
+    estimateScore,
+  } = useMilestoneScoring({
+    examTypes,
+    examParts,
+    skills,
+    scoringConversions,
+    selectedExamTypeId,
+  });
 
   const loadMilestones = useCallback(async () => {
     if (!selectedExamTypeId) {
