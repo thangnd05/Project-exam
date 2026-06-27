@@ -308,9 +308,28 @@ public class PostService {
         return PageResponse.from(postPage, buildSummaryResponses(postPage.getContent()));
     }
 
-    public List<PostSummaryResponse> getMyPosts(HttpServletRequest httpRequest) {
+    public PageResponse<PostSummaryResponse> getMyPosts(int page, int size, String keyword,
+                                                        Post.PostStatus status,
+                                                        HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        return buildSummaryResponses(postRepository.findByUserId(userId));
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 10 : Math.min(size, 100);
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // Bài của chính user → xem được mọi status. Cho phép lọc thêm theo keyword (tiêu đề) và status.
+        Specification<Post> spec = (root, query, cb) -> cb.equal(root.get("userId"), userId);
+        if (keyword != null && !keyword.isBlank()) {
+            String like = "%" + keyword.trim().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("title")), like));
+        }
+        if (status != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+        }
+
+        Page<Post> postPage = postRepository.findAll(spec, pageable);
+
+        return PageResponse.from(postPage, buildSummaryResponses(postPage.getContent()));
     }
 
     /**

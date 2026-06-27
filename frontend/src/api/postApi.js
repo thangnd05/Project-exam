@@ -25,8 +25,19 @@ export const getPostById = (postId) => {
   return axios.get(`${BASE_URL}/${postId}`).then((response) => response.data);
 };
 
-export const getMyPosts = () => {
-  return axios.get(`${BASE_URL}/me`).then((response) => response.data);
+export const getMyPosts = ({ page = 0, size = 10, keyword, status } = {}) => {
+  const params = new URLSearchParams();
+  params.set('page', String(page));
+  params.set('size', String(size));
+  if (keyword && keyword.trim()) {
+    params.set('keyword', keyword.trim());
+  }
+  if (status) {
+    params.set('status', status);
+  }
+  return axios
+    .get(`${BASE_URL}/me?${params.toString()}`)
+    .then((response) => response.data);
 };
 
 // --- Create / Update (multipart: kèm thumbnail/ảnh) ---
@@ -100,8 +111,16 @@ export const toggleSavePost = (postId) => {
   return axios.post(`${BASE_URL}/${postId}/save`).then((response) => response.data);
 };
 
-export const getSavedPosts = () => {
-  return axios.get(`${BASE_URL}/saved`).then((response) => response.data);
+export const getSavedPosts = ({ page = 0, size = 10, keyword } = {}) => {
+  const params = new URLSearchParams();
+  params.set('page', String(page));
+  params.set('size', String(size));
+  if (keyword && keyword.trim()) {
+    params.set('keyword', keyword.trim());
+  }
+  return axios
+    .get(`${BASE_URL}/saved?${params.toString()}`)
+    .then((response) => response.data);
 };
 
 export const getSaveStatus = (postId) => {

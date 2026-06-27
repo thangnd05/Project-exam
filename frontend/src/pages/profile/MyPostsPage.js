@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
@@ -73,50 +73,51 @@ function MyPostsPage() {
   const [deletingPost, setDeletingPost] = useState(null);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchData = async () => {
+  // Debounce ô tìm kiếm + reset về trang đầu (gộp 1 lần set để chỉ fetch 1 lần).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(0);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setErrorMessage('');
     try {
-      const data = await getMyPosts();
-      const sorted = (Array.isArray(data) ? data : []).slice().sort((a, b) => {
-        const da = new Date(a.createdAt || 0).getTime();
-        const db = new Date(b.createdAt || 0).getTime();
-        return db - da;
+      const data = await getMyPosts({
+        page: currentPage,
+        size: PAGE_SIZE,
+        keyword: debouncedSearch,
+        status: statusFilter !== 'ALL' ? statusFilter : undefined,
       });
-      setPosts(sorted);
+      setPosts(Array.isArray(data?.content) ? data.content : []);
+      setTotalPages(data?.totalPages || 0);
     } catch (error) {
       setErrorMessage('Không tải được danh sách bài viết của bạn.');
       setPosts([]);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, debouncedSearch, statusFilter]);
 
   useEffect(() => {
     fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
     getCategories()
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(() => setCategories([]));
   }, []);
 
-  // Reset page khi filter/search đổi
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [statusFilter, searchQuery]);
-
-  const filteredPosts = useMemo(() => {
-    const keyword = searchQuery.trim().toLowerCase();
-    return posts.filter((p) => {
-      if (statusFilter !== 'ALL' && p.status !== statusFilter) return false;
-      if (keyword && !(p.title || '').toLowerCase().includes(keyword)) return false;
-      return true;
-    });
-  }, [posts, statusFilter, searchQuery]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / PAGE_SIZE));
-  const pageItems = filteredPosts.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+  const hasActiveFilter = statusFilter !== 'ALL' || debouncedSearch.trim().length > 0;
 
   const handleEdit = async (postId) => {
     setActionLoadingId(postId);
@@ -142,9 +143,9 @@ function MyPostsPage() {
     setActionLoadingId(postId);
     try {
       await deletePost(postId);
-      setPosts((prev) => prev.filter((p) => p.id !== postId));
       toast.success('Đã xóa bài viết');
       setDeletingPost(null);
+      fetchData();
     } catch (error) {
       toast.error('Không thể xóa bài viết. Vui lòng thử lại.');
     } finally {
@@ -233,7 +234,10 @@ function MyPostsPage() {
                 key={opt.value}
                 type="button"
                 className={cx('pill', { active: statusFilter === opt.value })}
-                onClick={() => setStatusFilter(opt.value)}
+                onClick={() => {
+                  setStatusFilter(opt.value);
+                  setCurrentPage(0);
+                }}
               >
                 {opt.label}
               </button>
@@ -252,19 +256,19 @@ function MyPostsPage() {
           <Alert variant="danger" className={cx('alertBox')}>{errorMessage}</Alert>
         )}
 
-        {!loading && !errorMessage && filteredPosts.length === 0 && (
+        {!loading && !errorMessage && posts.length === 0 && (
           <Alert variant="info" className={cx('alertBox')}>
-            {posts.length === 0 ? (
-              <>Bạn chưa đăng bài viết nào. <Link to={routes.posts}>Tạo bài viết đầu tiên</Link>.</>
-            ) : (
+            {hasActiveFilter ? (
               <>Không có bài viết nào khớp với bộ lọc hiện tại.</>
+            ) : (
+              <>Bạn chưa đăng bài viết nào. <Link to={routes.posts}>Tạo bài viết đầu tiên</Link>.</>
             )}
           </Alert>
         )}
 
-        {!loading && !errorMessage && pageItems.length > 0 && (
+        {!loading && !errorMessage && posts.length > 0 && (
           <div className={cx('list')}>
-            {pageItems.map((post, index) => {
+            {posts.map((post, index) => {
               const status = STATUS_LABEL[post.status] || { text: post.status, cls: '' };
               const detailUrl = routes.postDetail.replace(':postId', post.id);
               return (

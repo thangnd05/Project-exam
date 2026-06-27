@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
@@ -54,39 +54,45 @@ function SavedPostsPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [unsavingPost, setUnsavingPost] = useState(null);
 
-  const fetchData = async () => {
+  // Debounce ô tìm kiếm + reset về trang đầu (gộp 1 lần set để chỉ fetch 1 lần).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(0);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setErrorMessage('');
     try {
-      const data = await getSavedPosts();
-      setPosts(Array.isArray(data) ? data : []);
+      const data = await getSavedPosts({
+        page: currentPage,
+        size: PAGE_SIZE,
+        keyword: debouncedSearch,
+      });
+      setPosts(Array.isArray(data?.content) ? data.content : []);
+      setTotalPages(data?.totalPages || 0);
     } catch (error) {
       setErrorMessage('Không tải được danh sách bài đã lưu.');
       setPosts([]);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, debouncedSearch]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [searchQuery]);
-
-  const filteredPosts = useMemo(() => {
-    const keyword = searchQuery.trim().toLowerCase();
-    if (!keyword) return posts;
-    return posts.filter((p) => (p.title || '').toLowerCase().includes(keyword));
-  }, [posts, searchQuery]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / PAGE_SIZE));
-  const pageItems = filteredPosts.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+  const hasActiveFilter = debouncedSearch.trim().length > 0;
 
   const handleUnsave = async () => {
     if (!unsavingPost) return;
@@ -94,9 +100,9 @@ function SavedPostsPage() {
     setActionLoadingId(postId);
     try {
       await toggleSavePost(postId);
-      setPosts((prev) => prev.filter((p) => p.id !== postId));
       toast.success('Đã bỏ lưu');
       setUnsavingPost(null);
+      fetchData();
     } catch (error) {
       toast.error('Không thể bỏ lưu. Vui lòng thử lại.');
     } finally {
@@ -190,19 +196,19 @@ function SavedPostsPage() {
           <Alert variant="danger" className={cx('alertBox')}>{errorMessage}</Alert>
         )}
 
-        {!loading && !errorMessage && filteredPosts.length === 0 && (
+        {!loading && !errorMessage && posts.length === 0 && (
           <Alert variant="info" className={cx('alertBox')}>
-            {posts.length === 0 ? (
-              <>Bạn chưa lưu bài viết nào. Mở một bài và bấm icon <IoBookmarkOutline /> để lưu lại.</>
-            ) : (
+            {hasActiveFilter ? (
               <>Không có bài viết nào khớp với từ khóa.</>
+            ) : (
+              <>Bạn chưa lưu bài viết nào. Mở một bài và bấm icon <IoBookmarkOutline /> để lưu lại.</>
             )}
           </Alert>
         )}
 
-        {!loading && !errorMessage && pageItems.length > 0 && (
+        {!loading && !errorMessage && posts.length > 0 && (
           <div className={cx('list')}>
-            {pageItems.map((post, index) => {
+            {posts.map((post, index) => {
               const detailUrl = routes.postDetail.replace(':postId', post.id);
               return (
                 <motion.article

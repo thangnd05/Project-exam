@@ -7,11 +7,15 @@ import com.project_exam.backend.modules.posts.dto.SavedPostStatusResponse;
 import com.project_exam.backend.modules.posts.mapper.SavedPostMapper;
 import com.project_exam.backend.modules.posts.repository.PostRepository;
 import com.project_exam.backend.modules.posts.repository.SavedPostRepository;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -70,14 +74,21 @@ public class SavedPostService {
         return savedPostMapper.toStatusResponse(saved, count);
     }
 
-    public List<PostSummaryResponse> getMySavedPosts(HttpServletRequest httpRequest) {
+    public PageResponse<PostSummaryResponse> getMySavedPosts(int page, int size, String keyword,
+                                                             HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        List<SavedPost> saved = savedPostRepository.findByUserIdOrderByCreatedAtDesc(userId);
-        return saved.stream()
-                .map(s -> postRepository.findById(s.getPostId()).orElse(null))
-                .filter(p -> p != null && p.getStatus() == Post.PostStatus.APPROVED)
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 10 : Math.min(size, 100);
+        String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+
+        Pageable pageable = PageRequest.of(safePage, safeSize);
+        Page<Post> savedPage = savedPostRepository.findSavedApprovedPosts(userId, normalizedKeyword, pageable);
+
+        List<PostSummaryResponse> content = savedPage.getContent().stream()
                 .map(postService::toSummaryResponse)
                 .collect(Collectors.toList());
+
+        return PageResponse.from(savedPage, content);
     }
 
     private String tryGetUserId(HttpServletRequest httpRequest) {
