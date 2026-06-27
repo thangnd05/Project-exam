@@ -37,10 +37,7 @@ import {
 } from 'recharts';
 import ChangePasswordModal from './modals/ChangePasswordModal';
 import UpdateProfileModal from './modals/UpdateProfileModal';
-import BaseModal from '~/components/common/modal/BaseModal';
-import MyEvaluationsPage from './MyEvaluationsPage';
-import MyPostsPage from './MyPostsPage';
-import SavedPostsPage from './SavedPostsPage';
+import ProfileSectionModal from './ProfileSectionModal';
 import styles from './ProfileOverviewPage.module.scss';
 import routes, { buildNextStepPath } from '~/config/Routes';
 import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
@@ -49,13 +46,6 @@ import { useCosmetics } from '~/hooks/useCosmetics';
 const cx = classNames.bind(styles);
 
 const TARGET_VISIBLE_COUNT = 2;
-
-// Các mục mở bằng modal (thay vì điều hướng sang trang riêng).
-const PROFILE_SECTIONS = {
-  evaluations: { title: 'Đánh giá của tôi', icon: IoStar, Component: MyEvaluationsPage },
-  posts: { title: 'Bài viết của tôi', icon: IoNewspaperOutline, Component: MyPostsPage },
-  saved: { title: 'Bài đã lưu', icon: IoBookmarkOutline, Component: SavedPostsPage },
-};
 
 const formatDateTime = (value) => {
   if (!value) return '--';
@@ -638,21 +628,7 @@ function ProfileOverviewPage() {
         onHide={() => setShowChangePasswordModal(false)}
       />
 
-      {activeSection && (() => {
-        const section = PROFILE_SECTIONS[activeSection];
-        const SectionComponent = section.Component;
-        return (
-          <BaseModal
-            show
-            onClose={() => setActiveSection(null)}
-            title={section.title}
-            icon={section.icon}
-            maxWidth={1040}
-          >
-            <SectionComponent embedded />
-          </BaseModal>
-        );
-      })()}
+      <ProfileSectionModal section={activeSection} onClose={() => setActiveSection(null)} />
     </div>
   );
 }

@@ -77,9 +77,6 @@ const routes = {
   mockHistory: '/my-target/mocks',
   targetAchieved: '/my-target/achieved',
   nextStep: '/next-step',
-  myEvaluations: '/my-evaluations',
-  myPosts: '/my-posts',
-  savedPosts: '/saved-posts',
 
   oauth2Redirect: '/oauth2/redirect',
 

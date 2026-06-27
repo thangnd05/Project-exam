@@ -29,9 +29,6 @@ import ClassMemberManagementPage from '~/pages/myclass/class-member/ClassMemberM
 import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFromBankPage';
 import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBankPage';
 import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
-import MyEvaluationsPage from '~/pages/profile/MyEvaluationsPage';
-import MyPostsPage from '~/pages/profile/MyPostsPage';
-import SavedPostsPage from '~/pages/profile/SavedPostsPage';
 
 // Admin imports
 import AdminDashboard from '~/admin/pages/Dashboard';
@@ -137,9 +134,6 @@ export const privateRoutes = [
   { path: routes.personalQuestionBank, component: PersonalQuestionBankPage },
   { path: routes.profile, component: ProfileOverviewPage },
   { path: routes.myTarget, component: UserTargetPage },
-  { path: routes.myEvaluations, component: MyEvaluationsPage },
-  { path: routes.myPosts, component: MyPostsPage },
-  { path: routes.savedPosts, component: SavedPostsPage },
   { path: '/learning-plans', component: LearningPlansRedirect },
   { path: routes.generatePlan, component: GeneratePlanPage },
   { path: routes.planCompare, component: PlanComparisonPage },

@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info } from 'lucide-react';
+import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
 import { getPosts, getCategories } from '~/api/postApi';
 import routes from '~/config/Routes';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import Pagination from '~/components/common/Pagination/Pagination';
 import CreatePostModal from './modals/CreatePostModal';
+import ProfileSectionModal from '~/pages/profile/ProfileSectionModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);
@@ -32,6 +33,7 @@ function PostsPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 9;
@@ -90,7 +92,26 @@ function PostsPage() {
           actionText="Tạo bài viết"
           actionIcon={Plus}
           onAction={() => setShowCreateModal(true)}
-        />
+        >
+          <button
+            type="button"
+            className={cx('headerIconBtn')}
+            onClick={() => setActiveSection('posts')}
+            title="Bài viết của tôi"
+            aria-label="Bài viết của tôi"
+          >
+            <Newspaper size={22} />
+          </button>
+          <button
+            type="button"
+            className={cx('headerIconBtn')}
+            onClick={() => setActiveSection('saved')}
+            title="Bài đã lưu"
+            aria-label="Bài đã lưu"
+          >
+            <Bookmark size={22} />
+          </button>
+        </PageHeader>
 
         {/* Filter Bar */}
         <motion.div
@@ -191,6 +212,8 @@ function PostsPage() {
           onRefresh={refreshPosts}
           categories={categories}
         />
+
+        <ProfileSectionModal section={activeSection} onClose={() => setActiveSection(null)} />
 
       </div>
     </div>
