@@ -346,7 +346,7 @@ const CreateTestFormBody = ({
   );
 
   return (
-    <div className={cx('body')}>
+    <>
       {notification.message && (
         <Alert variant={notification.type} className="mb-3">{notification.message}</Alert>
       )}
@@ -753,7 +753,7 @@ const CreateTestFormBody = ({
           showAddBtn={false}
         />
       )}
-    </div>
+    </>
   );
 };
 

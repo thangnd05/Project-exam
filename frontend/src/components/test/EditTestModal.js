@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import { getAdminTestById, updateTest } from '../../api/testApi';
 import { getExamTypes } from '../../api/examTypeApi';
 import { getQuestionCollections } from '../../api/questionCollectionApi';
@@ -9,7 +10,6 @@ import { useHasPermission } from '~/hooks/usePermission';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
-  IoCloseOutline,
   IoCreateOutline,
   IoSettingsOutline,
   IoListOutline,
@@ -18,10 +18,8 @@ import {
 } from 'react-icons/io5';
 import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
 import createModalStyles from './CreateTestModal.module.scss';
-import baseModalStyles from '~/components/common/modal/BaseModal.module.scss';
 
 const cxCreate = classNames.bind(createModalStyles);
-const cxBase = classNames.bind(baseModalStyles);
 
 const EditTestModal = ({ show, onHide, test, onSuccess }) => {
   const canSetPricing = useHasPermission('TEST:MANAGE_PRICING');
@@ -230,14 +228,15 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       }
       maxWidth={1140}
       footer={
-        <>
-          <button type="button" className={cxBase('btnCancel')} onClick={onHide} disabled={saving}>
-            <IoCloseOutline size={18} /> Hủy
-          </button>
-          <button type="button" className={cxBase('btnSubmit')} onClick={handleSave} disabled={saving}>
-            {saving ? <Spinner size="sm" /> : <><IoRocketOutline /> Lưu cập nhật</>}
-          </button>
-        </>
+        <ModalActionFooter
+          onCancel={onHide}
+          onSubmit={handleSave}
+          loading={saving}
+          cancelLabel="Hủy"
+          submitLabel="Lưu cập nhật"
+          loadingLabel="Đang lưu..."
+          submitIcon={IoRocketOutline}
+        />
       }
     >
       <div>

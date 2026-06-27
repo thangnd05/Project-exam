@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button, Spinner, Row, Col } from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import TagSelector from '~/components/common/TagSelector/TagSelector';
 import { getQuestionById, updateQuestion } from '~/api/questionApi';
 import { getExamPartById } from '~/api/examPartApi';
@@ -12,7 +13,6 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
   IoCheckmarkCircleOutline,
-  IoCloseOutline,
   IoCreateOutline,
   IoTrashOutline,
 } from 'react-icons/io5';
@@ -374,23 +374,15 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       icon={IoCreateOutline}
       maxWidth={800}
       footer={
-        <>
-          <Button variant="secondary" onClick={onHide} disabled={saving}>
-            <IoCloseOutline size={20} className="me-1" /> Hủy
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleSave}
-            disabled={saving || loading}
-          >
-            {saving ? (
-              <Spinner size="sm" />
-            ) : (
-              <IoCheckmarkCircleOutline size={20} className="me-1" />
-            )}
-            Lưu cập nhật
-          </Button>
-        </>
+        <ModalActionFooter
+          onCancel={onHide}
+          onSubmit={handleSave}
+          loading={saving || loading}
+          cancelLabel="Hủy"
+          submitLabel="Lưu cập nhật"
+          loadingLabel="Đang lưu..."
+          submitIcon={IoCheckmarkCircleOutline}
+        />
       }
     >
       <div className={cx('modalBody')}>

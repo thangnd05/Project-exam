@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import { createEvaluation } from '~/api/evaluationApi';
 import { toast } from 'react-toastify';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import styles from '~/components/common/modal/PortalFormModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -40,14 +41,14 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
     };
 
     const footer = (
-        <>
-            <button className={cx('btnCancel')} onClick={onClose} disabled={submitting}>
-                Để sau
-            </button>
-            <button className={cx('btnSubmit')} onClick={handleReviewSubmit} disabled={submitting}>
-                {submitting ? 'Đang gửi...' : 'Gửi đánh giá'}
-            </button>
-        </>
+        <ModalActionFooter
+            onCancel={onClose}
+            onSubmit={handleReviewSubmit}
+            loading={submitting}
+            cancelLabel="Để sau"
+            submitLabel="Gửi đánh giá"
+            loadingLabel="Đang gửi..."
+        />
     );
 
     return (
