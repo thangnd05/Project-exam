@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.users.controller;
 
 import com.project_exam.backend.modules.users.dto.UserUpsertRequest;
 import com.project_exam.backend.modules.users.dto.ProfileOverviewResponse;
+import com.project_exam.backend.modules.users.dto.ProfileActivityResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.dto.UserResponse;
 import com.project_exam.backend.modules.users.service.UserService;
@@ -63,6 +64,16 @@ public class UserController {
     @GetMapping("/me/profile-overview")
     public ResponseEntity<ProfileOverviewResponse> getMyProfileOverview(HttpServletRequest httpRequest) {
         return ResponseEntity.ok(userService.getMyProfileOverview(httpRequest));
+    }
+
+    // Hoạt động học tập theo tháng (mặc định tháng hiện tại) — cho biểu đồ ở Dashboard cá nhân.
+    @GetMapping("/me/activity")
+    public ResponseEntity<ProfileActivityResponse> getMyActivity(
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String year,
+            HttpServletRequest httpRequest
+    ) {
+        return ResponseEntity.ok(userService.getMyActivity(httpRequest, month, year));
     }
 
     // Tạo mới user (admin only — đăng ký thường đi qua /api/auth/register)

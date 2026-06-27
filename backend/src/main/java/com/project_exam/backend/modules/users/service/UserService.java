@@ -7,6 +7,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.infrastructure.cloudinary.CloudinaryService;
 import com.project_exam.backend.modules.users.dto.UserUpsertRequest;
 import com.project_exam.backend.modules.users.dto.ProfileOverviewResponse;
+import com.project_exam.backend.modules.users.dto.ProfileActivityResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.dto.UserResponse;
 import com.project_exam.backend.modules.users.mapper.UserMapper;
@@ -53,6 +54,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final CloudinaryService cloudinaryService;
     private final UserTestRepository userTestRepository;
+    private final TestRepository testRepository;
     private final UserVocabularyRepository userVocabularyRepository;
     private final ClassMemberRepository classMemberRepository;
     private final AuthUtils authUtils;
@@ -227,6 +229,124 @@ public class UserService {
     public ProfileOverviewResponse getMyProfileOverview(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return getProfileOverview(userId);
+    }
+
+    public ProfileActivityResponse getMyActivity(HttpServletRequest httpRequest, String monthParam, String yearParam) {
+        String userId = authUtils.getUserId(httpRequest);
+
+        java.time.YearMonth currentMonth = java.time.YearMonth.now();
+        int currentYear = currentMonth.getYear();
+
+        java.time.YearMonth month;
+        try {
+            month = (monthParam == null || monthParam.isBlank())
+                    ? currentMonth
+                    : java.time.YearMonth.parse(monthParam);
+        } catch (Exception e) {
+            month = currentMonth;
+        }
+
+        int year;
+        try {
+            year = (yearParam == null || yearParam.isBlank()) ? currentYear : Integer.parseInt(yearParam.trim());
+        } catch (Exception e) {
+            year = currentYear;
+        }
+
+        // Phạm vi query gộp: bao trùm cả tháng đang xem (biểu đồ ngày) lẫn cả năm đang xem (biểu đồ tháng).
+        java.time.LocalDateTime monthStart = month.atDay(1).atStartOfDay();
+        java.time.LocalDateTime monthEnd = month.plusMonths(1).atDay(1).atStartOfDay();
+        java.time.LocalDateTime yearStart = java.time.LocalDate.of(year, 1, 1).atStartOfDay();
+        java.time.LocalDateTime yearEnd = java.time.LocalDate.of(year + 1, 1, 1).atStartOfDay();
+        java.time.LocalDateTime rangeStart = monthStart.isBefore(yearStart) ? monthStart : yearStart;
+        java.time.LocalDateTime rangeEnd = monthEnd.isAfter(yearEnd) ? monthEnd : yearEnd;
+
+        List<UserTest> attempts = userTestRepository.findByUserIdAndStartedAtRange(userId, rangeStart, rangeEnd);
+
+        // Thời lượng tối đa từng đề để chặn trường hợp mở bài rồi bỏ đó (elapsed bị thổi phồng).
+        java.util.Map<String, Integer> durationByTestId = new java.util.HashMap<>();
+        List<String> testIds = attempts.stream().map(UserTest::getTestId).distinct().toList();
+        if (!testIds.isEmpty()) {
+            testRepository.findAllById(testIds)
+                    .forEach(t -> durationByTestId.put(t.getTestId(), t.getDurationMinutes()));
+        }
+
+        // Cộng dồn thời gian (phút) theo ngày-trong-tháng-xem và theo từng tháng-trong-năm-xem.
+        java.util.Map<Integer, Long> minutesByDay = new java.util.HashMap<>();
+        long[] minutesByMonthOfYear = new long[13]; // index 1..12
+        for (UserTest ut : attempts) {
+            long mins = elapsedMinutes(ut, durationByTestId.get(ut.getTestId()));
+            if (mins <= 0) continue;
+            java.time.LocalDateTime started = ut.getStartedAt();
+            if (started.getYear() == year) {
+                minutesByMonthOfYear[started.getMonthValue()] += mins;
+            }
+            if (java.time.YearMonth.from(started).equals(month)) {
+                minutesByDay.merge(started.getDayOfMonth(), mins, Long::sum);
+            }
+        }
+
+        int lengthOfMonth = month.lengthOfMonth();
+        List<ProfileActivityResponse.DayActivity> days = new java.util.ArrayList<>();
+        long activeDays = 0;
+        long totalMinutes = 0;
+        for (int d = 1; d <= lengthOfMonth; d++) {
+            long m = minutesByDay.getOrDefault(d, 0L);
+            if (m > 0) activeDays++;
+            totalMinutes += m;
+            days.add(ProfileActivityResponse.DayActivity.builder()
+                    .date(month.atDay(d).toString())
+                    .day(d)
+                    .minutes(m)
+                    .build());
+        }
+
+        // Đủ 12 tháng của năm đang xem (tháng 1 -> 12), điền đủ kể cả tháng 0 phút.
+        List<ProfileActivityResponse.MonthTime> monthlyTime = new java.util.ArrayList<>();
+        for (int mo = 1; mo <= 12; mo++) {
+            monthlyTime.add(ProfileActivityResponse.MonthTime.builder()
+                    .month(java.time.YearMonth.of(year, mo).toString())
+                    .minutes(minutesByMonthOfYear[mo])
+                    .build());
+        }
+
+        // Danh sách tháng/năm có thể chọn: từ thời điểm làm bài sớm nhất tới hiện tại (mới nhất trước).
+        java.time.LocalDateTime earliest = userTestRepository.findEarliestStartedAt(userId);
+        java.time.YearMonth fromMonth = earliest != null ? java.time.YearMonth.from(earliest) : currentMonth;
+        if (month.isBefore(fromMonth)) fromMonth = month;
+        List<String> availableMonths = new java.util.ArrayList<>();
+        for (java.time.YearMonth ym = currentMonth; !ym.isBefore(fromMonth); ym = ym.minusMonths(1)) {
+            availableMonths.add(ym.toString());
+        }
+
+        int fromYear = Math.min(fromMonth.getYear(), year);
+        List<String> availableYears = new java.util.ArrayList<>();
+        for (int y = currentYear; y >= fromYear; y--) {
+            availableYears.add(String.valueOf(y));
+        }
+
+        return ProfileActivityResponse.builder()
+                .month(month.toString())
+                .days(days)
+                .totalMinutes(totalMinutes)
+                .activeDays(activeDays)
+                .year(String.valueOf(year))
+                .monthlyTime(monthlyTime)
+                .availableMonths(availableMonths)
+                .availableYears(availableYears)
+                .build();
+    }
+
+    /** Thời gian làm 1 bài (phút) = finishedAt - startedAt, chặn trên theo thời lượng đề. */
+    private long elapsedMinutes(UserTest ut, Integer testDurationMinutes) {
+        if (ut.getStartedAt() == null || ut.getFinishedAt() == null) return 0;
+        long minutes = Math.round(
+                java.time.Duration.between(ut.getStartedAt(), ut.getFinishedAt()).getSeconds() / 60.0);
+        if (minutes <= 0) minutes = 1; // bài rất nhanh vẫn tính 1 phút
+        if (testDurationMinutes != null && testDurationMinutes > 0 && minutes > testDurationMinutes) {
+            minutes = testDurationMinutes;
+        }
+        return minutes;
     }
 
     public Optional<User> getUserCurrent(HttpServletRequest httpRequest) {

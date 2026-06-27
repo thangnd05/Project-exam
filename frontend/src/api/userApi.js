@@ -29,6 +29,17 @@ export const getProfileOverview = () => {
   return axios.get(`${BASE_URL}/me/profile-overview`).then((response) => response.data);
 };
 
+// month dạng "YYYY-MM", year dạng "YYYY"; bỏ trống => backend lấy tháng/năm hiện tại.
+export const getMyActivity = ({ month, year } = {}) => {
+  const params = new URLSearchParams();
+  if (month) params.set('month', month);
+  if (year) params.set('year', year);
+  const query = params.toString();
+  return axios
+    .get(`${BASE_URL}/me/activity${query ? `?${query}` : ''}`)
+    .then((response) => response.data);
+};
+
 export const getMyInfo = () => {
   return axios.get(`${BASE_URL}/me/info-user`).then((response) => response.data);
 };

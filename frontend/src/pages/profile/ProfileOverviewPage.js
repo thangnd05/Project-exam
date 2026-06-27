@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { getProfileOverview } from '../../api/userApi';
-import { getMyEvaluations } from '../../api/evaluationApi';
+import { getProfileOverview, getMyActivity } from '../../api/userApi';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import {
   IoCalendarOutline,
-  IoChevronForwardOutline,
   IoCheckmarkCircleOutline,
   IoClipboardOutline,
   IoLayersOutline,
@@ -34,8 +32,8 @@ import { getExamParts } from '~/api/examPartApi';
 import { getUserTarget } from '~/api/userTargetApi';
 import { sortPartsByLookup } from '~/utils/partOrder';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
+  LineChart, Line
 } from 'recharts';
 import ChangePasswordModal from './modals/ChangePasswordModal';
 import UpdateProfileModal from './modals/UpdateProfileModal';
@@ -60,7 +58,28 @@ const formatNumber = (value) => {
   return safeValue.toLocaleString('vi-VN');
 };
 
-const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'];
+// "2026-06" -> "Tháng 6/2026"
+const formatMonthLabel = (value) => {
+  if (!value) return '';
+  const [year, month] = value.split('-');
+  return `Tháng ${Number(month)}/${year}`;
+};
+
+// "2026-06" -> "T6" (gọn cho trục X)
+const formatMonthShort = (value) => {
+  if (!value) return '';
+  const [, month] = value.split('-');
+  return `T${Number(month)}`;
+};
+
+// 95 -> "1h 35p"; 40 -> "40p"; 0 -> "0p"
+const formatDuration = (minutes) => {
+  const total = Math.max(0, Math.round(Number(minutes) || 0));
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  if (h > 0) return m > 0 ? `${h}h ${m}p` : `${h}h`;
+  return `${m}p`;
+};
 
 function ProfileOverviewPage() {
   const navigate = useNavigate();
@@ -70,12 +89,13 @@ function ProfileOverviewPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
-  const [myEvaluations, setMyEvaluations] = useState([]);
-  const [loadingEvaluations, setLoadingEvaluations] = useState(true);
   const [myTargets, setMyTargets] = useState([]);
   const [loadingTargets, setLoadingTargets] = useState(true);
   const [showAllTargets, setShowAllTargets] = useState(false);
-  const PREVIEW_EVALUATION_COUNT = 3;
+  const [activity, setActivity] = useState(null);
+  const [loadingActivity, setLoadingActivity] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
 
   const fetchProfileOverview = async (showLoader = true) => {
     if (showLoader) setLoading(true);
@@ -93,22 +113,6 @@ function ProfileOverviewPage() {
 
   useEffect(() => {
     fetchProfileOverview();
-  }, []);
-
-  const fetchMyEvaluations = async () => {
-    setLoadingEvaluations(true);
-    try {
-      const data = await getMyEvaluations();
-      setMyEvaluations(Array.isArray(data) ? data : []);
-    } catch (error) {
-      setMyEvaluations([]);
-    } finally {
-      setLoadingEvaluations(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMyEvaluations();
   }, []);
 
   useEffect(() => {
@@ -156,26 +160,55 @@ function ProfileOverviewPage() {
     fetchMyTargets();
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    const fetchActivity = async () => {
+      setLoadingActivity(true);
+      try {
+        const data = await getMyActivity({
+          month: selectedMonth || undefined,
+          year: selectedYear || undefined,
+        });
+        if (cancelled) return;
+        setActivity(data || null);
+        // Đồng bộ tháng/năm đang chọn theo giá trị backend trả về (lần đầu chưa chọn).
+        if (!selectedMonth && data?.month) setSelectedMonth(data.month);
+        if (!selectedYear && data?.year) setSelectedYear(data.year);
+      } catch {
+        if (!cancelled) setActivity(null);
+      } finally {
+        if (!cancelled) setLoadingActivity(false);
+      }
+    };
+    fetchActivity();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMonth, selectedYear]);
+
   const fullName = useMemo(() => {
     if (!profileOverview) return '';
     return profileOverview.fullName || profileOverview.userName || 'Người dùng';
   }, [profileOverview]);
 
-  const vocabData = useMemo(() => {
-    if (!profileOverview?.vocabularyStats) return [];
-    return [
-      { name: 'Đã ghi nhớ', value: profileOverview.vocabularyStats.masteredVocabulary || 0 },
-      { name: 'Đang học', value: profileOverview.vocabularyStats.learningVocabulary || 0 }
-    ];
-  }, [profileOverview]);
+  const activityDays = useMemo(() => activity?.days || [], [activity]);
+  const activityHasData = useMemo(
+    () => activityDays.some((d) => d.minutes > 0),
+    [activityDays]
+  );
 
-  const testData = useMemo(() => {
-    if (!profileOverview?.testStats) return [];
-    return [
-      { name: 'Hoàn thành', value: profileOverview.testStats.completedAttempts || 0 },
-      { name: 'Chưa hoàn thành', value: profileOverview.testStats.inProgressAttempts || 0 }
-    ];
-  }, [profileOverview]);
+  const monthlyTimeData = useMemo(
+    () =>
+      (activity?.monthlyTime || []).map((m) => ({
+        ...m,
+        label: formatMonthShort(m.month),
+      })),
+    [activity]
+  );
+  const monthlyHasData = useMemo(
+    () => monthlyTimeData.some((m) => m.minutes > 0),
+    [monthlyTimeData]
+  );
 
   if (loading) {
     return (
@@ -270,7 +303,7 @@ function ProfileOverviewPage() {
                   </button>
                   <button onClick={() => navigate(routes.myAlbums)} className={cx('actionBtn', 'btnGreen')}>
                     <IoBookOutline className={cx('btnIcon')} />
-                    <span>Học từ vựng</span>
+                    <span>Thẻ ghi nhớ</span>
                   </button>
                   <button onClick={() => navigate(routes.myClasses)} className={cx('actionBtn', 'btnOrange')}>
                     <IoSchoolOutline className={cx('btnIcon')} />
@@ -314,7 +347,7 @@ function ProfileOverviewPage() {
                     <IoClipboardOutline />
                   </div>
                   <div className={cx('statInfo')}>
-                    <span className={cx('statLabel')}>Từ vựng đã lưu</span>
+                    <span className={cx('statLabel')}>Thẻ ghi nhớ đã lưu</span>
                     <strong className={cx('statValue')}>{formatNumber(profileOverview.vocabularyStats?.totalVocabulary)}</strong>
                   </div>
                 </article>
@@ -332,57 +365,98 @@ function ProfileOverviewPage() {
 
               <section className={cx('chartsRow')}>
                 <article className={cx('chartCard')}>
-                  <h3 className={cx('cardTitle')}>Tiến độ từ vựng</h3>
+                  <div className={cx('chartHeader')}>
+                    <h3 className={cx('cardTitle')}>Thời gian làm bài</h3>
+                    <select
+                      className={cx('monthSelect')}
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      disabled={loadingActivity && !activity}
+                    >
+                      {(activity?.availableMonths || (selectedMonth ? [selectedMonth] : [])).map((m) => (
+                        <option key={m} value={m}>
+                          {formatMonthLabel(m)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {activity && (
+                    <p className={cx('chartSubtitle')}>
+                      {formatDuration(activity.totalMinutes)} làm bài · {activity.activeDays} ngày hoạt động
+                    </p>
+                  )}
                   <div className={cx('chartContainer')}>
-                    {vocabData.reduce((acc, curr) => acc + curr.value, 0) > 0 ? (
+                    {loadingActivity ? (
+                      <div className={cx('noDataMessage')}>Đang tải hoạt động...</div>
+                    ) : activityHasData ? (
                       <ResponsiveContainer width="100%" height={250}>
-                        <PieChart>
-                          <Pie
-                            data={vocabData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="value"
-                            label
-                          >
-                            {vocabData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <RechartsTooltip />
-                          <Legend verticalAlign="bottom" height={36} />
-                        </PieChart>
+                        <BarChart
+                          data={activityDays}
+                          margin={{ top: 10, right: 16, left: 0, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                          <XAxis dataKey="day" interval={2} tick={{ fontSize: 11 }} />
+                          <YAxis allowDecimals={false} tick={{ fontSize: 11 }} unit="p" width={40} />
+                          <RechartsTooltip
+                            cursor={{ fill: 'rgba(0,0,0,0.04)' }}
+                            labelFormatter={(d) => `Ngày ${d}`}
+                            formatter={(value) => [formatDuration(value), 'Thời gian']}
+                          />
+                          <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={28} fill="#3b82f6" />
+                        </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className={cx('noDataMessage')}>Chưa có dữ liệu từ vựng</div>
+                      <div className={cx('noDataMessage')}>Không có hoạt động trong tháng này</div>
                     )}
                   </div>
                 </article>
 
                 <article className={cx('chartCard')}>
-                  <h3 className={cx('cardTitle')}>Thống kê bài thi</h3>
+                  <div className={cx('chartHeader')}>
+                    <h3 className={cx('cardTitle')}>Thời gian học theo tháng</h3>
+                    <select
+                      className={cx('monthSelect')}
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      disabled={loadingActivity && !activity}
+                    >
+                      {(activity?.availableYears || (selectedYear ? [selectedYear] : [])).map((y) => (
+                        <option key={y} value={y}>
+                          Năm {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className={cx('chartContainer')}>
-                    {testData.reduce((acc, curr) => acc + curr.value, 0) > 0 ? (
+                    {loadingActivity ? (
+                      <div className={cx('noDataMessage')}>Đang tải...</div>
+                    ) : monthlyHasData ? (
                       <ResponsiveContainer width="100%" height={250}>
-                        <BarChart
-                          data={testData}
-                          margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                        <LineChart
+                          data={monthlyTimeData}
+                          margin={{ top: 16, right: 24, left: 0, bottom: 5 }}
                         >
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="name" />
-                          <YAxis allowDecimals={false} />
-                          <RechartsTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-                          <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={60}>
-                            {testData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Bar>
-                        </BarChart>
+                          <XAxis dataKey="label" interval={0} tick={{ fontSize: 11 }} />
+                          <YAxis allowDecimals={false} tick={{ fontSize: 11 }} unit="p" width={40} />
+                          <RechartsTooltip
+                            formatter={(value) => [formatDuration(value), 'Thời gian học']}
+                            labelFormatter={(label, items) =>
+                              formatMonthLabel(items?.[0]?.payload?.month) || label
+                            }
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="minutes"
+                            stroke="#10b981"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                          />
+                        </LineChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className={cx('noDataMessage')}>Chưa có dữ liệu bài thi</div>
+                      <div className={cx('noDataMessage')}>Chưa có dữ liệu học trong năm này</div>
                     )}
                   </div>
                 </article>
@@ -523,60 +597,6 @@ function ProfileOverviewPage() {
                               <IoChevronDownOutline />
                             </>
                           )}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </article>
-              </section>
-
-              <section className={cx('detailsRow')}>
-                <article className={cx('statCard')}>
-                  <h3 className={cx('cardTitle')}>
-                    <IoStar />
-                    Đánh giá của bạn
-                  </h3>
-
-                  {loadingEvaluations ? (
-                    <div className={cx('noDataMessage')}>Đang tải đánh giá...</div>
-                  ) : myEvaluations.length === 0 ? (
-                    <div className={cx('noDataMessage')}>Bạn chưa gửi đánh giá nào.</div>
-                  ) : (
-                    <div className={cx('evaluationList')}>
-                      {myEvaluations
-                        .slice(0, PREVIEW_EVALUATION_COUNT)
-                        .map((evaluation) => (
-                          <article key={evaluation.id} className={cx('evaluationItem')}>
-                            <div className={cx('evaluationHeader')}>
-                              <div className={cx('evaluationStars')}>
-                                {Array.from({ length: 5 }).map((_, index) => (
-                                  <IoStar
-                                    key={`${evaluation.id}-star-${index}`}
-                                    className={cx(
-                                      index < Number(evaluation.rating || 0)
-                                        ? 'evaluationStarActive'
-                                        : 'evaluationStarInactive'
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                              <span className={cx('evaluationDate')}>
-                                {formatDateTime(evaluation.createdAt)}
-                              </span>
-                            </div>
-                            <p className={cx('evaluationContent')}>
-                              {evaluation.content || '--'}
-                            </p>
-                          </article>
-                        ))}
-                      {myEvaluations.length > PREVIEW_EVALUATION_COUNT && (
-                        <button
-                          type="button"
-                          className={cx('viewAllEvaluationsBtn')}
-                          onClick={() => navigate(routes.myEvaluations)}
-                        >
-                          Xem tất cả {formatNumber(myEvaluations.length)} đánh giá
-                          <IoChevronForwardOutline />
                         </button>
                       )}
                     </div>

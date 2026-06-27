@@ -47,6 +47,17 @@ public interface UserTestRepository extends JpaRepository<UserTest, String> {
     @Query("SELECT AVG(ut.totalScore) FROM UserTest ut WHERE ut.userId = :userId AND ut.status = :status")
     Double findAverageScoreByUserIdAndStatus(@Param("userId") String userId, @Param("status") UserTest.Status status);
 
+    /** Các lượt làm bài bắt đầu trong khoảng [start, end) — phục vụ biểu đồ hoạt động theo tháng. */
+    @Query("SELECT ut FROM UserTest ut WHERE ut.userId = :userId "
+            + "AND ut.startedAt >= :start AND ut.startedAt < :end ORDER BY ut.startedAt ASC")
+    List<UserTest> findByUserIdAndStartedAtRange(@Param("userId") String userId,
+                                                 @Param("start") java.time.LocalDateTime start,
+                                                 @Param("end") java.time.LocalDateTime end);
+
+    /** Mốc bắt đầu sớm nhất của user — để dựng danh sách tháng có thể chọn. */
+    @Query("SELECT MIN(ut.startedAt) FROM UserTest ut WHERE ut.userId = :userId")
+    java.time.LocalDateTime findEarliestStartedAt(@Param("userId") String userId);
+
     long countByTestIdAndStatusAndTotalScoreLessThanEqual(String testId, UserTest.Status status, Integer score);
 
     long countByTestIdAndStatus(String testId, UserTest.Status status);
