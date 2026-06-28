@@ -20,4 +20,9 @@ public class AddRandomQuestionsToTestRequest {
     private Integer toIndex;
     /** Nguồn kho: "admin" để lấy từ kho do admin tạo (public). Bỏ trống = kho cá nhân/lớp. */
     private String bank;
+    /**
+     * Giới hạn ứng viên trong một Bộ đề (collection). Null/blank = không lọc theo bộ đề (toàn kho).
+     * Nếu là bộ đề cha thì gồm luôn câu của các bộ đề con trực tiếp.
+     */
+    private String collectionId;
 }

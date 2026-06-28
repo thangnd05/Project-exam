@@ -1229,6 +1229,14 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                     examPartId, currentUserId));
         }
 
+        // Giới hạn theo Bộ đề (collection) nếu có. removeIf giữ nguyên thứ tự còn lại nên
+        // chế độ "tuần tự" vẫn khớp index với danh sách (đã lọc bộ đề) mà FE hiển thị.
+        if (request.getCollectionId() != null && !request.getCollectionId().isBlank()) {
+            Set<String> collectionScope = collectionScopeIds(request.getCollectionId());
+            candidates.removeIf(q -> q.getCollectionId() == null
+                    || !collectionScope.contains(q.getCollectionId()));
+        }
+
         boolean sequential = Boolean.TRUE.equals(request.getIsSequential());
         List<Question> pool;
         if (sequential) {
@@ -1278,6 +1286,18 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
      * thứ tự các nhóm rồi thêm nguyên nhóm cho tới khi đạt {@code count} — có thể dôi ra ở nhóm
      * cuối, KHÔNG bao giờ cắt giữa nhóm.</p>
      */
+    /**
+     * Tập id bộ đề dùng để lọc câu: gồm chính bộ đề và các bộ đề con trực tiếp
+     * (collection chỉ 2 cấp nên con trực tiếp là đủ).
+     */
+    private Set<String> collectionScopeIds(String collectionId) {
+        Set<String> ids = new HashSet<>();
+        ids.add(collectionId);
+        questionCollectionRepository.findByParentId(collectionId)
+                .forEach(c -> ids.add(c.getCollectionId()));
+        return ids;
+    }
+
     private List<Question> pickRandomQuestionsKeepingPassages(
             List<Question> candidates, Set<String> existingIds, int count) {
         LinkedHashMap<String, List<Question>> passageGroups = new LinkedHashMap<>();

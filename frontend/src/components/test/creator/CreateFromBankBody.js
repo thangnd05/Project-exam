@@ -9,7 +9,7 @@ import { getQuestionsByPart } from '~/api/questionApi';
 import { getChaptersByClass } from '~/api/chapterApi';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/api/testApi';
 import { createTestPart } from '~/api/testPartApi';
-import { buildCollectionTree } from '~/utils/collectionTree';
+import { buildCollectionTree, getCollectionWithDescendantIds } from '~/utils/collectionTree';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {
@@ -39,8 +39,17 @@ const cx = classNames.bind(styles);
 const SELECTION_MODES = {
   MANUAL: 'manual',
   RANDOM: 'random',
+  RANDOM_BY_COLLECTION: 'random_by_collection',
   SEQUENTIAL: 'sequential',
 };
+
+// Chế độ bám theo Bộ đề khi đã chọn (random theo bộ đề / tuần tự / thủ công).
+// Riêng "Random theo số lượng" luôn lấy toàn kho.
+const COLLECTION_SCOPED_MODES = [
+  SELECTION_MODES.RANDOM_BY_COLLECTION,
+  SELECTION_MODES.SEQUENTIAL,
+  SELECTION_MODES.MANUAL,
+];
 
 const BANK_SOURCES = {
   PERSONAL: 'personal',
@@ -206,7 +215,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const toggleGroup = (examPartId, groupKey) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return;
-    const groups = groupQuestionsByPassage(cfg.bankQuestions);
+    const groups = groupQuestionsByPassage(getScopedQuestions(cfg));
     const group = groups.find((g) => g.groupKey === groupKey);
     if (!group) return;
     const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean);
@@ -220,7 +229,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const isGroupSelected = (examPartId, groupKey) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return false;
-    const groups = groupQuestionsByPassage(cfg.bankQuestions);
+    const groups = groupQuestionsByPassage(getScopedQuestions(cfg));
     const group = groups.find((g) => g.groupKey === groupKey);
     if (!group) return false;
     const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean);
@@ -231,41 +240,67 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const toggleSelectAll = (examPartId, checked) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return;
-    const ids = (cfg.bankQuestions || []).map((q) => q.questionId ?? q.id).filter(Boolean);
+    const ids = getScopedQuestions(cfg).map((q) => q.questionId ?? q.id).filter(Boolean);
     updatePartConfig(examPartId, 'selectedIds', checked ? ids : []);
+  };
+
+  /* ---------- phạm vi câu theo Bộ đề ---------- */
+  // Khi đã chọn Bộ đề: các chế độ "Random theo bộ đề"/"Lấy tuần tự"/"Chọn thủ công" chỉ lấy câu
+  // thuộc bộ đề đó (gồm cả bộ đề con trực tiếp). "Random theo số lượng" luôn lấy toàn kho.
+  // Chưa chọn bộ đề -> mọi chế độ đều lấy toàn kho.
+  const collectionScopeIds = testInfo.collectionId
+    ? getCollectionWithDescendantIds(questionCollections, testInfo.collectionId).map(String)
+    : null;
+
+  const getScopedQuestions = (cfg) => {
+    const list = cfg?.bankQuestions || [];
+    if (!collectionScopeIds || !COLLECTION_SCOPED_MODES.includes(cfg?.mode)) return list;
+    const scope = new Set(collectionScopeIds);
+    return list.filter((q) => q.collectionId != null && scope.has(String(q.collectionId)));
   };
 
   const getPartEffectiveCount = (examPartId) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return 0;
+    const scoped = getScopedQuestions(cfg);
     if (cfg.mode === SELECTION_MODES.RANDOM) {
       const n = Math.max(0, parseInt(cfg.randomCount, 10) || 0);
-      return Math.min(n, (cfg.bankQuestions || []).length);
+      return Math.min(n, scoped.length);
+    }
+    if (cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION) {
+      // Lấy TOÀN BỘ câu trong bộ đề (domain) đó.
+      return scoped.length;
     }
     if (cfg.mode === SELECTION_MODES.SEQUENTIAL) {
       const from = Math.max(1, parseInt(cfg.fromIndex, 10) || 1);
       const to = Math.max(from, parseInt(cfg.toIndex, 10) || from);
-      const maxInBank = (cfg.bankQuestions || []).length;
+      const maxInBank = scoped.length;
       if (from > maxInBank) return 0;
       const actualTo = Math.min(to, maxInBank);
       return actualTo - from + 1;
     }
-    return (cfg.selectedIds || []).length;
+    // MANUAL: chỉ tính câu đã chọn còn nằm trong phạm vi (đề phòng đổi bộ đề sau khi chọn).
+    const scopedIds = new Set(scoped.map((q) => q.questionId ?? q.id));
+    return (cfg.selectedIds || []).filter((id) => scopedIds.has(id)).length;
   };
 
   const hasPartWithQuestions = (part) => {
     const cfg = partConfigs[part.examPartId];
     if (!cfg) return false;
+    const scoped = getScopedQuestions(cfg);
     if (cfg.mode === SELECTION_MODES.RANDOM) {
       const n = Math.max(0, parseInt(cfg.randomCount, 10) || 0);
-      return n > 0 && (cfg.bankQuestions || []).length > 0;
+      return n > 0 && scoped.length > 0;
+    }
+    if (cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION) {
+      return scoped.length > 0;
     }
     if (cfg.mode === SELECTION_MODES.SEQUENTIAL) {
       const from = parseInt(cfg.fromIndex, 10);
       const to = parseInt(cfg.toIndex, 10);
-      return !isNaN(from) && !isNaN(to) && from > 0 && to >= from && (cfg.bankQuestions || []).length >= from;
+      return !isNaN(from) && !isNaN(to) && from > 0 && to >= from && scoped.length >= from;
     }
-    return (cfg.selectedIds || []).length > 0;
+    return getPartEffectiveCount(part.examPartId) > 0;
   };
 
   /* ---------- submit ---------- */
@@ -319,22 +354,28 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         const newPartId = partData.testPartId ?? partData.id;
         if (!newPartId) throw new Error(`Không nhận được testPartId cho part ${part.name}.`);
 
-        if (cfg.mode === SELECTION_MODES.RANDOM || cfg.mode === SELECTION_MODES.SEQUENTIAL) {
+        if (cfg.mode === SELECTION_MODES.MANUAL) {
+          const scopedIds = new Set(getScopedQuestions(cfg).map((q) => q.questionId ?? q.id));
+          await addQuestionsToPart({
+            testPartId: String(newPartId),
+            questionIds: (cfg.selectedIds || []).filter((id) => scopedIds.has(id)).map(String),
+          });
+        } else {
           const useClassSource = bankSource === BANK_SOURCES.CLASS && classId;
+          const isSequential = cfg.mode === SELECTION_MODES.SEQUENTIAL;
+          // "Random theo bộ đề" và "Lấy tuần tự" giới hạn trong bộ đề (nếu đã chọn);
+          // "Random theo số lượng" luôn lấy toàn kho.
+          const scopeByCollection = COLLECTION_SCOPED_MODES.includes(cfg.mode) && !!testInfo.collectionId;
           await addRandomQuestionsToPart({
             testPartId: String(newPartId),
             count: numQuestions,
-            isSequential: cfg.mode === SELECTION_MODES.SEQUENTIAL,
-            fromIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.fromIndex, 10) : undefined,
-            toIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.toIndex, 10) : undefined,
+            isSequential,
+            fromIndex: isSequential ? parseInt(cfg.fromIndex, 10) : undefined,
+            toIndex: isSequential ? parseInt(cfg.toIndex, 10) : undefined,
             bank: bankSource === BANK_SOURCES.ADMIN ? 'admin' : undefined,
             classId: useClassSource ? classId : undefined,
             chapterId: useClassSource && selectedChapterId && selectedChapterId !== ALL_CHAPTERS ? selectedChapterId : undefined,
-          });
-        } else {
-          await addQuestionsToPart({
-            testPartId: String(newPartId),
-            questionIds: (cfg.selectedIds || []).map(String),
+            collectionId: scopeByCollection ? String(testInfo.collectionId) : undefined,
           });
         }
       }
@@ -591,15 +632,24 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
               </span>
             </div>
             <p className={cx('bankHint')}>
-              Mỗi part: <strong>Random theo số lượng</strong> (BE lấy ngẫu nhiên từ kho cá nhân) hoặc <strong>Chọn thủ công</strong>.
-              Với part có passage (vd. Part 3, 4, 6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng, không chọn lẻ từng câu.
+              Mỗi part: <strong>Random theo số lượng</strong> (lấy ngẫu nhiên toàn kho), <strong>Random theo bộ đề</strong>,{' '}
+              <strong>Lấy tuần tự</strong> hoặc <strong>Chọn thủ công</strong>.
+              {testInfo.collectionId
+                ? ' Đã chọn Bộ đề → Random theo bộ đề / Tuần tự / Thủ công chỉ lấy câu trong bộ đề đó.'
+                : ' Chọn Bộ đề ở mục 1 để giới hạn nguồn câu theo bộ đề.'}
+              {' '}Với part có passage (vd. Part 3, 4, 6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng, không chọn lẻ từng câu.
             </p>
 
             {(examParts || []).map((part) => {
               const cfg = partConfigs[part.examPartId] ?? defaultPartConfig();
               const totalInBank = (cfg.bankQuestions || []).length;
-              const maxInBank = totalInBank;
-              const allSelected = maxInBank > 0 && (cfg.selectedIds || []).length === maxInBank;
+              const scopedQuestions = getScopedQuestions(cfg);
+              // maxInBank = số câu khả dụng cho chế độ hiện tại (đã lọc bộ đề nếu áp dụng).
+              const maxInBank = scopedQuestions.length;
+              // Chế độ hiện tại có đang bị giới hạn trong bộ đề không (để hiển thị nhãn).
+              const collectionScoped = !!collectionScopeIds && COLLECTION_SCOPED_MODES.includes(cfg.mode);
+              const scopeLabel = collectionScoped ? 'bộ đề' : 'kho';
+              const allSelected = maxInBank > 0 && getPartEffectiveCount(part.examPartId) === maxInBank;
 
               return (
                 <div key={part.examPartId} className={cx('bankPartCard')}>
@@ -630,6 +680,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                         </button>
                         <button
                           type="button"
+                          className={cx('bankModeTab', { active: cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION })}
+                          onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM_BY_COLLECTION)}
+                          aria-pressed={cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION}
+                          title={testInfo.collectionId ? undefined : 'Chưa chọn Bộ đề ở mục 1 → sẽ lấy toàn kho'}
+                        >
+                          <IoLibraryOutline size={18} /> Random theo bộ đề
+                        </button>
+                        <button
+                          type="button"
                           className={cx('bankModeTab', { active: cfg.mode === SELECTION_MODES.SEQUENTIAL })}
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.SEQUENTIAL)}
                           aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
@@ -646,7 +705,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                         </button>
                       </div>
 
-                      {/* random input */}
+                      {/* random theo số lượng — nhập số câu */}
                       {cfg.mode === SELECTION_MODES.RANDOM && (
                         <div className={cx('bankRandomRow')}>
                           <label className={cx('bankRandomLabel')}>Số câu lấy ngẫu nhiên:</label>
@@ -659,7 +718,18 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                             onChange={(e) => updatePartConfig(part.examPartId, 'randomCount', e.target.value)}
                             aria-label={`Số câu random ${part.name}`}
                           />
-                          <span className={cx('bankRandomHint')}>Tối đa {maxInBank} câu trong kho</span>
+                          <span className={cx('bankRandomHint')}>Tối đa {maxInBank} câu trong {scopeLabel}</span>
+                        </div>
+                      )}
+
+                      {/* random theo bộ đề — lấy TOÀN BỘ câu trong bộ đề (không nhập số) */}
+                      {cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION && (
+                        <div className={cx('bankRandomRow')}>
+                          <span className={cx('bankRandomHint')}>
+                            {testInfo.collectionId
+                              ? `Lấy toàn bộ ${maxInBank} câu trong bộ đề (xáo trộn thứ tự, giữ trọn cụm passage).`
+                              : `Chưa chọn Bộ đề ở mục 1 → sẽ lấy toàn bộ ${maxInBank} câu trong kho.`}
+                          </span>
                         </div>
                       )}
 
@@ -686,7 +756,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                             onChange={(e) => updatePartConfig(part.examPartId, 'toIndex', e.target.value)}
                             aria-label={`Đến câu ${part.name}`}
                           />
-                          <span className={cx('bankRandomHint')}>Tối đa {maxInBank} câu trong kho</span>
+                          <span className={cx('bankRandomHint')}>Tối đa {maxInBank} câu trong {scopeLabel}</span>
                         </div>
                       )}
 
@@ -700,19 +770,21 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                       {/* empty */}
                       {!cfg.loading && maxInBank === 0 && (
                         <Alert variant="info" className="mb-0 mt-2">
-                          {bankSource === BANK_SOURCES.ADMIN
-                            ? 'Kho quản trị chưa có câu hỏi cho part này.'
-                            : bankSource === BANK_SOURCES.CLASS
-                              ? (selectedChapterId && selectedChapterId !== ALL_CHAPTERS
-                                  ? 'Kho lớp học (chapter đã chọn) chưa có câu hỏi cho part này.'
-                                  : 'Kho lớp học chưa có câu hỏi cho part này.')
-                              : 'Chưa có câu hỏi trong kho cá nhân cho part này.'}
+                          {collectionScoped
+                            ? 'Bộ đề đã chọn chưa có câu hỏi cho part này.'
+                            : bankSource === BANK_SOURCES.ADMIN
+                              ? 'Kho quản trị chưa có câu hỏi cho part này.'
+                              : bankSource === BANK_SOURCES.CLASS
+                                ? (selectedChapterId && selectedChapterId !== ALL_CHAPTERS
+                                    ? 'Kho lớp học (chapter đã chọn) chưa có câu hỏi cho part này.'
+                                    : 'Kho lớp học chưa có câu hỏi cho part này.')
+                                : 'Chưa có câu hỏi trong kho cá nhân cho part này.'}
                         </Alert>
                       )}
 
                       {/* manual selection — giống hệt CreateTestFromBankPage */}
                       {!cfg.loading && cfg.mode === SELECTION_MODES.MANUAL && maxInBank > 0 && (() => {
-                        const groups = groupQuestionsByPassage(cfg.bankQuestions);
+                        const groups = groupQuestionsByPassage(scopedQuestions);
                         return (
                           <>
                             <div className={cx('bankSelectAllRow')}>
