@@ -189,6 +189,17 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     }));
   };
 
+  // Gộp: set 1 chế độ cho TẤT CẢ Part một lần (khỏi mở & bấm từng part).
+  const applyModeToAllParts = (modeValue) => {
+    setPartConfigs((prev) => {
+      const next = { ...prev };
+      (examParts || []).forEach((p) => {
+        next[p.examPartId] = { ...(next[p.examPartId] || defaultPartConfig()), mode: modeValue };
+      });
+      return next;
+    });
+  };
+
   const togglePartExpanded = (examPartId) => {
     setPartConfigs((prev) => ({
       ...prev,
@@ -639,6 +650,28 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 : ' Chọn Bộ đề ở mục 1 để giới hạn nguồn câu theo bộ đề.'}
               {' '}Với part có passage (vd. Part 3, 4, 6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng, không chọn lẻ từng câu.
             </p>
+
+            {/* Nút gộp: áp dụng nhanh 1 chế độ cho tất cả Part */}
+            <div className={cx('bankModeTabs')}>
+              <button
+                type="button"
+                className={cx('bankModeTab', 'active')}
+                onClick={() => applyModeToAllParts(SELECTION_MODES.RANDOM_BY_COLLECTION)}
+                title={testInfo.collectionId
+                  ? 'Lấy toàn bộ câu trong bộ đề cho tất cả Part'
+                  : 'Chưa chọn Bộ đề → sẽ lấy toàn bộ kho cho tất cả Part'}
+              >
+                <IoLibraryOutline size={18} /> Random theo bộ đề · tất cả Part
+              </button>
+              <button
+                type="button"
+                className={cx('bankModeTab')}
+                onClick={() => applyModeToAllParts(SELECTION_MODES.RANDOM)}
+                title="Đặt tất cả Part về Random theo số lượng"
+              >
+                <IoShuffleOutline size={18} /> Random số lượng · tất cả Part
+              </button>
+            </div>
 
             {(examParts || []).map((part) => {
               const cfg = partConfigs[part.examPartId] ?? defaultPartConfig();
