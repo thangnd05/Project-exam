@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { Spinner } from 'react-bootstrap';
-import { ArrowLeft, Printer } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import { getResourceById, viewResourceContent } from '~/api/recoveryResourceApi';
 import routes from '~/config/Routes';
 import { isMarkdownResource } from '~/utils/recoveryResource';
@@ -20,7 +20,6 @@ marked.setOptions({
 
 function RecoveryResourceViewPage() {
   const { resourceId } = useParams();
-  const navigate = useNavigate();
   const [resource, setResource] = useState(null);
   const [markdownHtml, setMarkdownHtml] = useState('');
   const [loading, setLoading] = useState(true);
@@ -93,10 +92,6 @@ function RecoveryResourceViewPage() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('container')}>
-          <button type="button" className={cx('backLink', 'noPrint')} onClick={() => navigate(-1)}>
-            <ArrowLeft size={16} />
-            Quay lại
-          </button>
           <div className={cx('stateBox')}>{errorMessage}</div>
         </div>
       </div>
@@ -107,10 +102,6 @@ function RecoveryResourceViewPage() {
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
         <header className={cx('header')}>
-          <button type="button" className={cx('backLink', 'noPrint')} onClick={() => navigate(-1)}>
-            <ArrowLeft size={16} />
-            Quay lại
-          </button>
           <h1 className={cx('title')}>{resource?.title}</h1>
           {resource?.description && (
             <p className={cx('description')}>{resource.description}</p>

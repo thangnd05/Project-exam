@@ -39,9 +39,5 @@ export const getRecoveryResourceLinkProps = (resource, apiBase = '') => {
     return null;
   }
 
-  if (isMarkdownResource(resource) && resource.resourceId) {
-    return { to: url, external: false };
-  }
-
   return { href: url, external: true };
 };
