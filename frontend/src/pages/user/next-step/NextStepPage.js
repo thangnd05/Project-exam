@@ -7,6 +7,7 @@ import { getUserTarget } from '~/api/userTargetApi';
 import { listPlans, getPlanById } from '~/api/learningPlanApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
 import { buildExamTypeDetailPath } from '~/config/Routes';
+import { getRecoveryResourceLinkProps } from '~/utils/recoveryResource';
 import { filterCompletedTests } from '~/utils/userTests';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
@@ -154,13 +155,16 @@ function NextStepPage() {
       const recommended = pickRecommendedTask(activePlanDetail);
       if (recommended) {
         const stuck = (recommended.consecutiveFails ?? 0) >= 3;
-        const studyResourceUrl = recommended.studyResource?.url;
+        const studyResource = recommended.studyResource;
+        const studyResourceLink = studyResource
+          ? getRecoveryResourceLinkProps(studyResource)
+          : null;
         const extras = [];
-        if (stuck && studyResourceUrl) {
+        if (stuck && studyResourceLink) {
           extras.push({
             label: 'Mở tài liệu ôn',
-            to: studyResourceUrl,
-            external: true,
+            to: studyResourceLink.external ? studyResourceLink.href : studyResourceLink.to,
+            external: studyResourceLink.external,
           });
         }
         extras.push({

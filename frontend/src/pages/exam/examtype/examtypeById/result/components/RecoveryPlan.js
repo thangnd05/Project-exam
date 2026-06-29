@@ -1,6 +1,8 @@
 import { Download, ExternalLink } from 'lucide-react';
 import { IoBookOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
+import { getRecoveryResourceOpenUrl, isMarkdownResource } from '~/utils/recoveryResource';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);
@@ -34,12 +36,12 @@ function RecoveryPlan({ recommendations = [], recoveryMessage }) {
     }
   };
 
-  const getViewUrl = (rec) => {
-    if (rec.resourceId && API_BASE) {
-      return `${API_BASE}/api/recovery-resources/${rec.resourceId}/view`;
-    }
-    return rec.resourceUrl || null;
-  };
+  const getViewResource = (rec) => ({
+    resourceId: rec.resourceId,
+    originalFileName: rec.originalFileName,
+    url: rec.resourceUrl,
+    resourceUrl: rec.resourceUrl,
+  });
 
   return (
     <div className={cx('sectionContainer')}>
@@ -55,8 +57,9 @@ function RecoveryPlan({ recommendations = [], recoveryMessage }) {
           <p className={cx('skillGroupTitle')}>Tài liệu {skillName}</p>
 
           {recs.map((rec, idx) => {
-            const viewUrl = getViewUrl(rec);
-            const canDownload = Boolean(rec.resourceUrl);
+            const viewResource = getViewResource(rec);
+            const canView = Boolean(getRecoveryResourceOpenUrl(viewResource, API_BASE));
+            const canDownload = Boolean(rec.resourceUrl) && !isMarkdownResource(viewResource);
 
             return (
               <div
@@ -81,18 +84,16 @@ function RecoveryPlan({ recommendations = [], recoveryMessage }) {
                     </p>
                   )}
                 </div>
-                {(viewUrl || canDownload) && (
+                {(canView || canDownload) && (
                   <div className={cx('resourceActions')}>
-                    {viewUrl && (
-                      <a
-                        href={viewUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    {canView && (
+                      <RecoveryResourceLink
+                        resource={viewResource}
                         className={cx('resourceActionLink')}
                       >
                         <ExternalLink size={14} />
                         Xem
-                      </a>
+                      </RecoveryResourceLink>
                     )}
                     {canDownload && (
                       <button

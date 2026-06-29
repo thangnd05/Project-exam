@@ -34,3 +34,8 @@ export const updateResource = (resourceId, request, file) => {
 
 export const deleteResource = (resourceId) =>
   axios.delete(`${BASE_URL}/${resourceId}`).then(() => {});
+
+export const viewResourceContent = (resourceId) =>
+  axios
+    .get(`${BASE_URL}/${resourceId}/view`, { responseType: 'text' })
+    .then((res) => res.data);

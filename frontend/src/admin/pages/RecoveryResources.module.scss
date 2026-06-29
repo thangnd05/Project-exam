@@ -49,8 +49,7 @@
 .cardActions {
   display: flex;
   gap: 0.4rem;
-  opacity: 0;
-  transition: opacity 0.15s;
+  opacity: 1;
   flex-shrink: 0;
 
   button {
@@ -102,9 +101,22 @@
   background: #f8fafc;
   padding: 0.4rem 0.8rem;
   border-radius: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.fileTypeBadge {
+  flex-shrink: 0;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .cardFooter {
@@ -133,4 +145,11 @@
   &:hover {
     text-decoration: underline;
   }
+}
+
+.footerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
 }

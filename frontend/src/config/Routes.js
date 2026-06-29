@@ -3,6 +3,7 @@ const routes = {
   about: '/about',
   posts: '/posts',
   postDetail: '/posts/:postId',
+  recoveryResourceView: '/resources/:resourceId',
   policy: '/policy',
   service: '/service',
 

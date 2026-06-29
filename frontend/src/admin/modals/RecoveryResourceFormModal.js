@@ -60,10 +60,14 @@ function RecoveryResourceFormModal({
           <Form.Label>Upload file</Form.Label>
           <Form.Control
             type="file"
+            accept=".md,.markdown,.pdf,.doc,.docx,image/*,audio/*,video/*,text/markdown"
             onChange={(e) => onFileChange(e.target.files[0] || null)}
           />
+          <Form.Text className="text-muted">
+            Hỗ trợ Markdown (.md), PDF, Word, ảnh, audio, video.
+          </Form.Text>
           {selectedFile && (
-            <Form.Text className="text-muted">{selectedFile.name}</Form.Text>
+            <Form.Text className="text-muted d-block">{selectedFile.name}</Form.Text>
           )}
           {isEditing && !selectedFile && formState.url && (
             <Form.Text className="text-muted d-block mt-1">

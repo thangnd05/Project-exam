@@ -43,10 +43,12 @@ frontend/yarn-debug.log*
 frontend/yarn-error.log*
 frontend/.cache/
 frontend/coverage/
+frontend/.pnpm-store/
 
 # ==========================================
 # GENERAL (Root & OS)
 # ==========================================
+.pnpm-store/
 .DS_Store
 *.log
 .idea/

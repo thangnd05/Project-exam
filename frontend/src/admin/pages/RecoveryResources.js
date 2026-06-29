@@ -13,7 +13,9 @@ import {
 } from '../../api/recoveryResourceApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
+import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
+import {isMarkdownResource} from '~/utils/recoveryResource';
 import styles from './RecoveryResources.module.scss';
 
 const cx = classNames.bind(styles);
@@ -261,27 +263,29 @@ function RecoveryResourcesManagement() {
               {r.originalFileName && (
                 <div className={cx('cardFileName')}>
                   {r.originalFileName}
+                  {isMarkdownResource(r) && (
+                    <span className={cx('fileTypeBadge')}>Markdown</span>
+                  )}
                 </div>
               )}
 
               <div className={cx('cardFooter')}>
                 <span>{formatDate(r.createdAt)}</span>
-                <div className="d-flex gap-3">
-                  <a
-                    href={`${API_BASE}/api/recovery-resources/${r.resourceId}/view`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={cx('viewLink')}
-                  >
+                <div className={cx('footerActions')}>
+                  <RecoveryResourceLink resource={r} className={cx('viewLink')}>
                     <ExternalLink size={14} /> Xem
-                  </a>
-                  <button
-                    type="button"
-                    className={cx('viewLink')}
-                    onClick={() => handleDownload(r.url, r.originalFileName)}
-                  >
-                    <Download size={14} /> Tải về
-                  </button>
+                  </RecoveryResourceLink>
+                  {r.url && (
+                    <button
+                      type="button"
+                      className={cx('viewLink')}
+                      onClick={() => handleDownload(r.url, r.originalFileName)}
+                      title={isMarkdownResource(r) ? 'Tải file markdown gốc (dành cho quản trị)' : 'Tải về'}
+                    >
+                      <Download size={14} />
+                      {isMarkdownResource(r) ? 'Tải file gốc' : 'Tải về'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

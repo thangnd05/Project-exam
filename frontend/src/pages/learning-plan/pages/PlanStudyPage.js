@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getCurrentSession, submitSession } from '~/api/learningPlanApi';
+import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
 import { useStreak } from '~/hooks/useStreak';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import styles from '../styles/PersonalizedPlan.module.scss';
@@ -312,14 +313,12 @@ function PlanStudyPage() {
                 {session.resource && (
                   <div className={cx('resourceBox')}>
                     <div className={cx('resourceLabel')}>Bước 1: đọc tài liệu</div>
-                    <a
-                      href={session.resource.url}
-                      target="_blank"
-                      rel="noreferrer"
+                    <RecoveryResourceLink
+                      resource={session.resource}
                       className={cx('resourceLink')}
                     >
                       {session.resource.title}
-                    </a>
+                    </RecoveryResourceLink>
                     {session.resource.description && (
                       <p className={cx('resourceDesc')}>{session.resource.description}</p>
                     )}

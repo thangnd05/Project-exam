@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @RestController
@@ -119,16 +120,7 @@ public class RecoveryResourceController {
         String fileName = resource.getOriginalFileName();
 
         // Detect content type từ tên file gốc
-        String contentType = null;
-        if (fileName != null) {
-            contentType = URLConnection.guessContentTypeFromName(fileName);
-        }
-        if (contentType == null && url != null) {
-            contentType = URLConnection.guessContentTypeFromName(url);
-        }
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
+        String contentType = resolveContentType(fileName, url);
 
         // Fetch file từ Cloudinary
         try (InputStream in = URI.create(url).toURL().openStream()) {
@@ -143,6 +135,28 @@ public class RecoveryResourceController {
 
             return new ResponseEntity<>(data, headers, HttpStatus.OK);
         }
+    }
+
+    private String resolveContentType(String fileName, String url) {
+        String name = fileName != null ? fileName : url;
+        if (name != null) {
+            String lowerName = name.toLowerCase(Locale.ROOT);
+            if (lowerName.endsWith(".md") || lowerName.endsWith(".markdown")) {
+                return "text/markdown; charset=utf-8";
+            }
+        }
+
+        String contentType = null;
+        if (fileName != null) {
+            contentType = URLConnection.guessContentTypeFromName(fileName);
+        }
+        if (contentType == null && url != null) {
+            contentType = URLConnection.guessContentTypeFromName(url);
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return contentType;
     }
 
 }

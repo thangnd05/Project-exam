@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
 import styles from '../styles/PersonalizedPlan.module.scss';
 import { sortByPartOrder } from '~/utils/partOrder';
 
@@ -150,16 +151,14 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
       {!compact && !isCapstone && (
         <div className={cx('resourceBox')}>
           <div className={cx('resourceLabel')}>Tài liệu (đọc trước)</div>
-          {resource?.url ? (
+          {resource?.url || resource?.resourceId ? (
             <>
-              <a
-                href={resource.url}
-                target="_blank"
-                rel="noreferrer"
+              <RecoveryResourceLink
+                resource={resource}
                 className={cx('resourceLink')}
               >
                 {resource.title || resource.originalFileName || 'Mở tài liệu'}
-              </a>
+              </RecoveryResourceLink>
               {resource.description && (
                 <p className={cx('resourceDesc')}>{resource.description}</p>
               )}

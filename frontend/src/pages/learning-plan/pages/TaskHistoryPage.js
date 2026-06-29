@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getPlanById, getTaskSessions } from '~/api/learningPlanApi';
+import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/utils/format-date-time';
 import styles from '../styles/PersonalizedPlan.module.scss';
 
@@ -215,9 +216,9 @@ function TaskHistoryPage() {
         <div className={cx('card')}>
           <div className={cx('cardHeader')}>Tài liệu được gắn cho ải</div>
           <div className={cx('cardBody')}>
-            <a href={task.studyResource.url} target="_blank" rel="noreferrer">
+            <RecoveryResourceLink resource={task.studyResource}>
               {task.studyResource.title}
-            </a>
+            </RecoveryResourceLink>
             {task.studyResource.description && (
               <p className={cx('muted')} style={{ marginTop: '0.4rem', marginBottom: 0, fontSize: 'var(--font-size-sm)' }}>
                 {task.studyResource.description}
