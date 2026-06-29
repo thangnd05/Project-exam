@@ -49,6 +49,15 @@ function App() {
             {/* Public Routes */}
             {publicRoutes.map((route, index) => {
               const Page = route.component;
+              if (route.noLayout) {
+                return (
+                  <Route
+                    key={`public-${index}`}
+                    path={route.path}
+                    element={<Page />}
+                  />
+                );
+              }
               const Layout = DefaultLayout;
               return (
                 <Route

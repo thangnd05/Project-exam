@@ -28,6 +28,90 @@ const emptyForm = {
   tagIds: [],
 };
 
+const getRootTagId = (tag, tagById) => {
+  let current = tag;
+  let depth = 0;
+
+  while (current?.parentId && depth < 20) {
+    const parent = tagById.get(current.parentId);
+    if (!parent) {
+      break;
+    }
+    current = parent;
+    depth += 1;
+  }
+
+  return current?.tagId || null;
+};
+
+function ResourceCard({
+  resource,
+  onEdit,
+  onDelete,
+  onDownload,
+  formatDate,
+  cx,
+}) {
+  return (
+    <div className={cx('resourceCard')}>
+      <div className={cx('cardHeader')}>
+        <h3 className={cx('cardTitle')}>{resource.title}</h3>
+        <div className={cx('cardActions')}>
+          <button type="button" onClick={() => onEdit(resource)} title="Sửa">
+            <Edit size={16} />
+          </button>
+          <button type="button" onClick={() => onDelete(resource)} title="Xóa">
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
+
+      {resource.description && (
+        <p className={cx('cardDescription')}>{resource.description}</p>
+      )}
+
+      {resource.tags && resource.tags.length > 0 && (
+        <div className={cx('cardTags')}>
+          {resource.tags.map((tag) => (
+            <Badge key={tag.tagId} bg="light" text="dark" className="border">
+              {tag.name}
+            </Badge>
+          ))}
+        </div>
+      )}
+
+      {resource.originalFileName && (
+        <div className={cx('cardFileName')}>
+          {resource.originalFileName}
+          {isMarkdownResource(resource) && (
+            <span className={cx('fileTypeBadge')}>Markdown</span>
+          )}
+        </div>
+      )}
+
+      <div className={cx('cardFooter')}>
+        <span>{formatDate(resource.createdAt)}</span>
+        <div className={cx('footerActions')}>
+          <RecoveryResourceLink resource={resource} className={cx('viewLink')}>
+            <ExternalLink size={14} /> Xem
+          </RecoveryResourceLink>
+          {resource.url && (
+            <button
+              type="button"
+              className={cx('viewLink')}
+              onClick={() => onDownload(resource.url, resource.originalFileName)}
+              title={isMarkdownResource(resource) ? 'Tải file markdown gốc (dành cho quản trị)' : 'Tải về'}
+            >
+              <Download size={14} />
+              {isMarkdownResource(resource) ? 'Tải file gốc' : 'Tải về'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RecoveryResourcesManagement() {
   const [resources, setResources] = useState([]);
   const [examTypes, setExamTypes] = useState([]);
@@ -42,6 +126,7 @@ function RecoveryResourcesManagement() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingResource, setDeletingResource] = useState(null);
+  const [selectedParentTagId, setSelectedParentTagId] = useState('');
 
   useEffect(() => {
     getExamTypes()
@@ -53,10 +138,22 @@ function RecoveryResourcesManagement() {
   }, []);
 
   useEffect(() => {
-    if (!selectedExamTypeId) { setAvailableTags([]); return; }
+    if (!selectedExamTypeId) {
+      setAvailableTags([]);
+      setSelectedParentTagId('');
+      return;
+    }
     getTagsFlatByExamType(selectedExamTypeId)
-      .then((tags) => setAvailableTags(Array.isArray(tags) ? tags : []))
-      .catch(() => setAvailableTags([]));
+      .then((tags) => {
+        const list = Array.isArray(tags) ? tags : [];
+        setAvailableTags(list);
+        const firstRootId = list.find((tag) => !tag.parentId)?.tagId || '';
+        setSelectedParentTagId(firstRootId);
+      })
+      .catch(() => {
+        setAvailableTags([]);
+        setSelectedParentTagId('');
+      });
   }, [selectedExamTypeId]);
 
   const fetchResources = useCallback(async () => {
@@ -100,6 +197,107 @@ function RecoveryResourcesManagement() {
       );
     });
   }, [resources, searchTerm, selectedExamTypeId]);
+
+  const parentTagGroups = useMemo(() => {
+    if (!selectedExamTypeId) {
+      return null;
+    }
+
+    const tagById = new Map(availableTags.map((tag) => [tag.tagId, tag]));
+    const rootTags = availableTags.filter((tag) => !tag.parentId);
+    const groups = rootTags.map((parentTag) => ({
+      parentTag,
+      resources: [],
+    }));
+    const groupMap = new Map(groups.map((group) => [group.parentTag.tagId, group]));
+    const ungrouped = [];
+    const ungroupedIds = new Set();
+
+    const pushUngrouped = (resource) => {
+      if (ungroupedIds.has(resource.resourceId)) {
+        return;
+      }
+      ungroupedIds.add(resource.resourceId);
+      ungrouped.push(resource);
+    };
+
+    filteredResources.forEach((resource) => {
+      const examTags = (resource.tags || []).filter(
+        (tag) => String(tag.examTypeId) === String(selectedExamTypeId),
+      );
+
+      if (examTags.length === 0) {
+        pushUngrouped(resource);
+        return;
+      }
+
+      const parentIds = new Set();
+      examTags.forEach((tag) => {
+        const rootId = tag.parentId ? getRootTagId(tag, tagById) : tag.tagId;
+        if (rootId) {
+          parentIds.add(rootId);
+        }
+      });
+
+      if (parentIds.size === 0) {
+        pushUngrouped(resource);
+        return;
+      }
+
+      let placed = false;
+      parentIds.forEach((parentId) => {
+        const group = groupMap.get(parentId);
+        if (group) {
+          group.resources.push(resource);
+          placed = true;
+        }
+      });
+
+      if (!placed) {
+        pushUngrouped(resource);
+      }
+    });
+
+    return {groups, ungrouped};
+  }, [selectedExamTypeId, availableTags, filteredResources]);
+
+  const activeParentGroup = useMemo(() => {
+    if (!parentTagGroups || !selectedParentTagId) {
+      return null;
+    }
+
+    if (selectedParentTagId === '__ungrouped__') {
+      return {
+        title: 'Chưa gán tag cha',
+        resources: parentTagGroups.ungrouped,
+      };
+    }
+
+    const group = parentTagGroups.groups.find(
+      (item) => item.parentTag.tagId === selectedParentTagId,
+    );
+
+    if (!group) {
+      return null;
+    }
+
+    return {
+      title: group.parentTag.name,
+      resources: group.resources,
+    };
+  }, [parentTagGroups, selectedParentTagId]);
+
+  const renderResourceCard = (resource) => (
+    <ResourceCard
+      key={resource.resourceId}
+      resource={resource}
+      onEdit={openEditModal}
+      onDelete={setDeletingResource}
+      onDownload={handleDownload}
+      formatDate={formatDate}
+      cx={cx}
+    />
+  );
 
   const resetForm = () => {
     setFormState(emptyForm);
@@ -242,70 +440,59 @@ function RecoveryResourcesManagement() {
         </div>
       )}
 
-      {!loading && filteredResources.length === 0 && (
+      {!loading && !parentTagGroups && filteredResources.length === 0 && (
         <div className="text-center py-5 text-muted">Không có tài liệu nào.</div>
       )}
 
-      {!loading && filteredResources.length > 0 && (
+      {!loading && filteredResources.length > 0 && !parentTagGroups && (
         <div className={cx('cardGrid')}>
-          {filteredResources.map((r) => (
-            <div key={r.resourceId} className={cx('resourceCard')}>
-              <div className={cx('cardHeader')}>
-                <h3 className={cx('cardTitle')}>{r.title}</h3>
-                <div className={cx('cardActions')}>
-                  <button onClick={() => openEditModal(r)} title="Sửa">
-                    <Edit size={16} />
-                  </button>
-                  <button onClick={() => setDeletingResource(r)} title="Xóa">
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
+          {filteredResources.map((resource) => renderResourceCard(resource))}
+        </div>
+      )}
 
-              {r.description && (
-                <p className={cx('cardDescription')}>{r.description}</p>
+      {!loading && parentTagGroups && (
+        <div className={cx('groupWrapper')}>
+          <div className={cx('parentTabList')}>
+            {parentTagGroups.groups.map((group) => (
+              <button
+                key={group.parentTag.tagId}
+                type="button"
+                className={cx('parentTab', {
+                  active: selectedParentTagId === group.parentTag.tagId,
+                })}
+                onClick={() => setSelectedParentTagId(group.parentTag.tagId)}
+              >
+                <span className={cx('parentTabTitle')}>{group.parentTag.name}</span>
+                <span className={cx('parentTabCount')}>{group.resources.length}</span>
+              </button>
+            ))}
+            {parentTagGroups.ungrouped.length > 0 && (
+              <button
+                type="button"
+                className={cx('parentTab', {
+                  active: selectedParentTagId === '__ungrouped__',
+                })}
+                onClick={() => setSelectedParentTagId('__ungrouped__')}
+              >
+                <span className={cx('parentTabTitle')}>Chưa gán tag cha</span>
+                <span className={cx('parentTabCount')}>{parentTagGroups.ungrouped.length}</span>
+              </button>
+            )}
+          </div>
+
+          {activeParentGroup && (
+            <div className={cx('parentTabPanel')}>
+              {activeParentGroup.resources.length > 0 ? (
+                <div className={cx('cardGrid')}>
+                  {activeParentGroup.resources.map((resource) => renderResourceCard(resource))}
+                </div>
+              ) : (
+                <div className={cx('emptyGroup')}>
+                  Chưa có tài liệu trong nhóm &quot;{activeParentGroup.title}&quot;.
+                </div>
               )}
-
-              {r.tags && r.tags.length > 0 && (
-                <div className={cx('cardTags')}>
-                  {r.tags.map((tag) => (
-                    <Badge key={tag.tagId} bg="light" text="dark" className="border">
-                      {tag.name}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              {r.originalFileName && (
-                <div className={cx('cardFileName')}>
-                  {r.originalFileName}
-                  {isMarkdownResource(r) && (
-                    <span className={cx('fileTypeBadge')}>Markdown</span>
-                  )}
-                </div>
-              )}
-
-              <div className={cx('cardFooter')}>
-                <span>{formatDate(r.createdAt)}</span>
-                <div className={cx('footerActions')}>
-                  <RecoveryResourceLink resource={r} className={cx('viewLink')}>
-                    <ExternalLink size={14} /> Xem
-                  </RecoveryResourceLink>
-                  {r.url && (
-                    <button
-                      type="button"
-                      className={cx('viewLink')}
-                      onClick={() => handleDownload(r.url, r.originalFileName)}
-                      title={isMarkdownResource(r) ? 'Tải file markdown gốc (dành cho quản trị)' : 'Tải về'}
-                    >
-                      <Download size={14} />
-                      {isMarkdownResource(r) ? 'Tải file gốc' : 'Tải về'}
-                    </button>
-                  )}
-                </div>
-              </div>
             </div>
-          ))}
+          )}
         </div>
       )}
 

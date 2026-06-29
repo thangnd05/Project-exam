@@ -81,7 +81,7 @@ export const publicRoutes = [
   { path: routes.about, component: About },
   { path: routes.posts, component: PostsPage },
   { path: routes.postDetail, component: PostDetailPage },
-  { path: routes.recoveryResourceView, component: RecoveryResourceViewPage },
+  { path: routes.recoveryResourceView, component: RecoveryResourceViewPage, noLayout: true },
   { path: routes.verifyEmail, component: VerifyEmailPage },
   { path: routes.notFoundPage, component: NotFoundPage },
   { path: routes.notFound, component: NotFoundPage },

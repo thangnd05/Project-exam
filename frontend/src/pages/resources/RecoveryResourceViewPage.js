@@ -26,6 +26,14 @@ function RecoveryResourceViewPage() {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    document.body.classList.add('recovery-resource-print-page');
+
+    return () => {
+      document.body.classList.remove('recovery-resource-print-page');
+    };
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     const loadResource = async () => {
@@ -79,7 +87,7 @@ function RecoveryResourceViewPage() {
 
   if (loading) {
     return (
-      <div className={cx('wrapper')}>
+      <div id="recovery-resource-print-root" className={cx('wrapper')}>
         <div className={cx('container', 'stateBox')}>
           <Spinner animation="border" size="sm" />
           <span>Đang tải tài liệu...</span>
@@ -90,7 +98,7 @@ function RecoveryResourceViewPage() {
 
   if (errorMessage) {
     return (
-      <div className={cx('wrapper')}>
+      <div id="recovery-resource-print-root" className={cx('wrapper')}>
         <div className={cx('container')}>
           <div className={cx('stateBox')}>{errorMessage}</div>
         </div>
@@ -99,7 +107,7 @@ function RecoveryResourceViewPage() {
   }
 
   return (
-    <div className={cx('wrapper')}>
+    <div id="recovery-resource-print-root" className={cx('wrapper')}>
       <div className={cx('container')}>
         <header className={cx('header')}>
           <h1 className={cx('title')}>{resource?.title}</h1>
