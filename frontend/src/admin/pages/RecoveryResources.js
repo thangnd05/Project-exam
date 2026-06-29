@@ -48,7 +48,6 @@ function RecoveryResourcesManagement() {
       .then((list) => {
         const mapped = list.map((item) => ({id: item.examTypeId, name: item.name}));
         setExamTypes(mapped);
-        if (mapped.length > 0) setSelectedExamTypeId(mapped[0].id);
       })
       .catch(() => {});
   }, []);
@@ -77,14 +76,30 @@ function RecoveryResourcesManagement() {
 
   const filteredResources = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
-    if (!keyword) return resources;
-    return resources.filter(
-      (r) =>
-        r.title.toLowerCase().includes(keyword) ||
-        (r.description || '').toLowerCase().includes(keyword) ||
-        (r.tags || []).some((t) => t.name.toLowerCase().includes(keyword)),
-    );
-  }, [resources, searchTerm]);
+
+    return resources.filter((resource) => {
+      const resourceTags = resource.tags || [];
+
+      if (selectedExamTypeId) {
+        const matchesExamType = resourceTags.some(
+          (tag) => String(tag.examTypeId) === String(selectedExamTypeId),
+        );
+        if (!matchesExamType) {
+          return false;
+        }
+      }
+
+      if (!keyword) {
+        return true;
+      }
+
+      return (
+        resource.title.toLowerCase().includes(keyword) ||
+        (resource.description || '').toLowerCase().includes(keyword) ||
+        resourceTags.some((tag) => tag.name.toLowerCase().includes(keyword))
+      );
+    });
+  }, [resources, searchTerm, selectedExamTypeId]);
 
   const resetForm = () => {
     setFormState(emptyForm);
@@ -211,6 +226,7 @@ function RecoveryResourcesManagement() {
           value={selectedExamTypeId}
           onChange={(e) => setSelectedExamTypeId(e.target.value)}
         >
+          <option value="">Tất cả loại kỳ thi</option>
           {examTypes.map((et) => (
             <option key={et.id} value={et.id}>{et.name}</option>
           ))}
