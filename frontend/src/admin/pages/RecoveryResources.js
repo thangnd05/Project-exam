@@ -347,7 +347,7 @@ function RecoveryResourcesManagement() {
         title: formState.title.trim(),
         description: formState.description.trim(),
         url: formState.url.trim() || null,
-        tagIds: formState.tagIds,
+        tagIds: [...new Set(formState.tagIds || [])],
       };
       if (editingId) {
         await updateResource(editingId, payload, selectedFile);

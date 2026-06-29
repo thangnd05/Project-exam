@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -183,9 +184,14 @@ public class RecoveryResourceService {
     @Transactional
     public void syncResourceTags(String resourceId, List<String> tagIds) {
         resourceTagRepository.deleteByResourceId(resourceId);
-        if (tagIds == null || tagIds.isEmpty()) return;
+        resourceTagRepository.flush();
 
-        for (String tagId : tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            return;
+        }
+
+        LinkedHashSet<String> uniqueTagIds = new LinkedHashSet<>(tagIds);
+        for (String tagId : uniqueTagIds) {
             tagRepository.findById(tagId)
                     .orElseThrow(() -> new NotFoundException("Tag không tồn tại: " + tagId));
             ResourceTag rt = new ResourceTag();
