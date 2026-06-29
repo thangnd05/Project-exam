@@ -109,6 +109,16 @@ function RecoveryResourceViewPage() {
   return (
     <div id="recovery-resource-print-root" className={cx('wrapper')}>
       <div className={cx('container')}>
+        <div className={cx('actions', 'noPrint')}>
+          <button type="button" className={cx('actionBtn', 'primary')} onClick={handlePrint}>
+            <Printer size={16} />
+            In / Lưu PDF
+          </button>
+          <Link to={routes.home} className={cx('actionBtn')}>
+            Về trang chủ
+          </Link>
+        </div>
+
         <header className={cx('header')}>
           <h1 className={cx('title')}>{resource?.title}</h1>
           {resource?.description && (
@@ -124,16 +134,6 @@ function RecoveryResourceViewPage() {
           className={cx('markdownBody')}
           dangerouslySetInnerHTML={{ __html: markdownHtml }}
         />
-
-        <div className={cx('actions', 'noPrint')}>
-          <button type="button" className={cx('actionBtn', 'primary')} onClick={handlePrint}>
-            <Printer size={16} />
-            In / Lưu PDF
-          </button>
-          <Link to={routes.home} className={cx('actionBtn')}>
-            Về trang chủ
-          </Link>
-        </div>
       </div>
     </div>
   );
