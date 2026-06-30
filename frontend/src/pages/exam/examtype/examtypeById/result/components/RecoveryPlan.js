@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { IoCalendarOutline } from 'react-icons/io5';
+import { IoCalendarOutline, IoFlagOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import routes from '~/config/Routes';
 import styles from './Result.module.scss';
@@ -15,9 +15,16 @@ function RecoveryPlan({
   isGuest,
 }) {
   const navigate = useNavigate();
+  const canCreateTarget = !isGuest && !hasTarget && Boolean(examTypeId);
   const canCreatePlan = !isGuest && hasTarget && !isTargetMet;
 
-  if (!recoveryMessage && !canCreatePlan) return null;
+  if (!recoveryMessage && !canCreateTarget && !canCreatePlan) return null;
+
+  const handleGoToTarget = () => {
+    const params = new URLSearchParams();
+    if (examTypeId) params.set('examTypeId', String(examTypeId));
+    navigate(`${routes.myTarget}?${params.toString()}`);
+  };
 
   const handleGoToPlan = () => {
     const params = new URLSearchParams();
@@ -34,6 +41,16 @@ function RecoveryPlan({
       </h3>
       {recoveryMessage && (
         <p className={cx('recoveryMessage')}>{recoveryMessage}</p>
+      )}
+      {canCreateTarget && (
+        <button
+          type="button"
+          className={cx('recoveryPlanCta', 'recoveryTargetCta')}
+          onClick={handleGoToTarget}
+        >
+          <IoFlagOutline size={20} aria-hidden />
+          Đặt mục tiêu
+        </button>
       )}
       {canCreatePlan && (
         <button

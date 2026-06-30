@@ -297,7 +297,7 @@ public class EnhancedResultService {
         } else if (!hasTarget && readinessScore < 85) {
             int nextTarget = Math.min(readinessScore + 10, 100);
             recoveryMessage = "Mục tiêu: tăng readiness từ " + readinessScore + "% lên " + nextTarget + "%. " +
-                    "Hãy lập kế hoạch học để luyện tập có hệ thống.";
+                    "Hãy đặt mục tiêu điểm và aim từng phần thi để hệ thống gợi ý lộ trình phù hợp.";
         } else {
             recoveryMessage = null;
         }

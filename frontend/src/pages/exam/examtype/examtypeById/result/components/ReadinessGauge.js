@@ -29,7 +29,7 @@ function ReadinessGauge({ enhanced }) {
   const {
     examCategoryCode, examTypeId,
     gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage,
-    readinessLevel, hasTarget, passed, correct, total,
+    readinessLevel, hasTarget, correct, total,
   } = enhanced;
 
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
@@ -84,11 +84,6 @@ function ReadinessGauge({ enhanced }) {
             <p className={cx('gaugeStat')}>
               Trả lời đúng <strong>{correct}/{total}</strong> câu
             </p>
-          )}
-          {!isQuickChallenge && passed != null && !hasTarget && (
-            <span className={cx('gaugeBadge', passed ? 'gaugeBadgePass' : 'gaugeBadgeFail')}>
-              {passed ? 'PASS (giả lập)' : '❌ FAIL (giả lập)'}
-            </span>
           )}
         </div>
       </div>
