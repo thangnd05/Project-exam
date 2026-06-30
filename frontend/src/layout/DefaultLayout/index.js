@@ -9,7 +9,12 @@ import BackgroundDecor from '~/components/common/BackgroundDecor';
 
 const cx = classNames.bind(styles);
 
-function DefaultLayout({children, noContainer = false}) {
+function DefaultLayout({
+  children,
+  noContainer = false,
+  hideFooter = false,
+  hideScrollToTop = false,
+}) {
   const location = useLocation();
 
   return (
@@ -17,20 +22,24 @@ function DefaultLayout({children, noContainer = false}) {
       <BackgroundDecor />
       <Header />
 
-      <main className={cx('main')}>
-        <motion.div
-          key={location.pathname}
-          initial={{opacity: 0}}
-          animate={{opacity: 1}}
-          transition={{duration: 0.2, ease: 'easeOut'}}
-          className={cx('pageWrap')}
-        >
-          {noContainer ? children : <div>{children}</div>}
-        </motion.div>
+      <main className={cx('main', { examMode: hideFooter })}>
+        {hideFooter ? (
+          <div className={cx('pageWrap')}>{noContainer ? children : <div>{children}</div>}</div>
+        ) : (
+          <motion.div
+            key={location.pathname}
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            transition={{duration: 0.2, ease: 'easeOut'}}
+            className={cx('pageWrap')}
+          >
+            {noContainer ? children : <div>{children}</div>}
+          </motion.div>
+        )}
       </main>
 
-      <Footer />
-      <ScrollToTop />
+      {!hideFooter && <Footer />}
+      {!hideScrollToTop && <ScrollToTop />}
     </div>
   );
 }

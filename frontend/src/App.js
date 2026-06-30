@@ -64,7 +64,11 @@ function App() {
                   key={`public-${index}`}
                   path={route.path}
                   element={
-                    <Layout noContainer={route.noContainer || false}>
+                    <Layout
+                      noContainer={route.noContainer || false}
+                      hideFooter={route.hideFooter || false}
+                      hideScrollToTop={route.hideScrollToTop || false}
+                    >
                       <Page />
                     </Layout>
                   }
@@ -100,7 +104,11 @@ function App() {
                   path={route.path}
                   element={
                     <ProtectedRoute allowGuest={route.allowGuest || false}>
-                      <Layout noContainer={route.noContainer || false}>
+                      <Layout
+                        noContainer={route.noContainer || false}
+                        hideFooter={route.hideFooter || false}
+                        hideScrollToTop={route.hideScrollToTop || false}
+                      >
                         <Page />
                       </Layout>
                     </ProtectedRoute>

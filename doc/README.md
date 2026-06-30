@@ -24,36 +24,56 @@
 
 **Tổng:** 200 câu — Listening ~45 phút | Reading ~75 phút
 
-## Danh mục tài liệu
+## Cấu trúc tài liệu
 
-| File | Nội dung | Trạng thái |
-|------|----------|------------|
-| [part-01-photographs.md](./part-01-photographs.md) | Part 1 — Photographs | ✅ Hoàn thành |
-| [part-02-question-response.md](./part-02-question-response.md) | Part 2 — Question-Response | ✅ Hoàn thành |
-| [part-03-conversations.md](./part-03-conversations.md) | Part 3 — Conversations | ✅ Hoàn thành |
-| [part-04-talks.md](./part-04-talks.md) | Part 4 — Talks | ✅ Hoàn thành |
-| [part-05-incomplete-sentences.md](./part-05-incomplete-sentences.md) | Part 5 — Incomplete Sentences | ✅ Hoàn thành |
-| [part-06-text-completion.md](./part-06-text-completion.md) | Part 6 — Text Completion | ✅ Hoàn thành |
-| [part-07-reading-comprehension.md](./part-07-reading-comprehension.md) | Part 7 — Reading Comprehension | ✅ Hoàn thành |
+```
+doc/
+├── README.md                 ← Bạn đang ở đây
+├── _shared/                  ← Lý thuyết dùng chung giữa các Part
+│   ├── INDEX.md              ← Bản đồ nội dung shared
+│   ├── listening-part3-part4/  ← 7 tag Listening (P3 + P4)
+│   ├── reading-grammar/        ← 7 tag ngữ pháp (P5 + P6)
+│   └── sentence-insertion/       ← Điền câu (P6 + P7)
+├── part-01/ … part-07/       ← Mỗi Part: overview + file tag
+```
 
-## Cách sử dụng giáo trình
+> **Lưu ý:** Các file `part-0X-*.md` ở thư mục gốc `doc/` đã được **tách và chuyển** vào cấu trúc thư mục trên. Không còn dùng file phẳng cũ.
 
-1. **Đọc tổng quan** của từng Part — nắm số câu, thời gian, mục tiêu điểm.
-2. **Học Core Strategies** — áp dụng ngay khi làm bài luyện.
-3. **Ghi nhớ Common Traps** — đánh dấu bẫy hay mắc phải.
-4. **Ôn từ vựng/ngữ pháp đặc sản** — flashcard hoặc Anki.
-5. **Làm Mini-Practice** — đọc giải thích chi tiết, không chỉ xem đáp án.
+## Danh mục theo Part
 
-## Lộ trình gợi ý (8 tuần → 750+)
+| Part | Overview | Nội dung |
+|------|----------|----------|
+| 1 | [part-01/overview.md](./part-01/overview.md) | Photographs — 2 tag riêng |
+| 2 | [part-02/overview.md](./part-02/overview.md) | Question-Response — 13 tag riêng |
+| 3 | [part-03/overview.md](./part-03/overview.md) | Conversations — 7 tag (link shared) |
+| 4 | [part-04/overview.md](./part-04/overview.md) | Talks — 7 tag (link shared) |
+| 5 | [part-05/overview.md](./part-05/overview.md) | Incomplete Sentences — 7 tag ngữ pháp (link shared) |
+| 6 | [part-06/overview.md](./part-06/overview.md) | Text Completion — 7 tag + điền câu |
+| 7 | [part-07/overview.md](./part-07/overview.md) | Reading Comprehension — 4 tag riêng + link shared |
 
-| Tuần | Trọng tâm | Mục tiêu |
+**Bản đồ shared:** [_shared/INDEX.md](./_shared/INDEX.md)
+
+## Lộ trình học gợi ý (8 tuần → 750+)
+
+| Tuần | Trọng tâm | Việc làm |
 |------|-----------|----------|
-| 1–2 | Part 1 + Part 2 | Listening Part 1–2 ≥ 85% |
-| 3–4 | Part 3 + Part 4 | Listening Part 3–4 ≥ 80% |
-| 5 | Part 5 + Part 6 | Reading Part 5–6 ≥ 85% |
-| 6–7 | Part 7 | Reading Part 7 ≥ 75% |
-| 8 | Full test + review lỗi | Mock test 2 lần/tuần |
+| 1 | Part 1 + 2 | Đọc overview → học tag → mini-practice |
+| 2 | Part 1 + 2 | Luyện đề + error log |
+| 3 | Part 3 + 4 | Đọc [_shared/listening-part3-part4/](./_shared/listening-part3-part4/README.md) trước, sau đó ghi chú riêng từng Part |
+| 4 | Part 3 + 4 | Full listening Part 3–4 |
+| 5 | Part 5 + 6 | Đọc [_shared/reading-grammar/](./_shared/reading-grammar/README.md) → Part 5 rồi Part 6 |
+| 6 | Part 7 | Tag riêng (suy luận, NOT, đồng nghĩa, liên kết văn bản) |
+| 7 | Part 7 + review | Double/triple passage + điền câu |
+| 8 | Full test | Mock 2 lần/tuần + review error log |
+
+## Cách sử dụng
+
+1. **Bắt đầu từ `overview.md`** của Part — nắm thời gian, quy trình, checklist.
+2. **Học tag** — file riêng (Part 1, 2, 7) hoặc `_shared/` + ghi chú Part (3–6).
+3. **Làm Mini-Practice** trong từng file tag — đọc giải thích, không chỉ xem đáp án.
+4. **Ghi Error log** theo mẫu trong overview.
+5. **Ôn shared trước** khi học Part 3 & 4 hoặc 5 & 6 cùng lúc — tránh đọc trùng lặp.
 
 ---
 
-*Tài liệu được biên soạn cho mục tiêu TOEIC 750+. Đủ 7 Part Listening & Reading.*
+*Tài liệu TOEIC 750+ — 7 Part Listening & Reading, cấu trúc modular.*

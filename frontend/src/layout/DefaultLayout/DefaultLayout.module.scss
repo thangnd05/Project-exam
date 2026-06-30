@@ -32,6 +32,11 @@
   z-index: 2;
 }
 
+/* Trang làm bài: nâng stacking context để thanh nộp bài fixed không bị che */
+.main.examMode {
+  z-index: 1050;
+}
+
 /* ============================= */
 /* Responsive Mobile */
 /* ============================= */

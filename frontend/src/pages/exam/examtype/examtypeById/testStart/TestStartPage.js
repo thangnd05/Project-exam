@@ -4,6 +4,7 @@ import { getAnswersByUserTest, batchSaveAnswers } from '../../../../../api/userA
 import { getUserTestInfo, purchaseTestAccess } from '../../../../../api/testApi';
 import { toast } from 'react-toastify';
 import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -821,73 +822,74 @@ function TestStartPage() {
         </Row>
       </Container>
 
-      {/* --- Footer: nút xem thời gian & câu hỏi + Nộp bài --- */}
-      <div className={cx('footer-actions')}>
-        {showInfoPanel && (
-          <div className={cx('footer-panel')}>
-            <TestStartDashboard
-              timeLeft={timeLeft}
-              formatTime={formatTime}
-              allQuestions={allQuestions}
-              userAnswers={userAnswers}
-              onScrollToQuestion={(id) => {
-                scrollToQuestion(id);
-                setShowInfoPanel(false);
-              }}
-            />
-          </div>
-        )}
-        <div className={cx('footer-buttons')}>
-          <Container className={cx('footer-buttons-inner')}>
-            <button
-              type="button"
-              className={cx('btn-toggle-info', { active: showInfoPanel })}
-              onClick={() => setShowInfoPanel((v) => !v)}
-              aria-expanded={showInfoPanel}
-              aria-label={
-                showInfoPanel
-                  ? 'Ẩn thời gian và danh sách câu'
-                  : 'Xem thời gian và danh sách câu'
-              }
-            >
-              {showInfoPanel ? (
-                <IoCloseOutline size={22} />
-              ) : (
-                <IoListOutline size={22} />
-              )}
-              <span>{showInfoPanel ? 'Ẩn' : 'Thời gian & Câu hỏi'}</span>
-            </button>
-            <div className={cx('footer-right-group')}>
-              <div className={cx('footer-pills')}>
-                {timeLeft !== null && (
-                  <div className={cx('exam-stat', 'exam-stat-time')}>
-                    <IoTimeOutline aria-hidden />
-                    <span className={cx('exam-stat-value')}>{formatTime(timeLeft)}</span>
-                  </div>
-                )}
-                <div className={cx('exam-stat', 'exam-stat-done')}>
-                  <IoCheckmarkCircleOutline aria-hidden />
-                  <span className={cx('exam-stat-value')}>
-                    {Object.keys(userAnswers).length}/{allQuestions.length}
-                  </span>
-                </div>
-              </div>
-              <button
-                className={cx('btn-submit')}
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  <IoSendOutline />
-                )}
-                {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài thi'}
-              </button>
+      {createPortal(
+        <div className={cx('footer-actions')}>
+          {showInfoPanel && (
+            <div className={cx('footer-panel')}>
+              <TestStartDashboard
+                allQuestions={allQuestions}
+                userAnswers={userAnswers}
+                onScrollToQuestion={(id) => {
+                  scrollToQuestion(id);
+                  setShowInfoPanel(false);
+                }}
+              />
             </div>
-          </Container>
-        </div>
-      </div>
+          )}
+          <div className={cx('footer-buttons')}>
+            <Container className={cx('footer-buttons-inner')}>
+              <button
+                type="button"
+                className={cx('btn-toggle-info', { active: showInfoPanel })}
+                onClick={() => setShowInfoPanel((v) => !v)}
+                aria-expanded={showInfoPanel}
+                aria-label={
+                  showInfoPanel
+                    ? 'Ẩn thời gian và danh sách câu'
+                    : 'Xem thời gian và danh sách câu'
+                }
+              >
+                {showInfoPanel ? (
+                  <IoCloseOutline size={22} />
+                ) : (
+                  <IoListOutline size={22} />
+                )}
+                <span>{showInfoPanel ? 'Ẩn' : 'Câu hỏi'}</span>
+              </button>
+              <div className={cx('footer-right-group')}>
+                <div className={cx('footer-pills')}>
+                  {timeLeft !== null && (
+                    <div className={cx('exam-stat', 'exam-stat-time')}>
+                      <IoTimeOutline aria-hidden />
+                      <span className={cx('exam-stat-value')}>{formatTime(timeLeft)}</span>
+                    </div>
+                  )}
+                  <div className={cx('exam-stat', 'exam-stat-done')}>
+                    <IoCheckmarkCircleOutline aria-hidden />
+                    <span className={cx('exam-stat-value')}>
+                      {Object.keys(userAnswers).length}/{allQuestions.length}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className={cx('btn-submit')}
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    <IoSendOutline />
+                  )}
+                  {isSubmitting ? 'Đang nộp bài...' : 'Nộp bài thi'}
+                </button>
+              </div>
+            </Container>
+          </div>
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

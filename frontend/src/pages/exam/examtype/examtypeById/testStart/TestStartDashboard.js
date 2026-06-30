@@ -1,12 +1,10 @@
-import { IoTimeOutline, IoInformationCircleOutline } from 'react-icons/io5';
+import { IoInformationCircleOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
 function TestStartDashboard({
-  timeLeft,
-  formatTime,
   allQuestions,
   userAnswers,
   onScrollToQuestion,
@@ -14,14 +12,6 @@ function TestStartDashboard({
   return (
     <div className={cx('dashboard')}>
       <div className={cx('dashboard-card')}>
-        <div className={cx('dashboard-timer')}>
-          <div className={cx('timer-label')}>THỜI GIAN CÒN LẠI</div>
-          <div className={cx('timer-value')}>
-            <IoTimeOutline className={cx('timer-icon')} />
-            <span>{formatTime(timeLeft)}</span>
-          </div>
-        </div>
-
         <div className={cx('dashboard-header')}>
           <IoInformationCircleOutline />
           <span>Danh sách câu hỏi</span>
