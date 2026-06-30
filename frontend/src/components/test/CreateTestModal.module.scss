@@ -364,22 +364,67 @@
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 20px;
+
+    &.collapsed {
+        padding-bottom: 16px;
+
+        .groupHeader {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+    }
 }
 
 .groupHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     margin-bottom: 16px;
     padding-bottom: 12px;
     border-bottom: 1px solid #e2e8f0;
+}
+
+.groupToggleBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    color: inherit;
+
+    &:hover .groupTitle {
+        color: #1d4ed8;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+        border-radius: 8px;
+    }
 
     .groupTitle {
         font-size: 1.5rem;
         font-weight: 700;
         color: var(--primary-color);
         margin: 0;
+        flex-shrink: 0;
     }
+}
+
+.groupSummaryBadge {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .removeBtn {

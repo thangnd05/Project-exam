@@ -11,6 +11,13 @@ import { CREATOR_TYPES } from './useCreateTest';
 
 const TOAST_VALIDATION_MS = 8000;
 
+// Phải khớp với cấu hình backend (spring.servlet.multipart) để chặn sớm phía client,
+// tránh upload thất bại giữa chừng (ERR_CONNECTION_ABORTED khi vượt giới hạn Tomcat).
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB / file
+const MAX_REQUEST_SIZE_BYTES = 50 * 1024 * 1024; // 50MB tổng
+
+const formatMB = (bytes) => `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+
 export const useTestSubmission = ({
     mode,
     classId,
@@ -66,6 +73,42 @@ export const useTestSubmission = ({
         return invalidRefs;
     };
 
+    // Gom tất cả file media sẽ upload theo từng loại creator để validate dung lượng phía client.
+    const collectMediaFiles = (creatorType) => {
+        const files = [];
+        if (creatorType === CREATOR_TYPES.PASSAGE) {
+            groups.forEach((group) => {
+                (group.passage?.mediaFiles || []).forEach((f) => files.push(f));
+            });
+        } else {
+            questions.forEach((q) => {
+                (q.mediaFiles || []).forEach((f) => files.push(f));
+            });
+            if (creatorType === CREATOR_TYPES.TEST && documentFile) {
+                files.push(documentFile);
+            }
+        }
+        return files;
+    };
+
+    // Trả về message lỗi nếu vượt giới hạn, ngược lại null.
+    const validateUploadSize = (creatorType) => {
+        const files = collectMediaFiles(creatorType);
+        const oversized = files.find((f) => f.size > MAX_FILE_SIZE_BYTES);
+        if (oversized) {
+            return `File "${oversized.name}" (${formatMB(oversized.size)}) vượt giới hạn ${formatMB(
+                MAX_FILE_SIZE_BYTES,
+            )} mỗi file.`;
+        }
+        const total = files.reduce((sum, f) => sum + f.size, 0);
+        if (total > MAX_REQUEST_SIZE_BYTES) {
+            return `Tổng dung lượng file (${formatMB(total)}) vượt giới hạn ${formatMB(
+                MAX_REQUEST_SIZE_BYTES,
+            )}. Vui lòng chia nhỏ thành nhiều lần lưu.`;
+        }
+        return null;
+    };
+
     const handleSubmit = async (creatorType) => {
         if (creatorType === CREATOR_TYPES.TEST) {
             if (!testInfo.title || !testInfo.examTypeId || !testInfo.examPartId) {
@@ -85,6 +128,12 @@ export const useTestSubmission = ({
                 `Được để trống nội dung đáp án, nhưng mỗi câu phải chọn ít nhất 1 đáp án đúng. Vui lòng kiểm tra: ${invalidQuestionRefs.join(', ')}`,
                 { autoClose: TOAST_VALIDATION_MS },
             );
+            return false;
+        }
+
+        const uploadSizeError = validateUploadSize(creatorType);
+        if (uploadSizeError) {
+            toast.warning(uploadSizeError, { autoClose: TOAST_VALIDATION_MS });
             return false;
         }
 

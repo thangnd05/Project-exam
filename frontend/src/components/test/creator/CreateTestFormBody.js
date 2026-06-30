@@ -16,7 +16,7 @@ import {
   IoAddOutline,
   IoLibraryOutline,
 } from 'react-icons/io5';
-import { Trash, PlusCircle } from 'lucide-react';
+import { Trash, PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -104,6 +104,7 @@ const CreateTestFormBody = ({
   const [chapterName, setChapterName] = useState('');
   const [groupDocumentFiles, setGroupDocumentFiles] = useState({});
   const [bulkPassageFile, setBulkPassageFile] = useState(null);
+  const [collapsedGroups, setCollapsedGroups] = useState(() => new Set());
 
   useEffect(() => {
     if (mode === 'class' && classId) {
@@ -113,6 +114,39 @@ const CreateTestFormBody = ({
       getChapterById(chapterId).then((data) => setChapterName(data?.title || `Chapter ${chapterId}`)).catch(() => setChapterName(`Chapter ${chapterId}`));
     }
   }, [mode, classId, chapterId]);
+
+  useEffect(() => {
+    setCollapsedGroups((prev) => {
+      const next = new Set([...prev].filter((i) => i < groups.length));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [groups.length]);
+
+  const toggleGroupCollapsed = (gIndex) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(gIndex)) {
+        next.delete(gIndex);
+      } else {
+        next.add(gIndex);
+      }
+      return next;
+    });
+  };
+
+  const getGroupSummary = (group) => {
+    const questionCount = group.questions?.length ?? 0;
+    const hasPassage =
+      Boolean(group.passage?.content?.trim()) ||
+      Boolean(group.passage?.contentTranslation?.trim()) ||
+      (group.passage?.extraContents || []).some((t) => t?.trim()) ||
+      (group.passage?.mediaFiles?.length ?? 0) > 0;
+    const parts = [`${questionCount} câu hỏi`];
+    if (hasPassage) {
+      parts.push('có passage');
+    }
+    return parts.join(' · ');
+  };
 
   const handleFormSubmit = async () => {
     const success = await handleSubmit();
@@ -590,16 +624,30 @@ const CreateTestFormBody = ({
             </div>
           </div>
 
-          {groups.map((group, gIndex) => (
-            <div key={gIndex} className={cx('groupCard')}>
+          {groups.map((group, gIndex) => {
+            const isCollapsed = collapsedGroups.has(gIndex);
+            return (
+            <div key={gIndex} className={cx('groupCard', { collapsed: isCollapsed })}>
               <div className={cx('groupHeader')}>
-                <h4 className={cx('groupTitle')}>Nhóm thứ {gIndex + 1}</h4>
+                <button
+                  type="button"
+                  className={cx('groupToggleBtn')}
+                  onClick={() => toggleGroupCollapsed(gIndex)}
+                  aria-expanded={!isCollapsed}
+                  aria-label={isCollapsed ? `Mở nhóm ${gIndex + 1}` : `Thu gọn nhóm ${gIndex + 1}`}
+                >
+                  {isCollapsed ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
+                  <h4 className={cx('groupTitle')}>Nhóm thứ {gIndex + 1}</h4>
+                  <span className={cx('groupSummaryBadge')}>{getGroupSummary(group)}</span>
+                </button>
                 {groups.length > 1 && (
                   <Button variant="link" className={cx('removeBtn')} onClick={() => removeGroup(gIndex)} aria-label={`Xóa nhóm ${gIndex + 1}`}>
                     <Trash size={18} />
                   </Button>
                 )}
               </div>
+              {!isCollapsed && (
+              <>
               <div className={cx('passageSection')}>
                 <div className={cx('formGroupModern')}>
                   <label className="mb-2 d-block fw-bold">Nội dung Passage (tùy chọn)</label>
@@ -719,8 +767,11 @@ const CreateTestFormBody = ({
                 ))}
                 <button type="button" className={cx('btnSecondary')} onClick={() => addGroupQuestion(gIndex)}><PlusCircle size={18} /> Thêm câu hỏi</button>
               </div>
+              </>
+              )}
             </div>
-          ))}
+            );
+          })}
           <button type="button" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><IoAddOutline size={20} /> Thêm nhóm passage</button>
         </>
       )}
