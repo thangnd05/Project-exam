@@ -133,6 +133,34 @@ Bước 5 → Loại trừ đáp án sai → chọn đáp án đúng
 | 5 | **Quản lý thời gian** — bỏ câu khó, quay lại sau |
 | 6 | **Đáp án có bằng chứng** — inference phải có căn cứ trong bài |
 
+### Chiến thuật nâng cao (900+) ⭐
+
+| Loại lỗi | Cách phòng |
+|----------|------------|
+| **NOT nhầm** | Gạch **NOT** — tìm đáp án False, không phải True |
+| **Partially true** | Đúng 50% vẫn sai — loại ngay |
+| **Extreme inference** | all, never, definitely, main reason — cần bằng chứng |
+| **Hết giờ** | Bỏ câu khó, làm hết single trước double/triple |
+
+#### Tie-breaker — khi còn 2 đáp án
+
+```
+1. Có bằng chứng trực tiếp trong bài? (detail / NOT)
+2. Inference: đáp án vừa phải hơn extreme?
+3. Vocabulary: nghĩa trong ngữ cảnh câu, không nghĩa điển?
+4. Main idea: bao quát cả bài, không quá hẹp/rộng?
+5. Double/triple: đúng passage được hỏi?
+```
+
+#### Phân bổ thời gian thực chiến
+
+| Giai đoạn | Thời gian | Việc làm |
+|-----------|-----------|----------|
+| 0–35 phút | Single + Part 6 xong | Ưu tiên câu dễ, giữ nhịp |
+| 35–50 phút | Double passages | Đọc câu hỏi → xác định passage |
+| 50–55 phút | Triple + câu khó | Không panic, loại trừ |
+| Còn 3 phút | Review câu đánh dấu | Chỉ sửa nếu chắc |
+
 ---
 
 ## 3. Các bẫy kinh điển của ETS (Common Traps)
@@ -192,6 +220,13 @@ Câu nghe rất hay nhưng **lặp thông tin** đã có → loại.
 | Extreme | all, never, definitely | Chọn đáp án vừa phải |
 | NOT/True nhầm | chọn đáp án đúng khi hỏi NOT | Gạch NOT, tìm False |
 | Vocabulary sai context | nghĩa điển hình | Đọc câu chứa từ |
+| **Double/triple nhầm passage** | đọc nhầm bài | Xác định Passage 1/2/3 trước |
+
+### Bẫy 8: Double/Triple — nhầm passage ⭐
+
+> **Hỏi:** According to **Passage 2**, what is true about the merger?  
+> **Bẫy:** Chọn thông tin có trong Passage 1 (cùng chủ đề merger)  
+> **Fix:** Skim đúng passage được hỏi trước khi chọn
 
 ---
 
@@ -343,6 +378,48 @@ The company plans to **streamline** its production process next quarter.
 
 ---
 
+### Câu đơn — [Tag: Điền câu vào đoạn]
+
+**Câu cần điền:** *Such programs can also improve employee morale.*
+
+**Đoạn:** Many firms now offer wellness initiatives. [BLANK] As a result, absenteeism has declined in several departments.
+
+- (A) Such programs can also improve employee morale.  
+- (B) Employee morale has always been high.  
+- (C) Wellness initiatives are expensive to maintain.  
+- (D) Several departments are hiring new staff.  
+
+**Đáp án: (A)** — *Such programs* tham chiếu wellness initiatives; nối với *As a result, absenteeism declined*.
+
+---
+
+### Câu đơn — [Tag: Partially true · Bẫy 2]
+
+**Passage (rút gọn):** The company expanded operations into **Asia and Europe** last year, opening offices in Tokyo and Berlin.
+
+**Câu hỏi:** What is stated about the company's expansion?
+
+- (A) It focused exclusively on Asian markets.  
+- (B) It included new offices in two regions.  
+- (C) It was completed entirely in Berlin.  
+- (D) It was delayed until this year.  
+
+**Đáp án: (B)** — Asia **and** Europe = two regions. (A) bẫy partially true — có Asia nhưng *exclusively* sai.
+
+---
+
+## 6. Error log — sửa lỗi có hệ thống
+
+**Mẫu 1 dòng:**
+
+```
+Set 3-Q4 | NOT | Chọn đáp án True thay vì False | Fix: gạch NOT, tìm 3 True trước
+```
+
+**Phân tích hàng tuần:** >30% NOT → luyện gạch NOT. >30% inference extreme → ôn Bẫy 4. Hết giờ → xem phân bổ thời gian single/double.
+
+---
+
 ## Checklist Part 7
 
 - [ ] Đã đọc câu hỏi trước khi đọc bài?
@@ -351,8 +428,8 @@ The company plans to **streamline** its production process next quarter.
 - [ ] Đã loại đáp án partially true / extreme?
 - [ ] Đã tìm bằng chứng trong bài trước khi chọn inference?
 - [ ] Với double/triple: đã xác định câu hỏi hỏi passage nào?
-
----
+- [ ] Còn 2 đáp án? → **Tie-breaker**: bằng chứng → vừa phải vs extreme
+- [ ] Đã quản lý thời gian — single trước, triple cuối?
 
 **Trước đó:** [Part 6 — Text Completion](./part-06-text-completion.md)  
 **Về mục lục:** [README](./README.md)

@@ -85,6 +85,49 @@ Sau khi nghe (25s)   → Trả lời 3 câu theo thứ tự, không quay lại �
 | 4 | **Paraphrase là chuẩn** — đáp án hiếm khi lặp nguyên văn |
 | 5 | **Đoán nếu bắt buộc** — không bỏ trống, chuyển đoạn tiếp ngay |
 
+### Lưu ý phát âm khi nghe (Pronunciation traps)
+
+| Hiện tượng | Ví dụ | Hậu quả nếu bỏ qua |
+|------------|-------|---------------------|
+| **Số bị nói nhanh** | *fifty* vs *fifteen*; *thirty* vs *thirteen* | Sai câu detail |
+| **Tên riêng lạ** | Tên người / địa điểm không quen | Không match được đáp án |
+| **Paraphrase âm** | *due date* nghe gần *do it* | Bỏ lỡ từ khóa cần note |
+| **Giọng nam/nữ xen kẽ** | Nhầm ai nói câu cuối | Sai câu hành động tiếp theo |
+| **Thông tin sửa** | *actually, I meant...* / *instead* | Giữ số cũ trong đầu |
+
+**Mẹo:** Note **số + tên riêng** bằng viết tắt; nghe thấy *actually / instead / no wait* → ghi đè thông tin cũ.
+
+### Kỹ thuật dùng thời gian
+
+- **5 giây đầu mỗi đoạn:** đọc 3 câu hỏi — bắt buộc, không bỏ qua.
+- **Không pause giữa đoạn** — hết 3 câu → chuyển đoạn mới ngay.
+- **Graphic:** xem tranh trong lúc đọc câu hỏi, trước khi audio bắt đầu.
+
+### Chiến thuật nâng cao (900+) ⭐
+
+| Loại lỗi | Triệu chứng | Cách phòng |
+|----------|-------------|------------|
+| **Giữ số cũ** | Audio đổi 50→75, vẫn chọn 50 | Nghe tín hiệu *actually, instead* |
+| **Nhầm người hành động** | Chọn man vì nghe thấy giọng nam cuối | Xác định **ai nói câu cam kết** (I'll...) |
+| **Literal hàm ý** | Chọn nghĩa đen câu nói | Hỏi: *"Người nói muốn truyền đạt gì?"* |
+| **Echo paraphrase** | Đáp án có từ trong audio nhưng sai ý | Khớp **câu hỏi**, không chỉ từ quen |
+| **Mệt đoạn 8–13** | Sai liên tiếp | Giữ nhịp đọc câu hỏi trước — không bỏ bước |
+
+#### Tie-breaker — khi còn 2 đáp án
+
+```
+1. Khớp đúng TAG câu hỏi? (detail / next action / imply / who)
+2. Thông tin mới nhất hay cũ? (ưu tiên mới — Bẫy 2)
+3. Ai là chủ thể hành động? (Bẫy 3)
+4. Paraphrase có đúng nghĩa không? (không chỉ từ giống)
+5. Vẫn không chắc → loại đáp án **cụ thể hơn mức audio hỗ trợ** (suy diễn quá)
+```
+
+#### Chuyển tiếp Part 2 → Part 3
+
+- Part 2: **không có câu hỏi đọc trước** → Part 3: **bắt buộc đọc 3 câu**.
+- Đổi tư duy: từ phản xạ 20 giây/câu → quản lý **70 giây/đoạn** (3 câu + 1 audio dài).
+
 ---
 
 ## 3. Các bẫy kinh điển của ETS (Common Traps)
@@ -138,6 +181,16 @@ Audio nhắc nhiều chi tiết, chỉ **1 chi tiết** là đáp án.
 | Đảo người | I'll / you / he | Xác định chủ thể |
 | Hàm ý | What does X mean? | Không hiểu literal |
 | Paraphrase | Từ khác, nghĩa giống | Nắm nghĩa, không từ |
+| **Near-miss** | 2 đáp án cùng liên quan | Chọn câu trả lời **đúng tag** + **đúng nghĩa** |
+
+### Bẫy 7: Near-miss — hai đáp án cùng hợp lý ⭐
+
+> **Hỏi:** What does the woman suggest?  
+> **Audio:** Woman: "Maybe we should ask the IT department first."  
+> **(A)** The IT department should handle the problem. ← gần đúng  
+> **(B)** They should consult IT before proceeding. ← đúng (consult = ask first)
+
+→ (A) là **kết luận quá mạnh** (IT sẽ xử lý hết); (B) khớp *ask first*.
 
 ---
 
@@ -243,6 +296,75 @@ What will the man most likely do next?
 
 ---
 
+### Đoạn mẫu 2 — [Tag: Danh tính người nói + Vấn đề]
+
+**Transcript (rút gọn):**
+
+> **M:** Hi, I received a message about a leak under the kitchen sink in apartment 4B.  
+> **W:** Yes, I'm the building manager. I'll send a **plumber** this afternoon. Can you make sure someone is home to let him in?  
+> **M:** Sure. Should I turn off the water valve in the meantime?  
+> **W:** That would be helpful. It's located behind the access panel in the hallway.
+
+**Câu 1 — [Tag: Danh tính người nói]**  
+Who most likely is the woman?
+
+- (A) A plumber  
+- (B) A building manager  
+- (C) A tenant  
+
+**Đáp án: (B)** — Woman tự giới thiệu *"I'm the building manager"*.
+
+**Câu 2 — [Tag: Vấn đề / Trở ngại]**  
+What is the problem?
+
+- (A) A pipe is leaking.  
+- (B) The water valve is broken.  
+- (C) The access panel is locked.  
+
+**Đáp án: (A)** — Man nói *leak under the kitchen sink*. (B) valve chỉ là hướng dẫn xử lý tạm. (C) không nhắc locked.
+
+---
+
+### Đoạn mẫu 3 — [Tag: Chủ đề + Thông tin nhiễu]
+
+**Transcript (rút gọn):**
+
+> **W:** I'm calling to reserve a conference room for the board meeting on **April 10th**.  
+> **M:** We have the **Grand Hall** available that day. It seats 40 people.  
+> **W:** Perfect. We'll also need audiovisual equipment.  
+> **M:** That's included. By the way, the **April 3rd** booking was canceled — would you like that date instead?  
+> **W:** No, **April 10th** works for us.
+
+**Câu hỏi:** On which date will the meeting take place?
+
+- (A) April 3rd  
+- (B) April 10th  
+- (C) April 13th  
+
+**Đáp án: (B)** — Woman xác nhận lại *April 10th*. (A) là Bẫy 1 thông tin nhiễu (booking bị cancel, không phải ngày họ chọn).
+
+---
+
+## 6. Error log — sửa lỗi có hệ thống
+
+| Trường | Ghi chú |
+|--------|---------|
+| **Đề / Đoạn / Câu** | ETS Test 3 — Conversation 5 — Q2 |
+| **Tag câu hỏi** | Detail / Next action / Imply / Who |
+| **Loại bẫy** | Nhiễu / Sai thì / Đảo người / Near-miss |
+| **Nguyên nhân** | Không đọc câu hỏi / giữ số cũ / literal |
+| **Hành động** | Lần sau kiểm tra gì? |
+
+**Mẫu 1 dòng:**
+
+```
+Conv.5-Q2 | Next action | Chọn man vì giọng nam cuối | Fix: tìm ai nói "I'll..."
+```
+
+**Phân tích hàng tuần:** >30% sai detail → luyện note số/tên. >30% imply → ôn bảng hàm ý. Sai dồn đoạn 8+ → giữ bước đọc câu hỏi trước.
+
+---
+
 ## Checklist Part 3
 
 - [ ] Đã đọc 3 câu hỏi trước khi nghe?
@@ -250,8 +372,8 @@ What will the man most likely do next?
 - [ ] Đã phân biệt thông tin cũ vs mới?
 - [ ] Đã xác định đúng người sẽ hành động?
 - [ ] Với câu hàm ý: không chọn đáp án literal?
-
----
+- [ ] Còn 2 đáp án? → áp dụng **Tie-breaker**
+- [ ] Với graphic: đã xem tranh trước khi nghe?
 
 **Trước đó:** [Part 2 — Question-Response](./part-02-question-response.md)  
 **Tiếp theo:** [Part 4 — Talks](./part-04-talks.md)

@@ -101,6 +101,39 @@ KẾT (10–15s)     → Tóm tắt / hành động cần làm / lời cảm ơn
 | 4 | **Advertisement vs Announcement** — quảng cáo kêu gọi mua, thông báo cung cấp thông tin |
 | 5 | **Không panic khi bỏ lỡ** — 2/3 câu đúng vẫn tốt |
 
+### Lưu ý phát âm khi nghe (Pronunciation traps)
+
+| Hiện tượng | Ví dụ | Hậu quả |
+|------------|-------|---------|
+| **Số / giờ nói nhanh** | Gate 15 vs 50; 9:15 vs 9:50 | Sai câu detail |
+| **Tên riêng / địa danh** | Tên sản phẩm, tên sự kiện | Không khớp đáp án |
+| **Liệt kê dài** | First... Next... Finally... | Nhầm thứ tự chi tiết |
+| **Sửa thông tin** | *originally... but now...* | Giữ lịch cũ |
+
+### Chiến thuật nâng cao (900+) ⭐
+
+| Loại lỗi | Cách phòng |
+|----------|------------|
+| **Nhầm mục đích** | Đọc câu mở + câu đóng — quảng cáo vs thông báo |
+| **Graphic sai phần** | Đọc câu hỏi → xem đúng cột/dòng trên hình |
+| **Cause vs effect** | Câu Why → tìm *because / due to*, không chọn kết quả |
+| **Mệt đoạn 6–10** | Map câu hỏi với First / Next / Finally |
+
+#### Tie-breaker — khi còn 2 đáp án
+
+```
+1. Khớp TAG? (purpose / detail / what listeners should do)
+2. Thông tin mới nhất? (Bẫy schedule change)
+3. Cause hay effect? (câu Why)
+4. Graphic — đúng phần được hỏi?
+5. Loại đáp án chỉ lặp từ khóa sai ngữ cảnh (Bẫy 6)
+```
+
+#### Chuyển tiếp Part 3 → Part 4
+
+- Part 3: 2 người đối thoại → Part 4: **1 người nói liên tục** — cấu trúc rõ hơn (mở–thân–kết).
+- Nghe **câu đầu** kỹ hơn — Part 4 thường cho biết loại bài + người nói ngay.
+
 ---
 
 ## 3. Các bẫy kinh điển của ETS (Common Traps)
@@ -145,6 +178,16 @@ Audio nhắc "discount" nhiều lần, nhưng câu hỏi hỏi về **location**
 | Nhầm cause/effect | Why...? | Tìm because/due to |
 | Graphic | biểu đồ phức tạp | Đọc câu hỏi trước, xem đúng phần |
 | Paraphrase | từ khác nghĩa giống | Hiểu nghĩa |
+| **Call-to-action nhầm** | Please visit... | Đừng nhầm với mục đích chính của bài |
+
+### Bẫy 7: Call-to-action vs mục đích chính ⭐
+
+> Bài quảng cáo: giới thiệu sản phẩm (80%) + *"Visit our website to order"* (cuối).  
+> **Hỏi:** What is the talk mainly about?  
+> **Bẫy:** Encouraging people to visit a website  
+> **Đúng:** Introducing a new product / service
+
+→ Câu kêu gọi hành động ở **cuối** thường không phải main purpose.
 
 ---
 
@@ -253,6 +296,60 @@ When will the inspectors arrive?
 
 ---
 
+### Đoạn mẫu 2 — [Tag: Hành động tiếp theo + Graphic]
+
+**Transcript (rút gọn):**
+
+> Attention shoppers. Our store will be **closing in 30 minutes**. Please bring your final selections to the checkout counters on the **first floor**. Customers holding layaway items should visit the customer service desk **before 8:45 P.M.** Thank you for shopping with us.
+
+**Câu 1 — [Tag: Hành động tiếp theo]**  
+What are shoppers asked to do?
+
+- (A) Return layaway items  
+- (B) Complete their purchases soon  
+- (C) Visit the second floor  
+
+**Đáp án: (B)** — *bring final selections to checkout* = hoàn tất mua. (A) visit desk for layaway, không phải return. (C) first floor, không phải second.
+
+**Câu 2 — [Tag: Thông tin chi tiết]**  
+By what time should layaway customers visit the service desk?
+
+- (A) 8:15 P.M.  
+- (B) 8:45 P.M.  
+- (C) 9:15 P.M.  
+
+**Đáp án: (B)** — *before 8:45 P.M.*
+
+---
+
+### Câu đơn — [Tag: Chủ đề vs Call-to-action · Bẫy 7]
+
+**Transcript (rút gọn):**
+
+> Welcome to GreenTech Solutions. Today we're excited to introduce our new solar panel series, which can reduce energy costs by up to 30 percent. The panels come with a 20-year warranty. **For more details, please visit our website at greentech dot com.**
+
+**Câu hỏi:** What is the main purpose of the talk?
+
+- (A) To announce a website redesign  
+- (B) To promote a new product  
+- (C) To explain warranty claim procedures  
+
+**Đáp án: (B)** — Giới thiệu solar panel series. (A) bẫy từ *visit our website* ở cuối — không phải main purpose.
+
+---
+
+## 6. Error log — sửa lỗi có hệ thống
+
+**Mẫu 1 dòng:**
+
+```
+Talk 4-Q1 | Purpose | Chọn "visit website" vì nghe cuối bài | Fix: main purpose = phần thân bài
+```
+
+**Phân tích hàng tuần:** >30% sai purpose → ôn Bẫy 3 + 7. >30% sai detail → luyện note số/giờ. Sai graphic → luyện đọc câu hỏi trước khi xem hình.
+
+---
+
 ## Checklist Part 4
 
 - [ ] Đã đọc 3 câu hỏi trước khi nghe?
@@ -260,8 +357,8 @@ When will the inspectors arrive?
 - [ ] Đã chú ý tín hiệu chuyển ý (First, However, Finally)?
 - [ ] Đã phân biệt thông tin cũ vs mới (originally / instead)?
 - [ ] Với graphic: đã xem hình trước khi nghe?
-
----
+- [ ] Còn 2 đáp án? → áp dụng **Tie-breaker**
+- [ ] Câu purpose: phân biệt main idea vs call-to-action cuối bài? (Bẫy 7)
 
 **Trước đó:** [Part 3 — Conversations](./part-03-conversations.md)  
 **Tiếp theo:** [Part 5 — Incomplete Sentences](./part-05-incomplete-sentences.md)

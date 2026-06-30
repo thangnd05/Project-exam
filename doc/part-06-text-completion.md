@@ -94,6 +94,29 @@ Bước 3 (10s) → Đọc lại đoạn sau khi điền — kiểm tra mạch v
 | 4 | **Nhận diện loại văn bản** — email vs memo vs article |
 | 5 | **Không quá 2 phút/đoạn** — dành thời gian cho Part 7 |
 
+### Chiến thuật nâng cao (900+) ⭐
+
+| Loại lỗi | Cách phòng |
+|----------|------------|
+| **Sai từ nối** | Đọc câu trước + sau — positive/negative/cause |
+| **Đại từ lệch số** | Tìm danh từ tham chiếu gần nhất |
+| **Đúng ngữ pháp, sai register** | Email/memo → từ trang trọng (obtain, advise) |
+| **Làm từng câu rời** | Điền xong 4 chỗ → đọc lại cả đoạn |
+
+#### Tie-breaker — khi còn 2 đáp án
+
+```
+1. Quan hệ logic 2 câu (However / Therefore / In addition)
+2. Đại từ it/they/this — khớp số và tham chiếu
+3. Collocation trong ngữ cảnh email/memo
+4. Đọc lại đoạn sau khi điền — mạch văn có tự nhiên?
+```
+
+#### Liên kết Part 5 → Part 6
+
+- Part 5: 1 câu đơn. Part 6: **cùng kiến thức ngữ pháp** + thêm ngữ cảnh đoạn văn.
+- Ưu tiên câu **từ nối** và **đại từ** — hay sai nhất ở Part 6.
+
 ---
 
 ## 3. Các bẫy kinh điển của ETS (Common Traps)
@@ -258,6 +281,44 @@ The company updated its software programs, and ___ are now available for downloa
 
 ---
 
+### Đoạn mẫu 2 — [Tag: Từ nối tương phản]
+
+The initial prototype received positive feedback from testers. ___, several design flaws were discovered during the final review.
+
+- (A) Therefore  
+- (B) Similarly  
+- (C) However  
+- (D) In addition  
+
+**Đáp án: (C)** — Positive → **However** + flaws (tương phản). (A) Therefore = cùng chiều.
+
+---
+
+### Đoạn mẫu 3 — [Tag: Điền câu]
+
+**Câu cần điền:** *This change will help reduce shipping delays.*
+
+**Đoạn:** We have partnered with a new logistics provider. [BLANK] The transition will begin on Monday.
+
+- (A) This change will help reduce shipping delays.  
+- (B) Shipping delays have been a problem for years.  
+- (C) Many providers offer competitive rates.  
+- (D) Customers can track packages online.  
+
+**Đáp án: (A)** — Câu sau nói *transition will begin* → (A) giải thích lợi ích đổi provider. (B) lặp vấn đề đã ngụ ý, không nối mạch.
+
+---
+
+## 6. Error log — sửa lỗi có hệ thống
+
+**Mẫu 1 dòng:**
+
+```
+Passage 2-Q133 | Connector | Chọn Therefore thay vì However | Fix: đọc quan hệ positive→negative
+```
+
+---
+
 ## Checklist Part 6
 
 - [ ] Đã đọc lướt toàn đoạn trước khi điền?
@@ -265,8 +326,7 @@ The company updated its software programs, and ___ are now available for downloa
 - [ ] Đã kiểm tra quan hệ logic giữa các câu (từ nối)?
 - [ ] Đã kiểm tra đại từ tham chiếu (it/they/this)?
 - [ ] Đã đọc lại đoạn sau khi điền hết 4 chỗ trống?
-
----
+- [ ] Còn 2 đáp án? → **Tie-breaker**: logic → đại từ → collocation
 
 **Trước đó:** [Part 5 — Incomplete Sentences](./part-05-incomplete-sentences.md)  
 **Tiếp theo:** [Part 7 — Reading Comprehension](./part-07-reading-comprehension.md)

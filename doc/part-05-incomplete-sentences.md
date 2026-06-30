@@ -108,6 +108,37 @@ Bước 4 (5s)  → Chọn đáp án, đi tiếp (không đổi)
 | 4 | **Đánh dấu câu khó** — quay lại nếu còn thời gian |
 | 5 | **Cùng gốc từ = câu từ loại** — làm nhanh |
 
+### Chiến thuật nâng cao (900+) ⭐
+
+| Loại lỗi | Cách phòng |
+|----------|------------|
+| **Overthink** | >45 giây/câu — chọn và đi, Part 7 cần thời gian |
+| **Bỏ qua collocation** | 2 đáp án cùng đúng ngữ pháp → chọn collocation chuẩn |
+| **Đọc không hết câu** | Chỗ trống ở giữa — đọc đến cuối câu |
+| **Nhầm The number of / A number of** | Xác định chủ ngữ thật (Bẫy 4) |
+
+#### Tie-breaker — khi còn 2 đáp án
+
+```
+1. Loại sai từ loại / thì / chủ-vị trước
+2. Collocation + giới từ cố định
+3. Nghĩa trong ngữ cảnh câu (không chỉ đúng ngữ pháp)
+4. Part of speech: 4 đáp án cùng gốc → chọn đúng loại từ
+```
+
+#### Phân bổ thời gian với Part 6 & 7
+
+- Part 5: **≤15 phút** (30 giây/câu) — dành thời gian cho Part 7.
+- Đánh dấu câu khó (○) — quay lại sau khi xong Part 6 nếu còn giờ.
+
+### Bẫy 7: Hai đáp án cùng đúng ngữ pháp ⭐
+
+> The manager asked the team to ___ the proposal before Friday.  
+> (A) review (B) revise — cả hai đều V nguyên mẫu sau *to*  
+> Ngữ cảnh: *before Friday* + submit deadline → **review** (xem xét) phù hợp hơn nếu chưa nói có lỗi cần sửa.
+
+→ Khi ngữ pháp loại hết trừ 2 đáp án → chọn theo **nghĩa + collocation**.
+
 ---
 
 ## 3. Các bẫy kinh điển của ETS (Common Traps)
@@ -157,6 +188,7 @@ Bước 4 (5s)  → Chọn đáp án, đi tiếp (không đổi)
 | Despite/Although | Despite it rained | Despite + N, Although + clause |
 | Chủ vị | The number are | Xác định chủ ngữ thật |
 | Collocation | do a decision | Học collocation |
+| **2 đáp án đúng ngữ pháp** | review vs revise | Chọn collocation + nghĩa ngữ cảnh |
 
 ---
 
@@ -270,6 +302,83 @@ The marketing team ___ the campaign results by the end of last month.
 
 ---
 
+### Câu 4 — [Tag: Mệnh đề quan hệ]
+
+The candidate ___ resume impressed the hiring committee was offered the position.
+
+- (A) who  
+- (B) whose  
+- (C) which  
+- (D) whom  
+
+**Đáp án: (B)** — **whose resume** = resume của người đó (sở hữu). (A) who resume — thiếu sở hữu.
+
+---
+
+### Câu 5 — [Tag: Despite vs Although · Bẫy 3]
+
+___ the heavy rain, the outdoor concert was not canceled.
+
+- (A) Although  
+- (B) Despite  
+- (C) Because  
+- (D) However  
+
+**Đáp án: (B)** — **Despite + N** (the heavy rain). (A) Although cần clause: *Although it rained heavily*.
+
+---
+
+### Câu 6 — [Tag: Chủ vị ngữ · Bẫy 4]
+
+A number of technical issues ___ reported during the software update.
+
+- (A) was  
+- (B) were  
+- (C) has been  
+- (D) is  
+
+**Đáp án: (B)** — **A number of + N số nhiều** → động từ số nhiều **were**.
+
+---
+
+### Câu 7 — [Tag: Collocation · Bẫy 5]
+
+Employees are encouraged to ___ advantage of the new training program.
+
+- (A) make  
+- (B) take  
+- (C) do  
+- (D) have  
+
+**Đáp án: (B)** — Collocation: **take advantage of**.
+
+---
+
+### Câu 8 — [Tag: Từ nối]
+
+The first quarter results were strong. ___, the company plans to open two new branches.
+
+- (A) However  
+- (B) Consequently  
+- (C) Otherwise  
+- (D) Instead  
+
+**Đáp án: (B)** — Kết quả tốt → **hệ quả** mở chi nhánh. Therefore/Consequently.
+
+---
+
+## 6. Error log — sửa lỗi có hệ thống
+
+**Mẫu 1 dòng:**
+
+```
+Q18 | Collocation | Chọn make thay vì take | Fix: học cụm take advantage of
+```
+
+**Phân tích hàng tuần:** >40% collocation → ôn bảng collocation. >30% thì → ôn dấu hiệu thời gian. >20% chủ-vị → ôn The/A number of.
+
+---
+
 ## Checklist Part 5
 
 - [ ] Đã xác định loại từ cần điền?
@@ -277,8 +386,8 @@ The marketing team ___ the campaign results by the end of last month.
 - [ ] Đã kiểm tra collocation / giới từ cố định?
 - [ ] Đã xác định đúng thì từ dấu hiệu thời gian?
 - [ ] Đã đọc cả câu, không chỉ chỗ trống?
-
----
+- [ ] Còn 2 đáp án? → **Tie-breaker**: collocation → nghĩa
+- [ ] Đã giữ nhịp ≤30 giây/câu cho Part 7?
 
 **Trước đó:** [Part 4 — Talks](./part-04-talks.md)  
 **Tiếp theo:** [Part 6 — Text Completion](./part-06-text-completion.md)

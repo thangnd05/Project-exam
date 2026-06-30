@@ -301,6 +301,8 @@ public class QuestionDocumentImportService {
                 block.select("br").forEach(br -> br.replaceWith(new TextNode("\n")));
                 String blockText = block.wholeText();
                 if (blockText == null || blockText.trim().isEmpty()) {
+                    // Đoạn rỗng (Enter 2 lần trong Word) -> giữ làm ngăn cách đoạn.
+                    addBlankMarker(lines);
                     continue;
                 }
                 // Chỉ lấy style liên quan đến đánh dấu đáp án đúng (bold/underline/highlight/màu).
@@ -315,9 +317,11 @@ public class QuestionDocumentImportService {
                 String styledRawText = styledElements.text();
                 String normalizedStyled = normalizeText(styledRawText);
 
-                for (String logicalLine : blockText.split("\\R+")) {
+                for (String logicalLine : blockText.split("\\R")) {
                     String cleanLine = cleanWhitespace(logicalLine);
                     if (cleanLine.isEmpty()) {
+                        // Dòng trống do soft-break (Shift+Enter 2 lần) -> ngăn cách đoạn.
+                        addBlankMarker(lines);
                         continue;
                     }
                     if (isBulletLine(cleanLine)) {
@@ -388,6 +392,17 @@ public class QuestionDocumentImportService {
         return normalizedStyledText.contains(normalizedBody);
     }
 
+    /**
+     * Thêm marker dòng trống để giữ khoảng cách đoạn trong "Giải thích:".
+     * Bỏ qua nếu list rỗng hoặc dòng cuối đã là blank — tránh blank thừa/đầu chuỗi.
+     */
+    private void addBlankMarker(List<ParsedLine> lines) {
+        if (lines.isEmpty() || lines.get(lines.size() - 1).blank) {
+            return;
+        }
+        lines.add(ParsedLine.blankMarker());
+    }
+
     private void extractLinesFromDocx(XWPFDocument docx, List<ParsedLine> lines) {
         for (XWPFParagraph para : docx.getParagraphs()) {
             processParagraph(para, lines);
@@ -406,11 +421,14 @@ public class QuestionDocumentImportService {
     private void processParagraph(XWPFParagraph para, List<ParsedLine> lines) {
         String text = para.getParagraphText();
         if (text == null || text.trim().isEmpty()) {
+            // Đoạn rỗng -> giữ làm ngăn cách đoạn (cho "Giải thích:" nhiều đoạn).
+            addBlankMarker(lines);
             return;
         }
-        for (String logicalLine : text.split("\\R+")) {
+        for (String logicalLine : text.split("\\R")) {
             String cleanLine = cleanWhitespace(logicalLine);
             if (cleanLine.isEmpty()) {
+                addBlankMarker(lines);
                 continue;
             }
             if (isBulletLine(cleanLine)) {
@@ -433,9 +451,14 @@ public class QuestionDocumentImportService {
         if (text == null) {
             return;
         }
-        for (String logicalLine : text.split("\\R+")) {
+        if (text.trim().isEmpty()) {
+            addBlankMarker(lines);
+            return;
+        }
+        for (String logicalLine : text.split("\\R")) {
             String cleanLine = cleanWhitespace(logicalLine);
             if (cleanLine.isEmpty()) {
+                addBlankMarker(lines);
                 continue;
             }
             if (isBulletLine(cleanLine)) {
@@ -508,6 +531,11 @@ public class QuestionDocumentImportService {
         // Sau khi gặp "Giải thích:", các dòng tiếp theo gom vào explanation
         // cho đến khi gặp câu mới / passage mới / option mới.
         private boolean inExplanation = false;
+        // True khi vừa gặp 1 dòng trống trong khối explanation -> dòng explanation
+        // kế tiếp sẽ ngăn cách bằng dòng trống ("\n\n") thay vì 1 lần xuống dòng.
+        private boolean pendingExplanationBlank = false;
+        // Tương tự cho passage header (nội dung gốc / bản dịch): giữ khoảng cách đoạn.
+        private boolean pendingPassageBlank = false;
 
         LineProcessor(QuestionCollector collector) {
             this.collector = collector;
@@ -525,6 +553,23 @@ public class QuestionDocumentImportService {
         }
 
         private void handleLine(ParsedLine pl) {
+            // Dòng trống: chỉ có ý nghĩa khi đang trong khối "Giải thích:" — đánh dấu
+            // để ngăn cách đoạn. Ngoài explanation thì bỏ qua (không phải nội dung).
+            if (pl.blank) {
+                if (inExplanation && currentQuestion != null
+                        && currentQuestion.explanation != null
+                        && !currentQuestion.explanation.isBlank()) {
+                    pendingExplanationBlank = true;
+                } else if (inPassageHeader) {
+                    // Giữ khoảng cách đoạn cho nội dung gốc / bản dịch của passage.
+                    StringBuilder target = inPassageTranslation ? pendingTranslation : pendingText;
+                    if (target.length() > 0) {
+                        pendingPassageBlank = true;
+                    }
+                }
+                return;
+            }
+
             String text = pl.text;
             if (isSkippableLine(text)) {
                 return;
@@ -541,6 +586,7 @@ public class QuestionDocumentImportService {
                     pendingTranslation.setLength(0);
                     passageSegments.clear();
                     inPassageTranslation = false;
+                    pendingPassageBlank = false;
                     String extraText = pm.group(2);
                     if (extraText != null && !extraText.trim().isEmpty()) {
                         pendingText.append(extraText.trim());
@@ -566,6 +612,7 @@ public class QuestionDocumentImportService {
                 }
                 pendingText.setLength(0);
                 pendingTranslation.setLength(0);
+                pendingPassageBlank = false;
                 currentQuestion = new ParsedQuestion(qm.group(1), extractQuestionText(qm));
                 lastLabel = null;
                 return;
@@ -576,6 +623,8 @@ public class QuestionDocumentImportService {
                 Matcher tm = TRANSLATION_START_PATTERN.matcher(text);
                 if (tm.matches()) {
                     inPassageTranslation = true;
+                    // Chuyển buffer content -> translation: bỏ blank pending của content.
+                    pendingPassageBlank = false;
                     String tail = tm.group(1) == null ? "" : tm.group(1).trim();
                     if (!tail.isEmpty()) {
                         if (pendingTranslation.length() > 0) {
@@ -597,6 +646,8 @@ public class QuestionDocumentImportService {
                         passageSegments.add(seg);
                     }
                     pendingText.setLength(0);
+                    // "Đoạn N:" là ngắt đoạn cứng -> bỏ blank pending trước đó.
+                    pendingPassageBlank = false;
                     String tail = sm.group(2) == null ? "" : sm.group(2).trim();
                     if (!tail.isEmpty()) {
                         pendingText.append(tail);
@@ -633,11 +684,11 @@ public class QuestionDocumentImportService {
                     // chỉ append phần body.
                     String tail = em.group(1) == null ? "" : em.group(1).trim();
                     if (!tail.isEmpty()) {
-                        currentQuestion.explanation = appendLine(currentQuestion.explanation, tail, "\n");
+                        appendExplanation(tail);
                     }
                     return;
                 }
-                currentQuestion.explanation = appendLine(currentQuestion.explanation, text, "\n");
+                appendExplanation(text);
                 return;
             }
 
@@ -657,9 +708,10 @@ public class QuestionDocumentImportService {
                 Matcher em = EXPLANATION_START_PATTERN.matcher(text);
                 if (em.matches()) {
                     inExplanation = true;
+                    pendingExplanationBlank = false;
                     String tail = em.group(1) == null ? "" : em.group(1).trim();
                     if (!tail.isEmpty()) {
-                        currentQuestion.explanation = appendLine(currentQuestion.explanation, tail, "\n");
+                        appendExplanation(tail);
                     }
                     return;
                 }
@@ -667,6 +719,18 @@ public class QuestionDocumentImportService {
 
             // (5) Dòng tiếp nối thường (không phải explanation)
             handleContinuationLine(text);
+        }
+
+        /**
+         * Append 1 dòng vào explanation. Nếu trước đó có dòng trống ngăn cách
+         * (pendingExplanationBlank) thì dùng "\n\n" để giữ khoảng cách đoạn,
+         * ngược lại chỉ xuống dòng đơn "\n". Frontend render pre-wrap nên "\n\n"
+         * hiển thị thành 1 dòng trống giữa 2 đoạn.
+         */
+        private void appendExplanation(String addition) {
+            String separator = pendingExplanationBlank ? "\n\n" : "\n";
+            currentQuestion.explanation = appendLine(currentQuestion.explanation, addition, separator);
+            pendingExplanationBlank = false;
         }
 
         /**
@@ -745,8 +809,10 @@ public class QuestionDocumentImportService {
                 // Sau marker "Dịch:" -> gom vào bản dịch; trước đó -> content gốc.
                 StringBuilder target = inPassageTranslation ? pendingTranslation : pendingText;
                 if (target.length() > 0) {
-                    target.append("\n");
+                    // Giữ dòng trống ngăn cách đoạn (pendingPassageBlank) thành "\n\n".
+                    target.append(pendingPassageBlank ? "\n\n" : "\n");
                 }
+                pendingPassageBlank = false;
                 target.append(text);
                 return;
             }
@@ -1250,10 +1316,24 @@ public class QuestionDocumentImportService {
     private static class ParsedLine {
         final String text;
         final boolean isStyled;
+        // Đánh dấu dòng trống (ngăn cách đoạn). KHÔNG mang nội dung — chỉ dùng để
+        // giữ khoảng cách giữa các đoạn trong khối "Giải thích:".
+        final boolean blank;
 
         ParsedLine(String text, boolean isStyled) {
             this.text = text;
             this.isStyled = isStyled;
+            this.blank = false;
+        }
+
+        private ParsedLine() {
+            this.text = "";
+            this.isStyled = false;
+            this.blank = true;
+        }
+
+        static ParsedLine blankMarker() {
+            return new ParsedLine();
         }
     }
 
