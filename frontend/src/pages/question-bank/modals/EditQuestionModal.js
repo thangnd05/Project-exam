@@ -682,8 +682,8 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
               <Col md={12} className="mt-3">
                 <div className={cx('sectionTitle')}>Giải thích đáp án (không bắt buộc)</div>
                 <textarea
-                  className={cxCreate('inputModern')}
-                  rows={3}
+                  className={cxCreate('inputModern', 'explanationTextarea')}
+                  rows={6}
                   value={formData.explanation}
                   onChange={(e) =>
                     setFormData({ ...formData, explanation: e.target.value })

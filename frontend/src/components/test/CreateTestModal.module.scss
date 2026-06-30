@@ -259,6 +259,13 @@
     }
 }
 
+.explanationTextarea {
+    min-height: 180px;
+    white-space: pre-wrap;
+    line-height: 1.55;
+    resize: vertical;
+}
+
 .inputDisabled {
     background: #e2e8f0 !important;
     color: #64748b !important;

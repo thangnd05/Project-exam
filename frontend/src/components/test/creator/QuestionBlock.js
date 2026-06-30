@@ -173,8 +173,8 @@ const QuestionBlock = ({
             <div className="mt-3">
                 <label className="fw-bold mb-1 d-block">Giải thích đáp án (không bắt buộc)</label>
                 <textarea
-                    className={cx('inputModern')}
-                    rows={2}
+                    className={cx('inputModern', 'explanationTextarea')}
+                    rows={6}
                     placeholder="Nhập giải thích đáp án (hiển thị cho học sinh khi xem lại bài)..."
                     value={question.explanation || ''}
                     onChange={(e) => updateQuestionFieldFn?.(index, 'explanation', e.target.value)}
