@@ -48,6 +48,7 @@ public class EnhancedResultService {
     private final TagRepository tagRepository;
     private final UserTargetRepository userTargetRepository;
     private final UserTargetPartRepository userTargetPartRepository;
+    private final ExamTypeRepository examTypeRepository;
 
     public EnhancedResultDto getEnhancedResult(String userTestId, String currentUserId) {
         UserTest userTest = userTestRepository.findById(userTestId)
@@ -82,6 +83,10 @@ public class EnhancedResultService {
         // 1. Load test metadata
         Test test = testRepository.findById(userTest.getTestId())
                 .orElseThrow(() -> new NotFoundException("Test not found"));
+
+        String examTypeName = test.getExamTypeId() != null
+                ? examTypeRepository.findById(test.getExamTypeId()).map(ExamType::getName).orElse(null)
+                : null;
 
         String examCategoryCode = null;
         if (test.getExamCategoryId() != null) {
@@ -164,6 +169,8 @@ public class EnhancedResultService {
 
         Set<String> skillIds = examPartMap.values().stream()
                 .map(ExamPart::getSkillId)
+                .filter(Objects::nonNull)
+                .filter(id -> !id.isBlank())
                 .collect(Collectors.toSet());
 
         Map<String, Skill> skillMap = skillRepository.findAllById(skillIds).stream()
@@ -202,11 +209,11 @@ public class EnhancedResultService {
         // 8. Build Part breakdown (tầng 2.5 + tầng 3)
         List<PartBreakdownDto> partBreakdown = buildPartBreakdown(
                 questionMap, correctnessMap, statusMap, questionNumberMap,
-                examPartMap, skillMap, tagsByQuestion, tagMap, targetParts);
+                examPartMap, skillMap, tagsByQuestion, tagMap, targetParts, examTypeName);
 
         // 9. Build Skill breakdown (tầng 2) - aggregate from parts
         List<SkillBreakdownDto> skillBreakdown = buildSkillBreakdown(
-                partBreakdown, test.getExamTypeId(), skillMap);
+                partBreakdown, test.getExamTypeId(), skillMap, examTypeName);
 
         // 9. Calculate readiness
         double overallPercentage = totalQuestions > 0
@@ -284,12 +291,13 @@ public class EnhancedResultService {
 
         // 15. Recovery message
         String recoveryMessage;
-        if (hasTarget && !recommendations.isEmpty()) {
+        if (hasTarget && !Boolean.TRUE.equals(isTargetMetResult)) {
             recoveryMessage = "Mục tiêu của bạn: Lấp đầy khoảng trống kiến thức để đạt target. " +
-                    "Các tài liệu dưới đây được gợi ý dựa trên những phần thi bạn chưa đạt mục tiêu đề ra.";
-        } else if (readinessScore < 85) {
+                    "Hãy lập kế hoạch học để luyện tập theo những phần thi bạn chưa đạt mục tiêu đề ra.";
+        } else if (!hasTarget && readinessScore < 85) {
             int nextTarget = Math.min(readinessScore + 10, 100);
-            recoveryMessage = "Mục tiêu: tăng readiness từ " + readinessScore + "% lên " + nextTarget + "%";
+            recoveryMessage = "Mục tiêu: tăng readiness từ " + readinessScore + "% lên " + nextTarget + "%. " +
+                    "Hãy lập kế hoạch học để luyện tập có hệ thống.";
         } else {
             recoveryMessage = null;
         }
@@ -329,6 +337,19 @@ public class EnhancedResultService {
                 ua.getAnswerText(), correctAnswers);
     }
 
+    private String resolveSkillName(Skill skill, String examTypeName) {
+        if (skill != null) {
+            String name = skill.getName();
+            if (name != null && !name.isBlank()) {
+                return name;
+            }
+        }
+        if (examTypeName != null && !examTypeName.isBlank()) {
+            return examTypeName;
+        }
+        return "Chung";
+    }
+
     private List<PartBreakdownDto> buildPartBreakdown(
             Map<String, Question> questionMap,
             Map<String, Boolean> correctnessMap,
@@ -338,7 +359,8 @@ public class EnhancedResultService {
             Map<String, Skill> skillMap,
             Map<String, List<QuestionTag>> tagsByQuestion,
             Map<String, Tag> tagMap,
-            Map<String, Integer> targetParts) {
+            Map<String, Integer> targetParts,
+            String examTypeName) {
 
         // Group questions by examPartId
         Map<String, List<String>> questionsByPart = new HashMap<>();
@@ -397,7 +419,7 @@ public class EnhancedResultService {
                     .examPartId(partId)
                     .partName(examPart.getName())
                     .skillId(examPart.getSkillId())
-                    .skillName(skill != null ? skill.getName() : "Unknown")
+                    .skillName(resolveSkillName(skill, examTypeName))
                     .correct(correct)
                     .wrong(wrong)
                     .total(total)
@@ -509,7 +531,8 @@ public class EnhancedResultService {
     private List<SkillBreakdownDto> buildSkillBreakdown(
             List<PartBreakdownDto> partBreakdown,
             String examTypeId,
-            Map<String, Skill> skillMap) {
+            Map<String, Skill> skillMap,
+            String examTypeName) {
 
         // Aggregate parts by skill
         Map<String, int[]> skillStats = new LinkedHashMap<>(); // skillId -> [correct, wrong]
@@ -542,7 +565,7 @@ public class EnhancedResultService {
 
             skills.add(SkillBreakdownDto.builder()
                     .skillId(skillId)
-                    .skillName(skill != null ? skill.getName() : "Unknown")
+                    .skillName(resolveSkillName(skill, examTypeName))
                     .correct(correct)
                     .wrong(wrong)
                     .total(total)

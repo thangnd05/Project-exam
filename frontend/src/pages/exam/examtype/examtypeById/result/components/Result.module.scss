@@ -210,103 +210,24 @@
   margin-bottom: 16px;
 }
 
-.skillGroup {
-  margin-bottom: 16px;
-}
-
-.skillGroupTitle {
-  font-size: var(--font-size-ssm, 1.4rem);
-  font-weight: 600;
-  color: #475569;
-  margin-bottom: 8px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.resourceCard {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  margin-bottom: 8px;
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-
-  &:hover {
-    border-color: #e2e8f0;
-    box-shadow: 0 4px 12px rgba(0, 97, 242, 0.06);
-  }
-}
-
-.resourceIcon {
-  color: var(--primary, #0061f2);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.resourceContent {
-  flex: 1;
-}
-
-.resourceTitle {
-  font-weight: 600;
-  font-size: var(--font-size-ssm, 1.4rem);
-  color: var(--dark-color, #1e293b);
-  margin-bottom: 2px;
-}
-
-.resourceTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.resourceTag {
-  display: inline-block;
-  font-size: 1.1rem; /* 11px */
-  padding: 2px 8px;
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #dbeafe;
-  border-radius: 12px;
-}
-
-.resourceDescription {
-  font-size: 1.3rem; /* 13px */
-  color: #64748b;
-  margin-bottom: 0;
-}
-
-.resourceActions {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  flex-shrink: 0;
-  margin-left: 4px;
-}
-
-.resourceActionLink {
-  font-size: 1.3rem; /* 13px */
-  color: var(--primary, #0061f2);
-  text-decoration: none;
-  font-weight: 600;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
+.recoveryPlanCta {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  white-space: nowrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-gradient, linear-gradient(135deg, #0061f2 0%, #0050d0 100%));
+  color: #fff;
+  font-size: var(--font-size-ssm, 1.4rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    text-decoration: underline;
-    color: #0050d0;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 97, 242, 0.25);
   }
 }

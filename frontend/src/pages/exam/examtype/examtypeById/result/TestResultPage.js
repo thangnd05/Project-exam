@@ -241,7 +241,7 @@ const TestResultPage = () => {
                   <IoSchoolOutline /> Lịch sử bài thi
                 </button>
 
-                {!isGuest && (enhanced?.examCategoryCode === 'QUICK_CHALLENGE' || enhanced?.examCategoryCode === 'FULL_MOCK') && (
+                {!isGuest && enhanced?.hasTarget && !enhanced?.isTargetMet && (
                   <button
                     className={cx("btn-review")}
                     onClick={() => navigate(
@@ -277,8 +277,12 @@ const TestResultPage = () => {
                 />
 
                 <RecoveryPlan
-                  recommendations={enhanced.recommendations}
                   recoveryMessage={enhanced.recoveryMessage}
+                  userTestId={userTestId}
+                  examTypeId={enhanced.examTypeId}
+                  hasTarget={enhanced.hasTarget}
+                  isTargetMet={enhanced.isTargetMet}
+                  isGuest={isGuest}
                 />
               </div>
             </div>
