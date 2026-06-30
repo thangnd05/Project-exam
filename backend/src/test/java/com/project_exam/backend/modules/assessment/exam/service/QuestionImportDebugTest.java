@@ -59,5 +59,36 @@ class QuestionImportDebugTest {
         System.out.println("Questions WITHOUT explanation: " + noExpl);
         System.out.println("Questions WITH empty stem    : " + emptyStem);
         System.out.println("=============================================\n");
+
+        // Dump explanation câu đầu với newline hiện rõ (¶ = \n) để kiểm tra ngăn đoạn.
+        if (!questions.isEmpty()) {
+            String expl = questions.get(0).getExplanation();
+            System.out.println("--- EXPLANATION[1] raw (¶=newline) ---");
+            System.out.println(expl == null ? "(null)" : expl.replace("\n", "¶\n"));
+            System.out.println("--------------------------------------\n");
+        }
+
+        // Cũng chạy luôn nhánh passage để xem content / translation.
+        if (Boolean.getBoolean("passage")) {
+            var groups = service.parsePassageQuestionsFromDocument(file);
+            System.out.println("\n================ PASSAGE RESULT ================");
+            System.out.println("Total passage groups: " + groups.size());
+            for (int g = 0; g < groups.size(); g++) {
+                var p = groups.get(g).getPassage();
+                System.out.println("\n###### PASSAGE " + (g + 1)
+                        + " (questions=" + (groups.get(g).getQuestions() == null ? 0 : groups.get(g).getQuestions().size()) + ")");
+                System.out.println("--- CONTENT (¶=newline) ---");
+                System.out.println(p.getContent() == null ? "(null)" : p.getContent().replace("\n", "¶\n"));
+                if (p.getExtraContents() != null && !p.getExtraContents().isEmpty()) {
+                    System.out.println("--- EXTRA CONTENTS (" + p.getExtraContents().size() + ") ---");
+                    for (int e = 0; e < p.getExtraContents().size(); e++) {
+                        System.out.println("  [extra " + e + "]: " + p.getExtraContents().get(e).replace("\n", "¶\n"));
+                    }
+                }
+                System.out.println("--- TRANSLATION (¶=newline) ---");
+                System.out.println(p.getContentTranslation() == null ? "(null)" : p.getContentTranslation().replace("\n", "¶\n"));
+            }
+            System.out.println("===============================================\n");
+        }
     }
 }

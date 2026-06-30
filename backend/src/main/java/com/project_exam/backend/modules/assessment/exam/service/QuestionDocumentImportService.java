@@ -253,7 +253,14 @@ public class QuestionDocumentImportService {
     private List<ParsedLine> extractFromDocx(byte[] bytes) throws IOException {
         // Ưu tiên Mammoth (giữ được style qua HTML để detect đáp án đúng).
         // Fallback POI khi Mammoth không trả về gì.
-        List<ParsedLine> mammothLines = extractLinesFromDocxWithMammoth(new ByteArrayInputStream(bytes));
+        //
+        // Mammoth BỎ các đoạn rỗng khi convert sang HTML -> mất dòng trống ngăn cách
+        // đoạn (vd transcript / bản dịch). Vì vậy ta tính trước "đoạn nào có dòng trống
+        // theo sau" bằng POI (giữ nguyên đoạn rỗng) rồi chèn lại blank marker vào kết
+        // quả Mammoth, căn theo thứ tự các đoạn KHÔNG rỗng.
+        List<Boolean> blankAfter = computeBlankAfterFlags(bytes);
+        List<ParsedLine> mammothLines =
+                extractLinesFromDocxWithMammoth(new ByteArrayInputStream(bytes), blankAfter);
         if (!mammothLines.isEmpty()) {
             return mammothLines;
         }
@@ -263,6 +270,35 @@ public class QuestionDocumentImportService {
             extractLinesFromDocx(docx, lines);
         }
         return lines;
+    }
+
+    /**
+     * Dùng POI tính: với mỗi đoạn (paragraph) KHÔNG rỗng theo thứ tự tài liệu, có
+     * đoạn rỗng nào ngay sau nó không (true = có dòng trống ngăn cách). Danh sách này
+     * căn 1-1 với các block không rỗng mà Mammoth tạo ra (Mammoth bỏ hết đoạn rỗng).
+     * Trả về list rỗng nếu không đọc được -> khi đó không chèn blank (an toàn).
+     */
+    private List<Boolean> computeBlankAfterFlags(byte[] bytes) {
+        List<Boolean> flags = new ArrayList<>();
+        try (InputStream is = new ByteArrayInputStream(bytes);
+             XWPFDocument docx = new XWPFDocument(is)) {
+            for (XWPFParagraph para : docx.getParagraphs()) {
+                String t = para.getParagraphText();
+                boolean empty = t == null || t.trim().isEmpty();
+                if (empty) {
+                    // Đánh dấu đoạn không rỗng gần nhất là "có dòng trống theo sau".
+                    if (!flags.isEmpty()) {
+                        flags.set(flags.size() - 1, Boolean.TRUE);
+                    }
+                } else {
+                    flags.add(Boolean.FALSE);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("computeBlankAfterFlags failed, skip blank-line preservation: {}", e.getMessage());
+            return List.of();
+        }
+        return flags;
     }
 
     private List<ParsedLine> extractFromLegacyDoc(byte[] bytes) throws IOException {
@@ -282,7 +318,7 @@ public class QuestionDocumentImportService {
         return lines;
     }
 
-    private List<ParsedLine> extractLinesFromDocxWithMammoth(InputStream is) {
+    private List<ParsedLine> extractLinesFromDocxWithMammoth(InputStream is, List<Boolean> blankAfter) {
         try {
             DocumentConverter converter = new DocumentConverter();
             Result<String> result = converter.convertToHtml(is);
@@ -293,6 +329,8 @@ public class QuestionDocumentImportService {
             Document dom = Jsoup.parse(html);
             Elements blocks = dom.select("p, li, td");
             List<ParsedLine> lines = new ArrayList<>();
+            // Chỉ số block KHÔNG rỗng, để tra blankAfter (Mammoth đã bỏ các đoạn rỗng).
+            int nonEmptyBlockIdx = 0;
             for (Element block : blocks) {
                 // Giữ <br/> (soft line break Shift+Enter trong Word) thành xuống dòng.
                 // block.text() gộp hết <br> thành 1 dòng, làm "Câu 7.A.B. *C.Giải thích:
@@ -338,6 +376,13 @@ public class QuestionDocumentImportService {
                         lines.add(new ParsedLine(cleanSeg, isStyled));
                     }
                 }
+                // Đoạn (không rỗng) này có dòng trống theo sau trong file Word gốc?
+                // -> chèn blank marker để giữ ngăn cách đoạn (Mammoth đã bỏ đoạn rỗng).
+                if (blankAfter != null && nonEmptyBlockIdx < blankAfter.size()
+                        && Boolean.TRUE.equals(blankAfter.get(nonEmptyBlockIdx))) {
+                    addBlankMarker(lines);
+                }
+                nonEmptyBlockIdx++;
             }
             return lines;
         } catch (Exception e) {
