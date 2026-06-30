@@ -845,8 +845,8 @@ function TestStartPage() {
                 aria-expanded={showInfoPanel}
                 aria-label={
                   showInfoPanel
-                    ? 'Ẩn thời gian và danh sách câu'
-                    : 'Xem thời gian và danh sách câu'
+                    ? 'Ẩn danh sách câu hỏi'
+                    : 'Xem danh sách câu hỏi'
                 }
               >
                 {showInfoPanel ? (

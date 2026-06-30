@@ -123,41 +123,6 @@
   width: 100%;
 }
 
-.dashboard-timer {
-  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-  border: 1px solid #fecdd3;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 20px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.05);
-
-  .timer-label {
-    font-size: 1rem;
-    font-weight: 800;
-    color: #e11d48;
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
-    opacity: 0.8;
-  }
-
-  .timer-value {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 2.4rem;
-    font-weight: 900;
-    color: #e11d48;
-    font-family: 'JetBrains Mono', monospace;
-
-    .timer-icon {
-      font-size: 2.22rem;
-      animation: pulse 1.5s infinite ease-in-out;
-    }
-  }
-}
-
 .dashboard-card {
   background: white;
   border-radius: var(--radius-lg);
@@ -710,7 +675,7 @@
   min-height: 150px;
 }
 
-/* --- Footer: panel thời gian & câu hỏi + nút Nộp bài --- */
+/* --- Footer: panel danh sách câu hỏi + nút Nộp bài --- */
 .footer-actions {
   position: fixed;
   bottom: 0;
@@ -740,11 +705,6 @@
     margin: 0 auto;
     max-width: 560px;
     padding: 16px 20px;
-  }
-
-  .dashboard-timer {
-    margin-bottom: 12px;
-    padding: 12px;
   }
 
   .dashboard-header {
@@ -779,7 +739,7 @@
   justify-content: center;
   gap: 8px;
   min-width: 220px;
-  /* Bằng nhau khi "Thời gian & Câu hỏi" / "Ẩn" */
+  /* Bằng nhau khi "Câu hỏi" / "Ẩn" */
   padding: 10px 20px;
   border-radius: 50px;
   border: 2px solid #e2e8f0;
@@ -891,22 +851,5 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(0, 97, 242, 0.25);
     }
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.05);
-    opacity: 0.8;
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 1;
   }
 }
