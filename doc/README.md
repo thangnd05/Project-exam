@@ -28,52 +28,53 @@
 
 ```
 doc/
-├── README.md                 ← Bạn đang ở đây
-├── _shared/                  ← Lý thuyết dùng chung giữa các Part
-│   ├── INDEX.md              ← Bản đồ nội dung shared
-│   ├── listening-part3-part4/  ← 7 tag Listening (P3 + P4)
-│   ├── reading-grammar/        ← 7 tag ngữ pháp (P5 + P6)
-│   └── sentence-insertion/       ← Điền câu (P6 + P7)
-├── part-01/ … part-07/       ← Mỗi Part: overview + file tag
+├── README.md           ← Bạn đang ở đây
+├── TAG-INDEX.md        ← Tag name → guide + anchor (recovery mapping)
+├── part-01/guide.md    ← Part 1 — Photographs
+├── part-02/guide.md    ← Part 2 — Question-Response
+├── part-03/guide.md    ← Part 3 — Conversations
+├── part-04/guide.md    ← Part 4 — Talks
+├── part-05/guide.md    ← Part 5 — Incomplete Sentences
+├── part-06/guide.md    ← Part 6 — Text Completion
+└── part-07/guide.md    ← Part 7 — Reading Comprehension
 ```
 
-> **Lưu ý:** Các file `part-0X-*.md` ở thư mục gốc `doc/` đã được **tách và chuyển** vào cấu trúc thư mục trên. Không còn dùng file phẳng cũ.
+Mỗi `guide.md` là **tài liệu tự chứa**: overview, chiến thuật, bẫy, từ vựng/ngữ pháp và lý thuyết + mini-practice theo từng tag.
 
 ## Danh mục theo Part
 
-| Part | Overview | Nội dung |
-|------|----------|----------|
-| 1 | [part-01/overview.md](./part-01/overview.md) | Photographs — 2 tag riêng |
-| 2 | [part-02/overview.md](./part-02/overview.md) | Question-Response — 13 tag riêng |
-| 3 | [part-03/overview.md](./part-03/overview.md) | Conversations — 7 tag (link shared) |
-| 4 | [part-04/overview.md](./part-04/overview.md) | Talks — 7 tag (link shared) |
-| 5 | [part-05/overview.md](./part-05/overview.md) | Incomplete Sentences — 7 tag ngữ pháp (link shared) |
-| 6 | [part-06/overview.md](./part-06/overview.md) | Text Completion — 7 tag + điền câu |
-| 7 | [part-07/overview.md](./part-07/overview.md) | Reading Comprehension — 4 tag riêng + link shared |
+| Part | Guide | Nội dung chính |
+|------|-------|----------------|
+| 1 | [part-01/guide.md](./part-01/guide.md) | Photographs — tranh tả người, tranh tả vật |
+| 2 | [part-02/guide.md](./part-02/guide.md) | Question-Response — 13 tag Wh-/Yes-No/đề nghị... |
+| 3 | [part-03/guide.md](./part-03/guide.md) | Conversations — 7 tag listening (nội dung đầy đủ inline) |
+| 4 | [part-04/guide.md](./part-04/guide.md) | Talks — 7 tag listening (nội dung đầy đủ inline) |
+| 5 | [part-05/guide.md](./part-05/guide.md) | Incomplete Sentences — 7 tag ngữ pháp |
+| 6 | [part-06/guide.md](./part-06/guide.md) | Text Completion — ngữ pháp + điền câu |
+| 7 | [part-07/guide.md](./part-07/guide.md) | Reading Comprehension — suy luận, NOT, đồng nghĩa, liên kết văn bản |
 
-**Bản đồ shared:** [_shared/INDEX.md](./_shared/INDEX.md)
+**Tra cứu tag:** [TAG-INDEX.md](./TAG-INDEX.md)
 
 ## Lộ trình học gợi ý (8 tuần → 750+)
 
 | Tuần | Trọng tâm | Việc làm |
 |------|-----------|----------|
-| 1 | Part 1 + 2 | Đọc overview → học tag → mini-practice |
+| 1 | Part 1 + 2 | Đọc guide → học tag → mini-practice |
 | 2 | Part 1 + 2 | Luyện đề + error log |
-| 3 | Part 3 + 4 | Đọc [_shared/listening-part3-part4/](./_shared/listening-part3-part4/README.md) trước, sau đó ghi chú riêng từng Part |
+| 3 | Part 3 + 4 | Đọc guide Part 3 rồi Part 4 (mỗi guide tự chứa đủ lý thuyết) |
 | 4 | Part 3 + 4 | Full listening Part 3–4 |
-| 5 | Part 5 + 6 | Đọc [_shared/reading-grammar/](./_shared/reading-grammar/README.md) → Part 5 rồi Part 6 |
-| 6 | Part 7 | Tag riêng (suy luận, NOT, đồng nghĩa, liên kết văn bản) |
+| 5 | Part 5 + 6 | Guide Part 5 → Part 6 |
+| 6 | Part 7 | Guide Part 7 — tag riêng + điền câu |
 | 7 | Part 7 + review | Double/triple passage + điền câu |
 | 8 | Full test | Mock 2 lần/tuần + review error log |
 
 ## Cách sử dụng
 
-1. **Bắt đầu từ `overview.md`** của Part — nắm thời gian, quy trình, checklist.
-2. **Học tag** — file riêng (Part 1, 2, 7) hoặc `_shared/` + ghi chú Part (3–6).
-3. **Làm Mini-Practice** trong từng file tag — đọc giải thích, không chỉ xem đáp án.
-4. **Ghi Error log** theo mẫu trong overview.
-5. **Ôn shared trước** khi học Part 3 & 4 hoặc 5 & 6 cùng lúc — tránh đọc trùng lặp.
+1. **Mở `guide.md`** của Part — nắm thời gian, quy trình, checklist.
+2. **Học từng tag** — mục `## Tag: ...` trong guide (hoặc tra [TAG-INDEX.md](./TAG-INDEX.md)).
+3. **Làm Mini-Practice** — đọc giải thích, không chỉ xem đáp án.
+4. **Ghi Error log** theo mẫu trong guide.
 
 ---
 
-*Tài liệu TOEIC 750+ — 7 Part Listening & Reading, cấu trúc modular.*
+*Tài liệu TOEIC 750+ — 7 Part Listening & Reading, 7 guide tự chứa.*

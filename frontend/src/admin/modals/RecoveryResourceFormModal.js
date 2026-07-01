@@ -8,6 +8,9 @@ function RecoveryResourceFormModal({
   show,
   isEditing,
   formState,
+  examTypes,
+  formExamTypeId,
+  onExamTypeChange,
   availableTags,
   selectedFile,
   onChangeField,
@@ -85,16 +88,39 @@ function RecoveryResourceFormModal({
           />
         </Form.Group>
 
-        {availableTags.length > 0 && (
-          <Form.Group className="mb-3">
+        <Form.Group className="mb-3">
+          <Form.Label>Loại kỳ thi (để chọn tag)</Form.Label>
+          <Form.Select
+            value={formExamTypeId}
+            onChange={(e) => onExamTypeChange(e.target.value)}
+          >
+            <option value="">— Chọn loại kỳ thi —</option>
+            {examTypes.map((et) => (
+              <option key={et.id} value={et.id}>
+                {et.name}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          {!formExamTypeId ? (
+            <Form.Text className="text-muted">
+              Chọn loại kỳ thi ở trên để gắn hoặc thay đổi tag cho tài liệu.
+            </Form.Text>
+          ) : availableTags.length > 0 ? (
             <TagSelector
               tags={availableTags}
               selectedIds={selectedTagIds}
               onToggle={onToggleTag}
               label="Gắn Tag (liên kết kiến thức)"
             />
-          </Form.Group>
-        )}
+          ) : (
+            <Form.Text className="text-muted">
+              Loại kỳ thi này chưa có tag. Tạo tag tại mục Quản lý Tag trước.
+            </Form.Text>
+          )}
+        </Form.Group>
     </BaseModal>
   );
 }

@@ -127,6 +127,8 @@ function RecoveryResourcesManagement() {
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingResource, setDeletingResource] = useState(null);
   const [selectedParentTagId, setSelectedParentTagId] = useState('');
+  const [formExamTypeId, setFormExamTypeId] = useState('');
+  const [formAvailableTags, setFormAvailableTags] = useState([]);
 
   useEffect(() => {
     getExamTypes()
@@ -155,6 +157,20 @@ function RecoveryResourcesManagement() {
         setSelectedParentTagId('');
       });
   }, [selectedExamTypeId]);
+
+  useEffect(() => {
+    if (!formExamTypeId) {
+      setFormAvailableTags([]);
+      return;
+    }
+    getTagsFlatByExamType(formExamTypeId)
+      .then((tags) => {
+        setFormAvailableTags(Array.isArray(tags) ? tags : []);
+      })
+      .catch(() => {
+        setFormAvailableTags([]);
+      });
+  }, [formExamTypeId]);
 
   const fetchResources = useCallback(async () => {
     setLoading(true);
@@ -303,15 +319,19 @@ function RecoveryResourcesManagement() {
     setFormState(emptyForm);
     setEditingId(null);
     setSelectedFile(null);
+    setFormExamTypeId('');
+    setFormAvailableTags([]);
     setErrorMessage('');
   };
 
   const openCreateModal = () => {
     resetForm();
+    setFormExamTypeId(selectedExamTypeId || '');
     setShowFormModal(true);
   };
 
   const openEditModal = (resource) => {
+    const tagExamTypeId = (resource.tags || []).find((t) => t.examTypeId)?.examTypeId;
     setEditingId(resource.resourceId);
     setFormState({
       title: resource.title,
@@ -320,6 +340,9 @@ function RecoveryResourcesManagement() {
       tagIds: (resource.tags || []).map((t) => t.tagId),
     });
     setSelectedFile(null);
+    setFormExamTypeId(
+      tagExamTypeId ? String(tagExamTypeId) : selectedExamTypeId || '',
+    );
     setShowFormModal(true);
   };
 
@@ -500,7 +523,10 @@ function RecoveryResourcesManagement() {
         show={showFormModal}
         isEditing={Boolean(editingId)}
         formState={formState}
-        availableTags={availableTags}
+        examTypes={examTypes}
+        formExamTypeId={formExamTypeId}
+        onExamTypeChange={setFormExamTypeId}
+        availableTags={formAvailableTags}
         selectedFile={selectedFile}
         onChangeField={(field, value) =>
           setFormState((prev) => ({...prev, [field]: value}))
