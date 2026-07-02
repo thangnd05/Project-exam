@@ -23,6 +23,7 @@ const defaultFormState = {
   description: '',
   parentId: '',
   examTypeId: '',
+  displayOrder: '',
 };
 
 const mapCollectionFromApi = (collection) => ({
@@ -38,6 +39,7 @@ const mapCollectionFromApi = (collection) => ({
       ? collection.totalQuestionCount
       : (typeof collection.questionCount === 'number' ? collection.questionCount : 0),
   exam_type_id: collection.examTypeId ? String(collection.examTypeId) : '',
+  display_order: typeof collection.displayOrder === 'number' ? collection.displayOrder : null,
 });
 
 const extractApiErrorMessage = (error, fallback) =>
@@ -189,10 +191,17 @@ function QuestionCollectionsManagement() {
         roots.push(c);
       }
     });
-    const byName = (a, b) => a.name.localeCompare(b.name);
+    // Sắp theo vị trí (display_order) đặt tay trước; chưa đặt (null) xuống cuối và
+    // sắp theo tên numeric-aware nên "ETS 2026 2" đứng trước "ETS 2026 10".
+    const byOrder = (a, b) => {
+      const ao = a.display_order == null ? Number.MAX_SAFE_INTEGER : a.display_order;
+      const bo = b.display_order == null ? Number.MAX_SAFE_INTEGER : b.display_order;
+      if (ao !== bo) return ao - bo;
+      return a.name.localeCompare(b.name, 'vi', {numeric: true});
+    };
     return roots
-      .sort(byName)
-      .map((root) => ({...root, children: (childrenOf.get(root.collection_id) || []).sort(byName)}));
+      .sort(byOrder)
+      .map((root) => ({...root, children: (childrenOf.get(root.collection_id) || []).sort(byOrder)}));
   }, [collectionList]);
 
   const toggleExpand = useCallback((id) => {
@@ -234,7 +243,7 @@ function QuestionCollectionsManagement() {
   const openCreateChildModal = (parent) => {
     resetForm();
     // Con kế thừa examType của cha — set sẵn để hiển thị (BE cũng tự ép theo cha).
-    setFormState({name: '', description: '', parentId: parent.collection_id, examTypeId: parent.exam_type_id || ''});
+    setFormState({name: '', description: '', parentId: parent.collection_id, examTypeId: parent.exam_type_id || '', displayOrder: ''});
     setShowModal(true);
   };
 
@@ -245,6 +254,7 @@ function QuestionCollectionsManagement() {
       description: collection.description || '',
       parentId: collection.parent_id || '',
       examTypeId: collection.exam_type_id || '',
+      displayOrder: collection.display_order == null ? '' : String(collection.display_order),
     });
     setErrorMessage('');
     setShowModal(true);
@@ -262,12 +272,16 @@ function QuestionCollectionsManagement() {
     try {
       // Luôn gửi parentId (chuỗi rỗng = gỡ cha / cấp 1) để backend cập nhật đúng.
       const payloadParentId = editingId && editingHasChildren ? '' : (formState.parentId || '');
+      // Vị trí sắp xếp: để trống = null (không đặt / không đổi). Chỉ gửi số hợp lệ.
+      const trimmedOrder = String(formState.displayOrder).trim();
+      const parsedOrder = trimmedOrder === '' ? null : Number.parseInt(trimmedOrder, 10);
       const payload = {
         name: normalizedName,
         description: formState.description.trim(),
         parentId: payloadParentId,
         // examTypeId chỉ ý nghĩa với collection cha; con để BE tự kế thừa.
         examTypeId: payloadParentId ? '' : (formState.examTypeId || ''),
+        displayOrder: Number.isNaN(parsedOrder) ? null : parsedOrder,
       };
 
       if (editingId) {
@@ -401,6 +415,18 @@ function QuestionCollectionsManagement() {
             onChange={(event) => setFormState((prev) => ({...prev, name: event.target.value}))}
             placeholder="VD: ETS 2026, ETS 2026 1, Cambridge 16..."
           />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Vị trí sắp xếp (tùy chọn)</Form.Label>
+          <Form.Control
+            type="number"
+            value={formState.displayOrder}
+            onChange={(event) => setFormState((prev) => ({...prev, displayOrder: event.target.value}))}
+            placeholder="VD: 1, 2, 3... (số nhỏ lên trước)"
+          />
+          <Form.Text muted>
+            Đặt số để ghim thứ tự hiển thị. Để trống thì tự sắp theo tên (ví dụ "ETS 2026 2" đứng trước "ETS 2026 10").
+          </Form.Text>
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Thuộc nhóm cha (tùy chọn)</Form.Label>

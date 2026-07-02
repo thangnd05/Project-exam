@@ -30,4 +30,7 @@ public class QuestionCollectionResponse {
 
     /** Loại kỳ thi gắn với collection (cha set trực tiếp, con kế thừa từ cha). */
     private String examTypeId;
+
+    /** Thứ tự hiển thị (số nhỏ lên trước). null = chưa đặt, FE sắp theo tên numeric-aware. */
+    private Integer displayOrder;
 }

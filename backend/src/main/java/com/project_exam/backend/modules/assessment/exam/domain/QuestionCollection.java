@@ -40,4 +40,12 @@ public class QuestionCollection {
      */
     @Column(name = "exam_type_id")
     private String examTypeId;
+
+    /**
+     * Thứ tự hiển thị trong danh sách/cây (số nhỏ lên trước). null = chưa đặt,
+     * khi đó FE sắp theo tên (numeric-aware, "ETS 2026 2" trước "ETS 2026 10").
+     * Cho phép admin ghim vị trí cố định cho từng bộ sưu tập.
+     */
+    @Column(name = "display_order")
+    private Integer displayOrder;
 }

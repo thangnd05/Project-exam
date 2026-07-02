@@ -26,6 +26,7 @@ public class QuestionCollectionMapper {
                 .childCount(childCount)
                 .totalQuestionCount(totalQuestionCount)
                 .examTypeId(collection.getExamTypeId())
+                .displayOrder(collection.getDisplayOrder())
                 .build();
     }
 }

@@ -56,6 +56,8 @@ public class QuestionCollectionService {
         collection.setParentId(parentId);
         // Cha: examType lấy từ request; con: kế thừa examType của cha.
         collection.setExamTypeId(resolveExamTypeId(parentId, request.getExamTypeId()));
+        // Vị trí sắp xếp (tùy chọn). null = chưa đặt → FE sắp theo tên numeric-aware.
+        collection.setDisplayOrder(request.getDisplayOrder());
         collection = collectionRepository.save(collection);
         return toResponse(collection);
     }
@@ -100,6 +102,11 @@ public class QuestionCollectionService {
             List<QuestionCollection> children = collectionRepository.findByParentId(id);
             children.forEach(c -> c.setExamTypeId(newExamTypeId));
             if (!children.isEmpty()) collectionRepository.saveAll(children);
+        }
+
+        // displayOrder: chỉ cập nhật khi request có gửi (khác null) — để trống = giữ nguyên vị trí cũ.
+        if (request.getDisplayOrder() != null) {
+            collection.setDisplayOrder(request.getDisplayOrder());
         }
 
         collection = collectionRepository.save(collection);

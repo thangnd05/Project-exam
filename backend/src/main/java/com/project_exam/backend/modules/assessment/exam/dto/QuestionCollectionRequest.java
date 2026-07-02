@@ -16,4 +16,9 @@ public class QuestionCollectionRequest {
      * collection con tự kế thừa từ cha nên field này bị bỏ qua khi có parentId.
      */
     private String examTypeId;
+    /**
+     * Thứ tự hiển thị (số nhỏ lên trước). null = không đặt / không thay đổi (khi cập nhật);
+     * khi không đặt, FE sắp theo tên numeric-aware.
+     */
+    private Integer displayOrder;
 }
