@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,15 @@ public class QuestionCollectionService {
     private final QuestionCollectionMapper questionCollectionMapper;
 
     public List<QuestionCollectionResponse> findAll() {
+        // Base order: displayOrder tăng dần (chưa đặt = null → xuống cuối), rồi theo tên.
+        // FE vẫn sắp lại numeric-aware ("ETS 2026 2" trước "ETS 2026 10") khi dựng cây.
+        Comparator<QuestionCollection> byOrderThenName = Comparator
+                .comparing(QuestionCollection::getDisplayOrder,
+                        Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(c -> c.getName() == null ? "" : c.getName(),
+                        String.CASE_INSENSITIVE_ORDER);
         return collectionRepository.findAll().stream()
+                .sorted(byOrderThenName)
                 .map(this::toResponse)
                 .toList();
     }

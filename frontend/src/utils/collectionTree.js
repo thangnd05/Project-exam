@@ -24,12 +24,26 @@ export const buildCollectionTree = (list) => {
     }
   });
 
-  const byName = (a, b) => (a.name || '').localeCompare(b.name || '');
+  // Ưu tiên displayOrder (số nhỏ lên trước, chưa đặt => xuống cuối), sau đó so tên
+  // theo kiểu numeric-aware để "ETS 2026 2" đứng trước "ETS 2026 10" (không bị 1,10,2...).
+  const orderOf = (c) =>
+    c.displayOrder == null || Number.isNaN(Number(c.displayOrder))
+      ? Number.POSITIVE_INFINITY
+      : Number(c.displayOrder);
+  const byOrderThenName = (a, b) => {
+    const oa = orderOf(a);
+    const ob = orderOf(b);
+    if (oa !== ob) return oa - ob;
+    return (a.name || '').localeCompare(b.name || '', undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    });
+  };
   const ordered = [];
-  roots.sort(byName).forEach((root) => {
+  roots.sort(byOrderThenName).forEach((root) => {
     ordered.push({ ...root, parentId: null, depth: 0 });
     (childrenOf.get(String(root.collectionId)) || [])
-      .sort(byName)
+      .sort(byOrderThenName)
       .forEach((child) =>
         ordered.push({ ...child, parentId: String(root.parentId ? root.parentId : root.collectionId), depth: 1 }),
       );

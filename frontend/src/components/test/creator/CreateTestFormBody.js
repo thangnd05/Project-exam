@@ -105,6 +105,7 @@ const CreateTestFormBody = ({
   const [groupDocumentFiles, setGroupDocumentFiles] = useState({});
   const [bulkPassageFile, setBulkPassageFile] = useState(null);
   const [collapsedGroups, setCollapsedGroups] = useState(() => new Set());
+  const [collapsedQuestions, setCollapsedQuestions] = useState(() => new Set());
 
   useEffect(() => {
     if (mode === 'class' && classId) {
@@ -129,6 +130,26 @@ const CreateTestFormBody = ({
         next.delete(gIndex);
       } else {
         next.add(gIndex);
+      }
+      return next;
+    });
+  };
+
+  // Đồng bộ tập câu hỏi bị thu gọn khi số lượng câu hỏi thay đổi (xóa index không còn tồn tại).
+  useEffect(() => {
+    setCollapsedQuestions((prev) => {
+      const next = new Set([...prev].filter((i) => i < questions.length));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [questions.length]);
+
+  const toggleQuestionCollapsed = (qIndex) => {
+    setCollapsedQuestions((prev) => {
+      const next = new Set(prev);
+      if (next.has(qIndex)) {
+        next.delete(qIndex);
+      } else {
+        next.add(qIndex);
       }
       return next;
     });
@@ -595,6 +616,9 @@ const CreateTestFormBody = ({
               setPassageTypeFn={setPassageType}
               availableTags={availableTags}
               minQuestions={questions.length}
+              collapsible
+              isCollapsed={collapsedQuestions.has(i)}
+              onToggleCollapsed={toggleQuestionCollapsed}
             />
           ))}
         </>

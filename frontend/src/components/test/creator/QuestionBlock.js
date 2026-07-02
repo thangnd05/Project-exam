@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { PlusCircle, Trash } from 'lucide-react';
+import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
 import TagSelector from '../../common/TagSelector/TagSelector';
@@ -8,6 +8,21 @@ import TagSelector from '../../common/TagSelector/TagSelector';
 const cx = classNames.bind(styles);
 
 const ACCEPT_MEDIA = 'image/*,audio/*';
+
+// Tóm tắt ngắn hiển thị trên header khi câu hỏi bị thu gọn (giống badge của nhóm passage).
+const getQuestionSummary = (question) => {
+    const text = (question.questionText || '').trim();
+    const preview = text
+        ? (text.length > 60 ? `${text.slice(0, 60)}…` : text)
+        : 'Chưa có nội dung';
+    const answers = question.answers || [];
+    const correctCount = answers.filter((a) => a.isCorrect).length;
+    const parts = [preview, `${answers.length} đáp án`];
+    if (correctCount > 0) {
+        parts.push(`${correctCount} đúng`);
+    }
+    return parts.join(' · ');
+};
 
 const QuestionBlock = ({
     question,
@@ -25,13 +40,31 @@ const QuestionBlock = ({
     withMedia = true,
     minQuestions = 1,
     radioGroupPrefix = 'q',
+    collapsible = false,
+    isCollapsed = false,
+    onToggleCollapsed,
 }) => {
     const selectedTagIds = question.tagIds || [];
     const isMsq = question.questionType === 'MSQ';
+    const collapsed = collapsible && isCollapsed;
     return (
-        <div className={cx('partBlock')}>
-            <div className="d-flex justify-content-between align-items-center mb-2">
-                <b>Câu hỏi số {index + 1}</b>
+        <div className={cx('partBlock', { collapsed })}>
+            <div className={collapsible ? cx('groupHeader') : 'd-flex justify-content-between align-items-center mb-2'}>
+                {collapsible ? (
+                    <button
+                        type="button"
+                        className={cx('groupToggleBtn')}
+                        onClick={() => onToggleCollapsed?.(index)}
+                        aria-expanded={!isCollapsed}
+                        aria-label={isCollapsed ? `Mở câu hỏi số ${index + 1}` : `Thu gọn câu hỏi số ${index + 1}`}
+                    >
+                        {isCollapsed ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
+                        <h4 className={cx('groupTitle')}>Câu hỏi số {index + 1}</h4>
+                        <span className={cx('groupSummaryBadge')}>{getQuestionSummary(question)}</span>
+                    </button>
+                ) : (
+                    <b>Câu hỏi số {index + 1}</b>
+                )}
                 <div className="d-flex align-items-center gap-3">
                     <label className="d-flex align-items-center gap-1 mb-0" style={{ fontSize: '1.3rem', cursor: 'pointer' }} title="Cho phép nhiều đáp án đúng (chấm đúng-hết)">
                         <input
@@ -54,6 +87,8 @@ const QuestionBlock = ({
                 </div>
             </div>
 
+            {!collapsed && (
+            <>
             <input
                 className={cx('inputModern', 'mb-3')}
                 placeholder="Nhập nội dung câu hỏi..."
@@ -180,6 +215,8 @@ const QuestionBlock = ({
                     onChange={(e) => updateQuestionFieldFn?.(index, 'explanation', e.target.value)}
                 />
             </div>
+            </>
+            )}
         </div>
     );
 };

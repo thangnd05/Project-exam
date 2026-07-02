@@ -291,6 +291,13 @@
         border-color: #cbd5e1;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
+
+    // Khi thu gọn: header không còn viền/khoảng cách dưới (giống .groupCard.collapsed).
+    &.collapsed .groupHeader {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
 }
 
 .answerItem {
