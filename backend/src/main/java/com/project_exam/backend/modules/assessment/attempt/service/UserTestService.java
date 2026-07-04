@@ -130,11 +130,10 @@ public class UserTestService {
         ExamType examType = examTypeRepository.findById(test.getExamTypeId())
                 .orElseThrow(() -> new NotFoundException("ExamType not found"));
 
-        // Luyện tập theo Part: luôn chấm thang % (đúng/tổng-câu-của-Part-đã-chọn),
-        // không quy đổi TOEIC/AWS vì bảng quy đổi giả định làm đủ cả section.
+        // Luyện tập theo Part: quy đổi TOEIC cho kỹ năng được luyện TRỌN section,
+        // còn lại chấm thang % (xem scorePractice).
         if (userTest.isPractice()) {
-            int practiceTotal = countQuestionsForPractice(userTest);
-            userTest.setTotalScore(scoreDefault(userAnswers, practiceTotal));
+            userTest.setTotalScore(scorePractice(userTest, userAnswers, examType));
             return userTestRepository.save(userTest);
         }
 
@@ -181,6 +180,113 @@ public class UserTestService {
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * Chấm điểm mode PRACTICE — chấm theo đúng phương pháp của dạng đề (giống full test),
+     * chỉ giới hạn phạm vi vào các Part đã luyện:
+     * - TOEIC (toeic_scale): kỹ năng nào được luyện TRỌN (đủ mọi Part của kỹ năng đó trong
+     *   đề) thì quy đổi điểm thang (Listening/Reading tối đa 495). Kỹ năng luyện lẻ vài Part
+     *   không quy đổi được (bảng quy đổi giả định làm đủ section) -> fallback thang %.
+     * - AWS (aws_scale): thang scaled 100–1000 trên số câu của các Part đã luyện.
+     * - Khác (default): thang % (số câu đúng / tổng câu đã luyện).
+     */
+    private int scorePractice(UserTest userTest, List<UserAnswer> userAnswers, ExamType examType) {
+        String scoringMethod = examType.getScoringMethod() != null
+                ? examType.getScoringMethod().toLowerCase() : "default";
+        int practiceTotal = countQuestionsForPractice(userTest);
+
+        if ("toeic_scale".equalsIgnoreCase(scoringMethod)) {
+            Set<String> fullyPracticedSkillIds = getFullyPracticedSkillIds(userTest);
+            if (!fullyPracticedSkillIds.isEmpty()) {
+                return scoreToeicForSkills(userAnswers, examType, fullyPracticedSkillIds);
+            }
+            return scoreDefault(userAnswers, practiceTotal); // luyện lẻ chưa đủ section -> %
+        }
+        if ("aws_scale".equalsIgnoreCase(scoringMethod)) {
+            return scoreAwsScale(userAnswers, practiceTotal);
+        }
+        return scoreDefault(userAnswers, practiceTotal);
+    }
+
+    /**
+     * Các kỹ năng (skillId) được luyện TRỌN: mọi Part của kỹ năng đó có trong đề
+     * đều nằm trong danh sách Part đã chọn luyện.
+     */
+    private Set<String> getFullyPracticedSkillIds(UserTest userTest) {
+        Set<String> practicedPartIds = parsePracticePartIds(userTest.getPracticePartIds());
+        if (practicedPartIds.isEmpty()) return Collections.emptySet();
+
+        Set<String> testExamPartIds = testPartRepository.findByTestId(userTest.getTestId()).stream()
+                .map(TestPart::getExamPartId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<String, String> partToSkill = examPartRepository.findAllById(testExamPartIds).stream()
+                .filter(ep -> ep.getSkillId() != null)
+                .collect(Collectors.toMap(ExamPart::getExamPartId, ExamPart::getSkillId));
+
+        // Nhóm examPartId (trong đề) theo skill.
+        Map<String, Set<String>> skillToParts = new HashMap<>();
+        for (String partId : testExamPartIds) {
+            String skillId = partToSkill.get(partId);
+            if (skillId == null) continue;
+            skillToParts.computeIfAbsent(skillId, k -> new HashSet<>()).add(partId);
+        }
+
+        Set<String> fullyPracticed = new HashSet<>();
+        for (Map.Entry<String, Set<String>> e : skillToParts.entrySet()) {
+            if (practicedPartIds.containsAll(e.getValue())) {
+                fullyPracticed.add(e.getKey());
+            }
+        }
+        return fullyPracticed;
+    }
+
+    /**
+     * Quy đổi điểm TOEIC chỉ cho các kỹ năng chỉ định (đã luyện trọn section):
+     * đếm số câu đúng theo skill rồi tra bảng scoring_conversion, cộng dồn.
+     * Không cộng điểm nền cho các kỹ năng không luyện.
+     */
+    private int scoreToeicForSkills(List<UserAnswer> userAnswers, ExamType examType, Set<String> skillIds) {
+        List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
+        List<String> allQuestionIds = uniqueAnswers.stream().map(UserAnswer::getQuestionId).toList();
+
+        Map<String, Question> questionMap = questionRepository.findAllById(allQuestionIds).stream()
+                .collect(Collectors.toMap(Question::getQuestionId, q -> q));
+        Map<String, List<Answer>> correctAnswersMap = answerRepository.findByQuestionIdInAndIsCorrectTrue(allQuestionIds)
+                .stream().collect(Collectors.groupingBy(Answer::getQuestionId));
+        Set<String> examPartIds = questionMap.values().stream()
+                .map(Question::getExamPartId).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> examPartToSkillId = examPartRepository.findAllById(examPartIds).stream()
+                .filter(ep -> ep.getSkillId() != null)
+                .collect(Collectors.toMap(ExamPart::getExamPartId, ExamPart::getSkillId));
+
+        Map<String, Integer> skillCorrectCount = new HashMap<>();
+        for (UserAnswer ua : uniqueAnswers) {
+            Question question = questionMap.get(ua.getQuestionId());
+            List<Answer> correctAnswers = correctAnswersMap.get(ua.getQuestionId());
+            if (question == null || correctAnswers == null || correctAnswers.isEmpty()) continue;
+
+            String skillId = question.getExamPartId() != null
+                    ? examPartToSkillId.get(question.getExamPartId()) : null;
+            if (skillId == null || !skillIds.contains(skillId)) continue;
+
+            boolean isCorrect = AnswerGradingUtil.isCorrect(question.getQuestionType(),
+                    ua.getSelectedAnswerId(), ua.getSelectedAnswerIds(),
+                    ua.getAnswerText(), correctAnswers);
+            if (isCorrect) skillCorrectCount.merge(skillId, 1, Integer::sum);
+        }
+
+        int totalScore = 0;
+        for (String skillId : skillIds) {
+            int numCorrect = skillCorrectCount.getOrDefault(skillId, 0);
+            int convertedScore = scoringConversionRepository
+                    .findByExamTypeIdAndSkillIdAndNumCorrect(examType.getExamTypeId(), skillId, numCorrect)
+                    .map(ScoringConversion::getConvertedScore)
+                    .orElse(5);
+            totalScore += convertedScore;
+        }
+        return totalScore;
     }
 
     private int scoreDefault(List<UserAnswer> userAnswers, int totalQuestionsInTest) {

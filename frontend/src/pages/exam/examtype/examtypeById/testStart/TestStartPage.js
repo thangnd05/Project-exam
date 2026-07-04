@@ -638,7 +638,6 @@ function TestStartPage() {
 
         {q.questionType === 'MSQ' && (
           <div className={cx('mcq-group')}>
-            <div className="text-muted mb-1" style={{ fontSize: '1.25rem' }}>Chọn tất cả đáp án đúng:</div>
             {q.answers?.map((a) => {
               const chosen = (userAnswers[q.questionId]?.selectedAnswerIds || []).includes(a.answerId);
               return (
