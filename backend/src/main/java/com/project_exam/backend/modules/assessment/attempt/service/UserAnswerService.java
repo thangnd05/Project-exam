@@ -274,7 +274,9 @@ public class UserAnswerService {
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {
-            return new ResultSummaryDto(0, 0, 0, 0);
+            // Nộp mà chưa trả lời câu nào: 0 đúng, còn lại tính là sai/bỏ (theo Part đã luyện nếu PRACTICE).
+            long total = getTotalQuestionsForResult(userTest);
+            return new ResultSummaryDto(0, total, total, userTest.getTotalScore());
         }
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
 
@@ -304,7 +306,7 @@ public class UserAnswerService {
             }
         }
 
-        long totalQuestions = getTotalQuestionsInTest(userTest.getTestId());
+        long totalQuestions = getTotalQuestionsForResult(userTest);
         long normalizedCorrectCount = Math.min(correctCount, totalQuestions);
         long wrongCount = Math.max(totalQuestions - normalizedCorrectCount, 0);
         return new ResultSummaryDto(normalizedCorrectCount, wrongCount, totalQuestions, userTest.getTotalScore());
@@ -358,7 +360,9 @@ public class UserAnswerService {
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {
-            return new ResultSummaryDto(0, 0, 0, 0);
+            // Nộp mà chưa trả lời câu nào: 0 đúng, còn lại tính là sai/bỏ (theo Part đã luyện nếu PRACTICE).
+            long total = getTotalQuestionsForResult(userTest);
+            return new ResultSummaryDto(0, total, total, userTest.getTotalScore());
         }
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
 
@@ -388,14 +392,23 @@ public class UserAnswerService {
             }
         }
 
-        long totalQuestions = getTotalQuestionsInTest(userTest.getTestId());
+        long totalQuestions = getTotalQuestionsForResult(userTest);
         long normalizedCorrectCount = Math.min(correctCount, totalQuestions);
         long wrongCount = Math.max(totalQuestions - normalizedCorrectCount, 0);
         return new ResultSummaryDto(normalizedCorrectCount, wrongCount, totalQuestions, userTest.getTotalScore());
     }
 
-    private long getTotalQuestionsInTest(String testId) {
-        List<String> testPartIds = testPartRepository.findByTestId(testId).stream()
+    /**
+     * Mẫu số cho kết quả. FULL_TEST đếm toàn bộ đề; PRACTICE chỉ đếm câu của các
+     * Part đã chọn luyện (practicePartIds) để số câu đúng/sai/tổng khớp phần luyện.
+     */
+    private long getTotalQuestionsForResult(UserTest userTest) {
+        Set<String> practicePartIds = userTest.isPractice()
+                ? parsePracticePartIds(userTest.getPracticePartIds())
+                : Collections.emptySet();
+
+        List<String> testPartIds = testPartRepository.findByTestId(userTest.getTestId()).stream()
+                .filter(tp -> practicePartIds.isEmpty() || practicePartIds.contains(tp.getExamPartId()))
                 .map(testPart -> testPart.getTestPartId())
                 .toList();
         if (testPartIds.isEmpty()) {
@@ -405,6 +418,14 @@ public class UserAnswerService {
                 .map(TestQuestion::getQuestionId)
                 .distinct()
                 .count();
+    }
+
+    private Set<String> parsePracticePartIds(String csv) {
+        if (csv == null || csv.isBlank()) return Collections.emptySet();
+        return Arrays.stream(csv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
     }
 
     private List<UserAnswer> deduplicateByQuestionId(List<UserAnswer> userAnswers) {

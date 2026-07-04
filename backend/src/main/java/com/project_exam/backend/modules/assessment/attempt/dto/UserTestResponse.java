@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.assessment.attempt.dto;
 
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,5 +20,6 @@ public class UserTestResponse {
     private Integer totalScore;
     private String status;
     private String mode; // FULL_TEST | PRACTICE (null dữ liệu cũ = FULL_TEST)
+    private List<String> practicePartIds; // examPartId các Part đã luyện, chỉ có khi mode = PRACTICE
     private Long durationTaken; // Thời gian làm bài (giây) = finishedAt - startedAt
 }

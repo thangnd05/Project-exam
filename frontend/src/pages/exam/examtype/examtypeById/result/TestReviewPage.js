@@ -137,7 +137,14 @@ const TestReviewPage = () => {
           getAnswersByUserTest(userTestId, isGuest, guestCfg),
         ]);
 
-        const loadedTest = { ...testData, parts: testData.parts || [] };
+        // Mode PRACTICE: chỉ xem lại các Part đã luyện, không hiện toàn bộ đề.
+        let parts = testData.parts || [];
+        if (metaData.mode === "PRACTICE" && metaData.practicePartIds?.length) {
+          const practiced = new Set(metaData.practicePartIds.map(String));
+          parts = parts.filter((p) => practiced.has(String(p.examPartId)));
+        }
+
+        const loadedTest = { ...testData, parts };
         setTest(loadedTest);
         setUserAnswers(answersData);
       } catch (err) {
