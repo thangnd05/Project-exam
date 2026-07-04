@@ -98,6 +98,14 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE
     );
 
+    // Câu hỏi có tiền tố keyword rõ ràng ("Câu 21", "Question 21", "Bài 21").
+    // Dùng để phân biệt câu hỏi thật với dòng số trần bên trong nội dung passage
+    // (giờ "8:00", mã bưu chính "10719 Berlin", ngày "2 August", hàng bảng lịch trình).
+    private static final Pattern QUESTION_KEYWORD_PREFIX_PATTERN = Pattern.compile(
+            "^\\s*(?:" + QUESTION_KEYWORDS + ")\\s*\\(?\\d",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+    );
+
     // A. / A) / (A) / A: / A- / A <text>
     // Negative lookahead (?![-_]{2,}) — sau separator/space, nếu là chuỗi gạch/gạch dưới
     // (fill-in-blank), KHÔNG coi là option line.
@@ -645,8 +653,19 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (1) Câu hỏi mới explicit (có số ở đầu) — luôn break inExplanation
+            // (1) Câu hỏi mới explicit (có số ở đầu) — luôn break inExplanation.
+            // NGOẠI LỆ: khi đang gom nội dung passage (inPassageHeader), một dòng số TRẦN
+            // (không có keyword "Câu/Question/Bài") thường là NỘI DUNG passage — giờ "8:00",
+            // mã bưu chính "10719 Berlin", ngày "2 August", hàng bảng "10:00 A.M. | ...".
+            // Nếu coi nó là câu hỏi sẽ cắt ngang passage và làm MẤT phần nội dung còn lại.
+            // Chỉ câu có keyword rõ ràng mới được đóng passage header.
             Matcher qm = QUESTION_START_PATTERN.matcher(text);
+            if (qm.matches()
+                    && inPassageHeader
+                    && !QUESTION_KEYWORD_PREFIX_PATTERN.matcher(text).find()) {
+                handleContinuationLine(text);
+                return;
+            }
             if (qm.matches()) {
                 inExplanation = false;
                 if (inPassageHeader) {
