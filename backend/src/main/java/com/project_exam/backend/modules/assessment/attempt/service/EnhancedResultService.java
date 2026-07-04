@@ -95,8 +95,9 @@ public class EnhancedResultService {
                     .orElse(null);
         }
 
-        // 2. Load ALL question IDs from test structure (not just answered ones)
-        Set<String> allTestQuestionIds = getAllQuestionIdsInTest(userTest.getTestId());
+        // 2. Load question IDs from test structure (not just answered ones).
+        // Mode PRACTICE chỉ phân tích các Part đã chọn, không lấy toàn bộ đề.
+        Set<String> allTestQuestionIds = getAnalyzedQuestionIds(userTest);
         long totalQuestions = allTestQuestionIds.size();
 
         if (allTestQuestionIds.isEmpty()) {
@@ -704,13 +705,30 @@ public class EnhancedResultService {
         return new ArrayList<>(seen.values());
     }
 
-    private Set<String> getAllQuestionIdsInTest(String testId) {
-        List<String> testPartIds = testPartRepository.findByTestId(testId).stream()
+    /**
+     * Các câu hỏi cần phân tích cho kết quả. Mode FULL_TEST lấy toàn bộ đề;
+     * mode PRACTICE chỉ lấy các Part người dùng đã chọn luyện tập (practicePartIds).
+     */
+    private Set<String> getAnalyzedQuestionIds(UserTest userTest) {
+        Set<String> practicePartIds = userTest.isPractice()
+                ? parsePracticePartIds(userTest.getPracticePartIds())
+                : Collections.emptySet();
+
+        List<String> testPartIds = testPartRepository.findByTestId(userTest.getTestId()).stream()
+                .filter(tp -> practicePartIds.isEmpty() || practicePartIds.contains(tp.getExamPartId()))
                 .map(tp -> tp.getTestPartId())
                 .toList();
         if (testPartIds.isEmpty()) return Set.of();
         return testQuestionRepository.findByTestPartIdIn(testPartIds).stream()
                 .map(TestQuestion::getQuestionId)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> parsePracticePartIds(String csv) {
+        if (csv == null || csv.isBlank()) return Collections.emptySet();
+        return Arrays.stream(csv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
                 .collect(Collectors.toSet());
     }
 
