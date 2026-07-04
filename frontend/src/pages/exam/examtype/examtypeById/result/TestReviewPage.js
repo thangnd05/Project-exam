@@ -9,7 +9,6 @@ import classNames from "classnames/bind";
 import {
   IoArrowBackOutline,
   IoHomeOutline,
-  IoVolumeHighOutline,
   IoListOutline,
   IoCloseOutline,
   IoCheckmarkCircleOutline,
@@ -269,10 +268,6 @@ const TestReviewPage = () => {
             if (type === "AUDIO") {
               return (
                 <div key={idx} className="mb-3">
-                  <div className={cx("audio-label")}>
-                    <IoVolumeHighOutline size={22} />
-                    <span>NGHE {audioCount > 1 ? `(${idx + 1})` : "ĐOẠN HỘI THOẠI"}</span>
-                  </div>
                   <audio controls src={getFullMediaUrl(url)} className={cx("audio-player")} />
                 </div>
               );
@@ -294,10 +289,6 @@ const TestReviewPage = () => {
           singleMediaUrl &&
           (pType === "LISTENING" || pType === "listening") && (
             <div className="mb-3">
-              <div className={cx("audio-label")}>
-                <IoVolumeHighOutline size={22} />
-                <span>NGHE ĐOẠN HỘI THOẠI</span>
-              </div>
               <audio controls src={getFullMediaUrl(singleMediaUrl)} className={cx("audio-player")} />
             </div>
           )}

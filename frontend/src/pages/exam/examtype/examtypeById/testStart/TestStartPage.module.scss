@@ -260,7 +260,7 @@
 
   &.split-layout {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
     align-items: start;
     margin-bottom: 28px;
@@ -359,7 +359,7 @@
   /* Ảnh trái – câu hỏi phải, khoảng cách vừa đẹp */
   &.split-layout {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
     align-items: start;
     margin-bottom: 28px;
@@ -614,6 +614,12 @@
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
+}
+
+/* Câu đúng 3 đáp án (kiểu Part 2: A/B/C): xếp dọc 1 cột cho cân,
+   tránh kiểu "2 trên + 1 dưới" lệch. :has() nhận nhóm có ô thứ 3 cũng là ô cuối. */
+.mcq-group:has(> :nth-child(3):last-child) {
+  grid-template-columns: 1fr;
 }
 
 .mcq-option {

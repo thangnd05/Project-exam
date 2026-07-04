@@ -11,7 +11,6 @@ import classNames from 'classnames/bind';
 import {
   IoSendOutline,
   IoLockClosedOutline,
-  IoVolumeHighOutline,
   IoAlertCircleOutline,
   IoTimeOutline,
   IoCheckmarkCircleOutline,
@@ -558,10 +557,6 @@ function TestStartPage() {
             if (type === 'AUDIO') {
               return (
                 <div key={idx} className="mb-3">
-                  <div className="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
-                    <IoVolumeHighOutline size={24} />
-                    <span>NGHE {audioTotal > 1 ? `(${idx + 1})` : 'ĐOẠN HỘI THOẠI'}</span>
-                  </div>
                   <audio
                     controls
                     src={getFullMediaUrl(url)}
@@ -587,10 +582,6 @@ function TestStartPage() {
           singleMediaUrl &&
           (pType === 'LISTENING' || pType === 'listening') && (
             <div className="mb-4">
-              <div className="d-flex align-items-center gap-2 mb-3 text-primary fw-bold">
-                <IoVolumeHighOutline size={24} />
-                <span>NGHE ĐOẠN HỘI THOẠI</span>
-              </div>
               <audio
                 controls
                 src={getFullMediaUrl(singleMediaUrl)}
