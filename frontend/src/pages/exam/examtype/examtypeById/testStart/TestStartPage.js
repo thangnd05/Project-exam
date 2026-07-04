@@ -805,10 +805,6 @@ function TestStartPage() {
           <Col xs={12}>
             {visibleParts.map((part, i) => (
               <div key={part.testPartId} className={cx('part-section')}>
-                <h3>
-                  {part.partName || `Phần ${i + 1}`}
-                </h3>
-
                 <div className={cx('questions-list')}>
                   {/* Render question groups */}
                   {part.questionGroups?.map((group, groupIdx) => {

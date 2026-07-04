@@ -356,6 +356,13 @@
   flex-direction: column;
   gap: 12px;
 
+  &:not(.split-layout) {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
   /* Ảnh trái – câu hỏi phải, khoảng cách vừa đẹp */
   &.split-layout {
     display: grid;
@@ -568,13 +575,33 @@
 
 .question-card {
   background: white;
-  padding: 25px;
-  border-radius: var(--radius-md);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s;
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 97, 242, 0.08);
+  box-shadow: 0 10px 25px -5px rgba(0, 97, 242, 0.03), 0 8px 10px -6px rgba(0, 97, 242, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: transparent;
+    transition: background 0.2s ease;
+  }
+
+  &:hover::before,
+  &:focus-within::before {
+    background: var(--primary);
+  }
 
   &:hover {
     border-color: var(--primary);
+    box-shadow: 0 20px 25px -5px rgba(0, 97, 242, 0.05), 0 10px 10px -5px rgba(0, 97, 242, 0.03);
   }
 
   .q-number {
@@ -589,18 +616,19 @@
     color: var(--dark-color);
     margin-bottom: 20px;
     display: block;
+    line-height: 1.6;
   }
 
   @media (max-width: 768px) {
-    padding: 16px;
-    /* Điện thoại: thu nhỏ padding ô câu hỏi */
+    padding: 20px;
+    border-radius: 12px;
   }
 
   @media (max-width: 576px) {
-    padding: 12px;
+    padding: 16px;
 
     .q-text {
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
   }
 }
@@ -625,33 +653,45 @@
 .mcq-option {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
-  border-radius: 10px;
+  gap: 14px;
+  padding: 14px 20px;
+  border-radius: 12px;
   background: #f8fafc;
   cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid #f1f5f9;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
 
   &:hover {
     background: #f1f5f9;
     border-color: #cbd5e1;
+    transform: translateY(-1px);
   }
 
-  input {
-    width: 18px;
-    height: 18px;
+  input[type='radio'],
+  input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    border: 2px solid #cbd5e1;
+    transition: all 0.2s;
+    
+    &:checked {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
   }
 
   span {
     font-size: 1.6rem;
     font-weight: 500;
     color: #475569;
+    line-height: 1.4;
   }
 
   &.selected {
-    background: #eff6ff;
+    background: rgba(0, 97, 242, 0.04);
     border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 97, 242, 0.06);
 
     span {
       color: var(--primary);
@@ -687,9 +727,11 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: white;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
-  border-top: 2px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
   z-index: 1100;
   display: flex;
   flex-direction: column;
@@ -744,28 +786,30 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-width: 220px;
-  /* Bằng nhau khi "Câu hỏi" / "Ẩn" */
-  padding: 10px 20px;
+  min-width: 200px;
+  padding: 12px 24px;
   border-radius: 50px;
-  border: 2px solid #e2e8f0;
+  border: 1px solid rgba(226, 232, 240, 0.8);
   background: white;
   font-size: 1.5rem;
   font-weight: 700;
   color: #64748b;
-  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 
   &:hover {
     border-color: var(--primary);
     color: var(--primary);
     background: #f0f9ff;
+    box-shadow: 0 6px 16px rgba(0, 97, 242, 0.08);
   }
 
   &.active {
     border-color: var(--primary);
     color: var(--primary);
     background: #eff6ff;
+    box-shadow: 0 6px 16px rgba(0, 97, 242, 0.1);
   }
 }
 
@@ -773,19 +817,20 @@
   background: var(--primary-gradient);
   color: white;
   border: none;
-  padding: 15px 40px;
+  padding: 14px 44px;
   border-radius: 50px;
   font-weight: 800;
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: all 0.3s;
+  box-shadow: 0 4px 14px rgba(0, 97, 242, 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 97, 242, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 97, 242, 0.35);
   }
 
   &:disabled {

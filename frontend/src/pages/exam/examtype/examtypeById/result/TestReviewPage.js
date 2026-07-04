@@ -353,10 +353,6 @@ const TestReviewPage = () => {
 
         {test?.parts?.map((part, i) => (
           <div key={part.testPartId || i} className={cx("part-section")}>
-            <h3 className={cx("part-title")}>
-              {part.partName || `Phần ${i + 1}`}
-            </h3>
-
             {part.questionGroups?.map((group, groupIndex) => {
               const firstQ = group.questions?.[0];
               const splitLayout = hasPassageContent(group.passage, firstQ);
