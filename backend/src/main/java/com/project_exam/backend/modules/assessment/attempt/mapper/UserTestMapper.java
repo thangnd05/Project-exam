@@ -24,6 +24,7 @@ public class UserTestMapper {
                 .finishedAt(userTest.getFinishedAt())
                 .totalScore(userTest.getTotalScore())
                 .status(userTest.getStatus() != null ? userTest.getStatus().name() : null)
+                .mode(userTest.getMode() != null ? userTest.getMode().name() : UserTest.Mode.FULL_TEST.name())
                 .durationTaken(
                         userTest.getFinishedAt() != null && userTest.getStartedAt() != null
                                 ? Duration.between(userTest.getStartedAt(), userTest.getFinishedAt()).getSeconds()

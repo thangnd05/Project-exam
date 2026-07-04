@@ -1,0 +1,385 @@
+.subtitle {
+  margin: -6px 0 18px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 6px;
+  background: var(--input-bg);
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 10px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  svg {
+    font-size: 1.8rem;
+  }
+
+  &:hover:not(.active) {
+    color: var(--dark-color);
+  }
+
+  &.active {
+    background: #fff;
+    color: var(--accent-color);
+    box-shadow: 0 2px 8px rgba(0, 97, 242, 0.15);
+  }
+}
+
+/* Khung chung cho 2 tab -> CHIỀU CAO CỐ ĐỊNH (clamp theo màn hình) để đổi tab
+   không co/nhảy; nhiều Part thì cuộn bên trong chứ không kéo dài modal. */
+.panel {
+  height: 58vh;
+  min-height: 340px;
+  max-height: 460px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tab Luyện tập fill toàn bộ panel; list Part chiếm phần còn lại và tự cuộn. */
+.practice {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Full test card ===== */
+.exam-card {
+  margin: auto 0; /* căn giữa dọc trong .panel */
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.exam-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.exam-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: var(--primary-gradient);
+  box-shadow: 0 6px 16px rgba(0, 97, 242, 0.3);
+
+  svg {
+    font-size: 2.4rem;
+  }
+}
+
+.exam-info {
+  flex: 1;
+  min-width: 0;
+
+  h4 {
+    margin: 0 0 4px;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--dark-color);
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--text-secondary);
+  }
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 97, 242, 0.08);
+  color: var(--accent-color);
+  font-size: 1.35rem;
+  font-weight: 600;
+
+  svg {
+    font-size: 1.6rem;
+  }
+}
+
+/* Quyền lợi khi thi full */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+
+    svg {
+      flex-shrink: 0;
+      font-size: 1.8rem;
+      color: var(--accent-color);
+    }
+  }
+}
+
+.exam-start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 20px;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 14px;
+  background: var(--primary-gradient);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 97, 242, 0.3);
+  transition: all 0.2s;
+
+  svg {
+    font-size: 2rem;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(0, 97, 242, 0.4);
+  }
+}
+
+/* ===== Start buttons (dùng gradient thương hiệu) ===== */
+.start-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-gradient);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 97, 242, 0.3);
+  transition: all 0.2s;
+
+  svg {
+    font-size: 1.8rem;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(0, 97, 242, 0.4);
+  }
+
+  &:disabled {
+    background: #cbd5e1;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+}
+
+/* ===== Practice ===== */
+.practice-hint {
+  margin: 0 0 16px;
+  font-size: 1.45rem;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--accent-color);
+  }
+}
+
+.loading {
+  padding: 30px 0;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 1.5rem;
+}
+
+/* Khung cuộn danh sách Part — chiếm hết chỗ trống còn lại và tự cuộn
+   (kéo chuột) thay vì kéo dài modal. */
+.part-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 -6px;
+  padding: 2px 6px;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+.section {
+  margin-top: 16px;
+
+  &:first-child {
+    margin-top: 4px;
+  }
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.part-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.part-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: rgba(0, 97, 242, 0.4);
+  }
+
+  &.checked {
+    border-color: var(--accent-color);
+    background: rgba(0, 97, 242, 0.06);
+  }
+
+  &.select-all {
+    margin-bottom: 4px;
+    border-style: dashed;
+  }
+}
+
+.checkbox {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid #cbd5e1;
+  position: relative;
+  transition: all 0.15s;
+
+  &.checked {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+.part-name {
+  flex: 1;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.part-count {
+  font-size: 1.3rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.practice-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  background: #fff;
+}
+
+.summary {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--accent-color);
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .part-grid {
+    grid-template-columns: 1fr;
+  }
+}

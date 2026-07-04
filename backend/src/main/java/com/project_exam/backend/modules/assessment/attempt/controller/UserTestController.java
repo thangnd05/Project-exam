@@ -66,13 +66,15 @@ public class UserTestController {
         }
 
         String userId = authUtils.getUserId(httpRequest);
-        UserTest userTest = userTestService.startUserTest(request.getTestId(), userId);
+        UserTest userTest = userTestService.startUserTest(
+                request.getTestId(), userId, request.getMode(), request.getExamPartIds());
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Bắt đầu làm bài thành công");
         response.put("userTestId", userTest.getUserTestId());
         response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
         response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
+        response.put("mode", userTest.getMode() != null ? userTest.getMode().name() : "FULL_TEST");
         response.put("serverNow", java.time.LocalDateTime.now().toString());
 
         return ResponseEntity.ok(response);
@@ -117,10 +119,12 @@ public class UserTestController {
     @GetMapping("/check-active")
     public ResponseEntity<Map<String, Object>> checkActiveUserTest(
             @RequestParam String testId,
+            @RequestParam(required = false) String mode,
+            @RequestParam(required = false) List<String> examPartIds,
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        Optional<UserTest> active = userTestService.findActiveUserTest(userId, testId);
+        Optional<UserTest> active = userTestService.findActiveUserTest(userId, testId, mode, examPartIds);
 
         Map<String, Object> response = new HashMap<>();
         // serverNow để frontend đồng bộ đồng hồ (tránh clock skew khi tính timer).

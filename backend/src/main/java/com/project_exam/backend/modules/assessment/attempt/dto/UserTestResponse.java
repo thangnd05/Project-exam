@@ -18,5 +18,6 @@ public class UserTestResponse {
     private LocalDateTime finishedAt;
     private Integer totalScore;
     private String status;
+    private String mode; // FULL_TEST | PRACTICE (null dữ liệu cũ = FULL_TEST)
     private Long durationTaken; // Thời gian làm bài (giây) = finishedAt - startedAt
 }

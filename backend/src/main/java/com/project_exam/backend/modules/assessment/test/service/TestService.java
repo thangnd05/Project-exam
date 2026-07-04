@@ -24,6 +24,7 @@ import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartResponse;
+import com.project_exam.backend.modules.assessment.test.dto.TestPartSummaryResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestCollectionResponse;
 import com.project_exam.backend.modules.assessment.test.domain.UserTestAccess;
@@ -592,9 +593,11 @@ public class TestService {
         }
 
         // 4. Kiểm tra số lượt làm bài — guest không bị giới hạn theo user.
+        // Lượt luyện tập theo Part KHÔNG tính vào maxAttempts -> loại mode PRACTICE.
         int attemptsUsed = isGuest
                 ? 0
-                : userTestRepository.countByUserIdAndTestIdAndStatus(currentUserId, testId, UserTest.Status.COMPLETED);
+                : userTestRepository.countCompletedExcludingMode(
+                        currentUserId, testId, UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
         Integer maxAttempts = test.getMaxAttempts();
         Integer remaining = (!isGuest && maxAttempts != null) ? Math.max(0, maxAttempts - attemptsUsed) : null;
         long totalAttempts = userTestRepository.countByTestId(testId);
@@ -686,6 +689,54 @@ public class TestService {
         return examPartRepository.findAllById(examPartIds).stream()
                 .filter(e -> e.getName() != null)
                 .collect(Collectors.toMap(ExamPart::getExamPartId, ExamPart::getName));
+    }
+
+    /**
+     * Tóm tắt các Part của đề (tên, số câu, skill) cho modal "Chọn chế độ".
+     * Nhẹ: chỉ đếm số câu theo testPart, không load nội dung câu hỏi.
+     */
+    public List<TestPartSummaryResponse> getPartsSummary(String testId) {
+        testRepository.findById(testId)
+                .orElseThrow(() -> new NotFoundException("Test not found"));
+
+        List<TestPart> testParts = testPartRepository.findByTestId(testId);
+        if (testParts.isEmpty()) return Collections.emptyList();
+
+        List<String> testPartIds = testParts.stream().map(TestPart::getTestPartId).toList();
+        Map<String, Long> countByTestPartId = testQuestionRepository.findByTestPartIdIn(testPartIds).stream()
+                .filter(tq -> tq.getQuestionId() != null)
+                .collect(Collectors.groupingBy(TestQuestion::getTestPartId,
+                        Collectors.mapping(TestQuestion::getQuestionId,
+                                Collectors.collectingAndThen(Collectors.toSet(), s -> (long) s.size()))));
+
+        Set<String> examPartIds = testParts.stream()
+                .map(TestPart::getExamPartId).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, ExamPart> examPartMap = examPartRepository.findAllById(examPartIds).stream()
+                .collect(Collectors.toMap(ExamPart::getExamPartId, e -> e));
+        Set<String> skillIds = examPartMap.values().stream()
+                .map(ExamPart::getSkillId).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> skillNames = skillIds.isEmpty()
+                ? Collections.emptyMap()
+                : skillRepository.findAllById(skillIds).stream()
+                        .collect(Collectors.toMap(Skill::getSkillId, Skill::getName));
+
+        return testParts.stream()
+                .map(tp -> {
+                    ExamPart ep = examPartMap.get(tp.getExamPartId());
+                    String skillName = (ep != null && ep.getSkillId() != null)
+                            ? skillNames.get(ep.getSkillId()) : null;
+                    return TestPartSummaryResponse.builder()
+                            .testPartId(tp.getTestPartId())
+                            .examPartId(tp.getExamPartId())
+                            .partName(ep != null && ep.getName() != null ? ep.getName() : "Phần thi")
+                            .skillName(skillName)
+                            .questionCount(countByTestPartId.getOrDefault(tp.getTestPartId(), 0L).intValue())
+                            .displayOrder(ep != null && ep.getDisplayOrder() != null ? ep.getDisplayOrder() : 999)
+                            .build();
+                })
+                .sorted(Comparator.comparing(TestPartSummaryResponse::getDisplayOrder,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
     }
 
     private List<TestPartResponse> buildUserPartResponses(TestUserDataBundle data, long seed) {

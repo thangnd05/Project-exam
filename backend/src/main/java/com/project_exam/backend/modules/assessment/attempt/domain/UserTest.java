@@ -42,6 +42,19 @@ public class UserTest {
     @Column(length = 20)
     private Status status = Status.IN_PROGRESS; // 🟢 mặc định khi bắt đầu thi
 
+    // FULL_TEST = làm cả đề, có giới hạn giờ, tính lượt/xu, lên bảng xếp hạng.
+    // PRACTICE  = luyện tập theo Part, không giới hạn giờ, miễn phí/không tốn lượt,
+    //             lưu lịch sử nhưng KHÔNG lên bảng xếp hạng.
+    // Cột mới (ddl-auto=update) -> row cũ = NULL, được coi như FULL_TEST ở mọi nơi.
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Mode mode = Mode.FULL_TEST;
+
+    // Danh sách examPartId được luyện (CSV đã sort), chỉ có khi mode = PRACTICE.
+    // Dùng để tính mẫu số chấm điểm đúng theo số câu của các Part đã chọn.
+    @Column(name = "practice_part_ids", length = 500)
+    private String practicePartIds;
+
     @Version
     private Long version;
 
@@ -49,5 +62,15 @@ public class UserTest {
         IN_PROGRESS,
         COMPLETED,
         EXPIRED
+    }
+
+    public enum Mode {
+        FULL_TEST,
+        PRACTICE
+    }
+
+    /** Row cũ (mode = NULL) coi như FULL_TEST. */
+    public boolean isPractice() {
+        return mode == Mode.PRACTICE;
     }
 }

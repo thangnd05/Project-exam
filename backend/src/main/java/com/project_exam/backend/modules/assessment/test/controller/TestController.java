@@ -55,6 +55,13 @@ public class TestController {
         return ResponseEntity.ok(response);
     }
 
+    /** Tóm tắt các Part (tên + số câu) để dựng modal chọn chế độ luyện tập. */
+    @GetMapping("/{testId}/parts-summary")
+    public ResponseEntity<List<com.project_exam.backend.modules.assessment.test.dto.TestPartSummaryResponse>>
+            getPartsSummary(@PathVariable String testId) {
+        return ResponseEntity.ok(testService.getPartsSummary(testId));
+    }
+
     @GetMapping("/admintest/{testId}")
     public ResponseEntity<TestAdminResponse> getTestByIdAdmin(@PathVariable String testId) {
         TestAdminResponse response = testService.getTestFullByIdAdmin(testId);

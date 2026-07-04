@@ -130,6 +130,14 @@ public class UserTestService {
         ExamType examType = examTypeRepository.findById(test.getExamTypeId())
                 .orElseThrow(() -> new NotFoundException("ExamType not found"));
 
+        // Luyện tập theo Part: luôn chấm thang % (đúng/tổng-câu-của-Part-đã-chọn),
+        // không quy đổi TOEIC/AWS vì bảng quy đổi giả định làm đủ cả section.
+        if (userTest.isPractice()) {
+            int practiceTotal = countQuestionsForPractice(userTest);
+            userTest.setTotalScore(scoreDefault(userAnswers, practiceTotal));
+            return userTestRepository.save(userTest);
+        }
+
         String scoringMethod = examType.getScoringMethod() != null ? examType.getScoringMethod().toLowerCase() : "default";
         int totalQuestionsInTest = calculateTotalQuestionsInTest(userTest.getTestId());
 
@@ -144,6 +152,35 @@ public class UserTestService {
 
         userTest.setTotalScore(totalScore);
         return userTestRepository.save(userTest);
+    }
+
+    /** Tổng số câu của các Part được luyện (mẫu số chấm % cho mode PRACTICE). */
+    private int countQuestionsForPractice(UserTest userTest) {
+        Set<String> examPartIds = parsePracticePartIds(userTest.getPracticePartIds());
+        if (examPartIds.isEmpty()) {
+            // Không rõ Part -> fallback về toàn bộ đề để không chia cho 0.
+            return calculateTotalQuestionsInTest(userTest.getTestId());
+        }
+        List<String> testPartIds = testPartRepository.findByTestId(userTest.getTestId()).stream()
+                .filter(tp -> examPartIds.contains(tp.getExamPartId()))
+                .map(TestPart::getTestPartId)
+                .toList();
+        if (testPartIds.isEmpty()) {
+            return calculateTotalQuestionsInTest(userTest.getTestId());
+        }
+        return (int) testQuestionRepository.findByTestPartIdIn(testPartIds).stream()
+                .map(TestQuestion::getQuestionId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .count();
+    }
+
+    private Set<String> parsePracticePartIds(String csv) {
+        if (csv == null || csv.isBlank()) return Collections.emptySet();
+        return Arrays.stream(csv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
     }
 
     private int scoreDefault(List<UserAnswer> userAnswers, int totalQuestionsInTest) {
@@ -370,13 +407,28 @@ public class UserTestService {
 
     @Transactional
     public UserTest startUserTest(String testId, String userId) {
+        return startUserTest(testId, userId, null, null);
+    }
+
+    @Transactional
+    public UserTest startUserTest(String testId, String userId, String modeRaw, List<String> examPartIds) {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
+
+        UserTest.Mode mode = parseMode(modeRaw);
+        boolean isPractice = mode == UserTest.Mode.PRACTICE;
+        String practicePartIds = isPractice ? normalizeParts(examPartIds) : null;
 
         //  RESUME: nếu user đã có attempt đang làm dở, trả về luôn — không áp dụng
         // các guard time-window/max-attempts nữa, vì user đã start hợp lệ trước đó.
         // (Class membership cũng skip cho resume — user vào lớp rồi rời ra vẫn được hoàn thành.)
-        Optional<UserTest> existing = userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
+        // Practice resume phải khớp đúng bộ Part để không lẫn với full test / bộ Part khác.
+        Optional<UserTest> existing = isPractice
+                ? userTestRepository
+                        .findTopByUserIdAndTestIdAndStatusAndModeAndPracticePartIdsOrderByStartedAtDesc(
+                                userId, testId, UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE, practicePartIds)
+                : userTestRepository.findActiveUserTest(
+                        userId, testId, UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE);
         if (existing.isPresent()) {
             return existing.get();
         }
@@ -397,19 +449,24 @@ public class UserTestService {
         if (status == TestStatus.ENDED) {
             throw new ForbiddenException("Bài kiểm tra đã kết thúc.");
         }
-        Integer maxAttempts = test.getMaxAttempts();
-        if (maxAttempts != null && maxAttempts > 0) {
-            int completedAttempts = userTestRepository.countByUserIdAndTestIdAndStatus(userId, testId, UserTest.Status.COMPLETED);
-            if (completedAttempts >= maxAttempts) {
-                throw new ForbiddenException("Bạn đã hết số lượt làm bài.");
-            }
-        }
 
-        // 💰 Bài trả phí: phải đã mua quyền (người tạo được miễn). Resume ở trên không qua đây.
-        if (test.getCostCoins() != null && test.getCostCoins() > 0
-                && !userId.equals(test.getCreatedBy())
-                && !userTestAccessRepository.existsByUserIdAndTestId(userId, testId)) {
-            throw new ForbiddenException("Bài này cần mở khoá bằng xu trước khi làm.");
+        // Luyện tập theo Part: MIỄN PHÍ, KHÔNG tốn lượt -> bỏ qua guard maxAttempts & xu.
+        if (!isPractice) {
+            Integer maxAttempts = test.getMaxAttempts();
+            if (maxAttempts != null && maxAttempts > 0) {
+                int completedAttempts = userTestRepository.countCompletedExcludingMode(
+                        userId, testId, UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
+                if (completedAttempts >= maxAttempts) {
+                    throw new ForbiddenException("Bạn đã hết số lượt làm bài.");
+                }
+            }
+
+            // 💰 Bài trả phí: phải đã mua quyền (người tạo được miễn). Resume ở trên không qua đây.
+            if (test.getCostCoins() != null && test.getCostCoins() > 0
+                    && !userId.equals(test.getCreatedBy())
+                    && !userTestAccessRepository.existsByUserIdAndTestId(userId, testId)) {
+                throw new ForbiddenException("Bài này cần mở khoá bằng xu trước khi làm.");
+            }
         }
 
         //  Tạo mới user_test
@@ -419,12 +476,48 @@ public class UserTestService {
         newTest.setStartedAt(LocalDateTime.now());
         newTest.setStatus(UserTest.Status.IN_PROGRESS);
         newTest.setTotalScore(0);
+        newTest.setMode(mode);
+        newTest.setPracticePartIds(practicePartIds);
 
         return userTestRepository.save(newTest);
     }
 
+    private UserTest.Mode parseMode(String raw) {
+        if (raw == null || raw.isBlank()) return UserTest.Mode.FULL_TEST;
+        try {
+            return UserTest.Mode.valueOf(raw.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return UserTest.Mode.FULL_TEST;
+        }
+    }
+
+    /** Chuẩn hoá danh sách examPartId thành CSV đã sort/distinct để so khớp resume ổn định. */
+    private String normalizeParts(List<String> examPartIds) {
+        if (examPartIds == null || examPartIds.isEmpty()) return null;
+        String csv = examPartIds.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .distinct()
+                .sorted()
+                .collect(Collectors.joining(","));
+        return csv.isEmpty() ? null : csv;
+    }
+
     public Optional<UserTest> findActiveUserTest(String userId, String testId) {
-        return userTestRepository.findActiveUserTest(userId, testId, UserTest.Status.IN_PROGRESS);
+        return userTestRepository.findActiveUserTest(
+                userId, testId, UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE);
+    }
+
+    /** Resume tra cứu theo mode (dùng cho check-active): practice cần đúng bộ Part. */
+    public Optional<UserTest> findActiveUserTest(String userId, String testId, String modeRaw, List<String> examPartIds) {
+        if (parseMode(modeRaw) == UserTest.Mode.PRACTICE) {
+            return userTestRepository
+                    .findTopByUserIdAndTestIdAndStatusAndModeAndPracticePartIdsOrderByStartedAtDesc(
+                            userId, testId, UserTest.Status.IN_PROGRESS,
+                            UserTest.Mode.PRACTICE, normalizeParts(examPartIds));
+        }
+        return findActiveUserTest(userId, testId);
     }
 
     public Optional<UserTest> findActiveGuestUserTest(String guestSessionId, String testId) {
@@ -571,7 +664,11 @@ public class UserTestService {
             return leaderboardMapper.toEmpty();
         }
 
-        List<UserTest> list = userTestRepository.findByTestIdAndStatus(testId, UserTest.Status.COMPLETED);
+        // Bảng xếp hạng CHỈ tính lượt full-test; loại các lượt luyện tập theo Part.
+        // (mode NULL của dữ liệu cũ != PRACTICE -> vẫn được giữ.)
+        List<UserTest> list = userTestRepository.findByTestIdAndStatus(testId, UserTest.Status.COMPLETED).stream()
+                .filter(u -> u.getMode() != UserTest.Mode.PRACTICE)
+                .toList();
         Map<String, UserTest> bestAttemptByUser = new HashMap<>();
         for (UserTest attempt : list) {
             String userId = attempt.getUserId();

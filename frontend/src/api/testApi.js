@@ -54,6 +54,11 @@ export const getUserTestInfo = (testId) => {
   return axios.get(`${BASE_URL}/usertest/${testId}`).then((res) => res.data);
 };
 
+// Tóm tắt các Part (tên + số câu) cho modal chọn chế độ luyện tập.
+export const getTestPartsSummary = (testId) => {
+  return axios.get(`${BASE_URL}/${testId}/parts-summary`).then((res) => res.data);
+};
+
 export const createTest = (payload) => {
   return axios.post(BASE_URL, payload).then((res) => res.data);
 };

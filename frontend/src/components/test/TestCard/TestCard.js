@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     IoTimeOutline,
@@ -17,6 +18,7 @@ import {
     formatDateTime,
     formatFullDateTime,
 } from '~/utils/testStatusHelper';
+import TestModeModal from '~/components/test/TestModeModal/TestModeModal';
 
 const cx = classNames.bind(styles);
 
@@ -63,6 +65,7 @@ const getSubjectBanner = (title = '', status = 'open') => {
 function TestCard({ test, countdowns }) {
     const navigate = useNavigate();
     const now = new Date();
+    const [showModeModal, setShowModeModal] = useState(false);
 
     const { status, statusLabel, buttonText, canStart } =
         getTestStatus(test, now, countdowns);
@@ -75,10 +78,21 @@ function TestCard({ test, countdowns }) {
 
     const handleStart = () => {
         if (!canStart) return;
+        setShowModeModal(true);
+    };
 
+    // Điều hướng vào trang làm bài kèm mode/parts qua QUERY PARAM (không dùng
+    // navigate state) để mode/part sống sót qua reload — TestStartPage resume theo URL.
+    const handleSelectMode = ({ mode, examPartIds }) => {
+        setShowModeModal(false);
         const allowedTime = calculateAllowedTime(test);
-
-        navigate(`/tests/${test.testId}/start`, {
+        const params = new URLSearchParams();
+        if (mode === 'practice') {
+            params.set('mode', 'practice');
+            if (examPartIds?.length) params.set('parts', examPartIds.join(','));
+        }
+        const qs = params.toString();
+        navigate(`/tests/${test.testId}/start${qs ? `?${qs}` : ''}`, {
             state: { allowedTime },
         });
     };
@@ -202,6 +216,13 @@ function TestCard({ test, countdowns }) {
                     )}
                 </div>
             </div>
+
+            <TestModeModal
+                show={showModeModal}
+                test={test}
+                onClose={() => setShowModeModal(false)}
+                onStart={handleSelectMode}
+            />
         </div>
     );
 }

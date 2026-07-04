@@ -19,10 +19,25 @@ public interface UserTestRepository extends JpaRepository<UserTest, String> {
 
     int countByUserIdAndTestIdAndStatus(String userId, String testId, UserTest.Status status);
 
-    @Query("SELECT ut FROM UserTest ut WHERE ut.userId = :userId AND ut.testId = :testId AND ut.status = :status")
+    /** Đếm lượt đã hoàn thành nhưng BỎ chế độ luyện tập (practice không tính vào maxAttempts). */
+    @Query("SELECT COUNT(ut) FROM UserTest ut WHERE ut.userId = :userId AND ut.testId = :testId "
+            + "AND ut.status = :status AND (ut.mode IS NULL OR ut.mode <> :practiceMode)")
+    int countCompletedExcludingMode(@Param("userId") String userId,
+                                    @Param("testId") String testId,
+                                    @Param("status") UserTest.Status status,
+                                    @Param("practiceMode") UserTest.Mode practiceMode);
+
+    // Resume của FULL_TEST: chỉ lấy attempt full-test (mode NULL cũ = full), bỏ qua practice.
+    @Query("SELECT ut FROM UserTest ut WHERE ut.userId = :userId AND ut.testId = :testId "
+            + "AND ut.status = :status AND (ut.mode IS NULL OR ut.mode <> :practiceMode)")
     Optional<UserTest> findActiveUserTest(@Param("userId") String userId,
                                           @Param("testId") String testId,
-                                          @Param("status") UserTest.Status status);
+                                          @Param("status") UserTest.Status status,
+                                          @Param("practiceMode") UserTest.Mode practiceMode);
+
+    // Resume của PRACTICE: khớp đúng bộ Part đã chọn (CSV đã sort) để không lẫn phiên.
+    Optional<UserTest> findTopByUserIdAndTestIdAndStatusAndModeAndPracticePartIdsOrderByStartedAtDesc(
+            String userId, String testId, UserTest.Status status, UserTest.Mode mode, String practicePartIds);
 
     @Query("SELECT ut FROM UserTest ut WHERE ut.guestSessionId = :guestSessionId AND ut.testId = :testId AND ut.status = :status")
     Optional<UserTest> findActiveGuestUserTest(@Param("guestSessionId") String guestSessionId,

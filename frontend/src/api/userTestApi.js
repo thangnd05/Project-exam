@@ -16,9 +16,14 @@ export const getLeaderboardByTest = (testId) => {
 
 // ===== Exam engine (hỗ trợ chế độ guest qua isGuest + config) =====
 
-export const checkActiveUserTest = (testId, isGuest, config = {}) => {
+export const checkActiveUserTest = (testId, isGuest, config = {}, { mode, examPartIds } = {}) => {
   const url = isGuest ? `${BASE_URL}/guest/check-active` : `${BASE_URL}/check-active`;
-  return axios.get(url, { params: { testId }, ...config }).then((res) => res.data);
+  const params = { testId };
+  // Guest luôn full-test; chỉ user mới có chế độ practice theo Part.
+  if (!isGuest && mode) params.mode = mode;
+  // Gửi CSV để Spring bind thẳng vào List<String> (tránh serialize kiểu examPartIds[]=).
+  if (!isGuest && examPartIds && examPartIds.length) params.examPartIds = examPartIds.join(',');
+  return axios.get(url, { params, ...config }).then((res) => res.data);
 };
 
 export const getUserTestMeta = (userTestId, isGuest, config = {}) => {
@@ -26,9 +31,13 @@ export const getUserTestMeta = (userTestId, isGuest, config = {}) => {
   return axios.get(url, config).then((res) => res.data);
 };
 
-export const startUserTest = (testId, isGuest, config = {}) => {
+export const startUserTest = (testId, isGuest, config = {}, { mode, examPartIds } = {}) => {
   const url = isGuest ? `${BASE_URL}/guest` : BASE_URL;
-  return axios.post(url, { testId }, config).then((res) => res.data);
+  const body = { testId };
+  // Guest luôn full-test; practice theo Part chỉ cho user đăng nhập.
+  if (!isGuest && mode) body.mode = mode;
+  if (!isGuest && examPartIds && examPartIds.length) body.examPartIds = examPartIds;
+  return axios.post(url, body, config).then((res) => res.data);
 };
 
 export const submitUserTest = (userTestId, isGuest, config = {}) => {

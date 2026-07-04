@@ -5,7 +5,7 @@ import { getUserTestInfo, purchaseTestAccess } from '../../../../../api/testApi'
 import { toast } from 'react-toastify';
 import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, Spinner, Button, Form, Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
@@ -36,6 +36,22 @@ const getApiErrorMessage = (error, fallbackMessage) =>
 function TestStartPage() {
   const { testId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Chế độ làm bài đọc từ query param (?mode=practice&parts=id1,id2) để sống sót qua reload.
+  const isPractice = searchParams.get('mode') === 'practice';
+  const partsParam = searchParams.get('parts') || '';
+  const selectedPartIds = useMemo(
+    () => (partsParam ? partsParam.split(',').filter(Boolean) : []),
+    [partsParam],
+  );
+  // Khóa sessionStorage riêng cho mỗi (đề, mode, bộ Part) để phiên full-test và
+  // các phiên luyện tập theo Part khác nhau không đè lên nhau.
+  const sessionKey = useMemo(() => {
+    if (!isPractice) return testId;
+    return `${testId}::practice::${[...selectedPartIds].sort().join(',')}`;
+  }, [testId, isPractice, selectedPartIds]);
+
   const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
   const { refreshStreak } = useStreak();
   const { balance, refreshCoins } = useCoins();
@@ -116,14 +132,17 @@ function TestStartPage() {
   }, []);
 
   const loadTest = useCallback(() => {
-    const savedState = sessionStorage.getItem(`userTestState-${testId}`);
+    const savedState = sessionStorage.getItem(`userTestState-${sessionKey}`);
     let restored = false;
 
     if (savedState) {
       const parsed = JSON.parse(savedState);
       setUserTestId(parsed.userTestId || null);
       setUserAnswers(parsed.userAnswers || {});
-      if (parsed.timeLeft && parsed.lastSavedAt) {
+      // Luyện tập theo Part: KHÔNG giới hạn giờ -> timeLeft luôn null.
+      if (isPractice) {
+        setTimeLeft(null);
+      } else if (parsed.timeLeft && parsed.lastSavedAt) {
         const elapsed = Math.floor((Date.now() - parsed.lastSavedAt) / 1000);
         setTimeLeft(Math.max(0, parsed.timeLeft - elapsed));
       } else {
@@ -177,7 +196,10 @@ function TestStartPage() {
         let serverStartedAt = null;
         if (!restored) {
           try {
-            const active = await checkActiveUserTest(testId, isGuest, guestCfg);
+            const active = await checkActiveUserTest(testId, isGuest, guestCfg, {
+              mode: isPractice ? 'practice' : undefined,
+              examPartIds: isPractice ? selectedPartIds : undefined,
+            });
             const activeUserTestId = active?.userTestId;
             if (activeUserTestId) {
               serverStartedAt = active?.startedAt || null;
@@ -192,7 +214,7 @@ function TestStartPage() {
               });
               setUserTestId(activeUserTestId);
               setUserAnswers(answersMap);
-              sessionStorage.setItem(`userTest-${testId}`, activeUserTestId);
+              sessionStorage.setItem(`userTest-${sessionKey}`, activeUserTestId);
               restored = true;
             }
           } catch {
@@ -201,7 +223,9 @@ function TestStartPage() {
         }
 
         // Tính thời gian còn lại = min(duration − elapsedSinceStart, availableTo − now).
+        // Chế độ luyện tập theo Part: không giới hạn giờ -> luôn null.
         const computeTimeLeft = (startedAtIso) => {
+          if (isPractice) return null;
           const durationMinutes = testData.durationMinutes;
           const durationSec = durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
           let elapsedSec = 0;
@@ -238,7 +262,7 @@ function TestStartPage() {
         }
       })
       .catch(() => setStatus('error'));
-  }, [testId, navigate, enrichTestWithPassageMedia, isGuest, guestCfg]);
+  }, [testId, sessionKey, isPractice, selectedPartIds, navigate, enrichTestWithPassageMedia, isGuest, guestCfg]);
 
   useEffect(() => {
     if (!testId || authLoading) return;
@@ -247,20 +271,25 @@ function TestStartPage() {
 
   useEffect(() => {
     if (status === 'open' && test?.testId) {
-      const existing = sessionStorage.getItem(`userTest-${test.testId}`);
+      const existing = sessionStorage.getItem(`userTest-${sessionKey}`);
       if (existing) {
         setUserTestId(existing);
         setStatus('active');
         return;
       }
-      startUserTest(test.testId, isGuest, guestCfg)
+      startUserTest(test.testId, isGuest, guestCfg, {
+        mode: isPractice ? 'practice' : undefined,
+        examPartIds: isPractice ? selectedPartIds : undefined,
+      })
         .then((data) => {
           const id = data.userTestId;
           const startedAtIso = data.startedAt;
           setUserTestId(id);
-          sessionStorage.setItem(`userTest-${test.testId}`, id);
-          // Tính lại timer dựa trên startedAt server (phòng trường hợp BE trả lại attempt sẵn có).
-          if (startedAtIso) {
+          sessionStorage.setItem(`userTest-${sessionKey}`, id);
+          // Luyện tập: không giới hạn giờ. Full-test: tính lại timer theo startedAt server.
+          if (isPractice) {
+            setTimeLeft(null);
+          } else if (startedAtIso) {
             const now = new Date();
             const availableTo = test.availableTo ? new Date(test.availableTo) : null;
             const durationMinutes = test.durationMinutes;
@@ -280,12 +309,12 @@ function TestStartPage() {
           else setStatus('error');
         });
     }
-  }, [status, test, isGuest, guestCfg]);
+  }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg]);
 
   useEffect(() => {
     if (status === 'active' && userTestId) {
       sessionStorage.setItem(
-        `userTestState-${testId}`,
+        `userTestState-${sessionKey}`,
         JSON.stringify({
           userTestId,
           userAnswers,
@@ -294,7 +323,7 @@ function TestStartPage() {
         }),
       );
     }
-  }, [userAnswers, timeLeft, userTestId, status, testId]);
+  }, [userAnswers, timeLeft, userTestId, status, sessionKey]);
 
   // 🔄 Autosave answers lên server (debounced 2s) — để logout/đóng tab vẫn khôi phục được.
   useEffect(() => {
@@ -356,16 +385,16 @@ function TestStartPage() {
       if (payload.length > 0)
         await batchSaveAnswers(payload, isGuest, guestCfg);
       const result = await submitUserTest(userTestId, isGuest, guestCfg);
-      sessionStorage.removeItem(`userTest-${testId}`);
-      sessionStorage.removeItem(`userTestState-${testId}`);
+      sessionStorage.removeItem(`userTest-${sessionKey}`);
+      sessionStorage.removeItem(`userTestState-${sessionKey}`);
       if (!isGuest) refreshStreak(); // 🔥 cập nhật streak sau khi nộp bài
       navigate(`/tests/result/${userTestId}`, {
         state: { score: result.totalScore },
       });
     } catch (err) {
       if (err?.response?.status === 409) {
-        sessionStorage.removeItem(`userTest-${testId}`);
-        sessionStorage.removeItem(`userTestState-${testId}`);
+        sessionStorage.removeItem(`userTest-${sessionKey}`);
+        sessionStorage.removeItem(`userTestState-${sessionKey}`);
         navigate(`/tests/result/${userTestId}`);
         return;
       }
@@ -404,16 +433,24 @@ function TestStartPage() {
     }
   };
 
+  // Luyện tập theo Part: chỉ hiển thị + chấm các Part đã chọn. Full-test: hiện tất cả.
+  const visibleParts = useMemo(() => {
+    const parts = test.parts || [];
+    if (!isPractice || selectedPartIds.length === 0) return parts;
+    const set = new Set(selectedPartIds);
+    return parts.filter((p) => set.has(p.examPartId));
+  }, [test.parts, isPractice, selectedPartIds]);
+
   const allQuestions = useMemo(() => {
     return (
-      test.parts?.reduce((acc, part) => {
+      visibleParts.reduce((acc, part) => {
         const groupedQuestions = (part.questionGroups || []).reduce((gAcc, group) => {
           return [...gAcc, ...(group.questions || [])];
         }, []);
         return [...acc, ...groupedQuestions];
       }, []) || []
     );
-  }, [test.parts]);
+  }, [visibleParts]);
 
   const questionIndexMap = useMemo(() => {
     const map = {};
@@ -772,11 +809,11 @@ function TestStartPage() {
   return (
     <div className={cx('wrapper')}>
       <Container fluid className={cx('content')}>
-        <h1>Bài thi</h1>
+        <h1>{isPractice ? 'Luyện tập theo Part' : 'Bài thi'}</h1>
 
         <Row>
           <Col xs={12}>
-            {test.parts?.map((part, i) => (
+            {visibleParts.map((part, i) => (
               <div key={part.testPartId} className={cx('part-section')}>
                 <h3>
                   {part.partName || `Phần ${i + 1}`}
