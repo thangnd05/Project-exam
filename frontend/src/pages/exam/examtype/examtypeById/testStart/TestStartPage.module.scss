@@ -525,11 +525,13 @@
     border: none;
     border-radius: 0;
     background: transparent;
-    padding: 14px 18px;
+    /* FIX #3: tăng padding một chút, đỡ chật hơn bản cũ (14px 18px) */
+    padding: 18px 20px;
     transition: background 0.2s;
 
     &:not(:first-child) {
-      border-top: 1px solid #f1f5f9;
+      /* FIX #3: đậm hơn #f1f5f9 để phân tách các câu rõ ràng hơn */
+      border-top: 1px solid #e2e8f0;
     }
 
     &:hover {
@@ -560,7 +562,10 @@
       font-size: 1.4rem;
     }
 
-    input {
+    /* FIX #4: đồng bộ kích thước input với font compact (1.4rem),
+       trước đây input vẫn giữ 20px của bản gốc gây lệch tỉ lệ */
+    input[type='radio'],
+    input[type='checkbox'] {
       width: 16px;
       height: 16px;
     }
@@ -568,7 +573,7 @@
 
   @media (max-width: 768px) {
     .question-card {
-      padding: 12px 14px;
+      padding: 14px 16px;
     }
   }
 }
@@ -594,6 +599,12 @@
     transition: background 0.2s ease;
   }
 
+  /* FIX #2: giữ hiệu ứng hover/focus (đây là chủ ý UX, không phải bug),
+     nhưng thêm class .is-current để có thể đánh dấu "câu đang xem" một
+     cách tường minh từ JS (vd khi scrollToQuestion), thay vì để hover
+     ngẫu nhiên trông giống trạng thái "đang chọn". Không bắt buộc dùng
+     nếu bạn không cần tính năng này. */
+  &.is-current::before,
   &:hover::before,
   &:focus-within::before {
     background: var(--primary);
@@ -652,7 +663,10 @@
 
 .mcq-option {
   display: flex;
-  align-items: center;
+  /* FIX #1: flex-start thay vì center — trước đây khi đáp án xuống 2 dòng
+     (vd. Câu 133), radio bị kéo xuống giữa 2 dòng gây lệch hàng so với
+     các đáp án 1 dòng bên cạnh. */
+  align-items: flex-start;
   gap: 14px;
   padding: 14px 20px;
   border-radius: 12px;
@@ -674,7 +688,11 @@
     cursor: pointer;
     border: 2px solid #cbd5e1;
     transition: all 0.2s;
-    
+    flex-shrink: 0;
+    /* FIX #1: căn cho tâm ô tròn thẳng hàng với baseline dòng chữ đầu
+       thay vì bị kéo xuống giữa khối text nhiều dòng */
+    margin-top: 3px;
+
     &:checked {
       background-color: var(--primary);
       border-color: var(--primary);
