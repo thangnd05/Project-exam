@@ -112,8 +112,10 @@ public class QuestionDocumentImportService {
     // - Negative lookahead (?![-_]{2,}): nếu phía sau là chuỗi dấu gạch/gạch dưới
     //   (fill-in-blank cloze), KHÔNG coi là option. Tránh "began a ------- agreement"
     //   bị tách thành option A.
+    // - Negative lookahead (?![Mm]\\.): "A." trong "A.M." / "P.M." (viết tắt giờ) KHÔNG coi
+    //   là nhãn option. Tránh đáp án dạng "At 8:00 A.M." bị cắt đôi thành option A giả.
     private static final Pattern OPTION_LABEL_START = Pattern.compile(
-            "(?:^|\\s)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s*[\\.\\):\\-](?![-_]{2,})"
+            "(?:^|\\s)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s*[\\.\\):\\-](?![-_]{2,})(?![Mm]\\.)"
                     + "|(?:^|\\s{2,}|\\t)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s+(?![-_]{2,})",
             Pattern.CASE_INSENSITIVE
     );
