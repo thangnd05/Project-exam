@@ -95,6 +95,13 @@ const TestReviewPage = () => {
     [flatQuestions],
   );
 
+  // Map questionId -> số thứ tự toàn cục (khớp với navigator "Danh sách câu hỏi").
+  const questionNumberMap = useMemo(() => {
+    const map = new Map();
+    flatQuestions.forEach((q, idx) => map.set(String(q.questionId), idx + 1));
+    return map;
+  }, [flatQuestions]);
+
   const scrollToQuestion = (qid) => {
     const el = document.getElementById(`rq-${qid}`);
     if (!el) return;
@@ -357,6 +364,7 @@ const TestReviewPage = () => {
                   <QuestionResult
                     key={q.questionId}
                     question={q}
+                    number={questionNumberMap.get(String(q.questionId))}
                     userAnswer={userAnswer}
                     canReview={canReview}
                   />
@@ -456,7 +464,7 @@ const TestReviewPage = () => {
 // =============================
 // QUESTION COMPONENT
 // =============================
-function QuestionResult({ question, userAnswer, canReview }) {
+function QuestionResult({ question, number, userAnswer, canReview }) {
   const correctAnswer = question.answers?.find((a) => a.isCorrect);
 
   let isUserCorrect = false;
@@ -480,7 +488,8 @@ function QuestionResult({ question, userAnswer, canReview }) {
   return (
     <div id={`rq-${question.questionId}`} className={cx("question-item", resultClass)}>
       <span className={cx("q-text")}>
-        <strong>Câu hỏi:</strong> {question.questionText}
+        <strong>{number ? `Câu ${number}:` : "Câu hỏi:"}</strong>{" "}
+        {question.questionText}
       </span>
 
       {/* MCQ */}
