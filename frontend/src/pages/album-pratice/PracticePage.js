@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {useParams} from 'react-router-dom';
-import axios from '../../api/axiosClient';
 import { generatePracticeQuestion, checkPracticeAnswer, markVocabKnown } from '../../api/practiceQuestionApi';
+import { getTtsUrl } from '~/utils/mediaUrl';
 import { useStreak } from '~/hooks/useStreak';
 import {Container, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -24,7 +24,6 @@ import styles from './PracticePage.module.scss';
 const cx = classNames.bind(styles);
 
 const PracticePage = () => {
-    const backendBaseUrl = (axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
     const {albumId} = useParams();
     const [question, setQuestion] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -271,7 +270,7 @@ const PracticePage = () => {
                                 className={cx('audioPlayer')}
                             >
                                 <source
-                                    src={`${backendBaseUrl}/api/tts?text=${encodeURIComponent(question.word || '')}`}
+                                    src={getTtsUrl(question.word)}
                                     type="audio/mpeg"
                                 />
                             </audio>

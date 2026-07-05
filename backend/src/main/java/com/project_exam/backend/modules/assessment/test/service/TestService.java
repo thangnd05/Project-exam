@@ -70,6 +70,7 @@ import com.project_exam.backend.modules.users.domain.Role;
 import com.project_exam.backend.modules.users.domain.User;
 import com.project_exam.backend.modules.users.repository.RoleRepository;
 import com.project_exam.backend.modules.users.repository.UserRepository;
+import com.project_exam.backend.modules.users.service.AdminUserProvider;
 
 // --- Classroom ---
 import com.project_exam.backend.modules.classroom.repository.ClassMemberRepository;
@@ -101,8 +102,7 @@ public class TestService {
     private final TestPartRepository testPartRepository;
     private final TestQuestionRepository testQuestionRepository;
     private final AnswerService answerService;
-    private final RoleRepository  roleRepository;
-    private final UserRepository userRepository;
+    private final AdminUserProvider adminUserProvider;
     private final ExamPartRepository  examPartRepository;
     private final ExamCategoryRepository examCategoryRepository;
     private final ExamTypeRepository examTypeRepository;
@@ -234,11 +234,7 @@ public class TestService {
      * mà mọi user đều thấy (không lộ đề cá nhân của user khác).
      */
     public List<TestResponse> getAdminTestsByExamType(String examTypeId) {
-        Role adminRole = roleRepository.findByRoleName("ADMIN");
-        if (adminRole == null) return new ArrayList<>();
-        Set<String> adminIds = userRepository.findByRoleId(adminRole.getRoleId()).stream()
-                .map(User::getUserId)
-                .collect(Collectors.toSet());
+        Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) return new ArrayList<>();
 
         List<Test> filtered = testRepository.findAll().stream()
@@ -258,7 +254,7 @@ public class TestService {
         int safeSize = size <= 0 ? 12 : Math.min(size, 100);
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Set<String> adminIds = resolveAdminIds();
+        Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) return PageResponse.empty(safePage, safeSize);
 
         Page<Test> testPage = testRepository
@@ -268,18 +264,9 @@ public class TestService {
         return toTestPageResponse(testPage, userId);
     }
 
-    /** Tập userId của tất cả admin (đề công khai = do admin tạo). Rỗng nếu chưa có admin. */
-    private Set<String> resolveAdminIds() {
-        Role adminRole = roleRepository.findByRoleName("ADMIN");
-        if (adminRole == null) return Set.of();
-        return userRepository.findByRoleId(adminRole.getRoleId()).stream()
-                .map(User::getUserId)
-                .collect(Collectors.toSet());
-    }
-
-    /** collectionId của bộ đề + tất cả collection con (2 cấp). */
-    private List<String> collectionWithChildrenIds(String collectionId) {
-        List<String> ids = new ArrayList<>();
+    /** collectionId của bộ đề + tất cả collection con trực tiếp (collection chỉ 2 cấp). */
+    private Set<String> collectionWithChildrenIds(String collectionId) {
+        Set<String> ids = new HashSet<>();
         ids.add(collectionId);
         questionCollectionRepository.findByParentId(collectionId)
                 .forEach(c -> ids.add(c.getCollectionId()));
@@ -290,7 +277,7 @@ public class TestService {
      * Danh sách folder bộ đề (collection cha) của một loại kỳ thi, kèm số đề bên trong (gộp con).
      */
     public List<TestCollectionResponse> getTestCollectionsByExamType(String examTypeId) {
-        Set<String> adminIds = resolveAdminIds();
+        Set<String> adminIds = adminUserProvider.adminUserIds();
         return questionCollectionRepository.findByExamTypeIdAndParentIdIsNull(examTypeId).stream()
                 .map(folder -> {
                     long testCount = adminIds.isEmpty() ? 0L
@@ -316,7 +303,7 @@ public class TestService {
         int safeSize = size <= 0 ? 12 : Math.min(size, 100);
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Set<String> adminIds = resolveAdminIds();
+        Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) return PageResponse.empty(safePage, safeSize);
 
         Page<Test> testPage = testRepository.findByClassIdIsNullAndCreatedByInAndCollectionIdIn(
@@ -504,13 +491,9 @@ public class TestService {
     }
 
     public List<TestAdminResponse> getAllTestsByAdmin() {
-        Role adminRole = roleRepository.findByRoleName("ADMIN");
-        if (adminRole == null) return new ArrayList<>();
+        Set<String> adminIds = adminUserProvider.adminUserIds();
+        if (adminIds.isEmpty()) return new ArrayList<>();
 
-        List<User> adminUsers = userRepository.findByRoleId(adminRole.getRoleId());
-        if (adminUsers.isEmpty()) return new ArrayList<>();
-
-        List<String> adminIds = adminUsers.stream().map(User::getUserId).toList();
         List<Test> result = testRepository.findByCreatedByIn(adminIds);
         return buildAdminTestSummariesBatch(result);
     }
@@ -1164,7 +1147,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
         // 🔒 Pre-compute: admin-bank set & accessible classes của user (cache để tránh query mỗi câu).
-        Set<String> adminIds = getAdminUserIdSet();
+        Set<String> adminIds = adminUserProvider.adminUserIds();
         Set<String> accessibleClassIds = new HashSet<>();
         if (currentUserId != null) {
             classMemberRepository.findByUserIdAndStatus(currentUserId,MemberStatus.APPROVED)
@@ -1208,17 +1191,6 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
      * Cá nhân (không classId/chapterId): chỉ kho của user đăng nhập (created_by = currentUserId).
      * Lớp: classId (+ chapterId nếu có).
      */
-    @Transactional
-    private Set<String> getAdminUserIdSet() {
-        Role adminRole = roleRepository.findByRoleName("ADMIN");
-        if (adminRole == null) {
-            return Collections.emptySet();
-        }
-        return userRepository.findByRoleId(adminRole.getRoleId()).stream()
-                .map(User::getUserId)
-                .collect(Collectors.toSet());
-    }
-
     public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId, HttpServletRequest httpRequest) {
         if (request.getTestPartId() == null || request.getCount() == null || request.getCount() <= 0) {
             throw new BadRequestException("testPartId và count (số câu) phải hợp lệ.");
@@ -1265,7 +1237,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         // Lấy TOÀN BỘ ứng viên cho part (KHÔNG limit ở DB) để có thể gom theo passage.
         List<Question> candidates;
         if (useAdminBank) {
-            Set<String> adminIds = getAdminUserIdSet();
+            Set<String> adminIds = adminUserProvider.adminUserIds();
             candidates = adminIds.isEmpty()
                     ? new ArrayList<>()
                     : new ArrayList<>(questionRepository.findAdminBankByExamPart(examPartId, adminIds));
@@ -1283,7 +1255,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         // Giới hạn theo Bộ đề (collection) nếu có. removeIf giữ nguyên thứ tự còn lại nên
         // chế độ "tuần tự" vẫn khớp index với danh sách (đã lọc bộ đề) mà FE hiển thị.
         if (request.getCollectionId() != null && !request.getCollectionId().isBlank()) {
-            Set<String> collectionScope = collectionScopeIds(request.getCollectionId());
+            Set<String> collectionScope = collectionWithChildrenIds(request.getCollectionId());
             candidates.removeIf(q -> q.getCollectionId() == null
                     || !collectionScope.contains(q.getCollectionId()));
         }
@@ -1337,18 +1309,6 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
      * thứ tự các nhóm rồi thêm nguyên nhóm cho tới khi đạt {@code count} — có thể dôi ra ở nhóm
      * cuối, KHÔNG bao giờ cắt giữa nhóm.</p>
      */
-    /**
-     * Tập id bộ đề dùng để lọc câu: gồm chính bộ đề và các bộ đề con trực tiếp
-     * (collection chỉ 2 cấp nên con trực tiếp là đủ).
-     */
-    private Set<String> collectionScopeIds(String collectionId) {
-        Set<String> ids = new HashSet<>();
-        ids.add(collectionId);
-        questionCollectionRepository.findByParentId(collectionId)
-                .forEach(c -> ids.add(c.getCollectionId()));
-        return ids;
-    }
-
     private List<Question> pickRandomQuestionsKeepingPassages(
             List<Question> candidates, Set<String> existingIds, int count) {
         LinkedHashMap<String, List<Question>> passageGroups = new LinkedHashMap<>();

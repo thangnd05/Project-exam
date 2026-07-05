@@ -1,4 +1,5 @@
 import axios from '../../../../../api/axiosClient';
+import { getApiErrorMessage } from '../../../../../utils/apiError';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '../../../../../api/userTestApi';
 import { getAnswersByUserTest, batchSaveAnswers } from '../../../../../api/userAnswerApi';
 import { getUserTestInfo, purchaseTestAccess } from '../../../../../api/testApi';
@@ -26,11 +27,6 @@ import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
 import styles from './TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
-
-const getApiErrorMessage = (error, fallbackMessage) =>
-  error?.response?.data?.message ||
-  error?.response?.data?.error ||
-  fallbackMessage;
 
 function TestStartPage() {
   const { testId } = useParams();

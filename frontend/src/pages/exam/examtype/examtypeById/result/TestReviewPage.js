@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from '../../../../../api/axiosClient';
 import { getUserTestMeta } from '../../../../../api/userTestApi';
 import { getAnswersByUserTest } from '../../../../../api/userAnswerApi';
 import { getUserTestInfo, getAdminTestById } from '../../../../../api/testApi';
@@ -16,17 +15,10 @@ import {
 
 import { AuthContext } from "~/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/utils/guestSession";
+import { getFullMediaUrl } from "~/utils/mediaUrl";
 import styles from "./TestReviewPage.module.scss";
 
 const cx = classNames.bind(styles);
-
-const getFullMediaUrl = (url) => {
-  if (!url) return null;
-  const cleanUrl = url.trim();
-  if (cleanUrl.startsWith('http')) return cleanUrl;
-  const backendUrl = axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '';
-  return `${backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl}/${cleanUrl.startsWith('/') ? cleanUrl.slice(1) : cleanUrl}`;
-};
 
 // Trạng thái 1 câu: correct | incorrect | unanswered (để tô màu navigator).
 // MSQ: tập đã chọn phải trùng khít tập đáp án đúng (all-or-nothing).

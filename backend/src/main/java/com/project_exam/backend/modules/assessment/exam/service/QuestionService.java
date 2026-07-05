@@ -33,6 +33,7 @@ import com.project_exam.backend.modules.vocabulary.domain.*;
 import com.project_exam.backend.modules.classroom.domain.*;
 import com.project_exam.backend.modules.audit.domain.*;
 import com.project_exam.backend.modules.users.repository.*;
+import com.project_exam.backend.modules.users.service.AdminUserProvider;
 import com.project_exam.backend.modules.posts.repository.*;
 import com.project_exam.backend.modules.assessment.exam.repository.*;
 import com.project_exam.backend.modules.assessment.test.repository.*;
@@ -70,8 +71,7 @@ public class QuestionService {
     private final ClassMemberRepository classMemberRepository;
     private final ClassRepository classRepository;
     private final QuestionDocumentImportService questionDocumentImportService;
-    private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
+    private final AdminUserProvider adminUserProvider;
     private final ClassAccessGuard classAccessGuard;
     private final UserAnswerRepository userAnswerRepository;
     private final TagService tagService;
@@ -257,7 +257,7 @@ public class QuestionService {
      */
     public List<QuestionResponse> getAdminBankQuestionsByPart(String examPartId, HttpServletRequest request) {
         authUtils.getUserId(request); // bắt buộc đăng nhập
-        Set<String> adminIds = getAdminUserIds();
+        Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -270,22 +270,13 @@ public class QuestionService {
 
     public long countAdminBankQuestionsByPart(String examPartId, HttpServletRequest request) {
         authUtils.getUserId(request);
-        Set<String> adminIds = getAdminUserIds();
+        Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return 0L;
         }
         return questionRepository.countAdminBankByExamPart(examPartId, adminIds);
     }
 
-    private Set<String> getAdminUserIds() {
-        Role adminRole = roleRepository.findByRoleName("ADMIN");
-        if (adminRole == null) {
-            return Collections.emptySet();
-        }
-        return userRepository.findByRoleId(adminRole.getRoleId()).stream()
-                .map(User::getUserId)
-                .collect(Collectors.toSet());
-    }
 
     private Set<String> getAccessibleClassIds(String currentUserId) {
         Set<String> classIds = new LinkedHashSet<>();
@@ -606,24 +597,7 @@ public class QuestionService {
         passage = passageRepository.save(passage);
         String passageId = passage.getPassageId();
         for (MultipartFile file : uploadedFiles) {
-            String contentType = file.getContentType();
-            String uploadedUrl;
-            PassageMedia.MediaType mediaType;
-            if (contentType != null && contentType.startsWith("audio")) {
-                uploadedUrl = cloudinaryService.uploadAudio(file);
-                mediaType = PassageMedia.MediaType.AUDIO;
-            } else if (contentType != null && contentType.startsWith("image")) {
-                uploadedUrl = cloudinaryService.uploadImage(file);
-                mediaType = PassageMedia.MediaType.IMAGE;
-            } else {
-                uploadedUrl = cloudinaryService.uploadDocument(file);
-                mediaType = PassageMedia.MediaType.DOCUMENT;
-            }
-            PassageMedia media = new PassageMedia();
-            media.setPassageId(passageId);
-            media.setMediaUrl(uploadedUrl);
-            media.setMediaType(mediaType);
-            passageMediaRepository.save(media);
+            savePassageMediaFile(passageId, file);
         }
 
         List<QuestionAdminResponse> responses = new ArrayList<>();
@@ -829,32 +803,8 @@ public class QuestionService {
             // 🔥 XỬ LÝ ĐA PHƯƠNG TIỆN (Lưu vào passage_media)
             if (hasFiles) {
                 for (MultipartFile file : files.values()) {
-
                     if (file == null || file.isEmpty()) continue;
-
-                    String contentType = file.getContentType();
-
-                    String uploadedUrl;
-                    PassageMedia.MediaType mediaType;
-
-                    if (contentType != null && contentType.startsWith("image")) {
-                        uploadedUrl = cloudinaryService.uploadImage(file);
-                        mediaType = PassageMedia.MediaType.IMAGE;
-                    } else if (contentType != null && contentType.startsWith("audio")) {
-                        uploadedUrl = cloudinaryService.uploadAudio(file);
-                        mediaType = PassageMedia.MediaType.AUDIO;
-                    } else {
-                        // PDF / DOC / XLS ...
-                        uploadedUrl = cloudinaryService.uploadDocument(file);
-                        mediaType = PassageMedia.MediaType.DOCUMENT;
-                    }
-
-                    PassageMedia media = new PassageMedia();
-                    media.setPassageId(passageId);
-                    media.setMediaUrl(uploadedUrl);
-                    media.setMediaType(mediaType);
-
-                    passageMediaRepository.save(media);
+                    savePassageMediaFile(passageId, file);
                 }
             }
         }
@@ -985,25 +935,35 @@ public class QuestionService {
             if (file == null || file.isEmpty()) {
                 continue;
             }
-            String contentType = file.getContentType();
-            String uploadedUrl;
-            PassageMedia.MediaType mediaType;
-            if (contentType != null && contentType.startsWith("image")) {
-                uploadedUrl = cloudinaryService.uploadImage(file);
-                mediaType = PassageMedia.MediaType.IMAGE;
-            } else if (contentType != null && contentType.startsWith("audio")) {
-                uploadedUrl = cloudinaryService.uploadAudio(file);
-                mediaType = PassageMedia.MediaType.AUDIO;
-            } else {
-                uploadedUrl = cloudinaryService.uploadDocument(file);
-                mediaType = PassageMedia.MediaType.DOCUMENT;
-            }
-            PassageMedia media = new PassageMedia();
-            media.setPassageId(passageId);
-            media.setMediaUrl(uploadedUrl);
-            media.setMediaType(mediaType);
-            passageMediaRepository.save(media);
+            savePassageMediaFile(passageId, file);
         }
+    }
+
+    /**
+     * Upload 1 file lên Cloudinary theo content-type (audio/image/document) rồi lưu 1 bản ghi
+     * passage_media. Why: logic phân loại + lưu này trước đây bị copy inline ở nhiều luồng tạo câu
+     * (bulk, group, create-and-attach), gom về một chỗ để không lệch nhau khi sửa.
+     * Ba nhánh loại trừ lẫn nhau nên thứ tự if không ảnh hưởng kết quả.
+     */
+    private void savePassageMediaFile(String passageId, MultipartFile file) throws IOException {
+        String contentType = file.getContentType();
+        String uploadedUrl;
+        PassageMedia.MediaType mediaType;
+        if (contentType != null && contentType.startsWith("audio")) {
+            uploadedUrl = cloudinaryService.uploadAudio(file);
+            mediaType = PassageMedia.MediaType.AUDIO;
+        } else if (contentType != null && contentType.startsWith("image")) {
+            uploadedUrl = cloudinaryService.uploadImage(file);
+            mediaType = PassageMedia.MediaType.IMAGE;
+        } else {
+            uploadedUrl = cloudinaryService.uploadDocument(file);
+            mediaType = PassageMedia.MediaType.DOCUMENT;
+        }
+        PassageMedia media = new PassageMedia();
+        media.setPassageId(passageId);
+        media.setMediaUrl(uploadedUrl);
+        media.setMediaType(mediaType);
+        passageMediaRepository.save(media);
     }
 
     private QuestionAdminResponse buildQuestionAdminResponse(Question question, Passage passage,
@@ -1217,14 +1177,6 @@ public class QuestionService {
         // 🔒 Nếu lưu vào kho lớp/chapter, user phải có quyền với lớp đó.
         requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
 
-        System.out.println("========== DEBUG START ==========");
-        if (files != null) {
-            System.out.println("Tổng số lượng file nhận được từ Controller: " + files.size());
-            System.out.println("Danh sách các Key file: " + files.keySet());
-        } else {
-            System.out.println("Biến 'files' bị NULL!");
-        }
-
         List<QuestionAdminResponse> allResponses = new ArrayList<>();
         int baseMax = resolveMaxQuestionNumber(
                 request.getExamPartId(), request.getClassId(), request.getChapterId(), currentUserId);
@@ -1266,30 +1218,8 @@ public class QuestionService {
                         .toList();
 
                 for (MultipartFile file : mediaFiles) {
-
                     if (file == null || file.isEmpty()) continue;
-
-                    String uploadedUrl;
-                    PassageMedia.MediaType mediaType;
-
-                    String contentType = file.getContentType();
-                    if (contentType != null && contentType.startsWith("audio")) {
-                        uploadedUrl = cloudinaryService.uploadAudio(file);
-                        mediaType = PassageMedia.MediaType.AUDIO;
-                    } else if (contentType != null && contentType.startsWith("image")) {
-                        uploadedUrl = cloudinaryService.uploadImage(file);
-                        mediaType = PassageMedia.MediaType.IMAGE;
-                    } else {
-                        uploadedUrl = cloudinaryService.uploadDocument(file);
-                        mediaType = PassageMedia.MediaType.DOCUMENT;
-                    }
-
-                    PassageMedia media = new PassageMedia();
-                    media.setPassageId(passage.getPassageId());
-                    media.setMediaUrl(uploadedUrl);
-                    media.setMediaType(mediaType);
-
-                    passageMediaRepository.save(media);
+                    savePassageMediaFile(passage.getPassageId(), file);
                 }
             }
 
