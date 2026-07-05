@@ -1,16 +1,10 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Coins, Edit, Plus, Trash2} from 'lucide-react';
 
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 
-import {
-  createCoinWallet,
-  deleteCoinWallet,
-  getCoinWallets,
-  updateCoinBalance,
-} from '../../api/coinApi';
 import {getUsers} from '../../api/userApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {
@@ -19,6 +13,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
+import {useCoins} from './hooks/useCoins';
 
 const defaultFormState = {
   userId: '',
@@ -26,33 +21,23 @@ const defaultFormState = {
 };
 
 function CoinsManagement() {
-  const [wallets, setWallets] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingWallet, setEditingWallet] = useState(null); // null = đang tạo mới
   const [formState, setFormState] = useState(defaultFormState);
   const [userOptions, setUserOptions] = useState([]); // user chưa có ví (để tạo mới)
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deletingWallet, setDeletingWallet] = useState(null);
 
-  const loadWallets = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const data = await getCoinWallets();
-      setWallets(Array.isArray(data) ? data : []);
-    } catch (error) {
-      setErrorMessage('Không thể tải danh sách ví xu.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadWallets();
-  }, [loadWallets]);
+  const {
+    wallets,
+    isLoading: loading,
+    isError,
+    createWallet,
+    updateWallet,
+    deleteWallet,
+  } = useCoins();
 
   const filteredWallets = useMemo(() => {
     const normalized = keyword.trim().toLowerCase();
@@ -112,20 +97,15 @@ function CoinsManagement() {
     setErrorMessage('');
     try {
       if (editingWallet) {
-        const updated = await updateCoinBalance(editingWallet.userId, {
+        await updateWallet({
+          userId: editingWallet.userId,
           balance: balanceNumber,
         });
-        setWallets((previous) =>
-          previous.map((wallet) =>
-            wallet.userId === editingWallet.userId ? updated : wallet,
-          ),
-        );
       } else {
-        const created = await createCoinWallet({
+        await createWallet({
           userId: formState.userId,
           balance: balanceNumber,
         });
-        setWallets((previous) => [...previous, created]);
       }
       setShowModal(false);
       resetForm();
@@ -145,10 +125,7 @@ function CoinsManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteCoinWallet(deletingWallet.userId);
-      setWallets((previous) =>
-        previous.filter((wallet) => wallet.userId !== deletingWallet.userId),
-      );
+      await deleteWallet(deletingWallet.userId);
       setDeletingWallet(null);
     } catch (error) {
       setErrorMessage('Không thể xóa ví xu.');
@@ -204,7 +181,13 @@ function CoinsManagement() {
         onSearchChange={setKeyword}
         searchPlaceholder="Tìm theo tên đăng nhập, họ tên hoặc email..."
       />
-      {!showModal && <AdminFieldError message={errorMessage} />}
+      {!showModal && (
+        <AdminFieldError
+          message={
+            errorMessage || (isError ? 'Không thể tải danh sách ví xu.' : '')
+          }
+        />
+      )}
 
       <AdminTable
         showIndex

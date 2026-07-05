@@ -1,18 +1,8 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
 
-import {getStandardExamTypes} from '../../api/examTypeApi';
-import {getExamParts} from '../../api/examPartApi';
-import {getSkills} from '../../api/skillApi';
-import {getScoringConversions} from '../../api/scoringConversionApi';
-import {
-  createMilestone,
-  deleteMilestone,
-  getMilestones,
-  updateMilestone,
-} from '../../api/milestoneApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import useMilestoneScoring from '../../hooks/useMilestoneScoring';
 import {
@@ -20,6 +10,7 @@ import {
   AdminPageHeader,
   AdminToolbar,
 } from '../components/common';
+import {useMilestones} from './hooks/useMilestones';
 import styles from './Milestones.module.scss';
 
 const cx = classNames.bind(styles);
@@ -42,14 +33,8 @@ const sortPartsByNameOrder = (parts) => {
 };
 
 function MilestonesManagement() {
-  const [milestones, setMilestones] = useState([]);
-  const [examTypes, setExamTypes] = useState([]);
-  const [examParts, setExamParts] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [scoringConversions, setScoringConversions] = useState([]);
   const [examTypeFilter, setExamTypeFilter] = useState('');
   const [keyword, setKeyword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingMilestone, setDeletingMilestone] = useState(null);
@@ -60,51 +45,37 @@ function MilestonesManagement() {
   const [newScore, setNewScore] = useState('');
   const [newDescription, setNewDescription] = useState('');
 
-  const loadExamTypes = useCallback(async () => {
-    try {
-      const data = await getStandardExamTypes();
-      setExamTypes(data);
-      if (data.length > 0 && !examTypeFilter) {
-        setExamTypeFilter(data[0].examTypeId);
-      }
-    } catch {
-      setErrorMessage('Không thể tải danh sách loại kỳ thi.');
-    }
-  }, []);
+  const {
+    milestones,
+    examTypes,
+    examParts,
+    skills,
+    scoringConversions,
+    isLoading,
+    loadErrorText,
+    createMilestone,
+    updateMilestone,
+    deleteMilestone,
+  } = useMilestones(examTypeFilter);
 
-  const loadExamParts = useCallback(async () => {
-    try {
-      const data = await getExamParts();
-      setExamParts(data);
-    } catch {
-      setErrorMessage('Không thể tải danh sách phần thi.');
-    }
-  }, []);
-
+  // Chọn sẵn loại kỳ thi đầu tiên khi danh sách vừa tải xong.
   useEffect(() => {
-    loadExamTypes();
-    loadExamParts();
-    getSkills().then(setSkills).catch(() => {});
-    getScoringConversions().then(setScoringConversions).catch(() => {});
-  }, [loadExamTypes, loadExamParts]);
-
-  const loadMilestones = useCallback(async () => {
-    if (!examTypeFilter) return;
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const data = await getMilestones(examTypeFilter);
-      setMilestones(data);
-    } catch {
-      setErrorMessage('Không thể tải danh sách mốc điểm.');
-    } finally {
-      setLoading(false);
+    if (examTypes.length > 0 && !examTypeFilter) {
+      setExamTypeFilter(examTypes[0].examTypeId);
     }
+  }, [examTypes, examTypeFilter]);
+
+  // Xóa thông báo lỗi cũ mỗi khi đổi loại kỳ thi.
+  useEffect(() => {
+    setErrorMessage('');
   }, [examTypeFilter]);
 
+  // Đưa lỗi tải dữ liệu ra khối thông báo chung.
   useEffect(() => {
-    loadMilestones();
-  }, [loadMilestones]);
+    if (loadErrorText) {
+      setErrorMessage(loadErrorText);
+    }
+  }, [loadErrorText]);
 
   const filteredParts = sortPartsByNameOrder(
     examParts.filter((p) => p.examTypeId === examTypeFilter),
@@ -160,7 +131,6 @@ function MilestonesManagement() {
 
       setNewScore('');
       setNewDescription('');
-      loadMilestones();
     } catch {
       setErrorMessage('Không thể tạo mốc điểm. Có thể mốc này đã tồn tại.');
     } finally {
@@ -203,7 +173,6 @@ function MilestonesManagement() {
 
       setEditingId(null);
       setEditParts({});
-      loadMilestones();
     } catch {
       setErrorMessage('Không thể cập nhật cấu hình.');
     } finally {
@@ -218,7 +187,6 @@ function MilestonesManagement() {
     try {
       await deleteMilestone(deletingMilestone.examTargetMilestoneId);
       setDeletingMilestone(null);
-      loadMilestones();
     } catch {
       setErrorMessage('Không thể xóa mốc điểm.');
     } finally {
@@ -313,20 +281,20 @@ function MilestonesManagement() {
         </div>
       )}
 
-      {loading && (
+      {isLoading && (
         <div className="text-center py-4">
           <Spinner size="sm" className="me-2" />
           Đang tải...
         </div>
       )}
 
-      {!loading && filteredMilestones.length === 0 && examTypeFilter && (
+      {!isLoading && filteredMilestones.length === 0 && examTypeFilter && (
         <div className={cx('emptyState')}>
           Chưa có mốc điểm nào cho loại kỳ thi này.
         </div>
       )}
 
-      {!loading &&
+      {!isLoading &&
         filteredMilestones.map((m) => (
           <div key={m.examTargetMilestoneId} className={cx('milestoneCard')}>
             <div className={cx('milestoneHeader')}>

@@ -1,19 +1,13 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Form, Button, Spinner} from 'react-bootstrap';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
 
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
-import {
-  createQuestionCollection,
-  deleteQuestionCollection,
-  getQuestionCollections,
-  updateQuestionCollection,
-} from '../../api/questionCollectionApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
-import {getExamTypes} from '../../api/examTypeApi';
+import {useQuestionCollections} from './hooks/useQuestionCollections';
 import styles from './QuestionCollections.module.scss';
 
 const cx = classNames.bind(styles);
@@ -25,22 +19,6 @@ const defaultFormState = {
   examTypeId: '',
   displayOrder: '',
 };
-
-const mapCollectionFromApi = (collection) => ({
-  collection_id: String(collection.collectionId),
-  name: collection.name || '',
-  description: collection.description || '',
-  question_count: typeof collection.questionCount === 'number' ? collection.questionCount : 0,
-  parent_id: collection.parentId ? String(collection.parentId) : '',
-  parent_name: collection.parentName || '',
-  child_count: typeof collection.childCount === 'number' ? collection.childCount : 0,
-  total_question_count:
-    typeof collection.totalQuestionCount === 'number'
-      ? collection.totalQuestionCount
-      : (typeof collection.questionCount === 'number' ? collection.questionCount : 0),
-  exam_type_id: collection.examTypeId ? String(collection.examTypeId) : '',
-  display_order: typeof collection.displayOrder === 'number' ? collection.displayOrder : null,
-});
 
 const extractApiErrorMessage = (error, fallback) =>
   error?.response?.data?.message || error?.response?.data?.error || error?.message || fallback;
@@ -135,43 +113,40 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
 
 // ==================== Main Page ====================
 function QuestionCollectionsManagement() {
-  const [collectionList, setCollectionList] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formState, setFormState] = useState(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deletingItem, setDeletingItem] = useState(null);
   const [expandedIds, setExpandedIds] = useState(new Set());
-  const [examTypes, setExamTypes] = useState([]);
 
-  const loadCollections = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const data = await getQuestionCollections();
-      const mapped = (Array.isArray(data) ? data : []).map(mapCollectionFromApi);
-      setCollectionList(mapped);
-      // Mặc định mở tất cả nhóm cha có con.
-      setExpandedIds(new Set(mapped.filter((c) => c.child_count > 0).map((c) => c.collection_id)));
-    } catch (error) {
-      setErrorMessage(extractApiErrorMessage(error, 'Không thể tải danh sách bộ sưu tập.'));
-    } finally {
-      setLoading(false);
-    }
+  const {
+    collections: collectionList,
+    examTypes,
+    isLoading: loading,
+    isSuccess: collectionsLoaded,
+    isError: collectionsError,
+    error: collectionsErrorObj,
+    refetchCollections,
+    createCollection,
+    updateCollection,
+    deleteCollection,
+  } = useQuestionCollections();
+
+  // Đặt trạng thái mở mặc định: mở tất cả nhóm cha có con.
+  const applyDefaultExpanded = useCallback((list) => {
+    setExpandedIds(new Set(list.filter((c) => c.child_count > 0).map((c) => c.collection_id)));
   }, []);
 
+  // Mở mặc định một lần khi tải xong lần đầu; các thao tác sau tự quản expandedIds.
+  const didInitExpand = useRef(false);
   useEffect(() => {
-    loadCollections();
-  }, [loadCollections]);
-
-  useEffect(() => {
-    getExamTypes()
-      .then((data) => setExamTypes(Array.isArray(data) ? data : (data?.data || data?.content || [])))
-      .catch(() => setExamTypes([]));
-  }, []);
+    if (didInitExpand.current || !collectionsLoaded) return;
+    didInitExpand.current = true;
+    applyDefaultExpanded(collectionList);
+  }, [collectionsLoaded, collectionList, applyDefaultExpanded]);
 
   const examTypeName = useCallback(
     (id) => examTypes.find((t) => String(t.examTypeId) === String(id))?.name || '',
@@ -285,12 +260,13 @@ function QuestionCollectionsManagement() {
       };
 
       if (editingId) {
-        await updateQuestionCollection(editingId, payload);
+        await updateCollection({id: editingId, payload});
       } else {
-        await createQuestionCollection(payload);
+        await createCollection(payload);
       }
       // Tải lại để số đếm gộp con-cháu và quan hệ cha-con luôn chính xác.
-      await loadCollections();
+      const {data: fresh} = await refetchCollections();
+      applyDefaultExpanded(Array.isArray(fresh) ? fresh : []);
       if (payload.parentId) {
         setExpandedIds((prev) => new Set(prev).add(payload.parentId));
       }
@@ -308,9 +284,10 @@ function QuestionCollectionsManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteQuestionCollection(deletingItem.collection_id);
+      await deleteCollection(deletingItem.collection_id);
       setDeletingItem(null);
-      await loadCollections();
+      const {data: fresh} = await refetchCollections();
+      applyDefaultExpanded(Array.isArray(fresh) ? fresh : []);
     } catch (error) {
       setErrorMessage(extractApiErrorMessage(error, 'Không thể xoá bộ sưu tập.'));
     } finally {
@@ -346,7 +323,14 @@ function QuestionCollectionsManagement() {
         onSearchChange={setKeyword}
         searchPlaceholder="Tìm theo tên bộ sưu tập hoặc mô tả..."
       />
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError
+        message={
+          errorMessage ||
+          (collectionsError
+            ? extractApiErrorMessage(collectionsErrorObj, 'Không thể tải danh sách bộ sưu tập.')
+            : '')
+        }
+      />
 
       <div className={cx('treeWrapper')}>
         <div className={cx('treeToolbar')}>

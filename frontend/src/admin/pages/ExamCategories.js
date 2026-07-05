@@ -1,13 +1,7 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Badge, Button} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {
-  createExamCategory,
-  deleteExamCategory,
-  getExamCategories,
-  updateExamCategory,
-} from '../../api/examCategoryApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import ExamCategoryFormModal from '../modals/ExamCategoryFormModal';
 import {
@@ -16,6 +10,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
+import {useExamCategories} from './hooks/useExamCategories';
 
 const emptyForm = {
   code: '',
@@ -24,15 +19,6 @@ const emptyForm = {
   guestAllowed: false,
   displayOrder: 0,
 };
-
-const mapFromApi = (item) => ({
-  examCategoryId: String(item.examCategoryId),
-  code: item.code || '',
-  name: item.name || '',
-  description: item.description || '',
-  guestAllowed: !!item.guestAllowed,
-  displayOrder: item.displayOrder ?? 0,
-});
 
 const buildPayload = (formState) => ({
   code: formState.code.trim(),
@@ -43,15 +29,25 @@ const buildPayload = (formState) => ({
 });
 
 function ExamCategoriesManagement() {
-  const [categories, setCategories] = useState([]);
+  const {
+    categories,
+    isLoading: loading,
+    isError,
+    createMutation,
+    updateMutation,
+    deleteMutation,
+  } = useExamCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingItem, setDeletingItem] = useState(null);
+
+  const submitting =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   const filtered = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -63,23 +59,6 @@ function ExamCategoriesManagement() {
         (c.description || '').toLowerCase().includes(keyword),
     );
   }, [categories, searchTerm]);
-
-  const fetchAll = async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const list = await getExamCategories();
-      setCategories(list.map(mapFromApi));
-    } catch (error) {
-      setErrorMessage('Không thể tải danh sách phân loại bài thi.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAll();
-  }, []);
 
   const resetForm = () => {
     setFormState(emptyForm);
@@ -116,20 +95,13 @@ function ExamCategoriesManagement() {
       return;
     }
 
-    setSubmitting(true);
     setErrorMessage('');
     try {
       const payload = buildPayload(formState);
       if (editingId) {
-        const updated = await updateExamCategory(editingId, payload);
-        setCategories((prev) =>
-          prev.map((item) =>
-            item.examCategoryId === editingId ? mapFromApi(updated) : item,
-          ),
-        );
+        await updateMutation.mutateAsync({id: editingId, payload});
       } else {
-        const created = await createExamCategory(payload);
-        setCategories((prev) => [...prev, mapFromApi(created)]);
+        await createMutation.mutateAsync(payload);
       }
       setShowFormModal(false);
       resetForm();
@@ -139,25 +111,17 @@ function ExamCategoriesManagement() {
         error.response?.data ||
         'Không thể lưu phân loại bài thi. Vui lòng thử lại.';
       setErrorMessage(typeof msg === 'string' ? msg : JSON.stringify(msg));
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const handleConfirmDelete = async () => {
     if (!deletingItem) return;
-    setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteExamCategory(deletingItem.examCategoryId);
-      setCategories((prev) =>
-        prev.filter((item) => item.examCategoryId !== deletingItem.examCategoryId),
-      );
+      await deleteMutation.mutateAsync(deletingItem.examCategoryId);
       setDeletingItem(null);
     } catch (error) {
       setErrorMessage('Không thể xóa phân loại này.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -199,7 +163,12 @@ function ExamCategoriesManagement() {
         onSearchChange={setSearchTerm}
         searchPlaceholder="Tìm theo code, tên, mô tả..."
       />
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError
+        message={
+          errorMessage ||
+          (isError ? 'Không thể tải danh sách phân loại bài thi.' : '')
+        }
+      />
 
       <AdminTable
         showIndex

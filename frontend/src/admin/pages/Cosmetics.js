@@ -1,13 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {
-  createCosmetic,
-  deleteCosmetic,
-  getCosmetics,
-  updateCosmetic,
-} from '../../api/cosmeticApi';
+import {useCosmetics} from './hooks/useCosmetics';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
@@ -81,32 +76,26 @@ function CosmeticPreview({item, size = 56}) {
 }
 
 function CosmeticsManagement() {
-  const [items, setItems] = useState([]);
+  const {
+    items,
+    isLoading: loading,
+    isError,
+    createCosmetic,
+    updateCosmetic,
+    deleteCosmetic,
+    isSubmitting,
+    isDeleting,
+  } = useCosmetics();
+
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formState, setFormState] = useState(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const data = await getCosmetics();
-      setItems(Array.isArray(data) ? data : []);
-    } catch (error) {
-      setErrorMessage('Không thể tải danh sách vật phẩm.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const submitting = isSubmitting || isDeleting;
+  const listErrorMessage = isError ? 'Không thể tải danh sách vật phẩm.' : '';
 
   const filtered = useMemo(() => {
     const normalized = keyword.trim().toLowerCase();
@@ -171,36 +160,27 @@ function CosmeticsManagement() {
       displayOrder: Number(formState.displayOrder) || 0,
     };
 
-    setSubmitting(true);
     setErrorMessage('');
     try {
       if (editingId) {
-        const updated = await updateCosmetic(editingId, payload);
-        setItems((prev) => prev.map((it) => (it.cosmeticId === editingId ? updated : it)));
+        await updateCosmetic({id: editingId, payload});
       } else {
-        const created = await createCosmetic(payload);
-        setItems((prev) => [...prev, created]);
+        await createCosmetic(payload);
       }
       setShowModal(false);
       resetForm();
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || 'Không thể lưu vật phẩm.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
     if (!deleting) return;
-    setSubmitting(true);
     try {
       await deleteCosmetic(deleting.cosmeticId);
-      setItems((prev) => prev.filter((it) => it.cosmeticId !== deleting.cosmeticId));
       setDeleting(null);
     } catch (error) {
       setErrorMessage('Không thể xóa vật phẩm.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -237,7 +217,7 @@ function CosmeticsManagement() {
         onSearchChange={setKeyword}
         searchPlaceholder="Tìm theo tên..."
       />
-      <AdminFieldError message={!showModal ? errorMessage : ''} />
+      <AdminFieldError message={!showModal ? errorMessage || listErrorMessage : ''} />
 
       <AdminTable
         showIndex

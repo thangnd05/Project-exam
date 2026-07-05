@@ -1,15 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import {Edit, Plus, ShieldCheck, Trash2} from 'lucide-react';
 
-import {
-  createRole,
-  deleteRole,
-  getRoles,
-  updateRole,
-  updateRolePermissions,
-} from '../../api/roleApi';
-import {getPermissions} from '../../api/permissionApi';
+import {useRoles} from './hooks/useRoles';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
@@ -26,52 +19,28 @@ const emptyForm = {
 };
 
 function RolesManagement() {
-  const [roleList, setRoleList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingRoleId, setEditingRoleId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingRole, setDeletingRole] = useState(null);
 
   // Phân quyền (RBAC): danh mục permission + modal gán cho role
-  const [permissionCatalog, setPermissionCatalog] = useState([]);
   const [permRole, setPermRole] = useState(null);
   const [permSelected, setPermSelected] = useState(() => new Set());
   const [permSaving, setPermSaving] = useState(false);
 
-  const mapRoleFromApi = (role) => ({
-    role_id: String(role.roleId),
-    role_name: role.roleName || '',
-    description: role.description || '',
-    permissions: Array.isArray(role.permissions) ? role.permissions : [],
-  });
-
-  const loadRoles = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const roleData = await getRoles();
-      setRoleList(roleData.map(mapRoleFromApi));
-    } catch (error) {
-      setErrorMessage('Không thể tải danh sách vai trò.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadRoles();
-  }, [loadRoles]);
-
-  // Tải danh mục permission một lần để dựng ma trận phân quyền.
-  useEffect(() => {
-    getPermissions()
-      .then((data) => setPermissionCatalog(Array.isArray(data) ? data : []))
-      .catch(() => setPermissionCatalog([]));
-  }, []);
+  const {
+    roleList,
+    permissionCatalog,
+    loading,
+    createRoleMutation,
+    updateRoleMutation,
+    deleteRoleMutation,
+    updatePermissionsMutation,
+  } = useRoles();
 
   // Gom permission theo nhóm để hiển thị theo từng khối.
   const permissionGroups = useMemo(() => {
@@ -119,12 +88,10 @@ function RolesManagement() {
     setErrorMessage('');
     try {
       const codes = Array.from(permSelected);
-      const updated = await updateRolePermissions(permRole.role_id, codes);
-      setRoleList((previous) =>
-        previous.map((role) =>
-          role.role_id === permRole.role_id ? mapRoleFromApi(updated) : role,
-        ),
-      );
+      await updatePermissionsMutation.mutateAsync({
+        id: permRole.role_id,
+        codes,
+      });
       setPermRole(null);
     } catch (error) {
       setErrorMessage('Không thể lưu phân quyền.');
@@ -182,15 +149,9 @@ function RolesManagement() {
       };
 
       if (editingRoleId) {
-        const updatedRole = await updateRole(editingRoleId, payload);
-        setRoleList((previous) =>
-          previous.map((role) =>
-            role.role_id === editingRoleId ? mapRoleFromApi(updatedRole) : role,
-          ),
-        );
+        await updateRoleMutation.mutateAsync({id: editingRoleId, payload});
       } else {
-        const createdRole = await createRole(payload);
-        setRoleList((previous) => [...previous, mapRoleFromApi(createdRole)]);
+        await createRoleMutation.mutateAsync(payload);
       }
 
       setShowFormModal(false);
@@ -209,10 +170,7 @@ function RolesManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteRole(deletingRole.role_id);
-      setRoleList((previous) =>
-        previous.filter((role) => role.role_id !== deletingRole.role_id),
-      );
+      await deleteRoleMutation.mutateAsync(deletingRole.role_id);
       setDeletingRole(null);
     } catch (error) {
       setErrorMessage('Không thể xóa vai trò.');

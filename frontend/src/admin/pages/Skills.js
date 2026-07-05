@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {createSkill, deleteSkill, getSkills, updateSkill} from '../../api/skillApi';
+import {useSkills} from './hooks/useSkills';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
@@ -19,38 +19,24 @@ const defaultFormState = {
 };
 
 function SkillsManagement() {
-  const [skillList, setSkillList] = useState([]);
+  const {
+    skillList,
+    isLoading: loading,
+    isError,
+    createSkill,
+    updateSkill,
+    deleteSkill,
+  } = useSkills();
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingSkillId, setEditingSkillId] = useState(null);
   const [formState, setFormState] = useState(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deletingSkill, setDeletingSkill] = useState(null);
 
-  const mapSkillFromApi = (skill) => ({
-    skill_id: String(skill.skillId),
-    name: skill.name || '',
-    description: skill.description || '',
-  });
-
-  const loadSkills = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const skillData = await getSkills();
-      setSkillList(skillData.map(mapSkillFromApi));
-    } catch (error) {
-      setErrorMessage('Không thể tải danh sách kỹ năng.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadSkills();
-  }, [loadSkills]);
+  const displayError =
+    errorMessage || (isError ? 'Không thể tải danh sách kỹ năng.' : '');
 
   const filteredSkills = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -117,15 +103,9 @@ function SkillsManagement() {
       };
 
       if (editingSkillId) {
-        const updatedSkill = await updateSkill(editingSkillId, payload);
-        setSkillList((previous) =>
-          previous.map((skill) =>
-            skill.skill_id === editingSkillId ? mapSkillFromApi(updatedSkill) : skill,
-          ),
-        );
+        await updateSkill({skillId: editingSkillId, payload});
       } else {
-        const createdSkill = await createSkill(payload);
-        setSkillList((previous) => [...previous, mapSkillFromApi(createdSkill)]);
+        await createSkill(payload);
       }
 
       setShowModal(false);
@@ -146,9 +126,6 @@ function SkillsManagement() {
     setErrorMessage('');
     try {
       await deleteSkill(deletingSkill.skill_id);
-      setSkillList((previous) =>
-        previous.filter((skill) => skill.skill_id !== deletingSkill.skill_id),
-      );
       setDeletingSkill(null);
     } catch (error) {
       setErrorMessage('Không thể xóa kỹ năng.');
@@ -179,7 +156,7 @@ function SkillsManagement() {
         onSearchChange={setKeyword}
         searchPlaceholder="Tìm theo tên kỹ năng hoặc mô tả..."
       />
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError message={displayError} />
 
       <AdminTable
         showIndex

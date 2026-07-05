@@ -1,21 +1,14 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
 
-import {getExamTypes} from '../../api/examTypeApi';
-import {getTagsFlatByExamType} from '../../api/tagApi';
-import {
-  getAllResources,
-  createResource,
-  updateResource,
-  deleteResource,
-} from '../../api/recoveryResourceApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
 import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {isMarkdownResource} from '~/utils/recoveryResource';
+import {useRecoveryResources, useTagsByExamType} from './hooks/useRecoveryResources';
 import styles from './RecoveryResources.module.scss';
 
 const cx = classNames.bind(styles);
@@ -113,79 +106,42 @@ function ResourceCard({
 }
 
 function RecoveryResourcesManagement() {
-  const [resources, setResources] = useState([]);
-  const [examTypes, setExamTypes] = useState([]);
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
-  const [availableTags, setAvailableTags] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingResource, setDeletingResource] = useState(null);
   const [selectedParentTagId, setSelectedParentTagId] = useState('');
   const [formExamTypeId, setFormExamTypeId] = useState('');
-  const [formAvailableTags, setFormAvailableTags] = useState([]);
 
-  useEffect(() => {
-    getExamTypes()
-      .then((list) => {
-        const mapped = list.map((item) => ({id: item.examTypeId, name: item.name}));
-        setExamTypes(mapped);
-      })
-      .catch(() => {});
-  }, []);
+  const {
+    resources,
+    isLoading: loading,
+    isError: resourcesError,
+    examTypes,
+    createMutation,
+    updateMutation,
+    deleteMutation,
+  } = useRecoveryResources();
 
+  const availableTags = useTagsByExamType(selectedExamTypeId);
+  const formAvailableTags = useTagsByExamType(formExamTypeId);
+
+  const fetchError = resourcesError ? 'Không thể tải danh sách tài liệu.' : '';
+
+  // Chọn sẵn tag cha đầu tiên mỗi khi đổi loại kỳ thi / tải xong danh sách tag.
   useEffect(() => {
     if (!selectedExamTypeId) {
-      setAvailableTags([]);
       setSelectedParentTagId('');
       return;
     }
-    getTagsFlatByExamType(selectedExamTypeId)
-      .then((tags) => {
-        const list = Array.isArray(tags) ? tags : [];
-        setAvailableTags(list);
-        const firstRootId = list.find((tag) => !tag.parentId)?.tagId || '';
-        setSelectedParentTagId(firstRootId);
-      })
-      .catch(() => {
-        setAvailableTags([]);
-        setSelectedParentTagId('');
-      });
-  }, [selectedExamTypeId]);
-
-  useEffect(() => {
-    if (!formExamTypeId) {
-      setFormAvailableTags([]);
-      return;
-    }
-    getTagsFlatByExamType(formExamTypeId)
-      .then((tags) => {
-        setFormAvailableTags(Array.isArray(tags) ? tags : []);
-      })
-      .catch(() => {
-        setFormAvailableTags([]);
-      });
-  }, [formExamTypeId]);
-
-  const fetchResources = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const list = await getAllResources();
-      setResources(list);
-    } catch {
-      setErrorMessage('Không thể tải danh sách tài liệu.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetchResources(); }, [fetchResources]);
+    const firstRootId = availableTags.find((tag) => !tag.parentId)?.tagId || '';
+    setSelectedParentTagId(firstRootId);
+  }, [selectedExamTypeId, availableTags]);
 
   const filteredResources = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -320,7 +276,6 @@ function RecoveryResourcesManagement() {
     setEditingId(null);
     setSelectedFile(null);
     setFormExamTypeId('');
-    setFormAvailableTags([]);
     setErrorMessage('');
   };
 
@@ -373,13 +328,12 @@ function RecoveryResourcesManagement() {
         tagIds: [...new Set(formState.tagIds || [])],
       };
       if (editingId) {
-        await updateResource(editingId, payload, selectedFile);
+        await updateMutation.mutateAsync({id: editingId, payload, file: selectedFile});
       } else {
-        await createResource(payload, selectedFile);
+        await createMutation.mutateAsync({payload, file: selectedFile});
       }
       setShowFormModal(false);
       resetForm();
-      await fetchResources();
     } catch {
       setErrorMessage('Không thể lưu tài liệu. Vui lòng thử lại.');
     } finally {
@@ -392,9 +346,8 @@ function RecoveryResourcesManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteResource(deletingResource.resourceId);
+      await deleteMutation.mutateAsync(deletingResource.resourceId);
       setDeletingResource(null);
-      await fetchResources();
     } catch {
       setErrorMessage('Không thể xóa tài liệu.');
     } finally {
@@ -454,7 +407,7 @@ function RecoveryResourcesManagement() {
         </Form.Select>
       </AdminToolbar>
 
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError message={errorMessage || fetchError} />
 
       {loading && (
         <div className="text-center py-5">

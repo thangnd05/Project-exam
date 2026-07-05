@@ -1,35 +1,31 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Form, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { Flame } from 'lucide-react';
 
-import { getStreakRecoverConfig, updateStreakRecoverConfig } from '~/api/streakApi';
 import { AdminCard, AdminFieldError, AdminPageHeader } from '../components/common';
+import { useStreakRecoverConfig } from './hooks/useStreakRecoverConfig';
 
 // Trang admin: cấu hình giá xu + bật/tắt tính năng khôi phục chuỗi ngày.
 function StreakRecoverManagement() {
   const [costCoins, setCostCoins] = useState(50);
   const [active, setActive] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getStreakRecoverConfig();
-      setCostCoins(data?.costCoins ?? 50);
-      setActive(data?.active !== false);
-    } catch (error) {
-      setErrorMessage('Không thể tải cấu hình.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { config, isLoading, isError, updateConfig, isSaving } = useStreakRecoverConfig();
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (config) {
+      setCostCoins(config.costCoins ?? 50);
+      setActive(config.active !== false);
+    }
+  }, [config]);
+
+  useEffect(() => {
+    if (isError) {
+      setErrorMessage('Không thể tải cấu hình.');
+    }
+  }, [isError]);
 
   const handleSave = async () => {
     const cost = Number(costCoins);
@@ -37,17 +33,14 @@ function StreakRecoverManagement() {
       setErrorMessage('Giá xu phải là số không âm.');
       return;
     }
-    setSaving(true);
     setErrorMessage('');
     try {
-      const data = await updateStreakRecoverConfig({ costCoins: cost, active });
+      const data = await updateConfig({ costCoins: cost, active });
       setCostCoins(data?.costCoins ?? cost);
       setActive(data?.active !== false);
       toast.success('Đã lưu cấu hình khôi phục chuỗi.');
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || 'Không thể lưu cấu hình.');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -58,7 +51,7 @@ function StreakRecoverManagement() {
         description="Giá xu user phải trả để nối lại chuỗi đã đứt (khi chưa học lại)."
       />
 
-      {loading ? (
+      {isLoading ? (
         <div className="text-center text-secondary py-4">
           <Spinner size="sm" className="me-2" />
           Đang tải cấu hình...
@@ -95,8 +88,8 @@ function StreakRecoverManagement() {
 
           <AdminFieldError message={errorMessage} />
 
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? 'Đang lưu...' : 'Lưu cấu hình'}
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
           </Button>
         </AdminCard>
       )}

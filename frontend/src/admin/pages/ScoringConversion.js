@@ -1,16 +1,7 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Braces, Plus, Trash2} from 'lucide-react';
 
-import {getExamTypes} from '../../api/examTypeApi';
-import {
-  createScoringConversion,
-  createScoringConversionsBulk,
-  deleteScoringConversion,
-  getScoringConversions,
-  getScoringConversionsBySkill,
-} from '../../api/scoringConversionApi';
-import {getSkills} from '../../api/skillApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import {
   AdminCard,
@@ -19,6 +10,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
+import {useScoringConversion} from './hooks/useScoringConversion';
 
 const defaultFormState = {
   exam_type_id: '',
@@ -28,9 +20,6 @@ const defaultFormState = {
 };
 
 function ScoringConversionManagement() {
-  const [scoringRules, setScoringRules] = useState([]);
-  const [examTypes, setExamTypes] = useState([]);
-  const [skills, setSkills] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [activeSkillId, setActiveSkillId] = useState('all');
@@ -39,65 +28,22 @@ function ScoringConversionManagement() {
   const [jsonCreateValue, setJsonCreateValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const jsonTextareaRef = useRef(null);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [deletingRule, setDeletingRule] = useState(null);
 
-  const mapExamTypeFromApi = (item) => ({
-    exam_type_id: String(item.examTypeId),
-    name: item.name || '',
-  });
+  const {
+    examTypes,
+    skills,
+    scoringRules,
+    isLoading: loading,
+    createMutation,
+    deleteMutation,
+    bulkCreateMutation,
+  } = useScoringConversion(activeSkillId, examTypeFilter);
 
-  const mapSkillFromApi = (item) => ({
-    skill_id: String(item.skillId),
-    name: item.name || '',
-  });
-
-  const mapScoringRuleFromApi = (item) => ({
-    conversion_id: String(item.conversionId),
-    exam_type_id: String(item.examTypeId),
-    skill_id: String(item.skillId),
-    num_correct: item.numCorrect || 0,
-    converted_score: item.convertedScore || 0,
-  });
-
-  const loadMetadata = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const [examTypeData, skillData] = await Promise.all([getExamTypes(), getSkills()]);
-      setExamTypes(examTypeData.map(mapExamTypeFromApi));
-      setSkills(skillData.map(mapSkillFromApi));
-    } catch (error) {
-      setErrorMessage('Không thể tải dữ liệu quy đổi điểm.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadMetadata();
-  }, [loadMetadata]);
-
-  const loadScoringRules = useCallback(async (skillId, examTypeId) => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const scoringData =
-        skillId && skillId !== 'all'
-          ? await getScoringConversionsBySkill(skillId, examTypeId)
-          : await getScoringConversions();
-      setScoringRules(scoringData.map(mapScoringRuleFromApi));
-    } catch (error) {
-      setErrorMessage('Không thể tải dữ liệu quy đổi điểm.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadScoringRules(activeSkillId, examTypeFilter);
-  }, [activeSkillId, examTypeFilter, loadScoringRules]);
+  const submitting =
+    createMutation.isPending ||
+    deleteMutation.isPending ||
+    bulkCreateMutation.isPending;
 
   useEffect(() => {
     if (activeSkillId !== 'all') {
@@ -167,23 +113,17 @@ function ScoringConversionManagement() {
       return;
     }
 
-    setSubmitting(true);
     setErrorMessage('');
     try {
-      const createdRule = await createScoringConversion({
+      await createMutation.mutateAsync({
         examTypeId,
         skillId,
         numCorrect: numCorrect,
         convertedScore: convertedScore,
       });
-
-      const normalizedCreatedRule = mapScoringRuleFromApi(createdRule);
-      setScoringRules((previous) => [...previous, normalizedCreatedRule]);
       resetForm();
     } catch (error) {
       setErrorMessage('Không thể thêm cấu hình quy đổi.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -192,18 +132,12 @@ function ScoringConversionManagement() {
       return;
     }
 
-    setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteScoringConversion(deletingRule.conversion_id);
-      setScoringRules((previous) =>
-        previous.filter((rule) => rule.conversion_id !== deletingRule.conversion_id),
-      );
+      await deleteMutation.mutateAsync(deletingRule.conversion_id);
       setDeletingRule(null);
     } catch (error) {
       setErrorMessage('Không thể xóa cấu hình quy đổi.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -240,17 +174,12 @@ function ScoringConversionManagement() {
         return;
       }
 
-      setSubmitting(true);
-      const createdRules = await createScoringConversionsBulk(normalizedPayload);
-      const mappedCreatedRules = createdRules.map(mapScoringRuleFromApi);
-      setScoringRules((previous) => [...previous, ...mappedCreatedRules]);
+      await bulkCreateMutation.mutateAsync(normalizedPayload);
       setJsonCreateValue('');
       setShowJsonCreateForm(false);
       setErrorMessage('');
     } catch (error) {
       setErrorMessage('Không thể tạo từ JSON. Vui lòng kiểm tra định dạng và dữ liệu.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
