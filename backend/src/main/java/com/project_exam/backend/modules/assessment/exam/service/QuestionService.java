@@ -712,25 +712,9 @@ public class QuestionService {
 
                 for (MultipartFile file : questionFiles) {
                     if (file == null || file.isEmpty()) continue;
-
-                    String uploadedUrl;
-                    PassageMedia.MediaType mediaType;
-
-                    // Tối ưu: Dựa vào ContentType của file để gọi Cloudinary tương ứng
-                    if (file.getContentType() != null && file.getContentType().startsWith("audio")) {
-                        uploadedUrl = cloudinaryService.uploadAudio(file);
-                        mediaType = PassageMedia.MediaType.AUDIO;
-                    } else {
-                        uploadedUrl = cloudinaryService.uploadImage(file);
-                        mediaType = PassageMedia.MediaType.IMAGE;
-                    }
-
-                    PassageMedia media = new PassageMedia();
-                    media.setPassageId(passage.getPassageId());
-                    media.setMediaUrl(uploadedUrl);
-                    media.setMediaType(mediaType);
-
-                    passageMediaRepository.save(media);
+                    // Dùng helper 3 nhánh (audio/image/document) như các luồng khác —
+                    // trước đây block này thiếu nhánh document nên PDF/doc bị upload nhầm sang image.
+                    savePassageMediaFile(passage.getPassageId(), file);
                 }
             }
 
