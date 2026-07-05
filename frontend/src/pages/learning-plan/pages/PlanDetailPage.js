@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getPlanById } from '~/api/learningPlanApi';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
+import { usePlanDetail } from './hooks/usePlanDetail';
 import styles from '../styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -27,22 +27,7 @@ function planBaselineReadiness(plan) {
 
 function PlanDetailPage() {
   const { learningPlanId } = useParams();
-  const [plan, setPlan] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const loadPlan = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    return getPlanById(learningPlanId)
-      .then((data) => setPlan(data))
-      .catch((err) => setError(err?.response?.data?.message || err.message))
-      .finally(() => setLoading(false));
-  }, [learningPlanId]);
-
-  useEffect(() => {
-    loadPlan();
-  }, [loadPlan]);
+  const { plan, error, loading } = usePlanDetail(learningPlanId);
 
   useEffect(() => {
     if (!loading && window.location.hash === '#chon-ai-hoc') {

@@ -1,0 +1,22 @@
+import { useQuery } from '@tanstack/react-query';
+import { getPlanById } from '~/api/learningPlanApi';
+
+export const planDetailKeys = {
+  detail: (learningPlanId) => ['learning-plan-detail', learningPlanId],
+};
+
+export function usePlanDetail(learningPlanId) {
+  const query = useQuery({
+    queryKey: planDetailKeys.detail(learningPlanId),
+    queryFn: () => getPlanById(learningPlanId),
+    enabled: !!learningPlanId,
+  });
+
+  return {
+    plan: query.data ?? null,
+    loading: query.isLoading,
+    error: query.error
+      ? query.error?.response?.data?.message || query.error.message
+      : null,
+  };
+}

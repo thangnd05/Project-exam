@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getMyUserTests } from '~/api/userTestApi';
-import { generatePlan } from '~/api/learningPlanApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { filterCompletedTests } from '~/utils/userTests';
 import { formatDateTime24 as formatDate } from '~/utils/format-date-time';
 import LearningPlanList from '../components/LearningPlanList';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import styles from '../styles/PersonalizedPlan.module.scss';
+import {
+  useCompletedUserTests,
+  useExamTypes,
+  useGeneratePlanMutation,
+  useUserTarget,
+} from './hooks/useGeneratePlan';
 
 const cx = classNames.bind(styles);
 
@@ -18,18 +19,14 @@ function GeneratePlanPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const planListRef = useRef(null);
 
-  const [userTests, setUserTests] = useState([]);
-  const [loadingList, setLoadingList] = useState(true);
   const [userTestId, setUserTestId] = useState(searchParams.get('userTestId') || '');
   // Tạm ẩn: ngày thi / target score override khi sinh plan
   // const [deadlineDays, setDeadlineDays] = useState('');
   // const [targetScore, setTargetScore] = useState('');
 
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
 
-  const [examTypes, setExamTypes] = useState([]);
   const [sourceExamTypeId, setSourceExamTypeId] = useState(
     searchParams.get('examTypeId') || '',
   );
@@ -37,66 +34,38 @@ function GeneratePlanPage() {
     searchParams.get('examTypeId') || '',
   );
   const [listRefreshKey, setListRefreshKey] = useState(0);
-  const [loadingTarget, setLoadingTarget] = useState(false);
-  const [userTarget, setUserTarget] = useState(null);
 
-  useEffect(() => {
-    let mounted = true;
-    getExamTypes()
-      .then((types) => {
-        if (!mounted) return;
-        const list = Array.isArray(types) ? types : [];
-        setExamTypes(list);
-        if (!sourceExamTypeId && list.length > 0) {
-          const fromUrl = searchParams.get('examTypeId');
-          const initial = fromUrl || list[0].examTypeId;
-          setSourceExamTypeId(initial);
-          setFilterExamTypeId(initial);
-        }
-      })
-      .catch(() => { /* exam types optional for list */ });
-    return () => { mounted = false; };
-  }, []);
+  const examTypesQuery = useExamTypes();
+  const examTypes = examTypesQuery.data ?? [];
 
+  const userTestsQuery = useCompletedUserTests();
+  const userTests = userTestsQuery.data ?? [];
+  const loadingList = userTestsQuery.isLoading;
+  const userTestsError = userTestsQuery.isError
+    ? userTestsQuery.error?.response?.data?.message || userTestsQuery.error?.message
+    : null;
+
+  const targetQuery = useUserTarget(sourceExamTypeId);
+  const userTarget = targetQuery.data ?? null;
+  const loadingTarget = targetQuery.isLoading;
+
+  const generatePlanMutation = useGeneratePlanMutation();
+  const submitting = generatePlanMutation.isPending;
+
+  // Khi tải xong loại kỳ thi mà chưa chọn nguồn -> chọn mặc định (URL hoặc phần tử đầu).
   useEffect(() => {
-    let mounted = true;
-    setLoadingList(true);
-    getMyUserTests()
-      .then((result) => {
-        if (!mounted) return;
-        setUserTests(filterCompletedTests(result));
-      })
-      .catch((err) => {
-        if (mounted) setError(err?.response?.data?.message || err.message);
-      })
-      .finally(() => { if (mounted) setLoadingList(false); });
-    return () => { mounted = false; };
-  }, []);
+    if (!sourceExamTypeId && examTypes.length > 0) {
+      const fromUrl = searchParams.get('examTypeId');
+      const initial = fromUrl || examTypes[0].examTypeId;
+      setSourceExamTypeId(initial);
+      setFilterExamTypeId(initial);
+    }
+  }, [examTypes, sourceExamTypeId]);
 
   const filteredUserTests = useMemo(() => {
     if (!sourceExamTypeId) return userTests;
     return userTests.filter((t) => t.examTypeId === sourceExamTypeId);
   }, [userTests, sourceExamTypeId]);
-
-  useEffect(() => {
-    if (!sourceExamTypeId) {
-      setUserTarget(null);
-      return undefined;
-    }
-    let mounted = true;
-    setLoadingTarget(true);
-    getUserTarget(sourceExamTypeId)
-      .then((data) => {
-        if (mounted) setUserTarget(data);
-      })
-      .catch(() => {
-        if (mounted) setUserTarget({ hasTarget: false });
-      })
-      .finally(() => {
-        if (mounted) setLoadingTarget(false);
-      });
-    return () => { mounted = false; };
-  }, [sourceExamTypeId]);
 
   const hasTarget = Boolean(userTarget?.hasTarget);
   /** Khóa chọn bài nguồn + nút sinh plan khi chưa có target (không khóa loại kỳ thi). */
@@ -139,27 +108,26 @@ function GeneratePlanPage() {
     [examTypes, sourceExamTypeId],
   );
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
     setResult(null);
-    setSubmitting(true);
-    try {
-      const payload = { userTestId };
-      // if (deadlineDays !== '') payload.deadlineDays = Number(deadlineDays);
-      // if (targetScore !== '') payload.targetScore = Number(targetScore);
-      const data = await generatePlan(payload);
-      setResult(data);
-      if (data?.examTypeId) {
-        setFilterExamTypeId(data.examTypeId);
-      }
-      setListRefreshKey((k) => k + 1);
-      planListRef.current?.reload();
-    } catch (err) {
-      setError(err?.response?.data?.message || err.message || 'Lỗi không xác định');
-    } finally {
-      setSubmitting(false);
-    }
+    const payload = { userTestId };
+    // if (deadlineDays !== '') payload.deadlineDays = Number(deadlineDays);
+    // if (targetScore !== '') payload.targetScore = Number(targetScore);
+    generatePlanMutation.mutate(payload, {
+      onSuccess: (data) => {
+        setResult(data);
+        if (data?.examTypeId) {
+          setFilterExamTypeId(data.examTypeId);
+        }
+        setListRefreshKey((k) => k + 1);
+        planListRef.current?.reload();
+      },
+      onError: (err) => {
+        setError(err?.response?.data?.message || err.message || 'Lỗi không xác định');
+      },
+    });
   };
 
 
@@ -261,7 +229,9 @@ function GeneratePlanPage() {
         </div>
       </div>
 
-      {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
+      {(error || userTestsError) && (
+        <div className={cx('alert', 'alertDanger')}>{error || userTestsError}</div>
+      )}
 
       {result?.targetAchieved && (
         <div className={cx('alert', 'alertSuccess')}>

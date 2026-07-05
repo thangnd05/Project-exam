@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getExamTypes } from '~/api/examTypeApi';
-import { listPlans } from '~/api/learningPlanApi';
 import { formatDateTime24 as formatDate } from '~/utils/format-date-time';
 import PlanComparisonCharts from '../components/PlanComparisonCharts';
+import { usePlanComparison } from './hooks/usePlanComparison';
 import pageStyles from '../styles/PlanComparisonPage.module.scss';
 import styles from '../styles/PersonalizedPlan.module.scss';
 
@@ -28,31 +27,15 @@ const STATUS_VARIANT = {
 
 function PlanComparisonPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [examTypes, setExamTypes] = useState([]);
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    getExamTypes().then(setExamTypes).catch(() => {});
-  }, []);
+  const { examTypes, plans, loading, error } = usePlanComparison(examTypeId);
 
   useEffect(() => {
     if (!examTypeId && examTypes.length > 0) {
       setExamTypeId(examTypes[0].examTypeId);
     }
   }, [examTypes, examTypeId]);
-
-  useEffect(() => {
-    if (!examTypeId) return;
-    setLoading(true);
-    setError(null);
-    listPlans(examTypeId)
-      .then((data) => setPlans(data || []))
-      .catch((err) => setError(err?.response?.data?.message || err.message))
-      .finally(() => setLoading(false));
-  }, [examTypeId]);
 
   const sorted = useMemo(() => {
     return [...plans].sort((a, b) => (a.planSequence ?? 0) - (b.planSequence ?? 0));
