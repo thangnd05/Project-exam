@@ -770,6 +770,29 @@ public class UserTestService {
         return toSave.size();
     }
 
+    /**
+     * Dọn MỘT LÔ bài làm dở của đề KHÔNG giới hạn giờ (không tự nộp được) đã quá ngưỡng.
+     * Xoá hẳn UserTest + UserAnswer để tránh phình DB bởi các attempt bỏ ngang.
+     * Mỗi lời gọi = 1 transaction nhỏ (tối đa `batchSize` bản ghi) → không bao giờ ôm
+     * giao dịch khổng lồ. Scheduler lặp gọi tới khi hết (có trần số lô/lần chạy).
+     * Trả về số bản ghi đã xoá trong lô này (0 = đã hết). Bài CÓ giờ không đụng tới.
+     */
+    @Transactional
+    public int purgeAbandonedUntimed(long thresholdHours, int batchSize) {
+        LocalDateTime cutoff = LocalDateTime.now().minusHours(thresholdHours);
+        List<UserTest> abandoned = userTestRepository.findAbandonedUntimed(
+                UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE, cutoff,
+                org.springframework.data.domain.PageRequest.of(0, batchSize));
+        if (abandoned.isEmpty()) return 0;
+
+        List<String> ids = abandoned.stream()
+                .map(UserTest::getUserTestId)
+                .collect(Collectors.toList());
+        userAnswerRepository.deleteByUserTestIdIn(ids); // xoá answers trước (FK)
+        userTestRepository.deleteAll(abandoned);
+        return abandoned.size();
+    }
+
     public List<UserTestResponse> getAttemptsByUserAndTest(String userId, String testId) {
 
         Test test = testRepository.findById(testId)

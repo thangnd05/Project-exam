@@ -47,6 +47,21 @@ public interface UserTestRepository extends JpaRepository<UserTest, String> {
     List<UserTest> findByGuestSessionId(String guestSessionId);
     List<UserTest> findByGuestSessionIdAndTestIdOrderByStartedAtDesc(String guestSessionId, String testId);
 
+    // Các attempt "bỏ dở" của bài KHÔNG giới hạn giờ (không tự nộp được) và đã quá ngưỡng:
+    //  - mode = PRACTICE (luyện tập luôn không giờ), HOẶC
+    //  - đề không đặt durationMinutes và không có availableTo (full-test không giờ).
+    // Bài có giờ KHÔNG nằm ở đây vì đã có cơ chế tự nộp phía client.
+    // Lấy tối đa 1 lô (giới hạn qua Pageable), xoá bài cũ nhất trước để không ôm transaction lớn.
+    @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.startedAt < :cutoff "
+            + "AND (ut.mode = :practiceMode "
+            + "OR EXISTS (SELECT t FROM Test t WHERE t.testId = ut.testId "
+            + "AND (t.durationMinutes IS NULL OR t.durationMinutes = 0) AND t.availableTo IS NULL))) "
+            + "ORDER BY ut.startedAt ASC")
+    List<UserTest> findAbandonedUntimed(@Param("status") UserTest.Status status,
+                                        @Param("practiceMode") UserTest.Mode practiceMode,
+                                        @Param("cutoff") java.time.LocalDateTime cutoff,
+                                        org.springframework.data.domain.Pageable pageable);
+
     List<UserTest> findByUserIdAndTestId(String userId, String testId);
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
     List<UserTest> findByTestIdAndStatus(String testId, UserTest.Status status);
