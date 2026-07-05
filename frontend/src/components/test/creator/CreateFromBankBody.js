@@ -5,7 +5,6 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
-import { getQuestionsByPart } from '~/api/questionApi';
 import { getChaptersByClass } from '~/api/chapterApi';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/api/testApi';
 import { createTestPart } from '~/api/testPartApi';
@@ -32,16 +31,15 @@ import CoinPriceField from '~/components/test/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
 import { getExamCategories } from '~/api/examCategoryApi';
+import {
+  useBankTestBuilder,
+  SELECTION_MODES,
+  defaultPartConfig,
+  groupQuestionsByPassage,
+} from '~/hooks/useBankTestBuilder';
 import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
-
-const SELECTION_MODES = {
-  MANUAL: 'manual',
-  RANDOM: 'random',
-  RANDOM_BY_COLLECTION: 'random_by_collection',
-  SEQUENTIAL: 'sequential',
-};
 
 // Chế độ bám theo Bộ đề khi đã chọn (random theo bộ đề / tuần tự / thủ công).
 // Riêng "Random theo số lượng" luôn lấy toàn kho.
@@ -58,17 +56,6 @@ const BANK_SOURCES = {
 };
 
 const ALL_CHAPTERS = '__ALL__';
-
-const defaultPartConfig = () => ({
-  mode: SELECTION_MODES.RANDOM,
-  randomCount: '',
-  fromIndex: '',
-  toIndex: '',
-  selectedIds: [],
-  bankQuestions: [],
-  loading: false,
-  expanded: true,
-});
 
 const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, chapterId }) => {
   const isClassMode = mode === 'class' && !!classId;
@@ -91,7 +78,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
   const [examCategories, setExamCategories] = useState([]);
 
-  const [partConfigs, setPartConfigs] = useState({});
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
@@ -101,6 +87,41 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const [selectedChapterId, setSelectedChapterId] = useState(chapterId || ALL_CHAPTERS);
 
   const { examTypes, examParts, questionCollections } = useBaseMetaData(testInfo.examTypeId);
+  const collectionScopeIds = testInfo.collectionId
+    ? getCollectionWithDescendantIds(questionCollections, testInfo.collectionId).map(String)
+    : null;
+
+  const getScopedQuestions = (cfg) => {
+    const list = cfg?.bankQuestions || [];
+    if (!collectionScopeIds || !COLLECTION_SCOPED_MODES.includes(cfg?.mode)) return list;
+    const scope = new Set(collectionScopeIds);
+    return list.filter((q) => q.collectionId != null && scope.has(String(q.collectionId)));
+  };
+
+  // State machine + helper dùng chung; truyền scoping theo bộ đề của màn này.
+  const {
+    partConfigs,
+    setPartConfigs,
+    updatePartConfig,
+    togglePartExpanded,
+    loadQuestionsForPart,
+    toggleGroup,
+    isGroupSelected,
+    toggleSelectAll,
+    getPartEffectiveCount,
+    hasPartWithQuestions,
+  } = useBankTestBuilder({ getScopedQuestions });
+
+  // Params tải câu theo nguồn kho (admin / lớp+chapter / cá nhân).
+  const buildLoadParams = (source = bankSource, chapterFilter = selectedChapterId) => {
+    if (source === BANK_SOURCES.ADMIN) return { bank: 'admin' };
+    if (source === BANK_SOURCES.CLASS && classId) {
+      const params = { classId };
+      if (chapterFilter && chapterFilter !== ALL_CHAPTERS) params.chapterId = chapterFilter;
+      return params;
+    }
+    return {};
+  };
 
   /* ---------- load danh sách exam category (Quick Challenge / Full Mock / Recovery...) ---------- */
   useEffect(() => {
@@ -123,38 +144,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
       });
   }, [isClassMode, classId]);
 
-  /* ---------- load câu hỏi theo part ---------- */
-  const loadQuestionsForPart = (examPartId, source = bankSource, chapterFilter = selectedChapterId) => {
-    setPartConfigs((prev) => ({
-      ...prev,
-      [examPartId]: { ...prev[examPartId], loading: true },
-    }));
-    let params = {};
-    if (source === BANK_SOURCES.ADMIN) {
-      params = { bank: 'admin' };
-    } else if (source === BANK_SOURCES.CLASS && classId) {
-      params = { classId };
-      if (chapterFilter && chapterFilter !== ALL_CHAPTERS) {
-        params.chapterId = chapterFilter;
-      }
-    }
-    getQuestionsByPart(examPartId, params)
-      .then((data) => {
-        const list = Array.isArray(data) ? data : data?.data ?? data?.questions ?? [];
-        setPartConfigs((prev) => ({
-          ...prev,
-          [examPartId]: { ...prev[examPartId], bankQuestions: list, loading: false },
-        }));
-      })
-      .catch((err) => {
-        console.error(err);
-        setPartConfigs((prev) => ({
-          ...prev,
-          [examPartId]: { ...prev[examPartId], bankQuestions: [], loading: false },
-        }));
-      });
-  };
-
   useEffect(() => {
     if (!testInfo.examTypeId || !examParts?.length) {
       setPartConfigs({});
@@ -166,7 +155,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     });
     setPartConfigs(initial);
     examParts.forEach((part) => {
-      loadQuestionsForPart(part.examPartId, bankSource, selectedChapterId);
+      loadQuestionsForPart(part.examPartId, buildLoadParams(bankSource, selectedChapterId));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [testInfo.examTypeId, examParts, bankSource, selectedChapterId]);
@@ -174,19 +163,12 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const handleEditQuestionSuccess = () => {
     setEditingQuestionId(null);
     if (editingPartId) {
-      loadQuestionsForPart(editingPartId, bankSource, selectedChapterId);
+      loadQuestionsForPart(editingPartId, buildLoadParams(bankSource, selectedChapterId));
     }
   };
 
   const handleExamTypeChange = (value) => {
     setTestInfo((prev) => ({ ...prev, examTypeId: value }));
-  };
-
-  const updatePartConfig = (examPartId, field, value) => {
-    setPartConfigs((prev) => ({
-      ...prev,
-      [examPartId]: { ...prev[examPartId], [field]: value },
-    }));
   };
 
   // Gộp: set 1 chế độ cho TẤT CẢ Part một lần (khỏi mở & bấm từng part).
@@ -198,120 +180,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
       });
       return next;
     });
-  };
-
-  const togglePartExpanded = (examPartId) => {
-    setPartConfigs((prev) => ({
-      ...prev,
-      [examPartId]: { ...prev[examPartId], expanded: !prev[examPartId].expanded },
-    }));
-  };
-
-  /* ---------- nhóm câu theo passage ---------- */
-  const groupQuestionsByPassage = (questions) => {
-    if (!questions?.length) return [];
-    const map = new Map();
-    questions.forEach((q) => {
-      const id = q.questionId ?? q.id;
-      const passageId = q.passageId ?? q.passage?.passageId ?? null;
-      const groupKey = passageId != null ? `passage-${passageId}` : `no-passage-${id}`;
-      if (!map.has(groupKey)) {
-        map.set(groupKey, { groupKey, passageId, questions: [] });
-      }
-      map.get(groupKey).questions.push(q);
-    });
-    return Array.from(map.values());
-  };
-
-  const toggleGroup = (examPartId, groupKey) => {
-    const cfg = partConfigs[examPartId];
-    if (!cfg) return;
-    const groups = groupQuestionsByPassage(getScopedQuestions(cfg));
-    const group = groups.find((g) => g.groupKey === groupKey);
-    if (!group) return;
-    const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean);
-    const selectedSet = new Set(cfg.selectedIds || []);
-    const allSelected = ids.every((id) => selectedSet.has(id));
-    if (allSelected) ids.forEach((id) => selectedSet.delete(id));
-    else ids.forEach((id) => selectedSet.add(id));
-    updatePartConfig(examPartId, 'selectedIds', Array.from(selectedSet));
-  };
-
-  const isGroupSelected = (examPartId, groupKey) => {
-    const cfg = partConfigs[examPartId];
-    if (!cfg) return false;
-    const groups = groupQuestionsByPassage(getScopedQuestions(cfg));
-    const group = groups.find((g) => g.groupKey === groupKey);
-    if (!group) return false;
-    const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean);
-    const selectedSet = new Set(cfg.selectedIds || []);
-    return ids.length > 0 && ids.every((id) => selectedSet.has(id));
-  };
-
-  const toggleSelectAll = (examPartId, checked) => {
-    const cfg = partConfigs[examPartId];
-    if (!cfg) return;
-    const ids = getScopedQuestions(cfg).map((q) => q.questionId ?? q.id).filter(Boolean);
-    updatePartConfig(examPartId, 'selectedIds', checked ? ids : []);
-  };
-
-  /* ---------- phạm vi câu theo Bộ đề ---------- */
-  // Khi đã chọn Bộ đề: các chế độ "Random theo bộ đề"/"Lấy tuần tự"/"Chọn thủ công" chỉ lấy câu
-  // thuộc bộ đề đó (gồm cả bộ đề con trực tiếp). "Random theo số lượng" luôn lấy toàn kho.
-  // Chưa chọn bộ đề -> mọi chế độ đều lấy toàn kho.
-  const collectionScopeIds = testInfo.collectionId
-    ? getCollectionWithDescendantIds(questionCollections, testInfo.collectionId).map(String)
-    : null;
-
-  const getScopedQuestions = (cfg) => {
-    const list = cfg?.bankQuestions || [];
-    if (!collectionScopeIds || !COLLECTION_SCOPED_MODES.includes(cfg?.mode)) return list;
-    const scope = new Set(collectionScopeIds);
-    return list.filter((q) => q.collectionId != null && scope.has(String(q.collectionId)));
-  };
-
-  const getPartEffectiveCount = (examPartId) => {
-    const cfg = partConfigs[examPartId];
-    if (!cfg) return 0;
-    const scoped = getScopedQuestions(cfg);
-    if (cfg.mode === SELECTION_MODES.RANDOM) {
-      const n = Math.max(0, parseInt(cfg.randomCount, 10) || 0);
-      return Math.min(n, scoped.length);
-    }
-    if (cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION) {
-      // Lấy TOÀN BỘ câu trong bộ đề (domain) đó.
-      return scoped.length;
-    }
-    if (cfg.mode === SELECTION_MODES.SEQUENTIAL) {
-      const from = Math.max(1, parseInt(cfg.fromIndex, 10) || 1);
-      const to = Math.max(from, parseInt(cfg.toIndex, 10) || from);
-      const maxInBank = scoped.length;
-      if (from > maxInBank) return 0;
-      const actualTo = Math.min(to, maxInBank);
-      return actualTo - from + 1;
-    }
-    // MANUAL: chỉ tính câu đã chọn còn nằm trong phạm vi (đề phòng đổi bộ đề sau khi chọn).
-    const scopedIds = new Set(scoped.map((q) => q.questionId ?? q.id));
-    return (cfg.selectedIds || []).filter((id) => scopedIds.has(id)).length;
-  };
-
-  const hasPartWithQuestions = (part) => {
-    const cfg = partConfigs[part.examPartId];
-    if (!cfg) return false;
-    const scoped = getScopedQuestions(cfg);
-    if (cfg.mode === SELECTION_MODES.RANDOM) {
-      const n = Math.max(0, parseInt(cfg.randomCount, 10) || 0);
-      return n > 0 && scoped.length > 0;
-    }
-    if (cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION) {
-      return scoped.length > 0;
-    }
-    if (cfg.mode === SELECTION_MODES.SEQUENTIAL) {
-      const from = parseInt(cfg.fromIndex, 10);
-      const to = parseInt(cfg.toIndex, 10);
-      return !isNaN(from) && !isNaN(to) && from > 0 && to >= from && scoped.length >= from;
-    }
-    return getPartEffectiveCount(part.examPartId) > 0;
   };
 
   /* ---------- submit ---------- */

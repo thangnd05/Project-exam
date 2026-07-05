@@ -7,7 +7,6 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Button, Form } from 'react-bootstrap';
-import { getQuestionsByPart } from '../../api/questionApi';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '../../api/testApi';
 import { createTestPart } from '../../api/testPartApi';
 import CoinPriceField from '~/components/test/CoinPriceField';
@@ -29,27 +28,16 @@ import { useBaseMetaData } from '~/hooks/useBaseMetaData';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
 import { getExamCategories } from '~/api/examCategoryApi';
+import {
+  useBankTestBuilder,
+  SELECTION_MODES,
+  defaultPartConfig,
+  groupQuestionsByPassage,
+} from '~/hooks/useBankTestBuilder';
 import styles from './CreateTestFromBankPage.module.scss';
 
 
 const cx = classNames.bind(styles);
-
-const SELECTION_MODES = {
-  MANUAL: 'manual',
-  RANDOM: 'random',
-  SEQUENTIAL: 'sequential',
-};
-
-const defaultPartConfig = () => ({
-  mode: SELECTION_MODES.RANDOM,
-  randomCount: '',
-  fromIndex: '',
-  toIndex: '',
-  selectedIds: [],
-  bankQuestions: [],
-  loading: false,
-  expanded: true,
-});
 
 const CreateTestFromBankPage = () => {
   const [testInfo, setTestInfo] = useState({
@@ -72,7 +60,6 @@ const CreateTestFromBankPage = () => {
       .catch(() => setExamCategories([]));
   }, []);
 
-  const [partConfigs, setPartConfigs] = useState({});
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
@@ -80,27 +67,19 @@ const CreateTestFromBankPage = () => {
 
   const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
 
-  const loadQuestionsForPart = (examPartId) => {
-      setPartConfigs((prev) => ({
-        ...prev,
-        [examPartId]: { ...prev[examPartId], loading: true },
-      }));
-      getQuestionsByPart(examPartId)
-        .then((data) => {
-          const list = Array.isArray(data) ? data : data?.data ?? data?.questions ?? [];
-          setPartConfigs((prev) => ({
-            ...prev,
-            [examPartId]: { ...prev[examPartId], bankQuestions: list, loading: false },
-          }));
-        })
-        .catch((err) => {
-          console.error(err);
-          setPartConfigs((prev) => ({
-            ...prev,
-            [examPartId]: { ...prev[examPartId], bankQuestions: [], loading: false },
-          }));
-        });
-  };
+  // Kho cá nhân: không lọc theo bộ đề -> dùng scoping mặc định (identity) của hook.
+  const {
+    partConfigs,
+    setPartConfigs,
+    updatePartConfig,
+    togglePartExpanded,
+    loadQuestionsForPart,
+    toggleGroup,
+    isGroupSelected,
+    toggleSelectAll,
+    getPartEffectiveCount,
+    hasPartWithQuestions,
+  } = useBankTestBuilder();
 
   // BE: GET /api/questions/by-part/{examPartId} (cá nhân: không classId/chapterId; JWT tự gửi)
   useEffect(() => {
@@ -128,108 +107,6 @@ const CreateTestFromBankPage = () => {
 
   const handleExamTypeChange = (value) => {
     setTestInfo((prev) => ({ ...prev, examTypeId: value }));
-  };
-
-  const updatePartConfig = (examPartId, field, value) => {
-    setPartConfigs((prev) => ({
-      ...prev,
-      [examPartId]: { ...prev[examPartId], [field]: value },
-    }));
-  };
-
-  const togglePartExpanded = (examPartId) => {
-    setPartConfigs((prev) => ({
-      ...prev,
-      [examPartId]: { ...prev[examPartId], expanded: !prev[examPartId].expanded },
-    }));
-  };
-
-  /** Nhóm câu theo passage_id (cùng passage = 1 nhóm; không passage = mỗi câu 1 nhóm). */
-  const groupQuestionsByPassage = (questions) => {
-    if (!questions?.length) return [];
-    const map = new Map();
-    questions.forEach((q) => {
-      const id = q.questionId ?? q.id;
-      const passageId = q.passageId ?? q.passage?.passageId ?? null;
-      const groupKey = passageId != null ? `passage-${passageId}` : `no-passage-${id}`;
-      if (!map.has(groupKey)) {
-        map.set(groupKey, { groupKey, passageId, questions: [] });
-      }
-      map.get(groupKey).questions.push(q);
-    });
-    return Array.from(map.values());
-  };
-
-  /** Bật/tắt cả nhóm (cùng passage): chọn hoặc bỏ chọn toàn bộ câu trong nhóm. */
-  const toggleGroup = (examPartId, groupKey) => {
-    const cfg = partConfigs[examPartId];
-    if (!cfg) return;
-    const groups = groupQuestionsByPassage(cfg.bankQuestions);
-    const group = groups.find((g) => g.groupKey === groupKey);
-    if (!group) return;
-    const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean);
-    const selectedSet = new Set(cfg.selectedIds || []);
-    const allSelected = ids.every((id) => selectedSet.has(id));
-    if (allSelected) {
-      ids.forEach((id) => selectedSet.delete(id));
-    } else {
-      ids.forEach((id) => selectedSet.add(id));
-    }
-    updatePartConfig(examPartId, 'selectedIds', Array.from(selectedSet));
-  };
-
-  const isGroupSelected = (examPartId, groupKey) => {
-    const cfg = partConfigs[examPartId];
-    if (!cfg) return false;
-    const groups = groupQuestionsByPassage(cfg.bankQuestions);
-    const group = groups.find((g) => g.groupKey === groupKey);
-    if (!group) return false;
-    const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean);
-    const selectedSet = new Set(cfg.selectedIds || []);
-    return ids.length > 0 && ids.every((id) => selectedSet.has(id));
-  };
-
-  const toggleSelectAll = (examPartId, checked) => {
-    const cfg = partConfigs[examPartId];
-    if (!cfg) return;
-    const ids = (cfg.bankQuestions || [])
-      .map((q) => q.questionId ?? q.id)
-      .filter(Boolean);
-    updatePartConfig(examPartId, 'selectedIds', checked ? ids : []);
-  };
-
-  const getPartEffectiveCount = (examPartId) => {
-    const cfg = partConfigs[examPartId];
-    if (!cfg) return 0;
-    if (cfg.mode === SELECTION_MODES.RANDOM) {
-      const n = Math.max(0, parseInt(cfg.randomCount, 10) || 0);
-      const maxInBank = (cfg.bankQuestions || []).length;
-      return Math.min(n, maxInBank);
-    }
-    if (cfg.mode === SELECTION_MODES.SEQUENTIAL) {
-      const from = Math.max(1, parseInt(cfg.fromIndex, 10) || 1);
-      const to = Math.max(from, parseInt(cfg.toIndex, 10) || from);
-      const maxInBank = (cfg.bankQuestions || []).length;
-      if (from > maxInBank) return 0;
-      const actualTo = Math.min(to, maxInBank);
-      return actualTo - from + 1;
-    }
-    return (cfg.selectedIds || []).length;
-  };
-
-  const hasPartWithQuestions = (part) => {
-    const cfg = partConfigs[part.examPartId];
-    if (!cfg) return false;
-    if (cfg.mode === SELECTION_MODES.RANDOM) {
-      const n = Math.max(0, parseInt(cfg.randomCount, 10) || 0);
-      return n > 0 && (cfg.bankQuestions || []).length > 0;
-    }
-    if (cfg.mode === SELECTION_MODES.SEQUENTIAL) {
-      const from = parseInt(cfg.fromIndex, 10);
-      const to = parseInt(cfg.toIndex, 10);
-      return !isNaN(from) && !isNaN(to) && from > 0 && to >= from && (cfg.bankQuestions || []).length >= from;
-    }
-    return (cfg.selectedIds || []).length > 0;
   };
 
   const handleSubmit = async (e) => {
