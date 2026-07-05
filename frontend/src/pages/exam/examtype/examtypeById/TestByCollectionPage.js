@@ -1,5 +1,4 @@
-import { getTestsByCollection, getTestCollectionsByExamType } from '../../../../api/testApi';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { IoArrowBack, IoDocumentTextOutline } from 'react-icons/io5';
@@ -7,6 +6,7 @@ import routes, { buildExamTypeDetailPath } from '~/config/Routes';
 
 import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
 import Pagination from '~/components/common/Pagination/Pagination';
+import { useCollectionTests, useCollectionName } from './hooks/useCollectionTests';
 
 const PAGE_SIZE = 12;
 
@@ -15,51 +15,14 @@ function TestByCollectionPage() {
   const { examTypeId, collectionId } = useParams();
   const navigate = useNavigate();
 
-  const [tests, setTests] = useState([]);
-  const [folderName, setFolderName] = useState('');
-  const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchTests = useCallback(
-    (page = 0) => {
-      if (!collectionId) return;
-      setLoading(true);
-      getTestsByCollection(collectionId, { page, size: PAGE_SIZE })
-        .then((data) => {
-          setTests(Array.isArray(data?.content) ? data.content : []);
-          setTotalPages(data?.totalPages ?? 0);
-          setCurrentPage(data?.currentPage ?? page);
-        })
-        .catch(() => {
-          setTests([]);
-          setTotalPages(0);
-        })
-        .finally(() => setLoading(false));
-    },
-    [collectionId],
-  );
-
-  useEffect(() => {
-    if (!collectionId) {
-      setLoading(false);
-      return;
-    }
-    fetchTests(0);
-
-    // Lấy tên folder từ danh sách bộ đề của loại kỳ thi.
-    if (examTypeId) {
-      getTestCollectionsByExamType(examTypeId)
-        .then((data) => {
-          const found = (Array.isArray(data) ? data : []).find(
-            (f) => String(f.collectionId) === String(collectionId),
-          );
-          setFolderName(found?.name || '');
-        })
-        .catch(() => setFolderName(''));
-    }
-  }, [collectionId, examTypeId, fetchTests]);
+  const testsQuery = useCollectionTests(collectionId, currentPage, PAGE_SIZE);
+  const tests = Array.isArray(testsQuery.data?.content) ? testsQuery.data.content : [];
+  const totalPages = testsQuery.data?.totalPages ?? 0;
+  const loading = testsQuery.isLoading;
+  const folderName = useCollectionName(examTypeId, collectionId).data ?? '';
 
   // Countdown realtime cho đề có lịch mở.
   useEffect(() => {
@@ -114,7 +77,7 @@ function TestByCollectionPage() {
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onChange={fetchTests}
+          onChange={setCurrentPage}
         />
       }
     />
