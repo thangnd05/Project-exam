@@ -1,10 +1,3 @@
-/**
- * Dữ liệu cho trang lịch sử làm bài — dùng react-query thay cho useEffect + setLoading thủ công.
- *
- * Đây là MẪU cho việc chuyển dần các trang tự-fetch sang react-query (đã cấu hình sẵn ở
- * config/queryClient.js + QueryClientProvider trong App.js). Lợi ích: tự cache, tự chống race,
- * bỏ boilerplate loading/error, và quay lại trang không phải fetch lại (staleTime 1 phút).
- */
 import { useQuery } from '@tanstack/react-query';
 import { getMyAttemptsByTest } from '~/api/userTestApi';
 import { getUserTestInfo } from '~/api/testApi';
