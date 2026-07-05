@@ -1,4 +1,4 @@
-import {useMutation, useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {getRoles, updateRolePermissions} from '../../../api/roleApi';
 import {getPermissions} from '../../../api/permissionApi';
@@ -14,6 +14,8 @@ const EMPTY_ARRAY = [];
 const asArray = (data) => (Array.isArray(data) ? data : []);
 
 export function usePermissionsMatrix() {
+  const qc = useQueryClient();
+
   const rolesQuery = useQuery({
     queryKey: permissionsKeys.roles(),
     queryFn: getRoles,
@@ -34,6 +36,7 @@ export function usePermissionsMatrix() {
           updateRolePermissions(roleId, Array.from(matrix[roleId] || [])),
         ),
       ),
+    onSuccess: () => qc.invalidateQueries({queryKey: permissionsKeys.roles()}),
   });
 
   return {

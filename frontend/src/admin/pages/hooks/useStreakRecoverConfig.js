@@ -1,16 +1,21 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getStreakRecoverConfig, updateStreakRecoverConfig } from '~/api/streakApi';
 
 export const streakRecoverKeys = { config: ['streak-recover-config'] };
 
 export function useStreakRecoverConfig() {
+  const qc = useQueryClient();
+
   const configQuery = useQuery({
     queryKey: streakRecoverKeys.config,
     queryFn: getStreakRecoverConfig,
   });
 
-  const updateMutation = useMutation({ mutationFn: updateStreakRecoverConfig });
+  const updateMutation = useMutation({
+    mutationFn: updateStreakRecoverConfig,
+    onSuccess: () => qc.invalidateQueries({ queryKey: streakRecoverKeys.config }),
+  });
 
   return {
     config: configQuery.data ?? null,
