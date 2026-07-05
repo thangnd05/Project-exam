@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { getMyClasses } from '../../api/classMemberApi';
-import { deleteClass } from '../../api/classApi';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
@@ -11,38 +10,27 @@ import routes from '../../config/Routes';
 import ClassListContainer from './components/ClassListContainer/ClassListContainer';
 import EditClassModal from './modals/EditClassModal';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import {
+  myClassesKeys,
+  useMyClasses,
+  useDeleteClass,
+} from './hooks/useMyClasses';
 
 const cx = classNames.bind(styles);
 
 const MyClassesPage = () => {
-  const [teachingClasses, setTeachingClasses] = useState([]);
-  const [learningClasses, setLearningClasses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
   const [selectedClass, setSelectedClass] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const navigate = useNavigate();
+  const qc = useQueryClient();
 
-  useEffect(() => {
-    const fetchMyClasses = async () => {
-      try {
-        const data = await getMyClasses();
-        if (data.message) {
-          setMessage(data.message);
-        } else {
-          setTeachingClasses(data.teachingClasses || []);
-          setLearningClasses(data.learningClasses || []);
-        }
-      } catch (err) {
-        console.error(' Lỗi khi tải danh sách lớp học:', err);
-        setMessage('Không thể kết nối đến máy chủ 😢');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMyClasses();
-  }, []);
+  const { data, isLoading: loading, isError } = useMyClasses();
+  const deleteMutation = useDeleteClass();
+
+  const teachingClasses = data?.teachingClasses ?? [];
+  const learningClasses = data?.learningClasses ?? [];
+  const message = data?.message || (isError ? 'Không thể kết nối đến máy chủ 😢' : '');
 
   const handleViewTests = (classId) => {
     const path = routes.classChapterPage.replace(':classId', classId);
@@ -65,22 +53,19 @@ const MyClassesPage = () => {
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (!selectedClass) return;
 
-    try {
-      await deleteClass(selectedClass.classId);
-      toast.success(' Xóa lớp học thành công!');
-
-      // Remove from local state
-      setTeachingClasses((prev) =>
-        prev.filter((c) => c.classId !== selectedClass.classId),
-      );
-      setShowDeleteModal(false);
-      setSelectedClass(null);
-    } catch (err) {
-      toast.error(err.response?.data?.error || ' Xóa lớp học thất bại!');
-    }
+    deleteMutation.mutate(selectedClass.classId, {
+      onSuccess: () => {
+        toast.success(' Xóa lớp học thành công!');
+        setShowDeleteModal(false);
+        setSelectedClass(null);
+      },
+      onError: (err) => {
+        toast.error(err.response?.data?.error || ' Xóa lớp học thất bại!');
+      },
+    });
   };
 
   const handleManageStudents = (classId) => {
@@ -88,12 +73,8 @@ const MyClassesPage = () => {
     navigate(path);
   };
 
-  const handleEditSuccess = (updatedClass) => {
-    setTeachingClasses((prev) =>
-      prev.map((c) =>
-        c.classId === updatedClass.classId ? { ...c, ...updatedClass } : c,
-      ),
-    );
+  const handleEditSuccess = () => {
+    qc.invalidateQueries({ queryKey: myClassesKeys.all });
   };
 
   if (loading) {

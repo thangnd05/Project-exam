@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { getChaptersByClass, deleteChapter } from '../../../api/chapterApi';
-import { getClassById } from '../../../api/classApi';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -23,6 +21,7 @@ import PageHeader from '~/components/common/PageHeader/PageHeader';
 import PageHeaderViewToggle from '~/components/common/PageHeader/PageHeaderViewToggle';
 import ChapterManagementTable from '../components/ChapterManagementTable/ChapterManagementTable';
 import routes from '~/config/Routes';
+import { useChaptersOfClass } from './hooks/useChaptersOfClass';
 
 const cx = classNames.bind(styles);
 
@@ -30,11 +29,18 @@ const ChapterOfClass = () => {
   const { classId } = useParams();
   const navigate = useNavigate();
 
-  const [chapters, setChapters] = useState([]);
-  const [className, setClassName] = useState('');
-  const [classQr, setClassQr] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
+  const {
+    chapters,
+    className,
+    classQr,
+    isLoading: loading,
+    isError,
+    deleteChapterMutation,
+    refetchChapters,
+  } = useChaptersOfClass(classId);
+
+  const message = isError ? 'Không thể tải danh sách chương 😢' : '';
+
   const [showCreateChapter, setShowCreateChapter] = useState(false);
   const [showUpdateChapter, setShowUpdateChapter] = useState(false);
   const [showDeleteChapter, setShowDeleteChapter] = useState(false);
@@ -65,9 +71,8 @@ const ChapterOfClass = () => {
     }
 
     try {
-      await deleteChapter(selectedChapter.chapterId);
+      await deleteChapterMutation.mutateAsync(selectedChapter.chapterId);
       toast.success('Xóa chương thành công!');
-      fetchChapters();
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -78,35 +83,6 @@ const ChapterOfClass = () => {
       setSelectedChapter(null);
     }
   };
-
-  const fetchChapters = useCallback(async () => {
-    try {
-      const data = await getChaptersByClass(classId);
-      setChapters(data || []);
-    } catch (err) {
-      console.error(' Lỗi load chapter:', err);
-      setMessage('Không thể tải danh sách chương 😢');
-    } finally {
-      setLoading(false);
-    }
-  }, [classId]);
-
-  useEffect(() => {
-    const fetchClassInfo = async () => {
-      try {
-        const data = await getClassById(classId);
-        if (data?.className) {
-          setClassName(data.className);
-        }
-        setClassQr(data?.classQr || '');
-      } catch (err) {
-        console.error(' Lỗi load class info:', err);
-      }
-    };
-
-    fetchClassInfo();
-    fetchChapters();
-  }, [classId, fetchChapters]);
 
   if (loading) {
     return (
@@ -212,7 +188,7 @@ const ChapterOfClass = () => {
         onClose={() => setShowCreateChapter(false)}
         classId={classId}
         onSuccess={() => {
-          fetchChapters();
+          refetchChapters();
           setShowCreateChapter(false);
         }}
       />
@@ -225,7 +201,7 @@ const ChapterOfClass = () => {
         }}
         chapter={selectedChapter}
         classId={classId}
-        onSuccess={fetchChapters}
+        onSuccess={refetchChapters}
       />
 
       <ConfirmDeleteModal
