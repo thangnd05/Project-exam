@@ -7,7 +7,6 @@ import TagSelector from '~/components/common/TagSelector/TagSelector';
 import { getQuestionById, updateQuestion } from '~/api/questionApi';
 import { getExamPartById } from '~/api/examPartApi';
 import { deletePassageMedia } from '~/api/passageMediaApi';
-import { getQuestionCollections } from '~/api/questionCollectionApi';
 import { buildCollectionTree } from '~/utils/collectionTree';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -17,6 +16,7 @@ import {
   IoTrashOutline,
 } from 'react-icons/io5';
 import { getTagsFlatByExamType } from '~/api/tagApi';
+import { useQuestionCollections } from './hooks/useQuestionCollections';
 import styles from './EditQuestionModal.module.scss';
 import createStyles from '~/components/test/CreateTestModal.module.scss';
 
@@ -66,7 +66,6 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   const [existingMedia, setExistingMedia] = useState([]);
   const [deletingMediaIds, setDeletingMediaIds] = useState([]);
   const [confirmDeleteMedia, setConfirmDeleteMedia] = useState(null);
-  const [questionCollections, setQuestionCollections] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [selectedTagIds, setSelectedTagIds] = useState([]);
 
@@ -76,14 +75,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     onHideRef.current = onHide;
   }, [onHide]);
 
-  useEffect(() => {
-    getQuestionCollections()
-      .then((data) => {
-        const list = Array.isArray(data) ? data : (data.data || data.content || []);
-        setQuestionCollections(list);
-      })
-      .catch((err) => console.error('Failed to load collections', err));
-  }, []);
+  const { data: questionCollections = [] } = useQuestionCollections();
 
   const [formData, setFormData] = useState({
     classId: '',

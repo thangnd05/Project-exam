@@ -8,8 +8,8 @@ import 'slick-carousel/slick/slick-theme.css';
 
 import styles from './HeroSection.module.scss';
 import {name} from '~/assets/images';
-import {getQuickChallengeTests} from '~/api/testApi';
 import {calculateAllowedTime} from '~/utils/testStatusHelper';
+import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
 
 const cx = classNames.bind(styles);
 
@@ -85,8 +85,7 @@ const NextArrow = ({onClick}) => (
 
 function HeroSection() {
   const navigate = useNavigate();
-  const [quickTests, setQuickTests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {quickTests, isLoading: loading} = useQuickChallengeTests();
   // Peek (card sau ló phải) chỉ ở desktop; mobile -> 1 card full-width
   const [isDesktop, setIsDesktop] = useState(
     typeof window === 'undefined' ? true : window.innerWidth > 992,
@@ -96,23 +95,6 @@ function HeroSection() {
     const onResize = () => setIsDesktop(window.innerWidth > 992);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    getQuickChallengeTests()
-      .then((data) => {
-        if (mounted) setQuickTests(Array.isArray(data) ? data : []);
-      })
-      .catch(() => {
-        if (mounted) setQuickTests([]);
-      })
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   // 1 card / 1 examType: gom theo examType, mỗi loại lấy 1 bài (bài đầu tiên)

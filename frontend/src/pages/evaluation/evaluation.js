@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {motion} from 'framer-motion';
 import {FaStar, FaQuoteLeft, FaPen} from 'react-icons/fa';
 import classNames from 'classnames/bind';
@@ -6,12 +6,12 @@ import styles from './evaluation.module.scss';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { getAllEvaluations } from '../../api/evaluationApi';
 import {toast} from 'react-toastify';
 import {useAuth} from '~/hooks/useAuth';
 import {useNavigate} from 'react-router-dom';
 import routes from '~/config/Routes';
 import EvaluationModal from './modals/EvaluationModal';
+import {useEvaluations} from './hooks/useEvaluations';
 
 const cx = classNames.bind(styles);
 
@@ -29,35 +29,10 @@ const Evaluation = () => {
   const navigate = useNavigate();
 
   // --- STATE ---
-  const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
   // --- FETCH DATA ---
-  const fetchReviews = async () => {
-    try {
-      const data = await getAllEvaluations();
-      // Đảm bảo data trả về là mảng
-      if (Array.isArray(data)) {
-        setReviews(data);
-      } else {
-        console.error(
-          'API evaluations returned non-array data:',
-          data,
-        );
-        setReviews([]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch reviews:', error);
-      setReviews([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchReviews();
-  }, []);
+  const {reviews, loading, refetchEvaluations} = useEvaluations();
 
   // --- LOGIC ---
   const showDots = reviews.length > 0 && reviews.length < 3;
@@ -100,7 +75,7 @@ const Evaluation = () => {
   };
 
   const handleReviewSuccess = () => {
-    fetchReviews(); // Refresh list
+    refetchEvaluations(); // Refresh list
   };
 
   const formatDate = (dateString) => {

@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Button, Spinner, Alert} from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
-import { getQuestionById } from '~/api/questionApi';
 import {toast} from 'react-toastify';
+import {useQuestionDetail} from './hooks/useQuestionDetail';
 import classNames from 'classnames/bind';
 import {
   IoCloseOutline,
@@ -45,44 +45,22 @@ const collectMediaItems = (questionDetail) => {
 };
 
 const ViewQuestionModal = ({show, onHide, questionId}) => {
-  const [loading, setLoading] = useState(false);
-  const [question, setQuestion] = useState(null);
   const onHideRef = useRef(onHide);
 
   useEffect(() => {
     onHideRef.current = onHide;
   }, [onHide]);
 
+  const {question, isLoading: loading, isError} = useQuestionDetail(questionId, {
+    enabled: !!show,
+  });
+
   useEffect(() => {
-    if (!show || !questionId) return;
-    let cancelled = false;
-
-    const fetchDetail = async (id) => {
-      setLoading(true);
-      try {
-        const data = await getQuestionById(id);
-        if (!cancelled) {
-          setQuestion(data);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          toast.error('Không thể tải dữ liệu câu hỏi');
-          onHideRef.current?.();
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    setQuestion(null);
-    fetchDetail(questionId);
-
-    return () => {
-      cancelled = true;
-    };
-  }, [show, questionId]);
+    if (isError) {
+      toast.error('Không thể tải dữ liệu câu hỏi');
+      onHideRef.current?.();
+    }
+  }, [isError]);
 
   const answers = Array.isArray(question?.answers) ? question.answers : [];
   const mediaItems = collectMediaItems(question);
