@@ -1,7 +1,6 @@
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
-import { uploadPostImage, createPost, updatePost } from '~/api/postApi';
 import classNames from 'classnames/bind';
 import { FaPenNib, FaEdit, FaImage, FaTag } from 'react-icons/fa';
 import { useAuth } from '~/hooks/useAuth';
@@ -12,6 +11,7 @@ import 'react-quill/dist/quill.snow.css';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import styles from '~/components/common/modal/CommonFormModal.module.scss';
+import { useSavePost } from './hooks/useSavePost';
 
 const cx = classNames.bind(styles);
 
@@ -22,11 +22,18 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
   const [categoryId, setCategoryId] = useState('');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [inlineImages, setInlineImages] = useState([]);
 
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const savePostMutation = useSavePost({
+    onSuccess: () => {
+      onClose();
+      if (onRefresh) onRefresh();
+    },
+  });
+  const loading = savePostMutation.isPending;
 
   // Khởi tạo / reset state khi mở modal (cả create lẫn edit)
   useEffect(() => {
@@ -93,7 +100,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
     'link', 'image', 'code-block',
   ];
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!user) {
       toast.warning(' Bạn cần đăng nhập trước khi đăng bài viết!');
       setTimeout(() => {
@@ -108,59 +115,16 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       return;
     }
 
-    setLoading(true);
-
-    try {
-      let finalContent = content;
-
-      // Upload inline images that are still in the content
-      const imagesToUpload = inlineImages.filter((img) => finalContent.includes(img.base64Url));
-
-      if (imagesToUpload.length > 0) {
-        toast.info(`Đang tải lên ${imagesToUpload.length} ảnh trong nội dung...`, { autoClose: 2000 });
-        for (const img of imagesToUpload) {
-          const imgFormData = new FormData();
-          imgFormData.append('image', img.file);
-
-          try {
-            const data = await uploadPostImage(imgFormData);
-            const cloudUrl = data.url;
-            finalContent = finalContent.split(img.base64Url).join(cloudUrl);
-          } catch (error) {
-            toast.error(` Lỗi tải ảnh ${img.file.name} lên Cloudinary!`);
-          }
-        }
-      }
-
-      const postData = {
-        title,
-        content: finalContent,
-        thumbnailUrl: thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1350&q=80',
-        categoryIds: [categoryId],
-      };
-
-      const formData = new FormData();
-      formData.append('post', JSON.stringify(postData));
-
-      if (thumbnailFile) {
-        formData.append('thumbnail', thumbnailFile);
-      }
-
-      if (isEditing) {
-        await updatePost(editingPost.id, formData);
-        toast.success('Cập nhật bài viết thành công!');
-      } else {
-        await createPost(formData);
-        toast.success('Đăng bài viết thành công!');
-      }
-
-      onClose();
-      if (onRefresh) onRefresh();
-    } catch (err) {
-      toast.error(err.response?.data?.message || (isEditing ? 'Lỗi khi cập nhật bài viết!' : 'Lỗi khi đăng bài viết!'));
-    } finally {
-      setLoading(false);
-    }
+    savePostMutation.mutate({
+      title,
+      content,
+      categoryId,
+      thumbnailUrl,
+      thumbnailFile,
+      inlineImages,
+      isEditing,
+      editingPostId: editingPost?.id,
+    });
   };
 
   return (
