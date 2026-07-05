@@ -1,7 +1,5 @@
-import { getMyAttemptsByTest } from '../../api/userTestApi';
-import { getUserTestInfo } from '../../api/testApi';
-import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTestHistory } from './hooks/useTestHistory';
 import { Container, Table, Spinner } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
@@ -34,37 +32,7 @@ function TestHistoryPage() {
   const { testId } = useParams();
   const navigate = useNavigate();
 
-  const [attempts, setAttempts] = useState([]);
-  const [testInfo, setTestInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!testId) return;
-
-    const fetchHistory = async () => {
-      setLoading(true);
-      try {
-        const [attemptsPayload, testInfoData] = await Promise.all([
-          getMyAttemptsByTest(testId),
-          getUserTestInfo(testId),
-        ]);
-        const normalizedAttempts = Array.isArray(attemptsPayload)
-          ? attemptsPayload
-          : Array.isArray(attemptsPayload?.data)
-            ? attemptsPayload.data
-            : [];
-        setAttempts(normalizedAttempts);
-        setTestInfo(testInfoData);
-      } catch (err) {
-        console.error(' Lỗi khi tải dữ liệu lịch sử:', err);
-        setAttempts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHistory();
-  }, [testId]);
+  const { attempts, testInfo, isLoading } = useTestHistory(testId);
 
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '-';
@@ -81,7 +49,7 @@ function TestHistoryPage() {
     navigate(`/tests/result/${userTestId}`);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={cx('loading-box')}>
         <Spinner animation="grow" variant="primary" size="lg" />

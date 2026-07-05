@@ -1,8 +1,5 @@
-import { useContext, useEffect, useState, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { getUserTestMeta } from '../../../../../api/userTestApi';
-import { getResultByUserTest } from '../../../../../api/userAnswerApi';
-import { getUserTestInfo } from '../../../../../api/testApi';
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
 import {
@@ -16,7 +13,7 @@ import {
 
 import { AuthContext } from "~/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/utils/guestSession";
-import { getEnhancedResult, getGuestEnhancedResult } from "~/api/enhancedResultApi";
+import { useTestResult } from "./hooks/useTestResult";
 import SkillBreakdownChart from "./components/SkillBreakdownChart";
 import ReadinessGauge from "./components/ReadinessGauge";
 import RecoveryPlan from "./components/RecoveryPlan";
@@ -36,16 +33,11 @@ const TestResultPage = () => {
     [isGuest],
   );
 
-  const [result, setResult] = useState(null);
-  const [testId, setTestId] = useState(null);
+  const { result, testId, enhanced, canReview, isLoading, isError } =
+    useTestResult(userTestId, isGuest, guestCfg, !authLoading);
 
-  const [enhanced, setEnhanced] = useState(null);
-
-  const [canReview, setCanReview] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
-  const [error, setError] = useState("");
+  const loading = authLoading || isLoading;
+  const error = isError ? "Không thể tải kết quả bài thi này" : "";
 
   const formatTime = (start, end) => {
     if (!start || !end) return "--:--";
@@ -56,54 +48,6 @@ const TestResultPage = () => {
 
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
-
-  // ================================
-  //  LOAD RESULT + CHECK REVIEW TIME
-  // ================================
-  useEffect(() => {
-    if (authLoading) return;
-    const fetchResult = async () => {
-      try {
-        setLoading(true);
-        // 1. Lấy thông tin tổng quan bài test (Chứa startedAt, finishedAt)
-        const metaData = await getUserTestMeta(userTestId, isGuest, guestCfg);
-        setTestId(metaData.testId);
-
-        // 2. Lấy kết quả điểm số, số câu đúng/sai
-        const resultData = await getResultByUserTest(userTestId, isGuest, guestCfg);
-
-        setResult({
-          ...resultData,
-          startedAt: metaData.startedAt,
-          finishedAt: metaData.finishedAt,
-        });
-
-        // 3. Check hạn review (endpoint public)
-        const testData = await getUserTestInfo(metaData.testId);
-        const now = new Date();
-        const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
-        setCanReview(!availableTo || now > availableTo);
-
-        // 4. Fetch enhanced result (non-blocking)
-        try {
-          const enhancedRes = isGuest
-            ? await getGuestEnhancedResult(userTestId)
-            : await getEnhancedResult(userTestId);
-          setEnhanced(enhancedRes.data);
-        } catch (enhErr) {
-          console.warn("Enhanced result not available:", enhErr);
-        }
-
-      } catch (err) {
-        console.error(" Lỗi tải kết quả:", err);
-        setError("Không thể tải kết quả bài thi này");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResult();
-  }, [userTestId, authLoading, isGuest, guestCfg]);
 
   // ================================
   //  XEM ĐÁP ÁN & GIẢI THÍCH (trang riêng)

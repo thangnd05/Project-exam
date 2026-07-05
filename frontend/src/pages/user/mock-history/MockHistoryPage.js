@@ -1,13 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getMyUserTests } from '~/api/userTestApi';
-import { getExamTypes } from '~/api/examTypeApi';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { filterCompletedTests } from '~/utils/userTests';
 import { formatDateTime24 as formatDate, formatDayMonth } from '~/utils/format-date-time';
 import MockHistoryCharts from './components/MockHistoryCharts';
+import { useMockHistory } from './hooks/useMockHistory';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -23,37 +20,13 @@ function formatDuration(seconds) {
 
 function MockHistoryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [examTypes, setExamTypes] = useState([]);
   const [examTypeFilter, setExamTypeFilter] = useState(searchParams.get('examTypeId') || '');
-  const [allTests, setAllTests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [enhancedById, setEnhancedById] = useState({});
   const [loadingId, setLoadingId] = useState(null);
   const [chartLoading, setChartLoading] = useState(false);
-  const [targetScore, setTargetScore] = useState(null);
 
-  useEffect(() => {
-    getExamTypes().then(setExamTypes).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    getMyUserTests()
-      .then((arr0) => {
-        if (!mounted) return;
-        setAllTests(filterCompletedTests(arr0));
-      })
-      .catch((err) => {
-        if (mounted) setError(err?.response?.data?.message || err.message);
-      })
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const { examTypes, allTests, isLoading: loading, error, targetScore } =
+    useMockHistory(examTypeFilter);
 
   const tests = useMemo(() => {
     if (!examTypeFilter) return allTests;
@@ -64,25 +37,6 @@ function MockHistoryPage() {
     () => examTypes.find((et) => et.examTypeId === examTypeFilter)?.name || '',
     [examTypes, examTypeFilter],
   );
-
-  useEffect(() => {
-    if (!examTypeFilter) {
-      setTargetScore(null);
-      return;
-    }
-    let mounted = true;
-    getUserTarget(examTypeFilter)
-      .then((data) => {
-        if (!mounted) return;
-        setTargetScore(data.hasTarget ? data.targetScore : null);
-      })
-      .catch(() => {
-        if (mounted) setTargetScore(null);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [examTypeFilter]);
 
   const testsForChart = useMemo(
     () => tests.slice(0, CHART_FETCH_LIMIT),

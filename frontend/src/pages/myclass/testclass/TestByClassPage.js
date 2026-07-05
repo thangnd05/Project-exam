@@ -1,6 +1,4 @@
-import { getClassById, getClassChapterTests } from '../../../api/classApi';
-import { deleteTest } from '../../../api/testApi';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -8,6 +6,7 @@ import { IoDocumentTextOutline, IoAddCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 
 import styles from './TestByClassPage.module.scss';
+import { useTestByClass } from './hooks/useTestByClass';
 import CreateTestModal from '~/components/test/CreateTestModal';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
@@ -16,41 +15,12 @@ const cx = classNames.bind(styles);
 
 function TestByClassPage() {
   const { classId, chapterId } = useParams();
-  const [tests, setTests] = useState([]);
-  const [className, setClassName] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { className, tests, isLoading, refetchTests, deleteTestMutation } =
+    useTestByClass(classId, chapterId);
   const [countdowns, setCountdowns] = useState({});
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [testToDelete, setTestToDelete] = useState(null);
-
-  // 🟢 Lấy thông tin lớp học
-  useEffect(() => {
-    if (!classId) return;
-    getClassById(classId)
-      .then((data) => {
-        if (data && data.className) {
-          setClassName(data.className);
-        }
-      })
-      .catch((err) => console.error(' Lỗi:', err));
-  }, [classId]);
-
-  // 🟢 Lấy danh sách bài test
-  const fetchTests = useCallback(() => {
-    if (!classId || !chapterId) return;
-    setLoading(true);
-    getClassChapterTests(classId, chapterId)
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setTests(data);
-        }
-      })
-      .catch((err) => {
-        console.error(' Lỗi bài test:', err);
-      })
-      .finally(() => setLoading(false));
-  }, [classId, chapterId]);
 
   const handleDeleteTest = (testId) => {
     const selectedTest = tests.find((testItem) => testItem.testId === testId);
@@ -64,9 +34,8 @@ function TestByClassPage() {
     }
 
     try {
-      await deleteTest(testToDelete.testId);
+      await deleteTestMutation.mutateAsync(testToDelete.testId);
       toast.success('Xóa bài kiểm tra thành công!');
-      fetchTests();
     } catch (err) {
       console.error(' Lỗi xóa bài test:', err);
       toast.error('Không thể xóa bài kiểm tra. Vui lòng thử lại.');
@@ -75,10 +44,6 @@ function TestByClassPage() {
       setTestToDelete(null);
     }
   };
-
-  useEffect(() => {
-    fetchTests();
-  }, [fetchTests]);
 
   // 🕒 Countdown logic
   useEffect(() => {
@@ -96,7 +61,7 @@ function TestByClassPage() {
     return () => clearInterval(interval);
   }, [tests]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div
         className="d-flex flex-column align-items-center justify-content-center"
@@ -127,7 +92,7 @@ function TestByClassPage() {
         tests={tests}
         countdowns={countdowns}
         handleDeleteTest={handleDeleteTest}
-        onRefresh={fetchTests}
+        onRefresh={refetchTests}
         emptyState={emptyState}
       />
 
@@ -138,7 +103,7 @@ function TestByClassPage() {
         classId={classId}
         chapterId={chapterId}
         onSuccess={() => {
-          fetchTests();
+          refetchTests();
           setShowCreateTestModal(false);
           toast.success('Tạo bài kiểm tra mới thành công!');
         }}

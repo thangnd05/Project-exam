@@ -1,13 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getClassById } from '../../../api/classApi';
-import {
-  getMembersByClass,
-  getPendingByClass,
-  approveMember,
-  approveAllMembers,
-  removeMember,
-} from '../../../api/classMemberApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
@@ -26,6 +18,7 @@ import { Spinner, Badge, Table, Tabs, Tab } from 'react-bootstrap';
 
 import styles from './ClassMemberManagementPage.module.scss';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
+import { useClassMembers } from './hooks/useClassMembers';
 
 const cx = classNames.bind(styles);
 
@@ -34,77 +27,36 @@ const ClassMemberManagementPage = () => {
   const navigate = useNavigate();
 
   // State
-  const [classInfo, setClassInfo] = useState(null);
-  const [allMembers, setAllMembers] = useState([]);
-  const [pendingMembers, setPendingMembers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'joinedAt', direction: 'desc' });
 
-  // 🟢 Fetch class info
-  const fetchClassInfo = useCallback(async () => {
-    if (!classId) return;
-    try {
-      const data = await getClassById(classId);
-      setClassInfo(data);
-    } catch (err) {
-      console.error('Lỗi khi lấy thông tin lớp học:', err);
-      toast.error('Không thể tải thông tin lớp học');
-    }
-  }, [classId]);
-
-  // 🟢 Fetch all members
-  const fetchAllMembers = useCallback(async () => {
-    if (!classId) return;
-    try {
-      const data = await getMembersByClass(classId);
-      setAllMembers(data || []);
-    } catch (err) {
-      console.error('Lỗi khi lấy danh sách thành viên:', err);
-      toast.error('Không thể tải danh sách thành viên');
-    }
-  }, [classId]);
-
-  // 🟢 Fetch pending members
-  const fetchPendingMembers = useCallback(async () => {
-    if (!classId) return;
-    try {
-      const data = await getPendingByClass(classId);
-      setPendingMembers(data || []);
-    } catch (err) {
-      console.error('Lỗi khi lấy danh sách chờ duyệt:', err);
-    }
-  }, [classId]);
-
-  // 🟢 Initial load
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await Promise.all([fetchClassInfo(), fetchAllMembers(), fetchPendingMembers()]);
-      setLoading(false);
-    };
-    loadData();
-  }, [classId, fetchClassInfo, fetchAllMembers, fetchPendingMembers]);
+  // 🟢 Data fetching + mutations via react-query
+  const {
+    classInfo,
+    allMembers,
+    pendingMembers,
+    isLoading: loading,
+    actionLoading,
+    approveMemberMutation,
+    approveAllMutation,
+    removeMemberMutation,
+    refreshMembers,
+  } = useClassMembers(classId);
 
   // 🟢 Handle approve single member
   const handleApproveMember = async (userId) => {
-    setActionLoading(true);
     try {
-      await approveMember({
+      await approveMemberMutation.mutateAsync({
         classId: String(classId),
         userId: String(userId),
       });
       toast.success('Duyệt học sinh thành công!');
-      await Promise.all([fetchAllMembers(), fetchPendingMembers()]);
     } catch (err) {
       console.error('Lỗi duyệt học sinh:', err);
       const msg = err?.response?.data?.error || 'Không thể duyệt học sinh';
       toast.error(msg);
-    } finally {
-      setActionLoading(false);
     }
   };
 
@@ -114,39 +66,31 @@ const ClassMemberManagementPage = () => {
       toast.warning('Không có học sinh nào đang chờ duyệt');
       return;
     }
-    setActionLoading(true);
     try {
-      const result = await approveAllMembers(classId);
+      const result = await approveAllMutation.mutateAsync(classId);
       toast.success(result.message || 'Đã duyệt tất cả học sinh!');
-      await Promise.all([fetchAllMembers(), fetchPendingMembers()]);
     } catch (err) {
       console.error('Lỗi duyệt tất cả:', err);
       const msg = err?.response?.data?.error || 'Không thể duyệt tất cả';
       toast.error(msg);
-    } finally {
-      setActionLoading(false);
     }
   };
 
   // 🟢 Handle remove member
   const handleRemoveMember = async () => {
     if (!memberToDelete) return;
-    setActionLoading(true);
     try {
-      await removeMember({
+      await removeMemberMutation.mutateAsync({
         classId: String(classId),
         userId: String(memberToDelete.userId),
       });
       toast.success('Đã xóa học sinh khỏi lớp!');
       setShowDeleteModal(false);
       setMemberToDelete(null);
-      await Promise.all([fetchAllMembers(), fetchPendingMembers()]);
     } catch (err) {
       console.error('Lỗi xóa học sinh:', err);
       const msg = err?.response?.data?.error || 'Không thể xóa học sinh';
       toast.error(msg);
-    } finally {
-      setActionLoading(false);
     }
   };
 
@@ -343,9 +287,7 @@ const ClassMemberManagementPage = () => {
           <button
             className={cx('btn-refresh')}
             onClick={() =>
-              Promise.all([fetchAllMembers(), fetchPendingMembers()]).then(() =>
-                toast.success('Đã làm mới!')
-              )
+              refreshMembers().then(() => toast.success('Đã làm mới!'))
             }
           >
             <IoRefreshOutline />

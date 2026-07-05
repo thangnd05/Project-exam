@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { getCategories, createCategory, updateCategory, deleteCategory } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
@@ -11,31 +10,21 @@ import {
     AdminToolbar,
     AdminTable,
 } from '../components/common';
+import { useCategories } from './hooks/useCategories';
 
 const Categories = () => {
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const {
+        categories,
+        isLoading: loading,
+        createCategory,
+        updateCategory,
+        deleteCategory,
+    } = useCategories();
     const [searchQuery, setSearchQuery] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
     const [deletingCategory, setDeletingCategory] = useState(null);
     const [formData, setFormData] = useState({ name: '' });
-
-    const fetchCategories = async () => {
-        setLoading(true);
-        try {
-            const data = await getCategories();
-            setCategories(data);
-        } catch (error) {
-            toast.error('Lỗi khi tải danh mục');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchCategories();
-    }, []);
 
     const filteredCategories = categories.filter(c =>
         c.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -59,7 +48,6 @@ const Categories = () => {
             await deleteCategory(deletingCategory.id);
             toast.success('Xóa danh mục thành công');
             setDeletingCategory(null);
-            fetchCategories();
         } catch (error) {
             toast.error('Lỗi khi xóa danh mục');
         }
@@ -68,14 +56,13 @@ const Categories = () => {
     const handleSubmit = async () => {
         try {
             if (editingCategory) {
-                await updateCategory(editingCategory.id, formData);
+                await updateCategory({ id: editingCategory.id, payload: formData });
                 toast.success('Cập nhật danh mục thành công');
             } else {
                 await createCategory(formData);
                 toast.success('Tạo danh mục thành công');
             }
             setShowModal(false);
-            fetchCategories();
         } catch (error) {
             toast.error('Lỗi khi lưu danh mục');
         }

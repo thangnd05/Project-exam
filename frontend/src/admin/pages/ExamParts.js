@@ -1,11 +1,9 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {createExamPart, deleteExamPart, getExamParts, updateExamPart} from '../../api/examPartApi';
-import {getExamTypes} from '../../api/examTypeApi';
-import {getSkills} from '../../api/skillApi';
+import {useExamParts} from './hooks/useExamParts';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
@@ -29,38 +27,24 @@ const emptyForm = {
 };
 
 function ExamPartsManagement() {
-  const [examParts, setExamParts] = useState([]);
-  const [examTypes, setExamTypes] = useState([]);
-  const [skills, setSkills] = useState([]);
+  const {
+    examParts,
+    examTypes,
+    skills,
+    isLoading: loading,
+    isError,
+    createMutation,
+    updateMutation,
+    deleteMutation,
+  } = useExamParts();
   const [searchTerm, setSearchTerm] = useState('');
   const [examTypeFilter, setExamTypeFilter] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingPartId, setEditingPartId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingExamPart, setDeletingExamPart] = useState(null);
-
-  const mapExamPartFromApi = (item) => ({
-    exam_part_id: String(item.examPartId),
-    exam_type_id: String(item.examTypeId),
-    skill_id: item.skillId ? String(item.skillId) : null,
-    name: item.name || '',
-    description: item.description || '',
-    default_num_questions: item.defaultNumQuestions ,
-    display_order: item.displayOrder ?? 999,
-  });
-
-  const mapExamTypeFromApi = (item) => ({
-    exam_type_id: String(item.examTypeId),
-    name: item.name || '',
-  });
-
-  const mapSkillFromApi = (item) => ({
-    skill_id: String(item.skillId),
-    name: item.name || '',
-  });
 
   const getExamTypeName = useCallback(
     (examTypeId) => {
@@ -113,29 +97,6 @@ function ExamPartsManagement() {
       .sort((left, right) => left.examTypeName.localeCompare(right.examTypeName, 'vi'));
   }, [examParts, getExamTypeName, searchTerm, examTypeFilter]);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const [examPartData, examTypeData, skillData] = await Promise.all([
-        getExamParts(),
-        getExamTypes(),
-        getSkills(),
-      ]);
-      setExamParts(examPartData.map(mapExamPartFromApi));
-      setExamTypes(examTypeData.map(mapExamTypeFromApi));
-      setSkills(skillData.map(mapSkillFromApi));
-    } catch (error) {
-      setErrorMessage('Không thể tải dữ liệu phần thi.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
   const resetForm = () => {
     setEditingPartId(null);
     setFormState(emptyForm);
@@ -183,15 +144,9 @@ function ExamPartsManagement() {
     setErrorMessage('');
     try {
       if (editingPartId) {
-        const updatedPart = await updateExamPart(editingPartId, payload);
-        setExamParts((previous) =>
-          previous.map((item) =>
-            item.exam_part_id === editingPartId ? mapExamPartFromApi(updatedPart) : item,
-          ),
-        );
+        await updateMutation.mutateAsync({ id: editingPartId, payload });
       } else {
-        const createdPart = await createExamPart(payload);
-        setExamParts((previous) => [...previous, mapExamPartFromApi(createdPart)]);
+        await createMutation.mutateAsync(payload);
       }
       setShowFormModal(false);
       resetForm();
@@ -210,10 +165,7 @@ function ExamPartsManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteExamPart(deletingExamPart.exam_part_id);
-      setExamParts((previous) =>
-        previous.filter((item) => item.exam_part_id !== deletingExamPart.exam_part_id),
-      );
+      await deleteMutation.mutateAsync(deletingExamPart.exam_part_id);
       setDeletingExamPart(null);
     } catch (error) {
       setErrorMessage('Không thể xóa phần thi.');
@@ -282,7 +234,11 @@ function ExamPartsManagement() {
           ))}
         </Form.Select>
       </AdminToolbar>
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError
+        message={
+          errorMessage || (isError ? 'Không thể tải dữ liệu phần thi.' : '')
+        }
+      />
 
       {loading ? (
         <AdminTable

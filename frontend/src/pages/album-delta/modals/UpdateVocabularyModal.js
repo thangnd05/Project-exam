@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import { IoPencil, IoText, IoLanguage } from 'react-icons/io5';
-import { updateVocabulary } from '~/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import styles from '~/components/common/modal/CommonFormModal.module.scss';
+import { useUpdateVocabulary } from './hooks/useUpdateVocabulary';
 
 const cx = classNames.bind(styles);
 
 const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }) => {
-    const [loading, setLoading] = useState(false);
     const [editVocab, setEditVocab] = useState({
         word: '',
         meaning: '',
@@ -27,30 +26,35 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }) => {
         }
     }, [vocab, show]);
 
+    const updateMutation = useUpdateVocabulary({
+        onSuccess: () => {
+            toast.success(' Cập nhật từ vựng thành công!');
+            onSuccess();
+            onClose();
+        },
+        onError: (err) => {
+            console.error(' Lỗi khi cập nhật từ:', err);
+            toast.error('Có lỗi xảy ra khi cập nhật từ vựng!');
+        },
+    });
+    const loading = updateMutation.isPending;
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setEditVocab({ ...editVocab, [name]: value });
     };
 
-    const handleUpdate = async (e) => {
+    const handleUpdate = (e) => {
         if (!editVocab.word.trim() || !editVocab.meaning.trim()) {
             toast.warning(' Vui lòng điền đầy đủ từ vựng và nghĩa!');
             return;
         }
 
         e.preventDefault();
-        setLoading(true);
-        try {
-            await updateVocabulary(vocab.vocabId, { ...editVocab, albumId: vocab.albumId });
-            toast.success(' Cập nhật từ vựng thành công!');
-            onSuccess();
-            onClose();
-        } catch (err) {
-            console.error(' Lỗi khi cập nhật từ:', err);
-            toast.error('Có lỗi xảy ra khi cập nhật từ vựng!');
-        } finally {
-            setLoading(false);
-        }
+        updateMutation.mutate({
+            vocabId: vocab.vocabId,
+            data: { ...editVocab, albumId: vocab.albumId },
+        });
     };
 
     return (

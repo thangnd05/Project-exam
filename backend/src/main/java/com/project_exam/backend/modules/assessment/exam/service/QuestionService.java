@@ -712,25 +712,9 @@ public class QuestionService {
 
                 for (MultipartFile file : questionFiles) {
                     if (file == null || file.isEmpty()) continue;
-
-                    String uploadedUrl;
-                    PassageMedia.MediaType mediaType;
-
-                    // Tối ưu: Dựa vào ContentType của file để gọi Cloudinary tương ứng
-                    if (file.getContentType() != null && file.getContentType().startsWith("audio")) {
-                        uploadedUrl = cloudinaryService.uploadAudio(file);
-                        mediaType = PassageMedia.MediaType.AUDIO;
-                    } else {
-                        uploadedUrl = cloudinaryService.uploadImage(file);
-                        mediaType = PassageMedia.MediaType.IMAGE;
-                    }
-
-                    PassageMedia media = new PassageMedia();
-                    media.setPassageId(passage.getPassageId());
-                    media.setMediaUrl(uploadedUrl);
-                    media.setMediaType(mediaType);
-
-                    passageMediaRepository.save(media);
+                    // Dùng helper 3 nhánh (audio/image/document) như các luồng khác —
+                    // trước đây block này thiếu nhánh document nên PDF/doc bị upload nhầm sang image.
+                    savePassageMediaFile(passage.getPassageId(), file);
                 }
             }
 
@@ -1057,6 +1041,23 @@ public class QuestionService {
             requireClassWriteAccess(effectiveClassId, effectiveChapterId, currentUserId, httpRequest);
         }
 
+        applyScalarFields(question, request);
+        Passage passage = upsertPassage(question, request);
+        passage = appendFilesToPassage(question, passage, request, files);
+        syncExtraTextContents(passage, request);
+
+        question = questionRepository.save(question);
+        List<Answer> updatedAnswers = answerService.syncAnswers(questionId, request.getAnswers());
+
+        if (request.getTagIds() != null) {
+            tagService.syncQuestionTags(questionId, request.getTagIds());
+        }
+
+        return buildQuestionAdminResponse(question, passage, updatedAnswers);
+    }
+
+    /** Cập nhật các field vô hướng của Question từ request (null = giữ nguyên). */
+    private void applyScalarFields(Question question, QuestionCreateRequest request) {
         if (request.getExamPartId() != null) question.setExamPartId(request.getExamPartId());
         if (request.getClassId() != null) question.setClassId(request.getClassId());
         if (request.getChapterId() != null) question.setChapterId(request.getChapterId());
@@ -1076,7 +1077,13 @@ public class QuestionService {
         if (request.getAnswers() != null) {
             validateQuestionAnswers(question.getQuestionType(), request.getAnswers());
         }
+    }
 
+    /**
+     * Cập nhật/tạo passage theo request. Nếu request có passage content: sửa passage cũ hoặc tạo mới
+     * (gán passageId cho question). Nếu không: trả passage hiện có của question (nếu có) để các bước sau dùng.
+     */
+    private Passage upsertPassage(Question question, QuestionCreateRequest request) {
         Passage passage = null;
         if (request.getPassage() != null && hasPassageContent(request.getPassage())) {
             if (question.getPassageId() != null) {
@@ -1105,39 +1112,52 @@ public class QuestionService {
                 passage = passageRepository.findById(question.getPassageId()).orElse(null);
             }
         }
+        return passage;
+    }
 
+    /**
+     * Append file mới vào passage_media. Nếu chưa có passage thì tạo mới (READING, hoặc LISTENING nếu có audio)
+     * và gán vào question. Trả passage đã refresh; nếu không có file mới thì trả passage nguyên trạng.
+     */
+    private Passage appendFilesToPassage(Question question, Passage passage,
+                                         QuestionCreateRequest request, Map<String, MultipartFile> files) {
         boolean hasNewFiles = files != null
                 && files.values().stream().anyMatch(f -> f != null && !f.isEmpty());
-        if (hasNewFiles) {
-            if (passage == null) {
-                Passage newPassage = new Passage();
-                newPassage.setContent("");
-                Passage.PassageType type = Passage.PassageType.READING;
-                if (request.getPassage() != null && request.getPassage().getPassageType() != null) {
-                    type = request.getPassage().getPassageType();
-                } else {
-                    for (MultipartFile f : files.values()) {
-                        if (f != null && !f.isEmpty() && f.getContentType() != null
-                                && f.getContentType().startsWith("audio")) {
-                            type = Passage.PassageType.LISTENING;
-                            break;
-                        }
+        if (!hasNewFiles) {
+            return passage;
+        }
+        if (passage == null) {
+            Passage newPassage = new Passage();
+            newPassage.setContent("");
+            Passage.PassageType type = Passage.PassageType.READING;
+            if (request.getPassage() != null && request.getPassage().getPassageType() != null) {
+                type = request.getPassage().getPassageType();
+            } else {
+                for (MultipartFile f : files.values()) {
+                    if (f != null && !f.isEmpty() && f.getContentType() != null
+                            && f.getContentType().startsWith("audio")) {
+                        type = Passage.PassageType.LISTENING;
+                        break;
                     }
                 }
-                newPassage.setPassageType(type);
-                passage = passageRepository.save(newPassage);
-                question.setPassageId(passage.getPassageId());
             }
-            try {
-                appendUploadedFilesToPassage(passage.getPassageId(), files.values());
-            } catch (IOException e) {
-                throw new BadRequestException("Upload file thất bại: " + e.getMessage(), e);
-            }
-            passage = passageRepository.findById(passage.getPassageId()).orElse(passage);
+            newPassage.setPassageType(type);
+            passage = passageRepository.save(newPassage);
+            question.setPassageId(passage.getPassageId());
         }
+        try {
+            appendUploadedFilesToPassage(passage.getPassageId(), files.values());
+        } catch (IOException e) {
+            throw new BadRequestException("Upload file thất bại: " + e.getMessage(), e);
+        }
+        return passageRepository.findById(passage.getPassageId()).orElse(passage);
+    }
 
-        // Đồng bộ các đoạn text bổ sung (passage nhiều đoạn): null = giữ nguyên;
-        // có list (kể cả rỗng) = xoá hết TEXT cũ rồi tạo lại theo đúng list mới.
+    /**
+     * Đồng bộ các đoạn text bổ sung (passage nhiều đoạn): null = giữ nguyên;
+     * có list (kể cả rỗng) = xoá hết TEXT cũ rồi tạo lại theo đúng list mới.
+     */
+    private void syncExtraTextContents(Passage passage, QuestionCreateRequest request) {
         if (passage != null && request.getPassage() != null
                 && request.getPassage().getExtraContents() != null) {
             passageMediaRepository.deleteByPassageIdAndMediaType(
@@ -1151,15 +1171,6 @@ public class QuestionService {
                 passageMediaRepository.save(textMedia);
             }
         }
-
-        question = questionRepository.save(question);
-        List<Answer> updatedAnswers = answerService.syncAnswers(questionId, request.getAnswers());
-
-        if (request.getTagIds() != null) {
-            tagService.syncQuestionTags(questionId, request.getTagIds());
-        }
-
-        return buildQuestionAdminResponse(question, passage, updatedAnswers);
     }
 
     @Transactional

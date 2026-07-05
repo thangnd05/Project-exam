@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {createQuest, deleteQuest, getQuests, updateQuest} from '../../api/questApi';
+import {useQuests} from './hooks/useQuests';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
@@ -36,32 +36,28 @@ const defaultFormState = {
 const toInputDateTime = (value) => (value ? String(value).slice(0, 16) : '');
 
 function QuestsManagement() {
-  const [quests, setQuests] = useState([]);
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingQuestId, setEditingQuestId] = useState(null);
   const [formState, setFormState] = useState(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deletingQuest, setDeletingQuest] = useState(null);
 
-  const loadQuests = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const data = await getQuests();
-      setQuests(Array.isArray(data) ? data : []);
-    } catch (error) {
-      setErrorMessage('Không thể tải danh sách nhiệm vụ.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    quests,
+    isLoading: loading,
+    isError,
+    createQuest,
+    updateQuest,
+    removeQuest,
+  } = useQuests();
 
   useEffect(() => {
-    loadQuests();
-  }, [loadQuests]);
+    if (isError) {
+      setErrorMessage('Không thể tải danh sách nhiệm vụ.');
+    }
+  }, [isError]);
 
   const filteredQuests = useMemo(() => {
     const normalized = keyword.trim().toLowerCase();
@@ -127,13 +123,9 @@ function QuestsManagement() {
     setErrorMessage('');
     try {
       if (editingQuestId) {
-        const updated = await updateQuest(editingQuestId, payload);
-        setQuests((previous) =>
-          previous.map((quest) => (quest.questId === editingQuestId ? updated : quest)),
-        );
+        await updateQuest({id: editingQuestId, payload});
       } else {
-        const created = await createQuest(payload);
-        setQuests((previous) => [created, ...previous]);
+        await createQuest(payload);
       }
       setShowModal(false);
       resetForm();
@@ -153,10 +145,7 @@ function QuestsManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteQuest(deletingQuest.questId);
-      setQuests((previous) =>
-        previous.filter((quest) => quest.questId !== deletingQuest.questId),
-      );
+      await removeQuest(deletingQuest.questId);
       setDeletingQuest(null);
     } catch (error) {
       setErrorMessage('Không thể xóa nhiệm vụ.');

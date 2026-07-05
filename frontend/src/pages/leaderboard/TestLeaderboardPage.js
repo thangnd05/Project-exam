@@ -1,6 +1,3 @@
-import { getLeaderboardByTest } from '../../api/userTestApi';
-import { getUserTestInfo } from '../../api/testApi';
-import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Container, Spinner, Table} from 'react-bootstrap';
 import {motion} from 'framer-motion';
@@ -10,6 +7,7 @@ import {IoArrowBack, IoPodiumOutline} from 'react-icons/io5';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import styles from './TestLeaderboardPage.module.scss';
 import routes from '~/config/Routes';
+import {useTestLeaderboard} from './hooks/useTestLeaderboard';
 
 const cx = classNames.bind(styles);
 
@@ -57,53 +55,14 @@ function TrophyIcon({rank}) {
 function TestLeaderboardPage() {
   const {testId} = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [testTitle, setTestTitle] = useState('');
-  const [rawRows, setRawRows] = useState([]);
-  const [me, setMe] = useState(null);
-  const [totalParticipants, setTotalParticipants] = useState(0);
-
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      setLoading(true);
-      setErrorMessage('');
-
-      try {
-        const testInfo = await getUserTestInfo(testId);
-        setTestTitle(testInfo?.title || '');
-      } catch (error) {
-        setTestTitle('');
-      }
-
-      try {
-        const data = await getLeaderboardByTest(testId);
-        // BE trả { entries, me, totalParticipants }
-        const list = Array.isArray(data?.entries) ? data.entries : [];
-        setRawRows(list);
-        setMe(data?.me ?? null);
-        setTotalParticipants(
-          typeof data?.totalParticipants === 'number'
-            ? data.totalParticipants
-            : list.length,
-        );
-      } catch (error) {
-        if (error?.response?.status === 403) {
-          setErrorMessage(
-            'Bạn không có quyền xem bảng xếp hạng của đề này (đề thuộc lớp riêng).',
-          );
-        } else {
-          setErrorMessage('Không tải được bảng xếp hạng từ hệ thống.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (testId) {
-      fetchLeaderboard();
-    }
-  }, [testId]);
+  const {
+    testTitle,
+    rawRows,
+    me,
+    totalParticipants,
+    errorMessage,
+    isLoading: loading,
+  } = useTestLeaderboard(testId);
 
   const rows = rawRows.map((entry, index) => ({
     id: entry.userTestId ?? entry.userId ?? `row-${index}`,

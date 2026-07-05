@@ -1,11 +1,10 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {CheckCircle, Shield, Trash2, UserCheck, UserX} from 'lucide-react';
 
-import {getRoles} from '../../api/roleApi';
-import {deleteUser, getUsers} from '../../api/userApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import {useUsers} from './hooks/useUsers';
 import {
   AdminFieldError,
   AdminPageHeader,
@@ -26,84 +25,43 @@ const roleColors = {
 
 const ITEMS_PER_PAGE = 10;
 
-const normalizeUser = (user) => ({
-  user_id: String(user.userId ?? user.user_id ?? user.id ?? ''),
-  user_name: user.userName ?? user.user_name ?? user.username ?? '',
-  full_name: user.fullName ?? user.full_name ?? user.username ?? '',
-  email: user.email ?? '',
-  role_id: String(user.roleId ?? user.role_id ?? ''),
-  verified:
-    typeof user.verified === 'boolean'
-      ? user.verified
-      : user.isVerified ?? null,
-  created_at: user.createdAt ?? user.created_at ?? null,
-});
-
 function UsersManagement() {
-  const [users, setUsers] = useState([]);
-  const [totalElements, setTotalElements] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [roles, setRoles] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
 
-  useEffect(() => {
-    const loadRoles = async () => {
-      try {
-        const rolesData = await getRoles();
-        setRoles(
-          rolesData.map((role) => ({
-            role_id: String(role.roleId),
-            role_name: role.roleName || '',
-            description: role.description || '',
-          })),
-        );
-      } catch (error) {
-        setErrorMessage('Không thể tải danh sách vai trò.');
-      }
-    };
+  const verifiedFilter =
+    statusFilter === 'verified'
+      ? true
+      : statusFilter === 'unverified'
+        ? false
+        : undefined;
 
-    loadRoles();
-  }, []);
+  const {
+    users,
+    totalElements,
+    totalPages,
+    roles,
+    isLoading: loading,
+    usersIsError,
+    rolesIsError,
+    deleteUserMutation,
+  } = useUsers({
+    page: currentPage,
+    size: ITEMS_PER_PAGE,
+    keyword: searchTerm,
+    roleId: roleFilter,
+    verified: verifiedFilter,
+  });
 
-  useEffect(() => {
-    const loadUsers = async () => {
-      setLoading(true);
-      setErrorMessage('');
-      try {
-        const verifiedFilter =
-          statusFilter === 'verified'
-            ? true
-            : statusFilter === 'unverified'
-              ? false
-              : undefined;
-
-        const userPage = await getUsers({
-          page: Math.max(currentPage - 1, 0),
-          size: ITEMS_PER_PAGE,
-          keyword: searchTerm,
-          roleId: roleFilter,
-          verified: verifiedFilter,
-        });
-
-        setUsers((userPage.content || []).map(normalizeUser));
-        setTotalElements(userPage.totalElements || 0);
-        setTotalPages(Math.max(userPage.totalPages || 1, 1));
-      } catch (error) {
-        setErrorMessage('Không thể tải danh sách người dùng.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUsers();
-  }, [currentPage, roleFilter, searchTerm, statusFilter]);
+  const submitting = deleteUserMutation.isPending;
+  const errorMessage =
+    deleteErrorMessage ||
+    (usersIsError ? 'Không thể tải danh sách người dùng.' : '') ||
+    (rolesIsError ? 'Không thể tải danh sách vai trò.' : '');
 
   const roleNameById = useMemo(() => {
     const roleMap = {};
@@ -124,17 +82,12 @@ function UsersManagement() {
     if (!userToDelete) {
       return;
     }
-    setSubmitting(true);
-    setErrorMessage('');
+    setDeleteErrorMessage('');
     try {
-      await deleteUser(userToDelete.user_id);
-      setUsers((previous) => previous.filter((user) => user.user_id !== userToDelete.user_id));
-      setTotalElements((previous) => Math.max(previous - 1, 0));
+      await deleteUserMutation.mutateAsync(userToDelete.user_id);
       setUserToDelete(null);
     } catch (error) {
-      setErrorMessage('Không thể xóa người dùng.');
-    } finally {
-      setSubmitting(false);
+      setDeleteErrorMessage('Không thể xóa người dùng.');
     }
   };
 

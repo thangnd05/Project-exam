@@ -1,54 +1,40 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
 import {Save, ShieldCheck} from 'lucide-react';
 import {toast} from 'react-toastify';
 
-import {getRoles, updateRolePermissions} from '../../api/roleApi';
-import {getPermissions} from '../../api/permissionApi';
 import {AdminFieldError, AdminPageHeader} from '../components/common';
+import {usePermissionsMatrix} from './hooks/usePermissionsMatrix';
 
 // ADMIN luôn giữ toàn quyền — khóa cột này để tránh tự khóa mình ra khỏi hệ thống.
 const PROTECTED_ROLE = 'ADMIN';
 
-function PermissionsManagement() {
-  const [roles, setRoles] = useState([]);
-  const [permissions, setPermissions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [saving, setSaving] = useState(false);
+const buildMatrix = (roleList) => {
+  const next = {};
+  roleList.forEach((role) => {
+    next[role.roleId] = new Set(role.permissions || []);
+  });
+  return next;
+};
 
-  // matrix[roleId] = Set(permission codes) — bản làm việc; originalRef để tính ô đã đổi.
+function PermissionsManagement() {
+  const {roles, permissions, isLoading, isError, saveMutation} = usePermissionsMatrix();
+  const loading = isLoading;
+  const saving = saveMutation.isPending;
+
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // matrix[roleId] = Set(permission codes) — bản làm việc; original để tính ô đã đổi.
   const [matrix, setMatrix] = useState({});
   const [original, setOriginal] = useState({});
 
-  const buildMatrix = (roleList) => {
-    const next = {};
-    roleList.forEach((role) => {
-      next[role.roleId] = new Set(role.permissions || []);
-    });
-    return next;
-  };
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const [roleData, permData] = await Promise.all([getRoles(), getPermissions()]);
-      const roleList = Array.isArray(roleData) ? roleData : [];
-      setRoles(roleList);
-      setPermissions(Array.isArray(permData) ? permData : []);
-      setMatrix(buildMatrix(roleList));
-      setOriginal(buildMatrix(roleList));
-    } catch (error) {
-      setErrorMessage('Không thể tải dữ liệu phân quyền.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // Nạp bản làm việc + bản gốc từ dữ liệu roles vừa tải.
   useEffect(() => {
-    load();
-  }, [load]);
+    setMatrix(buildMatrix(roles));
+    setOriginal(buildMatrix(roles));
+  }, [roles]);
+
+  const displayError = errorMessage || (isError ? 'Không thể tải dữ liệu phân quyền.' : '');
 
   // Gom permission theo nhóm để hiển thị từng khối hàng.
   const permissionGroups = useMemo(() => {
@@ -110,14 +96,9 @@ function PermissionsManagement() {
 
   const handleSave = async () => {
     if (dirtyRoleIds.length === 0) return;
-    setSaving(true);
     setErrorMessage('');
     try {
-      await Promise.all(
-        dirtyRoleIds.map((roleId) =>
-          updateRolePermissions(roleId, Array.from(matrix[roleId] || [])),
-        ),
-      );
+      await saveMutation.mutateAsync({dirtyRoleIds, matrix});
       // Đồng bộ lại bản gốc theo trạng thái vừa lưu.
       setOriginal(() => {
         const snapshot = {};
@@ -129,8 +110,6 @@ function PermissionsManagement() {
       toast.success(`Đã lưu phân quyền cho ${dirtyRoleIds.length} vai trò.`);
     } catch (error) {
       setErrorMessage('Không thể lưu phân quyền.');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -163,7 +142,7 @@ function PermissionsManagement() {
         </Button>
       </AdminPageHeader>
 
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError message={displayError} />
 
       <div style={{overflowX: 'auto'}}>
         <Table bordered hover responsive className="align-middle mb-0">

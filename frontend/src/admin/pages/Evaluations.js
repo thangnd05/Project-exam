@@ -1,13 +1,7 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Badge, Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {
-  createEvaluation,
-  deleteEvaluation,
-  getEvaluations,
-  updateEvaluation,
-} from '../../api/evaluationApi';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
@@ -17,63 +11,43 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
+import {useEvaluationMutations, useEvaluations} from './hooks/useEvaluations';
 
 const emptyForm = {
   content: '',
   rating: 5,
 };
 
-const normalizeEvaluation = (evaluation) => ({
-  id: String(evaluation.id),
-  content: evaluation.content || '',
-  rating: Number(evaluation.rating || 0),
-  created_at: evaluation.createdAt || null,
-  user_id: evaluation.userId ? String(evaluation.userId) : '',
-  username: evaluation.username || 'Ẩn danh',
-});
-
 function EvaluationsManagement() {
   const ITEMS_PER_PAGE = 10;
-  const [evaluationList, setEvaluationList] = useState([]);
-  const [totalElements, setTotalElements] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [keyword, setKeyword] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingEvaluationId, setEditingEvaluationId] = useState(null);
   const [deletingEvaluation, setDeletingEvaluation] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
 
-  const loadEvaluations = useCallback(async (page) => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const evaluationPage = await getEvaluations({
-        page: Math.max(page - 1, 0),
-        size: ITEMS_PER_PAGE,
-        keyword,
-        rating: ratingFilter,
-      });
-      setEvaluationList((evaluationPage.content || []).map(normalizeEvaluation));
-      setTotalElements(evaluationPage.totalElements || 0);
-      setTotalPages(Math.max(evaluationPage.totalPages || 1, 1));
-    } catch (error) {
-      setErrorMessage('Không thể tải danh sách đánh giá.');
-      setEvaluationList([]);
-      setTotalElements(0);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  }, [keyword, ratingFilter]);
+  const {
+    evaluationList,
+    totalElements,
+    totalPages,
+    isLoading: loading,
+    isError,
+  } = useEvaluations({
+    page: currentPage,
+    size: ITEMS_PER_PAGE,
+    keyword,
+    rating: ratingFilter,
+  });
 
-  useEffect(() => {
-    loadEvaluations(currentPage);
-  }, [currentPage, loadEvaluations]);
+  const {createMutation, updateMutation, deleteMutation} =
+    useEvaluationMutations();
+  const submitting =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   const resetForm = () => {
     setEditingEvaluationId(null);
@@ -107,7 +81,6 @@ function EvaluationsManagement() {
       return;
     }
 
-    setSubmitting(true);
     setErrorMessage('');
     try {
       const payload = {
@@ -116,28 +89,15 @@ function EvaluationsManagement() {
       };
 
       if (editingEvaluationId) {
-        const updatedEvaluation = await updateEvaluation(editingEvaluationId, payload);
-        setEvaluationList((previous) =>
-          previous.map((evaluation) =>
-            evaluation.id === editingEvaluationId
-              ? normalizeEvaluation(updatedEvaluation)
-              : evaluation,
-          ),
-        );
+        await updateMutation.mutateAsync({id: editingEvaluationId, payload});
       } else {
-        const createdEvaluation = await createEvaluation(payload);
-        setEvaluationList((previous) => [
-          normalizeEvaluation(createdEvaluation),
-          ...previous,
-        ]);
+        await createMutation.mutateAsync(payload);
       }
 
       setShowFormModal(false);
       resetForm();
     } catch (error) {
       setErrorMessage('Không thể lưu đánh giá.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -146,18 +106,12 @@ function EvaluationsManagement() {
       return;
     }
 
-    setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteEvaluation(deletingEvaluation.id);
-      setEvaluationList((previous) =>
-        previous.filter((evaluation) => evaluation.id !== deletingEvaluation.id),
-      );
+      await deleteMutation.mutateAsync(deletingEvaluation.id);
       setDeletingEvaluation(null);
     } catch (error) {
       setErrorMessage('Không thể xóa đánh giá.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -218,7 +172,9 @@ function EvaluationsManagement() {
           <option value="1">1 sao</option>
         </Form.Select>
       </AdminToolbar>
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError
+        message={errorMessage || (isError ? 'Không thể tải danh sách đánh giá.' : '')}
+      />
 
       <AdminTable
         showIndex

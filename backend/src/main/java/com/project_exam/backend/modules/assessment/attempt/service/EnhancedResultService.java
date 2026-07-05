@@ -236,49 +236,8 @@ public class EnhancedResultService {
         Long totalScoreVal = isQuickChallenge ? null
                 : (userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L);
 
-        int gaugePercentage;
-        String displayValue;
-        String gaugeLabel;
-        String gaugeTitle;
-        String gaugeMessage;
-
-        if (isQuickChallenge) {
-            gaugePercentage = percentage;
-            displayValue = percentage + "%";
-            gaugeLabel = "Độ chính xác";
-            if (percentage >= 85) {
-                gaugeTitle = "Xuất sắc";
-                gaugeMessage = "Bạn nắm rất vững kiến thức phần này!";
-            } else if (percentage >= 60) {
-                gaugeTitle = "Khá tốt";
-                gaugeMessage = "Bạn đã hiểu phần lớn, cần trau dồi thêm một chút.";
-            } else if (percentage >= 30) {
-                gaugeTitle = "Tạm ổn";
-                gaugeMessage = "Bạn cần ôn lại một số kiến thức cơ bản.";
-            } else {
-                gaugeTitle = "Cần luyện thêm";
-                gaugeMessage = "Hãy dành thời gian củng cố nền tảng kiến thức.";
-            }
-        } else if (hasTarget && targetScore != null) {
-            long ts = totalScoreVal != null ? totalScoreVal : 0;
-            boolean targetMet = ts >= targetScore;
-            gaugePercentage = Math.min(100, (int) Math.round((double) ts / targetScore * 100));
-            displayValue = ts + "/" + targetScore;
-            gaugeLabel = "Mục tiêu";
-            if (targetMet) {
-                gaugeTitle = "Đạt mục tiêu!";
-                gaugeMessage = "Chúc mừng! Bạn đã đạt mức điểm mục tiêu " + targetScore + " đề ra.";
-            } else {
-                gaugeTitle = "Chưa đạt mục tiêu";
-                gaugeMessage = "Bạn còn thiếu " + (targetScore - ts) + " điểm nữa để đạt mục tiêu.";
-            }
-        } else {
-            gaugePercentage = readinessScore;
-            displayValue = readinessScore + "%";
-            gaugeLabel = "Readiness";
-            gaugeTitle = getGaugeTitle(readinessLevel);
-            gaugeMessage = getGaugeMessage(readinessLevel);
-        }
+        GaugeInfo gauge = computeGauge(isQuickChallenge, percentage, hasTarget, targetScore,
+                totalScoreVal, readinessScore, readinessLevel);
 
         // 13. Compute isTargetMet (top-level)
         Boolean isTargetMetResult = null;
@@ -291,17 +250,7 @@ public class EnhancedResultService {
                 partBreakdown, tagMap, allTagIds);
 
         // 15. Recovery message
-        String recoveryMessage;
-        if (hasTarget && !Boolean.TRUE.equals(isTargetMetResult)) {
-            recoveryMessage = "Mục tiêu của bạn: Lấp đầy khoảng trống kiến thức để đạt target. " +
-                    "Hãy lập kế hoạch học để luyện tập theo những phần thi bạn chưa đạt mục tiêu đề ra.";
-        } else if (!hasTarget && readinessScore < 85) {
-            int nextTarget = Math.min(readinessScore + 10, 100);
-            recoveryMessage = "Mục tiêu: tăng readiness từ " + readinessScore + "% lên " + nextTarget + "%. " +
-                    "Hãy đặt mục tiêu điểm và aim từng phần thi để hệ thống gợi ý lộ trình phù hợp.";
-        } else {
-            recoveryMessage = null;
-        }
+        String recoveryMessage = buildRecoveryMessage(hasTarget, isTargetMetResult, readinessScore);
 
         return EnhancedResultDto.builder()
                 .correct(normalizedCorrect)
@@ -314,11 +263,11 @@ public class EnhancedResultService {
                 .isTargetMet(isTargetMetResult)
                 .targetScore(targetScore)
                 .percentage(percentage)
-                .gaugePercentage(gaugePercentage)
-                .displayValue(displayValue)
-                .gaugeLabel(gaugeLabel)
-                .gaugeTitle(gaugeTitle)
-                .gaugeMessage(gaugeMessage)
+                .gaugePercentage(gauge.gaugePercentage())
+                .displayValue(gauge.displayValue())
+                .gaugeLabel(gauge.gaugeLabel())
+                .gaugeTitle(gauge.gaugeTitle())
+                .gaugeMessage(gauge.gaugeMessage())
                 .skillBreakdown(skillBreakdown)
                 .partBreakdown(partBreakdown)
                 .readinessScore(readinessScore)
@@ -349,6 +298,62 @@ public class EnhancedResultService {
             return examTypeName;
         }
         return "Chung";
+    }
+
+    /** 5 field của "đồng hồ" kết quả (gauge) hiển thị ở đầu trang kết quả. */
+    private record GaugeInfo(int gaugePercentage, String displayValue, String gaugeLabel,
+                             String gaugeTitle, String gaugeMessage) {}
+
+    /**
+     * Tính gauge theo ngữ cảnh: Quick Challenge (theo % chính xác), có Target (theo điểm mục tiêu),
+     * hoặc mặc định (theo readiness). Chỉ dựng dữ liệu hiển thị — không đổi so với bản inline cũ.
+     */
+    private GaugeInfo computeGauge(boolean isQuickChallenge, int percentage, boolean hasTarget,
+                                   Integer targetScore, Long totalScoreVal,
+                                   int readinessScore, String readinessLevel) {
+        if (isQuickChallenge) {
+            String title;
+            String message;
+            if (percentage >= 85) {
+                title = "Xuất sắc";
+                message = "Bạn nắm rất vững kiến thức phần này!";
+            } else if (percentage >= 60) {
+                title = "Khá tốt";
+                message = "Bạn đã hiểu phần lớn, cần trau dồi thêm một chút.";
+            } else if (percentage >= 30) {
+                title = "Tạm ổn";
+                message = "Bạn cần ôn lại một số kiến thức cơ bản.";
+            } else {
+                title = "Cần luyện thêm";
+                message = "Hãy dành thời gian củng cố nền tảng kiến thức.";
+            }
+            return new GaugeInfo(percentage, percentage + "%", "Độ chính xác", title, message);
+        }
+        if (hasTarget && targetScore != null) {
+            long ts = totalScoreVal != null ? totalScoreVal : 0;
+            boolean targetMet = ts >= targetScore;
+            int gaugePercentage = Math.min(100, (int) Math.round((double) ts / targetScore * 100));
+            String title = targetMet ? "Đạt mục tiêu!" : "Chưa đạt mục tiêu";
+            String message = targetMet
+                    ? "Chúc mừng! Bạn đã đạt mức điểm mục tiêu " + targetScore + " đề ra."
+                    : "Bạn còn thiếu " + (targetScore - ts) + " điểm nữa để đạt mục tiêu.";
+            return new GaugeInfo(gaugePercentage, ts + "/" + targetScore, "Mục tiêu", title, message);
+        }
+        return new GaugeInfo(readinessScore, readinessScore + "%", "Readiness",
+                getGaugeTitle(readinessLevel), getGaugeMessage(readinessLevel));
+    }
+
+    /** Thông điệp gợi ý lộ trình (null nếu đã đạt target / readiness đủ cao). Giữ nguyên logic cũ. */
+    private String buildRecoveryMessage(boolean hasTarget, Boolean isTargetMetResult, int readinessScore) {
+        if (hasTarget && !Boolean.TRUE.equals(isTargetMetResult)) {
+            return "Mục tiêu của bạn: Lấp đầy khoảng trống kiến thức để đạt target. " +
+                    "Hãy lập kế hoạch học để luyện tập theo những phần thi bạn chưa đạt mục tiêu đề ra.";
+        } else if (!hasTarget && readinessScore < 85) {
+            int nextTarget = Math.min(readinessScore + 10, 100);
+            return "Mục tiêu: tăng readiness từ " + readinessScore + "% lên " + nextTarget + "%. " +
+                    "Hãy đặt mục tiêu điểm và aim từng phần thi để hệ thống gợi ý lộ trình phù hợp.";
+        }
+        return null;
     }
 
     private List<PartBreakdownDto> buildPartBreakdown(

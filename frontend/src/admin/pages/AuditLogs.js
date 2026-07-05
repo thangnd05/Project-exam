@@ -1,9 +1,9 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Badge, Form} from 'react-bootstrap';
 
-import {getAuditLogs} from '../../api/adminAuditApi';
 import {formatDateTime} from '../../utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
+import {useAuditLogs} from './hooks/useAuditLogs';
 
 const methodColorMap = {
   GET: 'info',
@@ -15,51 +15,17 @@ const methodColorMap = {
 
 function AuditLogs() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalElements, setTotalElements] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [auditLogs, setAuditLogs] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const ITEMS_PER_PAGE = 20;
 
-  const loadAuditData = async (page) => {
-    setLoading(true);
-    try {
-      const auditResponse = await getAuditLogs({
-        page: Math.max(page - 1, 0),
-        size: ITEMS_PER_PAGE,
-      });
-
-      const nextAuditLogs = (auditResponse.content || []).map((item) => ({
-        audit_log_id: String(item.auditLogId),
-        user_id: item.userId ? String(item.userId) : null,
-        user_name: item.userName || '',
-        full_name: item.fullName || '',
-        http_method: item.httpMethod || '',
-        endpoint: item.endpoint || '',
-        action: item.action || '',
-        ip_address: item.ipAddress || '',
-        success: Boolean(item.success),
-        created_at: item.createdAt || '',
-      }));
-
-      setAuditLogs(nextAuditLogs);
-      setTotalElements(auditResponse.totalElements || 0);
-      setTotalPages(Math.max(auditResponse.totalPages || 1, 1));
-    } catch (error) {
-      setAuditLogs([]);
-      setTotalElements(0);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadAuditData(currentPage);
-  }, [currentPage]);
+  const {
+    auditLogs,
+    totalElements,
+    totalPages,
+    isLoading: loading,
+  } = useAuditLogs(currentPage, ITEMS_PER_PAGE);
 
   const filteredLogs = useMemo(() => {
     return auditLogs.filter((log) => {

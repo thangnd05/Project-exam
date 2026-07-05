@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getPlanById, getTaskSessions } from '~/api/learningPlanApi';
 import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/utils/format-date-time';
+import { useTaskHistory } from './hooks/useTaskHistory';
 import styles from '../styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -31,32 +31,10 @@ function pct(v) {
 
 function TaskHistoryPage() {
   const { learningPlanId, taskId } = useParams();
-  const [plan, setPlan] = useState(null);
-  const [sessions, setSessions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [sessionsError, setSessionsError] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    setSessionsError(null);
-    Promise.all([
-      getPlanById(learningPlanId).catch((err) => {
-        setError(err?.response?.data?.message || err.message);
-        return null;
-      }),
-      getTaskSessions(learningPlanId, taskId).catch((err) => {
-        setSessionsError(err?.response?.data?.message || err.message);
-        return [];
-      }),
-    ])
-      .then(([planData, sessionData]) => {
-        setPlan(planData);
-        setSessions(sessionData || []);
-      })
-      .finally(() => setLoading(false));
-  }, [learningPlanId, taskId]);
+  const { plan, sessions, isLoading: loading, sessionsError, error } = useTaskHistory(
+    learningPlanId,
+    taskId,
+  );
 
   const task = useMemo(() => {
     if (!plan) return null;

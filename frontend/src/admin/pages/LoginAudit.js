@@ -1,52 +1,22 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Badge, Form} from 'react-bootstrap';
 
-import {getLoginAuditLogs} from '../../api/adminAuditApi';
 import {formatDateTime} from '../../utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
+import {useLoginAudit} from './hooks/useLoginAudit';
 
 function LoginAudit() {
   const ITEMS_PER_PAGE = 20;
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalElements, setTotalElements] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [loginAuditRows, setLoginAuditRows] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  const loadLoginAuditLogs = async (page) => {
-    setLoading(true);
-    try {
-      const response = await getLoginAuditLogs({
-        page: Math.max(page - 1, 0),
-        size: ITEMS_PER_PAGE,
-      });
-      const rows = (response.content || []).map((item) => ({
-        id: String(item.auditLogId),
-        login_time: item.createdAt || '',
-        action: item.action || '',
-        user_id: item.userId ? String(item.userId) : null,
-        ip_address: item.ipAddress || '',
-        status: item.success ? 'SUCCESS' : 'FAILED',
-        failure_reason: item.success ? '' : `HTTP ${item.statusCode || ''}`.trim(),
-        user_agent: item.userAgent || '',
-      }));
-      setLoginAuditRows(rows);
-      setTotalElements(response.totalElements || 0);
-      setTotalPages(Math.max(response.totalPages || 1, 1));
-    } catch (error) {
-      setLoginAuditRows([]);
-      setTotalElements(0);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadLoginAuditLogs(currentPage);
-  }, [currentPage]);
+  const {
+    rows: loginAuditRows,
+    totalElements,
+    totalPages,
+    isLoading: loading,
+  } = useLoginAudit(currentPage, ITEMS_PER_PAGE);
 
   const filteredRows = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();

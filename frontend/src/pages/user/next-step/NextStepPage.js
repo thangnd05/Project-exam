@@ -1,14 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getMyUserTests } from '~/api/userTestApi';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { listPlans, getPlanById } from '~/api/learningPlanApi';
-import { getEnhancedResult } from '~/api/enhancedResultApi';
 import { buildExamTypeDetailPath } from '~/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/utils/recoveryResource';
-import { filterCompletedTests } from '~/utils/userTests';
+import { useExamTypes, useNextStepOverview } from './hooks/useNextStep';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -31,68 +26,27 @@ function pickRecommendedTask(plan) {
 
 function NextStepPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [examTypes, setExamTypes] = useState([]);
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
 
-  const [target, setTarget] = useState(null);
-  const [plans, setPlans] = useState([]);
-  const [activePlanDetail, setActivePlanDetail] = useState(null);
-  const [latestMock, setLatestMock] = useState(null);
-  const [enhanced, setEnhanced] = useState(null);
+  const { data: examTypes = [] } = useExamTypes();
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    getExamTypes().then(setExamTypes).catch(() => {});
-  }, []);
+  const overviewQuery = useNextStepOverview(examTypeId);
+  const { target, plans, activePlanDetail, latestMock, enhanced } =
+    overviewQuery.data ?? {
+      target: null,
+      plans: [],
+      activePlanDetail: null,
+      latestMock: null,
+      enhanced: null,
+    };
+  const loading = overviewQuery.isLoading;
+  const error = overviewQuery.error
+    ? overviewQuery.error?.response?.data?.message || overviewQuery.error.message
+    : null;
 
   useEffect(() => {
     if (!examTypeId && examTypes.length > 0) setExamTypeId(examTypes[0].examTypeId);
   }, [examTypes, examTypeId]);
-
-  const reload = useCallback(async () => {
-    if (!examTypeId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const t = await getUserTarget(examTypeId).catch(() => null);
-      setTarget(t);
-
-      const ps = await listPlans(examTypeId).catch(() => []);
-      setPlans(ps || []);
-      const active = (ps || []).find((p) => p.status === 'ACTIVE');
-      if (active) {
-        const detail = await getPlanById(active.learningPlanId).catch(() => null);
-        setActivePlanDetail(detail);
-      } else {
-        setActivePlanDetail(null);
-      }
-
-      const completed = filterCompletedTests(await getMyUserTests(), examTypeId);
-      const latest = completed[0] || null;
-      setLatestMock(latest);
-
-      if (latest?.userTestId) {
-        try {
-          const r = await getEnhancedResult(latest.userTestId);
-          setEnhanced(r.data);
-        } catch {
-          setEnhanced(null);
-        }
-      } else {
-        setEnhanced(null);
-      }
-    } catch (err) {
-      setError(err?.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [examTypeId]);
-
-  useEffect(() => {
-    reload();
-  }, [reload]);
 
   const mockTestsPath = buildExamTypeDetailPath(examTypeId);
 

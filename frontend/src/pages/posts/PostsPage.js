@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
-import { getPosts, getCategories } from '~/api/postApi';
+import { usePosts } from './hooks/usePosts';
 import routes from '~/config/Routes';
 import PageHeader from '~/components/common/PageHeader/PageHeader';
 import Pagination from '~/components/common/Pagination/Pagination';
@@ -28,47 +28,28 @@ const cardVariants = {
 };
 
 function PostsPage() {
-  const [posts, setPosts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const pageSize = 9;
 
-  const fetchData = useCallback(async (page = 0) => {
-    try {
-      const [catsData, postsData] = await Promise.all([
-        getCategories(),
-        getPosts({
-          page,
-          size: pageSize,
-          categoryId: selectedCategory,
-          keyword: searchQuery,
-          status: 'APPROVED'
-        })
-      ]);
+  const { posts, categories, totalPages, refresh } = usePosts({
+    page: currentPage,
+    categoryId: selectedCategory,
+    keyword: searchQuery,
+    status: 'APPROVED',
+  });
 
-      setCategories(catsData || []);
-      if (postsData.content) {
-        setPosts(postsData.content);
-        setTotalPages(postsData.totalPages);
-        setCurrentPage(postsData.currentPage);
-      }
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-      setPosts([]);
-      setCategories([]);
-    }
+  // Reset về trang đầu khi đổi bộ lọc / từ khoá tìm kiếm
+  useEffect(() => {
+    setCurrentPage(0);
   }, [selectedCategory, searchQuery]);
 
-  useEffect(() => {
-    fetchData(0);
-  }, [fetchData]);
-
-  const refreshPosts = () => fetchData(0);
+  const refreshPosts = () => {
+    setCurrentPage(0);
+    refresh();
+  };
 
   const getCategoryStyles = (categoryName) => {
     switch (categoryName) {
@@ -203,7 +184,7 @@ function PostsPage() {
         </div>
 
         {/* Pagination */}
-        <Pagination currentPage={currentPage} totalPages={totalPages} onChange={fetchData} />
+        <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
 
         {/* Create Post Modal */}
         <CreatePostModal

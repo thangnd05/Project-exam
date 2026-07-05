@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { getMyAlbums, deleteAlbum } from '../../api/vocabularyAlbumApi';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
@@ -16,6 +15,7 @@ import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal
 import PageHeader from '../../components/common/PageHeader/PageHeader';
 import PageHeaderViewToggle from '../../components/common/PageHeader/PageHeaderViewToggle';
 import AlbumManagementTable from './components/AlbumManagementTable/AlbumManagementTable';
+import { useMyAlbums } from './hooks/useMyAlbums';
 
 const cx = classNames.bind(styles);
 
@@ -33,8 +33,6 @@ const albumCardVariants = {
 };
 
 function MyAlbumsPage() {
-  const [albums, setAlbums] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -44,46 +42,35 @@ function MyAlbumsPage() {
   const navigate = useNavigate();
 
   // 🟢 Lấy danh sách album
-  const fetchAlbums = async () => {
-    try {
-      const data = await getMyAlbums();
-      setAlbums(data || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { albums, isLoading: loading, refetchAlbums, deleteAlbumMutation } = useMyAlbums();
 
   const handleDeleteAlbum = (album) => {
     setAlbumToDelete(album);
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (!albumToDelete) return;
 
-    try {
-      await deleteAlbum(albumToDelete.albumId);
-      toast.success("Xóa Album thành công!");
-      fetchAlbums();
-    } catch (err) {
-      console.error(' Lỗi xóa album:', err);
-      toast.error(" Có lỗi xảy ra khi xóa Album!");
-    } finally {
-      setShowDeleteModal(false);
-      setAlbumToDelete(null);
-    }
+    deleteAlbumMutation.mutate(albumToDelete.albumId, {
+      onSuccess: () => {
+        toast.success("Xóa Album thành công!");
+      },
+      onError: (err) => {
+        console.error(' Lỗi xóa album:', err);
+        toast.error(" Có lỗi xảy ra khi xóa Album!");
+      },
+      onSettled: () => {
+        setShowDeleteModal(false);
+        setAlbumToDelete(null);
+      },
+    });
   };
 
   const handleEditAlbum = (album) => {
     setEditingAlbum(album);
     setShowEditModal(true);
   };
-
-  useEffect(() => {
-    fetchAlbums();
-  }, []);
 
   if (loading)
     return (
@@ -184,7 +171,7 @@ function MyAlbumsPage() {
       <CreateAlbumModal
         show={showModal}
         onClose={() => setShowModal(false)}
-        onSuccess={fetchAlbums}
+        onSuccess={refetchAlbums}
       />
 
       {/* === Modal chỉnh sửa album === */}
@@ -195,7 +182,7 @@ function MyAlbumsPage() {
           setShowEditModal(false);
           setEditingAlbum(null);
         }}
-        onSuccess={fetchAlbums}
+        onSuccess={refetchAlbums}
       />
 
       {/* === Modal xác nhận xóa === */}

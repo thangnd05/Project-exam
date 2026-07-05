@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { getMyInfo, updateUser } from '~/api/userApi';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoPersonCircleOutline, IoCameraOutline } from 'react-icons/io5';
@@ -8,14 +7,15 @@ import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import commonModalStyles from '~/components/common/modal/CommonFormModal.module.scss';
 import styles from './UpdateProfileModal.module.scss';
+import { useMyInfo, useUpdateProfile } from './hooks/useUpdateProfile';
 
 const cmx = classNames.bind(commonModalStyles);
 const cx = classNames.bind(styles);
 
 function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
-  const [submitting, setSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
+  const { data: userInfo, isLoading: loading, isError } = useMyInfo(show);
+  const updateProfileMutation = useUpdateProfile();
+  const submitting = updateProfileMutation.isPending;
 
   const [formValues, setFormValues] = useState({
     fullName: '',
@@ -32,37 +32,34 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     setFormValues({ fullName: '', email: '', userName: '' });
     setAvatarFile(null);
     setAvatarPreview('');
-    setUserInfo(null);
   }, []);
 
-  const fetchUserInfo = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getMyInfo();
-      if (data) {
-        setUserInfo(data);
-        setFormValues({
-          fullName: data.fullName || '',
-          email: data.email || '',
-          userName: data.userName || ''
-        });
-        setAvatarPreview(data.avatarUrl || '');
-      }
-    } catch (error) {
+  // Đổ dữ liệu vào form khi tải được thông tin cá nhân
+  useEffect(() => {
+    if (show && userInfo) {
+      setFormValues({
+        fullName: userInfo.fullName || '',
+        email: userInfo.email || '',
+        userName: userInfo.userName || ''
+      });
+      setAvatarPreview(userInfo.avatarUrl || '');
+    }
+  }, [show, userInfo]);
+
+  // Lỗi tải thông tin cá nhân
+  useEffect(() => {
+    if (show && isError) {
       toast.error('Không tải được thông tin cá nhân.');
       onHide();
-    } finally {
-      setLoading(false);
     }
-  }, [onHide]);
+  }, [show, isError, onHide]);
 
+  // Reset form khi đóng modal
   useEffect(() => {
-    if (show) {
-      fetchUserInfo();
-      return;
+    if (!show) {
+      resetForm();
     }
-    resetForm();
-  }, [show, fetchUserInfo, resetForm]);
+  }, [show, resetForm]);
 
   const updateField = (fieldName, fieldValue) => {
     setFormValues((prev) => ({
@@ -109,8 +106,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
       return;
     }
 
-    setSubmitting(true);
-
     try {
       const formData = new FormData();
 
@@ -130,7 +125,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
         formData.append('avatar', avatarFile);
       }
 
-      await updateUser(userInfo.userId, formData);
+      await updateProfileMutation.mutateAsync({ userId: userInfo.userId, formData });
 
       toast.success('Cập nhật thông tin thành công!');
       if (onUpdateSuccess) {
@@ -140,8 +135,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     } catch (error) {
       const apiMessage = error.response?.data?.message || 'Cập nhật thất bại. Vui lòng thử lại.';
       toast.error(apiMessage);
-    } finally {
-      setSubmitting(false);
     }
   };
 

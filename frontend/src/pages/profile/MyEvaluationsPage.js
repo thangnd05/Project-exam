@@ -1,13 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import { getMyEvaluations } from '../../api/evaluationApi';
+import React, {useState} from 'react';
 import classNames from 'classnames/bind';
 import {Alert, Spinner} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {IoArrowBackOutline, IoCalendarOutline, IoStar} from 'react-icons/io5';
 import {toast} from 'react-toastify';
-import {deleteEvaluation, updateEvaluation} from '~/api/evaluationApi';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import routes from '~/config/Routes';
+import {useMyEvaluations} from './hooks/useMyEvaluations';
 import styles from './MyEvaluationsPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -21,32 +20,16 @@ const formatDateTime = (value) => {
 
 function MyEvaluationsPage({ embedded = false }) {
   const navigate = useNavigate();
-  const [evaluations, setEvaluations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+  const {evaluations, isLoading: loading, isError, updateMutation, deleteMutation} =
+    useMyEvaluations();
+  const errorMessage = isError
+    ? 'Không tải được danh sách đánh giá. Vui lòng thử lại sau.'
+    : '';
   const [editingEvaluationId, setEditingEvaluationId] = useState(null);
   const [editRating, setEditRating] = useState(0);
   const [editContent, setEditContent] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [deletingEvaluationId, setDeletingEvaluationId] = useState(null);
-
-  const fetchMyEvaluations = async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const data = await getMyEvaluations();
-      setEvaluations(Array.isArray(data) ? data : []);
-    } catch (error) {
-      setErrorMessage('Không tải được danh sách đánh giá. Vui lòng thử lại sau.');
-      setEvaluations([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMyEvaluations();
-  }, []);
 
   const startEditEvaluation = (evaluation) => {
     setEditingEvaluationId(evaluation.id);
@@ -74,18 +57,11 @@ function MyEvaluationsPage({ embedded = false }) {
     setActionLoadingId(evaluationId);
 
     try {
-      const updatedEvaluation = await updateEvaluation(evaluationId, {
+      await updateMutation.mutateAsync({
+        evaluationId,
         rating: editRating,
         content: trimmedContent,
       });
-
-      setEvaluations((previousEvaluations) =>
-        previousEvaluations.map((evaluation) =>
-          evaluation.id === evaluationId
-            ? {...evaluation, ...updatedEvaluation}
-            : evaluation,
-        ),
-      );
       toast.success('Cập nhật đánh giá thành công.');
       cancelEditEvaluation();
     } catch (error) {
@@ -102,10 +78,7 @@ function MyEvaluationsPage({ embedded = false }) {
     setActionLoadingId(evaluationId);
 
     try {
-      await deleteEvaluation(evaluationId);
-      setEvaluations((previousEvaluations) =>
-        previousEvaluations.filter((evaluation) => evaluation.id !== evaluationId),
-      );
+      await deleteMutation.mutateAsync(evaluationId);
       if (editingEvaluationId === evaluationId) {
         cancelEditEvaluation();
       }

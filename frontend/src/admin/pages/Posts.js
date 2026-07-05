@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge, Button } from 'react-bootstrap';
 import { Eye, CheckCircle, Trash2 } from 'lucide-react';
-import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 import { toast } from 'react-toastify';
 import routes from '~/config/Routes';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import ConfirmActionModal from '~/components/common/modal/ConfirmActionModal';
 import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common';
+import { usePosts, useApprovePost, useDeletePost } from './hooks/usePosts';
 
 const STATUS_VARIANT = { APPROVED: 'success', PENDING: 'warning' };
 
@@ -17,64 +17,63 @@ const STATUS_FILTERS = [
 ];
 
 const Posts = () => {
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('PENDING');
     const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
-    const [totalElements, setTotalElements] = useState(0);
     const [approvingPost, setApprovingPost] = useState(null);
     const [deletingPost, setDeletingPost] = useState(null);
 
     const PAGE_SIZE = 10;
 
-    const fetchPosts = useCallback(async (page = 0) => {
-        setLoading(true);
-        try {
-            const data = await getPosts({
-                page,
-                size: PAGE_SIZE,
-                status: statusFilter === 'ALL' ? undefined : statusFilter,
-                keyword: searchQuery
-            });
-            setPosts(data.content || []);
-            setCurrentPage(data.currentPage || 0);
-            setTotalPages(data.totalPages || 0);
-            setTotalElements(data.totalElements || 0);
-        } catch (error) {
-            toast.error('Lỗi khi tải danh sách bài viết');
-        } finally {
-            setLoading(false);
-        }
+    const postsQuery = usePosts({
+        page: currentPage,
+        size: PAGE_SIZE,
+        status: statusFilter,
+        keyword: searchQuery,
+    });
+    const approvePost = useApprovePost();
+    const deletePostMutation = useDeletePost();
+
+    const posts = postsQuery.data?.content || [];
+    const totalPages = postsQuery.data?.totalPages || 0;
+    const totalElements = postsQuery.data?.totalElements || 0;
+    const loading = postsQuery.isLoading;
+
+    // Reset về trang đầu khi đổi bộ lọc/từ khoá
+    useEffect(() => {
+        setCurrentPage(0);
     }, [statusFilter, searchQuery]);
 
     useEffect(() => {
-        fetchPosts(0);
-    }, [fetchPosts]);
-
-    const handleApprove = async () => {
-        if (!approvingPost) return;
-        try {
-            await updatePostStatus(approvingPost.id, 'APPROVED');
-            toast.success('Đã duyệt bài viết');
-            setApprovingPost(null);
-            fetchPosts(currentPage);
-        } catch (error) {
-            toast.error('Lỗi khi duyệt bài viết');
+        if (postsQuery.isError) {
+            toast.error('Lỗi khi tải danh sách bài viết');
         }
+    }, [postsQuery.isError]);
+
+    const handleApprove = () => {
+        if (!approvingPost) return;
+        approvePost.mutate(approvingPost.id, {
+            onSuccess: () => {
+                toast.success('Đã duyệt bài viết');
+                setApprovingPost(null);
+            },
+            onError: () => {
+                toast.error('Lỗi khi duyệt bài viết');
+            },
+        });
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!deletingPost) return;
-        try {
-            await deletePost(deletingPost.id);
-            toast.success('Đã xóa bài viết');
-            setDeletingPost(null);
-            fetchPosts(currentPage);
-        } catch (error) {
-            toast.error('Lỗi khi xóa bài viết');
-        }
+        deletePostMutation.mutate(deletingPost.id, {
+            onSuccess: () => {
+                toast.success('Đã xóa bài viết');
+                setDeletingPost(null);
+            },
+            onError: () => {
+                toast.error('Lỗi khi xóa bài viết');
+            },
+        });
     };
 
     const columns = [
@@ -144,7 +143,7 @@ const Posts = () => {
                 totalElements={totalElements}
                 pageSize={PAGE_SIZE}
                 itemLabel="bài viết"
-                onPageChange={fetchPosts}
+                onPageChange={setCurrentPage}
                 rowActions={(post) => (
                     <>
                         <button

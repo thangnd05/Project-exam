@@ -1,7 +1,4 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import { getAdminTests, updateTest, deleteTest } from '../../api/testApi';
-import { getExamTypes } from '../../api/examTypeApi';
-import { getUsers } from '../../api/userApi';
 import {Badge, Form} from 'react-bootstrap';
 import {Edit, Trash2} from 'lucide-react';
 
@@ -13,6 +10,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
+import { useAdminTests } from './hooks/useAdminTests';
 
 const parseOptionalId = (value) => {
   const trimmed = String(value).trim();
@@ -35,50 +33,21 @@ const createEmptyForm = (examTypes = []) => ({
 });
 
 function TestsManagement() {
-  const [tests, setTests] = useState([]);
-  const [examTypes, setExamTypes] = useState([]);
-  const [users, setUsers] = useState([]);
+  const {
+    tests,
+    examTypes,
+    users,
+    isLoading: loading,
+    isError,
+    updateTest,
+    deleteTest,
+    isMutating: submitting,
+  } = useAdminTests();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingTestId, setEditingTestId] = useState(null);
   const [formState, setFormState] = useState(createEmptyForm());
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const fetchTests = async () => {
-    const data = await getAdminTests();
-    const testList = Array.isArray(data) ? data : [];
-    setTests(testList);
-  };
-
-  useEffect(() => {
-    const loadPageData = async () => {
-      setLoading(true);
-      setErrorMessage('');
-      try {
-        const [testsData, examTypesData, usersData] = await Promise.all([
-          getAdminTests(),
-          getExamTypes(),
-          getUsers({ page: 0, size: 200 }),
-        ]);
-
-        setTests(Array.isArray(testsData) ? testsData : []);
-        setExamTypes(
-          Array.isArray(examTypesData) ? examTypesData : [],
-        );
-        setUsers(
-          Array.isArray(usersData?.content) ? usersData.content : [],
-        );
-      } catch (error) {
-        setErrorMessage('Không thể tải dữ liệu đề thi từ hệ thống.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPageData();
-  }, []);
 
   useEffect(() => {
     if (examTypes.length > 0 && !formState.examTypeId) {
@@ -150,30 +119,22 @@ function TestsManagement() {
       bannerUrl: null,
     };
 
-    setSubmitting(true);
     setErrorMessage('');
     try {
-      await updateTest(editingTestId, payload);
-      await fetchTests();
+      await updateTest({ testId: editingTestId, payload });
       setShowFormModal(false);
       resetForm();
     } catch (error) {
       setErrorMessage('Không thể lưu đề thi. Vui lòng thử lại.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const handleDelete = async (testId) => {
-    setSubmitting(true);
     setErrorMessage('');
     try {
       await deleteTest(testId);
-      setTests((previous) => previous.filter((item) => item.testId !== testId));
     } catch (error) {
       setErrorMessage('Không thể xóa đề thi.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -231,7 +192,12 @@ function TestsManagement() {
         onSearchChange={setSearchTerm}
         searchPlaceholder="Tìm theo tiêu đề, mô tả, loại kỳ thi..."
       />
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError
+        message={
+          errorMessage ||
+          (isError ? 'Không thể tải dữ liệu đề thi từ hệ thống.' : '')
+        }
+      />
 
       <AdminTable
         showIndex

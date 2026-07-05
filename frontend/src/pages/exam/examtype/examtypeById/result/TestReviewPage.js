@@ -1,8 +1,5 @@
 import { useContext, useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getUserTestMeta } from '../../../../../api/userTestApi';
-import { getAnswersByUserTest } from '../../../../../api/userAnswerApi';
-import { getUserTestInfo, getAdminTestById } from '../../../../../api/testApi';
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
 import {
@@ -16,6 +13,7 @@ import {
 import { AuthContext } from "~/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/utils/guestSession";
 import { getFullMediaUrl } from "~/utils/mediaUrl";
+import { useTestReview } from "./hooks/useTestReview";
 import styles from "./TestReviewPage.module.scss";
 
 const cx = classNames.bind(styles);
@@ -67,12 +65,23 @@ const TestReviewPage = () => {
     [isGuest],
   );
 
-  const [test, setTest] = useState(null);
-  const [userAnswers, setUserAnswers] = useState([]);
-  const [canReview, setCanReview] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [showNav, setShowNav] = useState(false);
+
+  const { data, isLoading, isError } = useTestReview(userTestId, {
+    enabled: !authLoading,
+    isGuest,
+    guestCfg,
+  });
+
+  const test = data?.test ?? null;
+  const userAnswers = data?.userAnswers ?? [];
+  const canReview = data?.canReview ?? false;
+  const loading = authLoading || isLoading;
+  const error = isError
+    ? "Không thể tải chi tiết câu hỏi. Vui lòng thử lại."
+    : data?.notReviewable
+      ? "Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc."
+      : "";
 
   // Flatten toàn bộ câu hỏi + trạng thái đúng/sai để dựng navigator.
   const flatQuestions = useMemo(() => {
@@ -108,53 +117,6 @@ const TestReviewPage = () => {
     const y = el.getBoundingClientRect().top + window.pageYOffset - 90;
     window.scrollTo({ top: y, behavior: "smooth" });
   };
-
-  useEffect(() => {
-    if (authLoading) return;
-    const fetchDetail = async () => {
-      try {
-        setLoading(true);
-
-        const metaData = await getUserTestMeta(userTestId, isGuest, guestCfg);
-        const testId = metaData.testId;
-
-        // Check hạn review (endpoint public)
-        const testInfo = await getUserTestInfo(testId);
-        const now = new Date();
-        const availableTo = testInfo.availableTo ? new Date(testInfo.availableTo) : null;
-        const reviewable = !availableTo || now > availableTo;
-        setCanReview(reviewable);
-
-        if (!reviewable) {
-          setError("Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.");
-          return;
-        }
-
-        const [testData, answersData] = await Promise.all([
-          getAdminTestById(testId),
-          getAnswersByUserTest(userTestId, isGuest, guestCfg),
-        ]);
-
-        // Mode PRACTICE: chỉ xem lại các Part đã luyện, không hiện toàn bộ đề.
-        let parts = testData.parts || [];
-        if (metaData.mode === "PRACTICE" && metaData.practicePartIds?.length) {
-          const practiced = new Set(metaData.practicePartIds.map(String));
-          parts = parts.filter((p) => practiced.has(String(p.examPartId)));
-        }
-
-        const loadedTest = { ...testData, parts };
-        setTest(loadedTest);
-        setUserAnswers(answersData);
-      } catch (err) {
-        console.error(" Lỗi tải chi tiết:", err);
-        setError("Không thể tải chi tiết câu hỏi. Vui lòng thử lại.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDetail();
-  }, [userTestId, authLoading, isGuest, guestCfg]);
 
   // Cuộn tới câu khi mở từ bảng phân tích (URL có #rq-<questionId>).
   useEffect(() => {

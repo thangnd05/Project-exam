@@ -3,15 +3,10 @@ import {Badge, Button, Spinner} from 'react-bootstrap';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
 
-import {
-  createExamType,
-  deleteExamType,
-  getExamTypes,
-  updateExamType,
-} from '../../api/examTypeApi';
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import ExamTypeFormModal from '../modals/ExamTypeFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
+import {useExamTypes} from './hooks/useExamTypes';
 // Dùng lại bộ style cây của trang Bộ sưu tập câu hỏi cho đồng nhất.
 import styles from './QuestionCollections.module.scss';
 
@@ -136,35 +131,23 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDel
 
 // ==================== Main Page ====================
 function ExamTypesManagement() {
-  const [examTypes, setExamTypes] = useState([]);
+  const {examTypeList, isLoading: loading, isError, createMutation, updateMutation, deleteMutation} =
+    useExamTypes();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingTypeId, setEditingTypeId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingExamType, setDeletingExamType] = useState(null);
   const [expandedIds, setExpandedIds] = useState(new Set());
 
-  const fetchExamTypes = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const examTypeList = await getExamTypes();
-      const mapped = (Array.isArray(examTypeList) ? examTypeList : []).map(mapExamTypeFromApi);
-      setExamTypes(mapped);
-      setExpandedIds(new Set(mapped.filter((t) => t.child_count > 0).map((t) => t.exam_type_id)));
-    } catch (error) {
-      setErrorMessage('Không thể tải danh sách loại kỳ thi.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const examTypes = useMemo(() => examTypeList.map(mapExamTypeFromApi), [examTypeList]);
 
+  // Mỗi lần dữ liệu tải/làm mới lại: mở sẵn các loại đang có loại con (giữ hành vi cũ).
   useEffect(() => {
-    fetchExamTypes();
-  }, [fetchExamTypes]);
+    setExpandedIds(new Set(examTypes.filter((t) => t.child_count > 0).map((t) => t.exam_type_id)));
+  }, [examTypes]);
 
   // Dựng cây 2 cấp từ danh sách phẳng.
   const examTypeTree = useMemo(() => {
@@ -259,12 +242,11 @@ function ExamTypesManagement() {
     try {
       const payload = buildExamTypePayload(formState, {hasChildren: editingHasChildren});
       if (editingTypeId) {
-        await updateExamType(editingTypeId, payload);
+        await updateMutation.mutateAsync({id: editingTypeId, payload});
       } else {
-        await createExamType(payload);
+        await createMutation.mutateAsync(payload);
       }
-      // Tải lại để quan hệ cha-con + childCount luôn chính xác.
-      await fetchExamTypes();
+      // Mutation onSuccess đã invalidate để quan hệ cha-con + childCount luôn chính xác.
       if (payload.parentId) {
         setExpandedIds((prev) => new Set(prev).add(payload.parentId));
       }
@@ -284,9 +266,8 @@ function ExamTypesManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      await deleteExamType(deletingExamType.exam_type_id);
+      await deleteMutation.mutateAsync(deletingExamType.exam_type_id);
       setDeletingExamType(null);
-      await fetchExamTypes();
     } catch (error) {
       setErrorMessage(
         error?.response?.data?.message || 'Không thể xóa loại kỳ thi này.',
@@ -317,7 +298,9 @@ function ExamTypesManagement() {
         onSearchChange={setSearchTerm}
         searchPlaceholder="Tìm theo tên, mô tả, phương thức chấm..."
       />
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError
+        message={errorMessage || (isError ? 'Không thể tải danh sách loại kỳ thi.' : '')}
+      />
 
       <div className={cx('treeWrapper')}>
         <div className={cx('treeToolbar')}>

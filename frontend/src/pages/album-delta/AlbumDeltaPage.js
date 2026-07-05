@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../api/axiosClient';
-import { getVocabulariesByAlbum, deleteVocabulary } from '~/api/vocabularyApi';
+import { useAlbumVocabularies, useDeleteVocabulary } from './hooks/useAlbumVocabularies';
 import {
   Container,
   Table,
@@ -36,9 +36,6 @@ const cx = classNames.bind(styles);
 const AlbumDetailPage = () => {
   const backendBaseUrl = (axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
   const { albumId } = useParams();
-  const [vocabularies, setVocabularies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -50,21 +47,16 @@ const AlbumDetailPage = () => {
   const [flipped, setFlipped] = useState(false);
   const navigate = useNavigate();
 
-  const fetchVocabularies = useCallback(async () => {
-    try {
-      const data = await getVocabulariesByAlbum(albumId);
-      setVocabularies(data);
-    } catch (err) {
-      console.error(' Lỗi khi tải từ vựng:', err);
-      setErrorMsg('Không thể tải danh sách từ vựng 😢');
-    } finally {
-      setLoading(false);
-    }
-  }, [albumId]);
+  const {
+    data: vocabularies = [],
+    isLoading: loading,
+    isError,
+    refetch: fetchVocabularies,
+  } = useAlbumVocabularies(albumId);
+  const errorMsg = isError ? 'Không thể tải danh sách từ vựng 😢' : '';
+  const deleteMutation = useDeleteVocabulary(albumId);
 
   useEffect(() => {
-    if (albumId) fetchVocabularies();
-
     // Auto-switch to Flashcard mode for mobile/tablet devices
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -75,7 +67,7 @@ const AlbumDetailPage = () => {
     handleResize(); // Check on mount
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [albumId, fetchVocabularies]);
+  }, []);
 
   const handleDeleteClick = (vocab) => {
     setVocabToDelete(vocab);
@@ -90,8 +82,7 @@ const AlbumDetailPage = () => {
   const handleConfirmDelete = async () => {
     if (!vocabToDelete) return;
     try {
-      await deleteVocabulary(vocabToDelete.vocabId);
-      setVocabularies((prev) => prev.filter((v) => v.vocabId !== vocabToDelete.vocabId));
+      await deleteMutation.mutateAsync(vocabToDelete.vocabId);
       toast.success(`Đã xóa từ "${vocabToDelete.word}" thành công!`);
     } catch (err) {
       console.error(' Lỗi khi xóa:', err);

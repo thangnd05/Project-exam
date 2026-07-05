@@ -1,6 +1,4 @@
-import { getTestsByExamType, getTestCollectionsByExamType } from '../../../../api/testApi';
-import { getExamTypeById, getExamTypeChildren } from '../../../../api/examTypeApi';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -12,64 +10,20 @@ import { useAuth } from '../../../../hooks/useAuth';
 import style from './TestByExamTypePage.module.scss';
 import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
 import Pagination from '~/components/common/Pagination/Pagination';
+import { useTestsByExamType } from './hooks/useTestsByExamType';
 
 const cx = classNames.bind(style);
-const PAGE_SIZE = 12;
 
 function TestByExamTypePage() {
   const { examTypeId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [tests, setTests] = useState([]);
-  const [examTypeName, setExamTypeName] = useState('');
-  const [loading, setLoading] = useState(true);
   const [countdowns, setCountdowns] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [folders, setFolders] = useState([]);
-  const [children, setChildren] = useState([]);
 
-  const fetchTests = useCallback(
-    (page = 0) => {
-      if (!examTypeId) return;
-      setLoading(true);
-      getTestsByExamType(examTypeId, { page, size: PAGE_SIZE })
-        .then((data) => {
-          setTests(Array.isArray(data?.content) ? data.content : []);
-          setTotalPages(data?.totalPages ?? 0);
-          setCurrentPage(data?.currentPage ?? page);
-        })
-        .catch(() => {
-          setTests([]);
-          setTotalPages(0);
-        })
-        .finally(() => setLoading(false));
-    },
-    [examTypeId]
-  );
-
-  useEffect(() => {
-    if (!examTypeId) {
-      setLoading(false);
-      return;
-    }
-
-    fetchTests(0);
-
-    getExamTypeById(examTypeId)
-      .then((data) => setExamTypeName(data.name))
-      .catch(() => { });
-
-    getTestCollectionsByExamType(examTypeId)
-      .then((data) => setFolders(Array.isArray(data) ? data : []))
-      .catch(() => setFolders([]));
-
-    // Nếu đây là loại kỳ thi cha (vd AWS) → có các loại con (cert) để drill-in.
-    getExamTypeChildren(examTypeId)
-      .then((data) => setChildren(Array.isArray(data) ? data : []))
-      .catch(() => setChildren([]));
-  }, [examTypeId, fetchTests]);
+  const { tests, totalPages, examTypeName, folders, children, isLoading } =
+    useTestsByExamType(examTypeId, currentPage);
 
   // Countdown realtime
   useEffect(() => {
@@ -90,7 +44,7 @@ function TestByExamTypePage() {
     return () => clearInterval(interval);
   }, [tests]);
 
-  if (loading && tests.length === 0 && currentPage === 0 && totalPages === 0) {
+  if (isLoading && tests.length === 0 && currentPage === 0 && totalPages === 0) {
     return (
       <div
         className="d-flex flex-column align-items-center justify-content-center"
@@ -204,7 +158,7 @@ function TestByExamTypePage() {
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onChange={fetchTests}
+          onChange={setCurrentPage}
         />
       }
     />
