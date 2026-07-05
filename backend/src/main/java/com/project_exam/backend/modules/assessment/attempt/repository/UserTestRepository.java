@@ -55,7 +55,7 @@ public interface UserTestRepository extends JpaRepository<UserTest, String> {
     @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.startedAt < :cutoff "
             + "AND (ut.mode = :practiceMode "
             + "OR EXISTS (SELECT t FROM Test t WHERE t.testId = ut.testId "
-            + "AND (t.durationMinutes IS NULL OR t.durationMinutes = 0) AND t.availableTo IS NULL))) "
+            + "AND (t.durationMinutes IS NULL OR t.durationMinutes = 0) AND t.availableTo IS NULL)) "
             + "ORDER BY ut.startedAt ASC")
     List<UserTest> findAbandonedUntimed(@Param("status") UserTest.Status status,
                                         @Param("practiceMode") UserTest.Mode practiceMode,
