@@ -1,0 +1,89 @@
+import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData } from '~/config/queryClient';
+import { getProfileOverview, getMyActivity } from '~/api/userApi';
+import { getExamTypes } from '~/api/examTypeApi';
+import { getExamParts } from '~/api/examPartApi';
+import { getUserTarget } from '~/api/userTargetApi';
+import { sortPartsByLookup } from '~/utils/partOrder';
+
+export const profileDashboardKeys = {
+  overview: () => ['profile-overview'],
+  targets: () => ['profile-targets'],
+  activity: (month, year) => ['profile-activity', month || '', year || ''],
+};
+
+// Gom examTypes + examParts + mục tiêu từng loại đề thành danh sách mục tiêu đã có.
+const fetchMyTargets = async () => {
+  const [examTypes, examParts] = await Promise.all([
+    getExamTypes().catch(() => []),
+    getExamParts().catch(() => []),
+  ]);
+  if (!Array.isArray(examTypes) || examTypes.length === 0) {
+    return [];
+  }
+  const partNameById = new Map();
+  (examParts || []).forEach((p) => partNameById.set(p.examPartId, p.name));
+  const results = await Promise.all(
+    examTypes.map((et) =>
+      getUserTarget(et.examTypeId)
+        .then((data) =>
+          data?.hasTarget
+            ? {
+                ...data,
+                examTypeName: et.name,
+                partRequirements: sortPartsByLookup(
+                  data.partRequirements || [],
+                  examParts,
+                ).map((p) => ({
+                  ...p,
+                  examPartName: partNameById.get(p.examPartId) || p.examPartId,
+                })),
+              }
+            : null
+        )
+        .catch(() => null)
+    )
+  );
+  return results.filter(Boolean);
+};
+
+export function useProfileOverview() {
+  const query = useQuery({
+    queryKey: profileDashboardKeys.overview(),
+    queryFn: getProfileOverview,
+  });
+  return {
+    profileOverview: query.data ?? null,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: query.refetch,
+  };
+}
+
+export function useMyTargets() {
+  const query = useQuery({
+    queryKey: profileDashboardKeys.targets(),
+    queryFn: fetchMyTargets,
+  });
+  return {
+    myTargets: query.data ?? [],
+    loadingTargets: query.isLoading,
+  };
+}
+
+export function useMyActivity(selectedMonth, selectedYear) {
+  const query = useQuery({
+    queryKey: profileDashboardKeys.activity(selectedMonth, selectedYear),
+    queryFn: () =>
+      getMyActivity({
+        month: selectedMonth || undefined,
+        year: selectedYear || undefined,
+      }),
+    placeholderData: keepPreviousData,
+  });
+  return {
+    activity: query.data ?? null,
+    // isFetching để giữ nguyên hành vi cũ: hiện "Đang tải..." mỗi lần đổi tháng/năm.
+    loadingActivity: query.isFetching,
+  };
+}

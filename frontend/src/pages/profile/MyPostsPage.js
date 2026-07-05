@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
@@ -18,10 +18,11 @@ import {
   IoImageOutline,
 } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import { getMyPosts, deletePost, getCategories, getPostById } from '~/api/postApi';
+import { getPostById } from '~/api/postApi';
 import CreatePostModal from '~/pages/posts/modals/CreatePostModal';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import routes from '~/config/Routes';
+import { useMyPosts } from './hooks/useMyPosts';
 import styles from './PostsListPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -63,11 +64,7 @@ const formatCount = (n) => {
 
 function MyPostsPage({ embedded = false }) {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState(null);
-  const [categories, setCategories] = useState([]);
   const [editingPost, setEditingPost] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [deletingPost, setDeletingPost] = useState(null);
@@ -75,7 +72,6 @@ function MyPostsPage({ embedded = false }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
   // Debounce ô tìm kiếm + reset về trang đầu (gộp 1 lần set để chỉ fetch 1 lần).
   useEffect(() => {
@@ -86,36 +82,22 @@ function MyPostsPage({ embedded = false }) {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const data = await getMyPosts({
-        page: currentPage,
-        size: PAGE_SIZE,
-        keyword: debouncedSearch,
-        status: statusFilter !== 'ALL' ? statusFilter : undefined,
-      });
-      setPosts(Array.isArray(data?.content) ? data.content : []);
-      setTotalPages(data?.totalPages || 0);
-    } catch (error) {
-      setErrorMessage('Không tải được danh sách bài viết của bạn.');
-      setPosts([]);
-      setTotalPages(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, debouncedSearch, statusFilter]);
+  const {
+    posts,
+    totalPages,
+    isLoading: loading,
+    isError,
+    refetch: fetchData,
+    categories,
+    deleteMutation,
+  } = useMyPosts({
+    page: currentPage,
+    size: PAGE_SIZE,
+    keyword: debouncedSearch,
+    status: statusFilter,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  useEffect(() => {
-    getCategories()
-      .then((data) => setCategories(Array.isArray(data) ? data : []))
-      .catch(() => setCategories([]));
-  }, []);
+  const errorMessage = isError ? 'Không tải được danh sách bài viết của bạn.' : '';
 
   const hasActiveFilter = statusFilter !== 'ALL' || debouncedSearch.trim().length > 0;
 
@@ -142,10 +124,9 @@ function MyPostsPage({ embedded = false }) {
     const postId = deletingPost.id;
     setActionLoadingId(postId);
     try {
-      await deletePost(postId);
+      await deleteMutation.mutateAsync(postId);
       toast.success('Đã xóa bài viết');
       setDeletingPost(null);
-      fetchData();
     } catch (error) {
       toast.error('Không thể xóa bài viết. Vui lòng thử lại.');
     } finally {

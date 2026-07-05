@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
@@ -16,9 +16,9 @@ import {
   IoImageOutline,
 } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import { getSavedPosts, toggleSavePost } from '~/api/postApi';
 import ConfirmActionModal from '~/components/common/modal/ConfirmActionModal';
 import routes from '~/config/Routes';
+import { useSavedPosts, useUnsavePost } from './hooks/useSavedPosts';
 import styles from './PostsListPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -49,14 +49,10 @@ const formatCount = (n) => {
 
 function SavedPostsPage({ embedded = false }) {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const [unsavingPost, setUnsavingPost] = useState(null);
 
   // Debounce ô tìm kiếm + reset về trang đầu (gộp 1 lần set để chỉ fetch 1 lần).
@@ -68,29 +64,17 @@ function SavedPostsPage({ embedded = false }) {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const data = await getSavedPosts({
-        page: currentPage,
-        size: PAGE_SIZE,
-        keyword: debouncedSearch,
-      });
-      setPosts(Array.isArray(data?.content) ? data.content : []);
-      setTotalPages(data?.totalPages || 0);
-    } catch (error) {
-      setErrorMessage('Không tải được danh sách bài đã lưu.');
-      setPosts([]);
-      setTotalPages(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, debouncedSearch]);
+  const { data, isLoading, isError } = useSavedPosts({
+    page: currentPage,
+    size: PAGE_SIZE,
+    keyword: debouncedSearch,
+  });
+  const posts = data?.posts ?? [];
+  const totalPages = data?.totalPages ?? 0;
+  const loading = isLoading;
+  const errorMessage = isError ? 'Không tải được danh sách bài đã lưu.' : '';
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const unsaveMutation = useUnsavePost();
 
   const hasActiveFilter = debouncedSearch.trim().length > 0;
 
@@ -99,10 +83,9 @@ function SavedPostsPage({ embedded = false }) {
     const postId = unsavingPost.id;
     setActionLoadingId(postId);
     try {
-      await toggleSavePost(postId);
+      await unsaveMutation.mutateAsync(postId);
       toast.success('Đã bỏ lưu');
       setUnsavingPost(null);
-      fetchData();
     } catch (error) {
       toast.error('Không thể bỏ lưu. Vui lòng thử lại.');
     } finally {

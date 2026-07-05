@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { getProfileOverview, getMyActivity } from '../../api/userApi';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -27,10 +26,6 @@ import {
   IoChevronDownOutline,
   IoChevronUpOutline,
 } from 'react-icons/io5';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getExamParts } from '~/api/examPartApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { sortPartsByLookup } from '~/utils/partOrder';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   LineChart, Line
@@ -42,6 +37,11 @@ import styles from './ProfileOverviewPage.module.scss';
 import routes, { buildNextStepPath } from '~/config/Routes';
 import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '~/hooks/useCosmetics';
+import {
+  useProfileOverview,
+  useMyTargets,
+  useMyActivity,
+} from './hooks/useProfileDashboard';
 
 const cx = classNames.bind(styles);
 
@@ -85,108 +85,32 @@ const formatDuration = (minutes) => {
 function ProfileOverviewPage() {
   const navigate = useNavigate();
   const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
-  const [profileOverview, setProfileOverview] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
-  const [myTargets, setMyTargets] = useState([]);
-  const [loadingTargets, setLoadingTargets] = useState(true);
   const [showAllTargets, setShowAllTargets] = useState(false);
-  const [activity, setActivity] = useState(null);
-  const [loadingActivity, setLoadingActivity] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
 
-  const fetchProfileOverview = async (showLoader = true) => {
-    if (showLoader) setLoading(true);
-    setErrorMessage('');
+  const {
+    profileOverview,
+    isLoading: loading,
+    isError: profileError,
+    refetch: refetchProfileOverview,
+  } = useProfileOverview();
+  const { myTargets, loadingTargets } = useMyTargets();
+  const { activity, loadingActivity } = useMyActivity(selectedMonth, selectedYear);
 
-    try {
-      const data = await getProfileOverview();
-      setProfileOverview(data || null);
-    } catch (error) {
-      setErrorMessage('Không tải được thông tin hồ sơ. Vui lòng thử lại sau.');
-    } finally {
-      if (showLoader) setLoading(false);
-    }
-  };
+  const errorMessage = profileError
+    ? 'Không tải được thông tin hồ sơ. Vui lòng thử lại sau.'
+    : '';
 
+  // Đồng bộ tháng/năm đang chọn theo giá trị backend trả về (lần đầu chưa chọn).
   useEffect(() => {
-    fetchProfileOverview();
-  }, []);
-
-  useEffect(() => {
-    const fetchMyTargets = async () => {
-      setLoadingTargets(true);
-      try {
-        const [examTypes, examParts] = await Promise.all([
-          getExamTypes().catch(() => []),
-          getExamParts().catch(() => []),
-        ]);
-        if (!Array.isArray(examTypes) || examTypes.length === 0) {
-          setMyTargets([]);
-          return;
-        }
-        const partNameById = new Map();
-        (examParts || []).forEach((p) => partNameById.set(p.examPartId, p.name));
-        const results = await Promise.all(
-          examTypes.map((et) =>
-            getUserTarget(et.examTypeId)
-              .then((data) =>
-                data?.hasTarget
-                  ? {
-                      ...data,
-                      examTypeName: et.name,
-                      partRequirements: sortPartsByLookup(
-                        data.partRequirements || [],
-                        examParts,
-                      ).map((p) => ({
-                        ...p,
-                        examPartName: partNameById.get(p.examPartId) || p.examPartId,
-                      })),
-                    }
-                  : null
-              )
-              .catch(() => null)
-          )
-        );
-        setMyTargets(results.filter(Boolean));
-      } catch {
-        setMyTargets([]);
-      } finally {
-        setLoadingTargets(false);
-      }
-    };
-    fetchMyTargets();
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const fetchActivity = async () => {
-      setLoadingActivity(true);
-      try {
-        const data = await getMyActivity({
-          month: selectedMonth || undefined,
-          year: selectedYear || undefined,
-        });
-        if (cancelled) return;
-        setActivity(data || null);
-        // Đồng bộ tháng/năm đang chọn theo giá trị backend trả về (lần đầu chưa chọn).
-        if (!selectedMonth && data?.month) setSelectedMonth(data.month);
-        if (!selectedYear && data?.year) setSelectedYear(data.year);
-      } catch {
-        if (!cancelled) setActivity(null);
-      } finally {
-        if (!cancelled) setLoadingActivity(false);
-      }
-    };
-    fetchActivity();
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedMonth, selectedYear]);
+    if (!activity) return;
+    if (!selectedMonth && activity.month) setSelectedMonth(activity.month);
+    if (!selectedYear && activity.year) setSelectedYear(activity.year);
+  }, [activity, selectedMonth, selectedYear]);
 
   const fullName = useMemo(() => {
     if (!profileOverview) return '';
@@ -620,7 +544,7 @@ function ProfileOverviewPage() {
       <UpdateProfileModal
         show={showUpdateProfileModal}
         onHide={() => setShowUpdateProfileModal(false)}
-        onUpdateSuccess={() => fetchProfileOverview(false)}
+        onUpdateSuccess={() => refetchProfileOverview()}
       />
 
       <ChangePasswordModal
