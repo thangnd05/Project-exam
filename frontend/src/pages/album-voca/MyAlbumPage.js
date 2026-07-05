@@ -98,7 +98,7 @@ function MyAlbumsPage() {
       <Container>
         {/* === Header Dashboard === */}
         <PageHeader
-          title="Album từ vựng"
+          title="THẺ GHI NHỚ"
           label="QUẢN LÝ ALBUM"
           actionText="Tạo album mới"
           actionIcon={IoAdd}

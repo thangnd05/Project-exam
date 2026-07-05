@@ -100,7 +100,7 @@ const VocabularyManagement = () => {
                     tone="blue"
                 />
                 <StatCard
-                    label="Album từ vựng"
+                    label="Thẻ Ghi Nhớ"
                     value={fakeVocabularyAlbums.length}
                     icon={BookMarked}
                     tone="green"

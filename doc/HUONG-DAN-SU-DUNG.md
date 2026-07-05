@@ -46,7 +46,7 @@ Sau khi đăng nhập, thanh menu trên cùng gồm:
 |-----|-----------|
 | **Bài viết** | Đọc và viết bài chia sẻ kinh nghiệm |
 | **Lộ trình** | Trang cố vấn *Tiếp theo nên làm gì?* (cần đăng nhập) |
-| **Từ vựng** | Album từ vựng và flashcard |
+| **Từ vựng** | Thẻ ghi nhớ và flashcard |
 | **Bài đã tạo** | Các đề bạn tự soạn |
 | **Lớp học** | Tham gia / Vào / Tạo lớp học |
 | **Tạo bài kiểm tra** | Mở hộp thoại soạn đề mới |
@@ -385,7 +385,7 @@ Từ Hồ sơ → **Ngân hàng câu hỏi** hoặc link **Mở kho lưu trữ**
 
 **Quản lý album**
 
-Menu **"Từ vựng"** → trang **Album từ vựng**:
+Menu **"Từ vựng"** → trang **Thẻ ghi nhớ**:
 
 - **"Tạo album mới"** → **Tên Album** (bắt buộc), **Mô tả** → **"Tạo Album ngay"**.
 - Xem dạng **lưới** hoặc **bảng**. Chưa có album: *"Chưa có album nào"*.
@@ -529,7 +529,7 @@ Vào avatar → **"Hồ sơ"** — **Dashboard Cá Nhân**.
 | Liên kết | Chức năng |
 |----------|-----------|
 | **Làm bài thi mới** | Về trang chủ chọn đề |
-| **Thẻ ghi nhớ** | Album từ vựng |
+| **Thẻ ghi nhớ** | Thẻ ghi nhớ |
 | **Lớp học của tôi** | Danh sách lớp |
 | **Ngân hàng câu hỏi** | Kho câu hỏi cá nhân |
 | **Đánh giá của tôi** | Đánh giá đã viết |
