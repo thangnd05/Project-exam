@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(grep -E '\\\\.\\(java|js|jsx|ts|tsx\\)$')",
-      "Bash(cd backend/src/main/java/com/project_exam/backend *)",
-      "Read(//frontend/**)"
-    ]
-  }
-}

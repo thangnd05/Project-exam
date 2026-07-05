@@ -53,3 +53,6 @@ frontend/.pnpm-store/
 *.log
 .idea/
 .vscode/
+
+# Claude Code local config (settings tự thay đổi theo permission grant)
+.claude/
