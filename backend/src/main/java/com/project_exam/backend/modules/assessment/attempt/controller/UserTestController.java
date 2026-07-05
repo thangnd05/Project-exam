@@ -221,4 +221,16 @@ public class UserTestController {
     ) {
         return ResponseEntity.ok(userTestService.getMetaForGuest(userTestId, guestSessionId));
     }
+
+    // Gắn bài làm của phiên guest vào tài khoản vừa đăng nhập (yêu cầu JWT).
+    // FE gọi ngay sau login/OAuth thành công, kèm header X-Guest-Session từ localStorage.
+    @PostMapping("/claim-guest")
+    public ResponseEntity<Map<String, Object>> claimGuestTests(
+            @RequestHeader(value = "X-Guest-Session", required = false) String guestSessionId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        int claimed = userTestService.claimGuestTests(userId, guestSessionId);
+        return ResponseEntity.ok(Map.of("claimed", claimed));
+    }
 }

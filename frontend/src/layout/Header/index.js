@@ -213,13 +213,6 @@ function Header() {
           <Dropdown.Menu className={cx('custom-dropdown')}>
             <Dropdown.Item
               as={Link}
-              to={routes.targetDashboard}
-              onClick={() => isMobile && handleClose()}
-            >
-              Tổng quan mục tiêu
-            </Dropdown.Item>
-            <Dropdown.Item
-              as={Link}
               to={routes.profile}
               onClick={() => isMobile && handleClose()}
             >

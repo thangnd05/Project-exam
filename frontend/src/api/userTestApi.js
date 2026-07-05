@@ -46,3 +46,13 @@ export const submitUserTest = (userTestId, isGuest, config = {}) => {
     : `${BASE_URL}/${userTestId}/submit`;
   return axios.post(url, null, config).then((res) => res.data);
 };
+
+// Gắn bài làm của phiên guest vào tài khoản vừa đăng nhập (yêu cầu đã login).
+// Gọi ngay sau login/OAuth thành công; BE nhận diện qua header X-Guest-Session.
+export const claimGuestTests = (guestSessionId) => {
+  return axios
+    .post(`${BASE_URL}/claim-guest`, null, {
+      headers: { 'X-Guest-Session': guestSessionId },
+    })
+    .then((res) => res.data);
+};

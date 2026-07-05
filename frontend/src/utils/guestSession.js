@@ -22,5 +22,12 @@ export const getGuestSessionId = () => {
   return window.localStorage.getItem(STORAGE_KEY);
 };
 
+// Xoá guestSessionId (gọi sau khi đã claim bài guest vào tài khoản khi đăng nhập)
+// để phiên guest tiếp theo (sau logout) bắt đầu sạch, không claim nhầm.
+export const clearGuestSessionId = () => {
+  if (typeof window === 'undefined') return;
+  window.localStorage.removeItem(STORAGE_KEY);
+};
+
 export const guestHeaders = (sessionId) =>
   sessionId ? { 'X-Guest-Session': sessionId } : {};

@@ -3,6 +3,11 @@ import axios from '../../../api/axiosClient';
 import { login as loginRequest, register as registerRequest } from '../../../api/authApi';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
+import {
+  getRedirectTarget,
+  saveOAuthRedirect,
+  claimGuestAfterLogin,
+} from '~/utils/authRedirect';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import { FaFacebook } from "react-icons/fa";
@@ -54,11 +59,11 @@ function LoginPage() {
     }
   }, [location.state]);
 
-  // Redirect if already logged in
+  // Redirect khi đã đăng nhập (kể cả vừa login xong ở handleLogin/OAuth):
+  // quay lại đúng trang trước đó, giữ nguyên query string.
   useEffect(() => {
     if (user) {
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      navigate(getRedirectTarget(location), { replace: true });
     }
   }, [user, navigate, location]);
 
@@ -75,12 +80,14 @@ function LoginPage() {
       });
 
       if (userData?.id) {
-        login(userData); //  truyền thẳng vào AuthContext
+        // Gắn bài làm dạng khách (nếu có) vào tài khoản TRƯỚC khi set user,
+        // vì set user sẽ kích hoạt useEffect điều hướng rời trang login.
+        await claimGuestAfterLogin();
+
+        login(userData); //  truyền thẳng vào AuthContext -> useEffect lo redirect về `from`
 
         setMessage("Đăng nhập thành công! Đang chuyển hướng...");
         setMessageType("success");
-
-        setTimeout(() => navigate("/"), 1000);
       } else {
         throw new Error("User data invalid");
       }
@@ -140,8 +147,8 @@ function LoginPage() {
             <h1>Tạo tài khoản</h1>
             <div className={cx('social-login')}>
               <div className={cx('social-btns')}>
-                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')}><FcGoogle size={24} /></a>
-                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')}><FaFacebook size={24} color="#1877F2" /></a>
+                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FcGoogle size={24} /></a>
+                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FaFacebook size={24} color="#1877F2" /></a>
               </div>
             </div>
             <p className={cx('subtitle')}>Sử dụng thông tin của bạn để đăng ký</p>
@@ -183,8 +190,8 @@ function LoginPage() {
             <h1>Đăng nhập</h1>
             <div className={cx('social-login')}>
               <div className={cx('social-btns')}>
-                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')}><FcGoogle size={24} /></a>
-                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')}><FaFacebook size={24} color="#1877F2" /></a>
+                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FcGoogle size={24} /></a>
+                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FaFacebook size={24} color="#1877F2" /></a>
               </div>
             </div>
             <p className={cx('subtitle')}>Sử dụng tài khoản của bạn</p>

@@ -242,7 +242,7 @@ function GeneratePlanPage() {
                   <option value="">-- Chọn bài thi --</option>
                   {filteredUserTests.map((t) => (
                     <option key={t.userTestId} value={t.userTestId}>
-                      {formatDate(t.finishedAt)} · Score {t.totalScore ?? '—'} · testId={t.testId?.slice(0, 8) ?? '—'}…
+                      {formatDate(t.finishedAt)} · Score {t.totalScore ?? '—'}
                     </option>
                   ))}
                 </select>

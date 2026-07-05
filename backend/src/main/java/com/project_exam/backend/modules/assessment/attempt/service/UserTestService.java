@@ -735,6 +735,41 @@ public class UserTestService {
         return toResponse(ut);
     }
 
+    /**
+     * Gắn (claim) các bài làm của phiên guest vào tài khoản vừa đăng nhập.
+     * Gọi ngay sau khi login/OAuth thành công: mọi UserTest có guestSessionId này
+     * (cả IN_PROGRESS đang làm dở lẫn COMPLETED đã nộp) sẽ chuyển về userId để
+     * hiện trong lịch sử và cho phép làm tiếp. Idempotent: chạy lại là no-op vì
+     * guestSessionId đã bị xoá khỏi các bài đã claim.
+     */
+    @Transactional
+    public int claimGuestTests(String userId, String guestSessionId) {
+        if (userId == null || guestSessionId == null || guestSessionId.isBlank()) return 0;
+
+        List<UserTest> guestTests = userTestRepository.findByGuestSessionId(guestSessionId);
+        if (guestTests.isEmpty()) return 0;
+
+        List<UserTest> toSave = new ArrayList<>();
+        for (UserTest ut : guestTests) {
+            if (ut.getUserId() != null) continue; // đã có chủ, không đụng vào
+
+            // Tránh 2 attempt IN_PROGRESS cùng (user, test) làm hỏng resume
+            // (findActiveUserTest trả Optional): nếu user đã có bài dở cho đề này
+            // thì đánh dấu bài guest là EXPIRED — vẫn giữ lịch sử, không xung đột.
+            if (ut.getStatus() == UserTest.Status.IN_PROGRESS
+                    && findActiveUserTest(userId, ut.getTestId()).isPresent()) {
+                ut.setStatus(UserTest.Status.EXPIRED);
+            }
+
+            ut.setUserId(userId);
+            ut.setGuestSessionId(null);
+            toSave.add(ut);
+        }
+
+        if (!toSave.isEmpty()) userTestRepository.saveAll(toSave);
+        return toSave.size();
+    }
+
     public List<UserTestResponse> getAttemptsByUserAndTest(String userId, String testId) {
 
         Test test = testRepository.findById(testId)
