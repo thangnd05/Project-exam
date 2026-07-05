@@ -1,19 +1,34 @@
 import { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
-import { updateAlbum } from '~/api/vocabularyAlbumApi';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";
 import CommonFormModal from "~/components/common/modal/CommonFormModal";
 import ModalActionFooter from "~/components/common/modal/ModalActionFooter";
 import styles from "~/components/common/modal/CommonFormModal.module.scss";
+import { useUpdateAlbum } from "./hooks/useUpdateAlbum";
 
 const cx = classNames.bind(styles);
 
 function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [loading, setLoading] = useState(false);
+
+    const updateMutation = useUpdateAlbum({
+        onSuccess: () => {
+            toast.success("Cập nhật Album thành công!");
+            onClose();
+            if (onSuccess) onSuccess();
+        },
+        onError: (err) => {
+            console.error(err);
+            toast.error(
+                err.response?.data?.message ||
+                " Có lỗi xảy ra khi cập nhật Album!"
+            );
+        },
+    });
+    const loading = updateMutation.isPending;
 
     useEffect(() => {
         if (album) {
@@ -22,36 +37,18 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
         }
     }, [album, show]);
 
-    const handleUpdate = async () => {
+    const handleUpdate = () => {
         if (!name.trim()) {
             toast.warning(" Vui lòng nhập tên Album!");
             return;
         }
 
-        setLoading(true);
+        const payload = {
+            name: name,
+            description: description
+        };
 
-        try {
-            const payload = {
-                name: name,
-                description: description
-            };
-
-            await updateAlbum(album.albumId, payload);
-
-            toast.success("Cập nhật Album thành công!");
-
-            onClose();
-            if (onSuccess) onSuccess();
-
-        } catch (err) {
-            console.error(err);
-            toast.error(
-                err.response?.data?.message ||
-                " Có lỗi xảy ra khi cập nhật Album!"
-            );
-        } finally {
-            setLoading(false);
-        }
+        updateMutation.mutate({ albumId: album.albumId, payload });
     };
 
     return (
