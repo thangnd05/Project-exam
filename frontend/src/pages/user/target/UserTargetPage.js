@@ -1,11 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getMilestones } from '~/api/milestoneApi';
-import { getStandardExamTypes } from '~/api/examTypeApi';
-import { getExamParts } from '~/api/examPartApi';
-import { getSkills } from '~/api/skillApi';
-import { getScoringConversions } from '~/api/scoringConversionApi';
 import {
   createOrUpdateUserTarget,
   deleteUserTarget,
@@ -13,32 +8,24 @@ import {
 } from '~/api/userTargetApi';
 import planStyles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
-import { sortByPartOrder, sortPartsByLookup } from '~/utils/partOrder';
+import { sortPartsByLookup } from '~/utils/partOrder';
 import useMilestoneScoring from '~/hooks/useMilestoneScoring';
+import { useUserTargetData } from './hooks/useUserTargetData';
 
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);
 
 function UserTargetPage() {
   const [searchParams] = useSearchParams();
-  const [examTypes, setExamTypes] = useState([]);
-  const [examParts, setExamParts] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [scoringConversions, setScoringConversions] = useState([]);
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
-  const [milestones, setMilestones] = useState([]);
   const [targetScore, setTargetScore] = useState('');
   const [customParts, setCustomParts] = useState({});
   const [currentTarget, setCurrentTarget] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    getStandardExamTypes().then(setExamTypes).catch(() => {});
-    getExamParts().then((data) => setExamParts(sortByPartOrder(data))).catch(() => {});
-    getSkills().then(setSkills).catch(() => {});
-    getScoringConversions().then(setScoringConversions).catch(() => {});
-  }, []);
+  const { examTypes, examParts, skills, scoringConversions, milestones } =
+    useUserTargetData(selectedExamTypeId);
 
   useEffect(() => {
     const examTypeIdFromQuery = searchParams.get('examTypeId');
@@ -64,23 +51,6 @@ function UserTargetPage() {
     scoringConversions,
     selectedExamTypeId,
   });
-
-  const loadMilestones = useCallback(async () => {
-    if (!selectedExamTypeId) {
-      setMilestones([]);
-      return;
-    }
-    try {
-      const data = await getMilestones(selectedExamTypeId);
-      setMilestones(data);
-    } catch {
-      setMilestones([]);
-    }
-  }, [selectedExamTypeId]);
-
-  useEffect(() => {
-    loadMilestones();
-  }, [loadMilestones]);
 
   const loadCurrentTarget = useCallback(async () => {
     if (!selectedExamTypeId) {

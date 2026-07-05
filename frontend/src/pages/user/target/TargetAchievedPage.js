@@ -1,12 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getMyUserTests } from '~/api/userTestApi';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { getEnhancedResult } from '~/api/enhancedResultApi';
-import { filterCompletedTests } from '~/utils/userTests';
 import { formatDateTime24 as formatDate } from '~/utils/format-date-time';
+import { useTargetAchieved } from './hooks/useTargetAchieved';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -20,51 +16,14 @@ function suggestNextTarget(current) {
 
 function TargetAchievedPage() {
   const [searchParams] = useSearchParams();
-  const [examTypes, setExamTypes] = useState([]);
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
 
-  const [target, setTarget] = useState(null);
-  const [latestMock, setLatestMock] = useState(null);
-  const [enhanced, setEnhanced] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    getExamTypes().then(setExamTypes).catch(() => {});
-  }, []);
+  const { examTypes, target, latestMock, enhanced, isLoading: loading, error } =
+    useTargetAchieved(examTypeId);
 
   useEffect(() => {
     if (!examTypeId && examTypes.length > 0) setExamTypeId(examTypes[0].examTypeId);
   }, [examTypes, examTypeId]);
-
-  useEffect(() => {
-    if (!examTypeId) return;
-    setLoading(true);
-    setError(null);
-    (async () => {
-      try {
-        const t = await getUserTarget(examTypeId).catch(() => null);
-        setTarget(t);
-
-        const completed = filterCompletedTests(await getMyUserTests(), examTypeId);
-        const latest = completed[0] || null;
-        setLatestMock(latest);
-
-        if (latest?.userTestId) {
-          try {
-            const r = await getEnhancedResult(latest.userTestId);
-            setEnhanced(r.data);
-          } catch {
-            setEnhanced(null);
-          }
-        }
-      } catch (err) {
-        setError(err?.response?.data?.message || err.message);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [examTypeId]);
 
   const enhancedMatches =
     enhanced && (!enhanced.examTypeId || enhanced.examTypeId === examTypeId);

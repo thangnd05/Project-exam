@@ -1,17 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getMyUserTests } from '~/api/userTestApi';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getExamParts } from '~/api/examPartApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { listPlans } from '~/api/learningPlanApi';
-import { getEnhancedResult } from '~/api/enhancedResultApi';
-import { sortByPartOrder, sortPartsByLookup } from '~/utils/partOrder';
-import { filterCompletedTests } from '~/utils/userTests';
+import { sortPartsByLookup } from '~/utils/partOrder';
 import { formatDateTime24 as formatDate, formatDayMonth } from '~/utils/format-date-time';
 import TargetDashboardMockSparkline from './components/TargetDashboardMockSparkline';
 import TargetDashboardPartChart from './components/TargetDashboardPartChart';
+import { useTargetDashboard } from './hooks/useTargetDashboard';
 import { getReadinessClassName, getReadinessLabel } from './utils/readiness-label';
 import pageStyles from './TargetDashboardPage.module.scss';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
@@ -21,66 +15,26 @@ const pageCx = classNames.bind(pageStyles);
 
 function TargetDashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [examTypes, setExamTypes] = useState([]);
-  const [examParts, setExamParts] = useState([]);
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
-
-  const [target, setTarget] = useState(null);
-  const [plans, setPlans] = useState([]);
-  const [latestMock, setLatestMock] = useState(null);
-  const [recentMocks, setRecentMocks] = useState([]);
-  const [latestEnhanced, setLatestEnhanced] = useState(null);
   const [showPartTable, setShowPartTable] = useState(true);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    getExamTypes().then(setExamTypes).catch(() => {});
-    getExamParts().then((data) => setExamParts(sortByPartOrder(data))).catch(() => {});
-  }, []);
+  const {
+    examTypes,
+    examParts,
+    target,
+    plans,
+    latestMock,
+    recentMocks,
+    latestEnhanced,
+    isLoading: loading,
+    error,
+  } = useTargetDashboard(examTypeId);
 
   useEffect(() => {
     if (!examTypeId && examTypes.length > 0) {
       setExamTypeId(examTypes[0].examTypeId);
     }
   }, [examTypes, examTypeId]);
-
-  const loadDashboard = useCallback(async () => {
-    if (!examTypeId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const t = await getUserTarget(examTypeId).catch(() => null);
-      setTarget(t);
-
-      const ps = await listPlans(examTypeId).catch(() => []);
-      setPlans(ps || []);
-
-      const completed = filterCompletedTests(await getMyUserTests(), examTypeId);
-      setLatestMock(completed[0] || null);
-      setRecentMocks(completed.slice(0, 5));
-
-      if (completed[0]?.userTestId) {
-        try {
-          const r = await getEnhancedResult(completed[0].userTestId);
-          setLatestEnhanced(r.data);
-        } catch {
-          setLatestEnhanced(null);
-        }
-      } else {
-        setLatestEnhanced(null);
-      }
-    } catch (err) {
-      setError(err?.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [examTypeId]);
-
-  useEffect(() => {
-    loadDashboard();
-  }, [loadDashboard]);
 
   const activePlan = useMemo(
     () => (plans || []).find((p) => p.status === 'ACTIVE') || null,
