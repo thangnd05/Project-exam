@@ -2,63 +2,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* --- 1. GIỮ NGUYÊN TÊN BIẾN - CHỈ ĐỔI MÀU SÁNG (MODERN THEME) --- */
-
-  /* --primary: Màu chủ đạo (Logo/Brand) -> Đổi sang Xanh Dương Sáng */
   --primary: #0061f2;
-
-  /* --primary-color: Dùng cho các nút bấm chính/Header 
-     -> Đổi sang màu "Than Chì" (Dark Slate) để nút Đăng nhập nhìn nổi bật, sang trọng */
   --primary-color: #0061f2;
   --dark-color: #1e293b;
   --footer-bg: #0b2c4d;
-  /* navy đậm sang */
-
-
-
   --primary-gradient: linear-gradient(135deg,
       var(--accent-color) 0%,
       var(--accent-act-color) 100%);
-  /* --accent-color: Màu điểm nhấn (Link/Icon/Gradient Start) 
-     -> Xanh Dương Tươi */
   --accent-color: #0061f2;
+    --accent-act-color: #00c6ff;
+  --hover-accent: #0061f2;
 
-  /* --accent-act-color: Màu điểm nhấn 2 (Gradient End/Hover) 
-     -> Xanh Cyan Sáng (để pha màu Gradient đẹp) */
-  --accent-act-color: #00c6ff;
-
-  /* Các màu cơ bản */
   --black: #000;
   --white: #fff;
   --text-color: #161823;
   --text-secondary: #64748b;
-  /* Màu xám xanh hiện đại cho chữ phụ */
 
-  /* Màu nền & Viền */
   --bg-body: #f0f2f5;
-  /* Thêm biến này: Màu nền web xám nhẹ */
   --bg-white: #ffffff;
-  /* Thêm biến này: Màu nền trắng cho Card */
   --input-bg: #f1f5f9;
-  /* Thêm biến này: Màu nền input */
   --border-color: #e2e8f0;
-  /* Viền nhạt hơn */
   --hover-color: #f8f9fa;
   --author-tag-bg: #fff4e5;
   --author-tag-text: #b45309;
   --author-tag-border: #fcd9a5;
 
-  /* Success (xanh lá) - Trạng thái đã duyệt / hoàn thành */
   --success-bg: #dcfce7;
   --success-text: #166534;
   --success-border: #bbf7d0;
 
-  /* Danger (đỏ) - Hành động phá hủy / cảnh báo nặng */
   --danger-bg: #fef2f2;
   --danger-text: #b91c1c;
   --danger-border: #fecaca;
 
-  /* Typography giữ nguyên */
   --font-family: 'Inter', sans-serif;
   --font-weight: 600;
   --font-size: 2rem;
@@ -68,7 +44,6 @@
   --glass-border: rgba(255, 255, 255, 0.5);
   --surface-shadow: 0 8px 32px 0 rgba(0, 97, 242, 0.1);
 
-  /* Font Sizes */
   --font-size-xs: 0.75rem;
   --font-size-sm: 1.2rem;
   --font-size-ssm: 1.4rem;
@@ -80,26 +55,21 @@
   --font-size-4xl: 3.6rem;
   --font-size-5xl: 4.8rem;
 
-  /* Font Weights */
   --font-weight-light: 300;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* Shadow & Radius */
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-card: 0 14px 28px rgba(0, 0, 0, 0.05), 0 10px 10px rgba(0, 0, 0, 0.05);
-  /* Bóng cho Card Login */
 
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 20px;
-  /* Bo góc lớn */
 }
 
-/* --- PHẦN CLASS UTILITY (ĐÃ ĐƯA RA NGOÀI :ROOT ĐỂ CODE CHẠY ĐÚNG) --- */
 
 .shadow-md {
   box-shadow: var(--shadow-md) !important;
@@ -158,7 +128,6 @@
   font-size: var(--font-size-5xl) !important;
 }
 
-/* Utility Font Weights */
 .fw-light {
   font-weight: var(--font-weight-light) !important;
 }
@@ -196,7 +165,6 @@ body {
   text-rendering: optimizespeed;
   color: var(--text-color);
   background-color: #f5f8fc;
-  /* Nền base hơi sáng hơn để các blob trôi nổi rõ */
   scrollbar-gutter: stable;
 }
 
@@ -237,7 +205,6 @@ li {
   list-style: none;
 }
 
-/* Các button cũ (cập nhật màu mới) */
 .btn-accent {
   padding: 0.75rem 1.5rem;
   font-size: 1.1rem;
@@ -264,7 +231,6 @@ li {
   }
 }
 
-/* Tag badge cho chọn tag câu hỏi */
 :global(.tag-badge) {
   font-size: var(--font-size-ssm) !important;
   padding: 0.6rem 1.2rem !important;

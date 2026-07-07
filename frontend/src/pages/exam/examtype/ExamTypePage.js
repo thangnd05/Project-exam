@@ -4,8 +4,6 @@ import { getStandardExamTypes } from '../../../api/examTypeApi';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import style from './ExamTypeStyle.module.scss';
-import {useAuth} from '../../../hooks/useAuth';
-import routes from '~/config/Routes';
 
 const cx = classNames.bind(style);
 
@@ -42,7 +40,6 @@ const cardVariants = {
 function ExamTypePage() {
   const [examTypes, setExamTypes] = useState([]);
   const navigate = useNavigate();
-  const {user} = useAuth();
 
   const normalizeExamTypes = (payload) => {
     if (Array.isArray(payload)) {
@@ -71,15 +68,6 @@ function ExamTypePage() {
 
   const handleClick = (examTypeId) => {
     navigate(`/exam-types/${examTypeId}`);
-  };
-
-  const handleSetTarget = (event, examTypeId) => {
-    event.stopPropagation();
-    if (!user) {
-      navigate(routes.login);
-      return;
-    }
-    navigate(`${routes.myTarget}?examTypeId=${examTypeId}`);
   };
 
   return (
@@ -118,16 +106,6 @@ function ExamTypePage() {
                 <span className={cx('action-text')}>
                   {examType.childCount > 0 ? 'Xem các kỳ thi' : 'Khám phá ngay'}
                 </span>
-                {/* Node cha (gom nhiều kỳ thi con) không phải mục tiêu cụ thể nên ẩn nút mục tiêu. */}
-                {!(examType.childCount > 0) && (
-                  <button
-                    type="button"
-                    className={cx('targetBtn')}
-                    onClick={(event) => handleSetTarget(event, examType.examTypeId)}
-                  >
-                    Mục tiêu của tôi
-                  </button>
-                )}
               </div>
             </div>
           </motion.div>
