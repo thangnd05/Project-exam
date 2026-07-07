@@ -1,58 +1,60 @@
 .hero {
+  padding-block: clamp(20px, 3.2vw, 34px);
+}
+
+/* Lưới 2 cột nằm trong .container (Bootstrap) để canh lề trái khớp các section khác */
+.hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
   align-items: center;
   gap: clamp(18px, 3vw, 38px);
-  width: min(100%, 1600px);
-  margin: 0 auto;
-  padding: clamp(20px, 3.2vw, 34px) clamp(14px, 3.4vw, 44px);
   min-height: clamp(360px, 52vh, 520px);
-  border-radius: 18px;
 
   @media (max-width: 992px) {
     /* minmax(0,1fr) chứ KHÔNG phải 1fr: 1fr = minmax(auto,1fr) -> cột lấy min-content
        của carousel (slick-track rất rộng) làm cột phình ra, đẩy nội dung ra ngoài màn. */
     grid-template-columns: minmax(0, 1fr);
-    text-align: center;
-    padding: 24px 14px 18px;
+    text-align: left;
     min-height: auto;
   }
 }
 
 .content {
   max-width: 660px;
-  padding-left: clamp(4px, 1vw, 14px);
-
-  @media (max-width: 992px) {
-    margin: 0 auto;
-    padding-left: 0;
-  }
+  text-align: left;
 
   .badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 6px 14px;
-    margin-bottom: clamp(4px, 0.6vw, 8px);
+    margin-bottom: clamp(10px, 1.2vw, 16px);
     font-size: 1.3rem;
     font-weight: var(--font-weight-semibold);
-    color: var(--accent-color);
-    background: rgba(0, 97, 242, 0.08);
-    border: 1px solid rgba(0, 97, 242, 0.18);
+    color: var(--dark-color, #1e293b);
+    background: rgba(15, 23, 42, 0.04);
+    border: 1px solid rgba(15, 23, 42, 0.14);
     border-radius: 999px;
+
+    /* Chấm tròn trước chữ — giữ màu xanh làm điểm nhấn */
+    &::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-color, #0061f2);
+    }
   }
 
   .welcome {
-    font-size: clamp(3.2rem, 4.2vw, 5rem);
-    line-height: 1.12;
+    font-size: clamp(2.4rem, 3vw, 3.6rem);
+    line-height: 1.18;
     font-weight: 800;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: clamp(12px, 1.6vw, 16px);
+    color: var(--dark-color, #1e293b);
+    margin: 0 0 clamp(12px, 1.6vw, 16px);
     letter-spacing: -0.5px;
-    text-wrap: balance;
+    text-align: left;
+    align-self: start;
   }
 
   .desc {
@@ -63,13 +65,8 @@
     max-width: 54ch;
     text-wrap: pretty;
 
-    @media (max-width: 992px) {
-      margin-left: auto;
-      margin-right: auto;
-    }
-
     strong {
-      color: var(--accent-color);
+      color: var(--dark-color, #1e293b);
       font-weight: var(--font-weight-bold);
     }
   }
@@ -79,10 +76,6 @@
     align-items: center;
     gap: 14px;
     flex-wrap: wrap;
-
-    @media (max-width: 992px) {
-      justify-content: center;
-    }
 
     @media (max-width: 576px) {
       flex-direction: column;
@@ -281,7 +274,6 @@
 .type-card {
   display: flex;
   flex-direction: column;
-  min-height: 420px;
   padding: clamp(20px, 2.2vw, 28px);
   background: linear-gradient(160deg, #ffffff 0%, #f4f8ff 100%);
   border: 1px solid var(--border-color);
@@ -290,49 +282,61 @@
 
   .card-head {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: clamp(16px, 2vw, 22px);
+  }
+
+  /* Nhãn "QUICK CHALLENGE" nhỏ, in hoa nằm trên tiêu đề */
+  .mock-badge {
+    padding: 0;
+    font-size: 1.2rem;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    background: none;
   }
 
   .type-name {
-    font-size: clamp(1.9rem, 2.1vw, 2.4rem);
+    font-size: clamp(1.9rem, 2.1vw, 2.3rem);
     font-weight: var(--font-weight-bold);
+    line-height: 1.25;
     color: var(--text-color);
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
+}
 
-  .mock-badge {
-    flex-shrink: 0;
-    padding: 5px 12px;
-    font-size: 1.15rem;
-    font-weight: var(--font-weight-semibold);
-    color: var(--accent-color);
-    background: rgba(0, 97, 242, 0.08);
-    border-radius: 999px;
-  }
+/* Thân card: vòng tròn bên trái + danh sách part bên phải */
+.card-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 26px);
+  margin-bottom: clamp(18px, 2.2vw, 24px);
 }
 
 /* Gauge donut */
 .gauge {
+  flex-shrink: 0;
   display: flex;
   justify-content: center;
-  margin: 10px 0 18px;
 }
 
 .gauge-ring {
   position: relative;
-  width: clamp(140px, 18vw, 168px);
+  width: clamp(118px, 14vw, 146px);
   aspect-ratio: 1;
   border-radius: 50%;
   /* background = conic-gradient inline theo phân bố số câu */
 
   .gauge-hole {
     position: absolute;
-    inset: 16px;
+    inset: 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -343,15 +347,15 @@
   }
 
   .gauge-num {
-    font-size: clamp(3.2rem, 4vw, 4rem);
+    font-size: clamp(2.8rem, 3.4vw, 3.4rem);
     font-weight: var(--font-weight-bold);
     line-height: 1;
     color: var(--accent-color);
   }
 
   .gauge-label {
-    margin-top: 4px;
-    font-size: 1.3rem;
+    margin-top: 3px;
+    font-size: 1.2rem;
     color: var(--text-secondary);
   }
 }
@@ -359,10 +363,10 @@
 /* Thanh bar theo part */
 .bar-list {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 18px;
+  gap: clamp(10px, 1.4vw, 14px);
 }
 
 .bar-item {
@@ -371,11 +375,11 @@
     align-items: baseline;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
   }
 
   .bar-name {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
     font-weight: var(--font-weight-medium);
     color: var(--text-color);
     white-space: nowrap;
@@ -387,10 +391,11 @@
     flex-shrink: 0;
     font-size: 1.25rem;
     font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
   }
 
   .bar-track {
-    height: 8px;
+    height: 4px;
     border-radius: 999px;
     background: var(--input-bg);
     overflow: hidden;
@@ -404,7 +409,7 @@
 }
 
 .bar-more {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-style: italic;
   color: var(--text-secondary);
 }
@@ -416,7 +421,6 @@
   justify-content: center;
   font-size: 1.4rem;
   color: var(--text-secondary);
-  margin-bottom: 18px;
 }
 
 .btn-cta {

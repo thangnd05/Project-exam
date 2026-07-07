@@ -143,6 +143,7 @@ function HeroSection() {
 
   return (
     <section className={cx('hero')}>
+      <div className={classNames('container', cx('hero-grid'))}>
       <motion.div
         className={cx('content')}
         initial="hidden"
@@ -193,62 +194,61 @@ function HeroSection() {
                   <div key={test.testId} className={cx('slide')}>
                     <div className={cx('type-card')}>
                       <div className={cx('card-head')}>
+                        <span className={cx('mock-badge')}>Quick Challenge</span>
                         <span className={cx('type-name')} title={test.examTypeName}>
                           {test.examTypeName}
                         </span>
-                        <span className={cx('mock-badge')}>Quick Challenge</span>
                       </div>
 
-                      <div className={cx('gauge')}>
-                        <div
-                          className={cx('gauge-ring')}
-                          style={{background: buildRingGradient(parts, total)}}
-                        >
-                          <div className={cx('gauge-hole')}>
-                            <span className={cx('gauge-num')}>{total}</span>
-                            <span className={cx('gauge-label')}>câu hỏi</span>
+                      <div className={cx('card-body')}>
+                        <div className={cx('gauge')}>
+                          <div
+                            className={cx('gauge-ring')}
+                            style={{background: buildRingGradient(parts, total)}}
+                          >
+                            <div className={cx('gauge-hole')}>
+                              <span className={cx('gauge-num')}>{total}</span>
+                              <span className={cx('gauge-label')}>câu hỏi</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {shown.length > 0 ? (
-                        <ul className={cx('bar-list')}>
-                          {shown.map((part, idx) => {
-                            const pct = total
-                              ? Math.round((part.numQuestions / total) * 100)
-                              : 0;
-                            const color = partColor(idx);
-                            return (
-                              <li key={idx} className={cx('bar-item')}>
-                                <div className={cx('bar-top')}>
-                                  <span className={cx('bar-name')} title={part.name}>
-                                    {part.name}
-                                  </span>
-                                  <span
-                                    className={cx('bar-count')}
-                                    style={{color}}
-                                  >
-                                    {part.numQuestions} câu
-                                  </span>
-                                </div>
-                                <div className={cx('bar-track')}>
-                                  <div
-                                    className={cx('bar-fill')}
-                                    style={{width: `${pct}%`, background: color}}
-                                  />
-                                </div>
+                        {shown.length > 0 ? (
+                          <ul className={cx('bar-list')}>
+                            {shown.map((part, idx) => {
+                              const pct = total
+                                ? Math.round((part.numQuestions / total) * 100)
+                                : 0;
+                              const color = partColor(idx);
+                              return (
+                                <li key={idx} className={cx('bar-item')}>
+                                  <div className={cx('bar-top')}>
+                                    <span className={cx('bar-name')} title={part.name}>
+                                      {part.name}
+                                    </span>
+                                    <span className={cx('bar-count')}>
+                                      {part.numQuestions}
+                                    </span>
+                                  </div>
+                                  <div className={cx('bar-track')}>
+                                    <div
+                                      className={cx('bar-fill')}
+                                      style={{width: `${pct}%`, background: color}}
+                                    />
+                                  </div>
+                                </li>
+                              );
+                            })}
+                            {restCount > 0 && (
+                              <li className={cx('bar-more')}>
+                                + {restCount} mục khác
                               </li>
-                            );
-                          })}
-                          {restCount > 0 && (
-                            <li className={cx('bar-more')}>
-                              + {restCount} mục khác
-                            </li>
-                          )}
-                        </ul>
-                      ) : (
-                        <p className={cx('no-part')}>Bài thi nhanh sẵn sàng</p>
-                      )}
+                            )}
+                          </ul>
+                        ) : (
+                          <p className={cx('no-part')}>Bài thi nhanh sẵn sàng</p>
+                        )}
+                      </div>
 
                       <button
                         className={cx('btn-cta')}
@@ -271,6 +271,7 @@ function HeroSection() {
           </div>
         )}
       </motion.div>
+      </div>
     </section>
   );
 }
