@@ -78,6 +78,14 @@ const Evaluation = () => {
     refetchEvaluations(); // Refresh list
   };
 
+  // Lấy 1-2 chữ cái đầu tên để làm avatar (khi không có ảnh)
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(/\s+/).filter(Boolean);
+    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -96,16 +104,24 @@ const Evaluation = () => {
     <section className={cx('section', 'reviews-section')}>
       <div className="container">
         <motion.div
-          className="text-center mb-5"
+          className={cx('sectionHead')}
           initial="hidden"
           whileInView="visible"
           viewport={{once: true, amount: 0.5}}
           variants={fadeUp}
         >
-          <h2 className={cx('section-title')}>Người dùng nói gì về WinDe?</h2>
-          <p className="text-muted">
-            Niềm tin được khẳng định qua kết quả thực tế
-          </p>
+          <div className={cx('sectionHead-text')}>
+            <h2 className={cx('section-title')}>Người dùng nói gì về WinDe?</h2>
+            <p className={cx('section-subtitle')}>
+              Niềm tin được khẳng định qua kết quả thực tế
+            </p>
+          </div>
+          <button
+            className={cx('btn-write-review')}
+            onClick={handleWriteReviewClick}
+          >
+            Viết đánh giá
+          </button>
         </motion.div>
 
         {reviews.length > 0 ? (
@@ -121,33 +137,37 @@ const Evaluation = () => {
                 reviews.map((review) => (
                   <div key={review.id} className={cx('slide-item')}>
                     <div className={cx('review-card')}>
+                      <div className={cx('stars')}>
+                        {[...Array(5)].map((_, i) => (
+                          <FaStar
+                            key={i}
+                            className={
+                              i < review.rating
+                                ? cx('star-filled')
+                                : cx('star-empty')
+                            }
+                          />
+                        ))}
+                      </div>
                       <p className={cx('review-content')}>"{review.content}"</p>
                       <div className={cx('review-footer')}>
-                        <img
-                          src={
-                            review.avatarUrl || 'https://via.placeholder.com/50'
-                          }
-                          alt={review.username}
-                          className={cx('avatar')}
-                          referrerPolicy="no-referrer"
-                        />
+                        {review.avatarUrl ? (
+                          <img
+                            src={review.avatarUrl}
+                            alt={review.username}
+                            className={cx('avatar')}
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <div className={cx('avatar', 'avatar-initials')}>
+                            {getInitials(review.username)}
+                          </div>
+                        )}
                         <div className={cx('user-info')}>
                           <h4 className={cx('user-name')}>{review.username}</h4>
                           <span className={cx('user-role')}>
                             {formatDate(review.createdAt)}
                           </span>
-                          <div className={cx('stars')}>
-                            {[...Array(5)].map((_, i) => (
-                              <FaStar
-                                key={i}
-                                className={
-                                  i < review.rating
-                                    ? cx('star-filled')
-                                    : cx('star-empty')
-                                }
-                              />
-                            ))}
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -160,22 +180,6 @@ const Evaluation = () => {
             Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá!
           </div>
         )}
-
-        {/* NÚT MỞ MODAL */}
-        <motion.div
-          className="text-center mt-4"
-          initial={{opacity: 0, y: 16}}
-          whileInView={{opacity: 1, y: 0}}
-          viewport={{once: true, amount: 0.6}}
-          transition={{duration: 0.5, delay: 0.2}}
-        >
-          <button
-            className={cx('btn-write-review')}
-            onClick={handleWriteReviewClick}
-          >
-            Viết đánh giá của bạn
-          </button>
-        </motion.div>
       </div>
 
       {/* --- MODAL (POPUP) --- */}

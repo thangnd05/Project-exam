@@ -7,15 +7,37 @@
   padding: 60px 0;
 }
 
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  text-align: left;
+  margin-bottom: 40px;
+
+  .btn-write-review {
+    flex-shrink: 0;
+  }
+}
+
+.sectionHead-text {
+  min-width: 0;
+}
+
 .section-title {
-  font-size: var(--font-size-4xl);
-  font-weight: 900;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 16px;
-  letter-spacing: -1px;
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  color: var(--dark-color, #1e293b);
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.section-subtitle {
+  font-size: var(--font-size-lg);
+  color: #64748b;
+  font-weight: 500;
+  line-height: 1.6;
 }
 
 /* --- Style cho Card Đánh giá --- */
@@ -43,9 +65,8 @@
 
 .review-content {
   font-size: var(--font-size-ssm);
-  color: #4a5568;
-  line-height: 1.6;
-  font-style: italic;
+  color: #334155;
+  line-height: 1.65;
   margin-bottom: 25px;
   flex-grow: 1;
   /* Đẩy phần footer xuống đáy */
@@ -60,12 +81,25 @@
 }
 
 .avatar {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
   border: 2px solid #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Avatar chữ cái khi không có ảnh */
+.avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent-color, #0061f2) 0%, #0056d2 100%);
+  box-shadow: none;
 }
 
 .user-info {
@@ -90,16 +124,16 @@
   display: flex;
   gap: 4px;
   align-items: center;
+  margin-bottom: 16px;
 
   .star-filled {
     color: #fbbf24;
-    font-size: 1.2rem;
-    transition: transform 0.2s;
+    font-size: 1.4rem;
   }
 
   .star-empty {
     color: #e2e8f0;
-    font-size: 0.9rem;
+    font-size: 1.4rem;
   }
 }
 
@@ -212,22 +246,26 @@
 
 /* --- NÚT GỬI ĐÁNH GIÁ --- */
 .btn-write-review {
-  background-color: white;
-  color: #0061f2;
-  border: 2px solid #0061f2;
-  padding: 10px 25px;
-  border-radius: 30px;
+  background: linear-gradient(135deg, var(--accent-color, #0061f2) 0%, #0056d2 100%);
+  color: var(--white, #fff);
+  border: none;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-size: 1.55rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
+  box-shadow: 0 8px 20px rgba(0, 97, 242, 0.25);
 
   &:hover {
-    background-color: #0061f2;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 97, 242, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(0, 97, 242, 0.35);
+  }
+
+  &:active {
+    transform: translateY(-1px);
   }
 }
 
