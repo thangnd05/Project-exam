@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {motion} from 'framer-motion';
-import {FaStar, FaQuoteLeft, FaPen} from 'react-icons/fa';
+import {FaStar} from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import styles from './evaluation.module.scss';
 import Slider from 'react-slick';
@@ -121,9 +121,6 @@ const Evaluation = () => {
                 reviews.map((review) => (
                   <div key={review.id} className={cx('slide-item')}>
                     <div className={cx('review-card')}>
-                      <div className={cx('quote-icon')}>
-                        <FaQuoteLeft />
-                      </div>
                       <p className={cx('review-content')}>"{review.content}"</p>
                       <div className={cx('review-footer')}>
                         <img
@@ -176,7 +173,7 @@ const Evaluation = () => {
             className={cx('btn-write-review')}
             onClick={handleWriteReviewClick}
           >
-            <FaPen style={{marginRight: '8px'}} /> Viết đánh giá của bạn
+            Viết đánh giá của bạn
           </button>
         </motion.div>
       </div>

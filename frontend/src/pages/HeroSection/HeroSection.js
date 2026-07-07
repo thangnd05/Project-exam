@@ -150,7 +150,7 @@ function HeroSection() {
         variants={containerVariants}
       >
         <motion.span className={cx('badge')} variants={itemVariants}>
-          ⚡ Chẩn đoán nhanh năng lực
+          Chẩn đoán nhanh năng lực
         </motion.span>
         <motion.h1 className={cx('welcome')} variants={itemVariants}>
           Chào mừng đến với {name}
@@ -254,7 +254,7 @@ function HeroSection() {
                         className={cx('btn-cta')}
                         onClick={() => handleStartQuick(test)}
                       >
-                        BẮT ĐẦU QUICK CHALLENGE →
+                        Bắt đầu Quick Challenge
                       </button>
                     </div>
                   </div>

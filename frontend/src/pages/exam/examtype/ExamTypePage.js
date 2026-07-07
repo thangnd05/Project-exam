@@ -4,20 +4,17 @@ import { getStandardExamTypes } from '../../../api/examTypeApi';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import style from './ExamTypeStyle.module.scss';
-import {FaBookOpen, FaBullseye, FaGlobe, FaCertificate, FaGraduationCap, FaLayerGroup} from 'react-icons/fa';
 import {useAuth} from '../../../hooks/useAuth';
 import routes from '~/config/Routes';
 
 const cx = classNames.bind(style);
 
-// 🎨 Icon Mapping for common exam types
-const ICONS = {
-  'TOEIC': <FaCertificate />,
-  'IELTS': <FaGlobe />,
-  'NORMAL': <FaLayerGroup />,
-  'VSTEP': <FaGraduationCap />,
-  'ENGLISH': <FaBookOpen />,
-  'default': <FaLayerGroup />
+// Monogram tối giản: lấy 1-2 chữ cái đầu tên loại đề (thay cho icon).
+const getInitials = (name) => {
+  if (!name) return '?';
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
 };
 
 const headerVariants = {
@@ -85,16 +82,6 @@ function ExamTypePage() {
     navigate(`${routes.myTarget}?examTypeId=${examTypeId}`);
   };
 
-  const getIcon = (name) => {
-    const upper = name.toUpperCase();
-    if (upper.includes('TOEIC')) return ICONS['TOEIC'];
-    if (upper.includes('IELTS')) return ICONS['IELTS'];
-    if (upper.includes('NORMAL')) return ICONS['NORMAL'];
-    if (upper.includes('VSTEP')) return ICONS['VSTEP'];
-    if (upper.includes('ENGLISH')) return ICONS['ENGLISH'];
-    return ICONS['default'];
-  };
-
   return (
     <div id="exam-types" className={cx('exam-type-container')}>
       {/* Decorative background elements managed in CSS, but keeping structure clean */}
@@ -122,15 +109,14 @@ function ExamTypePage() {
             variants={cardVariants}
             whileHover={{y: -8}}
           >
-            <div className={cx('icon-wrapper')}>
-              {getIcon(examType.name)}
+            <div className={cx('monogram')} aria-hidden="true">
+              {getInitials(examType.name)}
             </div>
             <div className={cx('card-info')}>
               <h4 className={cx('name')}>{examType.name}</h4>
               <div className={cx('cardActions')}>
                 <span className={cx('action-text')}>
                   {examType.childCount > 0 ? 'Xem các kỳ thi' : 'Khám phá ngay'}
-                  <span className={cx('arrow')}>→</span>
                 </span>
                 {/* Node cha (gom nhiều kỳ thi con) không phải mục tiêu cụ thể nên ẩn nút mục tiêu. */}
                 {!(examType.childCount > 0) && (
@@ -139,7 +125,6 @@ function ExamTypePage() {
                     className={cx('targetBtn')}
                     onClick={(event) => handleSetTarget(event, examType.examTypeId)}
                   >
-                    <FaBullseye />
                     Mục tiêu của tôi
                   </button>
                 )}

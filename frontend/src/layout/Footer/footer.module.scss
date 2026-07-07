@@ -139,31 +139,14 @@
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  padding: 30px 20px;
+  padding: 30px 24px;
   display: flex;
-  align-items: center;
-  gap: 15px;
+  align-items: flex-start;
   transition: transform 0.3s ease, background 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.15);
-  }
-}
-
-.statIconWrapper {
-  width: 50px;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  .statIcon {
-    font-size: 2.2rem;
-    color: white;
   }
 }
 
@@ -221,22 +204,17 @@
 }
 
 .emailBox {
-  background: rgba(255, 255, 255, 0.1); 
-  border-radius: 8px; 
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  gap: 10px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   transition: background 0.2s ease;
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
   }
-}
-
-.emailIcon {
-  font-size: 1.4rem;
 }
 
 .emailText {
