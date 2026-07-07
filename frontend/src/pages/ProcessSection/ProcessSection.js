@@ -53,14 +53,14 @@ const ProcessSection = () => {
     <section className={cx('section', 'process-section')}>
       <div className="container">
         <motion.div
-          className="text-center mb-5"
+          className={cx('sectionHead')}
           initial="hidden"
           whileInView="visible"
           viewport={{once: true, amount: 0.5}}
           variants={headerVariants}
         >
           <h2 className={cx('section-title')}>Quy trình ôn luyện</h2>
-          <p className="text-muted">
+          <p className={cx('section-subtitle')}>
             Đơn giản hóa hành trình chinh phục điểm số
           </p>
         </motion.div>

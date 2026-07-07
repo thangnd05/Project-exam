@@ -4,19 +4,24 @@
     padding: 60px 0;
 }
 
-.section-title {
-    font-size: var(--font-size-4xl);
-    font-weight: 900;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 16px;
-    letter-spacing: -1px;
+.sectionHead {
+    text-align: left;
+    margin-bottom: 40px;
 }
 
-:global(.text-muted) {
+.section-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 800;
+    color: var(--dark-color, #1e293b);
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.section-subtitle {
     font-size: var(--font-size-lg);
+    color: #64748b;
+    font-weight: 500;
+    line-height: 1.6;
 }
 
 .processGrid {
@@ -32,19 +37,16 @@
 
 .process-card {
     text-align: left;
-    padding: 36px 32px;
-    border-radius: 20px;
     height: 100%;
-    border: 1px solid var(--border-color);
-    background: var(--bg-white);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    padding-top: 18px;
+    /* Vạch ngang phía trên — mặc định xám, sáng xanh khi hover */
+    border-top: 2px solid var(--border-color);
+    transition: border-color 0.3s ease;
 
     &:hover {
-        transform: translateY(-4px);
-        border-color: rgba(0, 97, 242, 0.35);
-        box-shadow: 0 16px 32px rgba(0, 97, 242, 0.1);
+        border-top-color: var(--hover-accent, #0061f2);
 
-        h3 {
+        .step-number {
             color: var(--hover-accent, #0061f2);
         }
     }
@@ -53,8 +55,7 @@
         font-size: 1.9rem;
         font-weight: 800;
         color: var(--dark-color);
-        margin: 20px 0 10px;
-        transition: color 0.3s ease;
+        margin: 12px 0 10px;
     }
 
     p {
@@ -64,18 +65,16 @@
     }
 }
 
-/* Số thứ tự bước (thay cho icon) — tối giản, đúng tone brand */
+/* Số thứ tự bước (thay cho icon) — mặc định xám, sáng xanh khi hover card */
 .step-number {
     display: inline-flex;
     align-items: baseline;
-    font-size: 3.2rem;
-    font-weight: 900;
+    font-size: 1.6rem;
+    font-weight: 700;
     line-height: 1;
-    letter-spacing: -1px;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
 }
 
 /* --- RESPONSIVE --- */
