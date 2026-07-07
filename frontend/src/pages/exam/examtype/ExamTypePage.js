@@ -72,20 +72,21 @@ function ExamTypePage() {
 
   return (
     <div id="exam-types" className={cx('exam-type-container')}>
-      {/* Decorative background elements managed in CSS, but keeping structure clean */}
-      <motion.div
-        className={cx('header-box')}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{once: true, amount: 0.5}}
-        variants={headerVariants}
-      >
-        <h2 className={cx('exam-type-title')}>Lựa chọn loại đề thi</h2>
-        <p className={cx('exam-type-subtitle')}>Khám phá kho đề thi phong phú và đa dạng phù hợp với mọi mục tiêu ôn tập</p>
-      </motion.div>
+      <div className="container">
+        {/* Decorative background elements managed in CSS, but keeping structure clean */}
+        <motion.div
+          className={cx('header-box')}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{once: true, amount: 0.5}}
+          variants={headerVariants}
+        >
+          <h2 className={cx('exam-type-title')}>Lựa chọn loại đề thi</h2>
+          <p className={cx('exam-type-subtitle')}>Khám phá kho đề thi phong phú và đa dạng phù hợp với mọi mục tiêu ôn tập</p>
+        </motion.div>
 
-      <div className={cx('exam-types-grid')}>
-        {examTypes.map((examType, index) => (
+        <div className={cx('exam-types-grid')}>
+          {examTypes.map((examType, index) => (
           <motion.div
             key={examType.examTypeId}
             className={cx('category-card')}
@@ -107,9 +108,10 @@ function ExamTypePage() {
                   {examType.childCount > 0 ? 'Xem các kỳ thi' : 'Khám phá ngay'}
                 </span>
               </div>
-            </div>
-          </motion.div>
-        ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );

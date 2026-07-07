@@ -7,33 +7,29 @@
 }
 
 .exam-type-container {
-  padding: 80px 4% 0px ;
-  // max-width: 1400px;
+  padding: 80px 0 0;
   margin: 0 auto;
   position: relative;
   overflow: hidden;
 
   .header-box {
-    text-align: center;
-    margin-bottom: 60px;
+    text-align: left;
+    margin-bottom: 40px;
     animation: fadeInUp 0.8s ease-out both;
 
     .exam-type-title {
-      font-size: var(--font-size-4xl);
-      font-weight: 900;
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 16px;
-      letter-spacing: -1px;
+      font-size: var(--font-size-3xl);
+      font-weight: 800;
+      color: var(--dark-color, #1e293b);
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
     }
 
     .exam-type-subtitle {
       font-size: var(--font-size-lg);
       color: #64748b;
       max-width: 700px;
-      margin: 0 auto;
+      margin: 0;
       font-weight: 500;
       line-height: 1.6;
     }
@@ -65,7 +61,7 @@
       border-color: rgba(0, 97, 242, 0.35);
 
       .monogram {
-        background: var(--primary-gradient);
+        background: var(--accent-color);
         color: #fff;
       }
 
@@ -155,7 +151,7 @@
 
 @media (max-width: 768px) {
   .exam-type-container {
-    padding: 60px 20px;
+    padding: 60px 0;
 
     .header-box {
       .exam-type-title {
