@@ -2,7 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
-import { formatDateTime24 as formatDate, formatDayMonth } from '~/utils/format-date-time';
+import {
+  formatDateTime24 as formatDate,
+  formatDayMonth,
+  formatHourMinute24,
+} from '~/utils/format-date-time';
 import MockHistoryCharts from './components/MockHistoryCharts';
 import { useMockHistory } from './hooks/useMockHistory';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
@@ -32,6 +36,19 @@ function MockHistoryPage() {
     if (!examTypeFilter) return allTests;
     return allTests.filter((u) => u.examTypeId === examTypeFilter);
   }, [allTests, examTypeFilter]);
+
+  // Trang này chỉ hiển thị bài có điểm tổng chuẩn. Bài Quick Challenge trả
+  // enhanced.totalScore = null (đề ngắn, không có điểm 990) → ẩn khỏi cả bảng lẫn
+  // biểu đồ. Chưa load enhanced thì tạm giữ; eager-load bên dưới sẽ xác định ngay.
+  const visibleTests = useMemo(
+    () =>
+      tests.filter((t) => {
+        const e = enhancedById[t.userTestId];
+        if (!e || e.error) return true;
+        return e.totalScore != null;
+      }),
+    [tests, enhancedById],
+  );
 
   const examTypeName = useMemo(
     () => examTypes.find((et) => et.examTypeId === examTypeFilter)?.name || '',
@@ -93,25 +110,37 @@ function MockHistoryPage() {
   }, [chartTestIds]);
 
   const chartData = useMemo(() => {
-    const chronological = [...testsForChart].reverse();
+    const chronological = [...visibleTests.slice(0, CHART_FETCH_LIMIT)].reverse();
+
+    // Đếm số bài mỗi ngày để phân biệt các lần thi trùng ngày bằng giờ.
+    const dayCounts = chronological.reduce((acc, t) => {
+      const day = formatDayMonth(t.finishedAt);
+      acc[day] = (acc[day] || 0) + 1;
+      return acc;
+    }, {});
+
     return chronological.map((t, idx) => {
       const e = enhancedById[t.userTestId];
       const enhancedLoaded = e && !e.error;
-      const totalScore =
-        (enhancedLoaded ? e.totalScore : null) ?? t.totalScore ?? null;
+      // visibleTests đã loại bài totalScore null nên ở đây điểm luôn hợp lệ.
+      const totalScore = enhancedLoaded ? (e.totalScore ?? null) : (t.totalScore ?? null);
       const readinessScore = enhancedLoaded ? e.readinessScore : null;
+
+      const day = formatDayMonth(t.finishedAt);
+      const time = formatHourMinute24(t.finishedAt);
+      const dateLabel = dayCounts[day] > 1 && time ? `${day} ${time}` : day;
 
       return {
         key: t.userTestId,
         order: idx + 1,
-        dateLabel: formatDayMonth(t.finishedAt),
+        dateLabel,
         fullDate: formatDate(t.finishedAt),
         totalScore,
         readinessScore,
         isTargetMet: enhancedLoaded ? e.isTargetMet : null,
       };
     });
-  }, [testsForChart, enhancedById]);
+  }, [visibleTests, enhancedById]);
 
   const loadEnhanced = useCallback(async (userTestId) => {
     if (enhancedById[userTestId]) return;
@@ -170,9 +199,13 @@ function MockHistoryPage() {
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
       {loading && <div className={cx('loading')}>Đang tải...</div>}
 
-      {!loading && tests.length === 0 && (
+      {!loading && !chartLoading && visibleTests.length === 0 && (
         <div className={cx('alert', 'alertInfo')}>
-          <span>Bạn chưa có bài thi nào đã hoàn thành.</span>
+          <span>
+            {tests.length === 0
+              ? 'Bạn chưa có bài thi nào đã hoàn thành.'
+              : 'Chưa có bài thi đầy đủ nào để thống kê (Quick Challenge không tính điểm tổng).'}
+          </span>
           <Link to="/" className={cx('btn', 'btnPrimary', 'btnSm')}>
             Làm bài đầu tiên
           </Link>
@@ -188,7 +221,7 @@ function MockHistoryPage() {
         />
       )}
 
-      {tests.length > 0 && (
+      {visibleTests.length > 0 && (
         <div className={cx('tableWrapper')}>
           <table className={cx('table')}>
             <thead>
@@ -204,19 +237,19 @@ function MockHistoryPage() {
               </tr>
             </thead>
             <tbody>
-              {tests.map((t, idx) => {
+              {visibleTests.map((t, idx) => {
                 const e = enhancedById[t.userTestId];
                 const enhancedLoaded = e && !e.error;
                 return (
                   <tr key={t.userTestId}>
-                    <td>{tests.length - idx}</td>
+                    <td>{visibleTests.length - idx}</td>
                     <td className={cx('small')}>{formatDate(t.finishedAt)}</td>
                     <td>
                       <code className={cx('code')}>{t.testId?.slice(0, 8)}…</code>
                     </td>
                     <td className={cx('right')}>
                       <strong>
-                        {enhancedLoaded ? e.totalScore : t.totalScore ?? '—'}
+                        {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '—'}
                       </strong>
                     </td>
                     <td className={cx('right')}>

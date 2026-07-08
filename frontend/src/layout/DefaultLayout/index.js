@@ -5,6 +5,7 @@ import styles from './DefaultLayout.module.scss';
 import Header from '../Header';
 import Footer from '../Footer';
 import ScrollToTop from '../ScrollToTop';
+import MobileBottomNav from '../MobileBottomNav';
 import BackgroundDecor from '~/components/common/BackgroundDecor';
 
 const cx = classNames.bind(styles);
@@ -16,9 +17,10 @@ function DefaultLayout({
   hideScrollToTop = false,
 }) {
   const location = useLocation();
+  const showMobileNav = !hideFooter;
 
   return (
-    <div className={cx('wrapper', { examWrapper: hideFooter })}>
+    <div className={cx('wrapper', {examWrapper: hideFooter, hasMobileNav: showMobileNav})}>
       <BackgroundDecor />
       <Header />
 
@@ -39,6 +41,7 @@ function DefaultLayout({
       </main>
 
       {!hideFooter && <Footer />}
+      {showMobileNav && <MobileBottomNav />}
       {!hideScrollToTop && <ScrollToTop />}
     </div>
   );

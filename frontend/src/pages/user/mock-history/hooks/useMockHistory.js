@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getMyUserTests } from '~/api/userTestApi';
 import { getExamTypes } from '~/api/examTypeApi';
 import { getUserTarget } from '~/api/userTargetApi';
-import { filterCompletedTests } from '~/utils/userTests';
+import { filterMockTests } from '~/utils/userTests';
 
 export const mockHistoryKeys = {
   examTypes: ['exam-types'],
@@ -10,7 +10,7 @@ export const mockHistoryKeys = {
   userTarget: (examTypeId) => ['user-target', examTypeId],
 };
 
-const selectCompletedTests = (arr) => filterCompletedTests(arr);
+const selectCompletedTests = (arr) => filterMockTests(arr);
 const selectTargetScore = (data) => (data?.hasTarget ? data.targetScore : null);
 
 export function useMockHistory(examTypeFilter) {

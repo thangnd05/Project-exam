@@ -47,9 +47,22 @@
   flex-direction: column;
 }
 
+.wrapper.hasMobileNav {
+  @media (max-width: 991.98px) {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 991.98px) {
+  .main {
+    padding-top: 16px;
+    padding-bottom: 24px;
+  }
+}
+
 @media (max-width: 768px) {
   .main {
-    padding-top: 20px;
-    padding-bottom: 40px;
+    padding-top: 16px;
+    padding-bottom: 20px;
   }
 }
