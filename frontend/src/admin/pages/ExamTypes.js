@@ -1,7 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {Badge, Button, Spinner} from 'react-bootstrap';
-import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Plus, Trash2} from 'lucide-react';
+import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Paintbrush, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
+
+import routes from '~/config/Routes';
 
 import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
 import ExamTypeFormModal from '../modals/ExamTypeFormModal';
@@ -49,7 +52,7 @@ const buildExamTypePayload = (formState, {hasChildren} = {}) => {
 };
 
 // ==================== Tree Node ====================
-function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, keyword}) {
+function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEditLayout, onDelete, onAddChild, keyword}) {
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedIds.has(node.exam_type_id);
   const kw = keyword.trim().toLowerCase();
@@ -95,6 +98,9 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDel
               <Plus size={16} />
             </button>
           )}
+          <button onClick={() => onEditLayout(node)} title="Thiết kế giao diện làm bài">
+            <Paintbrush size={16} />
+          </button>
           <button onClick={() => onEdit(node)} title="Sửa">
             <Edit size={16} />
           </button>
@@ -113,6 +119,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDel
               expandedIds={expandedIds}
               toggleExpand={toggleExpand}
               onEdit={onEdit}
+              onEditLayout={onEditLayout}
               onDelete={onDelete}
               onAddChild={onAddChild}
               keyword={keyword}
@@ -131,6 +138,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDel
 
 // ==================== Main Page ====================
 function ExamTypesManagement() {
+  const navigate = useNavigate();
   const {examTypeList, isLoading: loading, isError, createMutation, updateMutation, deleteMutation} =
     useExamTypes();
   const [searchTerm, setSearchTerm] = useState('');
@@ -208,6 +216,10 @@ function ExamTypesManagement() {
     resetForm();
     setFormState({...emptyForm, parent_id: parent.exam_type_id});
     setShowFormModal(true);
+  };
+
+  const openLayoutEditor = (examType) => {
+    navigate(routes.adminExamTypeLayout.replace(':examTypeId', examType.exam_type_id));
   };
 
   const openEditModal = (examType) => {
@@ -331,6 +343,7 @@ function ExamTypesManagement() {
               expandedIds={expandedIds}
               toggleExpand={toggleExpand}
               onEdit={openEditModal}
+              onEditLayout={openLayoutEditor}
               onDelete={setDeletingExamType}
               onAddChild={openCreateChildModal}
               keyword={searchTerm}
