@@ -180,32 +180,15 @@
 }
 
 html {
-  /* 1rem = 10px làm gốc; co dần theo màn hình để mọi chữ/spacing dạng rem tự scale responsive */
-  font-size: 62.5%;
-}
-
-@media (max-width: 1200px) {
-  html {
-    font-size: 60%; /* 1rem = 9.6px */
-  }
-}
-
-@media (max-width: 992px) {
-  html {
-    font-size: 58%; /* 1rem = 9.28px */
-  }
-}
-
-@media (max-width: 768px) {
-  html {
-    font-size: 56.25%; /* 1rem = 9px */
-  }
-}
-
-@media (max-width: 576px) {
-  html {
-    font-size: 55%; /* 1rem = 8.8px */
-  }
+  /* CƠ CHẾ RESPONSIVE CHUNG DUY NHẤT của cả app:
+     root font-size co mượt (fluid) theo bề rộng màn hình → mọi chữ & spacing dạng rem
+     tự scale đồng bộ, KHÔNG trang nào cần tự viết responsive cho cỡ chữ.
+       • desktop (≥~1280px): 1rem = 10px  (62.5%)
+       • tablet  (~768px):   1rem ≈ 9px
+       • mobile  (≤~415px):  1rem = 8.8px (sàn, 55%)
+     Dùng % ở min/max để tôn trọng cỡ chữ mặc định của trình duyệt (accessibility). */
+  font-size: 62.5%; /* fallback cho trình duyệt không hỗ trợ clamp */
+  font-size: clamp(55%, 7.5px + 0.2vw, 62.5%);
 }
 
 body {
@@ -216,6 +199,18 @@ body {
   color: var(--text-color);
   background-color: #f5f8fc;
   scrollbar-gutter: stable;
+}
+
+/* An toàn responsive chung: media không bao giờ vượt khung cha (chống tràn ngang toàn app) */
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
 }
 
 /* Scrollbar */

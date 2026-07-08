@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Container } from 'react-bootstrap';
+import { IoGridOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
 import TestStartDashboard from '../TestStartDashboard';
@@ -101,14 +102,16 @@ function ExamLayoutRenderer({
             />
           );
         }
-        // Ở sidebar/top/float: hiện luôn danh sách câu hỏi (không cần toggle). Mặc định 5 cột.
+        // Bọc để ẩn bản inline trên mobile — mobile dùng nút nổi + bottom-sheet cho gọn.
         return (
-          <TestStartDashboard
-            allQuestions={allQuestions}
-            userAnswers={userAnswers}
-            onScrollToQuestion={scrollToQuestion}
-            columns={block.props?.navColumns ?? 5}
-          />
+          <div className={zx('sideNavInline')}>
+            <TestStartDashboard
+              allQuestions={allQuestions}
+              userAnswers={userAnswers}
+              onScrollToQuestion={scrollToQuestion}
+              columns={block.props?.navColumns ?? 5}
+            />
+          </div>
         );
       default:
         return null;
@@ -187,6 +190,12 @@ function ExamLayoutRenderer({
   const bottomBlocks = byZone(ZONES.BOTTOM);
   const floatBlocks = byZone(ZONES.FLOAT);
 
+  const hasNav = (config.blocks || []).some(
+    (b) => b.visible !== false && b.type === BLOCK_TYPES.QUESTION_NAV,
+  );
+  const isNavOnly = (blocks) =>
+    blocks.length > 0 && blocks.every((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
+
   const questionArea = (
     <QuestionAreaBlock
       isPractice={isPractice}
@@ -197,13 +206,8 @@ function ExamLayoutRenderer({
       config={config.questionArea}
     />
   );
-
-  // ── Footer (BOTTOM): 3 nhóm trái/giữa/phải theo align. Trong mỗi nhóm, timer+progress gộp pill.
-  // Mặc định: nav align='left' -> trái; timer/progress/submit align='right' -> phải (y hệt hiện tại).
   const navInBottom = bottomBlocks.some((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
   const renderFooterGroup = (blocks) => {
-    // Nút "Danh sách câu hỏi" đứng ĐẦU cụm (ngay trước các pill tiến độ/đồng hồ) để
-    // gần khối 4/64 cho trực quan, thay vì nằm lẻ ở mép trái footer.
     const navs = blocks.filter((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
     const pills = blocks.filter(isPill);
     const others = blocks.filter((b) => !isPill(b) && b.type !== BLOCK_TYPES.QUESTION_NAV);
@@ -256,6 +260,49 @@ function ExamLayoutRenderer({
       </div>
     );
 
+  // Điều hướng câu hỏi trên MOBILE: nút đặt ở góc trên-phải vùng câu hỏi (ngang tiêu đề
+  // "Bài thi") -> không nổi đè lên đáp án như nút bottom. Bấm mở bottom-sheet trượt lên.
+  const mobileNavTrigger =
+    hasNav && !preview ? (
+      <div className={cx('mobile-nav-bar')}>
+        <button
+          type="button"
+          className={cx('mobile-nav-trigger')}
+          onClick={() => setShowInfoPanel((v) => !v)}
+          aria-expanded={showInfoPanel}
+          aria-label="Xem danh sách câu hỏi"
+          title="Danh sách câu hỏi"
+        >
+          <IoGridOutline size={24} />
+        </button>
+      </div>
+    ) : null;
+
+  const mobileNavSheet =
+    hasNav && !preview && showInfoPanel ? (
+      <div
+        className={cx('mobile-nav-backdrop')}
+        onClick={() => setShowInfoPanel(false)}
+        role="presentation"
+      >
+        <div
+          className={cx('mobile-nav-sheet')}
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-label="Danh sách câu hỏi"
+        >
+          <TestStartDashboard
+            allQuestions={allQuestions}
+            userAnswers={userAnswers}
+            onScrollToQuestion={(id) => {
+              scrollToQuestion(id);
+              setShowInfoPanel(false);
+            }}
+          />
+        </div>
+      </div>
+    ) : null;
+
   // Khung cố định: chiếm trọn phần dưới header, chỉ vùng câu hỏi cuộn.
   // Preview (editor): không khoá chiều cao viewport, để khung preview tự cuộn.
   const wrapperStyle = preview
@@ -285,7 +332,7 @@ function ExamLayoutRenderer({
       >
         <div className={zx('innerRow')}>
           {leftBlocks.length > 0 && (
-            <aside className={zx('zoneLeft')}>
+            <aside className={zx('zoneLeft', { hiddenOnMobile: isNavOnly(leftBlocks) })}>
               {leftBlocks.map((b) => wrap(b, renderBlockNode(b, ZONES.LEFT), ZONES.LEFT))}
             </aside>
           )}
@@ -293,10 +340,11 @@ function ExamLayoutRenderer({
             className={zx('centerScroll')}
             style={preview ? { overflowY: 'visible' } : undefined}
           >
+            {mobileNavTrigger}
             {questionArea}
           </div>
           {rightBlocks.length > 0 && (
-            <aside className={zx('zoneRight')}>
+            <aside className={zx('zoneRight', { hiddenOnMobile: isNavOnly(rightBlocks) })}>
               {rightBlocks.map((b) => wrap(b, renderBlockNode(b, ZONES.RIGHT), ZONES.RIGHT))}
             </aside>
           )}
@@ -309,6 +357,9 @@ function ExamLayoutRenderer({
       {preview
         ? floatStack
         : floatStack && createPortal(floatStack, document.body)}
+
+      {/* Bottom-sheet danh sách câu (mobile): portal ra body để đè lên tất cả. */}
+      {mobileNavSheet && createPortal(mobileNavSheet, document.body)}
     </div>
   );
 }

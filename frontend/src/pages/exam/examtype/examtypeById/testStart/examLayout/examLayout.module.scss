@@ -173,6 +173,8 @@
 
   .centerScroll {
     overflow: visible;
+    // Mốc định vị cho nút "Danh sách" (mobile-nav-trigger) ở góc trên-phải.
+    position: relative;
   }
 
   // Cot phu (danh sach cau...) hien o dau nhung gon lai, tu cuon neu qua dai
@@ -182,5 +184,12 @@
     scrollbar-gutter: auto;
     max-height: 42vh;
     overflow-y: auto;
+  }
+
+  // Cột chỉ chứa danh sách câu hỏi + bản inline của danh sách: ẩn hẳn trên mobile,
+  // thay bằng nút nổi + bottom-sheet (xem .mobile-nav*) cho gọn, không đẩy đề xuống.
+  .hiddenOnMobile,
+  .sideNavInline {
+    display: none;
   }
 }
