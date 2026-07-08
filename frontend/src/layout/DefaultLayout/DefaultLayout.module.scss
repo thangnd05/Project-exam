@@ -8,7 +8,17 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden; /* Tránh scroll ngang do blob nền, không chặn sticky */
+  overflow-x: clip; /* Cắt scroll ngang do blob nền. Dùng clip (không phải hidden)
+                       để KHÔNG tạo scroll-container -> position: sticky vẫn hoạt động. */
+}
+
+/* Trang làm bài (hideFooter): khoá đúng chiều cao 1 màn hình -> không cuộn cả trang,
+   chỉ vùng câu hỏi bên trong cuộn. Đây là điểm neo chiều cao chắc chắn nhất. */
+.wrapper.examWrapper {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* ============================= */
@@ -32,9 +42,23 @@
   z-index: 2;
 }
 
-/* Trang làm bài: nâng stacking context để thanh nộp bài fixed không bị che */
+/* Trang làm bài: khung cố định 1 màn hình — header + cột danh sách + thanh nộp bài đứng yên,
+   chỉ vùng câu hỏi ở giữa cuộn riêng. main lấp đầy phần dưới header và KHÔNG tự cuộn. */
 .main.examMode {
-  z-index: 1050;
+  /* KHÔNG nâng z-index ở đây: trước đây z-index:1050 khiến nội dung thi đè LÊN header (z 1000)
+     -> câu hỏi/sidebar "vút qua header". Để mặc định (1) nên header luôn nằm trên. */
+  min-height: 0; /* co để không đẩy trang dài ra -> chiều cao khoá = viewport - header */
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.main.examMode .pageWrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ============================= */

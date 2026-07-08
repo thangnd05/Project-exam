@@ -18,7 +18,7 @@ function DefaultLayout({
   const location = useLocation();
 
   return (
-    <div className={cx('wrapper')}>
+    <div className={cx('wrapper', { examWrapper: hideFooter })}>
       <BackgroundDecor />
       <Header />
 
