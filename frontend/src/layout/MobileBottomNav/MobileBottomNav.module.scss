@@ -216,6 +216,7 @@
 .menuItem {
   display: flex;
   align-items: center;
+  gap: 10px;
   min-height: 44px;
   padding: 10px 4px;
   font-size: 1.45rem;
@@ -228,6 +229,13 @@
     color: var(--accent-color);
     text-decoration: none;
   }
+}
+
+.menuItemIcon {
+  font-size: 1.5rem;
+  color: #64748b;
+  width: 20px;
+  text-align: center;
 }
 
 .menuSection {

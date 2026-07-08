@@ -36,8 +36,7 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}) => {
                   </div>
                 </td>
                 <td className={cx('album-description')}>
-                  {album.description ||
-                    'Hành trình chinh phục từ vựng mỗi ngày'}
+                  {album.description}
                 </td>
                 <td>
                   <div className={cx('action-group')}>

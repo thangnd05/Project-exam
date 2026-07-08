@@ -153,6 +153,8 @@
     padding: 40px 0;
 
     .header-box {
+      margin-bottom: 20px;
+
       .exam-type-title {
         font-size: var(--font-size-2xl);
       }
@@ -164,12 +166,14 @@
 
     .exam-types-grid {
       grid-template-columns: 1fr;
+      gap: 12px;
     }
 
     .category-card {
       flex-direction: row;
       align-items: center;
-      padding: 20px;
+      padding: 16px 18px;
+      gap: 14px;
 
       .monogram {
         width: 48px;

@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -44,6 +45,18 @@ public class UserTestController {
     public ResponseEntity<List<UserTestResponse>> getByCurrentUser(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(userTestService.findResponsesByUserId(userId));
+    }
+
+    // Lịch sử mock (phân trang): chỉ bài làm đề đầy đủ, bỏ luyện tập theo Part & Quick Challenge.
+    @GetMapping("/my/mock-history")
+    public ResponseEntity<PageResponse<UserTestResponse>> getMyMockHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String examTypeId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userTestService.getMockHistory(userId, examTypeId, page, size));
     }
 
     //  Lấy theo testId (chỉ chủ đề / admin)

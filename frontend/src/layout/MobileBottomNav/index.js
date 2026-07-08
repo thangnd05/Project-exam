@@ -4,6 +4,7 @@ import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {
   faBook,
+  faChalkboardUser,
   faHome,
   faNewspaper,
   faPlus,
@@ -44,30 +45,35 @@ function MobileBottomNav() {
   const navigate = useNavigate();
   const {user, logout} = useAuth();
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
-  const [showMore, setShowMore] = useState(false);
+  const [activeSheet, setActiveSheet] = useState(null);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateClassModal, setShowCreateClassModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
 
   const hidden = isHiddenRoute(pathname);
+  const sheetOpen = activeSheet !== null;
 
   useEffect(() => {
-    if (!showMore) return undefined;
+    if (!sheetOpen) return undefined;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const onKey = (e) => e.key === 'Escape' && setShowMore(false);
+    const onKey = (e) => e.key === 'Escape' && setActiveSheet(null);
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener('keydown', onKey);
     };
-  }, [showMore]);
+  }, [sheetOpen]);
 
   if (hidden) return null;
 
   const isHomeActive =
     pathname === routes.home || pathname.startsWith('/exam-types');
   const isPostsActive = pathname.startsWith('/posts');
+  const isClassActive =
+    pathname.startsWith('/my-classes') ||
+    pathname.startsWith('/class') ||
+    pathname.startsWith('/classes');
   const isVocabActive =
     pathname.startsWith('/my-albums') ||
     pathname.startsWith('/albums/') ||
@@ -85,7 +91,7 @@ function MobileBottomNav() {
   const handleClassAction = (modalType, targetRoute) => {
     if (!user) {
       navigate(routes.login);
-      setShowMore(false);
+      setActiveSheet(null);
       return;
     }
     if (modalType === 'join') {
@@ -95,14 +101,16 @@ function MobileBottomNav() {
     } else if (targetRoute) {
       navigate(targetRoute);
     }
-    setShowMore(false);
+    setActiveSheet(null);
   };
 
   const handleLogout = async () => {
     await logout();
-    setShowMore(false);
+    setActiveSheet(null);
     navigate(routes.home);
   };
+
+  const closeSheet = () => setActiveSheet(null);
 
   return (
     <>
@@ -134,21 +142,23 @@ function MobileBottomNav() {
           <FontAwesomeIcon icon={faPlus} />
         </button>
 
-        <Link
-          to={routes.myAlbums}
-          className={cx('tab', {active: isVocabActive})}
-          aria-current={isVocabActive ? 'page' : undefined}
+        <button
+          type="button"
+          className={cx('tab', {active: isClassActive || activeSheet === 'class'})}
+          onClick={() => setActiveSheet('class')}
+          aria-label="Lớp học"
+          aria-expanded={activeSheet === 'class'}
         >
-          <FontAwesomeIcon icon={faBook} className={cx('tabIcon')} />
-          <span className={cx('tabLabel')}>Từ vựng</span>
-        </Link>
+          <FontAwesomeIcon icon={faChalkboardUser} className={cx('tabIcon')} />
+          <span className={cx('tabLabel')}>Lớp học</span>
+        </button>
 
         <button
           type="button"
-          className={cx('tab', {active: showMore || isProfileActive})}
-          onClick={() => setShowMore(true)}
+          className={cx('tab', {active: activeSheet === 'menu' || isProfileActive || isVocabActive})}
+          onClick={() => setActiveSheet('menu')}
           aria-label="Menu"
-          aria-expanded={showMore}
+          aria-expanded={activeSheet === 'menu'}
         >
           {user ? (
             <AvatarWithCosmetic
@@ -168,29 +178,31 @@ function MobileBottomNav() {
 
       {createPortal(
         <div
-          className={cx('sheetOverlay', {open: showMore})}
-          onClick={() => setShowMore(false)}
-          aria-hidden={!showMore}
+          className={cx('sheetOverlay', {open: sheetOpen})}
+          onClick={closeSheet}
+          aria-hidden={!sheetOpen}
         >
           <div
-            className={cx('sheet', {open: showMore})}
+            className={cx('sheet', {open: sheetOpen})}
             role="dialog"
             aria-modal="true"
-            aria-label="Menu"
+            aria-label={activeSheet === 'class' ? 'Lớp học' : 'Menu'}
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               className={cx('sheetHandle')}
-              onClick={() => setShowMore(false)}
-              aria-label="Đóng menu"
+              onClick={closeSheet}
+              aria-label="Đóng"
             />
             <div className={cx('sheetHeader')}>
-              <span className={cx('sheetTitle')}>Menu</span>
+              <span className={cx('sheetTitle')}>
+                {activeSheet === 'class' ? 'Lớp học' : 'Menu'}
+              </span>
               <button
                 type="button"
                 className={cx('sheetClose')}
-                onClick={() => setShowMore(false)}
+                onClick={closeSheet}
                 aria-label="Đóng"
               >
                 <FontAwesomeIcon icon={faXmark} />
@@ -198,105 +210,116 @@ function MobileBottomNav() {
             </div>
 
             <div className={cx('sheetBody')}>
-              {user && (
-                <div className={cx('userRow')}>
-                  <AvatarWithCosmetic
-                    src={user?.avatarUrl}
-                    fallbackSrc={images.avtImage}
-                    size={40}
-                    frame={cosmeticFrame}
-                    badge={cosmeticBadge}
-                  />
-                  <div className={cx('userMeta')}>
-                    <span className={cx('userName')}>{user.userName}</span>
-                    <div className={cx('statsRow')}>
-                      <StreakBadge />
-                      <CoinQuestMenu />
-                    </div>
-                  </div>
+              {activeSheet === 'class' ? (
+                <div className={cx('menuSection')}>
+                  <button
+                    type="button"
+                    className={cx('menuAction')}
+                    onClick={() => handleClassAction('join')}
+                  >
+                    Tham gia lớp học
+                  </button>
+                  <button
+                    type="button"
+                    className={cx('menuAction')}
+                    onClick={() => handleClassAction(null, routes.myClasses)}
+                  >
+                    Vào lớp học
+                  </button>
+                  <button
+                    type="button"
+                    className={cx('menuAction')}
+                    onClick={() => handleClassAction('create')}
+                  >
+                    Tạo lớp học
+                  </button>
                 </div>
-              )}
+              ) : (
+                <>
+                  {user && (
+                    <div className={cx('userRow')}>
+                      <AvatarWithCosmetic
+                        src={user?.avatarUrl}
+                        fallbackSrc={images.avtImage}
+                        size={40}
+                        frame={cosmeticFrame}
+                        badge={cosmeticBadge}
+                      />
+                      <div className={cx('userMeta')}>
+                        <span className={cx('userName')}>{user.userName}</span>
+                        <div className={cx('statsRow')}>
+                          <StreakBadge />
+                          <CoinQuestMenu />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
-              <div className={cx('menuList')}>
-                {user && (
-                  <Link
-                    to={routes.nextStep}
-                    className={cx('menuItem')}
-                    onClick={() => setShowMore(false)}
-                  >
-                    Lộ trình
-                  </Link>
-                )}
-                <Link
-                  to={routes.MyTest}
-                  className={cx('menuItem')}
-                  onClick={() => setShowMore(false)}
-                >
-                  Bài đã tạo
-                </Link>
-                {user ? (
-                  <Link
-                    to={routes.profile}
-                    className={cx('menuItem')}
-                    onClick={() => setShowMore(false)}
-                  >
-                    Hồ sơ
-                  </Link>
-                ) : (
-                  <>
+                  <div className={cx('menuList')}>
+                    {user && (
+                      <Link
+                        to={routes.nextStep}
+                        className={cx('menuItem')}
+                        onClick={closeSheet}
+                      >
+                        Lộ trình
+                      </Link>
+                    )}
                     <Link
-                      to={routes.login}
-                      state={{mode: 'signin'}}
+                      to={routes.myAlbums}
                       className={cx('menuItem')}
-                      onClick={() => setShowMore(false)}
+                      onClick={closeSheet}
                     >
-                      Đăng nhập
+                      <FontAwesomeIcon icon={faBook} className={cx('menuItemIcon')} />
+                      Từ vựng
                     </Link>
                     <Link
-                      to={routes.login}
-                      state={{mode: 'signup'}}
+                      to={routes.MyTest}
                       className={cx('menuItem')}
-                      onClick={() => setShowMore(false)}
+                      onClick={closeSheet}
                     >
-                      Đăng ký
+                      Bài đã tạo
                     </Link>
-                  </>
-                )}
-              </div>
+                    {user ? (
+                      <Link
+                        to={routes.profile}
+                        className={cx('menuItem')}
+                        onClick={closeSheet}
+                      >
+                        Hồ sơ
+                      </Link>
+                    ) : (
+                      <>
+                        <Link
+                          to={routes.login}
+                          state={{mode: 'signin'}}
+                          className={cx('menuItem')}
+                          onClick={closeSheet}
+                        >
+                          Đăng nhập
+                        </Link>
+                        <Link
+                          to={routes.login}
+                          state={{mode: 'signup'}}
+                          className={cx('menuItem')}
+                          onClick={closeSheet}
+                        >
+                          Đăng ký
+                        </Link>
+                      </>
+                    )}
+                  </div>
 
-              <div className={cx('menuSection')}>
-                <span className={cx('menuSectionTitle')}>Lớp học</span>
-                <button
-                  type="button"
-                  className={cx('menuAction')}
-                  onClick={() => handleClassAction('join')}
-                >
-                  Tham gia lớp học
-                </button>
-                <button
-                  type="button"
-                  className={cx('menuAction')}
-                  onClick={() => handleClassAction(null, routes.myClasses)}
-                >
-                  Vào lớp học
-                </button>
-                <button
-                  type="button"
-                  className={cx('menuAction')}
-                  onClick={() => handleClassAction('create')}
-                >
-                  Tạo lớp học
-                </button>
-              </div>
-
-              {user && (
-                <button
-                  type="button"
-                  className={cx('logoutBtn')}
-                  onClick={handleLogout}
-                >
-                  Đăng xuất
-                </button>
+                  {user && (
+                    <button
+                      type="button"
+                      className={cx('logoutBtn')}
+                      onClick={handleLogout}
+                    >
+                      Đăng xuất
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>

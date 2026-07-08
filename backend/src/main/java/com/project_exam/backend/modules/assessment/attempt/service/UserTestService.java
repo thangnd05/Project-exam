@@ -9,6 +9,7 @@ import com.project_exam.backend.modules.gamification.streak.service.StreakServic
 import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
 import jakarta.servlet.http.HttpServletRequest;
 
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
 import com.project_exam.backend.modules.assessment.attempt.mapper.LeaderboardMapper;
@@ -34,6 +35,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -66,6 +72,9 @@ public class UserTestService {
     private final LeaderboardMapper leaderboardMapper;
 
     private static final int LEADERBOARD_TOP_LIMIT = 100;
+
+    /** Code ExamCategory của Quick Challenge — bài này không có điểm tổng chuẩn nên loại khỏi lịch sử mock. */
+    private static final String QUICK_CHALLENGE_CODE = "QUICK_CHALLENGE";
 
     public UserTestResponse toResponse(UserTest userTest) {
         String examTypeId = testRepository.findById(userTest.getTestId())
@@ -259,6 +268,45 @@ public class UserTestService {
     public List<UserTest> findByUserId(String userId) { return userTestRepository.findByUserId(userId); }
     public List<UserTestResponse> findResponsesByUserId(String userId) {
         return toResponseListBatched(findByUserId(userId));
+    }
+
+    /**
+     * Lịch sử mock (phân trang) cho trang Lịch sử bài thi: bỏ PRACTICE và Quick Challenge,
+     * chỉ giữ bài làm đề đầy đủ có điểm tổng chuẩn. examTypeId null/blank = tất cả kỳ thi.
+     * Dùng Specification + findAll(spec, pageable) như các trang phân trang khác (UserService).
+     */
+    public PageResponse<UserTestResponse> getMockHistory(String userId, String examTypeId, int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 10 : Math.min(size, 100);
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "finishedAt"));
+
+        Specification<UserTest> spec = Specification.<UserTest>where(null)
+                .and((root, q, cb) -> cb.equal(root.get("userId"), userId))
+                .and((root, q, cb) -> cb.equal(root.get("status"), UserTest.Status.COMPLETED))
+                // Bỏ luyện tập theo Part; mode NULL (dữ liệu cũ) coi như full nên vẫn giữ.
+                .and((root, q, cb) -> cb.or(
+                        cb.isNull(root.get("mode")),
+                        cb.notEqual(root.get("mode"), UserTest.Mode.PRACTICE)));
+
+        // Bỏ Quick Challenge (đề ngắn, không có điểm tổng chuẩn) — lọc theo testId thuộc category đó.
+        List<String> quickTestIds = examCategoryRepository.findByCode(QUICK_CHALLENGE_CODE)
+                .map(c -> testRepository.findByExamCategoryId(c.getExamCategoryId()).stream()
+                        .map(Test::getTestId).toList())
+                .orElseGet(List::of);
+        if (!quickTestIds.isEmpty()) {
+            spec = spec.and((root, q, cb) -> cb.not(root.get("testId").in(quickTestIds)));
+        }
+
+        // Lọc theo kỳ thi (nếu có) — không có test nào thì trả trang rỗng.
+        if (examTypeId != null && !examTypeId.isBlank()) {
+            List<String> examTypeTestIds = testRepository.findByExamTypeId(examTypeId).stream()
+                    .map(Test::getTestId).toList();
+            spec = spec.and((root, q, cb) ->
+                    examTypeTestIds.isEmpty() ? cb.disjunction() : root.get("testId").in(examTypeTestIds));
+        }
+
+        Page<UserTest> result = userTestRepository.findAll(spec, pageable);
+        return PageResponse.from(result, toResponseListBatched(result.getContent()));
     }
     public List<UserTest> findByTestId(String testId) { return userTestRepository.findByTestId(testId); }
 

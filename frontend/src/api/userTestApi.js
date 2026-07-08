@@ -6,6 +6,14 @@ export const getMyUserTests = () => {
   return axios.get(`${BASE_URL}/my`).then((res) => res.data);
 };
 
+// Lịch sử mock (phân trang) — BE đã loại luyện tập theo Part & Quick Challenge.
+// Trả PageResponse: { content, currentPage, size, totalElements, totalPages, hasNext }.
+export const getMockHistory = ({ page = 0, size = 10, examTypeId } = {}) => {
+  const params = { page, size };
+  if (examTypeId) params.examTypeId = examTypeId;
+  return axios.get(`${BASE_URL}/my/mock-history`, { params }).then((res) => res.data);
+};
+
 export const getMyAttemptsByTest = (testId) => {
   return axios.get(`${BASE_URL}/my/by-test/${testId}`).then((res) => res.data);
 };

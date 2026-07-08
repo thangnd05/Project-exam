@@ -2,18 +2,19 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { getEnhancedResult } from '~/api/enhancedResultApi';
+import Pagination from '~/components/common/Pagination/Pagination';
 import {
   formatDateTime24 as formatDate,
   formatDayMonth,
   formatHourMinute24,
 } from '~/utils/format-date-time';
 import MockHistoryCharts from './components/MockHistoryCharts';
-import { useMockHistory } from './hooks/useMockHistory';
+import { CHART_FETCH_LIMIT, useMockHistory } from './hooks/useMockHistory';
 import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
-const CHART_FETCH_LIMIT = 25;
+const PAGE_SIZE = 10;
 
 function formatDuration(seconds) {
   if (seconds == null) return '—';
@@ -25,53 +26,50 @@ function formatDuration(seconds) {
 function MockHistoryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [examTypeFilter, setExamTypeFilter] = useState(searchParams.get('examTypeId') || '');
+  const [page, setPage] = useState(0);
   const [enhancedById, setEnhancedById] = useState({});
   const [loadingId, setLoadingId] = useState(null);
   const [chartLoading, setChartLoading] = useState(false);
 
-  const { examTypes, allTests, isLoading: loading, error, targetScore } =
-    useMockHistory(examTypeFilter);
+  const {
+    examTypes,
+    chartTests,
+    tablePage,
+    isLoading: loading,
+    error,
+    targetScore,
+  } = useMockHistory(examTypeFilter, { page, size: PAGE_SIZE });
 
-  const tests = useMemo(() => {
-    if (!examTypeFilter) return allTests;
-    return allTests.filter((u) => u.examTypeId === examTypeFilter);
-  }, [allTests, examTypeFilter]);
-
-  // Trang này chỉ hiển thị bài có điểm tổng chuẩn. Bài Quick Challenge trả
-  // enhanced.totalScore = null (đề ngắn, không có điểm 990) → ẩn khỏi cả bảng lẫn
-  // biểu đồ. Chưa load enhanced thì tạm giữ; eager-load bên dưới sẽ xác định ngay.
-  const visibleTests = useMemo(
-    () =>
-      tests.filter((t) => {
-        const e = enhancedById[t.userTestId];
-        if (!e || e.error) return true;
-        return e.totalScore != null;
-      }),
-    [tests, enhancedById],
-  );
+  const tableRows = tablePage?.content ?? [];
+  const totalElements = tablePage?.totalElements ?? 0;
+  const totalPages = tablePage?.totalPages ?? 0;
+  const currentPage = tablePage?.currentPage ?? page;
 
   const examTypeName = useMemo(
     () => examTypes.find((et) => et.examTypeId === examTypeFilter)?.name || '',
     [examTypes, examTypeFilter],
   );
 
-  const testsForChart = useMemo(
-    () => tests.slice(0, CHART_FETCH_LIMIT),
-    [tests],
-  );
+  const changeExamType = (value) => {
+    setExamTypeFilter(value);
+    setPage(0);
+    setSearchParams(value ? { examTypeId: value } : {});
+  };
 
+  // Nạp readiness (enhanced result) cho các bài trong biểu đồ. BE đã loại Quick
+  // Challenge nên mọi bài ở đây đều có điểm tổng chuẩn.
   const chartTestIds = useMemo(
-    () => testsForChart.map((t) => t.userTestId).join(','),
-    [testsForChart],
+    () => chartTests.map((t) => t.userTestId).join(','),
+    [chartTests],
   );
 
   useEffect(() => {
-    if (testsForChart.length === 0) {
+    if (chartTests.length === 0) {
       return undefined;
     }
 
     let cancelled = false;
-    const missing = testsForChart.filter((t) => !enhancedById[t.userTestId]);
+    const missing = chartTests.filter((t) => !enhancedById[t.userTestId]);
 
     if (missing.length === 0) {
       return undefined;
@@ -110,7 +108,7 @@ function MockHistoryPage() {
   }, [chartTestIds]);
 
   const chartData = useMemo(() => {
-    const chronological = [...visibleTests.slice(0, CHART_FETCH_LIMIT)].reverse();
+    const chronological = [...chartTests].reverse();
 
     // Đếm số bài mỗi ngày để phân biệt các lần thi trùng ngày bằng giờ.
     const dayCounts = chronological.reduce((acc, t) => {
@@ -122,8 +120,7 @@ function MockHistoryPage() {
     return chronological.map((t, idx) => {
       const e = enhancedById[t.userTestId];
       const enhancedLoaded = e && !e.error;
-      // visibleTests đã loại bài totalScore null nên ở đây điểm luôn hợp lệ.
-      const totalScore = enhancedLoaded ? (e.totalScore ?? null) : (t.totalScore ?? null);
+      const totalScore = enhancedLoaded ? (e.totalScore ?? t.totalScore ?? null) : (t.totalScore ?? null);
       const readinessScore = enhancedLoaded ? e.readinessScore : null;
 
       const day = formatDayMonth(t.finishedAt);
@@ -140,7 +137,7 @@ function MockHistoryPage() {
         isTargetMet: enhancedLoaded ? e.isTargetMet : null,
       };
     });
-  }, [visibleTests, enhancedById]);
+  }, [chartTests, enhancedById]);
 
   const loadEnhanced = useCallback(async (userTestId) => {
     if (enhancedById[userTestId]) return;
@@ -177,10 +174,7 @@ function MockHistoryPage() {
           <select
             className={cx('select')}
             value={examTypeFilter}
-            onChange={(e) => {
-              setExamTypeFilter(e.target.value);
-              setSearchParams(e.target.value ? { examTypeId: e.target.value } : {});
-            }}
+            onChange={(e) => changeExamType(e.target.value)}
           >
             <option value="">Tất cả</option>
             {examTypes.map((et) => (
@@ -191,21 +185,17 @@ function MockHistoryPage() {
           </select>
         </div>
         <p className={cx('filterHint')}>
-          Biểu đồ hiển thị tối đa {CHART_FETCH_LIMIT} bài gần nhất (cũ → mới).
-          Bảng bên dưới liệt kê đầy đủ — nhấn <strong>Tải</strong> nếu thiếu readiness.
+          Chỉ tính bài làm đề đầy đủ (bỏ luyện tập theo Part & Quick Challenge). Biểu đồ hiển thị
+          tối đa {CHART_FETCH_LIMIT} bài gần nhất (cũ → mới); bảng phân trang bên dưới.
         </p>
       </div>
 
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
       {loading && <div className={cx('loading')}>Đang tải...</div>}
 
-      {!loading && !chartLoading && visibleTests.length === 0 && (
+      {!loading && totalElements === 0 && (
         <div className={cx('alert', 'alertInfo')}>
-          <span>
-            {tests.length === 0
-              ? 'Bạn chưa có bài thi nào đã hoàn thành.'
-              : 'Chưa có bài thi đầy đủ nào để thống kê (Quick Challenge không tính điểm tổng).'}
-          </span>
+          <span>Bạn chưa có bài thi đầy đủ nào để thống kê.</span>
           <Link to="/" className={cx('btn', 'btnPrimary', 'btnSm')}>
             Làm bài đầu tiên
           </Link>
@@ -221,80 +211,90 @@ function MockHistoryPage() {
         />
       )}
 
-      {visibleTests.length > 0 && (
-        <div className={cx('tableWrapper')}>
-          <table className={cx('table')}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Hoàn thành</th>
-                <th>Test ID</th>
-                <th className={cx('right')}>Score</th>
-                <th className={cx('right')}>Readiness</th>
-                <th>Mục tiêu</th>
-                <th>Thời gian</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {visibleTests.map((t, idx) => {
-                const e = enhancedById[t.userTestId];
-                const enhancedLoaded = e && !e.error;
-                return (
-                  <tr key={t.userTestId}>
-                    <td>{visibleTests.length - idx}</td>
-                    <td className={cx('small')}>{formatDate(t.finishedAt)}</td>
-                    <td>
-                      <code className={cx('code')}>{t.testId?.slice(0, 8)}…</code>
-                    </td>
-                    <td className={cx('right')}>
-                      <strong>
-                        {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '—'}
-                      </strong>
-                    </td>
-                    <td className={cx('right')}>
-                      {enhancedLoaded ? (
-                        `${e.readinessScore}%`
-                      ) : loadingId === t.userTestId ? (
-                        '...'
-                      ) : (
-                        <button
-                          type="button"
-                          className={cx('btn', 'btnGhost', 'btnSm')}
-                          onClick={() => loadEnhanced(t.userTestId)}
-                        >
-                          Tải
-                        </button>
-                      )}
-                    </td>
-                    <td>
-                      {enhancedLoaded ? (
-                        e.isTargetMet === true ? (
-                          <span className={cx('badge', 'badgeSuccess')}>Đạt</span>
-                        ) : e.isTargetMet === false ? (
-                          <span className={cx('badge', 'badgeWarning')}>Chưa đạt</span>
+      {tableRows.length > 0 && (
+        <>
+          <div className={cx('tableWrapper')}>
+            <table className={cx('table')}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Hoàn thành</th>
+                  <th>Test ID</th>
+                  <th className={cx('right')}>Score</th>
+                  <th className={cx('right')}>Readiness</th>
+                  <th>Mục tiêu</th>
+                  <th>Thời gian</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableRows.map((t, idx) => {
+                  const e = enhancedById[t.userTestId];
+                  const enhancedLoaded = e && !e.error;
+                  return (
+                    <tr key={t.userTestId}>
+                      <td>{totalElements - (currentPage * PAGE_SIZE + idx)}</td>
+                      <td className={cx('small')}>{formatDate(t.finishedAt)}</td>
+                      <td>
+                        <code className={cx('code')}>{t.testId?.slice(0, 8)}…</code>
+                      </td>
+                      <td className={cx('right')}>
+                        <strong>
+                          {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '—'}
+                        </strong>
+                      </td>
+                      <td className={cx('right')}>
+                        {enhancedLoaded ? (
+                          `${e.readinessScore}%`
+                        ) : loadingId === t.userTestId ? (
+                          '...'
                         ) : (
-                          <span className={cx('badge', 'badgeMuted')}>Chưa set</span>
-                        )
-                      ) : (
-                        '—'
-                      )}
-                    </td>
-                    <td className={cx('small')}>{formatDuration(t.durationTaken)}</td>
-                    <td>
-                      <Link
-                        to={`/tests/result/${t.userTestId}`}
-                        className={cx('btn', 'btnOutline', 'btnSm')}
-                      >
-                        Chẩn đoán
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                          <button
+                            type="button"
+                            className={cx('btn', 'btnGhost', 'btnSm')}
+                            onClick={() => loadEnhanced(t.userTestId)}
+                          >
+                            Tải
+                          </button>
+                        )}
+                      </td>
+                      <td>
+                        {enhancedLoaded ? (
+                          e.isTargetMet === true ? (
+                            <span className={cx('badge', 'badgeSuccess')}>Đạt</span>
+                          ) : e.isTargetMet === false ? (
+                            <span className={cx('badge', 'badgeWarning')}>Chưa đạt</span>
+                          ) : (
+                            <span className={cx('badge', 'badgeMuted')}>Chưa set</span>
+                          )
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                      <td className={cx('small')}>{formatDuration(t.durationTaken)}</td>
+                      <td>
+                        <Link
+                          to={`/tests/result/${t.userTestId}`}
+                          className={cx('btn', 'btnOutline', 'btnSm')}
+                        >
+                          Chẩn đoán
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onChange={setPage}
+            />
+          )}
+        </>
       )}
     </div>
   );

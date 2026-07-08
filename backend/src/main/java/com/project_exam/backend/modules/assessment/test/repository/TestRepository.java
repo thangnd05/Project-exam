@@ -26,6 +26,9 @@ public interface TestRepository extends JpaRepository<Test, String> {
     /** Lấy tất cả test thuộc 1 exam category (vd: Quick Challenge) — dùng cho hero landing page. */
     List<Test> findByExamCategoryId(String examCategoryId);
 
+    /** Tất cả test của 1 kỳ thi — dùng lọc lịch sử mock theo examType. */
+    List<Test> findByExamTypeId(String examTypeId);
+
     List<Test> findByClassIdAndChapterId(String classId, String chapterId);
 
     List<Test> findByCreatedByAndClassIdIsNullAndChapterIdIsNull(String createdBy);

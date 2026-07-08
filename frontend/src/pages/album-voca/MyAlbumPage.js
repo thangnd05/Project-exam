@@ -143,7 +143,6 @@ function MyAlbumsPage() {
                   <h3 className={cx('album-title')}>{album.name}</h3>
 
                   <div className={cx('album-info')}>
-                    <IoDocumentTextOutline />
                     <span>
                       {album.description || 'Hành trình chinh phục từ vựng mỗi ngày'}
                     </span>
