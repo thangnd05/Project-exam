@@ -15,7 +15,6 @@ function TestStartDashboard({
     <div className={cx('dashboard')}>
       <div className={cx('dashboard-card')}>
         <div className={cx('dashboard-header')}>
-          <IoInformationCircleOutline />
           <span>Danh sách câu hỏi</span>
         </div>
         <div className={cx('question-grid')} style={gridStyle}>

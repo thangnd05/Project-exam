@@ -1,4 +1,4 @@
-import { defaultLayoutConfig } from './layoutSchema';
+import { defaultLayoutConfig, BLOCK_TYPES } from './layoutSchema';
 
 // Nhận response layout từ API ({ config: <JSON string> } | null | JSON string | object)
 // -> trả về object config đã hợp nhất với mặc định (điền các key thiếu).
@@ -16,8 +16,20 @@ export function resolveLayoutConfig(raw) {
       ...defaultLayoutConfig.questionArea,
       ...(parsed.questionArea || {}),
     },
-    blocks: parsed.blocks.map((b) => ({ visible: true, props: {}, ...b })),
+    blocks: ensureQuestionNav(parsed.blocks.map((b) => ({ visible: true, props: {}, ...b }))),
   };
+}
+
+// Danh sách câu hỏi (nút toggle điều hướng) là điều hướng thiết yếu của trang làm bài.
+// Nếu layout đã lưu quên/bỏ block này thì bổ sung lại bản mặc định để người dùng vẫn
+// mở được danh sách câu — tránh trường hợp "mất nút Danh sách câu hỏi".
+function ensureQuestionNav(blocks) {
+  const hasNav = blocks.some((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
+  if (hasNav) return blocks;
+  const defaultNav = defaultLayoutConfig.blocks.find(
+    (b) => b.type === BLOCK_TYPES.QUESTION_NAV,
+  );
+  return defaultNav ? [defaultNav, ...blocks] : blocks;
 }
 
 function parseRaw(raw) {
