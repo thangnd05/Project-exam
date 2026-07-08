@@ -45,7 +45,6 @@ function TestByClassPage() {
     }
   };
 
-  // 🕒 Countdown logic
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();

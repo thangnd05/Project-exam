@@ -40,7 +40,6 @@ export const getMyPosts = ({ page = 0, size = 10, keyword, status } = {}) => {
     .then((response) => response.data);
 };
 
-// --- Create / Update (multipart: kèm thumbnail/ảnh) ---
 const MULTIPART = { headers: { 'Content-Type': 'multipart/form-data' } };
 
 export const uploadPostImage = (formData) => {
@@ -55,7 +54,6 @@ export const updatePost = (postId, formData) => {
   return axios.put(`${BASE_URL}/${postId}`, formData, MULTIPART).then((response) => response.data);
 };
 
-// --- Categories ---
 export const getCategories = () => {
   return axios.get('/api/categories').then((response) => response.data);
 };
@@ -80,7 +78,6 @@ export const deletePost = (postId) => {
   return axios.delete(`${BASE_URL}/${postId}`).then((response) => response.data);
 };
 
-// --- Comments ---
 export const getComments = (postId) => {
   return axios.get(`${BASE_URL}/${postId}/comments`).then((response) => response.data);
 };
@@ -97,7 +94,6 @@ export const updateComment = (commentId, data) => {
   return axios.put(`/api/comments/${commentId}`, data).then((response) => response.data);
 };
 
-// --- Reacts ---
 export const getReacts = (postId) => {
   return axios.get(`${BASE_URL}/${postId}/reacts`).then((response) => response.data);
 };
@@ -106,7 +102,6 @@ export const toggleReact = (postId, data) => {
   return axios.post(`${BASE_URL}/${postId}/reacts`, data).then((response) => response.data);
 };
 
-// --- Saved posts ---
 export const toggleSavePost = (postId) => {
   return axios.post(`${BASE_URL}/${postId}/save`).then((response) => response.data);
 };
@@ -126,4 +121,3 @@ export const getSavedPosts = ({ page = 0, size = 10, keyword } = {}) => {
 export const getSaveStatus = (postId) => {
   return axios.get(`${BASE_URL}/${postId}/save`).then((response) => response.data);
 };
-

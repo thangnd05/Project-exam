@@ -6,12 +6,11 @@ import Evaluation from '../../pages/evaluation/evaluation';
 export default function TestPage() {
   return (
     <div>
-      {/* 🌟 HERO */}
+
       <section className="hero-section">
         <HeroSection />
       </section>
 
-      {/*  MAIN ACTION */}
       <section className="main-section">
         <ExamTypePage />
       </section>
@@ -20,8 +19,6 @@ export default function TestPage() {
         <ProcessSection />
       </section>
 
-
-      {/* 📝 EVALUATION */}
       <section className="evaluation-section">
         <Evaluation />
       </section>

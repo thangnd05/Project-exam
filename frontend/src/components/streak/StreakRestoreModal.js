@@ -10,7 +10,6 @@ import styles from './StreakRestoreModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Modal xác nhận khôi phục chuỗi đã đứt bằng xu.
 function StreakRestoreModal({ show, onClose }) {
   const { lostStreak, recoverCost, restoreStreak } = useStreak();
   const { balance, refreshCoins } = useCoins();
@@ -37,7 +36,6 @@ function StreakRestoreModal({ show, onClose }) {
       show={show}
       onClose={busy ? undefined : onClose}
       title="Khôi phục chuỗi"
-      icon={Flame}
       maxWidth={420}
       footer={
         <>

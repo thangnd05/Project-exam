@@ -7,7 +7,6 @@ import style from './ExamTypeStyle.module.scss';
 
 const cx = classNames.bind(style);
 
-// Monogram tối giản: lấy 1-2 chữ cái đầu tên loại đề (thay cho icon).
 const getInitials = (name) => {
   if (!name) return '?';
   const words = name.trim().split(/\s+/).filter(Boolean);
@@ -57,7 +56,7 @@ function ExamTypePage() {
   useEffect(() => {
     getStandardExamTypes()
       .then((data) => {
-        // Chỉ hiện loại kỳ thi gốc (parentId null); loại con (vd các cert AWS) xem khi bấm vào cha.
+
         setExamTypes(normalizeExamTypes(data).filter((t) => !t.parentId));
       })
       .catch((error) => {
@@ -73,7 +72,7 @@ function ExamTypePage() {
   return (
     <div id="exam-types" className={cx('exam-type-container')}>
       <div className="container">
-        {/* Decorative background elements managed in CSS, but keeping structure clean */}
+
         <motion.div
           className={cx('header-box')}
           initial="hidden"

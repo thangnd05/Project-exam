@@ -61,7 +61,7 @@ function TestHistoryPage() {
   return (
     <div className={cx('wrapper')}>
       <Container>
-        {/* === Premium Header === */}
+
         <div className={cx('header-top')}>
           <button className={cx('btn-back')} onClick={() => navigate(-1)}>
             <IoArrowBack />
@@ -82,7 +82,7 @@ function TestHistoryPage() {
             </div>
           }
         />
-        {/* === Table Content === */}
+
         {attempts.length === 0 ? (
           <div className={cx('empty-state')}>
             <IoDocumentTextOutline className={cx('icon')} />

@@ -20,9 +20,6 @@ function GeneratePlanPage() {
   const planListRef = useRef(null);
 
   const [userTestId, setUserTestId] = useState(searchParams.get('userTestId') || '');
-  // Tạm ẩn: ngày thi / target score override khi sinh plan
-  // const [deadlineDays, setDeadlineDays] = useState('');
-  // const [targetScore, setTargetScore] = useState('');
 
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
@@ -52,7 +49,6 @@ function GeneratePlanPage() {
   const generatePlanMutation = useGeneratePlanMutation();
   const submitting = generatePlanMutation.isPending;
 
-  // Khi tải xong loại kỳ thi mà chưa chọn nguồn -> chọn mặc định (URL hoặc phần tử đầu).
   useEffect(() => {
     if (!sourceExamTypeId && examTypes.length > 0) {
       const fromUrl = searchParams.get('examTypeId');
@@ -68,7 +64,7 @@ function GeneratePlanPage() {
   }, [userTests, sourceExamTypeId]);
 
   const hasTarget = Boolean(userTarget?.hasTarget);
-  /** Khóa chọn bài nguồn + nút sinh plan khi chưa có target (không khóa loại kỳ thi). */
+
   const testFormLocked = !sourceExamTypeId || loadingTarget || !hasTarget;
 
   useEffect(() => {
@@ -113,8 +109,7 @@ function GeneratePlanPage() {
     setError(null);
     setResult(null);
     const payload = { userTestId };
-    // if (deadlineDays !== '') payload.deadlineDays = Number(deadlineDays);
-    // if (targetScore !== '') payload.targetScore = Number(targetScore);
+
     generatePlanMutation.mutate(payload, {
       onSuccess: (data) => {
         setResult(data);
@@ -129,7 +124,6 @@ function GeneratePlanPage() {
       },
     });
   };
-
 
   return (
     <div className={cx('wrapper')}>

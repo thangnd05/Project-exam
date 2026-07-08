@@ -8,7 +8,6 @@ import styles from './footer.module.scss';
 import images from '~/assets/images';
 import routes from '~/config/Routes';
 
-// Hook đếm số 0 → target khi isActive
 function useCountUp(target, isActive, duration = 1400) {
   const [value, setValue] = useState(0);
   const startedRef = useRef(false);
@@ -22,7 +21,7 @@ function useCountUp(target, isActive, duration = 1400) {
     const tick = (now) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.round(target * eased));
       if (progress < 1) {
         raf = requestAnimationFrame(tick);
@@ -41,94 +40,131 @@ const STATS = [
   {target: 100, suffix: '%', label: 'Cơ hội thi tốt nhất'},
 ];
 
-const StatRow = ({target, suffix, label, isActive}) => {
+const LINKS = [
+  {to: routes.about, label: 'Giới thiệu'},
+  {to: routes.policy, label: 'Chính sách'},
+  {to: routes.service, label: 'Điều khoản & dịch vụ'},
+];
+
+const SOCIALS = [
+  {href: 'https://facebook.com', label: 'Facebook', Icon: FaFacebookSquare},
+  {href: 'https://instagram.com', label: 'Instagram', Icon: FaInstagram},
+  {href: 'https://youtube.com', label: 'YouTube', Icon: FaYoutube},
+];
+
+const fadeUp = {
+  initial: {opacity: 0, y: 18},
+  whileInView: {opacity: 1, y: 0},
+  viewport: {once: true, amount: 0.3},
+  transition: {duration: 0.55, ease: [0.22, 1, 0.36, 1]},
+};
+
+const StatCard = ({target, suffix, label, isActive, index}) => {
   const value = useCountUp(target, isActive);
+
   return (
-    <div className={styles.statRow}>
+    <motion.div
+      className={styles.statCard}
+      initial={{opacity: 0, y: 14, scale: 0.97}}
+      whileInView={{opacity: 1, y: 0, scale: 1}}
+      viewport={{once: true, amount: 0.4}}
+      transition={{duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1]}}
+    >
       <span className={styles.statValue}>
         {value}
         {suffix}
       </span>
       <span className={styles.statLabel}>{label}</span>
-    </div>
+    </motion.div>
   );
 };
 
 function Footer() {
   const statsRef = useRef(null);
-  const inView = useInView(statsRef, {once: true, amount: 0.4});
+  const inView = useInView(statsRef, {once: true, amount: 0.35});
 
   return (
     <footer className={styles.footer}>
+      <div className={styles.bgDecor} aria-hidden="true">
+        <span className={styles.orbPrimary} />
+        <span className={styles.orbSecondary} />
+        <span className={styles.gridOverlay} />
+      </div>
+
       <Container className={styles.container}>
         <div className={styles.topGrid}>
-          {/* Brand */}
-          <motion.div
-            className={styles.brandCol}
-            initial={{opacity: 0, y: 20}}
-            whileInView={{opacity: 1, y: 0}}
-            viewport={{once: true, amount: 0.4}}
-            transition={{duration: 0.6, ease: [0.22, 1, 0.36, 1]}}
-          >
+          <motion.div className={styles.brandCol} {...fadeUp}>
             <div className={styles.logoRow}>
               <div className={styles.logoWrapper}>
-                <img src={images.logoW} alt="Logo" />
+                <img src={images.logoW} alt="WinDe logo" />
               </div>
-              <h3 className={styles.brandName}>WinDe</h3>
+              <div className={styles.brandText}>
+                <h3 className={styles.brandName}>WinDe</h3>
+                <span className={styles.brandBadge}>Nền tảng luyện thi</span>
+              </div>
             </div>
             <p className={styles.brandSub}>
               Đồng hành cùng bạn trên hành trình chinh phục tri thức.
             </p>
             <div className={styles.socialIcons}>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
-                <FaFacebookSquare />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
-                <FaInstagram />
-              </a>
-              <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube">
-                <FaYoutube />
-              </a>
+              {SOCIALS.map(({href, label, Icon}) => (
+                <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}>
+                  <Icon />
+                </a>
+              ))}
             </div>
           </motion.div>
 
-          {/* Links */}
-          <div className={styles.linksCol}>
-            <span className={styles.colTitle}>Liên kết</span>
-            <Link className={styles.footerLink} to={routes.about}>
-              Giới thiệu
-            </Link>
-            <Link className={styles.footerLink} to={routes.policy}>
-              Chính sách
-            </Link>
-            <Link className={styles.footerLink} to={routes.service}>
-              Điều khoản &amp; dịch vụ
-            </Link>
-          </div>
+          <div className={styles.infoGrid}>
+            <motion.nav className={styles.linksCol} aria-label="Liên kết footer" {...fadeUp} transition={{...fadeUp.transition, delay: 0.06}}>
+              <span className={styles.colTitle}>Liên kết</span>
+              <ul className={styles.linkList}>
+                {LINKS.map(({to, label}) => (
+                  <li key={to}>
+                    <Link className={styles.footerLink} to={to}>
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.nav>
 
-          {/* Stats */}
-          <div className={styles.statsCol} ref={statsRef}>
-            <span className={styles.colTitle}>Con số ấn tượng</span>
-            {STATS.map((s) => (
-              <StatRow key={s.label} {...s} isActive={inView} />
-            ))}
+            <div className={styles.statsCol} ref={statsRef}>
+              <motion.span
+                className={styles.colTitle}
+                initial={{opacity: 0}}
+                whileInView={{opacity: 1}}
+                viewport={{once: true}}
+                transition={{duration: 0.4}}
+              >
+                Con số ấn tượng
+              </motion.span>
+              <div className={styles.statsGrid}>
+                {STATS.map((stat, index) => (
+                  <StatCard key={stat.label} {...stat} isActive={inView} index={index} />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
         <div className={styles.divider} />
 
-        {/* Bottom Bar */}
-        <div className={styles.bottomBar}>
+        <motion.div
+          className={styles.bottomBar}
+          initial={{opacity: 0}}
+          whileInView={{opacity: 1}}
+          viewport={{once: true}}
+          transition={{duration: 0.5, delay: 0.1}}
+        >
           <div className={styles.bottomLeft}>
-            <span className={styles.contactText}>Liên hệ:</span>
+            <span className={styles.contactText}>Liên hệ</span>
             <a className={styles.emailLink} href="mailto:winde.contact@gmail.com">
               winde.contact@gmail.com
             </a>
           </div>
-          <span className={styles.copyrightText}>
-            © 2026 WinDe. All rights reserved.
-          </span>
-        </div>
+          <span className={styles.copyrightText}>© 2026 WinDe. All rights reserved.</span>
+        </motion.div>
       </Container>
     </footer>
   );

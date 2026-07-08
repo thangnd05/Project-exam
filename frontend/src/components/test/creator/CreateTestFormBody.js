@@ -4,8 +4,6 @@ import { getClassById } from '~/api/classApi';
 import { getChapterById } from '~/api/chapterApi';
 import { previewDocument, previewPassageDocument } from '~/api/questionApi';
 import {
-  IoSettingsOutline,
-  IoLayersOutline,
   IoCalendarOutline,
   IoTimeOutline,
   IoImageOutline,
@@ -135,7 +133,6 @@ const CreateTestFormBody = ({
     });
   };
 
-  // Đồng bộ tập câu hỏi bị thu gọn khi số lượng câu hỏi thay đổi (xóa index không còn tồn tại).
   useEffect(() => {
     setCollapsedQuestions((prev) => {
       const next = new Set([...prev].filter((i) => i < questions.length));
@@ -189,9 +186,6 @@ const CreateTestFormBody = ({
     }
   };
 
-  // Resolve tên tag (spec "Cha > Con" hoặc "Con") -> tagId dựa trên availableTags (phẳng,
-  // {tagId, name, parentId}) để TagSelector tô sáng ngay trên màn preview. Mirror logic backend;
-  // backend vẫn resolve lại lúc lưu (trọng tài). Ưu tiên con thuộc đúng Part đang chọn.
   const normTag = (s) => (s || '').trim().toLowerCase();
   const resolveTagNamesToIds = (tagNames = []) => {
     if (!tagNames.length || !availableTags.length) return [];
@@ -251,8 +245,8 @@ const CreateTestFormBody = ({
         mediaUrl: '',
         passageType: 'LISTENING',
         explanation: question.explanation || '',
-        tagIds, // đã resolve để UI tô sáng
-        tagNames, // giữ tên tag parser đọc từ Word để submit (backend resolve lại)
+        tagIds,
+        tagNames,
         answers: (question.answers && question.answers.length > 0)
           ? question.answers.map((ans, idx) => ({
             answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),
@@ -389,8 +383,6 @@ const CreateTestFormBody = ({
     }
   };
 
-
-  // Bộ đề/Collection lọc theo loại kỳ thi đang chọn (giữ cả collection chưa gắn examType để không ẩn dữ liệu cũ).
   const collectionOptions = buildCollectionTree(
     (questionCollections || []).filter(
       (c) =>
@@ -440,7 +432,7 @@ const CreateTestFormBody = ({
       {activeCreatorType !== CREATOR_TYPES.BANK && (
         <div className={cx('configCard')}>
           <div className={cx('sectionTitle')}>
-            <IoSettingsOutline /> 1. {activeCreatorType === CREATOR_TYPES.TEST ? 'Cấu hình bài thi' : 'Thông tin chung'}
+            1. {activeCreatorType === CREATOR_TYPES.TEST ? 'Cấu hình bài thi' : 'Thông tin chung'}
           </div>
           <Row className="g-3">
             {mode === 'class' && (
@@ -480,7 +472,7 @@ const CreateTestFormBody = ({
                 <label>Loại kỳ thi</label>
                 <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => handleExamTypeChange(e.target.value)}>
                   <option value="">-- Chọn --</option>
-                  {/* Chỉ cho chọn examType lá (ẩn node cha như "AWS" chỉ để gom). */}
+
                   {examTypes.filter((t) => !t.childCount).map((t) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
                 </select>
               </div>
@@ -597,7 +589,7 @@ const CreateTestFormBody = ({
       {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
         <>
           <div className={cx('sectionTitle')}>
-            <IoLayersOutline /> 2. Danh sách câu hỏi ({questions.length})
+            2. Danh sách câu hỏi ({questions.length})
           </div>
           {questions.map((q, i) => (
             <QuestionBlock
@@ -627,13 +619,13 @@ const CreateTestFormBody = ({
       {activeCreatorType === CREATOR_TYPES.PASSAGE && (
         <>
           <div className={cx('sectionTitle')}>
-            <IoLayersOutline /> 2. Danh sách nhóm ({groups.length})
+            2. Danh sách nhóm ({groups.length})
           </div>
 
           <div className={cx('groupCard')} style={{ borderStyle: 'dashed', backgroundColor: '#f8fafc', marginBottom: '20px' }}>
             <div className={cx('formGroupModern', 'mb-0')}>
               <label className="mb-2 d-block fw-bold text-primary">
-                <IoInformationCircleOutline /> Upload file Word nạp NHIỀU Passage tự động (DOC/DOCX)
+                Upload file Word nạp NHIỀU Passage tự động (DOC/DOCX)
               </label>
               <input
                 type="file"

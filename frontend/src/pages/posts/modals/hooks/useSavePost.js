@@ -5,9 +5,6 @@ import { uploadPostImage, createPost, updatePost } from '~/api/postApi';
 const DEFAULT_THUMBNAIL_URL =
   'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1350&q=80';
 
-// Mutation để tạo/cập nhật bài viết. Bao trọn cả bước upload ảnh inline
-// (trước đây nằm trong handleSubmit) nên isPending phủ đúng toàn bộ luồng như
-// biến `loading` cũ.
 export function useSavePost({ onSuccess } = {}) {
   return useMutation({
     mutationFn: async ({
@@ -22,7 +19,6 @@ export function useSavePost({ onSuccess } = {}) {
     }) => {
       let finalContent = content;
 
-      // Upload inline images that are still in the content
       const imagesToUpload = inlineImages.filter((img) => finalContent.includes(img.base64Url));
 
       if (imagesToUpload.length > 0) {

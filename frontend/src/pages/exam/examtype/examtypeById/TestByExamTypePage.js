@@ -25,7 +25,6 @@ function TestByExamTypePage() {
   const { tests, totalPages, examTypeName, folders, children, isLoading } =
     useTestsByExamType(examTypeId, currentPage);
 
-  // Countdown realtime
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -56,7 +55,6 @@ function TestByExamTypePage() {
     );
   }
 
-  // Loại kỳ thi cha (vd AWS) → hiện danh sách kỳ thi con (cert) để chọn, không hiện test.
   if (children.length > 0) {
     const childrenGrid = (
       <div className={cx('folder-section')}>

@@ -29,13 +29,11 @@ const VocabularyManagement = () => {
     const [currentPage] = useState(1);
     const itemsPerPage = 10;
 
-    // Enrich vocabulary with related data
     const vocabWithData = fakeVocabulary.map(v => {
         const album = fakeVocabularyAlbums.find(a => a.album_id === v.album_id);
         return { ...v, album };
     });
 
-    // Filter
     const filteredVocab = vocabWithData.filter(v => {
         const matchesSearch = v.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
             v.meaning.toLowerCase().includes(searchTerm.toLowerCase());
@@ -43,7 +41,6 @@ const VocabularyManagement = () => {
         return matchesSearch && matchesAlbum;
     });
 
-    // Pagination
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentVocab = filteredVocab.slice(indexOfFirstItem, indexOfLastItem);

@@ -1,19 +1,13 @@
 @import url('../../components/GlobalStyles/GlobalStyles.module.scss');
 
-/* ============================= */
-/* Wrapper toàn trang */
-/* ============================= */
 .wrapper {
   width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: clip; /* Cắt scroll ngang do blob nền. Dùng clip (không phải hidden)
-                       để KHÔNG tạo scroll-container -> position: sticky vẫn hoạt động. */
+  overflow-x: clip;
 }
 
-/* Trang làm bài (hideFooter): khoá đúng chiều cao 1 màn hình -> không cuộn cả trang,
-   chỉ vùng câu hỏi bên trong cuộn. Đây là điểm neo chiều cao chắc chắn nhất. */
 .wrapper.examWrapper {
   height: 100vh;
   height: 100dvh;
@@ -21,10 +15,6 @@
   overflow: hidden;
 }
 
-/* ============================= */
-/* Main content — KHÔNG có background riêng nữa
-   để BackgroundDecor (fixed, sau toàn page) hiện ra */
-/* ============================= */
 .main {
   flex: 1;
   width: 100%;
@@ -33,21 +23,17 @@
   padding-bottom: 60px;
   background: transparent;
   position: relative;
-  z-index: 1; /* nằm trên BackgroundDecor (z-index: -1) */
+  z-index: 1;
 }
 
-/* Container content giữ z-index để chắc chắn nằm trên */
 .main > * {
   position: relative;
   z-index: 2;
 }
 
-/* Trang làm bài: khung cố định 1 màn hình — header + cột danh sách + thanh nộp bài đứng yên,
-   chỉ vùng câu hỏi ở giữa cuộn riêng. main lấp đầy phần dưới header và KHÔNG tự cuộn. */
 .main.examMode {
-  /* KHÔNG nâng z-index ở đây: trước đây z-index:1050 khiến nội dung thi đè LÊN header (z 1000)
-     -> câu hỏi/sidebar "vút qua header". Để mặc định (1) nên header luôn nằm trên. */
-  min-height: 0; /* co để không đẩy trang dài ra -> chiều cao khoá = viewport - header */
+
+  min-height: 0;
   padding: 0;
   overflow: hidden;
   display: flex;
@@ -61,9 +47,6 @@
   flex-direction: column;
 }
 
-/* ============================= */
-/* Responsive Mobile */
-/* ============================= */
 @media (max-width: 768px) {
   .main {
     padding-top: 20px;

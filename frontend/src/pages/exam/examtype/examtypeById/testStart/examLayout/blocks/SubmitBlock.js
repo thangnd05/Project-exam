@@ -6,7 +6,6 @@ import styles from '../../TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Nút nộp bài.
 function SubmitBlock({ onSubmit, isSubmitting, label = 'Nộp bài thi' }) {
   return (
     <button

@@ -40,7 +40,7 @@ const TestListContainer = ({
   footer,
   topSlot,
 }) => {
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
+  const [viewMode, setViewMode] = useState('grid');
 
   return (
     <div className={cx('wrapper')}>

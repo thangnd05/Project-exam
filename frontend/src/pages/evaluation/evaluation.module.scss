@@ -1,8 +1,5 @@
 @import '../../components/GlobalStyles/GlobalStyles.module.scss';
 
-/* =========================================
-   PHẦN ĐÁNH GIÁ & SLIDER (REVIEWS SECTION)
-   ========================================= */
 .section {
   padding: 60px 0;
 }
@@ -40,7 +37,6 @@
   line-height: 1.6;
 }
 
-/* --- Style cho Card Đánh giá --- */
 .review-card {
   background: var(--bg-white);
   padding: 24px;
@@ -48,13 +44,12 @@
   border: 1px solid var(--border-color);
   height: 100%;
   min-height: 250px;
-  /* Chiều cao tối thiểu để các card đều nhau */
+
   display: flex;
   flex-direction: column;
   position: relative;
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   margin-bottom: 10px;
-  /* Tránh bị cắt bóng đổ khi hover */
 
   &:hover {
     transform: translateY(-4px);
@@ -69,7 +64,7 @@
   line-height: 1.65;
   margin-bottom: 25px;
   flex-grow: 1;
-  /* Đẩy phần footer xuống đáy */
+
 }
 
 .review-footer {
@@ -91,7 +86,6 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Avatar chữ cái khi không có ảnh */
 .avatar-initials {
   display: flex;
   align-items: center;
@@ -120,7 +114,7 @@
   font-size: var(--font-size-sm);
   color: #718096;
   margin-bottom: 4px;
-  white-space: nowrap; /* ngày dạng số ngắn -> giữ 1 dòng, không vỡ chữ */
+  white-space: nowrap;
 }
 
 .stars {
@@ -140,12 +134,9 @@
   }
 }
 
-/* --- Cấu hình Slider & Chấm tròn (Dots) --- */
 .slider-container {
-  padding-bottom: 40px;
-  /* Tăng khoảng cách dưới để chứa các chấm */
+  padding-bottom: 10px;
 
-  /* FIX LỖI DOTS: Dùng :global để can thiệp vào class của thư viện */
   :global {
     .slick-dots {
       bottom: -40px;
@@ -212,7 +203,6 @@
       }
     }
 
-    /* Style cho Navigation Arrows (Khi ẩn Dots) */
     .slick-prev,
     .slick-next {
       width: 40px;
@@ -247,7 +237,6 @@
   height: 100%;
 }
 
-/* --- NÚT GỬI ĐÁNH GIÁ --- */
 .btn-write-review {
   background: linear-gradient(135deg, var(--accent-color, #0061f2) 0%, #0056d2 100%);
   color: var(--white, #fff);
@@ -294,7 +283,6 @@
   }
 }
 
-/* Nút "Viết đánh giá" đặt DƯỚI danh sách card — chỉ hiện ở mobile. */
 .write-review-below {
   display: none;
 }
@@ -309,16 +297,14 @@
     gap: 12px;
   }
 
-  /* Tiêu đề & mô tả nhỏ lại cho vừa màn hình điện thoại. */
   .section-title {
-    font-size: var(--font-size-2xl); /* 30px -> 24px */
+    font-size: var(--font-size-2xl);
   }
 
   .section-subtitle {
-    font-size: var(--font-size-md); /* 18px -> 15px */
+    font-size: var(--font-size-md);
   }
 
-  /* Ẩn nút ở header, chuyển xuống dưới card cho gọn. */
   .btn-write-review--head {
     display: none;
   }
@@ -326,7 +312,7 @@
   .write-review-below {
     display: flex;
     justify-content: center;
-    /* Sát card đánh giá hơn (âm để bù padding-bottom của slider). */
+
     margin-top: -8px;
 
     .btn-write-review {
@@ -337,7 +323,7 @@
   }
 
   .slider-container {
-    /* Giảm khoảng trống dưới card; kéo dots vào trong để nút nằm gần card. */
+
     padding-bottom: 20px;
 
     :global {
@@ -355,6 +341,6 @@
 
 @media (max-width: 480px) {
   .section-title {
-    font-size: var(--font-size-xxl); /* 22px */
+    font-size: var(--font-size-xxl);
   }
 }

@@ -110,7 +110,7 @@ function PlanStudyPage() {
     try {
       const res = await submitSession(learningPlanId, session.sessionId, answers);
       setResult(res);
-      if (res?.passed) refreshStreak(); // 🔥 cập nhật streak khi vượt ải
+      if (res?.passed) refreshStreak();
     } catch (err) {
       setError(err?.response?.data?.message || err.message);
     } finally {
@@ -245,7 +245,7 @@ function PlanStudyPage() {
                     <div className={cx('reviewQuestionText')}>{item.questionText}</div>
                     <div className={cx('reviewAnswerList')}>
                       {(item.answers || []).map((a) => {
-                        // MSQ có nhiều đáp án đúng → ưu tiên cờ isCorrect của từng đáp án.
+
                         const isCorrectAnswer = a.isCorrect != null
                           ? a.isCorrect
                           : a.answerId === item.correctAnswerId;

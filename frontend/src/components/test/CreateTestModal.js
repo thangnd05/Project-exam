@@ -1,5 +1,4 @@
 import React from 'react';
-import { IoRocketOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import BaseModal from '~/components/common/modal/BaseModal';
 import CreateTestFormBody from './creator/CreateTestFormBody';
@@ -25,7 +24,6 @@ const CreateTestModal = ({
       show={show}
       onClose={onClose}
       title="Khởi tạo bài thi"
-      icon={IoRocketOutline}
       headerExtra={
         <span className={cx('headerBadge')}>
           {mode === 'class' ? `Lớp: ${classId}` : 'Cá nhân'}

@@ -22,7 +22,7 @@ const emptyQuestion = {
   passageType: 'LISTENING',
   explanation: '',
   tagIds: [],
-  tagNames: [], // tên tag đọc từ file import (Word), resolve sang tagId ở BE
+  tagNames: [],
   answers: [
     { answerLabel: 'A', answerText: '', isCorrect: false },
     { answerLabel: 'B', answerText: '', isCorrect: false },
@@ -37,7 +37,7 @@ const createInitialGroup = () => ({
     contentTranslation: '',
     passageType: 'READING',
     mediaFiles: [],
-    extraContents: [], // các đoạn text bổ sung (passage nhiều đoạn)
+    extraContents: [],
     inputMode: 'TEXT',
   },
   questions: [JSON.parse(JSON.stringify(emptyQuestion))],
@@ -68,7 +68,7 @@ export const useCreateTest = ({
     availableFrom: '',
     availableTo: '',
     collectionId: '',
-    costCoins: '', // giá xu (chỉ admin đặt, bài công khai)
+    costCoins: '',
   });
 
   const [questions, setQuestions] = useState([JSON.parse(JSON.stringify(emptyQuestion))]);
@@ -123,7 +123,6 @@ export const useCreateTest = ({
     const newQ = [...questions];
     newQ[index] = { ...newQ[index], [field]: value };
 
-    // If mediaUrl is updated, try to guess the type
     if (field === 'mediaUrl' && value) {
       const lowerVal = value.toLowerCase();
       if (['.mp3', '.wav', '.ogg', '.m4a'].some(ext => lowerVal.endsWith(ext))) {
@@ -139,7 +138,7 @@ export const useCreateTest = ({
   const updateAnswer = (qIndex, aIndex, field, value) => {
     const newQ = [...questions];
     if (field === 'isCorrect') {
-      // MSQ: bật/tắt độc lập từng đáp án; MCQ: chỉ 1 đáp án đúng.
+
       if (newQ[qIndex].questionType === 'MSQ')
         newQ[qIndex].answers = newQ[qIndex].answers.map((a, i) => (i === aIndex ? { ...a, isCorrect: value } : a));
       else
@@ -195,8 +194,7 @@ export const useCreateTest = ({
 
     const newQ = [...questions];
     const allFiles = [...(newQ[index].mediaFiles || []), ...files];
-    
-    // Auto-detect type: prefer LISTENING if any audio exists, otherwise READING
+
     if (allFiles.some((f) => f.type.startsWith('audio/'))) {
       newQ[index].passageType = 'LISTENING';
     } else if (allFiles.some((f) => f.type.startsWith('image/'))) {
@@ -258,7 +256,6 @@ export const useCreateTest = ({
     const newGroups = [...groups];
     const allFiles = [...(newGroups[gIndex].passage.mediaFiles || []), ...files];
 
-    // Auto-detect type
     if (allFiles.some((f) => f.type.startsWith('audio/'))) {
       newGroups[gIndex].passage.passageType = 'LISTENING';
     } else if (allFiles.some((f) => f.type.startsWith('image/'))) {
@@ -276,7 +273,6 @@ export const useCreateTest = ({
     setGroups(newGroups);
   };
 
-  // Đoạn text bổ sung của passage (giống "thêm đáp án" cho câu hỏi)
   const addGroupPassageText = (gIndex) => {
     const newGroups = [...groups];
     const current = newGroups[gIndex].passage.extraContents || [];

@@ -1,6 +1,3 @@
-// Layout cho các vùng (zone) khi block được đặt ngoài footer mặc định.
-// Chỉ kích hoạt khi có block ở TOP/LEFT/RIGHT/FLOAT — layout mặc định (chỉ BOTTOM) không dùng file này.
-
 .zoneTop {
   position: sticky;
   top: 0;
@@ -14,7 +11,6 @@
   border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
-// Vùng thân giữa header và footer: KHÔNG tự cuộn, chỉ cột giữa cuộn riêng.
 .scrollBody {
   flex: 1;
   min-height: 0;
@@ -32,20 +28,18 @@
   padding: 0 2.4rem;
 }
 
-// Cột câu hỏi ở giữa — vùng DUY NHẤT cuộn.
 .centerScroll {
   flex: 1 1 auto;
   min-width: 0;
   overflow-y: auto;
   padding: 4rem 0 4rem;
-  scroll-padding-top: 2rem; // khi nhảy tới 1 câu, chừa khoảng trên, không dính sát mép
+  scroll-padding-top: 2rem;
 
   @media (max-width: 768px) {
     padding-top: 2rem;
   }
 }
 
-// Cột bên (danh sách câu...) đứng yên, tự cuộn nếu quá dài.
 .zoneLeft,
 .zoneRight {
   flex: 0 0 auto;
@@ -53,14 +47,13 @@
   max-width: 34%;
   overflow-y: auto;
   overscroll-behavior: contain;
-  // Chừa chỗ cố định cho thanh cuộn để card không bị nhảy ngang khi ẩn/hiện.
+
   scrollbar-gutter: stable;
   padding: 4rem 0.4rem 2rem 0;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
 
-  // Thanh cuộn mảnh, chìm — chỉ đậm khi hover vào cột.
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 
@@ -95,7 +88,6 @@
   min-width: 0;
 }
 
-// Nhóm block trong footer (trái / giữa / phải).
 .footerGroup {
   display: flex;
   align-items: center;
@@ -113,7 +105,6 @@
   align-items: flex-end;
 }
 
-// Trong preview của editor: footer/float không "fixed" toàn màn mà nằm gọn trong khung preview.
 .previewFooter {
   position: static !important;
 }
@@ -173,12 +164,10 @@
 
   .centerScroll {
     overflow: visible;
-    // Mốc định vị cho nút "Danh sách" (mobile-nav-trigger) ở góc trên-phải.
+
     position: relative;
   }
 
-  // Cot phu (danh sach cau...) hien o dau nhung gon lai, tu cuon neu qua dai
-  // -> khong day vung cau hoi xuong qua xa ma van luon thay duoc.
   .zoneLeft,
   .zoneRight {
     scrollbar-gutter: auto;
@@ -186,8 +175,6 @@
     overflow-y: auto;
   }
 
-  // Cột chỉ chứa danh sách câu hỏi + bản inline của danh sách: ẩn hẳn trên mobile,
-  // thay bằng nút nổi + bottom-sheet (xem .mobile-nav*) cho gọn, không đẩy đề xuống.
   .hiddenOnMobile,
   .sideNavInline {
     display: none;

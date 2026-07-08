@@ -8,7 +8,6 @@ export const permissionsKeys = {
   permissions: () => ['admin-permissions'],
 };
 
-// Ref ổn định để tránh tạo mảng rỗng mới mỗi render (giữ deps của effect seed ổn định).
 const EMPTY_ARRAY = [];
 
 const asArray = (data) => (Array.isArray(data) ? data : []);
@@ -28,7 +27,6 @@ export function usePermissionsMatrix() {
     select: asArray,
   });
 
-  // Lưu nhiều role đã đổi trong một lần; giữ nguyên chữ ký updateRolePermissions.
   const saveMutation = useMutation({
     mutationFn: ({dirtyRoleIds, matrix}) =>
       Promise.all(

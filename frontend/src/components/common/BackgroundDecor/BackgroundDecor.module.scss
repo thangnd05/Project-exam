@@ -6,10 +6,6 @@
   overflow: hidden;
 }
 
-/* ============================================================
-   BLOBS — 3 quả gradient mờ, mỗi quả chuyển động theo path riêng,
-   vòng lặp dài (28-40s) để cảm giác "ambient" chứ không jittery.
-   ============================================================ */
 .blob {
   position: absolute;
   border-radius: 50%;
@@ -56,9 +52,6 @@
   animation: drift3 28s ease-in-out infinite;
 }
 
-/* ============================================================
-   GRID — chấm tĩnh nhẹ, mask radial để fade về tâm
-   ============================================================ */
 .grid {
   position: absolute;
   inset: 0;
@@ -80,9 +73,6 @@
   );
 }
 
-/* ============================================================
-   KEYFRAMES — di chuyển và scale nhẹ
-   ============================================================ */
 @keyframes drift1 {
   0%, 100% {
     transform: translate(0, 0) scale(1);
@@ -116,7 +106,6 @@
   }
 }
 
-/* Tôn trọng prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .blob {
     animation: none !important;

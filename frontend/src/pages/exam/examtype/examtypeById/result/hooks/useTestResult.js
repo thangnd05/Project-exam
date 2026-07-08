@@ -9,10 +9,9 @@ export const testResultKeys = {
 };
 
 const fetchTestResult = async (userTestId, isGuest, guestCfg) => {
-  // 1. Lấy thông tin tổng quan bài test (Chứa startedAt, finishedAt)
+
   const metaData = await getUserTestMeta(userTestId, isGuest, guestCfg);
 
-  // 2. Lấy kết quả điểm số, số câu đúng/sai
   const resultData = await getResultByUserTest(userTestId, isGuest, guestCfg);
 
   const result = {
@@ -21,13 +20,11 @@ const fetchTestResult = async (userTestId, isGuest, guestCfg) => {
     finishedAt: metaData.finishedAt,
   };
 
-  // 3. Check hạn review (endpoint public)
   const testData = await getUserTestInfo(metaData.testId);
   const now = new Date();
   const availableTo = testData.availableTo ? new Date(testData.availableTo) : null;
   const canReview = !availableTo || now > availableTo;
 
-  // 4. Fetch enhanced result (non-blocking)
   let enhanced = null;
   try {
     const enhancedRes = isGuest

@@ -1,8 +1,3 @@
-/**
- * Tạo đề thi từ kho câu hỏi — phiên bản nhúng trong modal/tab.
- * Logic hiển thị giống hệt CreateTestFromBankPage.js,
- * SCSS dùng chung CreateTestModal.module.scss.
- */
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import { getChaptersByClass } from '~/api/chapterApi';
@@ -41,8 +36,6 @@ import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Chế độ bám theo Bộ đề khi đã chọn (random theo bộ đề / tuần tự / thủ công).
-// Riêng "Random theo số lượng" luôn lấy toàn kho.
 const COLLECTION_SCOPED_MODES = [
   SELECTION_MODES.RANDOM_BY_COLLECTION,
   SELECTION_MODES.SEQUENTIAL,
@@ -59,7 +52,7 @@ const ALL_CHAPTERS = '__ALL__';
 
 const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, chapterId }) => {
   const isClassMode = mode === 'class' && !!classId;
-  // Chỉ người có quyền quản lý câu hỏi mới được dùng "Kho quản trị" làm nguồn.
+
   const canAccessAdminBank = useHasPermission('QUESTION:MANAGE');
 
   const [testInfo, setTestInfo] = useState({
@@ -98,7 +91,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     return list.filter((q) => q.collectionId != null && scope.has(String(q.collectionId)));
   };
 
-  // State machine + helper dùng chung; truyền scoping theo bộ đề của màn này.
   const {
     partConfigs,
     setPartConfigs,
@@ -112,7 +104,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     hasPartWithQuestions,
   } = useBankTestBuilder({ getScopedQuestions });
 
-  // Params tải câu theo nguồn kho (admin / lớp+chapter / cá nhân).
   const buildLoadParams = (source = bankSource, chapterFilter = selectedChapterId) => {
     if (source === BANK_SOURCES.ADMIN) return { bank: 'admin' };
     if (source === BANK_SOURCES.CLASS && classId) {
@@ -123,14 +114,12 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     return {};
   };
 
-  /* ---------- load danh sách exam category (Quick Challenge / Full Mock / Recovery...) ---------- */
   useEffect(() => {
     getExamCategories()
       .then((list) => setExamCategories(Array.isArray(list) ? list : []))
       .catch(() => setExamCategories([]));
   }, []);
 
-  /* ---------- load chapters của lớp khi ở class mode ---------- */
   useEffect(() => {
     if (!isClassMode) return;
     getChaptersByClass(classId)
@@ -171,7 +160,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     setTestInfo((prev) => ({ ...prev, examTypeId: value }));
   };
 
-  // Gộp: set 1 chế độ cho TẤT CẢ Part một lần (khỏi mở & bấm từng part).
   const applyModeToAllParts = (modeValue) => {
     setPartConfigs((prev) => {
       const next = { ...prev };
@@ -182,7 +170,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     });
   };
 
-  /* ---------- submit ---------- */
   const handleSubmit = async (e) => {
     if (e?.preventDefault) e.preventDefault();
 
@@ -242,8 +229,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         } else {
           const useClassSource = bankSource === BANK_SOURCES.CLASS && classId;
           const isSequential = cfg.mode === SELECTION_MODES.SEQUENTIAL;
-          // "Random theo bộ đề" và "Lấy tuần tự" giới hạn trong bộ đề (nếu đã chọn);
-          // "Random theo số lượng" luôn lấy toàn kho.
+
           const scopeByCollection = COLLECTION_SCOPED_MODES.includes(cfg.mode) && !!testInfo.collectionId;
           await addRandomQuestionsToPart({
             testPartId: String(newPartId),
@@ -273,7 +259,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const totalSelected = (examParts || []).reduce((sum, p) => sum + getPartEffectiveCount(p.examPartId), 0);
   const hasAnyPartWithQuestions = (examParts || []).some((p) => getPartEffectiveCount(p.examPartId) > 0);
 
-  /* ======================= RENDER ======================= */
   return (
     <>
       {notification.message && (
@@ -283,7 +268,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
       )}
 
       <Form onSubmit={handleSubmit}>
-        {/* ---- 1. Thông tin đề thi ---- */}
+
         <div className={cx('configCard')}>
           <div className={cx('sectionTitle')}>
             <IoSettingsOutline /> 1. Thông tin đề thi
@@ -326,7 +311,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   aria-label="Loại kỳ thi"
                 >
                   <option value="">-- Chọn --</option>
-                  {/* Chỉ cho chọn examType lá (ẩn node cha gom nhóm). */}
+
                   {(examTypes || []).filter((t) => !t.childCount).map((t) => (
                     <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>
                   ))}
@@ -410,7 +395,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
           </Row>
         </div>
 
-        {/* ---- 2. Chọn nguồn kho ---- */}
         <div className={cx('configCard')}>
           <div className={cx('sectionTitle')}>
             <IoServerOutline /> 2. Chọn nguồn kho câu hỏi
@@ -481,7 +465,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
           )}
         </div>
 
-        {/* ---- 3. Cấu hình từng Part ---- */}
         {testInfo.examTypeId && (examParts || []).length > 0 && (
           <div className={cx('configCard')}>
             <div className={cx('sectionTitle')}>
@@ -519,7 +502,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
               {' '}Với part có passage (vd. Part 3, 4, 6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng, không chọn lẻ từng câu.
             </p>
 
-            {/* Nút gộp: áp dụng nhanh 1 chế độ cho tất cả Part */}
             <div className={cx('bankModeTabs')}>
               <button
                 type="button"
@@ -545,9 +527,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
               const cfg = partConfigs[part.examPartId] ?? defaultPartConfig();
               const totalInBank = (cfg.bankQuestions || []).length;
               const scopedQuestions = getScopedQuestions(cfg);
-              // maxInBank = số câu khả dụng cho chế độ hiện tại (đã lọc bộ đề nếu áp dụng).
+
               const maxInBank = scopedQuestions.length;
-              // Chế độ hiện tại có đang bị giới hạn trong bộ đề không (để hiển thị nhãn).
+
               const collectionScoped = !!collectionScopeIds && COLLECTION_SCOPED_MODES.includes(cfg.mode);
               const scopeLabel = collectionScoped ? 'bộ đề' : 'kho';
               const allSelected = maxInBank > 0 && getPartEffectiveCount(part.examPartId) === maxInBank;
@@ -569,7 +551,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
                   {cfg.expanded && (
                     <div className={cx('bankPartBody')}>
-                      {/* mode tabs */}
+
                       <div className={cx('bankModeTabs')}>
                         <button
                           type="button"
@@ -606,7 +588,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                         </button>
                       </div>
 
-                      {/* random theo số lượng — nhập số câu */}
                       {cfg.mode === SELECTION_MODES.RANDOM && (
                         <div className={cx('bankRandomRow')}>
                           <label className={cx('bankRandomLabel')}>Số câu lấy ngẫu nhiên:</label>
@@ -623,7 +604,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                         </div>
                       )}
 
-                      {/* random theo bộ đề — lấy TOÀN BỘ câu trong bộ đề (không nhập số) */}
                       {cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION && (
                         <div className={cx('bankRandomRow')}>
                           <span className={cx('bankRandomHint')}>
@@ -634,7 +614,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                         </div>
                       )}
 
-                      {/* sequential input */}
                       {cfg.mode === SELECTION_MODES.SEQUENTIAL && (
                         <div className={cx('bankRandomRow')} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                           <label className={cx('bankRandomLabel')}>Từ câu:</label>
@@ -661,14 +640,12 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                         </div>
                       )}
 
-                      {/* loading */}
                       {cfg.loading && (
                         <div className={cx('bankLoadingWrap')}>
                           <Spinner animation="border" size="sm" /> <span>Đang tải câu hỏi...</span>
                         </div>
                       )}
 
-                      {/* empty */}
                       {!cfg.loading && maxInBank === 0 && (
                         <Alert variant="info" className="mb-0 mt-2">
                           {collectionScoped
@@ -683,7 +660,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                         </Alert>
                       )}
 
-                      {/* manual selection — giống hệt CreateTestFromBankPage */}
                       {!cfg.loading && cfg.mode === SELECTION_MODES.MANUAL && maxInBank > 0 && (() => {
                         const groups = groupQuestionsByPassage(scopedQuestions);
                         return (
@@ -767,7 +743,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
           </div>
         )}
 
-        {/* ---- Footer ---- */}
         <div className={cx('footer')}>
           {onCancel && (
             <button type="button" className={cx('btnCancel')} onClick={onCancel}>
@@ -784,7 +759,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         </div>
       </Form>
 
-      {/* Edit Question Modal */}
       <EditQuestionModal
         show={!!editingQuestionId}
         onHide={() => setEditingQuestionId(null)}

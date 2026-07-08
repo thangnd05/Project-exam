@@ -1,8 +1,3 @@
-// ============================================
-// Admin Layout Styles
-// ============================================
-
-// CSS Variables
 $sidebar-bg: #1e293b;
 $sidebar-dark: #0f172a;
 $sidebar-hover: #334155;
@@ -22,18 +17,12 @@ $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 $transition: all 0.3s ease;
 
-// ============================================
-// Main Wrapper
-// ============================================
 .adminWrapper {
     display: flex;
     min-height: 100vh;
     background: $content-bg;
 }
 
-// ============================================
-// Sidebar
-// ============================================
 .sidebar {
     width: 260px;
     background: linear-gradient(180deg, $sidebar-bg 0%, $sidebar-dark 100%);
@@ -45,8 +34,7 @@ $transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     transition: $transition;
-    // overflow: visible để nút thu gọn (đặt right:-12px, thò ra ngoài) không bị cắt;
-    // phần danh sách dài đã có .nav tự cuộn (overflow-y: auto).
+
     overflow: visible;
 
     &.collapsed {
@@ -74,9 +62,6 @@ $transition: all 0.3s ease;
     }
 }
 
-// ============================================
-// Logo
-// ============================================
 .logo {
     display: flex;
     align-items: center;
@@ -106,9 +91,6 @@ $transition: all 0.3s ease;
     white-space: nowrap;
 }
 
-// ============================================
-// Collapse Button
-// ============================================
 .collapseBtn {
     position: absolute;
     right: -14px;
@@ -134,9 +116,6 @@ $transition: all 0.3s ease;
     }
 }
 
-// ============================================
-// Navigation
-// ============================================
 .nav {
     flex: 1;
     padding: 16px 12px;
@@ -223,17 +202,11 @@ $transition: all 0.3s ease;
     border-radius: 0 4px 4px 0;
 }
 
-// ============================================
-// Bottom Section
-// ============================================
 .bottomSection {
     padding: 16px 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-// ============================================
-// Mobile Overlay
-// ============================================
 .mobileOverlay {
     display: none;
     position: fixed;
@@ -249,9 +222,6 @@ $transition: all 0.3s ease;
     }
 }
 
-// ============================================
-// Main Area
-// ============================================
 .mainArea {
     flex: 1;
     margin-left: 260px;
@@ -265,9 +235,6 @@ $transition: all 0.3s ease;
     }
 }
 
-// ============================================
-// Header
-// ============================================
 .header {
     height: 70px;
     background: $header-bg;
@@ -429,9 +396,6 @@ $transition: all 0.3s ease;
     color: $text-secondary;
 }
 
-// ============================================
-// Content
-// ============================================
 .content {
     flex: 1;
     padding: 24px;
@@ -441,9 +405,6 @@ $transition: all 0.3s ease;
     }
 }
 
-// ============================================
-// Responsive
-// ============================================
 @media (max-width: 1024px) {
     .sidebar {
         transform: translateX(-100%);
@@ -453,7 +414,6 @@ $transition: all 0.3s ease;
         }
     }
 
-    // Drawer trên mobile luôn full, không dùng nút thu gọn.
     .collapseBtn {
         display: none;
     }

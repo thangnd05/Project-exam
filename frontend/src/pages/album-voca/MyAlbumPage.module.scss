@@ -9,15 +9,13 @@
     }
 }
 
-/* --- GRID --- */
 .album-grid {
     display: grid;
-    /* Reflow tự động: số cột theo chỗ trống, không cần media query cột */
+
     grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
     gap: 3.5rem;
 }
 
-/* --- PREMIUM CARD --- */
 .album-card {
     position: relative;
     padding: 32px;
@@ -150,9 +148,6 @@
     }
 }
 
-
-
-/* --- EMPTY STATE --- */
 .empty-state {
     text-align: center;
     padding: 80px 40px;
@@ -205,7 +200,6 @@
     }
 }
 
-/* --- MODAL --- */
 :global(.modal-content) {
     border: none;
     border-radius: var(--radius-xl);

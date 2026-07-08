@@ -47,7 +47,6 @@ const formatTime = (seconds) => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 };
 
-// Tuỳ chọn canh vị trí theo vùng: TOP/BOTTOM canh ngang, LEFT/RIGHT canh dọc.
 function alignOptionsFor(zone) {
   if (zone === ZONES.LEFT || zone === ZONES.RIGHT) {
     return [
@@ -68,7 +67,6 @@ function alignDefaultFor(zone) {
   return 'left';
 }
 
-// Gán lại order theo thứ tự xuất hiện trong mảng, tính riêng từng zone.
 function normalizeOrders(blocks) {
   const counters = {};
   return blocks.map((b) => {
@@ -106,7 +104,6 @@ function ExamTypeLayoutEditor() {
     };
   }, [examTypeId]);
 
-  // ── Thao tác trên config (immutable) ──────────────────────────
   const updateBlocks = useCallback((fn) => {
     setConfig((c) => ({ ...c, blocks: normalizeOrders(fn(c.blocks)) }));
   }, []);
@@ -123,7 +120,7 @@ function ExamTypeLayoutEditor() {
           rest.splice(t < 0 ? rest.length : t, 0, relocated);
           return rest;
         }
-        // Không thả lên block cụ thể -> chèn sau block cuối cùng của zone đích.
+
         let insertAt = rest.length;
         for (let i = rest.length - 1; i >= 0; i -= 1) {
           if (rest[i].zone === targetZone) {
@@ -202,7 +199,6 @@ function ExamTypeLayoutEditor() {
     }
   }, [config, examTypeId]);
 
-  // ── Kéo-thả ──────────────────────────────────────────────────
   const handleDropOnZone = (zone) => {
     if (dragId) moveBlock(dragId, zone);
     setDragId(null);
@@ -260,7 +256,7 @@ function ExamTypeLayoutEditor() {
       </div>
 
       <div className={cx('workspace')}>
-        {/* ── Cột trái: vùng + block + palette ── */}
+
         <div className={cx('panel')}>
           <div className={cx('section')}>
             <h3>Bố cục theo vùng</h3>
@@ -353,7 +349,6 @@ function ExamTypeLayoutEditor() {
           </div>
         </div>
 
-        {/* ── Cột giữa: preview live ── */}
         <div className={cx('previewWrap')}>
           <div className={cx('previewBar')}>
             <span>Xem trước (dữ liệu mẫu)</span>
@@ -380,7 +375,6 @@ function ExamTypeLayoutEditor() {
           </div>
         </div>
 
-        {/* ── Cột phải: thuộc tính + theme ── */}
         <div className={cx('panel')}>
           <div className={cx('section')}>
             <h3>Chủ đề (theme)</h3>

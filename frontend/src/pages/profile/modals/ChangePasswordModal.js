@@ -2,7 +2,6 @@ import {useState} from 'react';
 import { changePassword } from '~/api/authApi';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
-import {IoLockClosedOutline} from 'react-icons/io5';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import commonModalStyles from '~/components/common/modal/CommonFormModal.module.scss';
@@ -89,7 +88,6 @@ function ChangePasswordModal({show, onHide}) {
       show={show}
       onHide={closeModal}
       title="Đổi mật khẩu"
-      icon={IoLockClosedOutline}
       footer={
         <ModalActionFooter
           cancelLabel="Hủy"

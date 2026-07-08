@@ -13,10 +13,8 @@ import styles from './CosmeticShop.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Thứ tự hiển thị các nhóm trong cửa hàng.
 const TYPE_ORDER = ['FRAME', 'BADGE'];
 
-// Gom các vật phẩm theo loại, giữ thứ tự nhóm cố định và giữ displayOrder bên trong mỗi nhóm.
 function groupByType(items) {
   const groups = new Map();
   items.forEach((item) => {
@@ -30,7 +28,6 @@ function groupByType(items) {
   );
 }
 
-// Xem trước cosmetic trên một avatar mẫu (đúng cách hiển thị thật).
 export function CosmeticPreview({ item, size = 60 }) {
   const isBadge = item.type === 'BADGE';
   return (

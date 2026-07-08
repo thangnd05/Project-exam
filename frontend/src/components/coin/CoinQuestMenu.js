@@ -7,7 +7,6 @@ import style from './CoinQuestMenu.module.scss';
 
 const cx = classNames.bind(style);
 
-// Badge xu — click để mở modal nhiệm vụ.
 function CoinQuestMenu() {
   const [open, setOpen] = useState(false);
 

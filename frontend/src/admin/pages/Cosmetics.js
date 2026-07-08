@@ -22,7 +22,6 @@ const TYPES = [
 
 const TYPE_ORDER = TYPES.map((t) => t.value);
 
-// Gom vật phẩm theo loại, giữ thứ tự nhóm cố định (Khung avatar trước, Huy hiệu sau).
 function groupByType(items) {
   const groups = new Map();
   items.forEach((item) => {
@@ -61,7 +60,6 @@ const defaultFormState = {
   displayOrder: 0,
 };
 
-// Xem trước trên avatar mẫu (đúng cách hiển thị thật).
 function CosmeticPreview({item, size = 56}) {
   const isBadge = item.type === 'BADGE';
   return (
@@ -103,7 +101,6 @@ function CosmeticsManagement() {
     return items.filter((item) => (item.name || '').toLowerCase().includes(normalized));
   }, [items, keyword]);
 
-  // Gom theo loại rồi trải phẳng để hiển thị theo thứ tự nhóm cố định.
   const orderedItems = useMemo(
     () => groupByType(filtered).flatMap((group) => group.items),
     [filtered],

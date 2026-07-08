@@ -6,7 +6,6 @@ import { Flame } from 'lucide-react';
 import { AdminCard, AdminFieldError, AdminPageHeader } from '../components/common';
 import { useStreakRecoverConfig } from './hooks/useStreakRecoverConfig';
 
-// Trang admin: cấu hình giá xu + bật/tắt tính năng khôi phục chuỗi ngày.
 function StreakRecoverManagement() {
   const [costCoins, setCostCoins] = useState(50);
   const [active, setActive] = useState(true);

@@ -57,14 +57,14 @@ const AlbumDetailPage = () => {
   const deleteMutation = useDeleteVocabulary(albumId);
 
   useEffect(() => {
-    // Auto-switch to Flashcard mode for mobile/tablet devices
+
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setFlashMode(true);
       }
     };
 
-    handleResize(); // Check on mount
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -118,7 +118,7 @@ const AlbumDetailPage = () => {
   return (
     <div className={cx('wrapper')}>
       <Container>
-        {/* === Standardized Page Header === */}
+
         <PageHeader
           title={flashMode ? ' Học bằng Flashcard' : ' Danh sách từ vựng'}
           label="QUẢN LÝ TỪ VỰNG"
@@ -160,7 +160,6 @@ const AlbumDetailPage = () => {
           </div>
         </div>
 
-        {/* === Content View === */}
         {flashMode ? (
           <div className={cx('flashcard-wrapper')}>
             <div
@@ -283,7 +282,6 @@ const AlbumDetailPage = () => {
         )}
       </Container>
 
-      {/* === Modern Modals === */}
       <CreateVocabularyModal
         show={showModal}
         onClose={() => setShowModal(false)}

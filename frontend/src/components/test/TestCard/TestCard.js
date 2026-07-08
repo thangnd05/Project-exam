@@ -70,9 +70,6 @@ function TestCard({ test, countdowns }) {
     const { status, statusLabel, buttonText, canStart } =
         getTestStatus(test, now, countdowns);
 
-    // Bảng xếp hạng chỉ có dữ liệu khi đề không hạn nộp HOẶC đã qua hạn
-    // (khớp đúng điều kiện ẩn bảng ở BE: isUnlimited || isEnded). Ẩn nút cho
-    // đề có deadline đang chạy để khỏi dẫn tới trang trống.
     const showLeaderboard =
         test.availableTo == null || now > new Date(test.availableTo);
 
@@ -81,8 +78,6 @@ function TestCard({ test, countdowns }) {
         setShowModeModal(true);
     };
 
-    // Điều hướng vào trang làm bài kèm mode/parts qua QUERY PARAM (không dùng
-    // navigate state) để mode/part sống sót qua reload — TestStartPage resume theo URL.
     const handleSelectMode = ({ mode, examPartIds }) => {
         setShowModeModal(false);
         const allowedTime = calculateAllowedTime(test);

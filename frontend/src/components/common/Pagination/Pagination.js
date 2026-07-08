@@ -7,8 +7,7 @@ import styles from './Pagination.module.scss';
 const cx = classNames.bind(styles);
 
 function Pagination({ currentPage = 0, totalPages = 0, onChange }) {
-  // Luôn hiện thanh phân trang để dễ quan sát, kể cả khi chỉ có 1 trang
-  // (hoặc chưa có dữ liệu) -> hiện 1 nút "1", prev/next tự disable.
+
   const total = Math.max(totalPages, 1);
 
   const pages = [];

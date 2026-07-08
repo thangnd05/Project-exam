@@ -11,7 +11,6 @@ export const examTypeKeys = {
   all: ['exam-types'],
 };
 
-// API trả về mảng phẳng các loại kỳ thi; chuẩn hoá phòng trường hợp bọc { content }.
 const normalizeList = (data) =>
   Array.isArray(data) ? data : data?.content ?? [];
 

@@ -23,9 +23,9 @@ const defaultFormState = {
 function CoinsManagement() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingWallet, setEditingWallet] = useState(null); // null = đang tạo mới
+  const [editingWallet, setEditingWallet] = useState(null);
   const [formState, setFormState] = useState(defaultFormState);
-  const [userOptions, setUserOptions] = useState([]); // user chưa có ví (để tạo mới)
+  const [userOptions, setUserOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [deletingWallet, setDeletingWallet] = useState(null);
@@ -62,7 +62,7 @@ function CoinsManagement() {
   const openCreateModal = async () => {
     resetForm();
     setShowModal(true);
-    // Lấy danh sách user để chọn; loại bỏ user đã có ví.
+
     try {
       const response = await getUsers({page: 0, size: 100});
       const existingUserIds = new Set(wallets.map((wallet) => wallet.userId));

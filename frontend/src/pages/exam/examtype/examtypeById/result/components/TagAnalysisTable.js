@@ -5,7 +5,6 @@ import styles from "./TagAnalysisTable.module.scss";
 
 const cx = classNames.bind(styles);
 
-// Gom unique câu (theo questionId) để đếm tổng — tránh đếm trùng khi 1 câu nhiều tag.
 const computeTotals = (tags) => {
   const seen = new Map();
   tags.forEach((t) =>
@@ -36,7 +35,6 @@ function TagAnalysisTable({ enhanced, userTestId }) {
       tags: p.weakTags || [],
     }));
 
-    // Tab "Tổng quát": gộp tag theo tagId trên toàn bài.
     const merged = {};
     parts.forEach((p) =>
       (p.weakTags || []).forEach((tag) => {
@@ -51,7 +49,7 @@ function TagAnalysisTable({ enhanced, userTestId }) {
       }),
     );
     const overallTags = Object.values(merged).map((m) => {
-      // dedupe câu trong từng tag (phòng câu lặp giữa các part)
+
       const map = new Map();
       m.questions.forEach((q) => map.set(q.questionId, q));
       const questions = [...map.values()].sort(

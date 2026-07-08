@@ -83,10 +83,9 @@ const ClassListContainer = ({
           )}
         </PageHeader>
 
-        {/* === GRID VIEW === */}
         {viewMode === 'grid' && (
           <>
-            {/* Teaching Classes */}
+
             <motion.div
               className={cx('section-header', 'teaching-header')}
               initial="hidden"
@@ -133,7 +132,6 @@ const ClassListContainer = ({
               )}
             </div>
 
-            {/* Learning Classes */}
             <motion.div
               className={cx('section-header', 'learning-header')}
               initial="hidden"
@@ -181,7 +179,6 @@ const ClassListContainer = ({
           </>
         )}
 
-        {/* === TABLE VIEW === */}
         {viewMode === 'table' && (
           <>
             {hasTeaching ? (

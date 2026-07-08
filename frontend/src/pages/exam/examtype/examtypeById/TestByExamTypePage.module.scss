@@ -12,9 +12,6 @@
   text-align: center;
 }
 
-
-
-/* --- Premium Header --- */
 .header {
   background: linear-gradient(135deg, #0d9488 0%, #0ea5e9 100%);
   padding: 50px 40px;
@@ -58,7 +55,6 @@
   }
 }
 
-/* --- Grid --- */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -84,7 +80,7 @@
     font-weight: 700;
   }
 }
-// ==================== Folder bộ đề ====================
+
 .folder-section {
   margin-bottom: 28px;
 }

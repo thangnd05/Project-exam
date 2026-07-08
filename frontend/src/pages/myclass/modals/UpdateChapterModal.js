@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react';
 import { updateChapter } from '~/api/chapterApi';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
-import {IoBookOutline} from 'react-icons/io5';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
 import commonModalStyles from '~/components/common/modal/CommonFormModal.module.scss';
@@ -62,7 +61,6 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}) {
       show={show}
       onHide={onClose}
       title="Chỉnh sửa chương"
-      icon={IoBookOutline}
       footer={
         <ModalActionFooter
           cancelLabel="Hủy"

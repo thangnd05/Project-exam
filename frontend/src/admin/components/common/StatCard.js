@@ -5,15 +5,10 @@ import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
-/** Lưới thẻ thống kê tự co giãn. */
 export function StatCardGroup({children}) {
   return <div className={cx('statGroup')}>{children}</div>;
 }
 
-/**
- * Thẻ thống kê: số liệu + nhãn + icon.
- * tone: blue | green | amber | violet | red
- */
 export function StatCard({label, value, icon: Icon, tone = 'blue'}) {
   return (
     <div className={cx('statCard', tone)}>

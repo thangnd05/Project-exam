@@ -18,8 +18,6 @@ import styles from "./TestReviewPage.module.scss";
 
 const cx = classNames.bind(styles);
 
-// Trạng thái 1 câu: correct | incorrect | unanswered (để tô màu navigator).
-// MSQ: tập đã chọn phải trùng khít tập đáp án đúng (all-or-nothing).
 const isMsqCorrect = (q, userAnswer) => {
   const correctIds = (q.answers || []).filter((a) => a.isCorrect).map((a) => a.answerId).sort();
   const chosen = [...(userAnswer?.selectedAnswerIds || [])].sort();
@@ -83,7 +81,6 @@ const TestReviewPage = () => {
       ? "Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc."
       : "";
 
-  // Flatten toàn bộ câu hỏi + trạng thái đúng/sai để dựng navigator.
   const flatQuestions = useMemo(() => {
     const list = [];
     (test?.parts || []).forEach((part) => {
@@ -104,7 +101,6 @@ const TestReviewPage = () => {
     [flatQuestions],
   );
 
-  // Map questionId -> số thứ tự toàn cục (khớp với navigator "Danh sách câu hỏi").
   const questionNumberMap = useMemo(() => {
     const map = new Map();
     flatQuestions.forEach((q, idx) => map.set(String(q.questionId), idx + 1));
@@ -118,7 +114,6 @@ const TestReviewPage = () => {
     window.scrollTo({ top: y, behavior: "smooth" });
   };
 
-  // Cuộn tới câu khi mở từ bảng phân tích (URL có #rq-<questionId>).
   useEffect(() => {
     if (loading || !test) return;
     const hash = window.location.hash;
@@ -135,7 +130,6 @@ const TestReviewPage = () => {
     return () => clearTimeout(timer);
   }, [loading, test]);
 
-  // Passage có content hoặc media → render layout 2 cột giống bài thi.
   const hasPassageContent = (passage, fallbackObj) => {
     const content =
       passage?.content ??
@@ -157,8 +151,6 @@ const TestReviewPage = () => {
     return Boolean(content || singleUrl);
   };
 
-  // Tách text passage theo dòng -> mỗi đoạn là 1 <p> để có khoảng cách giữa các đoạn
-  // (parser import nối các đoạn bằng "\n" đơn nên nếu không tách sẽ nhìn dính 1 khối).
   const renderPassageText = (text, key) => (
     <div key={key} className={cx("passage-content")}>
       {String(text)
@@ -213,8 +205,7 @@ const TestReviewPage = () => {
 
     return (
       <div className={cx("passage-box")}>
-        {/* Render theo ĐÚNG THỨ TỰ thêm: đoạn chính (content) trước, rồi từng item
-            trong passage_media (text / ảnh / audio) theo thứ tự id. */}
+
         {content && renderPassageText(content, "main")}
 
         {hasList &&
@@ -254,7 +245,6 @@ const TestReviewPage = () => {
             </div>
           )}
 
-        {/* Bản dịch (thu gọn) */}
         {translation && (
           <details className={cx("passage-translation")}>
             <summary>Bản dịch</summary>
@@ -358,7 +348,6 @@ const TestReviewPage = () => {
         ))}
       </Container>
 
-      {/* --- Footer: navigator nhảy câu (tô đúng/sai) --- */}
       {flatQuestions.length > 0 && (
         <div className={cx("footer-actions")}>
           {showNav && (
@@ -423,9 +412,6 @@ const TestReviewPage = () => {
   );
 };
 
-// =============================
-// QUESTION COMPONENT
-// =============================
 function QuestionResult({ question, number, userAnswer, canReview }) {
   const correctAnswer = question.answers?.find((a) => a.isCorrect);
 
@@ -454,7 +440,6 @@ function QuestionResult({ question, number, userAnswer, canReview }) {
         {question.questionText}
       </span>
 
-      {/* MCQ */}
       {question.questionType === "MCQ" && (
         <div className={cx("answers-options")}>
           {question.answers?.map((a) => {
@@ -478,7 +463,6 @@ function QuestionResult({ question, number, userAnswer, canReview }) {
         </div>
       )}
 
-      {/* MSQ — nhiều đáp án đúng */}
       {question.questionType === "MSQ" && (
         <div className={cx("answers-options")}>
           {question.answers?.map((a) => {
@@ -502,7 +486,6 @@ function QuestionResult({ question, number, userAnswer, canReview }) {
         </div>
       )}
 
-      {/* Fill blank */}
       {question.questionType === "FILL_BLANK" && (
         <div>
           <p className={cx("fill-row")}>

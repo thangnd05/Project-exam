@@ -1,8 +1,3 @@
-// ============================================
-// Dashboard Styles
-// ============================================
-
-// Variables
 $primary: #3b82f6;
 $success: #10b981;
 $warning: #f59e0b;
@@ -26,9 +21,6 @@ $radius-lg: 16px;
     padding: 0;
 }
 
-// ============================================
-// Page Header
-// ============================================
 .pageHeader {
     display: flex;
     justify-content: space-between;
@@ -67,9 +59,6 @@ $radius-lg: 16px;
     box-shadow: $shadow-sm;
 }
 
-// ============================================
-// Stats Cards
-// ============================================
 .statsRow {
     margin-bottom: 20px;
 }
@@ -137,9 +126,6 @@ $radius-lg: 16px;
     }
 }
 
-// ============================================
-// Secondary Stats
-// ============================================
 .secondaryStats {
     margin-bottom: 24px;
 }
@@ -168,9 +154,6 @@ $radius-lg: 16px;
     margin-top: 4px;
 }
 
-// ============================================
-// Charts
-// ============================================
 .chartsRow {
     margin-bottom: 24px;
 }
@@ -198,9 +181,6 @@ $radius-lg: 16px;
     }
 }
 
-// ============================================
-// Bottom Row
-// ============================================
 .bottomRow {
     margin-bottom: 24px;
 }
@@ -339,9 +319,6 @@ $radius-lg: 16px;
     }
 }
 
-// ============================================
-// Activity Card
-// ============================================
 .activityCard {
     background: $bg-white;
     border-radius: $radius-lg;
@@ -429,9 +406,6 @@ $radius-lg: 16px;
     margin-top: 4px;
 }
 
-// ============================================
-// Responsive
-// ============================================
 @media (max-width: 992px) {
     .pageHeader {
         flex-direction: column;

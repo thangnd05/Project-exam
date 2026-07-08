@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaStar, FaPen, FaInfoCircle } from 'react-icons/fa';
+import { FaStar, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import { createEvaluation } from '~/api/evaluationApi';
 import { toast } from 'react-toastify';
@@ -30,7 +30,7 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
             toast.success('Cảm ơn bạn đã gửi đánh giá!');
             setContent('');
             setUserRating(5);
-            onSuccess(); // Refresh list or handle success
+            onSuccess();
             onClose();
         } catch (error) {
             console.error('Failed to submit review:', error);
@@ -56,12 +56,11 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
             show={show}
             onClose={onClose}
             title="Viết đánh giá"
-            icon={FaPen}
             maxWidth={550}
             footer={footer}
         >
             <form onSubmit={handleReviewSubmit}>
-                {/* Rating Stars */}
+
                 <div className={cx('formGroup')}>
                     <label className={cx('label')}>Mức độ hài lòng</label>
                     <div className={cx('ratingSelect')}>
@@ -76,7 +75,6 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
                     </div>
                 </div>
 
-                {/* Input Content */}
                 <div className={cx('formGroup')}>
                     <label className={cx('label')}>Nội dung chia sẻ</label>
                     <div className={cx('inputWrapper')}>

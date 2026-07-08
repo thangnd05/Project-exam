@@ -8,8 +8,6 @@ import StreakRestoreModal from './StreakRestoreModal';
 
 const cx = classNames.bind(style);
 
-// Badge 🔥 hiển thị số ngày streak. Khi chuỗi đứt mà còn khôi phục được thì hiện
-// đúng số ngày đã mất (mờ đi) và cho bấm để khôi phục bằng xu.
 function StreakBadge({ className }) {
   const { currentStreak, lostStreak, canRecover } = useStreak();
   const [showRestore, setShowRestore] = useState(false);

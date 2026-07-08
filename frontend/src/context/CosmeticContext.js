@@ -22,7 +22,6 @@ export const CosmeticProvider = ({ children }) => {
   const frame = isAuthenticated ? data?.frame ?? null : null;
   const badge = isAuthenticated ? data?.badge ?? null : null;
 
-  // Gọi sau khi mua/đeo/tháo để cập nhật ngay khung + huy hiệu quanh avatar.
   const refreshCosmetics = useCallback(
     () => queryClient.invalidateQueries({ queryKey: EQUIPPED_COSMETICS_QUERY_KEY }),
     []

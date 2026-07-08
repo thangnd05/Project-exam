@@ -107,7 +107,7 @@ function Policy() {
         </div>
 
         <p className={cx("thankyou")}>
-          Cảm ơn bạn đã tin tưởng và sử dụng hệ thống!  
+          Cảm ơn bạn đã tin tưởng và sử dụng hệ thống!
           Hãy tuân thủ chính sách để cùng xây dựng môi trường học tập minh bạch, an toàn và hiệu quả.
         </p>
       </section>

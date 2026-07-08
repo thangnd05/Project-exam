@@ -37,7 +37,6 @@ import styles from './AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);
 
-// 🗂️ Sidebar được nhóm theo chức năng để dễ điều hướng.
 const adminRouteGroups = [
   {
     label: 'Tổng quan',
@@ -105,8 +104,6 @@ function AdminLayout({children}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
-  // Trên màn nhỏ (≤1024px) sidebar là drawer: ép bỏ trạng thái thu gọn để luôn hiện đầy đủ
-  // (tránh drawer mở ra chỉ còn icon), và ẩn nút thu gọn (xử lý ở CSS).
   useEffect(() => {
     const mql = window.matchMedia('(max-width: 1024px)');
     const sync = () => {
@@ -123,19 +120,18 @@ function AdminLayout({children}) {
 
   return (
     <div className={cx('adminWrapper')}>
-      {/* Sidebar */}
+
       <>
-        {/* Mobile Overlay */}
+
         <div
           className={cx('mobileOverlay', {show: mobileOpen})}
           onClick={() => setMobileOpen(false)}
         />
 
-        {/* Sidebar */}
         <aside
           className={cx('sidebar', {collapsed, 'mobile-open': mobileOpen})}
         >
-          {/* Logo */}
+
           <div className={cx('logo')}>
             <div className={cx('logoIcon')}>
               <span>E</span>
@@ -143,7 +139,6 @@ function AdminLayout({children}) {
             {!collapsed && <span className={cx('logoText')}>WinDe Manager</span>}
           </div>
 
-          {/* Collapse Toggle (Desktop) */}
           <button
             className={cx('collapseBtn')}
             onClick={() => setCollapsed(!collapsed)}
@@ -151,7 +146,6 @@ function AdminLayout({children}) {
             {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
 
-          {/* Navigation */}
           <nav className={cx('nav')}>
             {adminRouteGroups.map((group) => (
               <div key={group.label} className={cx('navSection')}>
@@ -181,7 +175,6 @@ function AdminLayout({children}) {
             ))}
           </nav>
 
-          {/* Bottom Section */}
           <div className={cx('bottomSection')}>
             <Link
               to={routes.home}
@@ -199,9 +192,8 @@ function AdminLayout({children}) {
         </aside>
       </>
 
-      {/* Main Content Area */}
       <div className={cx('mainArea', {collapsed})}>
-        {/* Top Header */}
+
         <header className={cx('header')}>
           <div className={cx('headerLeft')}>
             <button
@@ -236,7 +228,6 @@ function AdminLayout({children}) {
           </div>
         </header>
 
-        {/* Page Content */}
         <main className={cx('content')}>
           <AnimatePresence mode="wait">
             <motion.div

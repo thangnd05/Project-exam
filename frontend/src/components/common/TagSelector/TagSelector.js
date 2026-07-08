@@ -9,23 +9,10 @@ const cx = classNames.bind(styles);
 const isRoot = (tag, byId) => {
     const pid = tag.parentId;
     if (pid == null || pid === '') return true;
-    // parentId trỏ tới tag không tồn tại trong danh sách -> coi như root
+
     return !byId.has(pid);
 };
 
-/**
- * TagSelector - chọn tag theo nhóm: mặc định gom theo "root" (tag cha),
- * thu gọn sẵn; mở root nào thì hiện và pick các tag con phù hợp của root đó.
- *
- * Nếu danh sách tag không có phân cấp (không tag nào có cha) -> hiển thị
- * phẳng như cũ để không vỡ các loại đề chưa khai báo cây.
- *
- * Props:
- *  - tags: danh sách tag phẳng [{ tagId, name, parentId }]
- *  - selectedIds: string[] id tag đang chọn
- *  - onToggle: (tagId) => void  bật/tắt một tag
- *  - label: nhãn hiển thị phía trên (mặc định "Tag phân loại")
- */
 const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân loại' }) => {
     const { byId, childrenOf, roots, hasHierarchy } = useMemo(() => {
         const map = new Map(tags.map((t) => [t.tagId, t]));
@@ -45,8 +32,6 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
         };
     }, [tags]);
 
-    // Lưu trạng thái mở/đóng do người dùng bấm tay; mặc định nhóm có tag đang
-    // chọn thì mở sẵn, nhóm rỗng thì đóng.
     const [openOverride, setOpenOverride] = useState({});
 
     const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
@@ -68,7 +53,6 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
         );
     };
 
-    // Đếm số tag con (đệ quy) đang được chọn trong một nhóm.
     const countSelectedDescendants = (tagId) => {
         let count = 0;
         childrenOf(tagId).forEach((c) => {
@@ -84,7 +68,7 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
             return <Chip key={tag.tagId} tag={tag} />;
         }
         const selCount = countSelectedDescendants(tag.tagId);
-        // Mặc định mở sẵn tất cả nhóm; chỉ đóng khi người dùng tự bấm thu gọn.
+
         const open =
             openOverride[tag.tagId] !== undefined ? openOverride[tag.tagId] : true;
         return (

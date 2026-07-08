@@ -1,16 +1,9 @@
-// ============================================
-// FAKE DATA SERVICE - Dựa trên Database Schema
-// Database: english_exam
-// ============================================
-
-// ---- Roles ----
 export const roles = [
   {role_id: 1, role_name: 'ADMIN', description: 'Quản trị viên'},
   {role_id: 2, role_name: 'TEACHER', description: 'Giáo viên'},
   {role_id: 3, role_name: 'USER', description: 'Học sinh/Người dùng'},
 ];
 
-// ---- Users ----
 export const fakeUsers = [
   {
     user_id: 1,
@@ -114,7 +107,6 @@ export const fakeUsers = [
   },
 ];
 
-// ---- Exam Types ----
 export const fakeExamTypes = [
   {
     exam_type_id: 1,
@@ -146,7 +138,6 @@ export const fakeExamTypes = [
   },
 ];
 
-// ---- Exam Parts ----
 export const fakeExamParts = [
   {
     exam_part_id: 1,
@@ -204,7 +195,6 @@ export const fakeExamParts = [
   },
 ];
 
-// ---- Skills ----
 export const fakeSkills = [
   {skill_id: 1, name: 'Vocabulary', description: 'Từ vựng'},
   {skill_id: 2, name: 'Grammar', description: 'Ngữ pháp'},
@@ -214,7 +204,6 @@ export const fakeSkills = [
   {skill_id: 6, name: 'Writing', description: 'Viết'},
 ];
 
-// ---- Chapters ----
 export const fakeChapters = [
   {
     chapter_id: 1,
@@ -253,7 +242,6 @@ export const fakeChapters = [
   },
 ];
 
-// ---- Tests ----
 export const fakeTests = [
   {
     test_id: 1,
@@ -317,7 +305,6 @@ export const fakeTests = [
   },
 ];
 
-// ---- Questions ----
 export const fakeQuestions = [
   {
     question_id: 1,
@@ -381,7 +368,6 @@ export const fakeQuestions = [
   },
 ];
 
-// ---- Answers ----
 export const fakeAnswers = [
   {
     answer_id: 1,
@@ -441,7 +427,6 @@ export const fakeAnswers = [
   },
 ];
 
-// ---- Vocabulary Albums ----
 export const fakeVocabularyAlbums = [
   {
     album_id: 1,
@@ -466,7 +451,6 @@ export const fakeVocabularyAlbums = [
   },
 ];
 
-// ---- Vocabulary ----
 export const fakeVocabulary = [
   {
     vocab_id: 1,
@@ -515,7 +499,6 @@ export const fakeVocabulary = [
   },
 ];
 
-// ---- User Tests (Exam Results) ----
 export const fakeUserTests = [
   {
     user_test_id: 1,
@@ -582,7 +565,6 @@ export const fakeUserTests = [
   },
 ];
 
-// ---- Evaluations ----
 export const fakeEvaluations = [
   {
     id: 1,
@@ -607,7 +589,6 @@ export const fakeEvaluations = [
   },
 ];
 
-// ---- Audit Logs ----
 export const fakeAuditLogs = [
   {
     audit_log_id: 1,
@@ -695,7 +676,6 @@ export const fakeAuditLogs = [
   },
 ];
 
-// ---- Login Audit (login_audit) ----
 export const fakeLoginAudit = [
   {
     id: 1,
@@ -739,7 +719,6 @@ export const fakeLoginAudit = [
   },
 ];
 
-// ---- Dashboard Statistics (Aggregated) ----
 export const dashboardStats = {
   totalUsers: fakeUsers.length,
   totalTeachers: fakeUsers.filter((u) => u.role_id === 2).length,
@@ -759,7 +738,6 @@ export const dashboardStats = {
   verifiedUsers: fakeUsers.filter((u) => u.verified === 1).length,
 };
 
-// ---- Weekly User Registration Data ----
 export const weeklyUserRegistrations = [
   {day: 'Mon', users: 12, exams: 45},
   {day: 'Tue', users: 19, exams: 52},
@@ -770,7 +748,6 @@ export const weeklyUserRegistrations = [
   {day: 'Sun', users: 18, exams: 40},
 ];
 
-// ---- Monthly Test Performance ----
 export const monthlyTestPerformance = [
   {month: 'Jan', tests: 120, avgScore: 68},
   {month: 'Feb', tests: 145, avgScore: 71},
@@ -780,7 +757,6 @@ export const monthlyTestPerformance = [
   {month: 'Jun', tests: 220, avgScore: 78},
 ];
 
-// ---- Recent Activities ----
 export const recentActivities = [
   {
     id: 1,
@@ -832,7 +808,6 @@ export const recentActivities = [
   },
 ];
 
-// ---- Exam Type Distribution ----
 export const examTypeDistribution = [
   {name: 'IELTS', value: 45},
   {name: 'TOEFL', value: 25},
@@ -840,7 +815,6 @@ export const examTypeDistribution = [
   {name: 'Cambridge', value: 15},
 ];
 
-// ---- Skill Distribution ----
 export const skillDistribution = [
   {name: 'Listening', max: 100, value: 82},
   {name: 'Reading', max: 100, value: 78},
@@ -849,10 +823,6 @@ export const skillDistribution = [
   {name: 'Vocabulary', max: 100, value: 88},
   {name: 'Grammar', max: 100, value: 75},
 ];
-
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
 
 export const getUserById = (userId) =>
   fakeUsers.find((u) => u.user_id === userId);
@@ -875,6 +845,6 @@ export const getRoleName = (roleId) => {
 };
 
 export const getQuestionCountByTest = (testId) => {
-  // In real app, this would query through test_parts and test_questions
+
   return Math.floor(Math.random() * 50) + 10;
 };

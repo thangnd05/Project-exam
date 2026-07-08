@@ -7,10 +7,6 @@ import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Thanh công cụ: ô tìm kiếm có icon (trái) + slot children (phải, vd filter/nút).
- * Bỏ qua ô search bằng cách không truyền onSearchChange.
- */
 function AdminToolbar({
   searchValue = '',
   onSearchChange,

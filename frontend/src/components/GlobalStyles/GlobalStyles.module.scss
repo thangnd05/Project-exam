@@ -44,21 +44,21 @@
   --glass-border: rgba(255, 255, 255, 0.5);
   --surface-shadow: 0 8px 32px 0 rgba(0, 97, 242, 0.1);
 
-  --font-size-xs: 0.75rem;   /* 7.5px */
-  --font-size-xs2: 1.1rem;   /* 11px */
-  --font-size-sm: 1.2rem;    /* 12px */
-  --font-size-smd: 1.3rem;   /* 13px */
-  --font-size-ssm: 1.4rem;   /* 14px */
-  --font-size-md: 1.5rem;    /* 15px */
-  --font-size-base: 1.6rem;  /* 16px */
-  --font-size-lg: 1.8rem;    /* 18px */
-  --font-size-xl: 2rem;      /* 20px */
-  --font-size-xxl: 2.2rem;   /* 22px */
-  --font-size-2xl: 2.4rem;   /* 24px */
-  --font-size-2xxl: 2.8rem;  /* 28px */
-  --font-size-3xl: 3rem;     /* 30px */
-  --font-size-4xl: 3.6rem;   /* 36px */
-  --font-size-5xl: 4.8rem;   /* 48px */
+  --font-size-xs: 0.75rem;
+  --font-size-xs2: 1.1rem;
+  --font-size-sm: 1.2rem;
+  --font-size-smd: 1.3rem;
+  --font-size-ssm: 1.4rem;
+  --font-size-md: 1.5rem;
+  --font-size-base: 1.6rem;
+  --font-size-lg: 1.8rem;
+  --font-size-xl: 2rem;
+  --font-size-xxl: 2.2rem;
+  --font-size-2xl: 2.4rem;
+  --font-size-2xxl: 2.8rem;
+  --font-size-3xl: 3rem;
+  --font-size-4xl: 3.6rem;
+  --font-size-5xl: 4.8rem;
 
   --font-weight-light: 300;
   --font-weight-normal: 400;
@@ -74,7 +74,6 @@
   --radius-lg: 1rem;
   --radius-xl: 20px;
 }
-
 
 .shadow-md {
   box-shadow: var(--shadow-md) !important;
@@ -96,7 +95,6 @@
   font-size: var(--font-size);
 }
 
-/* Utility Font Sizes */
 .fs-xs {
   font-size: var(--font-size-xs) !important;
 }
@@ -180,14 +178,8 @@
 }
 
 html {
-  /* CƠ CHẾ RESPONSIVE CHUNG DUY NHẤT của cả app:
-     root font-size co mượt (fluid) theo bề rộng màn hình → mọi chữ & spacing dạng rem
-     tự scale đồng bộ, KHÔNG trang nào cần tự viết responsive cho cỡ chữ.
-       • desktop (≥~1280px): 1rem = 10px  (62.5%)
-       • tablet  (~768px):   1rem ≈ 9px
-       • mobile  (≤~415px):  1rem = 8.8px (sàn, 55%)
-     Dùng % ở min/max để tôn trọng cỡ chữ mặc định của trình duyệt (accessibility). */
-  font-size: 62.5%; /* fallback cho trình duyệt không hỗ trợ clamp */
+
+  font-size: 62.5%;
   font-size: clamp(55%, 7.5px + 0.2vw, 62.5%);
 }
 
@@ -201,7 +193,6 @@ body {
   scrollbar-gutter: stable;
 }
 
-/* An toàn responsive chung: media không bao giờ vượt khung cha (chống tràn ngang toàn app) */
 img,
 svg,
 video,
@@ -213,7 +204,6 @@ img {
   height: auto;
 }
 
-/* Scrollbar */
 html *::-webkit-scrollbar {
   border-radius: 0;
   width: 8px;

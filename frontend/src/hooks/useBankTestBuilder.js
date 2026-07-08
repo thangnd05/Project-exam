@@ -1,16 +1,3 @@
-/**
- * State machine + helper dùng chung cho luồng "Tạo đề thi từ kho câu hỏi".
- *
- * Why: logic quản lý cấu hình từng Part (chọn mode, group theo passage, đếm số câu hiệu dụng,
- * chọn thủ công, tải câu theo part) trước đây bị copy gần như y hệt ở 2 nơi:
- *   - components/test/creator/CreateFromBankBody.js (bản đầy đủ: có bộ đề/lớp/kho admin)
- *   - pages/create-test-from-bank/CreateTestFromBankPage.js (bản rút gọn: chỉ kho cá nhân)
- * Gom về một hook để sửa-một-lần. Hai màn hình vẫn giữ "vỏ" JSX + SCSS riêng.
- *
- * Điểm khác biệt duy nhất giữa 2 màn là "phạm vi câu theo bộ đề": truyền vào qua `getScopedQuestions`.
- * Page không có bộ đề -> để mặc định (identity) trả nguyên cfg.bankQuestions, nên toàn bộ helper
- * quy về đúng hành vi bản rút gọn; Body truyền hàm lọc theo collection.
- */
 import { useState } from 'react';
 import { getQuestionsByPart } from '~/api/questionApi';
 
@@ -32,7 +19,6 @@ export const defaultPartConfig = () => ({
   expanded: true,
 });
 
-/** Nhóm câu theo passage_id (cùng passage = 1 nhóm; không passage = mỗi câu 1 nhóm). */
 export const groupQuestionsByPassage = (questions) => {
   if (!questions?.length) return [];
   const map = new Map();
@@ -51,7 +37,6 @@ export const groupQuestionsByPassage = (questions) => {
 export function useBankTestBuilder({ getScopedQuestions } = {}) {
   const [partConfigs, setPartConfigs] = useState({});
 
-  // Phạm vi câu áp dụng cho một cfg. Mặc định: nguyên kho của part (không lọc bộ đề).
   const scopeOf = (cfg) =>
     getScopedQuestions ? getScopedQuestions(cfg) : cfg?.bankQuestions || [];
 
@@ -69,7 +54,6 @@ export function useBankTestBuilder({ getScopedQuestions } = {}) {
     }));
   };
 
-  /** Tải câu hỏi của một part vào cfg. `params` để truyền bank/classId/chapterId khi cần. */
   const loadQuestionsForPart = (examPartId, params = {}) => {
     setPartConfigs((prev) => ({
       ...prev,
@@ -92,7 +76,6 @@ export function useBankTestBuilder({ getScopedQuestions } = {}) {
       });
   };
 
-  /** Bật/tắt cả nhóm (cùng passage): chọn hoặc bỏ chọn toàn bộ câu trong nhóm. */
   const toggleGroup = (examPartId, groupKey) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return;
@@ -123,7 +106,6 @@ export function useBankTestBuilder({ getScopedQuestions } = {}) {
     updatePartConfig(examPartId, 'selectedIds', checked ? ids : []);
   };
 
-  /** Số câu thực sự sẽ đưa vào đề cho part, theo mode hiện tại. */
   const getPartEffectiveCount = (examPartId) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return 0;
@@ -143,7 +125,7 @@ export function useBankTestBuilder({ getScopedQuestions } = {}) {
       const actualTo = Math.min(to, maxInBank);
       return actualTo - from + 1;
     }
-    // MANUAL: chỉ tính câu đã chọn còn nằm trong phạm vi (đề phòng đổi bộ đề sau khi chọn).
+
     const scopedIds = new Set(scoped.map((q) => q.questionId ?? q.id));
     return (cfg.selectedIds || []).filter((id) => scopedIds.has(id)).length;
   };

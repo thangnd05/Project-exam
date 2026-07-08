@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert } from "react-bootstrap";
 import { joinClass } from '~/api/classMemberApi';
 import classNames from "classnames/bind";
-import { FaUsers, FaKey, FaInfoCircle } from "react-icons/fa";
+import { FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "~/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import routes from "~/config/Routes";
@@ -16,18 +16,15 @@ function JoinClassModal({ show, onClose }) {
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
 
-    //  Message state
     const [message, setMessage] = useState("");
     const [type, setType] = useState("info");
 
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    //  Join class logic
     const handleJoin = async () => {
         setMessage("");
 
-        // 🟢 Check login
         if (!user) {
             setType("warning");
             setMessage(" Bạn cần đăng nhập trước khi tham gia lớp!");
@@ -40,7 +37,6 @@ function JoinClassModal({ show, onClose }) {
             return;
         }
 
-        // 🟡 Validate input
         if (!code.trim()) {
             setType("danger");
             setMessage("Vui lòng nhập mã classQr!");
@@ -50,7 +46,7 @@ function JoinClassModal({ show, onClose }) {
         setLoading(true);
 
         try {
-            //  Call API join class (đúng như JoinClassPage)
+
             await joinClass({
                 classQr: code.trim().toUpperCase(),
             });
@@ -58,7 +54,6 @@ function JoinClassModal({ show, onClose }) {
             setType("success");
             setMessage(" Gửi yêu cầu tham gia lớp thành công!");
 
-            // Reset + close modal
             setTimeout(() => {
                 setCode("");
                 onClose();
@@ -80,7 +75,6 @@ function JoinClassModal({ show, onClose }) {
             show={show}
             onHide={onClose}
             title="Tham gia lớp học"
-            icon={FaUsers}
             footer={(
                 <ModalActionFooter
                     cancelLabel="Để sau"
@@ -92,7 +86,7 @@ function JoinClassModal({ show, onClose }) {
                 />
             )}
         >
-            {/*  Alert Message */}
+
             {message && (
                 <Alert
                     variant={type}

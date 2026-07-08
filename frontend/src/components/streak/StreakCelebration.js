@@ -8,7 +8,6 @@ import { useStreak } from '~/hooks/useStreak';
 
 const cx = classNames.bind(style);
 
-// Popup chúc mừng khi streak vừa tăng. Mount 1 lần ở layout gốc.
 function StreakCelebration() {
   const { currentStreak, justIncreased, clearJustIncreased } = useStreak();
 

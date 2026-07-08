@@ -88,7 +88,6 @@
   color: var(--primary, #2563eb);
 }
 
-/* ===== Group layout: passage trái – câu hỏi phải (giống bài thi) ===== */
 .group-section {
   display: flex;
   flex-direction: column;
@@ -128,7 +127,6 @@
   gap: 16px;
 }
 
-/* ===== Passage box: audio / ảnh / script / bản dịch ===== */
 .passage-box {
   background: #f8fafc;
   padding: 22px;
@@ -218,7 +216,6 @@
   }
 }
 
-/* ===== Câu hỏi + đáp án (tô đúng/sai) + giải thích ===== */
 .question-item {
   padding: 20px;
   border-radius: 15px;
@@ -344,7 +341,6 @@
   text-align: center;
 }
 
-/* ===== Footer navigator: nhảy câu, tô đúng/sai ===== */
 .footer-actions {
   position: fixed;
   left: 0;

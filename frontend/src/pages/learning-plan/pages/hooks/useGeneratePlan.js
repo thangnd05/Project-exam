@@ -32,7 +32,7 @@ export function useCompletedUserTests() {
 export function useUserTarget(examTypeId) {
   return useQuery({
     queryKey: generatePlanKeys.target(examTypeId),
-    // Giữ hành vi cũ: lỗi khi tải target được coi như "chưa có target".
+
     queryFn: () => getUserTarget(examTypeId).catch(() => ({ hasTarget: false })),
     enabled: !!examTypeId,
   });

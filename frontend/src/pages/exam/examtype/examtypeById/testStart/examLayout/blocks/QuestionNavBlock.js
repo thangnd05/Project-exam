@@ -5,8 +5,6 @@ import styles from '../../TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Nút bật/tắt panel "Danh sách câu hỏi". Panel (TestStartDashboard) do renderer đặt trong
-// vùng FLOAT phía trên footer — tách vậy để giữ đúng vị trí panel như hiện tại.
 function QuestionNavBlock({ open, onToggle, toggleLabel = 'Câu hỏi', hideLabel = 'Ẩn' }) {
   return (
     <button

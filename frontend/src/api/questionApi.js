@@ -23,12 +23,9 @@ export const deleteQuestion = (questionId) => {
   return axios.delete(`${BASE_URL}/${questionId}`).then(() => {});
 };
 
-// data có thể là JSON payload hoặc FormData (multipart) — caller truyền config tương ứng.
 export const updateQuestion = (questionId, data, config = {}) => {
   return axios.put(`${BASE_URL}/${questionId}`, data, config).then((res) => res.data);
 };
-
-// ===== Nạp/đọc từ file Word (multipart) =====
 
 export const previewDocument = (formData) => {
   return axios.post(`${BASE_URL}/preview/document`, formData, MULTIPART).then((res) => res.data);

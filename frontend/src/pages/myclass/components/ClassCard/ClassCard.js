@@ -20,7 +20,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
       onClick={() => onViewTests?.(classData.classId)}
     >
       <div className={cx('class-name')}>{classData.className}</div>
-      
+
       <div className={cx('info-item')}>
         <IoPersonOutline />
         {role === 'teacher' ? (

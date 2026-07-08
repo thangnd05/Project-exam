@@ -29,14 +29,13 @@ function MyTestPage() {
   const [testToDelete, setTestToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
 
-  // React Query: list có cache, tự refetch khi invalidate (không cần F5).
   const { data, isPending, isError } = useMyTests({ page: currentPage, size: PAGE_SIZE });
   const deleteTestMutation = useDeleteTest();
   const invalidateMyTests = useInvalidateMyTests();
 
   const tests = Array.isArray(data?.content) ? data.content : [];
   const totalPages = data?.totalPages ?? 0;
-  // Chỉ hiện spinner toàn màn ở lần tải đầu (chưa có data nào trong cache).
+
   const loading = isPending;
 
   const handleDeleteTest = (testId) => {
@@ -53,8 +52,7 @@ function MyTestPage() {
     try {
       await deleteTestMutation.mutateAsync(testToDelete.testId);
       toast.success('Xóa bài kiểm tra thành công!');
-      // Sau khi xóa, nếu trang hiện tại còn 1 item (sẽ trống sau xóa) thì lùi về trang trước.
-      // invalidate trong mutation đã tự refetch trang hiện tại; chỉ cần lùi trang nếu cần.
+
       if (tests.length === 1 && currentPage > 0) {
         setCurrentPage((prev) => prev - 1);
       }
@@ -79,7 +77,6 @@ function MyTestPage() {
     }
   }, [isError]);
 
-  // Countdown realtime
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();

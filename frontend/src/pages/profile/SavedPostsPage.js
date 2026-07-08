@@ -55,7 +55,6 @@ function SavedPostsPage({ embedded = false }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [unsavingPost, setUnsavingPost] = useState(null);
 
-  // Debounce ô tìm kiếm + reset về trang đầu (gộp 1 lần set để chỉ fetch 1 lần).
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);

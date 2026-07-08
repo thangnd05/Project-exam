@@ -24,7 +24,6 @@ const ConfirmModal = ({
             <div className={cx('content')} onClick={(e) => e.stopPropagation()}>
                 <div className={cx('header')}>
                     <div className={cx('titleWrapper')}>
-                        <Icon className={cx('headerIcon')} />
                         <h3 className={cx('title')}>{title}</h3>
                     </div>
                     <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label="Đóng">

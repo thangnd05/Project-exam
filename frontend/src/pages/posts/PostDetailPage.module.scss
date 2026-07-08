@@ -13,7 +13,6 @@
   font-family: 'Inter', sans-serif;
 }
 
-
 .containerDetail {
   max-width: 960px;
   margin: 0 auto;
@@ -25,7 +24,6 @@
   }
 }
 
-/* --- Breadcrumbs --- */
 .breadcrumbs {
   display: flex;
   align-items: center;
@@ -50,7 +48,6 @@
   }
 }
 
-/* --- Article Header --- */
 .articleHeader {
   max-width: var(--blog-reading-width);
   margin: 0 auto 32px;
@@ -137,7 +134,6 @@
   }
 }
 
-/* --- Floating Action Bar --- */
 .floatingBar {
   position: absolute;
   top: 150px;
@@ -228,7 +224,6 @@
   }
 }
 
-/* --- Article Body --- */
 .articleBody {
   max-width: var(--blog-reading-width);
   margin: 0 auto;
@@ -314,9 +309,6 @@
   }
 }
 
-
-
-/* --- Comment Section --- */
 .commentsSection {
   max-width: var(--blog-reading-width);
   margin: 80px auto;
@@ -474,7 +466,7 @@
 .subComments {
   margin-top: 16px;
   border-left: 2px solid var(--border-color);
-  // Indentation is handled via inline style marginLeft for recursion
+
 }
 
 .toggleRepliesBtn {
@@ -515,7 +507,6 @@
   }
 }
 
-/* --- Related Posts Slider --- */
 .relatedPosts {
   margin-top: 100px;
   padding-top: 60px;
@@ -532,11 +523,11 @@
 .sliderContainer {
   padding: 0 15px;
   position: relative;
-  
+
   :global(.slick-dots) {
     bottom: -40px;
   }
-  
+
   :global(.slick-prev), :global(.slick-next) {
     width: 44px;
     height: 44px;
@@ -548,13 +539,13 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
-    
+
     &:before {
       color: var(--primary);
       font-size: var(--font-size-xl);
       opacity: 1;
     }
-    
+
     &:hover {
       background: var(--primary) !important;
       &:before {

@@ -19,19 +19,6 @@ function buildPageItems(current, total) {
   return items;
 }
 
-/**
- * Bảng dữ liệu cấu hình bằng `columns`, tự xử lý loading/empty, bo góc.
- *
- * columns: [{ key, header, render?(row, index), align?: 'center'|'right', width? }]
- * showIndex: true -> tự thêm cột STT (số thứ tự bắt đầu từ 1) ở đầu, thay cho cột ID.
- * rowActions?: (row, index) => ReactNode  -> render cột "Thao tác" cuối, bọc sẵn .actions.
- *
- * Phân trang — dùng CHUNG 1 chân trang cho cả 2 chế độ:
- *  - Client-side: `paginated` + `pageSize` (mặc định 10). Bảng tự slice data.
- *  - Server-side (controlled): truyền `onPageChange` + `page` (0-based) + `totalPages`
- *    + `totalElements`. Bảng KHÔNG slice (data đã là 1 trang từ API).
- *  - `itemLabel` (vd 'vai trò') cho dòng "tổng số N ...".
- */
 function AdminTable({
   columns = [],
   data = [],
@@ -46,7 +33,7 @@ function AdminTable({
   paginated = false,
   pageSize = 10,
   itemLabel = 'mục',
-  // Server-side (controlled) pagination:
+
   page,
   totalPages: totalPagesProp,
   totalElements,
@@ -64,7 +51,6 @@ function AdminTable({
   const safeInternal = Math.min(internalPage, totalPages - 1);
   const currentPage = isServer ? page || 0 : safeInternal;
 
-  // Client mode: giữ trang hợp lệ khi data đổi (lọc/xoá làm giảm số trang).
   useEffect(() => {
     if (!isServer && internalPage !== safeInternal) {
       setInternalPage(safeInternal);

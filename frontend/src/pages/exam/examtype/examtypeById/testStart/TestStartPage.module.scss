@@ -3,7 +3,7 @@
 .wrapper {
   min-height: 100vh;
   padding-bottom: 100px;
-  /* Bỏ hở phía trên: kéo sát lên dưới header app */
+
   margin-top: -30px;
 }
 
@@ -12,7 +12,7 @@
   padding-left: 24px;
   padding-right: 24px;
   max-width: 1580px;
-  /* Vừa phải, không ăn hết màn hình */
+
   margin-left: auto;
   margin-right: auto;
 
@@ -23,7 +23,6 @@
 
     .part-section {
       margin-bottom: 28px;
-      /* Điện thoại: thu nhỏ khoảng cách giữa các phần */
 
       h3 {
         padding: 16px 0 0 0;
@@ -45,7 +44,6 @@
   }
 }
 
-/* Pills thời gian & hoàn thành (footer) */
 .exam-stat {
   display: flex;
   align-items: center;
@@ -124,7 +122,6 @@
   }
 }
 
-/* Dashboard dùng trong footer panel (không còn sidebar) */
 .dashboard {
   width: 100%;
 }
@@ -133,7 +130,7 @@
   background: white;
   border-radius: var(--radius-lg);
   padding: 18px 16px;
-  border: 2px solid #e2e8f0; // Enhanced "khung bọc"
+  border: 2px solid #e2e8f0;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
   background-clip: padding-box;
 }
@@ -147,7 +144,7 @@
   color: var(--dark-color);
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 2px solid #f1f5f9; // Enhanced border
+  border-bottom: 2px solid #f1f5f9;
 
   svg {
     color: var(--primary);
@@ -201,7 +198,7 @@
   .status-item {
     display: flex;
     align-items: center;
-    gap: 12px; // Use gap for consistent spacing between dot and text
+    gap: 12px;
     font-size: 1.4rem;
     font-weight: 600;
     color: #64748b;
@@ -227,7 +224,6 @@
   }
 }
 
-/* Tiêu đề trang làm bài ("Bài thi" / "Luyện tập theo Part") — căn giữa. */
 .exam-title {
   text-align: center;
   color: var(--primary);
@@ -239,8 +235,6 @@
   }
 }
 
-/* --- Questions Area (Framed) --- */
-/* --- Main Content Layout --- */
 .part-section {
   margin-bottom: 50px;
 
@@ -259,7 +253,7 @@
 
   @media (max-width: 768px) {
     gap: 12px;
-    /* Điện thoại: thu nhỏ khoảng cách giữa các câu hỏi */
+
   }
 
   @media (max-width: 576px) {
@@ -271,8 +265,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  /* Bỏ margin-bottom cộng dồn: khoảng cách giữa các nhóm/câu do gap của
-     .questions-list lo, tránh khe hở quá lớn giữa 2 câu. */
+
   margin-bottom: 0;
 
   &:last-child {
@@ -366,14 +359,13 @@
 
   .passage-divider {
     border: 0;
-    border-top: 2px dashed #94a3b8; /* Chuyển màu đậm hơn để dễ nhìn */
+    border-top: 2px dashed #94a3b8;
     margin: 20px 0;
   }
 }
 
 .question-card-wrapper {
-  /* Không margin-bottom cộng dồn — khoảng cách giữa các câu do gap của
-     .questions-list / .group-section quyết định. */
+
   margin-bottom: 0;
   display: flex;
   flex-direction: column;
@@ -386,7 +378,6 @@
     width: 100%;
   }
 
-  /* Ảnh trái – câu hỏi phải, khoảng cách vừa đẹp */
   &.split-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -397,13 +388,12 @@
     @media (max-width: 992px) {
       grid-template-columns: 1fr;
       gap: 12px;
-      /* Điện thoại: thu nhỏ khoảng cách giữa ảnh và câu hỏi */
+
       margin-bottom: 16px;
     }
   }
 }
 
-/* Điện thoại: thu nhỏ khoảng cách chung */
 @media (max-width: 768px) {
   .question-card-wrapper {
     margin-bottom: 0;
@@ -425,7 +415,6 @@
     scrollbar-width: thin;
     scrollbar-color: #94a3b8 #e2e8f0;
 
-    /* Thanh cuộn luôn hiển thị (track có màu) */
     &::-webkit-scrollbar {
       width: 10px;
     }
@@ -443,14 +432,13 @@
     }
   }
 
-  /* Ảnh full chiều rộng cột */
   .passage-image {
     width: 100%;
     height: auto;
     display: block;
     border-radius: var(--radius-md, 8px);
     margin-bottom: 16px;
-    /* Cách nhau vừa đẹp giữa các ảnh */
+
   }
 
   .passage-image:last-child {
@@ -462,21 +450,21 @@
 
     .passage-box {
       padding: 12px;
-      max-height: 50vh; /* Chuyển từ passage-box lên đây */
-      /* Điện thoại: ít padding hơn */
+      max-height: 50vh;
+
     }
 
     .passage-image {
-      // min-height: 50vh;
+
       margin-bottom: 12px;
-      /* Điện thoại: khoảng cách giữa các ảnh nhỏ hơn */
+
     }
   }
 
   @media (max-width: 576px) {
     .passage-box {
       padding: 8px;
-      max-height: 40vh; /* Chuyển từ passage-box lên đây */
+      max-height: 40vh;
     }
 
     .passage-image {
@@ -491,8 +479,6 @@
   flex-direction: column;
   gap: 16px;
 
-  /* Cột chỉ làm sticky + giới hạn chiều cao; scroll giao cho .questions-frame
-     bên trong (vì sticky + overflow:scroll cùng phần tử không vẽ scrollbar). */
   position: sticky;
   top: 72px;
   max-height: calc(100vh - 160px);
@@ -508,14 +494,11 @@
   }
 }
 
-/* Khung gom toàn bộ câu hỏi của 1 passage thành 1 khối liền,
-   ngăn cách giữa các câu chỉ bằng đường kẻ mảnh thay vì border riêng. */
 .questions-frame {
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg);
 
-  /* Container scroll: chỉ hiện thanh trượt khi nội dung tràn quá max-height. */
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -543,17 +526,16 @@
     overflow: visible;
   }
 
-  /* Gỡ style card riêng của từng câu khi nằm trong frame chung */
   .question-card {
     border: none;
     border-radius: 0;
     background: transparent;
-    /* FIX #3: tăng padding một chút, đỡ chật hơn bản cũ (14px 18px) */
+
     padding: 18px 20px;
     transition: background 0.2s;
 
     &:not(:first-child) {
-      /* FIX #3: đậm hơn #f1f5f9 để phân tách các câu rõ ràng hơn */
+
       border-top: 1px solid #e2e8f0;
     }
 
@@ -572,7 +554,6 @@
     }
   }
 
-  /* Đáp án compact hơn để 3 câu vừa viewport mà không cần scroll */
   .mcq-group {
     gap: 8px;
   }
@@ -585,8 +566,6 @@
       font-size: 1.4rem;
     }
 
-    /* FIX #4: đồng bộ kích thước input với font compact (1.4rem),
-       trước đây input vẫn giữ 20px của bản gốc gây lệch tỉ lệ */
     input[type='radio'],
     input[type='checkbox'] {
       width: 16px;
@@ -611,8 +590,6 @@
   position: relative;
   overflow: hidden;
 
-  /* Bỏ thanh accent đậm bên trái — chỉ dùng viền xanh mảnh khi
-     hover/focus/đang xem cho gọn. */
   &.is-current,
   &:focus-within,
   &:hover {
@@ -666,7 +643,6 @@
   }
 }
 
-/* --- Input Styles --- */
 .mcq-group {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -677,17 +653,13 @@
   }
 }
 
-/* Câu đúng 3 đáp án (kiểu Part 2: A/B/C): xếp dọc 1 cột cho cân,
-   tránh kiểu "2 trên + 1 dưới" lệch. :has() nhận nhóm có ô thứ 3 cũng là ô cuối. */
 .mcq-group:has(> :nth-child(3):last-child) {
   grid-template-columns: 1fr;
 }
 
 .mcq-option {
   display: flex;
-  /* FIX #1: flex-start thay vì center — trước đây khi đáp án xuống 2 dòng
-     (vd. Câu 133), radio bị kéo xuống giữa 2 dòng gây lệch hàng so với
-     các đáp án 1 dòng bên cạnh. */
+
   align-items: flex-start;
   gap: 14px;
   padding: 14px 20px;
@@ -711,8 +683,7 @@
     border: 2px solid #cbd5e1;
     transition: all 0.2s;
     flex-shrink: 0;
-    /* FIX #1: căn cho tâm ô tròn thẳng hàng với baseline dòng chữ đầu
-       thay vì bị kéo xuống giữa khối text nhiều dòng */
+
     margin-top: 3px;
 
     &:checked {
@@ -784,7 +755,6 @@
   min-height: 150px;
 }
 
-/* --- Footer: panel danh sách câu hỏi + nút Nộp bài --- */
 .footer-actions {
   position: fixed;
   bottom: 0;
@@ -854,7 +824,6 @@
 .mobile-nav-trigger {
   display: none;
 
-  /* Nút vuông có màu (gradient chính), icon lưới -> gợi "danh sách câu hỏi". */
   @media (max-width: 992px) {
     pointer-events: auto;
     display: inline-flex;
@@ -903,7 +872,6 @@
   box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.18);
   animation: mobileNavSlideUp 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Thanh "grabber" gợi ý kéo/đóng sheet. */
   &::before {
     content: '';
     display: block;
@@ -990,8 +958,6 @@
     box-shadow: 0 6px 16px rgba(0, 97, 242, 0.1);
   }
 
-  /* Mobile/tablet: footer không dùng nút toggle này nữa — thay bằng nút nổi +
-     bottom-sheet (.mobile-nav). Ẩn để footer gọn. */
   @media (max-width: 992px) {
     display: none;
   }
@@ -1035,7 +1001,6 @@
   }
 }
 
-/* --- Loading & States --- */
 .state-box {
   display: flex;
   flex-direction: column;

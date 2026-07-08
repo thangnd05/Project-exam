@@ -5,7 +5,6 @@
   min-height: calc(100vh - 200px);
 }
 
-/* --- Premium Header --- */
 .header-top {
   margin-bottom: 32px;
   display: flex;
@@ -20,7 +19,6 @@
     padding: 35px 24px !important;
   }
 }
-
 
 .historyLabel {
   font-size: var(--font-size-md) !important;
@@ -52,7 +50,6 @@
   }
 }
 
-/* --- Table Styles --- */
 .table-container {
   background: white;
   padding: 0;
@@ -111,7 +108,6 @@
   border: 1px solid #e0e7ff;
 }
 
-/* --- Status Labels --- */
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -160,7 +156,6 @@
   }
 }
 
-/* --- Loading & Empty --- */
 .loading-box {
   display: flex;
   flex-direction: column;

@@ -1,6 +1,3 @@
-// Schema cấu hình bố cục giao diện làm bài (zone-based).
-// Đây là "hợp đồng" mà cả renderer (trang thi) lẫn editor admin (Phase 3) cùng bám vào.
-
 export const ZONES = {
   TOP: 'TOP',
   LEFT: 'LEFT',
@@ -10,16 +7,15 @@ export const ZONES = {
 };
 
 export const BLOCK_TYPES = {
-  QUESTION_AREA: 'questionArea', // khối câu hỏi (trung tâm, không kéo đi)
+  QUESTION_AREA: 'questionArea',
   TIMER: 'timer',
   PROGRESS: 'progress',
   SUBMIT: 'submit',
-  QUESTION_NAV: 'questionNav', // nút + panel "Danh sách câu hỏi"
+  QUESTION_NAV: 'questionNav',
   BANNER: 'banner',
   TITLE: 'title',
 };
 
-// Nhãn hiển thị cho từng zone trong editor.
 export const ZONE_META = [
   { key: ZONES.TOP, label: 'Trên (thanh đầu trang)' },
   { key: ZONES.LEFT, label: 'Trái (cột bên)' },
@@ -28,7 +24,6 @@ export const ZONE_META = [
   { key: ZONES.FLOAT, label: 'Nổi (góc màn hình)' },
 ];
 
-// Nhãn + icon (emoji) cho từng loại block.
 export const BLOCK_META = {
   [BLOCK_TYPES.TIMER]: { label: 'Đồng hồ', icon: '⏱️' },
   [BLOCK_TYPES.PROGRESS]: { label: 'Tiến độ', icon: '✅' },
@@ -38,26 +33,23 @@ export const BLOCK_META = {
   [BLOCK_TYPES.TITLE]: { label: 'Tiêu đề', icon: '📝' },
 };
 
-// Các block có thể THÊM mới từ palette (những block còn lại là cố định trong config mặc định).
 export const ADDABLE_BLOCK_TYPES = [BLOCK_TYPES.BANNER];
 
-// Cấu hình MẶC ĐỊNH = tái tạo đúng giao diện làm bài hiện tại.
-// examType chưa cấu hình -> dùng nguyên cái này (không đổi 1 pixel).
 export const defaultLayoutConfig = {
   version: 1,
   theme: {
-    primary: null, // null = không override, dùng token --primary hiện có
+    primary: null,
     font: null,
     radius: null,
     density: 'comfortable',
   },
   questionArea: {
-    passagePosition: 'side', // 'side' = passage cột trái, câu hỏi cột phải (như hiện tại)
+    passagePosition: 'side',
     columns: 1,
     maxWidth: null,
     cardShadow: true,
   },
-  // Footer hiện tại: [nav] bên trái ... [timer][progress][submit] bên phải.
+
   blocks: [
     {
       id: 'questionNav',

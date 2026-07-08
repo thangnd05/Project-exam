@@ -1,10 +1,3 @@
-/**
- * Tạo đề thi từ kho câu hỏi – khớp BE:
- * - GET /api/questions/by-part/{examPartId} (cá nhân: không query; JWT gửi kèm)
- * - POST /api/tests → POST /api/test-parts → POST /api/tests/parts/questions hoặc /parts/random-questions
- *
- * Copy vào project React, đổi import path (styles, hook) cho đúng.
- */
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Button, Form } from 'react-bootstrap';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '../../api/testApi';
@@ -36,7 +29,6 @@ import {
 } from '~/hooks/useBankTestBuilder';
 import styles from './CreateTestFromBankPage.module.scss';
 
-
 const cx = classNames.bind(styles);
 
 const CreateTestFromBankPage = () => {
@@ -67,7 +59,6 @@ const CreateTestFromBankPage = () => {
 
   const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
 
-  // Kho cá nhân: không lọc theo bộ đề -> dùng scoping mặc định (identity) của hook.
   const {
     partConfigs,
     setPartConfigs,
@@ -81,7 +72,6 @@ const CreateTestFromBankPage = () => {
     hasPartWithQuestions,
   } = useBankTestBuilder();
 
-  // BE: GET /api/questions/by-part/{examPartId} (cá nhân: không classId/chapterId; JWT tự gửi)
   useEffect(() => {
     if (!testInfo.examTypeId || !examParts?.length) {
       setPartConfigs({});
@@ -464,8 +454,8 @@ const CreateTestFromBankPage = () => {
                                             <li key={id} className={cx('questionItem', { selected: checked })}>
                                               <span className={cx('questionIndex')}>{displayNo}.</span>
                                               <span className={cx('questionText')}>{q.questionText || '(Không có nội dung)'}</span>
-                                              <button 
-                                                type="button" 
+                                              <button
+                                                type="button"
                                                 className={cx('btnEditQuestion')}
                                                 onClick={() => {
                                                     setEditingPartId(part.examPartId);
@@ -510,11 +500,10 @@ const CreateTestFromBankPage = () => {
           </div>
         </Form>
       </div>
-      
-      {/* Edit Question Modal */}
-      <EditQuestionModal 
-        show={!!editingQuestionId} 
-        onHide={() => setEditingQuestionId(null)} 
+
+      <EditQuestionModal
+        show={!!editingQuestionId}
+        onHide={() => setEditingQuestionId(null)}
         questionId={editingQuestionId}
         onSuccess={handleEditQuestionSuccess}
       />

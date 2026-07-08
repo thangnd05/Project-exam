@@ -6,7 +6,6 @@ import {toast} from 'react-toastify';
 import {AdminFieldError, AdminPageHeader} from '../components/common';
 import {usePermissionsMatrix} from './hooks/usePermissionsMatrix';
 
-// ADMIN luôn giữ toàn quyền — khóa cột này để tránh tự khóa mình ra khỏi hệ thống.
 const PROTECTED_ROLE = 'ADMIN';
 
 const buildMatrix = (roleList) => {
@@ -24,11 +23,9 @@ function PermissionsManagement() {
 
   const [errorMessage, setErrorMessage] = useState('');
 
-  // matrix[roleId] = Set(permission codes) — bản làm việc; original để tính ô đã đổi.
   const [matrix, setMatrix] = useState({});
   const [original, setOriginal] = useState({});
 
-  // Nạp bản làm việc + bản gốc từ dữ liệu roles vừa tải.
   useEffect(() => {
     setMatrix(buildMatrix(roles));
     setOriginal(buildMatrix(roles));
@@ -36,7 +33,6 @@ function PermissionsManagement() {
 
   const displayError = errorMessage || (isError ? 'Không thể tải dữ liệu phân quyền.' : '');
 
-  // Gom permission theo nhóm để hiển thị từng khối hàng.
   const permissionGroups = useMemo(() => {
     const groups = new Map();
     permissions.forEach((permission) => {
@@ -67,7 +63,6 @@ function PermissionsManagement() {
     });
   };
 
-  // Tích/bỏ tích cả một nhóm cho 1 role.
   const toggleGroupForRole = (roleId, codes, allChecked) => {
     setMatrix((previous) => {
       const next = {...previous};
@@ -78,7 +73,6 @@ function PermissionsManagement() {
     });
   };
 
-  // Các role có thay đổi so với bản gốc (bỏ qua role bị khóa).
   const dirtyRoleIds = useMemo(() => {
     return roles
       .filter((role) => !isProtected(role))
@@ -99,7 +93,7 @@ function PermissionsManagement() {
     setErrorMessage('');
     try {
       await saveMutation.mutateAsync({dirtyRoleIds, matrix});
-      // Đồng bộ lại bản gốc theo trạng thái vừa lưu.
+
       setOriginal(() => {
         const snapshot = {};
         Object.keys(matrix).forEach((roleId) => {

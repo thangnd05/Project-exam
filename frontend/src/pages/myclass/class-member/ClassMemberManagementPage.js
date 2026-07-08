@@ -26,13 +26,11 @@ const ClassMemberManagementPage = () => {
   const { classId } = useParams();
   const navigate = useNavigate();
 
-  // State
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'joinedAt', direction: 'desc' });
 
-  // 🟢 Data fetching + mutations via react-query
   const {
     classInfo,
     allMembers,
@@ -45,7 +43,6 @@ const ClassMemberManagementPage = () => {
     refreshMembers,
   } = useClassMembers(classId);
 
-  // 🟢 Handle approve single member
   const handleApproveMember = async (userId) => {
     try {
       await approveMemberMutation.mutateAsync({
@@ -60,7 +57,6 @@ const ClassMemberManagementPage = () => {
     }
   };
 
-  // 🟢 Handle approve all
   const handleApproveAll = async () => {
     if (pendingMembers.length === 0) {
       toast.warning('Không có học sinh nào đang chờ duyệt');
@@ -76,7 +72,6 @@ const ClassMemberManagementPage = () => {
     }
   };
 
-  // 🟢 Handle remove member
   const handleRemoveMember = async () => {
     if (!memberToDelete) return;
     try {
@@ -94,7 +89,6 @@ const ClassMemberManagementPage = () => {
     }
   };
 
-  // 🟢 Sorting
   const handleSort = (key) => {
     setSortConfig((prev) => ({
       key,
@@ -122,7 +116,6 @@ const ClassMemberManagementPage = () => {
     return sorted;
   };
 
-  // 🟢 Filter + Sort
   const getFilteredMembers = (members) => {
     const filtered = members.filter((m) =>
       `${m.fullName || ''}`
@@ -132,7 +125,6 @@ const ClassMemberManagementPage = () => {
     return getSortedMembers(filtered);
   };
 
-  // 🟢 Helpers
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
     const d = new Date(dateStr);
@@ -163,7 +155,6 @@ const ClassMemberManagementPage = () => {
     return sortConfig.direction === 'asc' ? <IoChevronUp /> : <IoChevronDown />;
   };
 
-  // 🟢 Render table row
   const renderMemberRow = (member, showActions = false) => (
     <tr key={member.id} className={cx('member-row')}>
       <td className={cx('td-id')}>
@@ -203,7 +194,6 @@ const ClassMemberManagementPage = () => {
     </tr>
   );
 
-  // 🟢 Empty state
   const EmptyState = ({ message, icon: Icon }) => (
     <div className={cx('empty-state')}>
       <div className={cx('empty-icon-wrapper')}>
@@ -213,9 +203,6 @@ const ClassMemberManagementPage = () => {
     </div>
   );
 
-  // =============================================
-  // RENDER
-  // =============================================
   if (loading) {
     return (
       <div className={cx('wrapper')}>
@@ -233,7 +220,7 @@ const ClassMemberManagementPage = () => {
 
   return (
     <div className={cx('wrapper')}>
-      {/* ===== HEADER ===== */}
+
       <div className={cx('page-header')}>
         <button className={cx('btn-back')} onClick={() => navigate(-1)}>
           <IoArrowBack />
@@ -270,7 +257,6 @@ const ClassMemberManagementPage = () => {
         </div>
       </div>
 
-      {/* ===== TOOLBAR ===== */}
       <div className={cx('toolbar')}>
         <div className={cx('search-box')}>
           <IoSearchOutline className={cx('search-icon')} />
@@ -307,10 +293,9 @@ const ClassMemberManagementPage = () => {
         </div>
       </div>
 
-      {/* ===== TABS ===== */}
       <div className={cx('tabs-container')}>
         <Tabs defaultActiveKey="approved" className={cx('custom-tabs')}>
-          {/* TAB: Đã duyệt */}
+
           <Tab
             eventKey="approved"
             title={
@@ -361,7 +346,6 @@ const ClassMemberManagementPage = () => {
             </div>
           </Tab>
 
-          {/* TAB: Chờ duyệt */}
           <Tab
             eventKey="pending"
             title={
@@ -425,7 +409,6 @@ const ClassMemberManagementPage = () => {
         </Tabs>
       </div>
 
-      {/* ===== DELETE CONFIRM MODAL ===== */}
       <ConfirmDeleteModal
         show={showDeleteModal}
         onClose={() => {

@@ -122,7 +122,6 @@
   border: 1px solid #e0e7ff;
 }
 
-/* Dòng của chính người đang xem trong bảng */
 .myRow {
   td {
     background: #eff6ff;
@@ -146,7 +145,6 @@
   vertical-align: middle;
 }
 
-/* Thanh "Hạng của bạn" ghim ở cuối — luôn thấy mình đang top mấy */
 .myRankBar {
   position: sticky;
   bottom: 16px;

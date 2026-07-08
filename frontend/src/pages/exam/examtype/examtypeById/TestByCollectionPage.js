@@ -10,7 +10,6 @@ import { useCollectionTests, useCollectionName } from './hooks/useCollectionTest
 
 const PAGE_SIZE = 12;
 
-// Danh sách đề trong 1 bộ đề (folder collection) — gộp cả các collection con.
 function TestByCollectionPage() {
   const { examTypeId, collectionId } = useParams();
   const navigate = useNavigate();
@@ -24,7 +23,6 @@ function TestByCollectionPage() {
   const loading = testsQuery.isLoading;
   const folderName = useCollectionName(examTypeId, collectionId).data ?? '';
 
-  // Countdown realtime cho đề có lịch mở.
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();

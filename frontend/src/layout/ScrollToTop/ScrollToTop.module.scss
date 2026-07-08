@@ -4,13 +4,13 @@
   right: 20px;
   width: 45px;
   height: 45px;
-  background: var(--accent-color); /* 🔵 dùng màu chủ đạo */
+  background: var(--accent-color);
   color: var(--white);
   border: 2px solid var(--accent-color);
   border-radius: 6px;
   font-size: var(--font-size-xl);
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* xanh dương mờ */
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
   transition: all 0.3s ease-in-out;
   opacity: 0.9;
   z-index: 1000;

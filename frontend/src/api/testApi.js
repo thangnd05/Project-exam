@@ -24,14 +24,12 @@ export const getTestsByExamType = (examTypeId, { page = 0, size = 12 } = {}) => 
     .then((res) => res.data);
 };
 
-// Danh sách folder bộ đề (collection cha) của 1 loại kỳ thi, kèm số đề bên trong.
 export const getTestCollectionsByExamType = (examTypeId) => {
   return axios
     .get(`${BASE_URL}/collections/by-exam-type/${examTypeId}`)
     .then((res) => res.data);
 };
 
-// Danh sách đề thuộc 1 bộ đề (gộp cả collection con), có phân trang.
 export const getTestsByCollection = (collectionId, { page = 0, size = 12 } = {}) => {
   const params = new URLSearchParams();
   params.set('page', String(page));
@@ -41,7 +39,6 @@ export const getTestsByCollection = (collectionId, { page = 0, size = 12 } = {})
     .then((res) => res.data);
 };
 
-// Danh sách bài Quick Challenge cho Hero landing page (public, guest gọi được)
 export const getQuickChallengeTests = () => {
   return axios.get(`${BASE_URL}/quick-challenge`).then((res) => res.data);
 };
@@ -54,7 +51,6 @@ export const getUserTestInfo = (testId) => {
   return axios.get(`${BASE_URL}/usertest/${testId}`).then((res) => res.data);
 };
 
-// Tóm tắt các Part (tên + số câu) cho modal chọn chế độ luyện tập.
 export const getTestPartsSummary = (testId) => {
   return axios.get(`${BASE_URL}/${testId}/parts-summary`).then((res) => res.data);
 };
@@ -71,7 +67,6 @@ export const deleteTest = (testId) => {
   return axios.delete(`${BASE_URL}/${testId}`).then(() => {});
 };
 
-// Mua quyền làm bài trả phí bằng xu (mua 1 lần, mở khoá vĩnh viễn)
 export const purchaseTestAccess = (testId) => {
   return axios.post(`${BASE_URL}/${testId}/purchase`).then((res) => res.data);
 };

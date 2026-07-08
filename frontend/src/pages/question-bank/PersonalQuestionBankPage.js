@@ -39,7 +39,7 @@ const BANK_SCOPE = {
 };
 
 const PersonalQuestionBankPage = () => {
-  // Chỉ người có quyền quản lý câu hỏi mới thấy/dùng "Kho đề quản trị".
+
   const canAccessAdminBank = useHasPermission('QUESTION:MANAGE');
   const [bankScope, setBankScope] = useState(
     canAccessAdminBank ? BANK_SCOPE.ADMIN : BANK_SCOPE.PERSONAL,
@@ -62,12 +62,11 @@ const PersonalQuestionBankPage = () => {
   const [collectionsMap, setCollectionsMap] = useState({});
   const [collectionsList, setCollectionsList] = useState([]);
   const [collectionFilter, setCollectionFilter] = useState('');
-  // Khi lọc theo nhóm cha: có gộp luôn câu của các nhóm con hay không.
+
   const [includeChildCollections, setIncludeChildCollections] = useState(true);
 
   const {examTypes, examParts} = useBaseMetaData(examTypeId);
 
-  // Nếu mất quyền (hoặc permission nạp sau render đầu) mà đang ở kho admin → chuyển về kho cá nhân.
   useEffect(() => {
     if (!canAccessAdminBank && bankScope === BANK_SCOPE.ADMIN) {
       setBankScope(BANK_SCOPE.PERSONAL);
@@ -105,7 +104,7 @@ const PersonalQuestionBankPage = () => {
     if (collectionFilter === '__none__') {
       return questions.filter((q) => !q.collectionId);
     }
-    // Nhóm cha + đang bật "gộp con" → lấy câu của cả nhóm cha lẫn các nhóm con.
+
     if (includeChildCollections && selectedIsParent) {
       const ids = new Set(getCollectionWithDescendantIds(collectionsList, collectionFilter));
       return questions.filter((q) => ids.has(q.collectionId));

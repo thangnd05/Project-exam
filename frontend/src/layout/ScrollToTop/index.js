@@ -11,7 +11,7 @@ function ScrollToTop() {
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 200) {
-        // Hiển thị khi cuộn xuống 200px
+
         setShowScroll(true);
       } else {
         setShowScroll(false);

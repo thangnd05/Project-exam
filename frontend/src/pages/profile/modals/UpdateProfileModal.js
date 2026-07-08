@@ -20,7 +20,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
   const [formValues, setFormValues] = useState({
     fullName: '',
     email: '',
-    userName: '' // userName might not be editable but let's show it or allow edit if backend supports
+    userName: ''
   });
 
   const [avatarFile, setAvatarFile] = useState(null);
@@ -34,7 +34,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     setAvatarPreview('');
   }, []);
 
-  // Đổ dữ liệu vào form khi tải được thông tin cá nhân
   useEffect(() => {
     if (show && userInfo) {
       setFormValues({
@@ -46,7 +45,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     }
   }, [show, userInfo]);
 
-  // Lỗi tải thông tin cá nhân
   useEffect(() => {
     if (show && isError) {
       toast.error('Không tải được thông tin cá nhân.');
@@ -54,7 +52,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     }
   }, [show, isError, onHide]);
 
-  // Reset form khi đóng modal
   useEffect(() => {
     if (!show) {
       resetForm();
@@ -115,7 +112,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
         fullName: formValues.fullName,
         email: formValues.email,
         roleId: userInfo.roleId,
-        password: userInfo.password, // Preserve current info if needed by backend
+        password: userInfo.password,
         verified: userInfo.verified
       };
 
@@ -140,7 +137,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
 
   if (loading && show) {
     return (
-      <CommonFormModal show={show} onHide={closeModal} title="Cập nhật hồ sơ" icon={IoPersonCircleOutline}>
+      <CommonFormModal show={show} onHide={closeModal} title="Cập nhật hồ sơ">
         <div className="d-flex justify-content-center p-4">
           <Spinner animation="border" variant="primary" />
         </div>
@@ -153,7 +150,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
       show={show}
       onHide={closeModal}
       title="Cập nhật hồ sơ"
-      icon={IoPersonCircleOutline}
       footer={
         <ModalActionFooter
           cancelLabel="Hủy"

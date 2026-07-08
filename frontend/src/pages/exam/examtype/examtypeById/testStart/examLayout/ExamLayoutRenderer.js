@@ -18,7 +18,6 @@ import zoneStyles from './examLayout.module.scss';
 const cx = classNames.bind(pageStyles);
 const zx = classNames.bind(zoneStyles);
 
-// Đổi cấu hình theme (nếu có) thành CSS variables inline. Giá trị null -> không override.
 function buildThemeStyle(theme = {}) {
   const style = {};
   if (theme.primary) {
@@ -30,13 +29,6 @@ function buildThemeStyle(theme = {}) {
   return style;
 }
 
-/**
- * Renderer chung cho trang làm bài VÀ preview của editor admin.
- * Render các block theo zone (TOP/LEFT/RIGHT/BOTTOM/FLOAT); questionArea luôn ở trung tâm.
- *
- * @param preview     true = dùng trong khung editor (footer/float không fixed toàn màn hình).
- * @param interactive true = mỗi block click chọn được (editor); highlight block đang chọn.
- */
 function ExamLayoutRenderer({
   config,
   isPractice,
@@ -66,7 +58,6 @@ function ExamLayoutRenderer({
       )
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-  // Vùng cuộn là cột câu hỏi (không phải window) -> dùng scrollIntoView để cuộn đúng container.
   const scrollToQuestion = (questionId) => {
     const element = document.getElementById(`q-${questionId}`);
     if (element) {
@@ -74,7 +65,6 @@ function ExamLayoutRenderer({
     }
   };
 
-  // Render nội dung một block theo type + zone (nav ở BOTTOM là nút toggle, nơi khác là panel inline).
   const renderBlockNode = (block, zone) => {
     switch (block.type) {
       case BLOCK_TYPES.TIMER:
@@ -102,7 +92,7 @@ function ExamLayoutRenderer({
             />
           );
         }
-        // Bọc để ẩn bản inline trên mobile — mobile dùng nút nổi + bottom-sheet cho gọn.
+
         return (
           <div className={zx('sideNavInline')}>
             <TestStartDashboard
@@ -118,7 +108,6 @@ function ExamLayoutRenderer({
     }
   };
 
-  // Style tinh chỉnh vị trí theo block: khoảng cách (spacing px) + canh trong vùng.
   const blockWrapStyle = (block, zone) => {
     const style = {};
     const spacing = block.props?.spacing;
@@ -140,8 +129,6 @@ function ExamLayoutRenderer({
     return style;
   };
 
-  // Bọc block: áp style tinh chỉnh; ở editor thêm click-chọn + viền highlight.
-  // Không có style & không interactive -> render trần (giữ DOM mặc định y hệt).
   const wrap = (block, node, zone) => {
     const posStyle = blockWrapStyle(block, zone);
     if (!interactive && Object.keys(posStyle).length === 0) {
@@ -227,7 +214,6 @@ function ExamLayoutRenderer({
   const footerCenter = bottomBlocks.filter((b) => footerGroupOf(b) === 'center');
   const footerRight = bottomBlocks.filter((b) => footerGroupOf(b) === 'right');
 
-  // Footer là 1 item tĩnh cuối cột (khung cố định) -> không dùng position:fixed nữa.
   const footer =
     bottomBlocks.length === 0 ? null : (
       <div className={cx('footer-actions')} style={{ position: 'static' }}>
@@ -260,8 +246,6 @@ function ExamLayoutRenderer({
       </div>
     );
 
-  // Điều hướng câu hỏi trên MOBILE: nút đặt ở góc trên-phải vùng câu hỏi (ngang tiêu đề
-  // "Bài thi") -> không nổi đè lên đáp án như nút bottom. Bấm mở bottom-sheet trượt lên.
   const mobileNavTrigger =
     hasNav && !preview ? (
       <div className={cx('mobile-nav-bar')}>
@@ -303,8 +287,6 @@ function ExamLayoutRenderer({
       </div>
     ) : null;
 
-  // Khung cố định: chiếm trọn phần dưới header, chỉ vùng câu hỏi cuộn.
-  // Preview (editor): không khoá chiều cao viewport, để khung preview tự cuộn.
   const wrapperStyle = preview
     ? { ...buildThemeStyle(config.theme), position: 'relative' }
     : {
@@ -353,12 +335,10 @@ function ExamLayoutRenderer({
 
       {footer}
 
-      {/* Float: chế độ thật fixed góc màn hình (portal); preview nằm trong khung. */}
       {preview
         ? floatStack
         : floatStack && createPortal(floatStack, document.body)}
 
-      {/* Bottom-sheet danh sách câu (mobile): portal ra body để đè lên tất cả. */}
       {mobileNavSheet && createPortal(mobileNavSheet, document.body)}
     </div>
   );

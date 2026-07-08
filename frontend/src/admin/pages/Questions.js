@@ -39,13 +39,11 @@ const QuestionsManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
 
-    // Enrich questions with related data
     const questionsWithData = fakeQuestions.map(q => ({
         ...q,
         creator: getUserById(q.created_by)
     }));
 
-    // Filter
     const filteredQuestions = questionsWithData.filter(q => {
         const matchesSearch = q.question_text.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesType = typeFilter === 'all' || q.question_type === typeFilter;

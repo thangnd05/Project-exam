@@ -50,24 +50,20 @@ function PostDetailPage() {
         const data = await getPostById(postId);
         setPost(data);
 
-        // Fetch comments
         const commentsData = await getComments(postId);
         setComments(commentsData || []);
 
-        // Sync like state from backend
         setLiked(data.currentUserReactType === 'LIKE');
         setLikeCount(data.reactCounts?.LIKE || 0);
 
-        // Sync bookmark state
         setBookmarked(!!data.currentUserSaved);
         setSaveCount(data.saveCount || 0);
 
-        // Fetch related posts (same category)
         if (data.categories && data.categories.length > 0) {
           const catId = data.categories[0].id;
           const relatedData = await getPosts({ categoryId: catId, size: 8 });
           if (relatedData && relatedData.content) {
-            // Filter out current post
+
             setRelatedPosts(relatedData.content.filter(p => p.id !== postId));
           }
         }
@@ -80,7 +76,6 @@ function PostDetailPage() {
     fetchPostData();
   }, [postId]);
 
-  // Khi cosmetic của chính mình đổi -> fetch lại để avatar tác giả (comment + bài) cập nhật ngay.
   const skipFirstCosmeticSync = useRef(true);
   useEffect(() => {
     if (!postId) return;
@@ -101,7 +96,7 @@ function PostDetailPage() {
             : prev,
         );
       } catch (error) {
-        // bỏ qua lỗi đồng bộ cosmetic
+
       }
     })();
   }, [cosmeticFrame, cosmeticBadge, postId]);
@@ -123,7 +118,6 @@ function PostDetailPage() {
   useEffect(() => {
     setExpandedReplies({});
   }, [comments]);
-
 
   const sliderSettings = {
     dots: true,
@@ -196,7 +190,7 @@ function PostDetailPage() {
     try {
       await addComment(postId, { content: newComment });
       setNewComment('');
-      // Refresh comments
+
       const data = await getComments(postId);
       setComments(data || []);
     } catch (error) {
@@ -412,7 +406,6 @@ function PostDetailPage() {
 
       <div className={cx('containerDetail')}>
 
-        {/* Floating Actions Sidebar */}
         <div className={cx('floatingBar')}>
           <button
             className={cx('actionBtn', { active: liked })}
@@ -440,7 +433,6 @@ function PostDetailPage() {
           {copied && <span className={cx('copyToast')}>Đã sao chép</span>}
         </div>
 
-        {/* Breadcrumbs */}
         <div className={cx('breadcrumbs')}>
           <Link to={routes.home}>Trang chủ</Link>
           <ChevronRight size={14} />
@@ -478,9 +470,6 @@ function PostDetailPage() {
           <div dangerouslySetInnerHTML={{ __html: post.content }} />
         </article>
 
-
-
-        {/* Comments Section */}
         <section id="comments" className={cx('commentsSection')}>
           <h3>Bình luận ({post.commentCount || 0})</h3>
 
@@ -511,7 +500,6 @@ function PostDetailPage() {
           </div>
         </section>
 
-        {/* Related Posts Slider */}
         {relatedPosts.length > 0 && (
           <section className={cx('relatedPosts')}>
             <h3>Bài viết liên quan</h3>

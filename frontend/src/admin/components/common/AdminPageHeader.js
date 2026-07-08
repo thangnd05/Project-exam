@@ -5,10 +5,6 @@ import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Tiêu đề chuẩn cho trang admin: tên trang + mô tả (trái), slot hành động (phải).
- * children thường là nút "Thêm mới".
- */
 function AdminPageHeader({title, description, children}) {
   return (
     <div className={cx('header')}>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IoCloudUploadOutline, IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
+import { IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
 import { standardizeVocabularies, bulkCreateVocabularies } from '~/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -24,12 +24,10 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
         try {
             const result = await standardizeVocabularies({ rawText: jsonInput });
 
-            // Backend trả về { data: "..." } — lấy text rồi loại bỏ markdown fences nếu còn
             let cleanedJson = (result?.data || '')
                 .replace(/```json\n?|```/g, '')
                 .trim();
 
-            // Validate JSON trước khi set vào textarea
             JSON.parse(cleanedJson);
 
             setJsonInput(cleanedJson);
@@ -37,7 +35,6 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
         } catch (err) {
             console.error('Lỗi chuẩn hóa AI:', err);
 
-            // Phân biệt lỗi: parse JSON fail vs lỗi mạng/backend
             let errorMsg;
             if (err instanceof SyntaxError) {
                 errorMsg = 'AI trả về dữ liệu không hợp lệ. Vui lòng thử lại!';
@@ -76,7 +73,6 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             return;
         }
 
-        // Gắn albumId vào từng item nếu chưa có
         const processedPayload = payload.map((item) => ({
             ...item,
             albumId: item.albumId || albumId,
@@ -117,7 +113,6 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             show={show}
             onHide={onClose}
             title="Nhập Từ Vựng Hàng Loạt (JSON)"
-            icon={IoCloudUploadOutline}
             size="lg"
             footer={(
                 <ModalActionFooter

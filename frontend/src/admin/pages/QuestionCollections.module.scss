@@ -1,8 +1,3 @@
-// UI cây phân cấp bộ sưu tập câu hỏi (Collection) — dùng lại style giống cây Tag
-// (Tags.module.scss) để đồng nhất giao diện admin. Tối đa 2 cấp: cha → con.
-
-// ==================== Tree View ====================
-
 .treeWrapper {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -45,15 +40,11 @@
   }
 }
 
-// ==================== Root Group ====================
-
 .rootGroup {
   &:not(:last-child) {
     border-bottom: 2px solid #e5e7eb;
   }
 }
-
-// ==================== Tree Node ====================
 
 .treeNode {
   display: flex;
@@ -137,7 +128,6 @@
   text-overflow: ellipsis;
 }
 
-// Badge loại kỳ thi của bộ đề cha
 .examTypeBadge {
   font-size: 1.15rem;
   font-weight: 600;
@@ -149,7 +139,6 @@
   border: 1px solid #a7f3d0;
 }
 
-// Badge số collection con (xám, giống childCount của tag)
 .childCount {
   font-size: 1.2rem;
   color: #9ca3af;
@@ -159,7 +148,6 @@
   flex-shrink: 0;
 }
 
-// Badge số câu hỏi (xanh khi có câu, xám khi rỗng)
 .questionCount {
   font-size: 1.2rem;
   font-weight: 600;
@@ -213,8 +201,6 @@
     }
   }
 }
-
-// ==================== Connector Lines ====================
 
 .childrenWrapper {
   position: relative;

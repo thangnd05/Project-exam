@@ -2,7 +2,6 @@ import axios from './axiosClient';
 
 const BASE_URL = '/api/practice-questions';
 
-// Trả về null khi hết câu hỏi (BE trả 204 No Content → body rỗng).
 export const generatePracticeQuestion = (albumId) => {
   return axios.get(`${BASE_URL}/generate/${albumId}`).then((res) => res.data || null);
 };

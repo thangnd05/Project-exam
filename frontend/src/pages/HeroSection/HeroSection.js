@@ -15,8 +15,6 @@ const cx = classNames.bind(styles);
 
 const MAX_BARS_SHOWN = 4;
 
-// Màu xen kẽ theo cùng tông xanh: mục lẻ (Part 1,3,5...) đậm, mục chẵn (Part 2,4,6...) nhạt.
-// idx 0-based -> idx chẵn = mục lẻ = đậm; idx lẻ = mục chẵn = nhạt.
 const COLOR_DARK = '#0061f2';
 const COLOR_LIGHT = '#7fb1ff';
 const partColor = (idx) => (idx % 2 === 0 ? COLOR_DARK : COLOR_LIGHT);
@@ -48,7 +46,6 @@ const imageVariants = {
   },
 };
 
-// conic-gradient cho donut: mỗi part 1 cung tỉ lệ theo số câu
 const buildRingGradient = (parts, total) => {
   if (!total || !parts.length) return '#e2e8f0';
   let acc = 0;
@@ -86,7 +83,7 @@ const NextArrow = ({onClick}) => (
 function HeroSection() {
   const navigate = useNavigate();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
-  // Peek (card sau ló phải) chỉ ở desktop; mobile -> 1 card full-width
+
   const [isDesktop, setIsDesktop] = useState(
     typeof window === 'undefined' ? true : window.innerWidth > 992,
   );
@@ -97,7 +94,6 @@ function HeroSection() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // 1 card / 1 examType: gom theo examType, mỗi loại lấy 1 bài (bài đầu tiên)
   const cards = useMemo(() => {
     const seen = new Set();
     const out = [];
@@ -127,7 +123,7 @@ function HeroSection() {
   const hasQuick = !loading && cards.length > 0;
 
   const multi = cards.length > 1;
-  const peek = multi && isDesktop; // desktop nhiều card -> ló card sau; mobile -> 1 card full
+  const peek = multi && isDesktop;
   const sliderSettings = {
     dots: true,
     arrows: peek,
@@ -135,7 +131,7 @@ function HeroSection() {
     speed: 400,
     slidesToShow: 1,
     slidesToScroll: 1,
-    // variableWidth -> card căn trái, card kế tiếp ló ra bên phải (chỉ desktop)
+
     variableWidth: peek,
     prevArrow: <PrevArrow />,
     nextArrow: <NextArrow />,
@@ -157,13 +153,13 @@ function HeroSection() {
           Chào mừng đến với {name}
         </motion.h1>
         <motion.p className={cx('desc')} variants={itemVariants}>
-          <strong>{name}</strong> – nền tảng luyện đề giúp cá nhân hóa lộ trình học tập của bạn. 
-          Hãy bắt đầu bằng một bài kiểm tra nhanh bên cạnh để hệ thống chẩn đoán năng lực, từ đó xác định 
+          <strong>{name}</strong> – nền tảng luyện đề giúp cá nhân hóa lộ trình học tập của bạn.
+          Hãy bắt đầu bằng một bài kiểm tra nhanh bên cạnh để hệ thống chẩn đoán năng lực, từ đó xác định
           mục tiêu và xây dựng lộ trình ôn luyện tối ưu nhất!
         </motion.p>
         <motion.div className={cx('actions')} variants={itemVariants}>
           <button className={cx('btn-primary')} onClick={handleScrollToExam}>
-            Bắt đầu ngay
+            Khám phá ngay
           </button>
         </motion.div>
       </motion.div>

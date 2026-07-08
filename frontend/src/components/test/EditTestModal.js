@@ -109,7 +109,6 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     }
   };
 
-  // Bộ đề lọc theo loại kỳ thi đang chọn (giữ cả collection chưa gắn examType).
   const collectionOptions = useMemo(
     () =>
       buildCollectionTree(
@@ -135,7 +134,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       title: formData.title.trim(),
       description: formData.description || null,
       examTypeId: String(formData.examTypeId),
-      // Bộ đề: chuỗi rỗng = gỡ, có giá trị = gán/đổi.
+
       collectionId: formData.collectionId ? String(formData.collectionId) : '',
       durationMinutes:
         formData.durationMinutes && Number(formData.durationMinutes) > 0
@@ -152,7 +151,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       availableTo: formData.availableTo ? formData.availableTo + ':00' : null,
       classId: test.classId ? String(test.classId) : null,
       chapterId: test.chapterId ? String(test.chapterId) : null,
-      // Giá xu: BE chỉ áp dụng khi admin & bài công khai. Để trống = giữ nguyên, nhập 0 = miễn phí.
+
       costCoins: formData.costCoins === '' || formData.costCoins === null
         ? null
         : Number(formData.costCoins),
@@ -220,7 +219,6 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       show={show}
       onClose={onHide}
       title="Cập nhật bài thi"
-      icon={IoCreateOutline}
       headerExtra={
         <span className={cxCreate('badge')}>
           {test?.classId ? `Lớp: ${test.classId}` : 'Cá nhân'}
@@ -286,7 +284,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
                   }
                 >
                   <option value="">-- Chọn loại --</option>
-                  {/* Chỉ examType lá (ẩn node cha gom nhóm). */}
+
                   {examTypes.filter((type) => !type.childCount).map((type) => (
                     <option key={type.examTypeId} value={type.examTypeId}>
                       {type.name}

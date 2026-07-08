@@ -49,9 +49,6 @@ const TestResultPage = () => {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  // ================================
-  //  XEM ĐÁP ÁN & GIẢI THÍCH (trang riêng)
-  // ================================
   const handleShowDetail = () => {
     if (!canReview) {
       alert("Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.");
@@ -60,9 +57,6 @@ const TestResultPage = () => {
     navigate(`/tests/result/${userTestId}/review`);
   };
 
-  // ================================
-  // UI LOADING / ERROR
-  // ================================
   if (loading)
     return (
       <div className={cx("wrapper")}>
@@ -87,16 +81,12 @@ const TestResultPage = () => {
       </div>
     );
 
-  // ================================
-  // MAIN UI
-  // ================================
   return (
     <div className={cx("wrapper")}>
       <Container>
-        {/* ================= SPLIT LAYOUT ================= */}
+
         <div className={cx("result-layout")}>
 
-          {/* LEFT: Kết quả */}
           <div className={cx("result-left")}>
             <div className={cx("result-card")}>
               <div className={cx("icon-success")}>
@@ -105,7 +95,6 @@ const TestResultPage = () => {
 
               <h1>Hoàn thành bài thi!</h1>
 
-              {/* SCORE */}
               <div className={cx("score-display")}>
                 {enhanced?.examCategoryCode === 'QUICK_CHALLENGE' ? (
                   <>
@@ -126,7 +115,6 @@ const TestResultPage = () => {
                 )}
               </div>
 
-              {/* STATS */}
               <div className={cx("stats-grid")}>
                 <div className={cx("stat-item", "correct")}>
                   <IoCheckmarkCircle size={24} />
@@ -155,7 +143,6 @@ const TestResultPage = () => {
                 </div>
               </div>
 
-              {/* ACTIONS */}
               <div className={cx("actions")}>
                 {!canReview && (
                   <div className={cx("lock-message")}>
@@ -188,7 +175,6 @@ const TestResultPage = () => {
             </div>
           </div>
 
-          {/* RIGHT: Chẩn đoán */}
           {enhanced && (
             <div className={cx("result-right")}>
               <div className={cx("diagnosis-card")}>

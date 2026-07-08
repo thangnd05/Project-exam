@@ -6,7 +6,6 @@ import {useQuestionDetail} from './hooks/useQuestionDetail';
 import classNames from 'classnames/bind';
 import {
   IoCloseOutline,
-  IoEyeOutline,
   IoCheckmarkCircle,
 } from 'react-icons/io5';
 import styles from './EditQuestionModal.module.scss';
@@ -76,7 +75,6 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
       show={show}
       onClose={onHide}
       title="Chi tiết câu hỏi"
-      icon={IoEyeOutline}
       maxWidth={800}
       footer={
         <Button variant="secondary" onClick={onHide}>

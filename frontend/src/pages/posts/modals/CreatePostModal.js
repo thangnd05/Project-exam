@@ -2,7 +2,7 @@ import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import { FaPenNib, FaEdit, FaImage, FaTag } from 'react-icons/fa';
+import { FaEdit, FaImage, FaTag } from 'react-icons/fa';
 import { useAuth } from '~/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import routes from '~/config/Routes';
@@ -35,7 +35,6 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
   });
   const loading = savePostMutation.isPending;
 
-  // Khởi tạo / reset state khi mở modal (cả create lẫn edit)
   useEffect(() => {
     if (!show) return;
     if (editingPost) {
@@ -133,7 +132,6 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       onHide={onClose}
       size="xl"
       title={isEditing ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
-      icon={isEditing ? FaEdit : FaPenNib}
       footer={
         <ModalActionFooter
           cancelLabel="Hủy bỏ"
@@ -226,8 +224,6 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
           </small>
         </div>
       </div>
-
-
 
       <div className={cx('formGroup', 'mt-4')}>
         <label className={cx('label')}>Nội dung chi tiết</label>

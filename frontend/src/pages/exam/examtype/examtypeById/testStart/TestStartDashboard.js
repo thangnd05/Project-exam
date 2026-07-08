@@ -8,7 +8,7 @@ function TestStartDashboard({
   allQuestions,
   userAnswers,
   onScrollToQuestion,
-  columns, // số cột cố định cho lưới câu hỏi; bỏ trống = tự co (auto-fill).
+  columns,
 }) {
   const gridStyle = columns ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : undefined;
   return (

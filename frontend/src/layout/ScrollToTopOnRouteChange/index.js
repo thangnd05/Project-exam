@@ -10,7 +10,7 @@ const ScrollHandler = () => {
     };
 
     return () => {
-      saveScrollPosition(); // Lưu vị trí khi component unmount
+      saveScrollPosition();
     };
   }, [location.pathname]);
 

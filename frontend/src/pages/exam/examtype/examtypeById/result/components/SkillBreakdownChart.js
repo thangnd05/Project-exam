@@ -21,7 +21,6 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
     setExpandedParts((prev) => ({ ...prev, [partId]: !prev[partId] }));
   };
 
-  // Group parts by skill (đã sort theo displayOrder/Part X)
   const partsBySkill = {};
   partBreakdown.forEach((part) => {
     if (!partsBySkill[part.skillId]) {
@@ -39,7 +38,6 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
         Phân tích theo lĩnh vực
       </h3>
 
-      {/* Skill level breakdown */}
       {skillBreakdown.map((skill) => (
         <div key={skill.skillId} className={cx('skillContainer')}>
           <div className={cx('skillHeader')}>
@@ -49,18 +47,16 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
             </span>
           </div>
 
-          {/* Skill progress bar */}
           <div className={cx('progressBarContainer')}>
-            <div 
+            <div
               className={cx('progressBarFill')}
               style={{
                 width: `${Math.min(skill.percentage, 100)}%`,
                 background: getBarColor(skill.percentage),
-              }} 
+              }}
             />
           </div>
 
-          {/* Parts within this skill */}
           {partsBySkill[skill.skillId]?.map((part) => (
             <div key={part.examPartId} className={cx('partContainer')}>
               <div
@@ -83,14 +79,13 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
                 </span>
               </div>
 
-              {/* Part progress bar */}
               <div className={cx('partProgressBarContainer')}>
-                <div 
+                <div
                   className={cx('partProgressBarFill')}
                   style={{
                     width: `${Math.min(part.percentage, 100)}%`,
                     background: part.isTargetMet != null ? (part.isTargetMet ? '#22c55e' : '#ef4444') : getBarColor(part.percentage),
-                  }} 
+                  }}
                 />
                 {part.targetPercentage != null && (
                   <div
@@ -101,7 +96,6 @@ function SkillBreakdownChart({ skillBreakdown = [], partBreakdown = [] }) {
                 )}
               </div>
 
-              {/* Tầng 3: Tag breakdown */}
               {expandedParts[part.examPartId] && part.weakTags?.length > 0 && (
                 <div className={cx('tagBreakdownContainer')}>
                   <p className={cx('tagBreakdownTitle')}>

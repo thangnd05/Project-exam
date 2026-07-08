@@ -12,13 +12,13 @@ function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate(); // Hook để điều hướng
+  const navigate = useNavigate();
 
   const handleReset = async (e) => {
-    e.preventDefault(); // Ngăn reload trang (nếu input nằm trong form)
-    setIsLoading(true); // Bắt đầu trạng thái loading
+    e.preventDefault();
+    setIsLoading(true);
     setMessage('');
     setError('');
 
@@ -28,19 +28,18 @@ function ForgotPassword() {
       setMessage('Hãy vào email để lấy token để có thể đổi mật khẩu.');
       setError('Token chỉ có thời lượng là 5 phút');
 
-      // Chuyển hướng sau 4 giây
       setTimeout(() => {
-        navigate(routes.reset); // Chuyển sang trang reset password
+        navigate(routes.reset);
       }, 6000);
     } catch (error) {
-      // Xử lý lỗi khi không thể gửi yêu cầu
+
       if (error.response) {
         setError(error.response.data.message || 'Đã xảy ra lỗi!');
       } else {
         setError('Không thể kết nối đến server!');
       }
     } finally {
-      setIsLoading(false); // Kết thúc trạng thái loading
+      setIsLoading(false);
     }
   };
 
@@ -58,9 +57,9 @@ function ForgotPassword() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập email!'); // Tùy chỉnh thông báo
+              e.target.setCustomValidity('Vui lòng nhập email!');
             }}
-            onInput={(e) => e.target.setCustomValidity('')} // Xóa thông báo khi người dùng nhập
+            onInput={(e) => e.target.setCustomValidity('')}
           />
         </Form.Group>
 

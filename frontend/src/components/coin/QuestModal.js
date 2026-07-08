@@ -2,7 +2,6 @@ import {useCallback, useEffect, useState} from 'react';
 import {Spinner} from 'react-bootstrap';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
-import {IoTrophyOutline} from 'react-icons/io5';
 import {CircleDollarSign, Clock, CheckCircle2} from 'lucide-react';
 
 import {claimQuest, getMyQuests} from '~/api/questApi';
@@ -13,7 +12,6 @@ import styles from './QuestModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Thứ tự hiển thị các nhóm nhiệm vụ theo loại điều kiện.
 const CONDITION_ORDER = [
   'NONE',
   'COMPLETE_TEST',
@@ -22,11 +20,9 @@ const CONDITION_ORDER = [
   'COMPLETE_LEARNING_PLAN',
 ];
 
-// Tiêu đề nhóm cho nhiệm vụ không cần điều kiện; còn lại dùng conditionLabel từ backend.
 const groupTitle = (quest) =>
   quest.conditionType === 'NONE' ? 'Nhiệm vụ chung' : quest.conditionLabel;
 
-// Gom nhiệm vụ theo loại điều kiện, giữ thứ tự nhóm cố định.
 function groupByCondition(quests) {
   const groups = new Map();
   quests.forEach((quest) => {
@@ -41,7 +37,6 @@ function groupByCondition(quests) {
   );
 }
 
-// Modal phần thưởng: 2 tab Nhiệm vụ + Cửa hàng (dùng khung chung BaseModal).
 function QuestModal({show, onClose}) {
   const {balance, refreshCoins} = useCoins();
   const [tab, setTab] = useState('quests');
@@ -183,7 +178,6 @@ function QuestModal({show, onClose}) {
       show={show}
       onClose={onClose}
       title="Phần thưởng"
-      icon={IoTrophyOutline}
       headerExtra={balanceBadge}
       maxWidth={880}
     >

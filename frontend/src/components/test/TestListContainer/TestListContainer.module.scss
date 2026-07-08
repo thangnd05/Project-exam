@@ -1,6 +1,5 @@
 @import '../../GlobalStyles/GlobalStyles.module.scss';
 
-// Standardized Blue Theme
 $brand-primary: var(--accent-color);
 $brand-secondary: var(--accent-act-color);
 $brand-light: #f8fafc;
@@ -32,15 +31,13 @@ $brand-border: #e2e8f0;
   }
 }
 
-/* --- Test Grid --- */
 .test-grid {
   display: grid;
-  /* auto-fill tự lo số cột theo chỗ trống — bỏ media query cột thừa */
+
   grid-template-columns: repeat(auto-fill, minmax(34rem, 1fr));
   gap: 3rem;
 }
 
-/* --- Empty State --- */
 .empty-state {
   text-align: center;
   padding: 80px 40px;

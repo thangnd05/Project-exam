@@ -16,20 +16,12 @@ import styles from './TestModeModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Modal "Chọn chế độ": 2 tab
- *  - Luyện thi  -> Full Test (có giới hạn giờ theo đề)          -> onStart({ mode: 'full' })
- *  - Luyện tập  -> chọn nhiều Part, KHÔNG giới hạn giờ          -> onStart({ mode: 'practice', examPartIds })
- *
- * Component chỉ lo UI + chọn lựa; việc điều hướng do component cha (TestCard) xử lý.
- */
 function TestModeModal({ show, test, onClose, onStart }) {
-  const [tab, setTab] = useState('exam'); // 'exam' | 'practice'
+  const [tab, setTab] = useState('exam');
   const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(() => new Set());
 
-  // Nạp tóm tắt Part mỗi khi mở modal cho 1 đề.
   useEffect(() => {
     if (!show || !test?.testId) return;
     setTab('exam');
@@ -49,7 +41,6 @@ function TestModeModal({ show, test, onClose, onStart }) {
     [parts],
   );
 
-  // Gom Part theo section (Listening/Reading...) để hiển thị như đề TOEIC.
   const grouped = useMemo(() => {
     const map = new Map();
     parts.forEach((p) => {
@@ -92,7 +83,7 @@ function TestModeModal({ show, test, onClose, onStart }) {
 
   const handleStartPractice = () => {
     if (selected.size === 0) return;
-    // Giữ đúng thứ tự hiển thị của Part đã chọn.
+
     const examPartIds = parts
       .filter((p) => selected.has(p.examPartId))
       .map((p) => p.examPartId);
@@ -104,7 +95,6 @@ function TestModeModal({ show, test, onClose, onStart }) {
       show={show}
       onClose={onClose}
       title="Chọn chế độ"
-      icon={IoDocumentTextOutline}
       maxWidth={640}
     >
       <div className={cx('tabs')}>
@@ -198,12 +188,10 @@ function TestModeModal({ show, test, onClose, onStart }) {
                 <span className={cx('part-count')}>{totalQuestions} câu</span>
               </button>
 
-              {/* Vùng cuộn riêng: nhiều Part vẫn giữ modal cao cố định. */}
               <div className={cx('part-scroll')}>
                 {grouped.map(([section, list]) => (
                   <div key={section} className={cx('section')}>
-                    {/* Chỉ hiện tiêu đề nhóm khi có phân section thật (Listening/Reading...),
-                        tránh header "KHÁC" thừa khi Part không gắn skill. */}
+
                     {grouped.length > 1 && (
                       <div className={cx('section-title')}>{section}</div>
                     )}

@@ -58,7 +58,7 @@ function ExamPartsManagement() {
 
   const groupedExamParts = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
-    // Lọc theo loại kỳ thi trước (nếu có chọn), rồi mới lọc theo từ khoá.
+
     const scopedParts = examTypeFilter
       ? examParts.filter((examPart) => examPart.exam_type_id === examTypeFilter)
       : examParts;
@@ -104,7 +104,7 @@ function ExamPartsManagement() {
 
   const openCreateModal = () => {
     resetForm();
-    // Nếu đang lọc theo 1 loại kỳ thi → tự gắn sẵn loại đó vào form tạo.
+
     if (examTypeFilter) {
       setFormState((previous) => ({ ...previous, exam_type_id: examTypeFilter }));
     }

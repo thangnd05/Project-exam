@@ -1,5 +1,3 @@
-// utils/testStatusHelper.js
-
 export const formatCountdown = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const m = Math.floor(totalSeconds / 60);
@@ -17,7 +15,6 @@ export const formatDateTime = (dateStr) => {
     });
 };
 
-// Đầy đủ ngày/tháng/năm + giờ:phút:giây — dùng cho "Thời gian tạo".
 export const formatFullDateTime = (dateStr) => {
     if (!dateStr) return '—';
     return new Date(dateStr).toLocaleString('vi-VN', {
@@ -71,9 +68,8 @@ export const calculateAllowedTime = (test) => {
     const now = new Date();
     const availableTo = test.availableTo ? new Date(test.availableTo) : null;
 
-    // Nếu không giới hạn thời gian
     if (!test.durationMinutes || test.durationMinutes <= 0) {
-        return null;   // ← QUAN TRỌNG
+        return null;
     }
 
     let allowedTime = test.durationMinutes * 60;

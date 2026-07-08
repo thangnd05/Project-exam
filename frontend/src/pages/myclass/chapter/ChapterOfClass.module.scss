@@ -7,8 +7,6 @@
   max-width: 1200px;
 }
 
-/* ================= BACK BUTTON ================= */
-
 .btn-back {
   display: flex;
   align-items: center;
@@ -36,15 +34,11 @@
   }
 }
 
-/* ================= GRID ================= */
-
 .chapter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 35px;
 }
-
-/* ================= CARD ================= */
 
 .chapter-card {
   position: relative;
@@ -122,8 +116,6 @@
   }
 }
 
-/* ================= CONTENT ================= */
-
 .chapter-title {
   font-weight: 700;
   font-size: 2rem;
@@ -144,8 +136,6 @@
     font-size: 1.6rem;
   }
 }
-
-/* ================= CTA BUTTON ================= */
 
 .btn-view {
   margin-top: auto;
@@ -200,8 +190,6 @@
   }
 }
 
-/* ================= LOADING & EMPTY ================= */
-
 .loading,
 .empty {
   display: flex;
@@ -225,8 +213,6 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* ================= ANIMATIONS ================= */
-
 @keyframes float {
   0%,
   100% {
@@ -249,8 +235,6 @@
     transform: translateY(0);
   }
 }
-
-/* ================= RESPONSIVE ================= */
 
 @media (max-width: 992px) {
   .header-hero {

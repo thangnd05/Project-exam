@@ -7,7 +7,6 @@ export const testHistoryKeys = {
   info: (testId) => ['test-info', testId],
 };
 
-// BE có thể trả mảng trực tiếp hoặc { data: [...] } -> chuẩn hoá về mảng.
 const normalizeAttempts = (payload) =>
   Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : [];
 

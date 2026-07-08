@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from 'react-toastify';
 import { createAlbum } from '~/api/vocabularyAlbumApi';
 import classNames from "classnames/bind";
-import { FaFolderPlus, FaEdit, FaInfoCircle } from "react-icons/fa";
+import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import CommonFormModal from "~/components/common/modal/CommonFormModal";
 import ModalActionFooter from "~/components/common/modal/ModalActionFooter";
 import styles from "~/components/common/modal/CommonFormModal.module.scss";
@@ -32,7 +32,6 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
 
             toast.success("Tạo Album thành công!");
 
-            // Reset + close modal
             setName("");
             setDescription("");
             onClose();
@@ -55,7 +54,6 @@ function CreateAlbumModal({ show, onClose, onSuccess }) {
             show={show}
             onHide={onClose}
             title="Tạo Album Mới"
-            icon={FaFolderPlus}
             footer={(
                 <ModalActionFooter
                     cancelLabel="Để sau"

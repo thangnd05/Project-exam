@@ -1,6 +1,5 @@
 @import '../GlobalStyles/GlobalStyles.module.scss';
 
-/* Badge cạnh tiêu đề khi render qua BaseModal headerExtra (class phẳng, không nest). */
 .headerBadge {
     margin-left: 12px;
     padding: 6px 12px;
@@ -11,7 +10,6 @@
     color: #fff;
 }
 
-/* --- MODAL (POPUP) --- */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -21,7 +19,7 @@
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
     z-index: 10001;
-    /* Higher than Header */
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -103,7 +101,6 @@
     overflow-y: auto;
     flex: 1;
 
-    /* Custom scrollbar */
     &::-webkit-scrollbar {
         width: 8px;
     }
@@ -187,7 +184,6 @@
     }
 }
 
-/* Reuse styles from CreateTestPage */
 .configCard {
     background: #fff;
     border-radius: 20px;
@@ -292,7 +288,6 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
-    // Khi thu gọn: header không còn viền/khoảng cách dưới (giống .groupCard.collapsed).
     &.collapsed .groupHeader {
         margin-bottom: 0;
         padding-bottom: 0;
@@ -479,7 +474,6 @@
     margin-bottom: 20px;
 }
 
-/* --- BANK (Tạo đề từ kho) --- */
 .bankHint {
     font-size: var(--font-size-smd);
     color: #64748b;
@@ -754,7 +748,6 @@
     }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .modalContent {
         width: 98%;

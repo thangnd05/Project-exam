@@ -23,7 +23,6 @@ const defaultFormState = {
 const extractApiErrorMessage = (error, fallback) =>
   error?.response?.data?.message || error?.response?.data?.error || error?.message || fallback;
 
-// ==================== Tree Node ====================
 function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, keyword, examTypeName}) {
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedIds.has(node.collection_id);
@@ -111,7 +110,6 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
   return nodeContent;
 }
 
-// ==================== Main Page ====================
 function QuestionCollectionsManagement() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -135,12 +133,10 @@ function QuestionCollectionsManagement() {
     deleteCollection,
   } = useQuestionCollections();
 
-  // Đặt trạng thái mở mặc định: mở tất cả nhóm cha có con.
   const applyDefaultExpanded = useCallback((list) => {
     setExpandedIds(new Set(list.filter((c) => c.child_count > 0).map((c) => c.collection_id)));
   }, []);
 
-  // Mở mặc định một lần khi tải xong lần đầu; các thao tác sau tự quản expandedIds.
   const didInitExpand = useRef(false);
   useEffect(() => {
     if (didInitExpand.current || !collectionsLoaded) return;
@@ -153,7 +149,6 @@ function QuestionCollectionsManagement() {
     [examTypes],
   );
 
-  // Dựng cây 2 cấp từ danh sách phẳng.
   const collectionTree = useMemo(() => {
     const byId = new Map(collectionList.map((c) => [c.collection_id, c]));
     const childrenOf = new Map();
@@ -166,8 +161,7 @@ function QuestionCollectionsManagement() {
         roots.push(c);
       }
     });
-    // Sắp theo vị trí (display_order) đặt tay trước; chưa đặt (null) xuống cuối và
-    // sắp theo tên numeric-aware nên "ETS 2026 2" đứng trước "ETS 2026 10".
+
     const byOrder = (a, b) => {
       const ao = a.display_order == null ? Number.MAX_SAFE_INTEGER : a.display_order;
       const bo = b.display_order == null ? Number.MAX_SAFE_INTEGER : b.display_order;
@@ -194,7 +188,6 @@ function QuestionCollectionsManagement() {
   );
   const collapseAll = useCallback(() => setExpandedIds(new Set()), []);
 
-  // Chỉ collection cấp 1 mới được chọn làm cha; loại chính nó khi đang sửa.
   const parentOptions = useMemo(
     () => collectionList.filter((c) => !c.parent_id && c.collection_id !== editingId),
     [collectionList, editingId],
@@ -217,7 +210,7 @@ function QuestionCollectionsManagement() {
 
   const openCreateChildModal = (parent) => {
     resetForm();
-    // Con kế thừa examType của cha — set sẵn để hiển thị (BE cũng tự ép theo cha).
+
     setFormState({name: '', description: '', parentId: parent.collection_id, examTypeId: parent.exam_type_id || '', displayOrder: ''});
     setShowModal(true);
   };
@@ -245,16 +238,16 @@ function QuestionCollectionsManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      // Luôn gửi parentId (chuỗi rỗng = gỡ cha / cấp 1) để backend cập nhật đúng.
+
       const payloadParentId = editingId && editingHasChildren ? '' : (formState.parentId || '');
-      // Vị trí sắp xếp: để trống = null (không đặt / không đổi). Chỉ gửi số hợp lệ.
+
       const trimmedOrder = String(formState.displayOrder).trim();
       const parsedOrder = trimmedOrder === '' ? null : Number.parseInt(trimmedOrder, 10);
       const payload = {
         name: normalizedName,
         description: formState.description.trim(),
         parentId: payloadParentId,
-        // examTypeId chỉ ý nghĩa với collection cha; con để BE tự kế thừa.
+
         examTypeId: payloadParentId ? '' : (formState.examTypeId || ''),
         displayOrder: Number.isNaN(parsedOrder) ? null : parsedOrder,
       };
@@ -264,7 +257,7 @@ function QuestionCollectionsManagement() {
       } else {
         await createCollection(payload);
       }
-      // Tải lại để số đếm gộp con-cháu và quan hệ cha-con luôn chính xác.
+
       const {data: fresh} = await refetchCollections();
       applyDefaultExpanded(Array.isArray(fresh) ? fresh : []);
       if (payload.parentId) {
@@ -432,7 +425,7 @@ function QuestionCollectionsManagement() {
               : 'Chọn nhóm cha để gom vào, ví dụ "ETS 2026" chứa "ETS 2026 1". Chỉ hỗ trợ 2 cấp.'}
           </Form.Text>
         </Form.Group>
-        {/* examType chỉ gắn cho nhóm cấp 1; nhóm con tự kế thừa từ cha. */}
+
         {!(editingHasChildren ? false : Boolean(formState.parentId)) ? (
           <Form.Group className="mb-3">
             <Form.Label>Loại kỳ thi (cho bộ đề)</Form.Label>

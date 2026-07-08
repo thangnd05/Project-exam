@@ -23,7 +23,6 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
       setDescription(classData?.description || '');
       setMessage('');
 
-      // Fetch full class data if description is missing
       if (classData?.classId && !classData?.description) {
         getClassById(classData.classId)
           .then((data) => {
@@ -72,7 +71,6 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
       show={show}
       onHide={onClose}
       title="Chỉnh sửa lớp học"
-      icon={FaEdit}
       footer={
         <ModalActionFooter
           cancelLabel="Để sau"

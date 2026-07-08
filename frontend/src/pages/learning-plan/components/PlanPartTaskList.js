@@ -22,10 +22,6 @@ const PRIORITY = {
   LOW: { text: 'Tùy chọn', variant: 'badgeMuted' },
 };
 
-/**
- * Danh sách ải (tag) theo từng Part — nút "Học ải" nằm trong khung Part.
- * @param {'link'|'button'} studyAction
- */
 function PlanPartTaskList({
   partGroups = [],
   learningPlanId,

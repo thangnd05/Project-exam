@@ -21,7 +21,6 @@ const asArray = (data) => (Array.isArray(data) ? data : EMPTY);
 const mapExamTypes = (list) =>
   asArray(list).map((item) => ({id: item.examTypeId, name: item.name}));
 
-// Danh sách tài liệu + các mutation tạo/sửa/xoá (invalidate lại danh sách khi xong).
 export function useRecoveryResources() {
   const qc = useQueryClient();
 
@@ -66,7 +65,6 @@ export function useRecoveryResources() {
   };
 }
 
-// Danh sách tag phẳng theo loại kỳ thi; chỉ fetch khi có examTypeId.
 export function useTagsByExamType(examTypeId) {
   const query = useQuery({
     queryKey: recoveryResourceKeys.tags(examTypeId),

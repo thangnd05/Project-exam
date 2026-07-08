@@ -27,7 +27,6 @@ function RolesManagement() {
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingRole, setDeletingRole] = useState(null);
 
-  // Phân quyền (RBAC): danh mục permission + modal gán cho role
   const [permRole, setPermRole] = useState(null);
   const [permSelected, setPermSelected] = useState(() => new Set());
   const [permSaving, setPermSaving] = useState(false);
@@ -42,7 +41,6 @@ function RolesManagement() {
     updatePermissionsMutation,
   } = useRoles();
 
-  // Gom permission theo nhóm để hiển thị theo từng khối.
   const permissionGroups = useMemo(() => {
     const groups = new Map();
     permissionCatalog.forEach((permission) => {

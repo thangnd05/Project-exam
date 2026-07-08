@@ -46,7 +46,7 @@ function App() {
           <ScrollProgressBar />
           <StreakCelebration />
           <Routes>
-            {/* Public Routes */}
+
             {publicRoutes.map((route, index) => {
               const Page = route.component;
               if (route.noLayout) {
@@ -76,7 +76,6 @@ function App() {
               );
             })}
 
-            {/*  Admin Routes */}
             {adminRoutes.map((route, index) => {
               const Page = route.component;
               return (
@@ -94,7 +93,6 @@ function App() {
               );
             })}
 
-            {/*  Private Routes */}
             {privateRoutes.map((route, index) => {
               const Page = route.component;
               const Layout = DefaultLayout;

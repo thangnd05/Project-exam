@@ -9,7 +9,6 @@ const cx = classNames.bind(styles);
 
 const ACCEPT_MEDIA = 'image/*,audio/*';
 
-// Tóm tắt ngắn hiển thị trên header khi câu hỏi bị thu gọn (giống badge của nhóm passage).
 const getQuestionSummary = (question) => {
     const text = (question.questionText || '').trim();
     const preview = text

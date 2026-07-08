@@ -11,7 +11,6 @@ async function fetchTestReview(userTestId, isGuest, guestCfg) {
   const metaData = await getUserTestMeta(userTestId, isGuest, guestCfg);
   const testId = metaData.testId;
 
-  // Check hạn review (endpoint public)
   const testInfo = await getUserTestInfo(testId);
   const now = new Date();
   const availableTo = testInfo.availableTo ? new Date(testInfo.availableTo) : null;
@@ -26,7 +25,6 @@ async function fetchTestReview(userTestId, isGuest, guestCfg) {
     getAnswersByUserTest(userTestId, isGuest, guestCfg),
   ]);
 
-  // Mode PRACTICE: chỉ xem lại các Part đã luyện, không hiện toàn bộ đề.
   let parts = testData.parts || [];
   if (metaData.mode === 'PRACTICE' && metaData.practicePartIds?.length) {
     const practiced = new Set(metaData.practicePartIds.map(String));

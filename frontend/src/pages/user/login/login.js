@@ -14,17 +14,14 @@ import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { name } from '~/assets/images';
 
-
 const cx = classNames.bind(style);
 
 function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
 
-  // Login States
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
-  // Register States
   const [regFullName, setRegFullName] = useState('');
   const [regUserName, setRegUserName] = useState('');
   const [regEmail, setRegEmail] = useState('');
@@ -44,23 +41,19 @@ function LoginPage() {
   const FACEBOOK_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/facebook`;
 
   useEffect(() => {
-    // 1. Xử lý logic chuyển Tab (Login/Register) như đã nói ở câu trước
+
     if (location.state?.mode) {
       setIsSignUp(location.state.mode === 'signup');
     }
 
-    // 2. Xử lý hiển thị thông báo từ ProtectedRoute
     if (location.state?.flashMessage) {
       setMessage(location.state.flashMessage);
-      setMessageType('error'); // hoặc 'warning' tùy CSS của bạn
+      setMessageType('error');
 
-      // Tùy chọn: Xóa state để thông báo không hiện lại khi F5
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
 
-  // Redirect khi đã đăng nhập (kể cả vừa login xong ở handleLogin/OAuth):
-  // quay lại đúng trang trước đó, giữ nguyên query string.
   useEffect(() => {
     if (user) {
       navigate(getRedirectTarget(location), { replace: true });
@@ -73,18 +66,17 @@ function LoginPage() {
     setMessage("");
 
     try {
-      //  Backend trả thẳng UserResponse
+
       const userData = await loginRequest({
         identifier: loginIdentifier,
         password: loginPassword,
       });
 
       if (userData?.id) {
-        // Gắn bài làm dạng khách (nếu có) vào tài khoản TRƯỚC khi set user,
-        // vì set user sẽ kích hoạt useEffect điều hướng rời trang login.
+
         await claimGuestAfterLogin();
 
-        login(userData); //  truyền thẳng vào AuthContext -> useEffect lo redirect về `from`
+        login(userData);
 
         setMessage("Đăng nhập thành công! Đang chuyển hướng...");
         setMessageType("success");
@@ -123,7 +115,7 @@ function LoginPage() {
       setMessage(data.message || 'Đăng ký thành công! Vui lòng xác thực email.');
       setMessageType('success');
       alert('📧 Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
-      setIsSignUp(false); // Switch back to login after success
+      setIsSignUp(false);
     } catch (err) {
       const errorMessage =
         err.response?.data?.message ||
@@ -141,7 +133,6 @@ function LoginPage() {
     <div className={cx('splitContainer')}>
       <div className={cx('mainCard', { 'signUpMode': isSignUp })}>
 
-        {/* FORM REGISTRATION (Bên Phải ban đầu, trượt vào) */}
         <div className={cx('formContainer', 'signUpContainer')}>
           <form onSubmit={handleRegister}>
             <h1>Tạo tài khoản</h1>
@@ -184,7 +175,6 @@ function LoginPage() {
           </form>
         </div>
 
-        {/* FORM LOGIN (Bên Trái ban đầu) */}
         <div className={cx('formContainer', 'signInContainer')}>
           <form onSubmit={handleLogin}>
             <h1>Đăng nhập</h1>
@@ -219,7 +209,6 @@ function LoginPage() {
           </form>
         </div>
 
-        {/* OVERLAY SECTION (Trượt qua lại) */}
         <div className={cx('overlayContainer')}>
           <div className={cx('overlay')}>
             <div className={cx('overlayPanel', 'overlayLeft')}>

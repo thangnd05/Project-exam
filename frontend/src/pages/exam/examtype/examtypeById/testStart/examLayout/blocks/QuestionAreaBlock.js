@@ -6,8 +6,6 @@ import styles from '../../TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Khối câu hỏi (vùng nội dung trung tâm): render các Part -> question group -> passage + câu hỏi.
-// Tách nguyên logic render từ TestStartPage (giữ giao diện không đổi).
 function QuestionAreaBlock({
   isPractice,
   visibleParts,
@@ -16,7 +14,7 @@ function QuestionAreaBlock({
   handleAnswerChange,
   config,
 }) {
-  // 'side' (mặc định) = passage cột trái + câu hỏi cột phải; 'stacked' = passage xếp trên câu hỏi.
+
   const useSide = (config?.passagePosition ?? 'side') === 'side';
   const hasPassageContent = (passage, fallbackObj) => {
     const content =
@@ -39,8 +37,6 @@ function QuestionAreaBlock({
     return Boolean(content || singleUrl);
   };
 
-  // Tách text passage theo dòng -> mỗi đoạn là 1 <p> để có khoảng cách giữa các đoạn
-  // (parser import nối các đoạn bằng "\n" đơn nên nếu không tách sẽ nhìn dính 1 khối).
   const renderPassageText = (text, key) => (
     <div key={key} className={cx('passage-content')}>
       {String(text)
@@ -63,7 +59,6 @@ function QuestionAreaBlock({
       fallbackObj?.passage_content;
     const pType = passage?.passageType ?? passage?.passage_type ?? 'READING';
 
-    // Bảng trung gian passage_media: passage có danh sách media (nhiều audio/ảnh)
     const mediaList =
       passage?.passageMediaList ??
       passage?.passageMedias ??
@@ -72,7 +67,6 @@ function QuestionAreaBlock({
       [];
     const hasMediaList = Array.isArray(mediaList) && mediaList.length > 0;
 
-    // Backward compat: một media trực tiếp trên passage (cũ)
     const singleMediaUrl =
       passage?.mediaUrl ??
       passage?.media_url ??
@@ -88,11 +82,8 @@ function QuestionAreaBlock({
 
     return (
       <div className={cx('passage-box')}>
-        {/* Render theo ĐÚNG THỨ TỰ thêm: đoạn chính (content) trước, rồi từng item
-            trong passage_media (text / ảnh / audio) theo thứ tự id. */}
-        {content && renderPassageText(content, 'main')}
 
-        {/* KHÔNG hiển thị bản dịch trong lúc làm bài — chỉ có ở trang xem đáp án. */}
+        {content && renderPassageText(content, 'main')}
 
         {hasMediaList &&
           mediaList.map((m, idx) => {

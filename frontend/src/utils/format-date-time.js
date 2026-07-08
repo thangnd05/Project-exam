@@ -11,7 +11,7 @@ export const formatDateTime = (value) => {
   return date.toLocaleString('vi-VN');
 };
 
-// Ngày giờ đầy đủ, định dạng 24h, trả '—' khi rỗng (dùng cho bảng/lịch sử bài thi).
+
 export const formatDateTime24 = (value) => {
   if (!value) {
     return '—';
@@ -25,7 +25,7 @@ export const formatDateTime24 = (value) => {
   return date.toLocaleString('vi-VN', { hour12: false });
 };
 
-// Nhãn ngắn dd/mm cho trục biểu đồ.
+
 export const formatDayMonth = (value) => {
   if (!value) {
     return '—';

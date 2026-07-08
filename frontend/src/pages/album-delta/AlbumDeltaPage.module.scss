@@ -84,13 +84,11 @@
     }
 }
 
-
-/* --- TABLE VIEW --- */
 .table-container {
     background: white;
     padding: 0;
     border-radius: var(--radius-lg);
-    overflow: hidden; // Ensures corners are rounded
+    overflow: hidden;
     box-shadow: var(--shadow-md);
     border: 1px solid #f1f5f9;
     margin-bottom: 20px;
@@ -98,7 +96,7 @@
     :global(.table-responsive) {
         margin: 0;
         border: none;
-        // Force horizontal scroll if needed and prevent stacking
+
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
@@ -106,10 +104,10 @@
 
 :global(.table) {
     margin-bottom: 0;
-    min-width: 600px; // Ensures table doesn't shrink too much and forces scroll on mobile
+    min-width: 600px;
     width: 100%;
     border-collapse: collapse;
-    display: table !important; // Explicitly prevent stacking
+    display: table !important;
 
     thead {
         background: #f8fafc;
@@ -200,7 +198,6 @@
     }
 }
 
-/* --- FLASHCARD VIEW --- */
 .flashcard-wrapper {
     padding: 60px 0;
     max-width: 500px;
@@ -343,7 +340,6 @@
     }
 }
 
-/* --- LOADING & ERROR --- */
 .loading-box {
     display: flex;
     flex-direction: column;

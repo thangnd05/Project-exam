@@ -12,7 +12,6 @@ export const profileDashboardKeys = {
   activity: (month, year) => ['profile-activity', month || '', year || ''],
 };
 
-// Gom examTypes + examParts + mục tiêu từng loại đề thành danh sách mục tiêu đã có.
 const fetchMyTargets = async () => {
   const [examTypes, examParts] = await Promise.all([
     getExamTypes().catch(() => []),
@@ -83,7 +82,7 @@ export function useMyActivity(selectedMonth, selectedYear) {
   });
   return {
     activity: query.data ?? null,
-    // isFetching để giữ nguyên hành vi cũ: hiện "Đang tải..." mỗi lần đổi tháng/năm.
+
     loadingActivity: query.isFetching,
   };
 }

@@ -92,7 +92,7 @@ function Service() {
         </div>
 
         <p className={cx("thankyou")}>
-          Cảm ơn bạn đã sử dụng dịch vụ của hệ thống!  
+          Cảm ơn bạn đã sử dụng dịch vụ của hệ thống!
           Chúng tôi cam kết mang đến trải nghiệm học tập và kiểm tra hiệu quả, minh bạch và an toàn.
         </p>
       </section>

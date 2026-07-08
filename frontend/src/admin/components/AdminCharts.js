@@ -22,13 +22,11 @@ import {
     Legend,
 } from 'recharts';
 
-// Bảng màu dùng chung cho toàn bộ dashboard admin
 export const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 const AXIS_TICK = { fill: '#64748b', fontSize: 12 };
 const GRID_STROKE = '#e2e8f0';
 
-// Style tooltip thống nhất (thay cho cấu hình tooltip của ECharts)
 const TOOLTIP_STYLE = {
     contentStyle: {
         background: 'rgba(255, 255, 255, 0.97)',
@@ -41,7 +39,6 @@ const TOOLTIP_STYLE = {
     cursor: { fill: 'rgba(148, 163, 184, 0.1)' },
 };
 
-// 1. Area 2 series — hoạt động theo tuần (Người dùng mới / Bài thi)
 export const WeeklyActivityArea = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
@@ -84,7 +81,6 @@ export const WeeklyActivityArea = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// 2. Combo bar + line, 2 trục Y — hiệu suất hàng tháng (Số bài thi / Điểm TB)
 export const MonthlyPerformanceCombo = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
@@ -129,7 +125,6 @@ export const MonthlyPerformanceCombo = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// 3. Donut — phân bố loại kỳ thi
 export const ExamTypeDonut = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <PieChart>
@@ -155,7 +150,6 @@ export const ExamTypeDonut = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// 4. Radar — phân bố kỹ năng
 export const SkillRadar = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} outerRadius="70%">
@@ -175,7 +169,6 @@ export const SkillRadar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// 5. Bar đơn — đăng ký người dùng theo ngày
 export const UserGrowthBar = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
@@ -194,7 +187,6 @@ export const UserGrowthBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// 6. Bar đơn — phân bố điểm số (gradient đỏ → xanh)
 export const ScoreDistributionBar = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>

@@ -41,7 +41,6 @@ function PostsPage() {
     status: 'APPROVED',
   });
 
-  // Reset về trang đầu khi đổi bộ lọc / từ khoá tìm kiếm
   useEffect(() => {
     setCurrentPage(0);
   }, [selectedCategory, searchQuery]);
@@ -66,7 +65,6 @@ function PostsPage() {
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
 
-        {/* Header */}
         <PageHeader
           label="BLOG"
           title="Bài viết"
@@ -94,7 +92,6 @@ function PostsPage() {
           </button>
         </PageHeader>
 
-        {/* Filter Bar */}
         <motion.div
           className={cx('filterBar')}
           initial={{ opacity: 0, y: 12 }}
@@ -138,7 +135,6 @@ function PostsPage() {
           </div>
         </motion.div>
 
-        {/* Post Grid */}
         <div className={cx('postGrid')}>
           <AnimatePresence mode="popLayout">
           {posts.map((post, index) => (
@@ -183,10 +179,8 @@ function PostsPage() {
           </AnimatePresence>
         </div>
 
-        {/* Pagination */}
         <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
 
-        {/* Create Post Modal */}
         <CreatePostModal
           show={showCreateModal}
           onClose={() => setShowCreateModal(false)}

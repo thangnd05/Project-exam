@@ -1,7 +1,3 @@
-// Bộ style dùng chung cho các trang admin.
-// Toàn bộ màu/spacing lấy từ token global ở GlobalStyles (:root) để đồng bộ brand.
-
-// ===== Page header =====
 .header {
   display: flex;
   justify-content: space-between;
@@ -37,7 +33,6 @@
   gap: 8px;
   flex-shrink: 0;
 
-  // Nút CTA "Thêm ..." dùng gradient brand, bo góc, shadow nhẹ + hover nhấc lên.
   :global(.btn-primary) {
     background: var(--primary-gradient);
     border: none;
@@ -57,7 +52,6 @@
   }
 }
 
-// ===== Toolbar (search + actions) =====
 .toolbar {
   display: flex;
   align-items: center;
@@ -94,14 +88,12 @@
   gap: 8px;
 }
 
-// ===== Table =====
 .tableWrapper {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   overflow: hidden;
 
-  // react-bootstrap Table tự thêm margin-bottom, bỏ để bo góc đẹp
   :global(table) {
     margin-bottom: 0;
   }
@@ -113,7 +105,6 @@
   color: var(--text-secondary);
 }
 
-// ===== Table footer / pagination =====
 .tableFooter {
   display: flex;
   align-items: center;
@@ -186,7 +177,6 @@
   display: inline-flex;
   gap: 4px;
 
-  // Icon phẳng, không khung viền; hover mới hiện nền tròn nhạt cho đẹp.
   button {
     border: none;
     background: transparent;
@@ -212,7 +202,6 @@
   }
 }
 
-// ===== Card / panel (form cấu hình) =====
 .card {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
@@ -220,14 +209,12 @@
   padding: 24px;
 }
 
-// ===== Field error =====
 .errorText {
   margin: 0;
   color: var(--danger-text);
   font-size: var(--font-size-sm);
 }
 
-// ===== Stat cards =====
 .statGroup {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -273,7 +260,6 @@
   color: var(--text-secondary);
 }
 
-// Tông màu icon cho stat card
 .blue {
   .statIcon {
     background: rgba(0, 97, 242, 0.12);

@@ -44,7 +44,6 @@ import styles from './Dashboard.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Stat Card Component
 const StatCard = ({ title, value, icon, color, trend, trendValue, delay }) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -68,7 +67,6 @@ const StatCard = ({ title, value, icon, color, trend, trendValue, delay }) => (
     </motion.div>
 );
 
-// Activity Icon Helper
 const getActivityIcon = (type) => {
     switch (type) {
         case 'exam_completed': return <CheckCircle size={16} className={cx('activityIcon', 'success')} />;
@@ -88,7 +86,7 @@ const AdminDashboard = () => {
 
     return (
         <div className={cx('dashboard')}>
-            {/* Page Header */}
+
             <AdminPageHeader
                 title="Dashboard"
                 description="Tổng quan về hệ thống English Exam"
@@ -104,7 +102,6 @@ const AdminDashboard = () => {
                 </span>
             </AdminPageHeader>
 
-            {/* Stats Cards */}
             <Row className={cx('statsRow')}>
                 <Col lg={3} md={6} sm={12}>
                     <StatCard
@@ -152,7 +149,6 @@ const AdminDashboard = () => {
                 </Col>
             </Row>
 
-            {/* Secondary Stats */}
             <Row className={cx('secondaryStats')}>
                 <Col lg={2} md={4} sm={6}>
                     <motion.div
@@ -222,7 +218,6 @@ const AdminDashboard = () => {
                 </Col>
             </Row>
 
-            {/* Charts Row 1 */}
             <Row className={cx('chartsRow')}>
                 <Col lg={8}>
                     <motion.div
@@ -262,7 +257,6 @@ const AdminDashboard = () => {
                 </Col>
             </Row>
 
-            {/* Charts Row 2 */}
             <Row className={cx('chartsRow')}>
                 <Col lg={8}>
                     <motion.div
@@ -302,7 +296,6 @@ const AdminDashboard = () => {
                 </Col>
             </Row>
 
-            {/* Bottom Row: Recent Tests & Activities */}
             <Row className={cx('bottomRow')}>
                 <Col lg={8}>
                     <motion.div

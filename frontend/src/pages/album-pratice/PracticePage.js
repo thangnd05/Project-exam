@@ -62,7 +62,6 @@ const PracticePage = () => {
         fetchQuestion();
     }, [fetchQuestion]);
 
-    // Tự động phát âm thanh lần đầu mỗi khi có câu hỏi mới
     useEffect(() => {
         if (!question?.word || !audioRef.current) return;
 
@@ -71,8 +70,6 @@ const PracticePage = () => {
 
         const tryPlay = () => audioEl.play();
 
-        // Thử phát ngay; nếu trình duyệt chặn (vd: vừa F5 chưa tương tác)
-        // thì chờ thao tác đầu tiên của người dùng rồi phát lại đúng câu hiện tại.
         tryPlay()?.catch(() => {
             const playOnInteract = () => {
                 tryPlay()?.catch(() => {});
@@ -80,7 +77,6 @@ const PracticePage = () => {
             window.addEventListener('pointerdown', playOnInteract, { once: true });
             window.addEventListener('keydown', playOnInteract, { once: true });
 
-            // Cleanup nếu đổi câu trước khi người dùng kịp tương tác
             audioEl._cleanupAutoplay = () => {
                 window.removeEventListener('pointerdown', playOnInteract);
                 window.removeEventListener('keydown', playOnInteract);
@@ -117,7 +113,7 @@ const PracticePage = () => {
                 setSessionScore(prev => ({...prev, correct: prev.correct + 1}));
             }
             setSessionScore(prev => ({...prev, total: prev.total + 1}));
-            refreshStreak(); // 🔥 luyện từ vựng -> cập nhật streak
+            refreshStreak();
         } catch (err) {
             console.error('Lỗi khi chấm:', err);
         }
@@ -134,7 +130,7 @@ const PracticePage = () => {
         try {
             setMarkingKnown(true);
             await markVocabKnown(question.vocabId);
-            refreshStreak(); // 🔥 học từ vựng -> cập nhật streak
+            refreshStreak();
             setKnownMessage('Bạn đã đánh dấu từ này là đã biết!');
             setTimeout(() => setKnownMessage(''), 2000);
             setTimeout(async () => {
@@ -148,7 +144,6 @@ const PracticePage = () => {
         }
     };
 
-    // Loading state
     if (loading) {
         return (
             <div className={cx('wrapper')}>
@@ -166,7 +161,6 @@ const PracticePage = () => {
         );
     }
 
-    // Finished state
     if (finished) {
         return (
             <div className={cx('wrapper')}>
@@ -194,7 +188,6 @@ const PracticePage = () => {
         );
     }
 
-    // No question state
     if (!question) {
         return (
             <div className={cx('wrapper')}>
@@ -211,7 +204,6 @@ const PracticePage = () => {
         );
     }
 
-    // Main UI
     const isMultiChoice = question.type === 'MULTICHOICE';
     const canSubmit = isMultiChoice
         ? selectedOption !== null
@@ -220,7 +212,7 @@ const PracticePage = () => {
     return (
         <div className={cx('wrapper')}>
             <Container className={cx('practiceContainer')}>
-                {/* Known Message Toast */}
+
                 <AnimatePresence>
                     {knownMessage && (
                         <motion.div
@@ -235,7 +227,6 @@ const PracticePage = () => {
                     )}
                 </AnimatePresence>
 
-                {/* Header */}
                 <motion.div
                     initial={{opacity: 0, y: -20}}
                     animate={{opacity: 1, y: 0}}
@@ -249,7 +240,6 @@ const PracticePage = () => {
                     </div>
                 </motion.div>
 
-                {/* Main Card */}
                 <motion.div
                     key={question.vocabId}
                     initial={{opacity: 0, x: 50}}
@@ -257,11 +247,10 @@ const PracticePage = () => {
                     exit={{opacity: 0, x: -50}}
                     className={cx('mainCard')}
                 >
-                    {/* Question Section */}
+
                     <div className={cx('questionSection')}>
                         <h2 className={cx('questionText')}>{question.questionText}</h2>
 
-                        {/* Audio Player */}
                         <div className={cx('audioSection')}>
                             <audio
                                 ref={audioRef}
@@ -287,7 +276,6 @@ const PracticePage = () => {
                         </div>
                     </div>
 
-                    {/* Answer Section */}
                     <div className={cx('answerSection')}>
                         {isMultiChoice ? (
                             <div className={cx('optionsGrid')}>
@@ -351,7 +339,6 @@ const PracticePage = () => {
                             </div>
                         )}
 
-                        {/* Result Feedback */}
                         <AnimatePresence>
                             {result && (
                                 <motion.div
@@ -401,7 +388,6 @@ const PracticePage = () => {
                             )}
                         </AnimatePresence>
 
-                        {/* Action Buttons */}
                         <div className={cx('actionButtons')}>
                             {!result ? (
                                 <button

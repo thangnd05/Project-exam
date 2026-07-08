@@ -24,7 +24,6 @@ const STATUS_VARIANT = {
   ABANDONED: 'badgeDanger',
 };
 
-
 function PlanComparisonPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');

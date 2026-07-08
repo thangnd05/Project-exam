@@ -10,7 +10,7 @@ import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal
 import ExamTypeFormModal from '../modals/ExamTypeFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {useExamTypes} from './hooks/useExamTypes';
-// Dùng lại bộ style cây của trang Bộ sưu tập câu hỏi cho đồng nhất.
+
 import styles from './QuestionCollections.module.scss';
 
 const cx = classNames.bind(styles);
@@ -46,12 +46,11 @@ const buildExamTypePayload = (formState, {hasChildren} = {}) => {
     durationMinutes,
     scoringMethod: formState.scoring_method,
     flexible: Boolean(formState.flexible),
-    // Node đang có con thì không cho thành con của loại khác → gửi rỗng.
+
     parentId: hasChildren ? '' : (formState.parent_id || ''),
   };
 };
 
-// ==================== Tree Node ====================
 function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEditLayout, onDelete, onAddChild, keyword}) {
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedIds.has(node.exam_type_id);
@@ -136,7 +135,6 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
   return nodeContent;
 }
 
-// ==================== Main Page ====================
 function ExamTypesManagement() {
   const navigate = useNavigate();
   const {examTypeList, isLoading: loading, isError, createMutation, updateMutation, deleteMutation} =
@@ -152,12 +150,10 @@ function ExamTypesManagement() {
 
   const examTypes = useMemo(() => examTypeList.map(mapExamTypeFromApi), [examTypeList]);
 
-  // Mỗi lần dữ liệu tải/làm mới lại: mở sẵn các loại đang có loại con (giữ hành vi cũ).
   useEffect(() => {
     setExpandedIds(new Set(examTypes.filter((t) => t.child_count > 0).map((t) => t.exam_type_id)));
   }, [examTypes]);
 
-  // Dựng cây 2 cấp từ danh sách phẳng.
   const examTypeTree = useMemo(() => {
     const byId = new Map(examTypes.map((t) => [t.exam_type_id, t]));
     const childrenOf = new Map();
@@ -191,7 +187,6 @@ function ExamTypesManagement() {
   );
   const collapseAll = useCallback(() => setExpandedIds(new Set()), []);
 
-  // Chỉ examType gốc (chưa có cha) mới được làm cha; loại chính nó khi đang sửa.
   const parentOptions = useMemo(
     () => examTypes.filter((t) => !t.parent_id && t.exam_type_id !== editingTypeId),
     [examTypes, editingTypeId],
@@ -258,7 +253,7 @@ function ExamTypesManagement() {
       } else {
         await createMutation.mutateAsync(payload);
       }
-      // Mutation onSuccess đã invalidate để quan hệ cha-con + childCount luôn chính xác.
+
       if (payload.parentId) {
         setExpandedIds((prev) => new Set(prev).add(payload.parentId));
       }

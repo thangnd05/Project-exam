@@ -4,7 +4,6 @@ import TestStateScreens from './TestStateScreens';
 import { useTestSession } from './useTestSession';
 import ExamLayoutRenderer from './examLayout/ExamLayoutRenderer';
 
-// Các trạng thái không phải "đang làm bài" -> hiển thị màn riêng thay vì render đề.
 const STATE_SCREEN_STATUSES = ['loading', 'payment', 'no-attempts', 'locked', 'closed'];
 
 function TestStartPage() {

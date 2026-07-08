@@ -133,7 +133,6 @@ function RecoveryResourcesManagement() {
 
   const fetchError = resourcesError ? 'Không thể tải danh sách tài liệu.' : '';
 
-  // Chọn sẵn tag cha đầu tiên mỗi khi đổi loại kỳ thi / tải xong danh sách tag.
   useEffect(() => {
     if (!selectedExamTypeId) {
       setSelectedParentTagId('');
@@ -368,7 +367,7 @@ function RecoveryResourcesManagement() {
       a.remove();
       window.URL.revokeObjectURL(blobUrl);
     } catch {
-      // Fallback: mở tab mới
+
       window.open(url, '_blank');
     }
   };

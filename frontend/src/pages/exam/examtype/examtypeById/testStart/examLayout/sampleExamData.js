@@ -1,5 +1,3 @@
-// Dữ liệu câu hỏi giả để preview trong editor (không gọi API, không chấm điểm).
-// Dùng nội dung mẫu NGẮN GỌN — chỉ để xem bố cục "Câu 1" chứ không đổ nguyên văn đề thật.
 export const sampleExamData = {
   visibleParts: [
     {
@@ -46,7 +44,6 @@ export const sampleExamData = {
   ],
 };
 
-// allQuestions + questionIndexMap phẳng để preview timer/progress/nav.
 export const sampleAllQuestions = sampleExamData.visibleParts
   .flatMap((p) => p.questionGroups)
   .flatMap((g) => g.questions);

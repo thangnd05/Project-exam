@@ -6,7 +6,6 @@
   flex-shrink: 0;
 }
 
-// Vòng khung phía sau avatar (COLOR / EFFECT). Avatar nằm trên, không bị xoay theo.
 .backRing {
   position: absolute;
   inset: 0;
@@ -60,8 +59,6 @@
   border-radius: 0;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
-
-/* ---------- Hiệu ứng CSS (EFFECT) ---------- */
 
 .effect-glow {
   background: linear-gradient(135deg, #ffd43b, #fab005);

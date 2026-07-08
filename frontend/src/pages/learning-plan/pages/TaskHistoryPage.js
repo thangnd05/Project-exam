@@ -28,7 +28,6 @@ function pct(v) {
   return `${n.toFixed(2)}%`;
 }
 
-
 function TaskHistoryPage() {
   const { learningPlanId, taskId } = useParams();
   const { plan, sessions, isLoading: loading, sessionsError, error } = useTaskHistory(

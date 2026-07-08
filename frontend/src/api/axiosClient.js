@@ -9,7 +9,7 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(
   (config) => {
-    // Hàm đọc cookie
+
     const getCookie = (name) => {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -17,10 +17,8 @@ axiosClient.interceptors.request.use(
       return null;
     };
 
-    // Lấy token mới nhất từ trình duyệt
     const csrfToken = getCookie('XSRF-TOKEN');
 
-    // Gắn vào Header nếu tồn tại
     if (csrfToken) {
       config.headers['X-XSRF-TOKEN'] = decodeURIComponent(csrfToken);
     }
@@ -32,13 +30,6 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// ──────────────────────────────────────────────────────────────
-// Response interceptor: tự refresh khi access token hết hạn (401).
-// Refresh token là HttpOnly cookie với Path=/api/auth/refresh, browser tự đính kèm.
-// Tránh vòng lặp: không refresh khi chính request bị fail là /login hoặc /refresh,
-// và không refresh lần 2 cho cùng 1 request (cờ _retry).
-// Khi đang refresh, các request 401 khác xếp hàng → resolve cùng lúc sau khi refresh xong.
-// ──────────────────────────────────────────────────────────────
 const AUTH_BYPASS_PATHS = ['/api/auth/refresh', '/api/auth/login'];
 let isRefreshing = false;
 let pendingQueue = [];
@@ -78,8 +69,7 @@ axiosClient.interceptors.response.use(
       return axiosClient(original);
     } catch (refreshErr) {
       flushQueue(refreshErr);
-      // Báo cho app biết session đã chết: hết hạn tự nhiên, replay detected,
-      // hoặc family bị revoke (đổi pass ở device khác / logout-all). AuthContext sẽ clear state.
+
       window.dispatchEvent(new CustomEvent('auth:expired', {
         detail: { reason: refreshErr?.response?.data?.message },
       }));

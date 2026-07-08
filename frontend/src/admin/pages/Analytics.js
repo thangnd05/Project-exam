@@ -32,7 +32,6 @@ import styles from './Analytics.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Phân bố điểm số (dữ liệu tĩnh)
 const scoreDistribution = [
     { range: '0-2', count: 5 },
     { range: '2-4', count: 15 },
@@ -44,13 +43,12 @@ const scoreDistribution = [
 const AnalyticsPage = () => {
     return (
         <div className={cx('analyticsPage')}>
-            {/* Page Header */}
+
             <AdminPageHeader
                 title="Thống kê & Phân tích"
                 description="Phân tích chi tiết về hệ thống English Exam"
             />
 
-            {/* Key Metrics */}
             <Row className={cx('metricsRow')}>
                 <Col lg={3} md={6}>
                     <motion.div
@@ -124,7 +122,6 @@ const AnalyticsPage = () => {
                 </Col>
             </Row>
 
-            {/* Charts Row 1 */}
             <Row className={cx('chartsRow')}>
                 <Col lg={8}>
                     <motion.div
@@ -164,7 +161,6 @@ const AnalyticsPage = () => {
                 </Col>
             </Row>
 
-            {/* Charts Row 2 */}
             <Row className={cx('chartsRow')}>
                 <Col lg={4}>
                     <motion.div

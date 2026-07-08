@@ -4,8 +4,6 @@
   gap: 1.6rem;
 }
 
-// Header/toolbar/error dùng bộ admin kit. File này giữ style card/grid mốc đặc thù.
-
 .createBox {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
@@ -166,7 +164,6 @@
   }
 }
 
-// Score estimate bar
 .scoreEstimate {
   display: flex;
   align-items: center;

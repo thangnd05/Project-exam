@@ -45,7 +45,7 @@ const getMediaItemsFromQuestion = (questionDetail) => {
   const fallbackUrl = questionDetail?.passage?.mediaUrl;
   if (fallbackUrl && !items.some((m) => m.mediaUrl === fallbackUrl)) {
     items.push({
-      id: null, // fallback cũ không có id để xóa qua /api/passage-media/{id}
+      id: null,
       mediaUrl: fallbackUrl,
       mediaType:
         (questionDetail?.passage?.passageType || '').toUpperCase() ===
@@ -62,7 +62,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   const [saving, setSaving] = useState(false);
 
   const [newFiles, setNewFiles] = useState([]);
-  const [extraContents, setExtraContents] = useState([]); // các đoạn text bổ sung của passage
+  const [extraContents, setExtraContents] = useState([]);
   const [existingMedia, setExistingMedia] = useState([]);
   const [deletingMediaIds, setDeletingMediaIds] = useState([]);
   const [confirmDeleteMedia, setConfirmDeleteMedia] = useState(null);
@@ -112,7 +112,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
             isCorrect: ans.isCorrect,
           }));
         } else {
-          // Fallback if no answers
+
           mappedOptions = [
             { id: null, answerLabel: 'A', content: '', isCorrect: false },
             { id: null, answerLabel: 'B', content: '', isCorrect: false },
@@ -143,7 +143,6 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
           });
           setExistingMedia(getMediaItemsFromQuestion(questionDetail));
 
-          // Các đoạn text bổ sung (passage_media type=TEXT), giữ thứ tự theo id
           const textSegments = (
             Array.isArray(questionDetail.passageMedia) ? questionDetail.passageMedia : []
           )
@@ -152,7 +151,6 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
             .filter((t) => t !== '');
           setExtraContents(textSegments);
 
-          // Load tags: lấy danh sách tag đã gắn + danh sách tag available
           const currentTagIds = (questionDetail.tags || []).map((t) => t.tagId);
           setSelectedTagIds(currentTagIds);
 
@@ -161,7 +159,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
               .then((tags) => { if (!cancelled) setAvailableTags(tags); })
               .catch(() => {});
           } else if (questionDetail.examPartId) {
-            // Lấy examTypeId qua examPart
+
             getExamPartById(questionDetail.examPartId)
               .then((part) => {
                 const etId = part?.examTypeId;
@@ -302,7 +300,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       isBank: formData.isBank,
       answers: formData.options.map((opt) => ({
         id: opt.id,
-        answerId: opt.id, // tương thích backend syncAnswers
+        answerId: opt.id,
         answerLabel: opt.answerLabel,
         answerText: opt.content,
         isCorrect: opt.isCorrect,
@@ -326,7 +324,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
         content: formData.passage.content,
         contentTranslation: formData.passage.contentTranslation?.trim() || null,
         mediaUrl: formData.passage.mediaUrl,
-        // Luôn gửi (kể cả mảng rỗng) để BE đồng bộ: xoá đoạn đã bỏ, thêm đoạn mới
+
         extraContents: cleanExtraContents,
       };
     }
@@ -363,7 +361,6 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       show={show}
       onClose={onHide}
       title="Cập nhật câu hỏi"
-      icon={IoCreateOutline}
       maxWidth={800}
       footer={
         <ModalActionFooter

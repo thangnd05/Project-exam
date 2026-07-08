@@ -38,10 +38,9 @@ function MyAlbumsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editingAlbum, setEditingAlbum] = useState(null);
   const [albumToDelete, setAlbumToDelete] = useState(null);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
+  const [viewMode, setViewMode] = useState('grid');
   const navigate = useNavigate();
 
-  // 🟢 Lấy danh sách album
   const { albums, isLoading: loading, refetchAlbums, deleteAlbumMutation } = useMyAlbums();
 
   const handleDeleteAlbum = (album) => {
@@ -83,7 +82,7 @@ function MyAlbumsPage() {
   return (
     <div className={cx('wrapper')}>
       <Container>
-        {/* === Header Dashboard === */}
+
         <PageHeader
           title="THẺ GHI NHỚ"
           label="QUẢN LÝ ALBUM"
@@ -101,7 +100,6 @@ function MyAlbumsPage() {
           />
         </PageHeader>
 
-        {/* === Body Content === */}
         <div className={cx('content-section')}>
           {albums.length === 0 ? (
             <motion.div
@@ -167,14 +165,12 @@ function MyAlbumsPage() {
         </div>
       </Container>
 
-      {/* === Modal tạo album === */}
       <CreateAlbumModal
         show={showModal}
         onClose={() => setShowModal(false)}
         onSuccess={refetchAlbums}
       />
 
-      {/* === Modal chỉnh sửa album === */}
       <UpdateAlbumModal
         show={showEditModal}
         album={editingAlbum}
@@ -185,7 +181,6 @@ function MyAlbumsPage() {
         onSuccess={refetchAlbums}
       />
 
-      {/* === Modal xác nhận xóa === */}
       <ConfirmDeleteModal
         show={showDeleteModal}
         onClose={() => {

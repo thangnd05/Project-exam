@@ -44,7 +44,7 @@ function Header() {
     await logout();
     navigate(routes.home);
   };
-  // --- Sub-components để tái sử dụng ---
+
   const NavItems = ({isMobile = false}) => {
     const handleClassAction = (e, targetRoute, modalType = null) => {
       e.preventDefault();
@@ -261,7 +261,6 @@ function Header() {
             <FontAwesomeIcon icon={faBars} />
           </Button>
 
-          {/* Desktop Navbar */}
           <Navbar.Collapse
             id="basic-navbar-nav"
             className={cx('desktopCollapse')}
@@ -274,7 +273,6 @@ function Header() {
             </Nav>
           </Navbar.Collapse>
 
-          {/* Mobile Offcanvas */}
           <Offcanvas
             show={showOffcanvas}
             onHide={handleClose}
@@ -311,7 +309,7 @@ function Header() {
         mode="personal"
         onSuccess={() => {
           setShowCreateTestModal(false);
-          // Optionally navigate to test list or refresh
+
         }}
       />
     </div>

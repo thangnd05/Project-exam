@@ -19,7 +19,7 @@ function ScrollProgressBar() {
     };
 
     window.addEventListener('scroll', handleScroll);
-    // Initial calculation
+
     handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
@@ -27,9 +27,9 @@ function ScrollProgressBar() {
 
   return (
     <div className={cx('progressBarContainer')}>
-      <div 
-        className={cx('progressBar')} 
-        style={{ width: `${scrollProgress}%` }} 
+      <div
+        className={cx('progressBar')}
+        style={{ width: `${scrollProgress}%` }}
       />
     </div>
   );

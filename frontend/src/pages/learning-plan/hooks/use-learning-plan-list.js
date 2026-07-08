@@ -2,13 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getExamTypes } from '~/api/examTypeApi';
 import { listPlans } from '~/api/learningPlanApi';
 
-/**
- * @param {object} options
- * @param {boolean} [options.loadAll] — gộp plan mọi kỳ thi
- * @param {string} [options.examTypeId] — controlled (bắt buộc khi loadAll=false)
- * @param {string} [options.initialExamTypeId]
- * @param {number} [options.refreshKey] — đổi giá trị để reload
- */
 export function useLearningPlanList({
   loadAll = false,
   examTypeId: controlledExamTypeId,

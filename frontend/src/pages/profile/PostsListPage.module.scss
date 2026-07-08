@@ -8,7 +8,6 @@
   margin: 0 auto;
 }
 
-/* ── Page header ───────────────────────────── */
 .pageHeader {
   display: flex;
   justify-content: space-between;
@@ -53,7 +52,6 @@
   }
 }
 
-/* ── Toolbar (search + filter pills) ───────── */
 .toolbar {
   display: flex;
   align-items: center;
@@ -126,7 +124,6 @@
   }
 }
 
-/* ── States ───────────────────────────────── */
 .loadingWrap {
   display: flex;
   align-items: center;
@@ -140,7 +137,6 @@
   margin-top: 16px;
 }
 
-/* ── Card list ────────────────────────────── */
 .list {
   display: grid;
   gap: 16px;
@@ -293,7 +289,6 @@
   }
 }
 
-/* ── Three-dots dropdown ──────────────────── */
 .cardMenu {
   position: absolute;
   top: 14px;
@@ -320,7 +315,6 @@
     color: var(--text-color);
   }
 
-  /* Tắt mũi tên mặc định của Bootstrap */
   &::after { display: none !important; }
 }
 
@@ -358,7 +352,6 @@
   }
 }
 
-/* ── Inline action button (Saved page) ────── */
 .cardActions {
   display: flex;
   gap: 8px;
@@ -417,7 +410,6 @@
   }
 }
 
-/* ── Pagination ───────────────────────────── */
 .pagination {
   display: flex;
   justify-content: center;
@@ -467,7 +459,6 @@
   }
 }
 
-/* ── Responsive ───────────────────────────── */
 @media (max-width: 768px) {
   .toolbar {
     flex-direction: column;

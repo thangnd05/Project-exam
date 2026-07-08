@@ -41,7 +41,6 @@ export function useClassMembers(classId) {
     select: normalizeList,
   });
 
-  // Preserve original error toasts for class info + members fetch
   useEffect(() => {
     if (infoQuery.isError) {
       console.error('Lỗi khi lấy thông tin lớp học:', infoQuery.error);

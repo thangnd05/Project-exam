@@ -17,11 +17,10 @@ function ResetPassWord() {
   const navigate = useNavigate();
 
   const handleResetPassword = async (e) => {
-    e.preventDefault(); // Ngăn reload trang (nếu input nằm trong form)
+    e.preventDefault();
     setMessage('');
     setError('');
 
-    // Kiểm tra khớp mật khẩu
     if (newPassword !== confirmPassword) {
       setError('Mật khẩu mới và mật khẩu xác nhận không khớp!');
       return;
@@ -30,13 +29,12 @@ function ResetPassWord() {
     try {
       await resetPassword(token, newPassword);
 
-      // Hiển thị thông báo thành công và chuyển hướng
       setMessage('Đặt lại mật khẩu thành công!');
       setTimeout(() => {
-        navigate(routes.login); // Chuyển sang trang đăng nhập
+        navigate(routes.login);
       }, 2000);
     } catch (err) {
-      // Xử lý lỗi
+
       if (err.response && err.response.status === 400) {
         setError('Token không hợp lệ hoặc đã hết hạn!');
       }
@@ -52,7 +50,6 @@ function ResetPassWord() {
       >
         <h1>Đặt lại mật khẩu</h1>
 
-        {/* Nhập Token */}
         <Form.Group className={cx('input-box')}>
           <Form.Control
             type="text"
@@ -62,13 +59,12 @@ function ResetPassWord() {
             value={token}
             onChange={(e) => setToken(e.target.value)}
             onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập token!'); // Tùy chỉnh thông báo
+              e.target.setCustomValidity('Vui lòng nhập token!');
             }}
-            onInput={(e) => e.target.setCustomValidity('')} // Xóa thông báo khi người dùng nhập
+            onInput={(e) => e.target.setCustomValidity('')}
           />
         </Form.Group>
 
-        {/* Nhập mật khẩu mới */}
         <Form.Group className={cx('input-box')}>
           <Form.Control
             type="password"
@@ -78,13 +74,12 @@ function ResetPassWord() {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập mật khẩu mới!'); // Tùy chỉnh thông báo
+              e.target.setCustomValidity('Vui lòng nhập mật khẩu mới!');
             }}
-            onInput={(e) => e.target.setCustomValidity('')} // Xóa thông báo khi người dùng nhập
+            onInput={(e) => e.target.setCustomValidity('')}
           />
         </Form.Group>
 
-        {/* Nhập lại mật khẩu mới */}
         <Form.Group className={cx('input-box')}>
           <Form.Control
             type="password"
@@ -94,13 +89,12 @@ function ResetPassWord() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             onInvalid={(e) => {
-              e.target.setCustomValidity('Xác nhận mật khẩu mới!'); // Tùy chỉnh thông báo
+              e.target.setCustomValidity('Xác nhận mật khẩu mới!');
             }}
-            onInput={(e) => e.target.setCustomValidity('')} // Xóa thông báo khi người dùng nhập
+            onInput={(e) => e.target.setCustomValidity('')}
           />
         </Form.Group>
 
-        {/* Thông báo */}
         {message && (
           <div className={cx('alert', 'alert-success')}>{message}</div>
         )}

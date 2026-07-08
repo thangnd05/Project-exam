@@ -59,21 +59,18 @@ const formatNumber = (value) => {
   return safeValue.toLocaleString('vi-VN');
 };
 
-// "2026-06" -> "Tháng 6/2026"
 const formatMonthLabel = (value) => {
   if (!value) return '';
   const [year, month] = value.split('-');
   return `Tháng ${Number(month)}/${year}`;
 };
 
-// "2026-06" -> "T6" (gọn cho trục X)
 const formatMonthShort = (value) => {
   if (!value) return '';
   const [, month] = value.split('-');
   return `T${Number(month)}`;
 };
 
-// 95 -> "1h 35p"; 40 -> "40p"; 0 -> "0p"
 const formatDuration = (minutes) => {
   const total = Math.max(0, Math.round(Number(minutes) || 0));
   const h = Math.floor(total / 60);
@@ -105,7 +102,6 @@ function ProfileOverviewPage() {
     ? 'Không tải được thông tin hồ sơ. Vui lòng thử lại sau.'
     : '';
 
-  // Đồng bộ tháng/năm đang chọn theo giá trị backend trả về (lần đầu chưa chọn).
   useEffect(() => {
     if (!activity) return;
     if (!selectedMonth && activity.month) setSelectedMonth(activity.month);
@@ -166,7 +162,7 @@ function ProfileOverviewPage() {
 
         {!errorMessage && profileOverview && (
           <div className={cx('dashboardGrid')}>
-            {/* LÊN LEFT SIDE (CỘT NHỎ) */}
+
             <aside className={cx('leftCol')}>
               <section className={cx('profileCard')}>
                 <div className={cx('avatarWrap')}>
@@ -255,7 +251,6 @@ function ProfileOverviewPage() {
               </section>
             </aside>
 
-            {/* LÊN RIGHT SIDE (CỘT LỚN) */}
             <main className={cx('rightCol')}>
               <section className={cx('statsRow')}>
                 <article className={cx('statCard', 'statCardCompact')}>

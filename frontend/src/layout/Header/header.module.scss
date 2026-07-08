@@ -41,19 +41,16 @@
   gap: 22px;
 }
 
-/* ===  Thêm sticky + hiệu ứng mờ vào đây === */
 .wrapper {
   font-size: 1.6rem;
   position: sticky;
   top: 0;
   z-index: 1000;
 
-  /* Nền trong mờ nhẹ */
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
-  /* Viền và bóng mờ nhẹ để tách khỏi nội dung */
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -98,7 +95,7 @@
 
     &::after {
       width: 80%;
-      /* mở rộng đều ra hai bên */
+
     }
   }
 }
@@ -177,7 +174,6 @@
   padding: 8px 0;
 }
 
-/* Title */
 .menuTitle {
   position: relative;
   font-size: var(--font-size-md);
@@ -206,7 +202,6 @@
   width: 100%;
 }
 
-/* Dropdown */
 .menuDropdown {
   position: absolute;
   top: calc(100% + 10px);
@@ -223,7 +218,6 @@
   z-index: 999;
 }
 
-/*  Hover bridge */
 .menuDropdown::before {
   content: "";
   position: absolute;
@@ -236,13 +230,11 @@
   pointer-events: auto;
 }
 
-/*  Giữ dropdown mở khi hover */
 .customMenu:hover .menuDropdown,
 .menuDropdown:hover {
   display: flex;
 }
 
-/* Items */
 .menuDropdown button,
 .menuDropdown a {
   padding: 12px 16px;

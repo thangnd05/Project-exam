@@ -39,7 +39,6 @@ const Posts = () => {
     const totalElements = postsQuery.data?.totalElements || 0;
     const loading = postsQuery.isLoading;
 
-    // Reset về trang đầu khi đổi bộ lọc/từ khoá
     useEffect(() => {
         setCurrentPage(0);
     }, [statusFilter, searchQuery]);

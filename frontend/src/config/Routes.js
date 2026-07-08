@@ -7,7 +7,6 @@ const routes = {
   policy: '/policy',
   service: '/service',
 
-  // 🧩 Test / Exam
   testStart: '/tests/:testId/start',
   testResult: '/tests/result/:userTestId',
   testReview: '/tests/result/:userTestId/review',
@@ -16,7 +15,6 @@ const routes = {
   createTestFromBank: '/admin/create-test-from-bank',
   personalQuestionBank: '/admin/personal-question-bank',
 
-  // 🛠️ Admin Dashboard
   adminDashboard: '/admin/dashboard',
   adminUsers: '/admin/users',
   adminRoles: '/admin/roles',
@@ -52,7 +50,6 @@ const routes = {
   examTypeCollection: '/exam-types/:examTypeId/collections/:collectionId',
   MyTest: '/my-tests',
 
-  // 📚 Learning Plan
   generatePlan: '/learning-plans/generate',
   planCompare: '/learning-plans/compare',
   planDetail: '/learning-plans/:learningPlanId',
@@ -63,12 +60,10 @@ const routes = {
   albumDelta: '/albums/:albumId',
   vocaPratice: '/practice/:albumId',
 
-  // 🏫 Class routes
   myClasses: '/my-classes',
   classChapterTests: '/classes/:classId/chapters/:chapterId/tests',
   classMemberManagement: '/class/:classId/members',
 
-  // 👤 Auth
   login: '/login',
   forgot: '/forgot',
   reset: '/reset',
@@ -86,19 +81,16 @@ const routes = {
   notFound: '*',
 };
 
-/** Danh sách đề theo loại kỳ thi (mock / luyện thi). */
 export function buildExamTypeDetailPath(examTypeId) {
   if (!examTypeId) return routes.home;
   return `/exam-types/${encodeURIComponent(examTypeId)}`;
 }
 
-/** Danh sách đề trong 1 bộ đề (folder collection) của loại kỳ thi. */
 export function buildExamTypeCollectionPath(examTypeId, collectionId) {
   if (!examTypeId || !collectionId) return routes.home;
   return `/exam-types/${encodeURIComponent(examTypeId)}/collections/${encodeURIComponent(collectionId)}`;
 }
 
-/** Trang gợi ý bước tiếp theo trong lộ trình cá nhân hóa. */
 export function buildNextStepPath(examTypeId) {
   if (!examTypeId) return routes.nextStep;
   return `${routes.nextStep}?examTypeId=${encodeURIComponent(examTypeId)}`;

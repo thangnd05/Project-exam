@@ -24,15 +24,13 @@ export function useTestSession() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Chế độ làm bài đọc từ query param (?mode=practice&parts=id1,id2) để sống sót qua reload.
   const isPractice = searchParams.get('mode') === 'practice';
   const partsParam = searchParams.get('parts') || '';
   const selectedPartIds = useMemo(
     () => (partsParam ? partsParam.split(',').filter(Boolean) : []),
     [partsParam],
   );
-  // Khóa sessionStorage riêng cho mỗi (đề, mode, bộ Part) để phiên full-test và
-  // các phiên luyện tập theo Part khác nhau không đè lên nhau.
+
   const sessionKey = useMemo(() => {
     if (!isPractice) return testId;
     return `${testId}::practice::${[...selectedPartIds].sort().join(',')}`;
@@ -43,7 +41,6 @@ export function useTestSession() {
   const { balance, refreshCoins } = useCoins();
   const [purchasing, setPurchasing] = useState(false);
 
-  // Guest session: chỉ khởi tạo khi đã xác định KHÔNG đăng nhập.
   const isGuest = !authLoading && !isAuthenticated;
   const guestSessionId = useMemo(
     () => (isGuest ? getOrCreateGuestSessionId() : null),
@@ -61,7 +58,7 @@ export function useTestSession() {
   const [preCountdown, setPreCountdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState('loading');
-  // Bố cục giao diện làm bài theo examType (fallback về mặc định khi chưa cấu hình).
+
   const [layoutConfig, setLayoutConfig] = useState(defaultLayoutConfig);
 
   const enrichTestWithPassageMedia = useCallback(async (testData) => {
@@ -112,7 +109,7 @@ export function useTestSession() {
       const parsed = JSON.parse(savedState);
       setUserTestId(parsed.userTestId || null);
       setUserAnswers(parsed.userAnswers || {});
-      // Luyện tập theo Part: KHÔNG giới hạn giờ -> timeLeft luôn null.
+
       if (isPractice) {
         setTimeLeft(null);
       } else if (parsed.timeLeft && parsed.lastSavedAt) {
@@ -164,8 +161,6 @@ export function useTestSession() {
           return;
         }
 
-        // 🔄 Nếu không có state trong sessionStorage (vd. vừa logout/login),
-        // thử khôi phục từ server: tìm attempt đang IN_PROGRESS + answers đã lưu.
         let serverStartedAt = null;
         if (!restored) {
           try {
@@ -191,12 +186,10 @@ export function useTestSession() {
               restored = true;
             }
           } catch {
-            // ignore — sẽ rơi xuống flow tạo attempt mới
+
           }
         }
 
-        // Tính thời gian còn lại = min(duration − elapsedSinceStart, availableTo − now).
-        // Chế độ luyện tập theo Part: không giới hạn giờ -> luôn null.
         const computeTimeLeft = (startedAtIso) => {
           if (isPractice) return null;
           const durationMinutes = testData.durationMinutes;
@@ -215,18 +208,17 @@ export function useTestSession() {
         };
 
         if (availableTo && now > availableTo && !restored) {
-          // chỉ chặn vào mới khi đã hết giờ; resume thì vẫn cho làm tiếp.
+
           setStatus('closed');
           return;
         }
 
         if (!restored) {
-          // Tạo attempt mới: timer = full duration (sẽ đè lại sau khi POST /api/user-tests trả startedAt).
+
           setTimeLeft(computeTimeLeft(null));
           setStatus('open');
         } else {
-          // Resume: ưu tiên timeLeft từ sessionStorage (đã trừ elapsed lần trước),
-          // nếu không có (logout xoá storage) thì tính từ startedAt server-side.
+
           setStatus('active');
           setTimeLeft((prev) => {
             if (prev !== null && prev !== undefined) return prev;
@@ -242,7 +234,6 @@ export function useTestSession() {
     loadTest();
   }, [testId, authLoading, loadTest]);
 
-  // Lấy layout của examType (đã fallback lá->cha ở backend). Lỗi/không có -> giữ mặc định.
   useEffect(() => {
     const examTypeId = test?.examTypeId;
     if (!examTypeId) return;
@@ -276,7 +267,7 @@ export function useTestSession() {
           const startedAtIso = data.startedAt;
           setUserTestId(id);
           sessionStorage.setItem(`userTest-${sessionKey}`, id);
-          // Luyện tập: không giới hạn giờ. Full-test: tính lại timer theo startedAt server.
+
           if (isPractice) {
             setTimeLeft(null);
           } else if (startedAtIso) {
@@ -315,7 +306,6 @@ export function useTestSession() {
     }
   }, [userAnswers, timeLeft, userTestId, status, sessionKey]);
 
-  // 🔄 Autosave answers lên server (debounced 2s) — để logout/đóng tab vẫn khôi phục được.
   useEffect(() => {
     if (status !== 'active' || !userTestId) return;
     const entries = Object.entries(userAnswers);
@@ -328,7 +318,7 @@ export function useTestSession() {
         selectedAnswerIds: ans?.selectedAnswerIds || null,
         answerText: ans?.answerText || null,
       }));
-      batchSaveAnswers(payload, isGuest, guestCfg).catch(() => { /* swallow */ });
+      batchSaveAnswers(payload, isGuest, guestCfg).catch(() => {  });
     }, 2000);
     return () => clearTimeout(handle);
   }, [userAnswers, status, userTestId, isGuest, guestCfg]);
@@ -346,7 +336,7 @@ export function useTestSession() {
 
   const handleAnswerChange = (questionId, type, value) => {
     if (type === 'MSQ') {
-      // value = answerId vừa bấm → toggle trong danh sách đã chọn.
+
       const current = userAnswers[questionId]?.selectedAnswerIds || [];
       const next = current.includes(value)
         ? current.filter((x) => x !== value)
@@ -375,7 +365,7 @@ export function useTestSession() {
       const result = await submitUserTest(userTestId, isGuest, guestCfg);
       sessionStorage.removeItem(`userTest-${sessionKey}`);
       sessionStorage.removeItem(`userTestState-${sessionKey}`);
-      if (!isGuest) refreshStreak(); // 🔥 cập nhật streak sau khi nộp bài
+      if (!isGuest) refreshStreak();
       navigate(`/tests/result/${userTestId}`, {
         state: { score: result.totalScore },
       });
@@ -411,7 +401,6 @@ export function useTestSession() {
     return () => clearInterval(timer);
   }, [status, timeLeft]);
 
-  // Luyện tập theo Part: chỉ hiển thị + chấm các Part đã chọn. Full-test: hiện tất cả.
   const visibleParts = useMemo(() => {
     const parts = test.parts || [];
     if (!isPractice || selectedPartIds.length === 0) return parts;

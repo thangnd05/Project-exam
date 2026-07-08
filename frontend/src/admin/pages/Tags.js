@@ -20,7 +20,6 @@ const cx = classNames.bind(styles);
 
 const emptyForm = {name: '', parentId: null, examTypeId: ''};
 
-// ==================== Tree Node Component ====================
 function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, searchTerm}) {
   const hasChildren = tag.children && tag.children.length > 0;
   const isExpanded = expandedIds.has(tag.tagId);
@@ -87,7 +86,6 @@ function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, o
     </>
   );
 
-  // Root nodes get wrapped in a rootGroup for visual separation
   if (level === 0) {
     return <div className={cx('rootGroup')}>{nodeContent}</div>;
   }
@@ -95,7 +93,6 @@ function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, o
   return nodeContent;
 }
 
-// ==================== Main Page ====================
 function TagsManagement() {
   const [examTypes, setExamTypes] = useState([]);
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
@@ -133,9 +130,7 @@ function TagsManagement() {
       ]);
       setTagTree(tree);
       setFlatTags(flat);
-      // Only auto-expand all roots on a fresh load / exam-type switch.
-      // On refetch after create/delete, keep the current expansion so the
-      // whole tree doesn't pop open.
+
       if (!preserveExpanded) {
         setExpandedIds(new Set(tree.map((t) => t.tagId)));
       }

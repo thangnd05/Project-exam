@@ -56,7 +56,6 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
             show={show}
             onHide={onClose}
             title="Chỉnh sửa Album"
-            icon={FaEdit}
             footer={(
                 <ModalActionFooter
                     cancelLabel="Hủy"

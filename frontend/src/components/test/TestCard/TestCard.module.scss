@@ -1,6 +1,5 @@
 @import '../../../components/GlobalStyles/GlobalStyles.module.scss';
 
-// Standardized Blue Theme
 $brand-primary: var(--accent-color);
 $brand-secondary: var(--accent-act-color);
 
@@ -141,7 +140,6 @@ $brand-secondary: var(--accent-act-color);
     }
 }
 
-// Dòng "Thời gian tạo" full-width, tách nhẹ khỏi cụm lịch mở/hạn nộp bằng đường kẻ.
 .created-line {
     margin-top: -4px;
     margin-bottom: 14px;
@@ -230,7 +228,6 @@ $brand-secondary: var(--accent-act-color);
     }
 }
 
-/* --- Status Colors --- */
 .status-open {
     color: #065f46 !important;
     background: rgba(16, 185, 129, 0.18) !important;

@@ -41,7 +41,6 @@ function MilestonesManagement() {
   const [editingId, setEditingId] = useState(null);
   const [editParts, setEditParts] = useState({});
 
-  // Form state for creating new milestone
   const [newScore, setNewScore] = useState('');
   const [newDescription, setNewDescription] = useState('');
 
@@ -58,19 +57,16 @@ function MilestonesManagement() {
     deleteMilestone,
   } = useMilestones(examTypeFilter);
 
-  // Chọn sẵn loại kỳ thi đầu tiên khi danh sách vừa tải xong.
   useEffect(() => {
     if (examTypes.length > 0 && !examTypeFilter) {
       setExamTypeFilter(examTypes[0].examTypeId);
     }
   }, [examTypes, examTypeFilter]);
 
-  // Xóa thông báo lỗi cũ mỗi khi đổi loại kỳ thi.
   useEffect(() => {
     setErrorMessage('');
   }, [examTypeFilter]);
 
-  // Đưa lỗi tải dữ liệu ra khối thông báo chung.
   useEffect(() => {
     if (loadErrorText) {
       setErrorMessage(loadErrorText);
@@ -144,7 +140,7 @@ function MilestonesManagement() {
     (milestone.partRequirements || []).forEach((p) => {
       partsMap[p.examPartId] = p.requiredPercentage;
     });
-    // Fill in missing parts with 0
+
     filteredParts.forEach((p) => {
       if (partsMap[p.examPartId] === undefined) {
         partsMap[p.examPartId] = 0;
@@ -207,7 +203,6 @@ function MilestonesManagement() {
     });
   };
 
-  // Khối "Điểm ước tính" dùng chung cho cả nhánh xem và chỉnh sửa.
   const renderScoreEstimate = (partsConfig, milestoneScore) => {
     const est = estimateScore(partsConfig);
     if (!est) return null;

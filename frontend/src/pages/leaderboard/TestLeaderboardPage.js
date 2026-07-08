@@ -79,7 +79,6 @@ function TestLeaderboardPage() {
     isMe: me != null && entry.userTestId === me.userTestId,
   }));
 
-  // 123 -> "2:03", 3700 -> "1:01:40"
   const formatDuration = (totalSeconds) => {
     if (totalSeconds == null) return '---';
     const sec = Math.max(0, Math.floor(Number(totalSeconds)));
@@ -194,7 +193,6 @@ function TestLeaderboardPage() {
           </div>
         )}
 
-        {/* 🏅 Hạng của bạn — ghim lại để thấy ngay mình đang top mấy (kể cả ngoài top hiển thị) */}
         {!loading && !errorMessage && (
           <div className={cx('myRankBar', {empty: !me})}>
             {me ? (

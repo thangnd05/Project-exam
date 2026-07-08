@@ -12,7 +12,7 @@ function ModalActionFooter({
   onSubmit,
   submitIcon: SubmitIcon,
 }) {
-  // Không bọc .footer ở đây nữa — khung (BaseModal) tự render vùng footer.
+
   return (
     <>
       <button

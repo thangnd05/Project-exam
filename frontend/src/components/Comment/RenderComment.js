@@ -1,5 +1,3 @@
-// src/components/Comment/RenderComment.js
-
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -73,7 +71,7 @@ function RenderComment({
                     <>
                         <div className={cx("text-content")} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment.content) }} />
                         <div className={cx("d-flex align-items-start mt-3")}>
-                            {/* Điều kiện 1: Nếu là chủ comment, hiện Sửa/Xóa */}
+
                             {comment.userId === userId && (
                                 <div>
                                     <span onClick={() => handleEdit(comment)} className={cx("text-primary text-decoration-underline", "fix_content", 'cursor-pointer')}>Sửa</span>
@@ -81,7 +79,6 @@ function RenderComment({
                                 </div>
                             )}
 
-                            {/* Điều kiện 2: Nếu KHÔNG phải chủ comment VÀ ĐÃ ĐĂNG NHẬP, hiện Reply */}
                             {comment.userId !== userId && userId && (
                                 <div>
                                     <span onClick={handleReplyClick} className={cx("text-tertiary text-decoration-underline", "fix_content", 'cursor-pointer')}>
@@ -90,7 +87,6 @@ function RenderComment({
                                 </div>
                             )}
 
-                            {/* Phần hiển thị thời gian không đổi */}
                             <div className={cx("d-flex justify-content-end w-100")}>
                                 <small className={cx("text-secondary", "fix_content")}>{comment.created_at}</small>
                             </div>

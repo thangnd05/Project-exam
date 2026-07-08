@@ -5,7 +5,6 @@ import styles from '../../TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Đồng hồ đếm ngược. Ẩn khi không giới hạn giờ (timeLeft === null).
 function TimerBlock({ timeLeft, formatTime }) {
   if (timeLeft === null || timeLeft === undefined) return null;
   return (

@@ -3,7 +3,7 @@ import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { createClass } from '~/api/classApi';
 import classNames from 'classnames/bind';
-import { FaChalkboardTeacher, FaEdit, FaInfoCircle } from 'react-icons/fa';
+import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '~/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import routes from '~/config/Routes';
@@ -18,18 +18,15 @@ function CreateClassModal({ show, onClose }) {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
 
-  //  Message state
   const [message, setMessage] = useState('');
   const [type, setType] = useState('info');
 
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  //  Create class logic
   const handleCreate = async () => {
     setMessage('');
 
-    // 🟢 Check login
     if (!user) {
       setType('warning');
       setMessage(' Bạn cần đăng nhập trước khi tạo lớp!');
@@ -42,7 +39,6 @@ function CreateClassModal({ show, onClose }) {
       return;
     }
 
-    // 🟡 Validate input
     if (!className.trim()) {
       setType('danger');
       setMessage(' Vui lòng nhập tên lớp học!');
@@ -52,9 +48,7 @@ function CreateClassModal({ show, onClose }) {
     setLoading(true);
 
     try {
-      //  Call API create class
-      // Request body matches ClassEntity: className, description, teacherId (handled by backend or passed from frontend)
-      // Backend should handle teacherId from session (as mentioned in conversation 5997355f)
+
       await createClass({
         className: className,
         description: description,
@@ -62,11 +56,10 @@ function CreateClassModal({ show, onClose }) {
 
       toast.success('Tạo lớp học thành công!');
 
-      // Reset + close modal immediately
       setClassName('');
       setDescription('');
       onClose();
-      // Optionally navigate to myClasses or the new class
+
       navigate(routes.myClasses);
     } catch (err) {
       setType('danger');
@@ -83,7 +76,6 @@ function CreateClassModal({ show, onClose }) {
       show={show}
       onHide={onClose}
       title="Tạo lớp học mới"
-      icon={FaChalkboardTeacher}
       footer={
         <ModalActionFooter
           cancelLabel="Để sau"
@@ -95,7 +87,7 @@ function CreateClassModal({ show, onClose }) {
         />
       }
     >
-      {/*  Alert Message */}
+
       {message && (
         <Alert variant={type} style={{ margin: '15px 20px', fontSize: '14px' }}>
           {message}

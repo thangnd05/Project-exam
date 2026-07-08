@@ -31,7 +31,6 @@ import CreateTestFromBankPage from '~/pages/create-test-from-bank/CreateTestFrom
 import PersonalQuestionBankPage from '~/pages/question-bank/PersonalQuestionBankPage';
 import ProfileOverviewPage from '~/pages/profile/ProfileOverviewPage';
 
-// Admin imports
 import AdminDashboard from '~/admin/pages/Dashboard';
 import UsersManagement from '~/admin/pages/Users';
 import RolesManagement from '~/admin/pages/Roles';
@@ -69,7 +68,6 @@ import LearningPlansRedirect from '~/pages/learning-plan/pages/LearningPlansRedi
 import PlanComparisonPage from '~/pages/learning-plan/pages/PlanComparisonPage';
 import TaskHistoryPage from '~/pages/learning-plan/pages/TaskHistoryPage';
 
-//  Các trang bất kỳ ai cũng có thể xem
 export const publicRoutes = [
   { path: routes.login, component: Login },
   { path: routes.forgot, component: ForgotPassword },
@@ -88,7 +86,6 @@ export const publicRoutes = [
   { path: routes.notFound, component: NotFoundPage },
 ];
 
-//  Các trang admin (yêu cầu quyền admin)
 export const adminRoutes = [
   { path: routes.adminDashboard, component: AdminDashboard },
   { path: routes.adminUsers, component: UsersManagement },
@@ -117,8 +114,6 @@ export const adminRoutes = [
   { path: routes.adminStreakRecover, component: StreakRecoverManagement },
 ];
 
-//  Các trang yêu cầu phải đăng nhập
-// allowGuest=true: trang vẫn render khi chưa đăng nhập (vd. test thuộc ExamCategory cho phép guest).
 export const privateRoutes = [
   {
     path: routes.testStart,

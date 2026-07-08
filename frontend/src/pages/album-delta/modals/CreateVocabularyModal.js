@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IoAdd, IoText, IoLanguage } from 'react-icons/io5';
+import { IoText, IoLanguage } from 'react-icons/io5';
 import { createVocabulary } from '~/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -49,7 +49,6 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             show={show}
             onHide={onClose}
             title="Thêm Từ Vựng Mới"
-            icon={IoAdd}
             footer={(
                 <ModalActionFooter
                     cancelLabel="Hủy bỏ"

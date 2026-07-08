@@ -1,4 +1,3 @@
-// Admin Module - Export all components and pages
 export { default as AdminLayout } from './layouts/AdminLayout';
 export { default as AdminDashboard } from './pages/Dashboard';
 export { default as UsersManagement } from './pages/Users';
@@ -19,5 +18,4 @@ export { default as TagsManagement } from './pages/Tags';
 export { default as RecoveryResourcesManagement } from './pages/RecoveryResources';
 export { default as MilestonesManagement } from './pages/Milestones';
 
-// Export fake data for use in components
 export * from './data/fakeData';

@@ -5,7 +5,6 @@ import styles from '../examLayout.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Ảnh banner tuỳ chọn cho đầu trang làm bài. Không có URL: hiện placeholder khi ở editor.
 function BannerBlock({ url, showPlaceholder = false }) {
   if (!url) {
     return showPlaceholder ? (

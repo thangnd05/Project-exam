@@ -32,7 +32,6 @@ const defaultFormState = {
   active: true,
 };
 
-// Backend trả ISO (có thể kèm giây) -> cắt còn 'YYYY-MM-DDTHH:mm' cho input datetime-local.
 const toInputDateTime = (value) => (value ? String(value).slice(0, 16) : '');
 
 function QuestsManagement() {

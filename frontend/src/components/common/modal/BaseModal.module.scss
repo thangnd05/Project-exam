@@ -103,8 +103,6 @@
     }
   }
 
-  // Làm đẹp form react-bootstrap (Form.Control/Form.Select/Form.Label) bên trong modal
-  // để các modal admin trông gọn gàng như các form modal khác, không phải sửa từng field.
   :global(.form-label) {
     font-size: var(--font-size-md);
     font-weight: 700;
@@ -163,7 +161,6 @@
   justify-content: flex-end;
   flex-shrink: 0;
 
-  // Nút footer dùng chung — khớp với form tạo (FormFooter).
   .btnCancel,
   .btnSubmit {
     padding: 14px 24px;

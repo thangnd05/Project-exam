@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {motion} from 'framer-motion';
 import {FaStar} from 'react-icons/fa';
 import classNames from 'classnames/bind';
@@ -28,42 +28,37 @@ const Evaluation = () => {
   const {user} = useAuth();
   const navigate = useNavigate();
 
-  // --- STATE ---
   const [showModal, setShowModal] = useState(false);
 
-  // --- FETCH DATA ---
   const {reviews, loading, refetchEvaluations} = useEvaluations();
 
-  // --- LOGIC ---
-  const showDots = reviews.length > 0 && reviews.length < 3;
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200,
+  );
+
+  useEffect(() => {
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const count = reviews.length || 1;
+  let slidesToShow = Math.min(3, count);
+  if (windowWidth <= 768) slidesToShow = 1;
+  else if (windowWidth <= 1024) slidesToShow = Math.min(2, count);
+
+  const canSlide = reviews.length > slidesToShow;
 
   const settings = {
-    dots: showDots,
-    infinite: reviews.length > 3,
+    dots: false,
+    infinite: canSlide,
     speed: 500,
-    slidesToShow: Math.min(3, reviews.length > 0 ? reviews.length : 3),
-    slidesToScroll: showDots ? 1 : 1,
-    autoplay: reviews.length > 3,
+    slidesToShow,
+    slidesToScroll: 1,
+    autoplay: canSlide,
     autoplaySpeed: 3000,
     pauseOnHover: true,
-    arrows: reviews.length > 3 && !showDots,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: Math.min(2, reviews.length > 0 ? reviews.length : 2),
-          slidesToScroll: 1,
-        },
-      },
-      {
-        // Điện thoại (≤768px): xem từng card một cho dễ đọc.
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
+    arrows: canSlide && windowWidth > 768,
   };
 
   const handleWriteReviewClick = () => {
@@ -76,10 +71,9 @@ const Evaluation = () => {
   };
 
   const handleReviewSuccess = () => {
-    refetchEvaluations(); // Refresh list
+    refetchEvaluations();
   };
 
-  // Lấy 1-2 chữ cái đầu tên để làm avatar (khi không có ảnh)
   const getInitials = (name) => {
     if (!name) return '?';
     const words = name.trim().split(/\s+/).filter(Boolean);
@@ -90,7 +84,7 @@ const Evaluation = () => {
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    // Dạng số gọn (20/05/2026) để không bị xuống nhiều dòng trong card hẹp.
+
     return date.toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: '2-digit',
@@ -183,7 +177,6 @@ const Evaluation = () => {
           </div>
         )}
 
-        {/* Responsive: trên mobile nút nằm DƯỚI card đánh giá (desktop dùng nút ở header). */}
         <div className={cx('write-review-below')}>
           <button
             className={cx('btn-write-review')}
@@ -194,7 +187,6 @@ const Evaluation = () => {
         </div>
       </div>
 
-      {/* --- MODAL (POPUP) --- */}
       <EvaluationModal
         show={showModal}
         onClose={() => setShowModal(false)}

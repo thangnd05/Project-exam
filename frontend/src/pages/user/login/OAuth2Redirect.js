@@ -14,10 +14,10 @@ function OAuth2Redirect() {
                 const userData = await getCurrentUser();
 
                 if (userData) {
-                    // Gắn bài làm dạng khách (nếu có) vào tài khoản vừa đăng nhập.
+
                     await claimGuestAfterLogin();
                     login(userData);
-                    // Quay lại đúng trang trước khi đăng nhập (đã lưu trước khi rời trang).
+
                     navigate(takeOAuthRedirect('/'), { replace: true });
                 }
             } catch (error) {
@@ -33,7 +33,7 @@ function OAuth2Redirect() {
         <div className="flex justify-center items-center h-screen">
             <div className="text-center">
                 <p className="text-lg">Đang hoàn tất đăng nhập...</p>
-                {/* Bạn có thể thêm một cái Spinner/Loading ở đây */}
+
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { IoPencil, IoText, IoLanguage } from 'react-icons/io5';
+import { IoText, IoLanguage } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
@@ -62,7 +62,6 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }) => {
             show={show}
             onHide={onClose}
             title="Chỉnh Sửa Từ Vựng"
-            icon={IoPencil}
             footer={(
                 <ModalActionFooter
                     cancelLabel="Hủy bỏ"

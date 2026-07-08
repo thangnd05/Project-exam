@@ -6,7 +6,6 @@ import { useCoins } from '~/hooks/useCoins';
 
 const cx = classNames.bind(style);
 
-// Badge 🪙 hiển thị số xu user đang có.
 function CoinBadge({ className }) {
   const { balance } = useCoins();
 

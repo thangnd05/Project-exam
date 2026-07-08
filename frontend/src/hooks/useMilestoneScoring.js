@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 
-// Thang điểm AWS_SCALE: 100..1000 (không có skill, quy đổi thẳng theo tỉ lệ câu đúng).
 const SCALE_MIN = 100;
 const SCALE_SPAN = 900;
 const SCALE_MAX = SCALE_MIN + SCALE_SPAN;
@@ -11,17 +10,6 @@ export const percentToNum = (percent, total) =>
 export const numToPercent = (num, total) =>
   total > 0 ? Math.round((Number(num) / total) * 100) : 0;
 
-/**
- * Logic tính/quy đổi điểm mốc dùng chung cho trang cấu hình mốc của admin
- * và trang thiết lập mục tiêu của người dùng.
- *
- * @param {object} params
- * @param {Array} params.examTypes danh sách loại kỳ thi (để xác định scoringMethod)
- * @param {Array} params.examParts danh sách phần thi (defaultNumQuestions, skillId)
- * @param {Array} params.skills danh sách kỹ năng
- * @param {Array} params.scoringConversions bảng quy đổi điểm
- * @param {string} params.selectedExamTypeId loại kỳ thi đang chọn
- */
 export default function useMilestoneScoring({
   examTypes = [],
   examParts = [],
@@ -29,7 +17,7 @@ export default function useMilestoneScoring({
   scoringConversions = [],
   selectedExamTypeId = '',
 }) {
-  // Loại kỳ thi đang chọn + phương thức chấm. AWS_SCALE = thang scaled 100–1000, không skill.
+
   const selectedExamType = useMemo(
     () => examTypes.find((t) => String(t.examTypeId) === String(selectedExamTypeId)),
     [examTypes, selectedExamTypeId],
@@ -48,7 +36,6 @@ export default function useMilestoneScoring({
     [examParts],
   );
 
-  // % cần đạt (chia đều) tương ứng 1 mốc điểm.
   const evenPctForScore = useCallback(
     (score) =>
       isScaled
@@ -57,13 +44,10 @@ export default function useMilestoneScoring({
     [isScaled],
   );
 
-  // Tính điểm ước tính từ % các part qua bảng scoring conversion.
-  // partsConfig: { examPartId: requiredPercentage }
   const estimateScore = useCallback(
     (partsConfig, examTypeId = selectedExamTypeId) => {
       if (!examTypeId || !partsConfig || Object.keys(partsConfig).length === 0) return null;
 
-      // AWS / thang scaled không có skill → tính thẳng: 100 + (đúng/tổng)*900.
       if (isScaled) {
         let totalCorrect = 0;
         let totalQuestions = 0;
@@ -79,7 +63,6 @@ export default function useMilestoneScoring({
         return { totalScore, scaled: true, totalCorrect, totalQuestions, skillDetails: [] };
       }
 
-      // Gom số câu đúng theo skill
       const correctBySkill = {};
       for (const [examPartId, pct] of Object.entries(partsConfig)) {
         const part = examParts.find((p) => p.examPartId === examPartId);
@@ -88,7 +71,6 @@ export default function useMilestoneScoring({
         correctBySkill[part.skillId] = (correctBySkill[part.skillId] || 0) + numCorrect;
       }
 
-      // Tra bảng scoring conversion cho mỗi skill
       const relevantConversions = scoringConversions.filter((c) => c.examTypeId === examTypeId);
       if (relevantConversions.length === 0) return null;
 
@@ -100,7 +82,6 @@ export default function useMilestoneScoring({
           .sort((a, b) => a.numCorrect - b.numCorrect);
         if (skillConversions.length === 0) continue;
 
-        // Tìm convertedScore gần nhất (<=)
         let matched = skillConversions[0];
         for (const c of skillConversions) {
           if (c.numCorrect <= numCorrect) matched = c;
@@ -117,7 +98,6 @@ export default function useMilestoneScoring({
     [isScaled, examParts, scoringConversions, skills, selectedExamTypeId],
   );
 
-  // Chuỗi diễn giải điểm ước tính (khác nhau giữa thang scaled và quy đổi theo skill).
   const formatEstimateDetail = useCallback(
     (est) => {
       if (!est) return '';

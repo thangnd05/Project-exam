@@ -42,4 +42,3 @@ export const switchPlan = (learningPlanId) => {
 export const deletePlan = (learningPlanId) => {
   return axios.delete(`${BASE_URL}/${learningPlanId}`);
 };
-

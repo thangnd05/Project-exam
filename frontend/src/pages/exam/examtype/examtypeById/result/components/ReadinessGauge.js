@@ -5,12 +5,12 @@ import styles from './Result.module.scss';
 const cx = classNames.bind(styles);
 
 const COLOR_MAP = {
-  // Quick Challenge levels
+
   EXCELLENT:  { color: '#22c55e', bg: '#f0fdf4' },
   GOOD:       { color: '#3b82f6', bg: '#eff6ff' },
   FAIR:       { color: '#f59e0b', bg: '#fffbeb' },
   WEAK:       { color: '#ef4444', bg: '#fef2f2' },
-  // Readiness levels
+
   READY:             { color: '#22c55e', bg: '#f0fdf4' },
   ALMOST_READY:      { color: '#3b82f6', bg: '#eff6ff' },
   NEEDS_IMPROVEMENT: { color: '#f59e0b', bg: '#fffbeb' },
@@ -34,12 +34,10 @@ function ReadinessGauge({ enhanced }) {
 
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
 
-  // FE chỉ quyết màu sắc dựa trên data từ BE
   const { color, bg } = isQuickChallenge
     ? getColorFromPercentage(gaugePercentage)
     : (COLOR_MAP[readinessLevel] || COLOR_MAP.NOT_READY);
 
-  // Target mode override color
   const effectiveColor = (!isQuickChallenge && hasTarget)
     ? (enhanced.isTargetMet ? COLOR_MAP.READY.color : COLOR_MAP.NEEDS_IMPROVEMENT.color)
     : color;

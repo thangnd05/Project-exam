@@ -4,7 +4,6 @@
     min-height: calc(100vh - 200px);
 }
 
-// Split layout: kết quả trái, chẩn đoán phải
 .result-layout {
     display: flex;
     gap: 24px;
@@ -277,7 +276,6 @@
     }
 }
 
-/* --- Detailed Section --- */
 .detail-section {
     max-width: 1000px;
     margin: 60px auto 0;

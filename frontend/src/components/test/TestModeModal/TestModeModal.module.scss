@@ -45,8 +45,6 @@
   }
 }
 
-/* Khung chung cho 2 tab -> CHIỀU CAO CỐ ĐỊNH (clamp theo màn hình) để đổi tab
-   không co/nhảy; nhiều Part thì cuộn bên trong chứ không kéo dài modal. */
 .panel {
   height: 58vh;
   min-height: 340px;
@@ -55,7 +53,6 @@
   flex-direction: column;
 }
 
-/* Tab Luyện tập fill toàn bộ panel; list Part chiếm phần còn lại và tự cuộn. */
 .practice {
   flex: 1;
   min-height: 0;
@@ -63,9 +60,8 @@
   flex-direction: column;
 }
 
-/* ===== Full test card ===== */
 .exam-card {
-  margin: auto 0; /* căn giữa dọc trong .panel */
+  margin: auto 0;
   border: 1px solid var(--border-color);
   border-radius: 18px;
   padding: 20px;
@@ -137,7 +133,6 @@
   }
 }
 
-/* Quyền lợi khi thi full */
 .features {
   display: flex;
   flex-direction: column;
@@ -188,7 +183,6 @@
   }
 }
 
-/* ===== Start buttons (dùng gradient thương hiệu) ===== */
 .start-btn {
   flex-shrink: 0;
   display: inline-flex;
@@ -221,7 +215,6 @@
   }
 }
 
-/* ===== Practice ===== */
 .practice-hint {
   margin: 0 0 16px;
   font-size: 1.45rem;
@@ -239,8 +232,6 @@
   font-size: var(--font-size-md);
 }
 
-/* Khung cuộn danh sách Part — chiếm hết chỗ trống còn lại và tự cuộn
-   (kéo chuột) thay vì kéo dài modal. */
 .part-scroll {
   flex: 1;
   min-height: 0;

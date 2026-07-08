@@ -11,10 +11,8 @@ import { CREATOR_TYPES } from './useCreateTest';
 
 const TOAST_VALIDATION_MS = 8000;
 
-// Phải khớp với cấu hình backend (spring.servlet.multipart) để chặn sớm phía client,
-// tránh upload thất bại giữa chừng (ERR_CONNECTION_ABORTED khi vượt giới hạn Tomcat).
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB / file
-const MAX_REQUEST_SIZE_BYTES = 50 * 1024 * 1024; // 50MB tổng
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_REQUEST_SIZE_BYTES = 50 * 1024 * 1024;
 
 const formatMB = (bytes) => `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 
@@ -73,7 +71,6 @@ export const useTestSubmission = ({
         return invalidRefs;
     };
 
-    // Gom tất cả file media sẽ upload theo từng loại creator để validate dung lượng phía client.
     const collectMediaFiles = (creatorType) => {
         const files = [];
         if (creatorType === CREATOR_TYPES.PASSAGE) {
@@ -91,7 +88,6 @@ export const useTestSubmission = ({
         return files;
     };
 
-    // Trả về message lỗi nếu vượt giới hạn, ngược lại null.
     const validateUploadSize = (creatorType) => {
         const files = collectMediaFiles(creatorType);
         const oversized = files.find((f) => f.size > MAX_FILE_SIZE_BYTES);
@@ -164,9 +160,9 @@ export const useTestSubmission = ({
                         : null,
                     classId: mode === 'class' ? String(classId) : null,
                     chapterId: mode === 'class' ? String(chapterId) : null,
-                    // Bộ đề (folder) mà đề thuộc về — để gom đề theo collection ở trang khám phá.
+
                     collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
-                    // Giá xu: BE chỉ nhận khi là admin & bài công khai; còn lại bị ép null.
+
                     costCoins:
                         testInfo.costCoins && Number(testInfo.costCoins) > 0
                             ? Number(testInfo.costCoins)
