@@ -25,6 +25,7 @@ public final class PermissionCatalog {
 
     // ── Đề thi & nội dung kiểm tra ─────────────────────────────
     public static final String EXAM_TYPE_MANAGE = "EXAM_TYPE:MANAGE";
+    public static final String EXAM_TYPE_LAYOUT_MANAGE = "EXAM_TYPE:LAYOUT";
     public static final String EXAM_CATEGORY_MANAGE = "EXAM_CATEGORY:MANAGE";
     public static final String EXAM_PART_MANAGE = "EXAM_PART:MANAGE";
     public static final String SKILL_MANAGE = "SKILL:MANAGE";
@@ -75,6 +76,7 @@ public final class PermissionCatalog {
             new Def(ROLE_MANAGE, G_USER, "Quản lý vai trò và gán quyền"),
 
             new Def(EXAM_TYPE_MANAGE, G_EXAM, "Quản lý loại đề"),
+            new Def(EXAM_TYPE_LAYOUT_MANAGE, G_EXAM, "Thiết kế giao diện làm bài theo loại đề (kéo-thả bố cục)"),
             new Def(EXAM_CATEGORY_MANAGE, G_EXAM, "Quản lý nhóm đề"),
             new Def(EXAM_PART_MANAGE, G_EXAM, "Quản lý phần thi"),
             new Def(SKILL_MANAGE, G_EXAM, "Quản lý kỹ năng"),
