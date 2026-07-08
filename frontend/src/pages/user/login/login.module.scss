@@ -160,7 +160,7 @@
   }
 
   p {
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     line-height: 1.7;
     margin-bottom: 35px;
     color: var(--white);
@@ -244,7 +244,7 @@
 
 .agreement {
   margin-bottom: 20px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: var(--text-secondary);
   text-align: left;
   width: 100%;
@@ -296,7 +296,7 @@
   border: 2px solid var(--white);
   color: var(--white);
   border-radius: 30px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 700;
   padding: 12px 45px;
   text-transform: uppercase;

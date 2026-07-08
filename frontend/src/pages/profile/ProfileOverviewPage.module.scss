@@ -26,7 +26,7 @@
 
 .titleIcon {
   color: var(--accent-color, #3b82f6);
-  font-size: 2.8rem;
+  font-size: var(--font-size-2xxl);
 }
 
 .subtitle {
@@ -103,7 +103,7 @@
 .username {
   margin: 4px 0 16px 0;
   color: #64748b;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 600;
 }
 
@@ -123,14 +123,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: #475569;
   word-break: break-all;
 }
 
 .metaItem svg {
   flex-shrink: 0;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: #94a3b8;
 }
 
@@ -305,7 +305,7 @@
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  font-size: 2.2rem;
+  font-size: var(--font-size-xxl);
 }
 
 .bgBlue {
@@ -336,7 +336,7 @@
 }
 
 .statValue {
-  font-size: 2.2rem;
+  font-size: var(--font-size-xxl);
   font-weight: 800;
   color: #0f172a;
   line-height: 1;
@@ -414,7 +414,7 @@
 
 .noDataMessage {
   color: #94a3b8;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-style: italic;
 }
 
@@ -456,7 +456,7 @@
   border: 1px solid #dbeafe;
   border-radius: 10px;
   padding: 8px 14px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -520,7 +520,7 @@
   border: 1px solid #dbeafe;
   border-radius: 10px;
   padding: 10px 18px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -587,7 +587,7 @@
   font-weight: 700;
 
   svg {
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
   }
 }
 
@@ -757,7 +757,7 @@
   border-radius: 10px;
   background: #eff6ff;
   color: #1d4ed8;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 600;
   padding: 10px 12px;
   display: inline-flex;

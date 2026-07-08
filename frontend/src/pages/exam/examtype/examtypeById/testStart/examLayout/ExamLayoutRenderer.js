@@ -202,10 +202,14 @@ function ExamLayoutRenderer({
   // Mặc định: nav align='left' -> trái; timer/progress/submit align='right' -> phải (y hệt hiện tại).
   const navInBottom = bottomBlocks.some((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
   const renderFooterGroup = (blocks) => {
+    // Nút "Danh sách câu hỏi" đứng ĐẦU cụm (ngay trước các pill tiến độ/đồng hồ) để
+    // gần khối 4/64 cho trực quan, thay vì nằm lẻ ở mép trái footer.
+    const navs = blocks.filter((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
     const pills = blocks.filter(isPill);
-    const others = blocks.filter((b) => !isPill(b));
+    const others = blocks.filter((b) => !isPill(b) && b.type !== BLOCK_TYPES.QUESTION_NAV);
     return (
       <>
+        {navs.map((b) => wrap(b, renderBlockNode(b, ZONES.BOTTOM), ZONES.BOTTOM))}
         {pills.length > 0 && (
           <div className={cx('footer-pills')}>
             {pills.map((b) => wrap(b, renderBlockNode(b, ZONES.BOTTOM), ZONES.BOTTOM))}

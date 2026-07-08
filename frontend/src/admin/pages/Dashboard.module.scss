@@ -38,7 +38,7 @@ $radius-lg: 16px;
     gap: 16px;
 
     h1 {
-        font-size: 28px;
+        font-size: var(--font-size-2xxl);
         font-weight: 700;
         color: $text-primary;
         margin-bottom: 4px;
@@ -63,7 +63,7 @@ $radius-lg: 16px;
     background: $bg-white;
     border-radius: $radius-md;
     color: $text-secondary;
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
     box-shadow: $shadow-sm;
 }
 
@@ -109,13 +109,13 @@ $radius-lg: 16px;
 }
 
 .statTitle {
-    font-size: 13px;
+    font-size: var(--font-size-smd);
     color: $text-secondary;
     margin-bottom: 4px;
 }
 
 .statValue {
-    font-size: 28px;
+    font-size: var(--font-size-2xxl);
     font-weight: 700;
     color: $text-primary;
     line-height: 1;
@@ -125,7 +125,7 @@ $radius-lg: 16px;
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     margin-top: 6px;
 
     &.up {
@@ -156,14 +156,14 @@ $radius-lg: 16px;
 
 .miniValue {
     display: block;
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: $text-primary;
 }
 
 .miniLabel {
     display: block;
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: $text-secondary;
     margin-top: 4px;
 }
@@ -191,7 +191,7 @@ $radius-lg: 16px;
         display: flex;
         align-items: center;
         gap: 10px;
-        font-size: 16px;
+        font-size: var(--font-size-base);
         font-weight: 600;
         color: $text-primary;
         margin: 0;
@@ -221,7 +221,7 @@ $radius-lg: 16px;
     margin-bottom: 20px;
 
     h3 {
-        font-size: 16px;
+        font-size: var(--font-size-base);
         font-weight: 600;
         color: $text-primary;
         margin: 0;
@@ -229,7 +229,7 @@ $radius-lg: 16px;
 }
 
 .viewAll {
-    font-size: 13px;
+    font-size: var(--font-size-smd);
     color: $primary;
     text-decoration: none;
     font-weight: 500;
@@ -247,7 +247,7 @@ $radius-lg: 16px;
     margin-bottom: 0;
 
     th {
-        font-size: 12px;
+        font-size: var(--font-size-sm);
         font-weight: 600;
         color: $text-secondary;
         text-transform: uppercase;
@@ -258,7 +258,7 @@ $radius-lg: 16px;
     }
 
     td {
-        font-size: 14px;
+        font-size: var(--font-size-ssm);
         color: $text-primary;
         padding: 14px 16px;
         vertical-align: middle;
@@ -289,7 +289,7 @@ $radius-lg: 16px;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
     font-weight: 600;
     flex-shrink: 0;
 }
@@ -301,7 +301,7 @@ $radius-lg: 16px;
 
 .userUsername {
     display: block;
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: $text-secondary;
 }
 
@@ -355,7 +355,7 @@ $radius-lg: 16px;
     margin-bottom: 20px;
 
     h3 {
-        font-size: 16px;
+        font-size: var(--font-size-base);
         font-weight: 600;
         color: $text-primary;
         margin: 0;
@@ -414,17 +414,17 @@ $radius-lg: 16px;
 .activityUser {
     font-weight: 500;
     color: $text-primary;
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
 }
 
 .activityAction {
-    font-size: 13px;
+    font-size: var(--font-size-smd);
     color: $text-secondary;
     margin-top: 2px;
 }
 
 .activityTime {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: $text-muted;
     margin-top: 4px;
 }
@@ -438,7 +438,7 @@ $radius-lg: 16px;
         align-items: flex-start;
 
         h1 {
-            font-size: 24px;
+            font-size: var(--font-size-2xl);
         }
     }
 

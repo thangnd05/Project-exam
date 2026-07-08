@@ -7,14 +7,14 @@
   background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
   color: #5c3d00;
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--font-size-md);
   user-select: none;
   cursor: default;
   box-shadow: 0 2px 8px rgba(250, 176, 5, 0.3);
   transition: all 0.2s ease;
 
   .icon {
-    font-size: 16px;
+    font-size: var(--font-size-base);
     filter: drop-shadow(0 0 3px rgba(255, 244, 179, 0.9));
   }
 }

@@ -1,6 +1,6 @@
 .subtitle {
   margin: -6px 0 18px;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -25,7 +25,7 @@
   border-radius: 12px;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
@@ -199,7 +199,7 @@
   border-radius: 12px;
   background: var(--primary-gradient);
   color: #fff;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 97, 242, 0.3);
@@ -236,7 +236,7 @@
   padding: 30px 0;
   text-align: center;
   color: #94a3b8;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
 }
 
 /* Khung cuộn danh sách Part — chiếm hết chỗ trống còn lại và tự cuộn
@@ -346,13 +346,13 @@
 
 .part-name {
   flex: 1;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--dark-color);
 }
 
 .part-count {
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: #94a3b8;
   font-weight: 600;
 }
@@ -369,7 +369,7 @@
 }
 
 .summary {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: var(--text-secondary);
 
   strong {

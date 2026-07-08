@@ -106,7 +106,7 @@
   // Làm đẹp form react-bootstrap (Form.Control/Form.Select/Form.Label) bên trong modal
   // để các modal admin trông gọn gàng như các form modal khác, không phải sửa từng field.
   :global(.form-label) {
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     font-weight: 700;
     color: #475569;
     margin-bottom: 10px;
@@ -118,7 +118,7 @@
     border-radius: 14px;
     border: 2px solid #e2e8f0;
     background: #f8fafc;
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     color: #1e293b;
     box-shadow: none;
     transition: all 0.2s;
@@ -136,7 +136,7 @@
   }
 
   :global(.form-check-label) {
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     color: #475569;
   }
 
@@ -168,7 +168,7 @@
   .btnSubmit {
     padding: 14px 24px;
     border-radius: 14px;
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     font-weight: 700;
     transition: all 0.3s;
     border: none;

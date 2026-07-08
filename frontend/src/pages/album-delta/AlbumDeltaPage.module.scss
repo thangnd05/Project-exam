@@ -67,7 +67,7 @@
     align-items: center;
     gap: 8px;
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     color: var(--primary);
     background: transparent;
     border: none;
@@ -146,7 +146,7 @@
 
         td {
             padding: 20px;
-            font-size: 1.5rem;
+            font-size: var(--font-size-md);
             vertical-align: middle;
             color: var(--dark-color);
             border-bottom: 1px solid #f1f5f9;
@@ -172,7 +172,7 @@
 }
 
 .phonetic {
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     color: var(--text-secondary);
     font-family: 'Inter', sans-serif;
 }
@@ -264,7 +264,7 @@
         margin-bottom: 10px;
 
         @media (max-width: 576px) {
-            font-size: 2.8rem;
+            font-size: var(--font-size-2xxl);
         }
     }
 }
@@ -275,7 +275,7 @@
     transform: rotateY(180deg);
 
     .meaning {
-        font-size: 2.8rem;
+        font-size: var(--font-size-2xxl);
         font-weight: 800;
         margin-bottom: 15px;
         text-align: center;

@@ -84,7 +84,7 @@
         }
 
         .label {
-            font-size: 1.5rem;
+            font-size: var(--font-size-md);
             font-weight: 700;
             color: #475569;
             margin-bottom: 10px;
@@ -134,7 +134,7 @@
         padding: 14px 18px;
         border-radius: 16px;
         border: 2px solid #e2e8f0;
-        font-size: 1.5rem;
+        font-size: var(--font-size-md);
         font-family: var(--font-family, sans-serif);
         color: #1e293b;
         background: #f8fafc;
@@ -151,7 +151,7 @@
 
     .tip {
         margin-top: 12px;
-        font-size: 1.3rem;
+        font-size: var(--font-size-smd);
         color: #64748b;
         display: flex;
         align-items: center;
@@ -174,7 +174,7 @@
         flex: 1;
         padding: 14px;
         border-radius: 14px;
-        font-size: 1.5rem;
+        font-size: var(--font-size-md);
         font-weight: 700;
         transition: all 0.3s;
         border: none;

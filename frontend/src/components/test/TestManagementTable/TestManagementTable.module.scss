@@ -25,7 +25,7 @@
     background: #fcfdfe;
     border-bottom: 1px solid #edf2f7;
     padding: 20px 16px;
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     font-weight: 800;
     color: #64748b;
     text-transform: uppercase;
@@ -88,7 +88,7 @@
 .status-badge {
   padding: 10px 16px;
   border-radius: 12px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 800;
   letter-spacing: 0.3px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);

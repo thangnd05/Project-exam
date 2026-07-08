@@ -29,7 +29,7 @@
     gap: 6px;
     padding: 6px 14px;
     margin-bottom: clamp(10px, 1.2vw, 16px);
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     font-weight: var(--font-weight-semibold);
     color: var(--dark-color, #1e293b);
     background: rgba(15, 23, 42, 0.04);
@@ -216,7 +216,7 @@
     margin-top: 16px;
 
     li button:before {
-      font-size: 9px;
+      font-size: 0.9rem;
       color: var(--accent-color);
       opacity: 0.25;
     }
@@ -237,7 +237,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
+  font-size: var(--font-size-xxl);
   line-height: 1;
   color: var(--accent-color);
   background: var(--bg-white);
@@ -379,7 +379,7 @@
   }
 
   .bar-name {
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     font-weight: var(--font-weight-medium);
     color: var(--text-color);
     white-space: nowrap;

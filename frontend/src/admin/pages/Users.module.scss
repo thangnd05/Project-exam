@@ -36,7 +36,7 @@ $radius-lg: 16px;
     gap: 16px;
 
     h1 {
-        font-size: 28px;
+        font-size: var(--font-size-2xxl);
         font-weight: 700;
         color: $text-primary;
         margin-bottom: 4px;
@@ -103,13 +103,13 @@ $radius-lg: 16px;
 }
 
 .statValue {
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: $text-primary;
 }
 
 .statLabel {
-    font-size: 13px;
+    font-size: var(--font-size-smd);
     color: $text-secondary;
 }
 
@@ -142,7 +142,7 @@ $radius-lg: 16px;
     padding: 12px 14px 12px 44px;
     border: 1px solid $border-color;
     border-radius: $radius-md;
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
     transition: $transition;
 
     &:focus {
@@ -157,7 +157,7 @@ $radius-lg: 16px;
     padding: 12px 14px;
     border: 1px solid $border-color;
     border-radius: $radius-md;
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
 
     &:focus {
         outline: none;
@@ -185,7 +185,7 @@ $radius-lg: 16px;
     margin-bottom: 0;
 
     th {
-        font-size: 12px;
+        font-size: var(--font-size-sm);
         font-weight: 600;
         color: $text-secondary;
         text-transform: uppercase;
@@ -197,7 +197,7 @@ $radius-lg: 16px;
     }
 
     td {
-        font-size: 14px;
+        font-size: var(--font-size-ssm);
         color: $text-primary;
         padding: 14px 16px;
         vertical-align: middle;
@@ -228,7 +228,7 @@ $radius-lg: 16px;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 16px;
+    font-size: var(--font-size-base);
     font-weight: 600;
     flex-shrink: 0;
 }
@@ -244,14 +244,14 @@ $radius-lg: 16px;
 }
 
 .userUsername {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: $text-secondary;
 }
 
 .roleBadge,
 .statusBadge {
     padding: 6px 10px;
-    font-size: 11px;
+    font-size: var(--font-size-xs2);
     font-weight: 600;
     border-radius: 6px;
 }
@@ -305,7 +305,7 @@ $radius-lg: 16px;
 }
 
 .paginationInfo {
-    font-size: 13px;
+    font-size: var(--font-size-smd);
     color: $text-secondary;
 }
 
@@ -326,7 +326,7 @@ $radius-lg: 16px;
     color: $text-secondary;
     cursor: pointer;
     transition: $transition;
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
 
     &:hover:not(:disabled) {
         background: $bg-light;

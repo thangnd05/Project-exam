@@ -98,7 +98,7 @@
 
   .categoryTag {
     color: var(--primary);
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     font-weight: 700;
     text-transform: uppercase;
     margin-bottom: 16px;
@@ -129,7 +129,7 @@
   }
 
   .excerpt {
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     color: var(--text-secondary);
     line-height: 1.6;
     margin-bottom: 24px;
@@ -167,7 +167,7 @@
 
         span:first-child {
           font-weight: 700;
-          font-size: 1.5rem;
+          font-size: var(--font-size-md);
           color: var(--text-color);
         }
 
@@ -460,7 +460,7 @@
         }
 
         span {
-          font-size: 1.3rem;
+          font-size: var(--font-size-smd);
           font-weight: 600;
           color: var(--text-color);
         }

@@ -37,7 +37,7 @@
 }
 
 .desc {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: var(--text-secondary);
   margin-bottom: 30px;
   line-height: 1.6;

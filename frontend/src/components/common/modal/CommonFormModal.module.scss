@@ -73,7 +73,7 @@
 }
 
 .label {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   color: #475569;
   margin-bottom: 12px;
@@ -125,7 +125,7 @@
 
 .tip {
   margin-top: 10px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: #64748b;
   display: flex;
   align-items: center;
@@ -148,7 +148,7 @@
   flex: 1;
   padding: 14px;
   border-radius: 14px;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   transition: all 0.3s;
   border: none;

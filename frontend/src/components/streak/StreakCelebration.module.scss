@@ -11,28 +11,28 @@
 }
 
 .flame {
-  font-size: 64px;
+  font-size: 6.4rem;
   color: #ff922b;
   filter: drop-shadow(0 4px 12px rgba(255, 146, 43, 0.4));
   margin-bottom: 8px;
 }
 
 .count {
-  font-size: 40px;
+  font-size: 4rem;
   font-weight: 800;
   color: #ff922b;
   margin: 0;
 }
 
 .title {
-  font-size: 20px;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   color: #212529;
   margin: 6px 0 4px;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: var(--font-size-ssm);
   color: #6c757d;
   margin: 0 auto 22px;
   max-width: 320px;

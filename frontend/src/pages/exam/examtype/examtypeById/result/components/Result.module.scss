@@ -55,7 +55,7 @@
   display: inline-block;
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 1.3rem; /* 13px */
+  font-size: var(--font-size-smd); /* 13px */
   font-weight: 700;
 }
 
@@ -78,7 +78,7 @@
   font-weight: 600;
   cursor: pointer;
   display: inline-block;
-  font-size: 1.5rem; /* 15px */
+  font-size: var(--font-size-md); /* 15px */
   border: none;
   transition: background-color 0.2s ease;
   text-decoration: none;
@@ -99,7 +99,7 @@
   align-items: center;
   margin-bottom: 6px;
   font-weight: 600;
-  font-size: 1.5rem; /* 15px */
+  font-size: var(--font-size-md); /* 15px */
   color: #334155;
 }
 
@@ -147,7 +147,7 @@
 
 .targetGapMessage {
   margin-left: 6px;
-  font-size: 1.3rem; /* 13px */
+  font-size: var(--font-size-smd); /* 13px */
   font-weight: 500;
 }
 
@@ -184,7 +184,7 @@
 }
 
 .tagBreakdownTitle {
-  font-size: 1.3rem; /* 13px */
+  font-size: var(--font-size-smd); /* 13px */
   font-weight: 600;
   color: #64748b;
   margin-bottom: 8px;
@@ -195,7 +195,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 4px 0;
-  font-size: 1.3rem; /* 13px */
+  font-size: var(--font-size-smd); /* 13px */
   color: #475569;
 }
 

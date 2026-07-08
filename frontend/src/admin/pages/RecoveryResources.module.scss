@@ -194,7 +194,7 @@
 }
 
 .parentTabTitle {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--text-color);
   line-height: 1.4;

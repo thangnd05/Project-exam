@@ -119,7 +119,7 @@
     font-size: 1.35rem;
 
     svg {
-      font-size: 1.5rem;
+      font-size: var(--font-size-md);
     }
   }
 }
@@ -168,7 +168,7 @@
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   background: #f8fafc;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   color: #64748b;
   display: flex;
@@ -259,7 +259,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 20px;
+  /* Bỏ margin-bottom cộng dồn: khoảng cách giữa các nhóm/câu do gap của
+     .questions-list lo, tránh khe hở quá lớn giữa 2 câu. */
+  margin-bottom: 0;
 
   &:last-child {
     margin-bottom: 0;
@@ -281,7 +283,7 @@
 
   @media (max-width: 768px) {
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 0;
   }
 }
 
@@ -327,7 +329,7 @@
   }
 
   .passage-content {
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     line-height: 1.5;
     color: #111827;
     white-space: pre-wrap;
@@ -358,7 +360,9 @@
 }
 
 .question-card-wrapper {
-  margin-bottom: 24px;
+  /* Không margin-bottom cộng dồn — khoảng cách giữa các câu do gap của
+     .questions-list / .group-section quyết định. */
+  margin-bottom: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -390,7 +394,7 @@
 /* Điện thoại: thu nhỏ khoảng cách chung */
 @media (max-width: 768px) {
   .question-card-wrapper {
-    margin-bottom: 16px;
+    margin-bottom: 0;
     gap: 8px;
   }
 }
@@ -547,7 +551,7 @@
     }
 
     .q-text {
-      font-size: 1.5rem;
+      font-size: var(--font-size-md);
       margin-bottom: 10px;
     }
 
@@ -846,7 +850,7 @@
   border-radius: 50px;
   border: 1px solid rgba(226, 232, 240, 0.8);
   background: white;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   color: #64748b;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
@@ -917,7 +921,7 @@
 
   @media (max-width: 768px) {
     padding: 12px 28px;
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     gap: 8px;
   }
 
@@ -938,7 +942,7 @@
   text-align: center;
 
   h3 {
-    font-size: 2.8rem;
+    font-size: var(--font-size-2xxl);
     font-weight: 800;
     margin-top: 25px;
     color: var(--dark-color);

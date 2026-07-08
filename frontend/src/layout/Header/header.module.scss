@@ -74,7 +74,7 @@
 
 .home {
   position: relative;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   padding: 8px 0 !important;
   color: #898686;
   text-decoration: none;
@@ -133,7 +133,7 @@
 
 .username {
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   white-space: nowrap;
 }
 
@@ -180,7 +180,7 @@
 /* Title */
 .menuTitle {
   position: relative;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: #898686;
   transition: 0.2s;
 
@@ -295,7 +295,7 @@
 
 .mobileNavLink {
   color: #3a3a3a;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   padding: 10px 0 !important;
   border-bottom: 1px solid #f1f5f9;
 
@@ -314,7 +314,7 @@
 }
 
 .mobileMenuTitle {
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;

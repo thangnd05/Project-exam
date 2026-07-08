@@ -138,7 +138,7 @@
   border-radius: 12px;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #fff;
-  font-size: 2.2rem;
+  font-size: var(--font-size-xxl);
   flex-shrink: 0;
 }
 
@@ -159,7 +159,7 @@
 }
 
 .folder-card-count {
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: #64748b;
 }
 

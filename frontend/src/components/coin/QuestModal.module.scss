@@ -12,7 +12,7 @@
   border: none;
   background: transparent;
   padding: 8px 18px;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: #94a3b8;
   cursor: pointer;
@@ -35,7 +35,7 @@
   align-items: center;
   gap: 5px;
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: #5c3d00;
   background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
   padding: 4px 14px;
@@ -46,7 +46,7 @@
   padding: 56px 0;
   text-align: center;
   color: #6b7280;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
 }
 
 .groups {
@@ -112,13 +112,13 @@
   background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
   padding: 3px 11px;
   border-radius: 999px;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
 }
 
 .desc {
   margin: 0;
   color: #4b5563;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
 }
 
 .progress {
@@ -142,7 +142,7 @@
 }
 
 .progressText {
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: #6b7280;
 }
 
@@ -150,7 +150,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: #e8590c;
 }
 

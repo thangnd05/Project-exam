@@ -20,7 +20,7 @@
 }
 
 .treeCount {
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: #6b7280;
   font-weight: 500;
 }
@@ -33,7 +33,7 @@
     background: none;
     border: none;
     color: #3b82f6;
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     cursor: pointer;
     padding: 0.4rem 0.8rem;
     border-radius: 0.4rem;
@@ -116,7 +116,7 @@
 }
 
 .collectionName {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: #374151;
   white-space: nowrap;
   overflow: hidden;

@@ -44,16 +44,21 @@
   --glass-border: rgba(255, 255, 255, 0.5);
   --surface-shadow: 0 8px 32px 0 rgba(0, 97, 242, 0.1);
 
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 1.2rem;
-  --font-size-ssm: 1.4rem;
-  --font-size-base: 1.6rem;
-  --font-size-lg: 1.8rem;
-  --font-size-xl: 2rem;
-  --font-size-2xl: 2.4rem;
-  --font-size-3xl: 3rem;
-  --font-size-4xl: 3.6rem;
-  --font-size-5xl: 4.8rem;
+  --font-size-xs: 0.75rem;   /* 7.5px */
+  --font-size-xs2: 1.1rem;   /* 11px */
+  --font-size-sm: 1.2rem;    /* 12px */
+  --font-size-smd: 1.3rem;   /* 13px */
+  --font-size-ssm: 1.4rem;   /* 14px */
+  --font-size-md: 1.5rem;    /* 15px */
+  --font-size-base: 1.6rem;  /* 16px */
+  --font-size-lg: 1.8rem;    /* 18px */
+  --font-size-xl: 2rem;      /* 20px */
+  --font-size-xxl: 2.2rem;   /* 22px */
+  --font-size-2xl: 2.4rem;   /* 24px */
+  --font-size-2xxl: 2.8rem;  /* 28px */
+  --font-size-3xl: 3rem;     /* 30px */
+  --font-size-4xl: 3.6rem;   /* 36px */
+  --font-size-5xl: 4.8rem;   /* 48px */
 
   --font-weight-light: 300;
   --font-weight-normal: 400;
@@ -96,8 +101,20 @@
   font-size: var(--font-size-xs) !important;
 }
 
+.fs-xs2 {
+  font-size: var(--font-size-xs2) !important;
+}
+
 .fs-sm {
   font-size: var(--font-size-sm) !important;
+}
+
+.fs-smd {
+  font-size: var(--font-size-smd) !important;
+}
+
+.fs-md {
+  font-size: var(--font-size-md) !important;
 }
 
 .fs-base {
@@ -112,8 +129,16 @@
   font-size: var(--font-size-xl) !important;
 }
 
+.fs-xxl {
+  font-size: var(--font-size-xxl) !important;
+}
+
 .fs-2xl {
   font-size: var(--font-size-2xl) !important;
+}
+
+.fs-2xxl {
+  font-size: var(--font-size-2xxl) !important;
 }
 
 .fs-3xl {
@@ -155,7 +180,32 @@
 }
 
 html {
+  /* 1rem = 10px làm gốc; co dần theo màn hình để mọi chữ/spacing dạng rem tự scale responsive */
   font-size: 62.5%;
+}
+
+@media (max-width: 1200px) {
+  html {
+    font-size: 60%; /* 1rem = 9.6px */
+  }
+}
+
+@media (max-width: 992px) {
+  html {
+    font-size: 58%; /* 1rem = 9.28px */
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 56.25%; /* 1rem = 9px */
+  }
+}
+
+@media (max-width: 576px) {
+  html {
+    font-size: 55%; /* 1rem = 8.8px */
+  }
 }
 
 body {
@@ -207,7 +257,7 @@ li {
 
 .btn-accent {
   padding: 0.75rem 1.5rem;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   background-color: var(--accent-color);
   color: var(--white);
   border: none;

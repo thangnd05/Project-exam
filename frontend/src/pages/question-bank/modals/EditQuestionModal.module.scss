@@ -53,13 +53,13 @@
   font-weight: 700;
   margin-bottom: 8px;
   color: #334155;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
 }
 
 .sectionTitle {
   font-weight: 700;
   color: #1e293b;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   margin-top: 16px;
   margin-bottom: 12px;
   border-bottom: 2px solid #e2e8f0;

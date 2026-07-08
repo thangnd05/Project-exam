@@ -93,14 +93,14 @@ $transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     font-weight: 700;
     color: white;
     flex-shrink: 0;
 }
 
 .logoText {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: white;
     white-space: nowrap;
@@ -163,7 +163,7 @@ $transition: all 0.3s ease;
 }
 
 .navLabel {
-    font-size: 11px;
+    font-size: var(--font-size-xs2);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -207,7 +207,7 @@ $transition: all 0.3s ease;
 }
 
 .navText {
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
     font-weight: 500;
     white-space: nowrap;
 }
@@ -323,7 +323,7 @@ $transition: all 0.3s ease;
     padding: 10px 12px 10px 42px;
     border: 1px solid $border-color;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
     background: $content-bg;
     transition: $transition;
 
@@ -373,7 +373,7 @@ $transition: all 0.3s ease;
     height: 18px;
     background: $danger;
     color: white;
-    font-size: 10px;
+    font-size: 1rem;
     font-weight: 600;
     border-radius: 50%;
     display: flex;
@@ -404,7 +404,7 @@ $transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: var(--font-size-ssm);
     font-weight: 600;
     color: white;
 }
@@ -419,13 +419,13 @@ $transition: all 0.3s ease;
 }
 
 .userName {
-    font-size: 13px;
+    font-size: var(--font-size-smd);
     font-weight: 600;
     color: $text-primary;
 }
 
 .userRole {
-    font-size: 11px;
+    font-size: var(--font-size-xs2);
     color: $text-secondary;
 }
 

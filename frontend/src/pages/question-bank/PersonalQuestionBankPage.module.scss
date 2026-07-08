@@ -96,7 +96,7 @@
   align-items: center;
   gap: 6px;
   margin-top: 8px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: #334155;
   cursor: pointer;
   user-select: none;
@@ -166,7 +166,7 @@
   margin-bottom: 8px;
   color: #334155;
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
 }
 
 .chapterBadge {
@@ -214,7 +214,7 @@
   margin-left: 8px;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 600;
   background: #e0f2fe;
   color: #0369a1;
@@ -319,7 +319,7 @@
 }
 
 .mediaOpenLink {
-  font-size: 13px;
+  font-size: var(--font-size-smd);
   color: #0d6efd;
   text-decoration: none;
 }
