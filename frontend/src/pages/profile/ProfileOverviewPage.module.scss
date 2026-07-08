@@ -283,8 +283,9 @@
 
 .statsRow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  /* Reflow tự động — không cần media query cột */
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: 2rem;
 }
 
 .statCardCompact {
@@ -783,10 +784,6 @@
     grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
-
-  .statsRow {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 
 @media (max-width: 768px) {
@@ -794,7 +791,6 @@
     grid-template-columns: 1fr;
   }
 
-  .statsRow,
   .chartsRow {
     grid-template-columns: 1fr;
   }

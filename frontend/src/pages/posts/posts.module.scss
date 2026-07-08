@@ -329,17 +329,10 @@
 /* --- Post Grid --- */
 .postGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  /* Reflow tự động: số cột theo chỗ trống, không cần media query cột */
+  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+  gap: 2.4rem;
   margin-bottom: 60px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
 }
 
 .postCard {

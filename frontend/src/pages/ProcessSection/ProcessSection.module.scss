@@ -26,9 +26,10 @@
 
 .processGrid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: 32px;
-    row-gap: 24px;
+    /* Reflow tự động: các bước dàn đều & tự xuống hàng, không cần media query cột */
+    grid-template-columns: repeat(auto-fit, minmax(26rem, 1fr));
+    column-gap: 3.2rem;
+    row-gap: 2.4rem;
 }
 
 .processItem {
@@ -77,21 +78,51 @@
     transition: color 0.3s ease;
 }
 
-/* --- RESPONSIVE --- */
-@media (max-width: 1199px) {
-    .processGrid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        column-gap: 24px;
+/* --- RESPONSIVE --- (cột do auto-fit tự lo; chỉ còn chỉnh cỡ tiêu đề) */
+@media (max-width: 768px) {
+    .section {
+        padding: 40px 0;
+    }
+
+    .sectionHead {
+        margin-bottom: 24px;
+    }
+
+    .section-title {
+        font-size: var(--font-size-2xl); /* 30px -> 24px */
+    }
+
+    .section-subtitle {
+        font-size: var(--font-size-md); /* 18px -> 15px */
     }
 }
 
-@media (max-width: 768px) {
-    .section-title {
-        font-size: var(--font-size-3xl);
+/* Điện thoại: mỗi bước rút gọn thành 1 HÀNG NGANG (số + tiêu đề in đậm),
+   ẩn đoạn mô tả xám cho gọn */
+@media (max-width: 576px) {
+    .processGrid {
+        row-gap: 0.4rem;
     }
 
-    .processGrid {
-        grid-template-columns: 1fr;
-        row-gap: 16px;
+    .process-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-top: 1.4rem;
+
+        h3 {
+            margin: 0;
+            font-size: var(--font-size-lg);
+        }
+
+        p {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .section-title {
+        font-size: var(--font-size-xxl); /* 22px */
     }
 }

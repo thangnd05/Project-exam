@@ -56,7 +56,8 @@ const Evaluation = () => {
         },
       },
       {
-        breakpoint: 600,
+        // Điện thoại (≤768px): xem từng card một cho dễ đọc.
+        breakpoint: 768,
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
@@ -89,10 +90,11 @@ const Evaluation = () => {
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
+    // Dạng số gọn (20/05/2026) để không bị xuống nhiều dòng trong card hẹp.
     return date.toLocaleDateString('vi-VN', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
     });
   };
 
@@ -117,7 +119,7 @@ const Evaluation = () => {
             </p>
           </div>
           <button
-            className={cx('btn-write-review')}
+            className={cx('btn-write-review', 'btn-write-review--head')}
             onClick={handleWriteReviewClick}
           >
             Viết đánh giá
@@ -180,6 +182,16 @@ const Evaluation = () => {
             Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá!
           </div>
         )}
+
+        {/* Responsive: trên mobile nút nằm DƯỚI card đánh giá (desktop dùng nút ở header). */}
+        <div className={cx('write-review-below')}>
+          <button
+            className={cx('btn-write-review')}
+            onClick={handleWriteReviewClick}
+          >
+            Viết đánh giá
+          </button>
+        </div>
       </div>
 
       {/* --- MODAL (POPUP) --- */}

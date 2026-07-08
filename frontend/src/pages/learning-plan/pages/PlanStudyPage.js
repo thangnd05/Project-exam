@@ -182,7 +182,7 @@ function PlanStudyPage() {
     <div className={cx('wrapper')}>
       <div className={cx('headerBar')}>
         <button type="button" className={cx('btn', 'btnGhost', 'btnSm')} onClick={goToPicker}>
-          ← Chọn ải khác
+          Chọn ải khác
         </button>
       </div>
 

@@ -151,11 +151,15 @@
 
 @media (max-width: 768px) {
   .exam-type-container {
-    padding: 60px 0;
+    padding: 40px 0;
 
     .header-box {
       .exam-type-title {
-        font-size: var(--font-size-2xxl);
+        font-size: var(--font-size-2xl); /* 30px -> 24px */
+      }
+
+      .exam-type-subtitle {
+        font-size: var(--font-size-md); /* 18px -> 15px */
       }
     }
 

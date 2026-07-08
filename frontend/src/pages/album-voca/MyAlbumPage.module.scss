@@ -12,16 +12,9 @@
 /* --- GRID --- */
 .album-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 35px;
-
-    @media (max-width: 992px) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: 576px) {
-        grid-template-columns: 1fr;
-    }
+    /* Reflow tự động: số cột theo chỗ trống, không cần media query cột */
+    grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
+    gap: 3.5rem;
 }
 
 /* --- PREMIUM CARD --- */

@@ -43,11 +43,11 @@
 /* --- Style cho Card Đánh giá --- */
 .review-card {
   background: var(--bg-white);
-  padding: 30px;
+  padding: 24px;
   border-radius: 20px;
   border: 1px solid var(--border-color);
   height: 100%;
-  min-height: 280px;
+  min-height: 250px;
   /* Chiều cao tối thiểu để các card đều nhau */
   display: flex;
   flex-direction: column;
@@ -75,9 +75,10 @@
 .review-footer {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   border-top: 1px solid #edf2f7;
   padding-top: 20px;
+  min-width: 0;
 }
 
 .avatar {
@@ -105,6 +106,7 @@
 .user-info {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .user-name {
@@ -118,6 +120,7 @@
   font-size: var(--font-size-sm);
   color: #718096;
   margin-bottom: 4px;
+  white-space: nowrap; /* ngày dạng số ngắn -> giữ 1 dòng, không vỡ chữ */
 }
 
 .stars {
@@ -291,13 +294,67 @@
   }
 }
 
+/* Nút "Viết đánh giá" đặt DƯỚI danh sách card — chỉ hiện ở mobile. */
+.write-review-below {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  .section {
+    padding: 40px 0;
+  }
+
+  .sectionHead {
+    margin-bottom: 24px;
+    gap: 12px;
+  }
+
+  /* Tiêu đề & mô tả nhỏ lại cho vừa màn hình điện thoại. */
+  .section-title {
+    font-size: var(--font-size-2xl); /* 30px -> 24px */
+  }
+
+  .section-subtitle {
+    font-size: var(--font-size-md); /* 18px -> 15px */
+  }
+
+  /* Ẩn nút ở header, chuyển xuống dưới card cho gọn. */
+  .btn-write-review--head {
+    display: none;
+  }
+
+  .write-review-below {
+    display: flex;
+    justify-content: center;
+    /* Sát card đánh giá hơn (âm để bù padding-bottom của slider). */
+    margin-top: -8px;
+
+    .btn-write-review {
+      width: 100%;
+      max-width: 320px;
+      justify-content: center;
+    }
+  }
+
   .slider-container {
+    /* Giảm khoảng trống dưới card; kéo dots vào trong để nút nằm gần card. */
+    padding-bottom: 20px;
+
     :global {
       .slick-prev,
       .slick-next {
         display: none !important;
       }
+
+      .slick-dots {
+        bottom: -4px;
+      }
     }
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: var(--font-size-xxl); /* 22px */
   }
 }
