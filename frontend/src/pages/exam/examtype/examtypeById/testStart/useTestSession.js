@@ -5,6 +5,9 @@ import { checkActiveUserTest, startUserTest, submitUserTest } from '~/api/userTe
 import { getAnswersByUserTest, batchSaveAnswers } from '~/api/userAnswerApi';
 import { getUserTestInfo, purchaseTestAccess } from '~/api/testApi';
 import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
+import { getExamTypeLayout } from '~/api/examTypeApi';
+import { resolveLayoutConfig } from './examLayout/resolveLayoutConfig';
+import { defaultLayoutConfig } from './examLayout/layoutSchema';
 import { getApiErrorMessage } from '~/utils/apiError';
 import { AuthContext } from '~/context/AuthContext';
 import { useStreak } from '~/hooks/useStreak';
@@ -58,6 +61,8 @@ export function useTestSession() {
   const [preCountdown, setPreCountdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState('loading');
+  // Bố cục giao diện làm bài theo examType (fallback về mặc định khi chưa cấu hình).
+  const [layoutConfig, setLayoutConfig] = useState(defaultLayoutConfig);
 
   const enrichTestWithPassageMedia = useCallback(async (testData) => {
     const parts = testData.parts || [];
@@ -236,6 +241,23 @@ export function useTestSession() {
     if (!testId || authLoading) return;
     loadTest();
   }, [testId, authLoading, loadTest]);
+
+  // Lấy layout của examType (đã fallback lá->cha ở backend). Lỗi/không có -> giữ mặc định.
+  useEffect(() => {
+    const examTypeId = test?.examTypeId;
+    if (!examTypeId) return;
+    let cancelled = false;
+    getExamTypeLayout(examTypeId)
+      .then((res) => {
+        if (!cancelled) setLayoutConfig(resolveLayoutConfig(res));
+      })
+      .catch(() => {
+        if (!cancelled) setLayoutConfig(defaultLayoutConfig);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [test?.examTypeId]);
 
   useEffect(() => {
     if (status === 'open' && test?.testId) {
@@ -435,6 +457,7 @@ export function useTestSession() {
     isPractice,
     status,
     test,
+    layoutConfig,
     userAnswers,
     timeLeft,
     preCountdown,

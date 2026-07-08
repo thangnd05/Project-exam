@@ -8,7 +8,9 @@ function TestStartDashboard({
   allQuestions,
   userAnswers,
   onScrollToQuestion,
+  columns, // số cột cố định cho lưới câu hỏi; bỏ trống = tự co (auto-fill).
 }) {
+  const gridStyle = columns ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : undefined;
   return (
     <div className={cx('dashboard')}>
       <div className={cx('dashboard-card')}>
@@ -16,7 +18,7 @@ function TestStartDashboard({
           <IoInformationCircleOutline />
           <span>Danh sách câu hỏi</span>
         </div>
-        <div className={cx('question-grid')}>
+        <div className={cx('question-grid')} style={gridStyle}>
           {allQuestions.map((q, idx) => {
             const isAnswered =
               !!userAnswers[q.questionId]?.selectedAnswerId ||

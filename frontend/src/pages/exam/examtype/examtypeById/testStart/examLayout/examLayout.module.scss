@@ -1,0 +1,162 @@
+// Layout cho các vùng (zone) khi block được đặt ngoài footer mặc định.
+// Chỉ kích hoạt khi có block ở TOP/LEFT/RIGHT/FLOAT — layout mặc định (chỉ BOTTOM) không dùng file này.
+
+.zoneTop {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.6rem;
+  background: var(--bg-white, #fff);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+// Vùng thân giữa header và footer: KHÔNG tự cuộn, chỉ cột giữa cuộn riêng.
+.scrollBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.innerRow {
+  display: flex;
+  gap: 2.4rem;
+  width: 100%;
+  max-width: 158rem;
+  min-height: 0;
+  padding: 0 2.4rem;
+}
+
+// Cột câu hỏi ở giữa — vùng DUY NHẤT cuộn.
+.centerScroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 4rem 0 4rem;
+  scroll-padding-top: 2rem; // khi nhảy tới 1 câu, chừa khoảng trên, không dính sát mép
+
+  @media (max-width: 768px) {
+    padding-top: 2rem;
+  }
+}
+
+// Cột bên (danh sách câu...) đứng yên, tự cuộn nếu quá dài.
+.zoneLeft,
+.zoneRight {
+  flex: 0 0 auto;
+  width: 32rem;
+  max-width: 34%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  // Chừa chỗ cố định cho thanh cuộn để card không bị nhảy ngang khi ẩn/hiện.
+  scrollbar-gutter: stable;
+  padding: 4rem 0.4rem 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+
+  // Thanh cuộn mảnh, chìm — chỉ đậm khi hover vào cột.
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &:hover {
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+.zoneCenter {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+// Nhóm block trong footer (trái / giữa / phải).
+.footerGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.zoneFloat {
+  position: fixed;
+  right: 2rem;
+  bottom: 9rem;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+// Trong preview của editor: footer/float không "fixed" toàn màn mà nằm gọn trong khung preview.
+.previewFooter {
+  position: static !important;
+}
+
+.previewFloat {
+  position: absolute;
+  right: 1.2rem;
+  bottom: 1.2rem;
+}
+
+.banner {
+  width: 100%;
+  border-radius: var(--exam-radius, 1.2rem);
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+}
+
+.bannerPlaceholder {
+  width: 100%;
+  min-height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #64748b);
+  background: var(--input-bg, #f1f5f9);
+  border: 1px dashed var(--border-color, #cbd5e1);
+  border-radius: var(--exam-radius, 1.2rem);
+}
+
+@media (max-width: 992px) {
+  .body {
+    flex-direction: column;
+  }
+  .zoneLeft,
+  .zoneRight {
+    width: 100%;
+    max-width: 100%;
+    position: static;
+  }
+}
