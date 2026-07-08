@@ -449,7 +449,7 @@
 
     &:first-child {
       text-align: left;
-      width: 22%;
+      width: 40%;
     }
 
     &:nth-child(2),
@@ -458,8 +458,8 @@
     }
 
     &:last-child {
-      width: 42%;
-      text-align: left;
+      width: 24%;
+      text-align: center;
     }
   }
 
@@ -493,7 +493,45 @@
 }
 
 .partTableStatus {
-  text-align: left !important;
+  text-align: center !important;
+}
+
+/* Điện thoại: bảng gọn lại (giảm padding/cỡ chữ) để không tràn ngang. */
+@media (max-width: 640px) {
+  .partTable {
+    font-size: var(--font-size-sm);
+
+    thead th {
+      padding: 0.7rem 0.5rem;
+      font-size: var(--font-size-xs2);
+      letter-spacing: 0.02em;
+
+      &:first-child {
+        width: 34%;
+      }
+
+      &:nth-child(2),
+      &:nth-child(3) {
+        width: 18%;
+      }
+
+      &:last-child {
+        width: 30%;
+      }
+    }
+
+    tbody td {
+      padding: 0.7rem 0.5rem;
+    }
+  }
+
+  .partTableName {
+    font-size: var(--font-size-ssm) !important;
+  }
+
+  .partTableNum {
+    font-size: var(--font-size-ssm) !important;
+  }
 }
 
 .mockSparklineCard {

@@ -16,7 +16,6 @@ const pageCx = classNames.bind(pageStyles);
 function TargetDashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
-  const [showPartTable, setShowPartTable] = useState(true);
 
   const {
     examTypes,
@@ -272,49 +271,6 @@ function TargetDashboardPage() {
             <div className={cx('cardHeader')}>% từng Part — hiện tại vs aim</div>
             <div className={cx('cardBody')}>
               <TargetDashboardPartChart rows={partChartRows} />
-              <button
-                type="button"
-                className={classNames(cx('btn', 'btnGhost', 'btnSm'), pageCx('partTableToggle'))}
-                onClick={() => setShowPartTable((v) => !v)}
-              >
-                {showPartTable ? 'Ẩn bảng chi tiết' : 'Xem bảng chi tiết'}
-              </button>
-              {showPartTable && (
-                <div className={pageCx('partTableWrapper')}>
-                  <table className={pageCx('partTable')}>
-                    <thead>
-                      <tr>
-                        <th>Part</th>
-                        <th>Aim</th>
-                        <th>Hiện tại</th>
-                        <th>Trạng thái</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {partChartRows.map((row) => (
-                        <tr key={row.key}>
-                          <td className={pageCx('partTableName')}>{row.name}</td>
-                          <td className={pageCx('partTableNum')}>{row.aim}%</td>
-                          <td className={pageCx('partTableNum')}>
-                            {row.current != null ? `${row.current.toFixed(1)}%` : '—'}
-                          </td>
-                          <td className={pageCx('partTableStatus')}>
-                            {row.current == null ? (
-                              <span className={pageCx('partCompareBadge', 'muted')}>Chưa có mock</span>
-                            ) : row.reached ? (
-                              <span className={pageCx('partCompareBadge', 'ok')}>Đạt aim</span>
-                            ) : (
-                              <span className={pageCx('partCompareBadge', 'gap')}>
-                                Còn {(row.aim - row.current).toFixed(1)}%
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
             </div>
           </div>
 
