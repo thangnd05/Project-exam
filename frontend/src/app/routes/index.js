@@ -11,7 +11,7 @@ import TestReviewPage from '~/features/tests/exam/exam-types/detail/result/TestR
 import TestHistoryPage from '~/features/tests/history/TestHistoryPage';
 import TestLeaderboardPage from '~/features/tests/leaderboard/TestLeaderboardPage';
 import MyClassesPage from '~/features/classes/MyClassPage';
-import TestByClassPage from '~/features/classes/testclass/TestByClassPage';
+import TestByClassPage from '~/features/classes/class-tests/TestByClassPage';
 import Policy from '~/features/static/policy/policy';
 import Service from '~/features/static/policy/service';
 import About from '~/features/static/about';
@@ -26,7 +26,7 @@ import VerifyEmailPage from '~/features/user/login/VerifyEmailPage';
 import OAuth2Redirect from '~/features/user/login/OAuth2Redirect';
 import NotFoundPage from '~/features/static/error/NotFoundPage';
 import ChapterOfClass from '~/features/classes/chapters/ChapterOfClass';
-import ClassMemberManagementPage from '~/features/classes/class-members/ClassMemberManagementPage';
+import ClassMemberManagementPage from '~/features/classes/members/ClassMemberManagementPage';
 import CreateTestFromBankPage from '~/features/tests/create-test-from-bank/CreateTestFromBankPage';
 import PersonalQuestionBankPage from '~/features/tests/question-bank/PersonalQuestionBankPage';
 import ProfileOverviewPage from '~/features/user/profile/ProfileOverviewPage';
