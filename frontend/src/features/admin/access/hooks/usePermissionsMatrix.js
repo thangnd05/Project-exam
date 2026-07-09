@@ -1,7 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
-import {getRoles, updateRolePermissions} from '~/admin/api/roleApi';
-import {getPermissions} from '~/admin/api/permissionApi';
+import {getRoles, updateRolePermissions} from '~/features/admin/api/roleApi';
+import {getPermissions} from '~/features/admin/api/permissionApi';
 
 export const permissionsKeys = {
   roles: () => ['admin-roles'],

@@ -1,7 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {keepPreviousData} from '~/shared/config/queryClient';
-import {getRoles} from '~/admin/api/roleApi';
+import {getRoles} from '~/features/admin/api/roleApi';
 import {deleteUser, getUsers} from '~/shared/api/userApi';
 
 export const usersKeys = {

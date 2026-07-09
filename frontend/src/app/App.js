@@ -4,7 +4,7 @@ import { queryClient } from '~/shared/config/queryClient';
 import DefaultLayout from '~/layout/DefaultLayout';
 import { publicRoutes, privateRoutes, adminRoutes } from './routes';
 import ProtectedRoute from './routes/ProtectedRoute';
-import AdminLayout from '~/admin/layouts/AdminLayout';
+import AdminLayout from '~/features/admin/layouts/AdminLayout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from '~/shared/context/AuthContext';
 import { StreakProvider } from '~/shared/context/StreakContext';
