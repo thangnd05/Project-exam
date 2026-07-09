@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 import { formatDateTime24 as formatDate } from '~/utils/format-date-time';
 import PlanComparisonCharts from '../components/PlanComparisonCharts';
 import { usePlanComparison } from './hooks/usePlanComparison';
@@ -72,18 +73,22 @@ function PlanComparisonPage() {
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>So sánh các Plan</h2>
         <div className={cx('actionBar')}>
-          <Link
+          <ButtonPrime
+            as="link"
             to={examTypeId ? `/learning-plans/generate?examTypeId=${examTypeId}` : '/learning-plans/generate'}
-            className={cx('btn', 'btnOutline', 'btnSm')}
+            variant="outline"
+            size="sm"
           >
             Danh sách plan
-          </Link>
-          <Link
+          </ButtonPrime>
+          <ButtonPrime
+            as="link"
             to={examTypeId ? `/my-target/dashboard?examTypeId=${examTypeId}` : '/my-target/dashboard'}
-            className={cx('btn', 'btnOutline', 'btnSm')}
+            variant="outline"
+            size="sm"
           >
             Tổng quan mục tiêu
-          </Link>
+          </ButtonPrime>
         </div>
       </div>
 
@@ -111,9 +116,9 @@ function PlanComparisonPage() {
       {!loading && sorted.length === 0 && (
         <div className={cx('alert', 'alertInfo')}>
           <span>Chưa có plan nào cho kỳ thi này.</span>
-          <Link to="/learning-plans/generate" className={cx('btn', 'btnPrimary', 'btnSm')}>
+          <ButtonPrime as="link" to="/learning-plans/generate" variant="primary" size="sm">
             Sinh plan đầu tiên
-          </Link>
+          </ButtonPrime>
         </div>
       )}
 
@@ -185,19 +190,23 @@ function PlanComparisonPage() {
                   </ul>
 
                   <div className={pageCx('planCardActions')}>
-                    <Link
+                    <ButtonPrime
+                      as="link"
                       to={`/learning-plans/${p.learningPlanId}`}
-                      className={cx('btn', 'btnOutline', 'btnSm')}
+                      variant="outline"
+                      size="sm"
                     >
                       Chi tiết
-                    </Link>
+                    </ButtonPrime>
                     {p.status === 'ACTIVE' && (
-                      <Link
+                      <ButtonPrime
+                        as="link"
                         to={`/learning-plans/${p.learningPlanId}/study`}
-                        className={cx('btn', 'btnPrimary', 'btnSm')}
+                        variant="primary"
+                        size="sm"
                       >
                         Học tiếp
-                      </Link>
+                      </ButtonPrime>
                     )}
                   </div>
                 </div>

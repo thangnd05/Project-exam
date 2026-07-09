@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 import { sortPartsByLookup } from '~/utils/partOrder';
 import { formatDateTime24 as formatDate, formatDayMonth } from '~/utils/format-date-time';
 import TargetDashboardMockSparkline from './components/TargetDashboardMockSparkline';
@@ -100,21 +101,25 @@ function TargetDashboardPage() {
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>Tổng quan mục tiêu</h2>
         <div className={cx('actionBar')}>
-          <Link to="/my-target" className={cx('btn', 'btnOutline', 'btnSm')}>
+          <ButtonPrime as="link" to="/my-target" variant="outline" size="sm">
             Cài đặt target
-          </Link>
-          <Link
+          </ButtonPrime>
+          <ButtonPrime
+            as="link"
             to={examTypeId ? `/my-target/mocks?examTypeId=${examTypeId}` : '/my-target/mocks'}
-            className={cx('btn', 'btnOutline', 'btnSm')}
+            variant="outline"
+            size="sm"
           >
             Lịch sử Mock
-          </Link>
-          <Link
+          </ButtonPrime>
+          <ButtonPrime
+            as="link"
             to={examTypeId ? `/learning-plans/compare?examTypeId=${examTypeId}` : '/learning-plans/generate'}
-            className={cx('btn', 'btnOutline', 'btnSm')}
+            variant="outline"
+            size="sm"
           >
             So sánh Plan
-          </Link>
+          </ButtonPrime>
         </div>
       </div>
 
@@ -144,9 +149,9 @@ function TargetDashboardPage() {
       {!loading && !target?.hasTarget && examTypeId && (
         <div className={cx('alert', 'alertWarning')}>
           <span>Bạn chưa đặt mục tiêu cho kỳ thi này.</span>
-          <Link to={`/my-target?examTypeId=${examTypeId}`} className={cx('btn', 'btnPrimary', 'btnSm')}>
+          <ButtonPrime as="link" to={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
             Đặt mục tiêu
-          </Link>
+          </ButtonPrime>
         </div>
       )}
 
@@ -160,12 +165,14 @@ function TargetDashboardPage() {
                   ? ` Đạt lúc: ${formatDate(target.achievedAt)}.`
                   : ` Mock gần nhất: ${latestEnhanced?.totalScore} điểm.`}
               </p>
-              <Link
+              <ButtonPrime
+                as="link"
                 to={`/my-target/achieved?examTypeId=${examTypeId}`}
-                className={cx('btn', 'btnSuccess', 'btnSm')}
+                variant="success"
+                size="sm"
               >
                 Đặt mục tiêu mới
-              </Link>
+              </ButtonPrime>
             </div>
           )}
 
@@ -233,12 +240,14 @@ function TargetDashboardPage() {
                     {activePlan.passedTasks ?? 0}/{activePlan.totalTasks ?? 0} ải đã pass
                   </div>
                   <div className={pageCx('statTileFooter')}>
-                    <Link
+                    <ButtonPrime
+                      as="link"
                       to={`/learning-plans/${activePlan.learningPlanId}`}
-                      className={cx('btn', 'btnPrimary', 'btnSm')}
+                      variant="primary"
+                      size="sm"
                     >
                       Mở plan
-                    </Link>
+                    </ButtonPrime>
                   </div>
                 </>
               ) : (
@@ -246,12 +255,14 @@ function TargetDashboardPage() {
                   <div className={cx('statHint')}>Chưa có plan đang học.</div>
                   {latestMock?.userTestId && (
                     <div className={pageCx('statTileFooter')}>
-                      <Link
+                      <ButtonPrime
+                        as="link"
                         to={`/learning-plans/generate?userTestId=${latestMock.userTestId}`}
-                        className={cx('btn', 'btnPrimary', 'btnSm')}
+                        variant="primary"
+                        size="sm"
                       >
                         Sinh plan từ mock
-                      </Link>
+                      </ButtonPrime>
                     </div>
                   )}
                 </>
@@ -296,33 +307,39 @@ function TargetDashboardPage() {
                   </div>
                 </div>
                 <div className={cx('actionBar')}>
-                  <Link
+                  <ButtonPrime
+                    as="link"
                     to={`/tests/result/${latestMock.userTestId}`}
-                    className={cx('btn', 'btnOutline', 'btnSm')}
+                    variant="outline"
+                    size="sm"
                   >
                     Xem chẩn đoán
-                  </Link>
-                  <Link
+                  </ButtonPrime>
+                  <ButtonPrime
+                    as="link"
                     to={`/learning-plans/generate?userTestId=${latestMock.userTestId}`}
-                    className={cx('btn', 'btnOutline', 'btnSm')}
+                    variant="outline"
+                    size="sm"
                   >
                     Sinh plan
-                  </Link>
+                  </ButtonPrime>
                 </div>
               </div>
             </div>
           )}
 
           <div className={cx('actionBar')}>
-            <Link to={`/next-step?examTypeId=${examTypeId}`} className={cx('btn', 'btnPrimary', 'btnLg')}>
+            <ButtonPrime as="link" to={`/next-step?examTypeId=${examTypeId}`} variant="primary" size="lg">
               Tôi nên làm gì tiếp theo?
-            </Link>
-            <Link
+            </ButtonPrime>
+            <ButtonPrime
+              as="link"
               to={examTypeId ? `/my-target/mocks?examTypeId=${examTypeId}` : '/my-target/mocks'}
-              className={cx('btn', 'btnOutline', 'btnLg')}
+              variant="outline"
+              size="lg"
             >
               Tất cả bài đã làm
-            </Link>
+            </ButtonPrime>
           </div>
         </>
       )}

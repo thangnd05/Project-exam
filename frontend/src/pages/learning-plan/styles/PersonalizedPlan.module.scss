@@ -65,15 +65,8 @@
 }
 
 .btnPrimary {
-  background: var(--primary);
-  color: var(--white);
-  border-color: var(--primary);
-
-  &:hover {
-    background: var(--accent-act-color);
-    color: var(--white);
-    border-color: var(--accent-act-color);
-  }
+  // Dùng gradient chuẩn của hệ nút (giống ButtonPrime variant primary) để đồng bộ toàn site
+  @include globalStyles.primaryGradientButton;
 }
 
 .btnSuccess {
