@@ -9,7 +9,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '~/shared/hooks/useAuth';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
-import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import routes from '~/shared/config/Routes';
 import styles from './PostDetailPage.module.scss';

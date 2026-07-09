@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
+import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/shared/utils/format-date-time';
 import { useTaskHistory } from './hooks/useTaskHistory';
 import styles from '../styles/PersonalizedPlan.module.scss';

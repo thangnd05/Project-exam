@@ -8,7 +8,7 @@ import routes, { buildExamTypeCollectionPath, buildExamTypeDetailPath } from '~/
 import { useAuth } from '~/shared/hooks/useAuth';
 
 import style from './TestByExamTypePage.module.scss';
-import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
+import TestListContainer from '~/shared/test/TestListContainer/TestListContainer';
 import Pagination from '~/shared/ui/Pagination/Pagination';
 import { useTestsByExamType } from './hooks/useTestsByExamType';
 

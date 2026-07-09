@@ -17,10 +17,10 @@ import {name} from '~/shared/assets/images';
 import routes from '~/shared/config/Routes';
 import JoinClassModal from '~/features/myclass/modals/JoinClassModal';
 import CreateClassModal from '~/features/myclass/modals/CreateClassModal';
-import CreateTestModal from '~/components/test/CreateTestModal';
-import StreakBadge from '~/components/streak/StreakBadge';
-import CoinQuestMenu from '~/components/coin/CoinQuestMenu';
-import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
+import CreateTestModal from '~/shared/test/CreateTestModal';
+import StreakBadge from '~/shared/streak/StreakBadge';
+import CoinQuestMenu from '~/shared/coin/CoinQuestMenu';
+import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import {useCosmetics} from '~/shared/hooks/useCosmetics';
 
 const cx = classNames.bind(style);

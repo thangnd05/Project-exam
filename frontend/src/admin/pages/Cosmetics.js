@@ -6,7 +6,7 @@ import {useCosmetics} from './hooks/useCosmetics';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
-import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import images from '~/shared/assets/images';
 import {
   AdminFieldError,

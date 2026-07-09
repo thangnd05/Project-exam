@@ -11,7 +11,7 @@ import {
 import classNames from 'classnames/bind';
 import styles from './TestManagementTable.module.scss';
 import {getTestStatus} from '~/shared/utils/testStatusHelper';
-import EditTestModal from '~/components/test/EditTestModal';
+import EditTestModal from '~/shared/test/EditTestModal';
 
 const cx = classNames.bind(styles);
 

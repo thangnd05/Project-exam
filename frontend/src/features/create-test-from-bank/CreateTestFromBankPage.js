@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '../../api/testApi';
 import { createTestPart } from '../../api/testPartApi';
-import CoinPriceField from '~/components/test/CoinPriceField';
+import CoinPriceField from '~/shared/test/CoinPriceField';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {

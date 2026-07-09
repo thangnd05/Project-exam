@@ -10,7 +10,7 @@ import { AuthProvider } from '~/shared/context/AuthContext';
 import { StreakProvider } from '~/shared/context/StreakContext';
 import { CoinProvider } from '~/shared/context/CoinContext';
 import { CosmeticProvider } from '~/shared/context/CosmeticContext';
-import StreakCelebration from '~/components/streak/StreakCelebration';
+import StreakCelebration from '~/shared/streak/StreakCelebration';
 import ScrollHandler from './layout/ScrollToTopOnRouteChange';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

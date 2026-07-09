@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
+import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import styles from '../styles/PersonalizedPlan.module.scss';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
 

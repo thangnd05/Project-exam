@@ -10,7 +10,7 @@ import {
   IoCheckmarkCircle,
 } from 'react-icons/io5';
 import styles from './EditQuestionModal.module.scss';
-import createStyles from '~/components/test/CreateTestModal.module.scss';
+import createStyles from '~/shared/test/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 const cxCreate = classNames.bind(createStyles);

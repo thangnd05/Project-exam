@@ -35,7 +35,7 @@ import UpdateProfileModal from './modals/UpdateProfileModal';
 import ProfileSectionModal from './ProfileSectionModal';
 import styles from './ProfileOverviewPage.module.scss';
 import routes, { buildNextStepPath } from '~/shared/config/Routes';
-import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
 import {
   useProfileOverview,

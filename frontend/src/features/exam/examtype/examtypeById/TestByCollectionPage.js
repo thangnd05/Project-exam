@@ -4,7 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import { IoArrowBack, IoDocumentTextOutline } from 'react-icons/io5';
 import routes, { buildExamTypeDetailPath } from '~/shared/config/Routes';
 
-import TestListContainer from '~/components/test/TestListContainer/TestListContainer';
+import TestListContainer from '~/shared/test/TestListContainer/TestListContainer';
 import Pagination from '~/shared/ui/Pagination/Pagination';
 import { useCollectionTests, useCollectionName } from './hooks/useCollectionTests';
 

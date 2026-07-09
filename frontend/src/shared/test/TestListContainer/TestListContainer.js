@@ -7,8 +7,8 @@ import {IoListOutline, IoGridOutline} from 'react-icons/io5';
 import styles from './TestListContainer.module.scss';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import PageHeaderViewToggle from '~/shared/ui/PageHeader/PageHeaderViewToggle';
-import TestCard from '~/components/test/TestCard/TestCard';
-import TestManagementTable from '~/components/test/TestManagementTable/TestManagementTable';
+import TestCard from '~/shared/test/TestCard/TestCard';
+import TestManagementTable from '~/shared/test/TestManagementTable/TestManagementTable';
 
 const cx = classNames.bind(styles);
 

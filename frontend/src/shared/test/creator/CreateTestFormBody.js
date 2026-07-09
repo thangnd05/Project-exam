@@ -19,7 +19,7 @@ import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useCreateTest, CREATOR_TYPES } from '~/shared/hooks/useCreateTest';
-import CoinPriceField from '~/components/test/CoinPriceField';
+import CoinPriceField from '~/shared/test/CoinPriceField';
 import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
