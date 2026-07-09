@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from '../../../api/axiosClient';
-import { login as loginRequest, register as registerRequest } from '../../../api/authApi';
+import axios from '~/api/axiosClient';
+import { login as loginRequest, register as registerRequest } from '~/api/authApi';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import {

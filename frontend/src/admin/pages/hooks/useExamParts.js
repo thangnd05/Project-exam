@@ -5,9 +5,9 @@ import {
   deleteExamPart,
   getExamParts,
   updateExamPart,
-} from '../../../api/examPartApi';
-import { getExamTypes } from '../../../api/examTypeApi';
-import { getSkills } from '../../../api/skillApi';
+} from '~/api/examPartApi';
+import { getExamTypes } from '~/api/examTypeApi';
+import { getSkills } from '~/api/skillApi';
 
 export const examPartsKeys = {
   examParts: ['exam-parts'],

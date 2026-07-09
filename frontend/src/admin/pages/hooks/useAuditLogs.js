@@ -1,6 +1,6 @@
 import {useQuery} from '@tanstack/react-query';
 
-import {getAuditLogs} from '../../../api/adminAuditApi';
+import {getAuditLogs} from '~/api/adminAuditApi';
 import {keepPreviousData} from '../../../config/queryClient';
 
 export const auditLogKeys = {
