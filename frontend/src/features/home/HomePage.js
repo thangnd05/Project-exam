@@ -1,6 +1,6 @@
-import HeroSection from '../HeroSection/HeroSection';
-import ExamTypePage from './examtype/ExamTypePage';
-import ProcessSection from '../ProcessSection/ProcessSection';
+import HeroSection from './components/HeroSection/HeroSection';
+import ExamTypePage from '~/features/exam/examtype/ExamTypePage';
+import ProcessSection from './components/ProcessSection/ProcessSection';
 import Evaluation from '~/features/evaluation/evaluation';
 
 export default function TestPage() {

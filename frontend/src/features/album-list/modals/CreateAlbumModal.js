@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from 'react-toastify';
-import { createAlbum } from '~/features/album-voca/api/vocabularyAlbumApi';
+import { createAlbum } from '~/features/album-list/api/vocabularyAlbumApi';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import CommonFormModal from "~/shared/ui/modal/CommonFormModal";

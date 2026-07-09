@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IoText, IoLanguage } from 'react-icons/io5';
-import { createVocabulary } from '~/features/album-delta/api/vocabularyApi';
+import { createVocabulary } from '~/features/album-detail/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';

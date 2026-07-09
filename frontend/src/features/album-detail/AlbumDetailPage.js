@@ -29,7 +29,7 @@ import {
   IoCodeSlashOutline
 } from 'react-icons/io5';
 
-import styles from './AlbumDeltaPage.module.scss';
+import styles from './AlbumDetailPage.module.scss';
 
 const cx = classNames.bind(styles);
 
