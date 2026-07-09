@@ -21,7 +21,7 @@ import RecoveryResourceViewPage from '~/features/diagnostic/resources/RecoveryRe
 import MyAlbumsPage from '~/features/album/list/MyAlbumPage';
 import AlbumDetailPage from '~/features/album/detail/AlbumDetailPage';
 import PracticePage from '~/features/album/practice/PracticePage';
-import MyTestPage from '~/features/mytest/MyTestPage';
+import MyTestPage from '~/features/user/mytest/MyTestPage';
 import VerifyEmailPage from '~/features/user/login/VerifyEmailPage';
 import OAuth2Redirect from '~/features/user/login/OAuth2Redirect';
 import NotFoundPage from '~/features/static/error/NotFoundPage';
