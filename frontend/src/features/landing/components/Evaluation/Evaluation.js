@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {motion} from 'framer-motion';
 import {FaStar} from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import styles from './evaluation.module.scss';
+import styles from './Evaluation.module.scss';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
