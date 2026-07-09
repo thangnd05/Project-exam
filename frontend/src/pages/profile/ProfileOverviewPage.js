@@ -219,31 +219,31 @@ function ProfileOverviewPage() {
               <section className={cx('quickActionsCard')}>
                 <h3 className={cx('cardTitle')}>Truy cập nhanh</h3>
                 <div className={cx('quickActionsList')}>
-                  <button onClick={() => navigate(routes.home)} className={cx('actionBtn', 'btnBlue')}>
+                  <button onClick={() => navigate(routes.home)} className={cx('actionBtn')}>
                     <IoDesktopOutline className={cx('btnIcon')} />
                     <span>Làm bài thi mới</span>
                   </button>
-                  <button onClick={() => navigate(routes.myAlbums)} className={cx('actionBtn', 'btnGreen')}>
+                  <button onClick={() => navigate(routes.myAlbums)} className={cx('actionBtn')}>
                     <IoBookOutline className={cx('btnIcon')} />
                     <span>Thẻ ghi nhớ</span>
                   </button>
-                  <button onClick={() => navigate(routes.myClasses)} className={cx('actionBtn', 'btnOrange')}>
+                  <button onClick={() => navigate(routes.myClasses)} className={cx('actionBtn')}>
                     <IoSchoolOutline className={cx('btnIcon')} />
                     <span>Lớp học của tôi</span>
                   </button>
-                  <button onClick={() => navigate(routes.personalQuestionBank)} className={cx('actionBtn', 'btnPurple')}>
+                  <button onClick={() => navigate(routes.personalQuestionBank)} className={cx('actionBtn')}>
                     <IoFolderOpenOutline className={cx('btnIcon')} />
                     <span>Ngân hàng câu hỏi</span>
                   </button>
-                  <button onClick={() => setActiveSection('evaluations')} className={cx('actionBtn', 'btnYellow')}>
+                  <button onClick={() => setActiveSection('evaluations')} className={cx('actionBtn')}>
                     <IoStar className={cx('btnIcon')} />
                     <span>Đánh giá của tôi</span>
                   </button>
-                  <button onClick={() => setActiveSection('posts')} className={cx('actionBtn', 'btnBlue')}>
+                  <button onClick={() => setActiveSection('posts')} className={cx('actionBtn')}>
                     <IoNewspaperOutline className={cx('btnIcon')} />
                     <span>Bài viết của tôi</span>
                   </button>
-                  <button onClick={() => setActiveSection('saved')} className={cx('actionBtn', 'btnGreen')}>
+                  <button onClick={() => setActiveSection('saved')} className={cx('actionBtn')}>
                     <IoBookmarkOutline className={cx('btnIcon')} />
                     <span>Bài đã lưu</span>
                   </button>
@@ -254,7 +254,7 @@ function ProfileOverviewPage() {
             <main className={cx('rightCol')}>
               <section className={cx('statsRow')}>
                 <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statIconWrap', 'bgBlue')}>
+                  <div className={cx('statIconWrap')}>
                     <IoStatsChartOutline />
                   </div>
                   <div className={cx('statInfo')}>
@@ -264,7 +264,7 @@ function ProfileOverviewPage() {
                 </article>
 
                 <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statIconWrap', 'bgGreen')}>
+                  <div className={cx('statIconWrap')}>
                     <IoClipboardOutline />
                   </div>
                   <div className={cx('statInfo')}>
@@ -274,7 +274,7 @@ function ProfileOverviewPage() {
                 </article>
 
                 <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statIconWrap', 'bgOrange')}>
+                  <div className={cx('statIconWrap')}>
                     <IoSchoolOutline />
                   </div>
                   <div className={cx('statInfo')}>
@@ -323,7 +323,7 @@ function ProfileOverviewPage() {
                             labelFormatter={(d) => `Ngày ${d}`}
                             formatter={(value) => [formatDuration(value), 'Thời gian']}
                           />
-                          <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={28} fill="#3b82f6" />
+                          <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={28} fill="#0061f2" />
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
@@ -369,7 +369,7 @@ function ProfileOverviewPage() {
                           <Line
                             type="monotone"
                             dataKey="minutes"
-                            stroke="#10b981"
+                            stroke="#0061f2"
                             strokeWidth={2}
                             dot={{ r: 4 }}
                             activeDot={{ r: 6 }}
