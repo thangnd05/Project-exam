@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { keepPreviousData } from '~/config/queryClient';
+import { keepPreviousData } from '~/shared/config/queryClient';
 import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
 
 export const postKeys = {

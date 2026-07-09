@@ -11,7 +11,7 @@ import {
   updateTag,
   deleteTag,
 } from '../../api/tagApi';
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import TagFormModal from '../modals/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import styles from './Tags.module.scss';

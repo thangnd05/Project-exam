@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFire } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './StreakBadge.module.scss';
-import { useStreak } from '~/hooks/useStreak';
+import { useStreak } from '~/shared/hooks/useStreak';
 import StreakRestoreModal from './StreakRestoreModal';
 
 const cx = classNames.bind(style);

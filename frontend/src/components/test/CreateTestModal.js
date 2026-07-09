@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames/bind';
-import BaseModal from '~/components/common/modal/BaseModal';
+import BaseModal from '~/shared/ui/modal/BaseModal';
 import CreateTestFormBody from './creator/CreateTestFormBody';
 import styles from './CreateTestModal.module.scss';
 

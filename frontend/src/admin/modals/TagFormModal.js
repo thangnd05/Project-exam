@@ -1,7 +1,7 @@
 import React from 'react';
 import {Form} from 'react-bootstrap';
-import BaseModal from '~/components/common/modal/BaseModal';
-import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 
 function TagFormModal({
   show,

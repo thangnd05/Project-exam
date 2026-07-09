@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Braces, Plus, Trash2} from 'lucide-react';
 
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {
   AdminCard,
   AdminFieldError,

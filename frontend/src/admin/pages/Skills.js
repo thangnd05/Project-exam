@@ -3,9 +3,9 @@ import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {useSkills} from './hooks/useSkills';
-import BaseModal from '~/components/common/modal/BaseModal';
-import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,
   AdminPageHeader,

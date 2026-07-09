@@ -3,11 +3,11 @@ import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {useCosmetics} from './hooks/useCosmetics';
-import BaseModal from '~/components/common/modal/BaseModal';
-import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
-import images from '~/assets/images';
+import images from '~/shared/assets/images';
 import {
   AdminFieldError,
   AdminPageHeader,

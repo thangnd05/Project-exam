@@ -1,0 +1,232 @@
+@import 'shared/styles/GlobalStyles/GlobalStyles.module.scss';
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+  background: #ffffff;
+  width: 100%;
+  max-width: 1200px;
+  max-height: 90vh;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.header {
+  background: var(--primary-gradient);
+  padding: 24px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  svg {
+    color: #fff;
+    font-size: 2.4rem;
+  }
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 !important;
+  letter-spacing: -0.5px;
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+  }
+
+  svg {
+    font-size: 2rem;
+  }
+}
+
+.body {
+  padding: 30px;
+  overflow-y: auto;
+  flex: 1;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+
+  :global(.form-label) {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 10px;
+  }
+
+  :global(.form-control),
+  :global(.form-select) {
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: var(--font-size-md);
+    color: #1e293b;
+    box-shadow: none;
+    transition: all 0.2s;
+  }
+
+  :global(.form-control)::placeholder {
+    color: #94a3b8;
+  }
+
+  :global(.form-control:focus),
+  :global(.form-select:focus) {
+    border-color: var(--accent-color, #0061f2);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+  }
+
+  :global(.form-check-label) {
+    font-size: var(--font-size-md);
+    color: #475569;
+  }
+
+  :global(.form-check-input) {
+    cursor: pointer;
+
+    &:checked {
+      background-color: var(--accent-color, #0061f2);
+      border-color: var(--accent-color, #0061f2);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+    }
+  }
+}
+
+.footer {
+  padding: 20px 30px;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+
+  .btnCancel,
+  .btnSubmit {
+    padding: 14px 24px;
+    border-radius: 14px;
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btnCancel {
+    background: #f1f5f9;
+    color: #64748b;
+
+    &:hover:not(:disabled) {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  .btnSubmit {
+    background: var(--primary-gradient);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

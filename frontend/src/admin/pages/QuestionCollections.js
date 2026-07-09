@@ -3,9 +3,9 @@ import {Form, Button, Spinner} from 'react-bootstrap';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
 
-import BaseModal from '~/components/common/modal/BaseModal';
-import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {useQuestionCollections} from './hooks/useQuestionCollections';
 import styles from './QuestionCollections.module.scss';

@@ -2,7 +2,7 @@ import React, {useMemo, useState} from 'react';
 import {Badge, Button} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ExamCategoryFormModal from '../modals/ExamCategoryFormModal';
 import {
   AdminFieldError,

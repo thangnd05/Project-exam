@@ -3,8 +3,8 @@ import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
 
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
-import useMilestoneScoring from '../../hooks/useMilestoneScoring';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import useMilestoneScoring from '~/shared/hooks/useMilestoneScoring';
 import {
   AdminFieldError,
   AdminPageHeader,

@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import routes from '~/config/Routes';
-import { useAuth } from '../hooks/useAuth';
+import routes from '~/shared/config/Routes';
+import { useAuth } from '~/shared/hooks/useAuth';
 
 function ProtectedRoute({ children, requiredRoleName, requiredPermission, allowGuest = false }) {
   const { isAuthenticated, loading, roleName, permissions } = useAuth();

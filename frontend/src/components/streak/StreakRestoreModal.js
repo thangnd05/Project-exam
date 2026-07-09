@@ -3,9 +3,9 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { Flame, CircleDollarSign } from 'lucide-react';
 
-import BaseModal from '~/components/common/modal/BaseModal';
-import { useStreak } from '~/hooks/useStreak';
-import { useCoins } from '~/hooks/useCoins';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import { useStreak } from '~/shared/hooks/useStreak';
+import { useCoins } from '~/shared/hooks/useCoins';
 import styles from './StreakRestoreModal.module.scss';
 
 const cx = classNames.bind(styles);

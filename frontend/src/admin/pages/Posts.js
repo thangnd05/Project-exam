@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Badge, Button } from 'react-bootstrap';
 import { Eye, CheckCircle, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import routes from '~/config/Routes';
-import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
-import ConfirmActionModal from '~/components/common/modal/ConfirmActionModal';
+import routes from '~/shared/config/Routes';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common';
 import { usePosts, useApprovePost, useDeletePost } from './hooks/usePosts';
 

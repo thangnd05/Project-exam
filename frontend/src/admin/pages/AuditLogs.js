@@ -1,7 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {Badge, Form} from 'react-bootstrap';
 
-import {formatDateTime} from '../../utils/format-date-time';
+import {formatDateTime} from '~/shared/utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
 import {useAuditLogs} from './hooks/useAuditLogs';
 

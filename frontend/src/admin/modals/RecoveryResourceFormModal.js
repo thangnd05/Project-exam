@@ -1,8 +1,8 @@
 import React from 'react';
 import {Form} from 'react-bootstrap';
-import BaseModal from '~/components/common/modal/BaseModal';
-import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
-import TagSelector from '~/components/common/TagSelector/TagSelector';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
+import TagSelector from '~/shared/ui/TagSelector/TagSelector';
 
 function RecoveryResourceFormModal({
   show,

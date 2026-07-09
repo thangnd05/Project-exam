@@ -4,9 +4,9 @@ import {Badge, Button, Spinner} from 'react-bootstrap';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Paintbrush, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
 
-import routes from '~/config/Routes';
+import routes from '~/shared/config/Routes';
 
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ExamTypeFormModal from '../modals/ExamTypeFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {useExamTypes} from './hooks/useExamTypes';

@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleDollarToSlot } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './CoinBadge.module.scss';
-import { useCoins } from '~/hooks/useCoins';
+import { useCoins } from '~/shared/hooks/useCoins';
 
 const cx = classNames.bind(style);
 

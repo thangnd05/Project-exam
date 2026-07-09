@@ -19,7 +19,7 @@ import {
   getOwnExamTypeLayout,
   updateExamTypeLayout,
 } from '~/api/examTypeApi';
-import { resolveLayoutConfig } from '~/pages/exam/examtype/examtypeById/testStart/examLayout/resolveLayoutConfig';
+import { resolveLayoutConfig } from '~/features/exam/examtype/examtypeById/testStart/examLayout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,
   BLOCK_META,
@@ -27,13 +27,13 @@ import {
   ZONES,
   BLOCK_TYPES,
   ADDABLE_BLOCK_TYPES,
-} from '~/pages/exam/examtype/examtypeById/testStart/examLayout/layoutSchema';
-import ExamLayoutRenderer from '~/pages/exam/examtype/examtypeById/testStart/examLayout/ExamLayoutRenderer';
+} from '~/features/exam/examtype/examtypeById/testStart/examLayout/layoutSchema';
+import ExamLayoutRenderer from '~/features/exam/examtype/examtypeById/testStart/examLayout/ExamLayoutRenderer';
 import {
   sampleExamData,
   sampleAllQuestions,
   sampleQuestionIndexMap,
-} from '~/pages/exam/examtype/examtypeById/testStart/examLayout/sampleExamData';
+} from '~/features/exam/examtype/examtypeById/testStart/examLayout/sampleExamData';
 import styles from './ExamTypeLayoutEditor.module.scss';
 
 const cx = classNames.bind(styles);

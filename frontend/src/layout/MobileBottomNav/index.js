@@ -14,12 +14,12 @@ import {
 import classNames from 'classnames/bind';
 
 import styles from './MobileBottomNav.module.scss';
-import routes from '~/config/Routes';
-import {useAuth} from '~/hooks/useAuth';
-import {useCosmetics} from '~/hooks/useCosmetics';
-import images from '~/assets/images';
-import JoinClassModal from '~/pages/myclass/modals/JoinClassModal';
-import CreateClassModal from '~/pages/myclass/modals/CreateClassModal';
+import routes from '~/shared/config/Routes';
+import {useAuth} from '~/shared/hooks/useAuth';
+import {useCosmetics} from '~/shared/hooks/useCosmetics';
+import images from '~/shared/assets/images';
+import JoinClassModal from '~/features/myclass/modals/JoinClassModal';
+import CreateClassModal from '~/features/myclass/modals/CreateClassModal';
 import CreateTestModal from '~/components/test/CreateTestModal';
 import StreakBadge from '~/components/streak/StreakBadge';
 import CoinQuestMenu from '~/components/coin/CoinQuestMenu';

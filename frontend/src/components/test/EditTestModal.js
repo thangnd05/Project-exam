@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
-import BaseModal from '~/components/common/modal/BaseModal';
-import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import { getAdminTestById, updateTest } from '../../api/testApi';
 import { getExamTypes } from '../../api/examTypeApi';
 import { getQuestionCollections } from '../../api/questionCollectionApi';
-import { buildCollectionTree } from '~/utils/collectionTree';
-import { useHasPermission } from '~/hooks/usePermission';
+import { buildCollectionTree } from '~/shared/utils/collectionTree';
+import { useHasPermission } from '~/shared/hooks/usePermission';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
@@ -16,7 +16,7 @@ import {
   IoImageOutline,
   IoRocketOutline,
 } from 'react-icons/io5';
-import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
+import EditQuestionModal from '~/features/question-bank/modals/EditQuestionModal';
 import createModalStyles from './CreateTestModal.module.scss';
 
 const cxCreate = classNames.bind(createModalStyles);

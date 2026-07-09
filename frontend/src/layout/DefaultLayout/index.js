@@ -6,7 +6,7 @@ import Header from '../Header';
 import Footer from '../Footer';
 import ScrollToTop from '../ScrollToTop';
 import MobileBottomNav from '../MobileBottomNav';
-import BackgroundDecor from '~/components/common/BackgroundDecor';
+import BackgroundDecor from '~/shared/ui/BackgroundDecor';
 
 const cx = classNames.bind(styles);
 

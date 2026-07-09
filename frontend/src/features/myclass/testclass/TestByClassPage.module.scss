@@ -1,0 +1,38 @@
+@import 'shared/styles/GlobalStyles/GlobalStyles.module.scss';
+
+.empty-state {
+  width: 100%;
+  margin-top: 8px;
+  padding: 42px 36px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid #eaf0f8;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f6bdc 0%, #22a2f2 100%);
+  color: #ffffff;
+  font-size: var(--font-size-2xxl);
+  margin-bottom: 18px;
+}
+
+.empty-state h4 {
+  margin: 0 0 10px;
+  font-size: var(--font-size-xxl);
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1.65rem;
+  color: #64748b;
+  line-height: 1.6;
+}

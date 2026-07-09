@@ -3,11 +3,11 @@ import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
 
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
 import RecoveryResourceLink from '~/components/resources/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
-import {isMarkdownResource} from '~/utils/recoveryResource';
+import {isMarkdownResource} from '~/shared/utils/recoveryResource';
 import {useRecoveryResources, useTagsByExamType} from './hooks/useRecoveryResources';
 import styles from './RecoveryResources.module.scss';
 

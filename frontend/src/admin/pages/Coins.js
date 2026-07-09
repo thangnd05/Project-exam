@@ -2,11 +2,11 @@ import React, {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Coins, Edit, Plus, Trash2} from 'lucide-react';
 
-import BaseModal from '~/components/common/modal/BaseModal';
-import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 
 import {getUsers} from '../../api/userApi';
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,
   AdminPageHeader,

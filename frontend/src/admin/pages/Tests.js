@@ -2,8 +2,8 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import {Edit, Trash2} from 'lucide-react';
 
-import BaseModal from '~/components/common/modal/BaseModal';
-import ModalActionFooter from '../../components/common/modal/ModalActionFooter';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import {
   AdminFieldError,
   AdminPageHeader,

@@ -3,7 +3,7 @@ import {Badge, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {CheckCircle, Shield, Trash2, UserCheck, UserX} from 'lucide-react';
 
-import ConfirmDeleteModal from '../../components/common/modal/ConfirmDeleteModal';
+import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {useUsers} from './hooks/useUsers';
 import {
   AdminFieldError,

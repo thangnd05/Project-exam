@@ -1,5 +1,5 @@
 import React from 'react';
-import { getRecoveryResourceLinkProps } from '~/utils/recoveryResource';
+import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
 
 const API_BASE = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
 

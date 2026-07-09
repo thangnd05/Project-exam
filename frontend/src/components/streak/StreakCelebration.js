@@ -4,7 +4,7 @@ import { faFire } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
 import style from './StreakCelebration.module.scss';
-import { useStreak } from '~/hooks/useStreak';
+import { useStreak } from '~/shared/hooks/useStreak';
 
 const cx = classNames.bind(style);
 

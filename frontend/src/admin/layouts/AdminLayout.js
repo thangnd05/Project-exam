@@ -32,7 +32,7 @@ import {
   Sparkles,
   Flame,
 } from 'lucide-react';
-import routes from '~/config/Routes';
+import routes from '~/shared/config/Routes';
 import styles from './AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);

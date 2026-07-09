@@ -1,6 +1,6 @@
 import { Col } from 'react-bootstrap';
 import { IoRocketOutline } from 'react-icons/io5';
-import { useHasPermission } from '~/hooks/usePermission';
+import { useHasPermission } from '~/shared/hooks/usePermission';
 
 const CoinPriceField = ({
   value,

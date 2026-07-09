@@ -10,18 +10,18 @@ import React, {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
-import images from '~/assets/images';
+import images from '~/shared/assets/images';
 import classNames from 'classnames/bind';
-import {useAuth} from '../../hooks/useAuth';
-import {name} from '~/assets/images';
-import routes from '~/config/Routes';
-import JoinClassModal from '~/pages/myclass/modals/JoinClassModal';
-import CreateClassModal from '~/pages/myclass/modals/CreateClassModal';
+import {useAuth} from '~/shared/hooks/useAuth';
+import {name} from '~/shared/assets/images';
+import routes from '~/shared/config/Routes';
+import JoinClassModal from '~/features/myclass/modals/JoinClassModal';
+import CreateClassModal from '~/features/myclass/modals/CreateClassModal';
 import CreateTestModal from '~/components/test/CreateTestModal';
 import StreakBadge from '~/components/streak/StreakBadge';
 import CoinQuestMenu from '~/components/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '~/components/cosmetic/AvatarWithCosmetic';
-import {useCosmetics} from '~/hooks/useCosmetics';
+import {useCosmetics} from '~/shared/hooks/useCosmetics';
 
 const cx = classNames.bind(style);
 

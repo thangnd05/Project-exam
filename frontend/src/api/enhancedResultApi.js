@@ -1,5 +1,5 @@
 import axios from './axiosClient';
-import { getGuestSessionId } from '~/utils/guestSession';
+import { getGuestSessionId } from '~/shared/utils/guestSession';
 
 export const getEnhancedResult = (userTestId) => {
   return axios.get(`/api/user-answers/user-test/${userTestId}/result/enhanced`);

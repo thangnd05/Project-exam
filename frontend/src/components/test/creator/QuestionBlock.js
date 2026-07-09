@@ -3,7 +3,7 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
-import TagSelector from '../../common/TagSelector/TagSelector';
+import TagSelector from '~/shared/ui/TagSelector/TagSelector';
 
 const cx = classNames.bind(styles);
 

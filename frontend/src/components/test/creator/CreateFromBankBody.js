@@ -3,7 +3,7 @@ import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import { getChaptersByClass } from '~/api/chapterApi';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/api/testApi';
 import { createTestPart } from '~/api/testPartApi';
-import { buildCollectionTree, getCollectionWithDescendantIds } from '~/utils/collectionTree';
+import { buildCollectionTree, getCollectionWithDescendantIds } from '~/shared/utils/collectionTree';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {
@@ -20,19 +20,19 @@ import {
   IoServerOutline,
   IoSchoolOutline,
 } from 'react-icons/io5';
-import { useBaseMetaData } from '~/hooks/useBaseMetaData';
-import { useHasPermission } from '~/hooks/usePermission';
+import { useBaseMetaData } from '~/shared/hooks/useBaseMetaData';
+import { useHasPermission } from '~/shared/hooks/usePermission';
 import CoinPriceField from '~/components/test/CoinPriceField';
-import { getQuestionDisplayNumber } from '~/utils/questionNumber';
-import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
-import ButtonPrime from '~/components/common/Button/ButtonPrime';
+import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
+import EditQuestionModal from '~/features/question-bank/modals/EditQuestionModal';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { getExamCategories } from '~/api/examCategoryApi';
 import {
   useBankTestBuilder,
   SELECTION_MODES,
   defaultPartConfig,
   groupQuestionsByPassage,
-} from '~/hooks/useBankTestBuilder';
+} from '~/shared/hooks/useBankTestBuilder';
 import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);

@@ -5,10 +5,10 @@ import classNames from 'classnames/bind';
 import { CircleDollarSign, Check } from 'lucide-react';
 
 import { buyCosmetic, equipCosmetic, getCosmeticShop, unequipCosmetic } from '~/api/cosmeticApi';
-import { useCoins } from '~/hooks/useCoins';
-import { useCosmetics } from '~/hooks/useCosmetics';
+import { useCoins } from '~/shared/hooks/useCoins';
+import { useCosmetics } from '~/shared/hooks/useCosmetics';
 import AvatarWithCosmetic from './AvatarWithCosmetic';
-import images from '~/assets/images';
+import images from '~/shared/assets/images';
 import styles from './CosmeticShop.module.scss';
 
 const cx = classNames.bind(styles);

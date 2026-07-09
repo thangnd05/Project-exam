@@ -1,6 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
-import {keepPreviousData} from '~/config/queryClient';
+import {keepPreviousData} from '~/shared/config/queryClient';
 import {getRoles} from '~/api/roleApi';
 import {deleteUser, getUsers} from '~/api/userApi';
 

@@ -1,5 +1,5 @@
 import styles from './intro.module.scss';
-import {name} from '~/assets/images';
+import {name} from '~/shared/assets/images';
 import classNames from 'classnames/bind';
 
 const cx = classNames.bind(styles);

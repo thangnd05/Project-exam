@@ -10,7 +10,7 @@ import {
 } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 
-import BaseModal from '~/components/common/modal/BaseModal';
+import BaseModal from '~/shared/ui/modal/BaseModal';
 import { getTestPartsSummary } from '~/api/testApi';
 import styles from './TestModeModal.module.scss';
 

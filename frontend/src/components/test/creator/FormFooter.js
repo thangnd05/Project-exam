@@ -4,7 +4,7 @@ import { PlusCircle } from 'lucide-react';
 import { IoRocketOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
-import ButtonPrime from '~/components/common/Button/ButtonPrime';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 

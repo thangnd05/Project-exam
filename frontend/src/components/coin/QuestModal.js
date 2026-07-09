@@ -5,8 +5,8 @@ import classNames from 'classnames/bind';
 import {CircleDollarSign, Clock, CheckCircle2} from 'lucide-react';
 
 import {claimQuest, getMyQuests} from '~/api/questApi';
-import {useCoins} from '~/hooks/useCoins';
-import BaseModal from '~/components/common/modal/BaseModal';
+import {useCoins} from '~/shared/hooks/useCoins';
+import BaseModal from '~/shared/ui/modal/BaseModal';
 import CosmeticShop from '~/components/cosmetic/CosmeticShop';
 import styles from './QuestModal.module.scss';
 

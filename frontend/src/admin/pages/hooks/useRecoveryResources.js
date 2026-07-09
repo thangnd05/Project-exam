@@ -1,5 +1,5 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {keepPreviousData} from '~/config/queryClient';
+import {keepPreviousData} from '~/shared/config/queryClient';
 
 import {getExamTypes} from '~/api/examTypeApi';
 import {getTagsFlatByExamType} from '~/api/tagApi';

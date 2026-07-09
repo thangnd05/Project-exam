@@ -5,8 +5,8 @@ import {motion, useInView} from 'framer-motion';
 import {FaFacebookSquare, FaInstagram, FaYoutube} from 'react-icons/fa';
 
 import styles from './footer.module.scss';
-import images from '~/assets/images';
-import routes from '~/config/Routes';
+import images from '~/shared/assets/images';
+import routes from '~/shared/config/Routes';
 
 function useCountUp(target, isActive, duration = 1400) {
   const [value, setValue] = useState(0);
