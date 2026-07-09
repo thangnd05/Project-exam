@@ -108,6 +108,10 @@ function UserTargetPage() {
   }, [targetScore, matchedMilestone, filteredParts]);
 
   const handleSave = async () => {
+    if (hasSavedTarget) {
+      setMessage('Bạn đã có mục tiêu hiện tại. Vui lòng xóa mục tiêu cũ trước khi lưu mới.');
+      return;
+    }
     if (!targetScore || !selectedExamTypeId) {
       setMessage('Nhập điểm mục tiêu trước.');
       return;
@@ -225,7 +229,7 @@ function UserTargetPage() {
                 ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
                 : '/learning-plans/generate'
             }
-            className={planCx('btn', 'btnPrimary', 'btnSm')}
+            className={classNames(planCx('btn', 'btnPrimary', 'btnSm'), cx('heroHoverBtn'))}
           >
             Sinh lộ trình
           </Link>
@@ -397,9 +401,9 @@ function UserTargetPage() {
             <div className={planCx('actionBar')} style={{ marginTop: '0.8rem' }}>
               <button
                 type="button"
-                className={planCx('btn', 'btnPrimary', 'btnLg')}
+                className={classNames(planCx('btn', 'btnPrimary', 'btnLg'), cx('heroHoverBtn'))}
                 onClick={handleSave}
-                disabled={loading}
+                disabled={loading || hasSavedTarget}
               >
                 {loading ? 'Đang lưu...' : 'Lưu mục tiêu'}
               </button>
@@ -443,7 +447,7 @@ function UserTargetPage() {
                   ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
                   : '/learning-plans/generate'
               }
-              className={planCx('btn', 'btnPrimary', 'btnSm')}
+              className={classNames(planCx('btn', 'btnPrimary', 'btnSm'), cx('heroHoverBtn'))}
             >
               Sinh lộ trình vượt ải
             </Link>

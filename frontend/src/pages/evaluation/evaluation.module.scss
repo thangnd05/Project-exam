@@ -1,3 +1,4 @@
+@use '../../components/GlobalStyles/GlobalStyles.module.scss' as globalStyles;
 @import '../../components/GlobalStyles/GlobalStyles.module.scss';
 
 .section {
@@ -238,27 +239,15 @@
 }
 
 .btn-write-review {
-  background: linear-gradient(135deg, var(--accent-color, #0061f2) 0%, #0056d2 100%);
-  color: var(--white, #fff);
+  @include globalStyles.primaryGradientButton;
   border: none;
   padding: 12px 32px;
   border-radius: 12px;
   font-size: 1.55rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
-  box-shadow: 0 8px 20px rgba(0, 97, 242, 0.25);
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 25px rgba(0, 97, 242, 0.35);
-  }
-
-  &:active {
-    transform: translateY(-1px);
-  }
 }
 
 @keyframes fadeIn {

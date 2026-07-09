@@ -1,3 +1,5 @@
+@use '../../../components/GlobalStyles/GlobalStyles.module.scss' as globalStyles;
+
 .pageRoot {
   margin-top: 2.4rem;
 }
@@ -279,4 +281,8 @@
 .compactSelect {
   padding: 0.6rem 0.9rem !important;
   font-size: var(--font-size-ssm) !important;
+}
+
+.heroHoverBtn {
+  @include globalStyles.primaryGradientButton;
 }

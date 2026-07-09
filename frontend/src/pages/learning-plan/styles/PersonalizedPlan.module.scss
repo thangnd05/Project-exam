@@ -1,3 +1,5 @@
+@use '../../../components/GlobalStyles/GlobalStyles.module.scss' as globalStyles;
+
 .wrapper {
   max-width: 112rem;
   margin: 3.2rem auto;
@@ -590,6 +592,10 @@
   padding: 2.4rem;
   margin-bottom: 2rem;
   box-shadow: 0 8px 24px rgba(0, 97, 242, 0.1);
+
+  .btnPrimary {
+    @include globalStyles.primaryGradientButton;
+  }
 }
 
 .recoTag {

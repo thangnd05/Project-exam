@@ -1,3 +1,5 @@
+@use '../../components/GlobalStyles/GlobalStyles.module.scss' as globalStyles;
+
 .hero {
   padding-block: clamp(20px, 3.2vw, 34px);
 }
@@ -91,40 +93,9 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent-color) 0%, #0056d2 100%);
-      color: var(--white);
       padding: 12px 32px;
       font-size: 1.55rem;
-      box-shadow: 0 8px 20px rgba(0, 97, 242, 0.25);
-      position: relative;
-      z-index: 1;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #0072ff 0%, var(--accent-color) 100%);
-        opacity: 0;
-        z-index: -1;
-        transition: opacity 0.3s ease;
-        border-radius: inherit;
-      }
-
-      &:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 25px rgba(0, 97, 242, 0.35);
-
-        &::before {
-          opacity: 1;
-        }
-      }
-
-      &:active {
-        transform: translateY(-1px);
-      }
+      @include globalStyles.primaryGradientButton;
     }
   }
 }
@@ -416,22 +387,10 @@
   font-size: 1.45rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.3px;
-  color: var(--white);
-  background: linear-gradient(135deg, var(--accent-color) 0%, #0056d2 100%);
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 10px 22px rgba(0, 97, 242, 0.28);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 28px rgba(0, 97, 242, 0.38);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
+  @include globalStyles.primaryGradientButton;
 }
 
 .type-card.is-skeleton {

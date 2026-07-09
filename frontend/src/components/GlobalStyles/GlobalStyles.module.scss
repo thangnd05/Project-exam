@@ -290,3 +290,26 @@ li {
     background-color: #1ea05e !important;
   }
 }
+
+@mixin primaryGradientButton {
+  background: linear-gradient(135deg, var(--accent-color) 0%, #0056d2 100%);
+  border-color: transparent;
+  color: var(--white);
+  transition: all 0.25s ease;
+  box-shadow: 0 10px 22px rgba(0, 97, 242, 0.28);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(0, 97, 242, 0.38);
+    color: var(--white);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    transform: none;
+    box-shadow: 0 8px 18px rgba(0, 97, 242, 0.2);
+  }
+}
