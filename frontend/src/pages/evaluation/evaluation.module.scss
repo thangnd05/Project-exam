@@ -1,4 +1,3 @@
-@use '../../components/GlobalStyles/GlobalStyles.module.scss' as globalStyles;
 @import '../../components/GlobalStyles/GlobalStyles.module.scss';
 
 .section {
@@ -239,7 +238,6 @@
 }
 
 .btn-write-review {
-  @include globalStyles.primaryGradientButton;
   border: none;
   padding: 12px 32px;
   border-radius: 12px;

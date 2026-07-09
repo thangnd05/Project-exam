@@ -10,6 +10,7 @@ import styles from './HeroSection.module.scss';
 import {name} from '~/assets/images';
 import {calculateAllowedTime} from '~/utils/testStatusHelper';
 import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 
@@ -158,9 +159,9 @@ function HeroSection() {
           mục tiêu và xây dựng lộ trình ôn luyện tối ưu nhất!
         </motion.p>
         <motion.div className={cx('actions')} variants={itemVariants}>
-          <button className={cx('btn-primary')} onClick={handleScrollToExam}>
+          <ButtonPrime className={cx('btn-primary')} onClick={handleScrollToExam}>
             Khám phá ngay
-          </button>
+          </ButtonPrime>
         </motion.div>
       </motion.div>
 
@@ -246,12 +247,12 @@ function HeroSection() {
                         )}
                       </div>
 
-                      <button
+                      <ButtonPrime
                         className={cx('btn-cta')}
                         onClick={() => handleStartQuick(test)}
                       >
                         Bắt đầu Quick Challenge
-                      </button>
+                      </ButtonPrime>
                     </div>
                   </div>
                 );

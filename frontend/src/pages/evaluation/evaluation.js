@@ -12,6 +12,7 @@ import {useNavigate} from 'react-router-dom';
 import routes from '~/config/Routes';
 import EvaluationModal from './modals/EvaluationModal';
 import {useEvaluations} from './hooks/useEvaluations';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 
@@ -112,12 +113,12 @@ const Evaluation = () => {
               Niềm tin được khẳng định qua kết quả thực tế
             </p>
           </div>
-          <button
+          <ButtonPrime
             className={cx('btn-write-review', 'btn-write-review--head')}
             onClick={handleWriteReviewClick}
           >
             Viết đánh giá
-          </button>
+          </ButtonPrime>
         </motion.div>
 
         {reviews.length > 0 ? (
@@ -178,12 +179,12 @@ const Evaluation = () => {
         )}
 
         <div className={cx('write-review-below')}>
-          <button
+          <ButtonPrime
             className={cx('btn-write-review')}
             onClick={handleWriteReviewClick}
           >
             Viết đánh giá
-          </button>
+          </ButtonPrime>
         </div>
       </div>
 
