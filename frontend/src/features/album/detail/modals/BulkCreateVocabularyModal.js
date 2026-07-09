@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
-import { standardizeVocabularies, bulkCreateVocabularies } from '~/features/album-detail/api/vocabularyApi';
+import { standardizeVocabularies, bulkCreateVocabularies } from '~/features/album/detail/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
