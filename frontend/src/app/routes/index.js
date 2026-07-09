@@ -29,7 +29,7 @@ import ChapterOfClass from '~/features/myclass/chapter/ChapterOfClass';
 import ClassMemberManagementPage from '~/features/myclass/class-member/ClassMemberManagementPage';
 import CreateTestFromBankPage from '~/features/create-test-from-bank/CreateTestFromBankPage';
 import PersonalQuestionBankPage from '~/features/question-bank/PersonalQuestionBankPage';
-import ProfileOverviewPage from '~/features/profile/ProfileOverviewPage';
+import ProfileOverviewPage from '~/features/user/profile/ProfileOverviewPage';
 
 import AdminDashboard from '~/admin/overview/Dashboard';
 import UsersManagement from '~/admin/access/Users';

@@ -8,7 +8,7 @@ import routes from '~/shared/config/Routes';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import Pagination from '~/shared/ui/Pagination/Pagination';
 import CreatePostModal from './modals/CreatePostModal';
-import ProfileSectionModal from '~/features/profile/ProfileSectionModal';
+import ProfileSectionModal from '~/features/user/profile/ProfileSectionModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);
