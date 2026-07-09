@@ -65,14 +65,28 @@ src/
       Đã đưa ref băng-ranh-giới về `~/` trước khi move (giữ `../hooks` feature-local).
 - [x] **B4 — `shared/ui` + `shared/styles`** ✅ `components/common`→`shared/ui` (146 ref),
       `components/GlobalStyles`→`shared/styles/GlobalStyles`.
-- [ ] **B5 — re-home `components/*` còn lại**: `test/`→`shared/test` (domain dùng-chéo);
-      `coin/ streak/ cosmetic/`→`shared/ui` (widget cross-cutting); `Comment/`→
-      `features/posts/`; `resources/`→`features/resources/`.
-- [ ] **B6 — co-locate API**: từng file 1-consumer `git mv`→`features/<owner>/api/`;
-      `api/`→`shared/api/` cho phần còn lại. Sửa `~/api/`(160) theo đích.
-- [ ] **B7 — `app/` bootstrap**: `index.js App.js routes/` → `app/`; sửa
-      `index.html` entry `/src/index.js`→`/src/app/index.js`.
-- [ ] **B8 — admin/** nội bộ feature-slice (tùy chọn, làm sau).
+- [x] **B5 — re-home `components/*`** ✅ `coin cosmetic resources streak test` →
+      `shared/` (đều dùng-chéo); `Comment/` **xoá** (dead, 0 importer). `components/`
+      giải tán hoàn toàn.
+- [x] **B6 — co-locate API** ✅ 8 API 1-chủ → owner (`classMemberApi`→myclass,
+      `practiceQuestionApi`→album-pratice, `userAnswerApi`→exam, `vocabularyAlbumApi`→
+      album-voca, `vocabularyApi`→album-delta, `adminAuditApi/permissionApi/roleApi`→
+      admin); 28 API dùng-chéo → `shared/api/`. Sibling `./axiosClient` trong file
+      co-locate sửa về `~/shared/api/`.
+- [x] **B7 — `app/` bootstrap** ✅ `index.js App.js routes/`→`app/`; entry
+      `index.html`→`/src/app/index.js`. (`setupTests.js` để lại gốc — vite.config trỏ tới.)
+- [ ] **B8 — admin/** nội bộ feature-slice (tùy chọn, chưa làm).
+
+## 7. Kết quả cuối (đã build xanh mỗi batch)
+
+```
+src/
+  app/       index.js App.js routes/
+  features/  <feature>/{api?,pages,components,hooks,modals,styles}
+  shared/    api/ ui/ styles/ hooks/ utils/ config/ context/ assets/
+             coin/ cosmetic/ resources/ streak/ test/   (domain/widget dùng-chéo)
+  admin/     (+ api/)   layout/   setupTests.js
+```
 
 ### Quy trình mỗi batch
 1. `git mv`. 2. Sửa import nội bộ file vừa chuyển. 3. Sửa file import nó (global sed theo prefix).
