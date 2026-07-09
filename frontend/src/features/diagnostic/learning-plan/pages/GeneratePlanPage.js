@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import LearningPlanList from '../components/LearningPlanList';
 import PlanPartTaskList from '../components/PlanPartTaskList';
-import styles from '../styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import {
   useCompletedUserTests,
   useExamTypes,

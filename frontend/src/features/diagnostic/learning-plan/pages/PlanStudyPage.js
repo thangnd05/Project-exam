@@ -5,7 +5,7 @@ import { getCurrentSession, submitSession } from '~/shared/api/learningPlanApi';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
-import styles from '../styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

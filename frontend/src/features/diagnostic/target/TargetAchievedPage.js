@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import { useTargetAchieved } from './hooks/useTargetAchieved';
-import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

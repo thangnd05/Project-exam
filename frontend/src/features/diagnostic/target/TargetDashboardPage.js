@@ -9,7 +9,7 @@ import TargetDashboardPartChart from './components/TargetDashboardPartChart';
 import { useTargetDashboard } from './hooks/useTargetDashboard';
 import { getReadinessClassName, getReadinessLabel } from './utils/readiness-label';
 import pageStyles from './TargetDashboardPage.module.scss';
-import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 const pageCx = classNames.bind(pageStyles);

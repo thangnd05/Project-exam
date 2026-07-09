@@ -56,17 +56,17 @@ import CoinsManagement from '~/admin/gamification/Coins';
 import QuestsManagement from '~/admin/gamification/Quests';
 import CosmeticsManagement from '~/admin/gamification/Cosmetics';
 import StreakRecoverManagement from '~/admin/gamification/StreakRecover';
-import UserTargetPage from '~/features/user/target/UserTargetPage';
-import TargetDashboardPage from '~/features/user/target/TargetDashboardPage';
-import TargetAchievedPage from '~/features/user/target/TargetAchievedPage';
-import MockHistoryPage from '~/features/user/mock-history/MockHistoryPage';
-import NextStepPage from '~/features/user/next-step/NextStepPage';
-import GeneratePlanPage from '~/features/learning-plan/pages/GeneratePlanPage';
-import PlanDetailPage from '~/features/learning-plan/pages/PlanDetailPage';
-import PlanStudyPage from '~/features/learning-plan/pages/PlanStudyPage';
-import LearningPlansRedirect from '~/features/learning-plan/pages/LearningPlansRedirect';
-import PlanComparisonPage from '~/features/learning-plan/pages/PlanComparisonPage';
-import TaskHistoryPage from '~/features/learning-plan/pages/TaskHistoryPage';
+import UserTargetPage from '~/features/diagnostic/target/UserTargetPage';
+import TargetDashboardPage from '~/features/diagnostic/target/TargetDashboardPage';
+import TargetAchievedPage from '~/features/diagnostic/target/TargetAchievedPage';
+import MockHistoryPage from '~/features/diagnostic/mock-history/MockHistoryPage';
+import NextStepPage from '~/features/diagnostic/next-step/NextStepPage';
+import GeneratePlanPage from '~/features/diagnostic/learning-plan/pages/GeneratePlanPage';
+import PlanDetailPage from '~/features/diagnostic/learning-plan/pages/PlanDetailPage';
+import PlanStudyPage from '~/features/diagnostic/learning-plan/pages/PlanStudyPage';
+import LearningPlansRedirect from '~/features/diagnostic/learning-plan/pages/LearningPlansRedirect';
+import PlanComparisonPage from '~/features/diagnostic/learning-plan/pages/PlanComparisonPage';
+import TaskHistoryPage from '~/features/diagnostic/learning-plan/pages/TaskHistoryPage';
 
 export const publicRoutes = [
   { path: routes.login, component: Login },

@@ -6,7 +6,7 @@ import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time'
 import PlanComparisonCharts from '../components/PlanComparisonCharts';
 import { usePlanComparison } from './hooks/usePlanComparison';
 import pageStyles from '../styles/PlanComparisonPage.module.scss';
-import styles from '../styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 const pageCx = classNames.bind(pageStyles);

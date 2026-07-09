@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
 import { useExamTypes, useNextStepOverview } from './hooks/useNextStep';
-import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

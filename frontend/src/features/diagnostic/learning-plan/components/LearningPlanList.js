@@ -7,7 +7,7 @@ import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
-import styles from '../styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

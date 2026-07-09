@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import planStyles from '../../../learning-plan/styles/PersonalizedPlan.module.scss';
+import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import styles from '../TargetDashboardPage.module.scss';
 
 const cx = classNames.bind(styles);

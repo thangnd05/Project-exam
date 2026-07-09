@@ -10,7 +10,7 @@ import {
 } from '~/shared/utils/format-date-time';
 import MockHistoryCharts from './components/MockHistoryCharts';
 import { CHART_FETCH_LIMIT, useMockHistory } from './hooks/useMockHistory';
-import styles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

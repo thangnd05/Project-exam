@@ -6,7 +6,7 @@ import {
   deleteUserTarget,
   getUserTarget,
 } from '~/shared/api/userTargetApi';
-import planStyles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
+import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
 import useMilestoneScoring from '~/shared/hooks/useMilestoneScoring';

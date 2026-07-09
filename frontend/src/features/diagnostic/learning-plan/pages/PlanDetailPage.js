@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import { usePlanDetail } from './hooks/usePlanDetail';
-import styles from '../styles/PersonalizedPlan.module.scss';
+import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
