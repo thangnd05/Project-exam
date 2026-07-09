@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getUserTestMeta } from '~/shared/api/userTestApi';
-import { getResultByUserTest } from '~/features/exam/api/userAnswerApi';
+import { getResultByUserTest } from '~/features/tests/exam/api/userAnswerApi';
 import { getUserTestInfo } from '~/shared/api/testApi';
 import { getEnhancedResult, getGuestEnhancedResult } from '~/shared/api/enhancedResultApi';
 

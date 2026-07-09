@@ -16,7 +16,7 @@ import {
   IoImageOutline,
   IoRocketOutline,
 } from 'react-icons/io5';
-import EditQuestionModal from '~/features/question-bank/modals/EditQuestionModal';
+import EditQuestionModal from '~/features/tests/question-bank/modals/EditQuestionModal';
 import createModalStyles from './CreateTestModal.module.scss';
 
 const cxCreate = classNames.bind(createModalStyles);

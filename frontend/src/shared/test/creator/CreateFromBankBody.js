@@ -24,7 +24,7 @@ import { useBaseMetaData } from '~/shared/hooks/useBaseMetaData';
 import { useHasPermission } from '~/shared/hooks/usePermission';
 import CoinPriceField from '~/shared/test/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
-import EditQuestionModal from '~/features/question-bank/modals/EditQuestionModal';
+import EditQuestionModal from '~/features/tests/question-bank/modals/EditQuestionModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { getExamCategories } from '~/shared/api/examCategoryApi';
 import {

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getUserTestMeta } from '~/shared/api/userTestApi';
-import { getAnswersByUserTest } from '~/features/exam/api/userAnswerApi';
+import { getAnswersByUserTest } from '~/features/tests/exam/api/userAnswerApi';
 import { getUserTestInfo, getAdminTestById } from '~/shared/api/testApi';
 
 export const testReviewKeys = {

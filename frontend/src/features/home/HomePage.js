@@ -1,5 +1,5 @@
 import HeroSection from './components/HeroSection/HeroSection';
-import ExamTypePage from '~/features/exam/examtype/ExamTypePage';
+import ExamTypePage from '~/features/tests/exam/examtype/ExamTypePage';
 import ProcessSection from './components/ProcessSection/ProcessSection';
 import Evaluation from './components/evaluation/evaluation';
 
