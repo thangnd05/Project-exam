@@ -1,5 +1,5 @@
 import { queryClient } from '~/shared/config/queryClient';
-import { claimGuestTests } from '~/api/userTestApi';
+import { claimGuestTests } from '~/shared/api/userTestApi';
 import { getGuestSessionId, clearGuestSessionId } from '~/shared/utils/guestSession';
 
 const OAUTH_REDIRECT_KEY = 'postLoginRedirect';

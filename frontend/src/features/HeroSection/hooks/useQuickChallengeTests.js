@@ -1,6 +1,6 @@
 import {useQuery} from '@tanstack/react-query';
 
-import {getQuickChallengeTests} from '~/api/testApi';
+import {getQuickChallengeTests} from '~/shared/api/testApi';
 
 export const quickChallengeKeys = {
   all: ['quick-challenge-tests'],

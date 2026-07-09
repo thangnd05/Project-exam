@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getMyUserTests } from '~/api/userTestApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { generatePlan } from '~/api/learningPlanApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getMyUserTests } from '~/shared/api/userTestApi';
+import { getUserTarget } from '~/shared/api/userTargetApi';
+import { generatePlan } from '~/shared/api/learningPlanApi';
 import { filterCompletedTests } from '~/shared/utils/userTests';
 
 export const generatePlanKeys = {

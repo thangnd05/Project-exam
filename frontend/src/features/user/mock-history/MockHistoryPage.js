@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getEnhancedResult } from '~/api/enhancedResultApi';
+import { getEnhancedResult } from '~/shared/api/enhancedResultApi';
 import Pagination from '~/shared/ui/Pagination/Pagination';
 import {
   formatDateTime24 as formatDate,

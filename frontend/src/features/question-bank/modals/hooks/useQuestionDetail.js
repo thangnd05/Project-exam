@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getQuestionById } from '~/api/questionApi';
+import { getQuestionById } from '~/shared/api/questionApi';
 
 export const questionDetailKeys = {
   detail: (id) => ['question-detail', id],

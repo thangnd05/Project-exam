@@ -2,7 +2,7 @@ import { createContext, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { queryClient } from '~/shared/config/queryClient';
-import { getCurrentUser, logout as logoutRequest } from '~/api/authApi';
+import { getCurrentUser, logout as logoutRequest } from '~/shared/api/authApi';
 
 export const AuthContext = createContext(null);
 

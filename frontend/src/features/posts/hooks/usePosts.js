@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
-import { getPosts, getCategories } from '~/api/postApi';
+import { getPosts, getCategories } from '~/shared/api/postApi';
 
 const PAGE_SIZE = 9;
 

@@ -1,7 +1,7 @@
 import {useQuery} from '@tanstack/react-query';
 
-import {getLeaderboardByTest} from '~/api/userTestApi';
-import {getUserTestInfo} from '~/api/testApi';
+import {getLeaderboardByTest} from '~/shared/api/userTestApi';
+import {getUserTestInfo} from '~/shared/api/testApi';
 
 export const testLeaderboardKeys = {
   info: (id) => ['test-info', id],

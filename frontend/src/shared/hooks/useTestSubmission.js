@@ -1,11 +1,11 @@
-import { createTest } from '~/api/testApi';
-import { createTestPart } from '~/api/testPartApi';
+import { createTest } from '~/shared/api/testApi';
+import { createTestPart } from '~/shared/api/testPartApi';
 import {
   createAndAttachDocument,
   createAndAttach,
   bulkCreateQuestions,
   bulkCreateQuestionGroups,
-} from '~/api/questionApi';
+} from '~/shared/api/questionApi';
 import { toast } from 'react-toastify';
 import { CREATOR_TYPES } from './useCreateTest';
 

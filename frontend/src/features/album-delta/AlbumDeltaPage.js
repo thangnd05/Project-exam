@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from '../../api/axiosClient';
+import axios from '~/shared/api/axiosClient';
 import { useAlbumVocabularies, useDeleteVocabulary } from './hooks/useAlbumVocabularies';
 import {
   Container,

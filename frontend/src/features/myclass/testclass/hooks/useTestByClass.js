@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getClassById, getClassChapterTests } from '~/api/classApi';
-import { deleteTest } from '~/api/testApi';
+import { getClassById, getClassChapterTests } from '~/shared/api/classApi';
+import { deleteTest } from '~/shared/api/testApi';
 
 export const testByClassKeys = {
   classInfo: (classId) => ['class-info', classId],

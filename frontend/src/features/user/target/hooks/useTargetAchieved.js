@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { getMyUserTests } from '~/api/userTestApi';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { getEnhancedResult } from '~/api/enhancedResultApi';
+import { getMyUserTests } from '~/shared/api/userTestApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getUserTarget } from '~/shared/api/userTargetApi';
+import { getEnhancedResult } from '~/shared/api/enhancedResultApi';
 import { filterCompletedTests } from '~/shared/utils/userTests';
 
 export const targetAchievedKeys = {

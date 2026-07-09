@@ -18,7 +18,7 @@ import {
   IoImageOutline,
 } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import { getPostById } from '~/api/postApi';
+import { getPostById } from '~/shared/api/postApi';
 import CreatePostModal from '~/features/posts/modals/CreatePostModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import routes from '~/shared/config/Routes';

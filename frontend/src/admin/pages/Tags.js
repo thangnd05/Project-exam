@@ -3,14 +3,14 @@ import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronDown, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
 
-import {getExamTypes} from '../../api/examTypeApi';
+import {getExamTypes} from '~/shared/api/examTypeApi';
 import {
   getTagTreeByExamType,
   getTagsFlatByExamType,
   createTag,
   updateTag,
   deleteTag,
-} from '../../api/tagApi';
+} from '~/shared/api/tagApi';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import TagFormModal from '../modals/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';

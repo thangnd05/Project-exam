@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { updateVocabulary } from '~/api/vocabularyApi';
+import { updateVocabulary } from '~/features/album-delta/api/vocabularyApi';
 
 export function useUpdateVocabulary(options = {}) {
     return useMutation({

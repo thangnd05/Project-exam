@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getQuestionCollections } from '~/api/questionCollectionApi';
+import { getQuestionCollections } from '~/shared/api/questionCollectionApi';
 
 export const questionCollectionKeys = {
   list: ['question-collections'],

@@ -5,7 +5,7 @@ import {Coins, Edit, Plus, Trash2} from 'lucide-react';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 
-import {getUsers} from '../../api/userApi';
+import {getUsers} from '~/shared/api/userApi';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,

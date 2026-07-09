@@ -1,6 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
-import {createQuest, deleteQuest, getQuests, updateQuest} from '~/api/questApi';
+import {createQuest, deleteQuest, getQuests, updateQuest} from '~/shared/api/questApi';
 
 export const questKeys = {all: ['admin-quests']};
 

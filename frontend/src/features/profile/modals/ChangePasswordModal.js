@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import { changePassword } from '~/api/authApi';
+import { changePassword } from '~/shared/api/authApi';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';

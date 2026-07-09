@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import { createChapter } from '~/api/chapterApi';
+import { createChapter } from '~/shared/api/chapterApi';
 import { toast } from 'react-toastify';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';

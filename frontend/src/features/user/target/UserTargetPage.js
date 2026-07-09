@@ -5,7 +5,7 @@ import {
   createOrUpdateUserTarget,
   deleteUserTarget,
   getUserTarget,
-} from '~/api/userTargetApi';
+} from '~/shared/api/userTargetApi';
 import planStyles from '../../learning-plan/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';

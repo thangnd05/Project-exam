@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
-import { getChaptersByClass } from '~/api/chapterApi';
-import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/api/testApi';
-import { createTestPart } from '~/api/testPartApi';
+import { getChaptersByClass } from '~/shared/api/chapterApi';
+import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/shared/api/testApi';
+import { createTestPart } from '~/shared/api/testPartApi';
 import { buildCollectionTree, getCollectionWithDescendantIds } from '~/shared/utils/collectionTree';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
@@ -26,7 +26,7 @@ import CoinPriceField from '~/shared/test/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
 import EditQuestionModal from '~/features/question-bank/modals/EditQuestionModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
-import { getExamCategories } from '~/api/examCategoryApi';
+import { getExamCategories } from '~/shared/api/examCategoryApi';
 import {
   useBankTestBuilder,
   SELECTION_MODES,

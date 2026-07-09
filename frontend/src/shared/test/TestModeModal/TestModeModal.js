@@ -11,7 +11,7 @@ import {
 import { toast } from 'react-toastify';
 
 import BaseModal from '~/shared/ui/modal/BaseModal';
-import { getTestPartsSummary } from '~/api/testApi';
+import { getTestPartsSummary } from '~/shared/api/testApi';
 import styles from './TestModeModal.module.scss';
 
 const cx = classNames.bind(styles);

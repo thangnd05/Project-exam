@@ -6,10 +6,10 @@ import {
   getMyClassBankQuestions,
   getMyClassBankCount,
   deleteQuestion,
-} from '../../api/questionApi';
-import { getMyClasses } from '../../api/classApi';
-import { getChaptersByClass } from '../../api/chapterApi';
-import { getQuestionCollections } from '../../api/questionCollectionApi';
+} from '~/shared/api/questionApi';
+import { getMyClasses } from '~/shared/api/classApi';
+import { getChaptersByClass } from '~/shared/api/chapterApi';
+import { getQuestionCollections } from '~/shared/api/questionCollectionApi';
 import classNames from 'classnames/bind';
 import {
   IoBookOutline,

@@ -5,7 +5,7 @@ import {
   deleteExamCategory,
   getExamCategories,
   updateExamCategory,
-} from '~/api/examCategoryApi';
+} from '~/shared/api/examCategoryApi';
 
 export const examCategoryKeys = {
   list: () => ['exam-categories'],

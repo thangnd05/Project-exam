@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { getExamTypes } from '~/api/examTypeApi';
-import { listPlans } from '~/api/learningPlanApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { listPlans } from '~/shared/api/learningPlanApi';
 
 export const planComparisonKeys = {
   examTypes: () => ['exam-types'],

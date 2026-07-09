@@ -1,4 +1,4 @@
-import axios from './axiosClient';
+import axios from '~/shared/api/axiosClient';
 
 const BASE_AUDIT_URL = '/api/audits';
 

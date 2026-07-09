@@ -1,7 +1,7 @@
 import { createContext, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '~/shared/config/queryClient';
-import { getMyCoins } from '~/api/coinApi';
+import { getMyCoins } from '~/shared/api/coinApi';
 import { useAuth } from '~/shared/hooks/useAuth';
 
 export const CoinContext = createContext(null);

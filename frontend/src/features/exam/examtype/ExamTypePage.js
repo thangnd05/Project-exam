@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import { getStandardExamTypes } from '~/api/examTypeApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import style from './ExamTypeStyle.module.scss';

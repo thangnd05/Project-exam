@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { getStandardExamTypes } from '~/api/examTypeApi';
-import { getExamParts } from '~/api/examPartApi';
-import { getSkills } from '~/api/skillApi';
-import { getScoringConversions } from '~/api/scoringConversionApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
+import { getExamParts } from '~/shared/api/examPartApi';
+import { getSkills } from '~/shared/api/skillApi';
+import { getScoringConversions } from '~/shared/api/scoringConversionApi';
 import {
   createMilestone as apiCreateMilestone,
   deleteMilestone as apiDeleteMilestone,
   getMilestones,
   updateMilestone as apiUpdateMilestone,
-} from '~/api/milestoneApi';
+} from '~/shared/api/milestoneApi';
 
 export const milestonesKeys = {
   examTypes: ['admin-milestones', 'exam-types'],

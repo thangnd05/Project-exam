@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert } from "react-bootstrap";
-import { joinClass } from '~/api/classMemberApi';
+import { joinClass } from '~/features/myclass/api/classMemberApi';
 import classNames from "classnames/bind";
 import { FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "~/shared/hooks/useAuth";

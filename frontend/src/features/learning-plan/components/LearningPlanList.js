@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'r
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
-import { switchPlan, deletePlan } from '~/api/learningPlanApi';
+import { switchPlan, deletePlan } from '~/shared/api/learningPlanApi';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { createClass } from '~/api/classApi';
+import { createClass } from '~/shared/api/classApi';
 import classNames from 'classnames/bind';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '~/shared/hooks/useAuth';

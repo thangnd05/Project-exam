@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { getStandardExamTypes } from '~/api/examTypeApi';
-import { getExamParts } from '~/api/examPartApi';
-import { getSkills } from '~/api/skillApi';
-import { getScoringConversions } from '~/api/scoringConversionApi';
-import { getMilestones } from '~/api/milestoneApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
+import { getExamParts } from '~/shared/api/examPartApi';
+import { getSkills } from '~/shared/api/skillApi';
+import { getScoringConversions } from '~/shared/api/scoringConversionApi';
+import { getMilestones } from '~/shared/api/milestoneApi';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
 
 export const userTargetKeys = {

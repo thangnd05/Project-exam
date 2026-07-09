@@ -6,7 +6,7 @@ import {
   deleteEvaluation,
   getEvaluations,
   updateEvaluation,
-} from '~/api/evaluationApi';
+} from '~/shared/api/evaluationApi';
 
 export const evaluationKeys = {
   all: ['evaluations'],

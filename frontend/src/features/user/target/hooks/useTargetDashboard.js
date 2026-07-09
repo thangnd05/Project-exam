@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { getMyUserTests } from '~/api/userTestApi';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getExamParts } from '~/api/examPartApi';
-import { getUserTarget } from '~/api/userTargetApi';
-import { listPlans } from '~/api/learningPlanApi';
-import { getEnhancedResult } from '~/api/enhancedResultApi';
+import { getMyUserTests } from '~/shared/api/userTestApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getExamParts } from '~/shared/api/examPartApi';
+import { getUserTarget } from '~/shared/api/userTargetApi';
+import { listPlans } from '~/shared/api/learningPlanApi';
+import { getEnhancedResult } from '~/shared/api/enhancedResultApi';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
 import { filterCompletedTests } from '~/shared/utils/userTests';
 

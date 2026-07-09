@@ -6,7 +6,7 @@ import {
   useCallback,
   useRef,
 } from 'react';
-import { getMyStreak, restoreStreak as restoreStreakApi } from '~/api/streakApi';
+import { getMyStreak, restoreStreak as restoreStreakApi } from '~/shared/api/streakApi';
 import { useAuth } from '~/shared/hooks/useAuth';
 
 export const StreakContext = createContext(null);

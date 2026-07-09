@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getQuestionsByPart } from '~/api/questionApi';
+import { getQuestionsByPart } from '~/shared/api/questionApi';
 
 export const SELECTION_MODES = {
   MANUAL: 'manual',

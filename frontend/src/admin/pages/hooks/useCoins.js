@@ -5,7 +5,7 @@ import {
   deleteCoinWallet,
   getCoinWallets,
   updateCoinBalance,
-} from '~/api/coinApi';
+} from '~/shared/api/coinApi';
 
 export const coinKeys = {
   wallets: ['coin-wallets'],

@@ -1,14 +1,14 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {keepPreviousData} from '~/shared/config/queryClient';
 
-import {getExamTypes} from '~/api/examTypeApi';
-import {getTagsFlatByExamType} from '~/api/tagApi';
+import {getExamTypes} from '~/shared/api/examTypeApi';
+import {getTagsFlatByExamType} from '~/shared/api/tagApi';
 import {
   getAllResources,
   createResource,
   updateResource,
   deleteResource,
-} from '~/api/recoveryResourceApi';
+} from '~/shared/api/recoveryResourceApi';
 
 export const recoveryResourceKeys = {
   resources: ['recovery-resources'],

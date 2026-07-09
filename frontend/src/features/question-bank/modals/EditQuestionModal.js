@@ -5,9 +5,9 @@ import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import TagSelector from '~/shared/ui/TagSelector/TagSelector';
-import { getQuestionById, updateQuestion } from '~/api/questionApi';
-import { getExamPartById } from '~/api/examPartApi';
-import { deletePassageMedia } from '~/api/passageMediaApi';
+import { getQuestionById, updateQuestion } from '~/shared/api/questionApi';
+import { getExamPartById } from '~/shared/api/examPartApi';
+import { deletePassageMedia } from '~/shared/api/passageMediaApi';
 import { buildCollectionTree } from '~/shared/utils/collectionTree';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -16,7 +16,7 @@ import {
   IoCreateOutline,
   IoTrashOutline,
 } from 'react-icons/io5';
-import { getTagsFlatByExamType } from '~/api/tagApi';
+import { getTagsFlatByExamType } from '~/shared/api/tagApi';
 import { useQuestionCollections } from './hooks/useQuestionCollections';
 import styles from './EditQuestionModal.module.scss';
 import createStyles from '~/shared/test/CreateTestModal.module.scss';

@@ -5,7 +5,7 @@ import {
   deleteCosmetic,
   getCosmetics,
   updateCosmetic,
-} from '~/api/cosmeticApi';
+} from '~/shared/api/cosmeticApi';
 
 export const cosmeticKeys = {
   list: () => ['admin-cosmetics'],

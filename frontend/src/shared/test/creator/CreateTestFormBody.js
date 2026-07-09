@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
-import { getClassById } from '~/api/classApi';
-import { getChapterById } from '~/api/chapterApi';
-import { previewDocument, previewPassageDocument } from '~/api/questionApi';
+import { getClassById } from '~/shared/api/classApi';
+import { getChapterById } from '~/shared/api/chapterApi';
+import { previewDocument, previewPassageDocument } from '~/shared/api/questionApi';
 import {
   IoCalendarOutline,
   IoTimeOutline,

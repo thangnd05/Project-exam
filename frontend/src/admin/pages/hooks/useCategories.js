@@ -4,7 +4,7 @@ import {
     createCategory,
     updateCategory,
     deleteCategory,
-} from '~/api/postApi';
+} from '~/shared/api/postApi';
 
 export const categoriesKeys = {
     all: ['admin-categories'],

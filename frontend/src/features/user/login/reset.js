@@ -4,7 +4,7 @@ import style from './login.module.scss';
 import routes from '~/shared/config/Routes';
 import {Form, Button} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
-import { resetPassword } from '~/api/authApi';
+import { resetPassword } from '~/shared/api/authApi';
 
 const cx = classNames.bind(style);
 

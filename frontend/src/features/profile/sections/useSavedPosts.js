@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSavedPosts, toggleSavePost } from '~/api/postApi';
+import { getSavedPosts, toggleSavePost } from '~/shared/api/postApi';
 import { keepPreviousData } from '~/shared/config/queryClient';
 
 export const savedPostsKeys = {

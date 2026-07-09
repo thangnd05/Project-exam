@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import { updateChapter } from '~/api/chapterApi';
+import { updateChapter } from '~/shared/api/chapterApi';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';

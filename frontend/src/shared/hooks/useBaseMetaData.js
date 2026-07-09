@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getQuestionCollections } from '~/api/questionCollectionApi';
-import { getExamPartsByExamType } from '~/api/examPartApi';
-import { getTagsFlatByExamType } from '~/api/tagApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getQuestionCollections } from '~/shared/api/questionCollectionApi';
+import { getExamPartsByExamType } from '~/shared/api/examPartApi';
+import { getTagsFlatByExamType } from '~/shared/api/tagApi';
 import { sortByPartOrder } from '../utils/partOrder';
 
 export const useBaseMetaData = (examTypeId) => {

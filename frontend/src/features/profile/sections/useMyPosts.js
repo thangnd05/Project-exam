@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
-import { getMyPosts, getCategories, deletePost } from '~/api/postApi';
+import { getMyPosts, getCategories, deletePost } from '~/shared/api/postApi';
 
 export const myPostsKeys = {
   all: ['my-posts'],

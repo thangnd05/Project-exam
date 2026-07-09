@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { CircleDollarSign, Check } from 'lucide-react';
 
-import { buyCosmetic, equipCosmetic, getCosmeticShop, unequipCosmetic } from '~/api/cosmeticApi';
+import { buyCosmetic, equipCosmetic, getCosmeticShop, unequipCosmetic } from '~/shared/api/cosmeticApi';
 import { useCoins } from '~/shared/hooks/useCoins';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
 import AvatarWithCosmetic from './AvatarWithCosmetic';

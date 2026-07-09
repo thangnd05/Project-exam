@@ -4,7 +4,7 @@ import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import {CircleDollarSign, Clock, CheckCircle2} from 'lucide-react';
 
-import {claimQuest, getMyQuests} from '~/api/questApi';
+import {claimQuest, getMyQuests} from '~/shared/api/questApi';
 import {useCoins} from '~/shared/hooks/useCoins';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import CosmeticShop from '~/shared/cosmetic/CosmeticShop';

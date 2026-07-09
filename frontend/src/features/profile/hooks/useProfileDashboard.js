@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
-import { getProfileOverview, getMyActivity } from '~/api/userApi';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getExamParts } from '~/api/examPartApi';
-import { getUserTarget } from '~/api/userTargetApi';
+import { getProfileOverview, getMyActivity } from '~/shared/api/userApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getExamParts } from '~/shared/api/examPartApi';
+import { getUserTarget } from '~/shared/api/userTargetApi';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
 
 export const profileDashboardKeys = {

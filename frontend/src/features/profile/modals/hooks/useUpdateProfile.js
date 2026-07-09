@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getMyInfo, updateUser } from '~/api/userApi';
+import { getMyInfo, updateUser } from '~/shared/api/userApi';
 
 export const profileKeys = {
   me: () => ['my-info'],

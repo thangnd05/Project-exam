@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
-import { getResourceById, viewResourceContent } from '~/api/recoveryResourceApi';
+import { getResourceById, viewResourceContent } from '~/shared/api/recoveryResourceApi';
 import { isMarkdownResource } from '~/shared/utils/recoveryResource';
 
 const API_BASE = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');

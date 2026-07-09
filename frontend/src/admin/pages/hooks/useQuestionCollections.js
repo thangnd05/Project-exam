@@ -4,8 +4,8 @@ import {
   deleteQuestionCollection,
   getQuestionCollections,
   updateQuestionCollection,
-} from '~/api/questionCollectionApi';
-import { getExamTypes } from '~/api/examTypeApi';
+} from '~/shared/api/questionCollectionApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
 
 export const questionCollectionKeys = {
   all: ['admin-question-collections'],

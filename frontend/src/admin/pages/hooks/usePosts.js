@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
-import { getPosts, updatePostStatus, deletePost } from '~/api/postApi';
+import { getPosts, updatePostStatus, deletePost } from '~/shared/api/postApi';
 
 export const postKeys = {
     all: ['admin-posts'],

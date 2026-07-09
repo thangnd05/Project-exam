@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getAllEvaluations } from '~/api/evaluationApi';
+import { getAllEvaluations } from '~/shared/api/evaluationApi';
 
 export const evaluationKeys = { all: ['evaluations'] };
 

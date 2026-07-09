@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
-import { getTestsByExamType, getTestCollectionsByExamType } from '~/api/testApi';
-import { getExamTypeById, getExamTypeChildren } from '~/api/examTypeApi';
+import { getTestsByExamType, getTestCollectionsByExamType } from '~/shared/api/testApi';
+import { getExamTypeById, getExamTypeChildren } from '~/shared/api/examTypeApi';
 
 const PAGE_SIZE = 12;
 

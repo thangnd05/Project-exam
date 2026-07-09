@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {Alert} from 'react-bootstrap';
 import {toast} from 'react-toastify';
-import { getClassById, updateClass } from '~/api/classApi';
+import { getClassById, updateClass } from '~/shared/api/classApi';
 import classNames from 'classnames/bind';
 import {FaEdit, FaInfoCircle} from 'react-icons/fa';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';

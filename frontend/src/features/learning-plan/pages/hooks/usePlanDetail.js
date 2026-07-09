@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getPlanById } from '~/api/learningPlanApi';
+import { getPlanById } from '~/shared/api/learningPlanApi';
 
 export const planDetailKeys = {
   detail: (learningPlanId) => ['learning-plan-detail', learningPlanId],

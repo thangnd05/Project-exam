@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { uploadPostImage, createPost, updatePost } from '~/api/postApi';
+import { uploadPostImage, createPost, updatePost } from '~/shared/api/postApi';
 
 const DEFAULT_THUMBNAIL_URL =
   'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1350&q=80';

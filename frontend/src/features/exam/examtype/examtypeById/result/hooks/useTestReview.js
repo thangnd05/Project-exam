@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { getUserTestMeta } from '~/api/userTestApi';
-import { getAnswersByUserTest } from '~/api/userAnswerApi';
-import { getUserTestInfo, getAdminTestById } from '~/api/testApi';
+import { getUserTestMeta } from '~/shared/api/userTestApi';
+import { getAnswersByUserTest } from '~/features/exam/api/userAnswerApi';
+import { getUserTestInfo, getAdminTestById } from '~/shared/api/testApi';
 
 export const testReviewKeys = {
   detail: (userTestId, isGuest) => ['test-review', userTestId, isGuest],

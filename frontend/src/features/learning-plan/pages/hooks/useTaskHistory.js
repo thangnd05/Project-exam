@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getPlanById, getTaskSessions } from '~/api/learningPlanApi';
+import { getPlanById, getTaskSessions } from '~/shared/api/learningPlanApi';
 
 export const taskHistoryKeys = {
   plan: (planId) => ['learning-plan', planId],

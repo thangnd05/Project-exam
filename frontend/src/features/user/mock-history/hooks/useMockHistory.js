@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
-import { getMockHistory } from '~/api/userTestApi';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getUserTarget } from '~/api/userTargetApi';
+import { getMockHistory } from '~/shared/api/userTestApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getUserTarget } from '~/shared/api/userTargetApi';
 
 // Biểu đồ chỉ cần N bài gần nhất để vẽ tiến triển; bảng phân trang riêng.
 export const CHART_FETCH_LIMIT = 25;

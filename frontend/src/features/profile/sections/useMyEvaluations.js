@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMyEvaluations, updateEvaluation, deleteEvaluation } from '~/api/evaluationApi';
+import { getMyEvaluations, updateEvaluation, deleteEvaluation } from '~/shared/api/evaluationApi';
 
 export const myEvaluationsKeys = {
   list: () => ['my-evaluations'],

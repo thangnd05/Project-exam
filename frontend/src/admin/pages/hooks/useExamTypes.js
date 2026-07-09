@@ -5,7 +5,7 @@ import {
   deleteExamType,
   getExamTypes,
   updateExamType,
-} from '~/api/examTypeApi';
+} from '~/shared/api/examTypeApi';
 
 export const examTypeKeys = {
   all: ['exam-types'],

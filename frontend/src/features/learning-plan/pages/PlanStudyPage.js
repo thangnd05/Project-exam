@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getCurrentSession, submitSession } from '~/api/learningPlanApi';
+import { getCurrentSession, submitSession } from '~/shared/api/learningPlanApi';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';

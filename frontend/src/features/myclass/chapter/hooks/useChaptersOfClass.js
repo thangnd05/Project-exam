@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getChaptersByClass, deleteChapter } from '~/api/chapterApi';
-import { getClassById } from '~/api/classApi';
+import { getChaptersByClass, deleteChapter } from '~/shared/api/chapterApi';
+import { getClassById } from '~/shared/api/classApi';
 
 export const chapterKeys = {
   list: (classId) => ['chapters', classId],

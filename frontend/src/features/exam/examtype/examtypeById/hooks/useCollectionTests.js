@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
-import { getTestsByCollection, getTestCollectionsByExamType } from '~/api/testApi';
+import { getTestsByCollection, getTestCollectionsByExamType } from '~/shared/api/testApi';
 
 export function useCollectionTests(collectionId, page, size) {
   return useQuery({

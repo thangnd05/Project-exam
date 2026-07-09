@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getAdminTests, updateTest, deleteTest } from '~/api/testApi';
-import { getExamTypes } from '~/api/examTypeApi';
-import { getUsers } from '~/api/userApi';
+import { getAdminTests, updateTest, deleteTest } from '~/shared/api/testApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getUsers } from '~/shared/api/userApi';
 
 const USERS_PARAMS = { page: 0, size: 200 };
 

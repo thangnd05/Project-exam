@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getExamTypes } from '~/api/examTypeApi';
-import { listPlans } from '~/api/learningPlanApi';
+import { getExamTypes } from '~/shared/api/examTypeApi';
+import { listPlans } from '~/shared/api/learningPlanApi';
 
 export function useLearningPlanList({
   loadAll = false,

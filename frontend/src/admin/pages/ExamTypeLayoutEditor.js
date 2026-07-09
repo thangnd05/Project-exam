@@ -18,7 +18,7 @@ import {
   getExamTypeById,
   getOwnExamTypeLayout,
   updateExamTypeLayout,
-} from '~/api/examTypeApi';
+} from '~/shared/api/examTypeApi';
 import { resolveLayoutConfig } from '~/features/exam/examtype/examtypeById/testStart/examLayout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,

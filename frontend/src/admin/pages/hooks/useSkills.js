@@ -1,6 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
-import {createSkill, deleteSkill, getSkills, updateSkill} from '~/api/skillApi';
+import {createSkill, deleteSkill, getSkills, updateSkill} from '~/shared/api/skillApi';
 
 export const skillKeys = {
   list: () => ['admin-skills'],

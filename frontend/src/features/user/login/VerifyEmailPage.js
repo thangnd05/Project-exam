@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { verifyEmail } from '~/api/authApi';
+import { verifyEmail } from '~/shared/api/authApi';
 
 export default function VerifyEmailPage() {
   const [params] = useSearchParams();

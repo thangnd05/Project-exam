@@ -1,7 +1,7 @@
 import { createContext, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '~/shared/config/queryClient';
-import { getMyEquippedCosmetics } from '~/api/cosmeticApi';
+import { getMyEquippedCosmetics } from '~/shared/api/cosmeticApi';
 import { useAuth } from '~/shared/hooks/useAuth';
 
 export const CosmeticContext = createContext(null);

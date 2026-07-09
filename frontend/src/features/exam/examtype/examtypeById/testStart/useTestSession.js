@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { checkActiveUserTest, startUserTest, submitUserTest } from '~/api/userTestApi';
-import { getAnswersByUserTest, batchSaveAnswers } from '~/api/userAnswerApi';
-import { getUserTestInfo, purchaseTestAccess } from '~/api/testApi';
-import { getPassageMediaByPassageId } from '~/api/passageMediaApi';
-import { getExamTypeLayout } from '~/api/examTypeApi';
+import { checkActiveUserTest, startUserTest, submitUserTest } from '~/shared/api/userTestApi';
+import { getAnswersByUserTest, batchSaveAnswers } from '~/features/exam/api/userAnswerApi';
+import { getUserTestInfo, purchaseTestAccess } from '~/shared/api/testApi';
+import { getPassageMediaByPassageId } from '~/shared/api/passageMediaApi';
+import { getExamTypeLayout } from '~/shared/api/examTypeApi';
 import { resolveLayoutConfig } from './examLayout/resolveLayoutConfig';
 import { defaultLayoutConfig } from './examLayout/layoutSchema';
 import { getApiErrorMessage } from '~/shared/utils/apiError';

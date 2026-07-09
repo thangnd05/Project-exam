@@ -6,8 +6,8 @@ import {
   getRoles,
   updateRole,
   updateRolePermissions,
-} from '~/api/roleApi';
-import {getPermissions} from '~/api/permissionApi';
+} from '~/admin/api/roleApi';
+import {getPermissions} from '~/admin/api/permissionApi';
 
 export const roleKeys = {
   roles: ['admin-roles'],

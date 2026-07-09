@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { getClassById } from '~/api/classApi';
+import { getClassById } from '~/shared/api/classApi';
 import {
   getMembersByClass,
   getPendingByClass,
   approveMember,
   approveAllMembers,
   removeMember,
-} from '~/api/classMemberApi';
+} from '~/features/myclass/api/classMemberApi';
 
 export const classMemberKeys = {
   info: (classId) => ['class-info', classId],

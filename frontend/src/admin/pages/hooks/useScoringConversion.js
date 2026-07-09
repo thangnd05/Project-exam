@@ -1,14 +1,14 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
-import {getExamTypes} from '~/api/examTypeApi';
+import {getExamTypes} from '~/shared/api/examTypeApi';
 import {
   createScoringConversion,
   createScoringConversionsBulk,
   deleteScoringConversion,
   getScoringConversions,
   getScoringConversionsBySkill,
-} from '~/api/scoringConversionApi';
-import {getSkills} from '~/api/skillApi';
+} from '~/shared/api/scoringConversionApi';
+import {getSkills} from '~/shared/api/skillApi';
 
 export const scoringConversionKeys = {
   examTypes: ['scoring-conversion', 'exam-types'],

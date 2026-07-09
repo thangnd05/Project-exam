@@ -13,7 +13,7 @@ import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import routes from '~/shared/config/Routes';
 import styles from './PostDetailPage.module.scss';
-import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, toggleReact, toggleSavePost } from '~/api/postApi';
+import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, toggleReact, toggleSavePost } from '~/shared/api/postApi';
 
 const cx = classNames.bind(styles);
 const MAX_REPLY_DEPTH = 4;
