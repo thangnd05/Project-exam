@@ -19,6 +19,7 @@ import {
     formatFullDateTime,
 } from '~/utils/testStatusHelper';
 import TestModeModal from '~/components/test/TestModeModal/TestModeModal';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 
@@ -155,7 +156,9 @@ function TestCard({ test, countdowns }) {
                 </div>
 
                 <div className={cx('btn-group', {hasRank: showLeaderboard})}>
-                    <button
+                    <ButtonPrime
+                        variant="primary"
+                        size="sm"
                         className={cx('btn-primary-modern')}
                         onClick={handleStart}
                         disabled={!canStart}
@@ -166,9 +169,11 @@ function TestCard({ test, countdowns }) {
                             <IoLockClosedOutline size={20} />
                         )}
                         {buttonText}
-                    </button>
+                    </ButtonPrime>
 
-                    <button
+                    <ButtonPrime
+                        variant="outline"
+                        size="sm"
                         className={cx('btn-outline-modern')}
                         onClick={() =>
                             navigate(`/tests/history/${test.testId}`)
@@ -176,10 +181,12 @@ function TestCard({ test, countdowns }) {
                     >
                         <IoStatsChartOutline />
                         Lịch sử
-                    </button>
+                    </ButtonPrime>
 
                     {showLeaderboard && (
-                        <button
+                        <ButtonPrime
+                            variant="outline"
+                            size="sm"
                             className={cx('btn-icon-modern')}
                             title="Bảng xếp hạng"
                             aria-label="Bảng xếp hạng"
@@ -207,7 +214,7 @@ function TestCard({ test, countdowns }) {
                                 <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
                                 <path d="M6 9H4.5a1 1 0 0 1 0-5H6" />
                             </svg>
-                        </button>
+                        </ButtonPrime>
                     )}
                 </div>
             </div>

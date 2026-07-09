@@ -47,6 +47,30 @@
   }
 }
 
+.danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-color: transparent;
+  color: var(--white, #fff);
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.24);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(220, 38, 38, 0.32);
+    color: var(--white, #fff);
+  }
+}
+
+.dangerGhost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--danger-text, #b91c1c);
+
+  &:hover {
+    background: var(--danger-bg, #fef2f2);
+    color: var(--danger-text, #b91c1c);
+  }
+}
+
 .sm {
   padding: 0.75rem 1.5rem;
   font-size: var(--font-size-sm);
@@ -60,6 +84,11 @@
 .lg {
   padding: 1.1rem 2.2rem;
   font-size: var(--font-size-base);
+}
+
+.icon {
+  padding: 0.6rem;
+  border-radius: 10px;
 }
 
 .fullWidth {

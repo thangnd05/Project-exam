@@ -4,6 +4,7 @@ import { PlusCircle } from 'lucide-react';
 import { IoRocketOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 
@@ -18,16 +19,16 @@ const FormFooter = ({
     return (
         <div className={cx('footer')}>
             {showAddBtn && (
-                <button type="button" className={cx('btnAdd')} onClick={onAddQuestion}>
+                <ButtonPrime type="button" variant="outline" size="md" onClick={onAddQuestion}>
                     <PlusCircle size={18} /> Thêm câu hỏi
-                </button>
+                </ButtonPrime>
             )}
             {onCancel && (
-                <button type="button" className={cx('btnCancel')} onClick={onCancel}>
+                <ButtonPrime type="button" variant="ghost" size="md" onClick={onCancel}>
                     Để sau
-                </button>
+                </ButtonPrime>
             )}
-            <button type="button" className={cx('btnSubmit')} onClick={onSubmit} disabled={loading}>
+            <ButtonPrime type="button" variant="primary" size="md" onClick={onSubmit} disabled={loading}>
                 {loading ? (
                     <Spinner size="sm" />
                 ) : (
@@ -35,7 +36,7 @@ const FormFooter = ({
                         <IoRocketOutline /> {submitLabel}
                     </>
                 )}
-            </button>
+            </ButtonPrime>
         </div>
     );
 };

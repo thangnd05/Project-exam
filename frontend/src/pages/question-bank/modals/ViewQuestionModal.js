@@ -1,6 +1,7 @@
 import React, {useEffect, useRef} from 'react';
-import {Button, Spinner, Alert} from 'react-bootstrap';
+import {Spinner, Alert} from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 import {toast} from 'react-toastify';
 import {useQuestionDetail} from './hooks/useQuestionDetail';
 import classNames from 'classnames/bind';
@@ -77,9 +78,9 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
       title="Chi tiết câu hỏi"
       maxWidth={800}
       footer={
-        <Button variant="secondary" onClick={onHide}>
+        <ButtonPrime variant="ghost" size="lg" onClick={onHide}>
           <IoCloseOutline size={20} className="me-1" /> Đóng
-        </Button>
+        </ButtonPrime>
       }
     >
       <div className={cx('modalBody')}>

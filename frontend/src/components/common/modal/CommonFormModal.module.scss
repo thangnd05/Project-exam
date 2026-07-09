@@ -143,42 +143,8 @@
   gap: 12px;
 }
 
+/* Layout only — màu/kích thước nút do ButtonPrime (variant + size) quyết định để đồng bộ toàn hệ thống */
 .btnCancel,
 .btnSubmit {
   flex: 1;
-  padding: 14px;
-  border-radius: 14px;
-  font-size: var(--font-size-md);
-  font-weight: 700;
-  transition: all 0.3s;
-  border: none;
-  cursor: pointer;
-}
-
-.btnCancel {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-.btnCancel:hover {
-  background: #e2e8f0;
-  color: #1e293b;
-}
-
-.btnSubmit {
-  background: var(--accent-color);
-  color: #fff;
-  box-shadow: 0 4px 15px rgba(0, 97, 242, 0.3);
-}
-
-.btnSubmit:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 97, 242, 0.4);
-}
-
-.btnSubmit:disabled,
-.btnCancel:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  box-shadow: none;
 }

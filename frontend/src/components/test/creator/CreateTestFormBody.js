@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Alert } from 'react-bootstrap';
 import { getClassById } from '~/api/classApi';
 import { getChapterById } from '~/api/chapterApi';
 import { previewDocument, previewPassageDocument } from '~/api/questionApi';
@@ -24,6 +24,7 @@ import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
 import CreateFromBankBody from './CreateFromBankBody';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 import routes from '~/config/Routes';
 import { buildCollectionTree } from '~/utils/collectionTree';
 import styles from '../CreateTestModal.module.scss';
@@ -413,18 +414,19 @@ const CreateTestFormBody = ({
         <Alert variant="light" className="mb-3 border">
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
             <span>
-              <strong>Kho lưu trữ câu hỏi:</strong> Nếu bạn muốn tạo đề từ câu hỏi đã lưu trong kho (chọn thủ công hoặc random theo từng part), vào trang này.
+              <strong>Kho lưu trữ câu hỏi:</strong> Nếu bạn muốn tạo đề từ câu hỏi đã lưu trong kho, vào trang này.
             </span>
-            <Button
+            <ButtonPrime
               type="button"
-              variant="outline-primary"
+              variant="outline"
+              size="md"
               onClick={() => {
                 onCancel?.();
                 navigate(routes.personalQuestionBank);
               }}
             >
               Mở kho lưu trữ
-            </Button>
+            </ButtonPrime>
           </div>
         </Alert>
       )}
@@ -657,9 +659,9 @@ const CreateTestFormBody = ({
                   <span className={cx('groupSummaryBadge')}>{getGroupSummary(group)}</span>
                 </button>
                 {groups.length > 1 && (
-                  <Button variant="link" className={cx('removeBtn')} onClick={() => removeGroup(gIndex)} aria-label={`Xóa nhóm ${gIndex + 1}`}>
+                  <ButtonPrime variant="dangerGhost" size="icon" onClick={() => removeGroup(gIndex)} aria-label={`Xóa nhóm ${gIndex + 1}`}>
                     <Trash size={18} />
-                  </Button>
+                  </ButtonPrime>
                 )}
               </div>
               {!isCollapsed && (
@@ -679,14 +681,14 @@ const CreateTestFormBody = ({
                   <div className={cx('formGroupModern')} key={tIdx}>
                     <label className="mb-2 d-flex justify-content-between align-items-center fw-bold">
                       <span>Đoạn văn bổ sung {tIdx + 2}</span>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-danger p-0 px-1"
+                      <ButtonPrime
+                        variant="dangerGhost"
+                        size="icon"
                         onClick={() => removeGroupPassageText(gIndex, tIdx)}
                         aria-label={`Xóa đoạn văn bổ sung ${tIdx + 2}`}
                       >
                         <Trash size={14} />
-                      </button>
+                      </ButtonPrime>
                     </label>
                     <textarea
                       className={cx('inputModern')}
@@ -698,13 +700,15 @@ const CreateTestFormBody = ({
                   </div>
                 ))}
                 <div className="mb-3">
-                  <button
+                  <ButtonPrime
                     type="button"
+                    variant="outline"
+                    size="sm"
                     className={cx('btnSecondary')}
                     onClick={() => addGroupPassageText(gIndex)}
                   >
                     <PlusCircle size={16} className="me-1" /> Thêm đoạn văn
-                  </button>
+                  </ButtonPrime>
                 </div>
                 <div className={cx('formGroupModern')}>
                   <label className="mb-2 d-block fw-bold">Bản dịch Passage (tùy chọn)</label>
@@ -733,13 +737,13 @@ const CreateTestFormBody = ({
                       {group.passage.mediaFiles.map((file, fIdx) => (
                         <li key={fIdx} className="d-flex align-items-center gap-2 mb-1">
                           <span className="small text-secondary">{file.name}</span>
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-outline-danger p-0 px-1"
+                          <ButtonPrime
+                            variant="dangerGhost"
+                            size="icon"
                             onClick={() => removeGroupMediaFile(gIndex, fIdx)}
                           >
                             <Trash size={14} />
-                          </button>
+                          </ButtonPrime>
                         </li>
                       ))}
                     </ul>
@@ -781,14 +785,14 @@ const CreateTestFormBody = ({
                     minQuestions={group.questions.length}
                   />
                 ))}
-                <button type="button" className={cx('btnSecondary')} onClick={() => addGroupQuestion(gIndex)}><PlusCircle size={18} /> Thêm câu hỏi</button>
+                <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary')} onClick={() => addGroupQuestion(gIndex)}><PlusCircle size={18} /> Thêm câu hỏi</ButtonPrime>
               </div>
               </>
               )}
             </div>
             );
           })}
-          <button type="button" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><IoAddOutline size={20} /> Thêm nhóm passage</button>
+          <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><IoAddOutline size={20} /> Thêm nhóm passage</ButtonPrime>
         </>
       )}
 

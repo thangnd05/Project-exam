@@ -368,30 +368,7 @@
   padding-top: 6px;
 }
 
-.btnSubmit {
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-size: 1.15rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--primary-color, #6366f1);
-  border: none;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-  }
-
-  &:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-}
+/* Nút submit dùng ButtonPrime (variant primary) — không override màu ở đây nữa */
 
 @media (max-width: 768px) {
   .wrapper {

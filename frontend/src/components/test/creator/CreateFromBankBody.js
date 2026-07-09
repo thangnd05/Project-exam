@@ -25,6 +25,7 @@ import { useHasPermission } from '~/hooks/usePermission';
 import CoinPriceField from '~/components/test/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 import { getExamCategories } from '~/api/examCategoryApi';
 import {
   useBankTestBuilder,
@@ -745,17 +746,18 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
         <div className={cx('footer')}>
           {onCancel && (
-            <button type="button" className={cx('btnCancel')} onClick={onCancel}>
+            <ButtonPrime type="button" variant="ghost" size="md" onClick={onCancel}>
               Để sau
-            </button>
+            </ButtonPrime>
           )}
-          <button
+          <ButtonPrime
             type="submit"
-            className={cx('btnSubmit')}
+            variant="primary"
+            size="md"
             disabled={loadingSubmit || !hasAnyPartWithQuestions || !testInfo.examTypeId}
           >
             {loadingSubmit ? <><Spinner animation="border" size="sm" /> Đang tạo đề...</> : <><IoRocketOutline /> Tạo đề thi từ kho</>}
-          </button>
+          </ButtonPrime>
         </div>
       </Form>
 

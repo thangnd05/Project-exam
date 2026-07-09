@@ -120,68 +120,13 @@
     }
 }
 
+/* Màu/kích thước nút footer do ButtonPrime (variant + size) quyết định — ở đây chỉ giữ layout */
 .footer {
     padding: 20px 30px;
-    border-top: 1px solid #f1f5f9;
-    background: #f8fafc;
     display: flex;
     gap: 12px;
     justify-content: flex-end;
     flex-shrink: 0;
-
-    .btnCancel,
-    .btnSubmit,
-    .btnAdd {
-        padding: 14px 24px;
-        border-radius: 14px;
-        font-size: var(--font-size-md);
-        font-weight: 700;
-        transition: all 0.3s;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btnCancel {
-        background: #f1f5f9;
-        color: #64748b;
-
-        &:hover {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-    }
-
-    .btnAdd {
-        background: #fff;
-        color: var(--primary-color);
-        border: 2px solid var(--primary-color);
-
-        &:hover {
-            background: var(--primary-gradient);
-            color: #fff;
-        }
-    }
-
-    .btnSubmit {
-        background: var(--primary-gradient);
-        color: #fff;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-
-        &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        &:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-    }
 }
 
 .configCard {
@@ -777,11 +722,8 @@
         padding: 16px 20px;
         flex-direction: column;
 
-        .btnCancel,
-        .btnSubmit,
-        .btnAdd {
+        button {
             width: 100%;
-            justify-content: center;
         }
     }
 }

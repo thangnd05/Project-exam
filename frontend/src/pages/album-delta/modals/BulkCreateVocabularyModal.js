@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/components/common/modal/CommonFormModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 import styles from '~/components/common/modal/CommonFormModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -129,26 +130,26 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                 <div className="d-flex justify-content-between align-items-center mb-2">
                     <label className={cx('label', 'mb-0')}>Dữ liệu JSON</label>
                     <div className="d-flex gap-2">
-                        <button
+                        <ButtonPrime
                             type="button"
-                            className="btn btn-sm btn-outline-primary"
+                            variant="outline"
+                            size="sm"
                             onClick={handleStandardize}
                             disabled={aiLoading || loading}
-                            style={{ fontSize: '1.2rem' }}
                         >
                             <IoFlashOutline className="me-1" />
                             {aiLoading ? 'Đang xử lý...' : 'Chuẩn hóa bằng AI'}
-                        </button>
-                        <button
+                        </ButtonPrime>
+                        <ButtonPrime
                             type="button"
-                            className="btn btn-sm btn-outline-secondary"
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setJsonInput(exampleJson)}
                             disabled={aiLoading || loading}
-                            style={{ fontSize: '1.2rem' }}
                         >
                             <IoCodeSlashOutline className="me-1" />
                             Xem mẫu JSON
-                        </button>
+                        </ButtonPrime>
                     </div>
                 </div>
                 <div className={cx('inputWrapper')}>

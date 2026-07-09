@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Spinner, Alert, Button, Form } from 'react-bootstrap';
+import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '../../api/testApi';
 import { createTestPart } from '../../api/testPartApi';
 import CoinPriceField from '~/components/test/CoinPriceField';
@@ -20,6 +20,7 @@ import {
 import { useBaseMetaData } from '~/hooks/useBaseMetaData';
 import { getQuestionDisplayNumber } from '~/utils/questionNumber';
 import EditQuestionModal from '~/pages/question-bank/modals/EditQuestionModal';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 import { getExamCategories } from '~/api/examCategoryApi';
 import {
   useBankTestBuilder,
@@ -490,13 +491,14 @@ const CreateTestFromBankPage = () => {
           )}
 
           <div className={cx('footer')}>
-            <Button
+            <ButtonPrime
               type="submit"
-              className={cx('btnSubmit')}
+              variant="primary"
+              size="md"
               disabled={loadingSubmit || !hasAnyPartWithQuestions || !testInfo.examTypeId}
             >
               {loadingSubmit ? <><Spinner animation="border" size="sm" /> Đang tạo đề...</> : <><IoRocketOutline /> Tạo đề thi từ kho</>}
-            </Button>
+            </ButtonPrime>
           </div>
         </Form>
       </div>

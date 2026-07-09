@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Spinner, Row, Col } from 'react-bootstrap';
+import { Spinner, Row, Col } from 'react-bootstrap';
 import BaseModal from '~/components/common/modal/BaseModal';
 import ConfirmDeleteModal from '~/components/common/modal/ConfirmDeleteModal';
 import ModalActionFooter from '~/components/common/modal/ModalActionFooter';
+import ButtonPrime from '~/components/common/Button/ButtonPrime';
 import TagSelector from '~/components/common/TagSelector/TagSelector';
 import { getQuestionById, updateQuestion } from '~/api/questionApi';
 import { getExamPartById } from '~/api/examPartApi';
@@ -519,10 +520,10 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                             </span>
 
                             {item.id ? (
-                              <Button
+                              <ButtonPrime
                                 type="button"
                                 size="sm"
-                                variant="outline-danger"
+                                variant="dangerGhost"
                                 className={cx('deleteMediaBtn')}
                                 disabled={deleting || saving}
                                 onClick={() => setConfirmDeleteMedia(item)}
@@ -533,7 +534,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                                   <IoTrashOutline />
                                 )}
                                 {!deleting && <span className="ms-1">Xóa</span>}
-                              </Button>
+                              </ButtonPrime>
                             ) : null}
                           </div>
 
@@ -576,14 +577,14 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                 <Col md={12} key={idx}>
                   <label className={cx('formLabel')} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Đoạn văn bổ sung {idx + 2}</span>
-                    <Button
-                      variant="link"
-                      className="text-danger p-0"
+                    <ButtonPrime
+                      variant="dangerGhost"
+                      size="icon"
                       onClick={() => removeExtraContent(idx)}
                       aria-label={`Xóa đoạn văn bổ sung ${idx + 2}`}
                     >
                       <IoTrashOutline size={18} />
-                    </Button>
+                    </ButtonPrime>
                   </label>
                   <textarea
                     className={cxCreate('inputModern')}
@@ -596,13 +597,13 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
               ))}
 
               <Col md={12}>
-                <Button
-                  variant="outline-primary"
+                <ButtonPrime
+                  variant="outline"
                   size="sm"
                   onClick={addExtraContent}
                 >
                   <IoCreateOutline className="me-1" /> Thêm đoạn văn
-                </Button>
+                </ButtonPrime>
               </Col>
 
               <Col md={12}>
@@ -644,28 +645,29 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                       }
                       placeholder={`Nội dung ${opt.answerLabel}...`}
                     />
-                    <Button
-                      variant="link"
-                      className="text-danger p-0 ms-2"
+                    <ButtonPrime
+                      variant="dangerGhost"
+                      size="icon"
+                      className="ms-2"
                       onClick={() => removeAnswer(idx)}
                       disabled={formData.options.length <= 2}
                       aria-label={`Xóa đáp án ${opt.answerLabel}`}
                     >
                       <IoTrashOutline size={18} />
-                    </Button>
+                    </ButtonPrime>
                   </div>
                 </Col>
               ))}
 
               <Col md={12} className="mt-2">
-                <Button
-                  variant="outline-primary"
+                <ButtonPrime
+                  variant="outline"
                   size="sm"
                   onClick={addAnswer}
                   disabled={formData.options.length >= 10}
                 >
                   <IoCreateOutline className="me-1" /> Thêm đáp án
-                </Button>
+                </ButtonPrime>
               </Col>
 
               <Col md={12} className="mt-3">
