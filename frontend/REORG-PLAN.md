@@ -75,7 +75,11 @@ src/
       co-locate sửa về `~/shared/api/`.
 - [x] **B7 — `app/` bootstrap** ✅ `index.js App.js routes/`→`app/`; entry
       `index.html`→`/src/app/index.js`. (`setupTests.js` để lại gốc — vite.config trỏ tới.)
-- [ ] **B8 — admin/** nội bộ feature-slice (tùy chọn, chưa làm).
+- [x] **B8 — admin/ domain-slice** ✅ gom 27 trang phẳng thành 5 domain (access,
+      exam-content, gamification, content, overview), mỗi domain có `hooks/` riêng;
+      giữ `components/ modals/ data/ api/ layouts/` shared ở gốc admin (domain cùng cấp
+      `pages/` nên `../components`/`../modals`/`../data` tự đúng). Xoá barrel `index.js` dead.
+      **KHÔNG** tách per-resource (27 micro-folder = over-engineering).
 
 ## 7. Kết quả cuối (đã build xanh mỗi batch)
 
