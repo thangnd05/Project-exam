@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getVocabulariesByAlbum, deleteVocabulary } from '~/features/album/detail/api/vocabularyApi';
+import { getVocabulariesByAlbum, deleteVocabulary } from '~/features/albums/detail/api/vocabularyApi';
 
 export const albumDeltaKeys = {
   vocabularies: (albumId) => ['album-vocabularies', albumId],

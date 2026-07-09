@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateAlbum } from '~/features/album/list/api/vocabularyAlbumApi';
+import { updateAlbum } from '~/features/albums/list/api/vocabularyAlbumApi';
 
 export const albumKeys = { myAlbums: ['my-albums'] };
 
