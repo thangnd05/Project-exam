@@ -17,7 +17,7 @@ import Service from '~/features/static/policy/service';
 import About from '~/features/static/about';
 import PostsPage from '~/features/posts/PostsPage';
 import PostDetailPage from '~/features/posts/PostDetailPage';
-import RecoveryResourceViewPage from '~/features/resources/RecoveryResourceViewPage';
+import RecoveryResourceViewPage from '~/features/diagnostic/resources/RecoveryResourceViewPage';
 import MyAlbumsPage from '~/features/album/list/MyAlbumPage';
 import AlbumDetailPage from '~/features/album/detail/AlbumDetailPage';
 import PracticePage from '~/features/album/practice/PracticePage';
