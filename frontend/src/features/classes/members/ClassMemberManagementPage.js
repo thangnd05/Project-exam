@@ -157,18 +157,20 @@ const ClassMemberManagementPage = () => {
         <td className={cx('td-actions')}>
           <div className={cx('action-buttons')}>
             {member.status === 'PENDING' && (
-              <button
-                className={cx('btn-approve')}
+              <ButtonPrime
+                variant="primary"
+                size="sm"
                 onClick={() => handleApproveMember(member.userId)}
                 disabled={actionLoading}
                 title="Duyệt học sinh"
               >
                 <IoCheckmarkCircle />
                 <span>Duyệt</span>
-              </button>
+              </ButtonPrime>
             )}
-            <button
-              className={cx('btn-remove')}
+            <ButtonPrime
+              variant="dangerGhost"
+              size="sm"
               onClick={() => {
                 setMemberToDelete(member);
                 setShowDeleteModal(true);
@@ -178,7 +180,7 @@ const ClassMemberManagementPage = () => {
             >
               <IoPersonRemoveOutline />
               <span>Xóa</span>
-            </button>
+            </ButtonPrime>
           </div>
         </td>
       )}
@@ -252,15 +254,15 @@ const ClassMemberManagementPage = () => {
         </div>
 
         <div className={cx('toolbar-actions')}>
-          <button
-            className={cx('btn-refresh')}
+          <ButtonPrime
+            variant="outline"
             onClick={() =>
               refreshMembers().then(() => toast.success('Đã làm mới!'))
             }
           >
             <IoRefreshOutline />
             <span>Làm mới</span>
-          </button>
+          </ButtonPrime>
 
           {pendingMembers.length > 0 && (
             <ButtonPrime
