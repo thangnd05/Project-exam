@@ -14,7 +14,9 @@ import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import routes from '~/shared/config/Routes';
 import styles from './PostDetailPage.module.scss';
-import { getPosts, getPostById, getComments, addComment, updateComment, deleteComment, toggleReact, toggleSavePost } from '~/shared/api/postApi';
+import { getPosts, getPostById, getComments } from '~/shared/api/postApi';
+import { useAddComment, useUpdateComment, useDeleteComment } from './hooks/useComments';
+import { useToggleReact, useToggleSavePost } from './hooks/usePostReactions';
 
 const cx = classNames.bind(styles);
 const MAX_REPLY_DEPTH = 4;
@@ -27,10 +29,8 @@ function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const [isReacting, setIsReacting] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [saveCount, setSaveCount] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
@@ -43,6 +43,19 @@ function PostDetailPage() {
   const [replyIndentPx, setReplyIndentPx] = useState(40);
   const [expandedReplies, setExpandedReplies] = useState({});
   const navigate = useNavigate();
+
+  const addCommentMutation = useAddComment();
+  const updateCommentMutation = useUpdateComment();
+  const deleteCommentMutation = useDeleteComment();
+  const reactMutation = useToggleReact();
+  const saveMutation = useToggleSavePost();
+  const isReacting = reactMutation.isPending;
+  const isSaving = saveMutation.isPending;
+
+  const reloadComments = async () => {
+    const data = await getComments(postId);
+    setComments(data || []);
+  };
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -180,7 +193,7 @@ function PostDetailPage() {
     }
   };
 
-  const handleSubmitComment = async (e) => {
+  const handleSubmitComment = (e) => {
     e.preventDefault();
     if (!user) {
       toast.warning('Vui lòng đăng nhập để bình luận');
@@ -188,56 +201,60 @@ function PostDetailPage() {
     }
     if (!newComment.trim()) return;
 
-    try {
-      await addComment(postId, { content: newComment });
-      setNewComment('');
-
-      const data = await getComments(postId);
-      setComments(data || []);
-    } catch (error) {
-      console.error('Failed to add comment:', error);
-    }
+    addCommentMutation.mutate(
+      { postId, data: { content: newComment } },
+      {
+        onSuccess: async () => {
+          setNewComment('');
+          await reloadComments();
+        },
+        onError: (error) => console.error('Failed to add comment:', error),
+      },
+    );
   };
 
-  const handleUpdateComment = async (commentId) => {
+  const handleUpdateComment = (commentId) => {
     if (!editContent.trim()) return;
-    try {
-      await updateComment(commentId, { content: editContent });
-      setEditingCommentId(null);
-      setEditContent('');
-      const data = await getComments(postId);
-      setComments(data || []);
-    } catch (error) {
-      console.error('Failed to update comment:', error);
-    }
+    updateCommentMutation.mutate(
+      { commentId, data: { content: editContent } },
+      {
+        onSuccess: async () => {
+          setEditingCommentId(null);
+          setEditContent('');
+          await reloadComments();
+        },
+        onError: (error) => console.error('Failed to update comment:', error),
+      },
+    );
   };
 
-  const handleDeleteComment = async () => {
+  const handleDeleteComment = () => {
     if (!deletingCommentId) return;
-    try {
-      await deleteComment(deletingCommentId);
-      const data = await getComments(postId);
-      setComments(data || []);
-      setDeletingCommentId(null);
-    } catch (error) {
-      console.error('Failed to delete comment:', error);
-    }
+    deleteCommentMutation.mutate(deletingCommentId, {
+      onSuccess: async () => {
+        await reloadComments();
+        setDeletingCommentId(null);
+      },
+      onError: (error) => console.error('Failed to delete comment:', error),
+    });
   };
 
-  const handleReply = async (parentId) => {
+  const handleReply = (parentId) => {
     if (!replyContent.trim()) return;
-    try {
-      await addComment(postId, { content: replyContent, parentId });
-      setReplyingToId(null);
-      setReplyContent('');
-      const data = await getComments(postId);
-      setComments(data || []);
-    } catch (error) {
-      console.error('Failed to add reply:', error);
-    }
+    addCommentMutation.mutate(
+      { postId, data: { content: replyContent, parentId } },
+      {
+        onSuccess: async () => {
+          setReplyingToId(null);
+          setReplyContent('');
+          await reloadComments();
+        },
+        onError: (error) => console.error('Failed to add reply:', error),
+      },
+    );
   };
 
-  const handleToggleLike = async () => {
+  const handleToggleLike = () => {
     if (!user) {
       toast.warning('Vui lòng đăng nhập để thả tim');
       return;
@@ -249,22 +266,24 @@ function PostDetailPage() {
 
     setLiked(!prevLiked);
     setLikeCount(prevLiked ? Math.max(0, prevLikeCount - 1) : prevLikeCount + 1);
-    setIsReacting(true);
 
-    try {
-      const summary = await toggleReact(postId, { type: 'LIKE' });
-      setLiked(summary.currentUserReactType === 'LIKE');
-      setLikeCount(summary.counts?.LIKE || 0);
-    } catch (error) {
-      setLiked(prevLiked);
-      setLikeCount(prevLikeCount);
-      console.error('Failed to toggle like:', error);
-    } finally {
-      setIsReacting(false);
-    }
+    reactMutation.mutate(
+      { postId, type: 'LIKE' },
+      {
+        onSuccess: (summary) => {
+          setLiked(summary.currentUserReactType === 'LIKE');
+          setLikeCount(summary.counts?.LIKE || 0);
+        },
+        onError: (error) => {
+          setLiked(prevLiked);
+          setLikeCount(prevLikeCount);
+          console.error('Failed to toggle like:', error);
+        },
+      },
+    );
   };
 
-  const handleToggleBookmark = async () => {
+  const handleToggleBookmark = () => {
     if (!user) {
       toast.warning('Vui lòng đăng nhập để lưu bài viết');
       return;
@@ -275,19 +294,18 @@ function PostDetailPage() {
     const prevCount = saveCount;
     setBookmarked(!prevSaved);
     setSaveCount(prevSaved ? Math.max(0, prevCount - 1) : prevCount + 1);
-    setIsSaving(true);
 
-    try {
-      const result = await toggleSavePost(postId);
-      setBookmarked(!!result.saved);
-      setSaveCount(result.saveCount || 0);
-    } catch (error) {
-      setBookmarked(prevSaved);
-      setSaveCount(prevCount);
-      console.error('Failed to toggle bookmark:', error);
-    } finally {
-      setIsSaving(false);
-    }
+    saveMutation.mutate(postId, {
+      onSuccess: (result) => {
+        setBookmarked(!!result.saved);
+        setSaveCount(result.saveCount || 0);
+      },
+      onError: (error) => {
+        setBookmarked(prevSaved);
+        setSaveCount(prevCount);
+        console.error('Failed to toggle bookmark:', error);
+      },
+    });
   };
 
   const countNestedReplies = (comment) => {
