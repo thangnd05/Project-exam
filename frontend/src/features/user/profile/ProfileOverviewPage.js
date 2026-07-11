@@ -11,6 +11,7 @@ import ChangePasswordModal from './modals/ChangePasswordModal';
 import UpdateProfileModal from './modals/UpdateProfileModal';
 import ProfileSectionModal from './ProfileSectionModal';
 import styles from './ProfileOverviewPage.module.scss';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes, { buildNextStepPath } from '~/shared/config/Routes';
 import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
@@ -177,21 +178,21 @@ function ProfileOverviewPage() {
                   </div>
 
                   <div className={cx('actionRow')}>
-                    <button
-                      type="button"
-                      className={cx('changePasswordBtn')}
+                    <ButtonPrime
+                      variant="primary"
+                      fullWidth
                       onClick={() => setShowUpdateProfileModal(true)}
                     >
                       Cập nhật thông tin
-                    </button>
-                    <button
-                      type="button"
-                      className={cx('changePasswordBtn', 'secondaryBtn')}
+                    </ButtonPrime>
+                    <ButtonPrime
+                      variant="outline"
+                      fullWidth
                       onClick={() => setShowChangePasswordModal(true)}
                     >
                       <IoLockClosedOutline />
                       Đổi mật khẩu
-                    </button>
+                    </ButtonPrime>
                   </div>
                 </div>
               </section>
@@ -362,13 +363,13 @@ function ProfileOverviewPage() {
                     <h3 className={cx('cardTitle')}>
                       Mục tiêu của tôi
                     </h3>
-                    <button
-                      type="button"
-                      className={cx('targetManageBtn')}
+                    <ButtonPrime
+                      variant="outline"
+                      size="sm"
                       onClick={() => navigate(routes.myTarget)}
                     >
                       Quản lý mục tiêu
-                    </button>
+                    </ButtonPrime>
                   </div>
 
                   {loadingTargets ? (
@@ -378,13 +379,12 @@ function ProfileOverviewPage() {
                       <p className={cx('targetEmptyText')}>
                         Bạn chưa đặt mục tiêu nào. Đặt mục tiêu để cá nhân hóa lộ trình học.
                       </p>
-                      <button
-                        type="button"
-                        className={cx('targetEmptyBtn')}
+                      <ButtonPrime
+                        variant="primary"
                         onClick={() => navigate(routes.myTarget)}
                       >
                         Đặt mục tiêu ngay
-                      </button>
+                      </ButtonPrime>
                     </div>
                   ) : (
                     <div className={cx('targetList')}>
@@ -433,16 +433,18 @@ function ProfileOverviewPage() {
                             )}
 
                             <div className={cx('targetActions')}>
-                              <button
-                                type="button"
-                                className={cx('targetActionBtn', 'targetActionBtnPrimary')}
+                              <ButtonPrime
+                                variant="primary"
+                                size="sm"
+                                className={cx('targetActionFlex')}
                                 onClick={() => navigate(buildNextStepPath(target.examTypeId))}
                               >
                                 Tiếp theo
-                              </button>
-                              <button
-                                type="button"
-                                className={cx('targetActionBtn')}
+                              </ButtonPrime>
+                              <ButtonPrime
+                                variant="outline"
+                                size="sm"
+                                className={cx('targetActionFlex')}
                                 onClick={() =>
                                   navigate(
                                     `${routes.targetDashboard}?examTypeId=${encodeURIComponent(target.examTypeId)}`
@@ -450,10 +452,11 @@ function ProfileOverviewPage() {
                                 }
                               >
                                 Dashboard
-                              </button>
-                              <button
-                                type="button"
-                                className={cx('targetActionBtn')}
+                              </ButtonPrime>
+                              <ButtonPrime
+                                variant="outline"
+                                size="sm"
+                                className={cx('targetActionFlex')}
                                 onClick={() =>
                                   navigate(
                                     `${routes.generatePlan}?examTypeId=${encodeURIComponent(target.examTypeId)}`
@@ -461,22 +464,23 @@ function ProfileOverviewPage() {
                                 }
                               >
                                 Sinh lộ trình
-                              </button>
+                              </ButtonPrime>
                             </div>
                           </article>
                         );
                       })}
 
                       {myTargets.length > TARGET_VISIBLE_COUNT && (
-                        <button
-                          type="button"
-                          className={cx('targetShowMoreBtn')}
+                        <ButtonPrime
+                          variant="ghost"
+                          size="sm"
+                          className={cx('targetShowMore')}
                           onClick={() => setShowAllTargets((prev) => !prev)}
                         >
                           {showAllTargets
                             ? 'Thu gọn'
                             : `Xem thêm ${myTargets.length - TARGET_VISIBLE_COUNT} mục tiêu`}
-                        </button>
+                        </ButtonPrime>
                       )}
                     </div>
                   )}
