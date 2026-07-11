@@ -15,6 +15,7 @@ import {
 import { AuthContext } from "~/shared/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/shared/utils/guestSession";
 import { useTestResult } from "./hooks/useTestResult";
+import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
 import SkillBreakdownChart from "./components/SkillBreakdownChart";
 import ReadinessGauge from "./components/ReadinessGauge";
 import RecoveryPlan from "./components/RecoveryPlan";
@@ -75,9 +76,9 @@ const TestResultPage = () => {
       <div className={cx("wrapper")}>
         <Container>
           <Alert variant="danger">{error}</Alert>
-          <button className="btn btn-primary mt-3" onClick={() => navigate("/")}>
+          <ButtonPrime variant="primary" className="mt-3" onClick={() => navigate("/")}>
             Quay lại trang chủ
-          </button>
+          </ButtonPrime>
         </Container>
       </div>
     );
@@ -154,24 +155,27 @@ const TestResultPage = () => {
                   </div>
                 )}
 
-                <button
-                  className={cx("btn-detail", { "is-locked": !canReview })}
+                <ButtonPrime
+                  variant="outline"
+                  fullWidth
+                  className={cx({ "is-locked": !canReview })}
                   onClick={handleShowDetail}
                 >
                   {!canReview ? <IoLockClosedOutline /> : <IoStatsChartOutline />}
                   Xem đáp án & giải thích
-                </button>
+                </ButtonPrime>
 
-                <button className={cx("btn-home")} onClick={() => navigate("/")}>
+                <ButtonPrime variant="primary" fullWidth onClick={() => navigate("/")}>
                   <IoHomeOutline /> Trang chủ
-                </button>
+                </ButtonPrime>
 
-                <button
-                  className={cx("btn-review")}
+                <ButtonPrime
+                  variant="ghost"
+                  fullWidth
                   onClick={() => navigate(`/tests/history/${testId}`)}
                 >
                   <IoSchoolOutline /> Lịch sử bài thi
-                </button>
+                </ButtonPrime>
               </div>
             </div>
           </div>
@@ -182,11 +186,7 @@ const TestResultPage = () => {
                 <ReadinessGauge enhanced={enhanced} />
 
                 {enhanced.percentile != null && (
-                  <div style={{
-                    marginTop: 16, padding: '12px 16px', borderRadius: 12,
-                    background: '#f0f9ff', border: '1px solid #bae6fd',
-                    textAlign: 'center', fontSize: 14, color: '#0369a1',
-                  }}>
+                  <div className={cx("percentile-box")}>
                     Bạn làm tốt hơn <strong>{enhanced.percentile}%</strong> người đã từng làm bài này
                   </div>
                 )}

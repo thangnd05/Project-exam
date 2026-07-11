@@ -8,6 +8,7 @@ import { AuthContext } from "~/shared/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/shared/utils/guestSession";
 import { getFullMediaUrl } from "~/shared/utils/mediaUrl";
 import { useTestReview } from "./hooks/useTestReview";
+import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
 import styles from "./TestReviewPage.module.scss";
 
 const cx = classNames.bind(styles);
@@ -269,12 +270,12 @@ const TestReviewPage = () => {
       <div className={cx("wrapper")}>
         <Container>
           <Alert variant="warning">{error}</Alert>
-          <button
-            className={cx("back-btn")}
+          <ButtonPrime
+            variant="outline"
             onClick={() => navigate(`/tests/result/${userTestId}`)}
           >
             Quay lại kết quả
-          </button>
+          </ButtonPrime>
         </Container>
       </div>
     );
@@ -283,15 +284,15 @@ const TestReviewPage = () => {
     <div className={cx("wrapper")}>
       <Container fluid className={cx("content")}>
         <div className={cx("back-bar")}>
-          <button
-            className={cx("back-btn")}
+          <ButtonPrime
+            variant="outline"
             onClick={() => navigate(`/tests/result/${userTestId}`)}
           >
-             Quay lại kết quả
-          </button>
-          <button className={cx("back-btn", "secondary")} onClick={() => navigate("/")}>
+            Quay lại kết quả
+          </ButtonPrime>
+          <ButtonPrime variant="ghost" onClick={() => navigate("/")}>
             <IoHomeOutline /> Trang chủ
-          </button>
+          </ButtonPrime>
         </div>
 
         <h2 className={cx("section-title")}>Chi tiết bài làm</h2>
