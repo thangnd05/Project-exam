@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import {
-  createOrUpdateUserTarget,
-  deleteUserTarget,
-  getUserTarget,
-} from '~/shared/api/userTargetApi';
+import { getUserTarget } from '~/shared/api/userTargetApi';
 import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
 import useMilestoneScoring from '~/shared/hooks/useMilestoneScoring';
 import { useUserTargetData } from './hooks/useUserTargetData';
+import {
+  useSaveUserTarget,
+  useDeleteUserTarget,
+} from './hooks/useUserTargetMutations';
 
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);
@@ -21,11 +21,14 @@ function UserTargetPage() {
   const [targetScore, setTargetScore] = useState('');
   const [customParts, setCustomParts] = useState({});
   const [currentTarget, setCurrentTarget] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
   const { examTypes, examParts, skills, scoringConversions, milestones } =
     useUserTargetData(selectedExamTypeId);
+
+  const saveMutation = useSaveUserTarget();
+  const deleteMutation = useDeleteUserTarget();
+  const loading = saveMutation.isPending || deleteMutation.isPending;
 
   useEffect(() => {
     const examTypeIdFromQuery = searchParams.get('examTypeId');
@@ -107,7 +110,7 @@ function UserTargetPage() {
     }));
   }, [targetScore, matchedMilestone, filteredParts]);
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (hasSavedTarget) {
       setMessage('Bạn đã có mục tiêu hiện tại. Vui lòng xóa mục tiêu cũ trước khi lưu mới.');
       return;
@@ -116,46 +119,45 @@ function UserTargetPage() {
       setMessage('Nhập điểm mục tiêu trước.');
       return;
     }
-    setLoading(true);
     setMessage('');
-    try {
-      const allParts = partRequirements.map((pr) => ({
-        examPartId: pr.examPartId,
-        customPercentage:
-          customParts[pr.examPartId] !== undefined
-            ? Number(customParts[pr.examPartId])
-            : pr.requiredPercentage,
-      }));
 
-      const result = await createOrUpdateUserTarget({
+    const allParts = partRequirements.map((pr) => ({
+      examPartId: pr.examPartId,
+      customPercentage:
+        customParts[pr.examPartId] !== undefined
+          ? Number(customParts[pr.examPartId])
+          : pr.requiredPercentage,
+    }));
+
+    saveMutation.mutate(
+      {
         examTypeId: selectedExamTypeId,
         targetScore: Number(targetScore),
         customParts: allParts,
-      });
-      setCurrentTarget(result);
-      setMessage('Đã lưu mục tiêu thành công!');
-    } catch {
-      setMessage('Lỗi khi lưu mục tiêu.');
-    } finally {
-      setLoading(false);
-    }
+      },
+      {
+        onSuccess: (result) => {
+          setCurrentTarget(result);
+          setMessage('Đã lưu mục tiêu thành công!');
+        },
+        onError: () => setMessage('Lỗi khi lưu mục tiêu.'),
+      },
+    );
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!selectedExamTypeId) return;
-    setLoading(true);
     setMessage('');
-    try {
-      await deleteUserTarget(selectedExamTypeId);
-      setCurrentTarget(null);
-      setTargetScore('');
-      setCustomParts({});
-      setMessage('Đã xóa mục tiêu.');
-    } catch {
-      setMessage('Lỗi khi xóa mục tiêu.');
-    } finally {
-      setLoading(false);
-    }
+
+    deleteMutation.mutate(selectedExamTypeId, {
+      onSuccess: () => {
+        setCurrentTarget(null);
+        setTargetScore('');
+        setCustomParts({});
+        setMessage('Đã xóa mục tiêu.');
+      },
+      onError: () => setMessage('Lỗi khi xóa mục tiêu.'),
+    });
   };
 
   const handlePartChange = (examPartId, value) => {

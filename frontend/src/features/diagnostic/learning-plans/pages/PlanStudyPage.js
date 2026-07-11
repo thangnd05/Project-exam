@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { getCurrentSession, submitSession } from '~/shared/api/learningPlanApi';
+import { getCurrentSession } from '~/shared/api/learningPlanApi';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
+import { useSubmitSession } from './hooks/useSubmitSession';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -20,10 +21,12 @@ function PlanStudyPage() {
   const [session, setSession] = useState(null);
   const [selections, setSelections] = useState({});
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
   const [showReview, setShowReview] = useState(false);
+
+  const submitMutation = useSubmitSession();
+  const submitting = submitMutation.isPending;
 
   const loadSession = useCallback((taskId) => {
     setLoading(true);
@@ -88,7 +91,7 @@ function PlanStudyPage() {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!session?.sessionId) return;
     const answers = (session.questions || []).map((q) => {
       const sel = selections[q.questionId];
@@ -105,17 +108,17 @@ function PlanStudyPage() {
       setError('Vui lòng chọn đáp án cho tất cả câu hỏi.');
       return;
     }
-    setSubmitting(true);
     setError(null);
-    try {
-      const res = await submitSession(learningPlanId, session.sessionId, answers);
-      setResult(res);
-      if (res?.passed) refreshStreak();
-    } catch (err) {
-      setError(err?.response?.data?.message || err.message);
-    } finally {
-      setSubmitting(false);
-    }
+    submitMutation.mutate(
+      { learningPlanId, sessionId: session.sessionId, answers },
+      {
+        onSuccess: (res) => {
+          setResult(res);
+          if (res?.passed) refreshStreak();
+        },
+        onError: (err) => setError(err?.response?.data?.message || err.message),
+      },
+    );
   };
 
   if (loading) {

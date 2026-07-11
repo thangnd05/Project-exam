@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
-import { switchPlan, deletePlan } from '~/shared/api/learningPlanApi';
+import { switchPlan } from '~/shared/api/learningPlanApi';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';
+import { useDeletePlan } from '../hooks/use-delete-plan';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
@@ -66,8 +67,10 @@ const LearningPlanList = forwardRef(function LearningPlanList(
 
   const [switching, setSwitching] = useState(null);
   const [switchTarget, setSwitchTarget] = useState(null);
-  const [deleting, setDeleting] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const deleteMutation = useDeletePlan();
+  const deleting = deleteMutation.isPending ? deleteMutation.variables : null;
 
   useImperativeHandle(ref, () => ({ reload }), [reload]);
 
@@ -86,20 +89,15 @@ const LearningPlanList = forwardRef(function LearningPlanList(
     }
   }, [switchTarget, reload]);
 
-  const handleDeleteConfirm = useCallback(async () => {
+  const handleDeleteConfirm = useCallback(() => {
     if (!deleteTarget) return;
     const planId = deleteTarget.learningPlanId;
     setDeleteTarget(null);
-    setDeleting(planId);
-    try {
-      await deletePlan(planId);
-      reload();
-    } catch (err) {
-      toast.error(err?.response?.data?.message || 'Lỗi khi xóa plan');
-    } finally {
-      setDeleting(null);
-    }
-  }, [deleteTarget, reload]);
+    deleteMutation.mutate(planId, {
+      onSuccess: () => reload(),
+      onError: (err) => toast.error(err?.response?.data?.message || 'Lỗi khi xóa plan'),
+    });
+  }, [deleteTarget, deleteMutation, reload]);
 
   const handleFilterChange = (value) => {
     if (isControlled) {
