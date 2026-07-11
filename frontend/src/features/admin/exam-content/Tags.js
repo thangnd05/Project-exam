@@ -4,16 +4,11 @@ import classNames from 'classnames/bind';
 import {ChevronDown, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
 
 import {getExamTypes} from '~/shared/api/examTypeApi';
-import {
-  getTagTreeByExamType,
-  getTagsFlatByExamType,
-  createTag,
-  updateTag,
-  deleteTag,
-} from '~/shared/api/tagApi';
+import {getTagTreeByExamType, getTagsFlatByExamType} from '~/shared/api/tagApi';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import TagFormModal from '../modals/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
+import {useTags} from './hooks/useTags';
 import styles from './Tags.module.scss';
 
 const cx = classNames.bind(styles);
@@ -103,10 +98,13 @@ function TagsManagement() {
   const [editingTagId, setEditingTagId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingTag, setDeletingTag] = useState(null);
   const [expandedIds, setExpandedIds] = useState(new Set());
+
+  const {createMutation, updateMutation, deleteMutation} = useTags();
+  const submitting =
+    createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
   useEffect(() => {
     getExamTypes()
@@ -207,7 +205,7 @@ function TagsManagement() {
     setShowFormModal(true);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const examTypeId = formState.examTypeId || selectedExamTypeId;
     if (!examTypeId) {
       setErrorMessage('Vui lòng chọn loại kỳ thi.');
@@ -217,18 +215,14 @@ function TagsManagement() {
       setErrorMessage('Tên tag không được để trống.');
       return;
     }
-    setSubmitting(true);
     setErrorMessage('');
-    try {
-      const payload = {
-        name: formState.name.trim(),
-        examTypeId,
-        parentId: formState.parentId || null,
-      };
-      const savedTag = editingTagId
-        ? await updateTag(editingTagId, payload)
-        : await createTag(payload);
+    const payload = {
+      name: formState.name.trim(),
+      examTypeId,
+      parentId: formState.parentId || null,
+    };
 
+    const onSuccess = (savedTag) => {
       const targetExamTypeId = savedTag?.examTypeId || examTypeId;
       if (targetExamTypeId !== selectedExamTypeId) {
         setSelectedExamTypeId(targetExamTypeId);
@@ -236,7 +230,7 @@ function TagsManagement() {
       setSearchTerm('');
       setShowFormModal(false);
       resetForm();
-      await fetchTags(targetExamTypeId, {preserveExpanded: true});
+      fetchTags(targetExamTypeId, {preserveExpanded: true});
       if (savedTag?.tagId) {
         setExpandedIds((previous) => {
           const next = new Set(previous);
@@ -247,27 +241,29 @@ function TagsManagement() {
           return next;
         });
       }
-    } catch (error) {
+    };
+    const onError = (error) => {
       const apiMessage = error?.response?.data?.message;
       setErrorMessage(apiMessage || 'Không thể lưu tag. Vui lòng thử lại.');
-    } finally {
-      setSubmitting(false);
+    };
+
+    if (editingTagId) {
+      updateMutation.mutate({tagId: editingTagId, payload}, {onSuccess, onError});
+    } else {
+      createMutation.mutate(payload, {onSuccess, onError});
     }
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (!deletingTag) return;
-    setSubmitting(true);
     setErrorMessage('');
-    try {
-      await deleteTag(deletingTag.tagId);
-      setDeletingTag(null);
-      await fetchTags(undefined, {preserveExpanded: true});
-    } catch {
-      setErrorMessage('Không thể xóa tag này.');
-    } finally {
-      setSubmitting(false);
-    }
+    deleteMutation.mutate(deletingTag.tagId, {
+      onSuccess: () => {
+        setDeletingTag(null);
+        fetchTags(undefined, {preserveExpanded: true});
+      },
+      onError: () => setErrorMessage('Không thể xóa tag này.'),
+    });
   };
 
   return (

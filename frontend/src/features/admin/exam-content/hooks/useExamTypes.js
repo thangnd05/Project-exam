@@ -5,10 +5,12 @@ import {
   deleteExamType,
   getExamTypes,
   updateExamType,
+  updateExamTypeLayout,
 } from '~/shared/api/examTypeApi';
 
 export const examTypeKeys = {
   all: ['exam-types'],
+  layout: (examTypeId) => ['exam-type-layout', examTypeId ?? null],
 };
 
 const normalizeList = (data) =>
@@ -48,4 +50,16 @@ export function useExamTypes() {
     updateMutation,
     deleteMutation,
   };
+}
+
+export function useUpdateExamTypeLayout({onSuccess, onError} = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({examTypeId, config}) => updateExamTypeLayout(examTypeId, config),
+    onSuccess: (data, variables, ...rest) => {
+      qc.invalidateQueries({queryKey: examTypeKeys.layout(variables.examTypeId)});
+      onSuccess?.(data, variables, ...rest);
+    },
+    onError,
+  });
 }

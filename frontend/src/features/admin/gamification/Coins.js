@@ -27,17 +27,19 @@ function CoinsManagement() {
   const [formState, setFormState] = useState(defaultFormState);
   const [userOptions, setUserOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const [deletingWallet, setDeletingWallet] = useState(null);
 
   const {
     wallets,
     isLoading: loading,
     isError,
-    createWallet,
-    updateWallet,
-    deleteWallet,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   } = useCoins();
+
+  const submitting =
+    createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
   const filteredWallets = useMemo(() => {
     const normalized = keyword.trim().toLowerCase();
@@ -82,7 +84,7 @@ function CoinsManagement() {
     setShowModal(true);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const balanceNumber = Number(formState.balance);
     if (Number.isNaN(balanceNumber) || balanceNumber < 0) {
       setErrorMessage('Số xu phải là số không âm.');
@@ -93,45 +95,38 @@ function CoinsManagement() {
       return;
     }
 
-    setSubmitting(true);
     setErrorMessage('');
-    try {
-      if (editingWallet) {
-        await updateWallet({
-          userId: editingWallet.userId,
-          balance: balanceNumber,
-        });
-      } else {
-        await createWallet({
-          userId: formState.userId,
-          balance: balanceNumber,
-        });
-      }
+    const onSuccess = () => {
       setShowModal(false);
       resetForm();
-    } catch (error) {
+    };
+    const onError = (error) =>
       setErrorMessage(
         error?.response?.data?.message || 'Không thể lưu ví xu. Vui lòng thử lại.',
       );
-    } finally {
-      setSubmitting(false);
+
+    if (editingWallet) {
+      updateMutation.mutate(
+        {userId: editingWallet.userId, balance: balanceNumber},
+        {onSuccess, onError},
+      );
+    } else {
+      createMutation.mutate(
+        {userId: formState.userId, balance: balanceNumber},
+        {onSuccess, onError},
+      );
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!deletingWallet) {
       return;
     }
-    setSubmitting(true);
     setErrorMessage('');
-    try {
-      await deleteWallet(deletingWallet.userId);
-      setDeletingWallet(null);
-    } catch (error) {
-      setErrorMessage('Không thể xóa ví xu.');
-    } finally {
-      setSubmitting(false);
-    }
+    deleteMutation.mutate(deletingWallet.userId, {
+      onSuccess: () => setDeletingWallet(null),
+      onError: () => setErrorMessage('Không thể xóa ví xu.'),
+    });
   };
 
   const columns = [

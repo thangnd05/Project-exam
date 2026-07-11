@@ -14,11 +14,8 @@ import {
 } from 'lucide-react';
 import classNames from 'classnames/bind';
 
-import {
-  getExamTypeById,
-  getOwnExamTypeLayout,
-  updateExamTypeLayout,
-} from '~/shared/api/examTypeApi';
+import {getExamTypeById, getOwnExamTypeLayout} from '~/shared/api/examTypeApi';
+import {useUpdateExamTypeLayout} from './hooks/useExamTypes';
 import { resolveLayoutConfig } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,
@@ -83,9 +80,11 @@ function ExamTypeLayoutEditor() {
   const [examTypeName, setExamTypeName] = useState('');
   const [selectedId, setSelectedId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [dragId, setDragId] = useState(null);
   const [dropZone, setDropZone] = useState(null);
+
+  const saveLayout = useUpdateExamTypeLayout();
+  const saving = saveLayout.isPending;
 
   useEffect(() => {
     let cancelled = false;
@@ -187,17 +186,16 @@ function ExamTypeLayoutEditor() {
     setSelectedId(null);
   }, []);
 
-  const handleSave = useCallback(async () => {
-    setSaving(true);
-    try {
-      await updateExamTypeLayout(examTypeId, JSON.stringify(config));
-      toast.success('Đã lưu giao diện làm bài cho loại đề này.');
-    } catch (err) {
-      toast.error(err?.response?.data?.message || 'Lưu thất bại. Vui lòng thử lại.');
-    } finally {
-      setSaving(false);
-    }
-  }, [config, examTypeId]);
+  const handleSave = useCallback(() => {
+    saveLayout.mutate(
+      {examTypeId, config: JSON.stringify(config)},
+      {
+        onSuccess: () => toast.success('Đã lưu giao diện làm bài cho loại đề này.'),
+        onError: (err) =>
+          toast.error(err?.response?.data?.message || 'Lưu thất bại. Vui lòng thử lại.'),
+      },
+    );
+  }, [config, examTypeId, saveLayout]);
 
   const handleDropOnZone = (zone) => {
     if (dragId) moveBlock(dragId, zone);

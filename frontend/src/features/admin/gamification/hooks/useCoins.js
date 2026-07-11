@@ -44,8 +44,8 @@ export function useCoins() {
     wallets: walletsQuery.data ?? [],
     isLoading: walletsQuery.isLoading,
     isError: walletsQuery.isError,
-    createWallet: createMutation.mutateAsync,
-    updateWallet: updateMutation.mutateAsync,
-    deleteWallet: deleteMutation.mutateAsync,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   };
 }
