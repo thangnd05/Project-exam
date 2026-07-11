@@ -35,92 +35,47 @@
 }
 
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.9rem 1.8rem;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  font-size: var(--font-size-ssm);
-  line-height: 1.25;
-  font-weight: var(--font-weight-semibold);
-  font-family: var(--font-family);
-  color: var(--text-color);
-  background: var(--bg-white);
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
+  @include globalStyles.buttonBase;
+  @include globalStyles.buttonSizeMd;
 }
 
 .btnPrimary {
-  // Dùng gradient chuẩn của hệ nút (giống ButtonPrime variant primary) để đồng bộ toàn site
   @include globalStyles.primaryGradientButton;
 }
 
 .btnSuccess {
-  background: var(--success-text);
-  color: var(--white);
-  border-color: var(--success-text);
-
-  &:hover {
-    color: var(--white);
-    opacity: 0.92;
-  }
+  @include globalStyles.buttonSuccess;
 }
 
 .btnDanger {
-  background: var(--danger-text);
-  color: var(--white);
-  border-color: var(--danger-text);
-
-  &:hover {
-    color: var(--white);
-    opacity: 0.92;
-  }
+  @include globalStyles.buttonDanger;
 }
 
 .btnOutline {
-  border-color: var(--border-color);
-  background: var(--bg-white);
-
-  &:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-  }
+  @include globalStyles.buttonOutline;
 }
 
 .btnGhost {
-  background: transparent;
-  border-color: transparent;
-
-  &:hover {
-    background: var(--hover-color);
-    box-shadow: none;
-    transform: none;
-  }
+  @include globalStyles.buttonGhost;
 }
 
 .btnLg {
-  padding: 1.1rem 2.2rem;
-  font-size: var(--font-size-base);
+  @include globalStyles.buttonSizeLg;
 }
 
 .btnSm {
-  padding: 0.75rem 1.5rem;
-  font-size: var(--font-size-sm);
-  min-height: 3.6rem;
+  @include globalStyles.buttonSizeSm;
+}
+
+.pickTitle {
+  font-size: var(--font-size-xl);
+  margin-bottom: 0.8rem;
+}
+
+.msqHint {
+  font-size: var(--font-size-smd);
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
 }
 
 .filterRow {
@@ -495,20 +450,6 @@
   text-align: center;
   margin-bottom: 2.4rem;
   box-shadow: 0 16px 36px rgba(0, 97, 242, 0.08);
-}
-
-.heroEmoji {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 6.4rem;
-  height: 6.4rem;
-  margin: 0 auto 1.6rem;
-  font-size: 3.2rem;
-  line-height: 1;
-  background: var(--success-bg);
-  border: 1px solid var(--success-border);
-  border-radius: 50%;
 }
 
 .heroTitle {

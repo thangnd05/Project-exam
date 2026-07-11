@@ -176,7 +176,7 @@ function PlanStudyPage() {
 
         <div className={cx('card')}>
           <div className={cx('cardBody')}>
-            <h3 className={cx('title')} style={{ fontSize: 'var(--font-size-xl)', marginBottom: '0.8rem' }}>
+            <h3 className={cx('title', 'pickTitle')}>
               Chọn Part và ải để học
             </h3>
             <p className={cx('muted')} style={{ marginBottom: '1.2rem' }}>{session.message}</p>
@@ -356,7 +356,7 @@ function PlanStudyPage() {
                   <div className={cx('questionNo')}>Câu {idx + 1}</div>
                   <p className={cx('questionText')}>{q.questionText}</p>
                   {q.questionType === 'MSQ' && (
-                    <div className="text-muted mb-1" style={{ fontSize: '1.3rem' }}>Chọn tất cả đáp án đúng:</div>
+                    <div className={cx('msqHint')}>Chọn tất cả đáp án đúng:</div>
                   )}
                   <div className={cx('answerList')}>
                     {(q.answers || []).map((a) => {

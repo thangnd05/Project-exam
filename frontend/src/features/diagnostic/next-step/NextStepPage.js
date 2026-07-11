@@ -193,17 +193,7 @@ function NextStepPage() {
           <h3 className={cx('recoTitle')}>{recommendation.title}</h3>
           <p className={cx('recoDesc')}>{recommendation.desc}</p>
           {recommendation.warning && (
-            <div
-              style={{
-                marginTop: 8,
-                padding: '8px 12px',
-                borderRadius: 6,
-                background: '#fff4e5',
-                border: '1px solid #f0a800',
-                color: '#7a4a00',
-                fontSize: 14,
-              }}
-            >
+            <div className={cx('alert', 'alertWarning')}>
               {recommendation.warning}
             </div>
           )}
