@@ -93,9 +93,6 @@ const ClassListContainer = ({
               viewport={{once: true, amount: 0.5}}
               variants={sectionHeaderVariants}
             >
-              <div className={cx('icon-box')}>
-                <IoSchoolOutline />
-              </div>
               <h3>Lớp tôi giảng dạy</h3>
             </motion.div>
 
@@ -139,9 +136,6 @@ const ClassListContainer = ({
               viewport={{once: true, amount: 0.5}}
               variants={sectionHeaderVariants}
             >
-              <div className={cx('icon-box')}>
-                <IoPeopleOutline />
-              </div>
               <h3>Lớp tôi tham gia học</h3>
             </motion.div>
 
