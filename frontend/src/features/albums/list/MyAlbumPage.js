@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
-import { IoAddCircleOutline, IoFolderOpenOutline, IoDocumentTextOutline, IoGridOutline, IoListOutline, IoAdd } from "react-icons/io5";
+import { IoAddCircleOutline, IoFolderOpenOutline, IoGridOutline, IoListOutline, IoAdd } from "react-icons/io5";
 
 import styles from './MyAlbumPage.module.scss';
 

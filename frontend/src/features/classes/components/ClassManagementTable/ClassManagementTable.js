@@ -1,4 +1,3 @@
-import React from 'react';
 import { Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
   IoPencilOutline,

@@ -1,11 +1,4 @@
-import {
-  IoPeopleOutline,
-  IoKeyOutline,
-  IoBookOutline,
-  IoArrowForwardOutline,
-  IoPersonOutline,
-  IoSettingsOutline,
-} from 'react-icons/io5';
+import { IoPeopleOutline, IoKeyOutline, IoPersonOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import styles from './ClassCard.module.scss';

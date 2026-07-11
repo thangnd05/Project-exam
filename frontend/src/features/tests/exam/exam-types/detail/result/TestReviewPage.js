@@ -2,13 +2,7 @@ import { useContext, useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
-import {
-  IoArrowBackOutline,
-  IoHomeOutline,
-  IoListOutline,
-  IoCloseOutline,
-  IoCheckmarkCircleOutline,
-} from "react-icons/io5";
+import { IoHomeOutline, IoListOutline, IoCloseOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
 
 import { AuthContext } from "~/shared/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/shared/utils/guestSession";

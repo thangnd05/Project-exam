@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from '~/shared/api/axiosClient';
 import { login as loginRequest, register as registerRequest } from '~/shared/api/authApi';
 import { useNavigate, useLocation, Link } from 'react-router-dom';

@@ -1,4 +1,3 @@
-import React from 'react';
 import classNames from 'classnames/bind';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import CreateTestFormBody from './creator/CreateTestFormBody';

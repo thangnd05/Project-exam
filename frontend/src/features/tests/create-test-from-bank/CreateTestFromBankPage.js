@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/shared/api/testApi';
 import { createTestPart } from '~/shared/api/testPartApi';

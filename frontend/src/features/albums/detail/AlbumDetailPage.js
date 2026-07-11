@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '~/shared/api/axiosClient';
 import { useAlbumVocabularies, useDeleteVocabulary } from './hooks/useAlbumVocabularies';
@@ -15,19 +15,7 @@ import BulkCreateVocabularyModal from './modals/BulkCreateVocabularyModal';
 import UpdateVocabularyModal from './modals/UpdateVocabularyModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import classNames from 'classnames/bind';
-import {
-  IoArrowBack,
-  IoAdd,
-  IoFlashOutline,
-  IoTrashOutline,
-  IoPencilOutline,
-  IoChevronBack,
-  IoChevronForward,
-  IoListOutline,
-  IoSchoolOutline,
-  IoVolumeHighOutline,
-  IoCodeSlashOutline
-} from 'react-icons/io5';
+import { IoAdd, IoFlashOutline, IoTrashOutline, IoPencilOutline, IoChevronBack, IoChevronForward, IoListOutline, IoSchoolOutline, IoVolumeHighOutline, IoCodeSlashOutline } from 'react-icons/io5';
 
 import styles from './AlbumDetailPage.module.scss';
 

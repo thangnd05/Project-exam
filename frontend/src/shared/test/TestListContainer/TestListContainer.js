@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import { useState } from 'react';
 import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';

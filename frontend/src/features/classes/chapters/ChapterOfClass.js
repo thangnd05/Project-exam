@@ -1,17 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
-import {
-  IoBookOutline,
-  IoArrowBackOutline,
-  IoDocumentTextOutline,
-  IoCalendarOutline,
-  IoAdd,
-  IoGridOutline,
-  IoListOutline,
-} from 'react-icons/io5';
+import { IoBookOutline, IoDocumentTextOutline, IoCalendarOutline, IoAdd, IoGridOutline, IoListOutline } from 'react-icons/io5';
 
 import styles from './ChapterOfClass.module.scss';
 import CreateChapterModal from '../modals/CreateChapterModal';

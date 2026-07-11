@@ -1,4 +1,3 @@
-import React from 'react';
 import { Row, Col, Table, Badge } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';

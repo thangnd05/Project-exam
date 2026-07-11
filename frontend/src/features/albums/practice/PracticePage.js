@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import {useParams} from 'react-router-dom';
 import { generatePracticeQuestion, checkPracticeAnswer } from '~/features/albums/practice/api/practiceQuestionApi';
 import { getTtsUrl } from '~/shared/utils/mediaUrl';

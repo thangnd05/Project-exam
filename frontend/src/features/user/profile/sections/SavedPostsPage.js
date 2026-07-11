@@ -1,20 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
-import {
-  IoArrowBackOutline,
-  IoEyeOutline,
-  IoHeartOutline,
-  IoChatbubbleOutline,
-  IoBookmarkOutline,
-  IoSearchOutline,
-  IoEllipsisVertical,
-  IoChevronBackOutline,
-  IoChevronForwardOutline,
-  IoImageOutline,
-} from 'react-icons/io5';
+import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, IoSearchOutline, IoEllipsisVertical, IoChevronBackOutline, IoChevronForwardOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import routes from '~/shared/config/Routes';

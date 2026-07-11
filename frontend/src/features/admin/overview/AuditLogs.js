@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 
 import {formatDateTime} from '~/shared/utils/format-date-time';

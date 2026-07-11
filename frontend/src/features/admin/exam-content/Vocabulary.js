@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Badge, Button, Form } from 'react-bootstrap';
 import {
     Plus,

@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import { useState } from 'react';
 import classNames from 'classnames/bind';
 import {Alert, Spinner} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
-import {IoArrowBackOutline, IoCalendarOutline, IoStar} from 'react-icons/io5';
+import { IoCalendarOutline, IoStar } from 'react-icons/io5';
 import {toast} from 'react-toastify';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import routes from '~/shared/config/Routes';

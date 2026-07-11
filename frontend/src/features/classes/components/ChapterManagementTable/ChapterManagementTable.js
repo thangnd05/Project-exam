@@ -1,4 +1,3 @@
-import React from 'react';
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {IoPencilOutline, IoTrashOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';

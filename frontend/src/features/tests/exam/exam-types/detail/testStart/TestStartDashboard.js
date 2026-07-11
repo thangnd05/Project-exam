@@ -1,4 +1,3 @@
-import { IoInformationCircleOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './TestStartPage.module.scss';
 

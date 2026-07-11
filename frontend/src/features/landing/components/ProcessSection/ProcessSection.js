@@ -1,4 +1,3 @@
-import React from 'react';
 import {motion} from 'framer-motion';
 import classNames from 'classnames/bind';
 import styles from './ProcessSection.module.scss';

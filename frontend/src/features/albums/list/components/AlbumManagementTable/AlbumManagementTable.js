@@ -1,12 +1,6 @@
-import React from 'react';
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
-import {
-  IoPencilOutline,
-  IoTrashOutline,
-  IoPlayOutline,
-  IoBookOutline,
-} from 'react-icons/io5';
+import { IoPencilOutline, IoTrashOutline, IoPlayOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './AlbumManagementTable.module.scss';
 

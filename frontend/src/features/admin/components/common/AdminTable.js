@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronLeft, ChevronRight} from 'lucide-react';

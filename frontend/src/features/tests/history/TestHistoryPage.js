@@ -3,16 +3,7 @@ import { useTestHistory } from './hooks/useTestHistory';
 import { Container, Table, Spinner } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
-import {
-  IoArrowBack,
-  IoEyeOutline,
-  IoCalendarOutline,
-  IoStatsChartOutline,
-  IoCheckmarkCircleOutline,
-  IoHourglassOutline,
-  IoCloseCircleOutline,
-  IoDocumentTextOutline,
-} from 'react-icons/io5';
+import { IoEyeOutline, IoCalendarOutline, IoStatsChartOutline, IoCheckmarkCircleOutline, IoHourglassOutline, IoCloseCircleOutline, IoDocumentTextOutline } from 'react-icons/io5';
 
 import style from './TestHistory.module.scss';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';

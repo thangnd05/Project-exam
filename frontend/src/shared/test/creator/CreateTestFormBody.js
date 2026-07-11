@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
 import { getClassById } from '~/shared/api/classApi';
 import { getChapterById } from '~/shared/api/chapterApi';

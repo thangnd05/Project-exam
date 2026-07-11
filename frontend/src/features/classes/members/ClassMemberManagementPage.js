@@ -1,19 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import {
-  IoArrowBack,
-  IoPeopleOutline,
-  IoCheckmarkCircle,
-  IoTimeOutline,
-  IoPersonRemoveOutline,
-  IoSearchOutline,
-  IoRefreshOutline,
-  IoShieldCheckmarkOutline,
-  IoChevronDown,
-  IoChevronUp,
-} from 'react-icons/io5';
+import { IoPeopleOutline, IoCheckmarkCircle, IoTimeOutline, IoPersonRemoveOutline, IoSearchOutline, IoRefreshOutline, IoChevronDown, IoChevronUp } from 'react-icons/io5';
 import { Spinner, Badge, Table, Tabs, Tab } from 'react-bootstrap';
 
 import styles from './ClassMemberManagementPage.module.scss';

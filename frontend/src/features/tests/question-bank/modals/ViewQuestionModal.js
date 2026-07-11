@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import { useEffect, useRef } from 'react';
 import {Spinner, Alert} from 'react-bootstrap';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';

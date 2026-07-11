@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import { useMemo, useState } from 'react';
 import {Badge, Button} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 

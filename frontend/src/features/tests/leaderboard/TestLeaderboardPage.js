@@ -2,7 +2,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Container, Spinner, Table} from 'react-bootstrap';
 import {motion} from 'framer-motion';
 import classNames from 'classnames/bind';
-import {IoArrowBack, IoPodiumOutline} from 'react-icons/io5';
+import { IoPodiumOutline } from 'react-icons/io5';
 
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import styles from './TestLeaderboardPage.module.scss';

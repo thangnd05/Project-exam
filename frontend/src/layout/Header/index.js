@@ -6,7 +6,7 @@ import {
   Dropdown,
   Image,
 } from 'react-bootstrap';
-import React, {useState} from 'react';
+import { useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';

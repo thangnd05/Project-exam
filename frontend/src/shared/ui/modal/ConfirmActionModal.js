@@ -1,4 +1,3 @@
-import React from 'react';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
 import ConfirmModal from './ConfirmModal';
 

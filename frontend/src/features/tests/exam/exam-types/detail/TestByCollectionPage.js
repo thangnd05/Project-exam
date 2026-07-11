@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-import { IoArrowBack, IoDocumentTextOutline } from 'react-icons/io5';
+import { IoDocumentTextOutline } from 'react-icons/io5';
 import routes, { buildExamTypeDetailPath } from '~/shared/config/Routes';
 
 import TestListContainer from '~/shared/test/TestListContainer/TestListContainer';

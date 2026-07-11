@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 import { IoClose, IoWarningOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
