@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query';
 import {Alert, Button, Spinner} from 'react-bootstrap';
 import {AnimatePresence, motion} from 'framer-motion';
 import {
@@ -38,33 +39,57 @@ const BANK_SCOPE = {
   CLASS: 'class',
 };
 
+export const questionBankKeys = {
+  collections: ['question-bank', 'collections'],
+  myClasses: ['question-bank', 'my-classes'],
+  chapters: (classId) => ['question-bank', 'chapters', classId],
+  chapterCount: (classId, chapterId) => ['question-bank', 'chapter-count', classId, chapterId],
+  chapterQuestions: (classId, chapterId) => ['question-bank', 'chapter-questions', classId, chapterId],
+  partQuestions: (partId, scope) => ['question-bank', 'part-questions', partId, scope],
+};
+
+const normalizeCollections = (data) =>
+  Array.isArray(data) ? data : (data?.data || data?.content || []);
+
+const normalizeMyClasses = (result) =>
+  Array.isArray(result) ? result : result?.classes || [];
+
+const normalizeChapters = (raw) =>
+  Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : []);
+
+const normalizePartQuestions = (data) =>
+  Array.isArray(data) ? data : (data?.data ?? data?.questions ?? []);
+
+const normalizeChapterQuestions = (raw) =>
+  Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : []);
+
 const PersonalQuestionBankPage = () => {
 
   const canAccessAdminBank = useHasPermission('QUESTION:MANAGE');
+  const queryClient = useQueryClient();
   const [bankScope, setBankScope] = useState(
     canAccessAdminBank ? BANK_SCOPE.ADMIN : BANK_SCOPE.PERSONAL,
   );
-  const [classes, setClasses] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState('');
   const [examTypeId, setExamTypeId] = useState('');
-  const [partConfigs, setPartConfigs] = useState({});
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
   const [deleteQuestionTarget, setDeleteQuestionTarget] = useState(null);
   const [viewingQuestionId, setViewingQuestionId] = useState(null);
 
-  const [chapters, setChapters] = useState([]);
-  const [chapterConfigs, setChapterConfigs] = useState({});
-  const [chaptersLoading, setChaptersLoading] = useState(false);
   const [editingChapterId, setEditingChapterId] = useState(null);
-  const [collectionsMap, setCollectionsMap] = useState({});
-  const [collectionsList, setCollectionsList] = useState([]);
   const [collectionFilter, setCollectionFilter] = useState('');
 
   const [includeChildCollections, setIncludeChildCollections] = useState(true);
 
+  const [expandedParts, setExpandedParts] = useState(() => new Set());
+  const [expandedChapters, setExpandedChapters] = useState(() => new Set());
+
   const {examTypes, examParts} = useBaseMetaData(examTypeId);
+
+  const isPartScope =
+    bankScope === BANK_SCOPE.PERSONAL || bankScope === BANK_SCOPE.ADMIN;
 
   const deleteMutation = useDeleteQuestion();
   const isDeleting = (id) =>
@@ -76,24 +101,20 @@ const PersonalQuestionBankPage = () => {
     }
   }, [canAccessAdminBank, bankScope]);
 
-  useEffect(() => {
-    getQuestionCollections()
-      .then((data) => {
-        const list = Array.isArray(data)
-          ? data
-          : (data?.data || data?.content || []);
-        const map = {};
-        list.forEach((c) => {
-          if (c?.collectionId) map[c.collectionId] = c.name || '(Không tên)';
-        });
-        setCollectionsMap(map);
-        setCollectionsList(list);
-      })
-      .catch(() => {
-        setCollectionsMap({});
-        setCollectionsList([]);
-      });
-  }, []);
+  // ----- Collections -----
+  const collectionsQuery = useQuery({
+    queryKey: questionBankKeys.collections,
+    queryFn: getQuestionCollections,
+    select: normalizeCollections,
+  });
+  const collectionsList = collectionsQuery.data ?? [];
+  const collectionsMap = useMemo(() => {
+    const map = {};
+    collectionsList.forEach((c) => {
+      if (c?.collectionId) map[c.collectionId] = c.name || '(Không tên)';
+    });
+    return map;
+  }, [collectionsList]);
 
   const getCollectionName = (id) => {
     if (!id) return '';
@@ -115,199 +136,166 @@ const PersonalQuestionBankPage = () => {
     return questions.filter((q) => q.collectionId === collectionFilter);
   };
 
+  // ----- My classes -----
+  const classesQuery = useQuery({
+    queryKey: questionBankKeys.myClasses,
+    queryFn: getMyClasses,
+    select: normalizeMyClasses,
+  });
+  const classes = classesQuery.data ?? [];
+
+  // ----- Part-based bank (personal / admin) -----
+  const partQueries = useQueries({
+    queries: (isPartScope && examTypeId ? (examParts || []) : []).map((p) => ({
+      queryKey: questionBankKeys.partQuestions(p.examPartId, bankScope),
+      queryFn: () =>
+        getQuestionsByPart(
+          p.examPartId,
+          bankScope === BANK_SCOPE.ADMIN ? { bank: 'admin' } : {},
+        ),
+      enabled: isPartScope && !!examTypeId,
+      select: normalizePartQuestions,
+    })),
+  });
+
+  const partConfigs = useMemo(() => {
+    const map = {};
+    (examParts || []).forEach((p, i) => {
+      const q = partQueries[i];
+      map[p.examPartId] = {
+        expanded: expandedParts.has(p.examPartId),
+        loading: q?.isLoading ?? false,
+        questions: q?.data ?? [],
+      };
+    });
+    return map;
+  }, [examParts, partQueries, expandedParts]);
+
+  const anyPartError = partQueries.some((q) => q.isError);
   useEffect(() => {
-    getMyClasses()
-      .then((result) => {
-        const data = Array.isArray(result)
-          ? result
-          : result?.classes || [];
-        setClasses(data);
-      })
-      .catch(() => setClasses([]));
-  }, []);
-
-  const loadQuestionsForPart = useCallback(async (partId, scope) => {
-    setPartConfigs((prev) => ({
-      ...prev,
-      [partId]: {...(prev[partId] || {}), loading: true},
-    }));
-
-    try {
-      const params = scope === BANK_SCOPE.ADMIN ? {bank: 'admin'} : {};
-      const data = await getQuestionsByPart(partId, params);
-      const list = Array.isArray(data)
-        ? data
-        : (data?.data ?? data?.questions ?? []);
-      setPartConfigs((prev) => ({
-        ...prev,
-        [partId]: {
-          ...(prev[partId] || {}),
-          loading: false,
-          questions: list,
-        },
-      }));
-    } catch (error) {
-      setPartConfigs((prev) => ({
-        ...prev,
-        [partId]: {
-          ...(prev[partId] || {}),
-          loading: false,
-          questions: [],
-        },
-      }));
+    if (anyPartError) {
       setNotification({
         type: 'danger',
         message: 'Không tải được danh sách câu hỏi.',
       });
     }
-  }, []);
+  }, [anyPartError]);
 
+  // Collapse all parts when the exam type or bank scope changes.
   useEffect(() => {
-    const isPartScope =
-      bankScope === BANK_SCOPE.PERSONAL || bankScope === BANK_SCOPE.ADMIN;
-    if (!isPartScope || !examTypeId || !examParts?.length) {
-      setPartConfigs({});
-      return;
-    }
-
-    const initial = {};
-    examParts.forEach((p) => {
-      initial[p.examPartId] = {expanded: false, loading: true, questions: []};
-    });
-    setPartConfigs(initial);
-    examParts.forEach((p) => loadQuestionsForPart(p.examPartId, bankScope));
-  }, [examTypeId, examParts, bankScope, loadQuestionsForPart]);
+    setExpandedParts(new Set());
+  }, [examTypeId, bankScope]);
 
   const togglePartExpanded = (partId) => {
-    setPartConfigs((prev) => ({
-      ...prev,
-      [partId]: {...(prev[partId] || {}), expanded: !prev[partId]?.expanded},
-    }));
+    setExpandedParts((prev) => {
+      const next = new Set(prev);
+      if (next.has(partId)) next.delete(partId);
+      else next.add(partId);
+      return next;
+    });
   };
 
+  // ----- Chapter-based bank (class) -----
+  const chaptersQuery = useQuery({
+    queryKey: questionBankKeys.chapters(selectedClassId),
+    queryFn: () => getChaptersByClass(selectedClassId),
+    enabled: bankScope === BANK_SCOPE.CLASS && !!selectedClassId,
+    select: normalizeChapters,
+  });
+  const chapters = chaptersQuery.data ?? [];
+  const chaptersLoading = chaptersQuery.isLoading;
+
   useEffect(() => {
-    if (bankScope !== BANK_SCOPE.CLASS || !selectedClassId) {
-      setChapters([]);
-      setChapterConfigs({});
-      return;
+    if (chaptersQuery.isError) {
+      setNotification({
+        type: 'danger',
+        message: 'Không tải được danh sách chương.',
+      });
     }
+  }, [chaptersQuery.isError]);
 
-    setChaptersLoading(true);
-    getChaptersByClass(selectedClassId)
-      .then((raw) => {
-        const data = Array.isArray(raw)
-          ? raw
-          : Array.isArray(raw?.data)
-            ? raw.data
-            : [];
-        setChapters(data);
+  const chapterCountQueries = useQueries({
+    queries: chapters.map((ch) => ({
+      queryKey: questionBankKeys.chapterCount(selectedClassId, ch.chapterId),
+      queryFn: () =>
+        getMyClassBankCount({ classId: selectedClassId, chapterId: ch.chapterId }),
+      enabled: bankScope === BANK_SCOPE.CLASS && !!selectedClassId,
+      select: (count) => (typeof count === 'number' ? count : 0),
+    })),
+  });
 
-        const initial = {};
-        data.forEach((ch) => {
-          initial[ch.chapterId] = {
-            expanded: false,
-            loading: false,
-            questions: [],
-            count: null,
-          };
-        });
-        setChapterConfigs(initial);
+  const chapterQuestionQueries = useQueries({
+    queries: chapters.map((ch) => ({
+      queryKey: questionBankKeys.chapterQuestions(selectedClassId, ch.chapterId),
+      queryFn: () =>
+        getMyClassBankQuestions({ classId: selectedClassId, chapterId: ch.chapterId }),
+      enabled:
+        bankScope === BANK_SCOPE.CLASS &&
+        !!selectedClassId &&
+        expandedChapters.has(ch.chapterId),
+      select: normalizeChapterQuestions,
+    })),
+  });
 
-        data.forEach((ch) => {
-          getMyClassBankCount({classId: selectedClassId, chapterId: ch.chapterId})
-            .then((count) => {
-              const countVal =
-                typeof count === 'number' ? count : 0;
-              setChapterConfigs((prev) => ({
-                ...prev,
-                [ch.chapterId]: {
-                  ...(prev[ch.chapterId] || {}),
-                  count: countVal,
-                },
-              }));
-            })
-            .catch(() => {});
-        });
-      })
-      .catch(() => {
-        setChapters([]);
-        setNotification({
-          type: 'danger',
-          message: 'Không tải được danh sách chương.',
-        });
-      })
-      .finally(() => setChaptersLoading(false));
-  }, [bankScope, selectedClassId]);
-
-  const loadQuestionsForChapter = useCallback(
-    async (chapterId) => {
-      if (!selectedClassId) return;
-
-      setChapterConfigs((prev) => ({
-        ...prev,
-        [chapterId]: {...(prev[chapterId] || {}), loading: true},
-      }));
-
-      try {
-        const raw = await getMyClassBankQuestions({classId: selectedClassId, chapterId});
-        const list = Array.isArray(raw)
-          ? raw
-          : Array.isArray(raw?.data)
-            ? raw.data
-            : [];
-        setChapterConfigs((prev) => ({
-          ...prev,
-          [chapterId]: {
-            ...(prev[chapterId] || {}),
-            loading: false,
-            questions: list,
-            count: list.length,
-          },
-        }));
-      } catch (error) {
-        setChapterConfigs((prev) => ({
-          ...prev,
-          [chapterId]: {
-            ...(prev[chapterId] || {}),
-            loading: false,
-            questions: [],
-          },
-        }));
-        setNotification({
-          type: 'danger',
-          message: 'Không tải được câu hỏi của chương này.',
-        });
-      }
-    },
-    [selectedClassId],
-  );
-
-  const toggleChapterExpanded = (chapterId) => {
-    setChapterConfigs((prev) => {
-      const cfg = prev[chapterId] || {};
-      const willExpand = !cfg.expanded;
-      return {
-        ...prev,
-        [chapterId]: {...cfg, expanded: willExpand},
+  const chapterConfigs = useMemo(() => {
+    const map = {};
+    chapters.forEach((ch, i) => {
+      const cq = chapterQuestionQueries[i];
+      const countQ = chapterCountQueries[i];
+      const hasQuestions = cq?.data !== undefined;
+      const questions = cq?.data ?? [];
+      const count = hasQuestions ? questions.length : (countQ?.data ?? null);
+      map[ch.chapterId] = {
+        expanded: expandedChapters.has(ch.chapterId),
+        loading: cq?.isLoading ?? false,
+        questions,
+        count: count === undefined ? null : count,
       };
     });
+    return map;
+  }, [chapters, chapterQuestionQueries, chapterCountQueries, expandedChapters]);
 
-    const cfg = chapterConfigs[chapterId] || {};
-    if (!cfg.expanded && cfg.questions.length === 0 && !cfg.loading) {
-      loadQuestionsForChapter(chapterId);
+  const anyChapterQuestionError = chapterQuestionQueries.some((q) => q.isError);
+  useEffect(() => {
+    if (anyChapterQuestionError) {
+      setNotification({
+        type: 'danger',
+        message: 'Không tải được câu hỏi của chương này.',
+      });
     }
+  }, [anyChapterQuestionError]);
+
+  // Collapse all chapters when the selected class or bank scope changes.
+  useEffect(() => {
+    setExpandedChapters(new Set());
+  }, [selectedClassId, bankScope]);
+
+  const toggleChapterExpanded = (chapterId) => {
+    setExpandedChapters((prev) => {
+      const next = new Set(prev);
+      if (next.has(chapterId)) next.delete(chapterId);
+      else next.add(chapterId);
+      return next;
+    });
   };
 
   const handleEditSuccess = async () => {
     setEditingQuestionId(null);
 
     if (bankScope === BANK_SCOPE.CLASS && editingChapterId) {
-      await loadQuestionsForChapter(editingChapterId);
+      await queryClient.invalidateQueries({
+        queryKey: questionBankKeys.chapterQuestions(selectedClassId, editingChapterId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: questionBankKeys.chapterCount(selectedClassId, editingChapterId),
+      });
       return;
     }
 
     if (editingPartId) {
-      await loadQuestionsForPart(editingPartId, bankScope);
+      await queryClient.invalidateQueries({
+        queryKey: questionBankKeys.partQuestions(editingPartId, bankScope),
+      });
     }
   };
 
@@ -322,9 +310,16 @@ const PersonalQuestionBankPage = () => {
         }
 
         if (bankScope === BANK_SCOPE.CLASS && chapterId) {
-          await loadQuestionsForChapter(chapterId);
+          await queryClient.invalidateQueries({
+            queryKey: questionBankKeys.chapterQuestions(selectedClassId, chapterId),
+          });
+          queryClient.invalidateQueries({
+            queryKey: questionBankKeys.chapterCount(selectedClassId, chapterId),
+          });
         } else if (partId) {
-          await loadQuestionsForPart(partId, bankScope);
+          await queryClient.invalidateQueries({
+            queryKey: questionBankKeys.partQuestions(partId, bankScope),
+          });
         }
 
         setNotification({

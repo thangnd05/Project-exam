@@ -1,11 +1,29 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useQuery} from '@tanstack/react-query';
 import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import style from './ExamTypeStyle.module.scss';
 
 const cx = classNames.bind(style);
+
+export const examTypeKeys = {
+  standard: ['exam-types', 'standard'],
+};
+
+const normalizeExamTypes = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (payload && Array.isArray(payload.data)) {
+    return payload.data;
+  }
+  if (payload && Array.isArray(payload.content)) {
+    return payload.content;
+  }
+  return [];
+};
 
 const getInitials = (name) => {
   if (!name) return '?';
@@ -37,33 +55,23 @@ const cardVariants = {
 };
 
 function ExamTypePage() {
-  const [examTypes, setExamTypes] = useState([]);
   const navigate = useNavigate();
 
-  const normalizeExamTypes = (payload) => {
-    if (Array.isArray(payload)) {
-      return payload;
-    }
-    if (payload && Array.isArray(payload.data)) {
-      return payload.data;
-    }
-    if (payload && Array.isArray(payload.content)) {
-      return payload.content;
-    }
-    return [];
-  };
+  const {
+    data: examTypes = [],
+    isError,
+    error,
+  } = useQuery({
+    queryKey: examTypeKeys.standard,
+    queryFn: getStandardExamTypes,
+    select: (payload) => normalizeExamTypes(payload).filter((t) => !t.parentId),
+  });
 
   useEffect(() => {
-    getStandardExamTypes()
-      .then((data) => {
-
-        setExamTypes(normalizeExamTypes(data).filter((t) => !t.parentId));
-      })
-      .catch((error) => {
-        console.error('Lỗi khi lấy exam types:', error);
-        setExamTypes([]);
-      });
-  }, []);
+    if (isError) {
+      console.error('Lỗi khi lấy exam types:', error);
+    }
+  }, [isError, error]);
 
   const handleClick = (examTypeId) => {
     navigate(`/exam-types/${examTypeId}`);

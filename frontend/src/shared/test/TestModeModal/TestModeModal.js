@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {
   IoDocumentTextOutline,
@@ -16,25 +17,37 @@ import styles from './TestModeModal.module.scss';
 
 const cx = classNames.bind(styles);
 
+export const testModeKeys = {
+  parts: (testId) => ['test-parts-summary', testId],
+};
+
+const normalizeParts = (data) => (Array.isArray(data) ? data : []);
+
 function TestModeModal({ show, test, onClose, onStart }) {
   const [tab, setTab] = useState('exam');
-  const [parts, setParts] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(() => new Set());
+
+  const partsQuery = useQuery({
+    queryKey: testModeKeys.parts(test?.testId),
+    queryFn: () => getTestPartsSummary(test.testId),
+    enabled: !!show && !!test?.testId,
+    select: normalizeParts,
+  });
+
+  const parts = partsQuery.data ?? [];
+  const loading = partsQuery.isLoading;
 
   useEffect(() => {
     if (!show || !test?.testId) return;
     setTab('exam');
     setSelected(new Set());
-    setLoading(true);
-    getTestPartsSummary(test.testId)
-      .then((data) => setParts(Array.isArray(data) ? data : []))
-      .catch(() => {
-        setParts([]);
-        toast.error('Không tải được danh sách phần thi.');
-      })
-      .finally(() => setLoading(false));
   }, [show, test?.testId]);
+
+  useEffect(() => {
+    if (partsQuery.isError) {
+      toast.error('Không tải được danh sách phần thi.');
+    }
+  }, [partsQuery.isError]);
 
   const totalQuestions = useMemo(
     () => parts.reduce((sum, p) => sum + (p.questionCount || 0), 0),
