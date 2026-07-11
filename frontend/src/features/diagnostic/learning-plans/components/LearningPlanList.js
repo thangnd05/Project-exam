@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
-import { switchPlan } from '~/shared/api/learningPlanApi';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '../hooks/use-learning-plan-list';
 import { useDeletePlan } from '../hooks/use-delete-plan';
+import { useSwitchPlan } from '../hooks/use-switch-plan';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
@@ -65,29 +65,26 @@ const LearningPlanList = forwardRef(function LearningPlanList(
     refreshKey,
   });
 
-  const [switching, setSwitching] = useState(null);
   const [switchTarget, setSwitchTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const deleteMutation = useDeletePlan();
   const deleting = deleteMutation.isPending ? deleteMutation.variables : null;
 
+  const switchMutation = useSwitchPlan();
+  const switching = switchMutation.isPending ? switchMutation.variables : null;
+
   useImperativeHandle(ref, () => ({ reload }), [reload]);
 
-  const handleSwitchConfirm = useCallback(async () => {
+  const handleSwitchConfirm = useCallback(() => {
     if (!switchTarget) return;
     const planId = switchTarget.learningPlanId;
     setSwitchTarget(null);
-    setSwitching(planId);
-    try {
-      await switchPlan(planId);
-      reload();
-    } catch (err) {
-      toast.error(err?.response?.data?.message || 'Lỗi khi chuyển plan');
-    } finally {
-      setSwitching(null);
-    }
-  }, [switchTarget, reload]);
+    switchMutation.mutate(planId, {
+      onSuccess: () => reload(),
+      onError: (err) => toast.error(err?.response?.data?.message || 'Lỗi khi chuyển plan'),
+    });
+  }, [switchTarget, switchMutation, reload]);
 
   const handleDeleteConfirm = useCallback(() => {
     if (!deleteTarget) return;
