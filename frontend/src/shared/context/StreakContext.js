@@ -1,7 +1,7 @@
 import { createContext, useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '~/shared/config/queryClient';
-import { getMyStreak, restoreStreak as restoreStreakApi } from '~/shared/api/streakApi';
+import { getMyStreak } from '~/shared/api/streakApi';
 import { useAuth } from '~/shared/hooks/useAuth';
 
 export const StreakContext = createContext(null);
@@ -35,16 +35,6 @@ export const StreakProvider = ({ children }) => {
     if (after > before) setJustIncreased(true);
   }, [isAuthenticated]);
 
-  // Write. Kept as a plain async action for this pass; after a successful
-  // restore we push the fresh data into the cache and invalidate so every
-  // streak consumer updates.
-  const restoreStreak = useCallback(async () => {
-    const result = await restoreStreakApi();
-    queryClient.setQueryData(STREAK_QUERY_KEY, result);
-    queryClient.invalidateQueries({ queryKey: STREAK_QUERY_KEY });
-    return result;
-  }, []);
-
   const clearJustIncreased = useCallback(() => setJustIncreased(false), []);
 
   const value = useMemo(
@@ -56,7 +46,6 @@ export const StreakProvider = ({ children }) => {
       recoverCost,
       justIncreased: isAuthenticated && justIncreased,
       refreshStreak,
-      restoreStreak,
       clearJustIncreased,
     }),
     [
@@ -68,7 +57,6 @@ export const StreakProvider = ({ children }) => {
       isAuthenticated,
       justIncreased,
       refreshStreak,
-      restoreStreak,
       clearJustIncreased,
     ]
   );

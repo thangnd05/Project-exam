@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { Flame, CircleDollarSign } from 'lucide-react';
@@ -6,29 +5,29 @@ import { Flame, CircleDollarSign } from 'lucide-react';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import { useStreak } from '~/shared/hooks/useStreak';
 import { useCoins } from '~/shared/hooks/useCoins';
+import { useRestoreStreak } from '~/shared/streak/useRestoreStreak';
 import styles from './StreakRestoreModal.module.scss';
 
 const cx = classNames.bind(styles);
 
 function StreakRestoreModal({ show, onClose }) {
-  const { lostStreak, recoverCost, restoreStreak } = useStreak();
-  const { balance, refreshCoins } = useCoins();
-  const [busy, setBusy] = useState(false);
+  const { lostStreak, recoverCost } = useStreak();
+  const { balance } = useCoins();
+  const restoreMutation = useRestoreStreak();
+  const busy = restoreMutation.isPending;
 
   const enough = balance >= recoverCost;
 
-  const handleRestore = async () => {
-    setBusy(true);
-    try {
-      await restoreStreak();
-      await refreshCoins();
-      toast.success(`Đã khôi phục chuỗi ${lostStreak} ngày! 🔥`);
-      onClose();
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Khôi phục thất bại. Vui lòng thử lại.');
-    } finally {
-      setBusy(false);
-    }
+  const handleRestore = () => {
+    restoreMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success(`Đã khôi phục chuỗi ${lostStreak} ngày! 🔥`);
+        onClose();
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || 'Khôi phục thất bại. Vui lòng thử lại.');
+      },
+    });
   };
 
   return (
