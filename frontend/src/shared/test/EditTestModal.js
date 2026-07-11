@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
@@ -23,7 +24,6 @@ const cxCreate = classNames.bind(createModalStyles);
 
 const EditTestModal = ({ show, onHide, test, onSuccess }) => {
   const canSetPricing = useHasPermission('TEST:MANAGE_PRICING');
-  const [saving, setSaving] = useState(false);
   const [examTypes, setExamTypes] = useState([]);
   const [questionCollections, setQuestionCollections] = useState([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -122,13 +122,23 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     [questionCollections, formData.examTypeId],
   );
 
-  const handleSave = async () => {
+  const updateMutation = useMutation({
+    mutationFn: ({ testId, payload }) => updateTest(testId, payload),
+    onSuccess: () => {
+      toast.success('Cập nhật đề thi thành công!');
+      onSuccess();
+    },
+    onError: (error) => {
+      const msg = error.response?.data?.message ?? error.message;
+      toast.error(`Lỗi khi cập nhật: ${msg}`);
+    },
+  });
+
+  const handleSave = () => {
     if (!formData.title?.trim() || !formData.examTypeId) {
       toast.warning('Vui lòng nhập tên đề thi và chọn loại kỳ thi');
       return;
     }
-
-    setSaving(true);
 
     const payload = {
       title: formData.title.trim(),
@@ -157,16 +167,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
         : Number(formData.costCoins),
     };
 
-    try {
-      await updateTest(test.testId || test.id, payload);
-      toast.success('Cập nhật đề thi thành công!');
-      onSuccess();
-    } catch (error) {
-      const msg = error.response?.data?.message ?? error.message;
-      toast.error(`Lỗi khi cập nhật: ${msg}`);
-    } finally {
-      setSaving(false);
-    }
+    updateMutation.mutate({ testId: test.testId || test.id, payload });
   };
 
   const groupedQuestions = useMemo(() => {
@@ -229,7 +230,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
         <ModalActionFooter
           onCancel={onHide}
           onSubmit={handleSave}
-          loading={saving}
+          loading={updateMutation.isPending}
           cancelLabel="Hủy"
           submitLabel="Lưu cập nhật"
           loadingLabel="Đang lưu..."
