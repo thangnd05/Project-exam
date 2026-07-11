@@ -4,9 +4,9 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { CircleDollarSign, Check } from 'lucide-react';
 
-import { buyCosmetic, equipCosmetic, getCosmeticShop, unequipCosmetic } from '~/shared/api/cosmeticApi';
+import { getCosmeticShop } from '~/shared/api/cosmeticApi';
 import { useCoins } from '~/shared/hooks/useCoins';
-import { useCosmetics } from '~/shared/hooks/useCosmetics';
+import { useBuyCosmetic, useEquipCosmetic, useUnequipCosmetic } from './useCosmeticShop';
 import AvatarWithCosmetic from './AvatarWithCosmetic';
 import images from '~/shared/assets/images';
 import styles from './CosmeticShop.module.scss';
@@ -44,11 +44,17 @@ export function CosmeticPreview({ item, size = 60 }) {
 }
 
 function CosmeticShop() {
-  const { balance, refreshCoins } = useCoins();
-  const { refreshCosmetics } = useCosmetics();
+  const { balance } = useCoins();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState(null);
+  const buyMutation = useBuyCosmetic();
+  const equipMutation = useEquipCosmetic();
+  const unequipMutation = useUnequipCosmetic();
+  const busyId =
+    (buyMutation.isPending && buyMutation.variables) ||
+    (equipMutation.isPending && equipMutation.variables) ||
+    (unequipMutation.isPending && unequipMutation.variables) ||
+    null;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -66,44 +72,38 @@ function CosmeticShop() {
     load();
   }, [load]);
 
-  const handleBuy = async (item) => {
-    setBusyId(item.cosmeticId);
-    try {
-      await buyCosmetic(item.cosmeticId);
-      toast.success(`Đã mua "${item.name}"!`);
-      await refreshCoins();
-      await load();
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Mua thất bại. Vui lòng thử lại.');
-    } finally {
-      setBusyId(null);
-    }
+  const handleBuy = (item) => {
+    buyMutation.mutate(item.cosmeticId, {
+      onSuccess: () => {
+        toast.success(`Đã mua "${item.name}"!`);
+        load();
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || 'Mua thất bại. Vui lòng thử lại.');
+      },
+    });
   };
 
-  const handleEquip = async (item) => {
-    setBusyId(item.cosmeticId);
-    try {
-      await equipCosmetic(item.cosmeticId);
-      await refreshCosmetics();
-      await load();
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Không thể đeo vật phẩm.');
-    } finally {
-      setBusyId(null);
-    }
+  const handleEquip = (item) => {
+    equipMutation.mutate(item.cosmeticId, {
+      onSuccess: () => {
+        load();
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || 'Không thể đeo vật phẩm.');
+      },
+    });
   };
 
-  const handleUnequip = async (item) => {
-    setBusyId(item.cosmeticId);
-    try {
-      await unequipCosmetic(item.cosmeticId);
-      await refreshCosmetics();
-      await load();
-    } catch (error) {
-      toast.error('Không thể tháo vật phẩm.');
-    } finally {
-      setBusyId(null);
-    }
+  const handleUnequip = (item) => {
+    unequipMutation.mutate(item.cosmeticId, {
+      onSuccess: () => {
+        load();
+      },
+      onError: () => {
+        toast.error('Không thể tháo vật phẩm.');
+      },
+    });
   };
 
   if (loading) {

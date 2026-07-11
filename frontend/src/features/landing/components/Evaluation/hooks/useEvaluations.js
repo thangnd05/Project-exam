@@ -1,5 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getAllEvaluations } from '~/shared/api/evaluationApi';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createEvaluation, getAllEvaluations } from '~/shared/api/evaluationApi';
 
 export const evaluationKeys = { all: ['evaluations'] };
 
@@ -26,4 +26,16 @@ export function useEvaluations() {
     loading: query.isLoading,
     refetchEvaluations,
   };
+}
+
+export function useCreateEvaluation({ onSuccess, onError } = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => createEvaluation(payload),
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: evaluationKeys.all });
+      onSuccess?.(...args);
+    },
+    onError,
+  });
 }

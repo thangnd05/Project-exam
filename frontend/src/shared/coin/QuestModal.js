@@ -4,8 +4,9 @@ import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import {CircleDollarSign, Clock, CheckCircle2} from 'lucide-react';
 
-import {claimQuest, getMyQuests} from '~/shared/api/questApi';
+import {getMyQuests} from '~/shared/api/questApi';
 import {useCoins} from '~/shared/hooks/useCoins';
+import {useClaimQuest} from './useClaimQuest';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import CosmeticShop from '~/shared/cosmetic/CosmeticShop';
 import styles from './QuestModal.module.scss';
@@ -38,11 +39,12 @@ function groupByCondition(quests) {
 }
 
 function QuestModal({show, onClose}) {
-  const {balance, refreshCoins} = useCoins();
+  const {balance} = useCoins();
   const [tab, setTab] = useState('quests');
   const [quests, setQuests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [claimingId, setClaimingId] = useState(null);
+  const claimMutation = useClaimQuest();
+  const claimingId = claimMutation.isPending ? claimMutation.variables : null;
 
   const loadQuests = useCallback(async () => {
     setLoading(true);
@@ -62,20 +64,18 @@ function QuestModal({show, onClose}) {
     }
   }, [show, loadQuests]);
 
-  const handleClaim = async (quest) => {
-    setClaimingId(quest.questId);
-    try {
-      const result = await claimQuest(quest.questId);
-      toast.success(`Đã nhận ${result.rewardCoins} xu!`);
-      await refreshCoins();
-      await loadQuests();
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message || 'Không thể nhận nhiệm vụ. Vui lòng thử lại.',
-      );
-    } finally {
-      setClaimingId(null);
-    }
+  const handleClaim = (quest) => {
+    claimMutation.mutate(quest.questId, {
+      onSuccess: (result) => {
+        toast.success(`Đã nhận ${result.rewardCoins} xu!`);
+        loadQuests();
+      },
+      onError: (error) => {
+        toast.error(
+          error?.response?.data?.message || 'Không thể nhận nhiệm vụ. Vui lòng thử lại.',
+        );
+      },
+    });
   };
 
   const formatEndAt = (value) =>

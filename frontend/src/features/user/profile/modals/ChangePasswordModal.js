@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import { changePassword } from '~/shared/api/authApi';
+import { useChangePassword } from './hooks/useChangePassword';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
@@ -9,7 +9,8 @@ import commonModalStyles from '~/shared/ui/modal/CommonFormModal.module.scss';
 const cmx = classNames.bind(commonModalStyles);
 
 function ChangePasswordModal({show, onHide}) {
-  const [submitting, setSubmitting] = useState(false);
+  const changePasswordMutation = useChangePassword();
+  const submitting = changePasswordMutation.isPending;
   const [formValues, setFormValues] = useState({
     oldPassword: '',
     newPassword: '',
@@ -40,7 +41,7 @@ function ChangePasswordModal({show, onHide}) {
     resetForm();
   };
 
-  const submitChangePassword = async () => {
+  const submitChangePassword = () => {
     const {oldPassword, newPassword, confirmNewPassword} = formValues;
 
     if (!oldPassword || !newPassword || !confirmNewPassword) {
@@ -58,29 +59,28 @@ function ChangePasswordModal({show, onHide}) {
       return;
     }
 
-    setSubmitting(true);
-
-    try {
-      const payload = {
+    changePasswordMutation.mutate(
+      {
         oldPassword,
         newPassword,
         confirmNewPassword,
-      };
-      const data = await changePassword(payload);
-      const successMessage =
-        data?.message || 'Đổi mật khẩu thành công.';
-      toast.success(successMessage);
-      onHide();
-      resetForm();
-    } catch (error) {
-      const apiMessage =
-        error.response?.data?.message ||
-        error.response?.data ||
-        'Đổi mật khẩu thất bại. Vui lòng thử lại.';
-      toast.error(apiMessage);
-    } finally {
-      setSubmitting(false);
-    }
+      },
+      {
+        onSuccess: (data) => {
+          const successMessage = data?.message || 'Đổi mật khẩu thành công.';
+          toast.success(successMessage);
+          onHide();
+          resetForm();
+        },
+        onError: (error) => {
+          const apiMessage =
+            error.response?.data?.message ||
+            error.response?.data ||
+            'Đổi mật khẩu thất bại. Vui lòng thử lại.';
+          toast.error(apiMessage);
+        },
+      },
+    );
   };
 
   return (
