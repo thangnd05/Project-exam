@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import { IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
-import { standardizeVocabularies, bulkCreateVocabularies } from '~/features/albums/detail/api/vocabularyApi';
+import { standardizeVocabularies } from '~/features/albums/detail/api/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from '~/shared/ui/modal/CommonFormModal.module.scss';
+import { useBulkCreateVocabularies } from './hooks/useBulkCreateVocabularies';
 
 const cx = classNames.bind(styles);
 
 const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
-    const [loading, setLoading] = useState(false);
     const [aiLoading, setAiLoading] = useState(false);
     const [jsonInput, setJsonInput] = useState('');
+
+    const bulkCreateMutation = useBulkCreateVocabularies(albumId);
+    const loading = bulkCreateMutation.isPending;
 
     const handleStandardize = async () => {
         if (!jsonInput.trim()) {
@@ -79,21 +82,20 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             albumId: item.albumId || albumId,
         }));
 
-        setLoading(true);
-        try {
-            await bulkCreateVocabularies(processedPayload);
-            toast.success(` Đã nhập thành công ${processedPayload.length} từ vựng!`);
-            setJsonInput('');
-            onSuccess();
-            onClose();
-        } catch (err) {
-            console.error('Lỗi khi nhập bulk:', err);
-            const msg = err.response?.data?.message
-                || 'Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!';
-            toast.error(`❌ ${msg}`);
-        } finally {
-            setLoading(false);
-        }
+        bulkCreateMutation.mutate(processedPayload, {
+            onSuccess: () => {
+                toast.success(` Đã nhập thành công ${processedPayload.length} từ vựng!`);
+                setJsonInput('');
+                onSuccess();
+                onClose();
+            },
+            onError: (err) => {
+                console.error('Lỗi khi nhập bulk:', err);
+                const msg = err.response?.data?.message
+                    || 'Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!';
+                toast.error(`❌ ${msg}`);
+            },
+        });
     };
 
     const exampleJson = `[

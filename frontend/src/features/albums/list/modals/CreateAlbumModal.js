@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from 'react-toastify';
-import { createAlbum } from '~/features/albums/list/api/vocabularyAlbumApi';
+import { useCreateAlbum } from './hooks/useCreateAlbum';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import CommonFormModal from "~/shared/ui/modal/CommonFormModal";
@@ -12,41 +12,39 @@ const cx = classNames.bind(styles);
 function CreateAlbumModal({ show, onClose, onSuccess }) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [loading, setLoading] = useState(false);
 
-    const handleCreate = async () => {
+    const createMutation = useCreateAlbum();
+    const loading = createMutation.isPending;
+
+    const handleCreate = () => {
         if (!name.trim()) {
             toast.warning(" Vui lòng nhập tên Album!");
             return;
         }
 
-        setLoading(true);
+        const payload = {
+            name: name,
+            description: description
+        };
 
-        try {
-            const payload = {
-                name: name,
-                description: description
-            };
+        createMutation.mutate(payload, {
+            onSuccess: () => {
+                toast.success("Tạo Album thành công!");
 
-            await createAlbum(payload);
+                setName("");
+                setDescription("");
+                onClose();
 
-            toast.success("Tạo Album thành công!");
-
-            setName("");
-            setDescription("");
-            onClose();
-
-            if (onSuccess) onSuccess();
-
-        } catch (err) {
-            console.error(err);
-            toast.error(
-                err.response?.data?.message ||
-                "Có lỗi xảy ra khi tạo Album!"
-            );
-        } finally {
-            setLoading(false);
-        }
+                if (onSuccess) onSuccess();
+            },
+            onError: (err) => {
+                console.error(err);
+                toast.error(
+                    err.response?.data?.message ||
+                    "Có lỗi xảy ra khi tạo Album!"
+                );
+            },
+        });
     };
 
     return (

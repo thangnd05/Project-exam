@@ -1,8 +1,9 @@
 import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {useParams} from 'react-router-dom';
-import { generatePracticeQuestion, checkPracticeAnswer, markVocabKnown } from '~/features/albums/practice/api/practiceQuestionApi';
+import { generatePracticeQuestion, checkPracticeAnswer } from '~/features/albums/practice/api/practiceQuestionApi';
 import { getTtsUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
+import { useMarkVocabKnown } from '~/features/albums/practice/hooks/useMarkVocabKnown';
 import {Container, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -32,11 +33,12 @@ const PracticePage = () => {
     const [result, setResult] = useState(null);
     const [finished, setFinished] = useState(false);
     const [loadingNext, setLoadingNext] = useState(false);
-    const [markingKnown, setMarkingKnown] = useState(false);
     const [knownMessage, setKnownMessage] = useState('');
     const [sessionScore, setSessionScore] = useState({correct: 0, total: 0});
     const audioRef = useRef(null);
     const { refreshStreak } = useStreak();
+    const markMutation = useMarkVocabKnown(albumId);
+    const markingKnown = markMutation.isPending;
 
     const fetchQuestion = useCallback(async () => {
         try {
@@ -125,23 +127,22 @@ const PracticePage = () => {
         setLoadingNext(false);
     };
 
-    const handleMarkKnown = async () => {
+    const handleMarkKnown = () => {
         if (!question) return;
-        try {
-            setMarkingKnown(true);
-            await markVocabKnown(question.vocabId);
-            refreshStreak();
-            setKnownMessage('Bạn đã đánh dấu từ này là đã biết!');
-            setTimeout(() => setKnownMessage(''), 2000);
-            setTimeout(async () => {
-                await fetchQuestion();
-            }, 1500);
-        } catch (err) {
-            console.error('Lỗi khi đánh dấu đã biết:', err);
-            setKnownMessage('Có lỗi xảy ra khi đánh dấu từ này!');
-        } finally {
-            setMarkingKnown(false);
-        }
+        markMutation.mutate(question.vocabId, {
+            onSuccess: () => {
+                refreshStreak();
+                setKnownMessage('Bạn đã đánh dấu từ này là đã biết!');
+                setTimeout(() => setKnownMessage(''), 2000);
+                setTimeout(() => {
+                    fetchQuestion();
+                }, 1500);
+            },
+            onError: (err) => {
+                console.error('Lỗi khi đánh dấu đã biết:', err);
+                setKnownMessage('Có lỗi xảy ra khi đánh dấu từ này!');
+            },
+        });
     };
 
     if (loading) {
