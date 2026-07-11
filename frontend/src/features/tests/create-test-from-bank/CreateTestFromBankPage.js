@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/shared/api/testApi';
 import { createTestPart } from '~/shared/api/testPartApi';
@@ -53,7 +54,6 @@ const CreateTestFromBankPage = () => {
       .catch(() => setExamCategories([]));
   }, []);
 
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
@@ -100,23 +100,8 @@ const CreateTestFromBankPage = () => {
     setTestInfo((prev) => ({ ...prev, examTypeId: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!testInfo.title?.trim() || !testInfo.examTypeId) {
-      setNotification({ type: 'warning', message: 'Vui lòng điền tiêu đề và chọn loại kỳ thi.' });
-      return;
-    }
-
-    const partsToAdd = examParts.filter(hasPartWithQuestions);
-    if (partsToAdd.length === 0) {
-      setNotification({ type: 'warning', message: 'Vui lòng cấu hình ít nhất một part có câu hỏi (số câu > 0 hoặc chọn thủ công).' });
-      return;
-    }
-
-    setLoadingSubmit(true);
-    setNotification({});
-
-    try {
+  const createTestMutation = useMutation({
+    mutationFn: async (partsToAdd) => {
       const testData = await createTest({
         title: testInfo.title.trim(),
         description: testInfo.description || null,
@@ -163,15 +148,32 @@ const CreateTestFromBankPage = () => {
           });
         }
       }
-
+    },
+    onSuccess: () => {
       setTestInfo((prev) => ({ ...prev, title: '', description: '' }));
       toast.success('Đã tạo đề thi từ kho câu hỏi!');
-    } catch (error) {
+    },
+    onError: (error) => {
       const msg = error.response?.data?.message ?? error.response?.data ?? error.message;
       setNotification({ type: 'danger', message: 'Lỗi: ' + (typeof msg === 'string' ? msg : JSON.stringify(msg)) });
-    } finally {
-      setLoadingSubmit(false);
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!testInfo.title?.trim() || !testInfo.examTypeId) {
+      setNotification({ type: 'warning', message: 'Vui lòng điền tiêu đề và chọn loại kỳ thi.' });
+      return;
     }
+
+    const partsToAdd = examParts.filter(hasPartWithQuestions);
+    if (partsToAdd.length === 0) {
+      setNotification({ type: 'warning', message: 'Vui lòng cấu hình ít nhất một part có câu hỏi (số câu > 0 hoặc chọn thủ công).' });
+      return;
+    }
+
+    setNotification({});
+    createTestMutation.mutate(partsToAdd);
   };
 
   const totalSelected = (examParts || []).reduce((sum, p) => sum + getPartEffectiveCount(p.examPartId), 0);
@@ -495,9 +497,9 @@ const CreateTestFromBankPage = () => {
               type="submit"
               variant="primary"
               size="md"
-              disabled={loadingSubmit || !hasAnyPartWithQuestions || !testInfo.examTypeId}
+              disabled={createTestMutation.isPending || !hasAnyPartWithQuestions || !testInfo.examTypeId}
             >
-              {loadingSubmit ? <><Spinner animation="border" size="sm" /> Đang tạo đề...</> : <><IoRocketOutline /> Tạo đề thi từ kho</>}
+              {createTestMutation.isPending ? <><Spinner animation="border" size="sm" /> Đang tạo đề...</> : <><IoRocketOutline /> Tạo đề thi từ kho</>}
             </ButtonPrime>
           </div>
         </Form>
