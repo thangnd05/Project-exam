@@ -78,7 +78,20 @@
 }
 
 .partSection {
-  margin-top: 0.4rem;
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.partSectionTitle {
+  font-size: var(--font-size-ssm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+  margin-bottom: 0.8rem;
+}
+
+.partSectionBody {
+  padding: 0;
 }
 
 .partSectionHint {
@@ -281,8 +294,4 @@
 .compactSelect {
   padding: 0.6rem 0.9rem !important;
   font-size: var(--font-size-ssm) !important;
-}
-
-.heroHoverBtn {
-  @include globalStyles.primaryGradientButton;
 }

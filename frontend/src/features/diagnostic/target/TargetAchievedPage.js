@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import { useTargetAchieved } from './hooks/useTargetAchieved';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -37,9 +38,9 @@ function TargetAchievedPage() {
   return (
     <div className={cx('wrapper')}>
       <div className={cx('headerBar')}>
-        <Link to="/my-target/dashboard" className={cx('btn', 'btnGhost', 'btnSm')}>
+        <ButtonPrime as="link" to="/my-target/dashboard" variant="ghost" size="sm">
           ← Tổng quan mục tiêu
-        </Link>
+        </ButtonPrime>
       </div>
 
       <div className={cx('filterRow')}>
@@ -63,9 +64,9 @@ function TargetAchievedPage() {
       {!loading && !target?.hasTarget && (
         <div className={cx('alert', 'alertInfo')}>
           <span>Bạn chưa đặt mục tiêu cho kỳ thi này.</span>
-          <Link to={`/my-target?examTypeId=${examTypeId}`} className={cx('btn', 'btnPrimary', 'btnSm')}>
+          <ButtonPrime as="link" to={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
             Đặt mục tiêu
-          </Link>
+          </ButtonPrime>
         </div>
       )}
 
@@ -77,12 +78,14 @@ function TargetAchievedPage() {
               <>Điểm gần nhất: <strong>{enhanced.totalScore}</strong>.</>
             )}
           </span>
-          <Link
+          <ButtonPrime
+            as="link"
             to={`/my-target/dashboard?examTypeId=${examTypeId}`}
-            className={cx('btn', 'btnOutline', 'btnSm')}
+            variant="outline"
+            size="sm"
           >
             Xem tiến độ
-          </Link>
+          </ButtonPrime>
         </div>
       )}
 
@@ -119,32 +122,38 @@ function TargetAchievedPage() {
                   <div className={cx('suggestCard')}>
                     <div className={cx('suggestLabel')}>Gợi ý</div>
                     <div className={cx('suggestValue')}>{nextSuggestion}</div>
-                    <Link
+                    <ButtonPrime
+                      as="link"
                       to={`/my-target?examTypeId=${examTypeId}&suggest=${nextSuggestion}`}
-                      className={cx('btn', 'btnSuccess', 'btnSm')}
+                      variant="success"
+                      size="sm"
                     >
                       Đặt {nextSuggestion}
-                    </Link>
+                    </ButtonPrime>
                   </div>
                   <div className={cx('suggestCard')}>
                     <div className={cx('suggestLabel')}>Vượt xa hơn</div>
                     <div className={cx('suggestValue')}>{Math.min(990, nextSuggestion + 50)}</div>
-                    <Link
+                    <ButtonPrime
+                      as="link"
                       to={`/my-target?examTypeId=${examTypeId}&suggest=${Math.min(990, nextSuggestion + 50)}`}
-                      className={cx('btn', 'btnOutline', 'btnSm')}
+                      variant="outline"
+                      size="sm"
                     >
                       Thách thức
-                    </Link>
+                    </ButtonPrime>
                   </div>
                   <div className={cx('suggestCard')}>
                     <div className={cx('suggestLabel')}>Tự nhập</div>
                     <div className={cx('suggestValue')} style={{ fontSize: 'var(--font-size-lg)' }}>—</div>
-                    <Link
+                    <ButtonPrime
+                      as="link"
                       to={`/my-target?examTypeId=${examTypeId}`}
-                      className={cx('btn', 'btnOutline', 'btnSm')}
+                      variant="outline"
+                      size="sm"
                     >
                       Vào trang target
-                    </Link>
+                    </ButtonPrime>
                   </div>
                 </div>
               )}

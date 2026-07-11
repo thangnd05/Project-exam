@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { getUserTarget } from '~/shared/api/userTargetApi';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
@@ -211,26 +212,30 @@ function UserTargetPage() {
       <div className={planCx('headerBar')}>
         <h2 className={classNames(planCx('title'), cx('pageTitle'))}>Mục tiêu của tôi</h2>
         <div className={planCx('actionBar')}>
-          <Link
+          <ButtonPrime
+            as="link"
             to={
               selectedExamTypeId
                 ? `/my-target/dashboard?examTypeId=${selectedExamTypeId}`
                 : '/my-target/dashboard'
             }
-            className={planCx('btn', 'btnOutline', 'btnSm')}
+            variant="outline"
+            size="sm"
           >
             Dashboard
-          </Link>
-          <Link
+          </ButtonPrime>
+          <ButtonPrime
+            as="link"
             to={
               selectedExamTypeId
                 ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
                 : '/learning-plans/generate'
             }
-            className={classNames(planCx('btn', 'btnPrimary', 'btnSm'), cx('heroHoverBtn'))}
+            variant="primary"
+            size="sm"
           >
             Sinh lộ trình
-          </Link>
+          </ButtonPrime>
         </div>
       </div>
 
@@ -329,11 +334,11 @@ function UserTargetPage() {
           )}
 
           {targetScore && partRequirements.length > 0 && (
-            <div className={classNames(planCx('card'), cx('partSection'))}>
-              <div className={classNames(planCx('cardHeader'), cx('compactCardHeader'))}>
+            <div className={cx('partSection')}>
+              <div className={cx('partSectionTitle')}>
                 Yêu cầu từng phần thi
               </div>
-              <div className={classNames(planCx('cardBody'), cx('compactCardBody'))}>
+              <div className={cx('partSectionBody')}>
                 <p className={cx('partSectionHint')}>
                   {matchedMilestone
                     ? 'Giá trị từ cấu hình admin. Sửa ô để tuỳ chỉnh.'
@@ -397,24 +402,23 @@ function UserTargetPage() {
 
           {targetScore && (
             <div className={planCx('actionBar')} style={{ marginTop: '0.8rem' }}>
-              <button
-                type="button"
-                className={classNames(planCx('btn', 'btnPrimary', 'btnLg'), cx('heroHoverBtn'))}
+              <ButtonPrime
+                variant="primary"
+                size="lg"
                 onClick={handleSave}
                 disabled={loading || hasSavedTarget}
               >
                 {loading ? 'Đang lưu...' : 'Lưu mục tiêu'}
-              </button>
+              </ButtonPrime>
               {hasSavedTarget && (
-                <button
-                  type="button"
-                  className={planCx('btn', 'btnOutline', 'btnLg')}
+                <ButtonPrime
+                  variant="dangerGhost"
+                  size="lg"
                   onClick={handleDelete}
                   disabled={loading}
-                  style={{ color: 'var(--danger-text)', borderColor: 'var(--danger-border)' }}
                 >
                   Xóa mục tiêu
-                </button>
+                </ButtonPrime>
               )}
             </div>
           )}
@@ -439,16 +443,18 @@ function UserTargetPage() {
             })}
           </div>
           <div className={planCx('actionBar')} style={{ marginTop: '1rem' }}>
-            <Link
+            <ButtonPrime
+              as="link"
               to={
                 selectedExamTypeId
                   ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
                   : '/learning-plans/generate'
               }
-              className={classNames(planCx('btn', 'btnPrimary', 'btnSm'), cx('heroHoverBtn'))}
+              variant="primary"
+              size="sm"
             >
               Sinh lộ trình vượt ải
-            </Link>
+            </ButtonPrime>
           </div>
         </section>
       )}
