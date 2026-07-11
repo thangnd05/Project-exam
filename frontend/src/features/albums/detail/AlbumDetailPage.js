@@ -132,7 +132,6 @@ const AlbumDetailPage = () => {
 
         <div className={cx('custom-actions')}>
           <button className={cx('btn-back')} onClick={() => navigate(-1)}>
-            <IoArrowBack />
             Quay lại album
           </button>
 

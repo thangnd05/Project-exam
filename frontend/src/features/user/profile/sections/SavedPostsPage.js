@@ -151,7 +151,6 @@ function SavedPostsPage({ embedded = false }) {
               <p className={cx('subtitle')}>Những bài viết bạn đã đánh dấu để xem lại.</p>
             </div>
             <button type="button" className={cx('backLink')} onClick={() => navigate(routes.profile)}>
-              <IoArrowBackOutline />
               Trở lại hồ sơ
             </button>
           </header>

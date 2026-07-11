@@ -66,7 +66,6 @@ function TestByCollectionPage() {
       title={folderName || 'Bộ đề'}
       label="Khám phá bộ đề"
       secondaryActionText="Quay lại"
-      secondaryActionIcon={IoArrowBack}
       onSecondaryAction={goBack}
       tests={tests}
       countdowns={countdowns}

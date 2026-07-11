@@ -107,7 +107,6 @@ function MyEvaluationsPage({ embedded = false }) {
               className={cx('backBtn')}
               onClick={() => navigate(routes.profile)}
             >
-              <IoArrowBackOutline />
               Quay lại profile
             </button>
           </header>

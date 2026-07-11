@@ -78,6 +78,18 @@
   font-size: 1.2rem;
   color: #64748b;
   border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #eef2ff;
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
 }
 
 .btn-view {

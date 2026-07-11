@@ -279,7 +279,7 @@ const TestReviewPage = () => {
             className={cx("back-btn")}
             onClick={() => navigate(`/tests/result/${userTestId}`)}
           >
-            <IoArrowBackOutline /> Quay lại kết quả
+            Quay lại kết quả
           </button>
         </Container>
       </div>
@@ -293,7 +293,7 @@ const TestReviewPage = () => {
             className={cx("back-btn")}
             onClick={() => navigate(`/tests/result/${userTestId}`)}
           >
-            <IoArrowBackOutline /> Quay lại kết quả
+             Quay lại kết quả
           </button>
           <button className={cx("back-btn", "secondary")} onClick={() => navigate("/")}>
             <IoHomeOutline /> Trang chủ

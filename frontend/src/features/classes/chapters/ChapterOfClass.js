@@ -97,7 +97,6 @@ const ChapterOfClass = () => {
     <div className={cx('wrapper')}>
       <Container className={cx('container')}>
         <button className={cx('btn-back')} onClick={() => navigate(-1)}>
-          <IoArrowBackOutline />
           Quay lại lớp học
         </button>
 

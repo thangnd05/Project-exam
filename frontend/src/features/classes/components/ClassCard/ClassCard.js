@@ -7,12 +7,40 @@ import {
   IoSettingsOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import { toast } from 'react-toastify';
 import styles from './ClassCard.module.scss';
 
 const cx = classNames.bind(styles);
 
+const copyToClipboard = async (text) => {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+};
+
 const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }) => {
   const classQr = classData.classQr ;
+
+  const handleCopyCode = async (e) => {
+    e.stopPropagation();
+    if (!classQr) return;
+    try {
+      await copyToClipboard(classQr);
+      toast.success('Đã copy mã lớp!');
+    } catch (error) {
+      toast.error('Copy mã lớp thất bại');
+    }
+  };
 
   return (
     <div
@@ -33,10 +61,15 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
       <div className={cx('info-item')}>
         <IoPeopleOutline />
         <span>Mã lớp:</span>
-        <span className={cx('class-id')}>
+        <button
+          type="button"
+          className={cx('class-id')}
+          onClick={handleCopyCode}
+          title="Nhấn để copy mã lớp"
+        >
           <IoKeyOutline size={14} />
           {classQr}
-        </span>
+        </button>
       </div>
 
       <button className={cx('btn-view')}>

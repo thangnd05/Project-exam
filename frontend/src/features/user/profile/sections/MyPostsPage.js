@@ -194,7 +194,6 @@ function MyPostsPage({ embedded = false }) {
               <p className={cx('subtitle')}>Quản lý và theo dõi trạng thái các bài viết của bạn.</p>
             </div>
             <button type="button" className={cx('backLink')} onClick={() => navigate(routes.profile)}>
-              <IoArrowBackOutline />
               Trở lại hồ sơ
             </button>
           </header>

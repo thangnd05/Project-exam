@@ -100,7 +100,6 @@ function TestLeaderboardPage() {
               navigate(routes.testHistory.replace(':testId', String(testId)))
             }
           >
-            <IoArrowBack />
             Quay lại lịch sử
           </button>
         </div>

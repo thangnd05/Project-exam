@@ -64,7 +64,6 @@ function TestHistoryPage() {
 
         <div className={cx('header-top')}>
           <button className={cx('btn-back')} onClick={() => navigate(-1)}>
-            <IoArrowBack />
             Quay lại
           </button>
         </div>
