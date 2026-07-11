@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import {useParams} from 'react-router-dom';
-import { generatePracticeQuestion, checkPracticeAnswer } from '~/features/albums/practice/api/practiceQuestionApi';
+import { generatePracticeQuestion } from '~/features/albums/practice/api/practiceQuestionApi';
 import { getTtsUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import { useMarkVocabKnown } from '~/features/albums/practice/hooks/useMarkVocabKnown';
+import { useCheckPracticeAnswer } from '~/features/albums/practice/hooks/useCheckPracticeAnswer';
 import {Container, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -39,6 +40,7 @@ const PracticePage = () => {
     const { refreshStreak } = useStreak();
     const markMutation = useMarkVocabKnown(albumId);
     const markingKnown = markMutation.isPending;
+    const checkMutation = useCheckPracticeAnswer(albumId);
 
     const fetchQuestion = useCallback(async () => {
         try {
@@ -108,17 +110,19 @@ const PracticePage = () => {
                       userVietnamese: userAnswer.vietnamese,
                   };
 
-        try {
-            const data = await checkPracticeAnswer(payload);
-            setResult(data);
-            if (data.correct) {
-                setSessionScore(prev => ({...prev, correct: prev.correct + 1}));
-            }
-            setSessionScore(prev => ({...prev, total: prev.total + 1}));
-            refreshStreak();
-        } catch (err) {
-            console.error('Lỗi khi chấm:', err);
-        }
+        checkMutation.mutate(payload, {
+            onSuccess: (data) => {
+                setResult(data);
+                if (data.correct) {
+                    setSessionScore(prev => ({...prev, correct: prev.correct + 1}));
+                }
+                setSessionScore(prev => ({...prev, total: prev.total + 1}));
+                refreshStreak();
+            },
+            onError: (err) => {
+                console.error('Lỗi khi chấm:', err);
+            },
+        });
     };
 
     const handleNext = async () => {
@@ -394,9 +398,9 @@ const PracticePage = () => {
                                 <button
                                     className={cx('submitBtn')}
                                     onClick={handleSubmit}
-                                    disabled={!canSubmit}
+                                    disabled={!canSubmit || checkMutation.isPending}
                                 >
-                                    Kiểm tra đáp án
+                                    {checkMutation.isPending ? 'Đang chấm...' : 'Kiểm tra đáp án'}
                                 </button>
                             ) : (
                                 <>
