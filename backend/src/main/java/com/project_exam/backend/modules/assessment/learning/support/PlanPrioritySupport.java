@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.PartBreakdownDto;
 import com.project_exam.backend.modules.assessment.attempt.dto.TagBreakdownDto;
 
 /**
- * MVP priority: sai nhiều + Part càng yếu + dưới ngưỡng pass → điểm cao hơn.
+ * MVP priority: sai nhiều + Part càng yếu + dưới ngưỡng pass điểm cao hơn.
  */
 public final class PlanPrioritySupport {
 
@@ -30,9 +30,9 @@ public final class PlanPrioritySupport {
      * cho cùng output (không cộng dồn).
      *
      * Logic:
-     *  - Đã pass → 0 (đẩy xuống tier LOW)
-     *  - Chưa pass, gap giữa bestAccuracy và passAccuracy càng lớn → priority càng cao
-     *  - Fail ≥3 lần LIÊN TIẾP gần đây → bonus 8 điểm (đang stuck, cần ôn lại)
+     *  - Đã pass 0 (đẩy xuống tier LOW)
+     *  - Chưa pass, gap giữa bestAccuracy và passAccuracy càng lớn priority càng cao
+     *  - Fail ≥3 lần LIÊN TIẾP gần đây bonus 8 điểm (đang stuck, cần ôn lại)
      *  - Kết quả nằm trong [0, 40] để khớp tier hiện tại (HIGH ≥20, MED ≥10, LOW <10)
      */
     public static int recomputePriorityAfterSession(

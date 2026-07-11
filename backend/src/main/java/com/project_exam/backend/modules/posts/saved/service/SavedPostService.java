@@ -35,8 +35,8 @@ public class SavedPostService {
 
     /**
      * Toggle save:
-     * - Chưa save → tạo mới
-     * - Đã save → xóa
+     * - Chưa save tạo mới
+     * - Đã save xóa
      */
     @Transactional
     public SavedPostStatusResponse toggleSave(String postId, HttpServletRequest httpRequest) {

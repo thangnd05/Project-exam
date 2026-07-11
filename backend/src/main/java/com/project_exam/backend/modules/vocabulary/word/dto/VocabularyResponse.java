@@ -19,9 +19,9 @@ public class VocabularyResponse {
 
     private String albumId;
     private String albumName;
-    private String albumDesc;   // 👉 thêm để biết mô tả album (optional)
+    private String albumDesc;   // thêm để biết mô tả album (optional)
 
-    private String voiceUrl;   // 👈 thêm field này
+    private String voiceUrl;   // thêm field này
     private LocalDateTime createdAt;
 }
 

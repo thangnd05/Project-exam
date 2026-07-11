@@ -141,7 +141,7 @@ public class AnswerService {
 
         return allAnswers.stream()
                 .collect(Collectors.groupingBy(
-                        Answer::getQuestionId,   // 👈 group bằng entity trước
+                        Answer::getQuestionId,   // group bằng entity trước
                         Collectors.mapping(
                                 answerMapper::toResponse,
                                 Collectors.collectingAndThen(

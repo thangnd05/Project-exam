@@ -344,7 +344,7 @@ public class LearningPlanService {
 
     /**
      * Mỗi Part chưa đạt target (isTargetMet = false) phải có ít nhất 1 ải.
-     * Tag từ bài thi; nếu không có tag trên câu → lấy tag từ kho câu theo Part.
+     * Tag từ bài thi; nếu không có tag trên câu lấy tag từ kho câu theo Part.
      */
     private List<TaskCandidate> collectTasksForPart(
             PartBreakdownDto part,
@@ -628,7 +628,7 @@ public class LearningPlanService {
 
     private String stageLabel(PlanStage stage) {
         if (stage == null || stage == PlanStage.FOUNDATION) {
-            return "Đang ôn từng Part → từng tag.";
+            return "Đang ôn từng Part từng tag.";
         }
         if (stage == PlanStage.MOCK) {
             return "Đã xong ải — làm mock kiểm tra readiness.";

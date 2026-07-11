@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Thẻ "bộ đề" (folder) trên trang khám phá: gom các đề theo collection cha của một loại kỳ thi.
- * Bấm vào folder → xem danh sách đề bên trong (gộp cả collection con).
+ * Bấm vào folder xem danh sách đề bên trong (gộp cả collection con).
  */
 @Data
 @Builder

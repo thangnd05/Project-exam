@@ -34,7 +34,7 @@ public class EvaluationService {
     private final EvaluationMapper evaluationMapper;
 
     // ============================
-    //  Helper convert Entity → DTO
+    //  Helper convert Entity DTO
     // ============================
     private EvaluationResponse toResponse(Evaluation e) {
 
@@ -118,7 +118,7 @@ public class EvaluationService {
     public EvaluationResponse update(String id, EvaluationRequest request, HttpServletRequest httpRequest) {
         Evaluation evaluation = evaluationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-        // 🔒 Chỉ chính chủ (hoặc admin) mới được sửa.
+        //  Chỉ chính chủ (hoặc admin) mới được sửa.
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {
@@ -138,7 +138,7 @@ public class EvaluationService {
     public void delete(String id, HttpServletRequest httpRequest) {
         Evaluation evaluation = evaluationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-        // 🔒 Chỉ chính chủ (hoặc admin) mới được xoá.
+        //  Chỉ chính chủ (hoặc admin) mới được xoá.
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {

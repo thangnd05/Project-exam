@@ -116,8 +116,8 @@ public class AuthService {
      * Refresh access token bằng refresh token đọc từ HttpOnly cookie.
      * Why: refresh token không nên expose qua JS/body — chỉ cookie HttpOnly với Path scoped đến endpoint này.
      * Rotation thật: server-side check {fid, jti} qua RefreshTokenStore.
-     *   - jti khớp → rotate sang jti mới (cấp lại cặp access + refresh)
-     *   - jti lệch / family đã revoke → ReplayDetectedException, ép login lại
+     *   - jti khớp rotate sang jti mới (cấp lại cặp access + refresh)
+     *   - jti lệch / family đã revoke ReplayDetectedException, ép login lại
      */
     public Map<String, Object> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshTokenFromCookie(request);
@@ -145,13 +145,13 @@ public class AuthService {
                 .or(() -> userRepository.findByEmail(username))
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // Store quyết định jti: rotate thật → jti mới; grace window → trả jti hiện hành.
+        // Store quyết định jti: rotate thật jti mới; grace window trả jti hiện hành.
         String effectiveJti = refreshTokenStore.rotate(user.getUserId(), familyId, oldJti);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId());
         claims.put("roleId", user.getRoleId());
-        // Phải mang lại fid sau mỗi lần xoay token, nếu không accessToken mới mất fid → logout không revoke được.
+        // Phải mang lại fid sau mỗi lần xoay token, nếu không accessToken mới mất fid logout không revoke được.
         claims.put("fid", familyId);
 
         String newAccessToken = jwtService.generateToken(userDetails, claims);
@@ -166,7 +166,7 @@ public class AuthService {
         // Revoke family ở Redis trước khi clear cookie — nếu attacker đã copy refresh token,
         // sau khi logout token đó cũng không refresh được nữa.
         // Đọc từ accessToken (Path=/) chứ KHÔNG từ refresh cookie: refresh cookie có Path=/api/auth/refresh
-        // nên trình duyệt không gửi kèm tới /api/auth/logout → fid được nhúng vào accessToken thay thế.
+        // nên trình duyệt không gửi kèm tới /api/auth/logout fid được nhúng vào accessToken thay thế.
         try {
             Claims claims = jwtService.extractAllClaimsFromRequest(request);
             String userId = (String) claims.get("userId");
@@ -219,7 +219,7 @@ public class AuthService {
 
     /**
      * Cookie cho refresh token. Path scoped đến /api/auth/refresh để các request khác
-     * không tự đính kèm refresh token → giảm bề mặt rủi ro.
+     * không tự đính kèm refresh token giảm bề mặt rủi ro.
      */
     private String buildRefreshTokenCookie(String cookieValue, int cookieMaxAge) {
         boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");

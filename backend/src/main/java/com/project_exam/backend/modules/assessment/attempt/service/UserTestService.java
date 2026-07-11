@@ -136,9 +136,9 @@ public class UserTestService {
         }
 
         userTest.setFinishedAt(LocalDateTime.now());
-        userTest.setStatus(UserTest.Status.COMPLETED); // 🟢 Cập nhật trạng thái đã nộp
+        userTest.setStatus(UserTest.Status.COMPLETED); // Cập nhật trạng thái đã nộp
 
-        // 🔥 Ghi nhận streak (side-effect, không được làm hỏng luồng nộp bài)
+        // Ghi nhận streak (side-effect, không được làm hỏng luồng nộp bài)
         try {
             streakService.recordActivity(currentUserId, StreakActivityType.TEST_SUBMIT);
         } catch (Exception ignored) {
@@ -399,7 +399,7 @@ public class UserTestService {
             return existing.get();
         }
 
-        // 🔒 Tạo NEW attempt: phải pass mọi guard.
+        //  Tạo NEW attempt: phải pass mọi guard.
         if (test.getClassId() != null) {
             boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
                     test.getClassId(), userId, MemberStatus.APPROVED);
@@ -427,7 +427,7 @@ public class UserTestService {
                 }
             }
 
-            // 💰 Bài trả phí: phải đã mua quyền (người tạo được miễn). Resume ở trên không qua đây.
+            // Bài trả phí: phải đã mua quyền (người tạo được miễn). Resume ở trên không qua đây.
             if (test.getCostCoins() != null && test.getCostCoins() > 0
                     && !userId.equals(test.getCreatedBy())
                     && !userTestAccessRepository.existsByUserIdAndTestId(userId, testId)) {
@@ -500,7 +500,7 @@ public class UserTestService {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
 
-        // 🛡 Bắt buộc test phải thuộc ExamCategory cho phép guest.
+        // Bắt buộc test phải thuộc ExamCategory cho phép guest.
         if (test.getExamCategoryId() == null) {
             throw new ForbiddenException("Bài thi này yêu cầu đăng nhập.");
         }
@@ -623,7 +623,7 @@ public class UserTestService {
     /**
      * Dọn MỘT LÔ bài làm dở của đề KHÔNG giới hạn giờ (không tự nộp được) đã quá ngưỡng.
      * Xoá hẳn UserTest + UserAnswer để tránh phình DB bởi các attempt bỏ ngang.
-     * Mỗi lời gọi = 1 transaction nhỏ (tối đa `batchSize` bản ghi) → không bao giờ ôm
+     * Mỗi lời gọi = 1 transaction nhỏ (tối đa `batchSize` bản ghi) không bao giờ ôm
      * giao dịch khổng lồ. Scheduler lặp gọi tới khi hết (có trần số lô/lần chạy).
      * Trả về số bản ghi đã xoá trong lô này (0 = đã hết). Bài CÓ giờ không đụng tới.
      */
@@ -667,7 +667,7 @@ public class UserTestService {
     public TestLeaderboardResponse getAttemptsByTest(String testId,HttpServletRequest httpRequest) {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
-        // 🔒 Đề của lớp -> chỉ thành viên lớp xem; đề public theo exam_type -> mọi user đăng nhập xem được.
+        //  Đề của lớp -> chỉ thành viên lớp xem; đề public theo exam_type -> mọi user đăng nhập xem được.
         requireLeaderboardViewAccess(test, httpRequest);
 
         boolean isUnlimited = test.getAvailableTo() == null;
@@ -704,7 +704,7 @@ public class UserTestService {
                 )
                 .collect(Collectors.toList());
 
-        // 🏅 Hạng của chính người đang xem — tính trên TOÀN bảng (kể cả khi nằm ngoài top hiển thị).
+        // Hạng của chính người đang xem — tính trên TOÀN bảng (kể cả khi nằm ngoài top hiển thị).
         TestLeaderboardResponse.MyRank me = null;
         String viewerId = authUtils.getUserId(httpRequest);
         if (viewerId != null) {
@@ -780,7 +780,7 @@ public class UserTestService {
     public UserTestResponse getMeta(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         var ut = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
-        // 🔒 Chỉ user sở hữu attempt, chủ đề (giáo viên), hoặc admin được xem.
+        //  Chỉ user sở hữu attempt, chủ đề (giáo viên), hoặc admin được xem.
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             String currentUserId = authUtils.getUserId(httpRequest);
             boolean isOwner = currentUserId != null && currentUserId.equals(ut.getUserId());

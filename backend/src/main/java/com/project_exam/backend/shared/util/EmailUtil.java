@@ -22,16 +22,16 @@ public class EmailUtil {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-        // 🟢 Thêm người gửi (rất quan trọng để Gmail không đánh dấu spam)
+        // Thêm người gửi (rất quan trọng để Gmail không đánh dấu spam)
         try {
             helper.setFrom("Thang10072005@gmail.com", "WinDe Exam");
         } catch (UnsupportedEncodingException e) {
             helper.setFrom("Thang10072005@gmail.com");
         }
         helper.setTo(email);
-        helper.setSubject("🔐 Xác thực tài khoản WinDe Exam");
+        helper.setSubject("Xác thực tài khoản WinDe Exam");
 
-        // 🧩 HTML nội dung email (nút đẹp, giao diện gọn)
+        // HTML nội dung email (nút đẹp, giao diện gọn)
         String content = """
             <div style="font-family:Arial, sans-serif; background:#f9f9f9; padding:20px; border-radius:10px;">
                 <h2 style="color:#2c3e50;">Xin chào!</h2>

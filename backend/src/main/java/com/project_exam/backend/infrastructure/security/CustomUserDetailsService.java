@@ -44,23 +44,23 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
-        // 🔍 Tìm user theo username hoặc email
+        // Tìm user theo username hoặc email
         User user = userRepository.findByUserName(input)
                 .or(() -> userRepository.findByEmail(input))
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Không tìm thấy người dùng với: " + input));
 
-        // 🚫 Nếu user chưa xác thực email → không cho login
+        // Nếu user chưa xác thực email không cho login
         if (!user.getVerified()) {
             throw new UsernameNotFoundException("Tài khoản chưa được xác thực qua email.");
         }
 
-        // 🔑 Lấy role name
+        // Lấy role name
         Role role = roleRepository.findById(user.getRoleId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy Role ID: " + user.getRoleId()));
 
-        // 🔐 Authorities = role (ROLE_<name>, backward-compat) + từng permission code của role.
-        // Permission resolve từ DB mỗi request (nối qua bảng role_permissions) → đổi quyền có hiệu lực ngay.
+        // Authorities = role (ROLE_<name>, backward-compat) + từng permission code của role.
+        // Permission resolve từ DB mỗi request (nối qua bảng role_permissions) đổi quyền có hiệu lực ngay.
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName().toUpperCase()));
         for (String code : rolePermissionRepository.findPermissionCodesByRoleId(role.getRoleId())) {

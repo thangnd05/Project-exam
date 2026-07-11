@@ -145,7 +145,7 @@ public class LearningPlanSessionService {
         return "Hoàn thành tất cả ải tag của Part này trước khi mở ải tổng ôn.";
     }
 
-    /** Plan cũ ở trạm MIX → chuyển về FOUNDATION hoặc MOCK. */
+    /** Plan cũ ở trạm MIX chuyển về FOUNDATION hoặc MOCK. */
     private void normalizePlanStage(LearningPlan plan) {
         if (plan.getPlanStage() == PlanStage.MIX) {
             long total = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(
@@ -239,7 +239,7 @@ public class LearningPlanSessionService {
         session.setSubmittedAt(Instant.now());
         sessionRepository.save(session);
 
-        // 🔥 Pass 1 ải learning plan -> ghi nhận streak (side-effect, không phá luồng)
+        // Pass 1 ải learning plan -> ghi nhận streak (side-effect, không phá luồng)
         if (passed) {
             try {
                 streakService.recordActivity(userId, StreakActivityType.LESSON_PASS);
@@ -502,7 +502,7 @@ public class LearningPlanSessionService {
      * Đếm fail streak gần nhất cho task này.
      * - Chỉ xét tối đa 5 session gần nhất (đủ vì threshold struggle là 3).
      * - Bỏ qua session abandoned (user switch task giữa chừng), KHÔNG nhầm với fail thật 0%.
-     * - Gặp pass hoặc session bất thường → dừng đếm (fail-safe, không gộp streak cũ).
+     * - Gặp pass hoặc session bất thường dừng đếm (fail-safe, không gộp streak cũ).
      * Phải gọi SAU khi save session hiện tại để bao gồm cả lần submit vừa rồi.
      */
     private int countConsecutiveFails(String learningPlanId, String taskId) {

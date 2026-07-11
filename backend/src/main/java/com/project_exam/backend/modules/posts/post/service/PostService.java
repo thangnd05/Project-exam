@@ -317,7 +317,7 @@ public class PostService {
 
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // Bài của chính user → xem được mọi status. Cho phép lọc thêm theo keyword (tiêu đề) và status.
+        // Bài của chính user xem được mọi status. Cho phép lọc thêm theo keyword (tiêu đề) và status.
         Specification<Post> spec = (root, query, cb) -> cb.equal(root.get("userId"), userId);
         if (keyword != null && !keyword.isBlank()) {
             String like = "%" + keyword.trim().toLowerCase() + "%";

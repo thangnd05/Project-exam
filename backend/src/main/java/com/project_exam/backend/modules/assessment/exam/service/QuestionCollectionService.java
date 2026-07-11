@@ -27,7 +27,7 @@ public class QuestionCollectionService {
     private final QuestionCollectionMapper questionCollectionMapper;
 
     public List<QuestionCollectionResponse> findAll() {
-        // Base order: displayOrder tăng dần (chưa đặt = null → xuống cuối), rồi theo tên.
+        // Base order: displayOrder tăng dần (chưa đặt = null xuống cuối), rồi theo tên.
         // FE vẫn sắp lại numeric-aware ("ETS 2026 2" trước "ETS 2026 10") khi dựng cây.
         Comparator<QuestionCollection> byOrderThenName = Comparator
                 .comparing(QuestionCollection::getDisplayOrder,
@@ -52,7 +52,7 @@ public class QuestionCollectionService {
         if (name == null) {
             throw new BadRequestException("Tên bộ sưu tập không được để trống.");
         }
-        // 🔒 Chống trùng tên (case-insensitive). DB cũng có unique constraint, nhưng kiểm tra
+        //  Chống trùng tên (case-insensitive). DB cũng có unique constraint, nhưng kiểm tra
         // trước để trả về thông báo rõ ràng thay vì SQLException.
         collectionRepository.findByNameIgnoreCase(name).ifPresent(existing -> {
             throw new ConflictException("Tên bộ sưu tập đã tồn tại.");
@@ -65,7 +65,7 @@ public class QuestionCollectionService {
         collection.setParentId(parentId);
         // Cha: examType lấy từ request; con: kế thừa examType của cha.
         collection.setExamTypeId(resolveExamTypeId(parentId, request.getExamTypeId()));
-        // Vị trí sắp xếp (tùy chọn). null = chưa đặt → FE sắp theo tên numeric-aware.
+        // Vị trí sắp xếp (tùy chọn). null = chưa đặt FE sắp theo tên numeric-aware.
         collection.setDisplayOrder(request.getDisplayOrder());
         collection = collectionRepository.save(collection);
         return toResponse(collection);
@@ -102,10 +102,10 @@ public class QuestionCollectionService {
 
         // Xác định examTypeId sau khi parentId đã chốt.
         if (collection.getParentId() != null) {
-            // Là con → luôn kế thừa examType của cha.
+            // Là con luôn kế thừa examType của cha.
             collection.setExamTypeId(resolveExamTypeId(collection.getParentId(), null));
         } else if (request.getExamTypeId() != null) {
-            // Là cha và request có gửi examTypeId → cập nhật, đồng thời lan truyền xuống các con.
+            // Là cha và request có gửi examTypeId cập nhật, đồng thời lan truyền xuống các con.
             String newExamTypeId = normalize(request.getExamTypeId());
             collection.setExamTypeId(newExamTypeId);
             List<QuestionCollection> children = collectionRepository.findByParentId(id);
@@ -126,7 +126,7 @@ public class QuestionCollectionService {
     public void delete(String id) {
         QuestionCollection collection = collectionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bộ sưu tập câu hỏi không tồn tại"));
-        // 🔒 Chặn xoá khi đang có câu hỏi gắn vào — tránh orphan reference.
+        //  Chặn xoá khi đang có câu hỏi gắn vào — tránh orphan reference.
         long inUse = questionRepository.countByCollectionId(id);
         if (inUse > 0) {
             throw new ConflictException(
@@ -134,7 +134,7 @@ public class QuestionCollectionService {
                             "Hãy bỏ liên kết các câu hỏi trước khi xoá."
             );
         }
-        // 🔒 Chặn xoá collection cha khi còn collection con — tránh con bị mồ côi.
+        //  Chặn xoá collection cha khi còn collection con — tránh con bị mồ côi.
         long childCount = collectionRepository.countByParentId(id);
         if (childCount > 0) {
             throw new ConflictException(

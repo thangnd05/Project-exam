@@ -153,7 +153,7 @@
     gap: 10px;
 
     svg {
-        color: #667eea;
+        color: #0061f2;
         font-size: 2rem;
     }
 }
@@ -191,7 +191,7 @@
         outline: none;
         border-color: var(--primary-color);
         background: #fff;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
     }
 
     &:disabled {
@@ -469,15 +469,15 @@
     font-weight: 700;
 
     svg {
-        color: var(--primary-color, #667eea);
+        color: var(--primary-color, #0061f2);
     }
 }
 
 .bankPartBadge {
     padding: 4px 12px;
     border-radius: 10px;
-    background: #e0e7ff;
-    color: #4338ca;
+    background: #dbeafe;
+    color: #1d4ed8;
     font-weight: 600;
     font-size: 1.2rem;
 }
@@ -510,12 +510,12 @@
     transition: all 0.2s;
 
     &:hover {
-        border-color: var(--primary-color, #667eea);
-        color: var(--primary-color, #667eea);
+        border-color: var(--primary-color, #0061f2);
+        color: var(--primary-color, #0061f2);
     }
 
     &.active {
-        background: var(--primary-gradient, #667eea);
+        background: var(--primary-gradient, #0061f2);
         color: #fff;
         border-color: transparent;
     }
@@ -575,7 +575,7 @@
     transition: all 0.2s;
 
     &.selected {
-        border-color: var(--primary-color, #667eea);
+        border-color: var(--primary-color, #0061f2);
         background: #f8faff;
     }
 }
@@ -621,7 +621,7 @@
     }
 
     &.selected {
-        background: #e0e7ff;
+        background: #dbeafe;
         border: 1px solid #c7d2fe;
     }
 }
@@ -655,8 +655,8 @@
     flex-shrink: 0;
 
     &:hover {
-        color: var(--primary-color, #667eea);
-        background: #e0e7ff;
+        color: var(--primary-color, #0061f2);
+        background: #dbeafe;
     }
 }
 
@@ -667,7 +667,7 @@
     margin-bottom: 0;
 
     strong {
-        color: var(--primary-color, #667eea);
+        color: var(--primary-color, #0061f2);
     }
 }
 

@@ -18,7 +18,7 @@ public class DictionaryApiService {
         String audio = null;  // lưu link audio (ưu tiên Google TTS)
 
         try {
-            // 🔗 API dictionaryapi.dev để lấy phonetic
+            // API dictionaryapi.dev để lấy phonetic
             String url = "https://api.dictionaryapi.dev/api/v2/entries/en/"
                     + URLEncoder.encode(word, StandardCharsets.UTF_8);
 
@@ -49,7 +49,7 @@ public class DictionaryApiService {
             System.out.println("Error fetching word info: " + e.getMessage());
         }
 
-        // 🔊 Luôn tạo link Google TTS cho audio (đảm bảo không null)
+        // Luôn tạo link Google TTS cho audio (đảm bảo không null)
         audio = "https://translate.google.com/translate_tts?ie=UTF-8&q="
                 + URLEncoder.encode(word, StandardCharsets.UTF_8)
                 + "&tl=en&client=tw-ob";

@@ -378,7 +378,7 @@ public class UserService {
     }
 
     public boolean deleteUser(String id, HttpServletRequest httpRequest) {
-        // 🔒 Chỉ admin được xoá user khác. User tự xoá account của mình cũng được.
+        //  Chỉ admin được xoá user khác. User tự xoá account của mình cũng được.
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isSelf = currentUserId != null && currentUserId.equals(id);
         if (!isSelf && !authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {

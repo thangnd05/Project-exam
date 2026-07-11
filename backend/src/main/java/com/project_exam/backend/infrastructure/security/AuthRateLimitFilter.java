@@ -23,7 +23,7 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
 
     private static final long WINDOW_MS = 60_000L;
 
-    /** Mỗi path có giới hạn riêng. Path không có trong map → không rate-limit. */
+    /** Mỗi path có giới hạn riêng. Path không có trong map không rate-limit. */
     private static final Map<String, Integer> LIMITS = Map.of(
             "/api/auth/login", 10,
             "/api/auth/register", 5,

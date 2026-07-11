@@ -136,7 +136,7 @@ public class EnhancedResultService {
             if (ua != null && correctAnswers != null && !correctAnswers.isEmpty()) {
                 isCorrect = checkCorrectness(ua, question, correctAnswers);
             }
-            // Câu không khoanh (ua == null) → isCorrect = false (SAI)
+            // Câu không khoanh (ua == null) isCorrect = false (SAI)
 
             correctnessMap.put(qId, isCorrect);
             if (isCorrect) totalCorrect++;

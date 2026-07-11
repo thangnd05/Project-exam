@@ -43,7 +43,7 @@ public class UserTargetService {
             Integer oldScore = ut.getTargetScore();
             ut.setTargetScore(request.getTargetScore());
             ut.setTargetReadiness(request.getTargetReadiness());
-            // Mục tiêu mới cao hơn → reset trạng thái đã đạt để theo dõi lại.
+            // Mục tiêu mới cao hơn reset trạng thái đã đạt để theo dõi lại.
             if (oldScore == null || !Objects.equals(oldScore, request.getTargetScore())) {
                 ut.setAchievedAt(null);
             }

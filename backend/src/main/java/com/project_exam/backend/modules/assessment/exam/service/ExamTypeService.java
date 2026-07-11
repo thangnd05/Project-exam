@@ -41,7 +41,7 @@ public class ExamTypeService {
                 .toList();
     }
 
-    /** examType con trực tiếp của 1 examType cha (cho drill-in AWS → các cert). */
+    /** examType con trực tiếp của 1 examType cha (cho drill-in AWS các cert). */
     public List<ExamTypeResponse> findChildren(String parentId) {
         return examTypeRepository.findByParentId(parentId).stream()
                 .map(this::toResponse)
@@ -86,7 +86,7 @@ public class ExamTypeService {
     public void delete(String id) {
         ExamType type = examTypeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
-        // 🔒 Chặn xoá examType cha khi còn con — tránh con mồ côi.
+        //  Chặn xoá examType cha khi còn con — tránh con mồ côi.
         if (examTypeRepository.existsByParentId(id)) {
             throw new ConflictException(
                     "Không thể xoá: loại kỳ thi này đang chứa các loại con. Hãy xoá/tách chúng trước.");

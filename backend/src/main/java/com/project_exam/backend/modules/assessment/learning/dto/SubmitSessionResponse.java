@@ -28,7 +28,7 @@ public class SubmitSessionResponse {
     public static class ReviewItem {
         private String questionId;
         private String questionText;
-        private String questionType; // MCQ/MSQ/FILL_BLANK/ESSAY → FE biết render thế nào
+        private String questionType; // MCQ/MSQ/FILL_BLANK/ESSAY FE biết render thế nào
         private List<ReviewAnswer> answers;
         private String selectedAnswerId;
         private List<String> selectedAnswerIds; // MSQ: các đáp án user đã chọn

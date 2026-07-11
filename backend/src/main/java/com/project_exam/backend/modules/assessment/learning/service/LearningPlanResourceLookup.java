@@ -27,7 +27,7 @@ public class LearningPlanResourceLookup {
     }
 
     /**
-     * Mỗi tagId → tài liệu đầu tiên (theo thứ tự resource_tag).
+     * Mỗi tagId tài liệu đầu tiên (theo thứ tự resource_tag).
      */
     public Map<String, PlanPhaseDto.RecommendedResourceDto> findFirstByTagIds(Collection<String> tagIds) {
         if (tagIds == null || tagIds.isEmpty()) {

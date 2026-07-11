@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * Logic chấm điểm dùng chung cho mọi nơi (đề thi, learning plan): MCQ 1 đáp án,
- * MSQ nhiều đáp án (all-or-nothing), FILL_BLANK so text. ESSAY chấm tay → luôn false ở đây.
+ * MSQ nhiều đáp án (all-or-nothing), FILL_BLANK so text. ESSAY chấm tay luôn false ở đây.
  */
 public final class AnswerGradingUtil {
 

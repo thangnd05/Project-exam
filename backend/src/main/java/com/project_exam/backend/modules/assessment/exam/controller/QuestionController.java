@@ -60,7 +60,7 @@ public class QuestionController {
 
     /**
      * Lấy câu hỏi theo part:
-     * - bank=admin → kho admin (do admin tạo, public cho mọi user)
+     * - bank=admin kho admin (do admin tạo, public cho mọi user)
      * - Cá nhân: không gửi classId/chapterId (lấy theo user JWT)
      * - Lớp: gửi classId (+ chapterId)
      */

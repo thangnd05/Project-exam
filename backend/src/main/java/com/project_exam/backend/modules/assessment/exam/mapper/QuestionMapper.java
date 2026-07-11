@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * Mapper thuần cho Question → các response DTO.
+ * Mapper thuần cho Question các response DTO.
  *
  * <p>Question response được dựng với TẬP FIELD KHÁC NHAU tuỳ ngữ cảnh, nên mỗi shape
  * có một method riêng. Mọi giá trị cần DB/tính toán (examTypeId, passage dto,

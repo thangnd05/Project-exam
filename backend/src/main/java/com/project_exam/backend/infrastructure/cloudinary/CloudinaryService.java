@@ -41,7 +41,7 @@ public class CloudinaryService {
         Map uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap(
-                        "resource_type", "raw", // 🔥 quan trọng
+                        "resource_type", "raw", // quan trọng
                         "folder", "english_exam/documents",
                         "use_filename", true,
                         "unique_filename", true

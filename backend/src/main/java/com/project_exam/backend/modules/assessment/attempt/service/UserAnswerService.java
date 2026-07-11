@@ -115,7 +115,7 @@ public class UserAnswerService {
     }
 
     public List<UserAnswerResponse> findResponsesByUserTestId(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
-        // 🔒 Chỉ owner attempt, chủ đề (giáo viên), hoặc admin được xem.
+        //  Chỉ owner attempt, chủ đề (giáo viên), hoặc admin được xem.
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             UserTest ut = userTestRepository.findById(userTestId)
                     .orElseThrow(() -> new NotFoundException("UserTest not found"));
@@ -334,7 +334,7 @@ public class UserAnswerService {
 
     public boolean delete(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
         return userAnswerRepository.findById(id).map(u -> {
-            // 🔒 Chỉ owner attempt hoặc admin được xoá đáp án.
+            //  Chỉ owner attempt hoặc admin được xoá đáp án.
             if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
                 String currentUserId = authUtils.getUserId(httpRequest);
                 UserTest ut = userTestRepository.findById(u.getUserTestId())

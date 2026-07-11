@@ -60,7 +60,7 @@ public class EmailVerificationService {
      * Xác thực tài khoản qua token trong email
      */
     public ResponseEntity<Map<String, Object>> verifyToken(String token) {
-        // 🔍 Tìm token trong bảng email_verifications
+        // Tìm token trong bảng email_verifications
         EmailVerification ev = emailVerificationRepository.findByToken(token).orElse(null);
 
         if (ev == null) {
@@ -68,7 +68,7 @@ public class EmailVerificationService {
                     .body(Map.of("message", "Token không hợp lệ hoặc đã được sử dụng"));
         }
 
-        // 🔎 Tìm user tương ứng
+        // Tìm user tương ứng
         User user = userRepository.findById(ev.getUserId()).orElse(null);
         if (user == null) {
             // Xóa token mồ côi nếu không còn user
@@ -102,7 +102,7 @@ public class EmailVerificationService {
         user.setVerified(true);
         userRepository.save(user);
 
-        // 🧹 Xóa token ngay sau khi xác thực
+        // Xóa token ngay sau khi xác thực
         emailVerificationRepository.delete(ev);
 
         return ResponseEntity.ok(Map.of("message", " Xác thực tài khoản thành công!"));
@@ -121,7 +121,7 @@ public class EmailVerificationService {
             if (user != null && !user.getVerified()) {
                 emailVerificationRepository.delete(ev);
                 userRepository.delete(user);
-                System.out.println("🧹 Đã xóa user chưa xác thực: " + user.getEmail());
+                System.out.println("Đã xóa user chưa xác thực: " + user.getEmail());
             }
         }
     }

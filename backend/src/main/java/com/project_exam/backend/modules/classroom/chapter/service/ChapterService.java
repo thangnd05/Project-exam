@@ -45,7 +45,7 @@ public class ChapterService {
     }
 
     // ============================
-    //  Helper convert Entity → DTO
+    //  Helper convert Entity DTO
     // ============================
     private ChapterResponse toResponse(Chapter c) {
         return chapterMapper.toResponse(c);
@@ -87,7 +87,7 @@ public class ChapterService {
     //  GET BY CLASS
     // ============================
     public List<ChapterResponse> getByClassId(String classId, HttpServletRequest httpRequest) {
-        // 🔒 Chỉ thành viên/giáo viên của lớp (hoặc admin) mới được liệt kê chapter của lớp.
+        //  Chỉ thành viên/giáo viên của lớp (hoặc admin) mới được liệt kê chapter của lớp.
         String currentUserId = authUtils.getUserId(httpRequest);
         classAccessGuard.requireMemberOrTeacher(classId, currentUserId, httpRequest);
 
@@ -105,7 +105,7 @@ public class ChapterService {
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
-        // 🔒 Chỉ thành viên/giáo viên của lớp chứa chapter mới được xem.
+        //  Chỉ thành viên/giáo viên của lớp chứa chapter mới được xem.
         String currentUserId = authUtils.getUserId(httpRequest);
         classAccessGuard.requireMemberOrTeacher(chapter.getClassId(), currentUserId, httpRequest);
 
@@ -151,7 +151,7 @@ public class ChapterService {
         //  check teacher
         checkTeacherPermission(chapter.getClassId(), currentUserId);
 
-        // 🔥 Cascade: xoá toàn bộ questions (kèm answers/test_questions/user_answers) thuộc chapter này.
+        // Cascade: xoá toàn bộ questions (kèm answers/test_questions/user_answers) thuộc chapter này.
         questionService.cascadeDeleteQuestionsByChapter(chapterId);
 
         chapterRepository.deleteById(chapterId);

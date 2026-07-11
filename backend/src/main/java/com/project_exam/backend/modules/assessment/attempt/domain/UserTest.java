@@ -40,7 +40,7 @@ public class UserTest {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private Status status = Status.IN_PROGRESS; // 🟢 mặc định khi bắt đầu thi
+    private Status status = Status.IN_PROGRESS; // mặc định khi bắt đầu thi
 
     // FULL_TEST = làm cả đề, có giới hạn giờ, tính lượt/xu, lên bảng xếp hạng.
     // PRACTICE  = luyện tập theo Part, không giới hạn giờ, miễn phí/không tốn lượt,

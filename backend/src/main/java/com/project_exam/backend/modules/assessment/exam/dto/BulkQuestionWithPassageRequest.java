@@ -8,7 +8,7 @@ public class BulkQuestionWithPassageRequest {
 
     private String examPartId;
 
-    // 🔑 bắt buộc
+    // bắt buộc
     private String classId;
     private String chapterId;
 

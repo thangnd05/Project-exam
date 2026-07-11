@@ -28,7 +28,7 @@ public class QuestionCollection {
     /**
      * Collection cha (FK -> question_collections.collection_id, nullable).
      * <p>null = collection cấp 1 (cha). Có giá trị = collection con của một collection cấp 1.
-     * Hệ thống chỉ hỗ trợ tối đa 2 cấp: cha → con (con không được làm cha tiếp).
+     * Hệ thống chỉ hỗ trợ tối đa 2 cấp: cha con (con không được làm cha tiếp).
      */
     @Column(name = "parent_id")
     private String parentId;
