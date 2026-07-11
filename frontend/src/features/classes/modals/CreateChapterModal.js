@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import { createChapter } from '~/shared/api/chapterApi';
+import { useCreateChapter } from '~/features/classes/chapters/hooks/useChaptersOfClass';
 import { toast } from 'react-toastify';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
@@ -12,32 +12,31 @@ const cx = classNames.bind(styles);
 const CreateChapterModal = ({ show, onClose, classId, onSuccess }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [submitting, setSubmitting] = useState(false);
+    const createMutation = useCreateChapter(classId);
+    const submitting = createMutation.isPending;
 
-    const handleCreate = async () => {
+    const handleCreate = () => {
         if (!title.trim()) {
             toast.warning(' Vui lòng nhập tên chương!');
             return;
         }
 
-        setSubmitting(true);
-        try {
-            await createChapter({
-                classId: classId,
-                title: title,
-                description: description
-            });
-            toast.success('Tạo chương mới thành công!');
-            setTitle('');
-            setDescription('');
-            onSuccess();
-            onClose();
-        } catch (error) {
-            console.error('Failed to create chapter:', error);
-            toast.error('Có lỗi xảy ra khi tạo chương mới!');
-        } finally {
-            setSubmitting(false);
-        }
+        createMutation.mutate(
+            { classId, title, description },
+            {
+                onSuccess: () => {
+                    toast.success('Tạo chương mới thành công!');
+                    setTitle('');
+                    setDescription('');
+                    onSuccess?.();
+                    onClose();
+                },
+                onError: (error) => {
+                    console.error('Failed to create chapter:', error);
+                    toast.error('Có lỗi xảy ra khi tạo chương mới!');
+                },
+            },
+        );
     };
 
     return (

@@ -1,5 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getChaptersByClass, deleteChapter } from '~/shared/api/chapterApi';
+import {
+  getChaptersByClass,
+  createChapter,
+  updateChapter,
+  deleteChapter,
+} from '~/shared/api/chapterApi';
 import { getClassById } from '~/shared/api/classApi';
 
 export const chapterKeys = {
@@ -44,4 +49,28 @@ export function useChaptersOfClass(classId) {
     deleteChapterMutation,
     refetchChapters,
   };
+}
+
+export function useCreateChapter(classId, { onSuccess, onError } = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => createChapter(payload),
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: chapterKeys.list(classId) });
+      if (onSuccess) onSuccess(...args);
+    },
+    onError,
+  });
+}
+
+export function useUpdateChapter(classId, { onSuccess, onError } = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ chapterId, payload }) => updateChapter(chapterId, payload),
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: chapterKeys.list(classId) });
+      if (onSuccess) onSuccess(...args);
+    },
+    onError,
+  });
 }

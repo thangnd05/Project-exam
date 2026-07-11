@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import { updateChapter } from '~/shared/api/chapterApi';
+import { useUpdateChapter } from '~/features/classes/chapters/hooks/useChaptersOfClass';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
@@ -9,9 +9,10 @@ import commonModalStyles from '~/shared/ui/modal/CommonFormModal.module.scss';
 const cx = classNames.bind(commonModalStyles);
 
 function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}) {
-  const [submitting, setSubmitting] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const updateMutation = useUpdateChapter(classId);
+  const submitting = updateMutation.isPending;
 
   useEffect(() => {
     if (!chapter) {
@@ -24,7 +25,7 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}) {
     setDescription(chapter.description || '');
   }, [chapter, show]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!chapter?.chapterId) {
       return;
     }
@@ -34,26 +35,28 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}) {
       return;
     }
 
-    setSubmitting(true);
-    try {
-      const payload = {
-        classId: String(classId),
-        title: title.trim(),
-        description: description.trim(),
-      };
-      await updateChapter(chapter.chapterId, payload);
-      toast.success('Cập nhật chương thành công!');
-      onClose();
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || 'Không thể cập nhật chương. Vui lòng thử lại.',
-      );
-    } finally {
-      setSubmitting(false);
-    }
+    updateMutation.mutate(
+      {
+        chapterId: chapter.chapterId,
+        payload: {
+          classId: String(classId),
+          title: title.trim(),
+          description: description.trim(),
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success('Cập nhật chương thành công!');
+          onClose();
+          onSuccess?.();
+        },
+        onError: (error) => {
+          toast.error(
+            error.response?.data?.message || 'Không thể cập nhật chương. Vui lòng thử lại.',
+          );
+        },
+      },
+    );
   };
 
   return (
