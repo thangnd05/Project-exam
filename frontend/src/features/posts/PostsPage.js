@@ -50,17 +50,6 @@ function PostsPage() {
     refresh();
   };
 
-  const getCategoryStyles = (categoryName) => {
-    switch (categoryName) {
-      case 'Lập trình': return 'bg-blue-50 text-blue-700';
-      case 'Ngoại ngữ': return 'bg-green-50 text-green-700';
-      case 'Kinh nghiệm ôn thi': return 'bg-pink-50 text-pink-700';
-      case 'Tài liệu': return 'bg-orange-50 text-orange-700';
-      case 'Chia sẻ': return 'bg-purple-50 text-purple-700';
-      default: return 'bg-gray-50 text-gray-700';
-    }
-  };
-
   return (
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
@@ -147,10 +136,9 @@ function PostsPage() {
               animate="visible"
               exit={{ opacity: 0, y: 12, transition: { duration: 0.25 } }}
               variants={cardVariants}
-              whileHover={{ y: -6 }}
             >
               <div className={cx('thumbnail')}>
-                <div className={cx('cardCategory', getCategoryStyles(post.categories?.[0]?.name))}>
+                <div className={cx('cardCategory')}>
                   {post.categories?.[0]?.name || 'Blog'}
                 </div>
                 <img src={post.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={post.title} />
