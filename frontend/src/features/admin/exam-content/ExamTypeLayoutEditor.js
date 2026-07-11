@@ -14,8 +14,10 @@ import {
 } from 'lucide-react';
 import classNames from 'classnames/bind';
 
+import {useQuery} from '@tanstack/react-query';
+
 import {getExamTypeById, getOwnExamTypeLayout} from '~/shared/api/examTypeApi';
-import {useUpdateExamTypeLayout} from './hooks/useExamTypes';
+import {examTypeKeys, useUpdateExamTypeLayout} from './hooks/useExamTypes';
 import { resolveLayoutConfig } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,
@@ -77,31 +79,33 @@ function ExamTypeLayoutEditor() {
   const navigate = useNavigate();
 
   const [config, setConfig] = useState(defaultLayoutConfig);
-  const [examTypeName, setExamTypeName] = useState('');
   const [selectedId, setSelectedId] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [dragId, setDragId] = useState(null);
   const [dropZone, setDropZone] = useState(null);
 
   const saveLayout = useUpdateExamTypeLayout();
   const saving = saveLayout.isPending;
 
+  const examTypeQuery = useQuery({
+    queryKey: ['exam-type', examTypeId],
+    queryFn: () => getExamTypeById(examTypeId),
+    enabled: !!examTypeId,
+    select: (data) => data?.name || '',
+  });
+  const examTypeName = examTypeQuery.data || '';
+
+  const layoutQuery = useQuery({
+    queryKey: examTypeKeys.layout(examTypeId),
+    queryFn: () => getOwnExamTypeLayout(examTypeId),
+    enabled: !!examTypeId,
+  });
+  const loading = layoutQuery.isLoading;
+  
   useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    Promise.all([
-      getExamTypeById(examTypeId).catch(() => null),
-      getOwnExamTypeLayout(examTypeId).catch(() => null),
-    ]).then(([examType, layout]) => {
-      if (cancelled) return;
-      setExamTypeName(examType?.name || '');
-      setConfig(resolveLayoutConfig(layout));
-      setLoading(false);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [examTypeId]);
+    if (layoutQuery.data !== undefined) {
+      setConfig(resolveLayoutConfig(layoutQuery.data));
+    }
+  }, [layoutQuery.data]);
 
   const updateBlocks = useCallback((fn) => {
     setConfig((c) => ({ ...c, blocks: normalizeOrders(fn(c.blocks)) }));
