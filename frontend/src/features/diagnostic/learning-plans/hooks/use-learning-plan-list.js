@@ -1,6 +1,58 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { getExamTypes } from '~/shared/api/examTypeApi';
 import { listPlans } from '~/shared/api/learningPlanApi';
+
+export const learningPlanListKeys = {
+  all: ['learning-plan-list'],
+  list: (loadAll, examTypeId, refreshKey) => [
+    'learning-plan-list',
+    { loadAll, examTypeId: examTypeId || null, refreshKey },
+  ],
+};
+
+async function fetchPlanList({ loadAll, filterExamTypeId }) {
+  const types = await getExamTypes();
+  const nameById = Object.fromEntries(
+    types.map((et) => [et.examTypeId, et.name]),
+  );
+
+  let merged = [];
+
+  if (loadAll) {
+    const lists = await Promise.all(
+      types.map((et) => listPlans(et.examTypeId).catch(() => [])),
+    );
+    const seen = new Set();
+    merged = lists
+      .flat()
+      .map((p) => ({
+        ...p,
+        examTypeName: nameById[p.examTypeId] || p.examTypeId,
+      }))
+      .filter((p) => {
+        if (seen.has(p.learningPlanId)) return false;
+        seen.add(p.learningPlanId);
+        return true;
+      });
+  } else {
+    const id = filterExamTypeId || types[0]?.examTypeId;
+    if (!id) {
+      return { examTypes: types, plans: [] };
+    }
+    const data = await listPlans(id);
+    const examTypeName = nameById[id] || id;
+    merged = (data || []).map((p) => ({ ...p, examTypeName }));
+  }
+
+  merged.sort((a, b) => {
+    const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return tb - ta;
+  });
+
+  return { examTypes: types, plans: merged };
+}
 
 export function useLearningPlanList({
   loadAll = false,
@@ -8,11 +60,7 @@ export function useLearningPlanList({
   initialExamTypeId = '',
   refreshKey = 0,
 } = {}) {
-  const [examTypes, setExamTypes] = useState([]);
   const [internalExamTypeId, setInternalExamTypeId] = useState(initialExamTypeId);
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const filterExamTypeId = controlledExamTypeId !== undefined
     ? controlledExamTypeId
@@ -24,61 +72,13 @@ export function useLearningPlanList({
     }
   }, [controlledExamTypeId]);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const types = await getExamTypes();
-      setExamTypes(types);
-      const nameById = Object.fromEntries(
-        types.map((et) => [et.examTypeId, et.name]),
-      );
+  const query = useQuery({
+    queryKey: learningPlanListKeys.list(loadAll, filterExamTypeId, refreshKey),
+    queryFn: () => fetchPlanList({ loadAll, filterExamTypeId }),
+  });
 
-      let merged = [];
-
-      if (loadAll) {
-        const lists = await Promise.all(
-          types.map((et) => listPlans(et.examTypeId).catch(() => [])),
-        );
-        const seen = new Set();
-        merged = lists
-          .flat()
-          .map((p) => ({
-            ...p,
-            examTypeName: nameById[p.examTypeId] || p.examTypeId,
-          }))
-          .filter((p) => {
-            if (seen.has(p.learningPlanId)) return false;
-            seen.add(p.learningPlanId);
-            return true;
-          });
-      } else {
-        const id = filterExamTypeId || types[0]?.examTypeId;
-        if (!id) {
-          setPlans([]);
-          return;
-        }
-        const data = await listPlans(id);
-        const examTypeName = nameById[id] || id;
-        merged = (data || []).map((p) => ({ ...p, examTypeName }));
-      }
-
-      merged.sort((a, b) => {
-        const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return tb - ta;
-      });
-      setPlans(merged);
-    } catch (err) {
-      setError(err?.response?.data?.message || err.message || 'Không tải được danh sách plan');
-    } finally {
-      setLoading(false);
-    }
-  }, [loadAll, filterExamTypeId]);
-
-  useEffect(() => {
-    reload();
-  }, [reload, refreshKey]);
+  const examTypes = query.data?.examTypes ?? [];
+  const plans = query.data?.plans ?? [];
 
   const filteredPlans = useMemo(() => {
     if (loadAll && !filterExamTypeId) return plans;
@@ -90,10 +90,14 @@ export function useLearningPlanList({
     examTypes,
     plans: filteredPlans,
     allPlansCount: plans.length,
-    loading,
-    error,
+    loading: query.isLoading,
+    error: query.error
+      ? query.error?.response?.data?.message
+        || query.error.message
+        || 'Không tải được danh sách plan'
+      : null,
     filterExamTypeId,
     setFilterExamTypeId,
-    reload,
+    reload: query.refetch,
   };
 }

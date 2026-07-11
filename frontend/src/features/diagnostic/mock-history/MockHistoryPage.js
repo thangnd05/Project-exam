@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useQueries } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { getEnhancedResult } from '~/shared/api/enhancedResultApi';
 import Pagination from '~/shared/ui/Pagination/Pagination';
@@ -16,6 +17,10 @@ const cx = classNames.bind(styles);
 
 const PAGE_SIZE = 10;
 
+const enhancedResultKeys = {
+  detail: (userTestId) => ['enhanced-result', userTestId],
+};
+
 function formatDuration(seconds) {
   if (seconds == null) return '—';
   const m = Math.floor(seconds / 60);
@@ -27,9 +32,8 @@ function MockHistoryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [examTypeFilter, setExamTypeFilter] = useState(searchParams.get('examTypeId') || '');
   const [page, setPage] = useState(0);
-  const [enhancedById, setEnhancedById] = useState({});
-  const [loadingId, setLoadingId] = useState(null);
-  const [chartLoading, setChartLoading] = useState(false);
+  // Các bài người dùng bấm "Tải" thủ công ở bảng (ngoài tập bài của biểu đồ).
+  const [requestedIds, setRequestedIds] = useState(() => new Set());
 
   const {
     examTypes,
@@ -56,56 +60,53 @@ function MockHistoryPage() {
     setSearchParams(value ? { examTypeId: value } : {});
   };
 
-  // Nạp readiness (enhanced result) cho các bài trong biểu đồ. BE đã loại Quick
-  // Challenge nên mọi bài ở đây đều có điểm tổng chuẩn.
-  const chartTestIds = useMemo(
-    () => chartTests.map((t) => t.userTestId).join(','),
-    [chartTests],
-  );
+  // Nạp readiness (enhanced result) cho các bài trong biểu đồ + các bài bấm "Tải" ở
+  // bảng. BE đã loại Quick Challenge nên mọi bài ở đây đều có điểm tổng chuẩn.
+  const enhancedIds = useMemo(() => {
+    const ids = new Set(chartTests.map((t) => t.userTestId));
+    requestedIds.forEach((id) => ids.add(id));
+    return [...ids];
+  }, [chartTests, requestedIds]);
 
-  useEffect(() => {
-    if (chartTests.length === 0) {
-      return undefined;
-    }
+  const enhancedQueries = useQueries({
+    queries: enhancedIds.map((userTestId) => ({
+      queryKey: enhancedResultKeys.detail(userTestId),
+      queryFn: () => getEnhancedResult(userTestId).then((r) => r.data),
+      staleTime: Infinity,
+    })),
+  });
 
-    let cancelled = false;
-    const missing = chartTests.filter((t) => !enhancedById[t.userTestId]);
+  // Tra nhanh query theo id để biết trạng thái tải của từng dòng bảng.
+  const enhancedQueryById = {};
+  enhancedIds.forEach((id, i) => {
+    enhancedQueryById[id] = enhancedQueries[i];
+  });
 
-    if (missing.length === 0) {
-      return undefined;
-    }
+  // Chữ ký trạng thái để memo hoá map kết quả (giữ chartData ổn định giữa các render).
+  const enhancedSignature = enhancedIds
+    .map((id, i) => {
+      const q = enhancedQueries[i];
+      return `${id}:${q?.isError ? 'e' : q?.data !== undefined ? 'd' : 'p'}`;
+    })
+    .join('|');
 
-    setChartLoading(true);
-
-    (async () => {
-      const batches = await Promise.all(
-        missing.map(async (t) => {
-          try {
-            const r = await getEnhancedResult(t.userTestId);
-            return { userTestId: t.userTestId, data: r.data };
-          } catch {
-            return { userTestId: t.userTestId, data: { error: true } };
-          }
-        }),
-      );
-
-      if (cancelled) return;
-
-      setEnhancedById((prev) => {
-        const next = { ...prev };
-        batches.forEach((item) => {
-          next[item.userTestId] = item.data;
-        });
-        return next;
-      });
-      setChartLoading(false);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+  // enhancedById giữ đúng shape cũ: id -> data, hoặc { error: true } khi lỗi.
+  const enhancedById = useMemo(() => {
+    const map = {};
+    enhancedIds.forEach((id, i) => {
+      const q = enhancedQueries[i];
+      if (!q) return;
+      if (q.isError) map[id] = { error: true };
+      else if (q.data !== undefined) map[id] = q.data;
+    });
+    return map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartTestIds]);
+  }, [enhancedSignature]);
+
+  const chartLoading = chartTests.some((t) => {
+    const q = enhancedQueryById[t.userTestId];
+    return q ? q.isLoading : true;
+  });
 
   const chartData = useMemo(() => {
     const chronological = [...chartTests].reverse();
@@ -139,18 +140,16 @@ function MockHistoryPage() {
     });
   }, [chartTests, enhancedById]);
 
-  const loadEnhanced = useCallback(async (userTestId) => {
-    if (enhancedById[userTestId]) return;
-    setLoadingId(userTestId);
-    try {
-      const r = await getEnhancedResult(userTestId);
-      setEnhancedById((prev) => ({ ...prev, [userTestId]: r.data }));
-    } catch {
-      setEnhancedById((prev) => ({ ...prev, [userTestId]: { error: true } }));
-    } finally {
-      setLoadingId(null);
-    }
-  }, [enhancedById]);
+  const loadEnhanced = (userTestId) => {
+    // Đưa id vào danh sách cần nạp -> useQueries sẽ tự fetch. Giống hành vi cũ:
+    // đã nạp (có kết quả hoặc đã lỗi) thì không nạp lại.
+    setRequestedIds((prev) => {
+      if (prev.has(userTestId)) return prev;
+      const next = new Set(prev);
+      next.add(userTestId);
+      return next;
+    });
+  };
 
   const showCharts = !loading && chartData.length > 0;
 
@@ -231,6 +230,8 @@ function MockHistoryPage() {
                 {tableRows.map((t, idx) => {
                   const e = enhancedById[t.userTestId];
                   const enhancedLoaded = e && !e.error;
+                  const rowQuery = enhancedQueryById[t.userTestId];
+                  const rowLoading = !enhancedLoaded && !!rowQuery?.isFetching;
                   return (
                     <tr key={t.userTestId}>
                       <td>{totalElements - (currentPage * PAGE_SIZE + idx)}</td>
@@ -246,7 +247,7 @@ function MockHistoryPage() {
                       <td className={cx('right')}>
                         {enhancedLoaded ? (
                           `${e.readinessScore}%`
-                        ) : loadingId === t.userTestId ? (
+                        ) : rowLoading ? (
                           '...'
                         ) : (
                           <button

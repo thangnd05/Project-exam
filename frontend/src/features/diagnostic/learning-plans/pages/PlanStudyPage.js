@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { getCurrentSession } from '~/shared/api/learningPlanApi';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
@@ -10,6 +11,11 @@ import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
+const planSessionKeys = {
+  session: (learningPlanId, taskId, review) =>
+    ['plan-session', learningPlanId, taskId || null, !!review],
+};
+
 function PlanStudyPage() {
   const { learningPlanId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,59 +23,71 @@ function PlanStudyPage() {
   const { refreshStreak } = useStreak();
   const taskIdFromUrl = searchParams.get('taskId');
   const isReviewMode = searchParams.get('review') === 'true';
+  // Chỉ vào nhánh "xem lại" khi có taskId; nếu không thì tải phiên luyện bình thường.
+  const reviewBranch = isReviewMode && !!taskIdFromUrl;
 
-  const [session, setSession] = useState(null);
   const [selections, setSelections] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
   const [showReview, setShowReview] = useState(false);
+  const [formError, setFormError] = useState(null);
 
   const submitMutation = useSubmitSession();
   const submitting = submitMutation.isPending;
 
-  const loadSession = useCallback((taskId) => {
-    setLoading(true);
-    setError(null);
+  const sessionQuery = useQuery({
+    queryKey: planSessionKeys.session(learningPlanId, taskIdFromUrl, reviewBranch),
+    queryFn: () =>
+      getCurrentSession(learningPlanId, taskIdFromUrl || undefined, reviewBranch),
+    enabled: !!learningPlanId,
+  });
+
+  // Trong nhánh xem lại, không dựng "session" (giữ như bản cũ: chỉ hiển thị result).
+  const session = reviewBranch ? null : sessionQuery.data ?? null;
+  const loading = sessionQuery.isLoading || sessionQuery.isFetching;
+  const loadError = sessionQuery.error
+    ? sessionQuery.error?.response?.data?.message || sessionQuery.error.message
+    : null;
+  const error = formError || loadError;
+
+  // Reset trạng thái UI tạm thời khi đổi ải / đổi chế độ.
+  useEffect(() => {
     setResult(null);
     setShowReview(false);
-    getCurrentSession(learningPlanId, taskId || undefined)
-      .then((data) => {
-        setSession(data);
-        setSelections({});
-      })
-      .catch((err) => {
-        setError(err?.response?.data?.message || err.message);
-      })
-      .finally(() => setLoading(false));
-  }, [learningPlanId]);
+    setSelections({});
+    setFormError(null);
+  }, [learningPlanId, taskIdFromUrl, isReviewMode]);
 
+  // Nạp dữ liệu xem lại (đáp án & giải thích) từ session query.
   useEffect(() => {
-    if (isReviewMode && taskIdFromUrl) {
-      setLoading(true);
-      setError(null);
-      getCurrentSession(learningPlanId, taskIdFromUrl, true)
-        .then((data) => {
-          if (data.lastReviewItems) {
-            setResult({
-              reviewItems: data.lastReviewItems,
-              passed: true,
-              accuracy: 0,
-              correctCount: 0,
-              totalCount: 0,
-              message: data.message,
-            });
-            setShowReview(true);
-          } else {
-            setError('Chưa có dữ liệu giải thích cho ải này.');
-          }
-        })
-        .catch((err) => setError(err?.response?.data?.message || err.message))
-        .finally(() => setLoading(false));
+    if (!reviewBranch || !sessionQuery.data) return;
+    const data = sessionQuery.data;
+    if (data.lastReviewItems) {
+      setResult({
+        reviewItems: data.lastReviewItems,
+        passed: true,
+        accuracy: 0,
+        correctCount: 0,
+        totalCount: 0,
+        message: data.message,
+      });
+      setShowReview(true);
     } else {
-      loadSession(taskIdFromUrl);
+      setFormError('Chưa có dữ liệu giải thích cho ải này.');
     }
-  }, [loadSession, taskIdFromUrl, isReviewMode, learningPlanId]);
+  }, [reviewBranch, sessionQuery.data]);
+
+  const reloadSession = () => {
+    setResult(null);
+    setShowReview(false);
+    setSelections({});
+    setFormError(null);
+    if (reviewBranch) {
+      // Rời chế độ xem lại để lấy phiên luyện mới cho ải này (như loadSession cũ).
+      setSearchParams({ taskId: taskIdFromUrl });
+    } else {
+      sessionQuery.refetch();
+    }
+  };
 
   const goToPicker = () => {
     navigate(`/learning-plans/${learningPlanId}`);
@@ -105,10 +123,10 @@ function PlanStudyPage() {
       return q.questionType === 'MSQ' ? !(Array.isArray(sel) && sel.length) : !sel;
     });
     if (missing) {
-      setError('Vui lòng chọn đáp án cho tất cả câu hỏi.');
+      setFormError('Vui lòng chọn đáp án cho tất cả câu hỏi.');
       return;
     }
-    setError(null);
+    setFormError(null);
     submitMutation.mutate(
       { learningPlanId, sessionId: session.sessionId, answers },
       {
@@ -116,7 +134,7 @@ function PlanStudyPage() {
           setResult(res);
           if (res?.passed) refreshStreak();
         },
-        onError: (err) => setError(err?.response?.data?.message || err.message),
+        onError: (err) => setFormError(err?.response?.data?.message || err.message),
       },
     );
   };
@@ -213,7 +231,7 @@ function PlanStudyPage() {
               <button
                 type="button"
                 className={cx('btn', 'btnOutline', 'btnSm')}
-                onClick={() => loadSession(taskIdFromUrl)}
+                onClick={reloadSession}
               >
                 {result.passed ? 'Làm lại ải này' : 'Thử lại'}
               </button>

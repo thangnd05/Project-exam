@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
@@ -15,13 +16,23 @@ import {
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);
 
+const currentTargetKeys = {
+  detail: (examTypeId) => ['user-target', examTypeId],
+};
+
 function UserTargetPage() {
   const [searchParams] = useSearchParams();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [targetScore, setTargetScore] = useState('');
   const [customParts, setCustomParts] = useState({});
-  const [currentTarget, setCurrentTarget] = useState(null);
   const [message, setMessage] = useState('');
+
+  const targetQuery = useQuery({
+    queryKey: currentTargetKeys.detail(selectedExamTypeId),
+    queryFn: () => getUserTarget(selectedExamTypeId),
+    enabled: !!selectedExamTypeId,
+  });
+  const currentTarget = targetQuery.data?.hasTarget ? targetQuery.data : null;
 
   const { examTypes, examParts, skills, scoringConversions, milestones } =
     useUserTargetData(selectedExamTypeId);
@@ -55,38 +66,25 @@ function UserTargetPage() {
     selectedExamTypeId,
   });
 
-  const loadCurrentTarget = useCallback(async () => {
+  // Đồng bộ form (điểm mục tiêu, % từng part) theo mục tiêu server trả về.
+  useEffect(() => {
     if (!selectedExamTypeId) {
-      setCurrentTarget(null);
       setTargetScore('');
       setCustomParts({});
       return;
     }
-    try {
-      const data = await getUserTarget(selectedExamTypeId);
-      if (data.hasTarget) {
-        setCurrentTarget(data);
-        setTargetScore(String(data.targetScore || ''));
-        const cp = {};
-        (data.partRequirements || []).forEach((p) => {
-          cp[p.examPartId] = p.requiredPercentage;
-        });
-        setCustomParts(cp);
-      } else {
-        setCurrentTarget(null);
-        setTargetScore('');
-        setCustomParts({});
-      }
-    } catch {
-      setCurrentTarget(null);
+    if (targetQuery.data?.hasTarget) {
+      setTargetScore(String(targetQuery.data.targetScore || ''));
+      const cp = {};
+      (targetQuery.data.partRequirements || []).forEach((p) => {
+        cp[p.examPartId] = p.requiredPercentage;
+      });
+      setCustomParts(cp);
+    } else if (targetQuery.data || targetQuery.isError) {
       setTargetScore('');
       setCustomParts({});
     }
-  }, [selectedExamTypeId]);
-
-  useEffect(() => {
-    loadCurrentTarget();
-  }, [loadCurrentTarget]);
+  }, [selectedExamTypeId, targetQuery.data, targetQuery.isError]);
 
   const matchedMilestone = useMemo(() => {
     if (!targetScore) return null;
@@ -136,8 +134,7 @@ function UserTargetPage() {
         customParts: allParts,
       },
       {
-        onSuccess: (result) => {
-          setCurrentTarget(result);
+        onSuccess: () => {
           setMessage('Đã lưu mục tiêu thành công!');
         },
         onError: () => setMessage('Lỗi khi lưu mục tiêu.'),
@@ -151,7 +148,6 @@ function UserTargetPage() {
 
     deleteMutation.mutate(selectedExamTypeId, {
       onSuccess: () => {
-        setCurrentTarget(null);
         setTargetScore('');
         setCustomParts({});
         setMessage('Đã xóa mục tiêu.');
