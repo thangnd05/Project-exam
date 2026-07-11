@@ -10,38 +10,6 @@
   margin: 0 auto;
 }
 
-.header {
-  margin-bottom: 24px;
-}
-
-.title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 6px 0;
-  color: #0f172a;
-  font-size: 2.6rem;
-  font-weight: 800;
-}
-
-.titleGradient {
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
-.titleIcon {
-  color: var(--accent-color);
-}
-
-.subtitle {
-  margin: 0;
-  color: #64748b;
-  font-size: 1.45rem;
-}
-
 .card {
   background: #fff;
   border: 1px solid #e2e8f0;
@@ -69,16 +37,9 @@
 
 .scopeSwitch {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 12px;
-}
-
-.scopeBtn {
-  border-radius: 10px !important;
-  font-weight: 700 !important;
-  min-height: 38px !important;
-  padding: 8px 14px !important;
-  font-size: 1.35rem !important;
 }
 
 .selectField {
@@ -230,43 +191,17 @@
   font-weight: 500;
 }
 
-.editBtn {
-  border-radius: 9px !important;
-  min-width: 36px !important;
-  min-height: 36px !important;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  padding: 0 !important;
-  font-size: 1.55rem !important;
-}
-
-.viewBtn {
-  border-radius: 9px !important;
-  min-width: 36px !important;
-  min-height: 36px !important;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  padding: 0 !important;
-  font-size: 1.55rem !important;
-}
-
 .questionActions {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-.deleteBtn {
-  border-radius: 9px !important;
-  min-width: 36px !important;
-  min-height: 36px !important;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  padding: 0 !important;
-  font-size: 1.55rem !important;
+.iconBtn {
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 1.55rem;
+  line-height: 0;
 }
 
 .loadingWrap {

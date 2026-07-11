@@ -22,6 +22,7 @@ import { useBaseMetaData } from '~/shared/hooks/useBaseMetaData';
 import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
 import EditQuestionModal from '~/features/tests/question-bank/modals/EditQuestionModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import { getExamCategories } from '~/shared/api/examCategoryApi';
 import {
   useBankTestBuilder,
@@ -182,14 +183,16 @@ const CreateTestFromBankPage = () => {
   return (
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
-        <header className={cx('header')}>
-          <h1 className={cx('title')}>
-            <IoLibraryOutline /> Tạo đề thi từ kho câu hỏi
-          </h1>
-          <p className={cx('subtitle')}>
-            Chọn loại kỳ thi, cấu hình từng part (random theo số lượng hoặc chọn thủ công), rồi tạo đề. Câu hỏi lấy theo kho cá nhân (tài khoản đang đăng nhập).
-          </p>
-        </header>
+        <PageHeader
+          label="Tạo đề thi"
+          title="Tạo đề thi từ kho câu hỏi"
+          badgeLabel={
+            <>
+              <IoLibraryOutline />
+              <span>Cấu hình từng Part (random hoặc chọn thủ công) rồi tạo đề từ kho cá nhân.</span>
+            </>
+          }
+        />
 
         {notification.message && (
           <Alert variant={notification.type} className="mb-3" dismissible onClose={() => setNotification({})}>

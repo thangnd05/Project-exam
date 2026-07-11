@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query';
-import {Alert, Button, Spinner} from 'react-bootstrap';
-import {AnimatePresence, motion} from 'framer-motion';
+import {Alert, Spinner} from 'react-bootstrap';
 import {
   getQuestionsByPart,
   getMyClassBankQuestions,
@@ -23,6 +22,8 @@ import {
 } from 'react-icons/io5';
 import {useBaseMetaData} from '~/shared/hooks/useBaseMetaData';
 import {useHasPermission} from '~/shared/hooks/usePermission';
+import PageHeader from '~/shared/ui/PageHeader/PageHeader';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import EditQuestionModal from './modals/EditQuestionModal';
 import ViewQuestionModal from './modals/ViewQuestionModal';
 import { useDeleteQuestion } from './hooks/useDeleteQuestion';
@@ -342,25 +343,28 @@ const PersonalQuestionBankPage = () => {
   return (
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
-        <header className={cx('header')}>
-          <h1 className={cx('title')}>
-            <IoLibraryOutline className={cx('titleIcon')} />{' '}
-            <span className={cx('titleGradient')}>
-              {bankScope === BANK_SCOPE.CLASS
-                ? 'Kho câu hỏi lớp học'
-                : bankScope === BANK_SCOPE.ADMIN
-                  ? 'Kho đề quản trị'
-                  : 'Kho câu hỏi cá nhân'}
-            </span>
-          </h1>
-          <p className={cx('subtitle')}>
-            {bankScope === BANK_SCOPE.CLASS
-              ? 'Quản lý câu hỏi theo từng Chương. Bấm bút chì để sửa nhanh câu hỏi/đáp án.'
+        <PageHeader
+          label="Kho câu hỏi"
+          title={
+            bankScope === BANK_SCOPE.CLASS
+              ? 'Kho câu hỏi lớp học'
               : bankScope === BANK_SCOPE.ADMIN
-                ? 'Kho câu hỏi do quản trị viên cung cấp. Bất kỳ ai cũng có thể tham khảo và dùng làm nguồn tạo đề.'
-                : 'Quản lý câu hỏi theo từng Part. Bấm bút chì để sửa nhanh câu hỏi/đáp án.'}
-          </p>
-        </header>
+                ? 'Kho đề quản trị'
+                : 'Kho câu hỏi cá nhân'
+          }
+          badgeLabel={
+            <>
+              <IoLibraryOutline />
+              <span>
+                {bankScope === BANK_SCOPE.CLASS
+                  ? 'Quản lý câu hỏi theo từng Chương. Bấm bút chì để sửa nhanh.'
+                  : bankScope === BANK_SCOPE.ADMIN
+                    ? 'Kho câu hỏi quản trị viên cung cấp, dùng làm nguồn tạo đề.'
+                    : 'Quản lý câu hỏi theo từng Part. Bấm bút chì để sửa nhanh.'}
+              </span>
+            </>
+          }
+        />
 
         {notification.message && (
           <Alert
@@ -380,45 +384,34 @@ const PersonalQuestionBankPage = () => {
 
           <div className={cx('scopeSwitch')}>
             {canAccessAdminBank && (
-              <Button
-                type="button"
-                className={cx('scopeBtn')}
-                variant={
-                  bankScope === BANK_SCOPE.ADMIN ? 'primary' : 'outline-primary'
-                }
+              <ButtonPrime
+                size="sm"
+                variant={bankScope === BANK_SCOPE.ADMIN ? 'primary' : 'outline'}
                 onClick={() => {
                   setBankScope(BANK_SCOPE.ADMIN);
                   setSelectedClassId('');
                 }}
               >
                 Kho đề quản trị
-              </Button>
+              </ButtonPrime>
             )}
-            <Button
-              type="button"
-              className={cx('scopeBtn')}
-              variant={
-                bankScope === BANK_SCOPE.PERSONAL
-                  ? 'primary'
-                  : 'outline-primary'
-              }
+            <ButtonPrime
+              size="sm"
+              variant={bankScope === BANK_SCOPE.PERSONAL ? 'primary' : 'outline'}
               onClick={() => {
                 setBankScope(BANK_SCOPE.PERSONAL);
                 setSelectedClassId('');
               }}
             >
               Kho cá nhân
-            </Button>
-            <Button
-              type="button"
-              className={cx('scopeBtn')}
-              variant={
-                bankScope === BANK_SCOPE.CLASS ? 'primary' : 'outline-primary'
-              }
+            </ButtonPrime>
+            <ButtonPrime
+              size="sm"
+              variant={bankScope === BANK_SCOPE.CLASS ? 'primary' : 'outline'}
               onClick={() => setBankScope(BANK_SCOPE.CLASS)}
             >
               Kho lớp học
-            </Button>
+            </ButtonPrime>
           </div>
 
           <div className={cx('filterGrid')}>
@@ -531,16 +524,7 @@ const PersonalQuestionBankPage = () => {
                       )}
                     </button>
 
-                    <AnimatePresence initial={false}>
                     {cfg.expanded && (
-                      <motion.div
-                        key={`chapter-body-${chapter.chapterId}`}
-                        initial={{height: 0, opacity: 0}}
-                        animate={{height: 'auto', opacity: 1}}
-                        exit={{height: 0, opacity: 0}}
-                        transition={{duration: 0.3, ease: [0.22, 1, 0.36, 1]}}
-                        style={{overflow: 'hidden'}}
-                      >
                       <div className={cx('partCardBody')}>
                         {cfg.loading ? (
                           <div className={cx('loadingWrap')}>
@@ -583,21 +567,19 @@ const PersonalQuestionBankPage = () => {
                                     )}
                                   </span>
                                   <div className={cx('questionActions')}>
-                                    <Button
-                                      type="button"
-                                      className={cx('viewBtn')}
-                                      size="sm"
-                                      variant="outline-secondary"
+                                    <ButtonPrime
+                                      size="icon"
+                                      variant="ghost"
+                                      className={cx('iconBtn')}
                                       onClick={() => setViewingQuestionId(id)}
                                       aria-label={`Xem câu ${getQuestionDisplayNumber(q, idx)}`}
                                     >
                                       <IoEyeOutline />
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      className={cx('editBtn')}
-                                      size="sm"
-                                      variant="outline-primary"
+                                    </ButtonPrime>
+                                    <ButtonPrime
+                                      size="icon"
+                                      variant="outline"
+                                      className={cx('iconBtn')}
                                       disabled={isDeleting(id)}
                                       onClick={() => {
                                         setEditingChapterId(chapter.chapterId);
@@ -607,12 +589,11 @@ const PersonalQuestionBankPage = () => {
                                       aria-label={`Sửa câu ${getQuestionDisplayNumber(q, idx)}`}
                                     >
                                       <IoCreateOutline />
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      className={cx('deleteBtn')}
-                                      size="sm"
-                                      variant="outline-danger"
+                                    </ButtonPrime>
+                                    <ButtonPrime
+                                      size="icon"
+                                      variant="dangerGhost"
+                                      className={cx('iconBtn')}
                                       disabled={isDeleting(id)}
                                       onClick={() =>
                                         setDeleteQuestionTarget({
@@ -623,7 +604,7 @@ const PersonalQuestionBankPage = () => {
                                       aria-label={`Xóa câu ${getQuestionDisplayNumber(q, idx)}`}
                                     >
                                       <IoTrashOutline />
-                                    </Button>
+                                    </ButtonPrime>
                                   </div>
                                 </li>
                               );
@@ -632,9 +613,7 @@ const PersonalQuestionBankPage = () => {
                           );
                         })()}
                       </div>
-                      </motion.div>
                     )}
-                    </AnimatePresence>
                   </div>
                 );
               })
@@ -684,16 +663,7 @@ const PersonalQuestionBankPage = () => {
                       )}
                     </button>
 
-                    <AnimatePresence initial={false}>
                     {cfg.expanded && (
-                      <motion.div
-                        key={`part-body-${part.examPartId}`}
-                        initial={{height: 0, opacity: 0}}
-                        animate={{height: 'auto', opacity: 1}}
-                        exit={{height: 0, opacity: 0}}
-                        transition={{duration: 0.3, ease: [0.22, 1, 0.36, 1]}}
-                        style={{overflow: 'hidden'}}
-                      >
                       <div className={cx('partCardBody')}>
                         {cfg.loading ? (
                           <div className={cx('loadingWrap')}>
@@ -731,23 +701,21 @@ const PersonalQuestionBankPage = () => {
                                     )}
                                   </span>
                                   <div className={cx('questionActions')}>
-                                    <Button
-                                      type="button"
-                                      className={cx('viewBtn')}
-                                      size="sm"
-                                      variant="outline-secondary"
+                                    <ButtonPrime
+                                      size="icon"
+                                      variant="ghost"
+                                      className={cx('iconBtn')}
                                       onClick={() => setViewingQuestionId(id)}
                                       aria-label={`Xem câu ${getQuestionDisplayNumber(q, idx)}`}
                                     >
                                       <IoEyeOutline />
-                                    </Button>
+                                    </ButtonPrime>
                                     {bankScope === BANK_SCOPE.PERSONAL && (
                                       <>
-                                        <Button
-                                          type="button"
-                                          className={cx('editBtn')}
-                                          size="sm"
-                                          variant="outline-primary"
+                                        <ButtonPrime
+                                          size="icon"
+                                          variant="outline"
+                                          className={cx('iconBtn')}
                                           disabled={isDeleting(id)}
                                           onClick={() => {
                                             setEditingPartId(part.examPartId);
@@ -757,12 +725,11 @@ const PersonalQuestionBankPage = () => {
                                           aria-label={`Sửa câu ${getQuestionDisplayNumber(q, idx)}`}
                                         >
                                           <IoCreateOutline />
-                                        </Button>
-                                        <Button
-                                          type="button"
-                                          className={cx('deleteBtn')}
-                                          size="sm"
-                                          variant="outline-danger"
+                                        </ButtonPrime>
+                                        <ButtonPrime
+                                          size="icon"
+                                          variant="dangerGhost"
+                                          className={cx('iconBtn')}
                                           disabled={isDeleting(id)}
                                           onClick={() =>
                                             setDeleteQuestionTarget({
@@ -773,7 +740,7 @@ const PersonalQuestionBankPage = () => {
                                           aria-label={`Xóa câu ${getQuestionDisplayNumber(q, idx)}`}
                                         >
                                           <IoTrashOutline />
-                                        </Button>
+                                        </ButtonPrime>
                                       </>
                                     )}
                                   </div>
@@ -783,9 +750,7 @@ const PersonalQuestionBankPage = () => {
                           </ul>
                         )}
                       </div>
-                      </motion.div>
                     )}
-                    </AnimatePresence>
                   </div>
                 );
               })}
