@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { toast } from 'react-toastify';
 import {
   Heart, Bookmark, MessageCircle, ChevronRight, Copy
 } from 'lucide-react';
@@ -182,7 +183,7 @@ function PostDetailPage() {
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     if (!user) {
-      alert('Vui lòng đăng nhập để bình luận');
+      toast.warning('Vui lòng đăng nhập để bình luận');
       return;
     }
     if (!newComment.trim()) return;
@@ -238,7 +239,7 @@ function PostDetailPage() {
 
   const handleToggleLike = async () => {
     if (!user) {
-      alert('Vui lòng đăng nhập để thả tim');
+      toast.warning('Vui lòng đăng nhập để thả tim');
       return;
     }
     if (isReacting) return;
@@ -265,7 +266,7 @@ function PostDetailPage() {
 
   const handleToggleBookmark = async () => {
     if (!user) {
-      alert('Vui lòng đăng nhập để lưu bài viết');
+      toast.warning('Vui lòng đăng nhập để lưu bài viết');
       return;
     }
     if (isSaving) return;

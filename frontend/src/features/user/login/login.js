@@ -3,6 +3,7 @@ import axios from '~/shared/api/axiosClient';
 import { login as loginRequest, register as registerRequest } from '~/shared/api/authApi';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '~/shared/hooks/useAuth';
+import { toast } from 'react-toastify';
 import {
   getRedirectTarget,
   saveOAuthRedirect,
@@ -114,7 +115,7 @@ function LoginPage() {
 
       setMessage(data.message || 'Đăng ký thành công! Vui lòng xác thực email.');
       setMessageType('success');
-      alert('📧 Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
+      toast.info('Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
       setIsSignUp(false);
     } catch (err) {
       const errorMessage =

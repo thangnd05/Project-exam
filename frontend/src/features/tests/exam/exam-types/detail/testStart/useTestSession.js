@@ -376,7 +376,7 @@ export function useTestSession() {
         navigate(`/tests/result/${userTestId}`);
         return;
       }
-      alert(getApiErrorMessage(err, 'Nộp bài thất bại! Vui lòng thử lại.'));
+      toast.error(getApiErrorMessage(err, 'Nộp bài thất bại! Vui lòng thử lại.'));
     } finally {
       setIsSubmitting(false);
     }

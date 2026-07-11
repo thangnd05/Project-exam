@@ -8,6 +8,7 @@ import {
 } from 'react-bootstrap';
 import React, {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
+import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
 import images from '~/shared/assets/images';
@@ -41,7 +42,7 @@ function Header() {
   const handleClassAction = (e, targetRoute, modalType = null) => {
     e.preventDefault();
     if (!user) {
-      alert(' Bạn cần đăng nhập để thao tác lớp học!');
+      toast.warning('Bạn cần đăng nhập để thao tác lớp học!');
       navigate(routes.login);
       return;
     }

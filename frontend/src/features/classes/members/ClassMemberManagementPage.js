@@ -228,9 +228,6 @@ const ClassMemberManagementPage = () => {
         </button>
 
         <div className={cx('header-content')}>
-          <div className={cx('header-icon')}>
-            <IoPeopleOutline />
-          </div>
           <div className={cx('header-text')}>
             <h1>Quản lý học sinh</h1>
             <p className={cx('class-name')}>

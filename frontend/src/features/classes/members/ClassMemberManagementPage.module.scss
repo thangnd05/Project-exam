@@ -90,22 +90,6 @@
   z-index: 1;
 }
 
-.header-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-xxl);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-
-  svg {
-    color: white;
-  }
-}
-
 .header-text {
   h1 {
     font-size: 3.2rem;
@@ -591,13 +575,6 @@
 
   .header-content {
     gap: 14px;
-  }
-
-  .header-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 2rem;
-    border-radius: 10px;
   }
 
   .header-text h1 {

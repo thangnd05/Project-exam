@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { toast } from 'react-toastify';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
 import { switchPlan, deletePlan } from '~/shared/api/learningPlanApi';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
@@ -79,7 +80,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
       await switchPlan(planId);
       reload();
     } catch (err) {
-      alert(err?.response?.data?.message || 'Lỗi khi chuyển plan');
+      toast.error(err?.response?.data?.message || 'Lỗi khi chuyển plan');
     } finally {
       setSwitching(null);
     }
@@ -94,7 +95,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
       await deletePlan(planId);
       reload();
     } catch (err) {
-      alert(err?.response?.data?.message || 'Lỗi khi xóa plan');
+      toast.error(err?.response?.data?.message || 'Lỗi khi xóa plan');
     } finally {
       setDeleting(null);
     }

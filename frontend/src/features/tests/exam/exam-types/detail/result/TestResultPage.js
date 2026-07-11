@@ -1,6 +1,7 @@
 import { useContext, useMemo } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Container, Spinner, Alert } from "react-bootstrap";
+import { toast } from "react-toastify";
 import classNames from "classnames/bind";
 import {
   IoCheckmarkCircle,
@@ -51,7 +52,7 @@ const TestResultPage = () => {
 
   const handleShowDetail = () => {
     if (!canReview) {
-      alert("Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.");
+      toast.warning("Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.");
       return;
     }
     navigate(`/tests/result/${userTestId}/review`);
