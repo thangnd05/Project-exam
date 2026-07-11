@@ -7,6 +7,37 @@
   margin: 0 auto;
 }
 
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  background: var(--bg-white);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg {
+    font-size: var(--font-size-md);
+  }
+
+  &:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    transform: translateX(-3px);
+  }
+}
+
+.badge-divider {
+  opacity: 0.55;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -127,7 +158,7 @@
   padding: 0 10px;
 
   &.pending .stat-number {
-    color: #fde68a;
+    color: #fff;
   }
 }
 
@@ -323,6 +354,11 @@
 .tab-badge {
   font-size: var(--font-size-xs2) !important;
   padding: 3px 8px !important;
+
+  // Badge "Đã duyệt" dùng màu gốc thay vì xanh lục; "Chờ duyệt" (.pending) giữ amber
+  &:not(.pending) {
+    background-color: var(--primary) !important;
+  }
 }
 
 .tab-content-wrapper {
@@ -460,9 +496,9 @@
   gap: 6px;
   padding: 8px 16px;
   border-radius: 10px;
-  border: 2px solid #10b981;
+  border: 2px solid var(--primary);
   background: transparent;
-  color: #10b981;
+  color: var(--primary);
   font-weight: 700;
   font-size: var(--font-size-sm);
   font-family: var(--font-family);
@@ -474,10 +510,10 @@
   }
 
   &:hover {
-    background: #10b981;
+    background: var(--primary);
     color: white;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 97, 242, 0.3);
   }
 
   &:active {

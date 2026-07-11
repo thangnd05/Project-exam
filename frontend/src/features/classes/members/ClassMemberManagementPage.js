@@ -18,6 +18,8 @@ import { Spinner, Badge, Table, Tabs, Tab } from 'react-bootstrap';
 
 import styles from './ClassMemberManagementPage.module.scss';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import PageHeader from '~/shared/ui/PageHeader/PageHeader';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { useClassMembers } from './hooks/useClassMembers';
 
 const cx = classNames.bind(styles);
@@ -139,8 +141,8 @@ const ClassMemberManagementPage = () => {
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      APPROVED: { variant: 'success', label: 'Đã duyệt', icon: <IoCheckmarkCircle /> },
-      PENDING: { variant: 'warning', label: 'Chờ duyệt', icon: <IoTimeOutline /> },
+      APPROVED: { variant: 'success', label: 'Đã duyệt' },
+      PENDING: { variant: 'warning', label: 'Chờ duyệt'},
     };
     const s = statusMap[status] || { variant: 'secondary', label: status, icon: null };
     return (
@@ -221,21 +223,24 @@ const ClassMemberManagementPage = () => {
   return (
     <div className={cx('wrapper')}>
 
-      <div className={cx('page-header')}>
-        <button className={cx('btn-back')} onClick={() => navigate(-1)}>
-          <IoArrowBack />
-          <span>Quay lại</span>
-        </button>
+      <button className={cx('back-btn')} onClick={() => navigate(-1)}>
+        <span>Quay lại</span>
+      </button>
 
-        <div className={cx('header-content')}>
-          <div className={cx('header-text')}>
-            <h1>Quản lý học sinh</h1>
-            <p className={cx('class-name')}>
-              {classInfo?.className || `Lớp #${classId}`}
-            </p>
-          </div>
-        </div>
-
+      <PageHeader
+        title="Quản lý học sinh"
+        badgeLabel={
+          <>
+            Lớp: <strong>{classInfo?.className || `#${classId}`}</strong>
+            {classInfo?.classQr && (
+              <>
+                <span className={cx('badge-divider')}>·</span>
+                Mã lớp: <strong>{classInfo.classQr}</strong>
+              </>
+            )}
+          </>
+        }
+      >
         <div className={cx('header-stats')}>
           <div className={cx('stat-item')}>
             <span className={cx('stat-number')}>{approvedMembers.length}</span>
@@ -252,7 +257,7 @@ const ClassMemberManagementPage = () => {
             <span className={cx('stat-label')}>Tổng cộng</span>
           </div>
         </div>
-      </div>
+      </PageHeader>
 
       <div className={cx('toolbar')}>
         <div className={cx('search-box')}>
@@ -278,14 +283,13 @@ const ClassMemberManagementPage = () => {
           </button>
 
           {pendingMembers.length > 0 && (
-            <button
-              className={cx('btn-approve-all')}
+            <ButtonPrime
+              variant="primary"
               onClick={handleApproveAll}
               disabled={actionLoading}
             >
-              <IoShieldCheckmarkOutline />
               <span>Duyệt tất cả ({pendingMembers.length})</span>
-            </button>
+            </ButtonPrime>
           )}
         </div>
       </div>
@@ -297,7 +301,6 @@ const ClassMemberManagementPage = () => {
             eventKey="approved"
             title={
               <span className={cx('tab-title')}>
-                <IoCheckmarkCircle />
                 Đã duyệt
                 <Badge bg="success" pill className={cx('tab-badge')}>
                   {approvedMembers.length}
@@ -347,7 +350,6 @@ const ClassMemberManagementPage = () => {
             eventKey="pending"
             title={
               <span className={cx('tab-title')}>
-                <IoTimeOutline />
                 Chờ duyệt
                 {pendingMembers.length > 0 && (
                   <Badge bg="warning" pill className={cx('tab-badge', 'pending')}>
