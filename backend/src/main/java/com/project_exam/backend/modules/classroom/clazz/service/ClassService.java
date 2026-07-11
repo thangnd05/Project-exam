@@ -15,7 +15,7 @@ import com.project_exam.backend.modules.classroom.clazz.repository.ClassReposito
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
-import com.project_exam.backend.modules.assessment.test.service.TestService;
+import com.project_exam.backend.modules.assessment.test.service.TestCommandService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class ClassService {
     private final ChapterRepository chapterRepository;
     private final TestRepository testRepository;
     private final QuestionService questionService;
-    private final TestService testService;
+    private final TestCommandService testCommandService;
     private final AuthUtils authUtils;
     private final ClassMapper classMapper;
 
@@ -85,18 +85,18 @@ public class ClassService {
     public void deleteClass(String classId, HttpServletRequest httpRequest) {
         ClassEntity existing = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found!"));
-        // 🔒 Chỉ teacher của lớp (hoặc admin) được xoá.
+        //  Chỉ teacher của lớp (hoặc admin) được xoá.
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isTeacher = currentUserId != null && currentUserId.equals(existing.getTeacherId());
         if (!isTeacher && !authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá lớp này.");
         }
 
-        // 🔥 Cascade theo thứ tự: tests → questions → chapters → class
+        // Cascade theo thứ tự: tests questions chapters class
         // 1. Xoá toàn bộ tests gắn với class (kèm test_parts, test_questions, user_tests, user_answers).
         List<Test> tests = testRepository.findByClassId(classId);
         for (Test t : tests) {
-            testService.cascadeDeleteTestInternal(t.getTestId());
+            testCommandService.cascadeDeleteTestInternal(t.getTestId());
         }
 
         // 2. Xoá toàn bộ questions của class (kể cả câu thuộc các chapter của class này).

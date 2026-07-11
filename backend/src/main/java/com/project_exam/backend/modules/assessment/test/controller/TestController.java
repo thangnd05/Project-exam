@@ -16,6 +16,7 @@ import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.service.TestService;
 import com.project_exam.backend.modules.assessment.test.service.TestQuestionAssignmentService;
 import com.project_exam.backend.modules.assessment.test.service.TestAccessService;
+import com.project_exam.backend.modules.assessment.test.service.TestCommandService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,6 +39,7 @@ public class TestController {
     private final TestService testService;
     private final TestQuestionAssignmentService testQuestionAssignmentService;
     private final TestAccessService testAccessService;
+    private final TestCommandService testCommandService;
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
 
@@ -78,7 +80,7 @@ public class TestController {
             HttpServletRequest httpRequest
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
-        // 🔒 Khi đề được gắn vào lớp: user phải là teacher của lớp đó (admin pass).
+        //  Khi đề được gắn vào lớp: user phải là teacher của lớp đó (admin pass).
         if (request.getClassId() != null) {
             classAccessGuard.requireTeacher(request.getClassId(), currentUserId, httpRequest);
             classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
@@ -108,7 +110,7 @@ public class TestController {
         }
         test.setCreatedBy(currentUserId);
         test.setCreatedAt(LocalDateTime.now());
-        Test savedTest = testService.save(test);
+        Test savedTest = testCommandService.save(test);
         TestResponse response = testService.buildUserTestSummary(savedTest, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -141,7 +143,7 @@ public class TestController {
             @Valid @RequestBody CreateTestRequest request,
             HttpServletRequest httpRequest
     ) {
-        Test updated = testService.updateTest(id, request, httpRequest);
+        Test updated = testCommandService.updateTest(id, request, httpRequest);
         return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
     }
 
@@ -161,7 +163,7 @@ public class TestController {
         if (testService.getTestById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        testService.deleteTest(id, httpRequest);
+        testCommandService.deleteTest(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -254,7 +256,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         String userId = authUtils.getUserId(request);
         Test test = testService.getTestById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
-        // 🔒 Nếu đề thuộc 1 lớp, user phải là member/teacher của lớp đó (admin pass).
+        //  Nếu đề thuộc 1 lớp, user phải là member/teacher của lớp đó (admin pass).
         // Tránh leak metadata + countdown của bài kiểm tra cho user ngoài lớp.
         if (test.getClassId() != null) {
             classAccessGuard.requireMemberOrTeacher(test.getClassId(), userId, request);
