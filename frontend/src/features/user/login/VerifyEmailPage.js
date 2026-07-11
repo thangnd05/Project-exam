@@ -1,48 +1,85 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
+import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
+import classNames from 'classnames/bind';
 import { verifyEmail } from '~/shared/api/authApi';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import styles from './VerifyEmailPage.module.scss';
+
+const cx = classNames.bind(styles);
+
+const TITLES = {
+  loading: 'Đang xác thực tài khoản...',
+  success: 'Xác thực thành công!',
+  error: 'Xác thực thất bại',
+};
 
 export default function VerifyEmailPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const token = params.get("token");
+  const token = params.get('token');
 
-  const [status, setStatus] = useState("loading");
-  const [msg, setMsg] = useState("");
+  const [status, setStatus] = useState('loading');
+  const [msg, setMsg] = useState('Vui lòng chờ trong giây lát...');
 
   useEffect(() => {
     if (!token) {
-      setStatus("error");
-      setMsg(" Thiếu token xác thực!");
+      setStatus('error');
+      setMsg('Thiếu token xác thực!');
       return;
     }
 
     verifyEmail(token)
       .then((data) => {
-        setStatus("success");
-        setMsg(data.message || " Xác thực thành công!");
+        setStatus('success');
+        setMsg(data.message || 'Tài khoản của bạn đã được xác thực. Đang chuyển đến trang đăng nhập...');
 
         setTimeout(() => {
-          navigate("/login");
+          navigate('/login');
         }, 2000);
       })
       .catch((err) => {
-        setStatus("error");
-        setMsg(err.response?.data?.message || " Xác thực thất bại!");
+        setStatus('error');
+        setMsg(err.response?.data?.message || 'Liên kết xác thực không hợp lệ hoặc đã hết hạn.');
 
         setTimeout(() => {
-          navigate("/register");
+          navigate('/register');
         }, 2500);
       });
   }, [token, navigate]);
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      {status === "loading" && <h2>⏳ Đang xác thực tài khoản...</h2>}
-      {status === "success" && <h2 style={{ color: "green" }}>{msg}</h2>}
-      {status === "error" && <h2 style={{ color: "red" }}>{msg}</h2>}
+    <div className={cx('wrapper')}>
+      <div className={cx('card')}>
+        <div className={cx('iconWrap', status)}>
+          {status === 'loading' && <Spinner animation="border" />}
+          {status === 'success' && <IoCheckmarkCircleOutline />}
+          {status === 'error' && <IoCloseCircleOutline />}
+        </div>
 
-      <p>Vui lòng chờ trong giây lát...</p>
+        <h1 className={cx('title')}>{TITLES[status]}</h1>
+        <p className={cx('message')}>{msg}</p>
+
+        {status !== 'loading' && (
+          <div className={cx('actions')}>
+            {status === 'success' ? (
+              <ButtonPrime variant="primary" onClick={() => navigate('/login')}>
+                Đến trang đăng nhập
+              </ButtonPrime>
+            ) : (
+              <>
+                <ButtonPrime variant="outline" onClick={() => navigate('/login')}>
+                  Đăng nhập
+                </ButtonPrime>
+                <ButtonPrime variant="primary" onClick={() => navigate('/register')}>
+                  Đăng ký lại
+                </ButtonPrime>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
