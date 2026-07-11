@@ -14,6 +14,7 @@ import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestCollectionResponse;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.service.TestService;
+import com.project_exam.backend.modules.assessment.test.service.TestQuestionAssignmentService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ import java.util.Map;
 public class TestController {
 
     private final TestService testService;
+    private final TestQuestionAssignmentService testQuestionAssignmentService;
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
 
@@ -115,7 +117,7 @@ public class TestController {
             @Valid @RequestBody AddQuestionsToTestRequest request,
             HttpServletRequest httpRequest
     ) {
-        testService.addQuestionsToTestPart(request, httpRequest);
+        testQuestionAssignmentService.addQuestionsToTestPart(request, httpRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -126,7 +128,7 @@ public class TestController {
             HttpServletRequest httpRequest
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
-        AddRandomQuestionsResponse response = testService.addRandomQuestionsToTestPart(request, currentUserId, httpRequest);
+        AddRandomQuestionsResponse response = testQuestionAssignmentService.addRandomQuestionsToTestPart(request, currentUserId, httpRequest);
         return ResponseEntity.ok(response);
     }
 
