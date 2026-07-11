@@ -14,6 +14,7 @@ import CreateVocabularyModal from './modals/CreateVocabularyModal';
 import BulkCreateVocabularyModal from './modals/BulkCreateVocabularyModal';
 import UpdateVocabularyModal from './modals/UpdateVocabularyModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import classNames from 'classnames/bind';
 import { IoAdd, IoFlashOutline, IoTrashOutline, IoPencilOutline, IoChevronBack, IoChevronForward, IoListOutline, IoSchoolOutline, IoVolumeHighOutline, IoCodeSlashOutline } from 'react-icons/io5';
 
@@ -108,7 +109,7 @@ const AlbumDetailPage = () => {
       <Container>
 
         <PageHeader
-          title={flashMode ? ' Học bằng Flashcard' : ' Danh sách từ vựng'}
+          title={flashMode ? 'Học bằng Flashcard' : 'Danh sách từ vựng'}
           label="QUẢN LÝ TỪ VỰNG"
           onAction={() => setShowModal(true)}
           actionText="Thêm từ vựng"
@@ -119,9 +120,10 @@ const AlbumDetailPage = () => {
         />
 
         <div className={cx('custom-actions')}>
-          <button className={cx('btn-back')} onClick={() => navigate(-1)}>
+          <ButtonPrime variant="ghost" onClick={() => navigate(-1)}>
+            <IoChevronBack />
             Quay lại album
-          </button>
+          </ButtonPrime>
 
           <div className={cx('mode-group')}>
             <button
@@ -158,14 +160,13 @@ const AlbumDetailPage = () => {
                   <div className={cx('word')}>{currentVocab.word}</div>
                   <div className={cx('phonetic')}>/{currentVocab.phonetic || '...'}/</div>
                   <button
-                    className={cx('btn-play')}
+                    className={cx('btn-play', 'btn-play-lg')}
                     onClick={(e) => {
                       e.stopPropagation();
                       playAudio(currentVocab.word);
                     }}
-                    style={{ marginTop: '20px', border: 'none', background: '#f1f5f9', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <IoVolumeHighOutline size={24} color="#0061f2" />
+                    <IoVolumeHighOutline size={24} />
                   </button>
                 </div>
 

@@ -24,7 +24,7 @@
 .mode-group {
     display: flex;
     gap: 12px;
-    background: #f1f5f9;
+    background: var(--input-bg);
     padding: 6px;
     border-radius: 16px;
 
@@ -44,7 +44,7 @@
     transition: all 0.3s;
     border: none;
     background: transparent;
-    color: #64748b;
+    color: var(--text-secondary);
 
     &:hover {
         color: var(--primary);
@@ -53,34 +53,12 @@
     &.active {
         background: white;
         color: var(--primary);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-md);
     }
 
     @media (max-width: 576px) {
         flex: 1;
         justify-content: center;
-    }
-}
-
-.btn-back {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    font-size: var(--font-size-md);
-    color: var(--primary);
-    background: transparent;
-    border: none;
-    transition: all 0.2s;
-    padding: 10px;
-
-    &:hover {
-        transform: translateX(-5px);
-        color: var(--accent-color);
-    }
-
-    @media (max-width: 768px) {
-        margin-bottom: 5px;
     }
 }
 
@@ -102,7 +80,7 @@
     }
 }
 
-:global(.table) {
+.table-container :global(.table) {
     margin-bottom: 0;
     min-width: 600px;
     width: 100%;
@@ -175,27 +153,34 @@
     font-family: 'Inter', sans-serif;
 }
 
+.btn-play {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--input-bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.1);
+    }
+}
+
+.btn-play-lg {
+    width: 50px;
+    height: 50px;
+    margin-top: 20px;
+}
+
 .audio-cell {
     width: 60px;
-
-    .btn-play {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #f1f5f9;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--primary);
-        cursor: pointer;
-        transition: all 0.3s;
-
-        &:hover {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.1);
-        }
-    }
 }
 
 .flashcard-wrapper {

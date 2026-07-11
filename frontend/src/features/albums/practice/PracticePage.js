@@ -11,7 +11,7 @@ import {motion, AnimatePresence} from 'framer-motion';
 import {
     CheckCircle,
     XCircle,
-    ArrowRight,
+    ArrowLeft,
     SkipForward,
     Sparkles,
     BookOpen,
@@ -21,6 +21,7 @@ import {
     Volume2
 } from 'lucide-react';
 
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from './PracticePage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -183,10 +184,10 @@ const PracticePage = () => {
                             Bạn đã hoàn thành tất cả từ trong album này!
                         </p>
 
-                        <button className={cx('backBtn')} onClick={() => window.history.back()}>
-                            <ArrowRight size={20} className={cx('backBtnIcon')} />
+                        <ButtonPrime variant="primary" size="lg" onClick={() => window.history.back()}>
+                            <ArrowLeft size={20} />
                             Quay lại Album
-                        </button>
+                        </ButtonPrime>
                     </motion.div>
                 </Container>
             </div>
@@ -200,9 +201,9 @@ const PracticePage = () => {
                     <div className={cx('emptyContent')}>
                         <BookOpen size={64} className={cx('emptyIcon')} />
                         <h3>Không có câu hỏi nào khả dụng</h3>
-                        <button className={cx('backBtn')} onClick={() => window.history.back()}>
+                        <ButtonPrime variant="outline" onClick={() => window.history.back()}>
                             Quay lại
-                        </button>
+                        </ButtonPrime>
                     </div>
                 </Container>
             </div>
@@ -395,16 +396,18 @@ const PracticePage = () => {
 
                         <div className={cx('actionButtons')}>
                             {!result ? (
-                                <button
+                                <ButtonPrime
+                                    variant="primary"
                                     className={cx('submitBtn')}
                                     onClick={handleSubmit}
                                     disabled={!canSubmit || checkMutation.isPending}
                                 >
                                     {checkMutation.isPending ? 'Đang chấm...' : 'Kiểm tra đáp án'}
-                                </button>
+                                </ButtonPrime>
                             ) : (
                                 <>
-                                    <button
+                                    <ButtonPrime
+                                        variant="outline"
                                         className={cx('skipBtn')}
                                         onClick={handleNext}
                                         disabled={loadingNext}
@@ -418,15 +421,16 @@ const PracticePage = () => {
                                                 <ChevronRight size={18} />
                                             </>
                                         )}
-                                    </button>
-                                    <button
+                                    </ButtonPrime>
+                                    <ButtonPrime
+                                        variant="success"
                                         className={cx('knownBtn')}
                                         onClick={handleMarkKnown}
                                         disabled={markingKnown}
                                     >
                                         <Sparkles size={18} />
                                         {markingKnown ? 'Đang xử lý...' : 'Đã biết từ này'}
-                                    </button>
+                                    </ButtonPrime>
                                 </>
                             )}
                         </div>

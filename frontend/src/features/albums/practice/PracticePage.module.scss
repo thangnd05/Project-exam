@@ -7,9 +7,8 @@ $bg-body: #f0f2f5;
 $bg-white: #ffffff;
 $input-bg: #f1f5f9;
 $border-color: #e2e8f0;
-$success: #10b981;
+$success: #16a34a;
 $danger: #ef4444;
-$warning: #f59e0b;
 $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -75,7 +74,7 @@ $transition: all 0.3s ease;
 .finishedIcon {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, $success 0%, #34d399 100%);
+    background: $success;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -95,80 +94,6 @@ $transition: all 0.3s ease;
     font-size: var(--font-size-md);
     color: $text-secondary;
     margin-bottom: 2.5rem;
-}
-
-.scoreCard {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    padding: 2rem;
-    background: $input-bg;
-    border-radius: $radius-lg;
-    margin-bottom: 2.5rem;
-}
-
-.scoreItem {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.scoreValue {
-    font-size: var(--font-size-2xxl);
-    font-weight: 700;
-    color: $text-primary;
-    line-height: 1.2;
-
-    &.correct {
-        color: $success;
-    }
-
-    &.accuracy {
-        color: $primary;
-    }
-}
-
-.scoreLabel {
-    font-size: 1.2rem;
-    color: $text-secondary;
-    margin-top: 0.25rem;
-}
-
-.scoreDivider {
-    width: 1px;
-    height: 50px;
-    background: $border-color;
-}
-
-.backBtn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 1.25rem 2.5rem;
-    background: linear-gradient(135deg, $primary 0%, $accent-act-color 100%);
-    color: white;
-    border: none;
-    border-radius: $radius-lg;
-    font-size: var(--font-size-md);
-    font-weight: 600;
-    cursor: pointer;
-    transition: $transition;
-    box-shadow: 0 4px 15px rgba($primary, 0.3);
-
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba($primary, 0.4);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-}
-
-.backBtnIcon {
-    transform: rotate(180deg);
 }
 
 .emptyContainer {
@@ -210,11 +135,11 @@ $transition: all 0.3s ease;
     z-index: 1000;
 
     &.success {
-        background: linear-gradient(135deg, $success 0%, #34d399 100%);
+        background: $success;
     }
 
     &.error {
-        background: linear-gradient(135deg, $danger 0%, #f87171 100%);
+        background: $danger;
     }
 }
 
@@ -291,12 +216,12 @@ $transition: all 0.3s ease;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    box-shadow: $shadow-md;
 
     &:hover {
         transform: scale(1.1);
         background: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+        box-shadow: $shadow-lg;
     }
 
     &:active {
@@ -547,80 +472,14 @@ $transition: all 0.3s ease;
 .submitBtn {
     flex: 1;
     min-width: 200px;
-    padding: 1.25rem 2rem;
-    background: linear-gradient(135deg, $primary 0%, $accent-act-color 100%);
-    color: white;
-    border: none;
-    border-radius: $radius-md;
-    font-size: var(--font-size-md);
-    font-weight: 600;
-    cursor: pointer;
-    transition: $transition;
-    box-shadow: 0 4px 15px rgba($primary, 0.3);
-
-    &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba($primary, 0.4);
-    }
-
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
 }
 
 .skipBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 1.25rem 2rem;
-    background: $input-bg;
-    color: $text-primary;
-    border: 2px solid $border-color;
-    border-radius: $radius-md;
-    font-size: 1.4rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: $transition;
-
-    &:hover:not(:disabled) {
-        background: $bg-white;
-        border-color: $primary;
-        color: $primary;
-    }
-
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
+    flex: 1;
 }
 
 .knownBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 1.25rem 2rem;
-    background: rgba($success, 0.1);
-    color: $success;
-    border: 2px solid $success;
-    border-radius: $radius-md;
-    font-size: 1.4rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: $transition;
-
-    &:hover:not(:disabled) {
-        background: $success;
-        color: white;
-    }
-
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
+    flex: 1;
 }
 
 @media (max-width: 768px) {
