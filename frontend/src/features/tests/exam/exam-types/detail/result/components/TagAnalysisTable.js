@@ -35,31 +35,7 @@ function TagAnalysisTable({ enhanced, userTestId }) {
       tags: p.weakTags || [],
     }));
 
-    const merged = {};
-    parts.forEach((p) =>
-      (p.weakTags || []).forEach((tag) => {
-        const m =
-          merged[tag.tagId] ||
-          (merged[tag.tagId] = {
-            tagId: tag.tagId,
-            tagName: tag.tagName,
-            questions: [],
-          });
-        m.questions.push(...(tag.questions || []));
-      }),
-    );
-    const overallTags = Object.values(merged).map((m) => {
-
-      const map = new Map();
-      m.questions.forEach((q) => map.set(q.questionId, q));
-      const questions = [...map.values()].sort(
-        (a, b) => a.questionNumber - b.questionNumber,
-      );
-      const t = computeTotals([{ questions }]);
-      return { ...m, ...t, questions };
-    });
-
-    return [...partTabs, { key: "__overall__", label: "Tổng quát", tags: overallTags }];
+    return partTabs;
   }, [enhanced]);
 
   const [active, setActive] = useState(() => tabs[0]?.key);

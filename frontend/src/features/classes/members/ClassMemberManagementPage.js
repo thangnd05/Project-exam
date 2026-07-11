@@ -217,18 +217,9 @@ const ClassMemberManagementPage = () => {
       </button>
 
       <PageHeader
-        title="Quản lý học sinh"
-        badgeLabel={
-          <>
-            Lớp: <strong>{classInfo?.className || `#${classId}`}</strong>
-            {classInfo?.classQr && (
-              <>
-                <span className={cx('badge-divider')}>·</span>
-                Mã lớp: <strong>{classInfo.classQr}</strong>
-              </>
-            )}
-          </>
-        }
+        title={classInfo?.className || `Lớp #${classId}`}
+        label="Quản lý học sinh"
+        badgeLabel={classInfo?.classQr ? `Mã lớp: ${classInfo.classQr}` : undefined}
       >
         <div className={cx('header-stats')}>
           <div className={cx('stat-item')}>
