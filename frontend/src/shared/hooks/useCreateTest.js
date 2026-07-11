@@ -74,12 +74,11 @@ export const useCreateTest = ({
   const [questions, setQuestions] = useState([JSON.parse(JSON.stringify(emptyQuestion))]);
   const [groups, setGroups] = useState([createInitialGroup()]);
   const [documentFile, setDocumentFile] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({});
 
   const { examTypes, examParts, questionCollections, availableTags } = useBaseMetaData(testInfo.examTypeId);
 
-  const { handleSubmit: submitLogic } = useTestSubmission({
+  const { handleSubmit: submitLogic, isSubmitting } = useTestSubmission({
     mode,
     classId,
     chapterId,
@@ -90,7 +89,6 @@ export const useCreateTest = ({
     setQuestions,
     setGroups,
     setDocumentFile,
-    setLoading,
     setNotification,
     emptyQuestion,
     createInitialGroup,
@@ -396,7 +394,7 @@ export const useCreateTest = ({
     setGroups,
     documentFile,
     setDocumentFile,
-    loading,
+    loading: isSubmitting,
     notification,
     handleExamTypeChange,
     addQuestion,

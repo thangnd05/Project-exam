@@ -1,3 +1,4 @@
+import { useMutation } from '@tanstack/react-query';
 import { createTest } from '~/shared/api/testApi';
 import { createTestPart } from '~/shared/api/testPartApi';
 import {
@@ -27,7 +28,6 @@ export const useTestSubmission = ({
     setQuestions,
     setGroups,
     setDocumentFile,
-    setLoading,
     setNotification,
     emptyQuestion,
     createInitialGroup,
@@ -105,38 +105,8 @@ export const useTestSubmission = ({
         return null;
     };
 
-    const handleSubmit = async (creatorType) => {
-        if (creatorType === CREATOR_TYPES.TEST) {
-            if (!testInfo.title || !testInfo.examTypeId || !testInfo.examPartId) {
-                toast.warning('Vui lòng điền đủ thông tin!', { autoClose: TOAST_VALIDATION_MS });
-                return false;
-            }
-        } else {
-            if (!testInfo.examPartId) {
-                toast.warning('Vui lòng chọn Phần thi (Part)!', { autoClose: TOAST_VALIDATION_MS });
-                return false;
-            }
-        }
-
-        const invalidQuestionRefs = validateCorrectAnswerSelection(creatorType);
-        if (invalidQuestionRefs.length > 0) {
-            toast.warning(
-                `Được để trống nội dung đáp án, nhưng mỗi câu phải chọn ít nhất 1 đáp án đúng. Vui lòng kiểm tra: ${invalidQuestionRefs.join(', ')}`,
-                { autoClose: TOAST_VALIDATION_MS },
-            );
-            return false;
-        }
-
-        const uploadSizeError = validateUploadSize(creatorType);
-        if (uploadSizeError) {
-            toast.warning(uploadSizeError, { autoClose: TOAST_VALIDATION_MS });
-            return false;
-        }
-
-        setLoading(true);
-        setNotification({});
-
-        try {
+    const mutation = useMutation({
+        mutationFn: async (creatorType) => {
             if (creatorType === CREATOR_TYPES.TEST) {
                 const manualQuestions = questions.filter(hasValidManualQuestion);
                 const testData = await createTest({
@@ -219,12 +189,6 @@ export const useTestSubmission = ({
                         return createAndAttach(formData);
                     }),
                 );
-                setNotification({
-                    type: 'success',
-                    message: 'Tạo đề thi thành công!',
-                });
-                setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
-                setDocumentFile(null);
             } else if (creatorType === CREATOR_TYPES.BULK) {
                 const formData = new FormData();
                 const payload = {
@@ -258,11 +222,6 @@ export const useTestSubmission = ({
                 });
 
                 await bulkCreateQuestions(formData);
-                setNotification({
-                    type: 'success',
-                    message: 'Đã lưu câu hỏi vào kho!',
-                });
-                setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
             } else if (creatorType === CREATOR_TYPES.PASSAGE) {
                 const formData = new FormData();
                 let passageQuestionOrder = 0;
@@ -305,22 +264,75 @@ export const useTestSubmission = ({
                     }
                 });
                 await bulkCreateQuestionGroups(formData);
+            }
+        },
+        onMutate: () => {
+            setNotification({});
+        },
+        onSuccess: (_data, creatorType) => {
+            if (creatorType === CREATOR_TYPES.TEST) {
+                setNotification({
+                    type: 'success',
+                    message: 'Tạo đề thi thành công!',
+                });
+                setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
+                setDocumentFile(null);
+            } else if (creatorType === CREATOR_TYPES.BULK) {
+                setNotification({
+                    type: 'success',
+                    message: 'Đã lưu câu hỏi vào kho!',
+                });
+                setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
+            } else if (creatorType === CREATOR_TYPES.PASSAGE) {
                 setNotification({ type: 'success', message: 'Đã lưu thành công!' });
                 setGroups([createInitialGroup()]);
             }
-            return true;
-        } catch (error) {
+        },
+        onError: (error) => {
             const msg =
                 error.response?.data?.detail ||
                 error.response?.data?.message ||
                 error.message;
             toast.error(msg, { autoClose: TOAST_VALIDATION_MS });
             setNotification({});
+        },
+    });
+
+    const handleSubmit = async (creatorType) => {
+        if (creatorType === CREATOR_TYPES.TEST) {
+            if (!testInfo.title || !testInfo.examTypeId || !testInfo.examPartId) {
+                toast.warning('Vui lòng điền đủ thông tin!', { autoClose: TOAST_VALIDATION_MS });
+                return false;
+            }
+        } else {
+            if (!testInfo.examPartId) {
+                toast.warning('Vui lòng chọn Phần thi (Part)!', { autoClose: TOAST_VALIDATION_MS });
+                return false;
+            }
+        }
+
+        const invalidQuestionRefs = validateCorrectAnswerSelection(creatorType);
+        if (invalidQuestionRefs.length > 0) {
+            toast.warning(
+                `Được để trống nội dung đáp án, nhưng mỗi câu phải chọn ít nhất 1 đáp án đúng. Vui lòng kiểm tra: ${invalidQuestionRefs.join(', ')}`,
+                { autoClose: TOAST_VALIDATION_MS },
+            );
             return false;
-        } finally {
-            setLoading(false);
+        }
+
+        const uploadSizeError = validateUploadSize(creatorType);
+        if (uploadSizeError) {
+            toast.warning(uploadSizeError, { autoClose: TOAST_VALIDATION_MS });
+            return false;
+        }
+
+        try {
+            await mutation.mutateAsync(creatorType);
+            return true;
+        } catch {
+            return false;
         }
     };
 
-    return { handleSubmit };
+    return { handleSubmit, isSubmitting: mutation.isPending };
 };
