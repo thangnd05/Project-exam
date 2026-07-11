@@ -15,6 +15,7 @@ import com.project_exam.backend.modules.assessment.test.dto.TestCollectionRespon
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.service.TestService;
 import com.project_exam.backend.modules.assessment.test.service.TestQuestionAssignmentService;
+import com.project_exam.backend.modules.assessment.test.service.TestAccessService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +37,7 @@ public class TestController {
 
     private final TestService testService;
     private final TestQuestionAssignmentService testQuestionAssignmentService;
+    private final TestAccessService testAccessService;
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
 
@@ -150,7 +152,7 @@ public class TestController {
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(testService.purchaseTestAccess(userId, testId));
+        return ResponseEntity.ok(testAccessService.purchaseTestAccess(userId, testId));
     }
 
     // Xoá test
@@ -257,7 +259,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         if (test.getClassId() != null) {
             classAccessGuard.requireMemberOrTeacher(test.getClassId(), userId, request);
         }
-        Map<String, Object> result = testService.canStartTest(userId, test);
+        Map<String, Object> result = testAccessService.canStartTest(userId, test);
 
         if (!(Boolean) result.get("canStart")) {
             return ResponseEntity.badRequest().body(result);
