@@ -122,6 +122,7 @@ export const privateRoutes = [
     allowGuest: true,
     hideFooter: true,
     hideScrollToTop: true,
+    examMode: true,
   },
   { path: routes.testResult, component: TestResultPage, allowGuest: true },
   {

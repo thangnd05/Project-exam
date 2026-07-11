@@ -68,6 +68,7 @@ function App() {
                       noContainer={route.noContainer || false}
                       hideFooter={route.hideFooter || false}
                       hideScrollToTop={route.hideScrollToTop || false}
+                      examMode={route.examMode || false}
                     >
                       <Page />
                     </Layout>
@@ -106,6 +107,7 @@ function App() {
                         noContainer={route.noContainer || false}
                         hideFooter={route.hideFooter || false}
                         hideScrollToTop={route.hideScrollToTop || false}
+                        examMode={route.examMode || false}
                       >
                         <Page />
                       </Layout>

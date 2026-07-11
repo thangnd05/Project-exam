@@ -15,17 +15,18 @@ function DefaultLayout({
   noContainer = false,
   hideFooter = false,
   hideScrollToTop = false,
+  examMode = false,
 }) {
   const location = useLocation();
   const showMobileNav = !hideFooter;
 
   return (
-    <div className={cx('wrapper', {examWrapper: hideFooter, hasMobileNav: showMobileNav})}>
+    <div className={cx('wrapper', {examWrapper: examMode, hasMobileNav: showMobileNav})}>
       <BackgroundDecor />
       <Header />
 
-      <main className={cx('main', { examMode: hideFooter })}>
-        {hideFooter ? (
+      <main className={cx('main', { examMode })}>
+        {examMode ? (
           <div className={cx('pageWrap')}>{noContainer ? children : <div>{children}</div>}</div>
         ) : (
           <motion.div
