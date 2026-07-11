@@ -1,24 +1,15 @@
 import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Container, Spinner, Table} from 'react-bootstrap';
-import {motion} from 'framer-motion';
 import classNames from 'classnames/bind';
 import { IoPodiumOutline } from 'react-icons/io5';
 
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from './TestLeaderboardPage.module.scss';
 import routes from '~/shared/config/Routes';
 import {useTestLeaderboard} from './hooks/useTestLeaderboard';
 
 const cx = classNames.bind(styles);
-
-const rankRowVariants = {
-  hidden: {opacity: 0, x: -16},
-  visible: (i) => ({
-    opacity: 1,
-    x: 0,
-    transition: {duration: 0.4, delay: i * 0.05, ease: [0.22, 1, 0.36, 1]},
-  }),
-};
 
 const TROPHY_COLORS = {
   1: '#f59e0b',
@@ -93,23 +84,20 @@ function TestLeaderboardPage() {
     <div className={cx('wrapper')}>
       <Container>
         <div className={cx('headerTop')}>
-          <button
-            type="button"
-            className={cx('btnBack')}
+          <ButtonPrime
+            variant="outline"
             onClick={() =>
               navigate(routes.testHistory.replace(':testId', String(testId)))
             }
           >
             Quay lại lịch sử
-          </button>
+          </ButtonPrime>
         </div>
 
         <PageHeader
-          className={cx('leaderboardHeader')}
           title={testTitle || 'Bảng xếp hạng điểm'}
           description="Chỉ hiển thị thông tin tổng hợp: hạng, tên hiển thị, điểm và số lượt làm."
           label="Leaderboard"
-          labelClassName={cx('leaderboardLabel')}
           badgeLabel={
             <div className="d-flex align-items-center gap-2">
               <IoPodiumOutline />
@@ -148,14 +136,10 @@ function TestLeaderboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((entry, index) => (
-                  <motion.tr
+                {rows.map((entry) => (
+                  <tr
                     key={entry.id}
                     className={cx({myRow: entry.isMe})}
-                    custom={index}
-                    variants={rankRowVariants}
-                    initial="hidden"
-                    animate="visible"
                   >
                     <td data-label="Hạng">
                       <div className={cx('rankCell')}>
@@ -185,7 +169,7 @@ function TestLeaderboardPage() {
                     <td data-label="Thời gian làm">
                       {formatDuration(entry.durationTaken)}
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </Table>

@@ -1,23 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTestHistory } from './hooks/useTestHistory';
 import { Container, Table, Spinner } from 'react-bootstrap';
-import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
 import { IoEyeOutline, IoCalendarOutline, IoStatsChartOutline, IoCheckmarkCircleOutline, IoHourglassOutline, IoCloseCircleOutline, IoDocumentTextOutline } from 'react-icons/io5';
 
 import style from './TestHistory.module.scss';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 
 const cx = classNames.bind(style);
-
-const rowVariants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
 
 function TestHistoryPage() {
   const { testId } = useParams();
@@ -54,17 +45,15 @@ function TestHistoryPage() {
       <Container>
 
         <div className={cx('header-top')}>
-          <button className={cx('btn-back')} onClick={() => navigate(-1)}>
+          <ButtonPrime variant="outline" onClick={() => navigate(-1)}>
             Quay lại
-          </button>
+          </ButtonPrime>
         </div>
 
         <PageHeader
-          className={cx('historyHeader')}
           title={testInfo ? testInfo.title : 'Đang tải thông tin...'}
           description={testInfo?.description}
           label="Lịch sử làm bài kiểm tra"
-          labelClassName={cx('historyLabel')}
           badgeLabel={
             <div className="d-flex align-items-center gap-2">
               <IoStatsChartOutline />
@@ -96,13 +85,7 @@ function TestHistoryPage() {
               </thead>
               <tbody>
                 {attempts.map((a, i) => (
-                  <motion.tr
-                    key={a.userTestId}
-                    custom={i}
-                    variants={rowVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
+                  <tr key={a.userTestId}>
                     <td data-label="Lần" className="fw-bold text-muted">
                       #{i + 1}
                     </td>
@@ -142,20 +125,21 @@ function TestHistoryPage() {
                     </td>
                     <td data-label="Thao tác">
                       {a.status === 'COMPLETED' ? (
-                        <button
-                          className={cx('btn-view-modern')}
+                        <ButtonPrime
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleViewResult(a.userTestId)}
                         >
                           <IoEyeOutline />
                           Chi tiết
-                        </button>
+                        </ButtonPrime>
                       ) : (
                         <span className="text-muted small italic">
                           Không khả dụng
                         </span>
                       )}
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </Table>
