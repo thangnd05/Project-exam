@@ -24,7 +24,9 @@ import com.project_exam.backend.modules.assessment.exam.repository.*;
 import com.project_exam.backend.modules.assessment.test.repository.*;
 import com.project_exam.backend.modules.assessment.attempt.repository.*;
 import com.project_exam.backend.modules.vocabulary.repository.*;
-import com.project_exam.backend.modules.classroom.repository.*;
+import com.project_exam.backend.modules.classroom.clazz.repository.*;
+import com.project_exam.backend.modules.classroom.chapter.repository.*;
+import com.project_exam.backend.modules.classroom.member.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import lombok.RequiredArgsConstructor;
 

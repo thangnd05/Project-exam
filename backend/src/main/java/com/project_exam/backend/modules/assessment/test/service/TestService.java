@@ -34,7 +34,7 @@ import com.project_exam.backend.modules.assessment.test.repository.TestRepositor
 import com.project_exam.backend.modules.assessment.test.repository.UserTestAccessRepository;
 import com.project_exam.backend.modules.gamification.coin.service.CoinService;
 import com.project_exam.backend.shared.exception.ConflictException;
-import com.project_exam.backend.modules.classroom.domain.ClassMember.MemberStatus;
+import com.project_exam.backend.modules.classroom.member.domain.ClassMember.MemberStatus;
 
 // --- Assessment: Exam ---
 import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
@@ -73,8 +73,8 @@ import com.project_exam.backend.modules.users.repository.UserRepository;
 import com.project_exam.backend.modules.users.service.AdminUserProvider;
 
 // --- Classroom ---
-import com.project_exam.backend.modules.classroom.repository.ClassMemberRepository;
-import com.project_exam.backend.modules.classroom.repository.ClassRepository;
+import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
+import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 
 // --- Jakarta & Spring ---
 import jakarta.servlet.http.HttpServletRequest;

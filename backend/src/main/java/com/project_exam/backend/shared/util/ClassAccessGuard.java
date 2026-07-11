@@ -1,10 +1,10 @@
 package com.project_exam.backend.shared.util;
 
-import com.project_exam.backend.modules.classroom.domain.Chapter;
-import com.project_exam.backend.modules.classroom.domain.ClassMember;
-import com.project_exam.backend.modules.classroom.repository.ChapterRepository;
-import com.project_exam.backend.modules.classroom.repository.ClassMemberRepository;
-import com.project_exam.backend.modules.classroom.repository.ClassRepository;
+import com.project_exam.backend.modules.classroom.chapter.domain.Chapter;
+import com.project_exam.backend.modules.classroom.member.domain.ClassMember;
+import com.project_exam.backend.modules.classroom.chapter.repository.ChapterRepository;
+import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
+import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
