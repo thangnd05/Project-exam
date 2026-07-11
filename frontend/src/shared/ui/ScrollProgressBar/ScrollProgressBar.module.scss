@@ -10,8 +10,8 @@
 
 .progressBar {
   height: 100%;
-  background: var(--primary-gradient, linear-gradient(90deg, #3b82f6 0%, #2dd4bf 100%));
+  background: var(--primary-gradient, linear-gradient(90deg, #0061f2 0%, #00c6ff 100%));
   transition: width 0.1s ease-out;
   border-radius: 0 2px 2px 0;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 8px rgba(0, 97, 242, 0.25);
 }

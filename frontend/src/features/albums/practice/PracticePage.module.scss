@@ -291,12 +291,12 @@ $transition: all 0.3s ease;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 
     &:hover {
         transform: scale(1.1);
         background: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
     }
 
     &:active {

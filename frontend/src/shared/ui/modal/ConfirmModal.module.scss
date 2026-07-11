@@ -26,7 +26,7 @@
 }
 
 .header {
-    background: linear-gradient(135deg, #0f6bdc 0%, #19b5fe 100%);
+    background: var(--primary-gradient);
     padding: 24px 30px;
     display: flex;
     align-items: center;
@@ -93,7 +93,7 @@
 
         &.primary {
             background: #dbeafe;
-            color: #0f6bdc;
+            color: var(--primary);
         }
 
         &.danger {
@@ -154,12 +154,12 @@
         color: #fff;
 
         &.primary {
-            background: linear-gradient(135deg, #0f6bdc 0%, #19b5fe 100%);
-            box-shadow: 0 4px 15px rgba(15, 107, 220, 0.3);
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 15px rgba(0, 97, 242, 0.25);
 
             &:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(15, 107, 220, 0.4);
+                box-shadow: 0 8px 25px rgba(0, 97, 242, 0.35);
             }
         }
 

@@ -193,11 +193,11 @@
   .btnSubmit {
     background: var(--primary-gradient);
     color: #fff;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 97, 242, 0.25);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 8px 25px rgba(0, 97, 242, 0.35);
     }
 
     &:disabled {
