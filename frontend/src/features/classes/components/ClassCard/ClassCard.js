@@ -40,9 +40,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
       </div>
 
       <button className={cx('btn-view')}>
-        <IoBookOutline />
         {role === 'teacher' ? 'Xem các bài test' : 'Làm bài kiểm tra'}
-        <IoArrowForwardOutline />
       </button>
 
       {role === 'teacher' && (
@@ -53,9 +51,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
             onManageMembers?.(e, classData.classId);
           }}
         >
-          <IoPeopleOutline />
           Quản lý học sinh
-          <IoSettingsOutline />
         </button>
       )}
     </div>

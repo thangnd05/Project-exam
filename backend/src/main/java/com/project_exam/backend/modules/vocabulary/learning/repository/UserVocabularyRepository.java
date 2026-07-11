@@ -36,4 +36,11 @@ public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, 
     @Query("SELECT uv.vocabId FROM UserVocabulary uv WHERE uv.userId = :userId AND uv.status = :status")
     List<String> findVocabIdsByUserIdAndStatus(@Param("userId") String userId, @Param("status") UserVocabulary.Status status);
 
+    // Số từ đã thuộc (mastered) của user theo từng album: [albumId, count]
+    @Query("SELECT v.albumId, COUNT(uv) FROM UserVocabulary uv " +
+            "JOIN Vocabulary v ON uv.vocabId = v.vocabId " +
+            "WHERE uv.userId = :userId AND uv.status = 'mastered' AND v.albumId IN :albumIds " +
+            "GROUP BY v.albumId")
+    List<Object[]> countMasteredGroupedByAlbumIds(@Param("userId") String userId, @Param("albumIds") Collection<String> albumIds);
+
 }

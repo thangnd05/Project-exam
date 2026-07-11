@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { createClass } from '~/shared/api/classApi';
+import { useCreateClass } from '~/features/classes/hooks/useMyClasses';
 import classNames from 'classnames/bind';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '~/shared/hooks/useAuth';
@@ -16,15 +16,16 @@ const cx = classNames.bind(styles);
 function CreateClassModal({ show, onClose }) {
   const [className, setClassName] = useState('');
   const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const [message, setMessage] = useState('');
   const [type, setType] = useState('info');
 
   const { user } = useAuth();
   const navigate = useNavigate();
+  const createMutation = useCreateClass();
+  const loading = createMutation.isPending;
 
-  const handleCreate = async () => {
+  const handleCreate = () => {
     setMessage('');
 
     if (!user) {
@@ -45,30 +46,26 @@ function CreateClassModal({ show, onClose }) {
       return;
     }
 
-    setLoading(true);
+    createMutation.mutate(
+      { className, description },
+      {
+        onSuccess: () => {
+          toast.success('Tạo lớp học thành công!');
 
-    try {
+          setClassName('');
+          setDescription('');
+          onClose();
 
-      await createClass({
-        className: className,
-        description: description,
-      });
-
-      toast.success('Tạo lớp học thành công!');
-
-      setClassName('');
-      setDescription('');
-      onClose();
-
-      navigate(routes.myClasses);
-    } catch (err) {
-      setType('danger');
-      setMessage(
-        err.response?.data?.message || ' Có lỗi xảy ra khi tạo lớp học!',
-      );
-    } finally {
-      setLoading(false);
-    }
+          navigate(routes.myClasses);
+        },
+        onError: (err) => {
+          setType('danger');
+          setMessage(
+            err.response?.data?.message || ' Có lỗi xảy ra khi tạo lớp học!',
+          );
+        },
+      },
+    );
   };
 
   return (

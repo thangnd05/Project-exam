@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { IoAddCircleOutline, IoFolderOpenOutline, IoDocumentTextOutline, IoGridOutline, IoListOutline, IoAdd } from "react-icons/io5";
-import { FaBook } from "react-icons/fa";
 
 import styles from './MyAlbumPage.module.scss';
 
@@ -14,10 +13,17 @@ import UpdateAlbumModal from './modals/UpdateAlbumModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import PageHeaderViewToggle from '~/shared/ui/PageHeader/PageHeaderViewToggle';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import AlbumManagementTable from './components/AlbumManagementTable/AlbumManagementTable';
 import { useMyAlbums } from './hooks/useMyAlbums';
 
 const cx = classNames.bind(styles);
+
+// Vòng tiến độ: cung màu chính (đã thuộc) + phần còn lại màu track
+const buildRingGradient = (pct) => {
+  const p = Math.max(0, Math.min(100, pct));
+  return `conic-gradient(var(--primary) ${p}%, #e9eef5 ${p}% 100%)`;
+};
 
 const albumCardVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -120,39 +126,58 @@ function MyAlbumsPage() {
             </motion.div>
           ) : viewMode === 'grid' ? (
             <div className={cx('album-grid')}>
-              {albums.map((album, index) => (
-                <motion.div
-                  key={album.albumId}
-                  className={cx('album-card')}
-                  onClick={() => navigate(`/albums/${album.albumId}`)}
-                  custom={index}
-                  initial="hidden"
-                  animate="visible"
-                  variants={albumCardVariants}
-                  whileHover={{ y: -6 }}
-                >
-                  <div className={cx('card-top')}>
-                    <div className={cx('card-icon')}>
-                      <FaBook />
+              {albums.map((album, index) => {
+                const total = album.totalWords || 0;
+                const mastered = album.masteredWords || 0;
+                const pct = total > 0 ? Math.round((mastered / total) * 100) : 0;
+                const hasStarted = mastered > 0;
+                return (
+                  <motion.div
+                    key={album.albumId}
+                    className={cx('album-card')}
+                    onClick={() => navigate(`/albums/${album.albumId}`)}
+                    custom={index}
+                    initial="hidden"
+                    animate="visible"
+                    variants={albumCardVariants}
+                    whileHover={{ y: -6 }}
+                  >
+                    <div className={cx('card-top')}>
+                      <h3 className={cx('album-title')}>{album.name}</h3>
+                      <span className={cx('index')}>
+                        {(index + 1).toString().padStart(2, '0')}
+                      </span>
                     </div>
-                    <span className={cx('index')}>
-                      {(index + 1).toString().padStart(2, '0')}
-                    </span>
-                  </div>
 
-                  <h3 className={cx('album-title')}>{album.name}</h3>
+                    <div className={cx('progress-body')}>
+                      <div
+                        className={cx('gauge-ring')}
+                        style={{ background: buildRingGradient(pct) }}
+                      >
+                        <div className={cx('gauge-hole')}>
+                          <span className={cx('gauge-pct')}>{pct}%</span>
+                        </div>
+                      </div>
 
-                  <div className={cx('album-info')}>
-                    <span>
-                      {album.description || 'Hành trình chinh phục từ vựng mỗi ngày'}
-                    </span>
-                  </div>
+                      <div className={cx('progress-stats')}>
+                        <div className={cx('stat-total')}>
+                          <span className={cx('stat-num')}>{total}</span>
+                          <span className={cx('stat-unit')}>từ</span>
+                        </div>
+                        <div className={cx('stat-sub')}>
+                          Đã thuộc <strong>{mastered}</strong> từ
+                        </div>
+                      </div>
+                    </div>
 
-                  <button className={cx('btn-view')}>
-                    Bắt đầu học ngay
-                  </button>
-                </motion.div>
-              ))}
+                    <div className={cx('cta')}>
+                      <ButtonPrime variant="primary" fullWidth>
+                        {hasStarted ? 'Tiếp tục học' : 'Bắt đầu học'}
+                      </ButtonPrime>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           ) : (
             <AlbumManagementTable

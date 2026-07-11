@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getMyClasses } from '~/features/classes/api/classMemberApi';
-import { deleteClass } from '~/shared/api/classApi';
+import { getMyClasses, joinClass } from '~/features/classes/api/classMemberApi';
+import { createClass, updateClass, deleteClass } from '~/shared/api/classApi';
 
 export const myClassesKeys = {
   all: ['my-classes'],
@@ -17,6 +17,42 @@ export function useMyClasses() {
     queryKey: myClassesKeys.all,
     queryFn: getMyClasses,
     select: normalizeMyClasses,
+  });
+}
+
+export function useCreateClass({ onSuccess, onError } = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => createClass(payload),
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: myClassesKeys.all });
+      onSuccess?.(...args);
+    },
+    onError,
+  });
+}
+
+export function useUpdateClass({ onSuccess, onError } = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ classId, payload }) => updateClass(classId, payload),
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: myClassesKeys.all });
+      onSuccess?.(...args);
+    },
+    onError,
+  });
+}
+
+export function useJoinClass({ onSuccess, onError } = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => joinClass(payload),
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: myClassesKeys.all });
+      onSuccess?.(...args);
+    },
+    onError,
   });
 }
 

@@ -1,7 +1,8 @@
 import {useState, useEffect} from 'react';
 import {Alert} from 'react-bootstrap';
 import {toast} from 'react-toastify';
-import { getClassById, updateClass } from '~/shared/api/classApi';
+import { getClassById } from '~/shared/api/classApi';
+import { useUpdateClass } from '~/features/classes/hooks/useMyClasses';
 import classNames from 'classnames/bind';
 import {FaEdit, FaInfoCircle} from 'react-icons/fa';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
@@ -13,9 +14,11 @@ const cx = classNames.bind(styles);
 function EditClassModal({show, onClose, classData, onSuccess}) {
   const [className, setClassName] = useState('');
   const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [type, setType] = useState('info');
+
+  const updateMutation = useUpdateClass();
+  const loading = updateMutation.isPending;
 
   useEffect(() => {
     if (show) {
@@ -36,7 +39,7 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
     }
   }, [classData, show]);
 
-  const handleUpdate = async () => {
+  const handleUpdate = () => {
     setMessage('');
 
     if (!className.trim()) {
@@ -45,25 +48,25 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const data = await updateClass(classData.classId, {
-        className: className,
-        description: description,
-      });
-
-      toast.success('Cập nhật lớp học thành công!');
-      onSuccess?.(data);
-      onClose();
-    } catch (err) {
-      setType('danger');
-      setMessage(
-        err.response?.data?.error || 'Có lỗi xảy ra khi cập nhật lớp học!',
-      );
-    } finally {
-      setLoading(false);
-    }
+    updateMutation.mutate(
+      {
+        classId: classData.classId,
+        payload: { className, description },
+      },
+      {
+        onSuccess: (data) => {
+          toast.success('Cập nhật lớp học thành công!');
+          onSuccess?.(data);
+          onClose();
+        },
+        onError: (err) => {
+          setType('danger');
+          setMessage(
+            err.response?.data?.error || 'Có lỗi xảy ra khi cập nhật lớp học!',
+          );
+        },
+      },
+    );
   };
 
   return (

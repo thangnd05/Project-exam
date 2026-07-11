@@ -53,7 +53,7 @@ const AlbumDetailPage = () => {
     isError,
     refetch: fetchVocabularies,
   } = useAlbumVocabularies(albumId);
-  const errorMsg = isError ? 'Không thể tải danh sách từ vựng 😢' : '';
+  const errorMsg = isError ? 'Không thể tải danh sách từ vựng ' : '';
   const deleteMutation = useDeleteVocabulary(albumId);
 
   useEffect(() => {

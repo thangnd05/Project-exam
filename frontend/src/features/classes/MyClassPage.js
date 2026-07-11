@@ -30,7 +30,7 @@ const MyClassesPage = () => {
 
   const teachingClasses = data?.teachingClasses ?? [];
   const learningClasses = data?.learningClasses ?? [];
-  const message = data?.message || (isError ? 'Không thể kết nối đến máy chủ 😢' : '');
+  const message = data?.message || (isError ? 'Không thể kết nối đến máy chủ ' : '');
 
   const handleViewTests = (classId) => {
     const path = routes.classChapterPage.replace(':classId', classId);

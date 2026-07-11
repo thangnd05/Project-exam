@@ -31,7 +31,6 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}) => {
               <tr key={album.albumId}>
                 <td className={cx('album-title')}>
                   <div className="d-flex align-items-center">
-                    <IoBookOutline className="me-3 text-primary" size={20} />
                     <strong>{album.name}</strong>
                   </div>
                 </td>

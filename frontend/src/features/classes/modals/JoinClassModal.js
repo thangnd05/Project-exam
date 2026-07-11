@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert } from "react-bootstrap";
-import { joinClass } from '~/features/classes/api/classMemberApi';
+import { useJoinClass } from '~/features/classes/hooks/useMyClasses';
 import classNames from "classnames/bind";
 import { FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "~/shared/hooks/useAuth";
@@ -14,15 +14,16 @@ const cx = classNames.bind(styles);
 
 function JoinClassModal({ show, onClose }) {
     const [code, setCode] = useState("");
-    const [loading, setLoading] = useState(false);
 
     const [message, setMessage] = useState("");
     const [type, setType] = useState("info");
 
     const { user } = useAuth();
     const navigate = useNavigate();
+    const joinMutation = useJoinClass();
+    const loading = joinMutation.isPending;
 
-    const handleJoin = async () => {
+    const handleJoin = () => {
         setMessage("");
 
         if (!user) {
@@ -43,31 +44,28 @@ function JoinClassModal({ show, onClose }) {
             return;
         }
 
-        setLoading(true);
+        joinMutation.mutate(
+            { classQr: code.trim().toUpperCase() },
+            {
+                onSuccess: () => {
+                    setType("success");
+                    setMessage(" Gửi yêu cầu tham gia lớp thành công!");
 
-        try {
-
-            await joinClass({
-                classQr: code.trim().toUpperCase(),
-            });
-
-            setType("success");
-            setMessage(" Gửi yêu cầu tham gia lớp thành công!");
-
-            setTimeout(() => {
-                setCode("");
-                onClose();
-                navigate(routes.myClasses);
-            }, 1500);
-        } catch (err) {
-            setType("danger");
-            setMessage(
-                err.response?.data?.message ||
-                " Không có lớp nào với mã tham gia này!"
-            );
-        } finally {
-            setLoading(false);
-        }
+                    setTimeout(() => {
+                        setCode("");
+                        onClose();
+                        navigate(routes.myClasses);
+                    }, 1500);
+                },
+                onError: (err) => {
+                    setType("danger");
+                    setMessage(
+                        err.response?.data?.message ||
+                        " Không có lớp nào với mã tham gia này!"
+                    );
+                },
+            }
+        );
     };
 
     return (

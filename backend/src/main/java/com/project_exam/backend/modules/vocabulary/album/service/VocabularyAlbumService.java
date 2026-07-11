@@ -8,13 +8,17 @@ import com.project_exam.backend.modules.vocabulary.album.dto.VocabularyAlbumResp
 import com.project_exam.backend.modules.vocabulary.album.domain.VocabularyAlbum;
 import com.project_exam.backend.modules.vocabulary.album.mapper.VocabularyAlbumMapper;
 import com.project_exam.backend.modules.vocabulary.album.repository.VocabularyAlbumRepository;
+import com.project_exam.backend.modules.vocabulary.learning.repository.UserVocabularyRepository;
+import com.project_exam.backend.modules.vocabulary.word.repository.VocabularyRepository;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,8 @@ public class VocabularyAlbumService {
     private final VocabularyAlbumRepository repository;
     private final AuthUtils authUtils;
     private final VocabularyAlbumMapper vocabularyAlbumMapper;
+    private final VocabularyRepository vocabularyRepository;
+    private final UserVocabularyRepository userVocabularyRepository;
 
     // =========================
     // GET ALL
@@ -108,9 +114,27 @@ public class VocabularyAlbumService {
 
         String currentUserId = authUtils.getUserId(request);
 
-        return repository.findAllByUserId(currentUserId)
-                .stream()
-                .map(this::toResponse)
+        List<VocabularyAlbum> albums = repository.findAllByUserId(currentUserId);
+        List<String> albumIds = albums.stream().map(VocabularyAlbum::getAlbumId).toList();
+
+        Map<String, Long> totalMap = new HashMap<>();
+        Map<String, Long> masteredMap = new HashMap<>();
+        if (!albumIds.isEmpty()) {
+            for (Object[] row : vocabularyRepository.countGroupedByAlbumIds(albumIds)) {
+                totalMap.put((String) row[0], (Long) row[1]);
+            }
+            for (Object[] row : userVocabularyRepository.countMasteredGroupedByAlbumIds(currentUserId, albumIds)) {
+                masteredMap.put((String) row[0], (Long) row[1]);
+            }
+        }
+
+        return albums.stream()
+                .map(album -> {
+                    VocabularyAlbumResponse res = vocabularyAlbumMapper.toResponse(album);
+                    res.setTotalWords(totalMap.getOrDefault(album.getAlbumId(), 0L).intValue());
+                    res.setMasteredWords(masteredMap.getOrDefault(album.getAlbumId(), 0L).intValue());
+                    return res;
+                })
                 .toList();
     }
 

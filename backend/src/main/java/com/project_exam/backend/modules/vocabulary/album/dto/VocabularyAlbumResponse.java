@@ -17,4 +17,8 @@ public class VocabularyAlbumResponse {
     private String description;
     private String userId;
     private LocalDateTime createdAt;
+
+    // Tiến độ học của người dùng hiện tại (chỉ set ở API "album của tôi")
+    private int totalWords;
+    private int masteredWords;
 }

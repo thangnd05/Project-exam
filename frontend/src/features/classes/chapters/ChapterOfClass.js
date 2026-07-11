@@ -39,7 +39,7 @@ const ChapterOfClass = () => {
     refetchChapters,
   } = useChaptersOfClass(classId);
 
-  const message = isError ? 'Không thể tải danh sách chương 😢' : '';
+  const message = isError ? 'Không thể tải danh sách chương ' : '';
 
   const [showCreateChapter, setShowCreateChapter] = useState(false);
   const [showUpdateChapter, setShowUpdateChapter] = useState(false);
