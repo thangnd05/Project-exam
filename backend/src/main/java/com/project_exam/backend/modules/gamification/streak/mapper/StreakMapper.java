@@ -5,7 +5,6 @@ import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverCon
 import com.project_exam.backend.modules.gamification.streak.dto.StreakResponse;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 
 /** Mapper thuần: dựng DTO từ dữ liệu đã được service chuẩn bị sẵn. */
 @Component

@@ -20,7 +20,6 @@ import com.project_exam.backend.modules.gamification.cosmetic.dto.EquippedCosmet
 import com.project_exam.backend.modules.gamification.cosmetic.service.CosmeticService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

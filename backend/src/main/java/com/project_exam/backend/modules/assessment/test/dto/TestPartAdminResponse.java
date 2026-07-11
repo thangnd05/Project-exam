@@ -1,6 +1,5 @@
 package com.project_exam.backend.modules.assessment.test.dto;
 
-import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionGroupAdminResponse;
 import lombok.*;
 

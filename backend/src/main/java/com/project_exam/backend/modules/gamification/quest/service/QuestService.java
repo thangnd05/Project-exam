@@ -2,7 +2,6 @@ package com.project_exam.backend.modules.gamification.quest.service;
 
 import com.project_exam.backend.modules.gamification.coin.service.CoinService;
 import com.project_exam.backend.modules.gamification.quest.domain.Quest;
-import com.project_exam.backend.modules.gamification.quest.domain.QuestConditionType;
 import com.project_exam.backend.modules.gamification.quest.domain.UserQuestClaim;
 import com.project_exam.backend.modules.gamification.quest.dto.QuestClaimResponse;
 import com.project_exam.backend.modules.gamification.quest.dto.QuestRequest;

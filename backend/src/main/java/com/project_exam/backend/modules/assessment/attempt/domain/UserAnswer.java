@@ -3,7 +3,6 @@ package com.project_exam.backend.modules.assessment.attempt.domain;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(

@@ -1,5 +1,4 @@
 package com.project_exam.backend.modules.assessment.test.service;
-import com.project_exam.backend.shared.security.PermissionCatalog;
 
 // --- Shared ---
 import com.project_exam.backend.shared.exception.BadRequestException;
@@ -13,10 +12,7 @@ import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
 import com.project_exam.backend.modules.assessment.test.domain.TestStatus;
-import com.project_exam.backend.modules.assessment.test.dto.AddQuestionsToTestRequest;
-import com.project_exam.backend.modules.assessment.test.dto.AddRandomQuestionsToTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
-import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionGroupResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
@@ -33,7 +29,6 @@ import com.project_exam.backend.modules.assessment.test.repository.TestQuestionR
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import com.project_exam.backend.modules.assessment.test.repository.UserTestAccessRepository;
 import com.project_exam.backend.modules.gamification.coin.service.CoinService;
-import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.modules.classroom.member.domain.ClassMember.MemberStatus;
 
 // --- Assessment: Exam ---
@@ -43,7 +38,6 @@ import com.project_exam.backend.modules.assessment.exam.domain.ExamType;
 import com.project_exam.backend.modules.assessment.exam.domain.Skill;
 import com.project_exam.backend.modules.assessment.exam.domain.Passage;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
-import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
@@ -59,17 +53,13 @@ import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepos
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 
 // --- Assessment: Attempt ---
-import com.project_exam.backend.modules.assessment.attempt.domain.UserAnswer;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 
 // --- Users ---
-import com.project_exam.backend.modules.users.rbac.domain.Role;
 import com.project_exam.backend.modules.users.user.domain.User;
-import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
-import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.modules.users.user.service.AdminUserProvider;
 
 // --- Classroom ---
@@ -92,7 +82,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor

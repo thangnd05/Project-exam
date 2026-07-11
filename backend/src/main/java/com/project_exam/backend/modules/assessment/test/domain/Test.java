@@ -1,6 +1,5 @@
 package com.project_exam.backend.modules.assessment.test.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;

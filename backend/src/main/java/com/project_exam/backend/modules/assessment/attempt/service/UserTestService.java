@@ -40,7 +40,6 @@ import com.project_exam.backend.modules.posts.category.repository.*;
 import com.project_exam.backend.modules.posts.react.repository.*;
 import com.project_exam.backend.modules.posts.saved.repository.*;
 import com.project_exam.backend.modules.assessment.exam.repository.*;
-import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.test.repository.*;
 import com.project_exam.backend.modules.assessment.attempt.repository.*;
 import com.project_exam.backend.modules.vocabulary.album.repository.*;
