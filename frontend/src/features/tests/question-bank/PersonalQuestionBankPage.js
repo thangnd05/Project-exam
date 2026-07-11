@@ -5,7 +5,6 @@ import {
   getQuestionsByPart,
   getMyClassBankQuestions,
   getMyClassBankCount,
-  deleteQuestion,
 } from '~/shared/api/questionApi';
 import { getMyClasses } from '~/shared/api/classApi';
 import { getChaptersByClass } from '~/shared/api/chapterApi';
@@ -25,6 +24,7 @@ import {useBaseMetaData} from '~/shared/hooks/useBaseMetaData';
 import {useHasPermission} from '~/shared/hooks/usePermission';
 import EditQuestionModal from './modals/EditQuestionModal';
 import ViewQuestionModal from './modals/ViewQuestionModal';
+import { useDeleteQuestion } from './hooks/useDeleteQuestion';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
 import { buildCollectionTree, getCollectionWithDescendantIds, isParentCollection } from '~/shared/utils/collectionTree';
@@ -51,7 +51,6 @@ const PersonalQuestionBankPage = () => {
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
-  const [deletingQuestionId, setDeletingQuestionId] = useState(null);
   const [deleteQuestionTarget, setDeleteQuestionTarget] = useState(null);
   const [viewingQuestionId, setViewingQuestionId] = useState(null);
 
@@ -66,6 +65,10 @@ const PersonalQuestionBankPage = () => {
   const [includeChildCollections, setIncludeChildCollections] = useState(true);
 
   const {examTypes, examParts} = useBaseMetaData(examTypeId);
+
+  const deleteMutation = useDeleteQuestion();
+  const isDeleting = (id) =>
+    deleteMutation.isPending && deleteMutation.variables === id;
 
   useEffect(() => {
     if (!canAccessAdminBank && bankScope === BANK_SCOPE.ADMIN) {
@@ -308,39 +311,37 @@ const PersonalQuestionBankPage = () => {
     }
   };
 
-  const handleDeleteQuestion = async () => {
+  const handleDeleteQuestion = () => {
     if (!deleteQuestionTarget) return;
     const { questionId, partId = null, chapterId = null } = deleteQuestionTarget;
 
-    setDeletingQuestionId(questionId);
-    try {
-      await deleteQuestion(questionId);
+    deleteMutation.mutate(questionId, {
+      onSuccess: async () => {
+        if (editingQuestionId === questionId) {
+          setEditingQuestionId(null);
+        }
 
-      if (editingQuestionId === questionId) {
-        setEditingQuestionId(null);
-      }
+        if (bankScope === BANK_SCOPE.CLASS && chapterId) {
+          await loadQuestionsForChapter(chapterId);
+        } else if (partId) {
+          await loadQuestionsForPart(partId, bankScope);
+        }
 
-      if (bankScope === BANK_SCOPE.CLASS && chapterId) {
-        await loadQuestionsForChapter(chapterId);
-      } else if (partId) {
-        await loadQuestionsForPart(partId, bankScope);
-      }
-
-      setNotification({
-        type: 'success',
-        message: 'Đã xóa câu hỏi thành công.',
-      });
-      setDeleteQuestionTarget(null);
-    } catch (error) {
-      const message =
-        error.response?.data?.message || 'Không thể xóa câu hỏi. Vui lòng thử lại.';
-      setNotification({
-        type: 'danger',
-        message,
-      });
-    } finally {
-      setDeletingQuestionId(null);
-    }
+        setNotification({
+          type: 'success',
+          message: 'Đã xóa câu hỏi thành công.',
+        });
+        setDeleteQuestionTarget(null);
+      },
+      onError: (error) => {
+        const message =
+          error.response?.data?.message || 'Không thể xóa câu hỏi. Vui lòng thử lại.';
+        setNotification({
+          type: 'danger',
+          message,
+        });
+      },
+    });
   };
 
   return (
@@ -602,7 +603,7 @@ const PersonalQuestionBankPage = () => {
                                       className={cx('editBtn')}
                                       size="sm"
                                       variant="outline-primary"
-                                      disabled={deletingQuestionId === id}
+                                      disabled={isDeleting(id)}
                                       onClick={() => {
                                         setEditingChapterId(chapter.chapterId);
                                         setEditingPartId(null);
@@ -617,7 +618,7 @@ const PersonalQuestionBankPage = () => {
                                       className={cx('deleteBtn')}
                                       size="sm"
                                       variant="outline-danger"
-                                      disabled={deletingQuestionId === id}
+                                      disabled={isDeleting(id)}
                                       onClick={() =>
                                         setDeleteQuestionTarget({
                                           questionId: id,
@@ -752,7 +753,7 @@ const PersonalQuestionBankPage = () => {
                                           className={cx('editBtn')}
                                           size="sm"
                                           variant="outline-primary"
-                                          disabled={deletingQuestionId === id}
+                                          disabled={isDeleting(id)}
                                           onClick={() => {
                                             setEditingPartId(part.examPartId);
                                             setEditingChapterId(null);
@@ -767,7 +768,7 @@ const PersonalQuestionBankPage = () => {
                                           className={cx('deleteBtn')}
                                           size="sm"
                                           variant="outline-danger"
-                                          disabled={deletingQuestionId === id}
+                                          disabled={isDeleting(id)}
                                           onClick={() =>
                                             setDeleteQuestionTarget({
                                               questionId: id,

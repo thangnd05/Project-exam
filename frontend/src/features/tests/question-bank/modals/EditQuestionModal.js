@@ -5,9 +5,8 @@ import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import TagSelector from '~/shared/ui/TagSelector/TagSelector';
-import { getQuestionById, updateQuestion } from '~/shared/api/questionApi';
+import { getQuestionById } from '~/shared/api/questionApi';
 import { getExamPartById } from '~/shared/api/examPartApi';
-import { deletePassageMedia } from '~/shared/api/passageMediaApi';
 import { buildCollectionTree } from '~/shared/utils/collectionTree';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -18,6 +17,8 @@ import {
 } from 'react-icons/io5';
 import { getTagsFlatByExamType } from '~/shared/api/tagApi';
 import { useQuestionCollections } from './hooks/useQuestionCollections';
+import { useUpdateQuestion } from './hooks/useUpdateQuestion';
+import { useDeletePassageMedia } from './hooks/useDeletePassageMedia';
 import styles from './EditQuestionModal.module.scss';
 import createStyles from '~/shared/test/CreateTestModal.module.scss';
 
@@ -60,12 +61,10 @@ const getMediaItemsFromQuestion = (questionDetail) => {
 
 const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   const [newFiles, setNewFiles] = useState([]);
   const [extraContents, setExtraContents] = useState([]);
   const [existingMedia, setExistingMedia] = useState([]);
-  const [deletingMediaIds, setDeletingMediaIds] = useState([]);
   const [confirmDeleteMedia, setConfirmDeleteMedia] = useState(null);
   const [availableTags, setAvailableTags] = useState([]);
   const [selectedTagIds, setSelectedTagIds] = useState([]);
@@ -77,6 +76,12 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
   }, [onHide]);
 
   const { data: questionCollections = [] } = useQuestionCollections();
+
+  const updateMutation = useUpdateQuestion();
+  const deleteMediaMutation = useDeletePassageMedia();
+  const saving = updateMutation.isPending;
+  const isDeletingMedia = (id) =>
+    deleteMediaMutation.isPending && deleteMediaMutation.variables?.mediaId === id;
 
   const [formData, setFormData] = useState({
     classId: '',
@@ -188,7 +193,6 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     setNewFiles([]);
     setExtraContents([]);
     setExistingMedia([]);
-    setDeletingMediaIds([]);
     fetchQuestionDetails(questionId);
 
     return () => {
@@ -254,40 +258,39 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
     setFormData({ ...formData, options: updated });
   };
 
-  const handleDeleteExistingMedia = async (item) => {
+  const handleDeleteExistingMedia = (item) => {
     if (!item?.id) {
       toast.info('Media này không có id để xóa trực tiếp.');
       return;
     }
 
-    setDeletingMediaIds((prev) => [...prev, item.id]);
-    try {
-      await deletePassageMedia(item.id);
+    deleteMediaMutation.mutate(
+      { mediaId: item.id, questionId },
+      {
+        onSuccess: () => {
+          setExistingMedia((prev) => prev.filter((m) => m.id !== item.id));
 
-      setExistingMedia((prev) => prev.filter((m) => m.id !== item.id));
+          if (
+            formData.passage.mediaUrl &&
+            formData.passage.mediaUrl === item.mediaUrl
+          ) {
+            setFormData((prev) => ({
+              ...prev,
+              passage: { ...prev.passage, mediaUrl: '' },
+            }));
+          }
 
-      if (
-        formData.passage.mediaUrl &&
-        formData.passage.mediaUrl === item.mediaUrl
-      ) {
-        setFormData((prev) => ({
-          ...prev,
-          passage: { ...prev.passage, mediaUrl: '' },
-        }));
-      }
-
-      toast.success('Đã xóa media');
-    } catch (error) {
-      const msg = error.response?.data?.message ?? error.message;
-      toast.error(`Xóa media thất bại: ${msg}`);
-    } finally {
-      setDeletingMediaIds((prev) => prev.filter((id) => id !== item.id));
-    }
+          toast.success('Đã xóa media');
+        },
+        onError: (error) => {
+          const msg = error.response?.data?.message ?? error.message;
+          toast.error(`Xóa media thất bại: ${msg}`);
+        },
+      },
+    );
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-
+  const handleSave = () => {
     const payload = {
       classId: formData.classId ? String(formData.classId) : null,
       examPartId: formData.examPartId
@@ -330,30 +333,34 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
       };
     }
 
-    try {
-      if (newFiles.length > 0) {
-        const fd = new FormData();
-        fd.append('request', JSON.stringify(payload));
-        newFiles.forEach((file, index) => {
-          fd.append(`file${index}`, file);
-        });
-        await updateQuestion(questionId, fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-      } else {
-        await updateQuestion(questionId, payload, {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-
-      toast.success('Cập nhật câu hỏi thành công!');
-      onSuccess();
-    } catch (error) {
-      const msg = error.response?.data?.message ?? error.message;
-      toast.error(`Lỗi khi cập nhật: ${msg}`);
-    } finally {
-      setSaving(false);
+    let data;
+    let config;
+    if (newFiles.length > 0) {
+      const fd = new FormData();
+      fd.append('request', JSON.stringify(payload));
+      newFiles.forEach((file, index) => {
+        fd.append(`file${index}`, file);
+      });
+      data = fd;
+      config = { headers: { 'Content-Type': 'multipart/form-data' } };
+    } else {
+      data = payload;
+      config = { headers: { 'Content-Type': 'application/json' } };
     }
+
+    updateMutation.mutate(
+      { questionId, data, config },
+      {
+        onSuccess: () => {
+          toast.success('Cập nhật câu hỏi thành công!');
+          onSuccess();
+        },
+        onError: (error) => {
+          const msg = error.response?.data?.message ?? error.message;
+          toast.error(`Lỗi khi cập nhật: ${msg}`);
+        },
+      },
+    );
   };
 
   return (
@@ -502,8 +509,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                       const isImage =
                         item.mediaType === 'IMAGE' ||
                         /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(url);
-                      const deleting =
-                        item.id && deletingMediaIds.includes(item.id);
+                      const deleting = item.id && isDeletingMedia(item.id);
 
                       return (
                         <div
