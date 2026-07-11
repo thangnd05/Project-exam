@@ -1,31 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import {
-  IoCalendarOutline,
-  IoCheckmarkCircleOutline,
-  IoClipboardOutline,
-  IoLayersOutline,
-  IoMailOutline,
-  IoLockClosedOutline,
-  IoPersonCircleOutline,
-  IoSchoolOutline,
-  IoStatsChartOutline,
-  IoBookOutline,
-  IoFolderOpenOutline,
-  IoDesktopOutline,
-  IoPencilOutline,
-  IoStar,
-  IoNewspaperOutline,
-  IoBookmarkOutline,
-  IoFlagOutline,
-  IoTrophyOutline,
-  IoRocketOutline,
-  IoCompassOutline,
-  IoChevronDownOutline,
-  IoChevronUpOutline,
-} from 'react-icons/io5';
+import { IoClipboardOutline, IoLockClosedOutline, IoSchoolOutline, IoStatsChartOutline } from 'react-icons/io5';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   LineChart, Line
@@ -146,7 +123,6 @@ function ProfileOverviewPage() {
       <div className={cx('container')}>
         <header className={cx('header')}>
           <h1 className={cx('title')}>
-            <IoPersonCircleOutline className={cx('titleIcon')} />
             Dashboard Cá Nhân
           </h1>
           <p className={cx('subtitle')}>
@@ -180,18 +156,23 @@ function ProfileOverviewPage() {
                   <p className={cx('username')}>@{profileOverview.userName}</p>
 
                   <div className={cx('metaList')}>
-                    <span className={cx('metaItem')} title="Email">
-                      <IoMailOutline /> {profileOverview.email || '--'}
+                    <span className={cx('metaItem')}>
+                      <span className={cx('metaLabel')}>Email</span>
+                      {profileOverview.email || '--'}
                     </span>
-                    <span className={cx('metaItem')} title="Vai trò">
-                      <IoLayersOutline /> {profileOverview.roleName}
+                    <span className={cx('metaItem')}>
+                      <span className={cx('metaLabel')}>Vai trò</span>
+                      {profileOverview.roleName}
                     </span>
-                    <span className={cx('metaItem')} title="Ngày tham gia">
-                      <IoCalendarOutline /> {formatDateTime(profileOverview.createdAt)}
+                    <span className={cx('metaItem')}>
+                      <span className={cx('metaLabel')}>Ngày tham gia</span>
+                      {formatDateTime(profileOverview.createdAt)}
                     </span>
-                    <span className={cx('metaItem')} title="Trạng thái xác minh">
-                      <IoCheckmarkCircleOutline className={cx({ verifiedIcon: profileOverview.verified })} />
-                      {profileOverview.verified ? 'Đã xác minh' : 'Chưa xác minh'}
+                    <span className={cx('metaItem')}>
+                      <span className={cx('metaLabel')}>Trạng thái</span>
+                      <span className={cx({ verifiedText: profileOverview.verified })}>
+                        {profileOverview.verified ? 'Đã xác minh' : 'Chưa xác minh'}
+                      </span>
                     </span>
                   </div>
 
@@ -201,7 +182,6 @@ function ProfileOverviewPage() {
                       className={cx('changePasswordBtn')}
                       onClick={() => setShowUpdateProfileModal(true)}
                     >
-                      <IoPencilOutline />
                       Cập nhật thông tin
                     </button>
                     <button
@@ -220,31 +200,24 @@ function ProfileOverviewPage() {
                 <h3 className={cx('cardTitle')}>Truy cập nhanh</h3>
                 <div className={cx('quickActionsList')}>
                   <button onClick={() => navigate(routes.home)} className={cx('actionBtn')}>
-                    <IoDesktopOutline className={cx('btnIcon')} />
                     <span>Làm bài thi mới</span>
                   </button>
                   <button onClick={() => navigate(routes.myAlbums)} className={cx('actionBtn')}>
-                    <IoBookOutline className={cx('btnIcon')} />
                     <span>Thẻ ghi nhớ</span>
                   </button>
                   <button onClick={() => navigate(routes.myClasses)} className={cx('actionBtn')}>
-                    <IoSchoolOutline className={cx('btnIcon')} />
                     <span>Lớp học của tôi</span>
                   </button>
                   <button onClick={() => navigate(routes.personalQuestionBank)} className={cx('actionBtn')}>
-                    <IoFolderOpenOutline className={cx('btnIcon')} />
                     <span>Ngân hàng câu hỏi</span>
                   </button>
                   <button onClick={() => setActiveSection('evaluations')} className={cx('actionBtn')}>
-                    <IoStar className={cx('btnIcon')} />
                     <span>Đánh giá của tôi</span>
                   </button>
                   <button onClick={() => setActiveSection('posts')} className={cx('actionBtn')}>
-                    <IoNewspaperOutline className={cx('btnIcon')} />
                     <span>Bài viết của tôi</span>
                   </button>
                   <button onClick={() => setActiveSection('saved')} className={cx('actionBtn')}>
-                    <IoBookmarkOutline className={cx('btnIcon')} />
                     <span>Bài đã lưu</span>
                   </button>
                 </div>
@@ -387,7 +360,6 @@ function ProfileOverviewPage() {
                 <article className={cx('statCard', 'targetSummaryCard')}>
                   <div className={cx('targetHeader')}>
                     <h3 className={cx('cardTitle')}>
-                      <IoFlagOutline />
                       Mục tiêu của tôi
                     </h3>
                     <button
@@ -395,7 +367,6 @@ function ProfileOverviewPage() {
                       className={cx('targetManageBtn')}
                       onClick={() => navigate(routes.myTarget)}
                     >
-                      <IoPencilOutline />
                       Quản lý mục tiêu
                     </button>
                   </div>
@@ -412,7 +383,6 @@ function ProfileOverviewPage() {
                         className={cx('targetEmptyBtn')}
                         onClick={() => navigate(routes.myTarget)}
                       >
-                        <IoRocketOutline />
                         Đặt mục tiêu ngay
                       </button>
                     </div>
@@ -431,7 +401,6 @@ function ProfileOverviewPage() {
                                 <span className={cx('targetExamName')}>{target.examTypeName}</span>
                                 {isAchieved && (
                                   <span className={cx('targetAchievedBadge')}>
-                                    <IoTrophyOutline />
                                     Đã đạt
                                   </span>
                                 )}
@@ -469,7 +438,6 @@ function ProfileOverviewPage() {
                                 className={cx('targetActionBtn', 'targetActionBtnPrimary')}
                                 onClick={() => navigate(buildNextStepPath(target.examTypeId))}
                               >
-                                <IoCompassOutline />
                                 Tiếp theo
                               </button>
                               <button
@@ -481,7 +449,6 @@ function ProfileOverviewPage() {
                                   )
                                 }
                               >
-                                <IoStatsChartOutline />
                                 Dashboard
                               </button>
                               <button
@@ -493,7 +460,6 @@ function ProfileOverviewPage() {
                                   )
                                 }
                               >
-                                <IoRocketOutline />
                                 Sinh lộ trình
                               </button>
                             </div>
@@ -507,17 +473,9 @@ function ProfileOverviewPage() {
                           className={cx('targetShowMoreBtn')}
                           onClick={() => setShowAllTargets((prev) => !prev)}
                         >
-                          {showAllTargets ? (
-                            <>
-                              Thu gọn
-                              <IoChevronUpOutline />
-                            </>
-                          ) : (
-                            <>
-                              Xem thêm {myTargets.length - TARGET_VISIBLE_COUNT} mục tiêu
-                              <IoChevronDownOutline />
-                            </>
-                          )}
+                          {showAllTargets
+                            ? 'Thu gọn'
+                            : `Xem thêm ${myTargets.length - TARGET_VISIBLE_COUNT} mục tiêu`}
                         </button>
                       )}
                     </div>
