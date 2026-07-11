@@ -2,7 +2,7 @@ package com.project_exam.backend.infrastructure.security;
 
 import com.project_exam.backend.shared.exception.UnauthorizedException;
 
-import com.project_exam.backend.modules.users.repository.UserRepository;
+import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

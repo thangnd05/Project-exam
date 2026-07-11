@@ -19,8 +19,8 @@ import com.project_exam.backend.modules.posts.post.repository.PostCategoryReposi
 import com.project_exam.backend.modules.posts.post.repository.PostRepository;
 import com.project_exam.backend.modules.posts.react.repository.ReactRepository;
 import com.project_exam.backend.modules.posts.saved.repository.SavedPostRepository;
-import com.project_exam.backend.modules.users.domain.User;
-import com.project_exam.backend.modules.users.repository.UserRepository;
+import com.project_exam.backend.modules.users.user.domain.User;
+import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;

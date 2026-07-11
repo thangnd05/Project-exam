@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.gamification.cosmetic.dto.EquippedCosmeticsResponse;
 import com.project_exam.backend.modules.gamification.cosmetic.service.CosmeticService;
 
@@ -33,7 +33,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final AuthUtils authUtils;
-    private final com.project_exam.backend.modules.users.repository.UserRepository userRepository;
+    private final com.project_exam.backend.modules.users.user.repository.UserRepository userRepository;
     private final CosmeticService cosmeticService;
     private final CommentMapper commentMapper;
 

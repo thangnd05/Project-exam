@@ -2,11 +2,11 @@ package com.project_exam.backend.infrastructure.security;
 
 import com.project_exam.backend.shared.exception.NotFoundException;
 
-import com.project_exam.backend.modules.users.domain.Role;
-import com.project_exam.backend.modules.users.domain.User;
-import com.project_exam.backend.modules.users.repository.RolePermissionRepository;
-import com.project_exam.backend.modules.users.repository.RoleRepository;
-import com.project_exam.backend.modules.users.repository.UserRepository;
+import com.project_exam.backend.modules.users.rbac.domain.Role;
+import com.project_exam.backend.modules.users.user.domain.User;
+import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
+import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
+import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;

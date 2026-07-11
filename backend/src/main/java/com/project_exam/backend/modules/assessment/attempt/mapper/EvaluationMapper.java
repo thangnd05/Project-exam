@@ -2,7 +2,7 @@ package com.project_exam.backend.modules.assessment.attempt.mapper;
 
 import com.project_exam.backend.modules.assessment.attempt.domain.Evaluation;
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationResponse;
-import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.users.user.domain.User;
 import org.springframework.stereotype.Component;
 
 /**

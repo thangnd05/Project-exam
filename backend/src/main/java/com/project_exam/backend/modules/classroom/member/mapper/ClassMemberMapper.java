@@ -2,7 +2,7 @@ package com.project_exam.backend.modules.classroom.member.mapper;
 
 import com.project_exam.backend.modules.classroom.member.domain.ClassMember;
 import com.project_exam.backend.modules.classroom.member.dto.ClassMemberResponse;
-import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.users.user.domain.User;
 import org.springframework.stereotype.Component;
 
 @Component

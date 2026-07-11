@@ -1,13 +1,13 @@
 package com.project_exam.backend.infrastructure.loader;
 
-import com.project_exam.backend.modules.users.domain.Permission;
-import com.project_exam.backend.modules.users.domain.Role;
-import com.project_exam.backend.modules.users.domain.RolePermission;
-import com.project_exam.backend.modules.users.domain.User;
-import com.project_exam.backend.modules.users.repository.PermissionRepository;
-import com.project_exam.backend.modules.users.repository.RolePermissionRepository;
-import com.project_exam.backend.modules.users.repository.RoleRepository;
-import com.project_exam.backend.modules.users.repository.UserRepository;
+import com.project_exam.backend.modules.users.rbac.domain.Permission;
+import com.project_exam.backend.modules.users.rbac.domain.Role;
+import com.project_exam.backend.modules.users.rbac.domain.RolePermission;
+import com.project_exam.backend.modules.users.user.domain.User;
+import com.project_exam.backend.modules.users.rbac.repository.PermissionRepository;
+import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
+import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
+import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

@@ -66,11 +66,11 @@ import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRe
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 
 // --- Users ---
-import com.project_exam.backend.modules.users.domain.Role;
-import com.project_exam.backend.modules.users.domain.User;
-import com.project_exam.backend.modules.users.repository.RoleRepository;
-import com.project_exam.backend.modules.users.repository.UserRepository;
-import com.project_exam.backend.modules.users.service.AdminUserProvider;
+import com.project_exam.backend.modules.users.rbac.domain.Role;
+import com.project_exam.backend.modules.users.user.domain.User;
+import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
+import com.project_exam.backend.modules.users.user.repository.UserRepository;
+import com.project_exam.backend.modules.users.user.service.AdminUserProvider;
 
 // --- Classroom ---
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;

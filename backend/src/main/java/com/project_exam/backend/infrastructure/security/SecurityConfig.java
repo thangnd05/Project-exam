@@ -1,7 +1,7 @@
 package com.project_exam.backend.infrastructure.security;
 
-import com.project_exam.backend.modules.users.domain.User;
-import com.project_exam.backend.modules.users.repository.UserRepository;
+import com.project_exam.backend.modules.users.user.domain.User;
+import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

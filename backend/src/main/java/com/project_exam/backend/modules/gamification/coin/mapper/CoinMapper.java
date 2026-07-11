@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.gamification.coin.mapper;
 import com.project_exam.backend.modules.gamification.coin.domain.UserCoin;
 import com.project_exam.backend.modules.gamification.coin.dto.CoinResponse;
 import com.project_exam.backend.modules.gamification.coin.dto.CoinWalletResponse;
-import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.users.user.domain.User;
 import org.springframework.stereotype.Component;
 
 /** Mapper thuần: dựng DTO từ dữ liệu đã được service chuẩn bị sẵn. */

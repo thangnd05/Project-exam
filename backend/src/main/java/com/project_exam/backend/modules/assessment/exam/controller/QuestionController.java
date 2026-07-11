@@ -1,7 +1,8 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
 
 import com.project_exam.backend.modules.auth.dto.*;
-import com.project_exam.backend.modules.users.dto.*;
+import com.project_exam.backend.modules.users.user.dto.*;
+import com.project_exam.backend.modules.users.rbac.dto.*;
 import com.project_exam.backend.modules.posts.post.dto.*;
 import com.project_exam.backend.modules.posts.comment.dto.*;
 import com.project_exam.backend.modules.posts.category.dto.*;

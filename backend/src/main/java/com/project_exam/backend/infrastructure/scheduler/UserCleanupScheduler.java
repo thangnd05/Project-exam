@@ -1,7 +1,7 @@
 package com.project_exam.backend.infrastructure.scheduler;
 
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
-import com.project_exam.backend.modules.users.service.EmailVerificationService;
+import com.project_exam.backend.modules.users.user.service.EmailVerificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

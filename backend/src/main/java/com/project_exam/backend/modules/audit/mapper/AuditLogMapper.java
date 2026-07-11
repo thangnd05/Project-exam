@@ -2,7 +2,7 @@ package com.project_exam.backend.modules.audit.mapper;
 
 import com.project_exam.backend.modules.audit.domain.AuditLog;
 import com.project_exam.backend.modules.audit.dto.AuditLogResponse;
-import com.project_exam.backend.modules.users.domain.User;
+import com.project_exam.backend.modules.users.user.domain.User;
 import org.springframework.stereotype.Component;
 
 @Component
