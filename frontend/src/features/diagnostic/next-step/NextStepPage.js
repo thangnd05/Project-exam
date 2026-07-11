@@ -130,7 +130,7 @@ function NextStepPage() {
           title: `Học ải: ${recommended.examPartName} · ${recommended.tagName}`,
           desc: `Ưu tiên ${recommended.priorityTier}. Cần đạt ≥ ${recommended.passAccuracy}% để pass ải. Đã sai ${recommended.wrongCountAtDiagnosis ?? '—'} câu ở mock chẩn đoán.`,
           warning: stuck
-            ? `⚠️ Bạn đã fail ${recommended.consecutiveFails} lần liên tiếp ở ải này. Hãy đọc lại tài liệu trước khi thử lần nữa.`
+            ? `Bạn đã fail ${recommended.consecutiveFails} lần liên tiếp ở ải này. Hãy đọc lại tài liệu trước khi thử lần nữa.`
             : null,
           ctaLabel: 'Bắt đầu học',
           ctaTo: `/learning-plans/${activePlanDetail.learningPlanId}/study?taskId=${recommended.taskId}`,

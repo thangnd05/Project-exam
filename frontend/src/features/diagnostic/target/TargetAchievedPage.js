@@ -89,7 +89,6 @@ function TargetAchievedPage() {
       {!loading && isAchieved && (
         <>
           <div className={cx('hero')}>
-            <div className={cx('heroEmoji')}>🎉</div>
             <h1 className={cx('heroTitle')}>Bạn đã đạt mục tiêu!</h1>
             <p className={cx('heroSubtitle')}>
               Mục tiêu: <strong>{target.targetScore}</strong>
