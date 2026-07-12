@@ -35,7 +35,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             JSON.parse(cleanedJson);
 
             setJsonInput(cleanedJson);
-            toast.success('✨ Chuẩn hóa dữ liệu thành công!');
+            toast.success('Chuẩn hóa dữ liệu thành công!');
         } catch (err) {
             console.error('Lỗi chuẩn hóa AI:', err);
 
@@ -47,7 +47,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                     || err.message
                     || 'Không thể kết nối AI. Vui lòng thử lại!';
             }
-            toast.error(`❌ ${errorMsg}`);
+            toast.error(errorMsg);
         } finally {
             setAiLoading(false);
         }
@@ -57,7 +57,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
         e.preventDefault();
 
         if (!jsonInput.trim()) {
-            toast.warning(' Vui lòng nhập dữ liệu JSON!');
+            toast.warning('Vui lòng nhập dữ liệu JSON!');
             return;
         }
 
@@ -65,15 +65,15 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
         try {
             payload = JSON.parse(jsonInput);
             if (!Array.isArray(payload)) {
-                toast.error('❌ Dữ liệu phải là một mảng (Array) các đối tượng từ vựng!');
+                toast.error('Dữ liệu phải là một mảng (Array) các đối tượng từ vựng!');
                 return;
             }
             if (payload.length === 0) {
-                toast.error('❌ Mảng từ vựng không được rỗng!');
+                toast.error('Mảng từ vựng không được rỗng!');
                 return;
             }
         } catch (err) {
-            toast.error('❌ Định dạng JSON không hợp lệ. Vui lòng kiểm tra lại!');
+            toast.error('Định dạng JSON không hợp lệ. Vui lòng kiểm tra lại!');
             return;
         }
 
@@ -84,7 +84,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
 
         bulkCreateMutation.mutate(processedPayload, {
             onSuccess: () => {
-                toast.success(` Đã nhập thành công ${processedPayload.length} từ vựng!`);
+                toast.success(`Đã nhập thành công ${processedPayload.length} từ vựng!`);
                 setJsonInput('');
                 onSuccess();
                 onClose();
@@ -93,7 +93,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                 console.error('Lỗi khi nhập bulk:', err);
                 const msg = err.response?.data?.message
                     || 'Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!';
-                toast.error(`❌ ${msg}`);
+                toast.error(msg);
             },
         });
     };

@@ -98,12 +98,12 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
             <div className={cx('sectionTitle')}>Nội dung câu hỏi</div>
             <div
               style={{
-                background: '#fff',
-                border: '2px solid #e2e8f0',
+                background: 'var(--bg-white)',
+                border: '1px solid var(--border-color)',
                 borderRadius: 12,
                 padding: '12px 14px',
-                fontSize: '1.4rem',
-                color: '#0f172a',
+                fontSize: 'var(--font-size-ssm)',
+                color: 'var(--text-color)',
                 whiteSpace: 'pre-wrap',
                 marginBottom: 16,
               }}
@@ -118,12 +118,12 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                 {passageContent && (
                   <div
                     style={{
-                      background: '#fff',
-                      border: '2px solid #e2e8f0',
+                      background: 'var(--bg-white)',
+                      border: '1px solid var(--border-color)',
                       borderRadius: 12,
                       padding: '12px 14px',
-                      fontSize: '1.3rem',
-                      color: '#1e293b',
+                      fontSize: 'var(--font-size-smd)',
+                      color: 'var(--dark-color)',
                       whiteSpace: 'pre-wrap',
                       marginBottom: 12,
                     }}
@@ -136,12 +136,12 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                   <div
                     key={`extra-${idx}`}
                     style={{
-                      background: '#fff',
-                      border: '2px solid #e2e8f0',
+                      background: 'var(--bg-white)',
+                      border: '1px solid var(--border-color)',
                       borderRadius: 12,
                       padding: '12px 14px',
-                      fontSize: '1.3rem',
-                      color: '#1e293b',
+                      fontSize: 'var(--font-size-smd)',
+                      color: 'var(--dark-color)',
                       whiteSpace: 'pre-wrap',
                       marginBottom: 12,
                     }}
@@ -152,17 +152,17 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
 
                 {passageTranslation && (
                   <details style={{ marginBottom: 12 }}>
-                    <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#475569', marginBottom: 8 }}>
+                    <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>
                       Bản dịch
                     </summary>
                     <div
                       style={{
-                        background: '#f8fafc',
-                        border: '1px dashed #cbd5e1',
+                        background: 'var(--input-bg)',
+                        border: '1px dashed var(--border-color)',
                         borderRadius: 12,
                         padding: '12px 14px',
-                        fontSize: '1.3rem',
-                        color: '#475569',
+                        fontSize: 'var(--font-size-smd)',
+                        color: 'var(--text-secondary)',
                         whiteSpace: 'pre-wrap',
                       }}
                     >
@@ -245,15 +245,15 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                         gap: 10,
                         padding: '10px 12px',
                         borderRadius: 10,
-                        border: `2px solid ${isCorrect ? '#16a34a' : '#e2e8f0'}`,
-                        background: isCorrect ? '#f0fdf4' : '#fff',
-                        fontSize: '1.35rem',
+                        border: `1px solid ${isCorrect ? 'var(--success-border)' : 'var(--border-color)'}`,
+                        background: isCorrect ? 'var(--success-bg)' : 'var(--bg-white)',
+                        fontSize: 'var(--font-size-smd)',
                       }}
                     >
-                      <span style={{fontWeight: 800, minWidth: 22}}>
+                      <span style={{fontWeight: 700, minWidth: 22}}>
                         {label}.
                       </span>
-                      <span style={{flex: 1, color: '#0f172a'}}>
+                      <span style={{flex: 1, color: 'var(--text-color)'}}>
                         {text || '(Trống)'}
                       </span>
                       {isCorrect && (
@@ -262,7 +262,7 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: 4,
-                            color: '#16a34a',
+                            color: 'var(--success-text)',
                             fontWeight: 700,
                           }}
                         >
@@ -284,10 +284,10 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                   style={{
                     padding: '12px 14px',
                     borderRadius: 10,
-                    border: '2px solid #fbbf24',
-                    background: '#fffbeb',
-                    fontSize: '1.05rem',
-                    color: '#92400e',
+                    border: '1px solid var(--border-color)',
+                    background: 'var(--input-bg)',
+                    fontSize: 'var(--font-size-smd)',
+                    color: 'var(--text-color)',
                     whiteSpace: 'pre-wrap',
                     lineHeight: 1.5,
                   }}

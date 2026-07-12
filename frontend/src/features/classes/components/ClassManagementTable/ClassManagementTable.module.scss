@@ -65,13 +65,13 @@
     font-weight: 600;
 
     &.teaching {
-      background: rgba(79, 70, 229, 0.1);
-      color: #4f46e5;
+      background: rgba(0, 97, 242, 0.1);
+      color: var(--accent-color);
     }
 
     &.learning {
-      background: rgba(16, 185, 129, 0.1);
-      color: #10b981;
+      background: var(--input-bg);
+      color: var(--text-secondary);
     }
   }
 }

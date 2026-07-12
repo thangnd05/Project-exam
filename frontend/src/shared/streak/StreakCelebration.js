@@ -28,7 +28,7 @@ function StreakCelebration() {
           <FontAwesomeIcon icon={faFire} />
         </motion.div>
         <h3 className={cx('count')}>{currentStreak} ngày</h3>
-        <p className={cx('title')}>Giữ lửa thành công! 🔥</p>
+        <p className={cx('title')}>Giữ lửa thành công!</p>
         <p className={cx('subtitle')}>
           Bạn đã học {currentStreak} ngày liên tiếp. Quay lại ngày mai để nối dài chuỗi nhé!
         </p>

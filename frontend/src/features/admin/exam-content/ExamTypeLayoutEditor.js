@@ -279,7 +279,7 @@ function ExamTypeLayoutEditor() {
                   <span className={cx('zoneEmpty')}>— thả yếu tố vào đây —</span>
                 )}
                 {blocksByZone[zone.key].map((block) => {
-                  const meta = BLOCK_META[block.type] || { label: block.type, icon: '▫️' };
+                  const meta = BLOCK_META[block.type] || { label: block.type };
                   const addable = ADDABLE_BLOCK_TYPES.includes(block.type);
                   return (
                     <div
@@ -302,7 +302,6 @@ function ExamTypeLayoutEditor() {
                         <GripVertical size={16} />
                       </span>
                       <span className={cx('blockLabel')}>
-                        <span>{meta.icon}</span>
                         {meta.label}
                       </span>
                       <button
@@ -343,7 +342,7 @@ function ExamTypeLayoutEditor() {
                 const meta = BLOCK_META[type];
                 return (
                   <button key={type} className={cx('paletteBtn')} onClick={() => addBlock(type)}>
-                    <Plus size={14} /> {meta.icon} {meta.label}
+                    <Plus size={14} /> {meta.label}
                   </button>
                 );
               })}
@@ -449,7 +448,7 @@ function ExamTypeLayoutEditor() {
                 <div className={cx('field')}>
                   <label>Loại</label>
                   <div>
-                    {BLOCK_META[selectedBlock.type]?.icon} {BLOCK_META[selectedBlock.type]?.label}
+                    {BLOCK_META[selectedBlock.type]?.label}
                   </div>
                 </div>
                 <div className={cx('field')}>

@@ -25,12 +25,12 @@ export const ZONE_META = [
 ];
 
 export const BLOCK_META = {
-  [BLOCK_TYPES.TIMER]: { label: 'Đồng hồ', icon: '⏱️' },
-  [BLOCK_TYPES.PROGRESS]: { label: 'Tiến độ', icon: '✅' },
-  [BLOCK_TYPES.SUBMIT]: { label: 'Nút nộp bài', icon: '📨' },
-  [BLOCK_TYPES.QUESTION_NAV]: { label: 'Danh sách câu hỏi', icon: '🔢' },
-  [BLOCK_TYPES.BANNER]: { label: 'Banner', icon: '🖼️' },
-  [BLOCK_TYPES.TITLE]: { label: 'Tiêu đề', icon: '📝' },
+  [BLOCK_TYPES.TIMER]: { label: 'Đồng hồ' },
+  [BLOCK_TYPES.PROGRESS]: { label: 'Tiến độ' },
+  [BLOCK_TYPES.SUBMIT]: { label: 'Nút nộp bài' },
+  [BLOCK_TYPES.QUESTION_NAV]: { label: 'Danh sách câu hỏi' },
+  [BLOCK_TYPES.BANNER]: { label: 'Banner' },
+  [BLOCK_TYPES.TITLE]: { label: 'Tiêu đề' },
 };
 
 export const ADDABLE_BLOCK_TYPES = [BLOCK_TYPES.BANNER];

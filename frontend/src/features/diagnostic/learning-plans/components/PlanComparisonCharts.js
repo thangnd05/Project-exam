@@ -178,7 +178,7 @@ function PlanComparisonCharts({ chartData, examTypeName }) {
                   type="monotone"
                   dataKey="readiness"
                   name="trend"
-                  stroke="#0ea5e9"
+                  stroke={COLOR_DEFAULT}
                   strokeWidth={2}
                   strokeDasharray="4 4"
                   dot={false}

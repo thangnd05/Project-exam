@@ -1,12 +1,13 @@
-$primary: #0061f2;
-$accent-color: #0061f2;
-$accent-act-color: #00c6ff;
-$text-primary: #1e293b;
-$text-secondary: #64748b;
-$bg-body: #f0f2f5;
-$bg-white: #ffffff;
-$input-bg: #f1f5f9;
-$border-color: #e2e8f0;
+// Alias design tokens (GlobalStyles :root) so this file has no parallel palette.
+$primary: var(--primary);
+$accent-color: var(--accent-color);
+$accent-act-color: var(--accent-act-color);
+$text-primary: var(--dark-color);
+$text-secondary: var(--text-secondary);
+$bg-body: var(--bg-body);
+$bg-white: var(--bg-white);
+$input-bg: var(--input-bg);
+$border-color: var(--border-color);
 $success: #16a34a;
 $danger: #ef4444;
 $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -181,7 +182,7 @@ $transition: all 0.3s ease;
 }
 
 .questionSection {
-    background: linear-gradient(135deg, $primary 0%, $accent-act-color 100%);
+    background: linear-gradient(135deg, var(--accent-color) 0%, #0056d2 100%);
     padding: 2.5rem 2rem;
     text-align: center;
 }
@@ -256,12 +257,12 @@ $transition: all 0.3s ease;
     width: 100%;
 
     &:hover {
-        background: lighten($input-bg, 2%);
-        border-color: rgba($primary, 0.3);
+        background: var(--input-bg);
+        border-color: rgba(0, 97, 242, 0.3);
     }
 
     &.selected {
-        background: rgba($primary, 0.08);
+        background: rgba(0, 97, 242, 0.08);
         border-color: $primary;
     }
 
@@ -345,7 +346,7 @@ $transition: all 0.3s ease;
         outline: none;
         background: $bg-white;
         border-color: $primary;
-        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.1);
     }
 }
 

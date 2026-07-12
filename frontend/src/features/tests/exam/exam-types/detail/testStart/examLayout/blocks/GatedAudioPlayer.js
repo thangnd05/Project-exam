@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { IoPlay, IoVolumeHigh, IoArrowForward } from 'react-icons/io5';
+import { IoPlay } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { getFullMediaUrl } from '~/shared/utils/mediaUrl';
 import styles from './GatedAudioPlayer.module.scss';
 
@@ -97,12 +98,12 @@ function GatedAudioPlayer({ urls = [], onCompleted }) {
             </div>
           </div>
           <div className={cx('armRow')}>
-            <button type="button" className={cx('armBtn')} onClick={tryPlay}>
+            <ButtonPrime variant="primary" size="md" onClick={tryPlay}>
               <IoPlay /> Phát audio
-            </button>
-            <button type="button" className={cx('skipBtn')} onClick={complete}>
-              Câu tiếp <IoArrowForward />
-            </button>
+            </ButtonPrime>
+            <ButtonPrime variant="ghost" size="md" onClick={complete}>
+              Câu tiếp
+            </ButtonPrime>
           </div>
         </div>
       )}

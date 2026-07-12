@@ -1085,13 +1085,13 @@
   padding: 0.3rem 1rem;
   border-radius: 999px;
   color: #fff;
-  background: #64748b;
+  background: var(--text-secondary);
 
   &.listening {
-    background: linear-gradient(135deg, #2563eb, #1e40af);
+    background: var(--accent-color);
   }
   &.reading {
-    background: linear-gradient(135deg, #0d9488, #0f766e);
+    background: var(--dark-color);
   }
 }
 

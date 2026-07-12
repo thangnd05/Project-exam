@@ -21,7 +21,7 @@ function StreakRestoreModal({ show, onClose }) {
   const handleRestore = () => {
     restoreMutation.mutate(undefined, {
       onSuccess: () => {
-        toast.success(`Đã khôi phục chuỗi ${lostStreak} ngày! 🔥`);
+        toast.success(`Đã khôi phục chuỗi ${lostStreak} ngày!`);
         onClose();
       },
       onError: (error) => {
