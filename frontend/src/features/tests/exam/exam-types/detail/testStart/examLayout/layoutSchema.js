@@ -45,6 +45,8 @@ export const defaultLayoutConfig = {
   },
   questionArea: {
     passagePosition: 'side',
+    // Kiểu làm bài: 'scroll' = cuộn hết (mặc định, legacy) | 'paged' = từng câu/nhóm kiểu TOEIC.
+    navigationMode: 'scroll',
     columns: 1,
     maxWidth: null,
     cardShadow: true,

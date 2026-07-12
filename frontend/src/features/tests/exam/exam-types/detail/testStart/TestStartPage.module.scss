@@ -186,6 +186,22 @@
     color: white;
     box-shadow: 0 4px 10px rgba(0, 97, 242, 0.2);
   }
+
+  &.current {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+
+  &.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+
+    &:hover {
+      border-color: #e2e8f0;
+      color: #64748b;
+      transform: none;
+    }
+  }
 }
 
 .dashboard-footer {
@@ -347,7 +363,7 @@
     }
 
     .passage-paragraph {
-      margin: 0 0 0.9rem;
+      margin: 0 0 1.6rem; // nới khoảng cách để các đoạn văn tách nhau rõ
 
       &:last-child {
         margin-bottom: 0;
@@ -769,41 +785,6 @@
   pointer-events: auto;
 }
 
-.footer-panel {
-  padding: 16px 0;
-  border-bottom: 1px solid #f1f5f9;
-  background: #f8fafc;
-  max-height: 320px;
-  overflow-y: auto;
-
-  .dashboard {
-    margin: 0;
-  }
-
-  .dashboard-card {
-    margin: 0 auto;
-    max-width: 560px;
-    padding: 16px 20px;
-  }
-
-  .dashboard-header {
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-  }
-
-  .question-grid {
-    margin-bottom: 12px;
-  }
-
-  .dashboard-footer {
-    padding-top: 10px;
-  }
-
-  @media (max-width: 992px) {
-    display: none;
-  }
-}
-
 .mobile-nav-bar {
   display: none;
 
@@ -1061,5 +1042,190 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(0, 97, 242, 0.25);
     }
+  }
+}
+
+/* ============ Chế độ PAGED (từng bước, kiểu TOEIC) ============ */
+.paged-root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  width: 100%; // full width như chế độ cuộn (không bó max-width/căn giữa)
+}
+
+.paged-empty {
+  text-align: center;
+  color: #64748b;
+  padding: 4rem 0;
+  font-size: 1.6rem;
+}
+
+.paged-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.paged-part {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.paged-section {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  color: #fff;
+  background: #64748b;
+
+  &.listening {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+  }
+  &.reading {
+    background: linear-gradient(135deg, #0d9488, #0f766e);
+  }
+}
+
+.paged-progress {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.paged-body {
+  display: block;
+
+  &.split-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// Ghim cứng (Part 1 ảnh / passage 2 cột): khối làm bài cao đúng bằng vùng giữa nên KHÔNG sinh
+// scroll trang; thanh audio + nav là flex-none, phần thân co giãn; chỉ ảnh/câu hỏi cuộn trong cột.
+.paged-root.paged-fit {
+  height: 100%;
+  min-height: 0;
+
+  .paged-body.split-layout {
+    flex: 1 1 auto;
+    min-height: 0;
+    align-items: stretch;
+  }
+
+  // Trong chế độ ghim: bỏ sticky (đã bounded sẵn), 2 cột cao bằng nhau, nội dung tự cuộn.
+  .passage-column,
+  .question-column {
+    position: static;
+    top: auto;
+    max-height: none;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .passage-column .passage-box {
+    height: auto;
+    max-height: 100%; // ảnh cao quá thì cuộn trong khung, không đẩy cả trang
+    padding: 4px; // giữ "hộp trắng" nhưng gutter mỏng, ảnh gần sát mép
+  }
+
+  // Ảnh đề (email / Part 1...) lấp đầy cột trái: bỏ khung xám bọc ngoài + trần 420px.
+  .passage-column .passage-image-box {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    margin-bottom: 0;
+
+    &:not(:last-child) {
+      margin-bottom: 8px; // vẫn tách nhẹ khi có nhiều ảnh
+    }
+  }
+
+  .passage-column .passage-image {
+    width: 100%;
+    height: auto;
+    max-height: none; // bỏ trần 420px để ảnh to hết bề ngang cột
+    margin-bottom: 0;
+  }
+
+  .question-column .questions-frame {
+    flex: 0 1 auto; // ôm sát nội dung câu hỏi (không kéo dài khung trắng), dài quá thì tự cuộn
+    max-height: 100%;
+    min-height: 0;
+  }
+
+  @media (max-width: 900px) {
+    height: auto;
+    min-height: 0;
+
+    .paged-body.split-layout {
+      align-items: start;
+    }
+    .passage-column,
+    .question-column {
+      height: auto;
+    }
+    .passage-column .passage-box {
+      max-height: 50vh;
+    }
+    .question-column .questions-frame {
+      flex: 1 1 auto;
+      max-height: none;
+    }
+  }
+}
+
+.paged-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-top: 0;
+  padding-top: 0.6rem;
+  border-top: none; // bỏ vạch ngăn cách, nhường chỗ cho passage/câu hỏi cao thêm
+}
+
+.paged-nav-left,
+.paged-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.paged-nav-right {
+  margin-left: auto;
+}
+
+.paged-gated-note,
+.paged-last-note {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+@media (prefers-color-scheme: dark) {
+  .paged-header,
+  .paged-nav {
+    border-color: #334155;
+  }
+  .paged-progress,
+  .paged-gated-note,
+  .paged-last-note {
+    color: #94a3b8;
   }
 }

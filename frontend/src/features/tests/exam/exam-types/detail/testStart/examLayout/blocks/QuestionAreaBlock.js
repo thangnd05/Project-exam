@@ -1,10 +1,34 @@
+import { useLayoutEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 
 import { getFullMediaUrl } from '~/shared/utils/mediaUrl';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import GatedAudioPlayer from './GatedAudioPlayer';
 import styles from '../../TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
+
+// Trích danh sách URL audio của 1 passage (theo thứ tự) để feed GatedAudioPlayer ở chế độ paged.
+const getAudioUrls = (passage) => {
+  const list =
+    passage?.passageMedias ?? passage?.passageMediaList ?? passage?.mediaList ?? passage?.passage_media ?? [];
+  const urls = [];
+  if (Array.isArray(list)) {
+    list.forEach((m) => {
+      if ((m?.mediaType ?? m?.media_type ?? '').toUpperCase() === 'AUDIO') {
+        const u = m?.mediaUrl ?? m?.media_url;
+        if (u) urls.push(u);
+      }
+    });
+  }
+  if (urls.length === 0) {
+    const single = passage?.mediaUrl ?? passage?.media_url;
+    const pType = (passage?.passageType ?? passage?.passage_type ?? '').toUpperCase();
+    if (single && pType === 'LISTENING') urls.push(single);
+  }
+  return urls;
+};
 
 function QuestionAreaBlock({
   isPractice,
@@ -13,7 +37,28 @@ function QuestionAreaBlock({
   userAnswers,
   handleAnswerChange,
   config,
+  // Paged (TOEIC-style) — chỉ dùng khi isPaged=true
+  isPaged = false,
+  flowSteps = [],
+  currentStepIndex = 0,
+  canGoPrev = false,
+  goNext,
+  goPrev,
 }) {
+  // Paged: mỗi lần đổi bước, reset vùng cuộn bao ngoài (centerScroll) về đầu.
+  // 2 khung cuộn bên trong (passage-box, questions-frame) được reset qua key ở paged-body.
+  const pagedRootRef = useRef(null);
+  useLayoutEffect(() => {
+    if (!isPaged) return;
+    let p = pagedRootRef.current?.parentElement;
+    while (p) {
+      if (p.scrollHeight > p.clientHeight && p.scrollTop > 0) {
+        p.scrollTop = 0;
+        break;
+      }
+      p = p.parentElement;
+    }
+  }, [isPaged, currentStepIndex]);
 
   const useSide = (config?.passagePosition ?? 'side') === 'side';
   const hasPassageContent = (passage, fallbackObj) => {
@@ -51,7 +96,8 @@ function QuestionAreaBlock({
     </div>
   );
 
-  const renderPassage = (passage, fallbackObj) => {
+  const renderPassage = (passage, fallbackObj, opts = {}) => {
+    const suppressAudio = opts.suppressAudio === true;
     const content =
       passage?.content ??
       passage?.passage_content ??
@@ -78,7 +124,11 @@ function QuestionAreaBlock({
 
     const hasContent = !!content;
     const hasAnyMedia = hasMediaList || !!singleMediaUrl;
-    if (!hasContent && !hasAnyMedia) return null;
+    const hasNonAudioMedia =
+      hasMediaList &&
+      mediaList.some((m) => (m?.mediaType ?? m?.media_type ?? '').toUpperCase() !== 'AUDIO');
+    // Khi suppressAudio (paged listening) mà passage chỉ có audio -> không render box rỗng.
+    if (suppressAudio ? !hasContent && !hasNonAudioMedia : !hasContent && !hasAnyMedia) return null;
 
     return (
       <div className={cx('passage-box')}>
@@ -95,6 +145,7 @@ function QuestionAreaBlock({
             const url = m.mediaUrl ?? m.media_url;
             if (!url) return null;
             if (type === 'AUDIO') {
+              if (suppressAudio) return null; // paged listening: audio do GatedAudioPlayer đảm nhiệm
               return (
                 <div key={idx} className="mb-3">
                   <audio
@@ -118,7 +169,8 @@ function QuestionAreaBlock({
             }
             return null;
           })}
-        {!hasMediaList &&
+        {!suppressAudio &&
+          !hasMediaList &&
           singleMediaUrl &&
           (pType === 'LISTENING' || pType === 'listening') && (
             <div className="mb-4">
@@ -240,6 +292,86 @@ function QuestionAreaBlock({
       </div>
     );
   };
+
+  // ===== Chế độ PAGED (từng bước, kiểu TOEIC) =====
+  if (isPaged) {
+    const step = flowSteps[currentStepIndex];
+    if (!step) {
+      return <div className={cx('paged-empty')}>Đang tải câu hỏi…</div>;
+    }
+
+    const passage = step.passage;
+    const audioUrls = step.audioGated ? getAudioUrls(passage) : [];
+    const gated = step.audioGated && audioUrls.length > 0;
+    const isLast = currentStepIndex >= flowSteps.length - 1;
+    const showManualNext = !gated && !isLast;
+
+    // Có gì để hiện ở cột trái ngoài audio không? (text/ảnh) — audio đã do GatedAudioPlayer lo.
+    // Lưu ý: content của passage nghe thường là chuỗi rỗng '' nên phải trim, KHÔNG dùng ?? (nuốt '').
+    const passageText = String(passage?.content ?? passage?.passage_content ?? '').trim();
+    const mediaItems =
+      passage?.passageMediaList ??
+      passage?.passageMedias ??
+      passage?.mediaList ??
+      passage?.passage_media ??
+      [];
+    const hasNonAudioMedia =
+      Array.isArray(mediaItems) &&
+      mediaItems.some((m) => (m?.mediaType ?? m?.media_type ?? '').toUpperCase() !== 'AUDIO');
+    const passageContentToShow = gated
+      ? Boolean(passageText) || hasNonAudioMedia
+      : hasPassageContent(passage);
+    // Phần nghe cũng chia 2 cột (audio + ảnh bên trái, câu hỏi bên phải), không dồn dọc.
+    const split = passageContentToShow && useSide;
+
+    const questionsNode = step.questions.map((q) =>
+      renderQuestionOnly(q, questionIndexMap[q.questionId]),
+    );
+
+    return (
+      <div ref={pagedRootRef} className={cx('paged-root', { 'paged-fit': split })}>
+        {/* Player nghe: full chiều ngang, tách khỏi layout 2 cột; box chỉ hiện khi audio bị dừng. */}
+        {gated && <GatedAudioPlayer key={step.key} urls={audioUrls} onCompleted={goNext} />}
+
+        <div key={currentStepIndex} className={cx('paged-body', { 'split-layout': split })}>
+          {split ? (
+            <>
+              <div className={cx('passage-column')} aria-label="Tài liệu / audio">
+                {renderPassage(passage, null, { suppressAudio: gated })}
+              </div>
+              <div className={cx('question-column')}>
+                <div className={cx('questions-frame')}>{questionsNode}</div>
+              </div>
+            </>
+          ) : (
+            <>
+              {renderPassage(passage, null, { suppressAudio: gated })}
+              {questionsNode}
+            </>
+          )}
+        </div>
+
+        {!gated && (canGoPrev || !isLast) && (
+          <div className={cx('paged-nav')}>
+            <div className={cx('paged-nav-left')}>
+              {canGoPrev && (
+                <ButtonPrime variant="outline" onClick={goPrev}>
+                  Câu trước
+                </ButtonPrime>
+              )}
+            </div>
+            <div className={cx('paged-nav-right')}>
+              {showManualNext && (
+                <ButtonPrime variant="primary" onClick={goNext}>
+                  Câu tiếp
+                </ButtonPrime>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>

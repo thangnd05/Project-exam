@@ -25,6 +25,14 @@ function TestStartPage() {
     handleAnswerChange,
     handleSubmit,
     handlePurchase,
+    isPaged,
+    flowSteps,
+    currentStepIndex,
+    canGoPrev,
+    goNext,
+    goPrev,
+    goToQuestion,
+    canNavigateToQuestion,
   } = useTestSession();
 
   const formatTime = (seconds) => {
@@ -62,6 +70,14 @@ function TestStartPage() {
       formatTime={formatTime}
       isSubmitting={isSubmitting}
       handleSubmit={handleSubmit}
+      isPaged={isPaged}
+      flowSteps={flowSteps}
+      currentStepIndex={currentStepIndex}
+      canGoPrev={canGoPrev}
+      goNext={goNext}
+      goPrev={goPrev}
+      goToQuestion={goToQuestion}
+      canNavigateToQuestion={canNavigateToQuestion}
     />
   );
 }

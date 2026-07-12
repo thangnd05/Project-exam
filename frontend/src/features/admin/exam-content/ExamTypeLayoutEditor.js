@@ -418,6 +418,16 @@ function ExamTypeLayoutEditor() {
           <div className={cx('section')}>
             <h3>Khối câu hỏi</h3>
             <div className={cx('field')}>
+              <label>Kiểu làm bài</label>
+              <select
+                value={config.questionArea.navigationMode || 'scroll'}
+                onChange={(e) => patchQuestionArea({ navigationMode: e.target.value })}
+              >
+                <option value="scroll">Cuộn tất cả (mặc định)</option>
+                <option value="paged">Từng câu/nhóm — kiểu TOEIC (nghe tự chuyển, đọc bấm)</option>
+              </select>
+            </div>
+            <div className={cx('field')}>
               <label>Vị trí đoạn văn</label>
               <select
                 value={config.questionArea.passagePosition || 'side'}

@@ -8,6 +8,9 @@ function TestStartDashboard({
   userAnswers,
   onScrollToQuestion,
   columns,
+  isPaged = false,
+  canNavigateToQuestion,
+  currentQuestionIds = null,
 }) {
   const gridStyle = columns ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : undefined;
   return (
@@ -20,14 +23,24 @@ function TestStartDashboard({
           {allQuestions.map((q, idx) => {
             const isAnswered =
               !!userAnswers[q.questionId]?.selectedAnswerId ||
+              (Array.isArray(userAnswers[q.questionId]?.selectedAnswerIds) &&
+                userAnswers[q.questionId].selectedAnswerIds.length > 0) ||
               !!userAnswers[q.questionId]?.answerText;
+            // Paged: câu ở bước chưa mở khoá / phần nghe đã qua thì khoá (không nhảy được).
+            const locked =
+              isPaged && typeof canNavigateToQuestion === 'function'
+                ? !canNavigateToQuestion(q.questionId)
+                : false;
+            const isCurrent = currentQuestionIds ? currentQuestionIds.has(q.questionId) : false;
             return (
               <button
                 key={q.questionId}
                 type="button"
-                className={cx('q-nav-item', { answered: isAnswered })}
-                onClick={() => onScrollToQuestion(q.questionId)}
-                aria-label={`Câu ${idx + 1}${isAnswered ? ', đã làm' : ''}`}
+                className={cx('q-nav-item', { answered: isAnswered, current: isCurrent, locked })}
+                onClick={() => !locked && onScrollToQuestion(q.questionId)}
+                disabled={locked}
+                aria-current={isCurrent ? 'true' : undefined}
+                aria-label={`Câu ${idx + 1}${isAnswered ? ', đã làm' : ''}${locked ? ', đang khoá' : ''}`}
               >
                 {idx + 1}
               </button>

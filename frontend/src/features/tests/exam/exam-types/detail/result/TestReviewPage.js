@@ -215,7 +215,12 @@ const TestReviewPage = () => {
             if (type === "AUDIO") {
               return (
                 <div key={idx} className="mb-3">
-                  <audio controls src={getFullMediaUrl(url)} className={cx("audio-player")} />
+                  <audio
+                    controls
+                    preload="none"
+                    src={getFullMediaUrl(url)}
+                    className={cx("audio-player")}
+                  />
                 </div>
               );
             }
@@ -226,6 +231,8 @@ const TestReviewPage = () => {
                     src={getFullMediaUrl(url)}
                     alt={`Passage ${idx + 1}`}
                     className={cx("passage-image")}
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
               );
@@ -236,7 +243,12 @@ const TestReviewPage = () => {
           singleMediaUrl &&
           (pType === "LISTENING" || pType === "listening") && (
             <div className="mb-3">
-              <audio controls src={getFullMediaUrl(singleMediaUrl)} className={cx("audio-player")} />
+              <audio
+                controls
+                preload="none"
+                src={getFullMediaUrl(singleMediaUrl)}
+                className={cx("audio-player")}
+              />
             </div>
           )}
 

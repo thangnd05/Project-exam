@@ -19,6 +19,27 @@ const hasMediaList = (p) => {
   return Array.isArray(list) && list.length > 0;
 };
 
+// Passage có audio để nghe? (media list type AUDIO, hoặc single mediaUrl với passageType LISTENING).
+// Dùng để quyết định 1 bước làm bài có bị "gate" theo audio hay không (chế độ PAGED).
+const passageHasAudio = (passage) => {
+  const list =
+    passage?.passageMedias ?? passage?.passageMediaList ?? passage?.passage_media ?? [];
+  if (Array.isArray(list)) {
+    const found = list.some(
+      (m) => (m?.mediaType ?? m?.media_type ?? '').toUpperCase() === 'AUDIO' && (m?.mediaUrl ?? m?.media_url),
+    );
+    if (found) return true;
+  }
+  const single = passage?.mediaUrl ?? passage?.media_url;
+  const pType = (passage?.passageType ?? passage?.passage_type ?? '').toUpperCase();
+  return Boolean(single) && pType === 'LISTENING';
+};
+
+// Bước thuộc phần "nghe"? (để khoá quay lại + gate audio). Ưu tiên cờ audioGated (có audio),
+// fallback sectionType — không phụ thuộc việc skill có đặt đúng tên "Listening" hay không.
+const isListeningStep = (step) =>
+  !!step && (step.audioGated === true || step.sectionType === 'LISTENING');
+
 export function useTestSession() {
   const { testId } = useParams();
   const navigate = useNavigate();
@@ -60,6 +81,11 @@ export function useTestSession() {
   const [status, setStatus] = useState('loading');
 
   const [layoutConfig, setLayoutConfig] = useState(defaultLayoutConfig);
+
+  // --- Chế độ hiển thị từng bước (PAGED, kiểu TOEIC) ---
+  // currentStepIndex: bước đang xem; maxStepIndex: bước xa nhất đã mở khoá (chặn nhảy vượt).
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [maxStepIndex, setMaxStepIndex] = useState(0);
 
   const enrichTestWithPassageMedia = useCallback(async (testData) => {
     const parts = testData.parts || [];
@@ -109,6 +135,11 @@ export function useTestSession() {
       const parsed = JSON.parse(savedState);
       setUserTestId(parsed.userTestId || null);
       setUserAnswers(parsed.userAnswers || {});
+      // Khôi phục vị trí bước (chế độ PAGED); sẽ được clamp lại khi flowSteps sẵn sàng.
+      const savedStep = Number.isInteger(parsed.currentStepIndex) ? parsed.currentStepIndex : 0;
+      const savedMax = Number.isInteger(parsed.maxStepIndex) ? parsed.maxStepIndex : savedStep;
+      setCurrentStepIndex(savedStep);
+      setMaxStepIndex(Math.max(savedStep, savedMax));
 
       if (isPractice) {
         setTimeLeft(null);
@@ -300,11 +331,13 @@ export function useTestSession() {
           userTestId,
           userAnswers,
           timeLeft,
+          currentStepIndex,
+          maxStepIndex,
           lastSavedAt: Date.now(),
         }),
       );
     }
-  }, [userAnswers, timeLeft, userTestId, status, sessionKey]);
+  }, [userAnswers, timeLeft, userTestId, status, sessionKey, currentStepIndex, maxStepIndex]);
 
   useEffect(() => {
     if (status !== 'active' || !userTestId) return;
@@ -427,6 +460,121 @@ export function useTestSession() {
     return map;
   }, [allQuestions]);
 
+  // ============== Kiểu làm bài từng bước (paged, kiểu TOEIC) ==============
+  // Cấu hình nằm trong layout của loại kỳ thi (ExamTypeLayout.config.questionArea.navigationMode),
+  // KHÔNG phải cột riêng trên Test — tái dùng cơ chế cấu hình giao diện làm bài sẵn có.
+  const isPaged = (layoutConfig?.questionArea?.navigationMode || 'scroll') === 'paged';
+
+  // Mỗi "bước" = 1 nhóm câu (passage + các câu của nó). Loại phần (nghe/đọc) suy từ
+  // passage.passageType — dữ liệu chuẩn 100% (không phụ thuộc skill vốn thiếu ở nhiều part).
+  const flowSteps = useMemo(() => {
+    const steps = [];
+    visibleParts.forEach((part) => {
+      (part.questionGroups || []).forEach((group, gi) => {
+        const passage = group.passage || null;
+        const pType = (passage?.passageType ?? passage?.passage_type ?? '').toUpperCase();
+        const sectionType =
+          pType === 'LISTENING' ? 'LISTENING' : pType === 'READING' ? 'READING' : null;
+        // Bước nghe = passage LISTENING có audio -> gate (tự phát, khoá tua, hết audio tự chuyển).
+        const audioGated = sectionType === 'LISTENING' && passageHasAudio(passage);
+        steps.push({
+          key: passage?.passageId || group.questions?.[0]?.questionId || `${part.testPartId}-${gi}`,
+          partId: part.testPartId,
+          partName: part.partName || '',
+          sectionType,
+          audioGated,
+          passage,
+          questions: group.questions || [],
+        });
+      });
+    });
+    return steps;
+  }, [visibleParts]);
+
+  const questionStepIndex = useMemo(() => {
+    const map = {};
+    flowSteps.forEach((s, i) => (s.questions || []).forEach((q) => { map[q.questionId] = i; }));
+    return map;
+  }, [flowSteps]);
+
+  // Clamp step khi số bước đổi (vd sau khi load / đổi part practice) để không vượt biên.
+  useEffect(() => {
+    if (flowSteps.length === 0) return;
+    setCurrentStepIndex((i) => Math.max(0, Math.min(i, flowSteps.length - 1)));
+  }, [flowSteps.length]);
+
+  // maxStepIndex luôn >= currentStepIndex (mở khoá dần khi tiến lên).
+  useEffect(() => {
+    setMaxStepIndex((m) => Math.max(m, currentStepIndex));
+  }, [currentStepIndex]);
+
+  // Với mỗi bước: chỉ số bước NGHE gần nhất đứng TRƯỚC nó (-1 nếu không có).
+  // Reading chỉ mở khi đã vượt qua "cổng nghe" này — không cho nhảy vượt phần nghe chưa xong.
+  const listeningGateBefore = useMemo(() => {
+    const arr = new Array(flowSteps.length).fill(-1);
+    let last = -1;
+    for (let i = 0; i < flowSteps.length; i += 1) {
+      arr[i] = last;
+      if (isListeningStep(flowSteps[i])) last = i;
+    }
+    return arr;
+  }, [flowSteps]);
+
+  const canGoToStep = useCallback(
+    (target) => {
+      if (target < 0 || target >= flowSteps.length) return false;
+      // NGHE: chỉ tới bằng tiến tuần tự (audio), không nhảy palette (trừ đang đứng đúng bước).
+      if (isListeningStep(flowSteps[target])) return target === currentStepIndex;
+      // ĐỌC: nhảy tự do (tiến/lùi tới BẤT KỲ câu đọc nào) miễn là đã vượt qua phần nghe trước nó.
+      return maxStepIndex > listeningGateBefore[target];
+    },
+    [flowSteps, maxStepIndex, currentStepIndex, listeningGateBefore],
+  );
+
+  const goToStep = useCallback(
+    (target) => {
+      const t = Math.max(0, Math.min(target, flowSteps.length - 1));
+      if (!canGoToStep(t)) return;
+      setCurrentStepIndex(t);
+    },
+    [canGoToStep, flowSteps.length],
+  );
+
+  // Tiến bước: dùng cho nút "Câu tiếp" (reading) và auto-advance khi hết audio (listening).
+  const goNext = useCallback(() => {
+    setCurrentStepIndex((prev) => Math.min(prev + 1, flowSteps.length - 1));
+  }, [flowSteps.length]);
+
+  const goPrev = useCallback(() => {
+    setCurrentStepIndex((prev) => {
+      const target = prev - 1;
+      if (target < 0) return prev;
+      if (isListeningStep(flowSteps[target])) return prev; // không lùi vào phần nghe
+      return target;
+    });
+  }, [flowSteps]);
+
+  const goToQuestion = useCallback(
+    (questionId) => {
+      const idx = questionStepIndex[questionId];
+      if (idx == null) return;
+      goToStep(idx);
+    },
+    [questionStepIndex, goToStep],
+  );
+
+  const canNavigateToQuestion = useCallback(
+    (questionId) => {
+      const idx = questionStepIndex[questionId];
+      if (idx == null) return false;
+      return canGoToStep(idx);
+    },
+    [questionStepIndex, canGoToStep],
+  );
+
+  const canGoPrev =
+    isPaged && currentStepIndex > 0 && !isListeningStep(flowSteps[currentStepIndex - 1]);
+
   const handlePurchase = async () => {
     setPurchasing(true);
     try {
@@ -459,5 +607,15 @@ export function useTestSession() {
     handleAnswerChange,
     handleSubmit,
     handlePurchase,
+    // Paged (TOEIC-style)
+    isPaged,
+    flowSteps,
+    currentStepIndex,
+    canGoPrev,
+    goNext,
+    goPrev,
+    goToStep,
+    goToQuestion,
+    canNavigateToQuestion,
   };
 }

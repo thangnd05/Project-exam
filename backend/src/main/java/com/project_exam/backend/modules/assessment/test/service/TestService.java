@@ -518,7 +518,7 @@ public class TestService {
     ) {}
 
     private TestUserDataBundle loadUserTestData(String testId) {
-        List<TestPart> testParts = testPartRepository.findByTestId(testId);
+        List<TestPart> testParts = testPartRepository.findByTestIdOrderByExamPartDisplayOrder(testId);
         if (testParts.isEmpty()) {
             return new TestUserDataBundle(
                     Collections.emptyList(),

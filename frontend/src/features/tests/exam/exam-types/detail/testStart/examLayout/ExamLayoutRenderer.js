@@ -45,11 +45,25 @@ function ExamLayoutRenderer({
   interactive = false,
   selectedId = null,
   onSelectBlock,
+  // Paged (TOEIC-style)
+  isPaged = false,
+  flowSteps = [],
+  currentStepIndex = 0,
+  canGoPrev = false,
+  goNext,
+  goPrev,
+  goToQuestion,
+  canNavigateToQuestion,
 }) {
   const [showInfoPanel, setShowInfoPanel] = useState(false);
 
   const answered = Object.keys(userAnswers).length;
   const total = allQuestions.length;
+
+  // Ở chế độ paged, palette nhảy thẳng tới bước chứa câu (thay vì cuộn).
+  const currentStepQuestionIds = isPaged
+    ? new Set((flowSteps[currentStepIndex]?.questions || []).map((q) => q.questionId))
+    : null;
 
   const byZone = (zone) =>
     (config.blocks || [])
@@ -63,6 +77,21 @@ function ExamLayoutRenderer({
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  // Điều hướng palette: paged -> nhảy bước; all-at-once -> cuộn tới câu.
+  const navigateToQuestion = (questionId) => {
+    if (isPaged) {
+      goToQuestion?.(questionId);
+    } else {
+      scrollToQuestion(questionId);
+    }
+  };
+
+  const dashboardPagingProps = {
+    isPaged,
+    canNavigateToQuestion,
+    currentQuestionIds: currentStepQuestionIds,
   };
 
   const renderBlockNode = (block, zone) => {
@@ -98,8 +127,9 @@ function ExamLayoutRenderer({
             <TestStartDashboard
               allQuestions={allQuestions}
               userAnswers={userAnswers}
-              onScrollToQuestion={scrollToQuestion}
+              onScrollToQuestion={navigateToQuestion}
               columns={block.props?.navColumns ?? 5}
+              {...dashboardPagingProps}
             />
           </div>
         );
@@ -191,9 +221,14 @@ function ExamLayoutRenderer({
       userAnswers={userAnswers}
       handleAnswerChange={handleAnswerChange}
       config={config.questionArea}
+      isPaged={isPaged}
+      flowSteps={flowSteps}
+      currentStepIndex={currentStepIndex}
+      canGoPrev={canGoPrev}
+      goNext={goNext}
+      goPrev={goPrev}
     />
   );
-  const navInBottom = bottomBlocks.some((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
   const renderFooterGroup = (blocks) => {
     const navs = blocks.filter((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
     const pills = blocks.filter(isPill);
@@ -217,18 +252,6 @@ function ExamLayoutRenderer({
   const footer =
     bottomBlocks.length === 0 ? null : (
       <div className={cx('footer-actions')} style={{ position: 'static' }}>
-        {navInBottom && showInfoPanel && (
-          <div className={cx('footer-panel')}>
-            <TestStartDashboard
-              allQuestions={allQuestions}
-              userAnswers={userAnswers}
-              onScrollToQuestion={(id) => {
-                scrollToQuestion(id);
-                setShowInfoPanel(false);
-              }}
-            />
-          </div>
-        )}
         <div className={cx('footer-buttons')}>
           <Container className={cx('footer-buttons-inner')}>
             <div className={zx('footerGroup')}>{renderFooterGroup(footerLeft)}</div>
@@ -279,9 +302,10 @@ function ExamLayoutRenderer({
             allQuestions={allQuestions}
             userAnswers={userAnswers}
             onScrollToQuestion={(id) => {
-              scrollToQuestion(id);
+              navigateToQuestion(id);
               setShowInfoPanel(false);
             }}
+            {...dashboardPagingProps}
           />
         </div>
       </div>
@@ -319,7 +343,7 @@ function ExamLayoutRenderer({
             </aside>
           )}
           <div
-            className={zx('centerScroll')}
+            className={zx('centerScroll', { pagedFit: isPaged })}
             style={preview ? { overflowY: 'visible' } : undefined}
           >
             {mobileNavTrigger}
