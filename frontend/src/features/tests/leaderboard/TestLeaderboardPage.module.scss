@@ -118,9 +118,9 @@
   gap: 16px;
   padding: 18px 28px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, #0061f2, #00c6ff);
+  background: var(--primary-gradient);
   color: #fff;
-  box-shadow: 0 12px 30px rgba(0, 97, 242, 0.35);
+  box-shadow: var(--shadow-md);
 
   &.empty {
     background: #f8fafc;
@@ -222,7 +222,7 @@
   border: 2px dashed #cbd5e1;
 
   .icon {
-    font-size: 8rem;
+    font-size: 6rem;
     color: #e2e8f0;
     margin-bottom: 24px;
   }

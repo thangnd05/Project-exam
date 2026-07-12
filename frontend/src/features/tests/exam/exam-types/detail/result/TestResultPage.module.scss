@@ -56,30 +56,30 @@
 }
 
 .icon-success {
-    font-size: 10rem;
-    color: #10b981;
+    font-size: 6rem;
+    color: var(--success-text);
     margin: 10px 0;
 }
 
 .wrapper h1 {
     font-size: 3.2rem;
-    font-weight: 850;
+    font-weight: 800;
     color: var(--dark-color);
     margin-bottom: 20px;
 }
 
 .score-display {
-    background: #f0f9ff;
-    border-radius: 30px;
+    background: var(--input-bg);
+    border-radius: var(--radius-lg);
     padding: 20px;
     margin-bottom: 35px;
-    border: 2px solid #e0f2fe;
+    border: 1px solid var(--border-color);
 
     .label {
         display: block;
         font-size: 1.6rem;
         font-weight: 700;
-        color: #0369a1;
+        color: var(--accent-color);
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-bottom: 5px;
@@ -87,7 +87,7 @@
 
     .points {
         font-size: var(--font-size-3xl);
-        font-weight: 950;
+        font-weight: var(--font-weight-bold);
         color: var(--primary);
         line-height: 1;
         letter-spacing: -1px;
@@ -196,8 +196,8 @@
 }
 
 .is-locked {
-    color: #94a3b8;
-    border-color: #e2e8f0;
+    color: var(--text-secondary);
+    border-color: var(--border-color);
 }
 
 .detail-section {
@@ -209,7 +209,7 @@
 
 .section-title {
     font-size: var(--font-size-2xxl);
-    font-weight: 850;
+    font-weight: 800;
     margin-bottom: 30px;
     color: var(--dark-color);
     position: relative;

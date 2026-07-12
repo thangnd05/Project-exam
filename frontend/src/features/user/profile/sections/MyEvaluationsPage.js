@@ -5,6 +5,7 @@ import {useNavigate} from 'react-router-dom';
 import { IoCalendarOutline, IoStar } from 'react-icons/io5';
 import {toast} from 'react-toastify';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes from '~/shared/config/Routes';
 import {useMyEvaluations} from './useMyEvaluations';
 import styles from './MyEvaluationsPage.module.scss';
@@ -188,44 +189,44 @@ function MyEvaluationsPage({ embedded = false }) {
                     />
 
                     <div className={cx('actionRow')}>
-                      <button
-                        type="button"
-                        className={cx('actionBtn', 'saveBtn')}
+                      <ButtonPrime
+                        variant="primary"
+                        size="sm"
                         onClick={() => handleUpdateEvaluation(evaluation.id)}
                         disabled={actionLoadingId === evaluation.id}
                       >
                         {actionLoadingId === evaluation.id ? 'Đang lưu...' : 'Lưu'}
-                      </button>
-                      <button
-                        type="button"
-                        className={cx('actionBtn', 'cancelBtn')}
+                      </ButtonPrime>
+                      <ButtonPrime
+                        variant="ghost"
+                        size="sm"
                         onClick={cancelEditEvaluation}
                         disabled={actionLoadingId === evaluation.id}
                       >
                         Hủy
-                      </button>
+                      </ButtonPrime>
                     </div>
                   </div>
                 ) : (
                   <>
                     <p className={cx('content')}>{evaluation.content || '--'}</p>
                     <div className={cx('actionRow')}>
-                      <button
-                        type="button"
-                        className={cx('actionBtn', 'editBtn')}
+                      <ButtonPrime
+                        variant="outline"
+                        size="sm"
                         onClick={() => startEditEvaluation(evaluation)}
                         disabled={actionLoadingId === evaluation.id}
                       >
                         Sửa đánh giá
-                      </button>
-                      <button
-                        type="button"
-                        className={cx('actionBtn', 'deleteBtn')}
+                      </ButtonPrime>
+                      <ButtonPrime
+                        variant="danger"
+                        size="sm"
                         onClick={() => setDeletingEvaluationId(evaluation.id)}
                         disabled={actionLoadingId === evaluation.id}
                       >
                         {actionLoadingId === evaluation.id ? 'Đang xóa...' : 'Xóa đánh giá'}
-                      </button>
+                      </ButtonPrime>
                     </div>
                   </>
                 )}

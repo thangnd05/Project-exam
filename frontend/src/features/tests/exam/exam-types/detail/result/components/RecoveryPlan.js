@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { IoCalendarOutline, IoFlagOutline } from 'react-icons/io5';
+import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import routes from '~/shared/config/Routes';
 import styles from './Result.module.scss';
@@ -48,7 +48,6 @@ function RecoveryPlan({
           className={cx('recoveryPlanCta', 'recoveryTargetCta')}
           onClick={handleGoToTarget}
         >
-          <IoFlagOutline size={20} aria-hidden />
           Đặt mục tiêu
         </button>
       )}

@@ -194,7 +194,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
             className="form-control"
             onChange={(e) => setThumbnailFile(e.target.files[0])}
             disabled={loading}
-            style={{ padding: '10px', fontSize: '14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+            style={{ padding: '1rem', fontSize: 'var(--font-size-ssm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}
           />
           {thumbnailFile && (
             <small className="text-muted d-block mt-2">Đã chọn: {thumbnailFile.name}</small>
@@ -236,7 +236,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
             modules={quillModules}
             formats={quillFormats}
             placeholder="Viết nội dung bài viết tại đây..."
-            style={{ height: '300px', marginBottom: '50px' }}
+            style={{ height: '30rem', marginBottom: '5rem' }}
           />
         </div>
       </div>

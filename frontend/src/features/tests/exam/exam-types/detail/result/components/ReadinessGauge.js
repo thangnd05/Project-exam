@@ -6,13 +6,13 @@ const cx = classNames.bind(styles);
 
 const COLOR_MAP = {
 
-  EXCELLENT:  { color: '#22c55e', bg: '#f0fdf4' },
-  GOOD:       { color: '#3b82f6', bg: '#eff6ff' },
+  EXCELLENT:  { color: '#16a34a', bg: '#f0fdf4' },
+  GOOD:       { color: '#0061f2', bg: '#eff6ff' },
   FAIR:       { color: '#f59e0b', bg: '#fffbeb' },
   WEAK:       { color: '#ef4444', bg: '#fef2f2' },
 
-  READY:             { color: '#22c55e', bg: '#f0fdf4' },
-  ALMOST_READY:      { color: '#3b82f6', bg: '#eff6ff' },
+  READY:             { color: '#16a34a', bg: '#f0fdf4' },
+  ALMOST_READY:      { color: '#0061f2', bg: '#eff6ff' },
   NEEDS_IMPROVEMENT: { color: '#f59e0b', bg: '#fffbeb' },
   NOT_READY:         { color: '#ef4444', bg: '#fef2f2' },
 };
@@ -50,7 +50,7 @@ function ReadinessGauge({ enhanced }) {
   const progress = (gaugePercentage / 100) * circumference;
 
   return (
-    <div className={cx('gaugeContainer')} style={{ background: effectiveBg, borderColor: effectiveColor, borderWidth: 2, borderStyle: 'solid' }}>
+    <div className={cx('gaugeContainer')} style={{ background: effectiveBg, borderColor: effectiveColor, borderWidth: 1, borderStyle: 'solid' }}>
       <div className={cx('gaugeFlex')}>
         <svg width="130" height="130" viewBox="0 0 130 130">
           <circle cx="65" cy="65" r={radius} fill="none" stroke="#e2e8f0" strokeWidth="10" />

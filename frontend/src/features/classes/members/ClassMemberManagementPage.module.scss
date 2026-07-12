@@ -54,10 +54,10 @@
   display: flex;
   align-items: center;
   gap: 0;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   z-index: 1;
 }
@@ -244,10 +244,10 @@
   font-size: var(--font-size-base);
 
   thead {
-    background: #f8fafc;
+    background: var(--input-bg);
 
     th {
-      font-weight: 800;
+      font-weight: var(--font-weight-bold);
       font-size: var(--font-size-sm);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -263,7 +263,7 @@
       transition: background 0.2s;
 
       &:hover {
-        background: #f8fafc;
+        background: var(--hover-color);
       }
     }
 
@@ -348,7 +348,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #f1f5f9;
+  background: var(--input-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -356,7 +356,7 @@
 
   svg {
     font-size: 4rem;
-    color: #cbd5e1;
+    color: var(--border-color);
   }
 }
 

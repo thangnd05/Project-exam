@@ -3,13 +3,13 @@
   border-radius: var(--radius-lg, 16px);
   padding: 28px;
   margin-top: 28px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
   border: 1px solid #f1f5f9;
 }
 
 .title {
   font-size: 2rem;
-  font-weight: 850;
+  font-weight: var(--font-weight-bold);
   margin-bottom: 18px;
   color: var(--dark-color, #0f172a);
 }
@@ -26,7 +26,7 @@
   border-radius: 999px;
   border: 1px solid #e2e8f0;
   background: #f8fafc;
-  color: #475569;
+  color: var(--text-secondary);
   font-weight: 700;
   font-size: 1.4rem;
   cursor: pointer;
@@ -37,9 +37,9 @@
   }
 
   &.active {
-    background: #eff6ff;
-    border-color: #2563eb;
-    color: #2563eb;
+    background: rgba(0, 97, 242, 0.06);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
   }
 }
 
@@ -50,7 +50,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1.45rem;
+  font-size: var(--font-size-ssm);
 
   th,
   td {
@@ -62,8 +62,8 @@
 
   thead th {
     font-weight: 800;
-    color: #475569;
-    font-size: 1.35rem;
+    color: var(--text-secondary);
+    font-size: var(--font-size-smd);
     white-space: nowrap;
     border-bottom: 2px solid #e2e8f0;
   }
@@ -73,7 +73,7 @@
   }
 
   td {
-    color: #334155;
+    color: var(--text-secondary);
   }
 
   .col-name {
@@ -88,8 +88,8 @@
 
 .total-row {
   td {
-    font-weight: 850;
-    color: #0f172a;
+    font-weight: var(--font-weight-bold);
+    color: var(--dark-color);
     border-top: 2px solid #e2e8f0;
     border-bottom: none;
   }
@@ -107,7 +107,7 @@
   border-radius: 50%;
   border: 1.5px solid #cbd5e1;
   background: #f8fafc;
-  color: #64748b;
+  color: var(--text-secondary);
   font-weight: 700;
   font-size: var(--font-size-smd);
   cursor: pointer;
@@ -115,11 +115,11 @@
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-sm);
   }
 
   &.correct {
-    border-color: #10b981;
+    border-color: var(--success-border);
     color: #059669;
     background: #ecfdf5;
   }
@@ -132,7 +132,7 @@
 
   &.skipped {
     border-color: #cbd5e1;
-    color: #94a3b8;
+    color: var(--text-secondary);
     background: #f1f5f9;
   }
 }

@@ -16,7 +16,6 @@ import { AuthContext } from "~/shared/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/shared/utils/guestSession";
 import { useTestResult } from "./hooks/useTestResult";
 import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
-import SkillBreakdownChart from "./components/SkillBreakdownChart";
 import ReadinessGauge from "./components/ReadinessGauge";
 import RecoveryPlan from "./components/RecoveryPlan";
 import TagAnalysisTable from "./components/TagAnalysisTable";
@@ -91,9 +90,6 @@ const TestResultPage = () => {
 
           <div className={cx("result-left")}>
             <div className={cx("result-card")}>
-              <div className={cx("icon-success")}>
-                <IoCheckmarkCircle />
-              </div>
 
               <h1>Hoàn thành bài thi!</h1>
 
@@ -190,11 +186,6 @@ const TestResultPage = () => {
                     Bạn làm tốt hơn <strong>{enhanced.percentile}%</strong> người đã từng làm bài này
                   </div>
                 )}
-
-                <SkillBreakdownChart
-                  skillBreakdown={enhanced.skillBreakdown}
-                  partBreakdown={enhanced.partBreakdown}
-                />
 
                 <RecoveryPlan
                   recoveryMessage={enhanced.recoveryMessage}

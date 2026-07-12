@@ -103,7 +103,7 @@
 @media (max-width: 768px) {
   .footer-pills .exam-stat {
     padding: 9px 14px;
-    font-size: 1.45rem;
+    font-size: var(--font-size-ssm);
 
     svg {
       font-size: 1.6rem;
@@ -114,7 +114,7 @@
 @media (max-width: 576px) {
   .footer-pills .exam-stat {
     padding: 8px 12px;
-    font-size: 1.35rem;
+    font-size: var(--font-size-smd);
 
     svg {
       font-size: var(--font-size-md);
@@ -634,12 +634,12 @@
     border-radius: 12px;
 
     .q-text {
-      font-size: 1.55rem;
+      font-size: var(--font-size-ssm);
       line-height: 1.5;
     }
 
     .q-number {
-      font-size: 1.55rem;
+      font-size: var(--font-size-ssm);
     }
   }
 
@@ -647,12 +647,12 @@
     padding: 16px;
 
     .q-text {
-      font-size: 1.45rem;
+      font-size: var(--font-size-ssm);
       margin-bottom: 16px;
     }
 
     .q-number {
-      font-size: 1.45rem;
+      font-size: var(--font-size-ssm);
     }
   }
 }
@@ -743,7 +743,7 @@
     padding: 11px 12px;
 
     span {
-      font-size: 1.35rem;
+      font-size: var(--font-size-smd);
     }
   }
 }
@@ -947,13 +947,13 @@
   color: white;
   border: none;
   padding: 14px 44px;
-  border-radius: 50px;
-  font-weight: 800;
-  font-size: 1.7rem;
+  border-radius: 12px;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 4px 14px rgba(0, 97, 242, 0.25);
+  box-shadow: var(--shadow-md);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 

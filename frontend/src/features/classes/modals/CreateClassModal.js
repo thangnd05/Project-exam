@@ -86,7 +86,7 @@ function CreateClassModal({ show, onClose }) {
     >
 
       {message && (
-        <Alert variant={type} style={{ margin: '15px 20px', fontSize: '14px' }}>
+        <Alert variant={type} style={{ margin: '1.5rem 2rem', fontSize: 'var(--font-size-ssm)' }}>
           {message}
         </Alert>
       )}

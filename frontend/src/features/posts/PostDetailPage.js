@@ -12,6 +12,7 @@ import { useAuth } from '~/shared/hooks/useAuth';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
 import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes from '~/shared/config/Routes';
 import styles from './PostDetailPage.module.scss';
 import { getPosts, getPostById, getComments } from '~/shared/api/postApi';
@@ -509,7 +510,7 @@ function PostDetailPage() {
                 onChange={(e) => setNewComment(e.target.value)}
               />
               <div className={cx('formActions')}>
-                <button type="submit" className={cx('submitBtn')}>Đăng bình luận</button>
+                <ButtonPrime type="submit" variant="primary" size="md">Đăng bình luận</ButtonPrime>
               </div>
             </div>
           </form>

@@ -212,11 +212,11 @@
     padding: 80px 40px;
     background: white;
     border-radius: var(--radius-xl);
-    border: 2px dashed #cbd5e1;
+    border: 1px dashed var(--border-color);
 
     .empty-icon {
-        font-size: 8rem;
-        color: #e2e8f0;
+        font-size: 5rem;
+        color: var(--border-color);
         margin-bottom: 24px;
     }
 
@@ -256,7 +256,7 @@
         align-items: center;
         gap: 10px;
         padding: 12px 28px;
-        border-radius: 50px;
+        border-radius: var(--radius-md);
         font-weight: 700;
         font-size: var(--font-size-ssm);
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -267,7 +267,7 @@
         cursor: pointer;
 
         &:hover {
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
 

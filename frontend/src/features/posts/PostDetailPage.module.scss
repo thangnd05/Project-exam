@@ -353,17 +353,6 @@
       display: flex;
       justify-content: flex-end;
       margin-top: 12px;
-
-      .submitBtn {
-        background: var(--primary);
-        color: white;
-        border: none;
-        padding: 10px 24px;
-        border-radius: var(--radius-md);
-        font-weight: 700;
-        font-size: 1.4rem;
-        cursor: pointer;
-      }
     }
   }
 }

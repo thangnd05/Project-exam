@@ -18,7 +18,7 @@
   margin: 0 0 6px 0;
   font-size: 2.4rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--dark-color);
 }
 
 .subtitle {
@@ -86,7 +86,7 @@
   margin: 0;
   font-size: 2rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--dark-color);
 }
 
 .username {
@@ -113,7 +113,7 @@
   align-items: center;
   gap: 8px;
   font-size: var(--font-size-smd);
-  color: #475569;
+  color: var(--text-secondary);
   word-break: break-all;
 }
 
@@ -122,7 +122,7 @@
   min-width: 92px;
   font-size: var(--font-size-sm);
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 .verifiedText {
@@ -163,7 +163,7 @@
   border-radius: 12px;
   border: 1px solid transparent;
   background: var(--input-bg);
-  color: #334155;
+  color: var(--text-secondary);
   font-size: 1.4rem;
   font-weight: 600;
   text-align: left;
@@ -222,7 +222,7 @@
 .statValue {
   font-size: var(--font-size-xxl);
   font-weight: 800;
-  color: #0f172a;
+  color: var(--dark-color);
   line-height: 1;
 }
 
@@ -258,7 +258,7 @@
   padding: 6px 10px;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--text-secondary);
   cursor: pointer;
 
   &:hover {
@@ -287,7 +287,7 @@
 }
 
 .noDataMessage {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: var(--font-size-smd);
   font-style: italic;
 }
@@ -331,7 +331,7 @@
 
 .targetEmptyText {
   margin: 0;
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 1.4rem;
 }
 
@@ -380,14 +380,14 @@
 .targetExamName {
   font-size: 1.45rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--dark-color);
 }
 
 .targetAchievedBadge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #16a34a;
+  background: var(--success-text);
   color: #fff;
   border-radius: 999px;
   padding: 3px 10px;
@@ -402,7 +402,7 @@
   white-space: nowrap;
 
   .achieved & {
-    color: #16a34a;
+    color: var(--success-text);
   }
 }
 
@@ -427,7 +427,7 @@
   transition: width 0.3s ease;
 
   .achieved & {
-    background: #16a34a;
+    background: var(--success-text);
   }
 }
 
@@ -451,7 +451,7 @@
   border-radius: 999px;
   padding: 3px 10px;
   font-size: 1.15rem;
-  color: #475569;
+  color: var(--text-secondary);
   font-weight: 600;
 }
 

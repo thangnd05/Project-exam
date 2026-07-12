@@ -51,8 +51,8 @@
   margin: 12px 0 0;
   padding: 12px 16px;
   border-radius: var(--radius-md);
-  background: #eff6ff;
-  color: #1e40af;
+  background: rgba(0, 97, 242, 0.1);
+  color: var(--accent-color);
   font-size: var(--font-size-base);
   line-height: 1.55;
 }
@@ -175,7 +175,7 @@
   }
 
   &.primary {
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, var(--accent-color) 0%, #0056d2 100%);
     border-color: transparent;
     color: #fff;
 

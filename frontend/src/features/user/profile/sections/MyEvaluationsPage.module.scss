@@ -18,14 +18,14 @@
 
 .title {
   margin: 0;
-  color: #0f172a;
+  color: var(--dark-color);
   font-size: 2.4rem;
   font-weight: 800;
 }
 
 .subtitle {
   margin: 6px 0 0 0;
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 1.4rem;
 }
 
@@ -47,7 +47,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 1.35rem;
   padding: 16px 0;
 }
@@ -63,10 +63,10 @@
 }
 
 .item {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 14px;
-  background: #fff;
+  background: var(--bg-white);
 }
 
 .itemHeader {
@@ -96,7 +96,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 1.2rem;
 }
 
@@ -132,8 +132,8 @@
 
 .editTextarea {
   width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   padding: 10px 12px;
   color: #334155;
   font-size: 1.35rem;
@@ -142,8 +142,8 @@
 
   &:focus {
     outline: none;
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.15);
   }
 }
 
@@ -153,38 +153,6 @@
   gap: 8px;
   flex-wrap: wrap;
   margin-top: 10px;
-}
-
-.actionBtn {
-  border: 1px solid transparent;
-  border-radius: 8px;
-  font-size: 1.25rem;
-  font-weight: 600;
-  padding: 7px 12px;
-  cursor: pointer;
-}
-
-.saveBtn {
-  background: var(--primary);
-  color: #fff;
-}
-
-.cancelBtn {
-  background: #f8fafc;
-  color: #475569;
-  border-color: #cbd5e1;
-}
-
-.editBtn {
-  background: #eff6ff;
-  color: var(--primary);
-  border-color: #bfdbfe;
-}
-
-.deleteBtn {
-  background: #fef2f2;
-  color: #b91c1c;
-  border-color: #fecaca;
 }
 
 @media (max-width: 768px) {
