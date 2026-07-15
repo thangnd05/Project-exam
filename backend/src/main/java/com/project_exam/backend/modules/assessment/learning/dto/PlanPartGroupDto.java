@@ -13,6 +13,7 @@ public class PlanPartGroupDto {
 
     private String examPartId;
     private String examPartName;
+    private Integer displayOrder; // thứ tự part (ExamPart.displayOrder) để FE sắp đúng
     private Integer passAccuracy;
     private int passedTasksInPart;
     private int totalTasksInPart;

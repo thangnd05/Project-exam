@@ -683,11 +683,15 @@ public class LearningPlanSessionService {
             groups.add(learningMapper.toPartGroup(
                     partId,
                     part != null ? part.getName() : partId,
+                    part != null ? part.getDisplayOrder() : null,
                     passAcc,
                     passedInPart,
                     partTasks.size(),
                     partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList()));
         }
+        // Sắp Part theo displayOrder (cột "Thứ tự" của ExamPart); part không có xếp cuối.
+        groups.sort(Comparator.comparingInt(
+                g -> g.getDisplayOrder() != null ? g.getDisplayOrder() : Integer.MAX_VALUE));
         return groups;
     }
 

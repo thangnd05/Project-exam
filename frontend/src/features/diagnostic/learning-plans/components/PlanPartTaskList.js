@@ -171,15 +171,13 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
       )}
 
       <div className={cx('taskActions')}>
-        {!compact && resource?.url && (
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noreferrer"
+        {!compact && (resource?.url || resource?.resourceId) && (
+          <RecoveryResourceLink
+            resource={resource}
             className={cx('btn', 'btnOutline', 'btnSm')}
           >
             Xem tài liệu
-          </a>
+          </RecoveryResourceLink>
         )}
         {!compact && task.status === 'PASSED' && (
           <Link

@@ -181,6 +181,7 @@ public class LearningMapper {
     public PlanPartGroupDto toPartGroup(
             String examPartId,
             String examPartName,
+            Integer displayOrder,
             Integer passAccuracy,
             int passedTasksInPart,
             int totalTasksInPart,
@@ -188,6 +189,7 @@ public class LearningMapper {
         return PlanPartGroupDto.builder()
                 .examPartId(examPartId)
                 .examPartName(examPartName)
+                .displayOrder(displayOrder)
                 .passAccuracy(passAccuracy)
                 .passedTasksInPart(passedTasksInPart)
                 .totalTasksInPart(totalTasksInPart)
