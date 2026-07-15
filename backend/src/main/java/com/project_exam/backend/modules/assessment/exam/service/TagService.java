@@ -11,7 +11,7 @@ import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRe
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

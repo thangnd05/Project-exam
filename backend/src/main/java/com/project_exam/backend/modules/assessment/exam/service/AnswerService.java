@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Answer;
 import com.project_exam.backend.modules.assessment.exam.mapper.AnswerMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.AnswerRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.stereotype.Service;
 

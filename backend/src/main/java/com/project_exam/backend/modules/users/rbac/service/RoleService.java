@@ -12,7 +12,7 @@ import com.project_exam.backend.modules.users.rbac.mapper.RoleMapper;
 import com.project_exam.backend.modules.users.rbac.repository.PermissionRepository;
 import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
 import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

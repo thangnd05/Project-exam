@@ -68,7 +68,7 @@ import com.project_exam.backend.modules.classroom.clazz.repository.ClassReposito
 
 // --- Jakarta & Spring ---
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

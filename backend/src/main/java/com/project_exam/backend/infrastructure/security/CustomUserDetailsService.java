@@ -7,7 +7,7 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
 import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Lazy;
@@ -98,10 +98,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
 
             newUser.setVerified(true); // Mặc định tin tưởng Google nên cho verified luôn
-
-            // Gán Role mặc định cho User mới (Ví dụ: ROLE_USER)
-            // Bạn cần đảm bảo trong bảng Roles đã có sẵn bản ghi "USER"
-            // Tìm Role có tên là "USER"
             Role userRole = roleRepository.findByRoleName("USER");
             if (userRole == null) {
                 // Nếu DB chưa có role USER, hãy tạo hoặc báo lỗi

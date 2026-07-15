@@ -18,7 +18,7 @@ import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserAnswer;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.util.AttemptTimeUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import com.project_exam.backend.modules.users.user.repository.*;
 import com.project_exam.backend.modules.users.rbac.repository.*;
 import com.project_exam.backend.modules.posts.post.repository.*;

@@ -17,7 +17,7 @@ import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswer
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

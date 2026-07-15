@@ -24,7 +24,7 @@ import com.project_exam.backend.modules.classroom.member.repository.ClassMemberR
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

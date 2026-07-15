@@ -198,12 +198,14 @@ public class LearningPlanService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public PlanResponse getPlan(String userId, String learningPlanId) {
         LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
         List<LearningPlanTask> tasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId);
         return buildPlanResponseFromEntity(plan, tasks, loadResourcesForTasks(tasks));
     }
 
+    @Transactional(readOnly = true)
     public List<PlanResponse> listPlans(String userId, String examTypeId) {
         return planRepository
                 .findByUserIdAndExamTypeIdOrderByCreatedAtDesc(userId, examTypeId)

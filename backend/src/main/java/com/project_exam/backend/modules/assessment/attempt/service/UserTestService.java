@@ -49,7 +49,7 @@ import com.project_exam.backend.modules.classroom.clazz.repository.*;
 import com.project_exam.backend.modules.classroom.chapter.repository.*;
 import com.project_exam.backend.modules.classroom.member.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 

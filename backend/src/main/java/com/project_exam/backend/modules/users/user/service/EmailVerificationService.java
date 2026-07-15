@@ -7,7 +7,7 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.auth.repository.EmailVerificationRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.util.EmailUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

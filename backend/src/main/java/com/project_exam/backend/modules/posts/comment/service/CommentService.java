@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.project_exam.backend.modules.users.user.domain.User;
@@ -130,7 +131,7 @@ public class CommentService {
         return toResponse(comment, null);
     }
 
-    @jakarta.transaction.Transactional
+    @Transactional
     public CommentResponse updateComment(String id, CommentRequest request, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         Comment comment = commentRepository.findById(id)
