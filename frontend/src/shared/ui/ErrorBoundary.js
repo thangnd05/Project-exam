@@ -42,7 +42,7 @@ class ErrorBoundary extends Component {
           }}
         >
           <h2 style={{ fontSize: '2rem', margin: 0 }}>Đã có lỗi xảy ra</h2>
-          <p style={{ color: 'var(--text-secondary, #6b7280)', margin: 0 }}>
+          <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
             Xin lỗi vì sự bất tiện. Bạn hãy thử tải lại trang.
           </p>
           <div style={{ display: 'flex', gap: '1rem' }}>
@@ -53,8 +53,8 @@ class ErrorBoundary extends Component {
                 padding: '0.8rem 1.6rem',
                 borderRadius: '0.8rem',
                 border: 'none',
-                background: 'var(--primary-color, #2563eb)',
-                color: '#fff',
+                background: 'var(--primary-color)',
+                color: 'var(--bg-white)',
                 cursor: 'pointer',
               }}
             >
@@ -71,7 +71,7 @@ class ErrorBoundary extends Component {
               style={{
                 padding: '0.8rem 1.6rem',
                 borderRadius: '0.8rem',
-                border: '1px solid var(--border-color, #d1d5db)',
+                border: '1px solid var(--border-color)',
                 background: 'transparent',
                 cursor: 'pointer',
               }}

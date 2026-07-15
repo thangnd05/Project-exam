@@ -20,7 +20,7 @@ function ProtectedRoute({ children, requiredRoleName, requiredPermission, allowG
         }}
       >
         <Spinner animation="border" variant="primary" />
-        <span style={{ color: 'var(--text-secondary, #6b7280)' }}>
+        <span style={{ color: 'var(--text-secondary)' }}>
           Đang kiểm tra đăng nhập...
         </span>
       </div>

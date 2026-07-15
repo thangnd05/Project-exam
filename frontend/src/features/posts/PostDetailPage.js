@@ -411,7 +411,7 @@ function PostDetailPage() {
   if (isError) {
     return (
       <div className="text-center py-5">
-        <p style={{ marginBottom: '1.6rem', color: 'var(--text-secondary, #6b7280)' }}>
+        <p style={{ marginBottom: '1.6rem', color: 'var(--text-secondary)' }}>
           Không tải được bài viết. Vui lòng kiểm tra kết nối và thử lại.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
