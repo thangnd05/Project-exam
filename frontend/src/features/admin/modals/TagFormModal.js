@@ -52,7 +52,7 @@ function TagFormModal({
             placeholder="VD: Ngữ pháp, Giới từ, AWS S3..."
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Tag cha (tuỳ chọn)</Form.Label>
           <Form.Select
             value={formState.parentId || ''}
@@ -65,6 +65,24 @@ function TagFormModal({
               </option>
             ))}
           </Form.Select>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Thứ tự học (tuỳ chọn)</Form.Label>
+          <Form.Control
+            type="number"
+            value={formState.sortOrder ?? ''}
+            onChange={(e) =>
+              onChangeField(
+                'sortOrder',
+                e.target.value === '' ? null : Number(e.target.value),
+              )
+            }
+            placeholder="Nhỏ = học trước"
+          />
+          <Form.Text className="text-muted">
+            Ép thứ tự học nền tảng trong kế hoạch (VD: VPC trước VPC-Endpoint). Để
+            trống = xếp theo mức độ yếu.
+          </Form.Text>
         </Form.Group>
     </BaseModal>
   );

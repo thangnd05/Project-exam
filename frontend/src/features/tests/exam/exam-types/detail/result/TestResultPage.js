@@ -88,11 +88,10 @@ const TestResultPage = () => {
 
         <div className={cx("result-layout")}>
 
-          <div className={cx("result-left")}>
-            <div className={cx("result-card")}>
+          <div className={cx("result-card")}>
+            <h1>Hoàn thành bài thi!</h1>
 
-              <h1>Hoàn thành bài thi!</h1>
-
+            <div className={cx("result-body")}>
               <div className={cx("score-display")}>
                 {enhanced?.examCategoryCode === 'QUICK_CHALLENGE' ? (
                   <>
@@ -116,71 +115,77 @@ const TestResultPage = () => {
               <div className={cx("stats-grid")}>
                 <div className={cx("stat-item", "correct")}>
                   <IoCheckmarkCircle size={24} />
-                  <span className={cx("stat-val")}>{result?.correct || 0}</span>
-                  <span className={cx("stat-label")}>Câu đúng</span>
+                  <div className={cx("stat-text")}>
+                    <span className={cx("stat-val")}>{result?.correct || 0}</span>
+                    <span className={cx("stat-label")}>Câu đúng</span>
+                  </div>
                 </div>
 
                 <div className={cx("stat-item", "wrong")}>
                   <IoStatsChartOutline size={24} />
-                  <span className={cx("stat-val")}>{result?.wrong || 0}</span>
-                  <span className={cx("stat-label")}>Câu sai</span>
+                  <div className={cx("stat-text")}>
+                    <span className={cx("stat-val")}>{result?.wrong || 0}</span>
+                    <span className={cx("stat-label")}>Câu sai</span>
+                  </div>
                 </div>
 
                 <div className={cx("stat-item", "total")}>
                   <IoSchoolOutline size={24} />
-                  <span className={cx("stat-val")}>{result?.total || 0}</span>
-                  <span className={cx("stat-label")}>Tổng số câu</span>
+                  <div className={cx("stat-text")}>
+                    <span className={cx("stat-val")}>{result?.total || 0}</span>
+                    <span className={cx("stat-label")}>Tổng số câu</span>
+                  </div>
                 </div>
 
                 <div className={cx("stat-item")}>
                   <IoTimeOutline size={24} />
-                  <span className={cx("stat-val")}>
-                    {formatTime(result?.startedAt, result?.finishedAt)}
-                  </span>
-                  <span className={cx("stat-label")}>Thời gian</span>
+                  <div className={cx("stat-text")}>
+                    <span className={cx("stat-val")}>
+                      {formatTime(result?.startedAt, result?.finishedAt)}
+                    </span>
+                    <span className={cx("stat-label")}>Thời gian</span>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div className={cx("actions")}>
-                {!canReview && (
-                  <div className={cx("lock-message")}>
-                    <IoLockClosedOutline />
-                    <span>
-                      Đáp án sẽ hiển thị sau khi thời gian làm bài kết thúc.
-                    </span>
-                  </div>
-                )}
+            <div className={cx("actions")}>
+              {!canReview && (
+                <div className={cx("lock-message")}>
+                  <IoLockClosedOutline />
+                  <span>
+                    Đáp án sẽ hiển thị sau khi thời gian làm bài kết thúc.
+                  </span>
+                </div>
+              )}
 
-                <ButtonPrime
-                  variant="outline"
-                  fullWidth
-                  className={cx({ "is-locked": !canReview })}
-                  onClick={handleShowDetail}
-                >
-                  {!canReview ? <IoLockClosedOutline /> : <IoStatsChartOutline />}
-                  Xem đáp án & giải thích
-                </ButtonPrime>
+              <ButtonPrime
+                variant="outline"
+                className={cx({ "is-locked": !canReview })}
+                onClick={handleShowDetail}
+              >
+                {!canReview ? <IoLockClosedOutline /> : <IoStatsChartOutline />}
+                Xem đáp án & giải thích
+              </ButtonPrime>
 
-                <ButtonPrime variant="primary" fullWidth onClick={() => navigate("/")}>
-                  <IoHomeOutline /> Trang chủ
-                </ButtonPrime>
+              <ButtonPrime
+                variant="ghost"
+                onClick={() => navigate(`/tests/history/${testId}`)}
+              >
+                <IoSchoolOutline /> Lịch sử bài thi
+              </ButtonPrime>
 
-                <ButtonPrime
-                  variant="ghost"
-                  fullWidth
-                  onClick={() => navigate(`/tests/history/${testId}`)}
-                >
-                  <IoSchoolOutline /> Lịch sử bài thi
-                </ButtonPrime>
-              </div>
+              <ButtonPrime variant="primary" onClick={() => navigate("/")}>
+                <IoHomeOutline /> Trang chủ
+              </ButtonPrime>
             </div>
           </div>
 
           {enhanced && (
-            <div className={cx("result-right")}>
-              <div className={cx("diagnosis-card")}>
-                <ReadinessGauge enhanced={enhanced} />
+            <div className={cx("diagnosis-card")}>
+              <ReadinessGauge enhanced={enhanced} />
 
+              <div className={cx("diagnosis-side")}>
                 {enhanced.percentile != null && (
                   <div className={cx("percentile-box")}>
                     Bạn làm tốt hơn <strong>{enhanced.percentile}%</strong> người đã từng làm bài này

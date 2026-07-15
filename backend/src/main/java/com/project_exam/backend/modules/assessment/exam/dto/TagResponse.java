@@ -12,5 +12,6 @@ public class TagResponse {
     private final String name;
     private final String examTypeId;
     private final String parentId;
+    private final Integer sortOrder; // thứ tự học nền tảng (nhỏ = học trước)
     private final List<TagResponse> children; // dùng cho cấu trúc cây
 }

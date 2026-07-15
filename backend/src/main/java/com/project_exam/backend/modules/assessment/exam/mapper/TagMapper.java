@@ -15,6 +15,7 @@ public class TagMapper {
                 .name(tag.getName())
                 .examTypeId(tag.getExamTypeId())
                 .parentId(tag.getParentId())
+                .sortOrder(tag.getSortOrder())
                 .children(children)
                 .build();
     }

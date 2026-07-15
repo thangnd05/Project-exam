@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/shared/utils/format-date-time';
+import { priorityTierLabel } from '~/shared/utils/priorityTier';
 import { useTaskHistory } from './hooks/useTaskHistory';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
@@ -98,7 +99,7 @@ function TaskHistoryPage() {
       </h2>
       <div className={cx('actionBar')} style={{ marginBottom: '2rem' }}>
         <span className={cx('badge', TIER_VARIANT[task.priorityTier] || 'badgeMuted')}>
-          {task.priorityTier || 'MEDIUM'} priority
+          {priorityTierLabel(task.priorityTier)}
         </span>
         <span className={cx('badge', 'badgeMuted')}>
           Trạng thái: {TASK_STATUS_LABEL[task.status] || task.status}
@@ -107,7 +108,7 @@ function TaskHistoryPage() {
           Cần ≥ {pass}% để pass
         </span>
         {task.recommendedFirst && (
-          <span className={cx('badge', 'badgePrimary')}>Nên học trước</span>
+          <span className={cx('badge', 'badgePrimary')}>Gợi ý làm tiếp</span>
         )}
       </div>
 

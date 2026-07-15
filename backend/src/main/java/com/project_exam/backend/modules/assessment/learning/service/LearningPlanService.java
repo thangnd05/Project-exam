@@ -387,7 +387,12 @@ public class LearningPlanService {
             }
         }
 
-        partTasks.sort(Comparator.comparingInt(TaskCandidate::priorityScore).reversed());
+        // Thứ tự học nền tảng (Tag.sortOrder) làm khóa chính; độ yếu (priorityScore) phá hòa
+        // và sắp các tag chưa đặt lộ trình. Capstone thêm sau nên luôn ở cuối.
+        Map<String, Integer> sortOrderByTag = loadTagSortOrders(partTasks);
+        partTasks.sort(
+                Comparator.<TaskCandidate>comparingInt(t -> tagSortRank(sortOrderByTag.get(t.tagId())))
+                        .thenComparing(Comparator.comparingInt(TaskCandidate::priorityScore).reversed()));
 
         ExamPart examPart = examPartRepository.findById(part.getExamPartId()).orElse(null);
         int capstoneTarget = LearningPlanQuestionTargets.resolveCapstoneTarget(examPart);
@@ -396,6 +401,28 @@ public class LearningPlanService {
         partTasks.add(buildCapstoneCandidate(
                 part, passAccuracy, PlanTaskType.PART_CAPSTONE_2, capstoneTarget));
         return partTasks;
+    }
+
+    /**
+     * Thứ tự học nền tảng do admin đặt trên Tag.sortOrder (nhỏ = học trước).
+     * Batch-load 1 query/Part để tránh N+1; tag chưa đặt sortOrder bị bỏ khỏi map.
+     */
+    private Map<String, Integer> loadTagSortOrders(List<TaskCandidate> tasks) {
+        Set<String> tagIds = tasks.stream()
+                .map(TaskCandidate::tagId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (tagIds.isEmpty()) {
+            return Map.of();
+        }
+        return tagRepository.findAllById(tagIds).stream()
+                .filter(t -> t.getSortOrder() != null)
+                .collect(Collectors.toMap(Tag::getTagId, Tag::getSortOrder, (a, b) -> a));
+    }
+
+    /** sortOrder null (chưa đặt lộ trình) -> đẩy xuống cuối. */
+    private int tagSortRank(Integer sortOrder) {
+        return sortOrder != null ? sortOrder : Integer.MAX_VALUE;
     }
 
     private TaskCandidate buildTaskCandidate(

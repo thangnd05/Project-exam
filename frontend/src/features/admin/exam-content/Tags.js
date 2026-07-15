@@ -13,7 +13,7 @@ import styles from './Tags.module.scss';
 
 const cx = classNames.bind(styles);
 
-const emptyForm = {name: '', parentId: null, examTypeId: ''};
+const emptyForm = {name: '', parentId: null, examTypeId: '', sortOrder: null};
 
 function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, searchTerm}) {
   const hasChildren = tag.children && tag.children.length > 0;
@@ -191,6 +191,7 @@ function TagsManagement() {
       name: '',
       parentId: parentTag.tagId,
       examTypeId: parentTag.examTypeId || selectedExamTypeId,
+      sortOrder: null,
     });
     setShowFormModal(true);
   };
@@ -201,6 +202,7 @@ function TagsManagement() {
       name: tag.name,
       parentId: tag.parentId || null,
       examTypeId: tag.examTypeId || selectedExamTypeId,
+      sortOrder: tag.sortOrder ?? null,
     });
     setShowFormModal(true);
   };
@@ -220,6 +222,7 @@ function TagsManagement() {
       name: formState.name.trim(),
       examTypeId,
       parentId: formState.parentId || null,
+      sortOrder: formState.sortOrder ?? null,
     };
 
     const onSuccess = (savedTag) => {

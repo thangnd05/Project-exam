@@ -3,6 +3,7 @@ import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
+import { priorityTierLabel } from '~/shared/utils/priorityTier';
 
 const cx = classNames.bind(styles);
 
@@ -15,10 +16,10 @@ const TASK_STATUS = {
 
 const CAPSTONE_TYPES = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 
-const PRIORITY = {
-  HIGH: { text: 'Nên học trước', variant: 'badgeDanger' },
-  MEDIUM: { text: 'Ưu tiên vừa', variant: 'badgeWarning' },
-  LOW: { text: 'Tùy chọn', variant: 'badgeMuted' },
+const PRIORITY_VARIANT = {
+  HIGH: 'badgeDanger',
+  MEDIUM: 'badgeWarning',
+  LOW: 'badgeMuted',
 };
 
 function PlanPartTaskList({
@@ -74,7 +75,8 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
   const isCapstone = CAPSTONE_TYPES.has(task.taskType);
   const canStudy = task.status !== 'SKIPPED' && task.status !== 'LOCKED';
   const resource = task.studyResource;
-  const priority = PRIORITY[task.priorityTier] || PRIORITY.MEDIUM;
+  const priorityVariant =
+    PRIORITY_VARIANT[task.priorityTier] || PRIORITY_VARIANT.MEDIUM;
   const questionLabel = task.targetQuestionCount != null
     ? `${task.targetQuestionCount} câu (hết kho thì lấy tối đa có)`
     : null;
@@ -112,7 +114,9 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
               {task.tagName}
             </span>
             {task.priorityTier && (
-              <span className={cx('badge', priority.variant)}>{priority.text}</span>
+              <span className={cx('badge', priorityVariant)}>
+                {priorityTierLabel(task.priorityTier)}
+              </span>
             )}
           </div>
           <div className={cx('taskStats')}>

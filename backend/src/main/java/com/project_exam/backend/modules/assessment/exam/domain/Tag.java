@@ -28,4 +28,7 @@ public class Tag {
     @Column(name = "parent_id")
     private String parentId; // FK -> tags (nullable, tạo cấu trúc cây)
 
+    @Column(name = "sort_order")
+    private Integer sortOrder; // thứ tự học nền tảng (nhỏ = học trước); null = xếp cuối
+
 }

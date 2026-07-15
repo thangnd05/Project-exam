@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
+import { priorityTierLabel } from '~/shared/utils/priorityTier';
 import { useExamTypes, useNextStepOverview } from './hooks/useNextStep';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
@@ -128,7 +129,7 @@ function NextStepPage() {
         return {
           kind: 'study-task',
           title: `Học ải: ${recommended.examPartName} · ${recommended.tagName}`,
-          desc: `Ưu tiên ${recommended.priorityTier}. Cần đạt ≥ ${recommended.passAccuracy}% để pass ải. Đã sai ${recommended.wrongCountAtDiagnosis ?? '—'} câu ở mock chẩn đoán.`,
+          desc: `${priorityTierLabel(recommended.priorityTier)}. Cần đạt ≥ ${recommended.passAccuracy}% để pass ải. Đã sai ${recommended.wrongCountAtDiagnosis ?? '—'} câu ở mock chẩn đoán.`,
           warning: stuck
             ? `Bạn đã fail ${recommended.consecutiveFails} lần liên tiếp ở ải này. Hãy đọc lại tài liệu trước khi thử lần nữa.`
             : null,

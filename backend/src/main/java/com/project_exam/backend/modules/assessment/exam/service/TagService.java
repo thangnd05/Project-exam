@@ -54,6 +54,7 @@ public class TagService {
         tag.setName(request.getName().trim());
         tag.setExamTypeId(request.getExamTypeId());
         tag.setParentId(normalizeParentId(request.getParentId()));
+        tag.setSortOrder(request.getSortOrder());
         tag = tagRepository.save(tag);
 
         return toResponse(tag, List.of());
@@ -77,9 +78,11 @@ public class TagService {
             }
             tag.setParentId(normalizeParentId(request.getParentId()));
         }
+        // Set thẳng (không guard null) để admin có thể xoá thứ tự về "chưa xếp".
+        tag.setSortOrder(request.getSortOrder());
 
         tag = tagRepository.save(tag);
-        List<TagResponse> children = buildChildren(tag.getTagId(), tagRepository.findByExamTypeId(tag.getExamTypeId()));
+        List<TagResponse> children = buildChildren(tag.getTagId(), tagRepository.findByExamTypeIdOrderBySortOrderAsc(tag.getExamTypeId()));
         return toResponse(tag, children);
     }
 
@@ -108,15 +111,11 @@ public class TagService {
      * Lấy danh sách tag theo examTypeId dạng cây (tree).
      */
     public List<TagResponse> getTagTreeByExamType(String examTypeId) {
-        List<Tag> allTags = tagRepository.findByExamTypeId(examTypeId);
-        List<Tag> rootTags = tagRepository.findByExamTypeIdAndParentIdIsNull(examTypeId);
-        // Fallback: tag cũ có parent_id = '' vẫn coi là root
-        if (rootTags.isEmpty()) {
-            rootTags = allTags.stream()
-                    .filter(t -> t.getParentId() == null || t.getParentId().isBlank())
-                    .toList();
-        }
-        return rootTags.stream()
+        // 1 query: lấy hết tag đã sắp theo sortOrder. Root = tag không có parent, lọc tại chỗ
+        // (bao gồm cả tag cũ parent_id = ''). buildChildren chỉ .filter() nên con giữ đúng thứ tự.
+        List<Tag> allTags = tagRepository.findByExamTypeIdOrderBySortOrderAsc(examTypeId);
+        return allTags.stream()
+                .filter(t -> t.getParentId() == null || t.getParentId().isBlank())
                 .map(t -> toResponse(t, buildChildren(t.getTagId(), allTags)))
                 .collect(Collectors.toList());
     }
