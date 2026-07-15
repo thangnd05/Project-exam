@@ -15,6 +15,7 @@ import ScrollHandler from '~/layout/ScrollToTopOnRouteChange';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ScrollProgressBar from '~/shared/ui/ScrollProgressBar';
+import ErrorBoundary from '~/shared/ui/ErrorBoundary';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
         <div className="App">
           <ScrollProgressBar />
           <StreakCelebration />
+          <ErrorBoundary>
           <Routes>
 
             {publicRoutes.map((route, index) => {
@@ -117,6 +119,7 @@ function App() {
               );
             })}
           </Routes>
+          </ErrorBoundary>
         </div>
       </Router>
       </CosmeticProvider>

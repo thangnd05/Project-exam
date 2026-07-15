@@ -216,8 +216,9 @@ export function useTestSession() {
               sessionStorage.setItem(`userTest-${sessionKey}`, activeUserTestId);
               restored = true;
             }
-          } catch {
-
+          } catch (err) {
+            // Không khôi phục được đáp án cũ -> bắt đầu phiên mới, không chặn luồng.
+            console.error('Failed to restore in-progress answers:', err);
           }
         }
 

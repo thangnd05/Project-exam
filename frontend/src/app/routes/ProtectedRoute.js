@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
 import routes from '~/shared/config/Routes';
 import { useAuth } from '~/shared/hooks/useAuth';
 
@@ -7,7 +8,23 @@ function ProtectedRoute({ children, requiredRoleName, requiredPermission, allowG
   const location = useLocation();
 
   if (loading) {
-    return <div>Đang kiểm tra đăng nhập...</div>;
+    return (
+      <div
+        style={{
+          minHeight: '60vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '1.2rem',
+        }}
+      >
+        <Spinner animation="border" variant="primary" />
+        <span style={{ color: 'var(--text-secondary, #6b7280)' }}>
+          Đang kiểm tra đăng nhập...
+        </span>
+      </div>
+    );
   }
 
   if (!isAuthenticated && !allowGuest) {

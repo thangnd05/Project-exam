@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import DOMPurify from 'dompurify';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import {
@@ -26,16 +28,15 @@ function PostDetailPage() {
   const { postId } = useParams();
   const { user } = useAuth();
   const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [bookmarked, setBookmarked] = useState(false);
   const [saveCount, setSaveCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState([]);
-  const [relatedPosts, setRelatedPosts] = useState([]);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editContent, setEditContent] = useState('');
@@ -43,7 +44,35 @@ function PostDetailPage() {
   const [replyContent, setReplyContent] = useState('');
   const [replyIndentPx, setReplyIndentPx] = useState(40);
   const [expandedReplies, setExpandedReplies] = useState({});
-  const navigate = useNavigate();
+
+  // Server-state qua React Query để có cache/retry/error state đồng bộ.
+  const postQuery = useQuery({
+    queryKey: ['post', postId],
+    queryFn: () => getPostById(postId),
+    enabled: !!postId,
+  });
+  const commentsQuery = useQuery({
+    queryKey: ['post', postId, 'comments'],
+    queryFn: () => getComments(postId),
+    enabled: !!postId,
+  });
+
+  const post = postQuery.data;
+  const loading = postQuery.isLoading;
+  const isError = postQuery.isError;
+  const comments = commentsQuery.data || [];
+
+  const categoryId = post?.categories?.[0]?.id;
+  const relatedQuery = useQuery({
+    queryKey: ['post', 'related', categoryId],
+    queryFn: () => getPosts({ categoryId, size: 8 }),
+    enabled: !!categoryId,
+    select: (data) => (data?.content || []).filter((p) => p.id !== postId),
+  });
+  const relatedPosts = relatedQuery.data || [];
+
+  const reloadComments = () =>
+    queryClient.invalidateQueries({ queryKey: ['post', postId, 'comments'] });
 
   const addCommentMutation = useAddComment();
   const updateCommentMutation = useUpdateComment();
@@ -53,44 +82,18 @@ function PostDetailPage() {
   const isReacting = reactMutation.isPending;
   const isSaving = saveMutation.isPending;
 
-  const reloadComments = async () => {
-    const data = await getComments(postId);
-    setComments(data || []);
-  };
-
+  // Seed trạng thái optimistic (like/bookmark) từ post — chỉ khi ĐỔI bài (post.id),
+  // để refetch nền không ghi đè thao tác optimistic của user.
   useEffect(() => {
-    const fetchPostData = async () => {
-      try {
-        setLoading(true);
-        const data = await getPostById(postId);
-        setPost(data);
+    if (!post) return;
+    setLiked(post.currentUserReactType === 'LIKE');
+    setLikeCount(post.reactCounts?.LIKE || 0);
+    setBookmarked(!!post.currentUserSaved);
+    setSaveCount(post.saveCount || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post?.id]);
 
-        const commentsData = await getComments(postId);
-        setComments(commentsData || []);
-
-        setLiked(data.currentUserReactType === 'LIKE');
-        setLikeCount(data.reactCounts?.LIKE || 0);
-
-        setBookmarked(!!data.currentUserSaved);
-        setSaveCount(data.saveCount || 0);
-
-        if (data.categories && data.categories.length > 0) {
-          const catId = data.categories[0].id;
-          const relatedData = await getPosts({ categoryId: catId, size: 8 });
-          if (relatedData && relatedData.content) {
-
-            setRelatedPosts(relatedData.content.filter(p => p.id !== postId));
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch post:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPostData();
-  }, [postId]);
-
+  // Đổi trang phục (frame/badge) -> làm mới post + comments để hiển thị đúng.
   const skipFirstCosmeticSync = useRef(true);
   useEffect(() => {
     if (!postId) return;
@@ -98,23 +101,9 @@ function PostDetailPage() {
       skipFirstCosmeticSync.current = false;
       return;
     }
-    (async () => {
-      try {
-        const [commentsData, postData] = await Promise.all([
-          getComments(postId),
-          getPostById(postId),
-        ]);
-        setComments(commentsData || []);
-        setPost((prev) =>
-          prev
-            ? { ...prev, equippedFrame: postData.equippedFrame, equippedBadge: postData.equippedBadge }
-            : prev,
-        );
-      } catch (error) {
-
-      }
-    })();
-  }, [cosmeticFrame, cosmeticBadge, postId]);
+    queryClient.invalidateQueries({ queryKey: ['post', postId] });
+    queryClient.invalidateQueries({ queryKey: ['post', postId, 'comments'] });
+  }, [cosmeticFrame, cosmeticBadge, postId, queryClient]);
 
   useEffect(() => {
     const computeIndent = () => {
@@ -419,6 +408,21 @@ function PostDetailPage() {
   };
 
   if (loading) return <div className="text-center py-5">Đang tải bài viết...</div>;
+  if (isError) {
+    return (
+      <div className="text-center py-5">
+        <p style={{ marginBottom: '1.6rem', color: 'var(--text-secondary, #6b7280)' }}>
+          Không tải được bài viết. Vui lòng kiểm tra kết nối và thử lại.
+        </p>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+          <ButtonPrime variant="outline" onClick={() => navigate(routes.posts || '/posts')}>
+            Về danh sách
+          </ButtonPrime>
+          <ButtonPrime onClick={() => postQuery.refetch()}>Thử lại</ButtonPrime>
+        </div>
+      </div>
+    );
+  }
   if (!post) return <div className="text-center py-5">Không tìm thấy bài viết.</div>;
 
   return (
@@ -487,7 +491,7 @@ function PostDetailPage() {
         </div>
 
         <article className={cx('articleBody')}>
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || '') }} />
         </article>
 
         <section id="comments" className={cx('commentsSection')}>
