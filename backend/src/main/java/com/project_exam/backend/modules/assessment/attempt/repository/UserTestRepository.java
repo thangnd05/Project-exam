@@ -29,6 +29,13 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
                                     @Param("status") UserTest.Status status,
                                     @Param("practiceMode") UserTest.Mode practiceMode);
 
+    /** Đếm TỔNG lượt đã hoàn thành của user (mọi test), BỎ chế độ practice — dùng cho quest. */
+    @Query("SELECT COUNT(ut) FROM UserTest ut WHERE ut.userId = :userId "
+            + "AND ut.status = :status AND (ut.mode IS NULL OR ut.mode <> :practiceMode)")
+    int countByUserIdAndStatusExcludingMode(@Param("userId") String userId,
+                                            @Param("status") UserTest.Status status,
+                                            @Param("practiceMode") UserTest.Mode practiceMode);
+
     // Resume của FULL_TEST: chỉ lấy attempt full-test (mode NULL cũ = full), bỏ qua practice.
     @Query("SELECT ut FROM UserTest ut WHERE ut.userId = :userId AND ut.testId = :testId "
             + "AND ut.status = :status AND (ut.mode IS NULL OR ut.mode <> :practiceMode)")
@@ -50,14 +57,16 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     List<UserTest> findByGuestSessionIdAndTestIdOrderByStartedAtDesc(String guestSessionId, String testId);
 
     // Các attempt "bỏ dở" của bài KHÔNG giới hạn giờ (không tự nộp được) và đã quá ngưỡng:
-    //  - mode = PRACTICE (luyện tập luôn không giờ), HOẶC
-    //  - đề không đặt durationMinutes và không có availableTo (full-test không giờ).
+    //  - mode = PRACTICE (luyện tập luôn không giờ) -> luôn dọn (miễn phí, không xếp hạng), HOẶC
+    //  - full-test không giờ (durationMinutes null/0 và availableTo null) NHƯNG chỉ khi
+    //    CHƯA có đáp án nào, để không xoá mất tiến độ của người làm cách quãng nhiều ngày.
     // Bài có giờ KHÔNG nằm ở đây vì đã có cơ chế tự nộp phía client.
     // Lấy tối đa 1 lô (giới hạn qua Pageable), xoá bài cũ nhất trước để không ôm transaction lớn.
     @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.startedAt < :cutoff "
             + "AND (ut.mode = :practiceMode "
-            + "OR EXISTS (SELECT t FROM Test t WHERE t.testId = ut.testId "
-            + "AND (t.durationMinutes IS NULL OR t.durationMinutes = 0) AND t.availableTo IS NULL)) "
+            + "OR (EXISTS (SELECT t FROM Test t WHERE t.testId = ut.testId "
+            + "AND (t.durationMinutes IS NULL OR t.durationMinutes = 0) AND t.availableTo IS NULL) "
+            + "AND NOT EXISTS (SELECT ua FROM UserAnswer ua WHERE ua.userTestId = ut.userTestId))) "
             + "ORDER BY ut.startedAt ASC")
     List<UserTest> findAbandonedUntimed(@Param("status") UserTest.Status status,
                                         @Param("practiceMode") UserTest.Mode practiceMode,

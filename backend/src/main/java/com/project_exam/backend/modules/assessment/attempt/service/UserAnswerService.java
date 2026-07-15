@@ -17,6 +17,7 @@ import com.project_exam.backend.modules.assessment.test.domain.TestStatus;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserAnswer;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
+import com.project_exam.backend.modules.assessment.attempt.util.AttemptTimeUtil;
 import jakarta.transaction.Transactional;
 import com.project_exam.backend.modules.users.user.repository.*;
 import com.project_exam.backend.modules.users.rbac.repository.*;
@@ -41,6 +42,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -221,6 +223,22 @@ public class UserAnswerService {
         if (userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã nộp, không thể sửa đáp án");
         }
+
+        assertWithinTimeLimit(userTest);
+    }
+
+    /**
+     * Chặn ghi đáp án sau khi đề CÓ giờ đã hết hạn (server tự tính từ startedAt).
+     * Bài không giới hạn giờ / luyện tập thì bỏ qua.
+     */
+    private void assertWithinTimeLimit(UserTest userTest) {
+        Integer durationMinutes = testRepository.findById(userTest.getTestId())
+                .map(Test::getDurationMinutes)
+                .orElse(null);
+        if (AttemptTimeUtil.isExpired(userTest, durationMinutes, LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Đã hết giờ làm bài, không thể sửa đáp án");
+        }
     }
 
     // ===== GUEST FLOW =====
@@ -266,6 +284,8 @@ public class UserAnswerService {
         if (userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã nộp, không thể sửa đáp án");
         }
+
+        assertWithinTimeLimit(userTest);
     }
 
     public ResultSummaryDto getGuestResultSummary(String userTestId, String guestSessionId) {
