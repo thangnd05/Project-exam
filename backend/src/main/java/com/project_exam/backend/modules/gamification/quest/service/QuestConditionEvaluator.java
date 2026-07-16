@@ -42,8 +42,9 @@ public class QuestConditionEvaluator {
         }
 
         int current = switch (type) {
-            case COMPLETE_TEST -> (int) userTestRepository
-                    .countByUserIdAndStatus(userId, UserTest.Status.COMPLETED);
+            // Chỉ tính bài FULL_TEST đã hoàn thành; loại PRACTICE (không giới hạn, dễ farm xu).
+            case COMPLETE_TEST -> userTestRepository.countByUserIdAndStatusExcludingMode(
+                    userId, UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
             case STREAK_DAYS -> userStreakRepository.findByUserId(userId)
                     .map(UserStreak::getLongestStreak)
                     .orElse(0);

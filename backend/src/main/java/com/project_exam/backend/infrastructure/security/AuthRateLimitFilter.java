@@ -13,11 +13,6 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Rate-limit cho các endpoint nhạy cảm (auth) để chống brute-force / DoS.
- * Sliding window 60s, key = (clientIp, path). In-memory, đủ cho single-node;
- * scale ngang phải chuyển sang Redis.
- */
 @Component
 public class AuthRateLimitFilter extends OncePerRequestFilter {
 
@@ -75,14 +70,11 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
     }
 
     private String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            // Lấy IP đầu tiên trong chuỗi (client gốc)
-            int comma = forwarded.indexOf(',');
-            return (comma > 0 ? forwarded.substring(0, comma) : forwarded).trim();
-        }
-        String realIp = request.getHeader("X-Real-IP");
-        if (realIp != null && !realIp.isBlank()) return realIp.trim();
-        return request.getRemoteAddr();
+        // KHÔNG đọc trực tiếp X-Forwarded-For / X-Real-IP: client tự đặt được -> mỗi request 1 IP giả
+        // => mỗi IP 1 bucket mới => vượt hết rate-limit. Dùng getRemoteAddr(): với
+        // server.forward-headers-strategy=native, Tomcat RemoteIpValve chỉ áp XFF từ proxy nội bộ
+        // đáng tin, nên đây là IP client thật (không giả mạo được từ ngoài).
+        String ip = request.getRemoteAddr();
+        return ip == null ? "unknown" : ip;
     }
 }

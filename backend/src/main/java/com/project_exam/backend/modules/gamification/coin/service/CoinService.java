@@ -34,16 +34,17 @@ public class CoinService {
      */
     @Transactional
     public int addCoins(String userId, int amount) {
-        UserCoin wallet = userCoinRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    UserCoin w = new UserCoin();
-                    w.setUserId(userId);
-                    w.setBalance(0);
-                    return w;
-                });
-        wallet.setBalance(wallet.getBalance() + amount);
-        wallet.setUpdatedAt(LocalDateTime.now());
-        return userCoinRepository.save(wallet).getBalance();
+        // Cộng atomic ở DB (balance = balance + amount) -> không lost-update khi cộng đồng thời.
+        int updated = userCoinRepository.increment(userId, amount);
+        if (updated > 0) {
+            return userCoinRepository.findByUserId(userId).map(UserCoin::getBalance).orElse(amount);
+        }
+        // Ví chưa tồn tại (lần đầu) -> tạo. Race first-insert hiếm, unique(userId) sẽ chặn 1 bên.
+        UserCoin w = new UserCoin();
+        w.setUserId(userId);
+        w.setBalance(amount);
+        w.setUpdatedAt(LocalDateTime.now());
+        return userCoinRepository.save(w).getBalance();
     }
 
     /**

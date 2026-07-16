@@ -8,13 +8,18 @@ import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.util.AuthUtils;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RestController
@@ -24,6 +29,17 @@ public class UserTestController {
 
     private final UserTestService userTestService;
     private final AuthUtils authUtils;
+
+    // Cookie định danh phiên guest do SERVER đặt (HttpOnly) — nguồn tin cậy khi claim.
+    // Cấu hình qua env: APP_GUEST_COOKIE_NAME / APP_GUEST_COOKIE_MAX_AGE.
+    @Value("${app.guest.cookie-name}")
+    private String guestCookieName;
+
+    @Value("${app.guest.cookie-max-age}")
+    private int guestCookieMaxAge;
+
+    @Value("${app.frontend.origin}")
+    private String frontendOrigin;
 
     //  Lấy tất cả user test (admin only)
     @GetMapping
@@ -180,12 +196,15 @@ public class UserTestController {
     @PostMapping("/guest")
     public ResponseEntity<Map<String, Object>> startGuestUserTest(
             @Valid @RequestBody StartUserTestRequest request,
-            @RequestHeader("X-Guest-Session") String guestSessionId
+            @RequestHeader("X-Guest-Session") String guestSessionId,
+            HttpServletResponse httpResponse
     ) {
         if (request == null || request.getTestId() == null || request.getTestId().isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Missing testId"));
         }
         UserTest userTest = userTestService.startGuestUserTest(request.getTestId(), guestSessionId);
+        // Ràng buộc phiên guest vào trình duyệt này bằng cookie HttpOnly (server-set) để claim an toàn.
+        setGuestSessionCookie(httpResponse, guestSessionId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Bắt đầu làm bài (guest) thành công");
@@ -199,9 +218,12 @@ public class UserTestController {
     @PostMapping("/{userTestId}/guest-submit")
     public ResponseEntity<UserTestResponse> submitGuestTest(
             @PathVariable String userTestId,
-            @RequestHeader("X-Guest-Session") String guestSessionId
+            @RequestHeader("X-Guest-Session") String guestSessionId,
+            HttpServletResponse response
     ) {
         UserTest submitted = userTestService.submitGuestTest(userTestId, guestSessionId);
+        // Đảm bảo cookie ràng buộc vẫn còn (kể cả khi cookie lúc start đã mất/hết hạn).
+        setGuestSessionCookie(response, guestSessionId);
         return ResponseEntity.ok(userTestService.toResponse(submitted));
     }
 
@@ -236,14 +258,55 @@ public class UserTestController {
     }
 
     // Gắn bài làm của phiên guest vào tài khoản vừa đăng nhập (yêu cầu JWT).
-    // FE gọi ngay sau login/OAuth thành công, kèm header X-Guest-Session từ localStorage.
+    // FE gọi ngay sau login/OAuth thành công. guestSessionId lấy TỪ COOKIE HttpOnly do server đặt
+    // (KHÔNG tin header client tự cấp) -> chỉ trình duyệt đã làm bài guest mới claim được phiên đó.
     @PostMapping("/claim-guest")
     public ResponseEntity<Map<String, Object>> claimGuestTests(
-            @RequestHeader(value = "X-Guest-Session", required = false) String guestSessionId,
-            HttpServletRequest httpRequest
+            HttpServletRequest httpRequest,
+            HttpServletResponse response
     ) {
         String userId = authUtils.getUserId(httpRequest);
+        String guestSessionId = readGuestSessionCookie(httpRequest);
+        if (guestSessionId == null || guestSessionId.isBlank()) {
+            return ResponseEntity.ok(Map.of("claimed", 0));
+        }
         int claimed = userTestService.claimGuestTests(userId, guestSessionId);
+        clearGuestSessionCookie(response); // đã claim xong -> bỏ ràng buộc
         return ResponseEntity.ok(Map.of("claimed", claimed));
+    }
+
+    // ===== Guest-session cookie helpers =====
+
+    private boolean isSecureCookie() {
+        return frontendOrigin != null && frontendOrigin.startsWith("https");
+    }
+
+    private void setGuestSessionCookie(HttpServletResponse response, String guestSessionId) {
+        if (guestSessionId == null || guestSessionId.isBlank()) return;
+        String sameSite = isSecureCookie() ? "; SameSite=None; Secure" : "; SameSite=Lax";
+        // Path=/ để cookie được gửi tới /api/user-tests/claim-guest.
+        response.addHeader("Set-Cookie",
+                guestCookieName + "=" + urlEncode(guestSessionId)
+                        + "; HttpOnly; Path=/; Max-Age=" + guestCookieMaxAge + sameSite);
+    }
+
+    private void clearGuestSessionCookie(HttpServletResponse response) {
+        String sameSite = isSecureCookie() ? "; SameSite=None; Secure" : "; SameSite=Lax";
+        response.addHeader("Set-Cookie",
+                guestCookieName + "=; HttpOnly; Path=/; Max-Age=0" + sameSite);
+    }
+
+    private String readGuestSessionCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        for (Cookie c : request.getCookies()) {
+            if (guestCookieName.equals(c.getName())) {
+                return URLDecoder.decode(c.getValue(), StandardCharsets.UTF_8);
+            }
+        }
+        return null;
+    }
+
+    private static String urlEncode(String v) {
+        return java.net.URLEncoder.encode(v, StandardCharsets.UTF_8);
     }
 }

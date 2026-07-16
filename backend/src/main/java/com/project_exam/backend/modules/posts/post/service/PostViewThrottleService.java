@@ -39,16 +39,8 @@ public class PostViewThrottleService {
     }
 
     private String extractClientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-
-        String realIp = request.getHeader("X-Real-IP");
-        if (realIp != null && !realIp.isBlank()) {
-            return realIp.trim();
-        }
-
+        // Dùng getRemoteAddr() (an toàn nhờ forward-headers-strategy=native: RemoteIpValve chỉ tin
+        // proxy nội bộ). Không đọc thẳng X-Forwarded-For/X-Real-IP vì client giả mạo được -> vượt throttle.
         String remoteAddr = request.getRemoteAddr();
         return remoteAddr == null ? "unknown" : remoteAddr;
     }

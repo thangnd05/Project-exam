@@ -42,7 +42,8 @@ public class StreakService {
 
         LocalDate today = LocalDate.now(VN);
 
-        UserStreak streak = userStreakRepository.findByUserId(userId)
+        // Khóa ghi (PESSIMISTIC_WRITE) để 2 hoạt động gần nhau không cùng đọc-sửa-ghi -> lost update.
+        UserStreak streak = userStreakRepository.findByUserIdForUpdate(userId)
                 .orElseGet(() -> {
                     UserStreak s = new UserStreak();
                     s.setUserId(userId);

@@ -99,8 +99,35 @@ public class LearningPlanSessionService {
             return buildSessionResponse(plan, inProgress.get());
         }
 
-        LearningPlanSession session = createQuizSession(plan, task);
+        // Kho câu của ải rỗng (pool=0) -> không thể pass, sẽ kẹt. Tự SKIP để không chặn tiến độ.
+        List<String> questionIds = pickQuestionsForTask(plan, task);
+        if (questionIds.isEmpty()) {
+            skipEmptyPoolTask(plan, task);
+            return plan.getPlanStage() == PlanStage.MOCK
+                    ? buildMockStageResponse(plan)
+                    : buildPickResponse(plan);
+        }
+
+        LearningPlanSession session = createQuizSession(plan, task, questionIds);
         return buildSessionResponse(plan, session);
+    }
+
+    /** Ải có kho câu rỗng -> đánh dấu SKIPPED rồi kiểm tra điều kiện lên MOCK. */
+    private void skipEmptyPoolTask(LearningPlan plan, LearningPlanTask task) {
+        task.setStatus(TaskStatus.SKIPPED);
+        taskRepository.save(task);
+        maybeAdvanceToMock(plan);
+    }
+
+    /** Lên MOCK khi mọi ải đã PASSED hoặc SKIPPED (không còn ải nào phải làm). */
+    private void maybeAdvanceToMock(LearningPlan plan) {
+        String planId = plan.getLearningPlanId();
+        long total = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(planId).size();
+        long passed = taskRepository.countByLearningPlanIdAndStatus(planId, TaskStatus.PASSED);
+        long skipped = taskRepository.countByLearningPlanIdAndStatus(planId, TaskStatus.SKIPPED);
+        if (total > 0 && passed + skipped == total) {
+            advanceToMockStage(plan);
+        }
     }
 
     private CurrentSessionResponse buildReviewResponse(LearningPlan plan, LearningPlanTask task) {
@@ -277,12 +304,7 @@ public class LearningPlanSessionService {
             if (passed) {
                 taskUnlockSupport.onTaskPassed(task, learningPlanId);
             }
-            long totalTasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId).size();
-            long passedCount = taskRepository.countByLearningPlanIdAndStatus(
-                    learningPlanId, TaskStatus.PASSED);
-            if (totalTasks > 0 && passedCount == totalTasks) {
-                advanceToMockStage(plan);
-            }
+            maybeAdvanceToMock(plan);
         }
 
         String message = passed
@@ -409,16 +431,20 @@ public class LearningPlanSessionService {
                 .orElse(plan.getPassAccuracyDefault() != null ? plan.getPassAccuracyDefault() : 70);
     }
 
-    private LearningPlanSession createQuizSession(LearningPlan plan, LearningPlanTask task) {
+    /** Chọn câu cho ải (không side-effect) — tách để check kho rỗng trước khi tạo session. */
+    private List<String> pickQuestionsForTask(LearningPlan plan, LearningPlanTask task) {
         int targetCount = resolveTargetQuestionCount(task);
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
-        List<String> questionIds;
         if (taskType == PlanTaskType.TAG) {
-            questionIds = pickQuestionsForTag(
+            return pickQuestionsForTag(
                     plan.getUserId(), task.getTagId(), task.getExamPartId(), targetCount);
-        } else {
-            questionIds = pickQuestionsForPart(plan.getUserId(), task.getExamPartId(), targetCount);
         }
+        return pickQuestionsForPart(plan.getUserId(), task.getExamPartId(), targetCount);
+    }
+
+    private LearningPlanSession createQuizSession(
+            LearningPlan plan, LearningPlanTask task, List<String> questionIds) {
+        PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
 
         LearningPlanSession session = new LearningPlanSession();
         session.setLearningPlanId(plan.getLearningPlanId());

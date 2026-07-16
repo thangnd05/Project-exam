@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '~/shared/config/queryClient';
@@ -47,6 +48,21 @@ function App() {
           <ScrollProgressBar />
           <StreakCelebration />
           <ErrorBoundary>
+          <Suspense
+            fallback={
+              <div
+                style={{
+                  minHeight: '60vh',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                Đang tải...
+              </div>
+            }
+          >
           <Routes>
 
             {publicRoutes.map((route, index) => {
@@ -119,6 +135,7 @@ function App() {
               );
             })}
           </Routes>
+          </Suspense>
           </ErrorBoundary>
         </div>
       </Router>
