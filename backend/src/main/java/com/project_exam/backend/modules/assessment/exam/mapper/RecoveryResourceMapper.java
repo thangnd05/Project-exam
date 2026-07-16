@@ -11,9 +11,10 @@ import java.util.List;
 public class RecoveryResourceMapper {
 
     /**
-     * Mapper thuần: {@code tags} cần truy vấn DB nên service tính sẵn và truyền vào.
+     * Mapper thuần: {@code tags} và tên ExamType/Part cần truy vấn DB nên service tính sẵn và truyền vào.
      */
-    public RecoveryResourceResponse toResponse(RecoveryResource resource, List<TagResponse> tags) {
+    public RecoveryResourceResponse toResponse(RecoveryResource resource, List<TagResponse> tags,
+                                               String examTypeName, String examPartName) {
         return RecoveryResourceResponse.builder()
                 .resourceId(resource.getResourceId())
                 .title(resource.getTitle())
@@ -23,6 +24,10 @@ public class RecoveryResourceMapper {
                 .createdBy(resource.getCreatedBy())
                 .createdAt(resource.getCreatedAt())
                 .tags(tags)
+                .examTypeId(resource.getExamTypeId())
+                .examTypeName(examTypeName)
+                .examPartId(resource.getExamPartId())
+                .examPartName(examPartName)
                 .build();
     }
 }

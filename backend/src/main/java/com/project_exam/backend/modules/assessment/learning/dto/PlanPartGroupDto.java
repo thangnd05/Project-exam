@@ -17,5 +17,7 @@ public class PlanPartGroupDto {
     private Integer passAccuracy;
     private int passedTasksInPart;
     private int totalTasksInPart;
+    /** Tài liệu giới thiệu/cách làm gắn trực tiếp Part này (đọc trước khi vào các ải). */
+    private List<PlanPhaseDto.RecommendedResourceDto> partResources;
     private List<PlanTaskDto> tasks;
 }

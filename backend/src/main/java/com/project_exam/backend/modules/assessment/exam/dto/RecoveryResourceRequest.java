@@ -11,6 +11,7 @@ import java.util.List;
 public class RecoveryResourceRequest {
     private String title;
     private String description;
-    private String url; // dùng khi không upload file (nhập URL thủ công)
+    private String url;
     private List<String> tagIds;
+    private String examPartId; 
 }

@@ -8,7 +8,7 @@ import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {isMarkdownResource} from '~/shared/utils/recoveryResource';
-import {useRecoveryResources, useTagsByExamType} from './hooks/useRecoveryResources';
+import {usePartsByExamType, useRecoveryResources, useTagsByExamType} from './hooks/useRecoveryResources';
 import styles from './RecoveryResources.module.scss';
 
 const cx = classNames.bind(styles);
@@ -18,6 +18,7 @@ const emptyForm = {
   description: '',
   url: '',
   tagIds: [],
+  examPartId: '',
 };
 
 const getRootTagId = (tag, tagById) => {
@@ -62,9 +63,14 @@ function ResourceCard({
         <p className={cx('cardDescription')}>{resource.description}</p>
       )}
 
-      {resource.tags && resource.tags.length > 0 && (
+      {(resource.examPartName || (resource.tags && resource.tags.length > 0)) && (
         <div className={cx('cardTags')}>
-          {resource.tags.map((tag) => (
+          {resource.examPartName && (
+            <Badge bg="primary">
+              {resource.examTypeName ? `${resource.examTypeName} · ` : ''}{resource.examPartName}
+            </Badge>
+          )}
+          {(resource.tags || []).map((tag) => (
             <Badge key={tag.tagId} bg="light" text="dark" className="border">
               {tag.name}
             </Badge>
@@ -129,6 +135,7 @@ function RecoveryResourcesManagement() {
 
   const availableTags = useTagsByExamType(selectedExamTypeId);
   const formAvailableTags = useTagsByExamType(formExamTypeId);
+  const formAvailableParts = usePartsByExamType(formExamTypeId);
 
   const fetchError = resourcesError ? 'Không thể tải danh sách tài liệu.' : '';
 
@@ -148,9 +155,11 @@ function RecoveryResourcesManagement() {
       const resourceTags = resource.tags || [];
 
       if (selectedExamTypeId) {
-        const matchesExamType = resourceTags.some(
-          (tag) => String(tag.examTypeId) === String(selectedExamTypeId),
-        );
+        const matchesExamType =
+          String(resource.examTypeId || '') === String(selectedExamTypeId) ||
+          resourceTags.some(
+            (tag) => String(tag.examTypeId) === String(selectedExamTypeId),
+          );
         if (!matchesExamType) {
           return false;
         }
@@ -291,12 +300,23 @@ function RecoveryResourcesManagement() {
       description: resource.description || '',
       url: resource.url || '',
       tagIds: (resource.tags || []).map((t) => t.tagId),
+      examPartId: resource.examPartId || '',
     });
     setSelectedFile(null);
     setFormExamTypeId(
-      tagExamTypeId ? String(tagExamTypeId) : selectedExamTypeId || '',
+      resource.examTypeId
+        ? String(resource.examTypeId)
+        : tagExamTypeId
+          ? String(tagExamTypeId)
+          : selectedExamTypeId || '',
     );
     setShowFormModal(true);
+  };
+
+  // Đổi loại kỳ thi trong form thì bỏ Part đã chọn (Part thuộc loại kỳ thi cũ).
+  const handleFormExamTypeChange = (examTypeId) => {
+    setFormExamTypeId(examTypeId);
+    setFormState((prev) => ({...prev, examPartId: ''}));
   };
 
   const handleToggleTag = (tagId) => {
@@ -324,6 +344,7 @@ function RecoveryResourcesManagement() {
         description: formState.description.trim(),
         url: formState.url.trim() || null,
         tagIds: [...new Set(formState.tagIds || [])],
+        examPartId: formState.examPartId || '', // '' = gỡ gắn Part
       };
       if (editingId) {
         await updateMutation.mutateAsync({id: editingId, payload, file: selectedFile});
@@ -476,8 +497,9 @@ function RecoveryResourcesManagement() {
         formState={formState}
         examTypes={examTypes}
         formExamTypeId={formExamTypeId}
-        onExamTypeChange={setFormExamTypeId}
+        onExamTypeChange={handleFormExamTypeChange}
         availableTags={formAvailableTags}
+        availableParts={formAvailableParts}
         selectedFile={selectedFile}
         onChangeField={(field, value) =>
           setFormState((prev) => ({...prev, [field]: value}))

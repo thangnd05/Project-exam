@@ -695,6 +695,10 @@ public class LearningPlanSessionService {
                         LinkedHashMap::new,
                         Collectors.toList()));
 
+        // Tài liệu giới thiệu/cách làm gắn trực tiếp Part — hiện đầu nhóm, trước tài liệu theo tag.
+        Map<String, List<PlanPhaseDto.RecommendedResourceDto>> resourcesByPart =
+                resourceLookup.findByExamPartIds(byPart.keySet());
+
         List<PlanPartGroupDto> groups = new ArrayList<>();
         for (Map.Entry<String, List<LearningPlanTask>> entry : byPart.entrySet()) {
             String partId = entry.getKey();
@@ -713,6 +717,7 @@ public class LearningPlanSessionService {
                     passAcc,
                     passedInPart,
                     partTasks.size(),
+                    resourcesByPart.getOrDefault(partId, List.of()),
                     partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList()));
         }
         // Sắp Part theo displayOrder (cột "Thứ tự" của ExamPart); part không có xếp cuối.

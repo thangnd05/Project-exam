@@ -53,6 +53,23 @@ function PlanPartTaskList({
             <p className={cx('partGroupHint')}>
               Bước 1: đọc tài liệu · Bước 2: bấm Học ải để luyện (thứ tự ải tùy ý).
             </p>
+            {(group.partResources || []).length > 0 && (
+              <div className={cx('resourceBox')}>
+                <div className={cx('resourceLabel')}>
+                  Giới thiệu &amp; cách làm Part (đọc trước)
+                </div>
+                {group.partResources.map((r) => (
+                  <div key={r.resourceId}>
+                    <RecoveryResourceLink resource={r} className={cx('resourceLink')}>
+                      {r.title || r.originalFileName || 'Mở tài liệu'}
+                    </RecoveryResourceLink>
+                    {r.description && (
+                      <p className={cx('resourceDesc')}>{r.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
             {(group.tasks || []).map((t) => (
               <PartTaskRow
                 key={t.taskId}

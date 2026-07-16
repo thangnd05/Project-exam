@@ -99,6 +99,25 @@ public class RecoveryResourceController {
     }
 
     /**
+     * Tìm tài liệu gắn Part (vd giới thiệu/cách làm Part) — dùng cho trang luyện tập theo Part.
+     */
+    @GetMapping("/by-part/{examPartId}")
+    public ResponseEntity<List<RecoveryResourceResponse>> getResourcesByPart(@PathVariable String examPartId) {
+        return ResponseEntity.ok(resourceService.getResourcesByExamPartId(examPartId));
+    }
+
+    /**
+     * Tìm tài liệu gắn nhiều Part cùng lúc (query param: ?examPartIds=id1,id2) —
+     * dùng cho modal chọn chế độ luyện tập (1 request cho cả danh sách Part của đề).
+     */
+    @GetMapping("/by-parts")
+    public ResponseEntity<List<RecoveryResourceResponse>> getResourcesByParts(
+            @RequestParam List<String> examPartIds
+    ) {
+        return ResponseEntity.ok(resourceService.getResourcesByExamPartIds(examPartIds));
+    }
+
+    /**
      * Tìm tài liệu match tất cả tags (query param: ?tagIds=id1,id2,id3).
      */
     @GetMapping("/by-tags")

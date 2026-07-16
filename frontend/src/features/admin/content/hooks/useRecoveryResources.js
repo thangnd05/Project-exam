@@ -2,6 +2,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {keepPreviousData} from '~/shared/config/queryClient';
 
 import {getExamTypes} from '~/shared/api/examTypeApi';
+import {getExamPartsByExamType} from '~/shared/api/examPartApi';
 import {getTagsFlatByExamType} from '~/shared/api/tagApi';
 import {
   getAllResources,
@@ -14,6 +15,7 @@ export const recoveryResourceKeys = {
   resources: ['recovery-resources'],
   examTypes: ['recovery-exam-types'],
   tags: (examTypeId) => ['recovery-tags-flat', examTypeId ?? null],
+  parts: (examTypeId) => ['recovery-exam-parts', examTypeId ?? null],
 };
 
 const EMPTY = [];
@@ -63,6 +65,18 @@ export function useRecoveryResources() {
     updateMutation,
     deleteMutation,
   };
+}
+
+export function usePartsByExamType(examTypeId) {
+  const query = useQuery({
+    queryKey: recoveryResourceKeys.parts(examTypeId),
+    queryFn: () => getExamPartsByExamType(examTypeId),
+    enabled: !!examTypeId,
+    placeholderData: keepPreviousData,
+    select: asArray,
+  });
+
+  return query.data ?? EMPTY;
 }
 
 export function useTagsByExamType(examTypeId) {

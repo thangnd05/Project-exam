@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.exam.service;
 
 import com.project_exam.backend.infrastructure.cloudinary.CloudinaryService;
+import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.RecoveryResource;
 import com.project_exam.backend.modules.assessment.exam.domain.ResourceTag;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceRequest;
@@ -8,6 +9,8 @@ import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResp
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
 import com.project_exam.backend.modules.assessment.exam.mapper.RecoveryResourceMapper;
 import com.project_exam.backend.modules.assessment.exam.mapper.TagMapper;
+import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.RecoveryResourceRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
@@ -33,6 +36,8 @@ public class RecoveryResourceService {
     private final RecoveryResourceRepository resourceRepository;
     private final ResourceTagRepository resourceTagRepository;
     private final TagRepository tagRepository;
+    private final ExamPartRepository examPartRepository;
+    private final ExamTypeRepository examTypeRepository;
     private final TagService tagService;
     private final TagMapper tagMapper;
     private final RecoveryResourceMapper recoveryResourceMapper;
@@ -67,6 +72,8 @@ public class RecoveryResourceService {
         } else {
             throw new BadRequestException("Vui lòng upload file hoặc cung cấp URL.");
         }
+
+        applyExamPart(resource, request.getExamPartId());
 
         resource = resourceRepository.save(resource);
         syncResourceTags(resource.getResourceId(), request.getTagIds());
@@ -104,6 +111,10 @@ public class RecoveryResourceService {
             resource.setCloudinaryPublicId(extractPublicId(uploadedUrl));
         } else if (request.getUrl() != null && !request.getUrl().isBlank()) {
             resource.setUrl(request.getUrl().trim());
+        }
+
+        if (request.getExamPartId() != null) {
+            applyExamPart(resource, request.getExamPartId());
         }
 
         resource = resourceRepository.save(resource);
@@ -165,6 +176,23 @@ public class RecoveryResourceService {
                 .collect(Collectors.toList());
     }
 
+    /** Tài liệu gắn Part (vd giới thiệu/cách làm Part) — dùng cho trang luyện tập theo Part. */
+    public List<RecoveryResourceResponse> getResourcesByExamPartId(String examPartId) {
+        return resourceRepository.findByExamPartIdOrderByCreatedAtAsc(examPartId).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /** Tài liệu gắn nhiều Part cùng lúc (FE tự nhóm theo examPartId trong response). */
+    public List<RecoveryResourceResponse> getResourcesByExamPartIds(List<String> examPartIds) {
+        if (examPartIds == null || examPartIds.isEmpty()) {
+            return List.of();
+        }
+        return resourceRepository.findByExamPartIdInOrderByCreatedAtAsc(examPartIds).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     // ==================== HELPERS ====================
 
     /**
@@ -201,6 +229,22 @@ public class RecoveryResourceService {
         }
     }
 
+    /**
+     * Gắn tài liệu vào Part: validate Part tồn tại rồi denormalize examTypeId từ Part.
+     * examPartId rỗng ("") = gỡ gắn Part; null không đi vào đây (update giữ nguyên).
+     */
+    private void applyExamPart(RecoveryResource resource, String examPartId) {
+        if (examPartId == null || examPartId.isBlank()) {
+            resource.setExamPartId(null);
+            resource.setExamTypeId(null);
+            return;
+        }
+        ExamPart part = examPartRepository.findById(examPartId)
+                .orElseThrow(() -> new NotFoundException("Part không tồn tại: " + examPartId));
+        resource.setExamPartId(part.getExamPartId());
+        resource.setExamTypeId(part.getExamTypeId());
+    }
+
     private RecoveryResourceResponse toResponse(RecoveryResource resource) {
         List<TagResponse> tags = resourceTagRepository.findByResourceId(resource.getResourceId())
                 .stream()
@@ -209,7 +253,12 @@ public class RecoveryResourceService {
                 .map(t -> tagMapper.toResponse(t, null))
                 .collect(Collectors.toList());
 
-        return recoveryResourceMapper.toResponse(resource, tags);
+        String examPartName = resource.getExamPartId() == null ? null
+                : examPartRepository.findById(resource.getExamPartId()).map(ExamPart::getName).orElse(null);
+        String examTypeName = resource.getExamTypeId() == null ? null
+                : examTypeRepository.findById(resource.getExamTypeId()).map(t -> t.getName()).orElse(null);
+
+        return recoveryResourceMapper.toResponse(resource, tags, examTypeName, examPartName);
     }
 
     private String extractPublicId(String url) {

@@ -11,6 +11,7 @@ function RecoveryResourceFormModal({
   formExamTypeId,
   onExamTypeChange,
   availableTags,
+  availableParts,
   selectedFile,
   onChangeField,
   onFileChange,
@@ -88,7 +89,7 @@ function RecoveryResourceFormModal({
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Loại kỳ thi (để chọn tag)</Form.Label>
+          <Form.Label>Loại kỳ thi (để chọn tag / Part)</Form.Label>
           <Form.Select
             value={formExamTypeId}
             onChange={(e) => onExamTypeChange(e.target.value)}
@@ -101,6 +102,26 @@ function RecoveryResourceFormModal({
             ))}
           </Form.Select>
         </Form.Group>
+
+        {formExamTypeId && (
+          <Form.Group className="mb-3">
+            <Form.Label>Gắn Part (tùy chọn)</Form.Label>
+            <Form.Select
+              value={formState.examPartId || ''}
+              onChange={(e) => onChangeField('examPartId', e.target.value)}
+            >
+              <option value="">— Không gắn Part —</option>
+              {availableParts.map((part) => (
+                <option key={part.examPartId} value={part.examPartId}>
+                  {part.name}
+                </option>
+              ))}
+            </Form.Select>
+            <Form.Text className="text-muted">
+              Dùng cho tài liệu giới thiệu / cách làm của một Part (VD: &quot;Cách làm Part 1&quot;).
+            </Form.Text>
+          </Form.Group>
+        )}
 
         <Form.Group className="mb-3">
           {!formExamTypeId ? (

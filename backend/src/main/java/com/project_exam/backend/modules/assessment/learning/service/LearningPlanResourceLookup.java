@@ -62,6 +62,25 @@ public class LearningPlanResourceLookup {
         return result;
     }
 
+    /**
+     * Tài liệu gắn Part (giới thiệu/cách làm Part) theo từng examPartId —
+     * hiển thị đầu nhóm Part trong kế hoạch, trước tài liệu theo tag.
+     */
+    public Map<String, List<PlanPhaseDto.RecommendedResourceDto>> findByExamPartIds(Collection<String> examPartIds) {
+        if (examPartIds == null || examPartIds.isEmpty()) {
+            return Map.of();
+        }
+        List<String> distinctPartIds = examPartIds.stream().filter(Objects::nonNull).distinct().toList();
+        if (distinctPartIds.isEmpty()) {
+            return Map.of();
+        }
+        return recoveryResourceRepository.findByExamPartIdInOrderByCreatedAtAsc(distinctPartIds).stream()
+                .collect(Collectors.groupingBy(
+                        RecoveryResource::getExamPartId,
+                        LinkedHashMap::new,
+                        Collectors.mapping(this::toDto, Collectors.toList())));
+    }
+
     public PlanPhaseDto.RecommendedResourceDto toDto(RecoveryResource r) {
         return PlanPhaseDto.RecommendedResourceDto.builder()
                 .resourceId(r.getResourceId())

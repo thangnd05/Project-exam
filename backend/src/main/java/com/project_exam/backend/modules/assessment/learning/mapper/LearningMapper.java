@@ -185,6 +185,7 @@ public class LearningMapper {
             Integer passAccuracy,
             int passedTasksInPart,
             int totalTasksInPart,
+            List<PlanPhaseDto.RecommendedResourceDto> partResources,
             List<PlanTaskDto> tasks) {
         return PlanPartGroupDto.builder()
                 .examPartId(examPartId)
@@ -193,6 +194,7 @@ public class LearningMapper {
                 .passAccuracy(passAccuracy)
                 .passedTasksInPart(passedTasksInPart)
                 .totalTasksInPart(totalTasksInPart)
+                .partResources(partResources)
                 .tasks(tasks)
                 .build();
     }

@@ -11,6 +11,16 @@ export const getResourceById = (id) =>
 export const getResourcesByTag = (tagId) =>
   axios.get(`${BASE_URL}/by-tag/${tagId}`).then((res) => res.data);
 
+export const getResourcesByPart = (examPartId) =>
+  axios.get(`${BASE_URL}/by-part/${examPartId}`).then((res) => res.data);
+
+export const getResourcesByParts = (examPartIds) =>
+  axios
+    .get(`${BASE_URL}/by-parts`, {
+      params: { examPartIds: (examPartIds || []).join(',') },
+    })
+    .then((res) => res.data);
+
 export const createResource = (request, file) => {
   const fd = new FormData();
   fd.append('request', JSON.stringify(request));

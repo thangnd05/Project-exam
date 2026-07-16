@@ -17,4 +17,8 @@ public class RecoveryResourceResponse {
     private final String createdBy;
     private final Instant createdAt;
     private final List<TagResponse> tags;
+    private final String examTypeId;
+    private final String examTypeName;
+    private final String examPartId;
+    private final String examPartName;
 }

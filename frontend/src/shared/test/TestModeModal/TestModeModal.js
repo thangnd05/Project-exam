@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {
+  IoBookOutline,
   IoDocumentTextOutline,
   IoPlayOutline,
   IoTimeOutline,
@@ -12,13 +13,16 @@ import {
 import { toast } from 'react-toastify';
 
 import BaseModal from '~/shared/ui/modal/BaseModal';
+import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { getTestPartsSummary } from '~/shared/api/testApi';
+import { getResourcesByParts } from '~/shared/api/recoveryResourceApi';
 import styles from './TestModeModal.module.scss';
 
 const cx = classNames.bind(styles);
 
 export const testModeKeys = {
   parts: (testId) => ['test-parts-summary', testId],
+  partResources: (testId) => ['test-part-resources', testId],
 };
 
 const normalizeParts = (data) => (Array.isArray(data) ? data : []);
@@ -36,6 +40,15 @@ function TestModeModal({ show, test, onClose, onStart }) {
 
   const parts = partsQuery.data ?? [];
   const loading = partsQuery.isLoading;
+
+  // Tài liệu giới thiệu/cách làm gắn Part (chỉ tải khi mở tab Luyện tập).
+  const partResourcesQuery = useQuery({
+    queryKey: testModeKeys.partResources(test?.testId),
+    queryFn: () => getResourcesByParts(parts.map((p) => p.examPartId)),
+    enabled: !!show && tab === 'practice' && parts.length > 0,
+    select: normalizeParts,
+  });
+  const partResources = partResourcesQuery.data ?? [];
 
   useEffect(() => {
     if (!show || !test?.testId) return;
@@ -182,6 +195,23 @@ function TestModeModal({ show, test, onClose, onStart }) {
           <p className={cx('practice-hint')}>
             Chọn Part để luyện — <strong>không giới hạn thời gian</strong>.
           </p>
+
+          {partResources.length > 0 && (
+            <div className={cx('guide-box')}>
+              <div className={cx('guide-title')}>
+                <IoBookOutline /> Giới thiệu &amp; cách làm
+              </div>
+              <ul className={cx('guide-list')}>
+                {partResources.map((r) => (
+                  <li key={r.resourceId}>
+                    <RecoveryResourceLink resource={r} className={cx('guide-link')}>
+                      {r.examPartName ? `${r.examPartName}: ` : ''}{r.title}
+                    </RecoveryResourceLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {loading ? (
             <div className={cx('loading')}>Đang tải danh sách phần thi...</div>

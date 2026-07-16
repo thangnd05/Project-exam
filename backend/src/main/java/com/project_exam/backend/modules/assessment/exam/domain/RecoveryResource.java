@@ -8,7 +8,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.Instant;
 
 @Entity
-@Table(name = "recovery_resources")
+@Table(name = "recovery_resources", indexes = {
+        @Index(name = "idx_recovery_resources_exam_type_id", columnList = "exam_type_id"),
+        @Index(name = "idx_recovery_resources_exam_part_id", columnList = "exam_part_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,10 +32,17 @@ public class RecoveryResource {
     private String url;
 
     @Column(name = "original_file_name")
-    private String originalFileName; // tên file gốc khi upload (VD: "bai-giang.pdf")
+    private String originalFileName; 
 
     @Column(name = "cloudinary_public_id")
     private String cloudinaryPublicId;
+
+    
+    @Column(name = "exam_type_id")
+    private String examTypeId; 
+
+    @Column(name = "exam_part_id")
+    private String examPartId; 
 
     @Column(name = "created_by")
     private String createdBy;
