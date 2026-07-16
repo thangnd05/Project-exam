@@ -380,9 +380,6 @@ function ExamPartsManagement() {
                 }))
               }
             />
-            <Form.Text className="text-muted">
-              Số càng nhỏ hiển thị càng trên (Part 1 → 1, Part 2 → 2,...).
-            </Form.Text>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Mô tả</Form.Label>

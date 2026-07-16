@@ -77,6 +77,10 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
     List<UserTest> findByTestIdAndStatus(String testId, UserTest.Status status);
 
+    // Bài đã hoàn thành của user, sắp xếp mới nhất trước (sort ở DB, không sort ở FE).
+    List<UserTest> findByUserIdAndStatusAndFinishedAtIsNotNullOrderByFinishedAtDesc(
+            String userId, UserTest.Status status);
+
     List<UserTest> findByTestIdOrderByTotalScoreDesc(String testId);
 
     Optional<UserTest> findTopByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);

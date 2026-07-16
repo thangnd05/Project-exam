@@ -47,14 +47,22 @@ public class QuestionController {
 
     // =================== GET ===================
 
+    // Trả QuestionAdminResponse (kèm cờ isCorrect) -> chỉ người có quyền quản lý câu hỏi.
+    // Không gate sẽ lộ đáp án cho mọi user đã đăng nhập (gian lận thi).
     @GetMapping
     public ResponseEntity<List<QuestionAdminResponse>> getAllQuestions() {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(questionService.findAllAdminSummaries());
     }
 
+    // Chi tiết câu hỏi (kèm isCorrect): người tạo hoặc người có QUESTION_MANAGE — check trong service
+    // (giống ràng buộc PUT/DELETE, để owner vẫn sửa được câu mình tạo dù không có quyền quản lý).
     @GetMapping("/{id}")
-    public ResponseEntity<QuestionAdminResponse> getQuestionById(@PathVariable String id) {
-        QuestionAdminResponse response = questionService.getQuestionDetailAdmin(id);
+    public ResponseEntity<QuestionAdminResponse> getQuestionById(
+            @PathVariable String id,
+            HttpServletRequest httpRequest
+    ) {
+        QuestionAdminResponse response = questionService.getQuestionDetailAdmin(id, httpRequest);
         return ResponseEntity.ok(response);
     }
 

@@ -1001,10 +1001,19 @@ public class QuestionService {
                 tagService.getTagsByQuestionId(question.getQuestionId()));
     }
 
-    public QuestionAdminResponse getQuestionDetailAdmin(String questionId) {
+    public QuestionAdminResponse getQuestionDetailAdmin(String questionId, HttpServletRequest httpRequest) {
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NotFoundException("Question not found"));
+
+        //  Response kèm cờ isCorrect -> chỉ người tạo câu hỏi hoặc người có quyền quản lý mới được xem
+        //  (cùng ràng buộc như sửa/xoá; tránh lộ đáp án cho mọi user đã đăng nhập).
+        String currentUserId = authUtils.getUserId(httpRequest);
+        if (currentUserId == null
+                || (!currentUserId.equals(question.getCreatedBy())
+                        && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE))) {
+            throw new ForbiddenException("Bạn không có quyền xem chi tiết câu hỏi này.");
+        }
 
         String examTypeId = examPartRepository.findById(question.getExamPartId())
                 .map(ExamPart::getExamTypeId)

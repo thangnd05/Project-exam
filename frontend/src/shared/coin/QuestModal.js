@@ -1,10 +1,11 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
 import {Spinner} from 'react-bootstrap';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import {CircleDollarSign, Clock, CheckCircle2} from 'lucide-react';
 
-import {getMyQuests} from '~/shared/api/questApi';
+import {getMyQuests, QUESTS_QUERY_KEY} from '~/shared/api/questApi';
 import {useCoins} from '~/shared/hooks/useCoins';
 import {useClaimQuest} from './useClaimQuest';
 import BaseModal from '~/shared/ui/modal/BaseModal';
@@ -41,34 +42,24 @@ function groupByCondition(quests) {
 function QuestModal({show, onClose}) {
   const {balance} = useCoins();
   const [tab, setTab] = useState('quests');
-  const [quests, setQuests] = useState([]);
-  const [loading, setLoading] = useState(true);
   const claimMutation = useClaimQuest();
   const claimingId = claimMutation.isPending ? claimMutation.variables : null;
 
-  const loadQuests = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getMyQuests();
-      setQuests(Array.isArray(data) ? data : []);
-    } catch (error) {
-      toast.error('Không thể tải danh sách nhiệm vụ.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (show) {
-      loadQuests();
-    }
-  }, [show, loadQuests]);
+  // Danh sách nhiệm vụ qua React Query — chỉ fetch khi modal mở; useClaimQuest tự invalidate.
+  const {
+    data: quests = [],
+    isLoading: loading,
+  } = useQuery({
+    queryKey: QUESTS_QUERY_KEY,
+    queryFn: getMyQuests,
+    enabled: show,
+    select: (data) => (Array.isArray(data) ? data : []),
+  });
 
   const handleClaim = (quest) => {
     claimMutation.mutate(quest.questId, {
       onSuccess: (result) => {
         toast.success(`Đã nhận ${result.rewardCoins} xu!`);
-        loadQuests();
       },
       onError: (error) => {
         toast.error(

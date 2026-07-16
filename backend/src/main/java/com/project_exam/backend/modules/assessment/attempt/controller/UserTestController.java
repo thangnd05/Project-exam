@@ -56,10 +56,18 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.getMeta(userTestId, httpRequest));
     }
 
-    //  Lấy theo user đang đăng nhập (JWT)
+    //  Lấy theo user đang đăng nhập (JWT).
+    //  status=COMPLETED (+ examTypeId tuỳ chọn) -> chỉ bài đã hoàn thành, đã sort mới→cũ ở DB.
     @GetMapping("/my")
-    public ResponseEntity<List<UserTestResponse>> getByCurrentUser(HttpServletRequest httpRequest) {
+    public ResponseEntity<List<UserTestResponse>> getByCurrentUser(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String examTypeId,
+            HttpServletRequest httpRequest
+    ) {
         String userId = authUtils.getUserId(httpRequest);
+        if ("COMPLETED".equalsIgnoreCase(status)) {
+            return ResponseEntity.ok(userTestService.findCompletedResponsesByUserId(userId, examTypeId));
+        }
         return ResponseEntity.ok(userTestService.findResponsesByUserId(userId));
     }
 

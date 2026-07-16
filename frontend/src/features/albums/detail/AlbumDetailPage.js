@@ -45,16 +45,11 @@ const AlbumDetailPage = () => {
   const deleteMutation = useDeleteVocabulary(albumId);
 
   useEffect(() => {
-
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setFlashMode(true);
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    // Chọn chế độ mặc định theo bề rộng MỘT LẦN khi vào trang (mobile -> flashcard).
+    // Không nghe 'resize' để không đè chế độ người dùng đã tự bấm.
+    if (window.innerWidth < 768) {
+      setFlashMode(true);
+    }
   }, []);
 
   const handleDeleteClick = (vocab) => {

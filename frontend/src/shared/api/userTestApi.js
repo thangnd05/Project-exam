@@ -2,9 +2,13 @@ import axios from './axiosClient';
 
 const BASE_URL = '/api/user-tests';
 
-export const getMyUserTests = () => {
-  return axios.get(`${BASE_URL}/my`).then((res) => res.data);
+export const getMyUserTests = (params = {}) => {
+  return axios.get(`${BASE_URL}/my`, { params }).then((res) => res.data);
 };
+
+// Bài đã hoàn thành, BE đã lọc + sort mới→cũ (không sort ở FE).
+export const getMyCompletedUserTests = (examTypeId) =>
+  getMyUserTests({ status: 'COMPLETED', ...(examTypeId ? { examTypeId } : {}) });
 
 // Lịch sử mock (phân trang) — BE đã loại luyện tập theo Part & Quick Challenge.
 // Trả PageResponse: { content, currentPage, size, totalElements, totalPages, hasNext }.

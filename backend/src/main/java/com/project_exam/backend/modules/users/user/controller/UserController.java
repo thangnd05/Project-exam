@@ -46,9 +46,13 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllPaged(page, size, keyword, roleId, verified));
     }
 
-    // Lấy user theo id
+    // Lấy user theo id — chỉ chính chủ hoặc admin (UserResponse có email/PII, tránh IDOR lặp id).
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
+    public ResponseEntity<UserResponse> getUserById(
+            @PathVariable String id,
+            HttpServletRequest httpRequest
+    ) {
+        userService.requireSelfOrAdminForUser(id, httpRequest);
         return userService.findResponseById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

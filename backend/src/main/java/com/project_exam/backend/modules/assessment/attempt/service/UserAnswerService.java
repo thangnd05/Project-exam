@@ -63,16 +63,6 @@ public class UserAnswerService {
         return userAnswerMapper.toResponse(userAnswer);
     }
 
-    private UserAnswer toEntity(UserAnswerRequest request) {
-        UserAnswer userAnswer = new UserAnswer();
-        userAnswer.setUserTestId(request.getUserTestId());
-        userAnswer.setQuestionId(request.getQuestionId());
-        userAnswer.setSelectedAnswerId(request.getSelectedAnswerId());
-        userAnswer.setSelectedAnswerIds(AnswerGradingUtil.toCsv(request.getSelectedAnswerIds()));
-        userAnswer.setAnswerText(request.getAnswerText());
-        return userAnswer;
-    }
-
     public List<UserAnswer> findAll() {
         return userAnswerRepository.findAll();
     }
@@ -162,9 +152,20 @@ public class UserAnswerService {
     public UserAnswerResponse update(String id, UserAnswerRequest request, String currentUserId) {
         validateUserAnswerRequest(request);
         validateOwnershipAndInProgress(request.getUserTestId(), currentUserId);
-        UserAnswer userAnswer = toEntity(request);
-        userAnswer.setUserAnswerId(id);
-        return toResponse(save(userAnswer));
+
+        // Đối chiếu row theo path id phải thuộc đúng userTest đã validate — chặn IDOR:
+        // attacker truyền userTestId của mình + userAnswerId của người khác để ghi đè/phá đáp án.
+        UserAnswer existing = userAnswerRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserAnswer not found"));
+        if (!Objects.equals(existing.getUserTestId(), request.getUserTestId())) {
+            throw new ForbiddenException("Đáp án không thuộc bài làm này.");
+        }
+
+        existing.setQuestionId(request.getQuestionId());
+        existing.setSelectedAnswerId(request.getSelectedAnswerId());
+        existing.setSelectedAnswerIds(AnswerGradingUtil.toCsv(request.getSelectedAnswerIds()));
+        existing.setAnswerText(request.getAnswerText());
+        return toResponse(save(existing));
     }
 
     @Transactional
@@ -172,9 +173,16 @@ public class UserAnswerService {
         if (requests == null || requests.isEmpty()) {
             return List.of();
         }
+        // Validate quyền + thời gian MỘT LẦN cho mỗi userTestId (batch autosave thực tế chung 1
+        // userTestId) — tránh N lần findById userTest/test lặp lại như trước.
+        requests.forEach(this::validateUserAnswerRequest);
+        requests.stream()
+                .map(UserAnswerRequest::getUserTestId)
+                .distinct()
+                .forEach(userTestId -> validateOwnershipAndInProgress(userTestId, currentUserId));
 
         return requests.stream()
-                .map(request -> upsertByUserTestAndQuestion(request, currentUserId))
+                .map(this::upsertEntity)
                 .map(this::toResponse)
                 .toList();
     }
@@ -182,7 +190,11 @@ public class UserAnswerService {
     private UserAnswer upsertByUserTestAndQuestion(UserAnswerRequest request, String currentUserId) {
         validateUserAnswerRequest(request);
         validateOwnershipAndInProgress(request.getUserTestId(), currentUserId);
+        return upsertEntity(request);
+    }
 
+    /** Upsert 1 đáp án (đã validate quyền/thời gian ở nơi gọi). */
+    private UserAnswer upsertEntity(UserAnswerRequest request) {
         UserAnswer userAnswer = userAnswerRepository
                 .findByUserTestIdAndQuestionId(request.getUserTestId(), request.getQuestionId())
                 .orElseGet(UserAnswer::new);
@@ -248,27 +260,17 @@ public class UserAnswerService {
         if (requests == null || requests.isEmpty()) {
             return List.of();
         }
+        // Validate quyền guest + thời gian MỘT LẦN cho mỗi userTestId (xem upsertBatch).
+        requests.forEach(this::validateUserAnswerRequest);
+        requests.stream()
+                .map(UserAnswerRequest::getUserTestId)
+                .distinct()
+                .forEach(userTestId -> validateGuestOwnershipAndInProgress(userTestId, guestSessionId));
+
         return requests.stream()
-                .map(request -> upsertGuestByUserTestAndQuestion(request, guestSessionId))
+                .map(this::upsertEntity)
                 .map(this::toResponse)
                 .toList();
-    }
-
-    private UserAnswer upsertGuestByUserTestAndQuestion(UserAnswerRequest request, String guestSessionId) {
-        validateUserAnswerRequest(request);
-        validateGuestOwnershipAndInProgress(request.getUserTestId(), guestSessionId);
-
-        UserAnswer userAnswer = userAnswerRepository
-                .findByUserTestIdAndQuestionId(request.getUserTestId(), request.getQuestionId())
-                .orElseGet(UserAnswer::new);
-
-        userAnswer.setUserTestId(request.getUserTestId());
-        userAnswer.setQuestionId(request.getQuestionId());
-        userAnswer.setSelectedAnswerId(request.getSelectedAnswerId());
-        userAnswer.setSelectedAnswerIds(AnswerGradingUtil.toCsv(request.getSelectedAnswerIds()));
-        userAnswer.setAnswerText(request.getAnswerText());
-
-        return userAnswerRepository.save(userAnswer);
     }
 
     private void validateGuestOwnershipAndInProgress(String userTestId, String guestSessionId) {

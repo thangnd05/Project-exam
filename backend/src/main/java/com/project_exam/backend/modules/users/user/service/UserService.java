@@ -177,9 +177,18 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         //  Update thông tin profile
+        String newEmail = updatedUser.getEmail();
+        boolean emailChanged = newEmail != null && !newEmail.isBlank()
+                && !newEmail.equalsIgnoreCase(existingUser.getEmail());
+
         existingUser.setFullName(updatedUser.getFullName());
         existingUser.setUserName(updatedUser.getUserName());
-        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setEmail(newEmail);
+
+        //  Đổi sang email mới -> phải xác minh lại (tránh giữ trạng thái verified của email cũ).
+        if (emailChanged) {
+            existingUser.setVerified(false);
+        }
 
         //  Upload avatar nếu có
         if (avatar != null && !avatar.isEmpty()) {

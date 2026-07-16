@@ -76,8 +76,10 @@ export function useTestSession() {
   const [test, setTest] = useState({ parts: [] });
   const [userAnswers, setUserAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
+  const [startedAt, setStartedAt] = useState(null); // mốc bắt đầu (ISO, giờ server) — nguồn sự thật của deadline
   const [preCountdown, setPreCountdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false); // guard chống double-submit (state async không đủ nhanh)
   const [status, setStatus] = useState('loading');
 
   const [layoutConfig, setLayoutConfig] = useState(defaultLayoutConfig);
@@ -130,26 +132,28 @@ export function useTestSession() {
   const loadTest = useCallback(() => {
     const savedState = sessionStorage.getItem(`userTestState-${sessionKey}`);
     let restored = false;
+    let savedStartedAt = null;
 
     if (savedState) {
-      const parsed = JSON.parse(savedState);
-      setUserTestId(parsed.userTestId || null);
-      setUserAnswers(parsed.userAnswers || {});
-      // Khôi phục vị trí bước (chế độ PAGED); sẽ được clamp lại khi flowSteps sẵn sàng.
-      const savedStep = Number.isInteger(parsed.currentStepIndex) ? parsed.currentStepIndex : 0;
-      const savedMax = Number.isInteger(parsed.maxStepIndex) ? parsed.maxStepIndex : savedStep;
-      setCurrentStepIndex(savedStep);
-      setMaxStepIndex(Math.max(savedStep, savedMax));
-
-      if (isPractice) {
-        setTimeLeft(null);
-      } else if (parsed.timeLeft && parsed.lastSavedAt) {
-        const elapsed = Math.floor((Date.now() - parsed.lastSavedAt) / 1000);
-        setTimeLeft(Math.max(0, parsed.timeLeft - elapsed));
-      } else {
-        setTimeLeft(parsed.timeLeft || null);
+      let parsed = null;
+      try {
+        parsed = JSON.parse(savedState);
+      } catch {
+        // State hỏng -> bỏ, khôi phục lại từ server thay vì làm sập cả trang thi.
+        sessionStorage.removeItem(`userTestState-${sessionKey}`);
       }
-      restored = true;
+      if (parsed) {
+        setUserTestId(parsed.userTestId || null);
+        setUserAnswers(parsed.userAnswers || {});
+        // Khôi phục vị trí bước (chế độ PAGED); sẽ được clamp lại khi flowSteps sẵn sàng.
+        const savedStep = Number.isInteger(parsed.currentStepIndex) ? parsed.currentStepIndex : 0;
+        const savedMax = Number.isInteger(parsed.maxStepIndex) ? parsed.maxStepIndex : savedStep;
+        setCurrentStepIndex(savedStep);
+        setMaxStepIndex(Math.max(savedStep, savedMax));
+        // KHÔNG tin timeLeft từ client: chỉ giữ mốc startedAt (giờ server) để tính lại deadline.
+        if (typeof parsed.startedAt === 'string') savedStartedAt = parsed.startedAt;
+        restored = true;
+      }
     }
 
     getUserTestInfo(testId)
@@ -193,7 +197,10 @@ export function useTestSession() {
         }
 
         let serverStartedAt = null;
-        if (!restored) {
+        // Gọi server khi CHƯA khôi phục được, HOẶC đã khôi phục từ sessionStorage nhưng
+        // thiếu mốc startedAt cho bài có giờ (cần giờ server để tính deadline chính xác).
+        const needStartedAt = !isPractice && !savedStartedAt;
+        if (!restored || needStartedAt) {
           try {
             const active = await checkActiveUserTest(testId, isGuest, guestCfg, {
               mode: isPractice ? 'practice' : undefined,
@@ -202,17 +209,20 @@ export function useTestSession() {
             const activeUserTestId = active?.userTestId;
             if (activeUserTestId) {
               serverStartedAt = active?.startedAt || null;
-              const answers = await getAnswersByUserTest(activeUserTestId, isGuest, guestCfg);
-              const answersMap = {};
-              (answers || []).forEach((a) => {
-                answersMap[a.questionId] = {
-                  selectedAnswerId: a.selectedAnswerId || null,
-                  selectedAnswerIds: a.selectedAnswerIds || null,
-                  answerText: a.answerText || null,
-                };
-              });
-              setUserTestId(activeUserTestId);
-              setUserAnswers(answersMap);
+              // Chỉ nạp lại đáp án từ server khi CHƯA có state cục bộ (tránh đè đáp án mới hơn).
+              if (!restored) {
+                const answers = await getAnswersByUserTest(activeUserTestId, isGuest, guestCfg);
+                const answersMap = {};
+                (answers || []).forEach((a) => {
+                  answersMap[a.questionId] = {
+                    selectedAnswerId: a.selectedAnswerId || null,
+                    selectedAnswerIds: a.selectedAnswerIds || null,
+                    answerText: a.answerText || null,
+                  };
+                });
+                setUserTestId(activeUserTestId);
+                setUserAnswers(answersMap);
+              }
               sessionStorage.setItem(`userTest-${sessionKey}`, activeUserTestId);
               restored = true;
             }
@@ -222,40 +232,19 @@ export function useTestSession() {
           }
         }
 
-        const computeTimeLeft = (startedAtIso) => {
-          if (isPractice) return null;
-          const durationMinutes = testData.durationMinutes;
-          const durationSec = durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
-          let elapsedSec = 0;
-          if (startedAtIso) {
-            const startedMs = new Date(startedAtIso).getTime();
-            elapsedSec = Math.max(0, Math.floor((Date.now() - startedMs) / 1000));
-          }
-          let remaining = durationSec !== null ? Math.max(0, durationSec - elapsedSec) : null;
-          if (availableTo) {
-            const deadlineRemaining = Math.max(0, Math.floor((availableTo - now) / 1000));
-            if (remaining === null || deadlineRemaining < remaining) remaining = deadlineRemaining;
-          }
-          return remaining;
-        };
-
         if (availableTo && now > availableTo && !restored) {
-
           setStatus('closed');
           return;
         }
 
+        // Nguồn sự thật của thời gian = startedAt (giờ server). timeLeft suy ra từ
+        // deadline = startedAt + duration (clamp theo availableTo) ở effect đếm ngược.
         if (!restored) {
-
-          setTimeLeft(computeTimeLeft(null));
+          // Chưa có phiên -> effect 'open' sẽ startUserTest và nhận startedAt từ server.
           setStatus('open');
         } else {
-
+          setStartedAt(savedStartedAt || serverStartedAt || null);
           setStatus('active');
-          setTimeLeft((prev) => {
-            if (prev !== null && prev !== undefined) return prev;
-            return computeTimeLeft(serverStartedAt);
-          });
         }
       })
       .catch(() => setStatus('error'));
@@ -287,6 +276,13 @@ export function useTestSession() {
       const existing = sessionStorage.getItem(`userTest-${sessionKey}`);
       if (existing) {
         setUserTestId(existing);
+        // Khôi phục mốc startedAt từ state đã lưu (nếu có) để giữ đúng deadline.
+        try {
+          const saved = JSON.parse(sessionStorage.getItem(`userTestState-${sessionKey}`) || 'null');
+          if (saved?.startedAt) setStartedAt(saved.startedAt);
+        } catch {
+          /* state hỏng -> bỏ qua, coi như không có mốc thời gian cục bộ */
+        }
         setStatus('active');
         return;
       }
@@ -295,26 +291,10 @@ export function useTestSession() {
         examPartIds: isPractice ? selectedPartIds : undefined,
       })
         .then((data) => {
-          const id = data.userTestId;
-          const startedAtIso = data.startedAt;
-          setUserTestId(id);
-          sessionStorage.setItem(`userTest-${sessionKey}`, id);
-
-          if (isPractice) {
-            setTimeLeft(null);
-          } else if (startedAtIso) {
-            const now = new Date();
-            const availableTo = test.availableTo ? new Date(test.availableTo) : null;
-            const durationMinutes = test.durationMinutes;
-            const durationSec = durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
-            const elapsedSec = Math.max(0, Math.floor((Date.now() - new Date(startedAtIso).getTime()) / 1000));
-            let remaining = durationSec !== null ? Math.max(0, durationSec - elapsedSec) : null;
-            if (availableTo) {
-              const deadlineRemaining = Math.max(0, Math.floor((availableTo - now) / 1000));
-              if (remaining === null || deadlineRemaining < remaining) remaining = deadlineRemaining;
-            }
-            setTimeLeft(remaining);
-          }
+          setUserTestId(data.userTestId);
+          sessionStorage.setItem(`userTest-${sessionKey}`, data.userTestId);
+          // Chỉ lưu mốc startedAt (giờ server); timeLeft do effect đếm ngược tự suy ra.
+          if (!isPractice) setStartedAt(data.startedAt || null);
           setStatus('active');
         })
         .catch((err) => {
@@ -331,14 +311,14 @@ export function useTestSession() {
         JSON.stringify({
           userTestId,
           userAnswers,
-          timeLeft,
+          startedAt,
           currentStepIndex,
           maxStepIndex,
           lastSavedAt: Date.now(),
         }),
       );
     }
-  }, [userAnswers, timeLeft, userTestId, status, sessionKey, currentStepIndex, maxStepIndex]);
+  }, [userAnswers, startedAt, userTestId, status, sessionKey, currentStepIndex, maxStepIndex]);
 
   useEffect(() => {
     if (status !== 'active' || !userTestId) return;
@@ -369,22 +349,24 @@ export function useTestSession() {
   }, [preCountdown, status]);
 
   const handleAnswerChange = (questionId, type, value) => {
-    if (type === 'MSQ') {
-
-      const current = userAnswers[questionId]?.selectedAnswerIds || [];
-      const next = current.includes(value)
-        ? current.filter((x) => x !== value)
-        : [...current, value];
-      setUserAnswers({ ...userAnswers, [questionId]: { selectedAnswerIds: next } });
-      return;
-    }
-    const updatedAnswer =
-      type === 'MCQ' ? { selectedAnswerId: value } : { answerText: value };
-    setUserAnswers({ ...userAnswers, [questionId]: updatedAnswer });
+    // Dùng functional update để 2 thay đổi liên tiếp (vd toggle MSQ) không đè mất nhau.
+    setUserAnswers((prev) => {
+      if (type === 'MSQ') {
+        const current = prev[questionId]?.selectedAnswerIds || [];
+        const next = current.includes(value)
+          ? current.filter((x) => x !== value)
+          : [...current, value];
+        return { ...prev, [questionId]: { selectedAnswerIds: next } };
+      }
+      const updatedAnswer =
+        type === 'MCQ' ? { selectedAnswerId: value } : { answerText: value };
+      return { ...prev, [questionId]: updatedAnswer };
+    });
   };
 
   const handleSubmit = async () => {
-    if (!userTestId || isSubmitting) return;
+    if (!userTestId || submittingRef.current) return;
+    submittingRef.current = true;
     setIsSubmitting(true);
     try {
       const payload = Object.entries(userAnswers).map(([qid, ans]) => ({
@@ -412,6 +394,7 @@ export function useTestSession() {
       }
       toast.error(getApiErrorMessage(err, 'Nộp bài thất bại! Vui lòng thử lại.'));
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   };
@@ -419,21 +402,37 @@ export function useTestSession() {
   const handleSubmitRef = useRef();
   handleSubmitRef.current = handleSubmit;
 
+  // Deadline tuyệt đối (epoch ms) = startedAt + duration, clamp theo availableTo.
+  // null = không giới hạn giờ (practice hoặc test không đặt duration). Nguồn sự thật cho timeLeft.
+  const deadline = useMemo(() => {
+    if (isPractice || !startedAt) return null;
+    const durationMinutes = test?.durationMinutes;
+    const durationSec = durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
+    let end = durationSec !== null ? new Date(startedAt).getTime() + durationSec * 1000 : null;
+    const availableToMs = test?.availableTo ? new Date(test.availableTo).getTime() : null;
+    if (availableToMs !== null && (end === null || availableToMs < end)) end = availableToMs;
+    return end;
+  }, [isPractice, startedAt, test?.durationMinutes, test?.availableTo]);
+
   useEffect(() => {
-    if (status !== 'active' || timeLeft == null) return;
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev == null) return prev;
-        if (prev <= 1) {
-          clearInterval(timer);
-          handleSubmitRef.current();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    if (status !== 'active') return undefined;
+    if (deadline == null) {
+      setTimeLeft(null); // không giới hạn giờ
+      return undefined;
+    }
+    // Mỗi tick tính lại từ deadline CỐ ĐỊNH -> không trôi giờ, không tái tạo interval mỗi giây.
+    const tick = () => {
+      const remaining = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+      setTimeLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(timer);
+        if (!submittingRef.current) handleSubmitRef.current(); // side-effect NGOÀI updater, có guard ref
+      }
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [status, timeLeft]);
+  }, [status, deadline]);
 
   const visibleParts = useMemo(() => {
     const parts = test.parts || [];

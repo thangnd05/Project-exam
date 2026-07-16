@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { getMyUserTests } from '~/shared/api/userTestApi';
+import { getMyCompletedUserTests } from '~/shared/api/userTestApi';
 import { getExamTypes } from '~/shared/api/examTypeApi';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import { getEnhancedResult } from '~/shared/api/enhancedResultApi';
-import { filterCompletedTests } from '~/shared/utils/userTests';
 
 export const targetAchievedKeys = {
   examTypes: ['exam-types'],
@@ -15,7 +14,7 @@ const normalizeExamTypes = (data) => (Array.isArray(data) ? data : data?.content
 async function fetchTargetAchieved(examTypeId) {
   const target = await getUserTarget(examTypeId).catch(() => null);
 
-  const completed = filterCompletedTests(await getMyUserTests(), examTypeId);
+  const completed = await getMyCompletedUserTests(examTypeId);
   const latestMock = completed[0] || null;
 
   let enhanced = null;

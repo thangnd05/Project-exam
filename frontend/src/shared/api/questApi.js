@@ -3,6 +3,9 @@ import axios from './axiosClient';
 const BASE_URL = '/api/quests';
 const ADMIN_BASE_URL = '/api/admin/quests';
 
+// Query key dùng chung cho danh sách nhiệm vụ của user (React Query cache).
+export const QUESTS_QUERY_KEY = ['quests', 'me'];
+
 export const getMyQuests = () => {
   return axios.get(`${BASE_URL}/me`).then((response) => response.data);
 };

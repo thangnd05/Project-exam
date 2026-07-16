@@ -289,6 +289,25 @@ public class UserTestService {
     }
 
     /**
+     * Bài đã hoàn thành của user, đã sắp xếp mới→cũ ở DB (thay việc FE tự lọc+sort).
+     * examTypeId null/blank = mọi kỳ thi; giữ cả bài không xác định examType (khớp lọc cũ ở FE).
+     */
+    public List<UserTestResponse> findCompletedResponsesByUserId(String userId, String examTypeId) {
+        List<UserTest> completed = userTestRepository
+                .findByUserIdAndStatusAndFinishedAtIsNotNullOrderByFinishedAtDesc(userId, UserTest.Status.COMPLETED);
+        Map<String, String> examTypeIdByTest = loadExamTypeIdsByTestId(completed);
+        boolean filterByExamType = examTypeId != null && !examTypeId.isBlank();
+        return completed.stream()
+                .filter(u -> {
+                    if (!filterByExamType) return true;
+                    String et = examTypeIdByTest.get(u.getTestId());
+                    return et == null || et.equals(examTypeId);
+                })
+                .map(u -> toResponse(u, examTypeIdByTest.get(u.getTestId())))
+                .toList();
+    }
+
+    /**
      * Lịch sử mock (phân trang) cho trang Lịch sử bài thi: bỏ PRACTICE và Quick Challenge,
      * chỉ giữ bài làm đề đầy đủ có điểm tổng chuẩn. examTypeId null/blank = tất cả kỳ thi.
      * Dùng Specification + findAll(spec, pageable) như các trang phân trang khác (UserService).

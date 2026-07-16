@@ -1,9 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getExamTypes } from '~/shared/api/examTypeApi';
-import { getMyUserTests } from '~/shared/api/userTestApi';
+import { getMyCompletedUserTests } from '~/shared/api/userTestApi';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import { generatePlan } from '~/shared/api/learningPlanApi';
-import { filterCompletedTests } from '~/shared/utils/userTests';
 
 export const generatePlanKeys = {
   examTypes: ['generate-plan', 'exam-types'],
@@ -24,8 +23,7 @@ export function useExamTypes() {
 export function useCompletedUserTests() {
   return useQuery({
     queryKey: generatePlanKeys.userTests,
-    queryFn: getMyUserTests,
-    select: filterCompletedTests,
+    queryFn: () => getMyCompletedUserTests(),
   });
 }
 
