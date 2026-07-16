@@ -8,23 +8,23 @@ export const AuthContext = createContext(null);
 
 export const CURRENT_USER_QUERY_KEY = ['currentUser'];
 
+const normalizeUser = (data) => ({
+  userId: data.id,
+  userName: data.userName,
+  fullName: data.fullName,
+  email: data.email,
+  roleId: data.roleId,
+  roleName: data.roleName,
+
+  permissions: Array.isArray(data.permissions) ? data.permissions : [],
+  avatarUrl: data.avatarUrl,
+});
+
 export const AuthProvider = ({ children }) => {
 
   const expiredToastShownRef = useRef(false);
 
   const userRef = useRef(null);
-
-  const normalizeUser = (data) => ({
-    userId: data.id,
-    userName: data.userName,
-    fullName: data.fullName,
-    email: data.email,
-    roleId: data.roleId,
-    roleName: data.roleName,
-
-    permissions: Array.isArray(data.permissions) ? data.permissions : [],
-    avatarUrl: data.avatarUrl,
-  });
 
   const { data, isLoading } = useQuery({
     queryKey: CURRENT_USER_QUERY_KEY,
@@ -34,7 +34,9 @@ export const AuthProvider = ({ children }) => {
     retry: false,
   });
 
-  const user = data?.id ? normalizeUser(data) : null;
+  // Memo theo data để user giữ nguyên reference giữa các render —
+  // tránh context value đổi liên tục làm mọi consumer re-render oan.
+  const user = useMemo(() => (data?.id ? normalizeUser(data) : null), [data]);
   const loading = isLoading;
 
   const refreshUser = useCallback(
@@ -45,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         auto_select: false,
         itp_support: true,
       });

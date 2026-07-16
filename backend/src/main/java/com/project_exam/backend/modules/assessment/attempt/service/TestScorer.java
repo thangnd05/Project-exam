@@ -24,17 +24,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Chấm điểm bài làm. Tách khỏi UserTestService (god-service) để business logic chấm điểm
- * là một collaborator riêng, dùng chung cho cả nộp bài thường và nộp bài khách.
- *
- * Why: dispatch theo scoringMethod (toeic_scale / aws_scale / default) và các thuật toán
- * scoreToeic/scoreAws/scoreDefault trước đây nằm rải trong UserTestService và bị copy giữa
- * submitTest & submitGuestTest. Hành vi giữ NGUYÊN — chỉ chuyển chỗ.
- */
+
 @Component
 @RequiredArgsConstructor
 public class TestScorer {
+    /** Điểm sàn TOEIC mỗi skill — fallback khi DB thiếu dòng quy đổi trong scoring_conversions. */
+    private static final int TOEIC_MIN_SKILL_SCORE = 5;
 
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
@@ -90,11 +85,7 @@ public class TestScorer {
         int totalScore = 0;
         for (String skillId : skillIds) {
             int numCorrect = skillCorrectCount.getOrDefault(skillId, 0);
-            int convertedScore = scoringConversionRepository
-                    .findByExamTypeIdAndSkillIdAndNumCorrect(examType.getExamTypeId(), skillId, numCorrect)
-                    .map(ScoringConversion::getConvertedScore)
-                    .orElse(5);
-            totalScore += convertedScore;
+            totalScore += convertSkillScore(examType.getExamTypeId(), skillId, numCorrect);
         }
         return totalScore;
     }
@@ -210,28 +201,28 @@ public class TestScorer {
         // 5. Quy đổi điểm
         int totalScore = 0;
         for (Map.Entry<String, Integer> entry : skillCorrectCount.entrySet()) {
-            String skillId = entry.getKey();
-            Integer numCorrect = entry.getValue();
-
-            int convertedScore = scoringConversionRepository
-                    .findByExamTypeIdAndSkillIdAndNumCorrect(examType.getExamTypeId(), skillId, numCorrect)
-                    .map(ScoringConversion::getConvertedScore)
-                    .orElse(5);
-
-            totalScore += convertedScore;
+            totalScore += convertSkillScore(examType.getExamTypeId(), entry.getKey(), entry.getValue());
         }
 
         Set<String> allSkillIdsInTest = examParts.stream().map(ExamPart::getSkillId).filter(Objects::nonNull).collect(Collectors.toSet());
         for (String skillId : allSkillIdsInTest) {
             if (!skillCorrectCount.containsKey(skillId)) {
-                int convertedScore = scoringConversionRepository
-                        .findByExamTypeIdAndSkillIdAndNumCorrect(examType.getExamTypeId(), skillId, 0)
-                        .map(ScoringConversion::getConvertedScore)
-                        .orElse(5);
-                totalScore += convertedScore;
+                totalScore += convertSkillScore(examType.getExamTypeId(), skillId, 0);
             }
         }
         return totalScore;
+    }
+
+    /**
+     * Tra bảng scoring_conversions để quy đổi số câu đúng → điểm skill.
+     * Thiếu dòng quy đổi (seed thiếu/lệch số câu) thì fallback về điểm sàn TOEIC
+     * thay vì vỡ luồng nộp bài.
+     */
+    private int convertSkillScore(String examTypeId, String skillId, int numCorrect) {
+        return scoringConversionRepository
+                .findByExamTypeIdAndSkillIdAndNumCorrect(examTypeId, skillId, numCorrect)
+                .map(ScoringConversion::getConvertedScore)
+                .orElse(TOEIC_MIN_SKILL_SCORE);
     }
 
     private List<UserAnswer> deduplicateByQuestionId(List<UserAnswer> userAnswers) {

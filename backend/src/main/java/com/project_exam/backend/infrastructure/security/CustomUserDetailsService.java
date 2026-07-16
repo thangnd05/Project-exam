@@ -108,8 +108,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             newUser.setAvatarUrl(resolveOAuthAvatar(name, pictureUrl));
 
             userRepository.save(newUser);
-
-            System.out.println("--- Đã tạo tài khoản mới cho user: " + email);
         } else {
             // 3. Nếu ĐÃ CÓ -> Cập nhật thông tin (nếu cần)
             User user = existUser.get();
@@ -117,7 +115,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             user.setFullName(name);
             user.setAvatarUrl(resolveOAuthAvatar(name, pictureUrl));
             userRepository.save(user);
-            System.out.println("--- User đã tồn tại, chỉ cập nhật thông tin: " + email);
         }
     }
 

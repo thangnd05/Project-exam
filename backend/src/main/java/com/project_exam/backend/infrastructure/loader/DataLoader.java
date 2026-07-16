@@ -10,9 +10,11 @@ import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -26,6 +28,16 @@ public class DataLoader implements CommandLineRunner {
     private final PermissionRepository permissionRepository;
     private final RolePermissionRepository rolePermissionRepository;
     private final PasswordEncoder passwordEncoder;
+
+    // Thông tin admin mặc định — lấy từ env, không hardcode. Password để trống => bỏ qua seed.
+    @Value("${app.admin.username:}")
+    private String adminUsername;
+    @Value("${app.admin.email:}")
+    private String adminEmail;
+    @Value("${app.admin.fullName:Administrator}")
+    private String adminFullName;
+    @Value("${app.admin.password:}")
+    private String adminPassword;
 
     @Override
     public void run(String... args) throws Exception {
@@ -64,22 +76,24 @@ public class DataLoader implements CommandLineRunner {
             roleRepository.save(userRole);
         }
 
-        // 4) User admin mặc định
-        Optional<User> adminUser = userRepository.findByUserName("WinDe");
+        // 4) User admin mặc định — chỉ seed khi đã cấu hình đủ username + password qua env.
+        //    Thiếu bất kỳ giá trị nhạy cảm nào => bỏ qua (không tạo tài khoản mật khẩu yếu mặc định).
+        if (!StringUtils.hasText(adminUsername) || !StringUtils.hasText(adminPassword)) {
+            return;
+        }
+        Optional<User> adminUser = userRepository.findByUserName(adminUsername);
         if (adminUser.isEmpty()) {
             User user = new User();
-            user.setUserName("WinDe");
-            user.setFullName("WinDe");
-            user.setEmail("winde");
-            user.setPassword(passwordEncoder.encode("123456"));
+            user.setUserName(adminUsername);
+            user.setFullName(StringUtils.hasText(adminFullName) ? adminFullName : adminUsername);
+            user.setEmail(StringUtils.hasText(adminEmail) ? adminEmail : adminUsername);
+            user.setPassword(passwordEncoder.encode(adminPassword));
             user.setRoleId(adminRole.getRoleId());
             user.setCreatedAt(LocalDateTime.now());
             user.setVerified(true);
             user.setAvatarUrl(buildDefaultAvatar(user.getFullName()));
             userRepository.save(user);
         }
-
-        System.out.println("DataLoader: permissions seeded, ADMIN granted all, USER role ensured, admin user ready.");
     }
 
     private String buildDefaultAvatar(String name) {

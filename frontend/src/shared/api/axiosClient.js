@@ -1,9 +1,8 @@
 import axios from 'axios';
-
-const apiBaseUrl = (process.env.REACT_APP_API_BASE_URL || '').trim().replace(/\/$/, "");
+import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 
 const axiosClient = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: getApiBaseUrl(),
   withCredentials: true,
 });
 

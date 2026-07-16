@@ -1,6 +1,7 @@
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
+import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 
-const API_BASE = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE = getApiBaseUrl();
 
 function RecoveryResourceLink({ resource, className, children }) {
   const linkProps = getRecoveryResourceLinkProps(resource, API_BASE);

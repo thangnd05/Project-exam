@@ -3,8 +3,9 @@ import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { getResourceById, viewResourceContent } from '~/shared/api/recoveryResourceApi';
 import { isMarkdownResource } from '~/shared/utils/recoveryResource';
+import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 
-const API_BASE = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE = getApiBaseUrl();
 
 marked.setOptions({
   gfm: true,

@@ -12,7 +12,6 @@ import {useRecoveryResources, useTagsByExamType} from './hooks/useRecoveryResour
 import styles from './RecoveryResources.module.scss';
 
 const cx = classNames.bind(styles);
-const API_BASE = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
 
 const emptyForm = {
   title: '',

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from '~/shared/api/axiosClient';
 import { login as loginRequest, register as registerRequest } from '~/shared/api/authApi';
+import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '~/shared/hooks/useAuth';
 import { toast } from 'react-toastify';
@@ -37,7 +37,8 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const backendBaseUrl = (axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
+  // OAuth là full-page redirect sang backend nên cần URL tuyệt đối (không đi qua axios)
+  const backendBaseUrl = getApiBaseUrl();
   const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
   const FACEBOOK_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/facebook`;
 

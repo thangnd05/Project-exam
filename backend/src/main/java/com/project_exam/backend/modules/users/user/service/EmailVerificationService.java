@@ -121,7 +121,6 @@ public class EmailVerificationService {
             if (user != null && !user.getVerified()) {
                 emailVerificationRepository.delete(ev);
                 userRepository.delete(user);
-                System.out.println("Đã xóa user chưa xác thực: " + user.getEmail());
             }
         }
     }

@@ -38,8 +38,7 @@ public class RecoveryResource {
     private String createdBy;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false,
-            columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
 }

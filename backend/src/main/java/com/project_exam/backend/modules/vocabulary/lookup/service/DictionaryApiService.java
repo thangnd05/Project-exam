@@ -46,7 +46,7 @@ public class DictionaryApiService {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error fetching word info: " + e.getMessage());
+            // Bỏ qua lỗi tra phonetic — bên dưới vẫn luôn trả về audio Google TTS
         }
 
         // Luôn tạo link Google TTS cho audio (đảm bảo không null)

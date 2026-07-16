@@ -26,8 +26,7 @@ public class Question {
     private String questionId;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false,
-            columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @Column(nullable = false)

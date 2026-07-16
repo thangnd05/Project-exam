@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from '~/shared/api/axiosClient';
 import { useAlbumVocabularies, useDeleteVocabulary } from './hooks/useAlbumVocabularies';
+import { getTtsUrl } from '~/shared/utils/mediaUrl';
 import {
   Container,
   Table,
@@ -23,7 +23,6 @@ import styles from './AlbumDetailPage.module.scss';
 const cx = classNames.bind(styles);
 
 const AlbumDetailPage = () => {
-  const backendBaseUrl = (axios.defaults.baseURL || process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '');
   const { albumId } = useParams();
   const [showModal, setShowModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -83,8 +82,7 @@ const AlbumDetailPage = () => {
   };
 
   const playAudio = (word) => {
-    const ttsUrl = `${backendBaseUrl}/api/tts?text=${encodeURIComponent(word)}`;
-    const audio = new Audio(ttsUrl);
+    const audio = new Audio(getTtsUrl(word));
     audio.play();
   };
 
