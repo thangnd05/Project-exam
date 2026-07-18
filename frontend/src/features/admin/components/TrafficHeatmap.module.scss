@@ -1,0 +1,70 @@
+.heatmap {
+    padding: 14px 6px 6px;
+}
+
+.row,
+.axisRow {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.dayLabel {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-align: right;
+}
+
+.cells {
+    display: grid;
+    grid-template-columns: repeat(24, 1fr);
+    gap: 3px;
+}
+
+.cell {
+    height: 20px;
+    border-radius: 3px;
+    transition: transform 0.1s ease;
+    cursor: default;
+
+    &:hover {
+        transform: scale(1.18);
+        outline: 2px solid rgba(37, 99, 235, 0.5);
+    }
+}
+
+.hourTick {
+    font-size: 9px;
+    color: #94a3b8;
+    text-align: left;
+    transform: translateX(-2px);
+}
+
+.legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.legendScale {
+    width: 90px;
+    height: 8px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #f1f5f9, #3b82f6);
+}
+
+.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    color: #94a3b8;
+    font-size: 14px;
+}

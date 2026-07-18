@@ -113,8 +113,8 @@ export const MonthlyPerformanceCombo = ({ data }) => (
             <Line
                 yAxisId="right"
                 type="monotone"
-                dataKey="avgScore"
-                name="Điểm TB"
+                dataKey="rate"
+                name="Tỉ lệ hoàn thành (%)"
                 stroke="#f59e0b"
                 strokeWidth={3}
                 dot={{ r: 4, fill: '#f59e0b' }}
@@ -146,6 +146,59 @@ export const ExamTypeDonut = ({ data }) => (
                 ))}
             </Pie>
         </PieChart>
+    </ResponsiveContainer>
+);
+
+export const MonthlyNewUsersBar = ({ data }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <defs>
+                <linearGradient id="acNewUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8b5cf6" />
+                    <stop offset="100%" stopColor="#c4b5fd" />
+                </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+            <Tooltip {...TOOLTIP_STYLE} />
+            <Bar dataKey="newUsers" name="Người dùng mới" fill="url(#acNewUsers)" radius={[6, 6, 0, 0]} barSize={28} />
+        </BarChart>
+    </ResponsiveContainer>
+);
+
+// Tooltip riêng cho biểu đồ lượt truy cập theo tháng: hiện thêm giờ cao điểm của tháng.
+const MonthlyVisitsTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    const row = payload[0].payload ?? {};
+    const peak = row.peakHour;
+    const hasPeak = peak !== null && peak !== undefined && peak >= 0;
+    return (
+        <div style={{ ...TOOLTIP_STYLE.contentStyle, padding: '8px 12px' }}>
+            <div style={TOOLTIP_STYLE.labelStyle}>{label}</div>
+            <div>Lượt truy cập: <strong>{row.visits ?? 0}</strong></div>
+            <div style={{ color: '#64748b', marginTop: 2 }}>
+                {hasPeak ? `Giờ cao điểm: ${String(peak).padStart(2, '0')}:00` : 'Chưa có truy cập'}
+            </div>
+        </div>
+    );
+};
+
+export const MonthlyVisitsBar = ({ data }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <defs>
+                <linearGradient id="acVisitsMonth" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#93c5fd" />
+                </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+            <Tooltip {...TOOLTIP_STYLE} content={<MonthlyVisitsTooltip />} />
+            <Bar dataKey="visits" name="Lượt truy cập" fill="url(#acVisitsMonth)" radius={[6, 6, 0, 0]} barSize={28} />
+        </BarChart>
     </ResponsiveContainer>
 );
 
@@ -182,6 +235,103 @@ export const UserGrowthBar = ({ data }) => (
             <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} />
             <Tooltip {...TOOLTIP_STYLE} />
             <Bar dataKey="users" name="Người dùng" fill="url(#acGrowth)" radius={[6, 6, 0, 0]} barSize={32} />
+        </BarChart>
+    </ResponsiveContainer>
+);
+
+// Sparkline mini — nhúng trong KPI card, không trục/lưới.
+export const SparkArea = ({ data, dataKey = 'value', color = '#3b82f6', id = 'a' }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
+            <defs>
+                <linearGradient id={`spark-${id}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={color} stopOpacity={0.4} />
+                    <stop offset="100%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+            </defs>
+            <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2}
+                  fill={`url(#spark-${id})`} dot={false} isAnimationActive={false} />
+        </AreaChart>
+    </ResponsiveContainer>
+);
+
+export const SparkBar = ({ data, dataKey = 'value', color = '#3b82f6' }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }} barCategoryGap={1}>
+            <Bar dataKey={dataKey} fill={color} radius={[2, 2, 0, 0]} isAnimationActive={false} />
+        </BarChart>
+    </ResponsiveContainer>
+);
+
+// Traffic dạng cột chồng (khách + đã đăng nhập) — kiểu "Traffic summary".
+export const TrafficStackedBar = ({ data }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} dy={8} />
+            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+            <Tooltip {...TOOLTIP_STYLE} />
+            <Legend />
+            <Bar dataKey="users" name="Đã đăng nhập" stackId="1" fill="#3b82f6" radius={[0, 0, 0, 0]} barSize={26} />
+            <Bar dataKey="guests" name="Khách" stackId="1" fill="#10b981" radius={[4, 4, 0, 0]} barSize={26} />
+        </BarChart>
+    </ResponsiveContainer>
+);
+
+export const TrafficAreaChart = ({ data }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+            <defs>
+                <linearGradient id="acVisitUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.02} />
+                </linearGradient>
+                <linearGradient id="acVisitGuests" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
+                </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} dy={8} />
+            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+            <Tooltip {...TOOLTIP_STYLE} />
+            <Legend />
+            <Area
+                type="monotone"
+                dataKey="users"
+                name="Đã đăng nhập"
+                stackId="1"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                fill="url(#acVisitUsers)"
+            />
+            <Area
+                type="monotone"
+                dataKey="guests"
+                name="Khách"
+                stackId="1"
+                stroke="#10b981"
+                strokeWidth={2}
+                fill="url(#acVisitGuests)"
+            />
+        </AreaChart>
+    </ResponsiveContainer>
+);
+
+export const TrafficHourBar = ({ data }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <defs>
+                <linearGradient id="acVisitHour" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6366f1" />
+                    <stop offset="100%" stopColor="#a5b4fc" />
+                </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ ...AXIS_TICK, fontSize: 10 }} interval={2} />
+            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+            <Tooltip {...TOOLTIP_STYLE} />
+            <Bar dataKey="visits" name="Lượt truy cập" fill="url(#acVisitHour)" radius={[4, 4, 0, 0]} />
         </BarChart>
     </ResponsiveContainer>
 );

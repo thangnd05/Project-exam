@@ -1,0 +1,92 @@
+.mapWrap {
+    padding: 6px 4px 0;
+}
+
+.caption {
+    text-align: center;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 6px;
+    min-height: 18px;
+}
+
+/* Top countries list */
+.countryList {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    padding: 8px 4px 4px;
+    /* Hiện tối đa ~7 quốc gia; nhiều hơn thì cuộn trong khung. */
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 8px;
+
+    /* Thanh cuộn mảnh cho gọn */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+}
+
+.countryRow {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.countryInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.flag {
+    font-size: 16px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.countryName {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    color: #1e293b;
+}
+
+.countryCount {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 13px;
+}
+
+.countryTrack {
+    height: 6px;
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.1);
+    overflow: hidden;
+}
+
+.countryBar {
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.empty {
+    display: block;
+    text-align: center;
+    color: #94a3b8;
+    padding: 24px 0;
+    font-size: 13px;
+}

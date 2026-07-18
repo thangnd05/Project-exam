@@ -1,94 +1,131 @@
-import { Row, Col, Table, Badge } from 'react-bootstrap';
+import { useState } from 'react';
+import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import {
-    Users,
-    GraduationCap,
     BookOpen,
     FileQuestion,
-    TrendingUp,
-    Clock,
-    CheckCircle,
-    Eye,
-    Edit,
-    Trash2,
+    GraduationCap,
+    Calendar,
     ArrowUpRight,
     ArrowDownRight,
-    Calendar,
-    Award,
-    BarChart3,
-    PieChart as PieChartIcon
 } from 'lucide-react';
-import {
-    WeeklyActivityArea,
-    MonthlyPerformanceCombo,
-    ExamTypeDonut,
-    SkillRadar,
-} from '../components/AdminCharts';
-import { AdminPageHeader } from '../components/common';
+import { SparkArea } from '../components/AdminCharts';
+import TrafficHeatmap from '../components/TrafficHeatmap';
+import PageHeader from '~/shared/ui/PageHeader/PageHeader';
+import { useDashboardStats, useTrafficHeatmap } from './hooks/useDashboardStats';
 
-import {
-    dashboardStats,
-    weeklyUserRegistrations,
-    monthlyTestPerformance,
-    recentActivities,
-    examTypeDistribution,
-    skillDistribution,
-    fakeUserTests,
-    getUserById,
-    getTestById
-} from '../data/fakeData';
+/** Ngày hôm nay dạng 'yyyy-MM-dd' theo giờ địa phương (không lệch múi giờ như toISOString). */
+const localISODate = (d = new Date()) => {
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 10);
+};
 
 import styles from './Dashboard.module.scss';
 
 const cx = classNames.bind(styles);
 
-const StatCard = ({ title, value, icon, color, trend, trendValue, delay }) => (
+const EMPTY_TRAFFIC = {
+    visitsToday: 0,
+    visitsTrend: null,
+    uniqueVisitorsWeek: 0,
+    totalVisitsWeek: 0,
+    heatmap: [],
+    topCountries: [],
+};
+
+const KpiCard = ({ label, value, period, trend, live, spark, delay }) => {
+    const hasTrend = trend !== null && trend !== undefined;
+    const up = trend >= 0;
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: delay * 0.08, duration: 0.4 }}
+            className={cx('kpiCard')}
+        >
+            <div className={cx('kpiTop')}>
+                <span className={cx('kpiLabel')}>
+                    {live && <span className={cx('liveDot')} />}
+                    {label}
+                </span>
+                {period && <span className={cx('kpiPeriod')}>{period}</span>}
+            </div>
+            <div className={cx('kpiValueRow')}>
+                <span className={cx('kpiValue')}>{value}</span>
+                {hasTrend && (
+                    <span className={cx('kpiTrend', up ? 'up' : 'down')}>
+                        {up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                        {Math.abs(trend)}%
+                    </span>
+                )}
+            </div>
+            <div className={cx('kpiSpark')}>{spark}</div>
+        </motion.div>
+    );
+};
+
+const IconCard = ({ icon, value, label, sub, delay }) => (
     <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: delay * 0.1, duration: 0.4 }}
-        className={cx('statCard')}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay }}
+        className={cx('iconCard')}
     >
-        <div className={cx('statIcon')} style={{ backgroundColor: color }}>
-            {icon}
-        </div>
-        <div className={cx('statContent')}>
-            <span className={cx('statTitle')}>{title}</span>
-            <span className={cx('statValue')}>{value}</span>
-            {trend && (
-                <div className={cx('statTrend', trend > 0 ? 'up' : 'down')}>
-                    {trend > 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                    <span>{Math.abs(trendValue)}% so với tuần trước</span>
-                </div>
-            )}
+        <div className={cx('iconBox')}>{icon}</div>
+        <div className={cx('iconMeta')}>
+            <span className={cx('iconValue')}>{value}</span>
+            <span className={cx('iconLabel')}>{label}</span>
+            {sub && <span className={cx('iconSub')}>{sub}</span>}
         </div>
     </motion.div>
 );
 
-const getActivityIcon = (type) => {
-    switch (type) {
-        case 'exam_completed': return <CheckCircle size={16} className={cx('activityIcon', 'success')} />;
-        case 'user_registered': return <Users size={16} className={cx('activityIcon', 'primary')} />;
-        case 'class_joined': return <GraduationCap size={16} className={cx('activityIcon', 'warning')} />;
-        case 'test_created': return <BookOpen size={16} className={cx('activityIcon', 'info')} />;
-        default: return <Clock size={16} className={cx('activityIcon')} />;
-    }
+/**
+ * Card heatmap ngày×giờ có bộ lọc ngày: mặc định 7 ngày gần nhất, chọn ngày (chỉ hôm nay & quá khứ)
+ * để xem tuần kết thúc ở ngày đó — giữ nguyên giao diện heatmap.
+ */
+const TrafficHeatmapCard = ({ delay }) => {
+    const today = localISODate();
+    const [endDate, setEndDate] = useState(today);
+    const { data: heatmap = [] } = useTrafficHeatmap(endDate);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay }}
+            className={cx('chartCard')}
+        >
+            <div className={cx('chartHeader')}>
+                <h3>Lượt truy cập theo ngày & giờ</h3>
+                <input
+                    type="date"
+                    className={cx('dateInput')}
+                    value={endDate}
+                    max={today}
+                    onChange={(e) => setEndDate(e.target.value || today)}
+                />
+            </div>
+            <TrafficHeatmap data={heatmap} />
+        </motion.div>
+    );
 };
 
 const AdminDashboard = () => {
-    const recentTests = fakeUserTests.slice(0, 5).map(ut => ({
-        ...ut,
-        user: getUserById(ut.user_id),
-        test: getTestById(ut.test_id)
-    }));
+    const { data, isLoading, isError } = useDashboardStats();
+
+    const stats = data?.stats ?? {};
+    const traffic = data?.traffic ?? EMPTY_TRAFFIC;
+    const heatmap = traffic.heatmap ?? [];
+
+    const daySpark = heatmap.map((d) => ({ value: (d.hours ?? []).reduce((a, b) => a + b, 0) }));
 
     return (
         <div className={cx('dashboard')}>
-
-            <AdminPageHeader
+            <PageHeader
+                label="Tổng quan hệ thống English Exam"
                 title="Dashboard"
-                description="Tổng quan về hệ thống English Exam"
             >
                 <span className={cx('dateBadge')}>
                     <Calendar size={16} />
@@ -99,302 +136,67 @@ const AdminDashboard = () => {
                         day: 'numeric'
                     })}
                 </span>
-            </AdminPageHeader>
+            </PageHeader>
 
-            <Row className={cx('statsRow')}>
-                <Col lg={3} md={6} sm={12}>
-                    <StatCard
-                        title="Tổng Users"
-                        value={dashboardStats.totalUsers}
-                        icon={<Users size={24} />}
-                        color="#3b82f6"
-                        trend={12}
-                        trendValue={12}
-                        delay={0}
-                    />
-                </Col>
-                <Col lg={3} md={6} sm={12}>
-                    <StatCard
-                        title="Tổng Lớp học"
-                        value={dashboardStats.totalClasses}
-                        icon={<GraduationCap size={24} />}
-                        color="#10b981"
-                        trend={8}
-                        trendValue={8}
-                        delay={1}
-                    />
-                </Col>
-                <Col lg={3} md={6} sm={12}>
-                    <StatCard
-                        title="Tổng Bài thi"
-                        value={dashboardStats.totalTests}
-                        icon={<BookOpen size={24} />}
-                        color="#f59e0b"
-                        trend={-3}
-                        trendValue={3}
-                        delay={2}
-                    />
-                </Col>
-                <Col lg={3} md={6} sm={12}>
-                    <StatCard
-                        title="Câu hỏi"
-                        value={dashboardStats.totalQuestions}
-                        icon={<FileQuestion size={24} />}
-                        color="#8b5cf6"
-                        trend={15}
-                        trendValue={15}
-                        delay={3}
-                    />
-                </Col>
-            </Row>
+            {isLoading ? (
+                <div className={cx('loadingState')}>
+                    <Spinner animation="border" variant="primary" />
+                    <span>Đang tải số liệu...</span>
+                </div>
+            ) : isError ? (
+                <div className={cx('loadingState')}>
+                    <span>Không tải được số liệu thống kê. Vui lòng thử lại.</span>
+                </div>
+            ) : (
+                <>
+                    {/* KPI truy cập + card icon nội dung trên cùng 1 dòng */}
+                    <Row className={cx('kpiRow')}>
+                        <Col lg={3} md={6} sm={12}>
+                            <KpiCard
+                                label="Lượt truy cập hôm nay"
+                                value={traffic.visitsToday}
+                                period="Hôm nay"
+                                trend={traffic.visitsTrend}
+                                spark={<SparkArea data={daySpark} color="#3b82f6" id="visits" />}
+                                delay={0}
+                            />
+                        </Col>
+                        <Col lg={3} md={6} sm={12}>
+                            <IconCard
+                                icon={<BookOpen size={22} />}
+                                value={stats.totalTests ?? 0}
+                                label="Bài thi"
+                                sub={`${stats.totalExamsTaken ?? 0} lượt · ${stats.completedExams ?? 0} hoàn thành`}
+                                delay={0.4}
+                            />
+                        </Col>
+                        <Col lg={3} md={6} sm={12}>
+                            <IconCard
+                                icon={<FileQuestion size={22} />}
+                                value={stats.totalQuestions ?? 0}
+                                label="Câu hỏi"
+                                sub="Ngân hàng câu hỏi"
+                                delay={0.45}
+                            />
+                        </Col>
+                        <Col lg={3} md={6} sm={12}>
+                            <IconCard
+                                icon={<GraduationCap size={22} />}
+                                value={stats.totalClasses ?? 0}
+                                label="Lớp học"
+                                delay={0.5}
+                            />
+                        </Col>
+                    </Row>
 
-            <Row className={cx('secondaryStats')}>
-                <Col lg={2} md={4} sm={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.4 }}
-                        className={cx('miniStat')}
-                    >
-                        <span className={cx('miniValue')}>{dashboardStats.totalTeachers}</span>
-                        <span className={cx('miniLabel')}>Giáo viên</span>
-                    </motion.div>
-                </Col>
-                <Col lg={2} md={4} sm={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.5 }}
-                        className={cx('miniStat')}
-                    >
-                        <span className={cx('miniValue')}>{dashboardStats.totalStudents}</span>
-                        <span className={cx('miniLabel')}>Học sinh</span>
-                    </motion.div>
-                </Col>
-                <Col lg={2} md={4} sm={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.6 }}
-                        className={cx('miniStat')}
-                    >
-                        <span className={cx('miniValue')}>{dashboardStats.totalExamsTaken}</span>
-                        <span className={cx('miniLabel')}>Lượt thi</span>
-                    </motion.div>
-                </Col>
-                <Col lg={2} md={4} sm={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.7 }}
-                        className={cx('miniStat')}
-                    >
-                        <span className={cx('miniValue')}>{dashboardStats.completedExams}</span>
-                        <span className={cx('miniLabel')}>Hoàn thành</span>
-                    </motion.div>
-                </Col>
-                <Col lg={2} md={4} sm={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.8 }}
-                        className={cx('miniStat')}
-                    >
-                        <span className={cx('miniValue')}>{dashboardStats.avgScore}</span>
-                        <span className={cx('miniLabel')}>Điểm TB</span>
-                    </motion.div>
-                </Col>
-                <Col lg={2} md={4} sm={6}>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.9 }}
-                        className={cx('miniStat')}
-                    >
-                        <span className={cx('miniValue')}>{dashboardStats.pendingMembers}</span>
-                        <span className={cx('miniLabel')}>Chờ duyệt</span>
-                    </motion.div>
-                </Col>
-            </Row>
-
-            <Row className={cx('chartsRow')}>
-                <Col lg={8}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className={cx('chartCard')}
-                    >
-                        <div className={cx('chartHeader')}>
-                            <h3>
-                                <TrendingUp size={20} />
-                                Hoạt động tuần này
-                            </h3>
-                        </div>
-                        <div style={{ width: '100%', height: 300 }}>
-                            <WeeklyActivityArea data={weeklyUserRegistrations} />
-                        </div>
-                    </motion.div>
-                </Col>
-                <Col lg={4}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                        className={cx('chartCard')}
-                    >
-                        <div className={cx('chartHeader')}>
-                            <h3>
-                                <PieChartIcon size={20} />
-                                Loại kỳ thi
-                            </h3>
-                        </div>
-                        <div style={{ width: '100%', height: 300 }}>
-                            <ExamTypeDonut data={examTypeDistribution} />
-                        </div>
-                    </motion.div>
-                </Col>
-            </Row>
-
-            <Row className={cx('chartsRow')}>
-                <Col lg={8}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7 }}
-                        className={cx('chartCard')}
-                    >
-                        <div className={cx('chartHeader')}>
-                            <h3>
-                                <BarChart3 size={20} />
-                                Hiệu suất hàng tháng
-                            </h3>
-                        </div>
-                        <div style={{ width: '100%', height: 300 }}>
-                            <MonthlyPerformanceCombo data={monthlyTestPerformance} />
-                        </div>
-                    </motion.div>
-                </Col>
-                <Col lg={4}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8 }}
-                        className={cx('chartCard')}
-                    >
-                        <div className={cx('chartHeader')}>
-                            <h3>
-                                <Award size={20} />
-                                Kỹ năng học viên
-                            </h3>
-                        </div>
-                        <div style={{ width: '100%', height: 300 }}>
-                            <SkillRadar data={skillDistribution} />
-                        </div>
-                    </motion.div>
-                </Col>
-            </Row>
-
-            <Row className={cx('bottomRow')}>
-                <Col lg={8}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.9 }}
-                        className={cx('tableCard')}
-                    >
-                        <div className={cx('tableHeader')}>
-                            <h3>Bài thi gần đây</h3>
-                            <button type="button" className={cx('viewAll')}>Xem tất cả</button>
-                        </div>
-                        <div className={cx('tableWrapper')}>
-                            <Table responsive className={cx('customTable')}>
-                                <thead>
-                                    <tr>
-                                        <th>Học viên</th>
-                                        <th>Bài thi</th>
-                                        <th>Điểm</th>
-                                        <th>Trạng thái</th>
-                                        <th>Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {recentTests.map((test) => (
-                                        <tr key={test.user_test_id}>
-                                            <td>
-                                                <div className={cx('userCell')}>
-                                                    <div className={cx('userAvatar')}>
-                                                        {test.user?.full_name?.charAt(0)}
-                                                    </div>
-                                                    <span>{test.user?.full_name}</span>
-                                                </div>
-                                            </td>
-                                            <td>{test.test?.title}</td>
-                                            <td>
-                                                <span className={cx('score')}>
-                                                    {test.status === 'COMPLETED' ? test.total_score : '-'}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <Badge bg={
-                                                    test.status === 'COMPLETED' ? 'success' :
-                                                    test.status === 'IN_PROGRESS' ? 'warning' : 'danger'
-                                                }>
-                                                    {test.status === 'COMPLETED' ? 'Hoàn thành' :
-                                                     test.status === 'IN_PROGRESS' ? 'Đang làm' : 'Hết hạn'}
-                                                </Badge>
-                                            </td>
-                                            <td>
-                                                <div className={cx('actions')}>
-                                                    <button className={cx('actionBtn')} title="Xem">
-                                                        <Eye size={16} />
-                                                    </button>
-                                                    <button className={cx('actionBtn')} title="Sửa">
-                                                        <Edit size={16} />
-                                                    </button>
-                                                    <button className={cx('actionBtn', 'delete')} title="Xóa">
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        </div>
-                    </motion.div>
-                </Col>
-                <Col lg={4}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1 }}
-                        className={cx('activityCard')}
-                    >
-                        <div className={cx('activityHeader')}>
-                            <h3>Hoạt động gần đây</h3>
-                        </div>
-                        <div className={cx('activityList')}>
-                            {recentActivities.map((activity, index) => (
-                                <motion.div
-                                    key={activity.id}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 1 + index * 0.05 }}
-                                    className={cx('activityItem')}
-                                >
-                                    {getActivityIcon(activity.type)}
-                                    <div className={cx('activityContent')}>
-                                        <span className={cx('activityUser')}>{activity.user}</span>
-                                        <span className={cx('activityAction')}>{activity.action}</span>
-                                        <span className={cx('activityTime')}>{activity.time}</span>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
-                </Col>
-            </Row>
+                    {/* Heatmap tuần × giờ, lọc theo ngày ngay trong card */}
+                    <Row className={cx('chartsRow')}>
+                        <Col lg={12}>
+                            <TrafficHeatmapCard delay={0.5} />
+                        </Col>
+                    </Row>
+                </>
+            )}
         </div>
     );
 };

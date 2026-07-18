@@ -21,137 +21,23 @@ $radius-lg: 16px;
     padding: 0;
 }
 
-.pageHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    gap: 16px;
-
-    h1 {
-        font-size: var(--font-size-2xxl);
-        font-weight: 700;
-        color: $text-primary;
-        margin-bottom: 4px;
-    }
-
-    p {
-        color: $text-secondary;
-        margin: 0;
-    }
-}
-
-.headerActions {
-    display: flex;
-    gap: 12px;
-}
-
 .dateBadge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
-    background: $bg-white;
-    border-radius: $radius-md;
-    color: $text-secondary;
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius-md);
+    color: #fff;
     font-size: var(--font-size-ssm);
-    box-shadow: $shadow-sm;
-}
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
 
-.statsRow {
-    margin-bottom: 20px;
-}
-
-.statCard {
-    background: $bg-white;
-    border-radius: $radius-lg;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: $shadow-sm;
-    border: 1px solid $border-color;
-    transition: $transition;
-    height: 100%;
-
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: $shadow-md;
+    svg {
+        flex-shrink: 0;
     }
-}
-
-.statIcon {
-    width: 56px;
-    height: 56px;
-    border-radius: $radius-md;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    flex-shrink: 0;
-}
-
-.statContent {
-    display: flex;
-    flex-direction: column;
-}
-
-.statTitle {
-    font-size: var(--font-size-smd);
-    color: $text-secondary;
-    margin-bottom: 4px;
-}
-
-.statValue {
-    font-size: var(--font-size-2xxl);
-    font-weight: 700;
-    color: $text-primary;
-    line-height: 1;
-}
-
-.statTrend {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: var(--font-size-sm);
-    margin-top: 6px;
-
-    &.up {
-        color: $success;
-    }
-
-    &.down {
-        color: $danger;
-    }
-}
-
-.secondaryStats {
-    margin-bottom: 24px;
-}
-
-.miniStat {
-    background: $bg-white;
-    border-radius: $radius-md;
-    padding: 16px;
-    text-align: center;
-    box-shadow: $shadow-sm;
-    border: 1px solid $border-color;
-    height: 100%;
-}
-
-.miniValue {
-    display: block;
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: $text-primary;
-}
-
-.miniLabel {
-    display: block;
-    font-size: var(--font-size-sm);
-    color: $text-secondary;
-    margin-top: 4px;
 }
 
 .chartsRow {
@@ -169,6 +55,10 @@ $radius-lg: 16px;
 
 .chartHeader {
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 
     h3 {
         display: flex;
@@ -181,258 +71,195 @@ $radius-lg: 16px;
     }
 }
 
-.bottomRow {
-    margin-bottom: 24px;
-}
-
-.tableCard {
-    background: $bg-white;
-    border-radius: $radius-lg;
-    padding: 20px;
-    box-shadow: $shadow-sm;
+.dateInput {
     border: 1px solid $border-color;
-    height: 100%;
-}
-
-.tableHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-
-    h3 {
-        font-size: var(--font-size-base);
-        font-weight: 600;
-        color: $text-primary;
-        margin: 0;
-    }
-}
-
-.viewAll {
-    font-size: var(--font-size-smd);
-    color: $primary;
-    text-decoration: none;
-    font-weight: 500;
-
-    &:hover {
-        text-decoration: underline;
-    }
-}
-
-.tableWrapper {
-    overflow-x: auto;
-}
-
-.customTable {
-    margin-bottom: 0;
-
-    th {
-        font-size: var(--font-size-sm);
-        font-weight: 600;
-        color: $text-secondary;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid $border-color;
-        padding: 12px 16px;
-        white-space: nowrap;
-    }
-
-    td {
-        font-size: var(--font-size-ssm);
-        color: $text-primary;
-        padding: 14px 16px;
-        vertical-align: middle;
-        border-bottom: 1px solid $border-color;
-    }
-
-    tbody tr {
-        transition: $transition;
-
-        &:hover {
-            background: rgba($primary, 0.03);
-        }
-    }
-}
-
-.userCell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.userAvatar {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, $primary 0%, #60a5fa 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: var(--font-size-ssm);
-    font-weight: 600;
-    flex-shrink: 0;
-}
-
-.userName {
-    display: block;
-    font-weight: 500;
-}
-
-.userUsername {
-    display: block;
-    font-size: var(--font-size-sm);
-    color: $text-secondary;
-}
-
-.score {
-    font-weight: 600;
-    color: $primary;
-}
-
-.actions {
-    display: flex;
-    gap: 4px;
-}
-
-.actionBtn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    border-radius: $radius-sm;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $text-secondary;
+    border-radius: $radius-md;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: $text-primary;
+    background: $bg-white;
     cursor: pointer;
-    transition: $transition;
 
-    &:hover {
-        background: $bg-light;
-        color: $primary;
-    }
-
-    &.delete:hover {
-        background: rgba($danger, 0.1);
-        color: $danger;
+    &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 }
 
-.activityCard {
-    background: $bg-white;
-    border-radius: $radius-lg;
-    padding: 20px;
-    box-shadow: $shadow-sm;
-    border: 1px solid $border-color;
-    height: 100%;
-}
 
-.activityHeader {
-    margin-bottom: 20px;
 
-    h3 {
-        font-size: var(--font-size-base);
-        font-weight: 600;
-        color: $text-primary;
-        margin: 0;
-    }
-}
-
-.activityList {
+.loadingState {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 16px;
+    min-height: 320px;
+    color: $text-secondary;
+    font-size: 15px;
 }
 
-.activityItem {
-    display: flex;
-    gap: 12px;
+.emptyCell {
+    text-align: center;
+    color: $text-muted;
+    padding: 24px 0;
+    display: block;
 }
 
-.activityIcon {
-    width: 32px;
-    height: 32px;
+.liveDot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
     border-radius: 50%;
+    background: $success;
+    box-shadow: 0 0 0 0 rgba($success, 0.6);
+    animation: livePulse 1.8s infinite;
+}
+
+@keyframes livePulse {
+    0% { box-shadow: 0 0 0 0 rgba($success, 0.5); }
+    70% { box-shadow: 0 0 0 6px rgba($success, 0); }
+    100% { box-shadow: 0 0 0 0 rgba($success, 0); }
+}
+
+/* ── KPI card có sparkline (kiểu dashboard hiện đại) ── */
+.kpiRow {
+    margin-bottom: 24px;
+    row-gap: 20px;
+}
+
+.kpiCard {
+    position: relative;
+    background: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: 16px;
+    padding: 18px 20px 0;
+    height: 148px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        transform: translateY(-2px);
+    }
+}
+
+.kpiTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kpiLabel {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $text-muted;
+}
+
+.kpiPeriod {
+    font-size: 11px;
+    color: $text-muted;
+    background: $bg-light;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.kpiValueRow {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.kpiValue {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    color: $text-primary;
+}
+
+.kpiTrend {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 600;
+
+    &.up { color: $success; }
+    &.down { color: $danger; }
+}
+
+.kpiSpark {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 60px;
+}
+
+/* ── Card icon màu (kiểu Sales / Orders) ── */
+.iconRow { margin-bottom: 24px; }
+
+.iconCard {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: $bg-white;
+    border: 1px solid $border-color;
+    border-radius: 16px;
+    padding: 16px 18px;
+    height: 100%;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        transform: translateY(-2px);
+    }
+}
+
+.iconBox {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    background: $bg-light;
-
-    &.success {
-        background: rgba($success, 0.1);
-        color: $success;
-    }
-
-    &.primary {
-        background: rgba($primary, 0.1);
-        color: $primary;
-    }
-
-    &.warning {
-        background: rgba($warning, 0.1);
-        color: $warning;
-    }
-
-    &.info {
-        background: rgba($purple, 0.1);
-        color: $purple;
-    }
+    background: rgba($primary, 0.1);
+    color: $primary;
 }
 
-.activityContent {
+.iconMeta {
     display: flex;
     flex-direction: column;
-    flex: 1;
     min-width: 0;
 }
 
-.activityUser {
-    font-weight: 500;
+.iconValue {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
     color: $text-primary;
-    font-size: var(--font-size-ssm);
 }
 
-.activityAction {
-    font-size: var(--font-size-smd);
+.iconLabel {
+    font-size: 13px;
+    font-weight: 600;
     color: $text-secondary;
-    margin-top: 2px;
 }
 
-.activityTime {
-    font-size: var(--font-size-sm);
+.iconSub {
+    font-size: 11px;
     color: $text-muted;
-    margin-top: 4px;
-}
-
-@media (max-width: 992px) {
-    .pageHeader {
-        flex-direction: column;
-        align-items: flex-start;
-
-        h1 {
-            font-size: var(--font-size-2xl);
-        }
-    }
-
-    .statsRow {
-        .col-lg-3 {
-            margin-bottom: 16px;
-        }
-    }
-}
-
-@media (max-width: 768px) {
-    .secondaryStats {
-        .col-lg-2 {
-            margin-bottom: 12px;
-        }
-    }
-
-    .tableHeader {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
