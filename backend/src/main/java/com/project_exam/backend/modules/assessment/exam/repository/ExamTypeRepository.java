@@ -25,4 +25,11 @@ public interface ExamTypeRepository extends JpaRepository<ExamType, String> {
     boolean existsByParentId(String parentId);
 
     long countByParentId(String parentId);
+
+    /**
+     * Số loại kỳ thi gốc CHUẨN (parentId = null, không linh hoạt) — các nhóm cấp cao nhất
+     * hiển thị cho người dùng; bỏ loại "Thông Thường" (flexible) vì đó là loại tự tạo bài, không phải kỳ thi thật.
+     */
+    @Query("SELECT COUNT(e) FROM ExamType e WHERE e.parentId IS NULL AND (e.flexible IS NULL OR e.flexible = false)")
+    long countRootStandard();
 }

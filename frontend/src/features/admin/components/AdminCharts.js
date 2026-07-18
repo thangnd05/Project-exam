@@ -21,7 +21,13 @@ import {
     Legend,
 } from 'recharts';
 
-export const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+/**
+ * Hệ màu minimalism cho trang Thống kê — chỉ 3 vai trò, dùng nhất quán mọi chart:
+ * xanh dương = chính (số liệu cốt lõi), cam = accent duy nhất (KPI tỉ lệ), xám slate = nền/phụ.
+ */
+const VIZ = { primary: '#3b82f6', accent: '#f59e0b', muted: '#94a3b8' };
+// Thứ tự khớp buildStatusDistribution: [Hoàn thành, Đang làm, Hết hạn].
+const STATUS_COLORS = [VIZ.primary, VIZ.accent, VIZ.muted];
 
 const AXIS_TICK = { fill: '#64748b', fontSize: 12 };
 const GRID_STROKE = '#e2e8f0';
@@ -142,7 +148,7 @@ export const ExamTypeDonut = ({ data }) => (
                 strokeWidth={2}
             >
                 {data.map((entry, index) => (
-                    <Cell key={entry.name} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    <Cell key={entry.name} fill={STATUS_COLORS[index % STATUS_COLORS.length]} />
                 ))}
             </Pie>
         </PieChart>
@@ -164,6 +170,34 @@ export const MonthlyNewUsersBar = ({ data }) => (
             <Tooltip {...TOOLTIP_STYLE} />
             <Bar dataKey="newUsers" name="Người dùng mới" fill="url(#acNewUsers)" radius={[6, 6, 0, 0]} barSize={28} />
         </BarChart>
+    </ResponsiveContainer>
+);
+
+// Người dùng mới theo tháng — dạng đường (nhẹ hơn cột), đo tăng trưởng người dùng.
+export const MonthlyNewUsersLine = ({ data }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <defs>
+                <linearGradient id="acNewUsersLine" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.18} />
+                    <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0} />
+                </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+            <Tooltip {...TOOLTIP_STYLE} />
+            <Area
+                type="monotone"
+                dataKey="newUsers"
+                name="Người dùng mới"
+                stroke={VIZ.primary}
+                strokeWidth={2.5}
+                fill="url(#acNewUsersLine)"
+                dot={{ r: 3, fill: VIZ.primary }}
+                activeDot={{ r: 6 }}
+            />
+        </AreaChart>
     </ResponsiveContainer>
 );
 
@@ -199,6 +233,60 @@ export const MonthlyVisitsBar = ({ data }) => (
             <Tooltip {...TOOLTIP_STYLE} content={<MonthlyVisitsTooltip />} />
             <Bar dataKey="visits" name="Lượt truy cập" fill="url(#acVisitsMonth)" radius={[6, 6, 0, 0]} barSize={28} />
         </BarChart>
+    </ResponsiveContainer>
+);
+
+// Tooltip gộp cho biểu đồ hoạt động theo tháng: truy cập, lượt thi, tỉ lệ hoàn thành + giờ cao điểm.
+const MonthlyActivityTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    const row = payload[0].payload ?? {};
+    const peak = row.peakHour;
+    const hasPeak = peak !== null && peak !== undefined && peak >= 0;
+    return (
+        <div style={{ ...TOOLTIP_STYLE.contentStyle, padding: '8px 12px' }}>
+            <div style={TOOLTIP_STYLE.labelStyle}>{label}</div>
+            <div>Lượt truy cập: <strong>{row.visits ?? 0}</strong></div>
+            <div>Lượt thi: <strong>{row.tests ?? 0}</strong></div>
+            <div>Tỉ lệ hoàn thành: <strong>{row.rate ?? 0}%</strong></div>
+            <div style={{ color: '#64748b', marginTop: 2 }}>
+                {hasPeak ? `Giờ cao điểm: ${String(peak).padStart(2, '0')}:00` : 'Chưa có truy cập'}
+            </div>
+        </div>
+    );
+};
+
+// Gộp "Lượt truy cập theo tháng" + "Hiệu suất theo tháng": 2 cột nhóm (truy cập/lượt thi) trên trục
+// trái, đường tỉ lệ hoàn thành (%) trên trục phải.
+export const MonthlyActivityCombo = ({ data }) => (
+    <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+            <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+            <YAxis
+                yAxisId="right"
+                orientation="right"
+                domain={[0, 100]}
+                axisLine={false}
+                tickLine={false}
+                tick={AXIS_TICK}
+                unit="%"
+            />
+            <Tooltip {...TOOLTIP_STYLE} content={<MonthlyActivityTooltip />} />
+            <Legend />
+            <Bar yAxisId="left" dataKey="visits" name="Lượt truy cập" fill={VIZ.muted} radius={[4, 4, 0, 0]} barSize={16} />
+            <Bar yAxisId="left" dataKey="tests" name="Lượt thi" fill={VIZ.primary} radius={[4, 4, 0, 0]} barSize={16} />
+            <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="rate"
+                name="Tỉ lệ hoàn thành (%)"
+                stroke={VIZ.accent}
+                strokeWidth={2.5}
+                dot={{ r: 3, fill: VIZ.accent }}
+                activeDot={{ r: 6 }}
+            />
+        </ComposedChart>
     </ResponsiveContainer>
 );
 

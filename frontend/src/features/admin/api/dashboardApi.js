@@ -11,6 +11,10 @@ export const getMonthlyPerformance = (year) =>
     .get(`${BASE_DASHBOARD_URL}/monthly-performance`, {params: year ? {year} : {}})
     .then((response) => response.data);
 
+/** Phân tích nội dung: bài thi hoạt động nhiều nhất & câu hỏi khó nhất. */
+export const getContentInsights = () =>
+  axios.get(`${BASE_DASHBOARD_URL}/content-insights`).then((response) => response.data);
+
 /** Heatmap ngày×giờ cho 7 ngày kết thúc ở endDate (bỏ trống = hôm nay). */
 export const getTrafficHeatmap = (endDate) =>
   axios

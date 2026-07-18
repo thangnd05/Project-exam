@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.admin.dashboard.controller;
 
+import com.project_exam.backend.modules.admin.dashboard.dto.ContentInsightsResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse.DayHours;
 import com.project_exam.backend.modules.admin.dashboard.dto.MonthlyPerformanceResponse;
@@ -38,6 +39,13 @@ public class DashboardController {
             @RequestParam(required = false) Integer year) {
         authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         return ResponseEntity.ok(dashboardService.getMonthlyPerformance(year));
+    }
+
+    /** Phân tích nội dung: bài thi hoạt động nhiều nhất & câu hỏi khó nhất (chỉ trang Thống kê gọi). */
+    @GetMapping("/content-insights")
+    public ResponseEntity<ContentInsightsResponse> getContentInsights() {
+        authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
+        return ResponseEntity.ok(dashboardService.getContentInsights());
     }
 
     /** Heatmap NGÀY × GIỜ cho 7 ngày kết thúc ở ngày được chọn (mặc định/tương lai → hôm nay). */

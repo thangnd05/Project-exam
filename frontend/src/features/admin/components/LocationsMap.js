@@ -24,13 +24,14 @@ const canon = (name) => ALIAS[norm(name)] || norm(name);
 
 const isRealCountry = (c) => c.code && c.code !== 'LO' && c.code !== '??';
 
-/** Cờ emoji từ mã ISO alpha-2 (không cần thư viện). */
-export const flagEmoji = (code) => {
+/**
+ * Nhãn quốc gia hiển thị trong danh sách: mã ISO alpha-2 (vd "VN") cho quốc gia thật,
+ * emoji cho local/không xác định. Không dùng cờ emoji vì Windows không render, gây lệch hàng.
+ */
+export const flagLabel = (code) => {
     if (code === 'LO') return '🏠';
     if (!code || code.length !== 2 || code === '??') return '🌐';
-    return code
-        .toUpperCase()
-        .replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));
+    return code.toUpperCase();
 };
 
 export const TopCountriesList = ({ countries = [] }) => {
@@ -45,7 +46,7 @@ export const TopCountriesList = ({ countries = [] }) => {
             {visible.map((c) => (
                 <div key={`${c.code}-${c.name}`} className={cx('countryRow')}>
                     <div className={cx('countryInfo')}>
-                        <span className={cx('flag')}>{flagEmoji(c.code)}</span>
+                        <span className={cx('flag')}>{flagLabel(c.code)}</span>
                         <span className={cx('countryName')} title={c.name}>{c.name}</span>
                         <span className={cx('countryCount')}>{c.value}</span>
                     </div>

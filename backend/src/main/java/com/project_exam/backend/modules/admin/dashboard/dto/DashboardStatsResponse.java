@@ -20,7 +20,8 @@ public record DashboardStatsResponse(
             long totalQuestions,
             long totalClasses,
             long totalExamsTaken,
-            long completedExams
+            long completedExams,
+            long totalExamTypes      // số loại kỳ thi gốc (parentId = null)
     ) {}
 
     /** Cặp tên–giá trị dùng cho donut (loại kỳ thi, tình trạng lượt thi) và top trang. */
@@ -29,9 +30,6 @@ public record DashboardStatsResponse(
     /** Số liệu lượt truy cập (traffic) thật, lấy từ bảng page_visits. */
     public record Traffic(
             long visitsToday,
-            Integer visitsTrend,        // hôm nay vs hôm qua (%)
-            long uniqueVisitorsWeek,    // khách duy nhất 7 ngày
-            long totalVisitsWeek,       // tổng lượt xem trang 7 ngày
             List<DayHours> heatmap,     // lượt truy cập (phiên) theo NGÀY × GIỜ, 7 ngày gần nhất
             List<CountryTraffic> topCountries // vị trí truy cập 7 ngày
     ) {}

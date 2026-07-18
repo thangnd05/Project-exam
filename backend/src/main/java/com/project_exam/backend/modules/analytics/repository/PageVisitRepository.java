@@ -13,12 +13,7 @@ import java.util.List;
 @Repository
 public interface PageVisitRepository extends JpaRepository<PageVisit, String> {
 
-    long countByCreatedAtGreaterThanEqual(LocalDateTime from);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-
-    /** Số khách duy nhất (theo sessionKey) từ mốc :from — dùng cho "khách duy nhất" và "đang online". */
-    @Query("SELECT COUNT(DISTINCT v.sessionKey) FROM PageVisit v WHERE v.createdAt >= :from")
-    long countDistinctSessionsSince(@Param("from") LocalDateTime from);
 
     /** (createdAt, userId) của các lượt xem từ :from — dựng biểu đồ theo giờ, tách khách vs user. */
     @Query("SELECT v.createdAt, v.userId FROM PageVisit v WHERE v.createdAt >= :from")

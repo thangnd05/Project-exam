@@ -50,9 +50,20 @@
 }
 
 .flag {
-    font-size: 16px;
-    line-height: 1;
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 4px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    line-height: 1;
 }
 
 .countryName {

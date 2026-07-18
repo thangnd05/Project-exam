@@ -1,0 +1,106 @@
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$border-color: #e2e8f0;
+$success: #10b981;
+$warning: #f59e0b;
+$danger: #ef4444;
+
+.tableWrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-ssm);
+
+    thead th {
+        text-align: left;
+        padding: 10px 12px;
+        color: $text-secondary;
+        font-weight: var(--font-weight-medium);
+        border-bottom: 1px solid $border-color;
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 12px;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+        color: $text-primary;
+        vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover td {
+        background: rgba(59, 130, 246, 0.04);
+    }
+}
+
+.rank {
+    width: 40px;
+    color: $text-secondary;
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+}
+
+.title {
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--font-weight-medium);
+}
+
+.num {
+    width: 90px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.rateCol {
+    width: 200px;
+}
+
+.rateCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rateTrack {
+    flex: 1;
+    height: 8px;
+    background: #eef2f7;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.rateFill {
+    height: 100%;
+    border-radius: 999px;
+    background: #3b82f6;
+    transition: width 0.4s ease;
+}
+
+.rateValue {
+    width: 40px;
+    text-align: right;
+    color: $text-secondary;
+    font-variant-numeric: tabular-nums;
+}
+
+.empty {
+    text-align: center;
+    color: #94a3b8;
+    padding: 28px 0;
+}
+
+@media (max-width: 768px) {
+    .title { max-width: 160px; }
+    .rateCol { width: 130px; }
+}

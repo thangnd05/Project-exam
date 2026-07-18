@@ -1,12 +1,16 @@
 package com.project_exam.backend.modules.admin.dashboard.service;
 
+import com.project_exam.backend.modules.admin.dashboard.dto.ContentInsightsResponse;
+import com.project_exam.backend.modules.admin.dashboard.dto.ContentInsightsResponse.TestStat;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse.*;
 import com.project_exam.backend.modules.admin.dashboard.dto.MonthlyPerformanceResponse;
 import com.project_exam.backend.modules.analytics.repository.PageVisitRepository;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
+import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
@@ -37,6 +41,7 @@ public class DashboardService {
     private final ClassRepository classRepository;
     private final UserTestRepository userTestRepository;
     private final PageVisitRepository pageVisitRepository;
+    private final ExamTypeRepository examTypeRepository;
 
     @Transactional(readOnly = true)
     public DashboardStatsResponse getStats() {
@@ -56,7 +61,6 @@ public class DashboardService {
     // ── Traffic thật (bảng page_visits) ──────────────────────────
     private Traffic buildTraffic(LocalDate today) {
         LocalDateTime todayStart = today.atStartOfDay();
-        LocalDateTime yesterdayStart = todayStart.minusDays(1);
         LocalDate weekStartDate = today.minusDays(6);
         LocalDateTime weekStart = weekStartDate.atStartOfDay();
 
@@ -65,8 +69,6 @@ public class DashboardService {
 
         long visitsToday = sessions.stream()
                 .filter(s -> !s.time().isBefore(todayStart)).count();
-        long visitsYesterday = sessions.stream()
-                .filter(s -> !s.time().isBefore(yesterdayStart) && s.time().isBefore(todayStart)).count();
 
         // Heatmap lượt TRUY CẬP (phiên) theo NGÀY × GIỜ, 7 ngày gần nhất.
         List<DayHours> heatmap = buildHeatmap(today);
@@ -79,9 +81,6 @@ public class DashboardService {
 
         return new Traffic(
                 visitsToday,
-                trend(visitsToday, visitsYesterday),
-                pageVisitRepository.countDistinctSessionsSince(weekStart),
-                pageVisitRepository.countByCreatedAtGreaterThanEqual(weekStart), // tổng lượt XEM TRANG 7 ngày
                 heatmap,
                 topCountries
         );
@@ -160,16 +159,9 @@ public class DashboardService {
                 questionRepository.count(),
                 classRepository.count(),
                 userTestRepository.count(),
-                userTestRepository.countByStatus(UserTest.Status.COMPLETED)
+                userTestRepository.countByStatus(UserTest.Status.COMPLETED),
+                examTypeRepository.countRootStandard()
         );
-    }
-
-    /** % thay đổi giữa 2 kỳ; null khi không đủ dữ liệu để so sánh (ẩn mũi tên trend ở FE). */
-    private static Integer trend(long current, long previous) {
-        if (previous == 0) {
-            return current > 0 ? 100 : null;
-        }
-        return (int) Math.round(((double) (current - previous) / previous) * 100);
     }
 
     // ── Hiệu suất 12 tháng của một năm được chọn ─────────────────
@@ -247,6 +239,41 @@ public class DashboardService {
         result.add(new NameValue("Hoàn thành", userTestRepository.countByStatus(UserTest.Status.COMPLETED)));
         result.add(new NameValue("Đang làm", userTestRepository.countByStatus(UserTest.Status.IN_PROGRESS)));
         result.add(new NameValue("Hết hạn", userTestRepository.countByStatus(UserTest.Status.EXPIRED)));
+        return result;
+    }
+
+    // ── Phân tích nội dung: bài công khai làm nhiều nhất ─────────
+    private static final int TOP_TESTS_LIMIT = 8;
+
+    @Transactional(readOnly = true)
+    public ContentInsightsResponse getContentInsights() {
+        return new ContentInsightsResponse(
+                buildTopTests(userTestRepository.aggregateFullTestStats(
+                        UserTest.Status.COMPLETED, UserTest.Mode.FULL_TEST)),
+                buildTopTests(userTestRepository.aggregatePracticeTestStats(
+                        UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE))
+        );
+    }
+
+    /** Top bài theo tổng lượt làm (từ rows đã gom theo bài); kèm tỉ lệ hoàn thành & điểm TB. */
+    private List<TestStat> buildTopTests(List<Object[]> aggregated) {
+        List<Object[]> rows = new ArrayList<>(aggregated);
+        rows.sort((a, b) -> Long.compare(((Number) b[1]).longValue(), ((Number) a[1]).longValue()));
+        List<Object[]> top = rows.stream().limit(TOP_TESTS_LIMIT).collect(Collectors.toList());
+
+        List<String> testIds = top.stream().map(r -> (String) r[0]).collect(Collectors.toList());
+        Map<String, String> titles = testRepository.findAllById(testIds).stream()
+                .collect(Collectors.toMap(Test::getTestId, Test::getTitle));
+
+        List<TestStat> result = new ArrayList<>();
+        for (Object[] r : top) {
+            String testId = (String) r[0];
+            long attempts = ((Number) r[1]).longValue();
+            long completed = r[2] == null ? 0 : ((Number) r[2]).longValue();
+            long rate = attempts == 0 ? 0 : Math.round(completed * 100.0 / attempts);
+            result.add(new TestStat(testId, titles.getOrDefault(testId, "(đã xoá)"),
+                    attempts, completed, rate));
+        }
         return result;
     }
 }

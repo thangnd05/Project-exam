@@ -128,4 +128,30 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     @Query("SELECT ut.startedAt, ut.totalScore, ut.status FROM UserTest ut WHERE ut.startedAt >= :from")
     List<Object[]> findAttemptsSince(@Param("from") java.time.LocalDateTime from);
 
+    /**
+     * Bài thi CÔNG KHAI (không thuộc lớp) làm nhiều nhất ở chế độ FULL_TEST:
+     * [testId, tổng lượt, số hoàn thành]. Row cũ mode = NULL coi như full. Sắp xếp & lấy top ở service.
+     */
+    @Query("SELECT ut.testId, COUNT(ut), "
+            + "SUM(CASE WHEN ut.status = :completed THEN 1 ELSE 0 END) "
+            + "FROM UserTest ut, Test t "
+            + "WHERE t.testId = ut.testId AND t.classId IS NULL "
+            + "AND (ut.mode IS NULL OR ut.mode = :fullMode) "
+            + "GROUP BY ut.testId")
+    List<Object[]> aggregateFullTestStats(@Param("completed") UserTest.Status completed,
+                                          @Param("fullMode") UserTest.Mode fullMode);
+
+    /**
+     * Bài thi CÔNG KHAI (không thuộc lớp) được LUYỆN TẬP (PRACTICE) nhiều nhất:
+     * [testId, tổng lượt, số hoàn thành]. Sắp xếp & lấy top ở service.
+     */
+    @Query("SELECT ut.testId, COUNT(ut), "
+            + "SUM(CASE WHEN ut.status = :completed THEN 1 ELSE 0 END) "
+            + "FROM UserTest ut, Test t "
+            + "WHERE t.testId = ut.testId AND t.classId IS NULL "
+            + "AND ut.mode = :practiceMode "
+            + "GROUP BY ut.testId")
+    List<Object[]> aggregatePracticeTestStats(@Param("completed") UserTest.Status completed,
+                                              @Param("practiceMode") UserTest.Mode practiceMode);
+
 }

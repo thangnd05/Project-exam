@@ -1,11 +1,17 @@
 import {useQuery} from '@tanstack/react-query';
 
-import {getDashboardStats, getMonthlyPerformance, getTrafficHeatmap} from '~/features/admin/api/dashboardApi';
+import {
+  getContentInsights,
+  getDashboardStats,
+  getMonthlyPerformance,
+  getTrafficHeatmap,
+} from '~/features/admin/api/dashboardApi';
 
 export const dashboardKeys = {
   stats: ['admin-dashboard-stats'],
   monthlyPerformance: (year) => ['admin-dashboard-monthly-performance', year ?? 'current'],
   trafficHeatmap: (endDate) => ['admin-dashboard-traffic-heatmap', endDate ?? 'today'],
+  contentInsights: ['admin-dashboard-content-insights'],
 };
 
 /** Số liệu tổng quan cho Dashboard admin — tự làm mới mỗi 30s và khi quay lại tab. */
@@ -26,6 +32,15 @@ export function useMonthlyPerformance(year) {
     queryFn: () => getMonthlyPerformance(year),
     staleTime: 60 * 1000,
     keepPreviousData: true,
+  });
+}
+
+/** Phân tích nội dung (bài hot & câu khó) — số liệu nặng, ít đổi, chỉ trang Thống kê dùng. */
+export function useContentInsights() {
+  return useQuery({
+    queryKey: dashboardKeys.contentInsights,
+    queryFn: getContentInsights,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
