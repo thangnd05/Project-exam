@@ -69,7 +69,7 @@ const AnalyticsPage = () => {
         <div className={cx('analyticsPage')}>
             <AdminPageHeader
                 title="Thống kê & Phân tích"
-                description="Phân tích chi tiết về hệ thống English Exam"
+                description="Phân tích chi tiết về hệ thống WinDe Exam"
             />
 
             {isLoading ? (

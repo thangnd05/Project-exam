@@ -64,7 +64,7 @@ const AdminDashboard = () => {
     return (
         <div className={cx('dashboard')}>
             <PageHeader
-                label="Tổng quan hệ thống English Exam"
+                label="Tổng quan hệ thống WinDe Exam"
                 title="Dashboard"
             >
                 <span className={cx('dateBadge')}>
