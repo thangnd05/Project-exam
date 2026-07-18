@@ -9,6 +9,9 @@
   --primary-gradient: linear-gradient(135deg,
       var(--accent-color) 0%,
       var(--accent-act-color) 100%);
+  // Màu nút chính (nút "Bắt đầu"): dùng lại cho pagination active, ...
+  --primary-btn-gradient: linear-gradient(135deg, var(--accent-color) 0%, #0056d2 100%);
+  --primary-btn-shadow: 0 10px 22px rgba(0, 97, 242, 0.28);
   --accent-color: #0061f2;
     --accent-act-color: #00c6ff;
   --hover-accent: #0061f2;
@@ -292,11 +295,11 @@ li {
 }
 
 @mixin primaryGradientButton {
-  background: linear-gradient(135deg, var(--accent-color) 0%, #0056d2 100%);
+  background: var(--primary-btn-gradient);
   border-color: transparent;
   color: var(--white);
   transition: all 0.25s ease;
-  box-shadow: 0 10px 22px rgba(0, 97, 242, 0.28);
+  box-shadow: var(--primary-btn-shadow);
 
   &:hover {
     transform: translateY(-2px);

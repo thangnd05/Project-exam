@@ -175,7 +175,7 @@
   }
 
   &.primary {
-    background: linear-gradient(135deg, var(--accent-color) 0%, #0056d2 100%);
+    background: var(--primary-btn-gradient);
     border-color: transparent;
     color: #fff;
 

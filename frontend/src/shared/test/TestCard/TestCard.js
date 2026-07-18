@@ -4,8 +4,6 @@ import {
     IoTimeOutline,
     IoCalendarOutline,
     IoHourglassOutline,
-    IoStatsChartOutline,
-    IoPlayCircleOutline,
     IoLockClosedOutline,
     IoLockOpenOutline,
     IoCreateOutline,
@@ -163,11 +161,6 @@ function TestCard({ test, countdowns }) {
                         onClick={handleStart}
                         disabled={!canStart}
                     >
-                        {canStart ? (
-                            <IoPlayCircleOutline size={22} />
-                        ) : (
-                            <IoLockClosedOutline size={20} />
-                        )}
                         {buttonText}
                     </ButtonPrime>
 
@@ -179,7 +172,6 @@ function TestCard({ test, countdowns }) {
                             navigate(`/tests/history/${test.testId}`)
                         }
                     >
-                        <IoStatsChartOutline />
                         Lịch sử
                     </ButtonPrime>
 

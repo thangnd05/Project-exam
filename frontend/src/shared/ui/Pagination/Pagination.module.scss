@@ -28,10 +28,10 @@
   }
 
   &.active {
-    background: var(--primary-gradient);
+    background: var(--primary-btn-gradient);
     border-color: transparent;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 97, 242, 0.25);
+    box-shadow: var(--primary-btn-shadow);
   }
 
   &.disabled {
