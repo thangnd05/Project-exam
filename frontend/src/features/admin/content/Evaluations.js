@@ -5,6 +5,7 @@ import {Edit, Plus, Trash2} from 'lucide-react';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import useDebouncedValue from '~/shared/hooks/useDebouncedValue';
 import {
   AdminFieldError,
   AdminPageHeader,
@@ -29,6 +30,8 @@ function EvaluationsManagement() {
   const [deletingEvaluation, setDeletingEvaluation] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
 
+  const debouncedKeyword = useDebouncedValue(keyword, 300);
+
   const {
     evaluationList,
     totalElements,
@@ -38,7 +41,7 @@ function EvaluationsManagement() {
   } = useEvaluations({
     page: currentPage,
     size: ITEMS_PER_PAGE,
-    keyword,
+    keyword: debouncedKeyword,
     rating: ratingFilter,
   });
 

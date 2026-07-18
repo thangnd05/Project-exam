@@ -2,10 +2,16 @@ import { useState, useEffect } from 'react';
 import { Badge, Button } from 'react-bootstrap';
 import { Eye, CheckCircle, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import classNames from 'classnames/bind';
+
 import routes from '~/shared/config/Routes';
+import useDebouncedValue from '~/shared/hooks/useDebouncedValue';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common';
+import styles from '../components/common/adminKit.module.scss';
+
+const cx = classNames.bind(styles);
 import { usePosts, useApprovePost, useDeletePost } from './hooks/usePosts';
 
 const STATUS_VARIANT = { APPROVED: 'success', PENDING: 'warning' };
@@ -24,12 +30,13 @@ const Posts = () => {
     const [deletingPost, setDeletingPost] = useState(null);
 
     const PAGE_SIZE = 10;
+    const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
     const postsQuery = usePosts({
         page: currentPage,
         size: PAGE_SIZE,
         status: statusFilter,
-        keyword: searchQuery,
+        keyword: debouncedSearch,
     });
     const approvePost = useApprovePost();
     const deletePostMutation = useDeletePost();
@@ -41,7 +48,7 @@ const Posts = () => {
 
     useEffect(() => {
         setCurrentPage(0);
-    }, [statusFilter, searchQuery]);
+    }, [statusFilter, debouncedSearch]);
 
     useEffect(() => {
         if (postsQuery.isError) {
@@ -120,8 +127,7 @@ const Posts = () => {
                         <Button
                             key={item.value}
                             size="sm"
-                            className="rounded-pill"
-                            variant={statusFilter === item.value ? 'primary' : 'outline-secondary'}
+                            className={cx('pillBtn', {active: statusFilter === item.value})}
                             onClick={() => setStatusFilter(item.value)}
                         >
                             {item.label}
