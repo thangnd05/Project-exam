@@ -18,9 +18,6 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  Bell,
-  Search,
-  Menu,
   Folder,
   FileText,
   Library,
@@ -193,40 +190,6 @@ function AdminLayout({children}) {
       </>
 
       <div className={cx('mainArea', {collapsed})}>
-
-        <header className={cx('header')}>
-          <div className={cx('headerLeft')}>
-            <button
-              className={cx('mobileMenuBtn')}
-              onClick={() => setMobileOpen(true)}
-            >
-              <Menu size={24} />
-            </button>
-            <div className={cx('searchBox')}>
-              <Search size={18} className={cx('searchIcon')} />
-              <input
-                type="text"
-                placeholder="Tìm kiếm..."
-                className={cx('searchInput')}
-              />
-            </div>
-          </div>
-          <div className={cx('headerRight')}>
-            <button className={cx('headerBtn')}>
-              <Bell size={20} />
-              <span className={cx('notificationBadge')}>3</span>
-            </button>
-            <div className={cx('userInfo')}>
-              <div className={cx('userAvatar')}>
-                <span>A</span>
-              </div>
-              <div className={cx('userDetails')}>
-                <span className={cx('userName')}>Admin User</span>
-                <span className={cx('userRole')}>Administrator</span>
-              </div>
-            </div>
-          </div>
-        </header>
 
         <main className={cx('content')}>
           <AnimatePresence mode="wait">

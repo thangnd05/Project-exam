@@ -24,6 +24,7 @@ const PageHeader = ({
       <div className={cx('heroContent')}>
         {label && <span className={cx('label', labelClassName)}>{label}</span>}
         <h1>{title}</h1>
+        {description && <p className={cx('description')}>{description}</p>}
         {badgeLabel && <div className={cx('badge')}>{badgeLabel}</div>}
       </div>
 

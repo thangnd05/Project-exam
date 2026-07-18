@@ -1,18 +1,12 @@
-import classNames from 'classnames/bind';
+import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 
-import styles from './adminKit.module.scss';
-
-const cx = classNames.bind(styles);
-
+// Dùng chung PageHeader hero với Dashboard: mô tả thành eyebrow (IN HOA, mờ, ở trên),
+// tiêu đề đậm ở dưới — đồng bộ hệt Dashboard cho toàn bộ trang admin.
 function AdminPageHeader({title, description, children}) {
   return (
-    <div className={cx('header')}>
-      <div className={cx('headingGroup')}>
-        <h1 className={cx('title')}>{title}</h1>
-        {description && <p className={cx('description')}>{description}</p>}
-      </div>
-      {children && <div className={cx('headerActions')}>{children}</div>}
-    </div>
+    <PageHeader title={title} label={description}>
+      {children}
+    </PageHeader>
   );
 }
 
