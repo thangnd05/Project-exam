@@ -4,7 +4,6 @@ import {
     Plus,
     Edit,
     Trash2,
-    BookMarked,
     Eye,
     Volume2,
     Copy
@@ -90,24 +89,9 @@ const VocabularyManagement = () => {
             </AdminPageHeader>
 
             <StatCardGroup>
-                <StatCard
-                    label="Tổng từ vựng"
-                    value={dashboardStats.totalVocabulary}
-                    icon={BookMarked}
-                    tone="blue"
-                />
-                <StatCard
-                    label="Thẻ Ghi Nhớ"
-                    value={fakeVocabularyAlbums.length}
-                    icon={BookMarked}
-                    tone="green"
-                />
-                <StatCard
-                    label="Từ đã học"
-                    value={totalLearned}
-                    icon={BookMarked}
-                    tone="amber"
-                />
+                <StatCard label="Tổng từ vựng" value={dashboardStats.totalVocabulary} />
+                <StatCard label="Thẻ Ghi Nhớ" value={fakeVocabularyAlbums.length} />
+                <StatCard label="Từ đã học" value={totalLearned} />
             </StatCardGroup>
 
             <AdminToolbar

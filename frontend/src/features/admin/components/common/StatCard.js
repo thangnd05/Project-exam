@@ -1,6 +1,7 @@
 import classNames from 'classnames/bind';
 
 import styles from './adminKit.module.scss';
+import AdminCard from './AdminCard';
 
 const cx = classNames.bind(styles);
 
@@ -8,19 +9,12 @@ export function StatCardGroup({children}) {
   return <div className={cx('statGroup')}>{children}</div>;
 }
 
-export function StatCard({label, value, icon: Icon, tone = 'blue'}) {
+export function StatCard({label, value}) {
   return (
-    <div className={cx('statCard', tone)}>
-      {Icon && (
-        <div className={cx('statIcon')}>
-          <Icon size={20} />
-        </div>
-      )}
-      <div className={cx('statBody')}>
-        <span className={cx('statValue')}>{value}</span>
-        <span className={cx('statLabel')}>{label}</span>
-      </div>
-    </div>
+    <AdminCard className={cx('statCard')}>
+      <span className={cx('statLabel')}>{label}</span>
+      <span className={cx('statValue')}>{value}</span>
+    </AdminCard>
   );
 }
 

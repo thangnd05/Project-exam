@@ -2,9 +2,13 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
 import {Save, ShieldCheck} from 'lucide-react';
 import {toast} from 'react-toastify';
+import classNames from 'classnames/bind';
 
 import {AdminFieldError, AdminPageHeader} from '../components/common';
 import {usePermissionsMatrix} from './hooks/usePermissionsMatrix';
+import styles from '../components/common/adminKit.module.scss';
+
+const cx = classNames.bind(styles);
 
 const PROTECTED_ROLE = 'ADMIN';
 
@@ -138,8 +142,8 @@ function PermissionsManagement() {
 
       <AdminFieldError message={displayError} />
 
-      <div style={{overflowX: 'auto'}}>
-        <Table bordered hover responsive className="align-middle mb-0">
+      <div className={cx('tableWrapper')} style={{overflowX: 'auto'}}>
+        <Table hover responsive className="align-middle mb-0">
           <thead>
             <tr>
               <th style={{minWidth: 280}}>Hành động</th>

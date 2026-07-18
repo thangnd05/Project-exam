@@ -1,8 +1,6 @@
-import {Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Search} from 'lucide-react';
-
 import styles from './adminKit.module.scss';
+import AdminSearchInput from './AdminSearchInput';
 
 const cx = classNames.bind(styles);
 
@@ -15,14 +13,11 @@ function AdminToolbar({
   return (
     <div className={cx('toolbar')}>
       {onSearchChange && (
-        <div className={cx('searchBox')}>
-          <Search size={16} className={cx('searchIcon')} />
-          <Form.Control
-            value={searchValue}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder={searchPlaceholder}
-          />
-        </div>
+        <AdminSearchInput
+          value={searchValue}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder}
+        />
       )}
       {children && <div className={cx('toolbarActions')}>{children}</div>}
     </div>

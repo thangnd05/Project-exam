@@ -16,22 +16,6 @@ $radius-lg: 16px;
     padding: 0;
 }
 
-.pageHeader {
-    margin-bottom: 24px;
-
-    h1 {
-        font-size: var(--font-size-2xxl);
-        font-weight: 700;
-        color: $text-primary;
-        margin-bottom: 4px;
-    }
-
-    p {
-        color: $text-secondary;
-        margin: 0;
-    }
-}
-
 .metricsRow {
     margin-bottom: 24px;
 }

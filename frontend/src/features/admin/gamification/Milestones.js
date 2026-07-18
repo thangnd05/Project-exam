@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import {Button, Form, Spinner} from 'react-bootstrap';
+import {Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
 
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import useMilestoneScoring from '~/shared/hooks/useMilestoneScoring';
 import {
@@ -267,10 +268,10 @@ function MilestonesManagement() {
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
             />
-            <Button onClick={handleCreate} disabled={submitting}>
+            <ButtonPrime onClick={handleCreate} disabled={submitting}>
               <Plus size={16} />
               Thêm
-            </Button>
+            </ButtonPrime>
           </div>
           <AdminFieldError message={errorMessage} />
         </div>
@@ -360,8 +361,8 @@ function MilestonesManagement() {
                 </div>
                 {renderScoreEstimate(editParts, m.milestoneScore)}
                 <div className={cx('editActions')}>
-                  <Button
-                    variant="outline-secondary"
+                  <ButtonPrime
+                    variant="outline"
                     size="sm"
                     onClick={() => {
                       setEditingId(null);
@@ -369,14 +370,14 @@ function MilestonesManagement() {
                     }}
                   >
                     <X size={14} /> Hủy
-                  </Button>
-                  <Button
+                  </ButtonPrime>
+                  <ButtonPrime
                     size="sm"
                     onClick={() => handleSaveEdit(m)}
                     disabled={submitting}
                   >
                     <Check size={14} /> Lưu
-                  </Button>
+                  </ButtonPrime>
                 </div>
               </>
             ) : (

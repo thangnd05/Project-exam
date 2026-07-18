@@ -5,7 +5,6 @@ import {
     Plus,
     Edit,
     Trash2,
-    FileQuestion,
     Eye,
     Copy
 } from 'lucide-react';
@@ -101,20 +100,14 @@ const QuestionsManagement = () => {
                 <StatCard
                     label="Tổng câu hỏi"
                     value={dashboardStats.totalQuestions}
-                    icon={FileQuestion}
-                    tone="blue"
                 />
                 <StatCard
                     label="Trắc nghiệm"
                     value={fakeQuestions.filter(q => q.question_type === 'MCQ').length}
-                    icon={FileQuestion}
-                    tone="green"
                 />
                 <StatCard
                     label="Điền trống"
                     value={fakeQuestions.filter(q => q.question_type === 'FILL_BLANK').length}
-                    icon={FileQuestion}
-                    tone="amber"
                 />
             </StatCardGroup>
 

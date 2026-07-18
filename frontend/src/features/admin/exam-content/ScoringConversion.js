@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Braces, Plus, Trash2} from 'lucide-react';
+import classNames from 'classnames/bind';
 
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import {
   AdminCard,
   AdminFieldError,
@@ -10,6 +14,9 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
+import styles from '../components/common/adminKit.module.scss';
+
+const cx = classNames.bind(styles);
 import {useScoringConversion} from './hooks/useScoringConversion';
 
 const defaultFormState = {
@@ -205,7 +212,6 @@ function ScoringConversionManagement() {
         description="Thiết lập score theo exam type, kỹ năng và số câu trả lời đúng."
       >
         <Button
-          variant="outline-primary"
           onClick={() => {
             setShowJsonCreateForm((previous) => !previous);
             setErrorMessage('');
@@ -217,38 +223,46 @@ function ScoringConversionManagement() {
         </Button>
       </AdminPageHeader>
 
-      {showJsonCreateForm && (
-        <AdminCard>
-          <h5>Tạo quy đổi điểm bằng JSON</h5>
-          <p className="text-secondary">
-            Dán mảng JSON theo format: <code>[{'{'}"examTypeId","skillId","numCorrect","convertedScore"{'}'}]</code>
-          </p>
-          <Form.Control
-            as="textarea"
-            ref={jsonTextareaRef}
-            rows={8}
-            placeholder='[{"examTypeId":"...","skillId":"...","numCorrect":0,"convertedScore":5}]'
-            value={jsonCreateValue}
-            onChange={(event) => setJsonCreateValue(event.target.value)}
+      <BaseModal
+        show={showJsonCreateForm}
+        onClose={() => {
+          if (submitting) {
+            return;
+          }
+          setShowJsonCreateForm(false);
+          setJsonCreateValue('');
+          setErrorMessage('');
+        }}
+        title="Tạo quy đổi điểm bằng JSON"
+        maxWidth={600}
+        footer={
+          <ModalActionFooter
+            onCancel={() => {
+              setShowJsonCreateForm(false);
+              setJsonCreateValue('');
+              setErrorMessage('');
+            }}
+            onSubmit={handleCreateByJson}
+            cancelLabel="Hủy"
+            submitLabel="Tạo dữ liệu"
+            loading={submitting}
           />
-          <div className="d-flex gap-2 mt-3">
-            <Button variant="primary" disabled={submitting} onClick={handleCreateByJson}>
-              Tạo dữ liệu
-            </Button>
-            <Button
-              variant="outline-secondary"
-              disabled={submitting}
-              onClick={() => {
-                setShowJsonCreateForm(false);
-                setJsonCreateValue('');
-                setErrorMessage('');
-              }}
-            >
-              Hủy
-            </Button>
-          </div>
-        </AdminCard>
-      )}
+        }
+      >
+        <AdminFieldError message={errorMessage} />
+        <p className="text-secondary mb-3">
+          Dán mảng JSON theo format: <code>[{'{'}"examTypeId","skillId","numCorrect","convertedScore"{'}'}]</code>
+        </p>
+        <Form.Control
+          as="textarea"
+          ref={jsonTextareaRef}
+          rows={12}
+          style={{fontFamily: 'monospace', fontSize: '1.4rem'}}
+          placeholder='[{"examTypeId":"...","skillId":"...","numCorrect":0,"convertedScore":5}]'
+          value={jsonCreateValue}
+          onChange={(event) => setJsonCreateValue(event.target.value)}
+        />
+      </BaseModal>
 
       <AdminToolbar
         searchValue={keyword}
@@ -271,8 +285,7 @@ function ScoringConversionManagement() {
         <Button
           type="button"
           size="sm"
-          className="rounded-pill"
-          variant={activeSkillId === 'all' ? 'primary' : 'outline-secondary'}
+          className={cx('pillBtn', {active: activeSkillId === 'all'})}
           onClick={() => setActiveSkillId('all')}
         >
           Tất cả kỹ năng
@@ -282,8 +295,7 @@ function ScoringConversionManagement() {
             key={skill.skill_id}
             type="button"
             size="sm"
-            className="rounded-pill"
-            variant={activeSkillId === skill.skill_id ? 'primary' : 'outline-secondary'}
+            className={cx('pillBtn', {active: activeSkillId === skill.skill_id})}
             onClick={() => setActiveSkillId(skill.skill_id)}
           >
             {skill.name}
@@ -346,10 +358,10 @@ function ScoringConversionManagement() {
               }))
             }
           />
-          <Button onClick={handleAddRule}>
+          <ButtonPrime onClick={handleAddRule}>
             <Plus size={16} />
             Thêm
-          </Button>
+          </ButtonPrime>
         </div>
         <AdminFieldError message={errorMessage} />
       </AdminCard>

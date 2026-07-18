@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Button, Form, Spinner } from 'react-bootstrap';
+import { Form, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { Flame } from 'lucide-react';
 
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { AdminCard, AdminFieldError, AdminPageHeader } from '../components/common';
 import { useStreakRecoverConfig } from './hooks/useStreakRecoverConfig';
 
@@ -87,9 +88,9 @@ function StreakRecoverManagement() {
 
           <AdminFieldError message={errorMessage} />
 
-          <Button onClick={handleSave} disabled={isSaving}>
+          <ButtonPrime onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
-          </Button>
+          </ButtonPrime>
         </AdminCard>
       )}
     </div>
