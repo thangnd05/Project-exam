@@ -20,6 +20,9 @@ public interface ClassMemberRepository extends JpaRepository<ClassMember, String
     List<ClassMember> findByUserIdAndStatus(String studentId, MemberStatus status);
     long countByUserIdAndStatus(String userId, MemberStatus status);
 
+    // Tổng số lượt xin vào lớp đang chờ duyệt (thống kê Dashboard admin)
+    long countByStatus(MemberStatus status);
+
     // Kiểm tra học sinh đã trong lớp chưa (mọi trạng thái — dùng khi cần biết đã có request hay chưa)
     boolean existsByClassIdAndUserId(String classId, String userId);
 

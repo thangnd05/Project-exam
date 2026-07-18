@@ -103,6 +103,10 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     @Query("SELECT MIN(ut.startedAt) FROM UserTest ut WHERE ut.userId = :userId")
     java.time.LocalDateTime findEarliestStartedAt(@Param("userId") String userId);
 
+    /** Mốc bắt đầu sớm nhất toàn hệ thống — dựng danh sách năm chọn cho biểu đồ hiệu suất. */
+    @Query("SELECT MIN(ut.startedAt) FROM UserTest ut")
+    java.time.LocalDateTime findEarliestStartedAt();
+
     long countByTestIdAndStatusAndTotalScoreLessThanEqual(String testId, UserTest.Status status, Integer score);
 
     long countByTestIdAndStatus(String testId, UserTest.Status status);
@@ -116,5 +120,12 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
             + "WHERE ut.testId IN :testIds AND ut.userId = :userId GROUP BY ut.testId")
     List<Object[]> countGroupedByTestIdInAndUserId(
             @Param("testIds") List<String> testIds, @Param("userId") String userId);
+
+    // ── Thống kê Dashboard admin ──────────────────────────────
+    long countByStatus(UserTest.Status status);
+
+    /** (startedAt, totalScore, status) từ mốc :from — dựng biểu đồ hiệu suất theo tháng. */
+    @Query("SELECT ut.startedAt, ut.totalScore, ut.status FROM UserTest ut WHERE ut.startedAt >= :from")
+    List<Object[]> findAttemptsSince(@Param("from") java.time.LocalDateTime from);
 
 }

@@ -62,6 +62,7 @@ public final class PermissionCatalog {
 
     // ── Hệ thống ───────────────────────────────────────────────
     public static final String AUDIT_VIEW = "AUDIT:VIEW";
+    public static final String DASHBOARD_VIEW = "DASHBOARD:VIEW";
 
     private static final String G_USER = "Người dùng & phân quyền";
     private static final String G_EXAM = "Đề thi & nội dung kiểm tra";
@@ -107,6 +108,7 @@ public final class PermissionCatalog {
             new Def(COIN_MANAGE, G_GAME, "Quản lý xu người dùng"),
             new Def(STREAK_CONFIG_MANAGE, G_GAME, "Quản lý cấu hình streak"),
 
-            new Def(AUDIT_VIEW, G_SYSTEM, "Xem nhật ký hoạt động")
+            new Def(AUDIT_VIEW, G_SYSTEM, "Xem nhật ký hoạt động"),
+            new Def(DASHBOARD_VIEW, G_SYSTEM, "Xem tổng quan Dashboard quản trị (thống kê hệ thống)")
     );
 }

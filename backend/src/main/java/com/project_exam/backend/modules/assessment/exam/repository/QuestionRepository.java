@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, String> {
+
     List<Question> findByExamPartId(String examPartId);
     List<Question> findByPassageId(String passageId);
     List<Question> findByChapterId(String chapterId);
