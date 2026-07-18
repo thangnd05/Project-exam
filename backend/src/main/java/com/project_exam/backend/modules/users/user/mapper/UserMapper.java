@@ -15,6 +15,7 @@ public class UserMapper {
                 .email(user.getEmail())
                 .roleId(user.getRoleId())
                 .avatarUrl(user.getAvatarUrl())
+                .verified(user.getVerified())
                 .build();
     }
 }

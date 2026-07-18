@@ -18,6 +18,7 @@ public class UserResponse {
     private String email;
     private String roleId;
     private String avatarUrl;
+    private Boolean verified;
     // Chỉ điền ở luồng auth (login, /me): tên vai trò + danh sách permission code để FE gate UI.
     private String roleName;
     private List<String> permissions;

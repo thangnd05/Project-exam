@@ -172,6 +172,11 @@ public class UserService {
     }
 
     public User updateUser(String id, User updatedUser, MultipartFile avatar) throws IOException {
+        return updateUser(id, updatedUser, avatar, null);
+    }
+
+    public User updateUser(String id, User updatedUser, MultipartFile avatar, Boolean verifiedOverride)
+            throws IOException {
 
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -196,6 +201,11 @@ public class UserService {
             existingUser.setAvatarUrl(avatarUrl);
         }
 
+        //  Admin đổi trạng thái xác thực (đặt sau reset email để lựa chọn của admin thắng).
+        if (verifiedOverride != null) {
+            existingUser.setVerified(verifiedOverride);
+        }
+
         return userRepository.save(existingUser);
     }
 
@@ -204,7 +214,13 @@ public class UserService {
         updatedUser.setFullName(request.getFullName());
         updatedUser.setUserName(request.getUserName());
         updatedUser.setEmail(request.getEmail());
-        return toResponse(updateUser(id, updatedUser, avatar));
+
+        //  Chỉ admin (USER_MANAGE) mới được đổi trạng thái xác thực qua endpoint này.
+        Boolean verifiedOverride =
+                (request.getVerified() != null && authUtils.hasPermission(PermissionCatalog.USER_MANAGE))
+                        ? request.getVerified()
+                        : null;
+        return toResponse(updateUser(id, updatedUser, avatar, verifiedOverride));
     }
 
     public ProfileOverviewResponse getProfileOverview(String id) {
