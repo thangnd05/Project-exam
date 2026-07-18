@@ -13,6 +13,7 @@ import { CoinProvider } from '~/shared/context/CoinContext';
 import { CosmeticProvider } from '~/shared/context/CosmeticContext';
 import StreakCelebration from '~/shared/streak/StreakCelebration';
 import ScrollHandler from '~/layout/ScrollToTopOnRouteChange';
+import VisitTracker from '~/layout/VisitTracker';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ScrollProgressBar from '~/shared/ui/ScrollProgressBar';
@@ -32,6 +33,7 @@ function App() {
         }}
       >
         <ScrollHandler />
+        <VisitTracker />
         <ToastContainer
           position="top-right"
           autoClose={3000}
