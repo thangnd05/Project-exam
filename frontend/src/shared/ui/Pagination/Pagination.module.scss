@@ -21,7 +21,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover:not(.disabled) {
+  &:hover:not(.disabled):not(.active) {
     border-color: var(--primary);
     color: var(--primary);
     background-color: var(--hover-color);
