@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react';
-import {Badge, Form} from 'react-bootstrap';
+import {Badge, Button, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {CheckCircle, Shield, Trash2, UserCheck, UserX} from 'lucide-react';
+import {Edit, Plus, Trash2} from 'lucide-react';
 
+import BaseModal from '~/shared/ui/modal/BaseModal';
+import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
+import useDebouncedValue from '~/shared/hooks/useDebouncedValue';
 import {useUsers} from './hooks/useUsers';
 import {
   AdminFieldError,
@@ -16,6 +19,15 @@ import {
 import styles from './Users.module.scss';
 
 const cx = classNames.bind(styles);
+
+const emptyCreateForm = {
+  fullName: '',
+  userName: '',
+  email: '',
+  password: '',
+  roleId: '',
+  verified: false,
+};
 
 const roleColors = {
   ADMIN: 'danger',
@@ -32,6 +44,17 @@ function UsersManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteErrorMessage, setDeleteErrorMessage] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState(emptyCreateForm);
+  const [createError, setCreateError] = useState('');
+  const [editingUser, setEditingUser] = useState(null);
+  const [editForm, setEditForm] = useState({
+    fullName: '',
+    userName: '',
+    email: '',
+    verified: false,
+  });
+  const [editError, setEditError] = useState('');
 
   const verifiedFilter =
     statusFilter === 'verified'
@@ -40,19 +63,24 @@ function UsersManagement() {
         ? false
         : undefined;
 
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+
   const {
     users,
     totalElements,
     totalPages,
+    stats,
     roles,
     isLoading: loading,
     usersIsError,
     rolesIsError,
+    createUserMutation,
+    updateUserMutation,
     deleteUserMutation,
   } = useUsers({
     page: currentPage,
     size: ITEMS_PER_PAGE,
-    keyword: searchTerm,
+    keyword: debouncedSearchTerm,
     roleId: roleFilter,
     verified: verifiedFilter,
   });
@@ -71,12 +99,101 @@ function UsersManagement() {
     return roleMap;
   }, [roles]);
 
-  const totalUsers = totalElements;
-  const totalTeachers = users.filter(
-    (user) => roleNameById[user.role_id] === 'TEACHER',
-  ).length;
-  const verifiedUsers = users.filter((user) => user.verified === true).length;
   const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const creating = createUserMutation.isPending;
+
+  const openCreateModal = () => {
+    setCreateError('');
+    setCreateForm(emptyCreateForm);
+    setShowCreateModal(true);
+  };
+
+  const closeCreateModal = () => {
+    if (creating) {
+      return;
+    }
+    setShowCreateModal(false);
+  };
+
+  const updateCreateField = (field) => (event) => {
+    const value =
+      field === 'verified' ? event.target.checked : event.target.value;
+    setCreateForm((previous) => ({...previous, [field]: value}));
+  };
+
+  const handleCreateUser = async () => {
+    const fullName = createForm.fullName.trim();
+    const userName = createForm.userName.trim();
+    const email = createForm.email.trim();
+    if (!fullName || !userName || !email || !createForm.password) {
+      setCreateError('Vui lòng nhập đủ họ tên, username, email và mật khẩu.');
+      return;
+    }
+    setCreateError('');
+    try {
+      await createUserMutation.mutateAsync({
+        fullName,
+        userName,
+        email,
+        password: createForm.password,
+        roleId: createForm.roleId || null,
+        verified: createForm.verified,
+      });
+      setShowCreateModal(false);
+      setCurrentPage(1);
+    } catch (error) {
+      setCreateError(
+        error?.response?.data?.message || 'Không thể tạo người dùng.',
+      );
+    }
+  };
+
+  const updating = updateUserMutation.isPending;
+
+  const openEditModal = (user) => {
+    setEditError('');
+    setEditForm({
+      fullName: user.full_name || '',
+      userName: user.user_name || '',
+      email: user.email || '',
+      verified: user.verified === true,
+    });
+    setEditingUser(user);
+  };
+
+  const closeEditModal = () => {
+    if (updating) {
+      return;
+    }
+    setEditingUser(null);
+  };
+
+  const updateEditField = (field) => (event) => {
+    setEditForm((previous) => ({...previous, [field]: event.target.value}));
+  };
+
+  const handleUpdateUser = async () => {
+    const fullName = editForm.fullName.trim();
+    const userName = editForm.userName.trim();
+    const email = editForm.email.trim();
+    if (!fullName || !userName || !email) {
+      setEditError('Vui lòng nhập đủ họ tên, username và email.');
+      return;
+    }
+    setEditError('');
+    try {
+      await updateUserMutation.mutateAsync({
+        userId: editingUser.user_id,
+        values: {fullName, userName, email, verified: editForm.verified},
+      });
+      setEditingUser(null);
+    } catch (error) {
+      setEditError(
+        error?.response?.data?.message || 'Không thể cập nhật người dùng.',
+      );
+    }
+  };
 
   const handleDeleteUser = async () => {
     if (!userToDelete) {
@@ -154,28 +271,18 @@ function UsersManagement() {
       <AdminPageHeader
         title="Quản lý Users"
         description="Quản lý tài khoản người dùng trong hệ thống"
-      />
+      >
+        <Button onClick={openCreateModal}>
+          <Plus size={16} className="me-1" />
+          Thêm người dùng
+        </Button>
+      </AdminPageHeader>
 
       <StatCardGroup>
-        <StatCard label="Tổng Users" value={totalUsers} icon={Shield} tone="blue" />
-        <StatCard
-          label="Giáo viên"
-          value={totalTeachers}
-          icon={UserCheck}
-          tone="amber"
-        />
-        <StatCard
-          label="Đã xác thực"
-          value={verifiedUsers}
-          icon={CheckCircle}
-          tone="green"
-        />
-        <StatCard
-          label="Chưa xác thực"
-          value={totalUsers - verifiedUsers}
-          icon={UserX}
-          tone="red"
-        />
+        <StatCard label="Người dùng" value={stats.total} />
+        <StatCard label="Giáo viên" value={stats.teachers} />
+        <StatCard label="Đã xác thực" value={stats.verified} />
+        <StatCard label="Chưa xác thực" value={stats.unverified} />
       </StatCardGroup>
 
       <AdminToolbar
@@ -228,15 +335,142 @@ function UsersManagement() {
         itemLabel="người dùng"
         onPageChange={(p) => setCurrentPage(p + 1)}
         rowActions={(user) => (
-          <button
-            className="danger"
-            title="Xóa"
-            onClick={() => setUserToDelete(user)}
-          >
-            <Trash2 size={16} />
-          </button>
+          <>
+            <button title="Sửa" onClick={() => openEditModal(user)}>
+              <Edit size={16} />
+            </button>
+            <button
+              className="danger"
+              title="Xóa"
+              onClick={() => setUserToDelete(user)}
+            >
+              <Trash2 size={16} />
+            </button>
+          </>
         )}
       />
+
+      <BaseModal
+        show={showCreateModal}
+        onClose={closeCreateModal}
+        title="Thêm người dùng"
+        maxWidth={550}
+        footer={
+          <ModalActionFooter
+            onCancel={closeCreateModal}
+            onSubmit={handleCreateUser}
+            cancelLabel="Hủy"
+            submitLabel="Tạo mới"
+            loading={creating}
+          />
+        }
+      >
+        <AdminFieldError message={createError} />
+        <Form.Group className="mb-3">
+          <Form.Label>Họ và tên</Form.Label>
+          <Form.Control
+            value={createForm.fullName}
+            onChange={updateCreateField('fullName')}
+            placeholder="Nguyễn Văn A"
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Username</Form.Label>
+          <Form.Control
+            value={createForm.userName}
+            onChange={updateCreateField('userName')}
+            placeholder="nguyenvana"
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type="email"
+            value={createForm.email}
+            onChange={updateCreateField('email')}
+            placeholder="email@example.com"
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Mật khẩu</Form.Label>
+          <Form.Control
+            type="password"
+            value={createForm.password}
+            onChange={updateCreateField('password')}
+            placeholder="Tối thiểu 6 ký tự"
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Vai trò</Form.Label>
+          <Form.Select
+            value={createForm.roleId}
+            onChange={updateCreateField('roleId')}
+          >
+            <option value="">-- Mặc định (USER) --</option>
+            {roles.map((role) => (
+              <option key={role.role_id} value={role.role_id}>
+                {role.description || role.role_name}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+        <Form.Check
+          type="switch"
+          id="create-user-verified"
+          label="Đánh dấu đã xác thực"
+          checked={createForm.verified}
+          onChange={updateCreateField('verified')}
+        />
+      </BaseModal>
+
+      <BaseModal
+        show={Boolean(editingUser)}
+        onClose={closeEditModal}
+        title="Sửa người dùng"
+        maxWidth={550}
+        footer={
+          <ModalActionFooter
+            onCancel={closeEditModal}
+            onSubmit={handleUpdateUser}
+            cancelLabel="Hủy"
+            submitLabel="Lưu"
+            loading={updating}
+          />
+        }
+      >
+        <AdminFieldError message={editError} />
+        <Form.Group className="mb-3">
+          <Form.Label>Họ và tên</Form.Label>
+          <Form.Control
+            value={editForm.fullName}
+            onChange={updateEditField('fullName')}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Username</Form.Label>
+          <Form.Control
+            value={editForm.userName}
+            onChange={updateEditField('userName')}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type="email"
+            value={editForm.email}
+            onChange={updateEditField('email')}
+          />
+        </Form.Group>
+        <Form.Check
+          type="switch"
+          id="edit-user-verified"
+          label="Đã xác thực"
+          checked={editForm.verified}
+          onChange={(event) =>
+            setEditForm((previous) => ({...previous, verified: event.target.checked}))
+          }
+        />
+      </BaseModal>
 
       <ConfirmDeleteModal
         show={Boolean(userToDelete)}

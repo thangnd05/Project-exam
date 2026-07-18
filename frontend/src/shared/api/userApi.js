@@ -21,6 +21,10 @@ export const getUsers = ({page = 0, size = 10, keyword, roleId, verified} = {}) 
     .then((response) => response.data);
 };
 
+export const createUser = (payload) => {
+  return axios.post(BASE_URL, payload).then((response) => response.data);
+};
+
 export const deleteUser = (userId) => {
   return axios.delete(`${BASE_URL}/${userId}`).then(() => {});
 };
