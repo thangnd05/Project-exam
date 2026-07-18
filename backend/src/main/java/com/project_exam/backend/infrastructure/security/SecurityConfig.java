@@ -97,6 +97,7 @@ public class SecurityConfig {
                                 "/api/user-tests/guest",
                                 "/api/user-tests/*/guest-submit",
                                 "/api/user-answers/guest/**",
+                                "/api/analytics/visit",
                                 "/oauth2/**",
                                 "/login/oauth2/**"
                         )
@@ -147,6 +148,8 @@ public class SecurityConfig {
                                 "/api/user-tests/*/guest-submit",
                                 "/api/user-answers/guest/**"
                         ).permitAll()
+                        // Ghi nhận lượt truy cập — cho cả khách chưa đăng nhập.
+                        .requestMatchers(HttpMethod.POST, "/api/analytics/visit").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
