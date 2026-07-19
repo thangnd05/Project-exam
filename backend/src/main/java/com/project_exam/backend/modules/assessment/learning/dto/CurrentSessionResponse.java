@@ -23,6 +23,11 @@ public class CurrentSessionResponse {
     private PlanPhaseDto.RecommendedResourceDto resource;
     private Integer questionCount;
     private Integer passAccuracyRequired;
+    // Kết quả của phiên đã nộp gần nhất (mode REVIEW) — để trang kết quả sống sót khi F5.
+    private Integer correctCount;
+    private Integer totalCount;
+    private Integer accuracy;
+    private Boolean passed;
     private List<QuestionResponse> questions;
     private Integer totalTasks;
     private Integer passedTasks;

@@ -197,7 +197,7 @@ function NextStepPage() {
           <h3 className={cx('recoTitle')}>{recommendation.title}</h3>
           <p className={cx('recoDesc')}>{recommendation.desc}</p>
           {recommendation.warning && (
-            <div className={cx('alert', 'alertWarning')}>
+            <div className={cx('alert')}>
               {recommendation.warning}
             </div>
           )}

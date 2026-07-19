@@ -198,7 +198,7 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
         )}
         {!compact && task.status === 'PASSED' && (
           <Link
-            to={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}&review=true`}
+            to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/result`}
             className={cx('btn', 'btnOutline', 'btnSm')}
           >
             Xem giải thích

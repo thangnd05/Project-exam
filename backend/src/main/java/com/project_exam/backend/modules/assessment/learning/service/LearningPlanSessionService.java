@@ -156,11 +156,19 @@ public class LearningPlanSessionService {
 
         int total = sessionQuestions.size();
         int accuracy = lastSubmitted.getAccuracy() != null ? lastSubmitted.getAccuracy() : 0;
+        int correct = (int) reviewItems.stream()
+                .filter(SubmitSessionResponse.ReviewItem::isCorrect)
+                .count();
+        boolean passed = Boolean.TRUE.equals(lastSubmitted.getPassed());
 
         return learningMapper.toReviewResponse(
                 plan,
                 lastSubmitted,
-                accuracy + "% (" + (int) Math.round(accuracy / 100.0 * total) + "/" + total + " đúng)",
+                correct,
+                total,
+                accuracy,
+                passed,
+                accuracy + "% (" + correct + "/" + total + " đúng)",
                 reviewItems);
     }
 

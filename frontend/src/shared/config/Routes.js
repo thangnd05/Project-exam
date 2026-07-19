@@ -54,6 +54,7 @@ const routes = {
   planCompare: '/learning-plans/compare',
   planDetail: '/learning-plans/:learningPlanId',
   planStudy: '/learning-plans/:learningPlanId/study',
+  planResult: '/learning-plans/:learningPlanId/tasks/:taskId/result',
   taskHistory: '/learning-plans/:learningPlanId/tasks/:taskId/history',
 
   myAlbums: '/my-albums',

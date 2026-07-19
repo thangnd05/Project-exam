@@ -940,30 +940,117 @@
   color: var(--text-secondary);
 }
 
-.resultAlert {
-  padding: 1.4rem 1.6rem;
-  border-radius: var(--radius-lg);
+.resultCard {
+  display: flex;
+  align-items: center;
+  gap: 2.8rem;
+  max-width: 64rem;
+  margin: 0 auto 2rem;
+  padding: 2.8rem 3.2rem;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border-color);
-  background: var(--input-bg);
-  margin-bottom: 1.6rem;
+  background: var(--bg-white);
+  box-shadow: var(--shadow-card);
+
+  --ring-color: var(--primary);
+  --ring-track: var(--input-bg);
 
   &.passed {
-    background: rgba(0, 97, 242, 0.1);
-    border-color: rgba(0, 97, 242, 0.25);
-    color: var(--primary);
+    --ring-color: #22c55e;
+    border-color: var(--success-border);
+    background: linear-gradient(180deg, var(--success-bg), var(--bg-white) 62%);
+
+    .resultBadge {
+      color: var(--success-text);
+    }
   }
 
   &.failed {
-    background: var(--author-tag-bg);
+    --ring-color: #f59e0b;
     border-color: var(--author-tag-border);
-    color: var(--author-tag-text);
+    background: linear-gradient(180deg, var(--author-tag-bg), var(--bg-white) 62%);
+
+    .resultBadge {
+      color: var(--author-tag-text);
+    }
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.8rem;
+    padding: 2.4rem 1.8rem;
   }
 }
 
-.resultStats {
+.resultRing {
+  flex-shrink: 0;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--ring-color) calc(var(--pct, 0) * 1%),
+    var(--ring-track) 0
+  );
+  display: grid;
+  place-items: center;
+}
+
+.resultRingInner {
+  width: 9.2rem;
+  height: 9.2rem;
+  border-radius: 50%;
+  background: var(--bg-white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.resultPct {
+  font-size: 2.8rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--ring-color);
+}
+
+.resultFraction {
+  font-size: var(--font-size-ssm);
+  color: var(--text-secondary);
+}
+
+.resultBody {
+  flex: 1;
+  min-width: 0;
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+}
+
+.resultBadge {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  margin-bottom: 0.4rem;
+  color: var(--text-color);
+  margin-bottom: 0.6rem;
+}
+
+.resultMessage {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin: 0 0 1.6rem;
+  line-height: 1.5;
+}
+
+.resultActions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    justify-content: center;
+  }
 }
 
 .reviewSection {

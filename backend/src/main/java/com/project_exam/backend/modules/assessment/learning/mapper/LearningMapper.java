@@ -229,6 +229,10 @@ public class LearningMapper {
     public CurrentSessionResponse toReviewResponse(
             LearningPlan plan,
             LearningPlanSession lastSubmitted,
+            int correctCount,
+            int totalCount,
+            int accuracy,
+            boolean passed,
             String message,
             List<SubmitSessionResponse.ReviewItem> lastReviewItems) {
         return CurrentSessionResponse.builder()
@@ -238,6 +242,10 @@ public class LearningMapper {
                 .sessionId(lastSubmitted.getSessionId())
                 .totalTasks(null)
                 .passedTasks(null)
+                .correctCount(correctCount)
+                .totalCount(totalCount)
+                .accuracy(accuracy)
+                .passed(passed)
                 .message(message)
                 .lastReviewItems(lastReviewItems)
                 .build();

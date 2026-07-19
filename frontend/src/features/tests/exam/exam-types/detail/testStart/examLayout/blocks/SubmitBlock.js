@@ -1,5 +1,4 @@
 import { Spinner } from 'react-bootstrap';
-import { IoSendOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
 import styles from '../../TestStartPage.module.scss';
@@ -14,7 +13,7 @@ function SubmitBlock({ onSubmit, isSubmitting, label = 'Nộp bài thi' }) {
       onClick={onSubmit}
       disabled={isSubmitting}
     >
-      {isSubmitting ? <Spinner animation="border" size="sm" /> : <IoSendOutline />}
+      {isSubmitting && <Spinner animation="border" size="sm" />}
       {isSubmitting ? 'Đang nộp bài...' : label}
     </button>
   );

@@ -21,8 +21,8 @@ const ex = classNames.bind(examStyles);
 const API_BASE = getApiBaseUrl();
 
 const planSessionKeys = {
-  session: (learningPlanId, taskId, review) =>
-    ['plan-session', learningPlanId, taskId || null, !!review],
+  session: (learningPlanId, taskId) =>
+    ['plan-session', learningPlanId, taskId || null],
 };
 
 function PlanStudyPage() {
@@ -31,97 +31,48 @@ function PlanStudyPage() {
   const navigate = useNavigate();
   const { refreshStreak } = useStreak();
   const taskIdFromUrl = searchParams.get('taskId');
-  const isReviewMode = searchParams.get('review') === 'true';
-  // Chỉ vào nhánh "xem lại" khi có taskId; nếu không thì tải phiên luyện bình thường.
-  const reviewBranch = isReviewMode && !!taskIdFromUrl;
 
   // Lưu đáp án đã chọn vào sessionStorage để không mất khi F5 (giống trang làm bài thi).
   const answersStorageKey = `plan-study-answers-${learningPlanId}-${taskIdFromUrl || 'current'}`;
 
   const [selections, setSelections] = useState({});
-  const [result, setResult] = useState(null);
-  const [showReview, setShowReview] = useState(false);
   const [formError, setFormError] = useState(null);
 
   const submitMutation = useSubmitSession();
   const submitting = submitMutation.isPending;
 
   const sessionQuery = useQuery({
-    queryKey: planSessionKeys.session(learningPlanId, taskIdFromUrl, reviewBranch),
-    queryFn: () =>
-      getCurrentSession(learningPlanId, taskIdFromUrl || undefined, reviewBranch),
+    queryKey: planSessionKeys.session(learningPlanId, taskIdFromUrl),
+    queryFn: () => getCurrentSession(learningPlanId, taskIdFromUrl || undefined),
     enabled: !!learningPlanId,
   });
 
-  // Trong nhánh xem lại, không dựng "session" (giữ như bản cũ: chỉ hiển thị result).
-  const session = reviewBranch ? null : sessionQuery.data ?? null;
+  const session = sessionQuery.data ?? null;
   const loading = sessionQuery.isLoading || sessionQuery.isFetching;
   const loadError = sessionQuery.error
     ? sessionQuery.error?.response?.data?.message || sessionQuery.error.message
     : null;
   const error = formError || loadError;
 
-  // Reset trạng thái UI khi đổi ải / đổi chế độ, đồng thời khôi phục đáp án đã lưu (F5).
+  // Reset khi đổi ải, đồng thời khôi phục đáp án đã lưu (F5).
   useEffect(() => {
-    setResult(null);
-    setShowReview(false);
     setFormError(null);
-    if (reviewBranch) {
-      setSelections({});
-      return;
-    }
     try {
       const saved = sessionStorage.getItem(answersStorageKey);
       setSelections(saved ? JSON.parse(saved) : {});
     } catch {
       setSelections({});
     }
-  }, [learningPlanId, taskIdFromUrl, isReviewMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [learningPlanId, taskIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Lưu đáp án mỗi khi thay đổi (chỉ ở chế độ luyện), để F5 không mất.
+  // Lưu đáp án mỗi khi thay đổi, để F5 không mất.
   useEffect(() => {
-    if (reviewBranch) return;
     try {
       sessionStorage.setItem(answersStorageKey, JSON.stringify(selections));
     } catch {
       /* bỏ qua nếu storage đầy/không dùng được */
     }
-  }, [selections, answersStorageKey, reviewBranch]);
-
-  // Nạp dữ liệu xem lại (đáp án & giải thích) từ session query.
-  useEffect(() => {
-    if (!reviewBranch || !sessionQuery.data) return;
-    const data = sessionQuery.data;
-    if (data.lastReviewItems) {
-      setResult({
-        reviewItems: data.lastReviewItems,
-        passed: true,
-        accuracy: 0,
-        correctCount: 0,
-        totalCount: 0,
-        message: data.message,
-      });
-      setShowReview(true);
-    } else {
-      setFormError('Chưa có dữ liệu giải thích cho ải này.');
-    }
-  }, [reviewBranch, sessionQuery.data]);
-
-  const reloadSession = () => {
-    setResult(null);
-    setShowReview(false);
-    setSelections({});
-    setFormError(null);
-    try {
-      sessionStorage.removeItem(answersStorageKey);
-    } catch { /* noop */ }
-    if (reviewBranch) {
-      // Rời chế độ xem lại để lấy phiên luyện mới cho ải này (như loadSession cũ).
-      setSearchParams({ taskId: taskIdFromUrl });
-    } else {
-      sessionQuery.refetch();
-    }
-  };
+  }, [selections, answersStorageKey]);
 
   const goToPicker = () => {
     navigate(`/learning-plans/${learningPlanId}`);
@@ -129,7 +80,6 @@ function PlanStudyPage() {
 
   const startTask = (taskId) => {
     setSearchParams({ taskId });
-    setResult(null);
   };
 
   const handleSelect = (questionId, answerId, isMsq) => {
@@ -152,24 +102,19 @@ function PlanStudyPage() {
       }
       return { questionId: q.questionId, selectedAnswerId: sel };
     });
-    const missing = (session.questions || []).some((q) => {
-      const sel = selections[q.questionId];
-      return q.questionType === 'MSQ' ? !(Array.isArray(sel) && sel.length) : !sel;
-    });
-    if (missing) {
-      setFormError('Vui lòng chọn đáp án cho tất cả câu hỏi.');
-      return;
-    }
     setFormError(null);
     submitMutation.mutate(
       { learningPlanId, sessionId: session.sessionId, answers },
       {
         onSuccess: (res) => {
-          setResult(res);
           try {
             sessionStorage.removeItem(answersStorageKey);
           } catch { /* noop */ }
           if (res?.passed) refreshStreak();
+          // Điều hướng sang trang kết quả riêng (có URL) để F5 vẫn giữ kết quả,
+          // không rơi về phiên đề mới.
+          const taskId = taskIdFromUrl || session?.activeTask?.taskId;
+          navigate(`/learning-plans/${learningPlanId}/tasks/${taskId}/result`);
         },
         onError: (err) => setFormError(err?.response?.data?.message || err.message),
       },
@@ -200,7 +145,7 @@ function PlanStudyPage() {
     );
   }
 
-  if (isPickMode && !result) {
+  if (isPickMode) {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
@@ -269,100 +214,7 @@ function PlanStudyPage() {
 
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
 
-      {result && (
-        <>
-          <div className={cx('resultAlert', { passed: result.passed, failed: !result.passed })}>
-            {(result.correctCount > 0 || result.totalCount > 0) && (
-              <div className={cx('resultStats')}>
-                {result.correctCount}/{result.totalCount} đúng ({result.accuracy}%)
-              </div>
-            )}
-            <div className={cx('resultStats')} style={{ marginBottom: '1rem' }}>
-              {result.message}
-            </div>
-            <div className={cx('actionBar')}>
-              <button
-                type="button"
-                className={cx('btn', 'btnPrimary', 'btnSm')}
-                onClick={() => setShowReview((prev) => !prev)}
-              >
-                {showReview ? 'Ẩn đáp án' : 'Xem đáp án & giải thích'}
-              </button>
-              <button
-                type="button"
-                className={cx('btn', 'btnOutline', 'btnSm')}
-                onClick={reloadSession}
-              >
-                {result.passed ? 'Làm lại ải này' : 'Thử lại'}
-              </button>
-              <button
-                type="button"
-                className={cx('btn', 'btnGhost', 'btnSm')}
-                onClick={goToPicker}
-              >
-                Chọn ải khác
-              </button>
-            </div>
-          </div>
-
-          {showReview && result.reviewItems?.length > 0 && (
-            <div className={cx('reviewSection')}>
-              {result.reviewItems.map((item, idx) => {
-                const isMsq = item.questionType === 'MSQ';
-                const userSelectedIds = isMsq
-                  ? (item.selectedAnswerIds || [])
-                  : (item.selectedAnswerId ? [item.selectedAnswerId] : []);
-                return (
-                  <div
-                    key={item.questionId}
-                    className={cx('reviewItem', {
-                      reviewCorrect: item.correct,
-                      reviewWrong: !item.correct,
-                    })}
-                  >
-                    <div className={cx('reviewQuestionNo')}>
-                      Câu {idx + 1} {item.correct ? '✓' : '✗'}
-                    </div>
-                    <div className={cx('reviewQuestionText')}>{item.questionText}</div>
-                    <div className={cx('reviewAnswerList')}>
-                      {(item.answers || []).map((a) => {
-
-                        const isCorrectAnswer = a.isCorrect != null
-                          ? a.isCorrect
-                          : a.answerId === item.correctAnswerId;
-                        const isUserChoice = userSelectedIds.includes(a.answerId);
-                        return (
-                          <div
-                            key={a.answerId}
-                            className={cx('reviewAnswerOption', {
-                              isCorrectAnswer: isCorrectAnswer,
-                              isUserWrong: isUserChoice && !isCorrectAnswer,
-                              isUserCorrect: isUserChoice && isCorrectAnswer,
-                            })}
-                          >
-                            {a.answerText?.trim()
-                              ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
-                              : a.answerLabel}
-                            {isCorrectAnswer && ' ✓'}
-                            {isUserChoice && !isCorrectAnswer && ' (Bạn chọn)'}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {item.explanation?.trim() && (
-                      <div className={cx('reviewExplanation')}>
-                        <strong>Giải thích:</strong> {item.explanation}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </>
-      )}
-
-      {!result && session && (
+      {session && (
         <>
           <div className={cx('activeTaskCard')}>
             <div className={cx('activeTaskHead')}>
