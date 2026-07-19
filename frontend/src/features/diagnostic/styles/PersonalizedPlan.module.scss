@@ -443,7 +443,7 @@
 }
 
 .hero {
-  background: linear-gradient(160deg, #ffffff 0%, #f4f8ff 100%);
+  background: linear-gradient(160deg, var(--bg-white) 0%, var(--surface-tint) 100%);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: 4rem 2.4rem;
@@ -528,7 +528,7 @@
 }
 
 .recoBox {
-  background: linear-gradient(135deg, #eff6ff 0%, var(--bg-white) 100%);
+  background: linear-gradient(135deg, var(--surface-tint) 0%, var(--bg-white) 100%);
   border: 1px solid rgba(0, 97, 242, 0.25);
   border-radius: var(--radius-xl);
   padding: 2.4rem;
@@ -647,7 +647,7 @@
   flex-wrap: wrap;
   gap: 0.8rem;
   padding: 1.2rem 1.6rem;
-  background: linear-gradient(135deg, #eff6ff, var(--bg-white));
+  background: linear-gradient(135deg, var(--surface-tint), var(--bg-white));
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -822,7 +822,7 @@
 
   &:hover {
     border-color: var(--primary);
-    background: #eff6ff;
+    background: var(--surface-tint);
   }
 
   &.active {
@@ -858,7 +858,7 @@
 }
 
 .activeTaskCard {
-  background: linear-gradient(135deg, #eff6ff, var(--bg-white));
+  background: linear-gradient(135deg, var(--surface-tint), var(--bg-white));
   border: 1px solid var(--primary);
   border-radius: var(--radius-lg);
   padding: 1.6rem;

@@ -98,15 +98,15 @@
   pre {
     padding: 14px 16px;
     border-radius: var(--radius-md);
-    background: #0f172a;
-    color: #e2e8f0;
+    background: var(--dark-color);
+    color: var(--border-color);
     overflow-x: auto;
   }
 
   code {
     padding: 0.1em 0.35em;
     border-radius: 4px;
-    background: #f1f5f9;
+    background: var(--input-bg);
     font-size: 0.92em;
   }
 
@@ -177,10 +177,10 @@
   &.primary {
     background: var(--primary-btn-gradient);
     border-color: transparent;
-    color: #fff;
+    color: var(--white);
 
     &:hover {
-      color: #fff;
+      color: var(--white);
       opacity: 0.92;
     }
   }
@@ -188,7 +188,7 @@
 
 @media print {
   :global(body.recovery-resource-print-page) {
-    background: #fff !important;
+    background: var(--bg-white) !important;
   }
 
   :global(body.recovery-resource-print-page *) {
@@ -208,7 +208,7 @@
   }
 
   .wrapper {
-    background: #fff;
+    background: var(--bg-white);
     padding: 0;
     min-height: auto;
   }

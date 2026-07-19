@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import ButtonPrime from './Button/ButtonPrime';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -178,78 +179,47 @@ class ErrorBoundary extends Component {
                 marginTop: '0.8rem',
               }}
             >
-              <button
-                type="button"
+              <ButtonPrime
+                variant="primary"
+                size="lg"
                 onClick={() => window.location.reload()}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.8rem',
-                  padding: '1.1rem 2.2rem',
-                  borderRadius: '1rem',
-                  border: 'none',
-                  background:
-                    'var(--primary-btn-gradient, linear-gradient(135deg, #0061f2 0%, #0056d2 100%))',
-                  color: 'var(--white)',
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: 'var(--primary-btn-shadow, 0 10px 22px rgba(0, 97, 242, 0.28))',
-                  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.8rem',
+                  }}
                 >
-                  <path d="M23 4v6h-6" />
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                </svg>
-                Tải lại trang
-              </button>
-              <button
-                type="button"
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M23 4v6h-6" />
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                  </svg>
+                  Tải lại trang
+                </span>
+              </ButtonPrime>
+              <ButtonPrime
+                variant="outline"
+                size="lg"
                 onClick={() => {
                   this.handleReset();
                   window.history.length > 1
                     ? window.history.back()
                     : (window.location.href = '/');
                 }}
-                style={{
-                  padding: '1.1rem 2.2rem',
-                  borderRadius: '1rem',
-                  border: '1px solid var(--border-color)',
-                  background: 'var(--bg-white)',
-                  color: 'var(--text-color)',
-                  fontSize: '1.5rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'border-color 0.15s ease, background 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--hover-color)';
-                  e.currentTarget.style.borderColor = 'var(--primary-color)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'var(--bg-white)';
-                  e.currentTarget.style.borderColor = 'var(--border-color)';
-                }}
               >
                 Quay lại
-              </button>
+              </ButtonPrime>
             </div>
           </div>
         </div>

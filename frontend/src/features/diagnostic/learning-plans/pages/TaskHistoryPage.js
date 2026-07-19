@@ -141,7 +141,7 @@ function TaskHistoryPage() {
         <div className={cx('statTile')}>
           <div className={cx('statLabel')}>Số lần luyện</div>
           <div className={cx('statValue')}>{task.attemptCount ?? 0}</div>
-          <div className={cx('statHint')}>attempts</div>
+          <div className={cx('statHint')}>lượt luyện</div>
         </div>
 
         <div className={cx('statTile')}>
@@ -163,17 +163,17 @@ function TaskHistoryPage() {
               <div
                 className={cx('progressBaseline')}
                 style={{ width: `${Math.min(100, baseline)}%` }}
-                title={`Baseline ${pct(baseline)}`}
+                title={`Ban đầu ${pct(baseline)}`}
               />
               <div
                 className={cx('progressBest', { reached: best >= pass })}
                 style={{ width: `${Math.min(100, best)}%` }}
-                title={`Best ${pct(best)}`}
+                title={`Tốt nhất ${pct(best)}`}
               />
               <div
                 className={cx('progressPassLine')}
                 style={{ left: `${pass}%` }}
-                title={`Pass line ${pass}%`}
+                title={`Ngưỡng pass ${pass}%`}
               />
             </div>
             <div className={cx('progressLegend')}>
@@ -182,9 +182,9 @@ function TaskHistoryPage() {
               <span>100%</span>
             </div>
             <div style={{ marginTop: '0.8rem', fontSize: 'var(--font-size-sm)' }}>
-              <span className={cx('badge', 'badgeWarning')}>Baseline</span>{' '}
+              <span className={cx('badge', 'badgeWarning')}>Ban đầu</span>{' '}
               {pct(baseline)}{' '}·{' '}
-              <span className={cx('badge', best >= pass ? 'badgeSuccess' : 'badgePrimary')}>Best</span>{' '}
+              <span className={cx('badge', best >= pass ? 'badgeSuccess' : 'badgePrimary')}>Tốt nhất</span>{' '}
               {pct(best)}
             </div>
           </div>
