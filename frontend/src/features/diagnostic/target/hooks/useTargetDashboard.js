@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMyCompletedUserTests } from '~/shared/api/userTestApi';
-import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { getExamParts } from '~/shared/api/examPartApi';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import { listPlans } from '~/shared/api/learningPlanApi';
@@ -8,7 +8,7 @@ import { getEnhancedResult } from '~/shared/api/enhancedResultApi';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
 
 export const targetDashboardKeys = {
-  examTypes: ['exam-types'],
+  examTypes: ['exam-types', 'standard'],
   examParts: ['exam-parts'],
   dashboard: (examTypeId) => ['target-dashboard', examTypeId],
 };
@@ -45,7 +45,7 @@ async function fetchDashboard(examTypeId) {
 export function useTargetDashboard(examTypeId) {
   const examTypesQuery = useQuery({
     queryKey: targetDashboardKeys.examTypes,
-    queryFn: getExamTypes,
+    queryFn: getStandardExamTypes,
   });
 
   const examPartsQuery = useQuery({

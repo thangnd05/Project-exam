@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { listPlans } from '~/shared/api/learningPlanApi';
 
 export const learningPlanListKeys = {
@@ -12,7 +12,7 @@ export const learningPlanListKeys = {
 };
 
 async function fetchPlanList({ loadAll, filterExamTypeId }) {
-  const types = await getExamTypes();
+  const types = await getStandardExamTypes();
   const nameById = Object.fromEntries(
     types.map((et) => [et.examTypeId, et.name]),
   );

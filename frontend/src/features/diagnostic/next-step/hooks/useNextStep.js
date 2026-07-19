@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMyCompletedUserTests } from '~/shared/api/userTestApi';
-import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import { listPlans, getPlanById } from '~/shared/api/learningPlanApi';
 import { getEnhancedResult } from '~/shared/api/enhancedResultApi';
 
 export const nextStepKeys = {
-  examTypes: ['exam-types'],
+  examTypes: ['exam-types', 'standard'],
   overview: (examTypeId) => ['next-step-overview', examTypeId],
 };
 
@@ -38,7 +38,7 @@ async function fetchOverview(examTypeId) {
 export function useExamTypes() {
   return useQuery({
     queryKey: nextStepKeys.examTypes,
-    queryFn: getExamTypes,
+    queryFn: getStandardExamTypes,
   });
 }
 

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { getMyCompletedUserTests } from '~/shared/api/userTestApi';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import { generatePlan } from '~/shared/api/learningPlanApi';
@@ -15,7 +15,7 @@ const asArray = (data) => (Array.isArray(data) ? data : []);
 export function useExamTypes() {
   return useQuery({
     queryKey: generatePlanKeys.examTypes,
-    queryFn: getExamTypes,
+    queryFn: getStandardExamTypes,
     select: asArray,
   });
 }

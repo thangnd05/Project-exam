@@ -4,26 +4,28 @@ import classNames from 'classnames/bind';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
 import { priorityTierLabel } from '~/shared/utils/priorityTier';
+import { sortByPartOrder } from '~/shared/utils/partOrder';
 import { planStageLabel } from '~/features/diagnostic/learning-plans/planLabels';
 import { useExamTypes, useNextStepOverview } from './hooks/useNextStep';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
+// Chọn ải kế tiếp theo đúng thứ tự học BE đã sắp: Part trước học trước
+// (sortByPartOrder), trong Part đi theo taskOrder — lấy ải ACTIVE gặp đầu tiên.
 function pickRecommendedTask(plan) {
   if (!plan) return null;
-  const allTasks = [
-    ...(plan.tasks || []),
-    ...((plan.partGroups || []).flatMap((g) => g.tasks || [])),
-  ];
-  const active = allTasks.filter((t) => t.status === 'ACTIVE');
-  if (active.length === 0) return null;
-  const sorted = [...active].sort((a, b) => {
-    if (a.recommendedFirst && !b.recommendedFirst) return -1;
-    if (!a.recommendedFirst && b.recommendedFirst) return 1;
-    return (b.priorityScore ?? 0) - (a.priorityScore ?? 0);
-  });
-  return sorted[0];
+  const groups = (plan.partGroups || []).length
+    ? sortByPartOrder(plan.partGroups, { nameKey: 'examPartName' })
+    : [{ tasks: plan.tasks || [] }];
+  for (const group of groups) {
+    const tasks = [...(group.tasks || [])].sort(
+      (a, b) => (a.taskOrder ?? 0) - (b.taskOrder ?? 0),
+    );
+    const active = tasks.find((t) => t.status === 'ACTIVE');
+    if (active) return active;
+  }
+  return null;
 }
 
 function NextStepPage() {

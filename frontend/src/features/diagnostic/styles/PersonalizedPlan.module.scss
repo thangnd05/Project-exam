@@ -542,7 +542,7 @@
 
 .recoTag {
   display: inline-block;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: var(--font-weight-bold);
@@ -551,14 +551,15 @@
 }
 
 .recoTitle {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-2xxl);
   font-weight: var(--font-weight-bold);
   color: var(--text-color);
   margin: 0 0 0.8rem;
+  line-height: 1.3;
 }
 
 .recoDesc {
-  font-size: var(--font-size-ssm);
+  font-size: var(--font-size-base);
   color: var(--text-secondary);
   margin-bottom: 1.6rem;
 }

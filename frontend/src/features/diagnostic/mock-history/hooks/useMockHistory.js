@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
 import { getMockHistory } from '~/shared/api/userTestApi';
-import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 
 // Biểu đồ chỉ cần N bài gần nhất để vẽ tiến triển; bảng phân trang riêng.
 export const CHART_FETCH_LIMIT = 25;
 
 export const mockHistoryKeys = {
-  examTypes: ['exam-types'],
+  examTypes: ['exam-types', 'standard'],
   chart: (examTypeId) => ['mock-history-chart', examTypeId || ''],
   table: (examTypeId, page, size) => ['mock-history-table', examTypeId || '', page, size],
   userTarget: (examTypeId) => ['user-target', examTypeId],
@@ -19,7 +19,7 @@ const selectTargetScore = (data) => (data?.hasTarget ? data.targetScore : null);
 export function useMockHistory(examTypeFilter, { page = 0, size = 10 } = {}) {
   const examTypesQuery = useQuery({
     queryKey: mockHistoryKeys.examTypes,
-    queryFn: getExamTypes,
+    queryFn: getStandardExamTypes,
   });
 
   // Dữ liệu cho biểu đồ: luôn lấy trang đầu (bài mới nhất), size = CHART_FETCH_LIMIT.

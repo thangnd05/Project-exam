@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMyCompletedUserTests } from '~/shared/api/userTestApi';
-import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import { getEnhancedResult } from '~/shared/api/enhancedResultApi';
 
 export const targetAchievedKeys = {
-  examTypes: ['exam-types'],
+  examTypes: ['exam-types', 'standard'],
   detail: (examTypeId) => ['target-achieved', examTypeId],
 };
 
@@ -33,7 +33,7 @@ async function fetchTargetAchieved(examTypeId) {
 export function useTargetAchieved(examTypeId) {
   const examTypesQuery = useQuery({
     queryKey: targetAchievedKeys.examTypes,
-    queryFn: getExamTypes,
+    queryFn: getStandardExamTypes,
     select: normalizeExamTypes,
   });
 

@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { listPlans } from '~/shared/api/learningPlanApi';
 
 export const planComparisonKeys = {
-  examTypes: () => ['exam-types'],
+  examTypes: () => ['exam-types', 'standard'],
   plans: (examTypeId) => ['learning-plans', examTypeId],
 };
 
@@ -13,7 +13,7 @@ const normalizeList = (data) =>
 export function usePlanComparison(examTypeId) {
   const examTypesQuery = useQuery({
     queryKey: planComparisonKeys.examTypes(),
-    queryFn: getExamTypes,
+    queryFn: getStandardExamTypes,
     select: normalizeList,
   });
 
