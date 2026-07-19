@@ -11,8 +11,15 @@ function TestStartDashboard({
   isPaged = false,
   canNavigateToQuestion,
   currentQuestionIds = null,
+  gridMaxHeight = null,
 }) {
-  const gridStyle = columns ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : undefined;
+  const gridStyle =
+    columns || gridMaxHeight
+      ? {
+          ...(columns ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : {}),
+          ...(gridMaxHeight ? { maxHeight: gridMaxHeight, overflowY: 'auto' } : {}),
+        }
+      : undefined;
   return (
     <div className={cx('dashboard')}>
       <div className={cx('dashboard-card')}>

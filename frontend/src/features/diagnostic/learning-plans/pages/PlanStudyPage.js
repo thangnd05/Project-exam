@@ -3,14 +3,22 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { getCurrentSession } from '~/shared/api/learningPlanApi';
-import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
+import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
+import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import { useSubmitSession } from './hooks/useSubmitSession';
 import { planStageLabel } from '../planLabels';
+import TestStartDashboard from '~/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import examStyles from '~/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
+// Tái dùng đúng SCSS thẻ câu hỏi/đáp án của trang làm bài thi.
+const ex = classNames.bind(examStyles);
+
+const API_BASE = getApiBaseUrl();
 
 const planSessionKeys = {
   session: (learningPlanId, taskId, review) =>
@@ -26,6 +34,9 @@ function PlanStudyPage() {
   const isReviewMode = searchParams.get('review') === 'true';
   // Chỉ vào nhánh "xem lại" khi có taskId; nếu không thì tải phiên luyện bình thường.
   const reviewBranch = isReviewMode && !!taskIdFromUrl;
+
+  // Lưu đáp án đã chọn vào sessionStorage để không mất khi F5 (giống trang làm bài thi).
+  const answersStorageKey = `plan-study-answers-${learningPlanId}-${taskIdFromUrl || 'current'}`;
 
   const [selections, setSelections] = useState({});
   const [result, setResult] = useState(null);
@@ -50,13 +61,32 @@ function PlanStudyPage() {
     : null;
   const error = formError || loadError;
 
-  // Reset trạng thái UI tạm thời khi đổi ải / đổi chế độ.
+  // Reset trạng thái UI khi đổi ải / đổi chế độ, đồng thời khôi phục đáp án đã lưu (F5).
   useEffect(() => {
     setResult(null);
     setShowReview(false);
-    setSelections({});
     setFormError(null);
-  }, [learningPlanId, taskIdFromUrl, isReviewMode]);
+    if (reviewBranch) {
+      setSelections({});
+      return;
+    }
+    try {
+      const saved = sessionStorage.getItem(answersStorageKey);
+      setSelections(saved ? JSON.parse(saved) : {});
+    } catch {
+      setSelections({});
+    }
+  }, [learningPlanId, taskIdFromUrl, isReviewMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Lưu đáp án mỗi khi thay đổi (chỉ ở chế độ luyện), để F5 không mất.
+  useEffect(() => {
+    if (reviewBranch) return;
+    try {
+      sessionStorage.setItem(answersStorageKey, JSON.stringify(selections));
+    } catch {
+      /* bỏ qua nếu storage đầy/không dùng được */
+    }
+  }, [selections, answersStorageKey, reviewBranch]);
 
   // Nạp dữ liệu xem lại (đáp án & giải thích) từ session query.
   useEffect(() => {
@@ -82,6 +112,9 @@ function PlanStudyPage() {
     setShowReview(false);
     setSelections({});
     setFormError(null);
+    try {
+      sessionStorage.removeItem(answersStorageKey);
+    } catch { /* noop */ }
     if (reviewBranch) {
       // Rời chế độ xem lại để lấy phiên luyện mới cho ải này (như loadSession cũ).
       setSearchParams({ taskId: taskIdFromUrl });
@@ -133,6 +166,9 @@ function PlanStudyPage() {
       {
         onSuccess: (res) => {
           setResult(res);
+          try {
+            sessionStorage.removeItem(answersStorageKey);
+          } catch { /* noop */ }
           if (res?.passed) refreshStreak();
         },
         onError: (err) => setFormError(err?.response?.data?.message || err.message),
@@ -200,8 +236,31 @@ function PlanStudyPage() {
     );
   }
 
+  const answeredCount = (session?.questions || []).filter((q) => {
+    const sel = selections[q.questionId];
+    return q.questionType === 'MSQ'
+      ? Array.isArray(sel) && sel.length > 0
+      : Boolean(sel);
+  }).length;
+
+  // Đưa selections về đúng shape userAnswers mà TestStartDashboard (trục câu hỏi) cần.
+  const navAnswers = {};
+  (session?.questions || []).forEach((q) => {
+    const sel = selections[q.questionId];
+    navAnswers[q.questionId] =
+      q.questionType === 'MSQ'
+        ? { selectedAnswerIds: Array.isArray(sel) ? sel : [] }
+        : { selectedAnswerId: sel };
+  });
+
+  const scrollToQuestion = (questionId) => {
+    document
+      .getElementById(`q-${questionId}`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   return (
-    <div className={cx('wrapper')}>
+    <div className={cx('wrapper', 'studyWide')}>
       <div className={cx('headerBar')}>
         <button type="button" className={cx('btn', 'btnGhost', 'btnSm')} onClick={goToPicker}>
           Chọn ải khác
@@ -303,115 +362,129 @@ function PlanStudyPage() {
         </>
       )}
 
-      <div className={cx('studyLayout')}>
-        <div className={cx('studyMain')}>
-          {!result && session && (
-            <>
-              <div className={cx('activeTaskCard')}>
-                <div className={cx('activeTaskHead')}>
-                  <div>
-                    <div className={cx('statLabel')}>Đang học</div>
-                    <h3 className={cx('activeTaskTitle')}>
-                      {session.activeTask?.examPartName || 'Part'}
-                      {' · Ải '}{session.activeTask?.tagName || '—'}
-                    </h3>
-                    <div className={cx('actionBar')}>
-                      <span className={cx('badge', 'badgePrimary')}>{planStageLabel(session.planStage)}</span>
-                      <span className={cx('badge', 'badgeMuted')}>
-                        {session.passedTasks}/{session.totalTasks} ải đã pass
-                      </span>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div className={cx('muted', 'small')}>{session.message}</div>
-                    {session.activeTask && (
-                      <div className={cx('passRequired')} style={{ marginTop: '0.4rem' }}>
-                        Cần ≥{session.passAccuracyRequired}% để qua ải
-                      </div>
-                    )}
-                  </div>
+      {!result && session && (
+        <>
+          <div className={cx('activeTaskCard')}>
+            <div className={cx('activeTaskHead')}>
+              <div>
+                <div className={cx('statLabel')}>Đang học</div>
+                <h3 className={cx('activeTaskTitle')}>
+                  {session.activeTask?.examPartName || 'Part'}
+                  {' · Ải '}{session.activeTask?.tagName || '—'}
+                </h3>
+                <div className={cx('actionBar')}>
+                  <span className={cx('badge', 'badgePrimary')}>{planStageLabel(session.planStage)}</span>
+                  <span className={cx('badge', 'badgeMuted')}>
+                    {session.passedTasks}/{session.totalTasks} ải đã pass
+                  </span>
                 </div>
-
-                {session.resource && (
-                  <div className={cx('resourceBox')}>
-                    <div className={cx('resourceLabel')}>Bước 1: đọc tài liệu</div>
-                    <RecoveryResourceLink
-                      resource={session.resource}
-                      className={cx('resourceLink')}
-                    >
-                      {session.resource.title}
-                    </RecoveryResourceLink>
-                    {session.resource.description && (
-                      <p className={cx('resourceDesc')}>{session.resource.description}</p>
-                    )}
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div className={cx('muted', 'small')}>{session.message}</div>
+                {session.activeTask && (
+                  <div className={cx('passRequired')} style={{ marginTop: '0.4rem' }}>
+                    Cần ≥{session.passAccuracyRequired}% để qua ải
                   </div>
                 )}
               </div>
+            </div>
 
-              <h4 className={cx('sectionTitle')}>
-                Bước 2: Luyện ({session.questionCount} câu)
-              </h4>
-
-              {(session.questions || []).map((q, idx) => (
-                <div key={q.questionId} className={cx('questionCard')}>
-                  <div className={cx('questionNo')}>Câu {idx + 1}</div>
-                  <p className={cx('questionText')}>{q.questionText}</p>
-                  {q.questionType === 'MSQ' && (
-                    <div className={cx('msqHint')}>Chọn tất cả đáp án đúng:</div>
+            {session.resource && (
+              <div className={cx('resourceBox')}>
+                <div className={cx('resourceInfo')}>
+                  <div className={cx('resourceTitle')}>{session.resource.title}</div>
+                  {session.resource.description && (
+                    <p className={cx('resourceDesc')}>{session.resource.description}</p>
                   )}
-                  <div className={cx('answerList')}>
-                    {(q.answers || []).map((a) => {
-                      const isMsq = q.questionType === 'MSQ';
-                      const sel = selections[q.questionId];
-                      const checked = isMsq
-                        ? Array.isArray(sel) && sel.includes(a.answerId)
-                        : sel === a.answerId;
-                      return (
-                        <label
-                          key={a.answerId}
-                          className={cx('answerOption', { active: checked })}
-                        >
-                          <input
-                            type={isMsq ? 'checkbox' : 'radio'}
-                            name={`q-${q.questionId}`}
-                            checked={checked}
-                            onChange={() => handleSelect(q.questionId, a.answerId, isMsq)}
-                          />
-                          <span>
-                            {a.answerText?.trim()
-                              ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
-                              : a.answerLabel}
-                          </span>
-                        </label>
-                      );
-                    })}
-                  </div>
                 </div>
-              ))}
+                {getRecoveryResourceLinkProps(session.resource, API_BASE)?.href && (
+                  <ButtonPrime
+                    as="a"
+                    href={getRecoveryResourceLinkProps(session.resource, API_BASE).href}
+                    target="_blank"
+                    rel="noreferrer"
+                    variant="outline"
+                    size="sm"
+                    className={cx('resourceBtn')}
+                  >
+                    Mở tài liệu
+                  </ButtonPrime>
+                )}
+              </div>
+            )}
+          </div>
 
-              <button
-                type="button"
-                className={cx('btn', 'btnPrimary', 'btnLg')}
-                disabled={submitting || !(session.questions?.length)}
-                onClick={handleSubmit}
-              >
-                {submitting ? 'Đang chấm...' : 'Nộp bài'}
-              </button>
-            </>
-          )}
-        </div>
+          <div className={cx('studyLayout')}>
+            <div className={cx('studyMain')}>
+              {(session.questions || []).map((q, idx) => {
+                const isMsq = q.questionType === 'MSQ';
+                const sel = selections[q.questionId];
+                return (
+                  <div key={q.questionId} id={`q-${q.questionId}`} className={ex('question-card')}>
+                    <span className={ex('q-text')}>
+                      <span className={ex('q-number')}>Câu {idx + 1}:</span>{' '}
+                      {q.questionText}
+                    </span>
+                    {isMsq && <div className={cx('msqHint')}>Chọn tất cả đáp án đúng:</div>}
+                    <div className={ex('mcq-group')}>
+                      {(q.answers || []).map((a) => {
+                        const checked = isMsq
+                          ? Array.isArray(sel) && sel.includes(a.answerId)
+                          : sel === a.answerId;
+                        return (
+                          <label
+                            key={a.answerId}
+                            className={ex('mcq-option', { selected: checked })}
+                          >
+                            <input
+                              type={isMsq ? 'checkbox' : 'radio'}
+                              name={`q-${q.questionId}`}
+                              checked={checked}
+                              onChange={() => handleSelect(q.questionId, a.answerId, isMsq)}
+                            />
+                            <span>
+                              {a.answerText?.trim()
+                                ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
+                                : a.answerLabel}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
 
-        <div className={cx('studySidebar')}>
-          <h5 className={cx('sectionTitle')}>Đổi ải (trong Part)</h5>
-          <PlanPartTaskList
-            partGroups={partGroups}
-            learningPlanId={learningPlanId}
-            studyAction="button"
-            onStudyTask={startTask}
-            compact
-          />
-        </div>
-      </div>
+              {(session.questions?.length ?? 0) > 0 && (
+                <div className={cx('studySubmitBar')}>
+                  <span className={cx('studySubmitProgress')}>
+                    Đã trả lời <strong>{answeredCount}</strong>/{session.questions.length} câu
+                  </span>
+                  <button
+                    type="button"
+                    className={cx('btn', 'btnPrimary', 'btnLg')}
+                    disabled={submitting}
+                    onClick={handleSubmit}
+                  >
+                    {submitting ? 'Đang chấm...' : 'Nộp bài'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {(session.questions?.length ?? 0) > 0 && (
+              <div className={cx('studySidebar')}>
+                <TestStartDashboard
+                  allQuestions={session.questions}
+                  userAnswers={navAnswers}
+                  onScrollToQuestion={scrollToQuestion}
+                  gridMaxHeight="calc(100vh - 24rem)"
+                />
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
