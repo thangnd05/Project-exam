@@ -955,10 +955,9 @@
   --ring-color: var(--primary);
   --ring-track: var(--input-bg);
 
+  // Khung giữ màu trung tính chung; trạng thái qua/chưa qua thể hiện qua vòng % + badge.
   &.passed {
     --ring-color: #22c55e;
-    border-color: var(--success-border);
-    background: linear-gradient(180deg, var(--success-bg), var(--bg-white) 62%);
 
     .resultBadge {
       color: var(--success-text);
@@ -967,8 +966,6 @@
 
   &.failed {
     --ring-color: #f59e0b;
-    border-color: var(--author-tag-border);
-    background: linear-gradient(180deg, var(--author-tag-bg), var(--bg-white) 62%);
 
     .resultBadge {
       color: var(--author-tag-text);
@@ -1053,88 +1050,130 @@
   }
 }
 
-.reviewSection {
-  margin-top: 2rem;
-}
+// ===== Xem lại đáp án — đồng bộ phong cách trang "Chi tiết bài làm" của bài thi =====
+.reviewTitle {
+  font-size: 2.6rem;
+  font-weight: var(--font-weight-bold);
+  margin: 2.4rem 0 2rem;
+  color: var(--dark-color, #0f172a);
+  position: relative;
+  padding-left: 1.5rem;
 
-.reviewToggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 1.2rem;
-  cursor: pointer;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--primary);
-  border: none;
-  background: none;
-  padding: 0;
-
-  &:hover {
-    text-decoration: underline;
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 2.8rem;
+    background: var(--primary-gradient, linear-gradient(135deg, #0061f2, #0056d2));
+    border-radius: 10px;
   }
 }
 
-.reviewItem {
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 1.2rem 1.4rem;
-  margin-bottom: 1rem;
+.reviewPanel {
   background: var(--bg-white);
-}
-
-.reviewQuestionNo {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-secondary);
-  margin-bottom: 0.4rem;
-}
-
-.reviewQuestionText {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: 0.8rem;
-  color: var(--text-color);
-}
-
-.reviewAnswerList {
+  border-radius: var(--radius-lg);
+  padding: 2.8rem;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 0.8rem;
-}
+  gap: 1.6rem;
 
-.reviewAnswerOption {
-  padding: 0.7rem 1.2rem;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-base);
-  border: 1px solid transparent;
-  background: var(--input-bg);
-
-  &.isCorrectAnswer {
-    background: rgba(0, 97, 242, 0.1);
-    font-weight: var(--font-weight-semibold);
-    color: var(--primary);
-  }
-
-  &.isUserWrong {
-    background: var(--danger-bg);
-    color: var(--danger-text);
-  }
-
-  &.isUserCorrect {
-    background: rgba(0, 97, 242, 0.1);
-    color: var(--primary);
+  @media (max-width: 768px) {
+    padding: 1.6rem;
   }
 }
 
-.reviewExplanation {
-  margin-top: 0.8rem;
-  padding: 1rem 1.2rem;
-  border-radius: var(--radius-sm);
+.questionItem {
+  padding: 2rem;
+  border-radius: 15px;
+  border: 2px solid #f1f5f9;
+  transition: all 0.3s;
+
+  &.correct {
+    border-color: #10b98140;
+    background: #10b98108;
+  }
+
+  &.incorrect {
+    border-color: #ef444440;
+    background: #ef444408;
+  }
+
+  &.unanswered {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
+}
+
+.qText {
+  font-size: 1.6rem;
+  margin-bottom: 1.4rem;
+  color: var(--dark-color, #0f172a);
+  display: block;
+  line-height: 1.5;
+
+  strong {
+    font-weight: 800;
+  }
+}
+
+.answersOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.answerOption {
+  padding: 1.2rem 1.8rem;
+  border-radius: 10px;
+  background: var(--bg-white);
+  border: 1px solid #e2e8f0;
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+
+  &.isCorrect {
+    background: #ecfdf5;
+    border-color: var(--success-border);
+    color: #059669;
+    font-weight: 700;
+  }
+
+  &.isIncorrectChoice {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #dc2626;
+    font-weight: 700;
+  }
+
+  &.isUserChoice {
+    box-shadow: 0 0 0 2px rgba(0, 97, 242, 0.15);
+  }
+}
+
+.userPill {
+  margin-left: 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.explanationBox {
+  margin-top: 1.4rem;
+  padding: 1.2rem 1.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--author-tag-border);
   background: var(--author-tag-bg);
   color: var(--author-tag-text);
-  font-size: var(--font-size-base);
-  line-height: 1.6;
   white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: var(--font-size-md);
+
+  strong {
+    font-weight: 800;
+  }
 }

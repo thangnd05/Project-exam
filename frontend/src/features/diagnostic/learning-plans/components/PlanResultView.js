@@ -32,7 +32,7 @@ function PlanResultView({
 
         <div className={cx('resultBody')}>
           <div className={cx('resultBadge')}>
-            {result.passed ? '🎉 Đã qua ải!' : '📚 Chưa qua ải'}
+            {result.passed ? 'Đã qua ải!' : 'Chưa qua ải'}
           </div>
           <p className={cx('resultMessage')}>{result.message}</p>
           <div className={cx('resultActions')}>
@@ -62,57 +62,60 @@ function PlanResultView({
       </div>
 
       {showReview && result.reviewItems?.length > 0 && (
-        <div className={cx('reviewSection')}>
-          {result.reviewItems.map((item, idx) => {
-            const isMsq = item.questionType === 'MSQ';
-            const userSelectedIds = isMsq
-              ? (item.selectedAnswerIds || [])
-              : (item.selectedAnswerId ? [item.selectedAnswerId] : []);
-            return (
-              <div
-                key={item.questionId}
-                className={cx('reviewItem', {
-                  reviewCorrect: item.correct,
-                  reviewWrong: !item.correct,
-                })}
-              >
-                <div className={cx('reviewQuestionNo')}>
-                  Câu {idx + 1} {item.correct ? '✓' : '✗'}
-                </div>
-                <div className={cx('reviewQuestionText')}>{item.questionText}</div>
-                <div className={cx('reviewAnswerList')}>
-                  {(item.answers || []).map((a) => {
-                    const isCorrectAnswer = a.isCorrect != null
-                      ? a.isCorrect
-                      : a.answerId === item.correctAnswerId;
-                    const isUserChoice = userSelectedIds.includes(a.answerId);
-                    return (
-                      <div
-                        key={a.answerId}
-                        className={cx('reviewAnswerOption', {
-                          isCorrectAnswer: isCorrectAnswer,
-                          isUserWrong: isUserChoice && !isCorrectAnswer,
-                          isUserCorrect: isUserChoice && isCorrectAnswer,
-                        })}
-                      >
-                        {a.answerText?.trim()
-                          ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
-                          : a.answerLabel}
-                        {isCorrectAnswer && ' ✓'}
-                        {isUserChoice && !isCorrectAnswer && ' (Bạn chọn)'}
-                      </div>
-                    );
+        <>
+          <h2 className={cx('reviewTitle')}>Chi tiết bài làm</h2>
+          <div className={cx('reviewPanel')}>
+            {result.reviewItems.map((item, idx) => {
+              const isMsq = item.questionType === 'MSQ';
+              const userSelectedIds = isMsq
+                ? (item.selectedAnswerIds || [])
+                : (item.selectedAnswerId ? [item.selectedAnswerId] : []);
+              const answered = userSelectedIds.length > 0;
+              return (
+                <div
+                  key={item.questionId}
+                  className={cx('questionItem', {
+                    correct: item.correct,
+                    incorrect: answered && !item.correct,
+                    unanswered: !answered,
                   })}
-                </div>
-                {item.explanation?.trim() && (
-                  <div className={cx('reviewExplanation')}>
-                    <strong>Giải thích:</strong> {item.explanation}
+                >
+                  <span className={cx('qText')}>
+                    <strong>Câu {idx + 1}:</strong> {item.questionText}
+                  </span>
+                  <div className={cx('answersOptions')}>
+                    {(item.answers || []).map((a) => {
+                      const isCorrectAnswer = a.isCorrect != null
+                        ? a.isCorrect
+                        : a.answerId === item.correctAnswerId;
+                      const isUserChoice = userSelectedIds.includes(a.answerId);
+                      return (
+                        <div
+                          key={a.answerId}
+                          className={cx('answerOption', {
+                            isCorrect: isCorrectAnswer,
+                            isIncorrectChoice: isUserChoice && !isCorrectAnswer,
+                            isUserChoice,
+                          })}
+                        >
+                          {a.answerText?.trim()
+                            ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
+                            : a.answerLabel}
+                          {isUserChoice && <span className={cx('userPill')}>(Bạn chọn)</span>}
+                        </div>
+                      );
+                    })}
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                  {item.explanation?.trim() && (
+                    <div className={cx('explanationBox')}>
+                      <strong>Giải thích:</strong> {item.explanation}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </>
   );

@@ -65,12 +65,6 @@ function PlanResultPage() {
 
   return (
     <div className={cx('wrapper', 'studyWide')}>
-      <div className={cx('headerBar')}>
-        <button type="button" className={cx('btn', 'btnGhost', 'btnSm')} onClick={goToPicker}>
-          Chọn ải khác
-        </button>
-      </div>
-
       <PlanResultView
         result={result}
         showReview={showReview}
