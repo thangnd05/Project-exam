@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
@@ -26,7 +27,6 @@ function UserTargetPage() {
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [targetScore, setTargetScore] = useState('');
   const [customParts, setCustomParts] = useState({});
-  const [message, setMessage] = useState('');
 
   const targetQuery = useQuery({
     queryKey: currentTargetKeys.detail(selectedExamTypeId),
@@ -111,14 +111,13 @@ function UserTargetPage() {
 
   const handleSave = () => {
     if (hasSavedTarget) {
-      setMessage('Bạn đã có mục tiêu hiện tại. Vui lòng xóa mục tiêu cũ trước khi lưu mới.');
+      toast.warn('Bạn đã có mục tiêu hiện tại. Vui lòng xóa mục tiêu cũ trước khi lưu mới.');
       return;
     }
     if (!targetScore || !selectedExamTypeId) {
-      setMessage('Nhập điểm mục tiêu trước.');
+      toast.warn('Nhập điểm mục tiêu trước.');
       return;
     }
-    setMessage('');
 
     const allParts = partRequirements.map((pr) => ({
       examPartId: pr.examPartId,
@@ -135,25 +134,22 @@ function UserTargetPage() {
         customParts: allParts,
       },
       {
-        onSuccess: () => {
-          setMessage('Đã lưu mục tiêu thành công!');
-        },
-        onError: () => setMessage('Lỗi khi lưu mục tiêu.'),
+        onSuccess: () => toast.success('Đã lưu mục tiêu thành công!'),
+        onError: () => toast.error('Lỗi khi lưu mục tiêu.'),
       },
     );
   };
 
   const handleDelete = () => {
     if (!selectedExamTypeId) return;
-    setMessage('');
 
     deleteMutation.mutate(selectedExamTypeId, {
       onSuccess: () => {
         setTargetScore('');
         setCustomParts({});
-        setMessage('Đã xóa mục tiêu.');
+        toast.success('Đã xóa mục tiêu.');
       },
-      onError: () => setMessage('Lỗi khi xóa mục tiêu.'),
+      onError: () => toast.error('Lỗi khi xóa mục tiêu.'),
     });
   };
 
@@ -169,7 +165,6 @@ function UserTargetPage() {
     });
   };
 
-  const isSuccess = message.includes('thành công') || message.includes('Đã xóa');
   const hasSavedTarget = Boolean(currentTarget?.hasTarget);
 
   const scoreEstimateBlock = (() => {
@@ -245,17 +240,6 @@ function UserTargetPage() {
         với bản thân.
       </p>
 
-      {message && (
-        <div
-          className={planCx(
-            'alert',
-            isSuccess ? 'alertSuccess' : 'alertDanger',
-          )}
-        >
-          <span>{message}</span>
-        </div>
-      )}
-
       <div className={classNames(planCx('card'), cx('setupCard'))}>
         <div className={classNames(planCx('cardHeader'), cx('compactCardHeader'))}>Thiết lập mục tiêu</div>
         <div className={classNames(planCx('cardBody'), cx('compactCardBody'))}>
@@ -269,7 +253,6 @@ function UserTargetPage() {
                 setSelectedExamTypeId(e.target.value);
                 setTargetScore('');
                 setCustomParts({});
-                setMessage('');
               }}
             >
               <option value="">-- Chọn --</option>

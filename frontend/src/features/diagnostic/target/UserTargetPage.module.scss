@@ -289,6 +289,9 @@
 
 .compactCardBody {
   padding: 1.2rem !important;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
 }
 
 .compactSelect {

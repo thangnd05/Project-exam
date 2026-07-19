@@ -16,11 +16,17 @@ public class UserTestMapper {
      * rồi truyền vào để tránh N+1; userName có thể null nếu không cần.
      */
     public UserTestResponse toResponse(UserTest userTest, String examTypeId, String userName) {
+        return toResponse(userTest, examTypeId, userName, null);
+    }
+
+    /** Bản đầy đủ có kèm testTitle (tên bài) — service batch-load Test để tránh N+1. */
+    public UserTestResponse toResponse(UserTest userTest, String examTypeId, String userName, String testTitle) {
         return UserTestResponse.builder()
                 .userTestId(userTest.getUserTestId())
                 .userId(userTest.getUserId())
                 .userName(userName)
                 .testId(userTest.getTestId())
+                .testTitle(testTitle)
                 .examTypeId(examTypeId)
                 .startedAt(userTest.getStartedAt())
                 .finishedAt(userTest.getFinishedAt())

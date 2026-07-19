@@ -95,31 +95,35 @@ public class UserTestService {
     private static final String QUICK_CHALLENGE_CODE = "QUICK_CHALLENGE";
 
     public UserTestResponse toResponse(UserTest userTest) {
-        String examTypeId = testRepository.findById(userTest.getTestId())
-                .map(Test::getExamTypeId)
-                .orElse(null);
-        return toResponse(userTest, examTypeId);
+        Test test = userTest.getTestId() == null ? null
+                : testRepository.findById(userTest.getTestId()).orElse(null);
+        return toResponse(userTest, test);
     }
 
-    private UserTestResponse toResponse(UserTest userTest, String examTypeId) {
-        return userTestMapper.toResponse(userTest, examTypeId, null);
+    /** Map 1 UserTest, lấy examTypeId + testTitle từ Test đã resolve (null-safe). */
+    private UserTestResponse toResponse(UserTest userTest, Test test) {
+        return userTestMapper.toResponse(
+                userTest,
+                test != null ? test.getExamTypeId() : null,
+                null,
+                test != null ? test.getTitle() : null);
     }
 
-    /** Batch-load examTypeId theo testId để tránh N+1 khi map list UserTest. */
-    private Map<String, String> loadExamTypeIdsByTestId(Collection<UserTest> userTests) {
+    /** Batch-load Test theo testId để tránh N+1 khi map list UserTest (dùng cả examTypeId lẫn title). */
+    private Map<String, Test> loadTestsByTestId(Collection<UserTest> userTests) {
         Set<String> testIds = userTests.stream()
                 .map(UserTest::getTestId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         if (testIds.isEmpty()) return Collections.emptyMap();
         return testRepository.findAllById(testIds).stream()
-                .collect(Collectors.toMap(Test::getTestId, Test::getExamTypeId));
+                .collect(Collectors.toMap(Test::getTestId, test -> test));
     }
 
     private List<UserTestResponse> toResponseListBatched(List<UserTest> userTests) {
-        Map<String, String> examTypeIdByTest = loadExamTypeIdsByTestId(userTests);
+        Map<String, Test> testById = loadTestsByTestId(userTests);
         return userTests.stream()
-                .map(u -> toResponse(u, examTypeIdByTest.get(u.getTestId())))
+                .map(u -> toResponse(u, testById.get(u.getTestId())))
                 .toList();
     }
 
@@ -295,15 +299,16 @@ public class UserTestService {
     public List<UserTestResponse> findCompletedResponsesByUserId(String userId, String examTypeId) {
         List<UserTest> completed = userTestRepository
                 .findByUserIdAndStatusAndFinishedAtIsNotNullOrderByFinishedAtDesc(userId, UserTest.Status.COMPLETED);
-        Map<String, String> examTypeIdByTest = loadExamTypeIdsByTestId(completed);
+        Map<String, Test> testById = loadTestsByTestId(completed);
         boolean filterByExamType = examTypeId != null && !examTypeId.isBlank();
         return completed.stream()
                 .filter(u -> {
                     if (!filterByExamType) return true;
-                    String et = examTypeIdByTest.get(u.getTestId());
+                    Test t = testById.get(u.getTestId());
+                    String et = t != null ? t.getExamTypeId() : null;
                     return et == null || et.equals(examTypeId);
                 })
-                .map(u -> toResponse(u, examTypeIdByTest.get(u.getTestId())))
+                .map(u -> toResponse(u, testById.get(u.getTestId())))
                 .toList();
     }
 
