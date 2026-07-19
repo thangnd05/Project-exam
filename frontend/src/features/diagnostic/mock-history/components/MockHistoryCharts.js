@@ -45,7 +45,7 @@ function MockHistoryTooltip({ active, payload }) {
       )}
       {row.readinessScore != null && (
         <p>
-          <strong>Readiness:</strong> {row.readinessScore}%
+          <strong>Độ sẵn sàng:</strong> {row.readinessScore}%
         </p>
       )}
       {row.isTargetMet === true && (
@@ -110,7 +110,7 @@ function MockHistoryCharts({ chartData, targetScore, loading, examTypeName }) {
         )}
         {latestReadiness != null && (
           <div className={cx('statTile')}>
-            <span className={cx('statTileLabel')}>Readiness mới nhất</span>
+            <span className={cx('statTileLabel')}>Sẵn sàng mới nhất</span>
             <strong className={cx('statTileValue')}>{latestReadiness}%</strong>
           </div>
         )}
@@ -130,11 +130,11 @@ function MockHistoryCharts({ chartData, targetScore, loading, examTypeName }) {
           )}
         </div>
         <p className={cx('chartCardDesc')}>
-          Trục ngang: thứ tự bài thi từ cũ → mới. Cột = điểm tổng · đường = readiness %.
+          Trục ngang: thứ tự bài thi từ cũ → mới. Cột = điểm tổng · đường = độ sẵn sàng %.
         </p>
 
         {loading && (
-          <p className={cx('chartLoadingInline')}>Đang bổ sung readiness cho các bài cũ...</p>
+          <p className={cx('chartLoadingInline')}>Đang bổ sung độ sẵn sàng cho các bài cũ...</p>
         )}
 
         <div className={cx('chartContainer')}>
@@ -174,7 +174,7 @@ function MockHistoryCharts({ chartData, targetScore, loading, examTypeName }) {
                   tickLine={false}
                   axisLine={false}
                   label={{
-                    value: 'Readiness %',
+                    value: 'Độ sẵn sàng %',
                     angle: 90,
                     position: 'insideRight',
                     style: { fontSize: 11, fill: '#94a3b8' },
@@ -186,7 +186,7 @@ function MockHistoryCharts({ chartData, targetScore, loading, examTypeName }) {
                 wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
                 formatter={(value) => {
                   if (value === 'totalScore') return 'Điểm tổng';
-                  if (value === 'readinessScore') return 'Readiness';
+                  if (value === 'readinessScore') return 'Độ sẵn sàng';
                   return value;
                 }}
               />

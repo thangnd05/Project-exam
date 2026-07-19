@@ -220,7 +220,7 @@ function MockHistoryPage() {
                   <th>Hoàn thành</th>
                   <th>Test ID</th>
                   <th className={cx('right')}>Score</th>
-                  <th className={cx('right')}>Readiness</th>
+                  <th className={cx('right')}>Độ sẵn sàng</th>
                   <th>Mục tiêu</th>
                   <th>Thời gian</th>
                   <th></th>

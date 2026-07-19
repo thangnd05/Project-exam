@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
 import { priorityTierLabel } from '~/shared/utils/priorityTier';
+import { planStageLabel } from '~/features/diagnostic/learning-plans/planLabels';
 import { useExamTypes, useNextStepOverview } from './hooks/useNextStep';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
@@ -95,7 +96,7 @@ function NextStepPage() {
         return {
           kind: 'do-mock',
           title: 'Bạn đã pass hết ải — đến lúc làm Mock kiểm tra',
-          desc: `Plan #${activePlanDetail.planSequence} đã xong giai đoạn FOUNDATION. Làm một mock mới để cập nhật readiness.`,
+          desc: `Plan #${activePlanDetail.planSequence} đã xong giai đoạn nền tảng. Làm một mock mới để cập nhật độ sẵn sàng.`,
           ctaLabel: 'Làm mock',
           ctaTo: mockTestsPath,
           extras: [
@@ -143,7 +144,7 @@ function NextStepPage() {
     return {
       kind: 'generate-plan',
       title: 'Sinh lộ trình từ mock gần nhất',
-      desc: `Mock ${enhanced?.totalScore ?? latestMock.totalScore}đ · readiness ${enhanced?.readinessScore ?? '—'}% — chưa đạt target. Hệ thống sẽ tạo plan ải dựa trên các tag yếu.`,
+      desc: `Mock ${enhanced?.totalScore ?? latestMock.totalScore}đ · độ sẵn sàng ${enhanced?.readinessScore ?? '—'}% — chưa đạt mục tiêu. Hệ thống sẽ tạo plan ải dựa trên các tag yếu.`,
       ctaLabel: 'Sinh plan',
       ctaTo: `/learning-plans/generate?userTestId=${latestMock.userTestId}`,
       extras: [
@@ -238,7 +239,7 @@ function NextStepPage() {
                 <strong>Mock gần nhất:</strong>{' '}
                 {latestMock
                   ? `${enhanced?.totalScore ?? latestMock.totalScore ?? '—'}đ${
-                      enhanced?.readinessScore != null ? ` · readiness ${enhanced.readinessScore}%` : ''
+                      enhanced?.readinessScore != null ? ` · độ sẵn sàng ${enhanced.readinessScore}%` : ''
                     }`
                   : <span className={cx('muted')}>chưa có</span>}
               </li>
@@ -247,7 +248,7 @@ function NextStepPage() {
                 {activePlanDetail ? (
                   <>
                     Plan #{activePlanDetail.planSequence} · {activePlanDetail.passedTasks ?? 0}/
-                    {activePlanDetail.totalTasks ?? 0} ải pass · stage {activePlanDetail.planStage}
+                    {activePlanDetail.totalTasks ?? 0} ải đã qua · giai đoạn {planStageLabel(activePlanDetail.planStage)}
                   </>
                 ) : (
                   <span className={cx('muted')}>không có</span>

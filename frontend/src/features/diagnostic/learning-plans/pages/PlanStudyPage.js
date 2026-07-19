@@ -7,6 +7,7 @@ import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import { useSubmitSession } from './hooks/useSubmitSession';
+import { planStageLabel } from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -184,7 +185,7 @@ function PlanStudyPage() {
               <span className={cx('badge', 'badgeMuted')}>
                 Tiến độ: {session.passedTasks}/{session.totalTasks} ải
               </span>
-              <span className={cx('badge', 'badgePrimary')}>{session.planStage}</span>
+              <span className={cx('badge', 'badgePrimary')}>{planStageLabel(session.planStage)}</span>
             </div>
           </div>
         </div>
@@ -315,7 +316,7 @@ function PlanStudyPage() {
                       {' · Ải '}{session.activeTask?.tagName || '—'}
                     </h3>
                     <div className={cx('actionBar')}>
-                      <span className={cx('badge', 'badgePrimary')}>{session.planStage}</span>
+                      <span className={cx('badge', 'badgePrimary')}>{planStageLabel(session.planStage)}</span>
                       <span className={cx('badge', 'badgeMuted')}>
                         {session.passedTasks}/{session.totalTasks} ải đã pass
                       </span>

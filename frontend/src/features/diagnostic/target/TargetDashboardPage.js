@@ -147,7 +147,7 @@ function TargetDashboardPage() {
       {loading && <div className={cx('loading')}>Đang tải...</div>}
 
       {!loading && !target?.hasTarget && examTypeId && (
-        <div className={cx('alert', 'alertWarning')}>
+        <div className={cx('alert', 'alertInfo')}>
           <span>Bạn chưa đặt mục tiêu cho kỳ thi này.</span>
           <ButtonPrime as="link" to={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
             Đặt mục tiêu
@@ -210,7 +210,7 @@ function TargetDashboardPage() {
             </div>
 
             <div className={cx('statTile')}>
-              <div className={cx('statLabel')}>Readiness mock gần nhất</div>
+              <div className={cx('statLabel')}>Độ sẵn sàng mock gần nhất</div>
               <div className={cx('statValue')}>
                 {enhancedMatchesType ? `${latestEnhanced?.readinessScore ?? '—'}%` : '—'}
               </div>

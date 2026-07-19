@@ -5,6 +5,7 @@ import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/shared/utils/format-date-time';
 import { priorityTierLabel } from '~/shared/utils/priorityTier';
 import { useTaskHistory } from './hooks/useTaskHistory';
+import { planStageLabel } from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -254,7 +255,7 @@ function TaskHistoryPage() {
                       <span className={cx('muted', 'small')}>—</span>
                     )}
                   </td>
-                  <td className={cx('small')}>{s.planStage || '—'}</td>
+                  <td className={cx('small')}>{planStageLabel(s.planStage)}</td>
                 </tr>
               ))}
             </tbody>

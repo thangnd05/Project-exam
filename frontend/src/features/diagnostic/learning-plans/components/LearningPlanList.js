@@ -9,29 +9,10 @@ import { useLearningPlanList } from '../hooks/use-learning-plan-list';
 import { useDeletePlan } from '../hooks/use-delete-plan';
 import { useSwitchPlan } from '../hooks/use-switch-plan';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
+import { planStageLabel, planStatusLabel, planStatusVariant } from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
-
-const STATUS_VARIANT = {
-  ACTIVE: 'badgePrimary',
-  COMPLETED: 'badgeSuccess',
-  REPLACED: 'badgeMuted',
-  ABANDONED: 'badgeDanger',
-};
-
-const STATUS_LABEL = {
-  ACTIVE: 'Đang học',
-  COMPLETED: 'Hoàn thành',
-  REPLACED: 'Đã thay',
-  ABANDONED: 'Đã bỏ',
-};
-
-const STAGE_LABEL = {
-  FOUNDATION: 'Nền tảng',
-  MOCK: 'Thi thử',
-  MIX: 'Tổng hợp',
-};
 
 const LearningPlanList = forwardRef(function LearningPlanList(
   {
@@ -157,17 +138,16 @@ const LearningPlanList = forwardRef(function LearningPlanList(
           <div className={cx('planListMain')}>
             <div className={cx('planListTitle')}>
               Plan #{p.planSequence ?? '?'}
-              <span className={cx('badge', STATUS_VARIANT[p.status] || 'badgeMuted')}>
-                {STATUS_LABEL[p.status] || p.status}
+              <span className={cx('badge', planStatusVariant(p.status))}>
+                {planStatusLabel(p.status)}
               </span>
               {showExamTypeBadge && p.examTypeName && (
                 <span className={cx('badge', 'badgeMuted')}>{p.examTypeName}</span>
               )}
             </div>
             <div className={cx('planListMeta')}>
-              Giai đoạn <strong>{STAGE_LABEL[p.planStage] || STAGE_LABEL.FOUNDATION}</strong>
+              Giai đoạn <strong>{planStageLabel(p.planStage)}</strong>
               {' · '}Ải <strong>{p.passedTasks ?? 0}/{p.totalTasks ?? 0}</strong>
-              {' · '}Độ sẵn sàng <strong>{p.baselineReadiness ?? p.currentReadiness ?? '—'}%</strong>
               {p.createdAt && (
                 <>
                   {' · '}

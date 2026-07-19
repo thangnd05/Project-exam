@@ -172,11 +172,11 @@ function TargetAchievedPage() {
                   <Link to={`/learning-plans/compare?examTypeId=${examTypeId}`}>
                     Xem hành trình các plan
                   </Link>
-                  {' '}— readiness #1 → #N qua từng mock.
+                  {' '}— độ sẵn sàng #1 → #N qua từng mock.
                 </li>
                 <li>
                   <Link to="/my-target/mocks">Lịch sử bài thi</Link>
-                  {' '}— biểu đồ readiness theo thời gian.
+                  {' '}— biểu đồ độ sẵn sàng theo thời gian.
                 </li>
                 <li>
                   <Link to="/">Làm thêm bài</Link>

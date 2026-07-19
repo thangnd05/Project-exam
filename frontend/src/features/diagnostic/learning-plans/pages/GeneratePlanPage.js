@@ -4,6 +4,8 @@ import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import LearningPlanList from '../components/LearningPlanList';
 import PlanPartTaskList from '../components/PlanPartTaskList';
+import { planStageLabel } from '../planLabels';
+import { getReadinessLabel } from '~/features/diagnostic/target/utils/readiness-label';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import {
   useCompletedUserTests,
@@ -256,12 +258,12 @@ function GeneratePlanPage() {
           <div className={cx('cardBody')}>
             <p>{result.summary}</p>
             <ul className={cx('metaList')}>
-              <li><strong>Stage:</strong> {result.planStage}</li>
+              <li><strong>Giai đoạn:</strong> {planStageLabel(result.planStage)}</li>
               <li>
-                <strong>Readiness (chẩn đoán):</strong>{' '}
-                {result.baselineReadiness ?? result.currentReadiness}% ({result.readinessLevel})
+                <strong>Độ sẵn sàng (chẩn đoán):</strong>{' '}
+                {result.baselineReadiness ?? result.currentReadiness}% ({getReadinessLabel(result.readinessLevel)})
               </li>
-              <li><strong>Target:</strong> {result.targetScore ?? 'N/A'}</li>
+              <li><strong>Mục tiêu:</strong> {result.targetScore ?? 'N/A'}</li>
               <li><strong>Ải:</strong> {result.totalTasks} (ước tính ~{result.estimatedDaysRemaining} ngày)</li>
             </ul>
 

@@ -3,22 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import { usePlanDetail } from './hooks/usePlanDetail';
+import { planStageLabel, planStatusLabel } from '../planLabels';
+import { getReadinessLabel } from '~/features/diagnostic/target/utils/readiness-label';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
-
-const STAGE_LABELS = {
-  FOUNDATION: 'Đang ôn theo Part',
-  MIX: 'Đang chuyển (plan cũ)',
-  MOCK: 'Xong ải — làm Mock',
-};
-
-const STATUS_LABEL = {
-  ACTIVE: 'Đang học',
-  COMPLETED: 'Hoàn thành',
-  REPLACED: 'Đã thay bằng plan mới',
-  ABANDONED: 'Đã bỏ',
-};
 
 function planBaselineReadiness(plan) {
   if (plan == null) return null;
@@ -99,16 +88,16 @@ function PlanDetailPage() {
           <ul className={cx('metaList')} style={{ marginBottom: 0 }}>
             <li>
               <strong>Trạng thái:</strong>{' '}
-              {STATUS_LABEL[plan.status] || plan.status}
+              {planStatusLabel(plan.status)}
             </li>
             <li>
               <strong>Giai đoạn:</strong>{' '}
-              {STAGE_LABELS[plan.planStage] || plan.planStage}
+              {planStageLabel(plan.planStage)}
             </li>
             <li>
-              <strong>Readiness lúc tạo plan:</strong>{' '}
+              <strong>Độ sẵn sàng lúc tạo plan:</strong>{' '}
               {baseline != null ? `${baseline}%` : '—'}
-              {plan.readinessLevel ? ` (${plan.readinessLevel})` : ''}
+              {plan.readinessLevel ? ` (${getReadinessLabel(plan.readinessLevel)})` : ''}
             </li>
             <li>
               <strong>Tiến độ ải:</strong>{' '}

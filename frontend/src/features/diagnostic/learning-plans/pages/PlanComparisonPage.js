@@ -5,25 +5,12 @@ import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import PlanComparisonCharts from '../components/PlanComparisonCharts';
 import { usePlanComparison } from './hooks/usePlanComparison';
+import { planStageLabel, planStatusLabel, planStatusVariant } from '../planLabels';
 import pageStyles from '../styles/PlanComparisonPage.module.scss';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 const pageCx = classNames.bind(pageStyles);
-
-const STATUS_LABEL = {
-  ACTIVE: 'Đang học',
-  COMPLETED: 'Hoàn thành',
-  REPLACED: 'Đã thay',
-  ABANDONED: 'Đã bỏ',
-};
-
-const STATUS_VARIANT = {
-  ACTIVE: 'badgePrimary',
-  COMPLETED: 'badgeSuccess',
-  REPLACED: 'badgeMuted',
-  ABANDONED: 'badgeDanger',
-};
 
 function PlanComparisonPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -143,14 +130,14 @@ function PlanComparisonPage() {
                 >
                   <div className={cx('planHead')}>
                     <span className={cx('planNo')}>Plan #{p.planSequence ?? '?'}</span>
-                    <span className={cx('badge', STATUS_VARIANT[p.status] || 'badgeMuted')}>
-                      {STATUS_LABEL[p.status] || p.status}
+                    <span className={cx('badge', planStatusVariant(p.status))}>
+                      {planStatusLabel(p.status)}
                     </span>
                   </div>
 
                   <ul className={cx('metaList')}>
                     <li>
-                      <strong>Baseline readiness:</strong>
+                      <strong>Độ sẵn sàng ban đầu:</strong>
                       {cur != null ? ` ${cur}%` : ' —'}
                       {diff != null && (
                         <span
@@ -160,21 +147,19 @@ function PlanComparisonPage() {
                             flat: diff === 0,
                           })}
                         >
-                          ({diff > 0 ? '+' : ''}{diff}% vs #{prev.planSequence})
+                          ({diff > 0 ? '+' : ''}{diff}% so với Plan #{prev.planSequence})
                         </span>
                       )}
                     </li>
-                    <li><strong>Giai đoạn:</strong> {p.planStage || '—'}</li>
+                    <li><strong>Giai đoạn:</strong> {STAGE_LABEL[p.planStage] || '—'}</li>
                     <li>
-                      <strong>Ải đã pass:</strong>{' '}
+                      <strong>Ải đã qua:</strong>{' '}
                       {p.passedTasks ?? 0}/{p.totalTasks ?? 0}
                     </li>
                     <li>
-                      <strong>Mock nguồn:</strong>{' '}
+                      <strong>Bài thi nguồn:</strong>{' '}
                       {p.sourceUserTestId ? (
-                        <Link to={`/tests/result/${p.sourceUserTestId}`}>
-                          <code className={cx('code')}>{p.sourceUserTestId.slice(0, 8)}…</code>
-                        </Link>
+                        <Link to={`/tests/result/${p.sourceUserTestId}`}>Xem kết quả</Link>
                       ) : '—'}
                     </li>
                     <li className={cx('muted')}>

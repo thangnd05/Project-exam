@@ -226,7 +226,7 @@ function MilestonesManagement() {
     <div className={cx('milestonePage')}>
       <AdminPageHeader
         title="Cấu hình mốc điểm mục tiêu"
-        description="Thiết lập các mốc điểm và % yêu cầu từng phần thi để đánh giá readiness của người dùng."
+        description="Thiết lập các mốc điểm và % yêu cầu từng phần thi để đánh giá độ sẵn sàng của người dùng."
       />
 
       <AdminToolbar
