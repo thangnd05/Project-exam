@@ -1,9 +1,5 @@
 import { Component } from 'react';
 
-/**
- * Bắt lỗi render trong cây con để không "trắng cả app".
- * Dùng bọc quanh <Routes/> (và có thể bọc riêng các route nặng).
- */
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -56,32 +52,97 @@ class ErrorBoundary extends Component {
               textAlign: 'center',
             }}
           >
+            <style>{`
+              @keyframes eb-float {
+                0%, 100% { transform: translateY(0) rotate(-2deg); }
+                50% { transform: translateY(-1rem) rotate(2deg); }
+              }
+              @keyframes eb-blink {
+                0%, 92%, 100% { transform: scaleY(1); }
+                96% { transform: scaleY(0.1); }
+              }
+              @keyframes eb-drop {
+                0%, 100% { transform: translateY(0); opacity: 0.9; }
+                50% { transform: translateY(0.5rem); opacity: 1; }
+              }
+              @keyframes eb-shadow {
+                0%, 100% { transform: scaleX(1); opacity: 0.28; }
+                50% { transform: scaleX(0.8); opacity: 0.18; }
+              }
+              @keyframes eb-pop {
+                0% { transform: scale(0.7); opacity: 0; }
+                60% { transform: scale(1.06); }
+                100% { transform: scale(1); opacity: 1; }
+              }
+              .eb-mascot { animation: eb-float 3.4s ease-in-out infinite; transform-origin: center; }
+              .eb-eye { animation: eb-blink 4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+              .eb-drop { animation: eb-drop 2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+              .eb-shadow { animation: eb-shadow 3.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+              @media (prefers-reduced-motion: reduce) {
+                .eb-mascot, .eb-eye, .eb-drop, .eb-shadow { animation: none !important; }
+              }
+            `}</style>
+
             <div
               style={{
-                width: '9.6rem',
-                height: '9.6rem',
-                borderRadius: '50%',
-                display: 'grid',
-                placeItems: 'center',
-                background:
-                  'linear-gradient(135deg, rgba(0, 97, 242, 0.12) 0%, rgba(0, 198, 255, 0.14) 100%)',
-                color: 'var(--primary-color)',
+                animation: 'eb-pop 0.5s ease-out both',
               }}
             >
               <svg
-                width="52"
-                height="52"
-                viewBox="0 0 24 24"
+                width="150"
+                height="150"
+                viewBox="0 0 160 160"
                 fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
                 aria-hidden="true"
               >
-                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
+                {/* bóng đổ */}
+                <ellipse
+                  className="eb-shadow"
+                  cx="80"
+                  cy="146"
+                  rx="42"
+                  ry="8"
+                  fill="#0061f2"
+                />
+                <g className="eb-mascot">
+                  {/* thân tròn mềm */}
+                  <rect
+                    x="26"
+                    y="30"
+                    width="108"
+                    height="100"
+                    rx="42"
+                    fill="url(#eb-body)"
+                  />
+                  {/* má hồng */}
+                  <circle cx="52" cy="92" r="8" fill="#ffb0c4" opacity="0.75" />
+                  <circle cx="108" cy="92" r="8" fill="#ffb0c4" opacity="0.75" />
+                  {/* mắt */}
+                  <circle className="eb-eye" cx="62" cy="76" r="6.5" fill="#1e293b" />
+                  <circle className="eb-eye" cx="98" cy="76" r="6.5" fill="#1e293b" />
+                  <circle cx="64" cy="74" r="2" fill="#ffffff" />
+                  <circle cx="100" cy="74" r="2" fill="#ffffff" />
+                  {/* miệng buồn xin lỗi */}
+                  <path
+                    d="M70 100 Q80 92 90 100"
+                    stroke="#1e293b"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                  {/* giọt mồ hôi lo lắng */}
+                  <path
+                    className="eb-drop"
+                    d="M126 58 c0 5 -6 8 -6 13 a6 6 0 0 0 12 0 c0 -5 -6 -8 -6 -13 Z"
+                    fill="#7cc4ff"
+                  />
+                </g>
+                <defs>
+                  <linearGradient id="eb-body" x1="26" y1="30" x2="134" y2="130" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#cfe4ff" />
+                    <stop offset="1" stopColor="#a9d3ff" />
+                  </linearGradient>
+                </defs>
               </svg>
             </div>
 
@@ -93,7 +154,7 @@ class ErrorBoundary extends Component {
                 color: 'var(--text-color)',
               }}
             >
-              Đã có lỗi xảy ra
+              Ôi, có gì đó trục trặc rồi! 
             </h2>
             <p
               style={{
@@ -104,8 +165,8 @@ class ErrorBoundary extends Component {
                 maxWidth: '34rem',
               }}
             >
-              Xin lỗi vì sự bất tiện. Bạn hãy thử tải lại trang hoặc quay lại
-              trang trước đó.
+              Mình xin lỗi vì sự cố. Bạn thử tải lại trang
+              hoặc quay lại trang trước nhé!
             </p>
 
             <div
