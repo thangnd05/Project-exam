@@ -3,7 +3,9 @@ package com.project_exam.backend.modules.analytics.service;
 import com.project_exam.backend.modules.analytics.domain.PageVisit;
 import com.project_exam.backend.modules.analytics.repository.PageVisitRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -17,7 +19,13 @@ public class VisitTrackingService {
     private final PageVisitRepository pageVisitRepository;
     private final GeoIpService geoIpService;
 
-    /** Ghi nhận 1 lượt xem trang. Bỏ qua nếu path rỗng; cắt bớt các trường quá dài. */
+    /**
+     * Ghi nhận 1 lượt xem trang. Bỏ qua nếu path rỗng; cắt bớt các trường quá dài.
+     *
+     * <p>Chạy bất đồng bộ trên {@code visitExecutor}: phần tra geo-IP có thể gọi mạng nên không
+     * để chặn thread xử lý request (FE vốn fire-and-forget, không chờ kết quả).
+     */
+    @Async("visitExecutor")
     public void record(String path, String sessionKey, String userId, String ipAddress) {
         if (!StringUtils.hasText(path)) {
             return;
@@ -32,6 +40,12 @@ public class VisitTrackingService {
                 .country(trim(country.name(), 100))
                 .createdAt(LocalDateTime.now())
                 .build());
+    }
+
+    /** Xoá các lượt xem cũ hơn {@code days} ngày (retention) — tránh bảng page_visits phình vô hạn. */
+    @Transactional
+    public int purgeOlderThan(int days) {
+        return pageVisitRepository.deleteOlderThan(LocalDateTime.now().minusDays(days));
     }
 
     private String trim(String value, int max) {

@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.analytics.repository;
 import com.project_exam.backend.modules.analytics.domain.PageVisit;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,13 +16,19 @@ public interface PageVisitRepository extends JpaRepository<PageVisit, String> {
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
-    /** (createdAt, userId) của các lượt xem từ :from — dựng biểu đồ theo giờ, tách khách vs user. */
-    @Query("SELECT v.createdAt, v.userId FROM PageVisit v WHERE v.createdAt >= :from")
-    List<Object[]> findVisitsSince(@Param("from") LocalDateTime from);
+    /** Xoá hàng loạt các lượt xem cũ hơn :cutoff (retention) — trả về số dòng đã xoá. */
+    @Modifying
+    @Query("DELETE FROM PageVisit v WHERE v.createdAt < :cutoff")
+    int deleteOlderThan(@Param("cutoff") LocalDateTime cutoff);
 
     /**
      * (sessionKey, createdAt, userId) đã sort theo phiên rồi thời gian — để gom thành "phiên truy cập"
      * theo quy tắc nghỉ 30 phút (mỗi lần vào web tính 1 lượt, không cộng theo từng trang).
+     *
+     * <p>sessionKey = analyticsVisitorId: mã khách/thiết bị ỔN ĐỊNH, KHÔNG đổi khi login/logout.
+     * Nhờ vậy cùng 1 trình duyệt luôn gom về 1 phiên — guest lướt rồi đăng nhập, hay logout/login,
+     * đều không bị tách thành lượt mới. (Không ghép userId để tránh dòng userId=null lúc logout
+     * tách khoá làm phát sinh lượt ảo.)
      */
     @Query("SELECT v.sessionKey, v.createdAt, v.userId FROM PageVisit v WHERE v.createdAt >= :from "
             + "ORDER BY v.sessionKey, v.createdAt")

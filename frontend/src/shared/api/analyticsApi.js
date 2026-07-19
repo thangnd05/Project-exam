@@ -1,13 +1,14 @@
 import axios from '~/shared/api/axiosClient';
-import {getOrCreateGuestSessionId, guestHeaders} from '~/shared/utils/guestSession';
+import {getOrCreateVisitorId} from '~/shared/utils/visitorId';
 
 /**
- * Ghi nhận 1 lượt xem trang (fire-and-forget). Dùng lại guestSessionId ở localStorage làm
- * định danh phiên để backend đếm khách duy nhất / đang online. Không chặn UI, nuốt mọi lỗi.
+ * Ghi nhận 1 lượt xem trang (fire-and-forget). Gửi analyticsVisitorId (mã khách ổn định, KHÔNG
+ * bị xoá khi login/logout) làm định danh phiên cho khách; user đã đăng nhập thì backend gom theo
+ * userId. Không chặn UI, nuốt mọi lỗi.
  */
 export const trackVisit = (path) => {
-  const sessionId = getOrCreateGuestSessionId();
+  const visitorId = getOrCreateVisitorId();
   return axios
-    .post('/api/analytics/visit', {path}, {headers: guestHeaders(sessionId)})
+    .post('/api/analytics/visit', {path}, {headers: {'X-Guest-Session': visitorId}})
     .catch(() => {});
 };

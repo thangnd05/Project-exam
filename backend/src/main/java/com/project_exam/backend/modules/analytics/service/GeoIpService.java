@@ -41,7 +41,17 @@ public class GeoIpService {
 
     public Country resolve(String ip) {
         if (ip == null || ip.isBlank()) return Country.UNKNOWN;
-        return cache.computeIfAbsent(ip, this::lookup);
+        Country cached = cache.get(ip);
+        if (cached != null) return cached;
+
+        Country resolved = lookup(ip);
+        // CHỈ cache khi tra ĐƯỢC (có mã quốc gia, kể cả 'LO' cho IP nội bộ). Lỗi tạm thời
+        // — timeout / mất mạng / ip-api rate-limit (429) — trả UNKNOWN và KHÔNG cache, để lần
+        // sau còn tra lại; nếu cache cả UNKNOWN thì 1 lần lỗi sẽ ghim IP đó "không xác định" mãi.
+        if (resolved.code() != null) {
+            cache.put(ip, resolved);
+        }
+        return resolved;
     }
 
     private Country lookup(String ip) {

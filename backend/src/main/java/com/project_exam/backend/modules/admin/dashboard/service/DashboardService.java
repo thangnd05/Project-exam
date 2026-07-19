@@ -57,6 +57,8 @@ public class DashboardService {
 
     /** Khoảng nghỉ (phút) để tách 2 phiên truy cập: quay lại sau ngần này = phiên mới. */
     private static final long SESSION_GAP_MINUTES = 30;
+    /** Cùng ngưỡng nhưng tính theo giây để so sánh chính xác (không cắt cụt phần giây). */
+    private static final long SESSION_GAP_SECONDS = SESSION_GAP_MINUTES * 60;
 
     // ── Traffic thật (bảng page_visits) ──────────────────────────
     private Traffic buildTraffic(LocalDate today) {
@@ -97,12 +99,15 @@ public class DashboardService {
         String prevKey = null;
         LocalDateTime prevTime = null;
         for (Object[] row : rows) {
-            String key = (String) row[0];
+            String key = (String) row[0]; // sessionKey = analyticsVisitorId (ổn định qua login/logout)
             LocalDateTime ts = (LocalDateTime) row[1];
             String userId = (String) row[2];
-            boolean newSession = !java.util.Objects.equals(key, prevKey)
+            // Không có sessionKey -> không định danh được khách, coi mỗi lượt là 1 phiên riêng
+            // (tránh gộp nhầm nhiều khách key null — vốn sort cạnh nhau — thành chung phiên).
+            boolean newSession = key == null
+                    || !java.util.Objects.equals(key, prevKey)
                     || prevTime == null
-                    || ChronoUnit.MINUTES.between(prevTime, ts) > SESSION_GAP_MINUTES;
+                    || ChronoUnit.SECONDS.between(prevTime, ts) > SESSION_GAP_SECONDS;
             if (newSession) {
                 starts.add(new SessionStart(ts, userId));
             }
@@ -129,7 +134,10 @@ public class DashboardService {
     /** Dựng heatmap NGÀY × GIỜ cho cửa sổ 7 ngày kết thúc ở {@code endDate}. */
     private List<DayHours> buildHeatmap(LocalDate endDate) {
         LocalDate startDate = endDate.minusDays(6);
-        LocalDateTime scanFrom = startDate.atStartOfDay();
+        // Quét thêm 1 ngày đệm trước ngày đầu: phiên bắt đầu từ hôm trước rồi kéo qua nửa đêm
+        // sẽ được nhận diện đúng là phiên cũ (không bị tính thành phiên mới của ngày đầu).
+        // Bucket bên dưới chỉ có 7 ngày nên các phiên rơi vào ngày đệm tự bị bỏ qua.
+        LocalDateTime scanFrom = startDate.minusDays(1).atStartOfDay();
         LocalDateTime scanTo = endDate.plusDays(1).atStartOfDay();
 
         Map<LocalDate, long[]> heatBuckets = new LinkedHashMap<>();
