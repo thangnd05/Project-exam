@@ -2,7 +2,7 @@ import noImage from './no-image.png';
 import avtImage from './avtImage.jpg';
 import logo from './logo.png';
 import membership from './vip-member-banner.webp';
-import logoW from './logoW.png';
+import logoW from './logoWD.svg';
 
 const images = {
     noImage,
