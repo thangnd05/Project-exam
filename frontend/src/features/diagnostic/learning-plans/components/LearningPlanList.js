@@ -27,6 +27,12 @@ const STATUS_LABEL = {
   ABANDONED: 'Đã bỏ',
 };
 
+const STAGE_LABEL = {
+  FOUNDATION: 'Nền tảng',
+  MOCK: 'Thi thử',
+  MIX: 'Tổng hợp',
+};
+
 const LearningPlanList = forwardRef(function LearningPlanList(
   {
     loadAll = false,
@@ -157,12 +163,11 @@ const LearningPlanList = forwardRef(function LearningPlanList(
               {showExamTypeBadge && p.examTypeName && (
                 <span className={cx('badge', 'badgeMuted')}>{p.examTypeName}</span>
               )}
-              <code className={cx('code')}>{p.learningPlanId.slice(0, 8)}…</code>
             </div>
             <div className={cx('planListMeta')}>
-              Stage <strong>{p.planStage || 'FOUNDATION'}</strong>
+              Giai đoạn <strong>{STAGE_LABEL[p.planStage] || STAGE_LABEL.FOUNDATION}</strong>
               {' · '}Ải <strong>{p.passedTasks ?? 0}/{p.totalTasks ?? 0}</strong>
-              {' · '}Readiness <strong>{p.baselineReadiness ?? p.currentReadiness ?? '—'}%</strong>
+              {' · '}Độ sẵn sàng <strong>{p.baselineReadiness ?? p.currentReadiness ?? '—'}%</strong>
               {p.createdAt && (
                 <>
                   {' · '}
