@@ -17,12 +17,12 @@
   }
 
   &.active {
-    background: linear-gradient(135deg, #ffa94d 0%, #ff922b 100%);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(255, 146, 43, 0.3);
+    background: rgba(249, 115, 22, 0.1);
+    color: #ea580c;
+    box-shadow: none;
 
     .icon {
-      filter: drop-shadow(0 0 3px rgba(255, 224, 130, 0.9));
+      filter: none;
     }
   }
 

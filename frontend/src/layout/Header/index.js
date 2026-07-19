@@ -7,7 +7,7 @@ import {
   Image,
 } from 'react-bootstrap';
 import { useState } from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, NavLink, useNavigate} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
@@ -82,18 +82,18 @@ function Header() {
 
           <Navbar.Collapse id="basic-navbar-nav" className={cx('desktopCollapse')}>
             <Nav className={cx('desktopNav')}>
-              <Nav.Link as={Link} to={routes.posts} className={cx('home')}>
+              <Nav.Link as={NavLink} to={routes.posts} className={cx('home')}>
                 Bài viết
               </Nav.Link>
               {user && (
-                <Nav.Link as={Link} to={routes.nextStep} className={cx('home')}>
+                <Nav.Link as={NavLink} to={routes.nextStep} className={cx('home')}>
                   Lộ trình
                 </Nav.Link>
               )}
-              <Nav.Link as={Link} to={routes.myAlbums} className={cx('home')}>
+              <Nav.Link as={NavLink} to={routes.myAlbums} className={cx('home')}>
                 Từ vựng
               </Nav.Link>
-              <Nav.Link as={Link} to={routes.MyTest} className={cx('home')}>
+              <Nav.Link as={NavLink} to={routes.MyTest} className={cx('home')}>
                 Bài đã tạo
               </Nav.Link>
               <div className={cx('customMenu')}>
