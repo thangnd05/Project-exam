@@ -1,7 +1,6 @@
 import HeroSection from './components/HeroSection/HeroSection';
 import ExamTypePage from '~/features/tests/exam/exam-types/ExamTypePage';
 import ProcessSection from './components/ProcessSection/ProcessSection';
-import Evaluation from './components/Evaluation/Evaluation';
 
 export default function TestPage() {
   return (
@@ -17,10 +16,6 @@ export default function TestPage() {
 
       <section className="process-section">
         <ProcessSection />
-      </section>
-
-      <section className="evaluation-section">
-        <Evaluation />
       </section>
     </div>
   );

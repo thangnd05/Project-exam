@@ -17,7 +17,7 @@ src/
     common/              # CHỈ UI/infra dùng chung thật sự
       modal/             # CommonFormModal, ModalActionFooter (vỏ form chung)
                          # ConfirmModal + ConfirmActionModal + ConfirmDeleteModal (confirm dùng chéo)
-      BackgroundDecor/  MotionSection/  PageHeader/  ScrollProgressBar/
+      BackgroundDecor/  MotionSection/  PageHeader/
   pages/
     <feature>/           # gốc của một feature, vd: myclass, album-voca, profile
       components/        # component riêng của feature
@@ -75,7 +75,7 @@ Làm từ feature nhỏ/độc lập → cross-cutting để giảm rủi ro. **
 - [x] **Batch 6 — admin**: 4 form modal → `admin/modals/`
 - [x] **Batch 7 — myclass**: 5 modal → `pages/myclass/modals/`; ClassCard/ClassListContainer/ClassManagementTable/ChapterManagementTable → `pages/myclass/components/`
 - [x] **Batch 8 — test/creator**: gom TẤT CẢ vào `components/test/` (module domain shared, vì dùng chéo exam/myclass/mytest/question-bank/Header): CreateTestModal(+scss), EditTestModal, `creator/*`, TestCard/TestListContainer/TestManagementTable
-- [x] **Batch 9 — shared + dọn common/**: Confirm{,Action,Delete}Modal → `components/common/modal/`; AlbumManagementTable → `pages/album-voca/components/`; **`components/modals/` đã xoá hẳn**; `components/common/` còn lại toàn UI generic (BackgroundDecor, MotionSection, PageHeader, ScrollProgressBar, modal/)
+- [x] **Batch 9 — shared + dọn common/**: Confirm{,Action,Delete}Modal → `components/common/modal/`; AlbumManagementTable → `pages/album-voca/components/`; **`components/modals/` đã xoá hẳn**; `components/common/` còn lại toàn UI generic (BackgroundDecor, MotionSection, PageHeader, modal/)
 
 > **Kết quả**: thùng rác `components/modals/` (31 file) đã giải tán hoàn toàn. Mỗi batch đã `npm run build` xanh.
 

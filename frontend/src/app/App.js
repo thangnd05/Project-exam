@@ -16,7 +16,6 @@ import ScrollHandler from '~/layout/ScrollToTopOnRouteChange';
 import VisitTracker from '~/layout/VisitTracker';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ScrollProgressBar from '~/shared/ui/ScrollProgressBar';
 import ErrorBoundary from '~/shared/ui/ErrorBoundary';
 
 function App() {
@@ -47,7 +46,6 @@ function App() {
           style={{ zIndex: 99999 }}
         />
         <div className="App">
-          <ScrollProgressBar />
           <StreakCelebration />
           <ErrorBoundary>
           <Suspense
