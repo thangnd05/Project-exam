@@ -92,7 +92,7 @@
         animation: pulse 2s ease-in-out infinite;
 
         &.primary {
-            background: #dbeafe;
+            background: var(--brand-100);
             color: var(--primary);
         }
 
@@ -103,7 +103,7 @@
 
         &.warning {
             background: #fef3c7;
-            color: #d97706;
+            color: var(--brand-unique-hover);
         }
 
         &.success {
@@ -155,11 +155,11 @@
 
         &.primary {
             background: var(--primary-gradient);
-            box-shadow: 0 4px 15px rgba(0, 97, 242, 0.25);
+            box-shadow: 0 4px 15px rgba(13, 148, 136, 0.25);
 
             &:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(0, 97, 242, 0.35);
+                box-shadow: 0 8px 25px var(--primary-alpha-35);
             }
         }
 
@@ -175,7 +175,7 @@
         }
 
         &.warning {
-            background: #d97706;
+            background: var(--brand-unique-hover);
             box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
 
             &:hover {

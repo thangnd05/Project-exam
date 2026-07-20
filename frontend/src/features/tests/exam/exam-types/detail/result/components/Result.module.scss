@@ -71,7 +71,7 @@
 .actionButton {
   margin-top: 16px;
   padding: 12px 20px;
-  background: var(--primary-color, #0061f2);
+  background: var(--primary-color);
   color: #fff;
   border-radius: 10px;
   font-weight: 600;
@@ -226,6 +226,6 @@
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(0, 97, 242, 0.25);
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.25);
   }
 }

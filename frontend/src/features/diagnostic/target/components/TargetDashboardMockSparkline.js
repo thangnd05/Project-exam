@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import styles from '../TargetDashboardPage.module.scss';
+import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);
@@ -46,9 +47,9 @@ function TargetDashboardMockSparkline({ data, examTypeId, targetScore }) {
               <Line
                 type="monotone"
                 dataKey="score"
-                stroke="#0061f2"
+                stroke={brandColors.primary}
                 strokeWidth={2}
-                dot={{ r: 4, fill: '#0061f2' }}
+                dot={{ r: 4, fill: brandColors.primary }}
                 activeDot={{ r: 5 }}
               />
               {targetScore != null && (

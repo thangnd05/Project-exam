@@ -18,12 +18,13 @@ function DefaultLayout({
 }) {
   const location = useLocation();
   const showMobileNav = !hideFooter;
+  const flushTop = !examMode && location.pathname === '/';
 
   return (
     <div className={cx('wrapper', {examWrapper: examMode, hasMobileNav: showMobileNav})}>
       <Header />
 
-      <main className={cx('main', { examMode })}>
+      <main className={cx('main', {examMode, flushTop})}>
         {examMode ? (
           <div className={cx('pageWrap')}>{noContainer ? children : <div>{children}</div>}</div>
         ) : (

@@ -111,8 +111,8 @@
   flex-shrink: 0;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--brand-50);
+  color: var(--hover-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
 }
@@ -178,14 +178,14 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 
   &:hover {
-    border-color: #93c5fd;
+    border-color: var(--brand-300);
     box-shadow: var(--shadow-sm);
   }
 
   &.active {
-    border-color: #3b82f6;
-    background: #eff6ff;
-    box-shadow: 0 0 0 1px #3b82f6;
+    border-color: var(--accent-act-color);
+    background: var(--brand-50);
+    box-shadow: 0 0 0 1px var(--accent-act-color);
   }
 }
 
@@ -204,14 +204,14 @@
   height: 2.4rem;
   padding: 0 0.8rem;
   border-radius: 999px;
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--brand-100);
+  color: var(--hover-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
 }
 
 .parentTab.active .parentTabCount {
-  background: #3b82f6;
+  background: var(--accent-act-color);
   color: #fff;
 }
 

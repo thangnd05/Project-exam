@@ -4,6 +4,7 @@ import worldGeo from 'world-atlas/countries-110m.json';
 import classNames from 'classnames/bind';
 
 import styles from './LocationsMap.module.scss';
+import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
@@ -75,7 +76,7 @@ const LocationsMap = ({ countries = [] }) => {
         const v = counts[norm(name)];
         if (!v) return '#e9eef5';
         const t = 0.25 + 0.75 * (v / max);
-        return `rgba(59, 130, 246, ${t})`;
+        return `rgba(20, 184, 166, ${t})`;
     };
 
     return (
@@ -102,7 +103,7 @@ const LocationsMap = ({ countries = [] }) => {
                                     onMouseLeave={() => setHover(null)}
                                     style={{
                                         default: { outline: 'none' },
-                                        hover: { fill: '#2563eb', outline: 'none' },
+                                        hover: { fill: brandColors.primary, outline: 'none' },
                                         pressed: { outline: 'none' },
                                     }}
                                 />

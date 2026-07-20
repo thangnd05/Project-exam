@@ -6,7 +6,7 @@
   padding: 20px;
   background: radial-gradient(
     1200px 600px at 50% -10%,
-    rgba(0, 97, 242, 0.08),
+    var(--primary-alpha-08),
     transparent 60%
   );
 }

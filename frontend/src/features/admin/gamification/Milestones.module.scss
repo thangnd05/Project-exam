@@ -179,7 +179,7 @@
   }
 
   &.over {
-    background: #eff6ff;
+    background: var(--brand-50);
   }
 
   &.under {
@@ -207,7 +207,7 @@
   }
 
   .under & {
-    color: #d97706;
+    color: var(--brand-unique-hover);
   }
 
   .match & {

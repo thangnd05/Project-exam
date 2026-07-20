@@ -53,8 +53,8 @@
 
   &:hover {
     transform: translateY(-4px);
-    border-color: rgba(0, 97, 242, 0.35);
-    box-shadow: 0 16px 32px rgba(0, 97, 242, 0.1);
+    border-color: var(--primary-alpha-35);
+    box-shadow: 0 16px 32px var(--primary-alpha-10);
   }
 }
 
@@ -217,7 +217,7 @@
       }
 
       &:hover:before {
-        color: var(--accent-color, #0061f2);
+        color: var(--accent-color);
         opacity: 1;
       }
     }

@@ -23,7 +23,7 @@ const TrafficHeatmap = ({ data = [] }) => {
     const shade = (v) => {
         if (!v) return '#f1f5f9';
         const t = 0.18 + 0.82 * (v / max);
-        return `rgba(59, 130, 246, ${t})`;
+        return `rgba(20, 184, 166, ${t})`;
     };
 
     return (

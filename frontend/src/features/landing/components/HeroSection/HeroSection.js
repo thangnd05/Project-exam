@@ -11,13 +11,14 @@ import {name} from '~/shared/assets/images';
 import {calculateAllowedTime} from '~/shared/utils/testStatusHelper';
 import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
 const MAX_BARS_SHOWN = 4;
 
-const COLOR_DARK = '#0061f2';
-const COLOR_LIGHT = '#7fb1ff';
+const COLOR_DARK = brandColors.primary;
+const COLOR_LIGHT = brandColors.brand300;
 const partColor = (idx) => (idx % 2 === 0 ? COLOR_DARK : COLOR_LIGHT);
 
 const containerVariants = {
@@ -147,20 +148,19 @@ function HeroSection() {
         animate="visible"
         variants={containerVariants}
       >
-        <motion.span className={cx('badge')} variants={itemVariants}>
-          Chẩn đoán nhanh năng lực
-        </motion.span>
+        <motion.p className={cx('brandLead')} variants={itemVariants}>
+          {name}
+        </motion.p>
         <motion.h1 className={cx('welcome')} variants={itemVariants}>
-          Chào mừng đến với {name}
+          Luyện đề thông minh, lộ trình{' '}
+          <span className={cx('accent')}>cá nhân hóa</span>
         </motion.h1>
         <motion.p className={cx('desc')} variants={itemVariants}>
-          <strong>{name}</strong> – nền tảng luyện đề giúp cá nhân hóa lộ trình học tập của bạn.
-          Hãy bắt đầu bằng một bài kiểm tra nhanh bên cạnh để hệ thống chẩn đoán năng lực, từ đó xác định
-          mục tiêu và xây dựng lộ trình ôn luyện tối ưu nhất!
+          Bắt đầu Quick Challenge để chẩn đoán năng lực và nhận lộ trình ôn tối ưu.
         </motion.p>
         <motion.div className={cx('actions')} variants={itemVariants}>
           <ButtonPrime className={cx('btn-primary')} onClick={handleScrollToExam}>
-            Khám phá ngay
+            Bắt đầu luyện
           </ButtonPrime>
         </motion.div>
       </motion.div>

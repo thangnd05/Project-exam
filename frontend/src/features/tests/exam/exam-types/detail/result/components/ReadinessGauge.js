@@ -1,19 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './Result.module.scss';
+import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
 const COLOR_MAP = {
 
   EXCELLENT:  { color: '#16a34a', bg: '#f0fdf4' },
-  GOOD:       { color: '#0061f2', bg: '#eff6ff' },
-  FAIR:       { color: '#f59e0b', bg: '#fffbeb' },
+  GOOD:       { color: brandColors.primary, bg: brandColors.brand50 },
+  FAIR:       { color: brandColors.unique, bg: '#fffbeb' },
   WEAK:       { color: '#ef4444', bg: '#fef2f2' },
 
   READY:             { color: '#16a34a', bg: '#f0fdf4' },
-  ALMOST_READY:      { color: '#0061f2', bg: '#eff6ff' },
-  NEEDS_IMPROVEMENT: { color: '#f59e0b', bg: '#fffbeb' },
+  ALMOST_READY:      { color: brandColors.primary, bg: brandColors.brand50 },
+  NEEDS_IMPROVEMENT: { color: brandColors.unique, bg: '#fffbeb' },
   NOT_READY:         { color: '#ef4444', bg: '#fef2f2' },
 };
 

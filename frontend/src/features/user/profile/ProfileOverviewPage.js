@@ -13,6 +13,7 @@ import ProfileSectionModal from './ProfileSectionModal';
 import styles from './ProfileOverviewPage.module.scss';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes, { buildNextStepPath } from '~/shared/config/Routes';
+import { brandColors } from '~/shared/styles/brandColors';
 import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
 import {
@@ -297,7 +298,7 @@ function ProfileOverviewPage() {
                             labelFormatter={(d) => `Ngày ${d}`}
                             formatter={(value) => [formatDuration(value), 'Thời gian']}
                           />
-                          <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={28} fill="#0061f2" />
+                          <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={28} fill={brandColors.primary} />
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
@@ -343,7 +344,7 @@ function ProfileOverviewPage() {
                           <Line
                             type="monotone"
                             dataKey="minutes"
-                            stroke="#0061f2"
+                            stroke={brandColors.primary}
                             strokeWidth={2}
                             dot={{ r: 4 }}
                             activeDot={{ r: 6 }}

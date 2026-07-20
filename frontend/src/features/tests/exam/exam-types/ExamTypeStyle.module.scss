@@ -3,7 +3,7 @@
 :root {
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.5);
-  --surface-shadow: 0 8px 32px 0 rgba(0, 97, 242, 0.1);
+  --surface-shadow: 0 8px 32px 0 var(--primary-alpha-10);
 }
 
 .exam-type-container {
@@ -57,8 +57,8 @@
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 32px rgba(0, 97, 242, 0.1);
-      border-color: rgba(0, 97, 242, 0.35);
+      box-shadow: 0 16px 32px var(--primary-alpha-10);
+      border-color: var(--primary-alpha-35);
 
       .monogram {
         background: var(--accent-color);
@@ -67,11 +67,11 @@
 
       .card-info {
         .name {
-          color: var(--hover-accent, #0061f2);
+          color: var(--hover-accent);
         }
 
         .action-text {
-          color: var(--hover-accent, #0061f2);
+          color: var(--hover-accent);
         }
       }
     }
@@ -88,7 +88,7 @@
       font-weight: 800;
       letter-spacing: 0.5px;
       color: var(--accent-color);
-      background: rgba(0, 97, 242, 0.08);
+      background: var(--primary-alpha-08);
       transition: background 0.3s ease, color 0.3s ease;
     }
 

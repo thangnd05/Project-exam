@@ -32,7 +32,7 @@
 
     &:hover {
         transform: scale(1.18);
-        outline: 2px solid rgba(37, 99, 235, 0.5);
+        outline: 2px solid rgba(13, 148, 136, 0.5);
     }
 }
 
@@ -57,7 +57,7 @@
     width: 90px;
     height: 8px;
     border-radius: 6px;
-    background: linear-gradient(90deg, #f1f5f9, #3b82f6);
+    background: linear-gradient(90deg, #f1f5f9, var(--accent-act-color));
 }
 
 .empty {

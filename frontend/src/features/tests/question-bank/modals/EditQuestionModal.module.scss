@@ -80,7 +80,7 @@
   &:focus {
     border-color: var(--primary);
     outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(0, 97, 242, 0.15);
+    box-shadow: 0 0 0 0.2rem var(--primary-alpha-15);
     background-color: #fff;
   }
 

@@ -23,6 +23,7 @@ import {
 } from 'react-icons/io5';
 import { useBaseMetaData } from '~/shared/hooks/useBaseMetaData';
 import { useHasPermission } from '~/shared/hooks/usePermission';
+import { brandColors } from '~/shared/styles/brandColors';
 import CoinPriceField from '~/shared/test/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
 import EditQuestionModal from '~/features/tests/question-bank/modals/EditQuestionModal';
@@ -478,10 +479,10 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   fontSize: '1.15rem',
                   fontWeight: 600,
                   color: bankSource === BANK_SOURCES.ADMIN
-                    ? '#1d4ed8'
+                    ? brandColors.primaryHover
                     : bankSource === BANK_SOURCES.CLASS ? '#047857' : '#475569',
                   background: bankSource === BANK_SOURCES.ADMIN
-                    ? '#dbeafe'
+                    ? brandColors.brand100
                     : bankSource === BANK_SOURCES.CLASS ? '#d1fae5' : '#f1f5f9',
                   padding: '2px 10px',
                   borderRadius: 999,

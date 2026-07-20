@@ -152,7 +152,7 @@
 
 .equipBtn {
   color: #fff;
-  background: var(--accent-color, #0061f2);
+  background: var(--accent-color);
 
   &:hover:not(:disabled) {
     filter: brightness(1.05);

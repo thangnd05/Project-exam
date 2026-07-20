@@ -80,14 +80,14 @@
   border-radius: 50px;
   font-weight: 800;
   font-size: 1.6rem;
-  background: #eff6ff;
+  background: var(--brand-50);
   color: var(--primary);
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--brand-100);
 }
 
 .myRow {
   td {
-    background: #eff6ff;
+    background: var(--brand-50);
   }
 
   td:first-child {

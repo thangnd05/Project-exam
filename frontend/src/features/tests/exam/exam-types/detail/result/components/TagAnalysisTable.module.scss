@@ -33,11 +33,11 @@
   transition: all 0.15s;
 
   &:hover {
-    border-color: #93c5fd;
+    border-color: var(--brand-300);
   }
 
   &.active {
-    background: rgba(0, 97, 242, 0.06);
+    background: rgba(13, 148, 136, 0.06);
     border-color: var(--accent-color);
     color: var(--accent-color);
   }

@@ -33,9 +33,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--brand-100);
   border-radius: 10px;
-  background: #eff6ff;
+  background: var(--brand-50);
   color: var(--primary);
   padding: 9px 12px;
   font-size: var(--font-size-smd);
@@ -85,7 +85,7 @@
 }
 
 .starActive {
-  color: #f59e0b;
+  color: var(--brand-unique);
 }
 
 .starInactive {
@@ -143,7 +143,7 @@
   &:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.15);
+    box-shadow: 0 0 0 3px var(--primary-alpha-15);
   }
 }
 

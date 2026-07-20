@@ -8,11 +8,12 @@ import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from './TestLeaderboardPage.module.scss';
 import routes from '~/shared/config/Routes';
 import {useTestLeaderboard} from './hooks/useTestLeaderboard';
+import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
 const TROPHY_COLORS = {
-  1: '#f59e0b',
+  1: brandColors.unique,
   2: '#94a3b8',
   3: '#b45309',
 };

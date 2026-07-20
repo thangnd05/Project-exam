@@ -108,9 +108,9 @@
     border: 1px solid transparent;
 
     &.bg-primary {
-      background-color: #eff6ff !important;
-      color: #1d4ed8 !important;
-      border-color: #dbeafe;
+      background-color: var(--brand-50) !important;
+      color: var(--hover-accent) !important;
+      border-color: var(--brand-100);
     }
 
     &.bg-danger {
@@ -197,7 +197,7 @@
     border-color: var(--primary);
     color: #fff;
     cursor: default;
-    box-shadow: 0 4px 10px rgba(0, 97, 242, 0.2);
+    box-shadow: 0 4px 10px var(--primary-alpha-20);
   }
 
   &.ellipsis {
@@ -241,8 +241,8 @@
 
     &:hover {
       color: var(--primary);
-      background: #eff6ff;
-      border-color: #bfdbfe;
+      background: var(--brand-50);
+      border-color: var(--brand-200);
       transform: translateY(-1px);
     }
 
@@ -341,7 +341,7 @@
 
   &:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.06);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.06);
     outline: none;
   }
 }
@@ -367,6 +367,6 @@
     background-color: var(--primary) !important;
     border-color: var(--primary) !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 10px rgba(0, 97, 242, 0.15) !important;
+    box-shadow: 0 4px 10px var(--primary-alpha-15) !important;
   }
 }

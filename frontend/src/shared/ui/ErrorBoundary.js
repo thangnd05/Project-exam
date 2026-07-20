@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import ButtonPrime from './Button/ButtonPrime';
+import { brandColors } from '~/shared/styles/brandColors';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -34,7 +35,7 @@ class ErrorBoundary extends Component {
             justifyContent: 'center',
             padding: '2.4rem',
             background:
-              'radial-gradient(1200px 600px at 50% -10%, rgba(0, 97, 242, 0.08), transparent 60%)',
+              'radial-gradient(1200px 600px at 50% -10%, rgba(13, 148, 136, 0.08), transparent 60%)',
           }}
         >
           <div
@@ -103,7 +104,7 @@ class ErrorBoundary extends Component {
                   cy="146"
                   rx="42"
                   ry="8"
-                  fill="#0061f2"
+                  fill={brandColors.primary}
                 />
                 <g className="eb-mascot">
                   {/* thân tròn mềm */}

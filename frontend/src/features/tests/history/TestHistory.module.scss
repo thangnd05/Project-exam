@@ -43,7 +43,7 @@
       transition: all 0.2s;
 
       &:hover {
-        background-color: #eff6ff !important;
+        background-color: var(--brand-50) !important;
       }
     }
 
@@ -81,7 +81,7 @@
 
 .status-in-progress {
   background: #fffbeb;
-  color: #d97706;
+  color: var(--brand-unique-hover);
 }
 
 .status-expired {

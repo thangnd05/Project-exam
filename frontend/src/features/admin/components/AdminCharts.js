@@ -20,12 +20,13 @@ import {
     Tooltip,
     Legend,
 } from 'recharts';
+import { brandColors } from '~/shared/styles/brandColors';
 
 /**
  * Hệ màu minimalism cho trang Thống kê — chỉ 3 vai trò, dùng nhất quán mọi chart:
  * xanh dương = chính (số liệu cốt lõi), cam = accent duy nhất (KPI tỉ lệ), xám slate = nền/phụ.
  */
-const VIZ = { primary: '#3b82f6', accent: '#f59e0b', muted: '#94a3b8' };
+const VIZ = { primary: brandColors.accent, accent: brandColors.unique, muted: '#94a3b8' };
 // Thứ tự khớp buildStatusDistribution: [Hoàn thành, Đang làm, Hết hạn].
 const STATUS_COLORS = [VIZ.primary, VIZ.accent, VIZ.muted];
 
@@ -49,8 +50,8 @@ export const WeeklyActivityArea = ({ data }) => (
         <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
             <defs>
                 <linearGradient id="acUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.25} />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                    <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.25} />
+                    <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="acExams" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#10b981" stopOpacity={0.25} />
@@ -66,10 +67,10 @@ export const WeeklyActivityArea = ({ data }) => (
                 type="monotone"
                 dataKey="users"
                 name="Người dùng mới"
-                stroke="#3b82f6"
+                stroke={VIZ.primary}
                 strokeWidth={3}
                 fill="url(#acUsers)"
-                dot={{ r: 3, fill: '#3b82f6' }}
+                dot={{ r: 3, fill: VIZ.primary }}
                 activeDot={{ r: 6 }}
             />
             <Area
@@ -91,8 +92,8 @@ export const MonthlyPerformanceCombo = ({ data }) => (
         <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
                 <linearGradient id="acTests" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#60a5fa" />
+                    <stop offset="0%" stopColor={VIZ.primary} />
+                    <stop offset="100%" stopColor={brandColors.brand400} />
                 </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
@@ -121,9 +122,9 @@ export const MonthlyPerformanceCombo = ({ data }) => (
                 type="monotone"
                 dataKey="rate"
                 name="Tỉ lệ hoàn thành (%)"
-                stroke="#f59e0b"
+                stroke={VIZ.accent}
                 strokeWidth={3}
-                dot={{ r: 4, fill: '#f59e0b' }}
+                dot={{ r: 4, fill: VIZ.accent }}
                 activeDot={{ r: 6 }}
             />
         </ComposedChart>
@@ -223,8 +224,8 @@ export const MonthlyVisitsBar = ({ data }) => (
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
                 <linearGradient id="acVisitsMonth" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#93c5fd" />
+                    <stop offset="0%" stopColor={VIZ.primary} />
+                    <stop offset="100%" stopColor={brandColors.brand300} />
                 </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
@@ -293,15 +294,15 @@ export const MonthlyActivityCombo = ({ data }) => (
 export const SkillRadar = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} outerRadius="70%">
-            <PolarGrid stroke="rgba(59, 130, 246, 0.18)" />
+            <PolarGrid stroke="rgba(20, 184, 166, 0.18)" />
             <PolarAngleAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
             <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
             <Radar
                 name="Kỹ năng TB"
                 dataKey="value"
-                stroke="#3b82f6"
+                stroke={VIZ.primary}
                 strokeWidth={2}
-                fill="#3b82f6"
+                fill={VIZ.primary}
                 fillOpacity={0.3}
             />
             <Tooltip {...TOOLTIP_STYLE} />
@@ -328,7 +329,7 @@ export const UserGrowthBar = ({ data }) => (
 );
 
 // Sparkline mini — nhúng trong KPI card, không trục/lưới.
-export const SparkArea = ({ data, dataKey = 'value', color = '#3b82f6', id = 'a' }) => (
+export const SparkArea = ({ data, dataKey = 'value', color = VIZ.primary, id = 'a' }) => (
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
             <defs>
@@ -343,7 +344,7 @@ export const SparkArea = ({ data, dataKey = 'value', color = '#3b82f6', id = 'a'
     </ResponsiveContainer>
 );
 
-export const SparkBar = ({ data, dataKey = 'value', color = '#3b82f6' }) => (
+export const SparkBar = ({ data, dataKey = 'value', color = VIZ.primary }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }} barCategoryGap={1}>
             <Bar dataKey={dataKey} fill={color} radius={[2, 2, 0, 0]} isAnimationActive={false} />
@@ -360,7 +361,7 @@ export const TrafficStackedBar = ({ data }) => (
             <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
             <Tooltip {...TOOLTIP_STYLE} />
             <Legend />
-            <Bar dataKey="users" name="Đã đăng nhập" stackId="1" fill="#3b82f6" radius={[0, 0, 0, 0]} barSize={26} />
+            <Bar dataKey="users" name="Đã đăng nhập" stackId="1" fill={VIZ.primary} radius={[0, 0, 0, 0]} barSize={26} />
             <Bar dataKey="guests" name="Khách" stackId="1" fill="#10b981" radius={[4, 4, 0, 0]} barSize={26} />
         </BarChart>
     </ResponsiveContainer>
@@ -371,8 +372,8 @@ export const TrafficAreaChart = ({ data }) => (
         <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
             <defs>
                 <linearGradient id="acVisitUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.02} />
+                    <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.35} />
+                    <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0.02} />
                 </linearGradient>
                 <linearGradient id="acVisitGuests" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
@@ -389,7 +390,7 @@ export const TrafficAreaChart = ({ data }) => (
                 dataKey="users"
                 name="Đã đăng nhập"
                 stackId="1"
-                stroke="#3b82f6"
+                stroke={VIZ.primary}
                 strokeWidth={2}
                 fill="url(#acVisitUsers)"
             />
@@ -430,7 +431,7 @@ export const ScoreDistributionBar = ({ data }) => (
             <defs>
                 <linearGradient id="acScore" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#10b981" />
-                    <stop offset="50%" stopColor="#f59e0b" />
+                    <stop offset="50%" stopColor={VIZ.accent} />
                     <stop offset="100%" stopColor="#ef4444" />
                 </linearGradient>
             </defs>

@@ -34,6 +34,7 @@ import {
   sampleQuestionIndexMap,
 } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/sampleExamData';
 import styles from './ExamTypeLayoutEditor.module.scss';
+import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
@@ -383,7 +384,7 @@ function ExamTypeLayoutEditor() {
               <label>Màu chủ đạo</label>
               <input
                 type="color"
-                value={config.theme.primary || '#0061f2'}
+                value={config.theme.primary || brandColors.primary}
                 onChange={(e) => patchTheme({ primary: e.target.value })}
               />
             </div>

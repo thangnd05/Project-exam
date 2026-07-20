@@ -100,8 +100,8 @@
 }
 
 .btn-action.edit:hover {
-  background: #eff6ff;
-  border-color: #dbeafe;
+  background: var(--brand-50);
+  border-color: var(--brand-100);
 }
 
 .btn-action.delete {

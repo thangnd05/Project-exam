@@ -13,13 +13,14 @@ import {
   YAxis,
 } from 'recharts';
 import styles from '../MockHistoryPage.module.scss';
+import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
 const READINESS_COLOR = '#16a34a';
 const BAR_TARGET_MET = '#16a34a';
-const BAR_DEFAULT = '#0061f2';
-const BAR_BELOW = '#f59e0b';
+const BAR_DEFAULT = brandColors.primary;
+const BAR_BELOW = brandColors.unique;
 
 function formatShortDate(iso) {
   if (!iso) return '—';

@@ -105,7 +105,7 @@
 
   &.bg-warning {
     background: #fffbeb !important;
-    color: #d97706 !important;
+    color: var(--brand-unique-hover) !important;
   }
 }
 
@@ -146,11 +146,11 @@
   }
 
   &.edit {
-    color: #3b82f6;
+    color: var(--accent-act-color);
 
     &:hover {
-      background: #eff6ff;
-      border-color: #dbeafe;
+      background: var(--brand-50);
+      border-color: var(--brand-100);
     }
   }
 

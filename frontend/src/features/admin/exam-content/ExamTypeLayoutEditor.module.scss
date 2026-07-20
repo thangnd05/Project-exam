@@ -117,8 +117,8 @@
   transition: border-color 0.15s, background 0.15s;
 
   &.dropActive {
-    border-color: var(--primary, #0061f2);
-    background: rgba(0, 97, 242, 0.05);
+    border-color: var(--primary);
+    background: rgba(13, 148, 136, 0.05);
   }
 }
 
@@ -153,8 +153,8 @@
   }
 
   &.selected {
-    border-color: var(--primary, #0061f2);
-    box-shadow: 0 0 0 1px var(--primary, #0061f2);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary);
   }
 
   &.hidden {
@@ -182,7 +182,7 @@
     padding: 0.2rem;
 
     &:hover {
-      color: var(--primary, #0061f2);
+      color: var(--primary);
     }
   }
 }
@@ -205,8 +205,8 @@
   font-size: var(--font-size-smd);
 
   &:hover {
-    border-color: var(--primary, #0061f2);
-    color: var(--primary, #0061f2);
+    border-color: var(--primary);
+    color: var(--primary);
   }
 }
 

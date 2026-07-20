@@ -258,11 +258,11 @@ $transition: all 0.3s ease;
 
     &:hover {
         background: var(--input-bg);
-        border-color: rgba(0, 97, 242, 0.3);
+        border-color: rgba(13, 148, 136, 0.3);
     }
 
     &.selected {
-        background: rgba(0, 97, 242, 0.08);
+        background: var(--primary-alpha-08);
         border-color: $primary;
     }
 
@@ -346,7 +346,7 @@ $transition: all 0.3s ease;
         outline: none;
         background: $bg-white;
         border-color: $primary;
-        box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.1);
+        box-shadow: 0 0 0 3px var(--primary-alpha-10);
     }
 }
 

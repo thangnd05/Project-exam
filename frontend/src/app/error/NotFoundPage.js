@@ -1,5 +1,6 @@
 import classNames from "classnames/bind";
 import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
+import { brandColors } from "~/shared/styles/brandColors";
 import styles from "./errorPage.module.scss";
 
 const cx = classNames.bind(styles);
@@ -24,7 +25,7 @@ export default function NotFoundPage() {
                             cy="146"
                             rx="42"
                             ry="8"
-                            fill="#0061f2"
+                            fill={brandColors.primary}
                         />
                         <g className={cx("mascot")}>
                             {/* thân tròn mềm */}
@@ -54,7 +55,7 @@ export default function NotFoundPage() {
                             y="42"
                             fontSize="34"
                             fontWeight="800"
-                            fill="#0061f2"
+                            fill={brandColors.primary}
                             textAnchor="middle"
                         >
                             ?

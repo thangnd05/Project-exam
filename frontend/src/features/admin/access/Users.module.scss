@@ -10,7 +10,7 @@ $text-secondary: #64748b;
 .userAvatar {
     width: 42px;
     height: 42px;
-    background: linear-gradient(135deg, var(--primary) 0%, #00c6ff 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent-act-color) 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -19,7 +19,7 @@ $text-secondary: #64748b;
     font-size: 1.5rem;
     font-weight: 700;
     flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(0, 97, 242, 0.15);
+    box-shadow: 0 4px 10px var(--primary-alpha-15);
     text-transform: uppercase;
 }
 

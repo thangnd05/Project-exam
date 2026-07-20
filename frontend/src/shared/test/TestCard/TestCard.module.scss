@@ -179,7 +179,7 @@
 }
 
 .btn-icon-modern {
-    color: #f59e0b;
+    color: var(--brand-unique);
     padding: 9px 12px;
     font-size: 1.7rem;
     display: flex;
@@ -189,8 +189,8 @@
 
     &:hover {
         background: #fffbeb;
-        border-color: #f59e0b;
-        color: #f59e0b;
+        border-color: var(--brand-unique);
+        color: var(--brand-unique);
     }
 }
 
@@ -201,9 +201,9 @@
 }
 
 .status-locked {
-    color: #1d4ed8 !important;
-    background: rgba(59, 130, 246, 0.18) !important;
-    border-color: rgba(59, 130, 246, 0.35) !important;
+    color: var(--hover-accent) !important;
+    background: rgba(20, 184, 166, 0.18) !important;
+    border-color: rgba(20, 184, 166, 0.35) !important;
 }
 
 .status-expired {

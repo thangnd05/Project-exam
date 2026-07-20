@@ -27,7 +27,7 @@
   button {
     background: none;
     border: none;
-    color: #3b82f6;
+    color: var(--accent-act-color);
     font-size: var(--font-size-smd);
     cursor: pointer;
     padding: 0.4rem 0.8rem;
@@ -35,7 +35,7 @@
     transition: background-color 0.15s;
 
     &:hover {
-      background: #eff6ff;
+      background: var(--brand-50);
     }
   }
 }

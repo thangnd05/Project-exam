@@ -41,7 +41,7 @@
 }
 
 .titleWrapper svg {
-  color: var(--accent-color, #0061f2);
+  color: var(--accent-color);
   font-size: 2rem;
 }
 
@@ -119,9 +119,9 @@
 
 .inputControl:focus {
   outline: none;
-  border-color: var(--accent-color, #0061f2);
+  border-color: var(--accent-color);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+  box-shadow: 0 0 0 4px var(--primary-alpha-10);
 }
 
 .inputControl.textarea {
@@ -208,14 +208,14 @@
 }
 
 .btnSubmit {
-  background: var(--accent-color, #0061f2);
+  background: var(--accent-color);
   color: #fff;
-  box-shadow: 0 4px 15px rgba(0, 97, 242, 0.3);
+  box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
 }
 
 .btnSubmit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 97, 242, 0.4);
+  box-shadow: 0 8px 25px rgba(13, 148, 136, 0.4);
 }
 
 .btnSubmit:disabled,

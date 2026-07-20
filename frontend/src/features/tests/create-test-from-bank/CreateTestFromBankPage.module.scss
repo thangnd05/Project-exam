@@ -30,7 +30,7 @@
   gap: 8px;
 
   svg {
-    color: var(--primary-color, #0061f2);
+    color: var(--primary-color);
   }
 }
 
@@ -57,9 +57,9 @@
 
   &:focus {
     outline: none;
-    border-color: var(--primary-color, #0061f2);
+    border-color: var(--primary-color);
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(0, 97, 242, 0.12);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
   }
 
   &:disabled {
@@ -112,15 +112,15 @@
     font-weight: 700;
 
     svg {
-      color: var(--primary-color, #0061f2);
+      color: var(--primary-color);
     }
   }
 
   .partBadge {
     padding: 4px 10px;
     border-radius: 8px;
-    background: #dbeafe;
-    color: #1d4ed8;
+    background: var(--brand-100);
+    color: var(--hover-accent);
     font-weight: 600;
     font-size: 0.95rem;
   }
@@ -154,12 +154,12 @@
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--primary-color, #0061f2);
-    color: var(--primary-color, #0061f2);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
   }
 
   &.active {
-    background: var(--primary-color, #0061f2);
+    background: var(--primary-color);
     color: #fff;
     border-color: transparent;
   }
@@ -204,7 +204,7 @@
   padding: 8px 0;
 
   .form-check-input {
-    accent-color: var(--primary-color, #0061f2);
+    accent-color: var(--primary-color);
   }
 }
 
@@ -221,7 +221,7 @@
   background: #fff;
 
   &.selected {
-    border-color: var(--primary-color, #0061f2);
+    border-color: var(--primary-color);
     background: #f8faff;
   }
 
@@ -234,7 +234,7 @@
     border-bottom: 1px solid #e2e8f0;
 
     .form-check-input {
-      accent-color: var(--primary-color, #0061f2);
+      accent-color: var(--primary-color);
     }
   }
 
@@ -275,13 +275,13 @@
   }
 
   &.selected {
-    background: #dbeafe;
-    border: 1px solid #bfdbfe;
+    background: var(--brand-100);
+    border: 1px solid var(--brand-200);
   }
 
   .form-check-input {
     margin-top: 3px;
-    accent-color: var(--primary-color, #0061f2);
+    accent-color: var(--primary-color);
   }
 
   .questionIndex {
@@ -313,8 +313,8 @@
     flex-shrink: 0;
 
     &:hover {
-      color: var(--primary-color, #0061f2);
-      background: #dbeafe;
+      color: var(--primary-color);
+      background: var(--brand-100);
     }
   }
 }
@@ -326,7 +326,7 @@
   margin-bottom: 0;
 
   strong {
-    color: var(--primary-color, #0061f2);
+    color: var(--primary-color);
   }
 }
 

@@ -1,14 +1,12 @@
 $sidebar-bg: #1e293b;
 $sidebar-dark: #0f172a;
 $sidebar-hover: #334155;
-$sidebar-active: #3b82f6;
 $sidebar-text: #94a3b8;
 $sidebar-text-light: #e2e8f0;
 $header-bg: #ffffff;
 $content-bg: #f1f5f9;
-$primary: #3b82f6;
+$primary: var(--accent-act-color);
 $success: #10b981;
-$warning: #f59e0b;
 $danger: #ef4444;
 $text-primary: #1e293b;
 $text-secondary: #64748b;
@@ -73,7 +71,7 @@ $transition: all 0.3s ease;
 .logoIcon {
     width: 44px;
     height: 44px;
-    background: linear-gradient(135deg, $primary 0%, #60a5fa 100%);
+    background: linear-gradient(135deg, $primary 0%, var(--brand-400) 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -169,7 +167,7 @@ $transition: all 0.3s ease;
     }
 
     &.active {
-        background: rgba($primary, 0.15);
+        background: rgba(20, 184, 166, 0.15);
         color: white;
 
         .navIcon {
@@ -298,7 +296,7 @@ $transition: all 0.3s ease;
         outline: none;
         border-color: $primary;
         background: white;
-        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
     }
 
     &::placeholder {
@@ -366,7 +364,7 @@ $transition: all 0.3s ease;
 .userAvatar {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, $primary 0%, #60a5fa 100%);
+    background: linear-gradient(135deg, $primary 0%, var(--brand-400) 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;

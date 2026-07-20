@@ -99,7 +99,7 @@
         color: var(--accent-color);
 
         &:hover {
-            background: rgba(0, 97, 242, 0.08);
+            background: var(--primary-alpha-08);
             border-color: var(--accent-color);
         }
     }

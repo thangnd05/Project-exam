@@ -169,7 +169,7 @@ function ExamLayoutRenderer({
       ? {
           cursor: 'pointer',
           borderRadius: 8,
-          outline: selected ? '2px solid var(--primary, #0061f2)' : '2px solid transparent',
+          outline: selected ? '2px solid var(--primary)' : '2px solid transparent',
           outlineOffset: 2,
         }
       : {};

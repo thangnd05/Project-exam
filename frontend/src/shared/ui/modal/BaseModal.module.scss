@@ -128,9 +128,9 @@
 
   :global(.form-control:focus),
   :global(.form-select:focus) {
-    border-color: var(--accent-color, #0061f2);
+    border-color: var(--accent-color);
     background: #fff;
-    box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+    box-shadow: 0 0 0 4px var(--primary-alpha-10);
   }
 
   :global(.form-check-label) {
@@ -142,12 +142,12 @@
     cursor: pointer;
 
     &:checked {
-      background-color: var(--accent-color, #0061f2);
-      border-color: var(--accent-color, #0061f2);
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
     }
 
     &:focus {
-      box-shadow: 0 0 0 4px rgba(0, 97, 242, 0.1);
+      box-shadow: 0 0 0 4px var(--primary-alpha-10);
     }
   }
 }
@@ -193,11 +193,11 @@
   .btnSubmit {
     background: var(--primary-gradient);
     color: #fff;
-    box-shadow: 0 4px 15px rgba(0, 97, 242, 0.25);
+    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.25);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 97, 242, 0.35);
+      box-shadow: 0 8px 25px var(--primary-alpha-35);
     }
 
     &:disabled {

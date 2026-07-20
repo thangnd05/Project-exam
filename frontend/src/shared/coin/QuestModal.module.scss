@@ -22,8 +22,8 @@
   }
 
   &.active {
-    color: var(--accent-color, #0061f2);
-    border-bottom-color: var(--accent-color, #0061f2);
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
   }
 }
 

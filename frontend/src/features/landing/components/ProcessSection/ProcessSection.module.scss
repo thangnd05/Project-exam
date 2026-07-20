@@ -10,11 +10,22 @@
 }
 
 .section-title {
+    position: relative;
     font-size: var(--font-size-3xl);
     font-weight: 800;
     color: var(--dark-color, #1e293b);
     margin-bottom: 10px;
     letter-spacing: -0.5px;
+
+    &::after {
+        content: '';
+        display: block;
+        width: 48px;
+        height: 3px;
+        margin-top: 10px;
+        background: var(--brand-unique);
+        border-radius: 2px;
+    }
 }
 
 .section-subtitle {
@@ -45,10 +56,10 @@
     transition: border-color 0.3s ease;
 
     &:hover {
-        border-top-color: var(--hover-accent, #0061f2);
+        border-top-color: var(--brand-unique);
 
         .step-number {
-            color: var(--hover-accent, #0061f2);
+            color: var(--brand-unique);
         }
     }
 

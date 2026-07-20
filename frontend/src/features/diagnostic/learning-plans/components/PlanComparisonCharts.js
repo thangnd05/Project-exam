@@ -13,10 +13,11 @@ import {
 } from 'recharts';
 import { planStageLabel, planStatusLabel } from '../planLabels';
 import styles from '../styles/PlanComparisonPage.module.scss';
+import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
-const COLOR_ACTIVE = '#0061f2';
+const COLOR_ACTIVE = brandColors.primary;
 const COLOR_COMPLETED = '#10b981';
 const COLOR_REPLACED = '#94a3b8';
 const COLOR_ABANDONED = '#ef4444';
