@@ -136,6 +136,8 @@ function ExploreOrb() {
   const hubDiameter = isNarrow ? HUB_DIAMETER_MOBILE : HUB_DIAMETER_DESKTOP;
   const rippleScaleX = (radius.radiusX * 2) / hubDiameter;
   const rippleScaleY = (radius.radiusY * 2) / hubDiameter;
+  /** One ripple expand ≈ one front-card change (full lap / n). */
+  const cardStepMs = count > 0 ? ORBIT_PERIOD_MS / count : ORBIT_PERIOD_MS;
   const step = count > 0 ? TWO_PI / count : 0;
 
   radiusRef.current = radius;
@@ -444,10 +446,14 @@ function ExploreOrb() {
                     style={{
                       '--ripple-scale-x': rippleScaleX,
                       '--ripple-scale-y': rippleScaleY,
+                      '--ripple-duration': `${cardStepMs}ms`,
                     }}
                   >
-                    <span className={cx('hubRipple')} aria-hidden="true" />
-                    <span className={cx('hubRipple', 'hubRippleDelay')} aria-hidden="true" />
+                    <span
+                      key={cardStepMs}
+                      className={cx('hubRipple')}
+                      aria-hidden="true"
+                    />
                     <button
                       type="button"
                       className={cx('hub')}
