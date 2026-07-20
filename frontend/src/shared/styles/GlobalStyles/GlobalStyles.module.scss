@@ -21,7 +21,7 @@
   --text-color: #161823;
   --text-secondary: #64748b;
 
-  --bg-body: #f0f2f5;
+  --bg-body: #f8fafc;
   --bg-white: #ffffff;
   --input-bg: #f1f5f9;
   --border-color: #e2e8f0;
@@ -196,7 +196,7 @@ body {
   line-height: 1.5;
   text-rendering: optimizespeed;
   color: var(--text-color);
-  background-color: #f5f8fc;
+  background-color: var(--bg-body);
   scrollbar-gutter: stable;
 }
 

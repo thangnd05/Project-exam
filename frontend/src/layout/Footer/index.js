@@ -85,12 +85,6 @@ function Footer() {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.bgDecor} aria-hidden="true">
-        <span className={styles.orbPrimary} />
-        <span className={styles.orbSecondary} />
-        <span className={styles.gridOverlay} />
-      </div>
-
       <Container className={styles.container}>
         <div className={styles.topGrid}>
           <motion.div className={styles.brandCol} {...fadeUp}>

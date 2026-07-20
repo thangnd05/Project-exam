@@ -6,7 +6,6 @@ import Header from '../Header';
 import Footer from '../Footer';
 import ScrollToTop from '../ScrollToTop';
 import MobileBottomNav from '../MobileBottomNav';
-import BackgroundDecor from '~/shared/ui/BackgroundDecor';
 
 const cx = classNames.bind(styles);
 
@@ -22,7 +21,6 @@ function DefaultLayout({
 
   return (
     <div className={cx('wrapper', {examWrapper: examMode, hasMobileNav: showMobileNav})}>
-      <BackgroundDecor />
       <Header />
 
       <main className={cx('main', { examMode })}>
