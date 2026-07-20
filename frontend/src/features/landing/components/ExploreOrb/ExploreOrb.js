@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
@@ -421,9 +421,6 @@ function ExploreOrb() {
 
                 <div className={cx('track')}>
                   <div className={cx('hubStack')}>
-                    <span className={cx('watermark')} aria-hidden="true">
-                      WINDE
-                    </span>
                     <button
                       type="button"
                       className={cx('hub')}
@@ -450,23 +447,11 @@ function ExploreOrb() {
                       onOpen={() => frontType && openType(frontType.examTypeId)}
                     />
                   ) : (
-                    examTypes.map((type, index) => (
-                      <article
-                        key={type.examTypeId}
-                        ref={(el) => setCardRef(index, el)}
-                        className={cx('card')}
-                        onClick={() => handleCardActivate(type, index)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleCardActivate(type, index);
-                          }
-                        }}
-                        role="button"
-                      >
-                        <CardFace type={type} />
-                      </article>
-                    ))
+                    <OrbitCards
+                      types={examTypes}
+                      setCardRef={setCardRef}
+                      onActivate={handleCardActivate}
+                    />
                   )}
                 </div>
               </div>
@@ -521,6 +506,27 @@ function ExploreOrb() {
     </section>
   );
 }
+
+
+const OrbitCards = memo(function OrbitCards({types, setCardRef, onActivate}) {
+  return types.map((type, index) => (
+    <article
+      key={type.examTypeId}
+      ref={(el) => setCardRef(index, el)}
+      className={cx('card')}
+      onClick={() => onActivate(type, index)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onActivate(type, index);
+        }
+      }}
+      role="button"
+    >
+      <CardFace type={type} />
+    </article>
+  ));
+});
 
 function CardFace({type}) {
   return (

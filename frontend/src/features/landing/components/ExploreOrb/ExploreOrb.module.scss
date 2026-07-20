@@ -118,20 +118,6 @@
   pointer-events: none;
 }
 
-.watermark {
-  position: absolute;
-  font-size: clamp(2.4rem, 6vw, 4.4rem);
-  font-weight: 800;
-  letter-spacing: 0.28em;
-  line-height: 1;
-  color: rgba(94, 234, 212, 0.12);
-  text-indent: 0.28em;
-  user-select: none;
-  pointer-events: none;
-  text-shadow: 0 0 40px rgba(13, 148, 136, 0.18);
-  z-index: 0;
-}
-
 .hub {
   position: relative;
   z-index: 1;
@@ -521,10 +507,6 @@
     order: 2;
   }
 
-  .watermark {
-    display: none;
-  }
-
   .hubPulse {
     animation: none;
   }
@@ -564,11 +546,6 @@
     margin-top: calc(clamp(180px, 50vw, 220px) * -0.5);
     padding: 1rem 0.85rem 0.9rem;
     border-radius: 14px;
-  }
-
-  .watermark {
-    letter-spacing: 0.2em;
-    text-indent: 0.2em;
   }
 
   .hub {
