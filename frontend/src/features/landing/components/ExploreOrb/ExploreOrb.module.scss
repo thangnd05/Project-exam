@@ -249,7 +249,11 @@
   text-align: center;
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
   transform-origin: center center;
-  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+  contain: layout style;
+  transition: none;
   outline: none;
 
   &:focus-visible {
@@ -276,6 +280,8 @@
     left: auto;
     margin: 0 auto;
     transform: none !important;
+    will-change: auto;
+    contain: none;
     z-index: 60;
   }
 }
@@ -326,6 +332,12 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
+  opacity: 0;
+  /* Always in DOM — opacity only, so front changes never reflow */
+
+  .isActive & {
+    opacity: 1;
+  }
 }
 
 .navBtn {

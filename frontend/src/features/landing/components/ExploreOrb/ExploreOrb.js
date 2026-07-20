@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
@@ -16,7 +16,6 @@ const ORBIT_SPEED = (Math.PI * 2) / ORBIT_PERIOD_MS;
 const MANUAL_PAUSE_MS = 1600;
 const SWIPE_THRESHOLD = 48;
 const MAX_ORBIT_ITEMS = 8;
-const INSTANT = {duration: 0};
 
 const DESKTOP_RADIUS = {radiusX: 250, radiusY: 90, radiusZ: 150};
 const MOBILE_RADIUS = {radiusX: 140, radiusY: 70, radiusZ: 110};
@@ -110,8 +109,12 @@ function ExploreOrb() {
   const lastTsRef = useRef(null);
   const hoverPausedRef = useRef(false);
   const pointerPausedRef = useRef(false);
+  const previousFrontRef = useRef(0);
+  const radiusRef = useRef(isNarrow ? MOBILE_RADIUS : DESKTOP_RADIUS);
+  const countRef = useRef(0);
+  const typesRef = useRef([]);
+  const cardRefs = useRef([]);
 
-  const [rotation, setRotation] = useState(0);
   const [frontIndex, setFrontIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -128,30 +131,80 @@ function ExploreOrb() {
   const radius = isNarrow ? MOBILE_RADIUS : DESKTOP_RADIUS;
   const step = count > 0 ? TWO_PI / count : 0;
 
-  const syncFront = useCallback((rot, n) => {
-    setFrontIndex(getFrontIndex(rot, n));
+  radiusRef.current = radius;
+  countRef.current = count;
+  typesRef.current = examTypes;
+
+  const applyTransforms = useCallback(() => {
+    const n = countRef.current;
+    const rad = radiusRef.current;
+    const rot = rotationRef.current;
+    const cards = cardRefs.current;
+    const types = typesRef.current;
+
+    if (n <= 0) return;
+
+    const front = getFrontIndex(rot, n);
+
+    for (let i = 0; i < n; i++) {
+      const el = cards[i];
+      if (!el) continue;
+
+      const theta = (i / n) * TWO_PI - rot;
+      const t = getOrbitTransform(theta, rad);
+      const isActive = i === front;
+      const isFrontish = t.zIndex >= 70;
+      const name = types[i]?.name ?? '';
+
+      el.style.transform = `translate3d(${t.x}px, ${t.y}px, ${t.z}px) rotateY(${t.rotateY}deg) scale(${t.scale})`;
+      el.style.opacity = String(t.opacity);
+      el.style.zIndex = String(t.zIndex);
+
+      el.classList.toggle(styles.isActive, isActive);
+      el.classList.toggle(styles.isBack, !isFrontish);
+
+      el.tabIndex = isFrontish ? 0 : -1;
+      if (isFrontish) {
+        el.removeAttribute('aria-hidden');
+      } else {
+        el.setAttribute('aria-hidden', 'true');
+      }
+      el.setAttribute(
+        'aria-label',
+        isActive ? `Mở ${name}` : `Đưa ${name} ra trước`,
+      );
+    }
+
+    if (front !== previousFrontRef.current) {
+      previousFrontRef.current = front;
+      setFrontIndex(front);
+    }
+  }, []);
+
+  const setCardRef = useCallback((index, el) => {
+    cardRefs.current[index] = el;
   }, []);
 
   useEffect(() => {
     if (count === 0) {
+      previousFrontRef.current = 0;
       setFrontIndex(0);
       return;
     }
-    syncFront(rotationRef.current, count);
-  }, [count, syncFront]);
+    const front = getFrontIndex(rotationRef.current, count);
+    previousFrontRef.current = front;
+    setFrontIndex(front);
+  }, [count]);
+
+  // Re-apply after any React paint that may reset className on <article>
+  useLayoutEffect(() => {
+    if (reduceMotion || count === 0) return;
+    applyTransforms();
+  }, [applyTransforms, count, examTypes, frontIndex, isNarrow, paused, reduceMotion]);
 
   const pauseAuto = useCallback((ms = MANUAL_PAUSE_MS) => {
     pauseUntilRef.current = Date.now() + ms;
   }, []);
-
-  const applyRotation = useCallback(
-    (next) => {
-      rotationRef.current = next;
-      setRotation(next);
-      syncFront(next, count);
-    },
-    [count, syncFront],
-  );
 
   /** Nudge orbit so card `index` faces front (shortest angular path). */
   const goTo = useCallback(
@@ -164,23 +217,26 @@ function ExploreOrb() {
       let delta = targetNorm - currentNorm;
       if (delta > Math.PI) delta -= TWO_PI;
       if (delta < -Math.PI) delta += TWO_PI;
-      applyRotation(current + delta);
+      rotationRef.current = current + delta;
+      applyTransforms();
       pauseAuto();
     },
-    [applyRotation, count, pauseAuto, step],
+    [applyTransforms, count, pauseAuto, step],
   );
 
   const goPrev = useCallback(() => {
     if (count < 2) return;
-    applyRotation(rotationRef.current - step);
+    rotationRef.current -= step;
+    applyTransforms();
     pauseAuto();
-  }, [applyRotation, count, pauseAuto, step]);
+  }, [applyTransforms, count, pauseAuto, step]);
 
   const goNext = useCallback(() => {
     if (count < 2) return;
-    applyRotation(rotationRef.current + step);
+    rotationRef.current += step;
+    applyTransforms();
     pauseAuto();
-  }, [applyRotation, count, pauseAuto, step]);
+  }, [applyTransforms, count, pauseAuto, step]);
 
   const scrollToAll = useCallback(() => {
     document
@@ -200,7 +256,7 @@ function ExploreOrb() {
     setPaused(hoverPausedRef.current || pointerPausedRef.current);
   }, []);
 
-  // Continuous orbit via requestAnimationFrame
+  // Continuous orbit via requestAnimationFrame — DOM only, rare setState
   useEffect(() => {
     if (reduceMotion || count < 2) return undefined;
 
@@ -217,8 +273,7 @@ function ExploreOrb() {
       if (!hoveringOrHeld && !timedPause && last != null) {
         const deltaMs = Math.min(ts - last, 64);
         rotationRef.current += ORBIT_SPEED * deltaMs;
-        setRotation(rotationRef.current);
-        setFrontIndex(getFrontIndex(rotationRef.current, count));
+        applyTransforms();
       }
 
       rafId = window.requestAnimationFrame(tick);
@@ -229,15 +284,7 @@ function ExploreOrb() {
       window.cancelAnimationFrame(rafId);
       lastTsRef.current = null;
     };
-  }, [count, reduceMotion]);
-
-  const orbitTransforms = useMemo(() => {
-    if (count === 0) return [];
-    return examTypes.map((_, index) => {
-      const theta = (index / count) * TWO_PI - rotation;
-      return getOrbitTransform(theta, radius);
-    });
-  }, [count, examTypes, radius, rotation]);
+  }, [applyTransforms, count, reduceMotion]);
 
   const frontType = count > 0 ? examTypes[frontIndex] : null;
 
@@ -247,13 +294,13 @@ function ExploreOrb() {
         didSwipeRef.current = false;
         return;
       }
-      if (index === frontIndex) {
+      if (index === previousFrontRef.current) {
         openType(type.examTypeId);
         return;
       }
       goTo(index);
     },
-    [frontIndex, goTo, openType],
+    [goTo, openType],
   );
 
   const openFront = useCallback(() => {
@@ -403,50 +450,23 @@ function ExploreOrb() {
                       onOpen={() => frontType && openType(frontType.examTypeId)}
                     />
                   ) : (
-                    examTypes.map((type, index) => {
-                      const t = orbitTransforms[index];
-                      const isActive = index === frontIndex;
-                      const isFrontish = t.zIndex >= 70;
-
-                      return (
-                        <motion.article
-                          key={type.examTypeId}
-                          className={cx('card', {
-                            isActive,
-                            isBack: !isFrontish,
-                          })}
-                          initial={false}
-                          animate={{
-                            x: t.x,
-                            y: t.y,
-                            z: t.z,
-                            rotateY: t.rotateY,
-                            scale: t.scale,
-                            opacity: t.opacity,
-                            zIndex: t.zIndex,
-                          }}
-                          transition={INSTANT}
-                          style={{transformStyle: 'preserve-3d'}}
-                          onClick={() => handleCardActivate(type, index)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              handleCardActivate(type, index);
-                            }
-                          }}
-                          tabIndex={isFrontish ? 0 : -1}
-                          role="button"
-                          aria-label={
-                            isActive
-                              ? `Mở ${type.name}`
-                              : `Đưa ${type.name} ra trước`
+                    examTypes.map((type, index) => (
+                      <article
+                        key={type.examTypeId}
+                        ref={(el) => setCardRef(index, el)}
+                        className={cx('card')}
+                        onClick={() => handleCardActivate(type, index)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleCardActivate(type, index);
                           }
-                          aria-hidden={!isFrontish ? true : undefined}
-                        >
-                          <CardFace type={type} isActive={isActive} />
-                        </motion.article>
-                      );
-                    })
+                        }}
+                        role="button"
+                      >
+                        <CardFace type={type} />
+                      </article>
+                    ))
                   )}
                 </div>
               </div>
@@ -502,7 +522,7 @@ function ExploreOrb() {
   );
 }
 
-function CardFace({type, isActive}) {
+function CardFace({type}) {
   return (
     <>
       <div className={cx('monogram')} aria-hidden="true">
@@ -510,11 +530,9 @@ function CardFace({type, isActive}) {
       </div>
       <h3 className={cx('cardName')}>{type.name}</h3>
       <p className={cx('cardMeta')}>{getSubtitle(type)}</p>
-      {isActive && (
-        <span className={cx('cardCta')} aria-hidden="true">
-          Chọn để mở
-        </span>
-      )}
+      <span className={cx('cardCta')} aria-hidden="true">
+        Chọn để mở
+      </span>
     </>
   );
 }
@@ -544,7 +562,7 @@ function ReducedMotionCard({type, onOpen}) {
         role="button"
         aria-label={`Mở ${type.name}`}
       >
-        <CardFace type={type} isActive />
+        <CardFace type={type} />
       </motion.article>
     </AnimatePresence>
   );
