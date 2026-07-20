@@ -163,17 +163,27 @@ function ExploreOrb() {
       const theta = (i / n) * TWO_PI - rot;
       const t = getOrbitTransform(theta, rad);
 
-      // Per-frame: only compositor-friendly writes
+      let s = states[i];
+      if (!s) {
+        s = states[i] = {active: null, frontish: null, z: null};
+      }
+
+      // Per-frame: only genuinely-changing compositor properties
       el.style.transform = `translate3d(${t.x}px, ${t.y}px, ${t.z}px) rotateY(${t.rotateY}deg) scale(${t.scale})`;
       el.style.opacity = String(t.opacity);
-      el.style.zIndex = String(t.zIndex);
+
+      // zIndex is an int that holds for several frames — write only on change
+      const zStr = String(t.zIndex);
+      if (s.z !== zStr) {
+        el.style.zIndex = zStr;
+        s.z = zStr;
+      }
 
       // Structural writes (class / aria / tabIndex) only when a card's role
       // actually flips — skips string-building and DOM churn every frame.
       const isActive = i === front;
       const isFrontish = t.zIndex >= 70;
-      const prev = states[i];
-      if (!prev || prev.active !== isActive || prev.frontish !== isFrontish) {
+      if (s.active !== isActive || s.frontish !== isFrontish) {
         const name = types[i]?.name ?? '';
         el.classList.toggle(styles.isActive, isActive);
         el.classList.toggle(styles.isBack, !isFrontish);
@@ -187,7 +197,8 @@ function ExploreOrb() {
           'aria-label',
           isActive ? `Mở ${name}` : `Đưa ${name} ra trước`,
         );
-        states[i] = {active: isActive, frontish: isFrontish};
+        s.active = isActive;
+        s.frontish = isFrontish;
       }
     }
 
@@ -217,11 +228,14 @@ function ExploreOrb() {
     setFrontIndex(front);
   }, [count]);
 
-  // Re-apply after any React paint that may reset className on <article>
+  // Position cards imperatively when the *set* or *geometry* changes (data
+  // load, radius/breakpoint). Deliberately NOT on frontIndex/paused: cards are
+  // memoized so React never resets their className, and re-applying on every
+  // front change would double the work on that exact frame (visible stutter).
   useLayoutEffect(() => {
     if (reduceMotion || count === 0) return;
     applyTransforms();
-  }, [applyTransforms, count, examTypes, frontIndex, isNarrow, paused, reduceMotion]);
+  }, [applyTransforms, count, examTypes, isNarrow, reduceMotion]);
 
   const pauseAuto = useCallback((ms = MANUAL_PAUSE_MS) => {
     pauseUntilRef.current = Date.now() + ms;

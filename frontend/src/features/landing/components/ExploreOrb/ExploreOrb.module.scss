@@ -252,9 +252,15 @@
 
   &.isActive {
     border-color: rgba(94, 234, 212, 0.75);
-    background: rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    /* No backdrop-filter: toggling it on the front card every change forces a
+       layer promotion + repaint mid-orbit (a visible one-frame hitch). An
+       opaque frosted fill reads the same on the dark stage without that cost. */
+    background:
+      linear-gradient(
+        160deg,
+        rgba(30, 100, 94, 0.92),
+        rgba(12, 74, 70, 0.92)
+      );
     box-shadow:
       0 0 0 1px rgba(94, 234, 212, 0.28),
       0 0 40px rgba(13, 148, 136, 0.5),
