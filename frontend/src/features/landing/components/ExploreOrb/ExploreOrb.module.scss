@@ -15,22 +15,8 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background:
-    radial-gradient(
-      ellipse 58% 52% at 50% 52%,
-      rgba(13, 148, 136, 0.32),
-      transparent 68%
-    ),
-    radial-gradient(
-      ellipse 40% 34% at 50% 58%,
-      rgba(45, 212, 191, 0.12),
-      transparent 72%
-    ),
-    radial-gradient(
-      ellipse 28% 22% at 50% 48%,
-      rgba(245, 158, 11, 0.06),
-      transparent 70%
-    );
+  /* No section-wide amber bloom — glow lives on .hub only */
+  background: none;
 }
 
 .inner {
@@ -118,6 +104,30 @@
   pointer-events: none;
 }
 
+.hubRipple,
+.hub {
+  grid-area: 1 / 1;
+}
+
+.hubRipple {
+  width: clamp(120px, 16vw, 148px);
+  height: clamp(120px, 16vw, 148px);
+  border-radius: 50%;
+  border: 2px solid rgba(245, 158, 11, 0.55);
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 0;
+  /* Hidden until keyframes start so delayed ripple stays invisible during delay */
+  opacity: 0;
+  /* Full period D; active expand occupies first half, idle second half.
+     Delayed sibling (delay D/2) expands while this one rests → true handoff. */
+  animation: hubRippleOut 4.5s ease-out infinite;
+}
+
+.hubRippleDelay {
+  animation-delay: 2.25s;
+}
+
 .hub {
   position: relative;
   z-index: 1;
@@ -137,8 +147,8 @@
     linear-gradient(145deg, #14b8a6 0%, #0d9488 48%, #0f766e 100%);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 0 28px rgba(13, 148, 136, 0.55),
-    0 0 56px rgba(45, 212, 191, 0.28),
+    0 0 0 1px rgba(245, 158, 11, 0.22),
+    0 0 16px rgba(245, 158, 11, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
   transition:
     transform 0.2s ease,
@@ -151,8 +161,8 @@
     border-color: rgba(94, 234, 212, 0.85);
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.12),
-      0 0 36px rgba(13, 148, 136, 0.7),
-      0 0 72px rgba(45, 212, 191, 0.35),
+      0 0 0 1px rgba(245, 158, 11, 0.3),
+      0 0 20px rgba(245, 158, 11, 0.45),
       inset 0 1px 0 rgba(255, 255, 255, 0.28);
   }
 
@@ -167,15 +177,6 @@
   }
 }
 
-.hubPulse {
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(94, 234, 212, 0.45);
-  pointer-events: none;
-  animation: hubPulse 2.4s ease-out infinite;
-}
-
 .hubLabel {
   position: relative;
   z-index: 1;
@@ -188,17 +189,20 @@
   user-select: none;
 }
 
-@keyframes hubPulse {
+/* Elliptical expand toward orbit path (--ripple-scale-x/y from hubStack).
+   0–40%: expand + fade; 50–100%: idle (opacity 0) so the delayed twin can run. */
+@keyframes hubRippleOut {
   0% {
-    transform: scale(1);
-    opacity: 0.7;
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.65;
   }
-  70% {
-    transform: scale(1.14);
+  40% {
+    transform: scaleX(var(--ripple-scale-x, 3.4)) scaleY(var(--ripple-scale-y, 1.3));
     opacity: 0;
   }
+  50%,
   100% {
-    transform: scale(1.14);
+    transform: scaleX(1) scaleY(1);
     opacity: 0;
   }
 }
@@ -227,18 +231,24 @@
   box-sizing: border-box;
   border-radius: 18px;
   border: 1px solid rgba(94, 234, 212, 0.32);
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* Opaque frosted fill instead of live blur — cards are always moving,
+     so per-frame backdrop-filter compositing would tank FPS. Only the
+     (near-stationary) active card gets the real blur, below. */
+  background:
+    linear-gradient(
+      160deg,
+      rgba(20, 78, 74, 0.82),
+      rgba(6, 47, 46, 0.82)
+    );
   color: #fff;
   cursor: pointer;
   text-align: center;
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
   transform-origin: center center;
   transform-style: preserve-3d;
-  will-change: transform;
+  will-change: transform, opacity;
   backface-visibility: hidden;
-  contain: layout style;
+  contain: layout style paint;
   transition: none;
   outline: none;
 
@@ -254,6 +264,8 @@
   &.isActive {
     border-color: rgba(94, 234, 212, 0.75);
     background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     box-shadow:
       0 0 0 1px rgba(94, 234, 212, 0.28),
       0 0 40px rgba(13, 148, 136, 0.5),
@@ -507,7 +519,7 @@
     order: 2;
   }
 
-  .hubPulse {
+  .hubRipple {
     animation: none;
   }
 
@@ -525,7 +537,7 @@
     transition: none;
   }
 
-  .hubPulse {
+  .hubRipple {
     animation: none;
   }
 }
@@ -548,7 +560,8 @@
     border-radius: 14px;
   }
 
-  .hub {
+  .hub,
+  .hubRipple {
     width: clamp(110px, 30vw, 132px);
     height: clamp(110px, 30vw, 132px);
   }

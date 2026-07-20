@@ -19,6 +19,9 @@ const MAX_ORBIT_ITEMS = 8;
 
 const DESKTOP_RADIUS = {radiusX: 250, radiusY: 90, radiusZ: 150};
 const MOBILE_RADIUS = {radiusX: 140, radiusY: 70, radiusZ: 110};
+/** Approximate hub diameter matching `.hub` clamp in ExploreOrb.module.scss. */
+const HUB_DIAMETER_DESKTOP = 148;
+const HUB_DIAMETER_MOBILE = 120;
 
 const TWO_PI = Math.PI * 2;
 
@@ -114,6 +117,7 @@ function ExploreOrb() {
   const countRef = useRef(0);
   const typesRef = useRef([]);
   const cardRefs = useRef([]);
+  const cardStateRef = useRef([]);
 
   const [frontIndex, setFrontIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -129,6 +133,9 @@ function ExploreOrb() {
 
   const count = examTypes.length;
   const radius = isNarrow ? MOBILE_RADIUS : DESKTOP_RADIUS;
+  const hubDiameter = isNarrow ? HUB_DIAMETER_MOBILE : HUB_DIAMETER_DESKTOP;
+  const rippleScaleX = (radius.radiusX * 2) / hubDiameter;
+  const rippleScaleY = (radius.radiusY * 2) / hubDiameter;
   const step = count > 0 ? TWO_PI / count : 0;
 
   radiusRef.current = radius;
@@ -141,6 +148,7 @@ function ExploreOrb() {
     const rot = rotationRef.current;
     const cards = cardRefs.current;
     const types = typesRef.current;
+    const states = cardStateRef.current;
 
     if (n <= 0) return;
 
@@ -152,27 +160,33 @@ function ExploreOrb() {
 
       const theta = (i / n) * TWO_PI - rot;
       const t = getOrbitTransform(theta, rad);
-      const isActive = i === front;
-      const isFrontish = t.zIndex >= 70;
-      const name = types[i]?.name ?? '';
 
+      // Per-frame: only compositor-friendly writes
       el.style.transform = `translate3d(${t.x}px, ${t.y}px, ${t.z}px) rotateY(${t.rotateY}deg) scale(${t.scale})`;
       el.style.opacity = String(t.opacity);
       el.style.zIndex = String(t.zIndex);
 
-      el.classList.toggle(styles.isActive, isActive);
-      el.classList.toggle(styles.isBack, !isFrontish);
-
-      el.tabIndex = isFrontish ? 0 : -1;
-      if (isFrontish) {
-        el.removeAttribute('aria-hidden');
-      } else {
-        el.setAttribute('aria-hidden', 'true');
+      // Structural writes (class / aria / tabIndex) only when a card's role
+      // actually flips — skips string-building and DOM churn every frame.
+      const isActive = i === front;
+      const isFrontish = t.zIndex >= 70;
+      const prev = states[i];
+      if (!prev || prev.active !== isActive || prev.frontish !== isFrontish) {
+        const name = types[i]?.name ?? '';
+        el.classList.toggle(styles.isActive, isActive);
+        el.classList.toggle(styles.isBack, !isFrontish);
+        el.tabIndex = isFrontish ? 0 : -1;
+        if (isFrontish) {
+          el.removeAttribute('aria-hidden');
+        } else {
+          el.setAttribute('aria-hidden', 'true');
+        }
+        el.setAttribute(
+          'aria-label',
+          isActive ? `Mở ${name}` : `Đưa ${name} ra trước`,
+        );
+        states[i] = {active: isActive, frontish: isFrontish};
       }
-      el.setAttribute(
-        'aria-label',
-        isActive ? `Mở ${name}` : `Đưa ${name} ra trước`,
-      );
     }
 
     if (front !== previousFrontRef.current) {
@@ -182,6 +196,11 @@ function ExploreOrb() {
   }, []);
 
   const setCardRef = useCallback((index, el) => {
+    // New DOM node at this slot → drop its cached role so applyTransforms
+    // re-writes class/aria on the fresh element.
+    if (cardRefs.current[index] !== el) {
+      cardStateRef.current[index] = null;
+    }
     cardRefs.current[index] = el;
   }, []);
 
@@ -420,7 +439,15 @@ function ExploreOrb() {
                 />
 
                 <div className={cx('track')}>
-                  <div className={cx('hubStack')}>
+                  <div
+                    className={cx('hubStack')}
+                    style={{
+                      '--ripple-scale-x': rippleScaleX,
+                      '--ripple-scale-y': rippleScaleY,
+                    }}
+                  >
+                    <span className={cx('hubRipple')} aria-hidden="true" />
+                    <span className={cx('hubRipple', 'hubRippleDelay')} aria-hidden="true" />
                     <button
                       type="button"
                       className={cx('hub')}
@@ -432,7 +459,6 @@ function ExploreOrb() {
                           : 'Khám phá ngay'
                       }
                     >
-                      <span className={cx('hubPulse')} aria-hidden="true" />
                       <span className={cx('hubLabel')}>
                         Khám phá
                         <br />
