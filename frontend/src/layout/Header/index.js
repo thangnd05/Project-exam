@@ -58,116 +58,118 @@ function Header() {
 
   return (
     <div className={cx('wrapper')}>
-      <Navbar expand="lg" className={cx('navbarRoot')}>
-        <Container fluid>
-          <Navbar.Brand as={Link} to={routes.home} className={cx('brand')}>
-            <div className={cx('brandInner')}>
-              <Image
-                src={images.logoW}
-                alt="logo"
-                height="30"
-                loading="lazy"
-                className={cx('logo-brand')}
-              />
-              <span className={cx('brandName')}>{name}</span>
-            </div>
-          </Navbar.Brand>
-
-          {user && (
-            <div className={cx('mobileHeaderActions', 'd-lg-none')}>
-              <StreakBadge />
-              <CoinQuestMenu />
-            </div>
-          )}
-
-          <Navbar.Collapse id="basic-navbar-nav" className={cx('desktopCollapse')}>
-            <Nav className={cx('desktopNav')}>
-              <Nav.Link as={NavLink} to={routes.posts} className={cx('home')}>
-                Bài viết
-              </Nav.Link>
-              {user && (
-                <Nav.Link as={NavLink} to={routes.nextStep} className={cx('home')}>
-                  Lộ trình
-                </Nav.Link>
-              )}
-              <Nav.Link as={NavLink} to={routes.myAlbums} className={cx('home')}>
-                Từ vựng
-              </Nav.Link>
-              <Nav.Link as={NavLink} to={routes.MyTest} className={cx('home')}>
-                Bài đã tạo
-              </Nav.Link>
-              <div className={cx('customMenu')}>
-                <span className={cx('menuTitle')}>Lớp học</span>
-                <div className={cx('menuDropdown')}>
-                  <button onClick={(e) => handleClassAction(e, null, 'join')}>
-                    Tham gia lớp học
-                  </button>
-                  <button onClick={(e) => handleClassAction(e, routes.myClasses)}>
-                    Vào lớp học
-                  </button>
-                  <button onClick={(e) => handleClassAction(e, null, 'create')}>
-                    Tạo lớp học
-                  </button>
-                </div>
+      <div className={cx('pill')}>
+        <Navbar expand="lg" className={cx('navbarRoot')}>
+          <Container fluid>
+            <Navbar.Brand as={Link} to={routes.home} className={cx('brand')}>
+              <div className={cx('brandInner')}>
+                <Image
+                  src={images.logoW}
+                  alt="logo"
+                  height="32"
+                  loading="lazy"
+                  className={cx('logo-brand')}
+                />
+                <span className={cx('brandName')}>{name}</span>
               </div>
-            </Nav>
-            <Nav className={cx('desktopNav')}>
-              {!user ? (
-                <>
-                  <Nav.Link
-                    as={Link}
-                    to={routes.login}
-                    state={{mode: 'signin'}}
-                    className={cx('home')}
-                  >
-                    Đăng nhập
+            </Navbar.Brand>
+
+            {user && (
+              <div className={cx('mobileHeaderActions', 'd-lg-none')}>
+                <StreakBadge />
+                <CoinQuestMenu />
+              </div>
+            )}
+
+            <Navbar.Collapse id="basic-navbar-nav" className={cx('desktopCollapse')}>
+              <Nav className={cx('desktopNav')}>
+                <Nav.Link as={NavLink} to={routes.posts} className={cx('home')}>
+                  Bài viết
+                </Nav.Link>
+                {user && (
+                  <Nav.Link as={NavLink} to={routes.nextStep} className={cx('home')}>
+                    Lộ trình
                   </Nav.Link>
-                  <Nav.Link
-                    as={Link}
-                    to={routes.login}
-                    state={{mode: 'signup'}}
-                    className={cx('home')}
-                  >
-                    Đăng ký
-                  </Nav.Link>
-                </>
-              ) : (
-                <div className={cx('userMenuWrapper')}>
-                  <Button
-                    variant=""
-                    className={cx('new-test')}
-                    onClick={() => setShowCreateTestModal(true)}
-                  >
-                    Tạo bài kiểm tra
-                  </Button>
-                  <StreakBadge />
-                  <CoinQuestMenu />
-                  <Dropdown>
-                    <Dropdown.Toggle as="div" className={cx('user-info')}>
-                      <AvatarWithCosmetic
-                        src={user?.avatarUrl}
-                        fallbackSrc={images.avtImage}
-                        size={32}
-                        frame={cosmeticFrame}
-                        badge={cosmeticBadge}
-                      />
-                      <div className={cx('userNameWrapper')}>
-                        <span className={cx('username')}>{user.userName}</span>
-                      </div>
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu className={cx('custom-dropdown')}>
-                      <Dropdown.Item as={Link} to={routes.profile}>
-                        Hồ sơ
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={handleLogout}>Đăng xuất</Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
+                )}
+                <Nav.Link as={NavLink} to={routes.myAlbums} className={cx('home')}>
+                  Từ vựng
+                </Nav.Link>
+                <Nav.Link as={NavLink} to={routes.MyTest} className={cx('home')}>
+                  Bài đã tạo
+                </Nav.Link>
+                <div className={cx('customMenu')}>
+                  <span className={cx('menuTitle')}>Lớp học</span>
+                  <div className={cx('menuDropdown')}>
+                    <button onClick={(e) => handleClassAction(e, null, 'join')}>
+                      Tham gia lớp học
+                    </button>
+                    <button onClick={(e) => handleClassAction(e, routes.myClasses)}>
+                      Vào lớp học
+                    </button>
+                    <button onClick={(e) => handleClassAction(e, null, 'create')}>
+                      Tạo lớp học
+                    </button>
+                  </div>
                 </div>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+              </Nav>
+              <Nav className={cx('desktopNav')}>
+                {!user ? (
+                  <>
+                    <Nav.Link
+                      as={Link}
+                      to={routes.login}
+                      state={{mode: 'signin'}}
+                      className={cx('home')}
+                    >
+                      Đăng nhập
+                    </Nav.Link>
+                    <Nav.Link
+                      as={Link}
+                      to={routes.login}
+                      state={{mode: 'signup'}}
+                      className={cx('home')}
+                    >
+                      Đăng ký
+                    </Nav.Link>
+                  </>
+                ) : (
+                  <div className={cx('userMenuWrapper')}>
+                    <Button
+                      variant=""
+                      className={cx('new-test')}
+                      onClick={() => setShowCreateTestModal(true)}
+                    >
+                      Tạo bài kiểm tra
+                    </Button>
+                    <StreakBadge />
+                    <CoinQuestMenu />
+                    <Dropdown>
+                      <Dropdown.Toggle as="div" className={cx('user-info')}>
+                        <AvatarWithCosmetic
+                          src={user?.avatarUrl}
+                          fallbackSrc={images.avtImage}
+                          size={32}
+                          frame={cosmeticFrame}
+                          badge={cosmeticBadge}
+                        />
+                        <div className={cx('userNameWrapper')}>
+                          <span className={cx('username')}>{user.userName}</span>
+                        </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu className={cx('custom-dropdown')}>
+                        <Dropdown.Item as={Link} to={routes.profile}>
+                          Hồ sơ
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={handleLogout}>Đăng xuất</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                )}
+              </Nav>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+      </div>
 
       <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
       <CreateClassModal show={showCreateModal} onClose={() => setShowCreateModal(false)} />

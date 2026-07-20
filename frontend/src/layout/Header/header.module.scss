@@ -1,65 +1,16 @@
 @import 'shared/styles/GlobalStyles/GlobalStyles.module.scss';
 
-.brand {
-  font-size: 1.9rem;
-  font-weight: 600;
-  margin-right: 16px;
-}
-
-.brandInner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 148px;
-}
-
-.logo-brand {
-  height: 23px;
-  width: auto;
-  object-fit: contain;
-}
-
-.brandName {
-  font-size: 1em;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.2px;
-  color: var(--white, #fff);
-}
-
-.navbarRoot {
-  padding: 12px 20px;
-}
-
-.desktopCollapse {
-  display: none;
-}
-
-.desktopNav {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-}
-
 .wrapper {
   font-size: 1.6rem;
   position: sticky;
   top: 0;
   z-index: 1000;
-
-  background: color-mix(in srgb, var(--hero-bg) 88%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border-bottom: 1px solid var(--primary-alpha-20);
+  padding: 10px 16px 0;
+  background: transparent;
+  border-bottom: none;
   box-shadow: none;
 
-  // Fallback when color-mix is unsupported
-  @supports not (background: color-mix(in srgb, #000 50%, transparent)) {
-    background: rgba(4, 47, 46, 0.88);
-  }
-
-  // Keep Bootstrap toggler visible on dark bar (if present)
+  // Keep Bootstrap toggler visible on dark pill (if present)
   :global(.navbar-toggler) {
     border-color: rgba(255, 255, 255, 0.35);
     color: var(--white, #fff);
@@ -74,64 +25,114 @@
   }
 }
 
+.pill {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  border-radius: 999px;
+  padding: 6px 10px 6px 14px;
+  background: color-mix(in srgb, var(--hero-bg) 72%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+
+  @supports not (background: color-mix(in srgb, #000 50%, transparent)) {
+    background: rgba(4, 47, 46, 0.78);
+  }
+}
+
+.brand {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-right: 12px;
+}
+
+.brandInner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 148px;
+  padding-left: 8px;
+  border-left: 2px solid var(--brand-unique, #f59e0b);
+}
+
+.logo-brand {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(13, 148, 136, 0.45));
+}
+
+.brandName {
+  font-size: 1.05em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--white, #fff);
+}
+
+.navbarRoot {
+  padding: 0;
+}
+
+.desktopCollapse {
+  display: none;
+}
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .new-test {
   font-size: 1.4rem;
-  border-radius: 8px;
-  border: 1px solid var(--brand-300);
-  color: var(--brand-200);
+  font-weight: 600;
+  border-radius: 999px;
+  border: none;
+  color: var(--white, #fff);
   white-space: nowrap;
-  padding: 8px 16px;
-  background-color: transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  padding: 8px 18px;
+  background: var(--primary);
+  box-shadow: 0 4px 14px var(--primary-alpha-28);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 
   &:hover {
-    background-color: var(--primary-alpha-20);
-    border-color: var(--brand-300);
+    background: var(--brand-500);
     color: var(--white, #fff);
+    box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
   }
 
   &:active {
-    background-color: var(--primary-alpha-28);
+    background: var(--brand-700);
+    transform: scale(0.98);
   }
 }
 
 .home {
   position: relative;
   font-size: var(--font-size-md);
-  padding: 8px 0 !important;
+  padding: 8px 14px !important;
+  border-radius: 999px;
   color: rgba(255, 255, 255, 0.72);
   text-decoration: none;
-  transition: color 0.2s ease;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%) scaleX(0);
-    width: 100%;
-    height: 2px;
-    border-radius: 99px;
-    background-color: var(--accent-color);
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: center;
-  }
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 
   &:hover {
-    color: var(--brand-300);
-
-    &::after {
-      transform: translateX(-50%) scaleX(0.85);
-    }
+    color: var(--white, #fff);
+    background: var(--primary-alpha-20);
   }
 
   &.active,
   &:global(.active) {
     color: var(--white, #fff);
-
-    &::after {
-      transform: translateX(-50%) scaleX(0.85);
-    }
+    background: rgba(13, 148, 136, 0.18);
   }
 }
 
@@ -148,12 +149,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 0;
-  transition: transform 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 999px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 
   &:hover {
     cursor: pointer;
-    transform: scale(1.03);
+    background: rgba(255, 255, 255, 0.06);
+    transform: none;
   }
 }
 
@@ -165,7 +168,7 @@
 }
 
 .username {
-  font-weight: bold;
+  font-weight: 600;
   font-size: var(--font-size-md);
   white-space: nowrap;
   color: rgba(255, 255, 255, 0.92);
@@ -174,9 +177,20 @@
 .custom-dropdown {
   font-size: 1.6rem;
   min-width: 200px;
+  background: #fff;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 
   :global(.dropdown-item) {
     white-space: nowrap;
+    color: var(--text-color);
+
+    &:hover,
+    &:focus {
+      background: var(--hover-color);
+      color: var(--accent-color);
+    }
   }
 }
 
@@ -204,6 +218,7 @@
   align-items: center;
   gap: 10px;
   margin-left: auto;
+  margin-right: 4px;
 }
 
 .tit_sm {
@@ -215,36 +230,24 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 8px 0;
+  padding: 0;
 }
 
 .menuTitle {
   position: relative;
+  display: inline-block;
   font-size: var(--font-size-md);
+  padding: 8px 14px;
+  border-radius: 999px;
   color: rgba(255, 255, 255, 0.72);
-  transition: color 0.2s ease;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%) scaleX(0);
-    width: 100%;
-    height: 2px;
-    border-radius: 99px;
-    background-color: var(--accent-color);
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: center;
-  }
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .customMenu:hover .menuTitle {
-  color: var(--brand-300);
-}
-
-.customMenu:hover .menuTitle::after {
-  transform: translateX(-50%) scaleX(1);
+  color: var(--white, #fff);
+  background: var(--primary-alpha-20);
 }
 
 .menuDropdown {
@@ -314,7 +317,7 @@
 .userMenuWrapper {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 
 .userMenuWrapperMobile {
@@ -573,12 +576,26 @@
 }
 
 @media (max-width: 991.98px) {
+  .wrapper {
+    padding: 8px 12px 0;
+  }
+
+  .pill {
+    border-radius: 24px;
+    padding: 6px 10px 6px 12px;
+  }
+
   .brand {
     font-size: 1.65rem;
   }
 
   .logo-brand {
-    height: 20px;
+    height: 26px;
+  }
+
+  .brandInner {
+    min-width: 0;
+    padding-left: 6px;
   }
 
   .user-info {
@@ -598,10 +615,19 @@
 
 @media (min-width: 1200px) {
   .navbarRoot {
-    padding: 12px 36px;
+    padding: 0 4px;
   }
 
   .desktopNav {
-    gap: 28px;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home,
+  .menuTitle,
+  .new-test,
+  .user-info {
+    transition: none;
   }
 }
