@@ -111,6 +111,7 @@ function ExploreOrb() {
   const rotationRef = useRef(0);
   const lastTsRef = useRef(null);
   const hoverPausedRef = useRef(false);
+  const hoverCountRef = useRef(0);
   const pointerPausedRef = useRef(false);
   const previousFrontRef = useRef(0);
   const radiusRef = useRef(isNarrow ? MOBILE_RADIUS : DESKTOP_RADIUS);
@@ -218,6 +219,12 @@ function ExploreOrb() {
   }, []);
 
   useEffect(() => {
+    // Cards may remount when the set changes; a leave event can be lost, so
+    // clear any stuck hover-pause state.
+    hoverCountRef.current = 0;
+    hoverPausedRef.current = false;
+    setPaused(pointerPausedRef.current);
+
     if (count === 0) {
       previousFrontRef.current = 0;
       setFrontIndex(0);
@@ -290,6 +297,14 @@ function ExploreOrb() {
   const updatePausedFlag = useCallback(() => {
     setPaused(hoverPausedRef.current || pointerPausedRef.current);
   }, []);
+  const onCardHoverChange = useCallback(
+    (hovering) => {
+      hoverCountRef.current = Math.max(0, hoverCountRef.current + (hovering ? 1 : -1));
+      hoverPausedRef.current = hoverCountRef.current > 0;
+      updatePausedFlag();
+    },
+    [updatePausedFlag],
+  );
 
   // Continuous orbit via requestAnimationFrame — DOM only, rare setState
   useEffect(() => {
@@ -402,14 +417,6 @@ function ExploreOrb() {
     <section
       className={cx('section', {reduceMotion, paused})}
       aria-label="Khám phá loại đề"
-      onMouseEnter={() => {
-        hoverPausedRef.current = true;
-        updatePausedFlag();
-      }}
-      onMouseLeave={() => {
-        hoverPausedRef.current = false;
-        updatePausedFlag();
-      }}
     >
       <div className={cx('glow')} aria-hidden="true" />
 
@@ -497,6 +504,7 @@ function ExploreOrb() {
                       types={examTypes}
                       setCardRef={setCardRef}
                       onActivate={handleCardActivate}
+                      onHoverChange={onCardHoverChange}
                     />
                   )}
                 </div>
@@ -554,13 +562,20 @@ function ExploreOrb() {
 }
 
 
-const OrbitCards = memo(function OrbitCards({types, setCardRef, onActivate}) {
+const OrbitCards = memo(function OrbitCards({
+  types,
+  setCardRef,
+  onActivate,
+  onHoverChange,
+}) {
   return types.map((type, index) => (
     <article
       key={type.examTypeId}
       ref={(el) => setCardRef(index, el)}
       className={cx('card')}
       onClick={() => onActivate(type, index)}
+      onMouseEnter={() => onHoverChange(true)}
+      onMouseLeave={() => onHoverChange(false)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
