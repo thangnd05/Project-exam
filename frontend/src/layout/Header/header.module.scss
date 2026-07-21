@@ -31,21 +31,17 @@
   border-radius: 999px;
   padding: 6px 10px 6px 14px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 42%),
-    linear-gradient(
-      160deg,
-      color-mix(in srgb, var(--brand-700) 72%, transparent) 0%,
-      color-mix(in srgb, var(--brand-900) 80%, transparent) 100%
-    );
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 42%),
+    color-mix(in srgb, var(--brand-900) 58%, transparent);
+  backdrop-filter: blur(22px) saturate(125%);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 12px 34px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
   @supports not (background: color-mix(in srgb, #000 50%, transparent)) {
-    background: linear-gradient(160deg, rgba(15, 118, 110, 0.88), rgba(4, 47, 46, 0.9));
+    background: rgba(4, 47, 46, 0.62);
   }
 }
 
