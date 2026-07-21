@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import { getStandardExamTypes } from '~/shared/api/examTypeApi';
@@ -31,6 +31,26 @@ const getInitials = (name) => {
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
 };
+
+function Monogram({examType}) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const showImage = Boolean(examType.imageUrl) && !imgFailed;
+
+  return (
+    <div className={cx('monogram', {hasImage: showImage})} aria-hidden="true">
+      {showImage ? (
+        <img
+          className={cx('monogram-img')}
+          src={examType.imageUrl}
+          alt=""
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        getInitials(examType.name)
+      )}
+    </div>
+  );
+}
 
 const headerVariants = {
   hidden: {opacity: 0, y: 24},
@@ -105,9 +125,7 @@ function ExamTypePage() {
             variants={cardVariants}
             whileHover={{y: -8}}
           >
-            <div className={cx('monogram')} aria-hidden="true">
-              {getInitials(examType.name)}
-            </div>
+            <Monogram examType={examType} />
             <div className={cx('card-info')}>
               <h4 className={cx('name')}>{examType.name}</h4>
               <div className={cx('cardActions')}>

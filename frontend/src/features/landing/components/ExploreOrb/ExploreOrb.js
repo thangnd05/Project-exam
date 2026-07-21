@@ -589,12 +589,33 @@ const OrbitCards = memo(function OrbitCards({
   ));
 });
 
+function Monogram({type}) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const showImage = Boolean(type.imageUrl) && !imgFailed;
+
+  return (
+    <div
+      className={cx('monogram', {hasImage: showImage})}
+      aria-hidden="true"
+    >
+      {showImage ? (
+        <img
+          className={cx('monogramImg')}
+          src={type.imageUrl}
+          alt=""
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        getInitials(type.name)
+      )}
+    </div>
+  );
+}
+
 function CardFace({type}) {
   return (
     <>
-      <div className={cx('monogram')} aria-hidden="true">
-        {getInitials(type.name)}
-      </div>
+      <Monogram type={type} />
       <h3 className={cx('cardName')}>{type.name}</h3>
       <p className={cx('cardMeta')}>{getSubtitle(type)}</p>
       <span className={cx('cardCta')} aria-hidden="true">

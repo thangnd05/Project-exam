@@ -24,6 +24,9 @@ public class ExamType {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
     /** Gợi ý mặc định theo loại kỳ thi; hệ thống không đọc field này cho chấm điểm hay đếm giờ (dùng {@code Test#durationMinutes}). */
     @Column(nullable = true)
     private Integer durationMinutes;

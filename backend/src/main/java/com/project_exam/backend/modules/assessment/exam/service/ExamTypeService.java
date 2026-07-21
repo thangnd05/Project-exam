@@ -59,6 +59,7 @@ public class ExamTypeService {
         ExamType type = new ExamType();
         type.setName(request.getName());
         type.setDescription(request.getDescription());
+        type.setImageUrl(request.getImageUrl());
         type.setDurationMinutes(request.getDurationMinutes());
         type.setScoringMethod(request.getScoringMethod() != null ? request.getScoringMethod() : "DEFAULT");
         type.setFlexible(Boolean.TRUE.equals(request.getFlexible()));
@@ -72,6 +73,7 @@ public class ExamTypeService {
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
         if (request.getName() != null) type.setName(request.getName());
         if (request.getDescription() != null) type.setDescription(request.getDescription());
+        if (request.getImageUrl() != null) type.setImageUrl(request.getImageUrl());
         if (request.getDurationMinutes() != null) type.setDurationMinutes(request.getDurationMinutes());
         if (request.getScoringMethod() != null) type.setScoringMethod(request.getScoringMethod());
         if (request.getFlexible() != null) type.setFlexible(request.getFlexible());

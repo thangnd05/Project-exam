@@ -18,6 +18,7 @@ const cx = classNames.bind(styles);
 const emptyForm = {
   name: '',
   description: '',
+  image_url: '',
   duration_minutes: '',
   scoring_method: 'DEFAULT',
   flexible: false,
@@ -28,6 +29,7 @@ const mapExamTypeFromApi = (item) => ({
   exam_type_id: String(item.examTypeId),
   name: item.name || '',
   description: item.description || '',
+  image_url: item.imageUrl || '',
   duration_minutes: item.durationMinutes ?? '',
   scoring_method: item.scoringMethod || 'DEFAULT',
   flexible: Boolean(item.flexible),
@@ -43,6 +45,7 @@ const buildExamTypePayload = (formState, {hasChildren} = {}) => {
   return {
     name: formState.name.trim(),
     description: formState.description.trim(),
+    imageUrl: formState.image_url.trim(),
     durationMinutes,
     scoringMethod: formState.scoring_method,
     flexible: Boolean(formState.flexible),
@@ -222,6 +225,7 @@ function ExamTypesManagement() {
     setFormState({
       name: examType.name,
       description: examType.description || '',
+      image_url: examType.image_url || '',
       duration_minutes: examType.duration_minutes ?? '',
       scoring_method: examType.scoring_method || 'DEFAULT',
       flexible: Boolean(examType.flexible),

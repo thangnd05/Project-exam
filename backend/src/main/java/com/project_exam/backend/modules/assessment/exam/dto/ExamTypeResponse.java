@@ -13,6 +13,7 @@ public class ExamTypeResponse {
     private String examTypeId;
     private String name;
     private String description;
+    private String imageUrl;
     private Integer durationMinutes;
     private String scoringMethod;
     private Boolean flexible;

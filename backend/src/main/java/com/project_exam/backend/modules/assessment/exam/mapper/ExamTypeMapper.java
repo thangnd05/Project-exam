@@ -17,6 +17,7 @@ public class ExamTypeMapper {
                 .examTypeId(t.getExamTypeId())
                 .name(t.getName())
                 .description(t.getDescription())
+                .imageUrl(t.getImageUrl())
                 .durationMinutes(t.getDurationMinutes())
                 .scoringMethod(t.getScoringMethod())
                 .flexible(Boolean.TRUE.equals(t.getFlexible()))

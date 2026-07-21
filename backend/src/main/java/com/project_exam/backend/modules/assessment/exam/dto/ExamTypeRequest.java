@@ -6,6 +6,7 @@ import lombok.Data;
 public class ExamTypeRequest {
     private String name;
     private String description;
+    private String imageUrl;
     private Integer durationMinutes;
     private String scoringMethod;
     private Boolean flexible;

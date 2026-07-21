@@ -47,6 +47,35 @@ function ExamTypeFormModal({
           />
         </Form.Group>
         <Form.Group className="mb-3">
+          <Form.Label>URL ảnh đại diện (tùy chọn)</Form.Label>
+          <Form.Control
+            type="url"
+            placeholder="https://..."
+            value={formState.image_url}
+            onChange={(event) => onChangeField('image_url', event.target.value)}
+          />
+          <Form.Text muted>
+            Ảnh hiển thị cho kỳ thi. Để trống sẽ dùng chữ cái đầu của tên.
+          </Form.Text>
+          {formState.image_url ? (
+            <div className="mt-2">
+              <img
+                src={formState.image_url}
+                alt="Xem trước ảnh"
+                style={{
+                  maxHeight: 80,
+                  maxWidth: '100%',
+                  borderRadius: 8,
+                  objectFit: 'cover',
+                }}
+                onError={(event) => {
+                  event.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          ) : null}
+        </Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Thời lượng (phút)</Form.Label>
           <Form.Control
             type="number"

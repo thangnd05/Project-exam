@@ -274,12 +274,12 @@
 }
 
 .monogram {
-  width: 3.2rem;
-  height: 3.2rem;
+  width: 6rem;
+  height: 6rem;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 1.1rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--brand-300, #5eead4);
@@ -290,6 +290,28 @@
   .isActive & {
     box-shadow: 0 0 18px rgba(13, 148, 136, 0.35);
   }
+
+  &.hasImage {
+    width: 8.5rem;
+    height: 8.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    padding: 0;
+
+    .isActive & {
+      box-shadow: none;
+    }
+  }
+}
+
+.monogramImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .cardName {
