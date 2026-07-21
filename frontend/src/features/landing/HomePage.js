@@ -1,6 +1,5 @@
 import HeroSection from './components/HeroSection/HeroSection';
 import ExploreOrb from './components/ExploreOrb/ExploreOrb';
-import ExamTypePage from '~/features/tests/exam/exam-types/ExamTypePage';
 import ProcessSection from './components/ProcessSection/ProcessSection';
 
 export default function TestPage() {
@@ -12,10 +11,6 @@ export default function TestPage() {
       </section>
 
       <ExploreOrb />
-
-      <section className="main-section">
-        <ExamTypePage />
-      </section>
 
       <section className="process-section">
         <ProcessSection />

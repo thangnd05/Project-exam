@@ -5,7 +5,7 @@ import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
 import classNames from 'classnames/bind';
 
 import {getStandardExamTypes} from '~/shared/api/examTypeApi';
-import {examTypeKeys} from '~/features/tests/exam/exam-types/ExamTypePage';
+import {examTypeKeys} from '~/features/tests/exam/exam-types/examTypeKeys';
 import styles from './ExploreOrb.module.scss';
 
 const cx = classNames.bind(styles);
@@ -282,7 +282,7 @@ function ExploreOrb() {
 
   const scrollToAll = useCallback(() => {
     document
-      .getElementById('exam-types')
+      .getElementById('explore-orb')
       ?.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'});
   }, [reduceMotion]);
 
@@ -415,6 +415,7 @@ function ExploreOrb() {
 
   return (
     <section
+      id="explore-orb"
       className={cx('section', {reduceMotion, paused})}
       aria-label="Khám phá loại đề"
     >

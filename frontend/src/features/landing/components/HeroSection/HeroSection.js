@@ -110,7 +110,7 @@ function HeroSection() {
   }, [quickTests]);
 
   const handleScrollToExam = () => {
-    const element = document.getElementById('exam-types');
+    const element = document.getElementById('explore-orb');
     if (element) {
       element.scrollIntoView({behavior: 'smooth'});
     }
