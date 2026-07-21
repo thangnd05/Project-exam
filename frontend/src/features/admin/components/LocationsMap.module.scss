@@ -10,18 +10,16 @@
     min-height: 18px;
 }
 
-/* Top countries list */
 .countryList {
     display: flex;
     flex-direction: column;
     gap: 13px;
     padding: 8px 4px 4px;
-    /* Hiện tối đa ~7 quốc gia; nhiều hơn thì cuộn trong khung. */
+
     max-height: 300px;
     overflow-y: auto;
     padding-right: 8px;
 
-    /* Thanh cuộn mảnh cho gọn */
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
 

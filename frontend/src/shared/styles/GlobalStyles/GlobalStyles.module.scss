@@ -2,21 +2,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  // ─── Brand core ───
-  --primary: #0d9488; // == --brand-600
+
+  --primary: #0d9488;
   --primary-color: #0d9488;
   --accent-color: #0d9488;
-  --accent-act-color: #14b8a6; // == --brand-500
-  --hover-accent: #0f766e; // == --brand-700
+  --accent-act-color: #14b8a6;
+  --hover-accent: #0f766e;
 
   --brand-unique: #f59e0b;
   --brand-unique-hover: #d97706;
 
-  --hero-bg: #042f2e; // == --brand-900
-  --footer-bg: #134e4a; // == --brand-800
+  --hero-bg: #042f2e;
+  --footer-bg: #134e4a;
   --dark-color: #1e293b;
 
-  // ─── Brand scale (charts, soft fills, companions) ───
   --brand-50: #f0fdfa;
   --brand-100: #ccfbf1;
   --brand-200: #99f6e4;
@@ -28,7 +27,6 @@
   --brand-800: #134e4a;
   --brand-900: #042f2e;
 
-  // ─── RGBA helpers (soft fills / rings) ───
   --primary-alpha-08: rgba(13, 148, 136, 0.08);
   --primary-alpha-10: rgba(13, 148, 136, 0.1);
   --primary-alpha-15: rgba(13, 148, 136, 0.15);
@@ -37,7 +35,6 @@
   --primary-alpha-35: rgba(13, 148, 136, 0.35);
   --primary-alpha-45: rgba(13, 148, 136, 0.45);
 
-  // ─── Gradients & CTA shadows ───
   --primary-gradient: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-act-color) 100%);
   --primary-btn-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 100%);
   --primary-btn-shadow: 0 10px 22px var(--primary-alpha-28);
@@ -346,10 +343,6 @@ li {
     box-shadow: var(--primary-btn-shadow-disabled);
   }
 }
-
-// ─── Single source of truth for buttons ───
-// Used by both ButtonPrime (Button.module.scss) and the diagnostic .btn set
-// (PersonalizedPlan.module.scss). Edit here to change every button site-wide.
 
 @mixin buttonBase {
   display: inline-flex;

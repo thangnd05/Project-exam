@@ -496,7 +496,6 @@
   text-align: center !important;
 }
 
-/* Điện thoại: bảng gọn lại (giảm padding/cỡ chữ) để không tràn ngang. */
 @media (max-width: 640px) {
   .partTable {
     font-size: var(--font-size-sm);

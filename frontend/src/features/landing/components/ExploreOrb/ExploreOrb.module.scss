@@ -15,7 +15,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  /* No section-wide amber bloom — glow lives on .hub only */
+
   background: none;
 }
 
@@ -97,7 +97,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* Between back (~0–40) and front (~60–100) card zIndex */
+
   z-index: 45;
   display: grid;
   place-items: center;
@@ -118,7 +118,7 @@
   pointer-events: none;
   z-index: 0;
   opacity: 0;
-  /* Duration = cardStepMs (ORBIT_PERIOD_MS / count) → 1 expand ≈ 1 front-card change */
+
   animation: hubRippleOut var(--ripple-duration, 6s) ease-out infinite;
 }
 
@@ -183,8 +183,6 @@
   user-select: none;
 }
 
-/* Elliptical expand toward orbit path (--ripple-scale-x/y from hubStack).
-   Full 0–100% = one expand + fade; duration synced to one orbit card step. */
 @keyframes hubRippleOut {
   0% {
     transform: scaleX(1) scaleY(1);
@@ -220,9 +218,7 @@
   box-sizing: border-box;
   border-radius: 18px;
   border: 1px solid rgba(94, 234, 212, 0.32);
-  /* Opaque frosted fill instead of live blur — cards are always moving,
-     so per-frame backdrop-filter compositing would tank FPS. Only the
-     (near-stationary) active card gets the real blur, below. */
+
   background:
     linear-gradient(
       160deg,
@@ -252,9 +248,7 @@
 
   &.isActive {
     border-color: rgba(94, 234, 212, 0.75);
-    /* No backdrop-filter: toggling it on the front card every change forces a
-       layer promotion + repaint mid-orbit (a visible one-frame hitch). An
-       opaque frosted fill reads the same on the dark stage without that cost. */
+
     background:
       linear-gradient(
         160deg,
@@ -326,7 +320,6 @@
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
   opacity: 0;
-  /* Always in DOM — opacity only, so front changes never reflow */
 
   .isActive & {
     opacity: 1;
@@ -486,7 +479,6 @@
   border: 0;
 }
 
-/* Reduced motion: flatten 3D stage, keep hub CTA */
 .section.reduceMotion {
   .stage {
     perspective: none;

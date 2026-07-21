@@ -363,7 +363,7 @@
     }
 
     .passage-paragraph {
-      margin: 0 0 1.6rem; // nới khoảng cách để các đoạn văn tách nhau rõ
+      margin: 0 0 1.6rem;
 
       &:last-child {
         margin-bottom: 0;
@@ -1043,12 +1043,11 @@
   }
 }
 
-/* ============ Chế độ PAGED (từng bước, kiểu TOEIC) ============ */
 .paged-root {
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
-  width: 100%; // full width như chế độ cuộn (không bó max-width/căn giữa)
+  width: 100%;
 }
 
 .paged-empty {
@@ -1114,8 +1113,6 @@
   }
 }
 
-// Ghim cứng (Part 1 ảnh / passage 2 cột): khối làm bài cao đúng bằng vùng giữa nên KHÔNG sinh
-// scroll trang; thanh audio + nav là flex-none, phần thân co giãn; chỉ ảnh/câu hỏi cuộn trong cột.
 .paged-root.paged-fit {
   height: 100%;
   min-height: 0;
@@ -1126,7 +1123,6 @@
     align-items: stretch;
   }
 
-  // Trong chế độ ghim: bỏ sticky (đã bounded sẵn), 2 cột cao bằng nhau, nội dung tự cuộn.
   .passage-column,
   .question-column {
     position: static;
@@ -1138,11 +1134,10 @@
 
   .passage-column .passage-box {
     height: auto;
-    max-height: 100%; // ảnh cao quá thì cuộn trong khung, không đẩy cả trang
-    padding: 4px; // giữ "hộp trắng" nhưng gutter mỏng, ảnh gần sát mép
+    max-height: 100%;
+    padding: 4px;
   }
 
-  // Ảnh đề (email / Part 1...) lấp đầy cột trái: bỏ khung xám bọc ngoài + trần 420px.
   .passage-column .passage-image-box {
     padding: 0;
     background: transparent;
@@ -1150,19 +1145,19 @@
     margin-bottom: 0;
 
     &:not(:last-child) {
-      margin-bottom: 8px; // vẫn tách nhẹ khi có nhiều ảnh
+      margin-bottom: 8px;
     }
   }
 
   .passage-column .passage-image {
     width: 100%;
     height: auto;
-    max-height: none; // bỏ trần 420px để ảnh to hết bề ngang cột
+    max-height: none;
     margin-bottom: 0;
   }
 
   .question-column .questions-frame {
-    flex: 0 1 auto; // ôm sát nội dung câu hỏi (không kéo dài khung trắng), dài quá thì tự cuộn
+    flex: 0 1 auto;
     max-height: 100%;
     min-height: 0;
   }
@@ -1195,7 +1190,7 @@
   gap: 1.2rem;
   margin-top: 0;
   padding-top: 0.6rem;
-  border-top: none; // bỏ vạch ngăn cách, nhường chỗ cho passage/câu hỏi cao thêm
+  border-top: none;
 }
 
 .paged-nav-left,

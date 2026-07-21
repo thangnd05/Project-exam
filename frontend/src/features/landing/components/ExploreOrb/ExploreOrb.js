@@ -422,7 +422,7 @@ function ExploreOrb() {
 
       <div className={cx('inner')}>
         <header className={cx('header')}>
-          <h2 className={cx('title')}>Khám phá loại đề</h2>
+          <h2 className={cx('title')}>Khám phá dạng đề</h2>
           <p className={cx('subtitle')}>Vuốt hoặc chọn thẻ để xem kỳ thi phù hợp</p>
         </header>
 

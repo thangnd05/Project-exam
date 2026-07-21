@@ -200,7 +200,6 @@
   font-size: var(--font-size-xs2) !important;
   padding: 3px 8px !important;
 
-  // Badge "Đã duyệt" dùng màu gốc thay vì xanh lục; "Chờ duyệt" (.pending) giữ amber
   &:not(.pending) {
     background-color: var(--primary) !important;
   }

@@ -10,7 +10,6 @@
   border-bottom: none;
   box-shadow: none;
 
-  // Keep Bootstrap toggler visible on dark pill (if present)
   :global(.navbar-toggler) {
     border-color: rgba(255, 255, 255, 0.35);
     color: var(--white, #fff);
@@ -31,14 +30,22 @@
   width: 100%;
   border-radius: 999px;
   padding: 6px 10px 6px 14px;
-  background: color-mix(in srgb, var(--hero-bg) 72%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--brand-700) 72%, transparent) 0%,
+      color-mix(in srgb, var(--brand-900) 80%, transparent) 100%
+    );
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
 
   @supports not (background: color-mix(in srgb, #000 50%, transparent)) {
-    background: rgba(4, 47, 46, 0.78);
+    background: linear-gradient(160deg, rgba(15, 118, 110, 0.88), rgba(4, 47, 46, 0.9));
   }
 }
 
@@ -53,8 +60,6 @@
   align-items: center;
   gap: 10px;
   min-width: 148px;
-  padding-left: 8px;
-  border-left: 2px solid var(--brand-unique, #f59e0b);
 }
 
 .logo-brand {
@@ -126,13 +131,23 @@
 
   &:hover {
     color: var(--white, #fff);
-    background: var(--primary-alpha-20);
+    background: radial-gradient(
+      ellipse at center,
+      rgba(20, 184, 166, 0.22),
+      rgba(20, 184, 166, 0.08) 48%,
+      transparent 72%
+    );
   }
 
   &.active,
   &:global(.active) {
     color: var(--white, #fff);
-    background: rgba(13, 148, 136, 0.18);
+    background: radial-gradient(
+      ellipse at center,
+      rgba(20, 184, 166, 0.3),
+      rgba(20, 184, 166, 0.12) 48%,
+      transparent 74%
+    );
   }
 }
 
@@ -247,7 +262,12 @@
 
 .customMenu:hover .menuTitle {
   color: var(--white, #fff);
-  background: var(--primary-alpha-20);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(20, 184, 166, 0.22),
+    rgba(20, 184, 166, 0.08) 48%,
+    transparent 72%
+  );
 }
 
 .menuDropdown {
@@ -371,7 +391,6 @@
   align-items: center;
 }
 
-/* ===== Bottom sheet mobile ===== */
 .sheetOverlay {
   position: fixed;
   inset: 0;
@@ -595,7 +614,6 @@
 
   .brandInner {
     min-width: 0;
-    padding-left: 6px;
   }
 
   .user-info {
