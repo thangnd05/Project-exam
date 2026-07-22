@@ -100,7 +100,7 @@ function TaskHistoryPage() {
           Cần ≥ {pass}% để pass
         </span>
         {isTaskStuck(task) && (
-          <span className={cx('badge', 'badgeDanger')}>🔥 Đang bí</span>
+          <span className={cx('badge', 'badgeDanger')}>Đang bí</span>
         )}
       </div>
 

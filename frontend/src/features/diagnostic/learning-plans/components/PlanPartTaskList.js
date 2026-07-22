@@ -132,10 +132,10 @@ function PartTaskRow({ task, learningPlanId, isRecommended, studyAction, onStudy
               {task.tagName}
             </span>
             {isRecommended && (
-              <span className={cx('badge', 'badgePrimary')}>⭐ Nên làm tiếp</span>
+              <span className={cx('badge', 'badgePrimary')}>Nên làm tiếp</span>
             )}
             {stuck && (
-              <span className={cx('badge', 'badgeDanger')}>🔥 Đang bí</span>
+              <span className={cx('badge', 'badgeDanger')}>Đang bí</span>
             )}
           </div>
           <div className={cx('taskStats')}>
