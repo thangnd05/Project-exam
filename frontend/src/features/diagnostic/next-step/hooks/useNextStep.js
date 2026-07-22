@@ -20,19 +20,19 @@ async function fetchOverview(examTypeId) {
     : null;
 
   const completed = await getMyCompletedUserTests(examTypeId);
-  const latestMock = completed[0] || null;
+  const latestCompletedTest = completed[0] || null;
 
   let enhanced = null;
-  if (latestMock?.userTestId) {
+  if (latestCompletedTest?.userTestId) {
     try {
-      const r = await getEnhancedResult(latestMock.userTestId);
+      const r = await getEnhancedResult(latestCompletedTest.userTestId);
       enhanced = r.data;
     } catch {
       enhanced = null;
     }
   }
 
-  return { target, plans, activePlanDetail, latestMock, enhanced };
+  return { target, plans, activePlanDetail, latestCompletedTest, enhanced };
 }
 
 export function useExamTypes() {

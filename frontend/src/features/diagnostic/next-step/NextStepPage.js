@@ -3,29 +3,18 @@ import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
-import { priorityTierLabel } from '~/shared/utils/priorityTier';
-import { sortByPartOrder } from '~/shared/utils/partOrder';
+import { formatGapToPass } from '~/shared/utils/taskProgress';
 import { planStageLabel } from '~/features/diagnostic/learning-plans/planLabels';
 import { useExamTypes, useNextStepOverview } from './hooks/useNextStep';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Chọn ải kế tiếp theo đúng thứ tự học BE đã sắp: Part trước học trước
-// (sortByPartOrder), trong Part đi theo taskOrder — lấy ải ACTIVE gặp đầu tiên.
-function pickRecommendedTask(plan) {
-  if (!plan) return null;
-  const groups = (plan.partGroups || []).length
-    ? sortByPartOrder(plan.partGroups, { nameKey: 'examPartName' })
-    : [{ tasks: plan.tasks || [] }];
-  for (const group of groups) {
-    const tasks = [...(group.tasks || [])].sort(
-      (a, b) => (a.taskOrder ?? 0) - (b.taskOrder ?? 0),
-    );
-    const active = tasks.find((t) => t.status === 'ACTIVE');
-    if (active) return active;
-  }
-  return null;
+function findRecommendedTask(plan) {
+  if (!plan?.recommendedTaskId) return null;
+  const all = (plan.partGroups || []).flatMap((g) => g.tasks || []);
+  const pool = all.length ? all : plan.tasks || [];
+  return pool.find((t) => t.taskId === plan.recommendedTaskId) || null;
 }
 
 function NextStepPage() {
@@ -35,12 +24,12 @@ function NextStepPage() {
   const { data: examTypes = [] } = useExamTypes();
 
   const overviewQuery = useNextStepOverview(examTypeId);
-  const { target, plans, activePlanDetail, latestMock, enhanced } =
+  const { target, plans, activePlanDetail, latestCompletedTest, enhanced } =
     overviewQuery.data ?? {
       target: null,
       plans: [],
       activePlanDetail: null,
-      latestMock: null,
+      latestCompletedTest: null,
       enhanced: null,
     };
   const loading = overviewQuery.isLoading;
@@ -82,12 +71,12 @@ function NextStepPage() {
       };
     }
 
-    if (!latestMock) {
+    if (!latestCompletedTest) {
       return {
-        kind: 'do-mock',
-        title: 'Làm một bài Full Mock chẩn đoán',
-        desc: 'Chưa có bài thi nào COMPLETED. Hệ thống cần một mock để biết điểm yếu của bạn.',
-        ctaLabel: 'Chọn đề thi',
+        kind: 'do-quick',
+        title: 'Bắt đầu bằng một Quick Challenge để chẩn đoán nhanh',
+        desc: 'Chưa có bài thi nào hoàn thành. Làm một Quick Challenge (ngắn) để hệ thống biết điểm yếu và lập lộ trình — chưa cần Full Mock dài. Sau khi ôn, làm Full Mock để chẩn đoán chính xác hơn.',
+        ctaLabel: 'Chọn Quick Challenge',
         ctaTo: mockTestsPath,
       };
     }
@@ -110,7 +99,7 @@ function NextStepPage() {
         };
       }
 
-      const recommended = pickRecommendedTask(activePlanDetail);
+      const recommended = findRecommendedTask(activePlanDetail);
       if (recommended) {
         const stuck = (recommended.consecutiveFails ?? 0) >= 3;
         const studyResource = recommended.studyResource;
@@ -132,7 +121,7 @@ function NextStepPage() {
         return {
           kind: 'study-task',
           title: `Học ải: ${recommended.examPartName} · ${recommended.tagName}`,
-          desc: `${priorityTierLabel(recommended.priorityTier)}. Cần đạt ≥ ${recommended.passAccuracy}% để pass ải. Đã sai ${recommended.wrongCountAtDiagnosis ?? '—'} câu ở mock chẩn đoán.`,
+          desc: `${formatGapToPass(recommended) || `Cần đạt ≥ ${recommended.passAccuracy}%`} để pass ải. Đã sai ${recommended.wrongCountAtDiagnosis ?? '—'} câu ở bài chẩn đoán.`,
           warning: stuck
             ? `Bạn đã fail ${recommended.consecutiveFails} lần liên tiếp ở ải này. Hãy đọc lại tài liệu trước khi thử lần nữa.`
             : null,
@@ -145,18 +134,18 @@ function NextStepPage() {
 
     return {
       kind: 'generate-plan',
-      title: 'Sinh lộ trình từ mock gần nhất',
-      desc: `Mock ${enhanced?.totalScore ?? latestMock.totalScore}đ · độ sẵn sàng ${enhanced?.readinessScore ?? '—'}% — chưa đạt mục tiêu. Hệ thống sẽ tạo plan ải dựa trên các tag yếu.`,
+      title: 'Sinh lộ trình từ bài gần nhất',
+      desc: `Bài gần nhất ${enhanced?.totalScore ?? latestCompletedTest.totalScore}đ · độ sẵn sàng ${enhanced?.readinessScore ?? '—'}% — chưa đạt mục tiêu. Hệ thống sẽ tạo plan ải dựa trên các tag yếu.`,
       ctaLabel: 'Sinh plan',
-      ctaTo: `/learning-plans/generate?userTestId=${latestMock.userTestId}`,
+      ctaTo: `/learning-plans/generate?userTestId=${latestCompletedTest.userTestId}`,
       extras: [
         {
           label: 'Xem chẩn đoán',
-          to: `/tests/result/${latestMock.userTestId}`,
+          to: `/tests/result/${latestCompletedTest.userTestId}`,
         },
       ],
     };
-  }, [target, enhanced, latestMock, activePlanDetail, examTypeId, mockTestsPath]);
+  }, [target, enhanced, latestCompletedTest, activePlanDetail, examTypeId, mockTestsPath]);
 
   return (
     <div className={cx('wrapper')}>
@@ -238,9 +227,9 @@ function NextStepPage() {
                   : <span className={cx('muted')}>chưa đặt</span>}
               </li>
               <li>
-                <strong>Mock gần nhất:</strong>{' '}
-                {latestMock
-                  ? `${enhanced?.totalScore ?? latestMock.totalScore ?? '—'}đ${
+                <strong>Bài gần nhất:</strong>{' '}
+                {latestCompletedTest
+                  ? `${enhanced?.totalScore ?? latestCompletedTest.totalScore ?? '—'}đ${
                       enhanced?.readinessScore != null ? ` · độ sẵn sàng ${enhanced.readinessScore}%` : ''
                     }`
                   : <span className={cx('muted')}>chưa có</span>}

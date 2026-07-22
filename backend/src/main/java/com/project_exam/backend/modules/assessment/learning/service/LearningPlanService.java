@@ -545,7 +545,7 @@ public class LearningPlanService {
         Map<String, Tag> tagMap = loadTagMap(tasks);
         Map<String, ExamPart> partMap = loadPartMap(tasks);
 
-        return learningMapper.toGeneratedPlanResponse(
+        PlanResponse response = learningMapper.toGeneratedPlanResponse(
                 plan,
                 ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()),
                 plan.getPlanStage().name(),
@@ -556,6 +556,8 @@ public class LearningPlanService {
                 mapTaskDtos(tasks, resourcesByTag, tagMap, partMap),
                 buildPartGroups(tasks, resourcesByTag, tagMap, partMap),
                 partsWithoutTasks);
+        response.setRecommendedTaskId(pickRecommendedTaskId(tasks, partMap));
+        return response;
     }
 
     private PlanResponse buildPlanResponseFromEntity(
@@ -568,7 +570,7 @@ public class LearningPlanService {
         Map<String, Tag> tagMap = loadTagMap(tasks);
         Map<String, ExamPart> partMap = loadPartMap(tasks);
 
-        return learningMapper.toPlanResponseFromEntity(
+        PlanResponse response = learningMapper.toPlanResponseFromEntity(
                 plan,
                 ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()),
                 plan.getPlanStage() != null ? plan.getPlanStage().name() : PlanStage.FOUNDATION.name(),
@@ -582,6 +584,8 @@ public class LearningPlanService {
                 estimatedDays,
                 mapTaskDtos(tasks, resourcesByTag, tagMap, partMap),
                 buildPartGroups(tasks, resourcesByTag, tagMap, partMap));
+        response.setRecommendedTaskId(pickRecommendedTaskId(tasks, partMap));
+        return response;
     }
 
     private PlanResponse buildTargetAchievedResponse(
@@ -646,6 +650,23 @@ public class LearningPlanService {
         if (partIds.isEmpty()) return Map.of();
         return examPartRepository.findAllById(partIds).stream()
                 .collect(Collectors.toMap(ExamPart::getExamPartId, p -> p, (a, b) -> a));
+    }
+
+    private String pickRecommendedTaskId(List<LearningPlanTask> tasks, Map<String, ExamPart> partMap) {
+        return tasks.stream()
+                .filter(t -> t.getStatus() == TaskStatus.ACTIVE)
+                .min(Comparator
+                        .comparingInt((LearningPlanTask t) -> partDisplayOrderRank(t, partMap))
+                        .thenComparingInt(t -> t.getTaskOrder() != null ? t.getTaskOrder() : Integer.MAX_VALUE))
+                .map(LearningPlanTask::getTaskId)
+                .orElse(null);
+    }
+
+    private int partDisplayOrderRank(LearningPlanTask task, Map<String, ExamPart> partMap) {
+        ExamPart part = task.getExamPartId() != null ? partMap.get(task.getExamPartId()) : null;
+        return part != null && part.getDisplayOrder() != null
+                ? part.getDisplayOrder()
+                : Integer.MAX_VALUE;
     }
 
     private int resolveReadinessScore(EnhancedResultDto result) {
@@ -725,16 +746,13 @@ public class LearningPlanService {
                 ? resourcesByTag.get(task.getTagId())
                 : null;
         int priorityScore = task.getPriorityScore() != null ? task.getPriorityScore() : 0;
-        String tier = PlanPrioritySupport.tierFromScore(priorityScore);
         return learningMapper.toTaskDto(
                 task,
                 taskType.name(),
                 resolveTaskDisplayName(taskType, tag, part),
                 part != null ? part.getName() : null,
                 studyResource,
-                priorityScore,
-                tier,
-                PlanPrioritySupport.TIER_HIGH.equals(tier));
+                priorityScore);
     }
 
     private Integer resolveTargetScore(

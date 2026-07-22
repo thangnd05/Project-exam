@@ -48,6 +48,8 @@ public class PlanResponse {
     private Integer passedTasks;
     private Integer estimatedDaysRemaining;
 
+    private String recommendedTaskId;
+
     private List<PlanTaskDto> tasks;
 
     /** Ải nhóm theo Part — học từng Part riêng, không trộn. */

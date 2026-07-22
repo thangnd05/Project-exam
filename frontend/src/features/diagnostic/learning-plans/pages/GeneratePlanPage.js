@@ -280,6 +280,7 @@ function GeneratePlanPage() {
             <PlanPartTaskList
               partGroups={result.partGroups || []}
               learningPlanId={result.learningPlanId}
+              recommendedTaskId={result.recommendedTaskId}
               studyAction="link"
             />
           </div>

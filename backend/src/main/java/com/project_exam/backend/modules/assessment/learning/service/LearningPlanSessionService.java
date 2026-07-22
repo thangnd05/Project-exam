@@ -760,16 +760,13 @@ public class LearningPlanSessionService {
                 ? resourcesByTag.get(task.getTagId())
                 : null;
         int priorityScore = task.getPriorityScore() != null ? task.getPriorityScore() : 0;
-        String tier = PlanPrioritySupport.tierFromScore(priorityScore);
         return learningMapper.toTaskDto(
                 task,
                 taskType.name(),
                 resolveTaskDisplayName(taskType, tag, part),
                 part != null ? part.getName() : null,
                 studyResource,
-                priorityScore,
-                tier,
-                PlanPrioritySupport.TIER_HIGH.equals(tier));
+                priorityScore);
     }
 
     private String resolveTaskDisplayName(PlanTaskType taskType, Tag tag, ExamPart part) {

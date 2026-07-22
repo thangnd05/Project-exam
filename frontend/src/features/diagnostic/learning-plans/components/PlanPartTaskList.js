@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
-import { priorityTierLabel } from '~/shared/utils/priorityTier';
+import { formatGapToPass, isTaskStuck } from '~/shared/utils/taskProgress';
 
 const cx = classNames.bind(styles);
 
@@ -16,15 +16,10 @@ const TASK_STATUS = {
 
 const CAPSTONE_TYPES = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 
-const PRIORITY_VARIANT = {
-  HIGH: 'badgeDanger',
-  MEDIUM: 'badgeWarning',
-  LOW: 'badgeMuted',
-};
-
 function PlanPartTaskList({
   partGroups = [],
   learningPlanId,
+  recommendedTaskId,
   studyAction = 'link',
   onStudyTask,
   compact = false,
@@ -37,6 +32,11 @@ function PlanPartTaskList({
 
   return (
     <div>
+      <p className={cx('muted', 'small')} style={{ marginBottom: '1.2rem' }}>
+        Các ải xếp theo <strong>thứ tự lộ trình</strong> (học từ trên xuống). Ải gắn
+        <strong>Nên làm tiếp</strong> là bước kế tiếp gợi ý; mỗi ải hiện rõ còn cách
+        ngưỡng đạt bao nhiêu.
+      </p>
       {orderedGroups.map((group) => (
         <div key={group.examPartId} className={cx('partGroup')}>
           <div className={cx('partGroupHeader')}>
@@ -75,6 +75,7 @@ function PlanPartTaskList({
                 key={t.taskId}
                 task={t}
                 learningPlanId={learningPlanId}
+                isRecommended={t.taskId === recommendedTaskId}
                 studyAction={studyAction}
                 onStudyTask={onStudyTask}
                 compact={compact}
@@ -87,13 +88,13 @@ function PlanPartTaskList({
   );
 }
 
-function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }) {
+function PartTaskRow({ task, learningPlanId, isRecommended, studyAction, onStudyTask, compact }) {
   const status = TASK_STATUS[task.status] || TASK_STATUS.ACTIVE;
   const isCapstone = CAPSTONE_TYPES.has(task.taskType);
   const canStudy = task.status !== 'SKIPPED' && task.status !== 'LOCKED';
   const resource = task.studyResource;
-  const priorityVariant =
-    PRIORITY_VARIANT[task.priorityTier] || PRIORITY_VARIANT.MEDIUM;
+  const gapLabel = formatGapToPass(task);
+  const stuck = isTaskStuck(task);
   const questionLabel = task.targetQuestionCount != null
     ? `${task.targetQuestionCount} câu (hết kho thì lấy tối đa có)`
     : null;
@@ -130,24 +131,19 @@ function PartTaskRow({ task, learningPlanId, studyAction, onStudyTask, compact }
               <span className={cx('taskTitleHint')}>Ải #{task.taskOrder}</span>
               {task.tagName}
             </span>
-            {task.priorityTier && (
-              <span className={cx('badge', priorityVariant)}>
-                {priorityTierLabel(task.priorityTier)}
-              </span>
+            {isRecommended && (
+              <span className={cx('badge', 'badgePrimary')}>⭐ Nên làm tiếp</span>
+            )}
+            {stuck && (
+              <span className={cx('badge', 'badgeDanger')}>🔥 Đang bí</span>
             )}
           </div>
           <div className={cx('taskStats')}>
+            {gapLabel && (
+              <span><strong>{gapLabel}</strong></span>
+            )}
             {task.wrongCountAtDiagnosis != null && (
-              <span>Sai {task.wrongCountAtDiagnosis} câu (mock)</span>
-            )}
-            {task.baselineAccuracy != null && (
-              <span>Gốc {task.baselineAccuracy}%</span>
-            )}
-            {task.bestAccuracy != null && (
-              <span>Tốt nhất {task.bestAccuracy}%</span>
-            )}
-            {task.passAccuracy != null && (
-              <span>Pass ≥{task.passAccuracy}%</span>
+              <span>Sai {task.wrongCountAtDiagnosis} câu (chẩn đoán)</span>
             )}
             {questionLabel && (
               <span>{questionLabel}</span>

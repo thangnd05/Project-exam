@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Mapper thuần cho sub-module ASSESSMENT/LEARNING.
  * KHÔNG repository/DB/logic: mọi giá trị cần DB hoặc cần tính (tagName, priorityScore,
- * tier, recommendedFirst, studyResource, các số liệu thống kê, summary, message, list con...)
+ * studyResource, các số liệu thống kê, summary, message, list con...)
  * được service resolve rồi truyền vào qua tham số.
  */
 @Component
@@ -143,8 +143,8 @@ public class LearningMapper {
     // ===================== PlanTaskDto / PlanPartGroupDto =====================
 
     /**
-     * tagName (display name khác nhau giữa service), priorityScore, priorityTier,
-     * recommendedFirst, studyResource đều do service resolve rồi truyền vào.
+     * tagName (display name khác nhau giữa service), priorityScore, studyResource
+     * đều do service resolve rồi truyền vào.
      */
     public PlanTaskDto toTaskDto(
             LearningPlanTask task,
@@ -152,9 +152,7 @@ public class LearningMapper {
             String tagName,
             String examPartName,
             PlanPhaseDto.RecommendedResourceDto studyResource,
-            int priorityScore,
-            String priorityTier,
-            boolean recommendedFirst) {
+            int priorityScore) {
         return PlanTaskDto.builder()
                 .taskId(task.getTaskId())
                 .taskOrder(task.getTaskOrder())
@@ -172,9 +170,7 @@ public class LearningMapper {
                 .consecutiveFails(task.getConsecutiveFails())
                 .studyResource(studyResource)
                 .priorityScore(priorityScore)
-                .priorityTier(priorityTier)
                 .wrongCountAtDiagnosis(task.getWrongCountAtDiagnosis())
-                .recommendedFirst(recommendedFirst)
                 .build();
     }
 

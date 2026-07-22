@@ -32,9 +32,5 @@ public class PlanTaskDto {
     private PlanPhaseDto.RecommendedResourceDto studyResource;
 
     private Integer priorityScore;
-    /** HIGH | MEDIUM | LOW */
-    private String priorityTier;
     private Integer wrongCountAtDiagnosis;
-    /** Gợi ý UI: nên học trước (top priority trong plan). */
-    private Boolean recommendedFirst;
 }

@@ -104,11 +104,19 @@ function PlanDetailPage() {
               {plan.passedTasks ?? 0}/{plan.totalTasks ?? 0} đã pass
             </li>
             <li className={cx('muted', 'small')}>
-              Mỗi mock mới → sinh <strong>plan mới</strong> (plan cũ giữ lịch sử, không sửa đè ải).
+              Mỗi bài làm mới sinh <strong>plan mới</strong> (plan cũ giữ lịch sử, không sửa đè ải).
             </li>
           </ul>
         </div>
       </div>
+
+      {!isReplaced && plan.planStage === 'FOUNDATION' && (
+        <div className={cx('alert')}>
+          Lộ trình này được chẩn đoán từ bài bạn đã làm gần nhất. Ôn xong các ải,
+          hãy làm một <strong>Full Mock</strong> để kiểm tra lại và cập nhật độ chính
+          xác của chẩn đoán (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
+        </div>
+      )}
 
       {plan.partsWithoutTasks?.length > 0 && (
         <div className={cx('alert', 'alertWarning')}>
@@ -125,6 +133,7 @@ function PlanDetailPage() {
           <PlanPartTaskList
             partGroups={partGroups}
             learningPlanId={plan.learningPlanId}
+            recommendedTaskId={plan.recommendedTaskId}
             studyAction="link"
           />
         </>
