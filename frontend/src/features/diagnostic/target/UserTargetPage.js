@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { getUserTarget } from '~/shared/api/userTargetApi';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
@@ -134,7 +135,8 @@ function UserTargetPage() {
         customParts: allParts,
       },
       {
-        onSuccess: () => toast.success('Đã lưu mục tiêu thành công!'),
+        onSuccess: () =>
+          toast.success('Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.'),
         onError: () => toast.error('Lỗi khi lưu mục tiêu.'),
       },
     );
@@ -204,6 +206,7 @@ function UserTargetPage() {
 
   return (
     <div className={classNames(planCx('wrapper'), cx('pageRoot'))}>
+      <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} />
       <div className={planCx('headerBar')}>
         <h2 className={classNames(planCx('title'), cx('pageTitle'))}>Mục tiêu của tôi</h2>
         <div className={planCx('actionBar')}>
@@ -219,26 +222,25 @@ function UserTargetPage() {
           >
             Dashboard
           </ButtonPrime>
-          <ButtonPrime
-            as="link"
-            to={
-              selectedExamTypeId
-                ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
-                : '/learning-plans/generate'
-            }
-            variant="primary"
-            size="sm"
-          >
-            Sinh lộ trình
-          </ButtonPrime>
         </div>
       </div>
 
-      <p className={classNames(planCx('subtitle'), cx('pageSubtitle'))}>
-        Nhập điểm mục tiêu theo từng loại kỳ thi. Nếu trùng mốc admin đã cấu hình, % từng
-        phần sẽ được gợi ý tự động. Bạn có thể chỉnh lại yêu cầu từng part cho phù hợp
-        với bản thân.
-      </p>
+      {hasSavedTarget && (
+        <div className={planCx('alert', 'alertSuccess')}>
+          <span>
+            Đã có mục tiêu <strong>{currentTarget.targetScore} điểm</strong> — bước tiếp
+            theo: sang tab <strong>Lập kế hoạch</strong> để sinh lộ trình học.
+          </span>
+          <ButtonPrime
+            as="link"
+            to={`/learning-plans/generate?examTypeId=${encodeURIComponent(selectedExamTypeId)}`}
+            variant="primary"
+            size="sm"
+          >
+            Sang Lập kế hoạch →
+          </ButtonPrime>
+        </div>
+      )}
 
       <div className={classNames(planCx('card'), cx('setupCard'))}>
         <div className={classNames(planCx('cardHeader'), cx('compactCardHeader'))}>Thiết lập mục tiêu</div>
@@ -324,8 +326,8 @@ function UserTargetPage() {
               <div className={cx('partSectionBody')}>
                 <p className={cx('partSectionHint')}>
                   {matchedMilestone
-                    ? 'Giá trị từ cấu hình admin. Sửa ô để tuỳ chỉnh.'
-                    : `Chia đều ${evenPctForScore(targetScore)}%. Sửa ô để tuỳ chỉnh.`}
+                    ? 'Giá trị từ cấu hình quản trị viên. Hãy sửa lại nếu không phù hợp.'
+                    : `Chia đều ${evenPctForScore(targetScore)}%. Hãy sửa lại nếu không phù hợp.`}
                 </p>
 
                 {partRequirements.map((pr) => {

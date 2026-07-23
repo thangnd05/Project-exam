@@ -47,23 +47,10 @@ function NextStepPage() {
 
   const recommendation = useMemo(() => {
     if (!target?.hasTarget) {
-      // Đã có bài thi → trang sinh lộ trình tự phục vụ được cả mục tiêu gợi ý (1 chạm) lẫn plan.
-      if (latestCompletedTest) {
-        return {
-          kind: 'set-target',
-          title: 'Xác nhận mục tiêu gợi ý rồi sinh lộ trình ngay',
-          desc: 'Bạn đã có bài thi hoàn thành. Chỉ cần xác nhận mục tiêu gợi ý (1 chạm) là hệ thống sinh được lộ trình cá nhân hoá từ bài gần nhất.',
-          ctaLabel: 'Sinh lộ trình',
-          ctaTo: `/learning-plans/generate?examTypeId=${examTypeId}&userTestId=${latestCompletedTest.userTestId}`,
-          extras: [
-            { label: 'Đặt mục tiêu thủ công', to: `/my-target?examTypeId=${examTypeId}` },
-          ],
-        };
-      }
       return {
         kind: 'set-target',
         title: 'Hãy đặt mục tiêu cho kỳ thi này trước',
-        desc: 'Mục tiêu giúp hệ thống cá nhân hoá lộ trình ôn (điểm + aim từng Part).',
+        desc: 'Mục tiêu giúp hệ thống cá nhân hoá lộ trình ôn (điểm + aim từng Part). Đặt xong sẽ có chỉ dẫn sang bước Lập kế hoạch.',
         ctaLabel: 'Đặt mục tiêu',
         ctaTo: `/my-target?examTypeId=${examTypeId}`,
       };

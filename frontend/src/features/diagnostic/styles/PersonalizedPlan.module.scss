@@ -98,7 +98,7 @@
 }
 
 .fieldLabel {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: var(--font-weight-semibold);
@@ -859,7 +859,7 @@
 }
 
 .sectionTitle {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: var(--font-weight-semibold);
@@ -1168,5 +1168,33 @@
 
   strong {
     font-weight: 800;
+  }
+}
+
+// Thanh tab gộp khu "Mục tiêu" + "Lập kế hoạch" (TargetPlanTabs) — 2 route, 1 trải nghiệm.
+.pageTabs {
+  display: flex;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.pageTab {
+  padding: 1rem 1.8rem;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: var(--text-color);
+  }
+
+  &.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    font-weight: 700;
   }
 }

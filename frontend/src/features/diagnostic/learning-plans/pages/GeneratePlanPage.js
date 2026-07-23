@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import LearningPlanList from '../components/LearningPlanList';
 import PlanPartTaskList from '../components/PlanPartTaskList';
-import SuggestedTargetCard from '../components/SuggestedTargetCard';
+import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import { planStageLabel } from '../planLabels';
@@ -132,19 +132,28 @@ function GeneratePlanPage() {
 
   return (
     <div className={cx('wrapper')}>
+      <TargetPlanTabs active="plan" examTypeId={sourceExamTypeId} />
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>Sinh lộ trình vượt ải</h2>
       </div>
 
       <p className={cx('subtitle')}>
-        Một plan gồm nhiều Part (không trộn đề). Mỗi Part: mọi tag yếu (luyện ~50 câu/tag) → hai ải tổng ôn Part (mỗi ải ~200% số câu chuẩn của Part) → pass hết thì làm mock kiểm tra.
+        Kế hoạch học tập tạo dựa trên bài thi của bạn. Mỗi Part: mọi tag yếu (luyện ~50 câu/tag) → hai ải tổng ôn Part (mỗi ải ~200% số câu chuẩn của Part) → pass hết thì làm mock kiểm tra.
       </p>
 
       {sourceExamTypeId && !loadingTarget && !hasTarget && (
-        <SuggestedTargetCard
-          examTypeId={sourceExamTypeId}
-          examTypeName={sourceExamTypeName}
-        />
+        <div className={cx('alert', 'alertWarning')}>
+          <span>
+            Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;.
+            Sang tab <strong>Mục tiêu</strong> đặt trước (có mốc gợi ý sẵn), rồi quay lại đây sinh lộ trình.
+          </span>
+          <Link
+            to={`/my-target?examTypeId=${encodeURIComponent(sourceExamTypeId)}`}
+            className={cx('btn', 'btnPrimary', 'btnSm')}
+          >
+            Đặt mục tiêu
+          </Link>
+        </div>
       )}
 
       <div className={cx('card')}>

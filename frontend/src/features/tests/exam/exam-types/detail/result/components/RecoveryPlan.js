@@ -15,9 +15,9 @@ function RecoveryPlan({
   isGuest,
 }) {
   const navigate = useNavigate();
-  // Chưa có target vẫn lập kế hoạch được: trang generate có card "mục tiêu gợi ý 1-click".
+  // Chỉ 1 nút mỗi trạng thái: chưa có target → tab Mục tiêu; có target chưa đạt → Lập kế hoạch.
   const canCreateTarget = !isGuest && !hasTarget && Boolean(examTypeId);
-  const canCreatePlan = !isGuest && !isTargetMet && Boolean(examTypeId);
+  const canCreatePlan = !isGuest && hasTarget && !isTargetMet;
 
   if (!recoveryMessage && !canCreateTarget && !canCreatePlan) return null;
 
@@ -43,6 +43,15 @@ function RecoveryPlan({
       {recoveryMessage && (
         <p className={cx('recoveryMessage')}>{recoveryMessage}</p>
       )}
+      {canCreateTarget && (
+        <button
+          type="button"
+          className={cx('recoveryPlanCta', 'recoveryTargetCta')}
+          onClick={handleGoToTarget}
+        >
+          Đặt mục tiêu
+        </button>
+      )}
       {canCreatePlan && (
         <button
           type="button"
@@ -51,15 +60,6 @@ function RecoveryPlan({
         >
           <IoCalendarOutline size={20} aria-hidden />
           Lập kế hoạch học
-        </button>
-      )}
-      {canCreateTarget && (
-        <button
-          type="button"
-          className={cx('recoveryPlanCta', 'recoveryTargetCta')}
-          onClick={handleGoToTarget}
-        >
-          Đặt mục tiêu thủ công
         </button>
       )}
     </div>
