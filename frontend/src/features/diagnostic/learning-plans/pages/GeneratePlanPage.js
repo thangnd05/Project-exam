@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import LearningPlanList from '../components/LearningPlanList';
 import PlanPartTaskList from '../components/PlanPartTaskList';
+import SuggestedTargetCard from '../components/SuggestedTargetCard';
+import InfoTip from '~/shared/ui/InfoTip/InfoTip';
+import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import { planStageLabel } from '../planLabels';
 import { getReadinessLabel } from '~/features/diagnostic/target/utils/readiness-label';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
@@ -138,18 +141,10 @@ function GeneratePlanPage() {
       </p>
 
       {sourceExamTypeId && !loadingTarget && !hasTarget && (
-        <div className={cx('alert', 'alertWarning')}>
-          <span>
-            Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;.
-            Cần mục tiêu (điểm + % từng Part) trước khi sinh lộ trình.
-          </span>
-          <Link
-            to={`/my-target?examTypeId=${encodeURIComponent(sourceExamTypeId)}`}
-            className={cx('btn', 'btnPrimary', 'btnSm')}
-          >
-            Đặt mục tiêu
-          </Link>
-        </div>
+        <SuggestedTargetCard
+          examTypeId={sourceExamTypeId}
+          examTypeName={sourceExamTypeName}
+        />
       )}
 
       <div className={cx('card')}>
@@ -260,7 +255,8 @@ function GeneratePlanPage() {
             <ul className={cx('metaList')}>
               <li><strong>Giai đoạn:</strong> {planStageLabel(result.planStage)}</li>
               <li>
-                <strong>Độ sẵn sàng (chẩn đoán):</strong>{' '}
+                <strong>Độ sẵn sàng (chẩn đoán):</strong>
+                <InfoTip text={TERM_TIPS.readiness} />{' '}
                 {result.baselineReadiness ?? result.currentReadiness}% ({getReadinessLabel(result.readinessLevel)})
               </li>
               <li><strong>Mục tiêu:</strong> {result.targetScore ?? 'N/A'}</li>

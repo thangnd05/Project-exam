@@ -3,6 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
+import InfoTip from '~/shared/ui/InfoTip/InfoTip';
+import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import { formatGapToPass } from '~/shared/utils/taskProgress';
 import { planStageLabel } from '~/features/diagnostic/learning-plans/planLabels';
 import { useExamTypes, useNextStepOverview } from './hooks/useNextStep';
@@ -45,6 +47,19 @@ function NextStepPage() {
 
   const recommendation = useMemo(() => {
     if (!target?.hasTarget) {
+      // Đã có bài thi → trang sinh lộ trình tự phục vụ được cả mục tiêu gợi ý (1 chạm) lẫn plan.
+      if (latestCompletedTest) {
+        return {
+          kind: 'set-target',
+          title: 'Xác nhận mục tiêu gợi ý rồi sinh lộ trình ngay',
+          desc: 'Bạn đã có bài thi hoàn thành. Chỉ cần xác nhận mục tiêu gợi ý (1 chạm) là hệ thống sinh được lộ trình cá nhân hoá từ bài gần nhất.',
+          ctaLabel: 'Sinh lộ trình',
+          ctaTo: `/learning-plans/generate?examTypeId=${examTypeId}&userTestId=${latestCompletedTest.userTestId}`,
+          extras: [
+            { label: 'Đặt mục tiêu thủ công', to: `/my-target?examTypeId=${examTypeId}` },
+          ],
+        };
+      }
       return {
         kind: 'set-target',
         title: 'Hãy đặt mục tiêu cho kỳ thi này trước',
@@ -233,6 +248,9 @@ function NextStepPage() {
                       enhanced?.readinessScore != null ? ` · độ sẵn sàng ${enhanced.readinessScore}%` : ''
                     }`
                   : <span className={cx('muted')}>chưa có</span>}
+                {latestCompletedTest && enhanced?.readinessScore != null && (
+                  <InfoTip text={TERM_TIPS.readiness} />
+                )}
               </li>
               <li>
                 <strong>Plan đang học:</strong>{' '}

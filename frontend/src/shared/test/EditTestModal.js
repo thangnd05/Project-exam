@@ -5,6 +5,7 @@ import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import { getAdminTestById, updateTest } from '~/shared/api/testApi';
 import { getExamTypes } from '~/shared/api/examTypeApi';
+import { getExamCategories } from '~/shared/api/examCategoryApi';
 import { getQuestionCollections } from '~/shared/api/questionCollectionApi';
 import { buildCollectionTree } from '~/shared/utils/collectionTree';
 import { useHasPermission } from '~/shared/hooks/usePermission';
@@ -25,6 +26,7 @@ const cxCreate = classNames.bind(createModalStyles);
 const EditTestModal = ({ show, onHide, test, onSuccess }) => {
   const canSetPricing = useHasPermission('TEST:MANAGE_PRICING');
   const [examTypes, setExamTypes] = useState([]);
+  const [examCategories, setExamCategories] = useState([]);
   const [questionCollections, setQuestionCollections] = useState([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [testDetail, setTestDetail] = useState(null);
@@ -34,6 +36,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     title: '',
     description: '',
     examTypeId: '',
+    examCategoryId: '',
     collectionId: '',
     durationMinutes: '',
     maxAttempts: '',
@@ -46,12 +49,14 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
   useEffect(() => {
     if (show) {
       fetchExamTypes();
+      fetchExamCategories();
       fetchQuestionCollections();
       if (test) {
         setFormData({
           title: test.title || '',
           description: test.description || '',
           examTypeId: test.examType?.examTypeId || test.examTypeId || '',
+          examCategoryId: test.examCategoryId || '',
           collectionId: test.collectionId || '',
           durationMinutes: test.durationMinutes || '',
           maxAttempts: test.maxAttempts || '',
@@ -78,6 +83,12 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     try {
       const data = await getAdminTestById(id);
       setTestDetail(data);
+      // Row ở bảng list có thể thiếu examCategoryId — bổ sung từ detail nếu form đang trống.
+      if (data?.examCategoryId) {
+        setFormData((prev) =>
+          prev.examCategoryId ? prev : { ...prev, examCategoryId: data.examCategoryId },
+        );
+      }
     } catch (error) {
       console.error('Failed to load test detail', error);
       toast.error('Không tải được danh sách câu hỏi của đề');
@@ -96,6 +107,16 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       }
     } catch (error) {
       console.error('Failed to load exam types', error);
+    }
+  };
+
+  const fetchExamCategories = async () => {
+    try {
+      const data = await getExamCategories();
+      setExamCategories(Array.isArray(data) ? data : (data?.data || []));
+    } catch (error) {
+      console.error('Failed to load exam categories', error);
+      setExamCategories([]);
     }
   };
 
@@ -145,6 +166,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       description: formData.description || null,
       examTypeId: String(formData.examTypeId),
 
+      // examCategoryId: gửi chuỗi rỗng để gỡ phân loại, có giá trị để gán/đổi (giống collectionId).
+      examCategoryId: formData.examCategoryId ? String(formData.examCategoryId) : '',
       collectionId: formData.collectionId ? String(formData.collectionId) : '',
       durationMinutes:
         formData.durationMinutes && Number(formData.durationMinutes) > 0
@@ -289,6 +312,27 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
                   {examTypes.filter((type) => !type.childCount).map((type) => (
                     <option key={type.examTypeId} value={type.examTypeId}>
                       {type.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </Col>
+
+            <Col md={6}>
+              <div className={cxCreate('formGroupModern')}>
+                <label>Phân loại bài thi (tuỳ chọn)</label>
+                <select
+                  className={cxCreate('inputModern')}
+                  value={formData.examCategoryId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, examCategoryId: e.target.value })
+                  }
+                  aria-label="Phân loại bài thi"
+                >
+                  <option value="">-- Không phân loại --</option>
+                  {examCategories.map((c) => (
+                    <option key={c.examCategoryId} value={c.examCategoryId}>
+                      {c.name}
                     </option>
                   ))}
                 </select>

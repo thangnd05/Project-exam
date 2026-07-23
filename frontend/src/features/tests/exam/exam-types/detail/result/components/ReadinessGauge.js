@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import InfoTip from '~/shared/ui/InfoTip/InfoTip';
+import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import styles from './Result.module.scss';
 import { brandColors } from '~/shared/styles/brandColors';
 
@@ -75,6 +77,7 @@ function ReadinessGauge({ enhanced }) {
         <div className={cx('gaugeInfo')}>
           <h3 className={cx('gaugeTitle')} style={{ color: effectiveColor }}>
             {gaugeTitle}
+            {!isQuickChallenge && !hasTarget && <InfoTip text={TERM_TIPS.readiness} />}
           </h3>
           <p className={cx('gaugeMessage')}>
             {gaugeMessage}

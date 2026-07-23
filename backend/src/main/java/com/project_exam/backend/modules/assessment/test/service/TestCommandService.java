@@ -112,7 +112,10 @@ public class TestCommandService {
         if (request.getMaxAttempts() != null) test.setMaxAttempts(request.getMaxAttempts());
         if (request.getClassId() != null) test.setClassId(request.getClassId());
         if (request.getChapterId() != null) test.setChapterId(request.getChapterId());
-        if (request.getExamCategoryId() != null) test.setExamCategoryId(request.getExamCategoryId());
+        // examCategoryId: gửi chuỗi rỗng để gỡ phân loại, có giá trị để gán/đổi (giống collectionId).
+        if (request.getExamCategoryId() != null) {
+            test.setExamCategoryId(request.getExamCategoryId().isBlank() ? null : request.getExamCategoryId());
+        }
         // collectionId: gửi chuỗi rỗng để gỡ bộ đề, có giá trị để gán/đổi.
         if (request.getCollectionId() != null) {
             test.setCollectionId(request.getCollectionId().isBlank() ? null : request.getCollectionId());

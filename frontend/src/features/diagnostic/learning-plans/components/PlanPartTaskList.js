@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
+import InfoTip from '~/shared/ui/InfoTip/InfoTip';
+import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
 import { formatGapToPass, isTaskStuck } from '~/shared/utils/taskProgress';
@@ -47,6 +49,7 @@ function PlanPartTaskList({
             <span className={cx('badge', 'badgePrimary')}>
               {group.passedTasksInPart}/{group.totalTasksInPart} ải
               {group.passAccuracy != null ? ` · cần ≥${group.passAccuracy}%` : ''}
+              {group.passAccuracy != null && <InfoTip text={TERM_TIPS.passThreshold} />}
             </span>
           </div>
           <div className={cx('partGroupBody')}>

@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import InfoTip from '~/shared/ui/InfoTip/InfoTip';
+import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import { usePlanDetail } from './hooks/usePlanDetail';
 import { planStageLabel, planStatusLabel } from '../planLabels';
@@ -95,7 +97,8 @@ function PlanDetailPage() {
               {planStageLabel(plan.planStage)}
             </li>
             <li>
-              <strong>Độ sẵn sàng lúc tạo plan:</strong>{' '}
+              <strong>Độ sẵn sàng lúc tạo plan:</strong>
+              <InfoTip text={TERM_TIPS.readiness} />{' '}
               {baseline != null ? `${baseline}%` : '—'}
               {plan.readinessLevel ? ` (${getReadinessLabel(plan.readinessLevel)})` : ''}
             </li>
@@ -129,6 +132,7 @@ function PlanDetailPage() {
         <>
           <h3 id="chon-ai-hoc" className={cx('sectionTitle')} style={{ fontSize: 'var(--font-size-lg)', marginTop: '2rem', marginBottom: '1.2rem' }}>
             Chọn Part và ải để học ({partGroups.length})
+            <InfoTip text={TERM_TIPS.task} />
           </h3>
           <PlanPartTaskList
             partGroups={partGroups}

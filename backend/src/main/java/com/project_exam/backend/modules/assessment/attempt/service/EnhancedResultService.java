@@ -339,7 +339,7 @@ public class EnhancedResultService {
                     : "Bạn còn thiếu " + (targetScore - ts) + " điểm nữa để đạt mục tiêu.";
             return new GaugeInfo(gaugePercentage, ts + "/" + targetScore, "Mục tiêu", title, message);
         }
-        return new GaugeInfo(readinessScore, readinessScore + "%", "Readiness",
+        return new GaugeInfo(readinessScore, readinessScore + "%", "Độ sẵn sàng",
                 getGaugeTitle(readinessLevel), getGaugeMessage(readinessLevel));
     }
 
@@ -350,7 +350,7 @@ public class EnhancedResultService {
                     "Hãy lập kế hoạch học để luyện tập theo những phần thi bạn chưa đạt mục tiêu đề ra.";
         } else if (!hasTarget && readinessScore < 85) {
             int nextTarget = Math.min(readinessScore + 10, 100);
-            return "Mục tiêu: tăng readiness từ " + readinessScore + "% lên " + nextTarget + "%. " +
+            return "Mục tiêu: tăng độ sẵn sàng từ " + readinessScore + "% lên " + nextTarget + "%. " +
                     "Hãy đặt mục tiêu điểm và aim từng phần thi để hệ thống gợi ý lộ trình phù hợp.";
         }
         return null;
