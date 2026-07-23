@@ -16,6 +16,14 @@ function planBaselineReadiness(plan) {
   return plan.baselineReadiness ?? plan.currentReadiness ?? null;
 }
 
+// Tìm ải được BE gợi ý làm tiếp (cùng logic với NextStepPage).
+function findRecommendedTask(plan) {
+  if (!plan?.recommendedTaskId) return null;
+  const all = (plan.partGroups || []).flatMap((g) => g.tasks || []);
+  const pool = all.length ? all : plan.tasks || [];
+  return pool.find((t) => t.taskId === plan.recommendedTaskId) || null;
+}
+
 function PlanDetailPage() {
   const { learningPlanId } = useParams();
   const { plan, error, loading } = usePlanDetail(learningPlanId);
@@ -43,6 +51,11 @@ function PlanDetailPage() {
     : groupTasksByPart(plan.tasks || []);
   const baseline = planBaselineReadiness(plan);
   const isReplaced = plan.status === 'REPLACED';
+  const recommendedTask = findRecommendedTask(plan);
+  const totalTasks = plan.totalTasks ?? 0;
+  const progressPct = totalTasks > 0
+    ? Math.round(((plan.passedTasks ?? 0) / totalTasks) * 100)
+    : 0;
 
   return (
     <div className={cx('wrapper')}>
@@ -95,44 +108,64 @@ function PlanDetailPage() {
         </div>
       )}
 
-      <div className={cx('card')}>
-        <div className={cx('cardBody')}>
-          {plan.summary && (
-            <p style={{ marginBottom: '1.2rem', fontSize: 'var(--font-size-ssm)' }}>
-              {plan.summary}
-            </p>
+      <div className={cx('planHero')}>
+        <div className={cx('planHeroTop')}>
+          <div>
+            <div className={cx('planHeroEyebrow')}>
+              Lộ trình #{plan.planSequence ?? '?'} · {planStatusLabel(plan.status)}
+            </div>
+            <h3 className={cx('planHeroTitle')}>
+              {plan.planStage === 'MOCK'
+                ? 'Đã vượt hết ải — sẵn sàng thi thử!'
+                : recommendedTask
+                  ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${recommendedTask.tagName}`
+                  : 'Chinh phục từng ải để chạm mục tiêu'}
+            </h3>
+            <div className={cx('planHeroBadges')}>
+              <span className={cx('planHeroBadge')}>
+                Giai đoạn: {planStageLabel(plan.planStage)}
+              </span>
+              <span className={cx('planHeroBadge')}>
+                Độ sẵn sàng lúc tạo: {baseline != null ? `${baseline}%` : '—'}
+                {plan.readinessLevel ? ` · ${getReadinessLabel(plan.readinessLevel)}` : ''}
+              </span>
+            </div>
+          </div>
+          {!isReplaced && recommendedTask && plan.planStage !== 'MOCK' && (
+            <Link
+              to={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
+              className={cx('planHeroCta')}
+            >
+              Học ải ngay →
+            </Link>
           )}
-          <ul className={cx('metaList')} style={{ marginBottom: 0 }}>
-            <li>
-              <strong>Trạng thái:</strong>{' '}
-              {planStatusLabel(plan.status)}
-            </li>
-            <li>
-              <strong>Giai đoạn:</strong>{' '}
-              {planStageLabel(plan.planStage)}
-            </li>
-            <li>
-              <strong>Độ sẵn sàng lúc tạo plan:</strong>
-              <InfoTip text={TERM_TIPS.readiness} />{' '}
-              {baseline != null ? `${baseline}%` : '—'}
-              {plan.readinessLevel ? ` (${getReadinessLabel(plan.readinessLevel)})` : ''}
-            </li>
-            <li>
-              <strong>Tiến độ ải:</strong>{' '}
-              {plan.passedTasks ?? 0}/{plan.totalTasks ?? 0} đã vượt
-            </li>
-            <li className={cx('muted', 'small')}>
-              Mỗi bài làm mới sinh <strong>lộ trình mới</strong> (lộ trình cũ giữ lịch sử, không sửa đè ải).
-            </li>
-          </ul>
         </div>
+
+        <div className={cx('planHeroProgressLabel')}>
+          <span>
+            Tiến độ: <strong>{plan.passedTasks ?? 0}/{plan.totalTasks ?? 0}</strong> ải đã vượt
+          </span>
+          <strong>{progressPct}%</strong>
+        </div>
+        <div className={cx('planHeroProgressBar')}>
+          <div
+            className={cx('planHeroProgressFill')}
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+
+        <p className={cx('planHeroNote')}>
+          Mỗi bài làm mới sinh lộ trình mới (lộ trình cũ giữ lịch sử, không sửa đè ải).
+        </p>
       </div>
 
       {!isReplaced && plan.planStage === 'FOUNDATION' && (
         <div className={cx('alert')}>
-          Lộ trình này được chẩn đoán từ bài bạn đã làm gần nhất. Ôn xong các ải,
-          hãy làm một <strong>bài thi thử đầy đủ</strong> để kiểm tra lại và cập nhật độ chính
-          xác của chẩn đoán (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
+          <span>
+            Lộ trình này được chẩn đoán từ bài bạn đã làm gần nhất. Ôn xong các ải,
+            hãy làm một <strong>bài thi thử đầy đủ</strong> để kiểm tra lại và cập nhật
+            độ chính xác của chẩn đoán (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
+          </span>
         </div>
       )}
 

@@ -1171,6 +1171,109 @@
   }
 }
 
+// Hero trang chi tiết lộ trình: gradient chuẩn + thanh tiến độ + CTA "Học ải ngay".
+.planHero {
+  background: var(--primary-btn-gradient);
+  color: var(--white, #fff);
+  border-radius: var(--radius-xl, 16px);
+  padding: 2rem 2.4rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--primary-btn-shadow);
+}
+
+.planHeroTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.6rem;
+}
+
+.planHeroEyebrow {
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-semibold);
+  opacity: 0.85;
+  margin-bottom: 0.4rem;
+}
+
+.planHeroTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 0.8rem;
+  color: inherit;
+}
+
+.planHeroBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.planHeroBadge {
+  font-size: var(--font-size-sm);
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: inherit;
+  white-space: nowrap;
+}
+
+.planHeroCta {
+  display: inline-block;
+  padding: 1.1rem 2.2rem;
+  border-radius: var(--radius-md);
+  background: var(--white, #fff);
+  color: var(--primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transition: transform 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    color: var(--primary);
+  }
+}
+
+.planHeroProgressLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: var(--font-size-sm);
+  margin-bottom: 0.5rem;
+
+  strong {
+    font-size: var(--font-size-md);
+  }
+}
+
+.planHeroProgressBar {
+  height: 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+.planHeroProgressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--white, #fff);
+  transition: width 0.6s ease;
+}
+
+.planHeroNote {
+  margin: 1rem 0 0;
+  font-size: var(--font-size-sm);
+  opacity: 0.85;
+}
+
 // Header hướng dẫn dạng 3 bước (thay subtitle dài) — user quét nhanh là hiểu flow.
 .stepsGuide {
   display: flex;

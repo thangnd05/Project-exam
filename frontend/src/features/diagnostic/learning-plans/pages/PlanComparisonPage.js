@@ -60,7 +60,7 @@ function PlanComparisonPage() {
     <div className={cx('wrapper')}>
       <TargetPlanTabs active="compare" examTypeId={examTypeId} />
       <div className={cx('headerBar')}>
-        <h2 className={cx('title')}>So sánh các Plan</h2>
+        <h2 className={cx('title')}>So sánh các lộ trình</h2>
         <div className={cx('actionBar')}>
           <ButtonPrime
             as="link"
@@ -68,7 +68,7 @@ function PlanComparisonPage() {
             variant="outline"
             size="sm"
           >
-            Danh sách plan
+            Danh sách lộ trình
           </ButtonPrime>
           <ButtonPrime
             as="link"
@@ -104,9 +104,9 @@ function PlanComparisonPage() {
 
       {!loading && sorted.length === 0 && (
         <div className={cx('alert', 'alertInfo')}>
-          <span>Chưa có plan nào cho kỳ thi này.</span>
+          <span>Chưa có lộ trình nào cho kỳ thi này.</span>
           <ButtonPrime as="link" to="/learning-plans/generate" variant="primary" size="sm">
-            Sinh plan đầu tiên
+            Sinh lộ trình đầu tiên
           </ButtonPrime>
         </div>
       )}
@@ -153,7 +153,7 @@ function PlanComparisonPage() {
                         </span>
                       )}
                     </li>
-                    <li><strong>Giai đoạn:</strong> {STAGE_LABEL[p.planStage] || '—'}</li>
+                    <li><strong>Giai đoạn:</strong> {planStageLabel(p.planStage)}</li>
                     <li>
                       <strong>Ải đã qua:</strong>{' '}
                       {p.passedTasks ?? 0}/{p.totalTasks ?? 0}
@@ -170,7 +170,7 @@ function PlanComparisonPage() {
                     {p.replacedByPlanId && (
                       <li>
                         <Link to={`/learning-plans/${p.replacedByPlanId}`}>
-                          Đã thay bằng plan kế tiếp →
+                          Đã thay bằng lộ trình kế tiếp →
                         </Link>
                       </li>
                     )}
