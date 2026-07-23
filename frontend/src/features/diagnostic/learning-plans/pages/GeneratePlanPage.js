@@ -328,7 +328,7 @@ function GeneratePlanPage() {
         showExamTypeBadge
         title="Lộ trình đã sinh"
         emptyMessage={null}
-        showCompareLink={false}
+        showRefreshButton={false}
       />
     </div>
   );

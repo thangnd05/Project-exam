@@ -38,6 +38,10 @@ public class PlanResponse {
 
     private String planStage;
     private String userTargetId;
+
+    /** true khi plan ACTIVE sinh theo mục tiêu khác mục tiêu hiện tại (đã đổi/xoá target) — FE nhắc sinh lộ trình mới. */
+    private Boolean targetOutdated;
+
     private Integer passAccuracyDefault;
     private Instant createdAt;
 

@@ -80,6 +80,21 @@ function PlanDetailPage() {
         </div>
       )}
 
+      {!isReplaced && plan.targetOutdated && (
+        <div className={cx('alert', 'alertWarning')}>
+          <span>
+            Lộ trình này sinh theo <strong>mục tiêu cũ</strong> — ngưỡng vượt ải chưa áp
+            mục tiêu hiện tại. Sinh lộ trình mới để cập nhật.
+          </span>
+          <Link
+            to={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
+            className={cx('btn', 'btnPrimary', 'btnSm')}
+          >
+            Sinh lộ trình mới
+          </Link>
+        </div>
+      )}
+
       <div className={cx('card')}>
         <div className={cx('cardBody')}>
           {plan.summary && (

@@ -585,7 +585,23 @@ public class LearningPlanService {
                 mapTaskDtos(tasks, resourcesByTag, tagMap, partMap),
                 buildPartGroups(tasks, resourcesByTag, tagMap, partMap));
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, partMap));
+        response.setTargetOutdated(isTargetOutdated(plan));
         return response;
+    }
+
+    /**
+     * Plan ACTIVE nhưng target lúc sinh khác target hiện tại (đã đổi/xoá) → ngưỡng ải là snapshot cũ.
+     * So sánh null-safe: plan sinh không target + giờ đã có target cũng tính là outdated.
+     */
+    private boolean isTargetOutdated(LearningPlan plan) {
+        if (plan.getStatus() != LearningPlan.Status.ACTIVE) {
+            return false;
+        }
+        String currentTargetId = userTargetRepository
+                .findByUserIdAndExamTypeId(plan.getUserId(), plan.getExamTypeId())
+                .map(UserTarget::getUserTargetId)
+                .orElse(null);
+        return !Objects.equals(plan.getUserTargetId(), currentTargetId);
     }
 
     private PlanResponse buildTargetAchievedResponse(
