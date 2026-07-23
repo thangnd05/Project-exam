@@ -61,24 +61,6 @@ function PlanComparisonPage() {
       <TargetPlanTabs active="compare" examTypeId={examTypeId} />
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>So sánh các lộ trình</h2>
-        <div className={cx('actionBar')}>
-          <ButtonPrime
-            as="link"
-            to={examTypeId ? `/learning-plans/generate?examTypeId=${examTypeId}` : '/learning-plans/generate'}
-            variant="outline"
-            size="sm"
-          >
-            Danh sách lộ trình
-          </ButtonPrime>
-          <ButtonPrime
-            as="link"
-            to={examTypeId ? `/my-target/dashboard?examTypeId=${examTypeId}` : '/my-target/dashboard'}
-            variant="outline"
-            size="sm"
-          >
-            Tổng quan mục tiêu
-          </ButtonPrime>
-        </div>
       </div>
 
       <div className={cx('filterRow')}>

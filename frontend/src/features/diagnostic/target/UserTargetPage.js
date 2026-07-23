@@ -212,20 +212,6 @@ function UserTargetPage() {
       <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} />
       <div className={planCx('headerBar')}>
         <h2 className={classNames(planCx('title'), cx('pageTitle'))}>Mục tiêu của tôi</h2>
-        <div className={planCx('actionBar')}>
-          <ButtonPrime
-            as="link"
-            to={
-              selectedExamTypeId
-                ? `/my-target/dashboard?examTypeId=${selectedExamTypeId}`
-                : '/my-target/dashboard'
-            }
-            variant="outline"
-            size="sm"
-          >
-            Tổng quan
-          </ButtonPrime>
-        </div>
       </div>
 
       {hasSavedTarget && (

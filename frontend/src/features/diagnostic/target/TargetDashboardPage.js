@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
 import { formatDateTime24 as formatDate, formatDayMonth } from '~/shared/utils/format-date-time';
 import TargetDashboardMockSparkline from './components/TargetDashboardMockSparkline';
@@ -98,12 +99,10 @@ function TargetDashboardPage() {
 
   return (
     <div className={cx('wrapper')}>
+      <TargetPlanTabs active="overview" examTypeId={examTypeId} />
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>Tổng quan mục tiêu</h2>
         <div className={cx('actionBar')}>
-          <ButtonPrime as="link" to="/my-target" variant="outline" size="sm">
-            Cài đặt target
-          </ButtonPrime>
           <ButtonPrime
             as="link"
             to={examTypeId ? `/my-target/mocks?examTypeId=${examTypeId}` : '/my-target/mocks'}
@@ -111,14 +110,6 @@ function TargetDashboardPage() {
             size="sm"
           >
             Lịch sử thi thử
-          </ButtonPrime>
-          <ButtonPrime
-            as="link"
-            to={examTypeId ? `/learning-plans/compare?examTypeId=${examTypeId}` : '/learning-plans/generate'}
-            variant="outline"
-            size="sm"
-          >
-            So sánh Plan
           </ButtonPrime>
         </div>
       </div>

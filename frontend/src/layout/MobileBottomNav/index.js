@@ -258,7 +258,7 @@ function MobileBottomNav() {
                   <div className={cx('menuList')}>
                     {user && (
                       <Link
-                        to={routes.nextStep}
+                        to={routes.myTarget}
                         className={cx('menuItem')}
                         onClick={closeSheet}
                       >

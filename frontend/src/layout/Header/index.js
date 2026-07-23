@@ -87,7 +87,7 @@ function Header() {
                   Bài viết
                 </Nav.Link>
                 {user && (
-                  <Nav.Link as={NavLink} to={routes.nextStep} className={cx('home')}>
+                  <Nav.Link as={NavLink} to={routes.myTarget} className={cx('home')}>
                     Lộ trình
                   </Nav.Link>
                 )}
