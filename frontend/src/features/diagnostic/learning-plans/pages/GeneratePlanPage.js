@@ -137,9 +137,35 @@ function GeneratePlanPage() {
         <h2 className={cx('title')}>Sinh lộ trình vượt ải</h2>
       </div>
 
-      <p className={cx('subtitle')}>
-        Kế hoạch học tập tạo dựa trên bài thi của bạn. Mỗi Part: mọi tag yếu (luyện ~50 câu/tag) → hai ải tổng ôn Part (mỗi ải ~200% số câu chuẩn của Part) → pass hết thì làm mock kiểm tra.
-      </p>
+      <div className={cx('stepsGuide')}>
+        <div className={cx('stepItem')}>
+          <span className={cx('stepNum')}>1</span>
+          <div>
+            <div className={cx('stepTitle')}>Chọn bài thi đã làm</div>
+            <div className={cx('stepDesc')}>
+              Hệ thống chẩn đoán điểm yếu của bạn từ bài này.
+            </div>
+          </div>
+        </div>
+        <div className={cx('stepItem')}>
+          <span className={cx('stepNum')}>2</span>
+          <div>
+            <div className={cx('stepTitle')}>Sinh lộ trình</div>
+            <div className={cx('stepDesc')}>
+              Lộ trình chia theo từng phần thi, mỗi phần là chuỗi ải cần vượt.
+            </div>
+          </div>
+        </div>
+        <div className={cx('stepItem')}>
+          <span className={cx('stepNum')}>3</span>
+          <div>
+            <div className={cx('stepTitle')}>Vượt ải rồi thi thử</div>
+            <div className={cx('stepDesc')}>
+              Vượt hết ải thì làm bài thi thử để kiểm tra lại và cập nhật lộ trình.
+            </div>
+          </div>
+        </div>
+      </div>
 
       {sourceExamTypeId && !loadingTarget && !hasTarget && (
         <div className={cx('alert', 'alertWarning')}>
@@ -159,9 +185,9 @@ function GeneratePlanPage() {
       <div className={cx('card')}>
         <div className={cx('cardBody')}>
           <form onSubmit={handleSubmit}>
-            <div className={cx('filterRow')} style={{ marginBottom: '1.6rem' }}>
-              <div className={cx('fieldGroup')}>
-                <label className={cx('fieldLabel')}>Loại kỳ thi (lọc bài nguồn)</label>
+            <div className={cx('filterRow')} style={{ marginBottom: '1.6rem', alignItems: 'flex-start' }}>
+              <div className={cx('fieldGroup')} style={{ flex: 1 }}>
+                <label className={cx('fieldLabel')}>Loại kỳ thi</label>
                 <select
                   className={cx('select')}
                   value={sourceExamTypeId}
@@ -179,16 +205,15 @@ function GeneratePlanPage() {
                   )}
                 </select>
                 <small className={cx('muted')}>
-                  Chỉ hiện mock/quick đã hoàn thành thuộc loại kỳ thi này.
+                  Chỉ hiện bài đã hoàn thành thuộc loại kỳ thi này.
                 </small>
               </div>
-            </div>
 
-            <div className={cx('fieldGroup')} style={{ width: '100%', marginBottom: '1.6rem' }}>
-              <label className={cx('fieldLabel')}>
-                Bài thi nguồn (đã COMPLETED)
-                {sourceExamTypeName ? ` · ${sourceExamTypeName}` : ''}
-              </label>
+              <div className={cx('fieldGroup')} style={{ flex: 1 }}>
+                <label className={cx('fieldLabel')}>
+                  Bài thi nguồn (đã hoàn thành)
+                  {sourceExamTypeName ? ` · ${sourceExamTypeName}` : ''}
+                </label>
               {loadingList ? (
                 <div className={cx('muted')}>Đang tải danh sách bài thi...</div>
               ) : userTests.length === 0 ? (
@@ -211,11 +236,12 @@ function GeneratePlanPage() {
                   {filteredUserTests.map((t) => (
                     <option key={t.userTestId} value={t.userTestId}>
                       {t.testTitle ? `${t.testTitle} — ` : ''}
-                      {formatDate(t.finishedAt)} · Score {t.totalScore ?? '—'}
+                      {formatDate(t.finishedAt)} · Điểm {t.totalScore ?? '—'}
                     </option>
                   ))}
                 </select>
               )}
+              </div>
             </div>
 
             <button

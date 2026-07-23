@@ -1171,6 +1171,53 @@
   }
 }
 
+// Header hướng dẫn dạng 3 bước (thay subtitle dài) — user quét nhanh là hiểu flow.
+.stepsGuide {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.stepItem {
+  flex: 1;
+  min-width: 22rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem 1.4rem;
+}
+
+.stepNum {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: var(--primary-alpha-10);
+  color: var(--primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepTitle {
+  font-size: var(--font-size-ssm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+  margin-bottom: 0.2rem;
+}
+
+.stepDesc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 // Thanh tab gộp khu "Mục tiêu" + "Lập kế hoạch" (TargetPlanTabs) — 2 route, 1 trải nghiệm.
 .pageTabs {
   display: flex;

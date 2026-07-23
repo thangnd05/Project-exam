@@ -54,7 +54,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 0.7rem;
+  margin-bottom: 0.7rem;
   flex-wrap: wrap;
 }
 
@@ -69,11 +69,20 @@
   padding: 0.3rem 0.7rem !important;
   transition: all 0.15s;
 
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
   &.active {
-    background: var(--input-bg);
-    color: var(--text-color);
-    border-color: var(--border-color);
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
     font-weight: var(--font-weight-semibold);
+
+    &:hover {
+      color: #fff;
+    }
   }
 }
 
@@ -224,7 +233,7 @@
 }
 
 .currentTargetCard {
-  margin-top: 1.4rem;
+  margin-bottom: 2rem;
   padding: 1.2rem 1.4rem;
   background: var(--bg-white);
   border: 1px solid var(--border-color);

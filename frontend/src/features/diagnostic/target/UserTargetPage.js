@@ -135,8 +135,11 @@ function UserTargetPage() {
         customParts: allParts,
       },
       {
-        onSuccess: () =>
-          toast.success('Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.'),
+        onSuccess: () => {
+          toast.success('Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.');
+          // Card "Mục tiêu hiện tại" nằm đầu trang — kéo lên cho user thấy ngay.
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
         onError: () => toast.error('Lỗi khi lưu mục tiêu.'),
       },
     );
@@ -226,20 +229,37 @@ function UserTargetPage() {
       </div>
 
       {hasSavedTarget && (
-        <div className={planCx('alert', 'alertSuccess')}>
-          <span>
-            Đã có mục tiêu <strong>{currentTarget.targetScore} điểm</strong> — bước tiếp
-            theo: sang tab <strong>Lập kế hoạch</strong> để sinh lộ trình học.
-          </span>
-          <ButtonPrime
-            as="link"
-            to={`/learning-plans/generate?examTypeId=${encodeURIComponent(selectedExamTypeId)}`}
-            variant="primary"
-            size="sm"
-          >
-            Sang Lập kế hoạch →
-          </ButtonPrime>
-        </div>
+        <section className={cx('currentTargetCard')} aria-label="Mục tiêu hiện tại">
+          <div className={cx('currentTargetHeader')}>
+            <span className={cx('currentTargetLabel')}>Mục tiêu hiện tại</span>
+            <span className={cx('currentTargetScore')}>{currentTarget.targetScore} điểm</span>
+          </div>
+          <div className={cx('currentTargetParts')}>
+            {sortPartsByLookup(currentTarget.partRequirements || [], examParts).map((p) => {
+              const total = getPartTotal(p.examPartId);
+              const num = percentToNum(p.requiredPercentage, total);
+              return (
+                <span key={p.examPartId} className={cx('currentTargetBadge')}>
+                  {getPartName(p.examPartId)}: {num}/{total} ({p.requiredPercentage}%)
+                </span>
+              );
+            })}
+          </div>
+          <div className={planCx('actionBar')} style={{ marginTop: '1rem' }}>
+            <ButtonPrime
+              as="link"
+              to={
+                selectedExamTypeId
+                  ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
+                  : '/learning-plans/generate'
+              }
+              variant="primary"
+              size="sm"
+            >
+              Sinh lộ trình vượt ải
+            </ButtonPrime>
+          </div>
+        </section>
       )}
 
       <div className={classNames(planCx('card'), cx('setupCard'))}>
@@ -269,6 +289,26 @@ function UserTargetPage() {
           {selectedExamTypeId && (
             <div className={classNames(planCx('fieldGroup'), cx('fieldFull'))}>
               <label className={cx('fieldLabelLarge')}>Điểm mục tiêu</label>
+              {milestones.length > 0 && (
+                <div className={cx('milestoneChips')}>
+                  <span className={cx('chipsLabel')}>Gợi ý từ admin:</span>
+                  {milestones.map((m) => (
+                    <button
+                      key={m.examTargetMilestoneId}
+                      type="button"
+                      className={classNames(planCx('badge'), cx('chip', {
+                        active: Number(targetScore) === m.milestoneScore,
+                      }))}
+                      onClick={() => {
+                        setTargetScore(String(m.milestoneScore));
+                        setCustomParts({});
+                      }}
+                    >
+                      {m.milestoneScore}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className={cx('scoreInputRow')}>
                 <input
                   type="number"
@@ -295,26 +335,6 @@ function UserTargetPage() {
                   </span>
                 )}
               </div>
-              {milestones.length > 0 && (
-                <div className={cx('milestoneChips')}>
-                  <span className={cx('chipsLabel')}>Gợi ý từ admin:</span>
-                  {milestones.map((m) => (
-                    <button
-                      key={m.examTargetMilestoneId}
-                      type="button"
-                      className={classNames(planCx('badge'), cx('chip', {
-                        active: Number(targetScore) === m.milestoneScore,
-                      }))}
-                      onClick={() => {
-                        setTargetScore(String(m.milestoneScore));
-                        setCustomParts({});
-                      }}
-                    >
-                      {m.milestoneScore}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           )}
 
@@ -410,39 +430,6 @@ function UserTargetPage() {
         </div>
       </div>
 
-      {hasSavedTarget && (
-        <section className={cx('currentTargetCard')} aria-label="Mục tiêu hiện tại">
-          <div className={cx('currentTargetHeader')}>
-            <span className={cx('currentTargetLabel')}>Mục tiêu hiện tại</span>
-            <span className={cx('currentTargetScore')}>{currentTarget.targetScore} điểm</span>
-          </div>
-          <div className={cx('currentTargetParts')}>
-            {sortPartsByLookup(currentTarget.partRequirements || [], examParts).map((p) => {
-              const total = getPartTotal(p.examPartId);
-              const num = percentToNum(p.requiredPercentage, total);
-              return (
-                <span key={p.examPartId} className={cx('currentTargetBadge')}>
-                  {getPartName(p.examPartId)}: {num}/{total} ({p.requiredPercentage}%)
-                </span>
-              );
-            })}
-          </div>
-          <div className={planCx('actionBar')} style={{ marginTop: '1rem' }}>
-            <ButtonPrime
-              as="link"
-              to={
-                selectedExamTypeId
-                  ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
-                  : '/learning-plans/generate'
-              }
-              variant="primary"
-              size="sm"
-            >
-              Sinh lộ trình vượt ải
-            </ButtonPrime>
-          </div>
-        </section>
-      )}
     </div>
   );
 }
