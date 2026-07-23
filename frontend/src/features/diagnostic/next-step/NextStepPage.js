@@ -67,7 +67,7 @@ function NextStepPage() {
         title: `Chúc mừng — đã đạt ${target.targetScore} điểm!`,
         desc: target.achievedAt
           ? `Mục tiêu đã đạt. Đặt mục tiêu mới để giữ phong độ.`
-          : `Mock gần nhất ${enhanced?.totalScore}đ ≥ mục tiêu. Đặt mục tiêu mới để giữ phong độ.`,
+          : `Bài thi thử gần nhất ${enhanced?.totalScore}đ ≥ mục tiêu. Đặt mục tiêu mới để giữ phong độ.`,
         ctaLabel: 'Đặt mục tiêu mới',
         ctaTo: `/my-target/achieved?examTypeId=${examTypeId}`,
       };
@@ -76,9 +76,9 @@ function NextStepPage() {
     if (!latestCompletedTest) {
       return {
         kind: 'do-quick',
-        title: 'Bắt đầu bằng một Quick Challenge để chẩn đoán nhanh',
-        desc: 'Chưa có bài thi nào hoàn thành. Làm một Quick Challenge (ngắn) để hệ thống biết điểm yếu và lập lộ trình — chưa cần Full Mock dài. Sau khi ôn, làm Full Mock để chẩn đoán chính xác hơn.',
-        ctaLabel: 'Chọn Quick Challenge',
+        title: 'Bắt đầu bằng một bài thử thách nhanh để chẩn đoán',
+        desc: 'Chưa có bài thi nào hoàn thành. Làm một bài thử thách nhanh (ngắn) để hệ thống biết điểm yếu và lập lộ trình — chưa cần thi thử đầy đủ. Sau khi ôn, làm bài thi thử đầy đủ để chẩn đoán chính xác hơn.',
+        ctaLabel: 'Chọn thử thách nhanh',
         ctaTo: mockTestsPath,
       };
     }
@@ -88,13 +88,13 @@ function NextStepPage() {
       if (stage === 'MOCK') {
         return {
           kind: 'do-mock',
-          title: 'Bạn đã pass hết ải — đến lúc làm Mock kiểm tra',
-          desc: `Plan #${activePlanDetail.planSequence} đã xong giai đoạn nền tảng. Làm một mock mới để cập nhật độ sẵn sàng.`,
-          ctaLabel: 'Làm mock',
+          title: 'Bạn đã vượt hết ải — đến lúc làm bài thi thử kiểm tra',
+          desc: `Lộ trình #${activePlanDetail.planSequence} đã xong giai đoạn nền tảng. Làm một bài thi thử mới để cập nhật độ sẵn sàng.`,
+          ctaLabel: 'Làm bài thi thử',
           ctaTo: mockTestsPath,
           extras: [
             {
-              label: `Xem Plan #${activePlanDetail.planSequence}`,
+              label: `Xem lộ trình #${activePlanDetail.planSequence}`,
               to: `/learning-plans/${activePlanDetail.learningPlanId}`,
             },
           ],
@@ -240,10 +240,10 @@ function NextStepPage() {
                 )}
               </li>
               <li>
-                <strong>Plan đang học:</strong>{' '}
+                <strong>Lộ trình đang học:</strong>{' '}
                 {activePlanDetail ? (
                   <>
-                    Plan #{activePlanDetail.planSequence} · {activePlanDetail.passedTasks ?? 0}/
+                    Lộ trình #{activePlanDetail.planSequence} · {activePlanDetail.passedTasks ?? 0}/
                     {activePlanDetail.totalTasks ?? 0} ải đã qua · giai đoạn {planStageLabel(activePlanDetail.planStage)}
                   </>
                 ) : (
@@ -251,12 +251,12 @@ function NextStepPage() {
                 )}
               </li>
               <li>
-                <strong>Tổng số plan:</strong> {plans.length}
+                <strong>Tổng số lộ trình:</strong> {plans.length}
                 {plans.length > 0 && (
                   <>
                     {' '}
                     <Link to={`/learning-plans/compare?examTypeId=${examTypeId}`}>
-                      So sánh các plan →
+                      So sánh các lộ trình →
                     </Link>
                   </>
                 )}

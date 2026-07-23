@@ -45,7 +45,7 @@ function PlanComparisonPage() {
 
       return {
         key: p.learningPlanId,
-        label: `Plan #${p.planSequence ?? '?'}`,
+        label: `Lộ trình #${p.planSequence ?? '?'}`,
         readiness,
         status: p.status,
         planStage: p.planStage,
@@ -129,7 +129,7 @@ function PlanComparisonPage() {
                   })}
                 >
                   <div className={cx('planHead')}>
-                    <span className={cx('planNo')}>Plan #{p.planSequence ?? '?'}</span>
+                    <span className={cx('planNo')}>Lộ trình #{p.planSequence ?? '?'}</span>
                     <span className={cx('badge', planStatusVariant(p.status))}>
                       {planStatusLabel(p.status)}
                     </span>
@@ -147,7 +147,7 @@ function PlanComparisonPage() {
                             flat: diff === 0,
                           })}
                         >
-                          ({diff > 0 ? '+' : ''}{diff}% so với Plan #{prev.planSequence})
+                          ({diff > 0 ? '+' : ''}{diff}% so với lộ trình #{prev.planSequence})
                         </span>
                       )}
                     </li>

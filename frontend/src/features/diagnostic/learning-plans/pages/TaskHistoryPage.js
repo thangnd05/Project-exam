@@ -12,7 +12,7 @@ const cx = classNames.bind(styles);
 
 const TASK_STATUS_LABEL = {
   ACTIVE: 'Đang học',
-  PASSED: 'Đã pass',
+  PASSED: 'Đã vượt',
   SKIPPED: 'Bỏ qua',
   LOCKED: 'Khoá',
 };
@@ -79,7 +79,7 @@ function TaskHistoryPage() {
           to={`/learning-plans/${learningPlanId}`}
           className={cx('btn', 'btnGhost', 'btnSm')}
         >
-          ← Plan #{plan.planSequence ?? '?'}
+          ← Lộ trình #{plan.planSequence ?? '?'}
         </Link>
         <Link
           to={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
@@ -97,7 +97,7 @@ function TaskHistoryPage() {
           Trạng thái: {TASK_STATUS_LABEL[task.status] || task.status}
         </span>
         <span className={cx('badge', 'badgeMuted')}>
-          Cần ≥ {pass}% để pass
+          Cần ≥ {pass}% để vượt ải
         </span>
         {isTaskStuck(task) && (
           <span className={cx('badge', 'badgeDanger')}>Đang bí</span>
@@ -136,7 +136,7 @@ function TaskHistoryPage() {
         </div>
 
         <div className={cx('statTile')}>
-          <div className={cx('statLabel')}>Ngưỡng pass</div>
+          <div className={cx('statLabel')}>Ngưỡng vượt ải</div>
           <div className={cx('statValue')}>{pass}%</div>
           {best != null && (
             <div className={cx('statHint', best >= pass ? 'successText' : 'warningText')}>
@@ -164,7 +164,7 @@ function TaskHistoryPage() {
               <div
                 className={cx('progressPassLine')}
                 style={{ left: `${pass}%` }}
-                title={`Ngưỡng pass ${pass}%`}
+                title={`Ngưỡng vượt ải ${pass}%`}
               />
             </div>
             <div className={cx('progressLegend')}>
@@ -220,9 +220,9 @@ function TaskHistoryPage() {
                 <th>Bắt đầu</th>
                 <th>Nộp</th>
                 <th className={cx('right')}>Số câu</th>
-                <th className={cx('right')}>Accuracy</th>
+                <th className={cx('right')}>Độ chính xác</th>
                 <th>Kết quả</th>
-                <th>Stage</th>
+                <th>Giai đoạn</th>
               </tr>
             </thead>
             <tbody>
@@ -239,9 +239,9 @@ function TaskHistoryPage() {
                     {s.status === 'IN_PROGRESS' ? (
                       <span className={cx('badge', 'badgeWarning')}>Đang làm</span>
                     ) : s.passed === true ? (
-                      <span className={cx('badge', 'badgeSuccess')}>Pass</span>
+                      <span className={cx('badge', 'badgeSuccess')}>Đạt</span>
                     ) : s.passed === false ? (
-                      <span className={cx('badge', 'badgeMuted')}>Chưa pass</span>
+                      <span className={cx('badge', 'badgeMuted')}>Chưa đạt</span>
                     ) : (
                       <span className={cx('muted', 'small')}>—</span>
                     )}

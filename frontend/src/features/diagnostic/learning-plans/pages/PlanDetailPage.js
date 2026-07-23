@@ -53,13 +53,13 @@ function PlanDetailPage() {
         </h2>
         <div className={cx('actionBar')}>
           <Link to="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
-            Sinh plan mới
+            Sinh lộ trình mới
           </Link>
           <Link
             to={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
             className={cx('btn', 'btnOutline', 'btnSm')}
           >
-            Tất cả plan
+            Tất cả lộ trình
           </Link>
         </div>
       </div>
@@ -68,13 +68,13 @@ function PlanDetailPage() {
 
       {isReplaced && (
         <div className={cx('alert', 'alertWarning')}>
-          <span>Plan này đã được thay bằng lộ trình mới (mock sau).</span>
+          <span>Lộ trình này đã được thay bằng lộ trình mới hơn.</span>
           {plan.replacedByPlanId && (
             <Link
               to={`/learning-plans/${plan.replacedByPlanId}`}
               className={cx('btn', 'btnPrimary', 'btnSm')}
             >
-              Xem plan mới →
+              Xem lộ trình mới →
             </Link>
           )}
         </div>
@@ -104,10 +104,10 @@ function PlanDetailPage() {
             </li>
             <li>
               <strong>Tiến độ ải:</strong>{' '}
-              {plan.passedTasks ?? 0}/{plan.totalTasks ?? 0} đã pass
+              {plan.passedTasks ?? 0}/{plan.totalTasks ?? 0} đã vượt
             </li>
             <li className={cx('muted', 'small')}>
-              Mỗi bài làm mới sinh <strong>plan mới</strong> (plan cũ giữ lịch sử, không sửa đè ải).
+              Mỗi bài làm mới sinh <strong>lộ trình mới</strong> (lộ trình cũ giữ lịch sử, không sửa đè ải).
             </li>
           </ul>
         </div>
@@ -116,7 +116,7 @@ function PlanDetailPage() {
       {!isReplaced && plan.planStage === 'FOUNDATION' && (
         <div className={cx('alert')}>
           Lộ trình này được chẩn đoán từ bài bạn đã làm gần nhất. Ôn xong các ải,
-          hãy làm một <strong>Full Mock</strong> để kiểm tra lại và cập nhật độ chính
+          hãy làm một <strong>bài thi thử đầy đủ</strong> để kiểm tra lại và cập nhật độ chính
           xác của chẩn đoán (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
         </div>
       )}

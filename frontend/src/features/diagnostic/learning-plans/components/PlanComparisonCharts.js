@@ -127,7 +127,7 @@ function PlanComparisonCharts({ chartData, examTypeName }) {
           </h3>
         </div>
         <p className={cx('chartCardDesc')}>
-          Trục ngang: thứ tự plan (#1 → mới nhất). Cột = độ sẵn sàng ban đầu khi tạo plan từ mock.
+          Trục ngang: thứ tự lộ trình (#1 → mới nhất). Cột = độ sẵn sàng ban đầu khi tạo lộ trình từ bài thi thử.
         </p>
 
         <div className={cx('chartContainer')}>
@@ -187,7 +187,7 @@ function PlanComparisonCharts({ chartData, examTypeName }) {
 
         <p className={cx('chartLegendNote')}>
           Xanh dương = đang học · xanh lá = hoàn thành · xám = đã thay · đỏ = đã bỏ.
-          Mốc ban đầu không đổi khi qua ải — chỉ mock mới + plan mới mới tăng độ sẵn sàng.
+          Mốc ban đầu không đổi khi qua ải — chỉ bài thi thử mới + lộ trình mới mới tăng độ sẵn sàng.
         </p>
       </div>
     </div>

@@ -227,7 +227,7 @@ function PlanStudyPage() {
                 <div className={cx('actionBar')}>
                   <span className={cx('badge', 'badgePrimary')}>{planStageLabel(session.planStage)}</span>
                   <span className={cx('badge', 'badgeMuted')}>
-                    {session.passedTasks}/{session.totalTasks} ải đã pass
+                    {session.passedTasks}/{session.totalTasks} ải đã vượt
                   </span>
                 </div>
               </div>

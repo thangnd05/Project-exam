@@ -211,18 +211,17 @@ function GeneratePlanPage() {
 
               <div className={cx('fieldGroup')} style={{ flex: 1 }}>
                 <label className={cx('fieldLabel')}>
-                  Bài thi nguồn (đã hoàn thành)
-                  {sourceExamTypeName ? ` · ${sourceExamTypeName}` : ''}
+                  Chọn bài thi muốn lập kế hoạch
                 </label>
               {loadingList ? (
                 <div className={cx('muted')}>Đang tải danh sách bài thi...</div>
               ) : userTests.length === 0 ? (
                 <div className={cx('alert', 'alertWarning')}>
-                  Bạn chưa có bài thi nào đã hoàn thành. Hãy làm Quick Challenge hoặc Full Mock trước.
+                  Bạn chưa có bài thi nào đã hoàn thành. Hãy làm một bài thử thách nhanh hoặc thi thử trước.
                 </div>
               ) : filteredUserTests.length === 0 ? (
                 <div className={cx('alert', 'alertWarning')}>
-                  Chưa có bài hoàn thành cho loại kỳ thi này. Hãy làm mock thuộc &quot;{sourceExamTypeName || 'kỳ thi đã chọn'}&quot; hoặc đổi loại kỳ thi.
+                  Chưa có bài hoàn thành cho loại kỳ thi này. Hãy làm bài thi thử thuộc &quot;{sourceExamTypeName || 'kỳ thi đã chọn'}&quot; hoặc đổi loại kỳ thi.
                 </div>
               ) : (
                 <select
@@ -265,7 +264,7 @@ function GeneratePlanPage() {
           <span>
             {result.summary}
             <br />
-            <small>Bạn có thể đặt mục tiêu cao hơn trong phần Target, hoặc tiếp tục làm mock để duy trì phong độ.</small>
+            <small>Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài thi thử để duy trì phong độ.</small>
           </span>
         </div>
       )}
@@ -274,7 +273,7 @@ function GeneratePlanPage() {
         <div className={cx('card', 'cardPrimary')}>
           <div className={cx('cardHeader')} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <strong>Plan #{result.planSequence ?? '—'}:</strong>{' '}
+              <strong>Lộ trình #{result.planSequence ?? '—'}:</strong>{' '}
               <code className={cx('code')}>{result.learningPlanId.slice(0, 8)}…</code>
             </div>
             <button
@@ -301,7 +300,7 @@ function GeneratePlanPage() {
             {result.partsWithoutTasks?.length > 0 && (
               <div className={cx('alert', 'alertWarning')}>
                 Part chưa đạt mục tiêu nhưng <strong>chưa có ải</strong> vì câu trong đề chưa gắn tag:{' '}
-                {result.partsWithoutTasks.join(', ')}. Gắn tag câu hỏi (admin) rồi sinh plan lại.
+                {result.partsWithoutTasks.join(', ')}. Gắn tag câu hỏi (admin) rồi sinh lộ trình lại.
               </div>
             )}
 
@@ -328,7 +327,7 @@ function GeneratePlanPage() {
         refreshKey={listRefreshKey}
         showExamTypeBadge
         title="Lộ trình đã sinh"
-        emptyMessage="Chưa có lộ trình nào. Sinh plan từ form phía trên sau khi hoàn thành mock."
+        emptyMessage={null}
       />
     </div>
   );

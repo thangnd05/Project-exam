@@ -73,7 +73,7 @@ function TargetAchievedPage() {
       {!loading && target?.hasTarget && !isAchieved && (
         <div className={cx('alert', 'alertWarning')}>
           <span>
-            Mock gần nhất chưa đạt mục tiêu {target.targetScore} điểm.{' '}
+            Bài thi thử gần nhất chưa đạt mục tiêu {target.targetScore} điểm.{' '}
             {enhanced?.totalScore != null && (
               <>Điểm gần nhất: <strong>{enhanced.totalScore}</strong>.</>
             )}
@@ -170,9 +170,9 @@ function TargetAchievedPage() {
                 </li>
                 <li>
                   <Link to={`/learning-plans/compare?examTypeId=${examTypeId}`}>
-                    Xem hành trình các plan
+                    Xem hành trình các lộ trình
                   </Link>
-                  {' '}— độ sẵn sàng #1 → #N qua từng mock.
+                  {' '}— độ sẵn sàng #1 → #N qua từng bài thi thử.
                 </li>
                 <li>
                   <Link to="/my-target/mocks">Lịch sử bài thi</Link>

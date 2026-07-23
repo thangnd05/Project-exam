@@ -25,7 +25,7 @@ function PartRowTooltip({ row }) {
       </div>
       <p className={cx('partChartTooltipStatus')}>
         {!hasCurrent
-          ? 'Chưa có dữ liệu mock'
+          ? 'Chưa có dữ liệu thi thử'
           : row.reached
             ? 'Đạt aim'
             : `Còn ${(row.aim - row.current).toFixed(1)}% để đạt aim`}

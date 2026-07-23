@@ -223,7 +223,7 @@ function UserTargetPage() {
             variant="outline"
             size="sm"
           >
-            Dashboard
+            Tổng quan
           </ButtonPrime>
         </div>
       </div>
@@ -393,7 +393,7 @@ function UserTargetPage() {
                           className={cx('resetBtn')}
                           onClick={() => handleResetPart(pr.examPartId)}
                         >
-                          Reset
+                          Đặt lại
                         </button>
                       )}
                     </div>

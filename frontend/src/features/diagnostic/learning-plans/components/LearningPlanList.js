@@ -69,7 +69,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
     setSwitchTarget(null);
     switchMutation.mutate(planId, {
       onSuccess: () => reload(),
-      onError: (err) => toast.error(err?.response?.data?.message || 'Lỗi khi chuyển plan'),
+      onError: (err) => toast.error(err?.response?.data?.message || 'Lỗi khi chuyển lộ trình'),
     });
   }, [switchTarget, switchMutation, reload]);
 
@@ -79,7 +79,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
     setDeleteTarget(null);
     deleteMutation.mutate(planId, {
       onSuccess: () => reload(),
-      onError: (err) => toast.error(err?.response?.data?.message || 'Lỗi khi xóa plan'),
+      onError: (err) => toast.error(err?.response?.data?.message || 'Lỗi khi xóa lộ trình'),
     });
   }, [deleteTarget, deleteMutation, reload]);
 
@@ -99,7 +99,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
 
   const countSubtitle = loading
     ? 'Đang tải...'
-    : `${plans.length} plan${currentFilter ? ' (đã lọc)' : ''}`;
+    : `${plans.length} lộ trình`;
 
   const listBody = (
     <>
@@ -126,7 +126,8 @@ const LearningPlanList = forwardRef(function LearningPlanList(
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
       {loading && <div className={cx('loading')}>Đang tải...</div>}
 
-      {!loading && plans.length === 0 && (
+      {/* Truyền emptyMessage={null} để ẩn hẳn thông báo trống. */}
+      {!loading && plans.length === 0 && (emptyMessage || emptyAction) && (
         <div className={cx('alert', 'alertInfo')}>
           <span>{emptyMessage}</span>
           {emptyAction}
@@ -137,7 +138,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
         <div key={p.learningPlanId} className={cx('planListItem')}>
           <div className={cx('planListMain')}>
             <div className={cx('planListTitle')}>
-              Plan #{p.planSequence ?? '?'}
+              Lộ trình #{p.planSequence ?? '?'}
               <span className={cx('badge', planStatusVariant(p.status))}>
                 {planStatusLabel(p.status)}
               </span>
@@ -183,7 +184,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
               type="button"
               className={cx('btn', 'btnDanger', 'btnSm')}
               disabled={p.status === 'ACTIVE' || deleting === p.learningPlanId}
-              title={p.status === 'ACTIVE' ? 'Không thể xóa plan đang học' : undefined}
+              title={p.status === 'ACTIVE' ? 'Không thể xóa lộ trình đang học' : undefined}
               onClick={() => setDeleteTarget(p)}
             >
               {deleting === p.learningPlanId ? 'Đang xóa...' : 'Xóa'}
@@ -205,7 +206,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
         confirmText="Đồng ý chuyển"
         message={
           switchTarget
-            ? `Chuyển sang Plan #${switchTarget.planSequence ?? '?'}? Plan đang học hiện tại sẽ được lưu lại với trạng thái "Đã thay".`
+            ? `Chuyển sang lộ trình #${switchTarget.planSequence ?? '?'}? Lộ trình đang học hiện tại sẽ được lưu lại với trạng thái "Đã thay".`
             : ''
         }
       />
@@ -216,7 +217,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
         title="Xác nhận xóa lộ trình"
         message={
           deleteTarget
-            ? `Bạn có chắc muốn xóa Plan #${deleteTarget.planSequence ?? '?'}? Toàn bộ dữ liệu ải và phiên học sẽ bị mất vĩnh viễn.`
+            ? `Bạn có chắc muốn xóa lộ trình #${deleteTarget.planSequence ?? '?'}? Toàn bộ dữ liệu ải và phiên học sẽ bị mất vĩnh viễn.`
             : ''
         }
       />
@@ -250,7 +251,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
             <div className={cx('actionBar')}>
               {showCompareLink && (
                 <Link to={compareHref} className={cx('btn', 'btnOutline', 'btnSm')}>
-                  So sánh plan
+                  So sánh lộ trình
                 </Link>
               )}
               {showRefreshButton && (

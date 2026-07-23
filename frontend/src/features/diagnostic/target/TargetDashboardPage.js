@@ -110,7 +110,7 @@ function TargetDashboardPage() {
             variant="outline"
             size="sm"
           >
-            Lịch sử Mock
+            Lịch sử thi thử
           </ButtonPrime>
           <ButtonPrime
             as="link"
@@ -163,7 +163,7 @@ function TargetDashboardPage() {
                 <strong>Bạn đã đạt mục tiêu {target.targetScore}!</strong>
                 {target.achievedAt
                   ? ` Đạt lúc: ${formatDate(target.achievedAt)}.`
-                  : ` Mock gần nhất: ${latestEnhanced?.totalScore} điểm.`}
+                  : ` Bài thi thử gần nhất: ${latestEnhanced?.totalScore} điểm.`}
               </p>
               <ButtonPrime
                 as="link"
@@ -184,7 +184,7 @@ function TargetDashboardPage() {
                 <div className={pageCx('scoreProgressBlock')}>
                   <div className={pageCx('scoreProgressMeta')}>
                     <span>
-                      Mock gần nhất: <strong>{mockScore}</strong>
+                      Bài gần nhất: <strong>{mockScore}</strong>
                     </span>
                     <span>
                       {scoreProgress.reached
@@ -210,7 +210,7 @@ function TargetDashboardPage() {
             </div>
 
             <div className={cx('statTile')}>
-              <div className={cx('statLabel')}>Độ sẵn sàng mock gần nhất</div>
+              <div className={cx('statLabel')}>Độ sẵn sàng bài gần nhất</div>
               <div className={cx('statValue')}>
                 {enhancedMatchesType ? `${latestEnhanced?.readinessScore ?? '—'}%` : '—'}
               </div>
@@ -225,16 +225,16 @@ function TargetDashboardPage() {
                 </span>
               ) : (
                 <div className={cx('statHint')}>
-                  {enhancedMatchesType ? '' : 'Chưa có mock cho kỳ thi này'}
+                  {enhancedMatchesType ? '' : 'Chưa có bài thi thử cho kỳ thi này'}
                 </div>
               )}
             </div>
 
             <div className={cx('statTile')}>
-              <div className={cx('statLabel')}>Plan đang học</div>
+              <div className={cx('statLabel')}>Lộ trình đang học</div>
               {activePlan ? (
                 <>
-                  <div className={cx('statValue')}>Plan #{activePlan.planSequence ?? '?'}</div>
+                  <div className={cx('statValue')}>Lộ trình #{activePlan.planSequence ?? '?'}</div>
                   <div className={cx('statHint')}>
                     Ban đầu {activePlan.baselineReadiness ?? '—'}% ·{' '}
                     {activePlan.passedTasks ?? 0}/{activePlan.totalTasks ?? 0} ải đã pass
@@ -246,7 +246,7 @@ function TargetDashboardPage() {
                       variant="primary"
                       size="sm"
                     >
-                      Mở plan
+                      Mở lộ trình
                     </ButtonPrime>
                   </div>
                 </>
@@ -261,7 +261,7 @@ function TargetDashboardPage() {
                         variant="primary"
                         size="sm"
                       >
-                        Sinh plan từ mock
+                        Sinh lộ trình
                       </ButtonPrime>
                     </div>
                   )}

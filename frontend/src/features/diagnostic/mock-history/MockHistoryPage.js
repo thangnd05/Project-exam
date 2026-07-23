@@ -184,7 +184,7 @@ function MockHistoryPage() {
           </select>
         </div>
         <p className={cx('filterHint')}>
-          Chỉ tính bài làm đề đầy đủ (bỏ luyện tập theo Part & Quick Challenge). Biểu đồ hiển thị
+          Chỉ tính bài làm đề đầy đủ (bỏ luyện tập theo phần & thử thách nhanh). Biểu đồ hiển thị
           tối đa {CHART_FETCH_LIMIT} bài gần nhất (cũ → mới); bảng phân trang bên dưới.
         </p>
       </div>

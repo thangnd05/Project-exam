@@ -7,5 +7,5 @@ export const TERM_TIPS = {
   task:
     'Ải = một chặng luyện tập theo chủ đề (tag). Đạt ≥ ngưỡng % câu đúng là vượt ải.',
   passThreshold:
-    'Ngưỡng pass: % câu đúng tối thiểu trong một lượt luyện để vượt ải.',
+    'Ngưỡng vượt ải: % câu đúng tối thiểu trong một lượt luyện để vượt ải.',
 };
