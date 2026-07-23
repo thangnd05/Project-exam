@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import PlanComparisonCharts from '../components/PlanComparisonCharts';
 import { usePlanComparison } from './hooks/usePlanComparison';
@@ -57,6 +58,7 @@ function PlanComparisonPage() {
 
   return (
     <div className={cx('wrapper')}>
+      <TargetPlanTabs active="compare" examTypeId={examTypeId} />
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>So sánh các Plan</h2>
         <div className={cx('actionBar')}>

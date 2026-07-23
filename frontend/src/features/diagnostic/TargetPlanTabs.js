@@ -7,6 +7,7 @@ const cx = classNames.bind(styles);
 const TABS = [
   { key: 'target', label: 'Mục tiêu', path: '/my-target' },
   { key: 'plan', label: 'Lập kế hoạch', path: '/learning-plans/generate' },
+  { key: 'compare', label: 'So sánh lộ trình', path: '/learning-plans/compare' },
 ];
 
 /**
