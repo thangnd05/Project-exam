@@ -1,9 +1,10 @@
 .section {
+
   position: relative;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  padding-block: clamp(48px, 7vw, 96px);
+  padding-block: clamp(64px, 9vw, 120px);
   background: var(--hero-bg, #042f2e);
   color: #fff;
   overflow: hidden;
@@ -38,17 +39,18 @@
 
 .title {
   margin: 0;
-  font-size: clamp(1.65rem, 2.4vw, 2.15rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.4rem, 4vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
   color: #fff;
 }
 
 .subtitle {
-  margin: 0.45em 0 0;
-  font-size: clamp(1.05rem, 1.3vw, 1.25rem);
+  margin: 0.55em 0 0;
+  font-size: clamp(1.25rem, 1.5vw, 1.5rem);
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.5;
 }
 
 .controls {

@@ -1,20 +1,15 @@
 import HeroSection from './components/HeroSection/HeroSection';
 import ExploreOrb from './components/ExploreOrb/ExploreOrb';
-import ProcessSection from './components/ProcessSection/ProcessSection';
+import JourneySection from './components/JourneySection/JourneySection';
+import ClosingCta from './components/ClosingCta/ClosingCta';
 
-export default function TestPage() {
+export default function HomePage() {
   return (
     <div>
-
-      <section className="hero-section">
-        <HeroSection />
-      </section>
-
+      <HeroSection />
+      <JourneySection />
       <ExploreOrb />
-
-      <section className="process-section">
-        <ProcessSection />
-      </section>
+      <ClosingCta />
     </div>
   );
 }

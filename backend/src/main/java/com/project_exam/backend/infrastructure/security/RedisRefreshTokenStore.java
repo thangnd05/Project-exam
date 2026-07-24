@@ -14,20 +14,6 @@ import java.time.Duration;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Lưu trạng thái refresh token vào Redis.
- *
- * Key shape:
- *   rt:family:{fid}   (Hash)        TTL = refresh exp
- *      uid userId            (để cross-check token)
- *      jti jti hợp lệ hiện tại của family
- *
- *   rt:user:{uid}     (Set)         TTL = refresh exp
- *      members = các familyId đang active của user — dùng cho revokeAllForUser.
- *
- * Why fail-closed: khác với view counter (fail-open được), refresh token là cổng vào
- * nếu Redis down phải từ chối refresh để không cho attacker đoạt session.
- */
 @Service
 @RequiredArgsConstructor
 public class RedisRefreshTokenStore implements RefreshTokenStore {
@@ -40,6 +26,9 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
     private static final String FIELD_JTI = "jti";
     private static final String FIELD_PREV_JTI = "prevJti";
     private static final String FIELD_PREV_AT = "prevAt";
+    // Tombstone: logout/revoke KHÔNG xoá key mà đánh dấu revoked. Nhờ đó rotate phân biệt được
+    // "family bị revoke chủ động" (chặn) với "family biến mất do Redis mất dữ liệu" (self-heal).
+    private static final String FIELD_REVOKED = "revoked";
 
     /**
      * "Rotation grace window" — sau khi rotate, jti CŨ vẫn được chấp nhận trong khoảng này
@@ -77,12 +66,18 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
         String familyKey = familyKey(familyId);
 
         try {
+            if (redis.opsForHash().get(familyKey, FIELD_REVOKED) != null) {
+                // Đã logout/revoke chủ động — tombstone còn đó thì token này chết hẳn.
+                throw new UnauthorizedException("Phiên đăng nhập đã kết thúc, vui lòng đăng nhập lại.");
+            }
+
             Object storedUid = redis.opsForHash().get(familyKey, FIELD_USER_ID);
             Object storedJti = redis.opsForHash().get(familyKey, FIELD_JTI);
 
             if (storedUid == null || storedJti == null) {
-                // Family không tồn tại: đã logout/hết hạn/bị revoke trước đó.
-                throw new UnauthorizedException("Phiên đăng nhập đã kết thúc, vui lòng đăng nhập lại.");
+                createFamily(userId, familyId, oldJti);
+                storedUid = userId;
+                storedJti = oldJti;
             }
 
             if (!userId.equals(storedUid.toString())) {
@@ -135,7 +130,6 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
         try {
             revokeFamilyInternal(userId, familyId);
         } catch (DataAccessException ex) {
-            // Logout: best-effort, không chặn user. Cookie ở client vẫn bị clear.
             log.warn("Redis lỗi khi revokeFamily uid={} fid={}: {}", userId, familyId, ex.getMessage());
         }
     }
@@ -147,7 +141,7 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
             Set<String> families = redis.opsForSet().members(userKey);
             if (families != null) {
                 for (String fid : families) {
-                    redis.delete(familyKey(fid));
+                    markRevoked(familyKey(fid));
                 }
             }
             redis.delete(userKey);
@@ -157,8 +151,14 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
     }
 
     private void revokeFamilyInternal(String userId, String familyId) {
-        redis.delete(familyKey(familyId));
+        markRevoked(familyKey(familyId));
         redis.opsForSet().remove(userKey(userId), familyId);
+    }
+
+    private void markRevoked(String familyKey) {
+        redis.opsForHash().put(familyKey, FIELD_REVOKED, "1");
+        redis.opsForHash().delete(familyKey, FIELD_JTI, FIELD_PREV_JTI, FIELD_PREV_AT);
+        redis.expire(familyKey, Duration.ofMillis(refreshExpirationMs));
     }
 
     private String familyKey(String familyId) {

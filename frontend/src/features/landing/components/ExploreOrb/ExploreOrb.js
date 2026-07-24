@@ -423,8 +423,10 @@ function ExploreOrb() {
 
       <div className={cx('inner')}>
         <header className={cx('header')}>
-          <h2 className={cx('title')}>Khám phá dạng đề</h2>
-          <p className={cx('subtitle')}>Vuốt hoặc chọn thẻ để xem kỳ thi phù hợp</p>
+          <h2 className={cx('title')}>Chọn kỳ thi của bạn</h2>
+          <p className={cx('subtitle')}>
+            Xoay quỹ đạo — chạm vào kỳ thi để bắt đầu hành trình
+          </p>
         </header>
 
         {count === 0 && !isLoading ? (
