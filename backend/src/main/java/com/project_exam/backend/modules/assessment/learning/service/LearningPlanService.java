@@ -131,6 +131,14 @@ public class LearningPlanService {
                     partBreakdown, partRequirements, focusPartIds, questionIdsByPart);
         }
 
+        if (candidates.isEmpty()) {
+            String detail = partsWithoutTasks.isEmpty()
+                    ? "Các phần trong bài này đều đã đạt ngưỡng riêng — hãy làm một bài thi thử đầy đủ để nâng đều điểm."
+                    : "Các phần cần cải thiện (" + String.join(", ", partsWithoutTasks)
+                        + ") chưa có ải vì câu hỏi chưa được gắn tag. Gắn tag (admin) rồi sinh lại.";
+            throw new BadRequestException("Chưa tạo được lộ trình từ bài này. " + detail);
+        }
+
         int planSequence = (int) planRepository.countByUserIdAndExamTypeId(userId, examTypeId) + 1;
 
         LearningPlan plan = new LearningPlan();
@@ -145,6 +153,7 @@ public class LearningPlanService {
         plan.setPassAccuracyDefault(DEFAULT_PASS_ACCURACY);
         plan.setStatus(LearningPlan.Status.ACTIVE);
         plan.setPlanSequence(planSequence);
+        plan.setPartsWithoutTasks(joinPartsWithoutTasks(partsWithoutTasks));
         plan = planRepository.save(plan);
 
         closeActivePlans(userId, examTypeId, LearningPlan.Status.REPLACED, plan.getLearningPlanId());
@@ -596,7 +605,24 @@ public class LearningPlanService {
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, partMap));
         response.setTargetOutdated(isTargetOutdated(plan));
         response.setDiagnosisSourceCategory(resolveDiagnosisSourceCategory(plan.getSourceUserTestId()));
+        response.setPartsWithoutTasks(splitPartsWithoutTasks(plan.getPartsWithoutTasks()));
         return response;
+    }
+
+    /** Ghép tên Part chưa có ải thành 1 chuỗi để lưu (null nếu rỗng). Xem {@link #splitPartsWithoutTasks}. */
+    private static String joinPartsWithoutTasks(List<String> names) {
+        if (names == null || names.isEmpty()) {
+            return null;
+        }
+        return String.join("\n", names);
+    }
+
+    /** Tách chuỗi đã lưu về lại danh sách tên Part; rỗng nếu null/blank. */
+    private static List<String> splitPartsWithoutTasks(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return List.of();
+        }
+        return List.of(raw.split("\n"));
     }
 
     /**

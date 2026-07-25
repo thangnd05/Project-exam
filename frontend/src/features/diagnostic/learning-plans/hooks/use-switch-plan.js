@@ -1,11 +1,15 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { switchPlan } from '~/shared/api/learningPlanApi';
+import { invalidatePlanQueries } from './plan-cache';
 
-// useLearningPlanList giờ dùng useQuery; caller gọi reload() (= refetch) trong onSuccess.
 export function useSwitchPlan({ onSuccess, onError } = {}) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (learningPlanId) => switchPlan(learningPlanId),
-    onSuccess,
+    onSuccess: (...args) => {
+      invalidatePlanQueries(qc);
+      onSuccess?.(...args);
+    },
     onError,
   });
 }

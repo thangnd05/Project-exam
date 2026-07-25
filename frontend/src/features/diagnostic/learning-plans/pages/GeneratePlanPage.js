@@ -50,6 +50,11 @@ function GeneratePlanPage() {
   const targetQuery = useUserTarget(sourceExamTypeId);
   const userTarget = targetQuery.data ?? null;
   const loadingTarget = targetQuery.isLoading;
+  const targetError = targetQuery.isError
+    ? targetQuery.error?.response?.data?.message
+      || targetQuery.error?.message
+      || 'Không tải được mục tiêu'
+    : null;
 
   const generatePlanMutation = useGeneratePlanMutation();
   const submitting = generatePlanMutation.isPending;
@@ -70,7 +75,7 @@ function GeneratePlanPage() {
 
   const hasTarget = Boolean(userTarget?.hasTarget);
 
-  const testFormLocked = !sourceExamTypeId || loadingTarget || !hasTarget;
+  const testFormLocked = !sourceExamTypeId || loadingTarget || !!targetError || !hasTarget;
 
   useEffect(() => {
     if (!userTestId || loadingList) return;
@@ -167,7 +172,20 @@ function GeneratePlanPage() {
         </div>
       </div>
 
-      {sourceExamTypeId && !loadingTarget && !hasTarget && (
+      {sourceExamTypeId && targetError && (
+        <div className={cx('alert', 'alertDanger')}>
+          <span>Không tải được mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;: {targetError}.</span>
+          <button
+            type="button"
+            className={cx('btn', 'btnPrimary', 'btnSm')}
+            onClick={() => targetQuery.refetch()}
+          >
+            Thử lại
+          </button>
+        </div>
+      )}
+
+      {sourceExamTypeId && !loadingTarget && !targetError && !hasTarget && (
         <div className={cx('alert', 'alertWarning')}>
           <span>
             Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;.
@@ -291,7 +309,7 @@ function GeneratePlanPage() {
               <li>
                 <strong>Độ sẵn sàng (chẩn đoán):</strong>
                 <InfoTip text={TERM_TIPS.readiness} />{' '}
-                {result.baselineReadiness ?? result.currentReadiness}% ({getReadinessLabel(result.readinessLevel)})
+                {result.baselineReadiness ?? '—'}% ({getReadinessLabel(result.readinessLevel)})
               </li>
               <li><strong>Mục tiêu:</strong> {result.targetScore ?? 'N/A'}</li>
               <li><strong>Ải:</strong> {result.totalTasks} (ước tính ~{result.estimatedDaysRemaining} ngày)</li>

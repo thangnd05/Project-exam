@@ -30,8 +30,8 @@ export function useCompletedUserTests() {
 export function useUserTarget(examTypeId) {
   return useQuery({
     queryKey: generatePlanKeys.target(examTypeId),
-
-    queryFn: () => getUserTarget(examTypeId).catch(() => ({ hasTarget: false })),
+    
+    queryFn: () => getUserTarget(examTypeId),
     enabled: !!examTypeId,
   });
 }

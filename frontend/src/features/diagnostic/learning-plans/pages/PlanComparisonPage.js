@@ -37,10 +37,9 @@ function PlanComparisonPage() {
   const chartData = useMemo(() => {
     return sorted.map((p, idx) => {
       const prev = idx > 0 ? sorted[idx - 1] : null;
-      const readiness = p.baselineReadiness ?? p.currentReadiness ?? 0;
-      const prevReadiness = prev
-        ? prev.baselineReadiness ?? prev.currentReadiness ?? null
-        : null;
+      // Cột biểu đồ cần số; plan cũ (trước khi có baselineReadiness) coi như 0.
+      const readiness = p.baselineReadiness ?? 0;
+      const prevReadiness = prev ? prev.baselineReadiness ?? null : null;
       const diffVsPrev =
         prevReadiness != null ? readiness - prevReadiness : null;
 
@@ -100,8 +99,8 @@ function PlanComparisonPage() {
           <div className={cx('timelineGrid')}>
             {sorted.map((p, idx) => {
               const prev = idx > 0 ? sorted[idx - 1] : null;
-              const cur = p.baselineReadiness ?? p.currentReadiness;
-              const prevReadiness = prev ? (prev.baselineReadiness ?? prev.currentReadiness) : null;
+              const cur = p.baselineReadiness ?? null;
+              const prevReadiness = prev ? (prev.baselineReadiness ?? null) : null;
               const diff = prevReadiness != null && cur != null ? cur - prevReadiness : null;
 
               return (

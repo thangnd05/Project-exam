@@ -13,7 +13,7 @@ const cx = classNames.bind(styles);
 
 function planBaselineReadiness(plan) {
   if (plan == null) return null;
-  return plan.baselineReadiness ?? plan.currentReadiness ?? null;
+  return plan.baselineReadiness ?? null;
 }
 
 // Tìm ải được BE gợi ý làm tiếp (cùng logic với NextStepPage).

@@ -73,6 +73,13 @@ public class LearningPlan {
     @Column(name = "replaced_by_plan_id")
     private String replacedByPlanId;
 
+    /**
+     * Tên các Part chưa đạt mục tiêu nhưng không tạo được ải lúc sinh (câu chưa gắn tag).
+     * Lưu lại để cảnh báo vẫn hiện khi xem lại plan; ngăn cách bằng '\n'. Null nếu không có.
+     */
+    @Column(name = "parts_without_tasks", columnDefinition = "TEXT")
+    private String partsWithoutTasks;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     private Status status = Status.ACTIVE;

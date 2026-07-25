@@ -1,12 +1,16 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deletePlan } from '~/shared/api/learningPlanApi';
+import { invalidatePlanQueries } from './plan-cache';
 
-// Danh sách plan (useLearningPlanList) dùng state + reload thủ công, không có query key
-// react-query nên hook chỉ bọc thao tác ghi; caller tự gọi reload() trong onSuccess.
+
 export function useDeletePlan({ onSuccess, onError } = {}) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (learningPlanId) => deletePlan(learningPlanId),
-    onSuccess,
+    onSuccess: (...args) => {
+      invalidatePlanQueries(qc);
+      onSuccess?.(...args);
+    },
     onError,
   });
 }
