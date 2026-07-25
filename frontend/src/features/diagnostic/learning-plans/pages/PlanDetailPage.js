@@ -136,7 +136,7 @@ function PlanDetailPage() {
               to={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
               className={cx('planHeroCta')}
             >
-              Học ải ngay →
+              Học ngay
             </Link>
           )}
         </div>
@@ -162,9 +162,19 @@ function PlanDetailPage() {
       {!isReplaced && plan.planStage === 'FOUNDATION' && (
         <div className={cx('alert')}>
           <span>
-            Lộ trình này được chẩn đoán từ bài bạn đã làm gần nhất. Ôn xong các ải,
-            hãy làm một <strong>bài thi thử đầy đủ</strong> để kiểm tra lại và cập nhật
-            độ chính xác của chẩn đoán (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
+            {plan.diagnosisSourceCategory === 'QUICK_CHALLENGE' ? (
+              <>
+                Lộ trình này được chẩn đoán từ một <strong>bài thử thách nhanh</strong> (ngắn) — đủ để
+                bắt đầu ôn. Ôn xong các ải, hãy làm một <strong>bài thi thử đầy đủ</strong> để chẩn đoán
+                chính xác hơn (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
+              </>
+            ) : (
+              <>
+                Lộ trình này được chẩn đoán từ bài bạn đã làm gần nhất. Ôn xong các ải,
+                hãy làm một <strong>bài thi thử đầy đủ</strong> để kiểm tra lại và cập nhật
+                độ chính xác của chẩn đoán (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
+              </>
+            )}
           </span>
         </div>
       )}

@@ -297,6 +297,13 @@ function GeneratePlanPage() {
               <li><strong>Ải:</strong> {result.totalTasks} (ước tính ~{result.estimatedDaysRemaining} ngày)</li>
             </ul>
 
+            {result.diagnosisSourceCategory === 'QUICK_CHALLENGE' && (
+              <div className={cx('alert')}>
+                Lộ trình này chẩn đoán từ một <strong>bài thử thách nhanh</strong>. Ôn xong các ải,
+                hãy làm một <strong>bài thi thử đầy đủ</strong> để chẩn đoán chính xác hơn.
+              </div>
+            )}
+
             {result.partsWithoutTasks?.length > 0 && (
               <div className={cx('alert', 'alertWarning')}>
                 Part chưa đạt mục tiêu nhưng <strong>chưa có ải</strong> vì câu trong đề chưa gắn tag:{' '}

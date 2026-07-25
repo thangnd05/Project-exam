@@ -115,6 +115,18 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     @Query("SELECT ut.testId, COUNT(ut) FROM UserTest ut WHERE ut.testId IN :testIds GROUP BY ut.testId")
     List<Object[]> countGroupedByTestIdIn(@Param("testIds") List<String> testIds);
 
+    /**
+     * Code ExamCategory của bài chẩn đoán nguồn 1 lộ trình — 1 query thay vì chuỗi lookup,
+     * tránh N+1 khi build PlanResponse trong listPlans. Null nếu test không gắn category.
+     */
+    @Query("""
+            SELECT c.code FROM UserTest ut
+            JOIN Test t ON t.testId = ut.testId
+            JOIN ExamCategory c ON c.examCategoryId = t.examCategoryId
+            WHERE ut.userTestId = :userTestId
+            """)
+    Optional<String> findExamCategoryCodeByUserTestId(@Param("userTestId") String userTestId);
+
     /** Batch count attempt của 1 user trên nhiều testId — tránh N+1 trong list test cho user. */
     @Query("SELECT ut.testId, COUNT(ut) FROM UserTest ut "
             + "WHERE ut.testId IN :testIds AND ut.userId = :userId GROUP BY ut.testId")

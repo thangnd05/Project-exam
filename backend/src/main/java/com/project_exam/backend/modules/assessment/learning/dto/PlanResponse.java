@@ -36,6 +36,13 @@ public class PlanResponse {
     /** UserTest dùng làm nguồn baseline (có thể cập nhật sau refresh-diagnostic). */
     private String diagnosticUserTestId;
 
+    /**
+     * Code ExamCategory của bài chẩn đoán nguồn (QUICK_CHALLENGE / FULL_MOCK / ...).
+     * Null nếu test nguồn không gắn category. FE dùng để nhắc "chẩn đoán từ Quick Challenge,
+     * làm Full Mock để chính xác hơn".
+     */
+    private String diagnosisSourceCategory;
+
     private String planStage;
     private String userTargetId;
 

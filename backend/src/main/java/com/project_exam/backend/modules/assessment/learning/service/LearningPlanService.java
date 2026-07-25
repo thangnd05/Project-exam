@@ -557,7 +557,16 @@ public class LearningPlanService {
                 buildPartGroups(tasks, resourcesByTag, tagMap, partMap),
                 partsWithoutTasks);
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, partMap));
+        response.setDiagnosisSourceCategory(resolveDiagnosisSourceCategory(plan.getSourceUserTestId()));
         return response;
+    }
+
+    /** Code ExamCategory bài chẩn đoán nguồn (QUICK_CHALLENGE / FULL_MOCK / ...); null nếu không gắn category. */
+    private String resolveDiagnosisSourceCategory(String sourceUserTestId) {
+        if (sourceUserTestId == null) {
+            return null;
+        }
+        return userTestRepository.findExamCategoryCodeByUserTestId(sourceUserTestId).orElse(null);
     }
 
     private PlanResponse buildPlanResponseFromEntity(
@@ -586,6 +595,7 @@ public class LearningPlanService {
                 buildPartGroups(tasks, resourcesByTag, tagMap, partMap));
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, partMap));
         response.setTargetOutdated(isTargetOutdated(plan));
+        response.setDiagnosisSourceCategory(resolveDiagnosisSourceCategory(plan.getSourceUserTestId()));
         return response;
     }
 
