@@ -66,6 +66,7 @@ function getOrbitTransform(theta, radius) {
     z: Math.cos(theta) * radius.radiusZ,
     scale: 0.72 + 0.38 * depth,
     opacity: 0.4 + 0.6 * depth,
+    depth,
     rotateY: -Math.sin(theta) * 32,
     zIndex: Math.round(50 + Math.cos(theta) * 50),
   };
@@ -172,6 +173,8 @@ function ExploreOrb() {
       // Per-frame: only genuinely-changing compositor properties
       el.style.transform = `translate3d(${t.x}px, ${t.y}px, ${t.z}px) rotateY(${t.rotateY}deg) scale(${t.scale})`;
       el.style.opacity = String(t.opacity);
+      // 0 (back) → 1 (front): drives gradual glow brighten / dim
+      el.style.setProperty('--frontness', t.depth.toFixed(3));
 
       // zIndex is an int that holds for several frames — write only on change
       const zStr = String(t.zIndex);

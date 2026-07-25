@@ -100,7 +100,7 @@ function HeroSection() {
           <h1 className={cx('headline')}>
             Từ hôm nay đến ngày thi,
             <br />
-            <span className={cx('accent')}>một lộ trình</span> dành riêng cho bạn.
+            <span className={cx('accent')}>lộ trình</span> dành riêng cho bạn.
           </h1>
           <p className={cx('lede')}>
             Chọn kỳ thi và mốc điểm bạn nhắm tới. {name} chẩn đoán năng lực hiện tại,

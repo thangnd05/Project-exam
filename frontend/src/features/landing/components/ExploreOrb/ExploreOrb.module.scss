@@ -204,6 +204,7 @@
 }
 
 .card {
+  --frontness: 0;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -219,18 +220,20 @@
   padding: 1.25rem 1rem 1.1rem;
   box-sizing: border-box;
   border-radius: 18px;
-  border: 1px solid rgba(94, 234, 212, 0.32);
-
+  border: 1px solid rgba(94, 234, 212, calc(0.22 + 0.55 * var(--frontness)));
   background:
     linear-gradient(
       160deg,
-      rgba(20, 78, 74, 0.82),
-      rgba(6, 47, 46, 0.82)
+      rgba(20, 78, 74, calc(0.78 + 0.14 * var(--frontness))),
+      rgba(6, 47, 46, calc(0.78 + 0.14 * var(--frontness)))
     );
   color: #fff;
   cursor: pointer;
   text-align: center;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(94, 234, 212, calc(0.28 * var(--frontness))),
+    0 0 calc(8px + 36px * var(--frontness)) rgba(13, 148, 136, calc(0.5 * var(--frontness))),
+    0 14px 36px rgba(0, 0, 0, 0.28);
   transform-origin: center center;
   transform-style: preserve-3d;
   will-change: transform, opacity;
@@ -248,22 +251,8 @@
     pointer-events: auto;
   }
 
-  &.isActive {
-    border-color: rgba(94, 234, 212, 0.75);
-
-    background:
-      linear-gradient(
-        160deg,
-        rgba(30, 100, 94, 0.92),
-        rgba(12, 74, 70, 0.92)
-      );
-    box-shadow:
-      0 0 0 1px rgba(94, 234, 212, 0.28),
-      0 0 40px rgba(13, 148, 136, 0.5),
-      0 18px 42px rgba(0, 0, 0, 0.35);
-  }
-
   &.flatCard {
+    --frontness: 1;
     position: relative;
     top: auto;
     left: auto;
@@ -289,9 +278,7 @@
   border: 1px solid rgba(94, 234, 212, 0.4);
   flex-shrink: 0;
 
-  .isActive & {
-    box-shadow: 0 0 18px rgba(13, 148, 136, 0.35);
-  }
+  box-shadow: 0 0 calc(18px * var(--frontness, 0)) rgba(13, 148, 136, calc(0.35 * var(--frontness, 0)));
 
   &.hasImage {
     width: 8.5rem;
@@ -302,10 +289,6 @@
     box-shadow: none;
     overflow: visible;
     padding: 0;
-
-    .isActive & {
-      box-shadow: none;
-    }
   }
 }
 
@@ -343,11 +326,8 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
-  opacity: 0;
-
-  .isActive & {
-    opacity: 1;
-  }
+  /* Fade in near the front only (smooth with orbit, no hard toggle). */
+  opacity: calc(max(0, var(--frontness, 0) - 0.55) / 0.45);
 }
 
 .navBtn {
