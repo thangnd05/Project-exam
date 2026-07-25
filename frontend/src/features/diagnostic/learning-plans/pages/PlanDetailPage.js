@@ -40,6 +40,11 @@ function PlanDetailPage() {
   if (error && !plan) {
     return (
       <div className={cx('wrapper')}>
+        <div className={cx('headerBar')}>
+          <Link to="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
+            Quay lại
+          </Link>
+        </div>
         <div className={cx('alert', 'alertDanger')}>{error}</div>
       </div>
     );
@@ -57,21 +62,27 @@ function PlanDetailPage() {
     ? Math.round(((plan.passedTasks ?? 0) / totalTasks) * 100)
     : 0;
 
+  const backTo = plan.examTypeId
+    ? `/learning-plans/generate?examTypeId=${plan.examTypeId}`
+    : '/learning-plans/generate';
+
   return (
     <div className={cx('wrapper')}>
       <div className={cx('headerBar')}>
-        <h2 className={cx('title')}>
-          Kế hoạch học
-          {plan.planSequence != null ? ` #${plan.planSequence}` : ''}
-        </h2>
+        <div className={cx('actionBar')}>
+          <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+            Quay lại
+          </Link>
+          <h2 className={cx('title')}>
+            Kế hoạch học
+            {plan.planSequence != null ? ` #${plan.planSequence}` : ''}
+          </h2>
+        </div>
         <div className={cx('actionBar')}>
           <Link to="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
             Sinh lộ trình mới
           </Link>
-          <Link
-            to={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
-            className={cx('btn', 'btnOutline', 'btnSm')}
-          >
+          <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
             Tất cả lộ trình
           </Link>
         </div>

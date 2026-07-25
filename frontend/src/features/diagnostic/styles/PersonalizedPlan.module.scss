@@ -1333,7 +1333,7 @@
   font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-secondary);
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
   margin-bottom: -1px;
   transition: color 0.15s, border-color 0.15s;
 
@@ -1342,7 +1342,7 @@
   }
 
   &.active {
-    color: var(--primary);
+    color: var(--brand-700);
     border-bottom-color: var(--primary);
     font-weight: 700;
   }
