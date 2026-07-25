@@ -256,7 +256,7 @@ function NextStepPage() {
                   <>
                     {' '}
                     <Link to={`/learning-plans/compare?examTypeId=${examTypeId}`}>
-                      So sánh các lộ trình →
+                      So sánh các lộ trình
                     </Link>
                   </>
                 )}

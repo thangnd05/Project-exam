@@ -127,18 +127,53 @@
   margin: 0 0 18px;
   font-size: clamp(3rem, 5.2vw, 5.2rem);
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1.12;
   letter-spacing: -0.04em;
   color: #f8fafc;
 }
 
-.line2 {
-  color: rgba(255, 255, 255, 0.42);
+.problemHit {
+  appearance: none;
+  display: inline;
+  margin: 0;
+  padding: 0 0 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: inherit;
+  color: var(--brand-unique, #f59e0b);
+  text-align: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(
+    transparent 62%,
+    rgba(245, 158, 11, 0.35) 62%,
+    rgba(245, 158, 11, 0.35) 92%,
+    transparent 92%
+  );
+  transition: color 0.2s ease, filter 0.2s ease, background-image 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: #fbbf24;
+    background-image: linear-gradient(
+      transparent 58%,
+      rgba(245, 158, 11, 0.55) 58%,
+      rgba(245, 158, 11, 0.55) 94%,
+      transparent 94%
+    );
+    outline: none;
+  }
+
+  &:active {
+    filter: brightness(1.08);
+  }
 }
 
 .lede {
   margin: 0 0 28px;
-  max-width: 34ch;
+  max-width: 36ch;
   font-size: clamp(1.45rem, 1.7vw, 1.75rem);
   line-height: 1.55;
   color: rgba(226, 232, 240, 0.72);

@@ -98,7 +98,7 @@ function PlanDetailPage() {
               to={`/learning-plans/${plan.replacedByPlanId}`}
               className={cx('btn', 'btnPrimary', 'btnSm')}
             >
-              Xem lộ trình mới →
+              Xem lộ trình mới
             </Link>
           )}
         </div>

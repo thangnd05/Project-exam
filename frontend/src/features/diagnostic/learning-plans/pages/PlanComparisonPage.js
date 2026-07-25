@@ -151,7 +151,7 @@ function PlanComparisonPage() {
                     {p.replacedByPlanId && (
                       <li>
                         <Link to={`/learning-plans/${p.replacedByPlanId}`}>
-                          Đã thay bằng lộ trình kế tiếp →
+                          Đã thay bằng lộ trình kế tiếp
                         </Link>
                       </li>
                     )}

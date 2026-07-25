@@ -99,12 +99,18 @@ function HeroSection() {
         >
           <p className={cx('brand')}>{name}</p>
           <h1 className={cx('headline')}>
-            Chẩn đoán
+            Đang ôn nhưng
             <br />
-            <span className={cx('line2')}>rồi chinh phục.</span>
+            <button
+              type="button"
+              className={cx('problemHit')}
+              onClick={handleStartQuick}
+            >
+              không biết yếu chỗ nào?
+            </button>
           </h1>
           <p className={cx('lede')}>
-            Một kiểm tra nhanh. Bản đồ điểm yếu. Lộ trình chỉ dành cho bạn.
+            Một kiểm tra nhanh — thấy bản đồ điểm yếu, nhận lộ trình chỉ dành cho bạn.
           </p>
           <div className={cx('actions')}>
             <button type="button" className={cx('btnPrimary')} onClick={handleStartQuick}>

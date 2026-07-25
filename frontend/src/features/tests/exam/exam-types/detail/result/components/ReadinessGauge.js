@@ -96,7 +96,7 @@ function ReadinessGauge({ enhanced }) {
           style={{ backgroundColor: effectiveColor }}
           onClick={() => navigate(`/exam-types/${examTypeId}`)}
         >
-          Làm Full Mock Exam để biết khả năng của bản thân →
+          Làm Full Mock Exam để biết khả năng của bản thân
         </div>
       )}
     </div>
