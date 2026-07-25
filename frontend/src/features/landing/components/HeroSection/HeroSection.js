@@ -99,19 +99,21 @@ function HeroSection() {
         >
           <p className={cx('brand')}>{name}</p>
           <h1 className={cx('headline')}>
-            Đang ôn nhưng
+            Luyện đề mãi
             <br />
-            <button
-              type="button"
-              className={cx('problemHit')}
-              onClick={handleStartQuick}
-            >
-              không biết yếu chỗ nào?
-            </button>
+            mà <span className={cx('accent')}>điểm đứng yên?</span>
           </h1>
           <p className={cx('lede')}>
-            Một kiểm tra nhanh — thấy bản đồ điểm yếu, nhận lộ trình chỉ dành cho bạn.
+            Đừng ôn mù. Một kiểm tra nhanh giúp bạn thấy chỗ yếu và lộ trình đúng.
           </p>
+          <button
+            type="button"
+            className={cx('problemLink')}
+            onClick={handleStartQuick}
+          >
+            Kiểm tra xem bạn yếu chỗ nào
+            <span aria-hidden="true">→</span>
+          </button>
           <div className={cx('actions')}>
             <button type="button" className={cx('btnPrimary')} onClick={handleStartQuick}>
               {hasQuick ? 'Bắt đầu kiểm tra nhanh' : 'Khám phá kỳ thi'}
@@ -206,16 +208,6 @@ function HeroSection() {
         </motion.div>
       </div>
 
-      <motion.div
-        className={cx('scrollHint')}
-        initial={{opacity: 0}}
-        animate={{opacity: 1}}
-        transition={{delay: 1.2, duration: 0.8}}
-        aria-hidden="true"
-      >
-        <span>Cuộn để xem hành trình</span>
-        <i />
-      </motion.div>
     </section>
   );
 }
