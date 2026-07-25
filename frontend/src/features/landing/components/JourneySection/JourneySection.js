@@ -1,93 +1,43 @@
 import {motion} from 'framer-motion';
 import classNames from 'classnames/bind';
 import styles from './JourneySection.module.scss';
+import DeviceMockup from '../DeviceMockup/DeviceMockup';
 
 const cx = classNames.bind(styles);
 
+// TODO: thay `shot` bằng ảnh chụp thật của từng bước (tỷ lệ 16:10 là đẹp nhất).
+// import shotExam from '~/shared/assets/images/shot-exam.png';
+// import shotDiagnosis from '~/shared/assets/images/shot-diagnosis.png';
+// import shotPlan from '~/shared/assets/images/shot-plan.png';
 const steps = [
   {
     id: 'try',
     index: '01',
     title: 'Kiểm tra nhanh',
-    text: 'Làm bài ngắn, đủ để lộ điểm yếu — không cần ngồi cả buổi.',
+    text: 'Làm một bài ngắn có giới hạn thời gian — đủ để lộ điểm yếu thật, không cần ngồi cả buổi. Bạn vào đề như thi thật, hệ thống ghi nhận cách bạn xử lý từng phần.',
     hint: 'Timer · áp lực thật',
+    shot: undefined, // shotExam
+    shotAlt: 'Màn hình làm đề trên WinDe',
   },
   {
     id: 'see',
     index: '02',
     title: 'Xem chẩn đoán',
-    text: 'Biết kỹ năng nào đang kéo điểm xuống, ưu tiên sửa chỗ nào trước.',
+    text: 'Sau bài kiểm tra, WinDe phân tích kỹ năng nào đang kéo điểm xuống và mức độ nghiêm trọng ra sao. Bạn biết ngay nên ưu tiên sửa chỗ nào trước thay vì ôn lan man.',
     hint: 'Bản đồ năng lực',
+    shot: undefined, // shotDiagnosis
+    shotAlt: 'Trang chẩn đoán năng lực trên WinDe',
   },
   {
     id: 'path',
     index: '03',
     title: 'Luyện theo lộ trình',
-    text: 'Nhận kế hoạch cá nhân: từng task đúng chỗ còn hổng.',
+    text: 'Nhận kế hoạch cá nhân dựa trên kết quả chẩn đoán: từng task đúng chỗ còn hổng, xếp theo thứ tự hợp lý để tiến bộ rõ từng ngày thay vì luyện mù quáng.',
     hint: 'Task theo thứ tự',
+    shot: undefined, // shotPlan
+    shotAlt: 'Trang lộ trình cá nhân trên WinDe',
   },
 ];
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {staggerChildren: 0.14, delayChildren: 0.08},
-  },
-};
-
-const itemVariants = {
-  hidden: {opacity: 0, y: 28},
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {duration: 0.55, ease: [0.22, 1, 0.36, 1]},
-  },
-};
-
-function StepIcon({id}) {
-  if (id === 'try') {
-    return (
-      <svg viewBox="0 0 64 64" className={cx('icon')} aria-hidden="true">
-        <circle cx="32" cy="32" r="22" className={cx('iconRing')} />
-        <path
-          d="M32 18v14l9 6"
-          className={cx('iconStroke')}
-          fill="none"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-  if (id === 'see') {
-    return (
-      <svg viewBox="0 0 64 64" className={cx('icon')} aria-hidden="true">
-        <polygon
-          points="32,12 52,26 44,50 20,50 12,26"
-          className={cx('iconFill')}
-        />
-        <polygon
-          points="32,20 44,28 39,44 25,42 20,30"
-          className={cx('iconAccent')}
-        />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 64 64" className={cx('icon')} aria-hidden="true">
-      <path
-        d="M10 44c12 0 14-24 27-24s12 24 17 24"
-        className={cx('iconStroke')}
-        fill="none"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <circle cx="10" cy="44" r="4" className={cx('iconDot')} />
-      <circle cx="37" cy="20" r="4" className={cx('iconDot')} />
-      <circle cx="54" cy="44" r="5" className={cx('iconDotNext')} />
-    </svg>
-  );
-}
 
 export default function JourneySection() {
   return (
@@ -107,28 +57,30 @@ export default function JourneySection() {
           </p>
         </motion.header>
 
-        <motion.ol
-          className={cx('steps')}
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{once: true, amount: 0.25}}
-        >
+        <div className={cx('rows')}>
           {steps.map((step, i) => (
-            <motion.li key={step.id} className={cx('step')} variants={itemVariants}>
-              {i < steps.length - 1 && <span className={cx('connector')} aria-hidden="true" />}
-              <div className={cx('stepTop')}>
-                <span className={cx('index')}>{step.index}</span>
-                <div className={cx('iconWrap')}>
-                  <StepIcon id={step.id} />
+            <motion.div
+              key={step.id}
+              className={cx('row', {reverse: i % 2 === 1})}
+              initial={{opacity: 0, y: 40}}
+              whileInView={{opacity: 1, y: 0}}
+              viewport={{once: true, amount: 0.3}}
+              transition={{duration: 0.6, ease: [0.22, 1, 0.36, 1]}}
+            >
+              <div className={cx('rowText')}>
+                <div className={cx('stepTop')}>
+                  <span className={cx('index')}>{step.index}</span>
+                  <h3 className={cx('stepTitle')}>{step.title}</h3>
                 </div>
+                <p className={cx('stepText')}>{step.text}</p>
+                <span className={cx('hint')}>{step.hint}</span>
               </div>
-              <h3 className={cx('stepTitle')}>{step.title}</h3>
-              <p className={cx('stepText')}>{step.text}</p>
-              <span className={cx('hint')}>{step.hint}</span>
-            </motion.li>
+              <div className={cx('rowVisual')}>
+                <DeviceMockup src={step.shot} alt={step.shotAlt} />
+              </div>
+            </motion.div>
           ))}
-        </motion.ol>
+        </div>
       </div>
     </section>
   );

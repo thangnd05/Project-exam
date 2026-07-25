@@ -1,6 +1,6 @@
 .section {
   position: relative;
-  padding: clamp(64px, 9vw, 104px) clamp(20px, 4vw, 48px);
+  padding: clamp(48px, 6vw, 80px) clamp(20px, 4vw, 48px);
   background:
     radial-gradient(ellipse 55% 45% at 100% 0%, rgba(20, 184, 166, 0.1), transparent 55%),
     var(--brand-50, #f0fdfa);
@@ -14,7 +14,7 @@
 
 .header {
   max-width: 640px;
-  margin-bottom: clamp(36px, 5vw, 56px);
+  margin-bottom: clamp(28px, 3.5vw, 48px);
 }
 
 .eyebrow {
@@ -43,138 +43,85 @@
   color: #64748b;
 }
 
-.steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* ---- Hàng xen kẽ ảnh–chữ ---- */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 4vw, 52px);
+}
+
+.row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(20px, 3vw, 32px);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: clamp(20px, 3vw, 40px);
 
   @media (max-width: 860px) {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 20px;
   }
 }
 
-.step {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: clamp(22px, 2.5vw, 28px);
-  border-radius: 20px;
-  background: #fff;
-  border: 1px solid rgba(13, 148, 136, 0.12);
-  box-shadow: 0 12px 32px rgba(13, 148, 136, 0.08);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
-
-  &:hover {
-    border-color: rgba(13, 148, 136, 0.35);
-    box-shadow: 0 16px 40px rgba(13, 148, 136, 0.14);
-    transform: translateY(-3px);
+/* Đảo cột cho hàng chẵn (chỉ trên desktop); mobile luôn chữ trước, laptop sau. */
+@media (min-width: 861px) {
+  .reverse .rowText {
+    order: 2;
+  }
+  .reverse .rowVisual {
+    order: 1;
   }
 }
 
-.connector {
-  display: none;
+.rowText {
+  max-width: 460px;
 
-  @media (min-width: 861px) {
-    display: block;
-    position: absolute;
-    top: 52px;
-    left: calc(100% + 4px);
-    width: calc(clamp(20px, 3vw, 32px) - 8px);
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      var(--brand-400, #2dd4bf),
-      rgba(245, 158, 11, 0.55)
-    );
-    z-index: 1;
+  @media (max-width: 860px) {
+    max-width: none;
   }
+}
+
+.rowVisual {
+  min-width: 0;
 }
 
 .stepTop {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 6px;
 }
 
 .index {
-  font-size: 1.35rem;
+  flex-shrink: 0;
+  font-size: clamp(2.6rem, 3.4vw, 3.4rem);
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
+  line-height: 1;
   color: var(--brand-600, #0d9488);
-}
-
-.iconWrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(155deg, #042f2e 0%, #0f766e 100%);
-  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.25);
-}
-
-.icon {
-  width: 34px;
-  height: 34px;
-}
-
-.iconRing {
-  fill: none;
-  stroke: rgba(94, 234, 212, 0.35);
-  stroke-width: 3;
-}
-
-.iconStroke {
-  stroke: #5eead4;
-}
-
-.iconFill {
-  fill: rgba(94, 234, 212, 0.18);
-  stroke: rgba(94, 234, 212, 0.45);
-  stroke-width: 1.5;
-}
-
-.iconAccent {
-  fill: rgba(20, 184, 166, 0.45);
-  stroke: #5eead4;
-  stroke-width: 1.5;
-}
-
-.iconDot {
-  fill: #14b8a6;
-}
-
-.iconDotNext {
-  fill: #f59e0b;
+  opacity: 0.55;
 }
 
 .stepTitle {
-  margin: 0 0 10px;
-  font-size: clamp(1.7rem, 2vw, 2rem);
+  margin: 0;
+  font-size: clamp(2rem, 2.6vw, 2.6rem);
   font-weight: 800;
   letter-spacing: -0.02em;
+  line-height: 1.15;
   color: #0f172a;
 }
 
 .stepText {
-  margin: 0 0 16px;
-  flex: 1;
-  font-size: 1.4rem;
+  margin: 0 0 14px;
+  font-size: clamp(1.45rem, 1.6vw, 1.65rem);
   line-height: 1.55;
   color: #64748b;
 }
 
 .hint {
-  align-self: flex-start;
-  padding: 6px 12px;
+  display: inline-block;
+  padding: 7px 14px;
   border-radius: 999px;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--brand-700, #0f766e);
   background: var(--brand-100, #ccfbf1);

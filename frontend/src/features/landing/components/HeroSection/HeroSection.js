@@ -4,7 +4,6 @@ import classNames from 'classnames/bind';
 import {AnimatePresence, motion} from 'framer-motion';
 
 import styles from './HeroSection.module.scss';
-import {name} from '~/shared/assets/images';
 import {calculateAllowedTime} from '~/shared/utils/testStatusHelper';
 import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
 import {brandColors} from '~/shared/styles/brandColors';
@@ -96,23 +95,22 @@ function HeroSection() {
           animate={{opacity: 1, y: 0}}
           transition={{duration: 0.9, ease: [0.22, 1, 0.36, 1]}}
         >
-          <p className={cx('brand')}>{name}</p>
           <h1 className={cx('headline')}>
-            Từ hôm nay đến ngày thi,
+            Từ hôm nay đến ngày thi
             <br />
-            <span className={cx('accent')}>lộ trình</span> dành riêng cho bạn.
+            <span className={cx('accent')}>lộ trình</span> dành riêng bạn
           </h1>
           <p className={cx('lede')}>
-            Chọn kỳ thi và mốc điểm bạn nhắm tới. {name} chẩn đoán năng lực hiện tại,
+            Chọn kỳ thi và mốc điểm bạn nhắm tới. Chẩn đoán năng lực hiện tại,
             dựng lộ trình từng ải, và kết thúc bằng bộ đề mock sát đề thật.
           </p>
           <div className={cx('ctaBlock')}>
             <div className={cx('actions')}>
               <button type="button" className={cx('btnPrimary')} onClick={handleStartQuick}>
-                {hasQuick ? 'Bắt đầu kiểm tra nhanh' : 'Khám phá kỳ thi'}
+                {hasQuick ? 'Trải nghiệm kiểm tra nhanh' : 'Khám phá kỳ thi'}
               </button>
               <button type="button" className={cx('btnGhost')} onClick={handleScrollToExam}>
-                Xem các kỳ thi
+                Khám phá các kỳ thi
               </button>
             </div>
             {hasQuick && (
