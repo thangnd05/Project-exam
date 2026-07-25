@@ -6,14 +6,17 @@ import {
 import { targetDashboardKeys } from './useTargetDashboard';
 import { targetAchievedKeys } from './useTargetAchieved';
 import { generatePlanKeys } from '../../learning-plans/pages/hooks/useGeneratePlan';
+import { invalidatePlanQueries } from '../../learning-plans/hooks/plan-cache';
 
 // Các truy vấn đang hiển thị mục tiêu theo examTypeId (dashboard, đã đạt, trang sinh lộ trình,
-// và mục tiêu hiện tại ở trang Mục tiêu của tôi).
+// và mục tiêu hiện tại ở trang Mục tiêu của tôi). Kèm cả các query plan vì đổi/xoá mục tiêu
+// có thể khiến lộ trình đang chạy trở thành "outdated" (BE tính lại cờ targetOutdated).
 const invalidateTargetQueries = (qc, examTypeId) => {
   qc.invalidateQueries({ queryKey: targetDashboardKeys.dashboard(examTypeId) });
   qc.invalidateQueries({ queryKey: targetAchievedKeys.detail(examTypeId) });
   qc.invalidateQueries({ queryKey: generatePlanKeys.target(examTypeId) });
   qc.invalidateQueries({ queryKey: ['user-target', examTypeId] });
+  invalidatePlanQueries(qc);
 };
 
 export function useSaveUserTarget({ onSuccess, onError } = {}) {

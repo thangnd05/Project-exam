@@ -111,14 +111,11 @@ function UserTargetPage() {
   }, [targetScore, matchedMilestone, filteredParts]);
 
   const handleSave = () => {
-    if (hasSavedTarget) {
-      toast.warn('Bạn đã có mục tiêu hiện tại. Vui lòng xóa mục tiêu cũ trước khi lưu mới.');
-      return;
-    }
     if (!targetScore || !selectedExamTypeId) {
       toast.warn('Nhập điểm mục tiêu trước.');
       return;
     }
+    const isUpdate = hasSavedTarget;
 
     const allParts = partRequirements.map((pr) => ({
       examPartId: pr.examPartId,
@@ -136,7 +133,11 @@ function UserTargetPage() {
       },
       {
         onSuccess: () => {
-          toast.success('Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.');
+          toast.success(
+            isUpdate
+              ? 'Đã cập nhật mục tiêu. Nếu đang có lộ trình, hãy sinh lại để áp mục tiêu mới.'
+              : 'Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.',
+          );
           // Card "Mục tiêu hiện tại" nằm đầu trang — kéo lên cho user thấy ngay.
           window.scrollTo({ top: 0, behavior: 'smooth' });
         },
@@ -391,15 +392,26 @@ function UserTargetPage() {
 
           {scoreEstimateBlock}
 
+          {targetScore && hasSavedTarget && (
+            <div className={planCx('alert', 'alertWarning')} style={{ marginTop: '0.8rem' }}>
+              Bạn đang chỉnh sửa mục tiêu hiện tại — lưu sẽ cập nhật đè. Nếu đang có lộ trình,
+              nó sẽ cần <strong>sinh lại</strong> để áp ngưỡng theo mục tiêu mới.
+            </div>
+          )}
+
           {targetScore && (
             <div className={planCx('actionBar')} style={{ marginTop: '0.8rem' }}>
               <ButtonPrime
                 variant="primary"
                 size="lg"
                 onClick={handleSave}
-                disabled={loading || hasSavedTarget}
+                disabled={loading}
               >
-                {loading ? 'Đang lưu...' : 'Lưu mục tiêu'}
+                {loading
+                  ? 'Đang lưu...'
+                  : hasSavedTarget
+                    ? 'Cập nhật mục tiêu'
+                    : 'Lưu mục tiêu'}
               </ButtonPrime>
               {hasSavedTarget && (
                 <ButtonPrime

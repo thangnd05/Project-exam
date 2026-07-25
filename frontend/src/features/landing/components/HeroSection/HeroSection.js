@@ -7,27 +7,36 @@ import styles from './HeroSection.module.scss';
 import {name} from '~/shared/assets/images';
 import {calculateAllowedTime} from '~/shared/utils/testStatusHelper';
 import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
-import {brandColors} from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
-const COLOR_DARK = brandColors.primary;
-const COLOR_LIGHT = brandColors.brand300;
-const partColor = (idx) => (idx % 2 === 0 ? COLOR_DARK : COLOR_LIGHT);
+const FALLBACK_ROWS = [
+  {name: 'Networking & VPC', pct: 72},
+  {name: 'IAM & Security', pct: 41},
+  {name: 'Storage (S3, EBS)', pct: 80},
+  {name: 'Compute (EC2)', pct: 65},
+];
 
-const buildRingGradient = (parts, total) => {
-  if (!total || !parts.length) {
-    return `conic-gradient(from 210deg, ${COLOR_DARK}, ${COLOR_LIGHT}, ${brandColors.unique}, ${COLOR_DARK})`;
-  }
-  let acc = 0;
-  const stops = parts.map((part, idx) => {
-    const start = (acc / total) * 100;
-    acc += part.numQuestions;
-    const end = (acc / total) * 100;
-    return `${partColor(idx)} ${start}% ${end}%`;
+const SCORE_PATTERN = [78, 41, 84, 62, 55];
+
+function buildDiagnosisRows(parts) {
+  const list = (parts || []).slice(0, 5);
+  const base =
+    list.length > 0
+      ? list.map((part, i) => ({
+          name: part.name || `Chủ đề ${i + 1}`,
+          pct: SCORE_PATTERN[i % SCORE_PATTERN.length],
+        }))
+      : FALLBACK_ROWS;
+
+  const minPct = Math.min(...base.map((r) => r.pct));
+  let marked = false;
+  return base.map((row) => {
+    const weak = !marked && row.pct === minPct;
+    if (weak) marked = true;
+    return {...row, weak};
   });
-  return `conic-gradient(from 210deg, ${stops.join(', ')})`;
-};
+}
 
 function HeroSection() {
   const navigate = useNavigate();
@@ -53,6 +62,9 @@ function HeroSection() {
 
   const active = cards[activeIdx] ?? null;
   const hasQuick = !loading && Boolean(active);
+  const parts = active?.parts || [];
+  const total = active?.totalQuestions || 0;
+  const diagnosisRows = useMemo(() => buildDiagnosisRows(parts), [parts]);
 
   const handleScrollToExam = () => {
     document.getElementById('explore-orb')?.scrollIntoView({behavior: 'smooth'});
@@ -78,9 +90,6 @@ function HeroSection() {
     setActiveIdx((i) => (i + 1) % cards.length);
   };
 
-  const parts = active?.parts || [];
-  const total = active?.totalQuestions || 0;
-
   return (
     <section id="hero" className={cx('hero')}>
       <div className={cx('atmosphere')} aria-hidden="true">
@@ -99,71 +108,90 @@ function HeroSection() {
         >
           <p className={cx('brand')}>{name}</p>
           <h1 className={cx('headline')}>
-            Luyện đề mãi
+            <span className={cx('headlineLead')}>5 phút.</span>
             <br />
-            mà <span className={cx('accent')}>điểm đứng yên?</span>
+            Biết chính xác
+            <br />
+            mình <span className={cx('accent')}>hổng chỗ nào.</span>
           </h1>
           <p className={cx('lede')}>
-            Đừng ôn mù. Một kiểm tra nhanh giúp bạn thấy chỗ yếu và lộ trình đúng.
+            Không cần cày hết ngân hàng đề — {name} chỉ ra phần bạn yếu và lộ trình
+            ôn ngắn nhất.
           </p>
-          <button
-            type="button"
-            className={cx('problemLink')}
-            onClick={handleStartQuick}
-          >
-            Kiểm tra xem bạn yếu chỗ nào
-            <span aria-hidden="true">→</span>
-          </button>
-          <div className={cx('actions')}>
-            <button type="button" className={cx('btnPrimary')} onClick={handleStartQuick}>
-              {hasQuick ? 'Bắt đầu kiểm tra nhanh' : 'Khám phá kỳ thi'}
-            </button>
-            <button type="button" className={cx('btnGhost')} onClick={handleScrollToExam}>
-              Xem quỹ đạo đề
-            </button>
+          <div className={cx('ctaBlock')}>
+            <div className={cx('actions')}>
+              <button type="button" className={cx('btnPrimary')} onClick={handleStartQuick}>
+                {hasQuick ? 'Bắt đầu kiểm tra nhanh' : 'Khám phá kỳ thi'}
+              </button>
+              <button type="button" className={cx('btnGhost')} onClick={handleScrollToExam}>
+                Xem các kỳ thi
+              </button>
+            </div>
+            {hasQuick && (
+              <p className={cx('ctaNote')}>Miễn phí · Không cần đăng ký</p>
+            )}
           </div>
         </motion.div>
 
         <motion.div
           className={cx('stage')}
-          initial={{opacity: 0, scale: 0.92}}
+          initial={{opacity: 0, scale: 0.96}}
           animate={{opacity: 1, scale: 1}}
           transition={{duration: 1.1, delay: 0.15, ease: [0.22, 1, 0.36, 1]}}
         >
-          <div className={cx('ringWrap')}>
-            <div
-              className={cx('ring')}
-              style={{background: buildRingGradient(parts, total)}}
-            >
-              <div className={cx('ringHole')}>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={active?.testId ?? 'empty'}
-                    className={cx('ringCore')}
-                    initial={{opacity: 0, y: 12}}
-                    animate={{opacity: 1, y: 0}}
-                    exit={{opacity: 0, y: -12}}
-                    transition={{duration: 0.35}}
-                  >
-                    {loading ? (
-                      <span className={cx('coreMuted')}>Đang tải…</span>
-                    ) : hasQuick ? (
-                      <>
-                        <span className={cx('coreBadge')}>Kiểm tra nhanh</span>
-                        <span className={cx('coreNum')}>{total || '—'}</span>
-                        <span className={cx('coreUnit')}>câu hỏi</span>
-                        <span className={cx('coreName')} title={active.examTypeName}>
-                          {active.examTypeName}
+          <div className={cx('diagnosisCard')}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active?.testId ?? 'empty'}
+                initial={{opacity: 0, y: 10}}
+                animate={{opacity: 1, y: 0}}
+                exit={{opacity: 0, y: -8}}
+                transition={{duration: 0.3}}
+              >
+                <div className={cx('diagHead')}>
+                  <span className={cx('diagBadge')}>Kết quả chẩn đoán</span>
+                  {loading ? (
+                    <p className={cx('diagTitle')}>Đang tải…</p>
+                  ) : (
+                    <>
+                      <p className={cx('diagTitle')} title={active?.examTypeName}>
+                        {active?.examTypeName || 'Kiểm tra nhanh'}
+                      </p>
+                      {total > 0 && (
+                        <p className={cx('diagMeta')}>{total} câu · mẫu kết quả</p>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                <ul className={cx('skillList')}>
+                  {diagnosisRows.map((row) => (
+                    <li
+                      key={row.name}
+                      className={cx('skillRow', {weak: row.weak})}
+                    >
+                      <div className={cx('skillTop')}>
+                        <span className={cx('skillName')} title={row.name}>
+                          {row.name}
                         </span>
-                      </>
-                    ) : (
-                      <span className={cx('coreMuted')}>Sẵn sàng khám phá</span>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </div>
-            <div className={cx('ringPulse')} aria-hidden="true" />
+                        <strong className={cx('skillPct')}>{row.pct}%</strong>
+                      </div>
+                      <div className={cx('skillTrack')}>
+                        <motion.div
+                          className={cx('skillFill', {weak: row.weak})}
+                          initial={{width: 0}}
+                          animate={{width: `${row.pct}%`}}
+                          transition={{duration: 0.7, ease: [0.22, 1, 0.36, 1]}}
+                        />
+                      </div>
+                      {row.weak && (
+                        <span className={cx('weakTag')}>Ưu tiên ôn</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {cards.length > 1 && (
@@ -207,7 +235,6 @@ function HeroSection() {
           )}
         </motion.div>
       </div>
-
     </section>
   );
 }

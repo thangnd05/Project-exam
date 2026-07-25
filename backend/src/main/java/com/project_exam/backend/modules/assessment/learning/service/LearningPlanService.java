@@ -633,11 +633,17 @@ public class LearningPlanService {
         if (plan.getStatus() != LearningPlan.Status.ACTIVE) {
             return false;
         }
-        String currentTargetId = userTargetRepository
-                .findByUserIdAndExamTypeId(plan.getUserId(), plan.getExamTypeId())
-                .map(UserTarget::getUserTargetId)
-                .orElse(null);
-        return !Objects.equals(plan.getUserTargetId(), currentTargetId);
+        Optional<UserTarget> currentOpt = userTargetRepository
+                .findByUserIdAndExamTypeId(plan.getUserId(), plan.getExamTypeId());
+        String currentTargetId = currentOpt.map(UserTarget::getUserTargetId).orElse(null);
+        // Mục tiêu đã đổi/xoá (khác id, hoặc plan sinh không target giờ đã có) → ngưỡng ải là snapshot cũ.
+        if (!Objects.equals(plan.getUserTargetId(), currentTargetId)) {
+            return true;
+        }
+        // Cùng userTargetId nhưng sửa mục tiêu tại chỗ (createOrUpdate giữ nguyên id): điểm mục tiêu
+        // đổi thì plan vẫn theo điểm cũ → vẫn coi là outdated để nhắc sinh lại.
+        Integer currentScore = currentOpt.map(UserTarget::getTargetScore).orElse(null);
+        return !Objects.equals(plan.getTargetScore(), currentScore);
     }
 
     private PlanResponse buildTargetAchievedResponse(
