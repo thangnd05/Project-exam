@@ -62,8 +62,13 @@
   }
 }
 
-/* Đảo cột cho hàng chẵn (chỉ trên desktop); mobile luôn chữ trước, laptop sau. */
+/* Đảo cột cho hàng chẵn (chỉ trên desktop); mobile luôn chữ trước, laptop sau.
+   Đảo luôn tỉ lệ cột để máy ở giữa vẫn rộng bằng máy trên/dưới. */
 @media (min-width: 861px) {
+  .reverse {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+
   .reverse .rowText {
     order: 2;
   }

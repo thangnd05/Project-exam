@@ -4,11 +4,6 @@ import styles from './DeviceMockup.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Số phím mỗi hàng của bàn phím (chỉ để dựng hình).
-const KEY_ROWS = [13, 13, 13, 12];
-
-// On-brand placeholder page shown inside the screen until a real
-// website screenshot is passed via the `src` prop.
 function BrowserPlaceholder() {
   return (
     <div className={cx('browser')} aria-hidden="true">
@@ -40,8 +35,8 @@ function BrowserPlaceholder() {
 }
 
 /**
- * Khung MacBook mở (màn hình + bàn phím phối cảnh). Truyền `src` là ảnh chụp
- * website để hiển thị trong màn hình; bỏ trống sẽ dùng placeholder theo brand.
+ * Khung MacBook (chỉ màn hình). Truyền `src` để hiện screenshot;
+ * bỏ trống dùng placeholder brand.
  */
 export default function DeviceMockup({src, alt = '', className}) {
   const [imgFailed, setImgFailed] = useState(false);
@@ -68,22 +63,6 @@ export default function DeviceMockup({src, alt = '', className}) {
             )}
             <span className={cx('glare', {soft: showImg})} aria-hidden="true" />
           </div>
-        </div>
-
-        <div className={cx('deck')} aria-hidden="true">
-          <div className={cx('keyboard')}>
-            {KEY_ROWS.map((n, r) => (
-              <div key={r} className={cx('keyRow')}>
-                {Array.from({length: n}).map((_, i) => (
-                  <span key={i} className={cx('key')} />
-                ))}
-              </div>
-            ))}
-            <div className={cx('keyRow')}>
-              <span className={cx('key', 'spacebar')} />
-            </div>
-          </div>
-          <span className={cx('trackpad')} />
         </div>
       </div>
     </div>

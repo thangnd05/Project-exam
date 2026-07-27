@@ -1,6 +1,6 @@
 .viewport {
   position: relative;
-  width: min(100%, 520px);
+  width: min(100%, 580px);
   margin-inline: auto;
   padding: 3% 3% 5%;
 }
@@ -23,16 +23,16 @@
   left: 50%;
   bottom: 2%;
   z-index: 1;
-  width: 78%;
-  height: 38px;
+  width: 72%;
+  height: 28px;
   transform: translateX(-50%);
   pointer-events: none;
   background: radial-gradient(
     ellipse at center,
-    rgba(4, 47, 46, 0.4),
+    rgba(4, 47, 46, 0.32),
     transparent 72%
   );
-  filter: blur(15px);
+  filter: blur(14px);
 }
 
 .laptop {
@@ -51,11 +51,11 @@
   }
 }
 
-/* ---- Màn hình (MacBook: viền nhôm mảnh, bezel đen) ---- */
+/* ---- Màn hình MacBook (viền nhôm mảnh, bezel đen) ---- */
 .screen {
   position: relative;
   padding: 2.4%;
-  border-radius: 18px 18px 6px 6px;
+  border-radius: 18px;
   background: linear-gradient(160deg, #202225 0%, #0a0a0c 100%);
   box-shadow:
     0 0 0 2px #c8ccd0,
@@ -92,9 +92,6 @@
   height: auto;
   object-fit: contain;
   object-position: top center;
-  image-rendering: auto;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 .glare {
@@ -118,72 +115,7 @@
   }
 }
 
-/* ---- Bàn phím phối cảnh (nghiêng ra sau, có phím + trackpad) ---- */
-.deck {
-  position: relative;
-  width: 100%;
-  margin-top: -0.5%;
-  padding: 12px 8% 16px;
-  transform-origin: top center;
-  transform: perspective(760px) rotateX(46deg);
-  border-radius: 3px 3px 16px 16px;
-  background: linear-gradient(180deg, #eef1f3 0%, #cfd4d9 42%, #a7adb4 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 22px 26px rgba(4, 47, 46, 0.28);
-
-  /* Khe bản lề tối ở mép trên */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 6%;
-    right: 6%;
-    height: 4px;
-    border-radius: 0 0 4px 4px;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent);
-  }
-}
-
-.keyboard {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.keyRow {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-}
-
-.key {
-  flex: 1;
-  height: 13px;
-  border-radius: 3px;
-  background: linear-gradient(180deg, #3c4247 0%, #23282c 100%);
-  box-shadow:
-    0 1px 1px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(0, 0, 0, 0.2);
-
-  &.spacebar {
-    flex: 0 0 44%;
-  }
-}
-
-.trackpad {
-  display: block;
-  width: 40%;
-  height: 30px;
-  margin: 12px auto 0;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #d3d7dc, #bcc1c7);
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.1),
-    inset 0 2px 4px rgba(0, 0, 0, 0.06);
-}
-
-/* ---- Placeholder page (khi chưa gắn screenshot) ---- */
+/* ---- Placeholder page ---- */
 .browser {
   display: flex;
   flex-direction: column;
