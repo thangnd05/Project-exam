@@ -1,6 +1,7 @@
 import HeroSection from './components/HeroSection/HeroSection';
-import ExploreOrb from './components/ExploreOrb/ExploreOrb';
 import JourneySection from './components/JourneySection/JourneySection';
+import ExploreOrb from './components/ExploreOrb/ExploreOrb';
+import WhyWinDe from './components/WhyWinDe/WhyWinDe';
 
 export default function HomePage() {
   return (
@@ -8,6 +9,7 @@ export default function HomePage() {
       <HeroSection />
       <JourneySection />
       <ExploreOrb />
+      <WhyWinDe />
     </div>
   );
 }
