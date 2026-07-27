@@ -1,40 +1,37 @@
 import {motion} from 'framer-motion';
 import classNames from 'classnames/bind';
 import styles from './JourneySection.module.scss';
+import images from '~/shared/assets/images';
 import DeviceMockup from '../DeviceMockup/DeviceMockup';
 
 const cx = classNames.bind(styles);
 
-// TODO: thay `shot` bằng ảnh chụp thật của từng bước (tỷ lệ 16:10 là đẹp nhất).
-// import shotExam from '~/shared/assets/images/shot-exam.png';
-// import shotDiagnosis from '~/shared/assets/images/shot-diagnosis.png';
-// import shotPlan from '~/shared/assets/images/shot-plan.png';
 const steps = [
   {
     id: 'try',
     index: '01',
-    title: 'Kiểm tra nhanh',
-    text: 'Làm một bài ngắn có giới hạn thời gian — đủ để lộ điểm yếu thật, không cần ngồi cả buổi. Bạn vào đề như thi thật, hệ thống ghi nhận cách bạn xử lý từng phần.',
-    hint: 'Timer · áp lực thật',
-    shot: undefined, // shotExam
+    title: 'Làm bài thử',
+    text: 'Bài ngắn, đủ để lộ điểm yếu — không cần ngồi cả buổi.',
+    hint: 'Có timer · như thi thật',
+    shot: images.quickImage,
     shotAlt: 'Màn hình làm đề trên WinDe',
   },
   {
     id: 'see',
     index: '02',
-    title: 'Xem chẩn đoán',
-    text: 'Sau bài kiểm tra, WinDe phân tích kỹ năng nào đang kéo điểm xuống và mức độ nghiêm trọng ra sao. Bạn biết ngay nên ưu tiên sửa chỗ nào trước thay vì ôn lan man.',
-    hint: 'Bản đồ năng lực',
-    shot: undefined, // shotDiagnosis
+    title: 'Nhận chẩn đoán',
+    text: 'Biết chỗ nào đang kéo điểm, ưu tiên sửa phần nào trước.',
+    hint: 'Theo từng kỹ năng',
+    shot: images.dignos,
     shotAlt: 'Trang chẩn đoán năng lực trên WinDe',
   },
   {
     id: 'path',
     index: '03',
-    title: 'Luyện theo lộ trình',
-    text: 'Nhận kế hoạch cá nhân dựa trên kết quả chẩn đoán: từng task đúng chỗ còn hổng, xếp theo thứ tự hợp lý để tiến bộ rõ từng ngày thay vì luyện mù quáng.',
-    hint: 'Task theo thứ tự',
-    shot: undefined, // shotPlan
+    title: 'Luyện theo kế hoạch',
+    text: 'Nhận lộ trình cá nhân: làm đúng thứ tự, đúng chỗ còn yếu.',
+    hint: 'Task đúng chỗ hổng',
+    shot: images.learningPlan,
     shotAlt: 'Trang lộ trình cá nhân trên WinDe',
   },
 ];
@@ -51,7 +48,7 @@ export default function JourneySection() {
           transition={{duration: 0.55}}
         >
           <p className={cx('eyebrow')}>Cách WinDe hoạt động</p>
-          <h2 className={cx('title')}>Ba bước tới lộ trình của bạn</h2>
+          <h2 className={cx('title')}>Ba bước để ôn đúng chỗ</h2>
           <p className={cx('subtitle')}>
             Không luyện mù quáng — làm thử, xem rõ điểm yếu, rồi ôn đúng chỗ.
           </p>

@@ -54,18 +54,19 @@ export default function DeviceMockup({src, alt = '', className}) {
       <div className={cx('laptop')}>
         <div className={cx('screen')}>
           <span className={cx('camera')} aria-hidden="true" />
-          <div className={cx('display')}>
+          <div className={cx('display', {displayPlaceholder: !showImg})}>
             {showImg ? (
               <img
                 className={cx('shot')}
                 src={src}
                 alt={alt}
+                decoding="async"
                 onError={() => setImgFailed(true)}
               />
             ) : (
               <BrowserPlaceholder />
             )}
-            <span className={cx('glare')} aria-hidden="true" />
+            <span className={cx('glare', {soft: showImg})} aria-hidden="true" />
           </div>
         </div>
 

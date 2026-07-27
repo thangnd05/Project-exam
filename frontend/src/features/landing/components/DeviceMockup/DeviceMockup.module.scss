@@ -1,6 +1,6 @@
 .viewport {
   position: relative;
-  width: min(100%, 500px);
+  width: min(100%, 520px);
   margin-inline: auto;
   padding: 3% 3% 5%;
 }
@@ -79,15 +79,22 @@
   position: relative;
   overflow: hidden;
   border-radius: 4px;
+  background: #0f172a;
+}
+
+.displayPlaceholder {
   aspect-ratio: 16 / 10;
-  background: #f8fafc;
 }
 
 .shot {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
+  object-position: top center;
+  image-rendering: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .glare {
@@ -101,6 +108,14 @@
     rgba(255, 255, 255, 0) 62%,
     rgba(255, 255, 255, 0.06) 100%
   );
+
+  &.soft {
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0) 40%
+    );
+  }
 }
 
 /* ---- Bàn phím phối cảnh (nghiêng ra sau, có phím + trackpad) ---- */

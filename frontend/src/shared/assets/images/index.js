@@ -3,6 +3,9 @@ import avtImage from './avtImage.jpg';
 import logo from './logo.png';
 import membership from './vip-member-banner.webp';
 import logoW from './logoWD.svg';
+import quickImage from './quick-image.png';
+import dignos from './dignos.png';
+import learningPlan from './learningplan.png';
 
 const images = {
     noImage,
@@ -10,6 +13,9 @@ const images = {
     logo,
     membership,
     logoW,
+    quickImage,
+    dignos,
+    learningPlan,
 };
 
 export const SearchIcon = ({ width = '2.4rem', height = '2.4rem', className }) => (
