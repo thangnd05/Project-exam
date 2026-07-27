@@ -10,6 +10,7 @@ import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
 import {brandColors} from '~/shared/styles/brandColors';
 import {getStandardExamTypes} from '~/shared/api/examTypeApi';
 import {examTypeKeys} from '~/features/tests/exam/exam-types/examTypeKeys';
+import {name as brandName} from '~/shared/assets/images';
 
 const cx = classNames.bind(styles);
 
@@ -18,6 +19,15 @@ const normalizeExamTypes = (payload) => {
   if (payload && Array.isArray(payload.data)) return payload.data;
   if (payload && Array.isArray(payload.content)) return payload.content;
   return [];
+};
+
+/** Prefer primary title before dash; keep readable length for the ring. */
+const shortExamName = (name) => {
+  if (!name) return '';
+  const primary = name.split(/\s*[–—]\s*/)[0].trim();
+  if (primary.length <= 40) return primary;
+  const cut = primary.slice(0, 38).replace(/\s+\S*$/, '');
+  return `${cut || primary.slice(0, 38)}…`;
 };
 
 const COLOR_DARK = brandColors.primary;
@@ -111,14 +121,14 @@ function HeroSection() {
           animate={{opacity: 1, y: 0}}
           transition={{duration: 0.9, ease: [0.22, 1, 0.36, 1]}}
         >
+          <p className={cx('brand')}>{brandName}</p>
           <h1 className={cx('headline')}>
             Từ hôm nay đến ngày thi
             <br />
             <span className={cx('accent')}>lộ trình</span> dành riêng bạn
           </h1>
           <p className={cx('lede')}>
-            Chọn kỳ thi và mốc điểm bạn nhắm tới. Chẩn đoán năng lực hiện tại,
-            dựng lộ trình từng ải, và kết thúc bằng bộ đề mock sát đề thật.
+            Chẩn đoán điểm yếu, dựng lộ trình cá nhân, luyện mock sát đề thật.
           </p>
           <div className={cx('ctaBlock')}>
             <div className={cx('actions')}>
@@ -130,19 +140,11 @@ function HeroSection() {
               </button>
             </div>
             <p className={cx('trustLine')}>
-              {examTypeCount > 0 ? (
-                <span>{examTypeCount} kỳ thi</span>
-              ) : (
-                <span>Nhiều kỳ thi</span>
-              )}
+              <span>{examTypeCount > 0 ? `${examTypeCount} kỳ thi` : '50+ bộ đề'}</span>
               <span className={cx('trustSep')} aria-hidden="true">
                 ·
               </span>
-              <span>50+ bộ đề</span>
-              <span className={cx('trustSep')} aria-hidden="true">
-                ·
-              </span>
-              <span>{hasQuick ? 'Thử nhanh miễn phí, không cần đăng ký' : 'Bắt đầu miễn phí'}</span>
+              <span>Không cần đăng ký</span>
             </p>
           </div>
         </motion.div>
@@ -176,7 +178,7 @@ function HeroSection() {
                         <span className={cx('coreNum')}>{total || '—'}</span>
                         <span className={cx('coreUnit')}>câu hỏi</span>
                         <span className={cx('coreName')} title={active.examTypeName}>
-                          {active.examTypeName}
+                          {shortExamName(active.examTypeName)}
                         </span>
                       </>
                     ) : (
