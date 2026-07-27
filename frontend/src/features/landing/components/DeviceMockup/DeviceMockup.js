@@ -56,12 +56,12 @@ export default function DeviceMockup({src, alt = '', className}) {
                 src={src}
                 alt={alt}
                 decoding="async"
+                draggable={false}
                 onError={() => setImgFailed(true)}
               />
             ) : (
               <BrowserPlaceholder />
             )}
-            <span className={cx('glare', {soft: showImg})} aria-hidden="true" />
           </div>
         </div>
       </div>

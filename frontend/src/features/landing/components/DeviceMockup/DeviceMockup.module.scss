@@ -38,24 +38,13 @@
 .laptop {
   position: relative;
   z-index: 2;
-  animation: floatBob 6s ease-in-out infinite;
-}
-
-@keyframes floatBob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
 }
 
 /* ---- Màn hình MacBook (viền nhôm mảnh, bezel đen) ---- */
 .screen {
   position: relative;
-  padding: 2.4%;
-  border-radius: 18px;
+  padding: 1.8%;
+  border-radius: 16px;
   background: linear-gradient(160deg, #202225 0%, #0a0a0c 100%);
   box-shadow:
     0 0 0 2px #c8ccd0,
@@ -65,11 +54,11 @@
 
 .camera {
   position: absolute;
-  top: 1%;
+  top: 0.85%;
   left: 50%;
   transform: translateX(-50%);
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: #2b2f33;
   box-shadow: inset 0 0 0 1px rgba(120, 200, 190, 0.35);
@@ -80,6 +69,8 @@
   overflow: hidden;
   border-radius: 4px;
   background: #0f172a;
+  /* Khớp tỉ lệ ảnh screenshot (~2:1) để tránh co méo */
+  aspect-ratio: 2 / 1;
 }
 
 .displayPlaceholder {
@@ -89,30 +80,13 @@
 .shot {
   display: block;
   width: 100%;
-  height: auto;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
   object-position: top center;
-}
-
-.glare {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0.18) 0%,
-    rgba(255, 255, 255, 0) 34%,
-    rgba(255, 255, 255, 0) 62%,
-    rgba(255, 255, 255, 0.06) 100%
-  );
-
-  &.soft {
-    background: linear-gradient(
-      120deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0) 40%
-    );
-  }
+  /* Zoom nhẹ để chữ UI lớn hơn, nhìn nét hơn trong màn nhỏ */
+  transform: scale(1.08);
+  transform-origin: top center;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 /* ---- Placeholder page ---- */
@@ -233,10 +207,4 @@
   background: #fff;
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 10px rgba(13, 148, 136, 0.08);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .laptop {
-    animation: none;
-  }
 }
