@@ -3,6 +3,7 @@ import classNames from 'classnames/bind';
 import styles from './ScrollToTop.module.scss';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faArrowUp} from '@fortawesome/free-solid-svg-icons';
+
 const cx = classNames.bind(styles);
 
 function ScrollToTop() {
@@ -10,15 +11,11 @@ function ScrollToTop() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 200) {
-
-        setShowScroll(true);
-      } else {
-        setShowScroll(false);
-      }
+      setShowScroll(window.scrollY > 200);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, {passive: true});
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -27,11 +24,16 @@ function ScrollToTop() {
   };
 
   return (
-    showScroll && (
-      <button className={cx('scrollTopBtn')} onClick={scrollToTop}>
-        <FontAwesomeIcon icon={faArrowUp} />
-      </button>
-    )
+    <button
+      type="button"
+      className={cx('scrollTopBtn', {visible: showScroll})}
+      onClick={scrollToTop}
+      aria-label="Lên đầu trang"
+      aria-hidden={!showScroll}
+      tabIndex={showScroll ? 0 : -1}
+    >
+      <FontAwesomeIcon icon={faArrowUp} />
+    </button>
   );
 }
 

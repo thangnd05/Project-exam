@@ -30,7 +30,7 @@ const steps = [
     index: '03',
     title: 'Luyện theo kế hoạch',
     text: 'Nhận lộ trình cá nhân: làm đúng thứ tự, đúng chỗ còn yếu. Không còn bối rối giữa hàng ngàn tài liệu, WinDe tự động sắp xếp những gì quan trọng nhất vào lịch học hàng ngày của bạn.',
-    hint: 'Task đúng chỗ hổng',
+    hint: 'Luyện đúng chỗ hổng',
     shot: images.learningPlan,
     shotAlt: 'Trang lộ trình cá nhân trên WinDe',
   },

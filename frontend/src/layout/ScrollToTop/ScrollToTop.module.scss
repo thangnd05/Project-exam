@@ -11,23 +11,50 @@
   font-size: var(--font-size-xl);
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-  transition: all 0.3s ease-in-out;
-  opacity: 0.9;
   z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(14px) scale(0.88);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.35s,
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
 
-  &:hover {
+  &.visible {
+    opacity: 0.95;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  &.visible:hover {
     background: transparent;
     color: var(--accent-color);
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1);
     box-shadow: 0 6px 12px rgba(0, 123, 255, 0.25);
   }
 
-  &:active {
-    transform: translateY(0);
+  &.visible:active {
+    transform: translateY(0) scale(0.96);
     box-shadow: 0 3px 6px rgba(0, 123, 255, 0.15);
   }
 
   @media (max-width: 991.98px) {
     bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity 0.15s ease, visibility 0.15s;
+    transform: none;
+
+    &.visible,
+    &.visible:hover,
+    &.visible:active {
+      transform: none;
+    }
   }
 }
