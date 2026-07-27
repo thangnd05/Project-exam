@@ -422,7 +422,11 @@ function ExploreOrb() {
       className={cx('section', {reduceMotion, paused})}
       aria-label="Khám phá loại đề"
     >
-      <div className={cx('glow')} aria-hidden="true" />
+      <div className={cx('atmosphere')} aria-hidden="true">
+        <span className={cx('orb', 'orbA')} />
+        <span className={cx('orb', 'orbB')} />
+        <span className={cx('scan')} />
+      </div>
 
       <div className={cx('inner')}>
         <header className={cx('header')}>

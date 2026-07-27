@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {AnimatePresence, motion} from 'framer-motion';
 
@@ -7,8 +8,17 @@ import styles from './HeroSection.module.scss';
 import {calculateAllowedTime} from '~/shared/utils/testStatusHelper';
 import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
 import {brandColors} from '~/shared/styles/brandColors';
+import {getStandardExamTypes} from '~/shared/api/examTypeApi';
+import {examTypeKeys} from '~/features/tests/exam/exam-types/examTypeKeys';
 
 const cx = classNames.bind(styles);
+
+const normalizeExamTypes = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (payload && Array.isArray(payload.data)) return payload.data;
+  if (payload && Array.isArray(payload.content)) return payload.content;
+  return [];
+};
 
 const COLOR_DARK = brandColors.primary;
 const COLOR_LIGHT = brandColors.brand300;
@@ -32,6 +42,13 @@ function HeroSection() {
   const navigate = useNavigate();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
   const [activeIdx, setActiveIdx] = useState(0);
+
+  const {data: examTypeCount = 0} = useQuery({
+    queryKey: examTypeKeys.standard,
+    queryFn: getStandardExamTypes,
+    select: (payload) =>
+      normalizeExamTypes(payload).filter((t) => !t.parentId).length,
+  });
 
   const cards = useMemo(() => {
     const seen = new Set();
@@ -84,7 +101,6 @@ function HeroSection() {
       <div className={cx('atmosphere')} aria-hidden="true">
         <span className={cx('orb', 'orbA')} />
         <span className={cx('orb', 'orbB')} />
-        <span className={cx('grid')} />
         <span className={cx('scan')} />
       </div>
 
@@ -113,9 +129,21 @@ function HeroSection() {
                 Khám phá các kỳ thi
               </button>
             </div>
-            {hasQuick && (
-              <p className={cx('ctaNote')}>Miễn phí · Không cần đăng ký</p>
-            )}
+            <p className={cx('trustLine')}>
+              {examTypeCount > 0 ? (
+                <span>{examTypeCount} kỳ thi</span>
+              ) : (
+                <span>Nhiều kỳ thi</span>
+              )}
+              <span className={cx('trustSep')} aria-hidden="true">
+                ·
+              </span>
+              <span>50+ bộ đề</span>
+              <span className={cx('trustSep')} aria-hidden="true">
+                ·
+              </span>
+              <span>{hasQuick ? 'Thử nhanh miễn phí, không cần đăng ký' : 'Bắt đầu miễn phí'}</span>
+            </p>
           </div>
         </motion.div>
 

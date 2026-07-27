@@ -45,17 +45,6 @@
   animation-delay: -4s;
 }
 
-.grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(94, 234, 212, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(94, 234, 212, 0.05) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
-  opacity: 0.5;
-}
-
 .scan {
   position: absolute;
   inset: -20% 0;
@@ -170,6 +159,27 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.trustLine {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.52);
+
+  @media (max-width: 960px) {
+    justify-content: center;
+  }
+}
+
+.trustSep {
+  margin-inline: 8px;
+  color: rgba(94, 234, 212, 0.45);
 }
 
 .btnPrimary,

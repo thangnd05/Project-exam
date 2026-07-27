@@ -9,7 +9,7 @@ export const brandColors = {
   unique: '#f59e0b',
   uniqueHover: '#d97706',
   heroBg: '#042f2e',
-  footerBg: '#134e4a',
+  footerBg: '#042f2e',
   brand50: '#f0fdfa',
   brand100: '#ccfbf1',
   brand200: '#99f6e4',

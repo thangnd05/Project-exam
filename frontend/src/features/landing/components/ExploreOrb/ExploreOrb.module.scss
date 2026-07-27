@@ -1,6 +1,6 @@
 .section {
-
   position: relative;
+  isolation: isolate;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -8,16 +8,75 @@
   background: var(--hero-bg, #042f2e);
   color: #fff;
   overflow: hidden;
-  border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+  border-bottom: 2px solid var(--brand-unique, #f59e0b);
 }
 
-.glow {
+.atmosphere {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
 
-  background: none;
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  animation: drift 14s ease-in-out infinite alternate;
+}
+
+.orbA {
+  width: min(55vw, 520px);
+  height: min(55vw, 520px);
+  top: -8%;
+  right: -6%;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.55), transparent 68%);
+}
+
+.orbB {
+  width: min(45vw, 420px);
+  height: min(45vw, 420px);
+  bottom: 5%;
+  left: -8%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.28), transparent 70%);
+  animation-delay: -4s;
+}
+
+.scan {
+  position: absolute;
+  inset: -20% 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(94, 234, 212, 0.04) 48%,
+    transparent 52%
+  );
+  animation: scan 7s linear infinite;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-18px, 24px, 0) scale(1.08);
+  }
+}
+
+@keyframes scan {
+  from {
+    transform: translateY(-30%);
+  }
+  to {
+    transform: translateY(30%);
+  }
+}
+
+.section.reduceMotion .orb,
+.section.reduceMotion .scan {
+  animation: none;
 }
 
 .inner {
