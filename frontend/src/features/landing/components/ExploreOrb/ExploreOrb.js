@@ -428,7 +428,7 @@ function ExploreOrb() {
         <header className={cx('header')}>
           <h2 className={cx('title')}>Chọn kỳ thi của bạn</h2>
           <p className={cx('subtitle')}>
-            Xoay quỹ đạo — chạm vào kỳ thi để bắt đầu hành trình
+            Xoay quỹ đạo hãy chạm vào kỳ thi để bắt đầu hành trình
           </p>
         </header>
 

@@ -13,8 +13,10 @@
 }
 
 .header {
-  max-width: 640px;
+  max-width: 720px;
+  margin-inline: auto;
   margin-bottom: clamp(28px, 3.5vw, 48px);
+  text-align: center;
 }
 
 .eyebrow {
@@ -23,7 +25,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--brand-unique, #f59e0b);
+  color: var(--brand-700, #0f766e);
 }
 
 .title {
@@ -36,8 +38,8 @@
 }
 
 .subtitle {
-  margin: 0;
-  max-width: 42ch;
+  margin: 0 auto;
+  max-width: 52ch;
   font-size: clamp(1.4rem, 1.55vw, 1.65rem);
   line-height: 1.55;
   color: #64748b;
@@ -128,6 +130,6 @@
   border-radius: 999px;
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--brand-700, #0f766e);
-  background: var(--brand-100, #ccfbf1);
+  color: #fff;
+  background: var(--brand-700, #0f766e);
 }
