@@ -9,8 +9,6 @@ import {
   Flame,
   History,
   Lock,
-  Play,
-  RotateCcw,
   Sparkles,
   Trophy,
 } from 'lucide-react';
@@ -100,27 +98,6 @@ function defaultOpenParts(groups, recommendedTaskId) {
   return new Set([(firstUnfinished || groups[0]).examPartId]);
 }
 
-function ProgressRing({ value, done }) {
-  const r = 16;
-  const c = 2 * Math.PI * r;
-  return (
-    <span className={cx('ring', { ringDone: done })} aria-hidden>
-      <svg viewBox="0 0 40 40" className={cx('ringSvg')}>
-        <circle className={cx('ringTrack')} cx="20" cy="20" r={r} />
-        <circle
-          className={cx('ringBar')}
-          cx="20"
-          cy="20"
-          r={r}
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - Math.min(100, Math.max(0, value)) / 100)}
-        />
-      </svg>
-      <span className={cx('ringLabel')}>{done ? <Trophy size={14} /> : `${value}%`}</span>
-    </span>
-  );
-}
-
 function PlanPartTaskList({
   partGroups = [],
   learningPlanId,
@@ -145,8 +122,6 @@ function PlanPartTaskList({
     return <p className={cx('muted')}>Chưa có ải trong kế hoạch.</p>;
   }
 
-  const allOpen = orderedGroups.every((g) => openIds.has(g.examPartId));
-
   const togglePart = (partId) => {
     const next = new Set(openIds);
     if (next.has(partId)) next.delete(partId);
@@ -154,39 +129,23 @@ function PlanPartTaskList({
     setOpenOverride(next);
   };
 
-  const toggleAll = () => {
-    setOpenOverride(allOpen ? new Set() : new Set(orderedGroups.map((g) => g.examPartId)));
-  };
-
-  const toggleAllBtn = (
-    <button type="button" className={cx('btn', 'btnOutline', 'btnSm')} onClick={toggleAll}>
-      {allOpen ? 'Thu gọn tất cả' : 'Mở tất cả chặng'}
-    </button>
-  );
-
   return (
     <div>
       {roadmapHeading ? (
         <div id="chon-ai-hoc" className={cx('roadmapHeading')}>
-          <div className={cx('roadmapHeadingMain')}>
-            <h3 className={cx('roadmapHeadingTitle')}>
-              {roadmapHeading.title}
-              {roadmapHeading.tip ? <InfoTip text={roadmapHeading.tip} /> : null}
-            </h3>
-            {roadmapHeading.description ? (
-              <p className={cx('roadmapHeadingDesc')}>{roadmapHeading.description}</p>
-            ) : null}
-          </div>
-          <div className={cx('roadmapHeadingAction')}>{toggleAllBtn}</div>
+          <h3 className={cx('roadmapHeadingTitle')}>
+            {roadmapHeading.title}
+            {roadmapHeading.tip ? <InfoTip text={roadmapHeading.tip} /> : null}
+          </h3>
+          {roadmapHeading.description ? (
+            <p className={cx('roadmapHeadingDesc')}>{roadmapHeading.description}</p>
+          ) : null}
         </div>
-      ) : (
-        <div className={cx('roadmapToolbar')}>{toggleAllBtn}</div>
-      )}
+      ) : null}
 
       {orderedGroups.map((group, index) => {
         const total = group.totalTasksInPart || (group.tasks || []).length || 0;
         const passed = group.passedTasksInPart || 0;
-        const pct = total > 0 ? Math.round((passed / total) * 100) : 0;
         const done = total > 0 && passed >= total;
         const open = openIds.has(group.examPartId);
 
@@ -227,7 +186,6 @@ function PlanPartTaskList({
                   <Trophy size={13} /> Hoàn thành
                 </span>
               )}
-              <ProgressRing value={pct} done={done} />
               <ChevronDown className={cx('partChevron', { partChevronOpen: open })} size={20} />
             </button>
 
@@ -357,10 +315,10 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
               className={cx('stageFlag', 'stageFlagEnd')}
               style={{
                 left: `${nodeX(tasks.length - 1)}%`,
-                top: `${nodeY(tasks.length - 1) + 64}px`,
+                top: `${nodeY(tasks.length - 1) + 42}px`,
               }}
             >
-              <Flag size={12} /> Hết chặng
+              <Flag size={14} /> Hết chặng
             </span>
           </div>
         </div>
@@ -443,8 +401,8 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
   const stuck = isTaskStuck(task);
   const nearPass = !isPassed && gap != null && gap > 0 && gap <= NEAR_PASS_GAP;
 
-  const studyLabel = isPassed ? 'Luyện lại' : isRecommended ? 'Vào ải ngay' : 'Học ải';
-  const StudyIcon = isPassed ? RotateCcw : Play;
+  const hasAttempted = (task.attemptCount ?? 0) > 0;
+  const studyLabel = isPassed ? 'Luyện lại' : hasAttempted ? 'Thử lại' : 'Bắt đầu';
 
   const studyButton =
     studyAction === 'button' ? (
@@ -454,7 +412,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
         disabled={!canStudy}
         onClick={() => onStudyTask?.(task.taskId)}
       >
-        <StudyIcon size={16} /> {studyLabel}
+        {studyLabel}
       </button>
     ) : (
       <Link
@@ -465,7 +423,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
           if (!canStudy) e.preventDefault();
         }}
       >
-        <StudyIcon size={16} /> {studyLabel}
+        {studyLabel}
       </Link>
     );
 

@@ -710,68 +710,27 @@
 
 .roadmapHeading {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.2rem;
-  margin: 2.8rem 0 1.4rem;
-
-  @media (max-width: 640px) {
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-}
-
-.roadmapHeadingMain {
-  flex: 1;
-  min-width: 0;
-}
-
-.roadmapHeadingAction {
-  flex-shrink: 0;
-  margin-left: auto;
-
-  @media (max-width: 640px) {
-    margin-left: 0;
-    width: 100%;
-
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-}
-
-.roadmapToolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1.2rem;
-}
-
-.roadmapHeadingIcon {
-  width: 3.6rem;
-  height: 3.6rem;
-  border-radius: var(--radius-md);
-  background: var(--primary-alpha-10);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  text-align: center;
+  margin: 2.8rem 0 2rem;
 }
 
 .roadmapHeadingTitle {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   color: var(--text-color);
   margin: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.6rem;
 }
 
 .roadmapHeadingDesc {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  margin: 0.2rem 0 0;
+  margin: 0.4rem 0 0;
 }
 
 .partGroup {
@@ -950,12 +909,14 @@
     grid-template-columns: minmax(0, 1fr) minmax(28rem, 34rem);
     align-items: stretch;
   }
+
 }
 
 .stageMapShell {
   position: relative;
   width: 100%;
-  max-height: min(68vh, 560px);
+  // Đủ chỗ cho chặng 6 ải (56 + 5×108 + 88 = 684) khỏi phải cuộn lồng trong trang.
+  max-height: min(76vh, 700px);
   overflow-x: hidden;
   overflow-y: auto;
   border-radius: var(--radius-lg);
@@ -1035,9 +996,14 @@
 }
 
 .stageFlagEnd {
-  color: var(--author-tag-text);
-  border-color: var(--author-tag-border);
-  background: var(--author-tag-bg);
+  color: #fff;
+  border-color: var(--primary);
+  background: var(--primary);
+  font-size: var(--font-size-sm);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: var(--font-weight-semibold);
+  padding: 0.4rem 1.2rem;
 }
 
 .stageNodeWrap {
@@ -1203,7 +1169,8 @@
     position: sticky;
     top: 8rem;
     align-self: start;
-    max-height: min(68vh, 560px);
+    // Đủ chỗ cho chặng 6 ải (56 + 5×108 + 88 = 684) khỏi phải cuộn lồng trong trang.
+  max-height: min(76vh, 700px);
   }
 }
 
@@ -1384,53 +1351,6 @@
     color: var(--brand-700);
     text-decoration: underline;
   }
-}
-
-// Vòng tròn tiến độ nhỏ ở header mỗi chặng.
-.ring {
-  position: relative;
-  width: 4.4rem;
-  height: 4.4rem;
-  flex-shrink: 0;
-}
-
-.ringSvg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.ringTrack {
-  fill: none;
-  stroke: var(--border-color);
-  stroke-width: 4;
-}
-
-.ringBar {
-  fill: none;
-  stroke: var(--primary);
-  stroke-width: 4;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.6s ease;
-}
-
-.ringDone .ringBar {
-  stroke: #16a34a;
-}
-
-.ringLabel {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-xs2);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-color);
-}
-
-.ringDone .ringLabel {
-  color: #16a34a;
 }
 
 .taskStats {
