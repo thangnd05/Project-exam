@@ -908,25 +908,38 @@
 
 .stageLayout {
   display: grid;
-  gap: 1.6rem;
+  gap: 1.4rem;
   grid-template-columns: 1fr;
 
   @media (min-width: 1180px) {
-    grid-template-columns: minmax(0, 1fr) 32rem;
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(28rem, 34rem);
+    align-items: stretch;
+  }
+}
+
+.stageMapShell {
+  position: relative;
+  width: 100%;
+  max-height: min(68vh, 560px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background:
+    radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.35) 1px, transparent 0) 0 0 / 2.2rem 2.2rem,
+    var(--bg-white);
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+
+  @media (max-width: 1179px) {
+    max-height: min(62vh, 520px);
   }
 }
 
 .stageMap {
   position: relative;
   width: 100%;
-  max-width: 48rem;
-  margin: 0 auto;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  background:
-    radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.35) 1px, transparent 0) 0 0 / 2.2rem 2.2rem,
-    var(--bg-white);
+  margin: 0;
 }
 
 .stagePath {
@@ -1083,14 +1096,11 @@
 
 .stageNodeLabel {
   position: absolute;
-  top: calc(100% + 0.65rem);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 14rem;
+  top: 50%;
+  width: 12rem;
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.92);
-  text-align: center;
+  background: rgba(255, 255, 255, 0.94);
   font-size: var(--font-size-sm);
   line-height: 1.35;
   color: var(--text-secondary);
@@ -1098,10 +1108,26 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  z-index: 3;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
 
   @media (max-width: 560px) {
-    width: 11rem;
+    width: 9.5rem;
   }
+}
+
+.labelLeft {
+  right: calc(100% + 0.7rem);
+  left: auto;
+  transform: translateY(-50%);
+  text-align: right;
+}
+
+.labelRight {
+  left: calc(100% + 0.7rem);
+  right: auto;
+  transform: translateY(-50%);
+  text-align: left;
 }
 
 .stageNodeLabelActive {
@@ -1135,20 +1161,28 @@
 
 .stagePanel {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 
   @media (min-width: 1180px) {
     position: sticky;
     top: 8rem;
     align-self: start;
+    max-height: min(68vh, 560px);
   }
 }
 
 .stagePanelCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 1.8rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   background: var(--bg-white);
   box-shadow: var(--shadow-sm);
+  min-height: 0;
+  overflow: auto;
 }
 
 .stagePanelCardCapstone {
@@ -1179,9 +1213,11 @@
 }
 
 .stagePanelResource {
-  margin-top: 1.2rem;
-  padding-top: 1rem;
-  border-top: 1px dashed var(--border-color);
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary-alpha-20);
+  background: var(--primary-alpha-10);
 }
 
 .taskActions {
@@ -1189,7 +1225,8 @@
   flex-wrap: wrap;
   gap: 0.6rem;
   align-items: center;
-  margin-top: 1.2rem;
+  margin-top: auto;
+  padding-top: 1.2rem;
 }
 
 .stageCta {

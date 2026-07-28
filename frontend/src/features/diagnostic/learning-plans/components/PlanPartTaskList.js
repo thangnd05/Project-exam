@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {
@@ -35,11 +35,11 @@ const CAPSTONE_TYPES = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 /** Gap còn lại đủ nhỏ thì gắn nhãn "Sắp vượt" để tạo động lực đánh nốt. */
 const NEAR_PASS_GAP = 10;
 
-// Toạ độ bản đồ: x theo % (S nhẹ, phẳng — tránh zigzag mạnh nhìn như đổ xa).
-const NODE_X = [50, 64, 50, 36];
-const ROW_STEP = 148;
-const MAP_TOP = 72;
-const MAP_BOTTOM = 110;
+// Toạ độ bản đồ: x theo % — S nhẹ, hàng gần nhau để map đỡ cao.
+const NODE_X = [50, 62, 50, 38];
+const ROW_STEP = 108;
+const MAP_TOP = 56;
+const MAP_BOTTOM = 88;
 
 function nodeX(i) {
   return NODE_X[i % NODE_X.length];
@@ -47,6 +47,11 @@ function nodeX(i) {
 
 function nodeY(i) {
   return MAP_TOP + i * ROW_STEP;
+}
+
+/** Node lệch trái → nhãn sang phải (và ngược lại). */
+function labelSide(i) {
+  return nodeX(i) >= 50 ? 'right' : 'left';
 }
 
 /** Nhãn trên map: bỏ phần trong ngoặc, cắt ngắn. */
@@ -243,6 +248,19 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
   const [pickedId, setPickedId] = useState(null);
   const selectedId = pickedId ?? defaultSelected;
   const selected = tasks.find((t) => t.taskId === selectedId) || null;
+  const mapShellRef = useRef(null);
+  const selectedNodeRef = useRef(null);
+
+  useEffect(() => {
+    const shell = mapShellRef.current;
+    const node = selectedNodeRef.current;
+    if (!shell || !node) return;
+    const shellRect = shell.getBoundingClientRect();
+    const nodeRect = node.getBoundingClientRect();
+    const offset =
+      nodeRect.top - shellRect.top - shellRect.height / 2 + nodeRect.height / 2;
+    shell.scrollTo({ top: shell.scrollTop + offset, behavior: 'smooth' });
+  }, [selectedId]);
 
   if (!tasks.length) {
     return (
@@ -289,43 +307,49 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
       )}
 
       <div className={cx('stageLayout')}>
-        <div className={cx('stageMap')} style={{ height: `${height}px` }}>
-          <span className={cx('stageFlag', 'stageFlagStart')}>Xuất phát</span>
+        <div ref={mapShellRef} className={cx('stageMapShell')}>
+          <div className={cx('stageMap')} style={{ height: `${height}px` }}>
+            <span className={cx('stageFlag', 'stageFlagStart')}>Xuất phát</span>
 
-          <svg
-            className={cx('stagePath')}
-            width="100%"
-            height={height}
-            viewBox={`0 0 100 ${height}`}
-            preserveAspectRatio="none"
-            aria-hidden
-          >
-            {pathD && (
-              <>
-                <path className={cx('stagePathTrack')} d={pathD} />
-                {donePathD && <path className={cx('stagePathDone')} d={donePathD} />}
-                <path className={cx('stagePathDash')} d={pathD} />
-              </>
-            )}
-          </svg>
+            <svg
+              className={cx('stagePath')}
+              width="100%"
+              height={height}
+              viewBox={`0 0 100 ${height}`}
+              preserveAspectRatio="none"
+              aria-hidden
+            >
+              {pathD && (
+                <>
+                  <path className={cx('stagePathTrack')} d={pathD} />
+                  {donePathD && <path className={cx('stagePathDone')} d={donePathD} />}
+                  <path className={cx('stagePathDash')} d={pathD} />
+                </>
+              )}
+            </svg>
 
-          {tasks.map((task, i) => (
-            <StageNode
-              key={task.taskId}
-              task={task}
-              index={i}
-              isSelected={task.taskId === selectedId}
-              isRecommended={task.taskId === recommendedTaskId}
-              onSelect={() => setPickedId(task.taskId)}
-            />
-          ))}
+            {tasks.map((task, i) => (
+              <StageNode
+                key={task.taskId}
+                task={task}
+                index={i}
+                isSelected={task.taskId === selectedId}
+                isRecommended={task.taskId === recommendedTaskId}
+                nodeRef={task.taskId === selectedId ? selectedNodeRef : undefined}
+                onSelect={() => setPickedId(task.taskId)}
+              />
+            ))}
 
-          <span
-            className={cx('stageFlag', 'stageFlagEnd')}
-            style={{ left: `${nodeX(tasks.length - 1)}%`, top: `${nodeY(tasks.length - 1) + 84}px` }}
-          >
-            <Flag size={12} /> Hết chặng
-          </span>
+            <span
+              className={cx('stageFlag', 'stageFlagEnd')}
+              style={{
+                left: `${nodeX(tasks.length - 1)}%`,
+                top: `${nodeY(tasks.length - 1) + 64}px`,
+              }}
+            >
+              <Flag size={12} /> Hết chặng
+            </span>
+          </div>
         </div>
 
         <div className={cx('stagePanel')}>
@@ -344,7 +368,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
   );
 }
 
-function StageNode({ task, index, isSelected, isRecommended, onSelect }) {
+function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }) {
   const isCapstone = CAPSTONE_TYPES.has(task.taskType);
   const isPassed = task.status === 'PASSED';
   const isLocked = task.status === 'LOCKED';
@@ -358,6 +382,7 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect }) {
 
   return (
     <button
+      ref={nodeRef}
       type="button"
       className={cx('stageNodeWrap')}
       style={{ left: `${nodeX(index)}%`, top: `${nodeY(index)}px` }}
@@ -382,7 +407,11 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect }) {
           task.taskOrder
         )}
       </span>
-      <span className={cx('stageNodeLabel', { stageNodeLabelActive: isSelected || isRecommended })}>
+      <span
+        className={cx('stageNodeLabel', `label${labelSide(index) === 'left' ? 'Left' : 'Right'}`, {
+          stageNodeLabelActive: isSelected || isRecommended,
+        })}
+      >
         {isCapstone ? 'Ải trùm' : shortMapLabel(task.tagName)}
       </span>
     </button>
@@ -452,6 +481,17 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
         )}
       </div>
 
+      {!isLocked && !isCapstone && (resource?.url || resource?.resourceId) && (
+        <div className={cx('stagePanelResource')}>
+          <div className={cx('resourceLabel')}>
+            <BookOpen size={14} /> Tài liệu nên đọc trước
+          </div>
+          <RecoveryResourceLink resource={resource} className={cx('resourceLink')}>
+            {resource.title || resource.originalFileName || 'Mở tài liệu'}
+          </RecoveryResourceLink>
+        </div>
+      )}
+
       {task.passAccuracy != null && !isLocked && (
         <div className={cx('meterWrap')}>
           <div className={cx('meter')}>
@@ -496,37 +536,25 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
             : 'Hoàn thành các ải trước để mở ải này.'}
         </p>
       ) : (
-        <>
-          <div className={cx('taskActions')}>
-            {studyButton}
-            {task.attemptCount > 0 && (
-              <Link
-                to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
-                className={cx('btn', 'btnOutline', 'btnSm')}
-              >
-                <History size={14} /> Lịch sử {task.attemptCount}
-              </Link>
-            )}
-            {isPassed && (
-              <Link
-                to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/result`}
-                className={cx('btn', 'btnOutline', 'btnSm')}
-              >
-                Xem giải thích
-              </Link>
-            )}
-          </div>
-          {!isCapstone && (resource?.url || resource?.resourceId) && (
-            <div className={cx('stagePanelResource')}>
-              <div className={cx('resourceLabel')}>
-                <BookOpen size={14} /> Tài liệu nên đọc
-              </div>
-              <RecoveryResourceLink resource={resource} className={cx('resourceLink')}>
-                {resource.title || resource.originalFileName || 'Mở tài liệu'}
-              </RecoveryResourceLink>
-            </div>
+        <div className={cx('taskActions')}>
+          {studyButton}
+          {task.attemptCount > 0 && (
+            <Link
+              to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
+              className={cx('btn', 'btnOutline', 'btnSm')}
+            >
+              <History size={14} /> Lịch sử {task.attemptCount}
+            </Link>
           )}
-        </>
+          {isPassed && (
+            <Link
+              to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/result`}
+              className={cx('btn', 'btnOutline', 'btnSm')}
+            >
+              Xem giải thích
+            </Link>
+          )}
+        </div>
       )}
     </div>
   );
