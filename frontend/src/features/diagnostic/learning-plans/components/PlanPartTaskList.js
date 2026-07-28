@@ -35,11 +35,11 @@ const CAPSTONE_TYPES = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 /** Gap còn lại đủ nhỏ thì gắn nhãn "Sắp vượt" để tạo động lực đánh nốt. */
 const NEAR_PASS_GAP = 10;
 
-// Toạ độ bản đồ: x theo % bề ngang (đường đi lượn sóng), y theo px.
-const NODE_X = [50, 74, 50, 26];
-const ROW_STEP = 140;
+// Toạ độ bản đồ: x theo % (S nhẹ, phẳng — tránh zigzag mạnh nhìn như đổ xa).
+const NODE_X = [50, 64, 50, 36];
+const ROW_STEP = 148;
 const MAP_TOP = 72;
-const MAP_BOTTOM = 124;
+const MAP_BOTTOM = 110;
 
 function nodeX(i) {
   return NODE_X[i % NODE_X.length];
@@ -47,6 +47,15 @@ function nodeX(i) {
 
 function nodeY(i) {
   return MAP_TOP + i * ROW_STEP;
+}
+
+/** Nhãn trên map: bỏ phần trong ngoặc, cắt ngắn. */
+function shortMapLabel(name, max = 32) {
+  if (!name) return '';
+  const primary = name.split(/\s*[–—(]/)[0].trim();
+  if (primary.length <= max) return primary;
+  const cut = primary.slice(0, max - 1).replace(/\s+\S*$/, '');
+  return `${cut || primary.slice(0, max - 1)}…`;
 }
 
 /** Đường cong nối ải `from` → ải `to` — cubic với control point dọc để thành hình rắn lượn. */
@@ -107,6 +116,7 @@ function PlanPartTaskList({
   recommendedTaskId,
   studyAction = 'link',
   onStudyTask,
+  roadmapHeading = null,
 }) {
   const orderedGroups = useMemo(
     () => sortByPartOrder(partGroups, { nameKey: 'examPartName' }),
@@ -137,31 +147,33 @@ function PlanPartTaskList({
     setOpenOverride(allOpen ? new Set() : new Set(orderedGroups.map((g) => g.examPartId)));
   };
 
+  const toggleAllBtn = (
+    <button type="button" className={cx('btn', 'btnOutline', 'btnSm')} onClick={toggleAll}>
+      {allOpen ? 'Thu gọn tất cả' : 'Mở tất cả chặng'}
+    </button>
+  );
+
   return (
     <div>
-      <div className={cx('roadmapBar')}>
-        <p className={cx('roadmapLegend')}>
-          <span className={cx('legendItem')}>
-            <span className={cx('legendDot', 'legendPassed')}>
-              <Check size={11} />
-            </span>
-            Đã vượt
+      {roadmapHeading ? (
+        <div id="chon-ai-hoc" className={cx('roadmapHeading')}>
+          <span className={cx('roadmapHeadingIcon')}>
+            <Flag size={18} />
           </span>
-          <span className={cx('legendItem')}>
-            <span className={cx('legendDot', 'legendCurrent')} />
-            Đang mở
-          </span>
-          <span className={cx('legendItem')}>
-            <span className={cx('legendDot', 'legendLocked')}>
-              <Lock size={10} />
-            </span>
-            Chưa mở
-          </span>
-        </p>
-        <button type="button" className={cx('linkBtn')} onClick={toggleAll}>
-          {allOpen ? 'Thu gọn tất cả' : 'Mở tất cả chặng'}
-        </button>
-      </div>
+          <div className={cx('roadmapHeadingMain')}>
+            <h3 className={cx('roadmapHeadingTitle')}>
+              {roadmapHeading.title}
+              {roadmapHeading.tip ? <InfoTip text={roadmapHeading.tip} /> : null}
+            </h3>
+            {roadmapHeading.description ? (
+              <p className={cx('roadmapHeadingDesc')}>{roadmapHeading.description}</p>
+            ) : null}
+          </div>
+          <div className={cx('roadmapHeadingAction')}>{toggleAllBtn}</div>
+        </div>
+      ) : (
+        <div className={cx('roadmapToolbar')}>{toggleAllBtn}</div>
+      )}
 
       {orderedGroups.map((group, index) => {
         const total = group.totalTasksInPart || (group.tasks || []).length || 0;
@@ -247,20 +259,22 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
   return (
     <div className={cx('partBody')}>
       <p className={cx('partGroupHint')}>
-        Đi lần lượt từ ải đầu tiên xuống cuối chặng. Bấm vào một ải trên bản đồ để xem chi tiết.
+        Bấm ải trên bản đồ để xem chi tiết
         {group.passAccuracy != null && (
           <>
-            {' '}Mỗi ải cần đúng ≥{group.passAccuracy}% mới tính là vượt.
+            {' '}
+            · cần ≥{group.passAccuracy}% để vượt
             <InfoTip text={TERM_TIPS.passThreshold} />
           </>
         )}
+        .
       </p>
 
       {(group.partResources || []).length > 0 && (
         <div className={cx('resourceBox')}>
           <div className={cx('resourceInfo')}>
             <div className={cx('resourceLabel')}>
-              <BookOpen size={14} /> Giới thiệu &amp; cách làm chặng này (đọc trước)
+              <BookOpen size={14} /> Giới thiệu chặng (đọc trước)
             </div>
             {group.partResources.map((r) => (
               <div key={r.resourceId}>
@@ -275,18 +289,6 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
       )}
 
       <div className={cx('stageLayout')}>
-        <div className={cx('stagePanel')}>
-          {selected && (
-            <TaskDetailCard
-              task={selected}
-              learningPlanId={learningPlanId}
-              isRecommended={selected.taskId === recommendedTaskId}
-              studyAction={studyAction}
-              onStudyTask={onStudyTask}
-            />
-          )}
-        </div>
-
         <div className={cx('stageMap')} style={{ height: `${height}px` }}>
           <span className={cx('stageFlag', 'stageFlagStart')}>Xuất phát</span>
 
@@ -320,10 +322,22 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
 
           <span
             className={cx('stageFlag', 'stageFlagEnd')}
-            style={{ left: `${nodeX(tasks.length - 1)}%`, top: `${nodeY(tasks.length - 1) + 88}px` }}
+            style={{ left: `${nodeX(tasks.length - 1)}%`, top: `${nodeY(tasks.length - 1) + 84}px` }}
           >
             <Flag size={12} /> Hết chặng
           </span>
+        </div>
+
+        <div className={cx('stagePanel')}>
+          {selected && (
+            <TaskDetailCard
+              task={selected}
+              learningPlanId={learningPlanId}
+              isRecommended={selected.taskId === recommendedTaskId}
+              studyAction={studyAction}
+              onStudyTask={onStudyTask}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -368,8 +382,8 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect }) {
           task.taskOrder
         )}
       </span>
-      <span className={cx('stageNodeLabel', { stageNodeLabelActive: isSelected })}>
-        {isCapstone ? 'Ải trùm' : task.tagName}
+      <span className={cx('stageNodeLabel', { stageNodeLabelActive: isSelected || isRecommended })}>
+        {isCapstone ? 'Ải trùm' : shortMapLabel(task.tagName)}
       </span>
     </button>
   );
@@ -394,22 +408,22 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
     studyAction === 'button' ? (
       <button
         type="button"
-        className={cx('btn', 'btnPrimary', 'btnSm')}
+        className={cx('btn', 'btnPrimary', 'stageCta')}
         disabled={!canStudy}
         onClick={() => onStudyTask?.(task.taskId)}
       >
-        <StudyIcon size={14} /> {studyLabel}
+        <StudyIcon size={16} /> {studyLabel}
       </button>
     ) : (
       <Link
         to={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
-        className={cx('btn', 'btnPrimary', 'btnSm')}
+        className={cx('btn', 'btnPrimary', 'stageCta')}
         aria-disabled={!canStudy}
         onClick={(e) => {
           if (!canStudy) e.preventDefault();
         }}
       >
-        <StudyIcon size={14} /> {studyLabel}
+        <StudyIcon size={16} /> {studyLabel}
       </Link>
     );
 
@@ -449,59 +463,48 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
           </div>
           <div className={cx('meterLabel')}>
             {current == null ? (
-              <span>Chưa luyện ải này · cần đúng ≥{task.passAccuracy}% để vượt</span>
+              <span>Chưa luyện · cần ≥{task.passAccuracy}%</span>
             ) : gap === 0 ? (
               <span className={cx('successText')}>
-                <strong>{current}%</strong> · đã qua ngưỡng {task.passAccuracy}%
+                <strong>{current}%</strong> · đã đạt ngưỡng
               </span>
             ) : (
               <span>
-                <strong>{current}%</strong> hiện tại · còn <strong>{gap}%</strong> nữa là chạm
-                ngưỡng {task.passAccuracy}%
+                <strong>{current}%</strong> · cần ≥{task.passAccuracy}%
+                {gap != null ? ` · còn ${gap}%` : ''}
               </span>
             )}
           </div>
         </div>
       )}
 
-      <div className={cx('taskStats')}>
-        {task.wrongCountAtDiagnosis != null && (
-          <span className={cx('metaChip')}>Sai {task.wrongCountAtDiagnosis} câu lúc chẩn đoán</span>
-        )}
-        {task.targetQuestionCount != null && (
-          <span className={cx('metaChip')}>{task.targetQuestionCount} câu mỗi lượt</span>
-        )}
-      </div>
+      {(task.wrongCountAtDiagnosis != null || task.targetQuestionCount != null) && (
+        <div className={cx('taskStats')}>
+          {task.wrongCountAtDiagnosis != null && (
+            <span className={cx('metaChip')}>Sai {task.wrongCountAtDiagnosis} lúc chẩn đoán</span>
+          )}
+          {task.targetQuestionCount != null && (
+            <span className={cx('metaChip')}>{task.targetQuestionCount} câu / lượt</span>
+          )}
+        </div>
+      )}
 
       {isLocked ? (
         <p className={cx('muted', 'small', 'lockHint')}>
           {isCapstone
-            ? 'Vượt hết các ải phía trên của chặng này thì ải trùm sẽ mở.'
-            : 'Ải sẽ mở khi bạn hoàn thành các ải trước đó.'}
+            ? 'Vượt hết ải phía trên để mở ải trùm.'
+            : 'Hoàn thành các ải trước để mở ải này.'}
         </p>
       ) : (
         <>
-          {!isCapstone && (
-            <div className={cx('stagePanelResource')}>
-              <div className={cx('resourceLabel')}>
-                <BookOpen size={14} /> Tài liệu nên đọc trước
-              </div>
-              {resource?.url || resource?.resourceId ? (
-                <RecoveryResourceLink resource={resource} className={cx('resourceLink')}>
-                  {resource.title || resource.originalFileName || 'Mở tài liệu'}
-                </RecoveryResourceLink>
-              ) : (
-                <span className={cx('muted', 'small')}>Chưa có tài liệu cho tag này</span>
-              )}
-            </div>
-          )}
           <div className={cx('taskActions')}>
+            {studyButton}
             {task.attemptCount > 0 && (
               <Link
                 to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
                 className={cx('btn', 'btnOutline', 'btnSm')}
               >
-                <History size={14} /> Lịch sử {task.attemptCount} lượt
+                <History size={14} /> Lịch sử {task.attemptCount}
               </Link>
             )}
             {isPassed && (
@@ -512,8 +515,17 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
                 Xem giải thích
               </Link>
             )}
-            {studyButton}
           </div>
+          {!isCapstone && (resource?.url || resource?.resourceId) && (
+            <div className={cx('stagePanelResource')}>
+              <div className={cx('resourceLabel')}>
+                <BookOpen size={14} /> Tài liệu nên đọc
+              </div>
+              <RecoveryResourceLink resource={resource} className={cx('resourceLink')}>
+                {resource.title || resource.originalFileName || 'Mở tài liệu'}
+              </RecoveryResourceLink>
+            </div>
+          )}
         </>
       )}
     </div>

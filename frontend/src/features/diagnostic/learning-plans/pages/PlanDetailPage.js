@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { Flag, Play } from 'lucide-react';
-import InfoTip from '~/shared/ui/InfoTip/InfoTip';
-import { TERM_TIPS } from '~/features/diagnostic/termTips';
+import { Play } from 'lucide-react';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import { usePlanDetail } from './hooks/usePlanDetail';
 import { planStageLabel, planStatusLabel } from '../planLabels';
 import { getReadinessLabel } from '~/features/diagnostic/target/utils/readiness-label';
+import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -185,26 +184,6 @@ function PlanDetailPage() {
         </div>
       </div>
 
-      {!isReplaced && plan.planStage === 'FOUNDATION' && (
-        <div className={cx('alert')}>
-          <span>
-            {plan.diagnosisSourceCategory === 'QUICK_CHALLENGE' ? (
-              <>
-                Lộ trình này được chẩn đoán từ một <strong>bài thử thách nhanh</strong> (ngắn) — đủ để
-                bắt đầu ôn. Ôn xong các ải, hãy làm một <strong>bài thi thử đầy đủ</strong> để chẩn đoán
-                chính xác hơn (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
-              </>
-            ) : (
-              <>
-                Lộ trình này được chẩn đoán từ bài bạn đã làm gần nhất. Ôn xong các ải,
-                hãy làm một <strong>bài thi thử đầy đủ</strong> để kiểm tra lại và cập nhật
-                độ chính xác của chẩn đoán (nếu chưa đạt sẽ sinh lộ trình mới sát hơn).
-              </>
-            )}
-          </span>
-        </div>
-      )}
-
       {plan.partsWithoutTasks?.length > 0 && (
         <div className={cx('alert', 'alertWarning')}>
           Part chưa đạt mục tiêu nhưng chưa có ải (thiếu tag trên câu hỏi):{' '}
@@ -213,27 +192,17 @@ function PlanDetailPage() {
       )}
 
       {!isReplaced && (
-        <>
-          <div id="chon-ai-hoc" className={cx('roadmapHeading')}>
-            <span className={cx('roadmapHeadingIcon')}><Flag size={18} /></span>
-            <div>
-              <h3 className={cx('roadmapHeadingTitle')}>
-                Bản đồ ải của bạn
-                <InfoTip text={TERM_TIPS.task} />
-              </h3>
-              <p className={cx('roadmapHeadingDesc')}>
-                {partGroups.length} chặng · {totalTasks} ải. Vượt hết ải của một chặng để mở ải trùm
-                của chặng đó.
-              </p>
-            </div>
-          </div>
-          <PlanPartTaskList
-            partGroups={partGroups}
-            learningPlanId={plan.learningPlanId}
-            recommendedTaskId={plan.recommendedTaskId}
-            studyAction="link"
-          />
-        </>
+        <PlanPartTaskList
+          partGroups={partGroups}
+          learningPlanId={plan.learningPlanId}
+          recommendedTaskId={plan.recommendedTaskId}
+          studyAction="link"
+          roadmapHeading={{
+            title: 'Bản đồ ải của bạn',
+            tip: TERM_TIPS.task,
+            description: `${partGroups.length} chặng · ${totalTasks} ải. Vượt hết ải của một chặng để mở ải trùm của chặng đó.`,
+          }}
+        />
       )}
     </div>
   );
