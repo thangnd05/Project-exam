@@ -12,7 +12,7 @@ import UpdateProfileModal from './modals/UpdateProfileModal';
 import ProfileSectionModal from './ProfileSectionModal';
 import styles from './ProfileOverviewPage.module.scss';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
-import routes, { buildNextStepPath } from '~/shared/config/Routes';
+import routes from '~/shared/config/Routes';
 import { brandColors } from '~/shared/styles/brandColors';
 import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
@@ -436,14 +436,6 @@ function ProfileOverviewPage() {
                             <div className={cx('targetActions')}>
                               <ButtonPrime
                                 variant="primary"
-                                size="sm"
-                                className={cx('targetActionFlex')}
-                                onClick={() => navigate(buildNextStepPath(target.examTypeId))}
-                              >
-                                Tiếp theo
-                              </ButtonPrime>
-                              <ButtonPrime
-                                variant="outline"
                                 size="sm"
                                 className={cx('targetActionFlex')}
                                 onClick={() =>

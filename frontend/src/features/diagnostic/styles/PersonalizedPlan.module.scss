@@ -708,6 +708,23 @@
   }
 }
 
+// Khối lịch sử bài thi nhúng trong trang Tổng quan mục tiêu.
+.dashboardFooterActions {
+  margin-top: 2rem;
+}
+
+.historyToggle {
+  margin-top: 1.4rem;
+}
+
+.historyToggleIcon {
+  transition: transform 0.2s;
+}
+
+.historyToggleIconOpen {
+  transform: rotate(180deg);
+}
+
 .roadmapHeading {
   display: flex;
   flex-direction: column;

@@ -175,8 +175,10 @@ function TargetAchievedPage() {
                   {' '}— độ sẵn sàng #1 → #N qua từng bài thi thử.
                 </li>
                 <li>
-                  <Link to="/my-target/mocks">Lịch sử bài thi</Link>
-                  {' '}— biểu đồ độ sẵn sàng theo thời gian.
+                  <Link to={`/my-target/dashboard?examTypeId=${examTypeId}`}>
+                    Tổng quan mục tiêu
+                  </Link>
+                  {' '}— biểu đồ độ sẵn sàng theo thời gian và các bài đã làm.
                 </li>
                 <li>
                   <Link to="/">Làm thêm bài</Link>

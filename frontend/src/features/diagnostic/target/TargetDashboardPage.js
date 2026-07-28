@@ -4,8 +4,8 @@ import classNames from 'classnames/bind';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
-import { formatDateTime24 as formatDate, formatDayMonth } from '~/shared/utils/format-date-time';
-import TargetDashboardMockSparkline from './components/TargetDashboardMockSparkline';
+import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
+import MockHistoryPanel from '~/features/diagnostic/mock-history/MockHistoryPanel';
 import TargetDashboardPartChart from './components/TargetDashboardPartChart';
 import { useTargetDashboard } from './hooks/useTargetDashboard';
 import { getReadinessClassName, getReadinessLabel } from './utils/readiness-label';
@@ -25,7 +25,6 @@ function TargetDashboardPage() {
     target,
     plans,
     latestMock,
-    recentMocks,
     latestEnhanced,
     isLoading: loading,
     error,
@@ -41,6 +40,14 @@ function TargetDashboardPage() {
     () => (plans || []).find((p) => p.status === 'ACTIVE') || null,
     [plans],
   );
+
+  // Bước kế tiếp: đang có lộ trình thì vào thẳng bản đồ ải, chưa có thì đi sinh lộ trình.
+  // Dashboard đã nắm đủ plans/latestMock nên không phải gọi thêm API để biết đi đâu.
+  const nextStepTo = useMemo(() => {
+    if (activePlan) return `/learning-plans/${activePlan.learningPlanId}`;
+    if (latestMock?.userTestId) return `/learning-plans/generate?userTestId=${latestMock.userTestId}`;
+    return examTypeId ? `/learning-plans/generate?examTypeId=${examTypeId}` : '/learning-plans/generate';
+  }, [activePlan, latestMock, examTypeId]);
 
   const partNameOf = (id) =>
     examParts.find((p) => p.examPartId === id)?.name || id;
@@ -84,34 +91,17 @@ function TargetDashboardPage() {
     });
   }, [target, examParts]);
 
-  const mockSparklineData = useMemo(
-    () =>
-      [...recentMocks]
-        .reverse()
-        .map((t) => ({
-          label: formatDayMonth(t.finishedAt),
-          score: t.totalScore ?? 0,
-        })),
-    [recentMocks],
-  );
-
   const readinessLevel = enhancedMatchesType ? latestEnhanced?.readinessLevel : null;
+  const examTypeName = useMemo(
+    () => examTypes.find((et) => et.examTypeId === examTypeId)?.name || '',
+    [examTypes, examTypeId],
+  );
 
   return (
     <div className={cx('wrapper')}>
       <TargetPlanTabs active="overview" examTypeId={examTypeId} />
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>Tổng quan mục tiêu</h2>
-        <div className={cx('actionBar')}>
-          <ButtonPrime
-            as="link"
-            to={examTypeId ? `/my-target/mocks?examTypeId=${examTypeId}` : '/my-target/mocks'}
-            variant="outline"
-            size="sm"
-          >
-            Lịch sử thi thử
-          </ButtonPrime>
-        </div>
       </div>
 
       <div className={cx('filterRow')}>
@@ -261,14 +251,6 @@ function TargetDashboardPage() {
             </div>
           </div>
 
-          {mockSparklineData.length >= 2 && (
-            <TargetDashboardMockSparkline
-              data={mockSparklineData}
-              examTypeId={examTypeId}
-              targetScore={targetScore}
-            />
-          )}
-
           <div className={classNames(cx('card'), pageCx('partSection'))}>
             <div className={cx('cardHeader')}>% từng Part — hiện tại vs aim</div>
             <div className={cx('cardBody')}>
@@ -276,63 +258,31 @@ function TargetDashboardPage() {
             </div>
           </div>
 
-          {latestMock && (
-            <div className={cx('card')}>
-              <div
-                className={cx('cardBody')}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '1rem',
-                }}
-              >
-                <div>
-                  <div className={cx('statLabel')}>Mock gần nhất</div>
-                  <div style={{ fontSize: 'var(--font-size-ssm)' }}>
-                    <strong>{formatDate(latestMock.finishedAt)}</strong>
-                    {' · '}Score {latestMock.totalScore ?? '—'}
-                    {' · '}
-                    <code className={cx('code')}>{latestMock.userTestId.slice(0, 8)}…</code>
-                  </div>
-                </div>
-                <div className={cx('actionBar')}>
-                  <ButtonPrime
-                    as="link"
-                    to={`/tests/result/${latestMock.userTestId}`}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Xem chẩn đoán
-                  </ButtonPrime>
-                  <ButtonPrime
-                    as="link"
-                    to={`/learning-plans/generate?userTestId=${latestMock.userTestId}`}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Sinh plan
-                  </ButtonPrime>
-                </div>
-              </div>
-            </div>
-          )}
+        </>
+      )}
 
-          <div className={cx('actionBar')}>
-            <ButtonPrime as="link" to={`/next-step?examTypeId=${examTypeId}`} variant="primary" size="lg">
-              Tôi nên làm gì tiếp theo?
-            </ButtonPrime>
+      {/* Ngoài gate hasTarget: chưa đặt mục tiêu vẫn phải xem được bài đã làm. */}
+      {!loading && (
+        <MockHistoryPanel examTypeId={examTypeId} examTypeName={examTypeName} />
+      )}
+
+      {/* Hành động chốt trang — đặt cuối để người dùng đọc hết số liệu rồi mới quyết. */}
+      {!loading && (
+        <div className={cx('actionBar', 'dashboardFooterActions')}>
+          <ButtonPrime as="link" to={nextStepTo} variant="primary" size="lg">
+            {activePlan ? 'Vào lộ trình đang học' : 'Lập lộ trình ôn'}
+          </ButtonPrime>
+          {latestMock?.userTestId && (
             <ButtonPrime
               as="link"
-              to={examTypeId ? `/my-target/mocks?examTypeId=${examTypeId}` : '/my-target/mocks'}
+              to={`/tests/result/${latestMock.userTestId}`}
               variant="outline"
               size="lg"
             >
-              Tất cả bài đã làm
+              Xem chẩn đoán bài gần nhất
             </ButtonPrime>
-          </div>
-        </>
+          )}
+        </div>
       )}
     </div>
   );

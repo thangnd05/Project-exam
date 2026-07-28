@@ -63,8 +63,7 @@ const StreakRecoverManagement = lazy(() => import('~/features/admin/gamification
 const UserTargetPage = lazy(() => import('~/features/diagnostic/target/UserTargetPage'));
 const TargetDashboardPage = lazy(() => import('~/features/diagnostic/target/TargetDashboardPage'));
 const TargetAchievedPage = lazy(() => import('~/features/diagnostic/target/TargetAchievedPage'));
-const MockHistoryPage = lazy(() => import('~/features/diagnostic/mock-history/MockHistoryPage'));
-const NextStepPage = lazy(() => import('~/features/diagnostic/next-step/NextStepPage'));
+const MockHistoryRedirect = lazy(() => import('~/features/diagnostic/mock-history/MockHistoryRedirect'));
 const GeneratePlanPage = lazy(() => import('~/features/diagnostic/learning-plans/pages/GeneratePlanPage'));
 const PlanDetailPage = lazy(() => import('~/features/diagnostic/learning-plans/pages/PlanDetailPage'));
 const PlanStudyPage = lazy(() => import('~/features/diagnostic/learning-plans/pages/PlanStudyPage'));
@@ -162,9 +161,8 @@ export const privateRoutes = [
   { path: routes.taskHistory, component: TaskHistoryPage },
   { path: routes.planSessionReview, component: PlanSessionReviewPage },
   { path: routes.targetDashboard, component: TargetDashboardPage },
-  { path: routes.mockHistory, component: MockHistoryPage },
+  { path: routes.mockHistory, component: MockHistoryRedirect },
   { path: routes.targetAchieved, component: TargetAchievedPage },
-  { path: routes.nextStep, component: NextStepPage },
 ];
 
 const appRoutes = { publicRoutes, privateRoutes, adminRoutes };

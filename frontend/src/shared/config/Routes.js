@@ -75,7 +75,6 @@ const routes = {
   targetDashboard: '/my-target/dashboard',
   mockHistory: '/my-target/mocks',
   targetAchieved: '/my-target/achieved',
-  nextStep: '/next-step',
 
   oauth2Redirect: '/oauth2/redirect',
 
@@ -91,11 +90,6 @@ export function buildExamTypeDetailPath(examTypeId) {
 export function buildExamTypeCollectionPath(examTypeId, collectionId) {
   if (!examTypeId || !collectionId) return routes.home;
   return `/exam-types/${encodeURIComponent(examTypeId)}/collections/${encodeURIComponent(collectionId)}`;
-}
-
-export function buildNextStepPath(examTypeId) {
-  if (!examTypeId) return routes.nextStep;
-  return `${routes.nextStep}?examTypeId=${encodeURIComponent(examTypeId)}`;
 }
 
 export default routes;

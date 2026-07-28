@@ -11,7 +11,7 @@ import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Tìm ải được BE gợi ý làm tiếp (cùng logic với NextStepPage).
+// Tìm ải được BE gợi ý làm tiếp.
 function findRecommendedTask(plan) {
   if (!plan?.recommendedTaskId) return null;
   const all = (plan.partGroups || []).flatMap((g) => g.tasks || []);

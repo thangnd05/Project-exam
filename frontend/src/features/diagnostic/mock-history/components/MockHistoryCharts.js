@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import styles from '../MockHistoryPage.module.scss';
+import styles from '../MockHistoryPanel.module.scss';
 import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
@@ -21,11 +21,6 @@ const READINESS_COLOR = '#16a34a';
 const BAR_TARGET_MET = '#16a34a';
 const BAR_DEFAULT = brandColors.primary;
 const BAR_BELOW = brandColors.unique;
-
-function formatShortDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-}
 
 function MockHistoryTooltip({ active, payload }) {
   if (!active || !payload?.length) {
@@ -67,14 +62,6 @@ function MockHistoryCharts({ chartData, targetScore, loading, examTypeName }) {
     .map((p) => p.readinessScore)
     .filter((v) => v != null);
 
-  const avgScore =
-    scores.length > 0
-      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-      : null;
-  const maxScore = scores.length > 0 ? Math.max(...scores) : null;
-  const latestReadiness =
-    readinessValues.length > 0 ? readinessValues[readinessValues.length - 1] : null;
-
   const hasReadiness = readinessValues.length > 0;
   const hasScore = scores.length > 0;
 
@@ -92,37 +79,6 @@ function MockHistoryCharts({ chartData, targetScore, loading, examTypeName }) {
 
   return (
     <div className={cx('chartsSection')}>
-      <div className={cx('statsRow')}>
-        <div className={cx('statTile')}>
-          <span className={cx('statTileLabel')}>Số bài thi</span>
-          <strong className={cx('statTileValue')}>{chartData.length}</strong>
-        </div>
-        {maxScore != null && (
-          <div className={cx('statTile')}>
-            <span className={cx('statTileLabel')}>Điểm cao nhất</span>
-            <strong className={cx('statTileValue')}>{maxScore}</strong>
-          </div>
-        )}
-        {avgScore != null && (
-          <div className={cx('statTile')}>
-            <span className={cx('statTileLabel')}>Điểm trung bình</span>
-            <strong className={cx('statTileValue')}>{avgScore}</strong>
-          </div>
-        )}
-        {latestReadiness != null && (
-          <div className={cx('statTile')}>
-            <span className={cx('statTileLabel')}>Sẵn sàng mới nhất</span>
-            <strong className={cx('statTileValue')}>{latestReadiness}%</strong>
-          </div>
-        )}
-        {targetScore != null && (
-          <div className={cx('statTile', 'statTileHighlight')}>
-            <span className={cx('statTileLabel')}>Mục tiêu</span>
-            <strong className={cx('statTileValue')}>{targetScore}</strong>
-          </div>
-        )}
-      </div>
-
       <div className={cx('chartCard')}>
         <div className={cx('chartCardHeader')}>
           <h3 className={cx('chartCardTitle')}>Tiến triển theo thời gian</h3>
