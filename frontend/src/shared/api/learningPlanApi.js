@@ -29,6 +29,13 @@ export const submitSession = (learningPlanId, sessionId, answers) => {
     .then((res) => res.data);
 };
 
+/** Xem lại bài làm của đúng một phiên trong lịch sử (câu hỏi + lựa chọn đã chọn + đáp án đúng). */
+export const getSessionReview = (learningPlanId, sessionId) => {
+  return axios
+    .get(`${BASE_URL}/${learningPlanId}/sessions/${sessionId}/review`)
+    .then((res) => res.data);
+};
+
 export const getTaskSessions = (learningPlanId, taskId) => {
   return axios
     .get(`${BASE_URL}/${learningPlanId}/tasks/${taskId}/sessions`)

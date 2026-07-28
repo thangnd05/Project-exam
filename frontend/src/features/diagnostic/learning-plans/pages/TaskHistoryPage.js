@@ -223,6 +223,7 @@ function TaskHistoryPage() {
                 <th className={cx('right')}>Độ chính xác</th>
                 <th>Kết quả</th>
                 <th>Giai đoạn</th>
+                <th className={cx('right')}>Bài làm</th>
               </tr>
             </thead>
             <tbody>
@@ -247,6 +248,18 @@ function TaskHistoryPage() {
                     )}
                   </td>
                   <td className={cx('small')}>{planStageLabel(s.planStage)}</td>
+                  <td className={cx('right')}>
+                    {s.status === 'SUBMITTED' ? (
+                      <Link
+                        to={`/learning-plans/${learningPlanId}/sessions/${s.sessionId}/review?taskId=${taskId}`}
+                        className={cx('btn', 'btnOutline', 'btnSm')}
+                      >
+                        Xem đáp án
+                      </Link>
+                    ) : (
+                      <span className={cx('muted', 'small')}>—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

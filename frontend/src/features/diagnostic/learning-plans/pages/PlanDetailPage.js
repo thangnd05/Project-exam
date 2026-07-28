@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { Flag, Play } from 'lucide-react';
 import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
@@ -22,6 +23,16 @@ function findRecommendedTask(plan) {
   const all = (plan.partGroups || []).flatMap((g) => g.tasks || []);
   const pool = all.length ? all : plan.tasks || [];
   return pool.find((t) => t.taskId === plan.recommendedTaskId) || null;
+}
+
+// Câu cổ vũ theo tiến độ — thay câu tóm tắt kỹ thuật của BE.
+function progressCheer(passed, total, pct) {
+  if (total === 0) return 'Lộ trình đang chờ ải đầu tiên.';
+  if (passed === 0) return 'Vượt ải đầu tiên hôm nay để khởi động lộ trình.';
+  if (pct >= 100) return 'Bạn đã vượt toàn bộ ải — đến lúc thi thử để chốt kết quả!';
+  if (pct >= 75) return `Chỉ còn ${total - passed} ải nữa là hết lộ trình. Về đích thôi!`;
+  if (pct >= 40) return `Đã đi được hơn nửa chặng — còn ${total - passed} ải.`;
+  return `Đã vượt ${passed} ải, đang có đà. Giữ nhịp mỗi ngày một ải nhé.`;
 }
 
 function PlanDetailPage() {
@@ -65,6 +76,8 @@ function PlanDetailPage() {
   const backTo = plan.examTypeId
     ? `/learning-plans/generate?examTypeId=${plan.examTypeId}`
     : '/learning-plans/generate';
+
+  const passedTasks = plan.passedTasks ?? 0;
 
   return (
     <div className={cx('wrapper')}>
@@ -121,7 +134,7 @@ function PlanDetailPage() {
 
       <div className={cx('planHero')}>
         <div className={cx('planHeroTop')}>
-          <div>
+          <div className={cx('planHeroLead')}>
             <div className={cx('planHeroEyebrow')}>
               Lộ trình #{plan.planSequence ?? '?'} · {planStatusLabel(plan.status)}
             </div>
@@ -132,6 +145,9 @@ function PlanDetailPage() {
                   ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${recommendedTask.tagName}`
                   : 'Chinh phục từng ải để chạm mục tiêu'}
             </h3>
+            <p className={cx('planHeroCheer')}>
+              {progressCheer(passedTasks, totalTasks, progressPct)}
+            </p>
             <div className={cx('planHeroBadges')}>
               <span className={cx('planHeroBadge')}>
                 Giai đoạn: {planStageLabel(plan.planStage)}
@@ -140,6 +156,9 @@ function PlanDetailPage() {
                 Độ sẵn sàng lúc tạo: {baseline != null ? `${baseline}%` : '—'}
                 {plan.readinessLevel ? ` · ${getReadinessLabel(plan.readinessLevel)}` : ''}
               </span>
+              {plan.targetScore != null && (
+                <span className={cx('planHeroBadge')}>Mục tiêu: {plan.targetScore} điểm</span>
+              )}
             </div>
           </div>
           {!isReplaced && recommendedTask && plan.planStage !== 'MOCK' && (
@@ -147,14 +166,14 @@ function PlanDetailPage() {
               to={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
               className={cx('planHeroCta')}
             >
-              Học ngay
+              <Play size={16} /> Vào ải ngay
             </Link>
           )}
         </div>
 
         <div className={cx('planHeroProgressLabel')}>
           <span>
-            Tiến độ: <strong>{plan.passedTasks ?? 0}/{plan.totalTasks ?? 0}</strong> ải đã vượt
+            Tiến độ: <strong>{passedTasks}/{totalTasks}</strong> ải đã vượt
           </span>
           <strong>{progressPct}%</strong>
         </div>
@@ -164,10 +183,6 @@ function PlanDetailPage() {
             style={{ width: `${progressPct}%` }}
           />
         </div>
-
-        <p className={cx('planHeroNote')}>
-          Mỗi bài làm mới sinh lộ trình mới (lộ trình cũ giữ lịch sử, không sửa đè ải).
-        </p>
       </div>
 
       {!isReplaced && plan.planStage === 'FOUNDATION' && (
@@ -199,10 +214,19 @@ function PlanDetailPage() {
 
       {!isReplaced && (
         <>
-          <h3 id="chon-ai-hoc" className={cx('sectionTitle')} style={{ fontSize: 'var(--font-size-lg)', marginTop: '2rem', marginBottom: '1.2rem' }}>
-            Chọn Part và ải để học ({partGroups.length})
-            <InfoTip text={TERM_TIPS.task} />
-          </h3>
+          <div id="chon-ai-hoc" className={cx('roadmapHeading')}>
+            <span className={cx('roadmapHeadingIcon')}><Flag size={18} /></span>
+            <div>
+              <h3 className={cx('roadmapHeadingTitle')}>
+                Bản đồ ải của bạn
+                <InfoTip text={TERM_TIPS.task} />
+              </h3>
+              <p className={cx('roadmapHeadingDesc')}>
+                {partGroups.length} chặng · {totalTasks} ải. Vượt hết ải của một chặng để mở ải trùm
+                của chặng đó.
+              </p>
+            </div>
+          </div>
           <PlanPartTaskList
             partGroups={partGroups}
             learningPlanId={plan.learningPlanId}

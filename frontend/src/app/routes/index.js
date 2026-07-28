@@ -72,6 +72,7 @@ const PlanResultPage = lazy(() => import('~/features/diagnostic/learning-plans/p
 const LearningPlansRedirect = lazy(() => import('~/features/diagnostic/learning-plans/pages/LearningPlansRedirect'));
 const PlanComparisonPage = lazy(() => import('~/features/diagnostic/learning-plans/pages/PlanComparisonPage'));
 const TaskHistoryPage = lazy(() => import('~/features/diagnostic/learning-plans/pages/TaskHistoryPage'));
+const PlanSessionReviewPage = lazy(() => import('~/features/diagnostic/learning-plans/pages/PlanSessionReviewPage'));
 
 export const publicRoutes = [
   { path: routes.login, component: Login },
@@ -159,6 +160,7 @@ export const privateRoutes = [
   { path: routes.planStudy, component: PlanStudyPage },
   { path: routes.planResult, component: PlanResultPage },
   { path: routes.taskHistory, component: TaskHistoryPage },
+  { path: routes.planSessionReview, component: PlanSessionReviewPage },
   { path: routes.targetDashboard, component: TargetDashboardPage },
   { path: routes.mockHistory, component: MockHistoryPage },
   { path: routes.targetAchieved, component: TargetAchievedPage },

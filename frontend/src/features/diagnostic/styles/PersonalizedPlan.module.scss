@@ -636,101 +636,694 @@
   margin: 0.6rem 0;
 }
 
+// ===== Bản đồ ải: chặng (Part) gập/mở + đường đi dọc qua từng ải =====
+
+.roadmapBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.roadmapLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legendDot {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+}
+
+.legendPassed {
+  background: #16a34a;
+}
+
+.legendCurrent {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-alpha-20);
+}
+
+.legendLocked {
+  background: var(--border-strong);
+}
+
+.linkBtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--brand-700);
+    text-decoration: underline;
+  }
+}
+
+.roadmapHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  margin: 2.8rem 0 1.4rem;
+}
+
+.roadmapHeadingIcon {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: var(--radius-md);
+  background: var(--primary-alpha-10);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.roadmapHeadingTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.roadmapHeadingDesc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0.2rem 0 0;
+}
+
 .partGroup {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   margin-bottom: 1.6rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 }
 
-.partGroupHeader {
+.partGroupDone {
+  border-color: var(--success-border);
+}
+
+.partHeader {
+  width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  padding: 1.2rem 1.6rem;
+  gap: 1.4rem;
+  padding: 1.4rem 1.8rem;
   background: linear-gradient(135deg, var(--surface-tint), var(--bg-white));
+  border: 0;
   border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: linear-gradient(135deg, var(--brand-100), var(--bg-white));
+  }
 }
 
-.partGroupTag {
+.partHeaderDone {
+  background: linear-gradient(135deg, var(--success-bg), var(--bg-white));
+
+  &:hover {
+    background: linear-gradient(135deg, #cdf3da, var(--bg-white));
+  }
+}
+
+// Huy hiệu số chặng bên trái header — nhìn ra ngay "đang ở chặng mấy".
+.partCrest {
+  width: 5.2rem;
+  height: 5.2rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--primary-btn-gradient);
+  color: var(--white);
+  box-shadow: 0 4px 0 var(--brand-800);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.partCrestDone {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 4px 0 #15803d;
+}
+
+.partCrestLabel {
   font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
+  opacity: 0.9;
+}
+
+.partCrestNo {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin-top: 0.2rem;
+}
+
+.partHeaderMain {
+  flex: 1;
+  min-width: 0;
+  display: block;
 }
 
 .partGroupName {
+  display: block;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   color: var(--text-color);
   margin: 0.2rem 0 0;
 }
 
-.partGroupBody {
-  padding: 1.2rem 1.6rem;
+.partHeaderMeta {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: 0.3rem;
+
+  strong {
+    color: var(--primary);
+  }
+}
+
+.partDoneBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
+}
+
+.partChevron {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: transform 0.2s;
+}
+
+.partChevronOpen {
+  transform: rotate(180deg);
+}
+
+.partBody {
+  padding: 1.6rem 1.8rem 1.8rem;
 }
 
 .partGroupHint {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  margin: 0 0 1.2rem;
+  margin: 0 0 1.4rem;
 }
 
-.taskRow {
+// ===== Bản đồ màn chơi: đường đi + medallion từng ải + bảng chi tiết =====
+
+.stageLayout {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 1180px) {
+    grid-template-columns: 34rem minmax(0, 1fr);
+  }
+}
+
+.stageMap {
+  position: relative;
+  width: 100%;
+  max-width: 54rem;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 1.2rem;
-  margin-bottom: 1rem;
+  background:
+    radial-gradient(circle at 1px 1px, var(--border-color) 1px, transparent 0) 0 0 / 2.4rem 2.4rem,
+    linear-gradient(180deg, var(--brand-50), var(--bg-white) 60%);
+}
+
+.stagePath {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+}
+
+.stagePathTrack,
+.stagePathDone,
+.stagePathDash {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.stagePathTrack {
+  stroke: var(--border-strong);
+  stroke-width: 12;
+  opacity: 0.55;
+}
+
+.stagePathDone {
+  stroke: #4ade80;
+  stroke-width: 12;
+}
+
+.stagePathDash {
+  stroke: var(--bg-white);
+  stroke-width: 2;
+  stroke-dasharray: 8 10;
+  opacity: 0.9;
+}
+
+.stageFlag {
+  position: absolute;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
   background: var(--bg-white);
-  transition: all 0.15s;
-
-  &:hover {
-    border-color: var(--primary);
-    box-shadow: var(--shadow-md);
-  }
-
-  &.compact {
-    padding: 0.8rem 1rem;
-  }
+  border: 1px solid var(--border-color);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
-.taskRowHead {
+// Neo ở góc bản đồ, không đặt trên đầu ải 1 vì ải đó có thể đang mang ghim "Bạn ở đây".
+.stageFlagStart {
+  top: 1rem;
+  left: 1.2rem;
+  transform: none;
+}
+
+.stageFlagEnd {
+  color: var(--author-tag-text);
+  border-color: var(--author-tag-border);
+  background: var(--author-tag-bg);
+}
+
+.stageNodeWrap {
+  position: absolute;
+  width: 6.4rem;
+  height: 6.4rem;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.stageNode {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 0.8rem;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  .stageNodeWrap:hover & {
+    transform: translateY(-3px);
+  }
 }
 
-.taskTitle {
+.nodePassed {
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  color: var(--white);
+  box-shadow: 0 5px 0 #15803d, 0 10px 18px rgba(22, 163, 74, 0.25);
+}
+
+.nodeCurrent {
+  background: var(--bg-white);
+  color: var(--brand-700);
+  border: 3px solid var(--brand-600);
+  box-shadow: 0 5px 0 var(--brand-700);
+}
+
+.nodeOpen {
+  background: var(--bg-white);
+  color: var(--text-secondary);
+  border: 3px solid var(--border-strong);
+  box-shadow: 0 5px 0 var(--border-color);
+}
+
+.nodeLocked {
+  background: var(--input-bg);
+  color: #94a3b8;
+  border: 3px dashed var(--border-strong);
+  box-shadow: none;
+}
+
+.stageNodeCapstone {
+  transform: scale(1.16);
+  background: linear-gradient(180deg, #fbbf24, #d97706);
+  color: var(--white);
+  border: 0;
+  box-shadow: 0 5px 0 #b45309, 0 10px 20px rgba(217, 119, 6, 0.28);
+
+  .stageNodeWrap:hover & {
+    transform: scale(1.16) translateY(-3px);
+  }
+
+  &.nodeLocked {
+    background: var(--input-bg);
+    color: #94a3b8;
+    border: 3px dashed var(--border-strong);
+    box-shadow: none;
+  }
+
+  &.nodeCurrent {
+    background: var(--bg-white);
+    color: var(--brand-700);
+    border: 3px solid var(--brand-600);
+    box-shadow: 0 5px 0 var(--brand-700);
+  }
+}
+
+.stageNodeSelected {
+  outline: 3px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.nodeCurrent.stageNodeSelected {
+  outline: none;
+}
+
+.stageNodeLabel {
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  // Màn hẹp: nhãn ngắn lại kẻo tràn ra ngoài mép bản đồ.
+  @media (max-width: 560px) {
+    width: 11rem;
+  }
+}
+
+.stageNodeLabelActive {
+  color: var(--brand-700);
+  font-weight: var(--font-weight-semibold);
+}
+
+.stagePin {
+  position: absolute;
+  bottom: calc(100% + 0.9rem);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  background: var(--brand-800);
+  color: var(--white);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 0.5rem solid transparent;
+    border-top-color: var(--brand-800);
+  }
+}
+
+.stagePanel {
+  min-width: 0;
+
+  @media (min-width: 1180px) {
+    position: sticky;
+    top: 8rem;
+    align-self: start;
+  }
+}
+
+.stagePanelCard {
+  padding: 1.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.stagePanelCardCapstone {
+  border-color: var(--author-tag-border);
+  background: linear-gradient(180deg, var(--author-tag-bg), var(--bg-white) 45%);
+}
+
+.stagePanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.stagePanelKicker {
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+}
+
+.stagePanelTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+  margin: 0.6rem 0 0;
+}
+
+.stagePanelResource {
+  margin-top: 1.4rem;
+  padding-top: 1.2rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.taskBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid transparent;
+}
+
+.chipPrimary {
+  background: var(--primary-alpha-10);
+  color: var(--brand-700);
+  border-color: var(--primary-alpha-20);
+}
+
+.chipWarning {
+  background: var(--author-tag-bg);
+  color: var(--author-tag-text);
+  border-color: var(--author-tag-border);
+}
+
+.chipDanger {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+.meterWrap {
+  margin-top: 1.1rem;
+}
+
+.meter {
+  position: relative;
+  height: 0.8rem;
+  border-radius: 999px;
+  background: var(--input-bg);
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary-gradient);
+  transition: width 0.6s ease;
+}
+
+.meterFillDone {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.meterMark {
+  position: absolute;
+  top: -0.2rem;
+  bottom: -0.2rem;
+  width: 2px;
+  background: var(--dark-color);
+  opacity: 0.55;
+}
+
+.meterLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+
+  strong {
+    color: var(--text-color);
+  }
+}
+
+.metaChip {
+  padding: 0.2rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text-secondary);
+}
+
+.lockHint {
+  margin: 1rem 0 0;
+}
+
+.resourceLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: 0.6rem;
+}
+
+.resourceLink {
   font-size: var(--font-size-ssm);
   font-weight: var(--font-weight-semibold);
-  color: var(--text-color);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
+  color: var(--primary);
+
+  &:hover {
+    color: var(--brand-700);
+    text-decoration: underline;
+  }
 }
 
-.taskTitleHint {
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-normal);
-  margin-right: 0.2rem;
-  font-size: var(--font-size-sm);
+// Vòng tròn tiến độ nhỏ ở header mỗi chặng.
+.ring {
+  position: relative;
+  width: 4.4rem;
+  height: 4.4rem;
+  flex-shrink: 0;
+}
+
+.ringSvg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 4;
+}
+
+.ringBar {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.ringDone .ringBar {
+  stroke: #16a34a;
+}
+
+.ringLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs2);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+}
+
+.ringDone .ringLabel {
+  color: #16a34a;
 }
 
 .taskStats {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  margin-top: 0.4rem;
+  margin-top: 1rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
+  gap: 0.6rem;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .resourceBox {
@@ -1172,12 +1765,44 @@
 }
 
 .planHero {
+  position: relative;
+  overflow: hidden;
   background: var(--primary-btn-gradient);
   color: var(--white, #fff);
   border-radius: var(--radius-xl, 16px);
-  padding: 2rem 2.4rem;
-  margin-bottom: 2rem;
+  padding: 2.4rem 2.8rem;
+  margin-bottom: 1.6rem;
   box-shadow: var(--primary-btn-shadow);
+
+  // Vệt sáng trang trí — hero đỡ phẳng mà không cần ảnh.
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  &::before {
+    width: 26rem;
+    height: 26rem;
+    top: -14rem;
+    right: -6rem;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 70%);
+  }
+
+  &::after {
+    width: 18rem;
+    height: 18rem;
+    bottom: -12rem;
+    left: 18%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.14), transparent 70%);
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .planHeroTop {
@@ -1188,6 +1813,18 @@
   flex-wrap: wrap;
   margin-bottom: 1.6rem;
 }
+
+.planHeroLead {
+  flex: 1;
+  min-width: 28rem;
+}
+
+.planHeroCheer {
+  font-size: var(--font-size-ssm);
+  margin: 0 0 1rem;
+  opacity: 0.92;
+}
+
 
 .planHeroEyebrow {
   font-size: var(--font-size-sm);
@@ -1222,7 +1859,9 @@
 }
 
 .planHeroCta {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   padding: 1.1rem 2.2rem;
   border-radius: var(--radius-md);
   background: var(--white, #fff);

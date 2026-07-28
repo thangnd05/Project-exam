@@ -139,8 +139,13 @@ public class LearningPlanSessionService {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Chưa có phiên học nào được nộp cho ải này."));
 
+        return buildReviewResponse(plan, lastSubmitted);
+    }
+
+    /** Dựng lại bài làm của đúng một phiên đã nộp (câu hỏi + lựa chọn của user + đáp án đúng). */
+    private CurrentSessionResponse buildReviewResponse(LearningPlan plan, LearningPlanSession session) {
         List<LearningPlanSessionQuestion> sessionQuestions =
-                sessionQuestionRepository.findBySessionIdOrderByDisplayOrderAsc(lastSubmitted.getSessionId());
+                sessionQuestionRepository.findBySessionIdOrderByDisplayOrderAsc(session.getSessionId());
         List<String> questionIds = sessionQuestions.stream()
                 .map(LearningPlanSessionQuestion::getQuestionId)
                 .toList();
@@ -149,27 +154,45 @@ public class LearningPlanSessionService {
                 .stream()
                 .collect(Collectors.groupingBy(Answer::getQuestionId));
         List<LearningPlanSessionAnswer> userAnswerRows =
-                sessionAnswerRepository.findBySessionId(lastSubmitted.getSessionId());
+                sessionAnswerRepository.findBySessionId(session.getSessionId());
 
         List<SubmitSessionResponse.ReviewItem> reviewItems =
                 buildReviewItems(sessionQuestions, userAnswerRows, correctByQuestion);
 
         int total = sessionQuestions.size();
-        int accuracy = lastSubmitted.getAccuracy() != null ? lastSubmitted.getAccuracy() : 0;
+        int accuracy = session.getAccuracy() != null ? session.getAccuracy() : 0;
         int correct = (int) reviewItems.stream()
                 .filter(SubmitSessionResponse.ReviewItem::isCorrect)
                 .count();
-        boolean passed = Boolean.TRUE.equals(lastSubmitted.getPassed());
+        boolean passed = Boolean.TRUE.equals(session.getPassed());
 
         return learningMapper.toReviewResponse(
                 plan,
-                lastSubmitted,
+                session,
                 correct,
                 total,
                 accuracy,
                 passed,
                 accuracy + "% (" + correct + "/" + total + " đúng)",
                 reviewItems);
+    }
+
+    /** Xem lại bài làm của một phiên bất kỳ trong lịch sử (không chỉ phiên gần nhất). */
+    @Transactional(readOnly = true)
+    public CurrentSessionResponse getSessionReview(
+            String userId, String learningPlanId, String sessionId) {
+        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+
+        LearningPlanSession session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy phiên luyện"));
+        if (!Objects.equals(session.getLearningPlanId(), learningPlanId)) {
+            throw new ForbiddenException("Phiên luyện không thuộc kế hoạch này");
+        }
+        if (session.getStatus() != SessionStatus.SUBMITTED) {
+            throw new BadRequestException("Phiên này chưa nộp nên chưa có bài làm để xem.");
+        }
+
+        return buildReviewResponse(plan, session);
     }
 
     private String lockedTaskMessage(LearningPlanTask task) {

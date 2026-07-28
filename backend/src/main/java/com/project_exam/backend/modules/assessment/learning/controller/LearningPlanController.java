@@ -91,6 +91,17 @@ public class LearningPlanController {
                 userId, learningPlanId, sessionId, request));
     }
 
+    @GetMapping("/{learningPlanId}/sessions/{sessionId}/review")
+    public ResponseEntity<CurrentSessionResponse> sessionReview(
+            @PathVariable String learningPlanId,
+            @PathVariable String sessionId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(learningPlanSessionService
+                .getSessionReview(userId, learningPlanId, sessionId));
+    }
+
     @GetMapping("/{learningPlanId}/tasks/{taskId}/sessions")
     public ResponseEntity<List<TaskSessionHistoryDto>> taskSessionHistory(
             @PathVariable String learningPlanId,
