@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { getCurrentSession } from '~/shared/api/learningPlanApi';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
 import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
@@ -137,9 +138,21 @@ function PlanStudyPage() {
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertSuccess')}>
           <span>{session.message}</span>
-          <Link to={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnPrimary', 'btnSm')}>
-            Về kế hoạch
-          </Link>
+          <div className={cx('actionBar')}>
+            {/* Hết ải rồi thì việc tiếp theo là đi thi thử, không phải quay về kế hoạch. */}
+            <Link
+              to={buildExamTypeDetailPath(session.examTypeId)}
+              className={cx('btn', 'btnPrimary', 'btnSm')}
+            >
+              Làm bài thi thử
+            </Link>
+            <Link
+              to={`/learning-plans/${learningPlanId}`}
+              className={cx('btn', 'btnOutline', 'btnSm')}
+            >
+              Về kế hoạch
+            </Link>
+          </div>
         </div>
       </div>
     );

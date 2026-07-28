@@ -1,20 +1,15 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { Play } from 'lucide-react';
+import { ClipboardCheck, Play } from 'lucide-react';
 import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
 import { usePlanDetail } from './hooks/usePlanDetail';
 import { planStageLabel, planStatusLabel } from '../planLabels';
-import { getReadinessLabel } from '~/features/diagnostic/target/utils/readiness-label';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
+import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
-
-function planBaselineReadiness(plan) {
-  if (plan == null) return null;
-  return plan.baselineReadiness ?? null;
-}
 
 // Tìm ải được BE gợi ý làm tiếp (cùng logic với NextStepPage).
 function findRecommendedTask(plan) {
@@ -64,7 +59,6 @@ function PlanDetailPage() {
   const partGroups = plan.partGroups?.length
     ? plan.partGroups
     : groupTasksByPart(plan.tasks || []);
-  const baseline = planBaselineReadiness(plan);
   const isReplaced = plan.status === 'REPLACED';
   const recommendedTask = findRecommendedTask(plan);
   const totalTasks = plan.totalTasks ?? 0;
@@ -77,25 +71,21 @@ function PlanDetailPage() {
     : '/learning-plans/generate';
 
   const passedTasks = plan.passedTasks ?? 0;
+  const isMockStage = plan.planStage === 'MOCK';
+  const mockTestsTo = buildExamTypeDetailPath(plan.examTypeId);
 
   return (
     <div className={cx('wrapper')}>
       <div className={cx('headerBar')}>
-        <div className={cx('actionBar')}>
-          <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
-            Quay lại
-          </Link>
-          <h2 className={cx('title')}>
-            Kế hoạch học
-            {plan.planSequence != null ? ` #${plan.planSequence}` : ''}
-          </h2>
-        </div>
-        <div className={cx('actionBar')}>
-          <Link to="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
-            Sinh lộ trình mới
-          </Link>
+        <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+          Quay lại
+        </Link>
+        <div className={cx('headerActions')}>
           <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
             Tất cả lộ trình
+          </Link>
+          <Link to="/learning-plans/generate" className={cx('btn', 'btnPrimary', 'btnSm')}>
+            Sinh lộ trình mới
           </Link>
         </div>
       </div>
@@ -137,13 +127,13 @@ function PlanDetailPage() {
             <div className={cx('planHeroEyebrow')}>
               Lộ trình #{plan.planSequence ?? '?'} · {planStatusLabel(plan.status)}
             </div>
-            <h3 className={cx('planHeroTitle')}>
+            <h2 className={cx('planHeroTitle')}>
               {plan.planStage === 'MOCK'
                 ? 'Đã vượt hết ải — sẵn sàng thi thử!'
                 : recommendedTask
                   ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${recommendedTask.tagName}`
                   : 'Chinh phục từng ải để chạm mục tiêu'}
-            </h3>
+            </h2>
             <p className={cx('planHeroCheer')}>
               {progressCheer(passedTasks, totalTasks, progressPct)}
             </p>
@@ -151,16 +141,22 @@ function PlanDetailPage() {
               <span className={cx('planHeroBadge')}>
                 Giai đoạn: {planStageLabel(plan.planStage)}
               </span>
-              <span className={cx('planHeroBadge')}>
-                Độ sẵn sàng lúc tạo: {baseline != null ? `${baseline}%` : '—'}
-                {plan.readinessLevel ? ` · ${getReadinessLabel(plan.readinessLevel)}` : ''}
-              </span>
               {plan.targetScore != null && (
                 <span className={cx('planHeroBadge')}>Mục tiêu: {plan.targetScore} điểm</span>
               )}
             </div>
           </div>
-          {!isReplaced && recommendedTask && plan.planStage !== 'MOCK' && (
+
+          {!isReplaced && isMockStage && (
+            <div className={cx('planHeroCtaBox')}>
+              <Link to={mockTestsTo} className={cx('planHeroCta')}>
+                <ClipboardCheck size={16} /> Làm bài thi thử
+              </Link>
+              <span className={cx('planHeroCtaHint')}>Chấm lại độ sẵn sàng thật</span>
+            </div>
+          )}
+
+          {!isReplaced && !isMockStage && recommendedTask && (
             <Link
               to={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
               className={cx('planHeroCta')}
@@ -200,7 +196,7 @@ function PlanDetailPage() {
           roadmapHeading={{
             title: 'Bản đồ ải của bạn',
             tip: TERM_TIPS.task,
-            description: `${partGroups.length} chặng · ${totalTasks} ải. Vượt hết ải của một chặng để mở ải trùm của chặng đó.`,
+            description: `${partGroups.length} chặng · ${totalTasks} ải.`,
           }}
         />
       )}

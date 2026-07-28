@@ -283,6 +283,7 @@ public class LearningMapper {
         return CurrentSessionResponse.builder()
                 .mode("MOCK")
                 .learningPlanId(plan.getLearningPlanId())
+                .examTypeId(plan.getExamTypeId())
                 .planStage(planStage)
                 .sessionStatus(null)
                 .questions(List.of())

@@ -74,6 +74,12 @@ function buildPathD(from, to) {
   return d;
 }
 
+/** Chấm mini-map: chỉ sáng khi đã vượt — qua 1 ải mới sáng 1 chấm. */
+function taskDotState(task) {
+  if (task.status === 'PASSED') return 'partDotPassed';
+  return 'partDotPending';
+}
+
 /** Index ải cuối cùng đã vượt — đoạn đường tô xanh chạy tới đây. */
 function lastPassedIndex(tasks) {
   let last = -1;
@@ -162,9 +168,6 @@ function PlanPartTaskList({
     <div>
       {roadmapHeading ? (
         <div id="chon-ai-hoc" className={cx('roadmapHeading')}>
-          <span className={cx('roadmapHeadingIcon')}>
-            <Flag size={18} />
-          </span>
           <div className={cx('roadmapHeadingMain')}>
             <h3 className={cx('roadmapHeadingTitle')}>
               {roadmapHeading.title}
@@ -207,6 +210,16 @@ function PlanPartTaskList({
                   </strong>{' '}
                   ải đã vượt
                   {group.passAccuracy != null && ` · ngưỡng đạt ≥${group.passAccuracy}%`}
+                </span>
+                <span className={cx('partDots')}>
+                  {(group.tasks || []).map((t) => (
+                    <span
+                      key={t.taskId}
+                      className={cx('partDot', taskDotState(t), {
+                        partDotCapstone: CAPSTONE_TYPES.has(t.taskType),
+                      })}
+                    />
+                  ))}
                 </span>
               </span>
               {done && (
@@ -412,7 +425,7 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }
           stageNodeLabelActive: isSelected || isRecommended,
         })}
       >
-        {isCapstone ? 'Ải trùm' : shortMapLabel(task.tagName)}
+        {isCapstone ? 'Tổng hợp' : shortMapLabel(task.tagName)}
       </span>
     </button>
   );
@@ -460,7 +473,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
     <div className={cx('stagePanelCard', { stagePanelCardCapstone: isCapstone })}>
       <div className={cx('stagePanelHead')}>
         <span className={cx('stagePanelKicker')}>
-          {isCapstone ? 'Ải trùm cuối chặng' : `Ải ${task.taskOrder}`}
+          {isCapstone ? 'Tổng hợp cuối chặng' : `Ải ${task.taskOrder}`}
         </span>
         <span className={cx('badge', status.variant)}>{status.text}</span>
       </div>
@@ -532,7 +545,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
       {isLocked ? (
         <p className={cx('muted', 'small', 'lockHint')}>
           {isCapstone
-            ? 'Vượt hết ải phía trên để mở ải trùm.'
+            ? 'Vượt hết ải phía trên để mở tổng hợp.'
             : 'Hoàn thành các ải trước để mở ải này.'}
         </p>
       ) : (
@@ -543,7 +556,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
               to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
-              <History size={14} /> Lịch sử {task.attemptCount}
+              <History size={14} /> Lịch sử
             </Link>
           )}
           {isPassed && (

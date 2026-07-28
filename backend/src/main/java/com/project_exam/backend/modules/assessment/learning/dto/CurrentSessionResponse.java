@@ -16,6 +16,8 @@ public class CurrentSessionResponse {
     private String mode;
 
     private String learningPlanId;
+    /** Kỳ thi của plan — FE cần để trỏ sang danh sách đề khi đã hết ải (stage MOCK). */
+    private String examTypeId;
     private String planStage;
     private String sessionId;
     private String sessionStatus;

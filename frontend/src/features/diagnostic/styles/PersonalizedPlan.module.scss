@@ -19,6 +19,13 @@
   margin-bottom: 2rem;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
 .title {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
@@ -868,6 +875,34 @@
   strong {
     color: var(--primary);
   }
+}
+
+// Mini-map trạng thái từng ải, hiện khi chặng đang gập.
+.partDots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+}
+
+.partDot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+.partDotPassed {
+  background: #16a34a;
+}
+
+.partDotPending {
+  background: var(--border-color);
+}
+
+.partDotCapstone {
+  border-radius: 2px;
+  transform: rotate(45deg);
 }
 
 .partDoneBadge {
@@ -1932,6 +1967,20 @@
   background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: inherit;
+  white-space: nowrap;
+}
+
+.planHeroCtaBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.planHeroCtaHint {
+  font-size: var(--font-size-sm);
+  opacity: 0.85;
   white-space: nowrap;
 }
 
