@@ -10,7 +10,10 @@ import com.project_exam.backend.modules.classroom.member.domain.ClassMember.Memb
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.project_exam.backend.shared.dto.PageResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
+import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
+import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
 import com.project_exam.backend.modules.assessment.attempt.mapper.LeaderboardMapper;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
@@ -88,6 +91,9 @@ public class UserTestService {
     private final UserTestAccessRepository userTestAccessRepository;
     private final UserTestMapper userTestMapper;
     private final LeaderboardMapper leaderboardMapper;
+    private final EnhancedResultService enhancedResultService;
+    private final UserTargetRepository userTargetRepository;
+    private final UserTargetProgressService userTargetProgressService;
 
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
@@ -163,14 +169,42 @@ public class UserTestService {
         // còn lại chấm thang % (xem scorePractice).
         if (userTest.isPractice()) {
             userTest.setTotalScore(scorePractice(userTest, userAnswers, examType));
-            return userTestRepository.save(userTest);
+            UserTest saved = userTestRepository.save(userTest);
+            syncTargetProgressAfterSubmit(saved, test.getExamTypeId());
+            return saved;
         }
 
         int totalQuestionsInTest = calculateTotalQuestionsInTest(userTest.getTestId());
         int totalScore = testScorer.scoreFullTest(userAnswers, test, examType, totalQuestionsInTest);
 
         userTest.setTotalScore(totalScore);
-        return userTestRepository.save(userTest);
+        UserTest saved = userTestRepository.save(userTest);
+        syncTargetProgressAfterSubmit(saved, test.getExamTypeId());
+        return saved;
+    }
+
+    /**
+     * Cập nhật điểm hiện tại từng Part + cờ đạt mục tiêu ngay khi nộp bài, thay vì đợi tới lúc
+     * sinh lộ trình. Side-effect: lỗi ở đây không được làm hỏng việc nộp bài.
+     * Chỉ chạy khi người dùng đã đặt mục tiêu cho loại kỳ thi này.
+     */
+    private void syncTargetProgressAfterSubmit(UserTest userTest, String examTypeId) {
+        if (examTypeId == null || userTest.getUserId() == null) {
+            return;
+        }
+        try {
+            if (userTargetRepository.findByUserIdAndExamTypeId(userTest.getUserId(), examTypeId).isEmpty()) {
+                return;
+            }
+            EnhancedResultDto result = enhancedResultService.getEnhancedResult(
+                    userTest.getUserTestId(), userTest.getUserId());
+            userTargetProgressService.syncPartScoresFromMock(
+                    userTest.getUserId(), examTypeId, userTest.getUserTestId(),
+                    userTest.getFinishedAt(), result);
+            userTargetProgressService.markTargetAchievedIfMet(
+                    userTest.getUserId(), examTypeId, result);
+        } catch (Exception ignored) {
+        }
     }
 
     /** Tổng số câu của các Part được luyện (mẫu số chấm % cho mode PRACTICE). */

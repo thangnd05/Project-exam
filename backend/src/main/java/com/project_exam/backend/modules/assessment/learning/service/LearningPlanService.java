@@ -102,8 +102,9 @@ public class LearningPlanService {
             throw new BadRequestException("Bài thi không có dữ liệu phân tích phần, không thể sinh kế hoạch");
         }
 
+        // Bài nguồn có thể là bài cũ -> service tự bỏ qua nếu điểm Part đã được cập nhật từ bài mới hơn.
         userTargetProgressService.syncPartScoresFromMock(
-                userId, examTypeId, request.getUserTestId(), partBreakdown);
+                userId, examTypeId, request.getUserTestId(), userTest.getFinishedAt(), result);
 
         if (userTargetProgressService.markTargetAchievedIfMet(userId, examTypeId, result)) {
             closeActivePlans(userId, examTypeId, LearningPlan.Status.COMPLETED, null);

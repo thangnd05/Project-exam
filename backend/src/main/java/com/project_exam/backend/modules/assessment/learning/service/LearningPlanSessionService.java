@@ -65,12 +65,11 @@ public class LearningPlanSessionService {
 
         normalizePlanStage(plan);
 
-        if (plan.getPlanStage() == PlanStage.MOCK) {
-            return buildMockStageResponse(plan);
-        }
-
+        // Không có ải cụ thể: hết ải thì mời đi thi thử, còn lại về màn chọn ải.
         if (taskId == null || taskId.isBlank()) {
-            return buildPickResponse(plan);
+            return plan.getPlanStage() == PlanStage.MOCK
+                    ? buildMockStageResponse(plan)
+                    : buildPickResponse(plan);
         }
 
         LearningPlanTask task = taskRepository.findById(taskId)
@@ -79,6 +78,8 @@ public class LearningPlanSessionService {
             throw new ForbiddenException("Nhiệm vụ không thuộc kế hoạch này");
         }
 
+        // Xem lại/luyện lại một ải cụ thể vẫn phải chạy được cả khi plan đã sang trạm MOCK
+        // (vượt ải cuối xong mới xem kết quả, hoặc bấm "Luyện lại" ải đã vượt).
         if (includeReview) {
             return buildReviewResponse(plan, task);
         }
@@ -114,6 +115,10 @@ public class LearningPlanSessionService {
 
     /** Ải có kho câu rỗng -> đánh dấu SKIPPED rồi kiểm tra điều kiện lên MOCK. */
     private void skipEmptyPoolTask(LearningPlan plan, LearningPlanTask task) {
+        // Ải đã vượt (bấm luyện lại) không bị hạ về SKIPPED chỉ vì kho câu tạm rỗng.
+        if (task.getStatus() == TaskStatus.PASSED) {
+            return;
+        }
         task.setStatus(TaskStatus.SKIPPED);
         taskRepository.save(task);
         maybeAdvanceToMock(plan);
@@ -134,8 +139,11 @@ public class LearningPlanSessionService {
         List<LearningPlanSession> sessions = sessionRepository
                 .findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(
                         plan.getLearningPlanId(), task.getTaskId());
+        // Phiên bỏ dở (đổi ải giữa chừng) cũng mang status SUBMITTED nhưng 0% và không có bài làm
+        // -> phải loại, nếu không "Xem giải thích" sẽ hiện bài trống thay vì lần luyện thật.
         LearningPlanSession lastSubmitted = sessions.stream()
                 .filter(s -> s.getStatus() == SessionStatus.SUBMITTED)
+                .filter(s -> !Boolean.TRUE.equals(s.getAbandoned()))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Chưa có phiên học nào được nộp cho ải này."));
 
@@ -307,7 +315,8 @@ public class LearningPlanSessionService {
 
         String taskStatus = null;
         PlanStage stage = plan.getPlanStage() != null ? plan.getPlanStage() : PlanStage.FOUNDATION;
-        if (stage == PlanStage.FOUNDATION && session.getTaskId() != null) {
+        // Ghi nhận theo ải của chính phiên này, kể cả khi plan đã sang trạm MOCK (luyện lại ải cũ).
+        if (session.getTaskId() != null) {
             LearningPlanTask task = taskRepository.findById(session.getTaskId())
                     .orElseThrow(() -> new NotFoundException("Không tìm thấy nhiệm vụ"));
             task.setAttemptCount(task.getAttemptCount() + 1);
@@ -315,9 +324,13 @@ public class LearningPlanSessionService {
                     || accuracy > task.getBestAccuracy().intValue()) {
                 task.setBestAccuracy(java.math.BigDecimal.valueOf(accuracy));
             }
-            if (passed) {
+            // Luyện lại ải đã vượt mà không đạt thì vẫn giữ PASSED — không tụt tiến độ đã đạt.
+            boolean taskPassed = passed || task.getStatus() == TaskStatus.PASSED;
+            if (taskPassed) {
                 task.setStatus(TaskStatus.PASSED);
-                task.setPassedAt(Instant.now());
+                if (task.getPassedAt() == null) {
+                    task.setPassedAt(Instant.now());
+                }
                 taskStatus = TaskStatus.PASSED.name();
             } else {
                 task.setStatus(TaskStatus.ACTIVE);
@@ -330,7 +343,7 @@ public class LearningPlanSessionService {
                     task.getBestAccuracy().intValue(),
                     task.getPassAccuracy(),
                     consecutiveFails,
-                    passed));
+                    taskPassed));
             taskRepository.save(task);
             if (passed) {
                 taskUnlockSupport.onTaskPassed(task, learningPlanId);
@@ -352,7 +365,7 @@ public class LearningPlanSessionService {
                 accuracy,
                 passed,
                 taskStatus,
-                plan.getPlanStage().name(),
+                (plan.getPlanStage() != null ? plan.getPlanStage() : stage).name(),
                 message,
                 reviewItems);
     }
@@ -418,7 +431,10 @@ public class LearningPlanSessionService {
         List<LearningPlanSession> sessions = sessionRepository
                 .findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(learningPlanId, taskId);
 
+        // Bỏ phiên bỏ dở: không phải một lần luyện thật, hiện lên sẽ lệch với "Số lần luyện"
+        // và nút "Xem đáp án" mở ra bài trống.
         return sessions.stream()
+                .filter(s -> !Boolean.TRUE.equals(s.getAbandoned()))
                 .map(learningMapper::toTaskSessionHistory)
                 .toList();
     }

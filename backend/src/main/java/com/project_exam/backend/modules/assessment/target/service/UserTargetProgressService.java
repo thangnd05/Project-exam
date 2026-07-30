@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,12 +29,19 @@ public class UserTargetProgressService {
     private final UserTargetRepository userTargetRepository;
     private final UserTargetPartRepository userTargetPartRepository;
 
+    private static final String QUICK_CHALLENGE_CODE = "QUICK_CHALLENGE";
+
     @Transactional
     public void syncPartScoresFromMock(
             String userId,
             String examTypeId,
             String userTestId,
-            List<PartBreakdownDto> partBreakdown) {
+            LocalDateTime finishedAt,
+            EnhancedResultDto result) {
+        if (result == null || QUICK_CHALLENGE_CODE.equals(result.getExamCategoryCode())) {
+            return;
+        }
+        List<PartBreakdownDto> partBreakdown = result.getPartBreakdown();
         if (partBreakdown == null || partBreakdown.isEmpty()) {
             return;
         }
@@ -46,19 +54,28 @@ public class UserTargetProgressService {
                 .stream()
                 .collect(Collectors.toMap(UserTargetPart::getExamPartId, p -> p, (a, b) -> a));
 
+        List<UserTargetPart> changed = new ArrayList<>();
         for (PartBreakdownDto part : partBreakdown) {
             if (part.getExamPartId() == null) {
                 continue;
             }
             UserTargetPart row = byPartId.get(part.getExamPartId());
-            if (row == null) {
+            if (row == null || isStale(row, finishedAt)) {
                 continue;
             }
             row.setCurrentScore(BigDecimal.valueOf(part.getPercentage()).setScale(2, RoundingMode.HALF_UP));
             row.setLastUserTestId(userTestId);
             row.setUpdatedAt(LocalDateTime.now());
+            changed.add(row);
         }
-        userTargetPartRepository.saveAll(byPartId.values());
+        userTargetPartRepository.saveAll(changed);
+    }
+
+    private boolean isStale(UserTargetPart row, LocalDateTime finishedAt) {
+        return row.getCurrentScore() != null
+                && finishedAt != null
+                && row.getUpdatedAt() != null
+                && row.getUpdatedAt().isAfter(finishedAt);
     }
 
     @Transactional

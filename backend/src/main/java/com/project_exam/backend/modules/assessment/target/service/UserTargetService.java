@@ -38,8 +38,6 @@ public class UserTargetService {
         UserTarget ut;
         if (existing.isPresent()) {
             ut = existing.get();
-            userTargetPartRepository.deleteByUserTargetId(ut.getUserTargetId());
-            userTargetPartRepository.flush();
             Integer oldScore = ut.getTargetScore();
             ut.setTargetScore(request.getTargetScore());
             ut.setTargetReadiness(request.getTargetReadiness());
@@ -57,9 +55,7 @@ public class UserTargetService {
             ut = userTargetRepository.save(ut);
         }
 
-        if (request.getCustomParts() != null && !request.getCustomParts().isEmpty()) {
-            saveParts(ut.getUserTargetId(), request.getCustomParts());
-        }
+        syncParts(ut.getUserTargetId(), request.getCustomParts());
 
         return toResponse(ut);
     }
@@ -84,16 +80,40 @@ public class UserTargetService {
         ));
     }
 
-    private void saveParts(String userTargetId, List<UserPartRequirementDto> dtos) {
-        List<UserTargetPart> entities = new ArrayList<>();
-        for (UserPartRequirementDto dto : dtos) {
-            UserTargetPart p = new UserTargetPart();
-            p.setUserTargetId(userTargetId);
-            p.setExamPartId(dto.getExamPartId());
-            p.setCustomPercentage(dto.getCustomPercentage());
-            entities.add(p);
+    private void syncParts(String userTargetId, List<UserPartRequirementDto> dtos) {
+        if (dtos == null || dtos.isEmpty()) {
+            return;
         }
-        userTargetPartRepository.saveAll(entities);
+        List<UserTargetPart> existingParts = userTargetPartRepository.findByUserTargetId(userTargetId);
+        Map<String, UserTargetPart> byPartId = existingParts.stream()
+                .collect(Collectors.toMap(UserTargetPart::getExamPartId, p -> p, (a, b) -> a));
+
+        List<UserTargetPart> toSave = new ArrayList<>();
+        Map<String, UserTargetPart> kept = new HashMap<>();
+        for (UserPartRequirementDto dto : dtos) {
+            if (dto.getExamPartId() == null) {
+                continue;
+            }
+            UserTargetPart p = byPartId.get(dto.getExamPartId());
+            if (p == null) {
+                p = new UserTargetPart();
+                p.setUserTargetId(userTargetId);
+                p.setExamPartId(dto.getExamPartId());
+            }
+            p.setCustomPercentage(dto.getCustomPercentage());
+            kept.put(dto.getExamPartId(), p);
+            toSave.add(p);
+        }
+
+        // Xoá Part không còn được chọn, và cả bản ghi trùng examPartId (nếu dữ liệu cũ có).
+        List<UserTargetPart> stale = existingParts.stream()
+                .filter(p -> kept.get(p.getExamPartId()) != p)
+                .toList();
+        if (!stale.isEmpty()) {
+            userTargetPartRepository.deleteAll(stale);
+            userTargetPartRepository.flush();
+        }
+        userTargetPartRepository.saveAll(toSave);
     }
 
     private UserTargetResponse toResponse(UserTarget ut) {

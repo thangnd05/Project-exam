@@ -128,14 +128,29 @@ function PlanStudyPage() {
     return <div className={cx('wrapper')}><div className={cx('loading')}>Đang tải...</div></div>;
   }
 
-  const partGroups = session?.partGroups?.length
+  // Không có dữ liệu phiên (API lỗi) -> hiện lỗi, tránh rơi vào nhánh PICK rồi vỡ ở session.message.
+  if (!session) {
+    return (
+      <div className={cx('wrapper')}>
+        <div className={cx('headerBar')}>
+          <Link to={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
+            ← Kế hoạch
+          </Link>
+        </div>
+        <div className={cx('alert', 'alertDanger')}>{error || 'Không mở được ải này.'}</div>
+      </div>
+    );
+  }
+
+  const partGroups = session.partGroups?.length
     ? session.partGroups
-    : groupTasksByPart(session?.tasks || []);
+    : groupTasksByPart(session.tasks || []);
 
+  // Chỉ dựa vào mode của BE: plan đã sang trạm MOCK vẫn có thể mở phiên luyện lại một ải cũ.
   const isPickMode = session?.mode === 'PICK' || (!session?.sessionId && session?.mode !== 'MOCK');
-  const isMockMode = session?.mode === 'MOCK' || session?.planStage === 'MOCK';
+  const isMockMode = session?.mode === 'MOCK';
 
-  if (isMockMode && !session?.sessionId) {
+  if (isMockMode) {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertSuccess')}>
@@ -244,7 +259,10 @@ function PlanStudyPage() {
                   {' · Ải '}{session.activeTask?.tagName || '—'}
                 </h3>
                 <div className={cx('actionBar')}>
-                  <span className={cx('badge', 'badgePrimary')}>{planStageLabel(session.planStage)}</span>
+                  <span className={cx('badge', 'badgePrimary')}>
+                    {/* Hết ải rồi mà vẫn mở phiên -> đây là lượt luyện lại, không phải giai đoạn học. */}
+                    {session.planStage === 'MOCK' ? 'Luyện lại' : planStageLabel(session.planStage)}
+                  </span>
                   <span className={cx('badge', 'badgeMuted')}>
                     {session.passedTasks}/{session.totalTasks} ải đã vượt
                   </span>
