@@ -11,7 +11,6 @@ import java.time.Instant;
 @Builder
 public class TaskSessionHistoryDto {
     private String sessionId;
-    private String planStage;
     private String status;
     private Integer questionCount;
     private Integer accuracy;

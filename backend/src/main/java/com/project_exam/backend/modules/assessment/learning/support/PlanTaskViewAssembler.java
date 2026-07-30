@@ -8,7 +8,7 @@ import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanT
 import com.project_exam.backend.modules.assessment.learning.domain.PlanTaskType;
 import com.project_exam.backend.modules.assessment.learning.domain.TaskStatus;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupDto;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanPhaseDto;
+import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceDto;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskDto;
 import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.service.LearningPlanResourceLookup;
@@ -36,8 +36,8 @@ public class PlanTaskViewAssembler {
     public record Lookups(
             Map<String, Tag> tagsById,
             Map<String, ExamPart> partsById,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
-            Map<String, List<PlanPhaseDto.RecommendedResourceDto>> resourcesByPart) {
+            Map<String, RecommendedResourceDto> resourcesByTag,
+            Map<String, List<RecommendedResourceDto>> resourcesByPart) {
 
         public static Lookups empty() {
             return new Lookups(Map.of(), Map.of(), Map.of(), Map.of());
@@ -82,7 +82,7 @@ public class PlanTaskViewAssembler {
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
         Tag tag = task.getTagId() != null ? lookups.tagsById().get(task.getTagId()) : null;
         ExamPart part = task.getExamPartId() != null ? lookups.partsById().get(task.getExamPartId()) : null;
-        PlanPhaseDto.RecommendedResourceDto studyResource = task.getTagId() != null
+        RecommendedResourceDto studyResource = task.getTagId() != null
                 ? lookups.resourcesByTag().get(task.getTagId())
                 : null;
         return learningMapper.toTaskDto(
@@ -90,8 +90,7 @@ public class PlanTaskViewAssembler {
                 taskType.name(),
                 resolveTaskDisplayName(taskType, tag, part),
                 part != null ? part.getName() : null,
-                studyResource,
-                task.getPriorityScore() != null ? task.getPriorityScore() : 0);
+                studyResource);
     }
 
     public List<PlanPartGroupDto> buildPartGroups(List<LearningPlanTask> tasks, Lookups lookups) {

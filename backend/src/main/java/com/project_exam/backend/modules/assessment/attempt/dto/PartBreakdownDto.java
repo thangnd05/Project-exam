@@ -20,6 +20,5 @@ public class PartBreakdownDto {
     private double percentage;
     private Double targetPercentage;
     private Boolean isTargetMet;
-    private String targetGapMessage;
     private List<TagBreakdownDto> weakTags;
 }

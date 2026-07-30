@@ -18,6 +18,6 @@ public class PlanPartGroupDto {
     private int passedTasksInPart;
     private int totalTasksInPart;
 
-    private List<PlanPhaseDto.RecommendedResourceDto> partResources;
+    private List<RecommendedResourceDto> partResources;
     private List<PlanTaskDto> tasks;
 }

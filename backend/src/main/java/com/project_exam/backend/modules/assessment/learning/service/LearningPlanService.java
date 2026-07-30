@@ -20,7 +20,6 @@ import com.project_exam.backend.modules.assessment.learning.support.PlanPriority
 import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
 import com.project_exam.backend.modules.assessment.learning.support.ReadinessThresholds;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
-import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanPhaseRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionAnswerRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionQuestionRepository;
@@ -75,7 +74,6 @@ public class LearningPlanService {
     private final LearningPlanSessionRepository sessionRepository;
     private final LearningPlanSessionQuestionRepository sessionQuestionRepository;
     private final LearningPlanSessionAnswerRepository sessionAnswerRepository;
-    private final LearningPlanPhaseRepository phaseRepository;
     private final LearningMapper learningMapper;
 
     @Transactional
@@ -124,10 +122,6 @@ public class LearningPlanService {
                 partBreakdown, partRequirements, focusPartIds, questionIdsByPart);
         List<String> partsWithoutTasks = findPartsWithoutTasks(
                 partBreakdown, focusPartIds, candidates);
-        if (candidates.isEmpty()) {
-            candidates = buildFallbackCandidates(
-                    partBreakdown, partRequirements, focusPartIds, questionIdsByPart);
-        }
 
         if (candidates.isEmpty()) {
             String detail = partsWithoutTasks.isEmpty()
@@ -168,7 +162,6 @@ public class LearningPlanService {
             task.setPassAccuracy(c.passAccuracy());
             task.setBaselineAccuracy(round2(c.baselinePct()));
             task.setAttemptCount(0);
-            task.setPriorityScore(c.priorityScore());
             task.setWrongCountAtDiagnosis(c.wrongCount());
             if (c.taskType() == PlanTaskType.TAG) {
                 task.setTagId(c.tagId());
@@ -179,11 +172,9 @@ public class LearningPlanService {
             }
             savedTasks.add(task);
         }
-        plan.setCurrentTaskId(null);
         savedTasks = taskRepository.saveAll(savedTasks);
         activateCapstonesWithoutTagPrerequisite(savedTasks);
         savedTasks = taskRepository.saveAll(savedTasks);
-        plan = planRepository.save(plan);
 
         return buildPlanResponse(
                 plan,
@@ -314,7 +305,6 @@ public class LearningPlanService {
             sessionQuestionRepository.deleteBySessionIdIn(sessionIds);
             sessionRepository.deleteByLearningPlanId(learningPlanId);
         }
-        phaseRepository.deleteByLearningPlanId(learningPlanId);
         taskRepository.deleteByLearningPlanId(learningPlanId);
         planRepository.delete(plan);
     }
@@ -387,28 +377,6 @@ public class LearningPlanService {
                     .add(q.getQuestionId());
         }
         return byPart;
-    }
-
-    private List<TaskCandidate> buildFallbackCandidates(
-            List<PartBreakdownDto> partBreakdown,
-            Map<String, Integer> partRequirements,
-            Set<String> focusPartIds,
-            Map<String, List<String>> questionIdsByPart) {
-        List<TaskCandidate> result = new ArrayList<>();
-        for (PartBreakdownDto part : partBreakdown) {
-            if (!matchesFocus(part.getExamPartId(), focusPartIds) || !partNeedsFocus(part)) {
-                continue;
-            }
-            int passAccuracy = partRequirements.getOrDefault(
-                    part.getExamPartId(), DEFAULT_PASS_ACCURACY);
-            double threshold = part.getTargetPercentage() != null
-                    ? part.getTargetPercentage()
-                    : DEFAULT_WEAK_TAG_THRESHOLD;
-            List<String> questionIdsInPart = questionIdsByPart.getOrDefault(
-                    part.getExamPartId(), List.of());
-            result.addAll(collectTasksForPart(part, threshold, passAccuracy, questionIdsInPart));
-        }
-        return result;
     }
 
     private List<TaskCandidate> collectTasksForPart(
@@ -725,9 +693,6 @@ public class LearningPlanService {
         }
         if (stage == PlanStage.MOCK) {
             return "Đã xong ải — làm mock kiểm tra readiness.";
-        }
-        if (stage == PlanStage.MIX) {
-            return "Đang chuyển sang mock (bỏ trộn đề).";
         }
         return stage.name();
     }

@@ -24,13 +24,10 @@ public class PlanResponse {
     private Boolean targetAchieved;
 
     private Integer targetScore;
-    private Integer deadlineDays;
 
     private Integer baselineReadiness;
 
     private String readinessLevel;
-
-    private String diagnosticUserTestId;
 
     private String diagnosisSourceCategory;
 
@@ -41,7 +38,6 @@ public class PlanResponse {
 
     private Boolean targetOutdated;
 
-    private Integer passAccuracyDefault;
     private Instant createdAt;
 
     private String summary;
@@ -57,6 +53,4 @@ public class PlanResponse {
     private List<PlanPartGroupDto> partGroups;
 
     private List<String> partsWithoutTasks;
-
-    private List<PlanPhaseDto> phases;
 }

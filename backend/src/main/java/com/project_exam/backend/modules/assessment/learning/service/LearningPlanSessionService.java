@@ -17,7 +17,6 @@ import com.project_exam.backend.modules.assessment.learning.mapper.LearningMappe
 import com.project_exam.backend.modules.assessment.learning.repository.*;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanTaskUnlockSupport;
-import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
 import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
@@ -88,7 +87,7 @@ public class LearningPlanSessionService {
     @Transactional
     public CurrentSessionResponse startTaskSession(String userId, String learningPlanId, String taskId) {
         LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
-        PlanStage stage = normalizePlanStage(plan);
+        PlanStage stage = effectiveStage(plan);
 
         if (taskId == null || taskId.isBlank()) {
             return stage == PlanStage.MOCK
@@ -234,27 +233,9 @@ public class LearningPlanSessionService {
         return "Hoàn thành tất cả ải tag của Part này trước khi mở ải tổng ôn.";
     }
 
+    /** Trạm hiện tại của plan; cột NOT NULL nên chỉ null-safe cho dữ liệu cũ. */
     private PlanStage effectiveStage(LearningPlan plan) {
-        PlanStage stage = plan.getPlanStage();
-        if (stage == null) {
-            return PlanStage.FOUNDATION;
-        }
-        if (stage != PlanStage.MIX) {
-            return stage;
-        }
-        long total = taskRepository.countByLearningPlanId(plan.getLearningPlanId());
-        long passed = taskRepository.countByLearningPlanIdAndStatus(
-                plan.getLearningPlanId(), TaskStatus.PASSED);
-        return total > 0 && passed == total ? PlanStage.MOCK : PlanStage.FOUNDATION;
-    }
-
-    private PlanStage normalizePlanStage(LearningPlan plan) {
-        PlanStage stage = effectiveStage(plan);
-        if (plan.getPlanStage() != stage) {
-            plan.setPlanStage(stage);
-            planRepository.save(plan);
-        }
-        return stage;
+        return plan.getPlanStage() != null ? plan.getPlanStage() : PlanStage.FOUNDATION;
     }
 
     @Transactional
@@ -356,11 +337,6 @@ public class LearningPlanSessionService {
                 task.setStatus(TaskStatus.ACTIVE);
                 taskStatus = TaskStatus.ACTIVE.name();
             }
-            task.setPriorityScore(PlanPrioritySupport.recomputePriorityAfterSession(
-                    task.getWrongCountAtDiagnosis(),
-                    task.getBestAccuracy().intValue(),
-                    task.getPassAccuracy(),
-                    taskPassed));
             taskRepository.save(task);
             if (passed) {
                 taskUnlockSupport.onTaskPassed(task, learningPlanId);
@@ -479,7 +455,6 @@ public class LearningPlanSessionService {
 
     private void advanceToMockStage(LearningPlan plan) {
         plan.setPlanStage(PlanStage.MOCK);
-        plan.setCurrentTaskId(null);
         planRepository.save(plan);
     }
 
@@ -509,7 +484,6 @@ public class LearningPlanSessionService {
         LearningPlanSession session = new LearningPlanSession();
         session.setLearningPlanId(plan.getLearningPlanId());
         session.setTaskId(task.getTaskId());
-        session.setPlanStage(PlanStage.FOUNDATION);
         session.setResourceId(taskType == PlanTaskType.TAG ? resolveResourceId(task.getTagId()) : null);
         session.setQuestionCount(questionIds.size());
         session.setStatus(SessionStatus.IN_PROGRESS);
@@ -545,7 +519,7 @@ public class LearningPlanSessionService {
 
     private String resolveResourceId(String tagId) {
         return resourceLookup.findFirstByTagId(tagId)
-                .map(PlanPhaseDto.RecommendedResourceDto::getResourceId)
+                .map(RecommendedResourceDto::getResourceId)
                 .orElse(null);
     }
 
@@ -657,7 +631,7 @@ public class LearningPlanSessionService {
             }
         }
 
-        PlanPhaseDto.RecommendedResourceDto resourceDto = null;
+        RecommendedResourceDto resourceDto = null;
         if (session.getResourceId() != null) {
             resourceDto = recoveryResourceRepository.findById(session.getResourceId())
                     .map(this::toResourceDto)
@@ -725,7 +699,7 @@ public class LearningPlanSessionService {
         return "Đọc tài liệu, sau đó làm quiz của đúng Part/tag hiện tại.";
     }
 
-    private PlanPhaseDto.RecommendedResourceDto toResourceDto(RecoveryResource r) {
+    private RecommendedResourceDto toResourceDto(RecoveryResource r) {
         return learningMapper.toResourceDto(r);
     }
 }

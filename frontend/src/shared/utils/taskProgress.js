@@ -15,13 +15,3 @@ export function taskGapToPass(task) {
   if (cur == null || pass == null) return null;
   return Math.max(0, pass - cur);
 }
-
-export function formatGapToPass(task) {
-  const cur = taskCurrentAccuracy(task);
-  const pass = task?.passAccuracy;
-  if (pass == null) return null;
-  if (cur == null) return `cần ≥ ${pass}%`;
-  const gap = Math.max(0, pass - cur);
-  if (gap === 0) return `${cur}% → ${pass}% · đã tới ngưỡng`;
-  return `${cur}% → ${pass}% · còn ${gap}%`;
-}

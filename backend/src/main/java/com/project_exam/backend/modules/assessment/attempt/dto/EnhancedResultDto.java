@@ -19,8 +19,6 @@ public class EnhancedResultDto {
     private String examCategoryCode;
     private String examTypeId;
 
-    private List<SkillBreakdownDto> skillBreakdown;
-
     private List<PartBreakdownDto> partBreakdown;
 
     private int percentage;
@@ -42,5 +40,4 @@ public class EnhancedResultDto {
     private Integer targetScore;
 
     private String recoveryMessage;
-    private List<RecoveryRecommendationDto> recommendations;
 }

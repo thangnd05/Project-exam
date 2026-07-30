@@ -19,10 +19,8 @@ public class CurrentSessionResponse {
     private String examTypeId;
     private String planStage;
     private String sessionId;
-    private String sessionStatus;
     private PlanTaskDto activeTask;
-    private PlanPhaseDto.RecommendedResourceDto resource;
-    private Integer questionCount;
+    private RecommendedResourceDto resource;
     private Integer passAccuracyRequired;
 
     private Integer correctCount;

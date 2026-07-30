@@ -42,9 +42,6 @@ public class EnhancedResultService {
     private final TestQuestionRepository testQuestionRepository;
     private final ExamCategoryRepository examCategoryRepository;
     private final QuestionTagRepository questionTagRepository;
-    private final ResourceTagRepository resourceTagRepository;
-    private final RecoveryResourceRepository recoveryResourceRepository;
-    private final ScoringConversionRepository scoringConversionRepository;
     private final TagRepository tagRepository;
     private final UserTargetRepository userTargetRepository;
     private final UserTargetPartRepository userTargetPartRepository;
@@ -74,9 +71,7 @@ public class EnhancedResultService {
         if (userTest.getStatus() != UserTest.Status.COMPLETED) {
             return EnhancedResultDto.builder()
                     .correct(0).wrong(0).total(0).totalScore(0L)
-                    .skillBreakdown(List.of())
                     .partBreakdown(List.of())
-                    .recommendations(List.of())
                     .build();
         }
 
@@ -100,7 +95,7 @@ public class EnhancedResultService {
         if (allTestQuestionIds.isEmpty()) {
             return EnhancedResultDto.builder()
                     .correct(0).wrong(0).total(0).totalScore(userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L)
-                    .skillBreakdown(List.of()).partBreakdown(List.of()).recommendations(List.of())
+                    .partBreakdown(List.of())
                     .build();
         }
 
@@ -200,12 +195,9 @@ public class EnhancedResultService {
                 questionMap, correctnessMap, statusMap, questionNumberMap,
                 examPartMap, skillMap, tagsByQuestion, tagMap, targetParts, examTypeName);
 
-        List<SkillBreakdownDto> skillBreakdown = buildSkillBreakdown(
-                partBreakdown, test.getExamTypeId(), skillMap, examTypeName);
-
         double overallPercentage = totalQuestions > 0
                 ? (double) normalizedCorrect / totalQuestions * 100 : 0;
-        int readinessScore = calculateReadinessScore(skillBreakdown, overallPercentage);
+        int readinessScore = calculateReadinessScore(partBreakdown, overallPercentage);
         String readinessLevel = getReadinessLevel(readinessScore);
 
         Integer percentile = calculatePercentile(userTest.getTestId(), userTest.getTotalScore());
@@ -227,9 +219,6 @@ public class EnhancedResultService {
             isTargetMetResult = totalScoreVal >= targetScore;
         }
 
-        List<RecoveryRecommendationDto> recommendations = buildRecommendations(
-                partBreakdown, tagMap, allTagIds);
-
         String recoveryMessage = buildRecoveryMessage(hasTarget, isTargetMetResult, readinessScore);
 
         return EnhancedResultDto.builder()
@@ -248,14 +237,12 @@ public class EnhancedResultService {
                 .gaugeLabel(gauge.gaugeLabel())
                 .gaugeTitle(gauge.gaugeTitle())
                 .gaugeMessage(gauge.gaugeMessage())
-                .skillBreakdown(skillBreakdown)
                 .partBreakdown(partBreakdown)
                 .readinessScore(readinessScore)
                 .readinessLevel(readinessLevel)
                 .passed(passed)
                 .percentile(percentile)
                 .recoveryMessage(recoveryMessage)
-                .recommendations(recommendations)
                 .build();
     }
 
@@ -375,17 +362,9 @@ public class EnhancedResultService {
 
             Double targetPercentage = null;
             Boolean isTargetMet = null;
-            String targetGapMessage = null;
             if (targetParts.containsKey(partId)) {
                 targetPercentage = targetParts.get(partId).doubleValue();
                 isTargetMet = percentageRounded >= targetPercentage;
-                if (isTargetMet) {
-                    targetGapMessage = "(Đạt mục tiêu " + targetPercentage.intValue() + "%)";
-                } else {
-                    double gap = Math.max(0, targetPercentage - percentageRounded);
-                    String gapStr = gap == Math.floor(gap) ? String.valueOf((int) gap) : String.format("%.1f", gap);
-                    targetGapMessage = "(Cần thêm " + gapStr + "% để đạt " + targetPercentage.intValue() + "%)";
-                }
             }
 
             List<TagBreakdownDto> weakTags = buildTagBreakdown(
@@ -402,7 +381,6 @@ public class EnhancedResultService {
                     .percentage(percentageRounded)
                     .targetPercentage(targetPercentage)
                     .isTargetMet(isTargetMet)
-                    .targetGapMessage(targetGapMessage)
                     .weakTags(weakTags)
                     .build());
         }
@@ -502,62 +480,28 @@ public class EnhancedResultService {
         return numberMap;
     }
 
-    private List<SkillBreakdownDto> buildSkillBreakdown(
-            List<PartBreakdownDto> partBreakdown,
-            String examTypeId,
-            Map<String, Skill> skillMap,
-            String examTypeName) {
-
+    /**
+     * Readiness = trung bình % đúng của từng Skill (mỗi Skill trọng số như nhau), gộp từ partBreakdown.
+     * Không dựng DTO theo Skill vì FE chỉ hiển thị readiness + breakdown theo Part.
+     */
+    private int calculateReadinessScore(List<PartBreakdownDto> partBreakdown, double overallPercentage) {
         Map<String, int[]> skillStats = new LinkedHashMap<>();
-
         for (PartBreakdownDto part : partBreakdown) {
             int[] stats = skillStats.computeIfAbsent(part.getSkillId(), k -> new int[]{0, 0});
             stats[0] += part.getCorrect();
             stats[1] += part.getWrong();
         }
-
-        List<SkillBreakdownDto> skills = new ArrayList<>();
-        for (Map.Entry<String, int[]> entry : skillStats.entrySet()) {
-            String skillId = entry.getKey();
-            int[] stats = entry.getValue();
-            int correct = stats[0];
-            int wrong = stats[1];
-            int total = correct + wrong;
-            double percentage = total > 0 ? (double) correct / total * 100 : 0;
-
-            Skill skill = skillMap.get(skillId);
-
-            Integer convertedScore = null;
-            if (examTypeId != null) {
-                convertedScore = scoringConversionRepository
-                        .findByExamTypeIdAndSkillIdAndNumCorrect(examTypeId, skillId, correct)
-                        .map(ScoringConversion::getConvertedScore)
-                        .orElse(null);
-            }
-
-            skills.add(SkillBreakdownDto.builder()
-                    .skillId(skillId)
-                    .skillName(resolveSkillName(skill, examTypeName))
-                    .correct(correct)
-                    .wrong(wrong)
-                    .total(total)
-                    .percentage(Math.round(percentage * 10.0) / 10.0)
-                    .convertedScore(convertedScore)
-                    .build());
-        }
-
-        return skills;
-    }
-
-    private int calculateReadinessScore(List<SkillBreakdownDto> skillBreakdown, double overallPercentage) {
-        if (skillBreakdown.isEmpty()) {
+        if (skillStats.isEmpty()) {
             return (int) Math.round(overallPercentage);
         }
 
-        double sum = skillBreakdown.stream()
-                .mapToDouble(SkillBreakdownDto::getPercentage)
-                .sum();
-        return (int) Math.round(sum / skillBreakdown.size());
+        double sum = 0;
+        for (int[] stats : skillStats.values()) {
+            int total = stats[0] + stats[1];
+            double percentage = total > 0 ? (double) stats[0] / total * 100 : 0;
+            sum += Math.round(percentage * 10.0) / 10.0;
+        }
+        return (int) Math.round(sum / skillStats.size());
     }
 
     private String getReadinessLevel(int readinessScore) {
@@ -594,83 +538,6 @@ public class EnhancedResultService {
             case "NEEDS_IMPROVEMENT" -> "Bạn gần đạt nhưng còn lĩnh vực yếu có thể kéo tụt điểm.";
             default -> "Bạn cần củng cố nền tảng trước khi làm mock tiếp.";
         };
-    }
-
-    private List<RecoveryRecommendationDto> buildRecommendations(
-            List<PartBreakdownDto> partBreakdown,
-            Map<String, Tag> tagMap,
-            Set<String> allTagIds) {
-
-        Set<String> weakTagIds = new LinkedHashSet<>();
-        Map<String, String> tagToSkillName = new HashMap<>();
-
-        for (PartBreakdownDto part : partBreakdown) {
-            if (part.getWeakTags() == null) continue;
-
-            boolean shouldFocus = false;
-            if (part.getIsTargetMet() != null) {
-                shouldFocus = !part.getIsTargetMet();
-            } else {
-                shouldFocus = part.getPercentage() < 60;
-            }
-
-            if (!shouldFocus) continue;
-
-            for (TagBreakdownDto tag : part.getWeakTags()) {
-                double threshold = part.getTargetPercentage() != null ? part.getTargetPercentage() : 60.0;
-                if (tag.getPercentage() < threshold) {
-                    weakTagIds.add(tag.getTagId());
-                    tagToSkillName.put(tag.getTagId(), part.getSkillName());
-                }
-            }
-        }
-
-        if (weakTagIds.isEmpty()) return List.of();
-
-        List<ResourceTag> resourceTags = resourceTagRepository.findByTagIdIn(weakTagIds);
-
-        Set<String> resourceIds = resourceTags.stream()
-                .map(ResourceTag::getResourceId)
-                .collect(Collectors.toSet());
-
-        if (resourceIds.isEmpty()) return List.of();
-
-        Map<String, RecoveryResource> resourceMap = recoveryResourceRepository
-                .findAllById(resourceIds).stream()
-                .collect(Collectors.toMap(RecoveryResource::getResourceId, r -> r));
-
-        Map<String, RecoveryRecommendationDto> seen = new LinkedHashMap<>();
-        for (ResourceTag rt : resourceTags) {
-            RecoveryResource resource = resourceMap.get(rt.getResourceId());
-            if (resource == null) continue;
-
-            Tag tag = tagMap.get(rt.getTagId());
-            String tagName = tag != null ? tag.getName() : "";
-
-            if (seen.containsKey(rt.getResourceId())) {
-                RecoveryRecommendationDto existing = seen.get(rt.getResourceId());
-                if (!tagName.isEmpty() && !existing.getTagNames().contains(tagName)) {
-                    existing.getTagNames().add(tagName);
-                }
-                continue;
-            }
-
-            String skillName = tagToSkillName.getOrDefault(rt.getTagId(), "");
-            List<String> tagNames = new ArrayList<>();
-            if (!tagName.isEmpty()) tagNames.add(tagName);
-
-            seen.put(rt.getResourceId(), RecoveryRecommendationDto.builder()
-                    .skillName(skillName)
-                    .tagNames(tagNames)
-                    .resourceId(resource.getResourceId())
-                    .resourceTitle(resource.getTitle())
-                    .resourceUrl(resource.getUrl())
-                    .originalFileName(resource.getOriginalFileName())
-                    .resourceDescription(resource.getDescription())
-                    .build());
-        }
-
-        return new ArrayList<>(seen.values());
     }
 
     private Set<String> getAnalyzedQuestionIds(UserTest userTest) {

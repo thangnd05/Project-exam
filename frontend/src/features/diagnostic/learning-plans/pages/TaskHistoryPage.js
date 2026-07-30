@@ -4,7 +4,6 @@ import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/shared/utils/format-date-time';
 import { useTaskHistory } from './hooks/useTaskHistory';
-import { planStageLabel } from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -218,7 +217,6 @@ function TaskHistoryPage() {
                 <th className={cx('right')}>Số câu</th>
                 <th className={cx('right')}>Độ chính xác</th>
                 <th>Kết quả</th>
-                <th>Giai đoạn</th>
                 <th className={cx('right')}>Bài làm</th>
               </tr>
             </thead>
@@ -243,7 +241,6 @@ function TaskHistoryPage() {
                       <span className={cx('muted', 'small')}>—</span>
                     )}
                   </td>
-                  <td className={cx('small')}>{planStageLabel(s.planStage)}</td>
                   <td className={cx('right')}>
                     {s.status === 'SUBMITTED' ? (
                       <Link

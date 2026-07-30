@@ -8,7 +8,7 @@ import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanS
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanTask;
 import com.project_exam.backend.modules.assessment.learning.dto.CurrentSessionResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupDto;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanPhaseDto;
+import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceDto;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskDto;
 import com.project_exam.backend.modules.assessment.learning.dto.SubmitSessionResponse;
@@ -40,13 +40,10 @@ public class LearningMapper {
                 .sourceUserTestId(plan.getSourceUserTestId())
                 .userTargetId(plan.getUserTargetId())
                 .targetScore(plan.getTargetScore())
-                .deadlineDays(plan.getDeadlineDays())
                 .baselineReadiness(plan.getBaselineReadiness())
                 .readinessLevel(readinessLevel)
-                .diagnosticUserTestId(plan.getSourceUserTestId())
                 .planSequence(plan.getPlanSequence())
                 .planStage(planStage)
-                .passAccuracyDefault(plan.getPassAccuracyDefault())
                 .status(plan.getStatus().name())
                 .targetAchieved(false)
                 .createdAt(plan.getCreatedAt())
@@ -57,7 +54,6 @@ public class LearningMapper {
                 .tasks(tasks)
                 .partGroups(partGroups)
                 .partsWithoutTasks(partsWithoutTasks)
-                .phases(List.of())
                 .build();
     }
 
@@ -78,14 +74,11 @@ public class LearningMapper {
                 .sourceUserTestId(plan.getSourceUserTestId())
                 .userTargetId(plan.getUserTargetId())
                 .targetScore(plan.getTargetScore())
-                .deadlineDays(plan.getDeadlineDays())
                 .baselineReadiness(plan.getBaselineReadiness())
                 .readinessLevel(readinessLevel)
-                .diagnosticUserTestId(plan.getSourceUserTestId())
                 .planSequence(plan.getPlanSequence())
                 .replacedByPlanId(plan.getReplacedByPlanId())
                 .planStage(planStage)
-                .passAccuracyDefault(plan.getPassAccuracyDefault())
                 .status(plan.getStatus().name())
                 .targetAchieved(false)
                 .createdAt(plan.getCreatedAt())
@@ -96,7 +89,6 @@ public class LearningMapper {
                 .tasks(tasks)
                 .partGroups(partGroups)
                 .partsWithoutTasks(List.of())
-                .phases(List.of())
                 .build();
     }
 
@@ -116,7 +108,6 @@ public class LearningMapper {
                 .tasks(List.of())
                 .partGroups(List.of())
                 .partsWithoutTasks(List.of())
-                .phases(List.of())
                 .build();
     }
 
@@ -125,8 +116,7 @@ public class LearningMapper {
             String taskType,
             String tagName,
             String examPartName,
-            PlanPhaseDto.RecommendedResourceDto studyResource,
-            int priorityScore) {
+            RecommendedResourceDto studyResource) {
         return PlanTaskDto.builder()
                 .taskId(task.getTaskId())
                 .taskOrder(task.getTaskOrder())
@@ -142,7 +132,6 @@ public class LearningMapper {
                 .bestAccuracy(task.getBestAccuracy())
                 .attemptCount(task.getAttemptCount())
                 .studyResource(studyResource)
-                .priorityScore(priorityScore)
                 .wrongCountAtDiagnosis(task.getWrongCountAtDiagnosis())
                 .build();
     }
@@ -154,7 +143,7 @@ public class LearningMapper {
             Integer passAccuracy,
             int passedTasksInPart,
             int totalTasksInPart,
-            List<PlanPhaseDto.RecommendedResourceDto> partResources,
+            List<RecommendedResourceDto> partResources,
             List<PlanTaskDto> tasks) {
         return PlanPartGroupDto.builder()
                 .examPartId(examPartId)
@@ -168,8 +157,8 @@ public class LearningMapper {
                 .build();
     }
 
-    public PlanPhaseDto.RecommendedResourceDto toResourceDto(RecoveryResource r) {
-        return PlanPhaseDto.RecommendedResourceDto.builder()
+    public RecommendedResourceDto toResourceDto(RecoveryResource r) {
+        return RecommendedResourceDto.builder()
                 .resourceId(r.getResourceId())
                 .title(r.getTitle())
                 .description(r.getDescription())
@@ -220,7 +209,7 @@ public class LearningMapper {
             String planStage,
             LearningPlanSession session,
             PlanTaskDto activeTask,
-            PlanPhaseDto.RecommendedResourceDto resource,
+            RecommendedResourceDto resource,
             int passAccuracyRequired,
             List<QuestionResponse> questions,
             int totalTasks,
@@ -231,10 +220,8 @@ public class LearningMapper {
                 .learningPlanId(plan.getLearningPlanId())
                 .planStage(planStage)
                 .sessionId(session.getSessionId())
-                .sessionStatus(session.getStatus().name())
                 .activeTask(activeTask)
                 .resource(resource)
-                .questionCount(session.getQuestionCount())
                 .passAccuracyRequired(passAccuracyRequired)
                 .questions(questions)
                 .totalTasks(totalTasks)
@@ -254,7 +241,6 @@ public class LearningMapper {
                 .learningPlanId(plan.getLearningPlanId())
                 .examTypeId(plan.getExamTypeId())
                 .planStage(planStage)
-                .sessionStatus(null)
                 .questions(List.of())
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
@@ -302,7 +288,6 @@ public class LearningMapper {
                 .passed(passed)
                 .taskStatus(taskStatus)
                 .planStage(planStage)
-                .unlockedNextTask(false)
                 .message(message)
                 .reviewItems(reviewItems)
                 .build();
@@ -340,7 +325,6 @@ public class LearningMapper {
     public TaskSessionHistoryDto toTaskSessionHistory(LearningPlanSession s) {
         return TaskSessionHistoryDto.builder()
                 .sessionId(s.getSessionId())
-                .planStage(s.getPlanStage() != null ? s.getPlanStage().name() : null)
                 .status(s.getStatus() != null ? s.getStatus().name() : null)
                 .questionCount(s.getQuestionCount())
                 .accuracy(s.getAccuracy())

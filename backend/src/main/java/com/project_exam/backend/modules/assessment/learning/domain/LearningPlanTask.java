@@ -61,9 +61,6 @@ public class LearningPlanTask {
     @Column(name = "passed_at")
     private Instant passedAt;
 
-    @Column(name = "priority_score", nullable = false)
-    private Integer priorityScore = 0;
-
     @Column(name = "wrong_count_at_diagnosis")
     private Integer wrongCountAtDiagnosis;
 }

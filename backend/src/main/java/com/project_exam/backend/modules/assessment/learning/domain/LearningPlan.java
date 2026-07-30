@@ -13,7 +13,6 @@ import java.time.Instant;
         @Index(name = "idx_learning_plans_exam_type_id", columnList = "exam_type_id"),
         @Index(name = "idx_learning_plans_source_user_test_id", columnList = "source_user_test_id"),
         @Index(name = "idx_learning_plans_user_target_id", columnList = "user_target_id"),
-        @Index(name = "idx_learning_plans_current_task_id", columnList = "current_task_id"),
         @Index(name = "idx_learning_plans_replaced_by_plan_id", columnList = "replaced_by_plan_id")
 })
 @Getter
@@ -51,9 +50,6 @@ public class LearningPlan {
     @Column(name = "plan_stage", length = 20, nullable = false)
     private PlanStage planStage = PlanStage.FOUNDATION;
 
-    @Column(name = "current_task_id")
-    private String currentTaskId;
-
     @Column(name = "pass_accuracy_default", nullable = false)
     private Integer passAccuracyDefault = 70;
 
@@ -79,8 +75,6 @@ public class LearningPlan {
         ACTIVE,
 
         COMPLETED,
-
-        ABANDONED,
 
         REPLACED
     }

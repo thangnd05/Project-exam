@@ -29,10 +29,6 @@ public class LearningPlanSession {
     @Column(name = "task_id")
     private String taskId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "plan_stage", nullable = false, length = 20)
-    private PlanStage planStage;
-
     @Column(name = "resource_id")
     private String resourceId;
 

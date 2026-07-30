@@ -26,8 +26,7 @@ public class PlanTaskDto {
     private BigDecimal bestAccuracy;
     private Integer attemptCount;
 
-    private PlanPhaseDto.RecommendedResourceDto studyResource;
+    private RecommendedResourceDto studyResource;
 
-    private Integer priorityScore;
     private Integer wrongCountAtDiagnosis;
 }
