@@ -6,7 +6,6 @@ import {
   Check,
   ChevronDown,
   Flag,
-  Flame,
   History,
   Lock,
   Sparkles,
@@ -17,7 +16,7 @@ import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
-import { isTaskStuck, taskCurrentAccuracy, taskGapToPass } from '~/shared/utils/taskProgress';
+import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '~/shared/utils/taskProgress';
 
 const cx = classNames.bind(styles);
 
@@ -398,7 +397,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
   const resource = task.studyResource;
   const current = taskCurrentAccuracy(task);
   const gap = taskGapToPass(task);
-  const stuck = isTaskStuck(task);
+  const unpassedAttempts = taskUnpassedAttempts(task);
   const nearPass = !isPassed && gap != null && gap > 0 && gap <= NEAR_PASS_GAP;
 
   const hasAttempted = (task.attemptCount ?? 0) > 0;
@@ -445,9 +444,9 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
           </span>
         )}
         {nearPass && <span className={cx('chip', 'chipWarning')}>Sắp vượt · còn {gap}%</span>}
-        {stuck && (
-          <span className={cx('chip', 'chipDanger')}>
-            <Flame size={12} /> Đang bí
+        {unpassedAttempts > 0 && (
+          <span className={cx('chip', 'chipMuted')}>
+            Đã làm {unpassedAttempts} lượt · chưa qua
           </span>
         )}
       </div>

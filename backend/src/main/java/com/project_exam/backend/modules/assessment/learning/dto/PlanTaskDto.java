@@ -25,8 +25,6 @@ public class PlanTaskDto {
     private BigDecimal baselineAccuracy;
     private BigDecimal bestAccuracy;
     private Integer attemptCount;
-    /** Số session fail liên tiếp gần đây (reset khi pass). UI dùng để hiện cảnh báo stuck. */
-    private Integer consecutiveFails;
 
     /** Tài liệu đọc trước khi luyện (RecoveryResource gắn tag). */
     private PlanPhaseDto.RecommendedResourceDto studyResource;

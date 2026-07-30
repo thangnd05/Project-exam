@@ -975,6 +975,23 @@
   }
 }
 
+/*
+ * Nhãn nằm CẠNH node, phía xa tim đường (node lệch phải -> nhãn sang phải và ngược lại,
+ * xem labelSide trong PlanPartTaskList). Thiếu 2 class này thì nhãn rơi về góc trên-trái của
+ * node và đè lên cả node lẫn đường đi.
+ */
+.labelRight {
+  left: calc(100% + 0.6rem);
+  transform: translateY(-50%);
+  text-align: left;
+}
+
+.labelLeft {
+  right: calc(100% + 0.6rem);
+  transform: translateY(-50%);
+  text-align: right;
+}
+
 .stageNodeLabelActive {
   color: var(--brand-700);
   font-weight: var(--font-weight-semibold);
@@ -1121,6 +1138,13 @@
   background: var(--danger-bg);
   color: var(--danger-text);
   border-color: var(--danger-border);
+}
+
+/* Thông tin trung tính (số lượt đã làm...) — không phải cảnh báo, không cần màu mạnh. */
+.chipMuted {
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
 }
 
 .meterWrap {

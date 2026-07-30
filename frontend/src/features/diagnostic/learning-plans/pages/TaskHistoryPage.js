@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/shared/utils/format-date-time';
-import { isTaskStuck } from '~/shared/utils/taskProgress';
 import { useTaskHistory } from './hooks/useTaskHistory';
 import { planStageLabel } from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
@@ -99,9 +98,6 @@ function TaskHistoryPage() {
         <span className={cx('badge', 'badgeMuted')}>
           Cần ≥ {pass}% để vượt ải
         </span>
-        {isTaskStuck(task) && (
-          <span className={cx('badge', 'badgeDanger')}>Đang bí</span>
-        )}
       </div>
 
       <div className={cx('statGrid')}>

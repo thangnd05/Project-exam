@@ -383,17 +383,10 @@ public class LearningPlanSessionService {
                 task.setStatus(TaskStatus.ACTIVE);
                 taskStatus = TaskStatus.ACTIVE.name();
             }
-            // Ải đang ở trạng thái đã vượt thì không tính chuỗi trượt (tránh gắn nhãn "Đang bí"
-            // cho ải đã PASSED chỉ vì luyện lại chưa đạt).
-            int consecutiveFails = taskPassed
-                    ? 0
-                    : countConsecutiveFails(learningPlanId, task.getTaskId());
-            task.setConsecutiveFails(consecutiveFails);
             task.setPriorityScore(PlanPrioritySupport.recomputePriorityAfterSession(
                     task.getWrongCountAtDiagnosis(),
                     task.getBestAccuracy().intValue(),
                     task.getPassAccuracy(),
-                    consecutiveFails,
                     taskPassed));
             taskRepository.save(task);
             if (passed) {
@@ -636,29 +629,6 @@ public class LearningPlanSessionService {
         List<String> result = new ArrayList<>(unseen);
         result.addAll(fill);
         return result;
-    }
-
-    /**
-     * Đếm fail streak gần nhất cho task này.
-     * - Chỉ xét tối đa 5 session gần nhất (đủ vì threshold struggle là 3).
-     * - Bỏ qua session abandoned (user switch task giữa chừng), KHÔNG nhầm với fail thật 0%.
-     * - Gặp pass hoặc session bất thường dừng đếm (fail-safe, không gộp streak cũ).
-     * Phải gọi SAU khi save session hiện tại để bao gồm cả lần submit vừa rồi.
-     */
-    private int countConsecutiveFails(String learningPlanId, String taskId) {
-        List<LearningPlanSession> recent = sessionRepository
-                .findTop5ByLearningPlanIdAndTaskIdOrderByStartedAtDesc(learningPlanId, taskId);
-        int streak = 0;
-        for (LearningPlanSession s : recent) {
-            if (s.getStatus() != SessionStatus.SUBMITTED) break;
-            if (Boolean.TRUE.equals(s.getAbandoned())) continue;
-            if (Boolean.FALSE.equals(s.getPassed())) {
-                streak++;
-            } else {
-                break;
-            }
-        }
-        return streak;
     }
 
     /**

@@ -167,7 +167,6 @@ public class LearningMapper {
                 .baselineAccuracy(task.getBaselineAccuracy())
                 .bestAccuracy(task.getBestAccuracy())
                 .attemptCount(task.getAttemptCount())
-                .consecutiveFails(task.getConsecutiveFails())
                 .studyResource(studyResource)
                 .priorityScore(priorityScore)
                 .wrongCountAtDiagnosis(task.getWrongCountAtDiagnosis())
