@@ -156,7 +156,12 @@ export const privateRoutes = [
   { path: routes.generatePlan, component: GeneratePlanPage },
   { path: routes.planCompare, component: PlanComparisonPage },
   { path: routes.planDetail, component: PlanDetailPage },
-  { path: routes.planStudy, component: PlanStudyPage },
+  {
+    path: routes.planStudy,
+    component: PlanStudyPage,
+    hideFooter: true,
+    hideScrollToTop: true,
+  },
   { path: routes.planResult, component: PlanResultPage },
   { path: routes.taskHistory, component: TaskHistoryPage },
   { path: routes.planSessionReview, component: PlanSessionReviewPage },

@@ -10,6 +10,10 @@
   max-width: 158rem;
 }
 
+.studyWideWithFooter {
+  padding-bottom: 100px;
+}
+
 .headerBar {
   display: flex;
   justify-content: space-between;
@@ -1444,39 +1448,12 @@
 }
 
 .activeTaskCard {
-  background: linear-gradient(135deg, var(--surface-tint), var(--bg-white));
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-lg);
-  padding: 3.2rem 3.6rem;
-  margin-bottom: 1.6rem;
-  box-shadow: 0 4px 18px rgba(13, 148, 136, 0.12);
-}
-
-.studySubmitBar {
-  position: sticky;
-  bottom: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1.2rem;
-  margin-top: 2rem;
-  padding: 1.4rem 2rem;
   background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.06);
-}
-
-.studySubmitProgress {
-  font-size: var(--font-size-ssm);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
-
-  strong {
-    color: var(--primary);
-  }
+  padding: 3.2rem 3.6rem;
+  margin-bottom: 1.6rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .activeTaskHead {

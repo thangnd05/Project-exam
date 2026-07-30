@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { getCurrentSession } from '~/shared/api/learningPlanApi';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
@@ -12,9 +13,10 @@ import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskLi
 import { useSubmitSession } from './hooks/useSubmitSession';
 import { planStageLabel } from '../planLabels';
 import TestStartDashboard from '~/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
+import ProgressBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/ProgressBlock';
+import SubmitBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/SubmitBlock';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import examStyles from '~/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
-
 const cx = classNames.bind(styles);
 // Tái dùng đúng SCSS thẻ câu hỏi/đáp án của trang làm bài thi.
 const ex = classNames.bind(examStyles);
@@ -218,10 +220,14 @@ function PlanStudyPage() {
   };
 
   return (
-    <div className={cx('wrapper', 'studyWide')}>
+    <div
+      className={cx('wrapper', 'studyWide', {
+        studyWideWithFooter: (session?.questions?.length ?? 0) > 0,
+      })}
+    >
       <div className={cx('headerBar')}>
-        <button type="button" className={cx('btn', 'btnGhost', 'btnSm')} onClick={goToPicker}>
-          Chọn ải khác
+        <button type="button" className={cx('btn', 'btnOutline', 'btnSm')} onClick={goToPicker}>
+          Quay lại
         </button>
       </div>
 
@@ -242,15 +248,12 @@ function PlanStudyPage() {
                   <span className={cx('badge', 'badgeMuted')}>
                     {session.passedTasks}/{session.totalTasks} ải đã vượt
                   </span>
+                  {session.passAccuracyRequired != null && (
+                    <span className={cx('badge', 'badgePrimary')}>
+                      Cần ≥{session.passAccuracyRequired}% để qua ải
+                    </span>
+                  )}
                 </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div className={cx('muted', 'small')}>{session.message}</div>
-                {session.activeTask && (
-                  <div className={cx('passRequired')} style={{ marginTop: '0.4rem' }}>
-                    Cần ≥{session.passAccuracyRequired}% để qua ải
-                  </div>
-                )}
               </div>
             </div>
 
@@ -321,18 +324,24 @@ function PlanStudyPage() {
               })}
 
               {(session.questions?.length ?? 0) > 0 && (
-                <div className={cx('studySubmitBar')}>
-                  <span className={cx('studySubmitProgress')}>
-                    Đã trả lời <strong>{answeredCount}</strong>/{session.questions.length} câu
-                  </span>
-                  <button
-                    type="button"
-                    className={cx('btn', 'btnPrimary', 'btnLg')}
-                    disabled={submitting}
-                    onClick={handleSubmit}
-                  >
-                    {submitting ? 'Đang chấm...' : 'Nộp bài'}
-                  </button>
+                <div className={ex('footer-actions')}>
+                  <div className={ex('footer-buttons')}>
+                    <Container className={ex('footer-buttons-inner')}>
+                      <div className={ex('footer-pills')}>
+                        <ProgressBlock
+                          answered={answeredCount}
+                          total={session.questions.length}
+                        />
+                      </div>
+                      <div className={ex('footer-right-group')}>
+                        <SubmitBlock
+                          onSubmit={handleSubmit}
+                          isSubmitting={submitting}
+                          label="Nộp bài"
+                        />
+                      </div>
+                    </Container>
+                  </div>
                 </div>
               )}
             </div>
