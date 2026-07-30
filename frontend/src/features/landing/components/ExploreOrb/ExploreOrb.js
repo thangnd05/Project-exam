@@ -10,7 +10,6 @@ import styles from './ExploreOrb.module.scss';
 
 const cx = classNames.bind(styles);
 
-/** Full lap ≈ 18s (tune 14–22s). */
 const ORBIT_PERIOD_MS = 18_000;
 const ORBIT_SPEED = (Math.PI * 2) / ORBIT_PERIOD_MS;
 const MANUAL_PAUSE_MS = 1600;
@@ -19,7 +18,7 @@ const MAX_ORBIT_ITEMS = 8;
 
 const DESKTOP_RADIUS = {radiusX: 250, radiusY: 90, radiusZ: 150};
 const MOBILE_RADIUS = {radiusX: 140, radiusY: 70, radiusZ: 110};
-/** Approximate hub diameter matching `.hub` clamp in ExploreOrb.module.scss. */
+
 const HUB_DIAMETER_DESKTOP = 148;
 const HUB_DIAMETER_MOBILE = 120;
 
@@ -46,17 +45,12 @@ const getSubtitle = (type) => {
   return 'Kỳ thi chuẩn';
 };
 
-/** Normalize angle to [-π, π]. */
 function normalizeAngle(theta) {
   let t = ((theta % TWO_PI) + TWO_PI) % TWO_PI;
   if (t > Math.PI) t -= TWO_PI;
   return t;
 }
 
-/**
- * Orbital transform from absolute theta (radians).
- * Front (theta≈0) sits at bottom-center of the ellipse; CSS +y is down.
- */
 function getOrbitTransform(theta, radius) {
   const depth = (Math.cos(theta) + 1) / 2;
 
@@ -72,7 +66,6 @@ function getOrbitTransform(theta, radius) {
   };
 }
 
-/** Index whose theta is closest to 0 (front of orbit). */
 function getFrontIndex(rotation, n) {
   if (n <= 0) return 0;
   let best = 0;
@@ -138,7 +131,7 @@ function ExploreOrb() {
   const hubDiameter = isNarrow ? HUB_DIAMETER_MOBILE : HUB_DIAMETER_DESKTOP;
   const rippleScaleX = (radius.radiusX * 2) / hubDiameter;
   const rippleScaleY = (radius.radiusY * 2) / hubDiameter;
-  /** One ripple expand ≈ one front-card change (full lap / n). */
+
   const cardStepMs = count > 0 ? ORBIT_PERIOD_MS / count : ORBIT_PERIOD_MS;
   const step = count > 0 ? TWO_PI / count : 0;
 
@@ -170,21 +163,17 @@ function ExploreOrb() {
         s = states[i] = {active: null, frontish: null, z: null};
       }
 
-      // Per-frame: only genuinely-changing compositor properties
       el.style.transform = `translate3d(${t.x}px, ${t.y}px, ${t.z}px) rotateY(${t.rotateY}deg) scale(${t.scale})`;
       el.style.opacity = String(t.opacity);
-      // 0 (back) → 1 (front): drives gradual glow brighten / dim
+
       el.style.setProperty('--frontness', t.depth.toFixed(3));
 
-      // zIndex is an int that holds for several frames — write only on change
       const zStr = String(t.zIndex);
       if (s.z !== zStr) {
         el.style.zIndex = zStr;
         s.z = zStr;
       }
 
-      // Structural writes (class / aria / tabIndex) only when a card's role
-      // actually flips — skips string-building and DOM churn every frame.
       const isActive = i === front;
       const isFrontish = t.zIndex >= 70;
       if (s.active !== isActive || s.frontish !== isFrontish) {
@@ -213,8 +202,7 @@ function ExploreOrb() {
   }, []);
 
   const setCardRef = useCallback((index, el) => {
-    // New DOM node at this slot → drop its cached role so applyTransforms
-    // re-writes class/aria on the fresh element.
+
     if (cardRefs.current[index] !== el) {
       cardStateRef.current[index] = null;
     }
@@ -222,8 +210,7 @@ function ExploreOrb() {
   }, []);
 
   useEffect(() => {
-    // Cards may remount when the set changes; a leave event can be lost, so
-    // clear any stuck hover-pause state.
+
     hoverCountRef.current = 0;
     hoverPausedRef.current = false;
     setPaused(pointerPausedRef.current);
@@ -238,10 +225,6 @@ function ExploreOrb() {
     setFrontIndex(front);
   }, [count]);
 
-  // Position cards imperatively when the *set* or *geometry* changes (data
-  // load, radius/breakpoint). Deliberately NOT on frontIndex/paused: cards are
-  // memoized so React never resets their className, and re-applying on every
-  // front change would double the work on that exact frame (visible stutter).
   useLayoutEffect(() => {
     if (reduceMotion || count === 0) return;
     applyTransforms();
@@ -251,7 +234,6 @@ function ExploreOrb() {
     pauseUntilRef.current = Date.now() + ms;
   }, []);
 
-  /** Nudge orbit so card `index` faces front (shortest angular path). */
   const goTo = useCallback(
     (index) => {
       if (count === 0) return;
@@ -309,7 +291,6 @@ function ExploreOrb() {
     [updatePausedFlag],
   );
 
-  // Continuous orbit via requestAnimationFrame — DOM only, rare setState
   useEffect(() => {
     if (reduceMotion || count < 2) return undefined;
 
@@ -570,7 +551,6 @@ function ExploreOrb() {
     </section>
   );
 }
-
 
 const OrbitCards = memo(function OrbitCards({
   types,

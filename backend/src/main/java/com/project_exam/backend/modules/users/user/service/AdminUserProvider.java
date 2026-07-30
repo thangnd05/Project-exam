@@ -10,12 +10,6 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Nguồn duy nhất để lấy tập userId của các ADMIN.
- * Why: logic "findByRoleName(ADMIN) -> findByRoleId -> map userId" trước đây bị lặp
- * ở TestService (resolveAdminIds/getAdminUserIdSet), QuestionService (getAdminUserIds)...
- * Gom về một chỗ để sửa-một-lần và tránh lệch hành vi giữa các bản sao.
- */
 @Component
 @RequiredArgsConstructor
 public class AdminUserProvider {
@@ -23,7 +17,6 @@ public class AdminUserProvider {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
 
-    /** Tập userId của tất cả admin (đề/kho công khai = do admin tạo). Rỗng nếu chưa có admin. */
     public Set<String> adminUserIds() {
         Role adminRole = roleRepository.findByRoleName("ADMIN");
         if (adminRole == null) {

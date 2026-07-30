@@ -65,7 +65,7 @@ public class TestPartService {
 
     @Transactional
     public TestPart save(TestPartRequest dto, HttpServletRequest request) {
-        // Kiểm tra logic trước khi lưu
+
         if (dto.getTestId() == null) {
             throw new BadRequestException("Test ID không được để trống!");
         }
@@ -82,7 +82,6 @@ public class TestPartService {
             throw new ForbiddenException("Bạn không có quyền tạo part cho đề này.");
         }
 
-        // Map từ DTO sang Entity
         TestPart testPart = new TestPart();
         testPart.setTestId(dto.getTestId());
         testPart.setExamPartId(dto.getExamPartId());
@@ -112,7 +111,6 @@ public class TestPartService {
 
         existing.setExamPartId(dto.getExamPartId());
         existing.setNumQuestions(dto.getNumQuestions());
-        // Thường không update testId vì nó cố định theo đề
 
         return testPartRepository.save(existing);
     }

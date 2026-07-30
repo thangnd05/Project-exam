@@ -19,12 +19,11 @@ import SubmitBlock from '~/features/tests/exam/exam-types/detail/testStart/examL
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import examStyles from '~/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
 const cx = classNames.bind(styles);
-// Tái dùng đúng SCSS thẻ câu hỏi/đáp án của trang làm bài thi.
+
 const ex = classNames.bind(examStyles);
 
 const API_BASE = getApiBaseUrl();
 
-/** Câu đã trả lời: MSQ cần ít nhất 1 lựa chọn, còn lại cần có đáp án được chọn. */
 function isAnswered(question, selections) {
   const selected = selections[question.questionId];
   return question.questionType === 'MSQ'
@@ -44,12 +43,11 @@ function PlanStudyPage() {
   const { refreshStreak } = useStreak();
   const taskIdFromUrl = searchParams.get('taskId');
 
-  // Lưu đáp án đã chọn vào sessionStorage để không mất khi F5 (giống trang làm bài thi).
   const answersStorageKey = `plan-study-answers-${learningPlanId}-${taskIdFromUrl || 'current'}`;
 
   const [selections, setSelections] = useState({});
   const [formError, setFormError] = useState(null);
-  // > 0 = đang hỏi lại vì còn câu chưa trả lời.
+
   const [unansweredCount, setUnansweredCount] = useState(0);
 
   const submitMutation = useSubmitSession();
@@ -57,29 +55,25 @@ function PlanStudyPage() {
 
   const sessionQuery = useQuery({
     queryKey: planSessionKeys.session(learningPlanId, taskIdFromUrl),
-    // Có taskId = vào học ải đó -> gọi endpoint tạo phiên (POST, trả lại phiên đang dở nếu có).
-    // Không có taskId = chỉ xem danh sách ải -> endpoint chỉ đọc.
+
     queryFn: () => (taskIdFromUrl
       ? startTaskSession(learningPlanId, taskIdFromUrl)
       : getCurrentSession(learningPlanId)),
     enabled: !!learningPlanId,
     retry: false,
-    // Không giữ cache: rời trang rồi quay lại phải hỏi server lại phiên hiện tại.
-    // Nếu cache, sau khi nộp xong mà mở lại ải sẽ thấy phiên CŨ (đã nộp) và bấm nộp lần nữa bị 400.
+
     staleTime: 0,
     gcTime: 0,
   });
 
   const session = sessionQuery.data ?? null;
-  // Chỉ chặn màn hình ở lần tải đầu; refetch nền giữ nguyên bài đang làm, không nháy "Đang tải".
+
   const loading = sessionQuery.isLoading;
   const loadError = sessionQuery.error
     ? sessionQuery.error?.response?.data?.message || sessionQuery.error.message
     : null;
   const error = formError || loadError;
 
-  // Khôi phục đáp án đã lưu khi F5 — chỉ nhận nếu đúng phiên đang mở, vì lần luyện mới
-  // của cùng một ải bốc bộ câu khác, khôi phục nhầm sẽ thấy câu tự dưng đã được chọn.
   useEffect(() => {
     setFormError(null);
     const sessionId = session?.sessionId;
@@ -95,7 +89,6 @@ function PlanStudyPage() {
     }
   }, [answersStorageKey, session?.sessionId]);
 
-  // Lưu đáp án mỗi khi thay đổi, để F5 không mất.
   useEffect(() => {
     if (!session?.sessionId) return;
     try {
@@ -104,7 +97,7 @@ function PlanStudyPage() {
         JSON.stringify({ sessionId: session.sessionId, selections }),
       );
     } catch {
-      /* bỏ qua nếu storage đầy/không dùng được */
+
     }
   }, [selections, answersStorageKey, session?.sessionId]);
 
@@ -129,7 +122,7 @@ function PlanStudyPage() {
 
   const handleSubmit = () => {
     if (!session?.sessionId) return;
-    // Câu bỏ trống bị tính là sai -> hỏi lại trước khi nộp thay vì chấm thẳng.
+
     const unanswered = (session.questions || []).filter((q) => !isAnswered(q, selections)).length;
     if (unanswered > 0) {
       setUnansweredCount(unanswered);
@@ -154,10 +147,9 @@ function PlanStudyPage() {
         onSuccess: (res) => {
           try {
             sessionStorage.removeItem(answersStorageKey);
-          } catch { /* noop */ }
+          } catch {  }
           if (res?.passed) refreshStreak();
-          // Điều hướng sang trang kết quả riêng (có URL) để F5 vẫn giữ kết quả,
-          // không rơi về phiên đề mới.
+
           const taskId = taskIdFromUrl || session?.activeTask?.taskId;
           navigate(`/learning-plans/${learningPlanId}/tasks/${taskId}/result`);
         },
@@ -170,7 +162,6 @@ function PlanStudyPage() {
     return <div className={cx('wrapper')}><div className={cx('loading')}>Đang tải...</div></div>;
   }
 
-  // Không có dữ liệu phiên (API lỗi) -> hiện lỗi, tránh rơi vào nhánh PICK rồi vỡ ở session.message.
   if (!session) {
     return (
       <div className={cx('wrapper')}>
@@ -188,7 +179,6 @@ function PlanStudyPage() {
     ? session.partGroups
     : groupTasksByPart(session.tasks || []);
 
-  // Chỉ dựa vào mode của BE: plan đã sang trạm MOCK vẫn có thể mở phiên luyện lại một ải cũ.
   const isPickMode = session?.mode === 'PICK' || (!session?.sessionId && session?.mode !== 'MOCK');
   const isMockMode = session?.mode === 'MOCK';
 
@@ -198,7 +188,7 @@ function PlanStudyPage() {
         <div className={cx('alert', 'alertSuccess')}>
           <span>{session.message}</span>
           <div className={cx('actionBar')}>
-            {/* Hết ải rồi thì việc tiếp theo là đi thi thử, không phải quay về kế hoạch. */}
+
             <Link
               to={buildExamTypeDetailPath(session.examTypeId)}
               className={cx('btn', 'btnPrimary', 'btnSm')}
@@ -258,7 +248,6 @@ function PlanStudyPage() {
 
   const answeredCount = (session.questions || []).filter((q) => isAnswered(q, selections)).length;
 
-  // Đưa selections về đúng shape userAnswers mà TestStartDashboard (trục câu hỏi) cần.
   const navAnswers = {};
   (session?.questions || []).forEach((q) => {
     const sel = selections[q.questionId];
@@ -300,7 +289,7 @@ function PlanStudyPage() {
                 </h3>
                 <div className={cx('actionBar')}>
                   <span className={cx('badge', 'badgePrimary')}>
-                    {/* Hết ải rồi mà vẫn mở phiên -> đây là lượt luyện lại, không phải giai đoạn học. */}
+
                     {session.planStage === 'MOCK' ? 'Luyện lại' : planStageLabel(session.planStage)}
                   </span>
                   <span className={cx('badge', 'badgeMuted')}>

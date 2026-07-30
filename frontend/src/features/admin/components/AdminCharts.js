@@ -22,12 +22,8 @@ import {
 } from 'recharts';
 import { brandColors } from '~/shared/styles/brandColors';
 
-/**
- * Hệ màu minimalism cho trang Thống kê — chỉ 3 vai trò, dùng nhất quán mọi chart:
- * xanh dương = chính (số liệu cốt lõi), cam = accent duy nhất (KPI tỉ lệ), xám slate = nền/phụ.
- */
 const VIZ = { primary: brandColors.accent, accent: brandColors.unique, muted: '#94a3b8' };
-// Thứ tự khớp buildStatusDistribution: [Hoàn thành, Đang làm, Hết hạn].
+
 const STATUS_COLORS = [VIZ.primary, VIZ.accent, VIZ.muted];
 
 const AXIS_TICK = { fill: '#64748b', fontSize: 12 };
@@ -174,7 +170,6 @@ export const MonthlyNewUsersBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// Người dùng mới theo tháng — dạng đường (nhẹ hơn cột), đo tăng trưởng người dùng.
 export const MonthlyNewUsersLine = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
@@ -202,7 +197,6 @@ export const MonthlyNewUsersLine = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// Tooltip riêng cho biểu đồ lượt truy cập theo tháng: hiện thêm giờ cao điểm của tháng.
 const MonthlyVisitsTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload ?? {};
@@ -237,7 +231,6 @@ export const MonthlyVisitsBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// Tooltip gộp cho biểu đồ hoạt động theo tháng: truy cập, lượt thi, tỉ lệ hoàn thành + giờ cao điểm.
 const MonthlyActivityTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload ?? {};
@@ -256,8 +249,6 @@ const MonthlyActivityTooltip = ({ active, payload, label }) => {
     );
 };
 
-// Gộp "Lượt truy cập theo tháng" + "Hiệu suất theo tháng": 2 cột nhóm (truy cập/lượt thi) trên trục
-// trái, đường tỉ lệ hoàn thành (%) trên trục phải.
 export const MonthlyActivityCombo = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
@@ -328,7 +319,6 @@ export const UserGrowthBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-// Sparkline mini — nhúng trong KPI card, không trục/lưới.
 export const SparkArea = ({ data, dataKey = 'value', color = VIZ.primary, id = 'a' }) => (
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
@@ -352,7 +342,6 @@ export const SparkBar = ({ data, dataKey = 'value', color = VIZ.primary }) => (
     </ResponsiveContainer>
 );
 
-// Traffic dạng cột chồng (khách + đã đăng nhập) — kiểu "Traffic summary".
 export const TrafficStackedBar = ({ data }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>

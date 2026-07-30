@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Bảng quy đổi điểm (vd. TOEIC raw scaled). GET mở để display result;
- * CUD admin-only — sửa bảng = sửa điểm của mọi student trong hệ thống.
- */
 @RestController
 @RequestMapping("/api/scoring-conversions")
 @RequiredArgsConstructor

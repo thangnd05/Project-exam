@@ -15,5 +15,5 @@ public class PostUpsertRequest {
     private String content;
     private String thumbnailUrl;
     private Post.PostStatus status;
-    private List<String> categoryIds; // IDs các categories
+    private List<String> categoryIds;
 }

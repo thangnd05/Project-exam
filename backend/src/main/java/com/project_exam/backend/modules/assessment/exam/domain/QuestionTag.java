@@ -21,9 +21,9 @@ public class QuestionTag {
     private String id;
 
     @Column(name = "question_id", nullable = false)
-    private String questionId; // FK -> questions
+    private String questionId;
 
     @Column(name = "tag_id", nullable = false)
-    private String tagId; // FK -> tags
+    private String tagId;
 
 }

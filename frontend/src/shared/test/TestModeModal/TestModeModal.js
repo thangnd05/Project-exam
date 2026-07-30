@@ -41,7 +41,6 @@ function TestModeModal({ show, test, onClose, onStart }) {
   const parts = partsQuery.data ?? [];
   const loading = partsQuery.isLoading;
 
-  // Tài liệu giới thiệu/cách làm gắn Part (chỉ tải khi mở tab Luyện tập).
   const partResourcesQuery = useQuery({
     queryKey: testModeKeys.partResources(test?.testId),
     queryFn: () => getResourcesByParts(parts.map((p) => p.examPartId)),

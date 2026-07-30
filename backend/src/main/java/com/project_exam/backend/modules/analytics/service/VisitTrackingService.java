@@ -20,12 +20,6 @@ public class VisitTrackingService {
     private final PageVisitRepository pageVisitRepository;
     private final GeoIpService geoIpService;
 
-    /**
-     * Ghi nhận 1 lượt xem trang. Bỏ qua nếu path rỗng; cắt bớt các trường quá dài.
-     *
-     * <p>Chạy bất đồng bộ trên {@code visitExecutor}: phần tra geo-IP có thể gọi mạng nên không
-     * để chặn thread xử lý request (FE vốn fire-and-forget, không chờ kết quả).
-     */
     @Async("visitExecutor")
     public void record(String path, String sessionKey, String userId, String ipAddress) {
         if (!StringUtils.hasText(path)) {
@@ -43,7 +37,6 @@ public class VisitTrackingService {
                 .build());
     }
 
-    /** Xoá các lượt xem cũ hơn {@code days} ngày (retention) — tránh bảng page_visits phình vô hạn. */
     @Transactional
     public int purgeOlderThan(int days) {
         return pageVisitRepository.deleteOlderThan(Instant.now().minus(Duration.ofDays(days)));

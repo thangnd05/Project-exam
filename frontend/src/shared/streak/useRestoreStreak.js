@@ -8,10 +8,10 @@ export function useRestoreStreak({ onSuccess, onError } = {}) {
   return useMutation({
     mutationFn: () => restoreStreak(),
     onSuccess: (result, ...rest) => {
-      // Đẩy dữ liệu streak mới vào cache để UI cập nhật tức thì, rồi invalidate để đồng bộ.
+
       qc.setQueryData(STREAK_QUERY_KEY, result);
       qc.invalidateQueries({ queryKey: STREAK_QUERY_KEY });
-      // Khôi phục tốn xu -> làm mới số dư xu.
+
       qc.invalidateQueries({ queryKey: COINS_QUERY_KEY });
       if (onSuccess) onSuccess(result, ...rest);
     },

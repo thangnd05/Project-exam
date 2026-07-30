@@ -23,12 +23,12 @@ public class Tag {
     private String name;
 
     @Column(name = "exam_type_id", nullable = false)
-    private String examTypeId; // FK -> exam_types
+    private String examTypeId;
 
     @Column(name = "parent_id")
-    private String parentId; // FK -> tags (nullable, tạo cấu trúc cây)
+    private String parentId;
 
     @Column(name = "sort_order")
-    private Integer sortOrder; // thứ tự học nền tảng (nhỏ = học trước); null = xếp cuối
+    private Integer sortOrder;
 
 }

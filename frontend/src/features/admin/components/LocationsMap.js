@@ -15,7 +15,6 @@ const norm = (s) =>
         .replace(/\p{Diacritic}/gu, '')
         .trim();
 
-// Tên từ ip-api đôi khi khác world-atlas — quy về tên chuẩn của bản đồ.
 const ALIAS = {
     'united states': 'united states of america',
     'czechia': 'czech republic',
@@ -25,10 +24,6 @@ const canon = (name) => ALIAS[norm(name)] || norm(name);
 
 const isRealCountry = (c) => c.code && c.code !== 'LO' && c.code !== '??';
 
-/**
- * Nhãn quốc gia hiển thị trong danh sách: mã ISO alpha-2 (vd "VN") cho quốc gia thật,
- * emoji cho local/không xác định. Không dùng cờ emoji vì Windows không render, gây lệch hàng.
- */
 export const flagLabel = (code) => {
     if (code === 'LO') return '🏠';
     if (!code || code.length !== 2 || code === '??') return '🌐';
@@ -36,7 +31,7 @@ export const flagLabel = (code) => {
 };
 
 export const TopCountriesList = ({ countries = [] }) => {
-    // Ẩn "Local" (IP nội bộ/localhost) khỏi danh sách top quốc gia.
+
     const visible = countries.filter((c) => c.code !== 'LO' && c.name !== 'Local');
     const max = visible.reduce((m, c) => Math.max(m, c.value), 0) || 1;
     if (!visible.length) {

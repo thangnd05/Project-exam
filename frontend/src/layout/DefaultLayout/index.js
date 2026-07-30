@@ -42,11 +42,7 @@ function DefaultLayout({
 
       {!hideFooter && <Footer />}
       {showMobileNav && <MobileBottomNav />}
-      {/* Sổ tay ghi chú (features/notes) tạm ẩn khỏi giao diện — API và bảng
-          `notes` vẫn còn. Bật lại bằng cách mở import NotesButton ở đầu file rồi
-          bỏ comment dòng dưới; đặt cùng điều kiện với nút cuộn lên để trang làm
-          bài / học ải không bị nút nổi che nội dung. */}
-      {/* {!hideScrollToTop && <NotesButton />} */}
+
       {!hideScrollToTop && <ScrollToTop />}
     </div>
   );

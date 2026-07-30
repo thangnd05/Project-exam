@@ -19,14 +19,12 @@ public class CosmeticController {
     private final CosmeticService cosmeticService;
     private final AuthUtils authUtils;
 
-    // Cửa hàng: danh sách cosmetic + trạng thái owned/equipped
     @GetMapping
     public ResponseEntity<List<CosmeticResponse>> getShop(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(cosmeticService.getShopForUser(userId));
     }
 
-    // Cosmetic đang đeo (để hiển thị quanh avatar)
     @GetMapping("/me/equipped")
     public ResponseEntity<EquippedCosmeticsResponse> getEquipped(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);

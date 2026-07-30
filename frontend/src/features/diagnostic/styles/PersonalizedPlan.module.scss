@@ -547,9 +547,6 @@
   margin: 0.6rem 0;
 }
 
-// ===== Bản đồ ải: chặng (Part) gập/mở + đường đi dọc qua từng ải =====
-
-// Khối lịch sử bài thi nhúng trong trang Tổng quan mục tiêu.
 .dashboardFooterActions {
   margin-top: 2rem;
 }
@@ -635,7 +632,6 @@
   }
 }
 
-// Huy hiệu số chặng bên trái header — nhìn ra ngay "đang ở chặng mấy".
 .partCrest {
   width: 5.2rem;
   height: 5.2rem;
@@ -694,7 +690,6 @@
   }
 }
 
-// Mini-map trạng thái từng ải, hiện khi chặng đang gập.
 .partDots {
   display: flex;
   flex-wrap: wrap;
@@ -756,8 +751,6 @@
   margin: 0 0 1.4rem;
 }
 
-// ===== Bản đồ màn chơi: đường đi + medallion từng ải + bảng chi tiết =====
-
 .stageLayout {
   display: grid;
   gap: 1.4rem;
@@ -773,7 +766,7 @@
 .stageMapShell {
   position: relative;
   width: 100%;
-  // Đủ chỗ cho chặng 6 ải (56 + 5×108 + 88 = 684) khỏi phải cuộn lồng trong trang.
+
   max-height: min(76vh, 700px);
   overflow-x: hidden;
   overflow-y: auto;
@@ -846,7 +839,6 @@
   white-space: nowrap;
 }
 
-// Neo ở góc bản đồ, không đặt trên đầu ải 1 vì ải đó có thể đang mang ghim "Bạn ở đây".
 .stageFlagStart {
   top: 1rem;
   left: 1.2rem;
@@ -975,11 +967,6 @@
   }
 }
 
-/*
- * Nhãn nằm CẠNH node, phía xa tim đường (node lệch phải -> nhãn sang phải và ngược lại,
- * xem labelSide trong PlanPartTaskList). Thiếu 2 class này thì nhãn rơi về góc trên-trái của
- * node và đè lên cả node lẫn đường đi.
- */
 .labelRight {
   left: calc(100% + 0.6rem);
   transform: translateY(-50%);
@@ -1030,7 +1017,7 @@
     position: sticky;
     top: 8rem;
     align-self: start;
-    // Đủ chỗ cho chặng 6 ải (56 + 5×108 + 88 = 684) khỏi phải cuộn lồng trong trang.
+
   max-height: min(76vh, 700px);
   }
 }
@@ -1140,7 +1127,6 @@
   border-color: var(--danger-border);
 }
 
-/* Thông tin trung tính (số lượt đã làm...) — không phải cảnh báo, không cần màu mạnh. */
 .chipMuted {
   background: var(--input-bg);
   color: var(--text-secondary);
@@ -1486,7 +1472,6 @@
   margin-bottom: 1.6rem;
   box-shadow: var(--primary-btn-shadow);
 
-  // Vệt sáng trang trí — hero đỡ phẳng mà không cần ảnh.
   &::before,
   &::after {
     content: '';
@@ -1536,7 +1521,6 @@
   margin: 0 0 1rem;
   opacity: 0.92;
 }
-
 
 .planHeroEyebrow {
   font-size: var(--font-size-sm);
@@ -1632,7 +1616,6 @@
   transition: width 0.6s ease;
 }
 
-// Header hướng dẫn dạng 3 bước (thay subtitle dài) — user quét nhanh là hiểu flow.
 .stepsGuide {
   display: flex;
   flex-wrap: wrap;
@@ -1679,7 +1662,6 @@
   line-height: 1.5;
 }
 
-// Thanh tab gộp khu "Mục tiêu" + "Lập kế hoạch" (TargetPlanTabs) — 2 route, 1 trải nghiệm.
 .pageTabs {
   display: flex;
   gap: 0.4rem;

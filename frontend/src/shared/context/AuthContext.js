@@ -34,8 +34,6 @@ export const AuthProvider = ({ children }) => {
     retry: false,
   });
 
-  // Memo theo data để user giữ nguyên reference giữa các render —
-  // tránh context value đổi liên tục làm mọi consumer re-render oan.
   const user = useMemo(() => (data?.id ? normalizeUser(data) : null), [data]);
   const loading = isLoading;
 

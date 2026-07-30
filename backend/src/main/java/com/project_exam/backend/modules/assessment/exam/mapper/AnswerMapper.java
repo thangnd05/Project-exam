@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class AnswerMapper {
 
-    /** View cho người làm bài: KHÔNG lộ đáp án đúng. */
     public AnswerResponse toResponse(Answer answer) {
         return AnswerResponse.builder()
                 .answerId(answer.getAnswerId())
@@ -17,7 +16,6 @@ public class AnswerMapper {
                 .build();
     }
 
-    /** View admin/đáp án: có cờ isCorrect. */
     public AnswerAdminResponse toAdminResponse(Answer answer) {
         return AnswerAdminResponse.builder()
                 .answerId(answer.getAnswerId())

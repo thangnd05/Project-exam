@@ -1,9 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addComment, updateComment, deleteComment } from '~/shared/api/postApi';
 
-// PostDetailPage tự fetch danh sách comment bằng state thủ công (không qua react-query),
-// nên các mutation dưới đây để component tự refetch qua onSuccess. Chỉ invalidate key list
-// bài viết đang tồn tại (['posts']) vì card danh sách hiển thị commentCount.
 export function useAddComment({ onSuccess, onError } = {}) {
   const qc = useQueryClient();
   return useMutation({

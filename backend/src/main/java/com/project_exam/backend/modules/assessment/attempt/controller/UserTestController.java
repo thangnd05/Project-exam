@@ -30,8 +30,6 @@ public class UserTestController {
     private final UserTestService userTestService;
     private final AuthUtils authUtils;
 
-    // Cookie định danh phiên guest do SERVER đặt (HttpOnly) — nguồn tin cậy khi claim.
-    // Cấu hình qua env: APP_GUEST_COOKIE_NAME / APP_GUEST_COOKIE_MAX_AGE.
     @Value("${app.guest.cookie-name}")
     private String guestCookieName;
 
@@ -41,13 +39,11 @@ public class UserTestController {
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
 
-    //  Lấy tất cả user test (admin only)
     @GetMapping
     public ResponseEntity<List<UserTestResponse>> getAll(HttpServletRequest httpRequest) {
         return ResponseEntity.ok(userTestService.findAllResponses(httpRequest));
     }
 
-    //  Lấy theo ID
     @GetMapping("/{userTestId}")
     public ResponseEntity<UserTestResponse> getUserTestById(
             @PathVariable String userTestId,
@@ -56,8 +52,6 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.getMeta(userTestId, httpRequest));
     }
 
-    //  Lấy theo user đang đăng nhập (JWT).
-    //  status=COMPLETED (+ examTypeId tuỳ chọn) -> chỉ bài đã hoàn thành, đã sort mới→cũ ở DB.
     @GetMapping("/my")
     public ResponseEntity<List<UserTestResponse>> getByCurrentUser(
             @RequestParam(required = false) String status,
@@ -71,7 +65,6 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.findResponsesByUserId(userId));
     }
 
-    // Lịch sử mock (phân trang): chỉ bài làm đề đầy đủ, bỏ luyện tập theo Part & Quick Challenge.
     @GetMapping("/my/mock-history")
     public ResponseEntity<PageResponse<UserTestResponse>> getMyMockHistory(
             @RequestParam(defaultValue = "0") int page,
@@ -83,7 +76,6 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.getMockHistory(userId, examTypeId, page, size));
     }
 
-    //  Lấy theo testId (chỉ chủ đề / admin)
     @GetMapping("/test/{testId}")
     public ResponseEntity<List<UserTestResponse>> getByTest(
             @PathVariable String testId,
@@ -92,7 +84,6 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.findResponsesByTestId(testId, httpRequest));
     }
 
-    //  Tạo hoặc bắt đầu bài test mới
     @PostMapping
     public ResponseEntity<Map<String, Object>> startUserTest(
             @Valid @RequestBody StartUserTestRequest request,
@@ -117,7 +108,6 @@ public class UserTestController {
         return ResponseEntity.ok(response);
     }
 
-    //  Cập nhật UserTest
     @PutMapping("/{id}")
     public ResponseEntity<UserTestResponse> update(
             @PathVariable String id,
@@ -131,7 +121,6 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.updateStatusByOwner(id, userId, request.getStatus()));
     }
 
-    //  Xóa UserTest (owner hoặc admin)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userTestService.findById(id).isEmpty()) {
@@ -141,7 +130,6 @@ public class UserTestController {
         return ResponseEntity.noContent().build();
     }
 
-    //  Nộp bài thi
     @PostMapping("/{userTestId}/submit")
     public ResponseEntity<UserTestResponse> submitTest(
             @PathVariable String userTestId,
@@ -152,7 +140,6 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.toResponse(submittedTest));
     }
 
-    //  Kiểm tra có đang làm dở không
     @GetMapping("/check-active")
     public ResponseEntity<Map<String, Object>> checkActiveUserTest(
             @RequestParam String testId,
@@ -164,7 +151,7 @@ public class UserTestController {
         Optional<UserTest> active = userTestService.findActiveUserTest(userId, testId, mode, examPartIds);
 
         Map<String, Object> response = new HashMap<>();
-        // serverNow để frontend đồng bộ đồng hồ (tránh clock skew khi tính timer).
+
         response.put("serverNow", java.time.Instant.now().toString());
         if (active.isPresent()) {
             UserTest userTest = active.get();
@@ -198,9 +185,6 @@ public class UserTestController {
         return ResponseEntity.ok(res);
     }
 
-    // ===== GUEST FLOW =====
-    // Định danh phiên: client tự sinh UUID, gửi qua header X-Guest-Session.
-
     @PostMapping("/guest")
     public ResponseEntity<Map<String, Object>> startGuestUserTest(
             @Valid @RequestBody StartUserTestRequest request,
@@ -211,7 +195,7 @@ public class UserTestController {
             return ResponseEntity.badRequest().body(Map.of("error", "Missing testId"));
         }
         UserTest userTest = userTestService.startGuestUserTest(request.getTestId(), guestSessionId);
-        // Ràng buộc phiên guest vào trình duyệt này bằng cookie HttpOnly (server-set) để claim an toàn.
+
         setGuestSessionCookie(httpResponse, guestSessionId);
 
         Map<String, Object> response = new HashMap<>();
@@ -230,7 +214,7 @@ public class UserTestController {
             HttpServletResponse response
     ) {
         UserTest submitted = userTestService.submitGuestTest(userTestId, guestSessionId);
-        // Đảm bảo cookie ràng buộc vẫn còn (kể cả khi cookie lúc start đã mất/hết hạn).
+
         setGuestSessionCookie(response, guestSessionId);
         return ResponseEntity.ok(userTestService.toResponse(submitted));
     }
@@ -265,9 +249,6 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.getMetaForGuest(userTestId, guestSessionId));
     }
 
-    // Gắn bài làm của phiên guest vào tài khoản vừa đăng nhập (yêu cầu JWT).
-    // FE gọi ngay sau login/OAuth thành công. guestSessionId lấy TỪ COOKIE HttpOnly do server đặt
-    // (KHÔNG tin header client tự cấp) -> chỉ trình duyệt đã làm bài guest mới claim được phiên đó.
     @PostMapping("/claim-guest")
     public ResponseEntity<Map<String, Object>> claimGuestTests(
             HttpServletRequest httpRequest,
@@ -279,11 +260,9 @@ public class UserTestController {
             return ResponseEntity.ok(Map.of("claimed", 0));
         }
         int claimed = userTestService.claimGuestTests(userId, guestSessionId);
-        clearGuestSessionCookie(response); // đã claim xong -> bỏ ràng buộc
+        clearGuestSessionCookie(response);
         return ResponseEntity.ok(Map.of("claimed", claimed));
     }
-
-    // ===== Guest-session cookie helpers =====
 
     private boolean isSecureCookie() {
         return frontendOrigin != null && frontendOrigin.startsWith("https");
@@ -292,7 +271,7 @@ public class UserTestController {
     private void setGuestSessionCookie(HttpServletResponse response, String guestSessionId) {
         if (guestSessionId == null || guestSessionId.isBlank()) return;
         String sameSite = isSecureCookie() ? "; SameSite=None; Secure" : "; SameSite=Lax";
-        // Path=/ để cookie được gửi tới /api/user-tests/claim-guest.
+
         response.addHeader("Set-Cookie",
                 guestCookieName + "=" + urlEncode(guestSessionId)
                         + "; HttpOnly; Path=/; Max-Age=" + guestCookieMaxAge + sameSite);

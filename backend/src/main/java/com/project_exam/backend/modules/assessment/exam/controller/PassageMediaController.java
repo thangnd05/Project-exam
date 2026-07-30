@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * PassageMedia được student xem trong khi làm bài (GET ổn). CUD admin-only;
- * flow upload media kèm question đi qua {@code QuestionService} (đã có ownership check).
- */
 @RestController
 @RequestMapping("/api/passage-media")
 @RequiredArgsConstructor
@@ -24,7 +20,6 @@ public class PassageMediaController {
     private final PassageMediaService service;
     private final AuthUtils authUtils;
 
-    // CREATE
     @PostMapping
     public ResponseEntity<PassageMediaResponse> create(
             @RequestBody PassageMediaRequest request,
@@ -34,20 +29,17 @@ public class PassageMediaController {
         return ResponseEntity.ok(service.create(request));
     }
 
-    // GET BY ID
     @GetMapping("/{id}")
     public ResponseEntity<PassageMediaResponse> getById(@PathVariable String id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    // GET BY PASSAGE
     @GetMapping("/by-passage/{passageId}")
     public ResponseEntity<List<PassageMediaResponse>> getByPassage(
             @PathVariable String passageId) {
         return ResponseEntity.ok(service.getByPassageId(passageId));
     }
 
-    // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<PassageMediaResponse> update(
             @PathVariable String id,
@@ -58,7 +50,6 @@ public class PassageMediaController {
         return ResponseEntity.ok(service.update(id, request));
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
         authUtils.requirePermission(PermissionCatalog.PASSAGE_MEDIA_MANAGE);

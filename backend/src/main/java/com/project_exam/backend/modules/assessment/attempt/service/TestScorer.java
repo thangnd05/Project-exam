@@ -24,11 +24,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Component
 @RequiredArgsConstructor
 public class TestScorer {
-    /** Điểm sàn TOEIC mỗi skill — fallback khi DB thiếu dòng quy đổi trong scoring_conversions. */
+
     private static final int TOEIC_MIN_SKILL_SCORE = 5;
 
     private final QuestionRepository questionRepository;
@@ -36,10 +35,6 @@ public class TestScorer {
     private final ExamPartRepository examPartRepository;
     private final ScoringConversionRepository scoringConversionRepository;
 
-    /**
-     * Điểm cho bài FULL TEST (không phải practice): chọn thuật toán theo scoringMethod của ExamType.
-     * Gộp phần dispatch từng bị lặp ở submitTest & submitGuestTest.
-     */
     public int scoreFullTest(List<UserAnswer> userAnswers, Test test, ExamType examType, int totalQuestionsInTest) {
         String scoringMethod = examType.getScoringMethod() != null
                 ? examType.getScoringMethod().toLowerCase() : "default";
@@ -101,14 +96,10 @@ public class TestScorer {
             return 0;
         }
         int correctCount = countCorrectAnswers(uniqueAnswers);
-        // Tính điểm theo thang 100: (số câu đúng / tổng số câu) * 100
+
         return (int) Math.round((double) correctCount / totalQuestions * 100);
     }
 
-    /**
-     * Thang điểm kiểu AWS (scaled 100–1000): Score = 100 + (số câu đúng / tổng câu) * 900.
-     * Tổng câu = số câu thực tế của đề (vd AWS = 65). Kết quả kẹp trong [100, 1000].
-     */
     public int scoreAwsScale(List<UserAnswer> userAnswers, int totalQuestionsInTest) {
         if (userAnswers.isEmpty()) {
             return 100;
@@ -124,7 +115,6 @@ public class TestScorer {
         return Math.max(100, Math.min(1000, score));
     }
 
-    /** Đếm số câu đúng (MCQ/MSQ/FILL) trong danh sách đáp án (đã dedup). */
     private int countCorrectAnswers(List<UserAnswer> uniqueAnswers) {
         Set<String> questionIds = uniqueAnswers.stream()
                 .map(UserAnswer::getQuestionId)
@@ -157,18 +147,15 @@ public class TestScorer {
     public int scoreToeicOptimal(List<UserAnswer> userAnswers, Test test, ExamType examType) {
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
 
-        // 1. Lấy thông tin Question đầy đủ
         List<String> allQuestionIds = uniqueAnswers.stream().map(UserAnswer::getQuestionId).toList();
         List<Question> questions = questionRepository.findAllById(allQuestionIds);
         Map<String, Question> questionMap = questions.stream()
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q));
 
-        // 2. Lấy thông tin đáp án đúng đầy đủ
         Map<String, List<Answer>> correctAnswersMap = answerRepository.findByQuestionIdInAndIsCorrectTrue(allQuestionIds)
                 .stream()
                 .collect(Collectors.groupingBy(Answer::getQuestionId));
 
-        // 3. Lấy thông tin ExamPart và Skill
         Set<String> allExamPartIds = questions.stream().map(Question::getExamPartId).collect(Collectors.toSet());
         List<ExamPart> examParts = examPartRepository.findAllById(allExamPartIds);
         Map<String, String> examPartToSkillIdMap = examParts.stream()
@@ -185,7 +172,6 @@ public class TestScorer {
                 continue;
             }
 
-            // 4. Logic kiểm tra đúng/sai (MCQ/MSQ/FILL) qua helper dùng chung
             boolean isCorrect = AnswerGradingUtil.isCorrect(question.getQuestionType(),
                     ua.getSelectedAnswerId(), ua.getSelectedAnswerIds(),
                     ua.getAnswerText(), correctAnswers);
@@ -198,7 +184,6 @@ public class TestScorer {
             }
         }
 
-        // 5. Quy đổi điểm
         int totalScore = 0;
         for (Map.Entry<String, Integer> entry : skillCorrectCount.entrySet()) {
             totalScore += convertSkillScore(examType.getExamTypeId(), entry.getKey(), entry.getValue());
@@ -213,11 +198,6 @@ public class TestScorer {
         return totalScore;
     }
 
-    /**
-     * Tra bảng scoring_conversions để quy đổi số câu đúng → điểm skill.
-     * Thiếu dòng quy đổi (seed thiếu/lệch số câu) thì fallback về điểm sàn TOEIC
-     * thay vì vỡ luồng nộp bài.
-     */
     private int convertSkillScore(String examTypeId, String skillId, int numCorrect) {
         return scoringConversionRepository
                 .findByExamTypeIdAndSkillIdAndNumCorrect(examTypeId, skillId, numCorrect)

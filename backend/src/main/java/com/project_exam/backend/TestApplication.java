@@ -11,17 +11,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class TestApplication {
 
     public static void main(String[] args) {
-        // 1. Cấu hình Dotenv để tìm file .env
+
         Dotenv dotenv = Dotenv.configure()
-                .ignoreIfMissing() 
+                .ignoreIfMissing()
                 .load();
 
-        // 2. "Bơm" biến vào System và dùng .trim() để xóa ký tự thừa
         dotenv.entries().forEach(entry -> {
             System.setProperty(entry.getKey(), entry.getValue().trim());
         });
 
-        // 4. Khởi chạy Spring Boot
         SpringApplication.run(TestApplication.class, args);
     }
 }

@@ -19,8 +19,6 @@ const hasMediaList = (p) => {
   return Array.isArray(list) && list.length > 0;
 };
 
-// Passage có audio để nghe? (media list type AUDIO, hoặc single mediaUrl với passageType LISTENING).
-// Dùng để quyết định 1 bước làm bài có bị "gate" theo audio hay không (chế độ PAGED).
 const passageHasAudio = (passage) => {
   const list =
     passage?.passageMedias ?? passage?.passageMediaList ?? passage?.passage_media ?? [];
@@ -35,8 +33,6 @@ const passageHasAudio = (passage) => {
   return Boolean(single) && pType === 'LISTENING';
 };
 
-// Bước thuộc phần "nghe"? (để khoá quay lại + gate audio). Ưu tiên cờ audioGated (có audio),
-// fallback sectionType — không phụ thuộc việc skill có đặt đúng tên "Listening" hay không.
 const isListeningStep = (step) =>
   !!step && (step.audioGated === true || step.sectionType === 'LISTENING');
 
@@ -76,16 +72,14 @@ export function useTestSession() {
   const [test, setTest] = useState({ parts: [] });
   const [userAnswers, setUserAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
-  const [startedAt, setStartedAt] = useState(null); // mốc bắt đầu (ISO, giờ server) — nguồn sự thật của deadline
+  const [startedAt, setStartedAt] = useState(null);
   const [preCountdown, setPreCountdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const submittingRef = useRef(false); // guard chống double-submit (state async không đủ nhanh)
+  const submittingRef = useRef(false);
   const [status, setStatus] = useState('loading');
 
   const [layoutConfig, setLayoutConfig] = useState(defaultLayoutConfig);
 
-  // --- Chế độ hiển thị từng bước (PAGED, kiểu TOEIC) ---
-  // currentStepIndex: bước đang xem; maxStepIndex: bước xa nhất đã mở khoá (chặn nhảy vượt).
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [maxStepIndex, setMaxStepIndex] = useState(0);
 
@@ -139,18 +133,18 @@ export function useTestSession() {
       try {
         parsed = JSON.parse(savedState);
       } catch {
-        // State hỏng -> bỏ, khôi phục lại từ server thay vì làm sập cả trang thi.
+
         sessionStorage.removeItem(`userTestState-${sessionKey}`);
       }
       if (parsed) {
         setUserTestId(parsed.userTestId || null);
         setUserAnswers(parsed.userAnswers || {});
-        // Khôi phục vị trí bước (chế độ PAGED); sẽ được clamp lại khi flowSteps sẵn sàng.
+
         const savedStep = Number.isInteger(parsed.currentStepIndex) ? parsed.currentStepIndex : 0;
         const savedMax = Number.isInteger(parsed.maxStepIndex) ? parsed.maxStepIndex : savedStep;
         setCurrentStepIndex(savedStep);
         setMaxStepIndex(Math.max(savedStep, savedMax));
-        // KHÔNG tin timeLeft từ client: chỉ giữ mốc startedAt (giờ server) để tính lại deadline.
+
         if (typeof parsed.startedAt === 'string') savedStartedAt = parsed.startedAt;
         restored = true;
       }
@@ -197,8 +191,7 @@ export function useTestSession() {
         }
 
         let serverStartedAt = null;
-        // Gọi server khi CHƯA khôi phục được, HOẶC đã khôi phục từ sessionStorage nhưng
-        // thiếu mốc startedAt cho bài có giờ (cần giờ server để tính deadline chính xác).
+
         const needStartedAt = !isPractice && !savedStartedAt;
         if (!restored || needStartedAt) {
           try {
@@ -209,7 +202,7 @@ export function useTestSession() {
             const activeUserTestId = active?.userTestId;
             if (activeUserTestId) {
               serverStartedAt = active?.startedAt || null;
-              // Chỉ nạp lại đáp án từ server khi CHƯA có state cục bộ (tránh đè đáp án mới hơn).
+
               if (!restored) {
                 const answers = await getAnswersByUserTest(activeUserTestId, isGuest, guestCfg);
                 const answersMap = {};
@@ -227,7 +220,7 @@ export function useTestSession() {
               restored = true;
             }
           } catch (err) {
-            // Không khôi phục được đáp án cũ -> bắt đầu phiên mới, không chặn luồng.
+
             console.error('Failed to restore in-progress answers:', err);
           }
         }
@@ -237,10 +230,8 @@ export function useTestSession() {
           return;
         }
 
-        // Nguồn sự thật của thời gian = startedAt (giờ server). timeLeft suy ra từ
-        // deadline = startedAt + duration (clamp theo availableTo) ở effect đếm ngược.
         if (!restored) {
-          // Chưa có phiên -> effect 'open' sẽ startUserTest và nhận startedAt từ server.
+
           setStatus('open');
         } else {
           setStartedAt(savedStartedAt || serverStartedAt || null);
@@ -276,12 +267,12 @@ export function useTestSession() {
       const existing = sessionStorage.getItem(`userTest-${sessionKey}`);
       if (existing) {
         setUserTestId(existing);
-        // Khôi phục mốc startedAt từ state đã lưu (nếu có) để giữ đúng deadline.
+
         try {
           const saved = JSON.parse(sessionStorage.getItem(`userTestState-${sessionKey}`) || 'null');
           if (saved?.startedAt) setStartedAt(saved.startedAt);
         } catch {
-          /* state hỏng -> bỏ qua, coi như không có mốc thời gian cục bộ */
+
         }
         setStatus('active');
         return;
@@ -293,7 +284,7 @@ export function useTestSession() {
         .then((data) => {
           setUserTestId(data.userTestId);
           sessionStorage.setItem(`userTest-${sessionKey}`, data.userTestId);
-          // Chỉ lưu mốc startedAt (giờ server); timeLeft do effect đếm ngược tự suy ra.
+
           if (!isPractice) setStartedAt(data.startedAt || null);
           setStatus('active');
         })
@@ -349,7 +340,7 @@ export function useTestSession() {
   }, [preCountdown, status]);
 
   const handleAnswerChange = (questionId, type, value) => {
-    // Dùng functional update để 2 thay đổi liên tiếp (vd toggle MSQ) không đè mất nhau.
+
     setUserAnswers((prev) => {
       if (type === 'MSQ') {
         const current = prev[questionId]?.selectedAnswerIds || [];
@@ -402,8 +393,6 @@ export function useTestSession() {
   const handleSubmitRef = useRef();
   handleSubmitRef.current = handleSubmit;
 
-  // Deadline tuyệt đối (epoch ms) = startedAt + duration, clamp theo availableTo.
-  // null = không giới hạn giờ (practice hoặc test không đặt duration). Nguồn sự thật cho timeLeft.
   const deadline = useMemo(() => {
     if (isPractice || !startedAt) return null;
     const durationMinutes = test?.durationMinutes;
@@ -417,16 +406,16 @@ export function useTestSession() {
   useEffect(() => {
     if (status !== 'active') return undefined;
     if (deadline == null) {
-      setTimeLeft(null); // không giới hạn giờ
+      setTimeLeft(null);
       return undefined;
     }
-    // Mỗi tick tính lại từ deadline CỐ ĐỊNH -> không trôi giờ, không tái tạo interval mỗi giây.
+
     const tick = () => {
       const remaining = Math.max(0, Math.round((deadline - Date.now()) / 1000));
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(timer);
-        if (!submittingRef.current) handleSubmitRef.current(); // side-effect NGOÀI updater, có guard ref
+        if (!submittingRef.current) handleSubmitRef.current();
       }
     };
     tick();
@@ -460,13 +449,8 @@ export function useTestSession() {
     return map;
   }, [allQuestions]);
 
-  // ============== Kiểu làm bài từng bước (paged, kiểu TOEIC) ==============
-  // Cấu hình nằm trong layout của loại kỳ thi (ExamTypeLayout.config.questionArea.navigationMode),
-  // KHÔNG phải cột riêng trên Test — tái dùng cơ chế cấu hình giao diện làm bài sẵn có.
   const isPaged = (layoutConfig?.questionArea?.navigationMode || 'scroll') === 'paged';
 
-  // Mỗi "bước" = 1 nhóm câu (passage + các câu của nó). Loại phần (nghe/đọc) suy từ
-  // passage.passageType — dữ liệu chuẩn 100% (không phụ thuộc skill vốn thiếu ở nhiều part).
   const flowSteps = useMemo(() => {
     const steps = [];
     visibleParts.forEach((part) => {
@@ -475,7 +459,7 @@ export function useTestSession() {
         const pType = (passage?.passageType ?? passage?.passage_type ?? '').toUpperCase();
         const sectionType =
           pType === 'LISTENING' ? 'LISTENING' : pType === 'READING' ? 'READING' : null;
-        // Bước nghe = passage LISTENING có audio -> gate (tự phát, khoá tua, hết audio tự chuyển).
+
         const audioGated = sectionType === 'LISTENING' && passageHasAudio(passage);
         steps.push({
           key: passage?.passageId || group.questions?.[0]?.questionId || `${part.testPartId}-${gi}`,
@@ -497,19 +481,15 @@ export function useTestSession() {
     return map;
   }, [flowSteps]);
 
-  // Clamp step khi số bước đổi (vd sau khi load / đổi part practice) để không vượt biên.
   useEffect(() => {
     if (flowSteps.length === 0) return;
     setCurrentStepIndex((i) => Math.max(0, Math.min(i, flowSteps.length - 1)));
   }, [flowSteps.length]);
 
-  // maxStepIndex luôn >= currentStepIndex (mở khoá dần khi tiến lên).
   useEffect(() => {
     setMaxStepIndex((m) => Math.max(m, currentStepIndex));
   }, [currentStepIndex]);
 
-  // Với mỗi bước: chỉ số bước NGHE gần nhất đứng TRƯỚC nó (-1 nếu không có).
-  // Reading chỉ mở khi đã vượt qua "cổng nghe" này — không cho nhảy vượt phần nghe chưa xong.
   const listeningGateBefore = useMemo(() => {
     const arr = new Array(flowSteps.length).fill(-1);
     let last = -1;
@@ -523,9 +503,9 @@ export function useTestSession() {
   const canGoToStep = useCallback(
     (target) => {
       if (target < 0 || target >= flowSteps.length) return false;
-      // NGHE: chỉ tới bằng tiến tuần tự (audio), không nhảy palette (trừ đang đứng đúng bước).
+
       if (isListeningStep(flowSteps[target])) return target === currentStepIndex;
-      // ĐỌC: nhảy tự do (tiến/lùi tới BẤT KỲ câu đọc nào) miễn là đã vượt qua phần nghe trước nó.
+
       return maxStepIndex > listeningGateBefore[target];
     },
     [flowSteps, maxStepIndex, currentStepIndex, listeningGateBefore],
@@ -540,7 +520,6 @@ export function useTestSession() {
     [canGoToStep, flowSteps.length],
   );
 
-  // Tiến bước: dùng cho nút "Câu tiếp" (reading) và auto-advance khi hết audio (listening).
   const goNext = useCallback(() => {
     setCurrentStepIndex((prev) => Math.min(prev + 1, flowSteps.length - 1));
   }, [flowSteps.length]);
@@ -549,7 +528,7 @@ export function useTestSession() {
     setCurrentStepIndex((prev) => {
       const target = prev - 1;
       if (target < 0) return prev;
-      if (isListeningStep(flowSteps[target])) return prev; // không lùi vào phần nghe
+      if (isListeningStep(flowSteps[target])) return prev;
       return target;
     });
   }, [flowSteps]);
@@ -607,7 +586,7 @@ export function useTestSession() {
     handleAnswerChange,
     handleSubmit,
     handlePurchase,
-    // Paged (TOEIC-style)
+
     isPaged,
     flowSteps,
     currentStepIndex,

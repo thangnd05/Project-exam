@@ -25,7 +25,6 @@ public class UserVocabularyService {
     private final AuthUtils authUtils;
     private final UserVocabularyMapper userVocabularyMapper;
 
-    // Chỉ trả về user-vocabulary của chính người đang đăng nhập (tránh lộ dữ liệu user khác).
     public List<UserVocabularyResponse> findAllForCurrentUser(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return repository.findByUserId(userId).stream()
@@ -40,7 +39,6 @@ public class UserVocabularyService {
         return toResponse(uv);
     }
 
-    // Chỉ chủ sở hữu (hoặc người có VOCABULARY:MANAGE) mới được thao tác.
     private void requireOwner(UserVocabulary uv, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         if (!uv.getUserId().equals(userId) && !authUtils.hasPermission(PermissionCatalog.VOCABULARY_MANAGE)) {
@@ -73,7 +71,6 @@ public class UserVocabularyService {
         repository.delete(uv);
     }
 
-    // Chỉ xóa từ vựng của chính user hiện tại (trước đây xóa sạch cả bảng cho mọi user!).
     @Transactional
     public void deleteAllForCurrentUser(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);

@@ -6,11 +6,6 @@ import styles from '~/shared/styles/ReviewFooter.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Thanh footer cố định + bảng danh sách câu của màn xem lại (đề thi và ải kế hoạch học).
- *
- * `items`: [{ id, status }] — status dùng để tô màu ô số câu, số thứ tự lấy theo vị trí.
- */
 function ReviewFooterNav({ items = [], correctCount = 0, onSelect }) {
   const [open, setOpen] = useState(false);
 

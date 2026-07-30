@@ -15,7 +15,7 @@ public interface ReactRepository extends JpaRepository<React, String> {
     List<React> findByPostId(String postId);
     long countByPostId(String postId);
     long countByPostIdAndType(String postId, React.ReactType type);
-    /** Batch count theo nhiều postId 1 lần — tránh N+1 trong list post. */
+
     @Query("SELECT r.postId, COUNT(r) FROM React r WHERE r.postId IN :postIds GROUP BY r.postId")
     List<Object[]> countGroupedByPostIdIn(@Param("postIds") java.util.Collection<String> postIds);
     void deleteByPostIdAndUserId(String postId, String userId);

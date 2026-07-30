@@ -34,10 +34,6 @@ function BrowserPlaceholder() {
   );
 }
 
-/**
- * Khung MacBook (chỉ màn hình). Truyền `src` để hiện screenshot;
- * bỏ trống dùng placeholder brand.
- */
 export default function DeviceMockup({src, alt = '', className}) {
   const [imgFailed, setImgFailed] = useState(false);
   const showImg = src && !imgFailed;

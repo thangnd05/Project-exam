@@ -14,19 +14,10 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Suy ra quốc gia từ địa chỉ IP (geo-IP), phục vụ panel "Vị trí truy cập".
- *
- * <p>Không phụ thuộc thư viện ngoài (maven có thể offline): dùng JDK HttpClient gọi API ip-api.com.
- * Kết quả cache theo IP để không gọi lại. IP nội bộ/localhost -> "Local" (không gọi mạng);
- * lỗi/không có internet -> null (hiển thị "Không xác định"). Ở local mọi IP đều nội bộ nên
- * không tốn request nào — chỉ khi deploy có traffic thật (IP công cộng) mới tra quốc gia.
- */
 @Slf4j
 @Service
 public class GeoIpService {
 
-    /** Kết quả cache: ip -> {code, name}. code/name có thể null nếu không tra được. */
     private final Map<String, Country> cache = new ConcurrentHashMap<>();
 
     private final HttpClient http = HttpClient.newBuilder()
@@ -45,9 +36,7 @@ public class GeoIpService {
         if (cached != null) return cached;
 
         Country resolved = lookup(ip);
-        // CHỈ cache khi tra ĐƯỢC (có mã quốc gia, kể cả 'LO' cho IP nội bộ). Lỗi tạm thời
-        // — timeout / mất mạng / ip-api rate-limit (429) — trả UNKNOWN và KHÔNG cache, để lần
-        // sau còn tra lại; nếu cache cả UNKNOWN thì 1 lần lỗi sẽ ghim IP đó "không xác định" mãi.
+
         if (resolved.code() != null) {
             cache.put(ip, resolved);
         }
@@ -75,11 +64,11 @@ public class GeoIpService {
 
     private boolean isInternal(String ip) {
         try {
-            InetAddress addr = InetAddress.getByName(ip); // ip là literal -> không tra DNS
+            InetAddress addr = InetAddress.getByName(ip);
             return addr.isLoopbackAddress() || addr.isAnyLocalAddress()
                     || addr.isSiteLocalAddress() || addr.isLinkLocalAddress();
         } catch (Exception e) {
-            return true; // không parse được -> coi như nội bộ, không gọi mạng
+            return true;
         }
     }
 }

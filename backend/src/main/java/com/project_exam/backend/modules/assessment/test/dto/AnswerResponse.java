@@ -3,12 +3,12 @@ package com.project_exam.backend.modules.assessment.test.dto;
 import lombok.*;
 
 @Getter
-@Setter //  Thêm Setter để BE có thể gán lại nhãn A, B, C, D
+@Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor // Thêm để hỗ trợ các thư viện mapping nếu cần
+@NoArgsConstructor
 public class AnswerResponse {
     private String answerId;
     private String answerText;
-    private String answerLabel; // Bỏ final
+    private String answerLabel;
 }

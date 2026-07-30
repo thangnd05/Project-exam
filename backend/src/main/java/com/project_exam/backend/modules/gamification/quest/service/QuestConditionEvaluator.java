@@ -12,10 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
-/**
- * Tính tiến độ điều kiện của 1 nhiệm vụ cho 1 user (đếm từ dữ liệu đã có).
- * Thêm loại điều kiện mới: thêm 1 nhánh trong switch.
- */
 @Service
 @RequiredArgsConstructor
 public class QuestConditionEvaluator {
@@ -24,7 +20,6 @@ public class QuestConditionEvaluator {
     private final UserStreakRepository userStreakRepository;
     private final LearningPlanRepository learningPlanRepository;
 
-    /** Kết quả: đã đạt bao nhiêu / cần bao nhiêu, đủ điều kiện chưa. */
     @Getter
     @RequiredArgsConstructor
     public static class Progress {
@@ -38,11 +33,11 @@ public class QuestConditionEvaluator {
         int target = quest.getConditionTarget() == null ? 0 : quest.getConditionTarget();
 
         if (type == QuestConditionType.NONE) {
-            return new Progress(0, 0, true); // cổng luôn mở
+            return new Progress(0, 0, true);
         }
 
         int current = switch (type) {
-            // Chỉ tính bài FULL_TEST đã hoàn thành; loại PRACTICE (không giới hạn, dễ farm xu).
+
             case COMPLETE_TEST -> userTestRepository.countByUserIdAndStatusExcludingMode(
                     userId, UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
             case STREAK_DAYS -> userStreakRepository.findByUserId(userId)

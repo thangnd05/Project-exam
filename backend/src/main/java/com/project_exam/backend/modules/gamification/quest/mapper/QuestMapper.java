@@ -6,11 +6,9 @@ import com.project_exam.backend.modules.gamification.quest.dto.QuestResponse;
 import com.project_exam.backend.modules.gamification.quest.dto.UserQuestResponse;
 import org.springframework.stereotype.Component;
 
-/** Mapper thuần: dựng DTO từ dữ liệu đã được service chuẩn bị sẵn. */
 @Component
 public class QuestMapper {
 
-    /** Kết quả nhận xu của 1 nhiệm vụ. */
     public QuestClaimResponse toClaimResponse(String questId, int rewardCoins, int newBalance) {
         return QuestClaimResponse.builder()
                 .questId(questId)
@@ -19,10 +17,6 @@ public class QuestMapper {
                 .build();
     }
 
-    /**
-     * Nhiệm vụ hiển thị cho user. Service truyền sẵn tiến độ (current/target),
-     * cờ claimed và eligible đã tính toán.
-     */
     public UserQuestResponse toUserResponse(Quest quest, int currentProgress, int target,
                                             boolean claimed, boolean eligible) {
         return UserQuestResponse.builder()
@@ -40,7 +34,6 @@ public class QuestMapper {
                 .build();
     }
 
-    /** Nhiệm vụ hiển thị cho admin. Service truyền sẵn claimCount. */
     public QuestResponse toAdminResponse(Quest quest, long claimCount) {
         return QuestResponse.builder()
                 .questId(quest.getQuestId())

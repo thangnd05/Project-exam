@@ -13,11 +13,6 @@ import java.util.Map;
 @Component
 public class PostMapper {
 
-    /**
-     * Map sang PostResponse (shape "full"). Mọi giá trị cần DB/tính toán
-     * (author, cosmetics, categories, react counts, trạng thái current user...) phải
-     * được service tính sẵn rồi truyền vào.
-     */
     public PostResponse toFullResponse(Post post,
                                        String authorName,
                                        String authorAvatar,
@@ -50,10 +45,6 @@ public class PostMapper {
                 .build();
     }
 
-    /**
-     * Map sang PostSummaryResponse (shape "summary"). thumbnailUrl được service
-     * truyền vào để giữ nguyên hành vi gốc.
-     */
     public PostSummaryResponse toSummaryResponse(Post post,
                                                  String authorName,
                                                  String authorAvatar,

@@ -27,8 +27,8 @@ public class PostResponse {
 
     private List<CategoryResponse> categories;
 
-    private Map<String, Long> reactCounts; // {"LIKE": 5, "LOVE": 3, ...}
-    private String currentUserReactType;   // react type của current user (null nếu chưa react)
+    private Map<String, Long> reactCounts;
+    private String currentUserReactType;
     private long commentCount;
     private long viewCount;
     private long saveCount;

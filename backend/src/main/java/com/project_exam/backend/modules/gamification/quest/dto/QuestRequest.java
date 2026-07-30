@@ -8,7 +8,6 @@ import lombok.Data;
 
 import java.time.Instant;
 
-/** Tạo/cập nhật nhiệm vụ (admin). */
 @Data
 public class QuestRequest {
     @NotBlank(message = "Tiêu đề không được để trống")

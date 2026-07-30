@@ -12,12 +12,11 @@
   font-weight: 700;
 }
 
-// ---------- Danh sách ----------
 .list {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  // Panel không được cao quá màn hình; danh sách tự cuộn bên trong
+
   max-height: min(56vh, 520px);
   overflow-y: auto;
 }
@@ -106,7 +105,6 @@
   color: var(--text-secondary);
   margin: 0 0 6px;
 
-  // Giữ xuống dòng người dùng gõ nhưng chỉ hiện 2 dòng đầu
   white-space: pre-wrap;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -194,7 +192,6 @@
   color: var(--text-secondary);
 }
 
-// ---------- Trình soạn ----------
 .editor {
   display: flex;
   flex-direction: column;

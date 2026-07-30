@@ -19,21 +19,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Mapper thuần cho sub-module ASSESSMENT/LEARNING.
- * KHÔNG repository/DB/logic: mọi giá trị cần DB hoặc cần tính (tagName, priorityScore,
- * studyResource, các số liệu thống kê, summary, message, list con...)
- * được service resolve rồi truyền vào qua tham số.
- */
 @Component
 public class LearningMapper {
 
-    // ===================== PlanResponse — đa shape =====================
-
-    /**
-     * Shape "generate": dựng từ LearningPlan + dữ liệu chẩn đoán mới sinh.
-     * Tương ứng LearningPlanService.buildPlanResponse (KHÔNG set replacedByPlanId).
-     */
     public PlanResponse toGeneratedPlanResponse(
             LearningPlan plan,
             String readinessLevel,
@@ -73,10 +61,6 @@ public class LearningMapper {
                 .build();
     }
 
-    /**
-     * Shape "from entity": dựng lại từ LearningPlan đã lưu (getPlan/switchPlan).
-     * Có set replacedByPlanId; partsWithoutTasks luôn rỗng.
-     */
     public PlanResponse toPlanResponseFromEntity(
             LearningPlan plan,
             String readinessLevel,
@@ -116,10 +100,6 @@ public class LearningMapper {
                 .build();
     }
 
-    /**
-     * Shape "target achieved": mock đã đạt target — không tạo plan mới.
-     * Chỉ set vài field motivation, các list đều rỗng.
-     */
     public PlanResponse toTargetAchievedResponse(
             String userId,
             String examTypeId,
@@ -140,12 +120,6 @@ public class LearningMapper {
                 .build();
     }
 
-    // ===================== PlanTaskDto / PlanPartGroupDto =====================
-
-    /**
-     * tagName (display name khác nhau giữa service), priorityScore, studyResource
-     * đều do service resolve rồi truyền vào.
-     */
     public PlanTaskDto toTaskDto(
             LearningPlanTask task,
             String taskType,
@@ -204,9 +178,6 @@ public class LearningMapper {
                 .build();
     }
 
-    // ===================== QuestionResponse (test.dto — shape của learning) =====================
-
-    /** Chỉ set đúng các field learning cần; KHÔNG đụng test/mapper hay exam/mapper. */
     public QuestionResponse toQuestionResponse(Question q, List<AnswerResponse> answers) {
         return QuestionResponse.builder()
                 .questionId(q.getQuestionId())
@@ -218,8 +189,6 @@ public class LearningMapper {
                 .answers(answers)
                 .build();
     }
-
-    // ===================== CurrentSessionResponse — đa shape =====================
 
     public CurrentSessionResponse toReviewResponse(
             LearningPlan plan,
@@ -315,8 +284,6 @@ public class LearningMapper {
                 .build();
     }
 
-    // ===================== SubmitSessionResponse + nested =====================
-
     public SubmitSessionResponse toSubmitSessionResponse(
             String sessionId,
             int correctCount,
@@ -369,8 +336,6 @@ public class LearningMapper {
                 .explanation(q.getExplanation())
                 .build();
     }
-
-    // ===================== TaskSessionHistoryDto =====================
 
     public TaskSessionHistoryDto toTaskSessionHistory(LearningPlanSession s) {
         return TaskSessionHistoryDto.builder()

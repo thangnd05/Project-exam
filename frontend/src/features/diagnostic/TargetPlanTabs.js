@@ -11,10 +11,6 @@ const TABS = [
   { key: 'overview', label: 'Tổng quan', path: '/my-target/dashboard' },
 ];
 
-/**
- * Thanh tab gộp khu "Mục tiêu" + "Lập kế hoạch" thành 1 trải nghiệm.
- * Vẫn giữ 2 route riêng (không vỡ link cũ) — tab chỉ là điều hướng, giữ examTypeId.
- */
 function TargetPlanTabs({ active, examTypeId }) {
   const qs = examTypeId ? `?examTypeId=${encodeURIComponent(examTypeId)}` : '';
   return (

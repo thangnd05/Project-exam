@@ -19,10 +19,6 @@ public class PassageMapper {
         return toResponse(passage, passageMedias, true);
     }
 
-    /**
-     * @param includeTranslation chỉ trả bản dịch (contentTranslation) khi true.
-     *                            Luồng làm bài (bài thi) phải để false — không lộ bản dịch.
-     */
     public PassageResponse toResponse(
             Passage passage, List<PassageMediaResponse> passageMedias, boolean includeTranslation) {
         return PassageResponse.builder()

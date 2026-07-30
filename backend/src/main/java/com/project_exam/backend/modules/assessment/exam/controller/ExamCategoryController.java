@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Reference data toàn hệ thống (Quick Challenge, Full Mock Exam, Recovery Quiz...).
- * GET mở để FE hiển thị + cho phép admin gắn vào Test; CUD bắt buộc admin.
- */
 @RestController
 @RequestMapping("/api/exam-categories")
 @RequiredArgsConstructor

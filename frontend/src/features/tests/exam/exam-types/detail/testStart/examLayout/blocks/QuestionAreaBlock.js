@@ -9,7 +9,6 @@ import styles from '../../TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Trích danh sách URL audio của 1 passage (theo thứ tự) để feed GatedAudioPlayer ở chế độ paged.
 const getAudioUrls = (passage) => {
   const list =
     passage?.passageMedias ?? passage?.passageMediaList ?? passage?.mediaList ?? passage?.passage_media ?? [];
@@ -37,7 +36,7 @@ function QuestionAreaBlock({
   userAnswers,
   handleAnswerChange,
   config,
-  // Paged (TOEIC-style) — chỉ dùng khi isPaged=true
+
   isPaged = false,
   flowSteps = [],
   currentStepIndex = 0,
@@ -45,8 +44,7 @@ function QuestionAreaBlock({
   goNext,
   goPrev,
 }) {
-  // Paged: mỗi lần đổi bước, reset vùng cuộn bao ngoài (centerScroll) về đầu.
-  // 2 khung cuộn bên trong (passage-box, questions-frame) được reset qua key ở paged-body.
+
   const pagedRootRef = useRef(null);
   useLayoutEffect(() => {
     if (!isPaged) return;
@@ -127,7 +125,7 @@ function QuestionAreaBlock({
     const hasNonAudioMedia =
       hasMediaList &&
       mediaList.some((m) => (m?.mediaType ?? m?.media_type ?? '').toUpperCase() !== 'AUDIO');
-    // Khi suppressAudio (paged listening) mà passage chỉ có audio -> không render box rỗng.
+
     if (suppressAudio ? !hasContent && !hasNonAudioMedia : !hasContent && !hasAnyMedia) return null;
 
     return (
@@ -145,7 +143,7 @@ function QuestionAreaBlock({
             const url = m.mediaUrl ?? m.media_url;
             if (!url) return null;
             if (type === 'AUDIO') {
-              if (suppressAudio) return null; // paged listening: audio do GatedAudioPlayer đảm nhiệm
+              if (suppressAudio) return null;
               return (
                 <div key={idx} className="mb-3">
                   <audio
@@ -293,7 +291,6 @@ function QuestionAreaBlock({
     );
   };
 
-  // ===== Chế độ PAGED (từng bước, kiểu TOEIC) =====
   if (isPaged) {
     const step = flowSteps[currentStepIndex];
     if (!step) {
@@ -306,8 +303,6 @@ function QuestionAreaBlock({
     const isLast = currentStepIndex >= flowSteps.length - 1;
     const showManualNext = !gated && !isLast;
 
-    // Có gì để hiện ở cột trái ngoài audio không? (text/ảnh) — audio đã do GatedAudioPlayer lo.
-    // Lưu ý: content của passage nghe thường là chuỗi rỗng '' nên phải trim, KHÔNG dùng ?? (nuốt '').
     const passageText = String(passage?.content ?? passage?.passage_content ?? '').trim();
     const mediaItems =
       passage?.passageMediaList ??
@@ -321,7 +316,7 @@ function QuestionAreaBlock({
     const passageContentToShow = gated
       ? Boolean(passageText) || hasNonAudioMedia
       : hasPassageContent(passage);
-    // Phần nghe cũng chia 2 cột (audio + ảnh bên trái, câu hỏi bên phải), không dồn dọc.
+
     const split = passageContentToShow && useSide;
 
     const questionsNode = step.questions.map((q) =>
@@ -330,7 +325,7 @@ function QuestionAreaBlock({
 
     return (
       <div ref={pagedRootRef} className={cx('paged-root', { 'paged-fit': split })}>
-        {/* Player nghe: full chiều ngang, tách khỏi layout 2 cột; box chỉ hiện khi audio bị dừng. */}
+
         {gated && <GatedAudioPlayer key={step.key} urls={audioUrls} onCompleted={goNext} />}
 
         <div key={currentStepIndex} className={cx('paged-body', { 'split-layout': split })}>

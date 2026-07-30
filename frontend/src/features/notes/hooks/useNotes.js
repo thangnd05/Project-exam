@@ -3,10 +3,6 @@ import { getMyNotes, deleteNote } from '~/features/notes/api/noteApi';
 
 export const noteKeys = { my: ['my-notes'] };
 
-/**
- * @param enabled panel nằm sẵn trong header nên hook chạy ở mọi trang; chỉ gọi
- *   API khi panel thật sự mở để không tốn thêm một request mỗi lần tải trang.
- */
 export function useNotes({ enabled = true } = {}) {
   const qc = useQueryClient();
 

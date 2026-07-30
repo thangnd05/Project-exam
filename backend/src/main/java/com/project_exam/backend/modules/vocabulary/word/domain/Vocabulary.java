@@ -29,9 +29,9 @@ public class Vocabulary {
     private String example;
 
     @Column(nullable = false)
-    private String albumId; // FK -> vocabulary_album.album_id
+    private String albumId;
 
-    private String voiceUrl; // URL audio pronunciation
+    private String voiceUrl;
 
     private Instant createdAt = Instant.now();
 

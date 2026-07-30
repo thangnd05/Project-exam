@@ -21,7 +21,7 @@ public class UserStreak {
     private String userStreakId;
 
     @Column(nullable = false, unique = true)
-    private String userId; // 1 record / user
+    private String userId;
 
     @Column(nullable = false)
     private Integer currentStreak = 0;
@@ -30,7 +30,7 @@ public class UserStreak {
     private Integer longestStreak = 0;
 
     @Column(name = "last_activity_date")
-    private LocalDate lastActivityDate; // ngày học gần nhất (theo VN zone)
+    private LocalDate lastActivityDate;
 
     @Column(nullable = false)
     private Instant updatedAt = Instant.now();

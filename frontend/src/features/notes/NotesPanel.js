@@ -21,13 +21,6 @@ const cx = classNames.bind(styles);
 
 const EMPTY_DRAFT = { title: '', content: '' };
 
-/**
- * Sổ tay ghi chú dạng panel: mở đè lên trang đang xem nên viết xong là đóng lại
- * học tiếp, không phải điều hướng đi đâu.
- *
- * Xác nhận xoá làm inline ngay trên dòng thay vì mở thêm một modal nữa — chồng
- * hai lớp overlay lên nhau vừa rối vừa dễ vỡ z-index.
- */
 function NotesPanel({ show, onClose }) {
   const [view, setView] = useState('list');
   const [editingId, setEditingId] = useState(null);
@@ -38,7 +31,6 @@ function NotesPanel({ show, onClose }) {
   const saveMutation = useSaveNote();
   const saving = saveMutation.isPending;
 
-  // Mỗi lần mở lại panel thì về danh sách, không giữ bản nháp của lần trước.
   useEffect(() => {
     if (show) return;
     setView('list');

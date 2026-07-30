@@ -19,14 +19,12 @@ public class StreakController {
     private final StreakService streakService;
     private final AuthUtils authUtils;
 
-    // Streak của chính user đang đăng nhập
     @GetMapping("/me")
     public ResponseEntity<StreakResponse> getMyStreak(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(streakService.getStreak(userId));
     }
 
-    // Khôi phục chuỗi đã đứt (tốn xu) cho user đang đăng nhập
     @PostMapping("/restore")
     public ResponseEntity<StreakResponse> restore(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);

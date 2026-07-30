@@ -10,10 +10,6 @@ import java.util.List;
 @Component
 public class CommentMapper {
 
-    /**
-     * Map sang CommentResponse. author/cosmetics và replies do service chuẩn bị
-     * rồi truyền vào (mapper thuần, không gọi DB).
-     */
     public CommentResponse toResponse(Comment c,
                                       List<CommentResponse> replies,
                                       String authorName,

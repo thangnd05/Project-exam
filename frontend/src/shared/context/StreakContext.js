@@ -25,8 +25,6 @@ export const StreakProvider = ({ children }) => {
   const canRecover = Boolean(streak?.canRecover);
   const recoverCost = streak?.recoverCost ?? 0;
 
-  // Manual refresh (after finishing a test / practice). Celebrates only when the
-  // streak actually grew compared to the value we knew before refetching.
   const refreshStreak = useCallback(async () => {
     if (!isAuthenticated) return;
     const before = queryClient.getQueryData(STREAK_QUERY_KEY)?.currentStreak ?? 0;

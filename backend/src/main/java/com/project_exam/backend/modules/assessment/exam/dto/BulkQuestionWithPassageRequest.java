@@ -8,10 +8,9 @@ public class BulkQuestionWithPassageRequest {
 
     private String examPartId;
 
-    // bắt buộc
     private String classId;
     private String chapterId;
 
-    private PassageRequest passage; // chung cho tất cả question
+    private PassageRequest passage;
     private List<NormalQuestionRequest> questions;
 }

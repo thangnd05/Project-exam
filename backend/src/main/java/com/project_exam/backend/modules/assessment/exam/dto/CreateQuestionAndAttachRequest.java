@@ -5,10 +5,6 @@ import lombok.*;
 
 import java.util.List;
 
-/**
- * Tạo câu hỏi "tức thì" và gắn thẳng vào một part của đề (không lưu kho, isBank = false).
- * Dùng khi giáo viên trên lớp đặt câu hỏi rồi đưa vào đề.
- */
 @Setter
 @Getter
 @AllArgsConstructor
@@ -23,6 +19,6 @@ public class CreateQuestionAndAttachRequest {
     private List<AnswerRequest> answers;
     private String collectionId;
     private String explanation;
-    private List<String> tagIds; // optional: danh sách tag gắn cho câu hỏi (theo id)
-    private List<String> tagNames; // optional: tên tag từ file import, BE resolve theo examType
+    private List<String> tagIds;
+    private List<String> tagNames;
 }

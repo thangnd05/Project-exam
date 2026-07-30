@@ -1,7 +1,4 @@
-/**
- * Brand color constants for JS (charts, SVG fills, inline styles).
- * Keep in sync with GlobalStyles :root brand tokens.
- */
+
 export const brandColors = {
   primary: '#0d9488',
   primaryHover: '#0f766e',

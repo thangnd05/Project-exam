@@ -19,14 +19,12 @@ public class QuestController {
     private final QuestService questService;
     private final AuthUtils authUtils;
 
-    // Danh sách nhiệm vụ user đang thấy (kèm tiến độ + trạng thái nhận)
     @GetMapping("/me")
     public ResponseEntity<List<UserQuestResponse>> getMyQuests(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(questService.getAvailableForUser(userId));
     }
 
-    // Nhận xu của 1 nhiệm vụ
     @PostMapping("/{questId}/claim")
     public ResponseEntity<QuestClaimResponse> claim(
             @PathVariable String questId,

@@ -26,12 +26,6 @@ public class ReactService {
     private final AuthUtils authUtils;
     private final ReactMapper reactMapper;
 
-    /**
-     * Toggle react:
-     * - Chưa react tạo mới
-     * - Đã react cùng type xóa (unlike)
-     * - Đã react khác type cập nhật type
-     */
     @Transactional
     public ReactSummaryResponse toggleReact(String postId, ReactRequest request,
                                             HttpServletRequest httpRequest) {
@@ -44,15 +38,15 @@ public class ReactService {
         if (existing.isPresent()) {
             React react = existing.get();
             if (react.getType() == request.getType()) {
-                // Cùng type xóa (unlike)
+
                 reactRepository.delete(react);
             } else {
-                // Khác type cập nhật
+
                 react.setType(request.getType());
                 reactRepository.save(react);
             }
         } else {
-            // Chưa react tạo mới
+
             React react = React.builder()
                     .postId(postId)
                     .userId(userId)
@@ -71,10 +65,6 @@ public class ReactService {
         String currentUserId = tryGetUserId(httpRequest);
         return buildSummary(postId, currentUserId);
     }
-
-    // ─────────────────────────────────────────────
-    // HELPERS
-    // ─────────────────────────────────────────────
 
     private ReactSummaryResponse buildSummary(String postId, String currentUserId) {
         Map<String, Long> counts = new LinkedHashMap<>();

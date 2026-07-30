@@ -24,7 +24,7 @@ public class VocabularyAlbum {
     private String description;
 
     @Column(nullable = false)
-    private String userId; // FK -> users.user_id
+    private String userId;
 
     private Instant createdAt = Instant.now();
 }

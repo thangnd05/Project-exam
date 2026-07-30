@@ -19,7 +19,6 @@ public class QuestionAdminResponse {
     private final Question.QuestionType questionType;
     private final String explanation;
 
-    // Admin-specific fields
     private final String examTypeId;
     private final String classId;
     private final Boolean isBank;

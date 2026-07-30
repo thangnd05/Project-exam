@@ -24,11 +24,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Dựng PlanTaskDto / PlanPartGroupDto từ entity ải — nguồn DUY NHẤT cho cả kế hoạch
- * (LearningPlanService) lẫn màn học (LearningPlanSessionService), để tên ải và cách nhóm
- * Part không bị lệch giữa hai màn.
- */
 @Component
 @RequiredArgsConstructor
 public class PlanTaskViewAssembler {
@@ -38,7 +33,6 @@ public class PlanTaskViewAssembler {
     private final LearningPlanResourceLookup resourceLookup;
     private final LearningMapper learningMapper;
 
-    /** Dữ liệu tra cứu cho một danh sách ải — batch-load 1 lần để tránh N+1 trong vòng lặp map DTO. */
     public record Lookups(
             Map<String, Tag> tagsById,
             Map<String, ExamPart> partsById,
@@ -50,7 +44,6 @@ public class PlanTaskViewAssembler {
         }
     }
 
-    /** Dùng chung được cho nhiều plan: mọi map đều tra theo id nên gộp task của các plan lại vẫn đúng. */
     public Lookups lookupsFor(List<LearningPlanTask> tasks) {
         if (tasks == null || tasks.isEmpty()) {
             return Lookups.empty();
@@ -101,7 +94,6 @@ public class PlanTaskViewAssembler {
                 task.getPriorityScore() != null ? task.getPriorityScore() : 0);
     }
 
-    /** Ải nhóm theo Part, sắp theo ExamPart.displayOrder (Part không đặt thứ tự xếp cuối). */
     public List<PlanPartGroupDto> buildPartGroups(List<LearningPlanTask> tasks, Lookups lookups) {
         if (tasks == null || tasks.isEmpty()) {
             return List.of();
@@ -129,7 +121,7 @@ public class PlanTaskViewAssembler {
                     partTasks.isEmpty() ? null : partTasks.get(0).getPassAccuracy(),
                     passedInPart,
                     partTasks.size(),
-                    // Tài liệu giới thiệu/cách làm gắn trực tiếp Part — hiện đầu nhóm, trước tài liệu theo tag.
+
                     lookups.resourcesByPart().getOrDefault(partId, List.of()),
                     partTasks.stream().map(t -> toTaskDto(t, lookups)).toList()));
         }

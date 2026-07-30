@@ -27,5 +27,5 @@ public class Answer {
     private Boolean isCorrect;
 
     @Column(nullable = false)
-    private String questionId; // FK -> questions
+    private String questionId;
 }

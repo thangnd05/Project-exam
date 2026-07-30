@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * ExamPart là reference data hệ thống. GET mở để frontend hiển thị, CUD admin-only.
- */
 @RestController
 @RequestMapping("/api/exam-parts")
 @RequiredArgsConstructor

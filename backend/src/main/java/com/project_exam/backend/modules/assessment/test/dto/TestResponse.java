@@ -30,7 +30,6 @@ public class TestResponse {
     private Long totalAttempts;
     private Boolean canDoTest;
 
-    // Bài trả phí bằng xu: costCoins>0 = cần mua; owned = đã mở khoá; locked = trả phí & chưa mua.
     private Integer costCoins;
     private Boolean owned;
     private Boolean locked;

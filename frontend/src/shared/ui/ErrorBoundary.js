@@ -13,7 +13,7 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    // TODO: thay bằng logger/monitoring khi có (Sentry...).
+
     console.error('ErrorBoundary caught:', error, info);
   }
 
@@ -97,7 +97,7 @@ class ErrorBoundary extends Component {
                 fill="none"
                 aria-hidden="true"
               >
-                {/* bóng đổ */}
+
                 <ellipse
                   className="eb-shadow"
                   cx="80"
@@ -107,7 +107,7 @@ class ErrorBoundary extends Component {
                   fill={brandColors.primary}
                 />
                 <g className="eb-mascot">
-                  {/* thân tròn mềm */}
+
                   <rect
                     x="26"
                     y="30"
@@ -116,15 +116,15 @@ class ErrorBoundary extends Component {
                     rx="42"
                     fill="url(#eb-body)"
                   />
-                  {/* má hồng */}
+
                   <circle cx="52" cy="92" r="8" fill="#ffb0c4" opacity="0.75" />
                   <circle cx="108" cy="92" r="8" fill="#ffb0c4" opacity="0.75" />
-                  {/* mắt */}
+
                   <circle className="eb-eye" cx="62" cy="76" r="6.5" fill="#1e293b" />
                   <circle className="eb-eye" cx="98" cy="76" r="6.5" fill="#1e293b" />
                   <circle cx="64" cy="74" r="2" fill="#ffffff" />
                   <circle cx="100" cy="74" r="2" fill="#ffffff" />
-                  {/* miệng buồn xin lỗi */}
+
                   <path
                     d="M70 100 Q80 92 90 100"
                     stroke="#1e293b"
@@ -132,7 +132,7 @@ class ErrorBoundary extends Component {
                     strokeLinecap="round"
                     fill="none"
                   />
-                  {/* giọt mồ hôi lo lắng */}
+
                   <path
                     className="eb-drop"
                     d="M126 58 c0 5 -6 8 -6 13 a6 6 0 0 0 12 0 c0 -5 -6 -8 -6 -13 Z"
@@ -156,7 +156,7 @@ class ErrorBoundary extends Component {
                 color: 'var(--text-color)',
               }}
             >
-              Ôi, có gì đó trục trặc rồi! 
+              Ôi, có gì đó trục trặc rồi!
             </h2>
             <p
               style={{

@@ -9,6 +9,6 @@ import lombok.*;
 public class TagRequest {
     private String name;
     private String examTypeId;
-    private String parentId; // nullable
-    private Integer sortOrder; // nullable; thứ tự học nền tảng (nhỏ = học trước)
+    private String parentId;
+    private Integer sortOrder;
 }

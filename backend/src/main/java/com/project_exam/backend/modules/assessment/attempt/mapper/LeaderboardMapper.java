@@ -7,15 +7,9 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Mapper thuần cho bảng xếp hạng (sub-module ASSESSMENT/ATTEMPT).
- * entries/me/totalParticipants do service tính (xếp hạng, tìm hạng người xem, cắt top)
- * rồi truyền vào.
- */
 @Component
 public class LeaderboardMapper {
 
-    /** Shape rỗng: chưa được phép xem điểm (entries=[], me=null, totalParticipants=0). */
     public TestLeaderboardResponse toEmpty() {
         return TestLeaderboardResponse.builder()
                 .entries(Collections.emptyList())
@@ -24,7 +18,6 @@ public class LeaderboardMapper {
                 .build();
     }
 
-    /** Shape đầy đủ: entries (đã cắt top), me (hạng người xem, có thể null), tổng số người. */
     public TestLeaderboardResponse toResponse(
             List<UserTestResponse> entries,
             TestLeaderboardResponse.MyRank me,

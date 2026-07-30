@@ -9,14 +9,11 @@ import java.util.Optional;
 public interface QuestionCollectionRepository extends JpaRepository<QuestionCollection, String> {
     Optional<QuestionCollection> findByNameIgnoreCase(String name);
 
-    /** Các collection con trực tiếp của một collection cha. */
     List<QuestionCollection> findByParentId(String parentId);
 
-    /** Có collection con nào không (chặn xoá cha / chặn biến cha thành con). */
     boolean existsByParentId(String parentId);
 
     long countByParentId(String parentId);
 
-    /** Các collection cha (folder bộ đề) của một loại kỳ thi. */
     List<QuestionCollection> findByExamTypeIdAndParentIdIsNull(String examTypeId);
 }

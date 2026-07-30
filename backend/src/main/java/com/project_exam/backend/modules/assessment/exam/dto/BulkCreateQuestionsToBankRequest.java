@@ -4,7 +4,6 @@ import lombok.*;
 
 import java.util.List;
 
-/** Tạo nhiều câu hỏi thông thường vào kho (không passage). */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -12,13 +12,13 @@ import java.util.List;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, String> {
-    // Top-level comments (không phải reply)
+
     List<Comment> findByPostIdAndParentIdIsNullOrderByCreatedAtAsc(String postId);
     List<Comment> findByPostIdOrderByCreatedAtAsc(String postId);
-    // Replies của một comment
+
     List<Comment> findByParentIdOrderByCreatedAtAsc(String parentId);
     long countByPostId(String postId);
-    /** Batch count theo nhiều postId 1 lần — tránh N+1 trong list post. */
+
     @Query("SELECT c.postId, COUNT(c) FROM Comment c WHERE c.postId IN :postIds GROUP BY c.postId")
     List<Object[]> countGroupedByPostIdIn(@Param("postIds") java.util.Collection<String> postIds);
     @Transactional

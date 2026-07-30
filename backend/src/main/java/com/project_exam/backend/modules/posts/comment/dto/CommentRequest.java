@@ -9,5 +9,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommentRequest {
     private String content;
-    private String parentId; // null = top-level, có giá trị = reply
+    private String parentId;
 }

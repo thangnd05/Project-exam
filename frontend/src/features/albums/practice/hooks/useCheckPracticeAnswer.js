@@ -8,7 +8,7 @@ export function useCheckPracticeAnswer(albumId, { onSuccess, onError } = {}) {
   return useMutation({
     mutationFn: (payload) => checkPracticeAnswer(payload),
     onSuccess: (...args) => {
-      // Chấm bài cập nhật tiến độ (correctCount/status) -> làm mới album + từ vựng.
+
       qc.invalidateQueries({ queryKey: albumKeys.my });
       qc.invalidateQueries({ queryKey: albumDeltaKeys.vocabularies(albumId) });
       if (onSuccess) onSuccess(...args);

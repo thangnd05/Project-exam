@@ -20,10 +20,10 @@ public class ScoringConversion {
     private String conversionId;
 
     @Column(nullable = false)
-    private String examTypeId; // FK -> exam_types
+    private String examTypeId;
 
     @Column(nullable = false)
-    private String skillId; // FK -> skills
+    private String skillId;
 
     @Column(nullable = false)
     private Integer numCorrect;

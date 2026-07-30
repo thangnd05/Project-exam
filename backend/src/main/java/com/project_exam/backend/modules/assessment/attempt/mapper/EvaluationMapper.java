@@ -5,10 +5,6 @@ import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationRespons
 import com.project_exam.backend.modules.users.user.domain.User;
 import org.springframework.stereotype.Component;
 
-/**
- * Mapper thuần Evaluation -> DTO (sub-module ASSESSMENT/ATTEMPT).
- * User được service load (lookup) rồi truyền vào.
- */
 @Component
 public class EvaluationMapper {
 

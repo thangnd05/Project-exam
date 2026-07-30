@@ -26,7 +26,6 @@ public class UserController {
     private final UserService userService;
     private final ObjectMapper objectMapper;
 
-    // Lấy danh sách user (admin only)
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers(HttpServletRequest httpRequest) {
         userService.requireAdminToManageUsers(httpRequest);
@@ -46,7 +45,6 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllPaged(page, size, keyword, roleId, verified));
     }
 
-    // Lấy user theo id — chỉ chính chủ hoặc admin (UserResponse có email/PII, tránh IDOR lặp id).
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(
             @PathVariable String id,
@@ -70,7 +68,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getMyProfileOverview(httpRequest));
     }
 
-    // Hoạt động học tập theo tháng (mặc định tháng hiện tại) — cho biểu đồ ở Dashboard cá nhân.
     @GetMapping("/me/activity")
     public ResponseEntity<ProfileActivityResponse> getMyActivity(
             @RequestParam(required = false) String month,
@@ -80,7 +77,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getMyActivity(httpRequest, month, year));
     }
 
-    // Tạo mới user (admin only — đăng ký thường đi qua /api/auth/register)
     @PostMapping
     public ResponseEntity<UserResponse> createUser(
             @Valid @RequestBody UserUpsertRequest request,
@@ -90,7 +86,6 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(request));
     }
 
-    // Cập nhật user (chính chủ hoặc admin)
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable String id,
@@ -103,7 +98,6 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, request, avatar));
     }
 
-    // Xóa user (chính chủ hoặc admin)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userService.findById(id).isEmpty()) {

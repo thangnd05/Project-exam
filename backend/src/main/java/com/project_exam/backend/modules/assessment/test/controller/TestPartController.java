@@ -35,7 +35,6 @@ public class TestPartController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // TẠO MỚI DÙNG DTO
     @PostMapping
     public ResponseEntity<TestPartSimpleResponse> createTestPart(
             @Valid @RequestBody TestPartRequest request,
@@ -44,7 +43,6 @@ public class TestPartController {
         return ResponseEntity.ok(testPartService.saveResponse(request, httpRequest));
     }
 
-    // CẬP NHẬT DÙNG DTO
     @PutMapping("/{id}")
     public ResponseEntity<TestPartSimpleResponse> updateTestPart(
             @PathVariable String id,

@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-/**
- * Bảng nối role permission (RBAC granular). Nối qua id thường theo convention dự án
- * (không dùng @ManyToMany/@OneToMany). Mỗi dòng = một role được gán một permission.
- */
 @Entity
 @Table(
         name = "role_permissions",

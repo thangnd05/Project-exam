@@ -5,7 +5,6 @@ import styles from './ContentInsightsTables.module.scss';
 
 const cx = classNames.bind(styles);
 
-/** Thanh tỉ lệ nhỏ trong ô bảng — tông xanh dương đồng nhất (minimalism, không traffic-light). */
 const RateBar = ({ value }) => (
     <div className={cx('rateCell')}>
         <div className={cx('rateTrack')}>
@@ -24,7 +23,6 @@ const EmptyRow = ({ colSpan, message }) => (
     </tr>
 );
 
-/** Bảng bài thi hoạt động nhiều nhất: lượt làm, tỉ lệ hoàn thành, điểm TB. */
 export const TopTestsTable = ({ data = [] }) => (
     <div className={cx('tableWrap')}>
         <table className={cx('table')}>

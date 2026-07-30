@@ -14,9 +14,6 @@ public interface QuestionTagRepository extends JpaRepository<QuestionTag, String
 
     List<QuestionTag> findByTagId(String tagId);
 
-    // Bulk DELETE chạy NGAY (immediate). Nếu để derived delete, Hibernate hoãn DELETE tới cuối
-    // transaction và flush INSERT trước re-insert lại cặp (question_id, tag_id) cũ gây vi phạm
-    // UNIQUE(question_id, tag_id) khi sync lại tag. Xem TagService.syncQuestionTags.
     @Modifying
     @Query("DELETE FROM QuestionTag qt WHERE qt.questionId = :questionId")
     void deleteByQuestionId(@Param("questionId") String questionId);

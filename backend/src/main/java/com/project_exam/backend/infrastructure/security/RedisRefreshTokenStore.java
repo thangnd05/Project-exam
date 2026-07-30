@@ -26,15 +26,9 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
     private static final String FIELD_JTI = "jti";
     private static final String FIELD_PREV_JTI = "prevJti";
     private static final String FIELD_PREV_AT = "prevAt";
-    // Tombstone: logout/revoke KHÔNG xoá key mà đánh dấu revoked. Nhờ đó rotate phân biệt được
-    // "family bị revoke chủ động" (chặn) với "family biến mất do Redis mất dữ liệu" (self-heal).
+
     private static final String FIELD_REVOKED = "revoked";
 
-    /**
-     * "Rotation grace window" — sau khi rotate, jti CŨ vẫn được chấp nhận trong khoảng này
-     * để khoan dung race condition multi-tab (cookie chưa kịp propagate giữa các tab).
-     * Why 10s: đủ cho mạng chậm, ngắn để attacker không kịp khai thác.
-     */
     private static final long GRACE_WINDOW_MS = 10_000;
 
     private final StringRedisTemplate redis;
@@ -67,7 +61,7 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 
         try {
             if (redis.opsForHash().get(familyKey, FIELD_REVOKED) != null) {
-                // Đã logout/revoke chủ động — tombstone còn đó thì token này chết hẳn.
+
                 throw new UnauthorizedException("Phiên đăng nhập đã kết thúc, vui lòng đăng nhập lại.");
             }
 
@@ -81,7 +75,7 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
             }
 
             if (!userId.equals(storedUid.toString())) {
-                // Token bị giả mạo / dùng sai user revoke luôn để chắc ăn.
+
                 log.warn("SECURITY_REFRESH_UID_MISMATCH expected={} got={} fid={}", storedUid, userId, familyId);
                 revokeFamilyInternal(storedUid.toString(), familyId);
                 throw new ReplayDetectedException("Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.");
@@ -89,12 +83,11 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 
             String currentJti = storedJti.toString();
 
-            // Path 1: khớp jti hiện hành ROTATE bình thường.
             if (currentJti.equals(oldJti)) {
                 String newJti = UUID.randomUUID().toString();
                 Duration ttl = Duration.ofMillis(refreshExpirationMs);
                 redis.opsForHash().put(familyKey, FIELD_JTI, newJti);
-                // Lưu jti cũ + thời điểm để bảo vệ grace window cho request đến muộn.
+
                 redis.opsForHash().put(familyKey, FIELD_PREV_JTI, currentJti);
                 redis.opsForHash().put(familyKey, FIELD_PREV_AT, String.valueOf(System.currentTimeMillis()));
                 redis.expire(familyKey, ttl);
@@ -102,9 +95,6 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
                 return newJti;
             }
 
-            // Path 2: khớp jti TRƯỚC trong grace window tab/client đến muộn do race,
-            // không phải replay. Không rotate, không thay đổi state, trả jti hiện hành
-            // để cấp lại cookie với jti đúng cho client đó.
             Object prevJti = redis.opsForHash().get(familyKey, FIELD_PREV_JTI);
             Object prevAt = redis.opsForHash().get(familyKey, FIELD_PREV_AT);
             if (prevJti != null && prevAt != null
@@ -114,7 +104,6 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
                 return currentJti;
             }
 
-            // Path 3: jti lạ hoặc prevJti đã quá grace window REPLAY thật giết family.
             log.warn("SECURITY_REFRESH_REPLAY uid={} fid={} expectedJti={} prevJti={} gotJti={}",
                     userId, familyId, currentJti, prevJti, oldJti);
             revokeFamilyInternal(userId, familyId);

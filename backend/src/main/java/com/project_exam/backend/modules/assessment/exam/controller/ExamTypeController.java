@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * ExamType là reference data toàn hệ thống (TOEIC, IELTS…). GET mở để frontend hiển thị,
- * nhưng CUD phải admin để tránh user phá scoring/metadata của mọi đề trong hệ thống.
- */
 @RestController
 @RequestMapping("/api/exam-types")
 @RequiredArgsConstructor
@@ -31,13 +27,11 @@ public class ExamTypeController {
         return ResponseEntity.ok(examTypeService.findAll());
     }
 
-    /** Loại kỳ thi chuẩn (flexible=false) — dùng cho trang chọn loại đề, ẩn loại linh hoạt. */
     @GetMapping("/standard")
     public ResponseEntity<List<ExamTypeResponse>> getStandardExamTypes() {
         return ResponseEntity.ok(examTypeService.findStandard());
     }
 
-    /** Loại kỳ thi linh hoạt (flexible=true). */
     @GetMapping("/flexible")
     public ResponseEntity<List<ExamTypeResponse>> getFlexibleExamTypes() {
         return ResponseEntity.ok(examTypeService.findFlexible());
@@ -48,7 +42,6 @@ public class ExamTypeController {
         return ResponseEntity.ok(examTypeService.findById(id));
     }
 
-    /** Các loại kỳ thi con của 1 loại cha (drill-in vd "AWS" các cert). */
     @GetMapping("/{id}/children")
     public ResponseEntity<List<ExamTypeResponse>> getChildren(@PathVariable String id) {
         return ResponseEntity.ok(examTypeService.findChildren(id));

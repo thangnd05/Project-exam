@@ -1,7 +1,5 @@
-// Mã "khách/thiết bị" ổn định RIÊNG cho analytics (lượt truy cập).
-// KHÁC guestSessionId: cái kia bị clearGuestSessionId() xoá mỗi lần login (cơ chế claim-guest),
-// khiến logout/login bị đếm thành lượt mới. Mã này KHÔNG bao giờ bị xoá khi login/logout,
-// nên 1 khách vãng lai luôn được gom đúng phiên. (User đã đăng nhập thì backend gom theo userId.)
+
+
 const STORAGE_KEY = 'analyticsVisitorId';
 
 const generateId = () => {

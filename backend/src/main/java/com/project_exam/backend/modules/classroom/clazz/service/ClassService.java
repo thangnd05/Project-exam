@@ -79,28 +79,23 @@ public class ClassService {
     public void deleteClass(String classId, HttpServletRequest httpRequest) {
         ClassEntity existing = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found!"));
-        //  Chỉ teacher của lớp (hoặc admin) được xoá.
+
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isTeacher = currentUserId != null && currentUserId.equals(existing.getTeacherId());
         if (!isTeacher && !authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá lớp này.");
         }
 
-        // Cascade theo thứ tự: tests questions chapters class
-        // 1. Xoá toàn bộ tests gắn với class (kèm test_parts, test_questions, user_tests, user_answers).
         List<Test> tests = testRepository.findByClassId(classId);
         for (Test t : tests) {
             testCommandService.cascadeDeleteTestInternal(t.getTestId());
         }
 
-        // 2. Xoá toàn bộ questions của class (kể cả câu thuộc các chapter của class này).
         questionService.cascadeDeleteQuestionsByClass(classId);
 
-        // 3. Xoá toàn bộ chapters của class (đã rỗng questions sau bước 2).
         List<Chapter> chapters = chapterRepository.findByClassId(classId);
         if (!chapters.isEmpty()) chapterRepository.deleteAll(chapters);
 
-        // 4. Cuối cùng, xoá class.
         classRepository.deleteById(classId);
     }
 

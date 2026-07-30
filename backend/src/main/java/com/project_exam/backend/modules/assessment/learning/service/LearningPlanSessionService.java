@@ -58,10 +58,6 @@ public class LearningPlanSessionService {
     private final StreakService streakService;
     private final LearningMapper learningMapper;
 
-    /**
-     * Trạng thái hiện tại của kế hoạch — CHỈ ĐỌC, không tạo phiên/không đổi trạng thái ải.
-     * Muốn bắt đầu (hoặc quay lại) một ải thì gọi {@link #startTaskSession} (POST).
-     */
     @Transactional(readOnly = true)
     public CurrentSessionResponse getCurrentSession(
             String userId, String learningPlanId, String taskId, boolean includeReview) {
@@ -76,13 +72,10 @@ public class LearningPlanSessionService {
 
         LearningPlanTask task = requireTaskOfPlan(learningPlanId, taskId);
 
-        // Xem lại một ải cụ thể vẫn phải chạy được cả khi plan đã sang trạm MOCK
-        // (vượt ải cuối xong mới xem kết quả).
         if (includeReview) {
             return buildReviewResponse(plan, task);
         }
 
-        // Đã có phiên đang làm dở thì trả về để làm tiếp; còn lại về màn chọn ải.
         return sessionRepository
                 .findFirstByLearningPlanIdAndTaskIdAndStatusOrderByStartedAtDesc(
                         learningPlanId, taskId, SessionStatus.IN_PROGRESS)
@@ -92,10 +85,6 @@ public class LearningPlanSessionService {
                         : buildPickResponse(plan, stage));
     }
 
-    /**
-     * Bắt đầu/quay lại phiên luyện của một ải — đây là đường DUY NHẤT được ghi DB
-     * (tạo phiên, bỏ dở phiên ải khác, bỏ qua ải kho rỗng).
-     */
     @Transactional
     public CurrentSessionResponse startTaskSession(String userId, String learningPlanId, String taskId) {
         LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
@@ -124,14 +113,13 @@ public class LearningPlanSessionService {
             return buildSessionResponse(plan, stage, inProgress.get());
         }
 
-        // Kho câu của ải rỗng (pool=0) -> không thể pass, sẽ kẹt. Tự SKIP để không chặn tiến độ.
         List<String> questionIds = pickQuestionsForTask(plan, task);
         if (questionIds.isEmpty()) {
             boolean skipped = skipEmptyPoolTask(plan, task);
             if (plan.getPlanStage() == PlanStage.MOCK) {
                 return buildMockStageResponse(plan);
             }
-            // Nói rõ lý do bị đá về màn chọn ải, không im lặng như trước.
+
             CurrentSessionResponse response = buildPickResponse(plan, plan.getPlanStage());
             response.setNotice(skipped
                     ? "Ải này chưa có câu hỏi nào trong kho nên đã được bỏ qua — hãy chọn ải khác."
@@ -152,13 +140,8 @@ public class LearningPlanSessionService {
         return task;
     }
 
-    /**
-     * Ải có kho câu rỗng -> đánh dấu SKIPPED rồi kiểm tra điều kiện lên MOCK.
-     *
-     * @return true nếu vừa đánh dấu bỏ qua (false = ải đã vượt, không hạ trạng thái).
-     */
     private boolean skipEmptyPoolTask(LearningPlan plan, LearningPlanTask task) {
-        // Ải đã vượt (bấm luyện lại) không bị hạ về SKIPPED chỉ vì kho câu tạm rỗng.
+
         if (task.getStatus() == TaskStatus.PASSED) {
             return false;
         }
@@ -168,7 +151,6 @@ public class LearningPlanSessionService {
         return true;
     }
 
-    /** Lên MOCK khi mọi ải đã PASSED hoặc SKIPPED (không còn ải nào phải làm). */
     private void maybeAdvanceToMock(LearningPlan plan) {
         String planId = plan.getLearningPlanId();
         long total = taskRepository.countByLearningPlanId(planId);
@@ -183,8 +165,7 @@ public class LearningPlanSessionService {
         List<LearningPlanSession> sessions = sessionRepository
                 .findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(
                         plan.getLearningPlanId(), task.getTaskId());
-        // Phiên bỏ dở (đổi ải giữa chừng) cũng mang status SUBMITTED nhưng 0% và không có bài làm
-        // -> phải loại, nếu không "Xem giải thích" sẽ hiện bài trống thay vì lần luyện thật.
+
         LearningPlanSession lastSubmitted = sessions.stream()
                 .filter(s -> s.getStatus() == SessionStatus.SUBMITTED)
                 .filter(s -> !Boolean.TRUE.equals(s.getAbandoned()))
@@ -194,7 +175,6 @@ public class LearningPlanSessionService {
         return buildReviewResponse(plan, lastSubmitted);
     }
 
-    /** Dựng lại bài làm của đúng một phiên đã nộp (câu hỏi + lựa chọn của user + đáp án đúng). */
     private CurrentSessionResponse buildReviewResponse(LearningPlan plan, LearningPlanSession session) {
         List<LearningPlanSessionQuestion> sessionQuestions =
                 sessionQuestionRepository.findBySessionIdOrderByDisplayOrderAsc(session.getSessionId());
@@ -229,7 +209,6 @@ public class LearningPlanSessionService {
                 reviewItems);
     }
 
-    /** Xem lại bài làm của một phiên bất kỳ trong lịch sử (không chỉ phiên gần nhất). */
     @Transactional(readOnly = true)
     public CurrentSessionResponse getSessionReview(
             String userId, String learningPlanId, String sessionId) {
@@ -255,7 +234,6 @@ public class LearningPlanSessionService {
         return "Hoàn thành tất cả ải tag của Part này trước khi mở ải tổng ôn.";
     }
 
-    /** Trạm hiệu lực của plan, KHÔNG ghi DB — plan cũ ở trạm MIX quy về FOUNDATION/MOCK. */
     private PlanStage effectiveStage(LearningPlan plan) {
         PlanStage stage = plan.getPlanStage();
         if (stage == null) {
@@ -270,7 +248,6 @@ public class LearningPlanSessionService {
         return total > 0 && passed == total ? PlanStage.MOCK : PlanStage.FOUNDATION;
     }
 
-    /** Như {@link #effectiveStage} nhưng lưu lại — chỉ gọi ở luồng vốn đã ghi DB. */
     private PlanStage normalizePlanStage(LearningPlan plan) {
         PlanStage stage = effectiveStage(plan);
         if (plan.getPlanStage() != stage) {
@@ -307,12 +284,9 @@ public class LearningPlanSessionService {
                 .stream()
                 .collect(Collectors.groupingBy(Answer::getQuestionId));
 
-        // Cần loại câu hỏi (MCQ/MSQ/FILL) để chấm đúng.
         Map<String, Question> questionMap = questionRepository.findAllById(allowedQuestionIds).stream()
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q, (a, b) -> a));
 
-        // Dedup theo questionId — giữ entry đầu tiên, bỏ duplicate (FE bug / replay attack).
-        // Tránh đội accuracy lên sai khi cùng 1 câu xuất hiện nhiều lần.
         Map<String, SubmitSessionRequest.AnswerItem> uniqueAnswers = new LinkedHashMap<>();
         for (SubmitSessionRequest.AnswerItem item : request.getAnswers()) {
             uniqueAnswers.putIfAbsent(item.getQuestionId(), item);
@@ -339,7 +313,7 @@ public class LearningPlanSessionService {
             row.setSelectedAnswerIds(selectedIdsCsv);
             row.setIsCorrect(isCorrect);
             rows.add(row);
-            // Không ghi exposure ở đây: đã ghi đủ cho cả phiên lúc tạo session.
+
         }
         sessionAnswerRepository.saveAll(rows);
 
@@ -354,7 +328,6 @@ public class LearningPlanSessionService {
         session.setSubmittedAt(Instant.now());
         sessionRepository.save(session);
 
-        // Pass 1 ải learning plan -> ghi nhận streak (side-effect, không phá luồng nộp bài)
         if (passed) {
             AfterCommitTasks.runQuietly(
                     () -> streakService.recordActivity(userId, StreakActivityType.LESSON_PASS));
@@ -362,7 +335,7 @@ public class LearningPlanSessionService {
 
         String taskStatus = null;
         PlanStage stage = plan.getPlanStage() != null ? plan.getPlanStage() : PlanStage.FOUNDATION;
-        // Ghi nhận theo ải của chính phiên này, kể cả khi plan đã sang trạm MOCK (luyện lại ải cũ).
+
         if (session.getTaskId() != null) {
             LearningPlanTask task = taskRepository.findById(session.getTaskId())
                     .orElseThrow(() -> new NotFoundException("Không tìm thấy nhiệm vụ"));
@@ -371,7 +344,7 @@ public class LearningPlanSessionService {
                     || accuracy > task.getBestAccuracy().intValue()) {
                 task.setBestAccuracy(java.math.BigDecimal.valueOf(accuracy));
             }
-            // Luyện lại ải đã vượt mà không đạt thì vẫn giữ PASSED — không tụt tiến độ đã đạt.
+
             boolean taskPassed = passed || task.getStatus() == TaskStatus.PASSED;
             if (taskPassed) {
                 task.setStatus(TaskStatus.PASSED);
@@ -444,7 +417,6 @@ public class LearningPlanSessionService {
                     .map(learningMapper::toReviewAnswer)
                     .toList();
 
-            // MSQ: gom lựa chọn của user; MCQ: fallback về selectedAnswerId đơn.
             List<String> selectedIds = userAns == null ? List.of()
                     : (userAns.getSelectedAnswerIds() != null
                         ? List.copyOf(AnswerGradingUtil.parseIds(userAns.getSelectedAnswerIds()))
@@ -461,7 +433,6 @@ public class LearningPlanSessionService {
         return items;
     }
 
-    /** Lịch sử các phiên luyện của một ải. Mới nhất trước. */
     @Transactional(readOnly = true)
     public List<TaskSessionHistoryDto> getTaskSessionHistory(
             String userId, String learningPlanId, String taskId) {
@@ -476,8 +447,6 @@ public class LearningPlanSessionService {
         List<LearningPlanSession> sessions = sessionRepository
                 .findByLearningPlanIdAndTaskIdOrderByStartedAtDesc(learningPlanId, taskId);
 
-        // Bỏ phiên bỏ dở: không phải một lần luyện thật, hiện lên sẽ lệch với "Số lần luyện"
-        // và nút "Xem đáp án" mở ra bài trống.
         return sessions.stream()
                 .filter(s -> !Boolean.TRUE.equals(s.getAbandoned()))
                 .map(learningMapper::toTaskSessionHistory)
@@ -523,7 +492,6 @@ public class LearningPlanSessionService {
                 .orElse(plan.getPassAccuracyDefault() != null ? plan.getPassAccuracyDefault() : 70);
     }
 
-    /** Chọn câu cho ải (không side-effect) — tách để check kho rỗng trước khi tạo session. */
     private List<String> pickQuestionsForTask(LearningPlan plan, LearningPlanTask task) {
         int targetCount = resolveTargetQuestionCount(task);
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
@@ -596,10 +564,6 @@ public class LearningPlanSessionService {
         return selectFromPool(userId, pool, count);
     }
 
-    /**
-     * Lấy tối đa {@code count} câu: ưu tiên câu chưa gặp bao giờ, thiếu thì bù bằng câu
-     * ĐÃ GẶP ÍT NHẤT (trước đây bù bằng đầu pool nên câu vừa làm dễ lặp lại ngay).
-     */
     private List<String> selectFromPool(String userId, List<Question> pool, int count) {
         List<String> ids = pool.stream().map(Question::getQuestionId).distinct().toList();
         if (ids.isEmpty()) {
@@ -631,11 +595,6 @@ public class LearningPlanSessionService {
         return result;
     }
 
-    /**
-     * Ghi nhận user đã nhìn thấy các câu này (dùng để ưu tiên câu chưa gặp ở phiên sau).
-     * Ghi 1 lần lúc tạo phiên, theo lô — trước đây gọi từng câu ở cả lúc tạo lẫn lúc nộp
-     * nên timesSeen bị đếm gấp đôi và tốn ~2 query/câu.
-     */
     private void recordExposures(String userId, List<String> questionIds) {
         if (questionIds == null || questionIds.isEmpty()) {
             return;

@@ -17,6 +17,6 @@ public class TagBreakdownDto {
     private int skipped;
     private int total;
     private double percentage;
-    /** Danh sách câu thuộc tag (số câu + trạng thái) để bấm nhảy tới giải thích. */
+
     private List<TagQuestionRefDto> questions;
 }

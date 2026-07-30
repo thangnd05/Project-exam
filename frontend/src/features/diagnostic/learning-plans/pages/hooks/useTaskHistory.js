@@ -3,7 +3,7 @@ import { getPlanById, getTaskSessions } from '~/shared/api/learningPlanApi';
 import { planDetailKeys } from './usePlanDetail';
 
 export const taskHistoryKeys = {
-  // Dùng chung key với usePlanDetail: cùng gọi getPlanById nên không tách cache làm 2 lần fetch.
+
   plan: planDetailKeys.detail,
   sessions: (planId, taskId) => ['task-sessions', planId, taskId],
 };

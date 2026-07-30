@@ -1,6 +1,5 @@
-// Khớp với ScrollToTop (layout/ScrollToTop/ScrollToTop.module.scss): cùng kích
-// thước và lề phải để hai nút thành một cột thẳng hàng ở góc phải dưới.
-// Sửa các giá trị dưới đây thì phải sửa cả bên đó.
+
+
 $fab-size: 45px;
 $fab-gap: 12px;
 $scroll-bottom: 20px;
@@ -42,7 +41,6 @@ $scroll-bottom-mobile: 72px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
   }
 
-  // Mobile có thanh nav dưới nên nút cuộn-lên đã bị đẩy lên, đẩy theo cho khớp.
   @media (max-width: 991.98px) {
     bottom: calc(#{$scroll-bottom-mobile + $fab-size + $fab-gap} + env(safe-area-inset-bottom, 0px));
   }

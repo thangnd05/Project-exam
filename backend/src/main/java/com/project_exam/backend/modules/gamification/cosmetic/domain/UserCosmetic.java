@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/** Đồ trang trí user đã sở hữu. equipped = đang đeo (mỗi loại tối đa 1 cái equipped). */
 @Entity
 @Table(
         name = "user_cosmetics",

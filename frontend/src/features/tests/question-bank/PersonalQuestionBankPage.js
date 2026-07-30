@@ -102,7 +102,6 @@ const PersonalQuestionBankPage = () => {
     }
   }, [canAccessAdminBank, bankScope]);
 
-  // ----- Collections -----
   const collectionsQuery = useQuery({
     queryKey: questionBankKeys.collections,
     queryFn: getQuestionCollections,
@@ -137,7 +136,6 @@ const PersonalQuestionBankPage = () => {
     return questions.filter((q) => q.collectionId === collectionFilter);
   };
 
-  // ----- My classes -----
   const classesQuery = useQuery({
     queryKey: questionBankKeys.myClasses,
     queryFn: getMyClasses,
@@ -145,7 +143,6 @@ const PersonalQuestionBankPage = () => {
   });
   const classes = classesQuery.data ?? [];
 
-  // ----- Part-based bank (personal / admin) -----
   const partQueries = useQueries({
     queries: (isPartScope && examTypeId ? (examParts || []) : []).map((p) => ({
       queryKey: questionBankKeys.partQuestions(p.examPartId, bankScope),
@@ -182,7 +179,6 @@ const PersonalQuestionBankPage = () => {
     }
   }, [anyPartError]);
 
-  // Collapse all parts when the exam type or bank scope changes.
   useEffect(() => {
     setExpandedParts(new Set());
   }, [examTypeId, bankScope]);
@@ -196,7 +192,6 @@ const PersonalQuestionBankPage = () => {
     });
   };
 
-  // ----- Chapter-based bank (class) -----
   const chaptersQuery = useQuery({
     queryKey: questionBankKeys.chapters(selectedClassId),
     queryFn: () => getChaptersByClass(selectedClassId),
@@ -266,7 +261,6 @@ const PersonalQuestionBankPage = () => {
     }
   }, [anyChapterQuestionError]);
 
-  // Collapse all chapters when the selected class or bank scope changes.
   useEffect(() => {
     setExpandedChapters(new Set());
   }, [selectedClassId, bankScope]);

@@ -126,7 +126,6 @@ const LearningPlanList = forwardRef(function LearningPlanList(
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
       {loading && <div className={cx('loading')}>Đang tải...</div>}
 
-      {/* Truyền emptyMessage={null} để ẩn hẳn thông báo trống. */}
       {!loading && plans.length === 0 && (emptyMessage || emptyAction) && (
         <div className={cx('alert', 'alertInfo')}>
           <span>{emptyMessage}</span>

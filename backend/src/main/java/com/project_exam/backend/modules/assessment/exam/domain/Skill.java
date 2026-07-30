@@ -16,7 +16,7 @@ public class Skill {
     private String skillId;
 
     @Column(nullable = false, unique = true, length = 100)
-    private String name; // Listening, Reading, Speaking, Writing
+    private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;

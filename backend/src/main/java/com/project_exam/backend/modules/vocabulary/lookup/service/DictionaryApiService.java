@@ -14,11 +14,11 @@ public class DictionaryApiService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public DictionaryResult fetchWordInfo(String word) {
-        String text = null;   // lưu IPA
-        String audio = null;  // lưu link audio (ưu tiên Google TTS)
+        String text = null;
+        String audio = null;
 
         try {
-            // API dictionaryapi.dev để lấy phonetic
+
             String url = "https://api.dictionaryapi.dev/api/v2/entries/en/"
                     + URLEncoder.encode(word, StandardCharsets.UTF_8);
 
@@ -30,7 +30,6 @@ public class DictionaryApiService {
                 if (body != null && body.isArray() && body.size() > 0) {
                     JsonNode first = body.get(0);
 
-                    // Lấy phonetic từ mảng phonetics
                     JsonNode phonetics = first.path("phonetics");
                     for (JsonNode phonetic : phonetics) {
                         String textCandidate = phonetic.path("text").asText();
@@ -39,17 +38,15 @@ public class DictionaryApiService {
                         }
                     }
 
-                    // Nếu không có thì fallback lấy từ root
                     if (text == null || text.isEmpty()) {
                         text = first.path("phonetic").asText();
                     }
                 }
             }
         } catch (Exception e) {
-            // Bỏ qua lỗi tra phonetic — bên dưới vẫn luôn trả về audio Google TTS
+
         }
 
-        // Luôn tạo link Google TTS cho audio (đảm bảo không null)
         audio = "https://translate.google.com/translate_tts?ie=UTF-8&q="
                 + URLEncoder.encode(word, StandardCharsets.UTF_8)
                 + "&tl=en&client=tw-ob";

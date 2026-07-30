@@ -67,7 +67,6 @@ public class UserAnswerService {
         return userAnswerRepository.findAll();
     }
 
-    /** Chỉ admin được liệt kê toàn bộ đáp án. */
     public List<UserAnswerResponse> findAllResponses(jakarta.servlet.http.HttpServletRequest httpRequest) {
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ đáp án.");
@@ -81,7 +80,6 @@ public class UserAnswerService {
         return userAnswerRepository.findById(id);
     }
 
-    /** Chỉ owner attempt, chủ đề (giáo viên), hoặc admin được xem 1 đáp án. */
     public Optional<UserAnswerResponse> findResponseById(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
         return findById(id).map(ua -> {
             if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
@@ -107,7 +105,7 @@ public class UserAnswerService {
     }
 
     public List<UserAnswerResponse> findResponsesByUserTestId(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
-        //  Chỉ owner attempt, chủ đề (giáo viên), hoặc admin được xem.
+
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             UserTest ut = userTestRepository.findById(userTestId)
                     .orElseThrow(() -> new NotFoundException("UserTest not found"));
@@ -131,7 +129,6 @@ public class UserAnswerService {
         return userAnswerRepository.findByQuestionId(questionId);
     }
 
-    /** Liệt kê toàn bộ đáp án theo câu hỏi (cross-attempt) — chỉ admin. */
     public List<UserAnswerResponse> findResponsesByQuestionId(String questionId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được liệt kê đáp án theo câu hỏi.");
@@ -153,8 +150,6 @@ public class UserAnswerService {
         validateUserAnswerRequest(request);
         validateOwnershipAndInProgress(request.getUserTestId(), currentUserId);
 
-        // Đối chiếu row theo path id phải thuộc đúng userTest đã validate — chặn IDOR:
-        // attacker truyền userTestId của mình + userAnswerId của người khác để ghi đè/phá đáp án.
         UserAnswer existing = userAnswerRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserAnswer not found"));
         if (!Objects.equals(existing.getUserTestId(), request.getUserTestId())) {
@@ -173,8 +168,7 @@ public class UserAnswerService {
         if (requests == null || requests.isEmpty()) {
             return List.of();
         }
-        // Validate quyền + thời gian MỘT LẦN cho mỗi userTestId (batch autosave thực tế chung 1
-        // userTestId) — tránh N lần findById userTest/test lặp lại như trước.
+
         requests.forEach(this::validateUserAnswerRequest);
         requests.stream()
                 .map(UserAnswerRequest::getUserTestId)
@@ -193,7 +187,6 @@ public class UserAnswerService {
         return upsertEntity(request);
     }
 
-    /** Upsert 1 đáp án (đã validate quyền/thời gian ở nơi gọi). */
     private UserAnswer upsertEntity(UserAnswerRequest request) {
         UserAnswer userAnswer = userAnswerRepository
                 .findByUserTestIdAndQuestionId(request.getUserTestId(), request.getQuestionId())
@@ -239,10 +232,6 @@ public class UserAnswerService {
         assertWithinTimeLimit(userTest);
     }
 
-    /**
-     * Chặn ghi đáp án sau khi đề CÓ giờ đã hết hạn (server tự tính từ startedAt).
-     * Bài không giới hạn giờ / luyện tập thì bỏ qua.
-     */
     private void assertWithinTimeLimit(UserTest userTest) {
         Integer durationMinutes = testRepository.findById(userTest.getTestId())
                 .map(Test::getDurationMinutes)
@@ -253,14 +242,12 @@ public class UserAnswerService {
         }
     }
 
-    // ===== GUEST FLOW =====
-
     @Transactional
     public List<UserAnswerResponse> upsertBatchForGuest(List<UserAnswerRequest> requests, String guestSessionId) {
         if (requests == null || requests.isEmpty()) {
             return List.of();
         }
-        // Validate quyền guest + thời gian MỘT LẦN cho mỗi userTestId (xem upsertBatch).
+
         requests.forEach(this::validateUserAnswerRequest);
         requests.stream()
                 .map(UserAnswerRequest::getUserTestId)
@@ -298,14 +285,13 @@ public class UserAnswerService {
             throw new ForbiddenException("Phiên guest không hợp lệ.");
         }
 
-        // Guest result luôn xem được sau khi nộp — nhưng trước khi nộp trả 0.
         if (userTest.getStatus() != UserTest.Status.COMPLETED) {
             return new ResultSummaryDto(0, 0, 0, 0);
         }
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {
-            // Nộp mà chưa trả lời câu nào: 0 đúng, còn lại tính là sai/bỏ (theo Part đã luyện nếu PRACTICE).
+
             long total = getTotalQuestionsForResult(userTest);
             return new ResultSummaryDto(0, total, total, userTest.getTotalScore());
         }
@@ -356,7 +342,7 @@ public class UserAnswerService {
 
     public boolean delete(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
         return userAnswerRepository.findById(id).map(u -> {
-            //  Chỉ owner attempt hoặc admin được xoá đáp án.
+
             if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
                 String currentUserId = authUtils.getUserId(httpRequest);
                 UserTest ut = userTestRepository.findById(u.getUserTestId())
@@ -370,7 +356,6 @@ public class UserAnswerService {
         }).orElse(false);
     }
 
-    //  PHƯƠNG THỨC LOGIC MỚI ĐƯỢC CHUYỂN VÀO ĐÂY
     public ResultSummaryDto getResultSummary(String userTestId, String currentUserId) {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
@@ -378,7 +363,6 @@ public class UserAnswerService {
             throw new ForbiddenException("Bạn không có quyền xem kết quả bài thi này");
         }
 
-        //  Kiểm tra quyền xem kết quả dựa trên thời gian
         Test test = testRepository.findById(userTest.getTestId())
             .orElseThrow(() -> new NotFoundException("Test not found"));
 
@@ -391,7 +375,7 @@ public class UserAnswerService {
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {
-            // Nộp mà chưa trả lời câu nào: 0 đúng, còn lại tính là sai/bỏ (theo Part đã luyện nếu PRACTICE).
+
             long total = getTotalQuestionsForResult(userTest);
             return new ResultSummaryDto(0, total, total, userTest.getTotalScore());
         }
@@ -429,10 +413,6 @@ public class UserAnswerService {
         return new ResultSummaryDto(normalizedCorrectCount, wrongCount, totalQuestions, userTest.getTotalScore());
     }
 
-    /**
-     * Mẫu số cho kết quả. FULL_TEST đếm toàn bộ đề; PRACTICE chỉ đếm câu của các
-     * Part đã chọn luyện (practicePartIds) để số câu đúng/sai/tổng khớp phần luyện.
-     */
     private long getTotalQuestionsForResult(UserTest userTest) {
         Set<String> practicePartIds = userTest.isPractice()
                 ? parsePracticePartIds(userTest.getPracticePartIds())

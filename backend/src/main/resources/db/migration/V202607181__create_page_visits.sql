@@ -1,5 +1,5 @@
--- Bảng ghi nhận lượt xem trang (page view) phục vụ thống kê traffic Dashboard/Analytics.
--- FE ping mỗi lần vào/chuyển route -> 1 dòng. sessionKey tái dùng guestSessionId (localStorage).
+
+
 CREATE TABLE public.page_visits (
     visit_id      character varying(255) NOT NULL,
     path          character varying(255) NOT NULL,

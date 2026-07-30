@@ -77,7 +77,7 @@ public class ClassMemberController {
             @PathVariable String classId,
             HttpServletRequest request
     ) {
-        // Chỉ thành viên đã duyệt hoặc giáo viên của lớp (admin pass) mới xem danh sách thành viên.
+
         classAccessGuard.requireMemberOrTeacher(classId, authUtils.getUserId(request), request);
         return ResponseEntity.ok(classMemberService.getAllMembers(classId));
     }
@@ -87,7 +87,7 @@ public class ClassMemberController {
             @PathVariable String classId,
             HttpServletRequest request
     ) {
-        // Danh sách chờ duyệt chỉ dành cho giáo viên của lớp (admin pass).
+
         classAccessGuard.requireTeacher(classId, authUtils.getUserId(request), request);
         return ResponseEntity.ok(classMemberService.getPendingMembers(classId));
     }

@@ -25,7 +25,6 @@ public class PostController {
     private final PostService postService;
     private final ObjectMapper objectMapper;
 
-    // ─── GET danh sách (public) ───────────────────
     @GetMapping
     public ResponseEntity<PageResponse<PostSummaryResponse>> getPosts(
             @RequestParam(defaultValue = "0") int page,
@@ -38,7 +37,6 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostsPaged(page, size, keyword, status, categoryId, httpRequest));
     }
 
-    // ─── GET chi tiết (public) ────────────────────
     @GetMapping("/{id}")
     public ResponseEntity<PostResponse> getPostById(
             @PathVariable String id,
@@ -47,7 +45,6 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(id, httpRequest));
     }
 
-    // ─── GET posts của tôi (auth) ─────────────────
     @GetMapping("/me")
     public ResponseEntity<PageResponse<PostSummaryResponse>> getMyPosts(
             @RequestParam(defaultValue = "0") int page,
@@ -59,7 +56,6 @@ public class PostController {
         return ResponseEntity.ok(postService.getMyPosts(page, size, keyword, status, httpRequest));
     }
 
-    // ─── CREATE (auth) — MULTIPART ────────────────────
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResponse> createPost(
             @RequestPart("post") String requestJson,
@@ -74,7 +70,6 @@ public class PostController {
         }
     }
 
-    // ─── UPDATE (auth, owner only) — MULTIPART ────────
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResponse> updatePost(
             @PathVariable String id,
@@ -90,7 +85,6 @@ public class PostController {
         }
     }
 
-    // ─── DELETE (auth, owner hoặc admin) ──────────
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(
             @PathVariable String id,
@@ -100,7 +94,6 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    // ─── UPDATE STATUS (Admin) ────────────────────
     @PatchMapping("/{id}/status")
     public ResponseEntity<PostResponse> updatePostStatus(
             @PathVariable String id,
@@ -110,7 +103,6 @@ public class PostController {
         return ResponseEntity.ok(postService.updatePostStatus(id, request.getStatus(), httpRequest));
     }
 
-    // ─── UPLOAD IMAGE (QuillJS) ───────────────────
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image) {
         try {

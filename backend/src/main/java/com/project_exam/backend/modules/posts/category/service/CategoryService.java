@@ -55,7 +55,7 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException("Category không tồn tại"));
 
         String slug = resolveSlug(request.getSlug(), request.getName());
-        // Cho phép giữ nguyên slug nếu không đổi
+
         if (!slug.equals(c.getSlug()) && categoryRepository.existsBySlug(slug)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Slug đã tồn tại: " + slug);
         }
@@ -71,9 +71,6 @@ public class CategoryService {
         categoryRepository.deleteById(id);
     }
 
-    // ─────────────────────────────────────────────
-    // HELPER: tạo slug từ name nếu slug trống
-    // ─────────────────────────────────────────────
     private String resolveSlug(String slug, String name) {
         if (slug != null && !slug.isBlank()) return slug.trim().toLowerCase();
         return generateSlug(name);
@@ -81,7 +78,7 @@ public class CategoryService {
 
     public static String generateSlug(String name) {
         if (name == null) return "";
-        // Normalize Unicode (NFD) rồi bỏ dấu
+
         String normalized = Normalizer.normalize(name, Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
         return normalized.toLowerCase()

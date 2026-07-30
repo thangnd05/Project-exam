@@ -20,7 +20,7 @@ public class ExamPart {
     private String examPartId;
 
     @Column(nullable = false)
-    private String examTypeId; // FK -> exam_types
+    private String examTypeId;
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -32,7 +32,7 @@ public class ExamPart {
     private Integer defaultNumQuestions;
 
     @Column(nullable = true)
-    private String skillId; // FK -> skills (cho phép null với scoring mặc định)
+    private String skillId;
 
     @Column(name = "display_order", nullable = false)
     private Integer displayOrder = 999;

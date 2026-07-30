@@ -1,12 +1,5 @@
 package com.project_exam.backend.modules.assessment.learning.support;
 
-/**
- * Ngưỡng readiness level — đồng bộ với {@code EnhancedResultService#getReadinessLevel}.
- * <p>
- * Level chỉ phụ thuộc % readiness (trung bình skill trên bài chẩn đoán), không phụ thuộc
- * {@code UserTarget.targetScore}. Đổi target điểm không đổi level; Part target ảnh hưởng
- * {@code isTargetMet} / pass ải, không ảnh hưởng band này.
- */
 public final class ReadinessThresholds {
 
     public static final int NOT_READY_MAX = 59;

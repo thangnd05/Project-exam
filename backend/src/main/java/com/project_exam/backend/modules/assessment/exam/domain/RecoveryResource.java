@@ -32,17 +32,16 @@ public class RecoveryResource {
     private String url;
 
     @Column(name = "original_file_name")
-    private String originalFileName; 
+    private String originalFileName;
 
     @Column(name = "cloudinary_public_id")
     private String cloudinaryPublicId;
 
-    
     @Column(name = "exam_type_id")
-    private String examTypeId; 
+    private String examTypeId;
 
     @Column(name = "exam_part_id")
-    private String examPartId; 
+    private String examPartId;
 
     @Column(name = "created_by")
     private String createdBy;

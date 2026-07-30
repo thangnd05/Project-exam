@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/** Mapper thuần UserAnswer -> DTO (sub-module ASSESSMENT/ATTEMPT). */
 @Component
 public class UserAnswerMapper {
 

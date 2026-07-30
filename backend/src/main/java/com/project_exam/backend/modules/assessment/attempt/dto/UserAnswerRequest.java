@@ -10,9 +10,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserAnswerRequest {
-    private String userTestId;       // thêm luôn userTestId
+    private String userTestId;
     private String questionId;
-    private String selectedAnswerId; // MCQ: 1 đáp án; null nếu tự luận/MSQ
-    private List<String> selectedAnswerIds; // MSQ: nhiều đáp án
-    private String answerText;     // cho tự luận
+    private String selectedAnswerId;
+    private List<String> selectedAnswerIds;
+    private String answerText;
 }

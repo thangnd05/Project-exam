@@ -5,10 +5,6 @@ import styles from './OverviewCard.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Card số liệu tổng quan dùng chung cho Dashboard & Thống kê — chỉ chữ, không icon.
- * label (in hoa nhỏ) ở trên, value lớn ở dưới; period là badge góc phải, sub là dòng phụ — đều tuỳ chọn.
- */
 const OverviewCard = ({ label, value, period, sub, delay = 0 }) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}

@@ -6,10 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/**
- * Cấu hình khôi phục chuỗi ngày: giá xu + bật/tắt. Chỉ giữ 1 dòng (singleton),
- * admin chỉnh runtime giống cách quản lý giá cosmetic.
- */
 @Entity
 @Table(name = "streak_recover_config")
 @Getter

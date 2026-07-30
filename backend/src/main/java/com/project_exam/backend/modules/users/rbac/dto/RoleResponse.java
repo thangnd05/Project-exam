@@ -15,6 +15,6 @@ public class RoleResponse {
     private String roleId;
     private String roleName;
     private String description;
-    // Danh sách permission code đã gán cho role (cho ma trận phân quyền trên UI).
+
     private List<String> permissions;
 }

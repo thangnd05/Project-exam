@@ -6,29 +6,24 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
-/**
- * Mapper thuần cho ProfileOverviewResponse. Toàn bộ số liệu thống kê
- * (test/vocabulary/class) đều được tính ở service (truy nhiều repository),
- * rồi truyền vào đây qua tham số — mapper không giữ repository/logic.
- */
 @Component
 public class UserProfileMapper {
 
     public ProfileOverviewResponse toProfileOverview(
             User user,
             String roleName,
-            // test stats
+
             long totalAttempts,
             long completedAttempts,
             long inProgressAttempts,
             Integer bestScore,
             Double averageScore,
             Instant lastAttemptAt,
-            // vocabulary stats
+
             long totalVocabulary,
             long learningVocabulary,
             long masteredVocabulary,
-            // class stats
+
             long approvedClassCount,
             long pendingClassCount
     ) {

@@ -9,7 +9,6 @@ public interface TagRepository extends JpaRepository<Tag, String> {
 
     List<Tag> findByExamTypeId(String examTypeId);
 
-    // Sắp theo sortOrder (nhỏ trước); Postgres xếp NULL xuống cuối mặc định.
     List<Tag> findByExamTypeIdOrderBySortOrderAsc(String examTypeId);
 
     List<Tag> findByParentId(String parentId);

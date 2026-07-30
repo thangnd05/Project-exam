@@ -109,10 +109,6 @@ public class QuestionService {
     private final AnswerMapper answerMapper;
     private final QuestionMapper questionMapper;
 
-    /**
-     * Khi câu hỏi được gắn vào một class/chapter, user phải là thành viên hoặc giáo viên của lớp đó
-     * (admin pass), và chapter (nếu có) phải thuộc đúng lớp.
-     */
     private void requireClassWriteAccess(String classId, String chapterId, String currentUserId, HttpServletRequest httpRequest) {
         if (classId == null) {
             if (chapterId != null) {
@@ -144,11 +140,6 @@ public class QuestionService {
         return questionRepository.save(question);
     }
 
-    /**
-     * Lấy danh sách câu theo part.
-     * Cá nhân (classId == null): chỉ câu của user đăng nhập (created_by = currentUserId, class_id/chapter_id NULL).
-     * Lớp: classId (+ chapterId nếu có).
-     */
     private List<Question> fetchQuestions(
             String examPartId,
             String classId,
@@ -192,10 +183,8 @@ public class QuestionService {
             return Collections.emptyMap();
         }
 
-        //  TỐI ƯU: Chỉ 1 câu Query duy nhất cho tất cả Passage
         List<PassageMedia> allMedia = passageMediaRepository.findByPassageIdInOrderByIdAsc(passageIds);
 
-        // Dùng Stream API để nhóm (groupingBy) media theo passageId ngay trên RAM
         return allMedia.stream()
                 .map(passageMediaMapper::toResponse)
                 .collect(Collectors.groupingBy(PassageMediaResponse::getPassageId));
@@ -219,7 +208,6 @@ public class QuestionService {
                 ? List.of()
                 : mediaByPassageId.getOrDefault(question.getPassageId(), List.of());
 
-        // Lấy danh sách đáp án theo đúng thứ tự hiện tại
         List<AnswerResponse> answers = new ArrayList<>(answersByQuestionId.getOrDefault(
                 question.getQuestionId(),
                 Collections.emptyList()
@@ -257,7 +245,6 @@ public class QuestionService {
 
         String currentUserId = authUtils.getUserId(request);
 
-        //  Khi đọc kho lớp: phải là member/teacher của lớp; chapter (nếu có) phải thuộc lớp đó.
         if (classId != null) {
             classAccessGuard.requireMemberOrTeacher(classId, currentUserId, request);
             classAccessGuard.requireChapterInClass(chapterId, classId);
@@ -279,12 +266,8 @@ public class QuestionService {
         return buildUserQuestionResponses(questions);
     }
 
-    /**
-     * Lấy kho admin: câu hỏi do bất kỳ admin nào tạo, không gắn class/chapter, là kho.
-     * Bất kỳ user đăng nhập nào cũng đọc được để dùng làm nguồn tạo đề.
-     */
     public List<QuestionResponse> getAdminBankQuestionsByPart(String examPartId, HttpServletRequest request) {
-        authUtils.getUserId(request); // bắt buộc đăng nhập
+        authUtils.getUserId(request);
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return Collections.emptyList();
@@ -304,7 +287,6 @@ public class QuestionService {
         }
         return questionRepository.countAdminBankByExamPart(examPartId, adminIds);
     }
-
 
     private Set<String> getAccessibleClassIds(String currentUserId) {
         Set<String> classIds = new LinkedHashSet<>();
@@ -429,13 +411,13 @@ public class QuestionService {
 
         TestPart testPart = testPartRepository.findById(testPartId)
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
-        //  Phải sở hữu test cha.
+
         Test parentTest = testRepository.findById(testPart.getTestId())
                 .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
         if (!currentUserId.equals(parentTest.getCreatedBy()) && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
-        //  Nếu gắn class/chapter, user phải có quyền với lớp.
+
         requireClassWriteAccess(classId, chapterId, currentUserId, httpRequest);
 
         List<NormalQuestionRequest> parsedQuestions = questionDocumentImportService.parseQuestionsFromDocument(file);
@@ -485,11 +467,6 @@ public class QuestionService {
         return responses;
     }
 
-    /**
-     * Gắn tag cho câu hỏi vừa import. Gộp tagIds (form đã chọn, nếu có) với các tên tag
-     * đọc từ dòng "Tags:" trong file (resolve sang tagId theo examType của part — chỉ khớp
-     * tag có sẵn, bỏ qua tên lạ). Chỉ sync khi danh sách cuối cùng khác rỗng.
-     */
     private void attachImportTags(String questionId, String examPartId,
                                   List<String> tagIds, List<String> tagNames) {
         List<String> ids = new ArrayList<>();
@@ -499,8 +476,7 @@ public class QuestionService {
         if (tagNames != null && !tagNames.isEmpty()) {
             ExamPart part = examPartRepository.findById(examPartId).orElse(null);
             if (part != null) {
-                // Truyền tên Part (vd "Part 3") để resolution ưu tiên tag con đúng Part,
-                // tránh nhầm với tag con cùng tên ở Part khác.
+
                 ids.addAll(tagService.resolveTagIdsByNames(
                         tagNames, part.getExamTypeId(), part.getName()));
             }
@@ -526,11 +502,6 @@ public class QuestionService {
         cascadeDeleteQuestionInternal(id);
     }
 
-    /**
-     * Cascade xoá 1 question: lịch sử bài làm (user_answers), liên kết đề (test_questions),
-     * đáp án (answers), rồi tới chính question. Dùng chung cho Chapter/Class cascade.
-     * Không kiểm tra quyền — caller phải đảm bảo.
-     */
     @Transactional
     public void cascadeDeleteQuestionInternal(String questionId) {
         userAnswerRepository.deleteByQuestionId(questionId);
@@ -540,9 +511,6 @@ public class QuestionService {
         questionRepository.deleteById(questionId);
     }
 
-    /**
-     * Cascade xoá tất cả questions trong 1 chapter.
-     */
     @Transactional
     public void cascadeDeleteQuestionsByChapter(String chapterId) {
         List<Question> questions = questionRepository.findByChapterId(chapterId);
@@ -551,9 +519,6 @@ public class QuestionService {
         }
     }
 
-    /**
-     * Cascade xoá tất cả questions thuộc 1 class (kể cả các câu không gắn chapter).
-     */
     @Transactional
     public void cascadeDeleteQuestionsByClass(String classId) {
         List<Question> questions = questionRepository.findByClassId(classId);
@@ -562,13 +527,10 @@ public class QuestionService {
         }
     }
 
-    /**
-     * Đếm câu theo part. Cá nhân = theo user đăng nhập; lớp = classId (+ chapterId nếu có).
-     */
     public long countByExamPartId(String examPartId, String classId, String chapterId, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
         if (classId != null) {
-            //  Cùng guard với getQuestionsByPart.
+
             classAccessGuard.requireMemberOrTeacher(classId, currentUserId, request);
             classAccessGuard.requireChapterInClass(chapterId, classId);
             if (chapterId != null) {
@@ -582,10 +544,6 @@ public class QuestionService {
         return questionRepository.countByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(examPartId, currentUserId);
     }
 
-    /**
-     * Tạo nhiều câu hỏi cùng 1 passage vào kho (BẮT BUỘC lưu kho, BẮT BUỘC có passage).
-     * Passage trong request là bắt buộc cho bulk; nếu LISTENING có thể kèm file audio.
-     */
     @Transactional
     public List<QuestionAdminResponse> createBulkQuestionsToBank(BulkQuestionWithPassageRequest request,
                                                                 HttpServletRequest httpRequest,
@@ -594,7 +552,7 @@ public class QuestionService {
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng từ token.");
         }
-        //  Nếu lưu vào kho lớp/chapter, user phải có quyền với lớp đó.
+
         requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
         List<MultipartFile> uploadedFiles = files == null
                 ? List.of()
@@ -654,9 +612,6 @@ public class QuestionService {
         return responses;
     }
 
-    /**
-     * Tạo nhiều câu hỏi thông thường vào kho (không passage). Mỗi câu độc lập.
-     */
     @Transactional
     public List<QuestionAdminResponse> createBulkQuestionsToBankNoPassage(
             BulkCreateQuestionsToBankRequest request,
@@ -668,7 +623,7 @@ public class QuestionService {
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng từ token.");
         }
-        //  Nếu lưu vào kho lớp/chapter, user phải có quyền với lớp đó.
+
         requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
 
         if (request.getQuestions() == null || request.getQuestions().isEmpty()) {
@@ -705,7 +660,6 @@ public class QuestionService {
             question.setQuestionNumber(resolveBankQuestionNumber(baseMax, qReq, i));
             question = questionRepository.save(question);
 
-            // Lấy toàn bộ file của câu hỏi này
             List<MultipartFile> questionFiles = files.entrySet().stream()
                     .filter(e -> e.getKey().startsWith("media_" + questionIndex + "_"))
                     .map(Map.Entry::getValue)
@@ -713,25 +667,21 @@ public class QuestionService {
 
             if (!questionFiles.isEmpty()) {
 
-                // 1. Tạo đối tượng Passage mới
                 Passage passage = new Passage();
                 passage.setContent("");
 
-                // --- ĐOẠN SỬA ĐỂ NHẬN DIỆN LOẠI ---
-                // Mặc định là READING (cho ảnh), nếu thấy file audio thì chuyển thành LISTENING
                 Passage.PassageType determinedType = Passage.PassageType.READING;
 
                 for (MultipartFile file : questionFiles) {
                     if (file != null && file.getContentType() != null) {
                         if (file.getContentType().startsWith("audio")) {
                             determinedType = Passage.PassageType.LISTENING;
-                            break; // Ưu tiên LISTENING nếu có file âm thanh
+                            break;
                         }
                     }
                 }
 
                 passage.setPassageType(determinedType);
-                // ---------------------------------
 
                 passage = passageRepository.save(passage);
 
@@ -740,8 +690,7 @@ public class QuestionService {
 
                 for (MultipartFile file : questionFiles) {
                     if (file == null || file.isEmpty()) continue;
-                    // Dùng helper 3 nhánh (audio/image/document) như các luồng khác —
-                    // trước đây block này thiếu nhánh document nên PDF/doc bị upload nhầm sang image.
+
                     savePassageMediaFile(passage.getPassageId(), file);
                 }
             }
@@ -762,15 +711,11 @@ public class QuestionService {
         return responses;
     }
 
-    /**
-     * Tạo câu hỏi "tức thì" (isBank = false) và gắn thẳng vào part của đề.
-     * Dùng khi giáo viên trên lớp đặt câu hỏi rồi đưa vào đề, không cần lưu kho.
-     */
     @Transactional
     public QuestionAdminResponse createQuestionAndAttachToTest(
             CreateQuestionAndAttachRequest request,
             HttpServletRequest httpRequest,
-            Map<String, MultipartFile> files // Chuyển sang Map để nhận đa file
+            Map<String, MultipartFile> files
     ) throws IOException {
 
         String currentUserId = authUtils.getUserId(httpRequest);
@@ -780,19 +725,18 @@ public class QuestionService {
 
         TestPart testPart = testPartRepository.findById(request.getTestPartId())
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + request.getTestPartId()));
-        //  Phải sở hữu test cha (admin pass).
+
         Test parentTest = testRepository.findById(testPart.getTestId())
                 .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
         if (!currentUserId.equals(parentTest.getCreatedBy()) && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
-        //  Nếu gắn class/chapter, user phải có quyền với lớp.
+
         requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
 
         String passageId = null;
         Passage savedPassage = null;
 
-        // Kiểm tra xem có file nào gửi lên không hoặc có content passage không
         boolean hasFiles = files != null && !files.isEmpty();
         boolean hasPassageReq = request.getPassage() != null;
 
@@ -803,7 +747,7 @@ public class QuestionService {
                 passage.setContentTranslation(request.getPassage().getContentTranslation());
                 passage.setPassageType(request.getPassage().getPassageType());
             } else {
-                // Mặc định nếu chỉ có file mà không có request passage
+
                 passage.setContent("");
                 passage.setPassageType(Passage.PassageType.LISTENING);
             }
@@ -811,8 +755,6 @@ public class QuestionService {
             savedPassage = passageRepository.save(passage);
             passageId = savedPassage.getPassageId();
 
-            // XỬ LÝ ĐA PHƯƠNG TIỆN (Lưu vào passage_media)
-            // XỬ LÝ ĐA PHƯƠNG TIỆN (Lưu vào passage_media)
             if (hasFiles) {
                 for (MultipartFile file : files.values()) {
                     if (file == null || file.isEmpty()) continue;
@@ -821,7 +763,6 @@ public class QuestionService {
             }
         }
 
-            // Lưu Question
         Question question = new Question();
         question.setExamPartId(testPart.getExamPartId());
         question.setPassageId(passageId);
@@ -837,14 +778,12 @@ public class QuestionService {
 
         question = questionRepository.save(question);
 
-        // Lưu Answers
         List<Answer> savedAnswers = saveAnswersForQuestion(
                 question.getQuestionId(),
                 request.getAnswers(),
                 request.getQuestionType()
         );
 
-        // Gán vào Test
         TestQuestion tq = new TestQuestion();
         tq.setTestPartId(request.getTestPartId());
         tq.setQuestionId(question.getQuestionId());
@@ -865,7 +804,7 @@ public class QuestionService {
     }
 
     private void validateQuestionAnswers(Question.QuestionType questionType, List<AnswerRequest> answers) {
-        // Cả MCQ (1 đúng) và MSQ (nhiều đúng) đều phải có ít nhất 1 đáp án đúng.
+
         if (questionType != Question.QuestionType.MCQ && questionType != Question.QuestionType.MSQ) {
             return;
         }
@@ -888,8 +827,7 @@ public class QuestionService {
 
         switch (questionType) {
             case ESSAY -> {
-                // ESSAY: user tự viết câu trả lời, không cần tạo đáp án trắc nghiệm
-                // Có thể lưu một đáp án mẫu nếu teacher muốn cung cấp gợi ý
+
                 if (answers != null && !answers.isEmpty()) {
                     AnswerRequest ar = answers.get(0);
                     Answer a = new Answer();
@@ -901,7 +839,7 @@ public class QuestionService {
                 }
             }
             case MCQ, MSQ -> {
-                // MCQ: đúng 1 đáp án; MSQ: nhiều đáp án isCorrect=true.
+
                 for (AnswerRequest ar : answers) {
                     Answer a = new Answer();
                     a.setQuestionId(questionId);
@@ -912,7 +850,7 @@ public class QuestionService {
                 }
             }
             default -> {
-                // fallback: xử lý như MCQ
+
                 for (AnswerRequest ar : answers) {
                     Answer a = new Answer();
                     a.setQuestionId(questionId);
@@ -936,9 +874,6 @@ public class QuestionService {
                 .toList();
     }
 
-    /**
-     * Upload thêm file vào passage (append vào passage_media). Giống luồng create-and-attach.
-     */
     private void appendUploadedFilesToPassage(String passageId, Collection<MultipartFile> files) throws IOException {
         if (files == null || files.isEmpty()) {
             return;
@@ -951,12 +886,6 @@ public class QuestionService {
         }
     }
 
-    /**
-     * Upload 1 file lên Cloudinary theo content-type (audio/image/document) rồi lưu 1 bản ghi
-     * passage_media. Why: logic phân loại + lưu này trước đây bị copy inline ở nhiều luồng tạo câu
-     * (bulk, group, create-and-attach), gom về một chỗ để không lệch nhau khi sửa.
-     * Ba nhánh loại trừ lẫn nhau nên thứ tự if không ảnh hưởng kết quả.
-     */
     private void savePassageMediaFile(String passageId, MultipartFile file) throws IOException {
         String contentType = file.getContentType();
         String uploadedUrl;
@@ -1006,8 +935,6 @@ public class QuestionService {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NotFoundException("Question not found"));
 
-        //  Response kèm cờ isCorrect -> chỉ người tạo câu hỏi hoặc người có quyền quản lý mới được xem
-        //  (cùng ràng buộc như sửa/xoá; tránh lộ đáp án cho mọi user đã đăng nhập).
         String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null
                 || (!currentUserId.equals(question.getCreatedBy())
@@ -1043,17 +970,11 @@ public class QuestionService {
                 tagService.getTagsByQuestionId(questionId));
     }
 
-    /**
-     * Cập nhật câu hỏi (JSON). Đồng bộ đáp án theo {@link AnswerService#syncAnswers}.
-     */
     @Transactional
     public QuestionAdminResponse updateQuestion(String questionId, QuestionCreateRequest request, HttpServletRequest httpRequest) {
         return updateQuestion(questionId, request, httpRequest, null);
     }
 
-    /**
-     * Cập nhật câu hỏi; {@code files} (multipart) được append vào {@code passage_media} của passage liên kết.
-     */
     @Transactional
     public QuestionAdminResponse updateQuestion(
             String questionId,
@@ -1071,7 +992,7 @@ public class QuestionService {
         if (!currentUserId.equals(question.getCreatedBy()) && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE)) {
             throw new ForbiddenException("Chỉ người tạo câu hỏi mới được sửa.");
         }
-        //  Nếu đổi class/chapter, user phải có quyền với lớp đó.
+
         String effectiveClassId = request.getClassId() != null ? request.getClassId() : question.getClassId();
         String effectiveChapterId = request.getChapterId() != null ? request.getChapterId() : question.getChapterId();
         if (request.getClassId() != null || request.getChapterId() != null) {
@@ -1093,7 +1014,6 @@ public class QuestionService {
         return buildQuestionAdminResponse(question, passage, updatedAnswers);
     }
 
-    /** Cập nhật các field vô hướng của Question từ request (null = giữ nguyên). */
     private void applyScalarFields(Question question, QuestionCreateRequest request) {
         if (request.getExamPartId() != null) question.setExamPartId(request.getExamPartId());
         if (request.getClassId() != null) question.setClassId(request.getClassId());
@@ -1101,11 +1021,11 @@ public class QuestionService {
         if (request.getQuestionText() != null) question.setQuestionText(request.getQuestionText());
         if (request.getQuestionType() != null) question.setQuestionType(request.getQuestionType());
         if (request.getIsBank() != null) question.setIsBank(request.getIsBank());
-        // explanation: null = giữ nguyên, chuỗi rỗng = xóa, có giá trị = cập nhật
+
         if (request.getExplanation() != null) {
             question.setExplanation(request.getExplanation().isBlank() ? null : request.getExplanation());
         }
-        // collectionId: null = xóa collection; có giá trị = gán collection mới
+
         if (request.getCollectionId() != null && !request.getCollectionId().isBlank()) {
             question.setCollectionId(request.getCollectionId());
         } else if (request.getCollectionId() != null && request.getCollectionId().isBlank()) {
@@ -1116,10 +1036,6 @@ public class QuestionService {
         }
     }
 
-    /**
-     * Cập nhật/tạo passage theo request. Nếu request có passage content: sửa passage cũ hoặc tạo mới
-     * (gán passageId cho question). Nếu không: trả passage hiện có của question (nếu có) để các bước sau dùng.
-     */
     private Passage upsertPassage(Question question, QuestionCreateRequest request) {
         Passage passage = null;
         if (request.getPassage() != null && hasPassageContent(request.getPassage())) {
@@ -1152,10 +1068,6 @@ public class QuestionService {
         return passage;
     }
 
-    /**
-     * Append file mới vào passage_media. Nếu chưa có passage thì tạo mới (READING, hoặc LISTENING nếu có audio)
-     * và gán vào question. Trả passage đã refresh; nếu không có file mới thì trả passage nguyên trạng.
-     */
     private Passage appendFilesToPassage(Question question, Passage passage,
                                          QuestionCreateRequest request, Map<String, MultipartFile> files) {
         boolean hasNewFiles = files != null
@@ -1190,10 +1102,6 @@ public class QuestionService {
         return passageRepository.findById(passage.getPassageId()).orElse(passage);
     }
 
-    /**
-     * Đồng bộ các đoạn text bổ sung (passage nhiều đoạn): null = giữ nguyên;
-     * có list (kể cả rỗng) = xoá hết TEXT cũ rồi tạo lại theo đúng list mới.
-     */
     private void syncExtraTextContents(Passage passage, QuestionCreateRequest request) {
         if (passage != null && request.getPassage() != null
                 && request.getPassage().getExtraContents() != null) {
@@ -1222,7 +1130,7 @@ public class QuestionService {
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng.");
         }
-        //  Nếu lưu vào kho lớp/chapter, user phải có quyền với lớp đó.
+
         requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
 
         List<QuestionAdminResponse> allResponses = new ArrayList<>();
@@ -1236,7 +1144,6 @@ public class QuestionService {
             PassageQuestionGroup group = request.getGroups().get(gIndex);
             PassageRequest pReq = group.getPassage();
 
-            // SAVE PASSAGE
             Passage passage = new Passage();
             passage.setContent(pReq.getContent() != null ? pReq.getContent() : "");
             passage.setContentTranslation(pReq.getContentTranslation());
@@ -1244,8 +1151,6 @@ public class QuestionService {
 
             passage = passageRepository.save(passage);
 
-            // CÁC ĐOẠN TEXT BỔ SUNG (passage nhiều đoạn) -> passage_media type=TEXT.
-            // Lưu trước media file để UUIDv7 nhỏ hơn -> hiển thị trước ảnh/audio.
             if (pReq.getExtraContents() != null) {
                 for (String extra : pReq.getExtraContents()) {
                     if (extra == null || extra.trim().isEmpty()) continue;
@@ -1257,7 +1162,6 @@ public class QuestionService {
                 }
             }
 
-            // MULTI MEDIA
             if (files != null) {
 
                 List<MultipartFile> mediaFiles = files.entrySet().stream()
@@ -1271,7 +1175,6 @@ public class QuestionService {
                 }
             }
 
-            // SAVE QUESTIONS
             for (NormalQuestionRequest qReq : group.getQuestions()) {
 
                 Question question = new Question();
@@ -1335,9 +1238,6 @@ public class QuestionService {
         return max == null ? 0 : max;
     }
 
-    /**
-     * Gán số câu trong kho: max hiện tại + thứ tự từ form (questionNumber 1, 2, 3…).
-     */
     private int resolveBankQuestionNumber(int baseMax, NormalQuestionRequest qReq, int batchIndex) {
         if (qReq.getQuestionNumber() != null && qReq.getQuestionNumber() > 0) {
             return baseMax + qReq.getQuestionNumber();

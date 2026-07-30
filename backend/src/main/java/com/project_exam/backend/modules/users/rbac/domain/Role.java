@@ -1,4 +1,4 @@
-// models/Role.java
+
 package com.project_exam.backend.modules.users.rbac.domain;
 
 import jakarta.persistence.*;

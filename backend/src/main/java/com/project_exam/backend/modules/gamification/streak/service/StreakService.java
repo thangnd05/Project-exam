@@ -28,21 +28,14 @@ public class StreakService {
     private final CoinService coinService;
     private final StreakMapper streakMapper;
 
-    /**
-     * Ghi nhận 1 hoạt động học cho user và cập nhật chuỗi ngày.
-     *
-     * Chạy trong transaction RIÊNG (REQUIRES_NEW) để side-effect streak không làm
-     * rollback luồng chính (nộp bài, luyện từ...). Người gọi nên bọc try/catch.
-     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public StreakResponse recordActivity(String userId, StreakActivityType type) {
         if (type == null || !type.isEnabled() || userId == null || userId.isBlank()) {
-            return null; // loại này không tính streak, hoặc là guest -> bỏ qua
+            return null;
         }
 
         LocalDate today = LocalDate.now(VN);
 
-        // Khóa ghi (PESSIMISTIC_WRITE) để 2 hoạt động gần nhau không cùng đọc-sửa-ghi -> lost update.
         UserStreak streak = userStreakRepository.findByUserIdForUpdate(userId)
                 .orElseGet(() -> {
                     UserStreak s = new UserStreak();
@@ -56,13 +49,13 @@ public class StreakService {
         boolean increased;
 
         if (today.equals(last)) {
-            // Đã tính trong ngày -> không đổi.
+
             increased = false;
         } else {
             if (last != null && last.equals(today.minusDays(1))) {
-                streak.setCurrentStreak(streak.getCurrentStreak() + 1); // +1 nối tiếp
+                streak.setCurrentStreak(streak.getCurrentStreak() + 1);
             } else {
-                streak.setCurrentStreak(1); // lần đầu hoặc đứt chuỗi -> đếm lại từ 1
+                streak.setCurrentStreak(1);
             }
             streak.setLongestStreak(Math.max(streak.getLongestStreak(), streak.getCurrentStreak()));
             streak.setLastActivityDate(today);
@@ -74,11 +67,6 @@ public class StreakService {
         return buildResponse(streak, today, increased);
     }
 
-    /**
-     * Đọc streak để hiển thị. Nếu hoạt động gần nhất cũ hơn hôm qua thì chuỗi đã đứt
-     * -> hiển thị currentStreak = 0 (không ghi DB, longestStreak giữ nguyên), đồng thời
-     * báo về số ngày vừa mất + có khôi phục được không.
-     */
     @Transactional(readOnly = true)
     public StreakResponse getStreak(String userId) {
         UserStreak streak = userStreakRepository.findByUserId(userId).orElse(null);
@@ -90,10 +78,6 @@ public class StreakService {
         return buildResponse(streak, today, false);
     }
 
-    /**
-     * Khôi phục chuỗi đã đứt: trừ xu rồi nối lại chuỗi về đúng số đã mất.
-     * Điều kiện: chuỗi đã đứt, user CHƯA học lại (currentStreak cũ còn nguyên), tính năng đang bật.
-     */
     @Transactional
     public StreakResponse restore(String userId) {
         if (userId == null || userId.isBlank()) {
@@ -116,9 +100,8 @@ public class StreakService {
             throw new BadRequestException("Tính năng khôi phục chuỗi đang tắt");
         }
 
-        coinService.spend(userId, cfg.getCostCoins()); // ném lỗi nếu không đủ xu
+        coinService.spend(userId, cfg.getCostCoins());
 
-        // Nối lại: coi như đã học tới hôm qua -> chuỗi 'lost' sống lại, hôm nay học tiếp sẽ +1.
         streak.setLastActivityDate(today.minusDays(1));
         streak.setUpdatedAt(Instant.now());
         userStreakRepository.save(streak);

@@ -313,7 +313,6 @@ function RecoveryResourcesManagement() {
     setShowFormModal(true);
   };
 
-  // Đổi loại kỳ thi trong form thì bỏ Part đã chọn (Part thuộc loại kỳ thi cũ).
   const handleFormExamTypeChange = (examTypeId) => {
     setFormExamTypeId(examTypeId);
     setFormState((prev) => ({...prev, examPartId: ''}));
@@ -344,7 +343,7 @@ function RecoveryResourcesManagement() {
         description: formState.description.trim(),
         url: formState.url.trim() || null,
         tagIds: [...new Set(formState.tagIds || [])],
-        examPartId: formState.examPartId || '', // '' = gỡ gắn Part
+        examPartId: formState.examPartId || '',
       };
       if (editingId) {
         await updateMutation.mutateAsync({id: editingId, payload, file: selectedFile});

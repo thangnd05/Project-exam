@@ -15,10 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Ghi chú là dữ liệu riêng tư: mọi thao tác đều bám theo user đang đăng nhập,
- * không có API nào cho phép đọc ghi chú của người khác kể cả admin.
- */
 @Service
 @RequiredArgsConstructor
 public class NoteService {

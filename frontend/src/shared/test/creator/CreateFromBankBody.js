@@ -149,7 +149,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     examParts.forEach((part) => {
       loadQuestionsForPart(part.examPartId, buildLoadParams(bankSource, selectedChapterId));
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [testInfo.examTypeId, examParts, bankSource, selectedChapterId]);
 
   const handleEditQuestionSuccess = () => {

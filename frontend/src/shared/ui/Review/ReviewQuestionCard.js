@@ -3,14 +3,6 @@ import styles from '~/shared/styles/ReviewQuestions.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Thẻ xem lại một câu hỏi — dùng chung cho review đề thi và review ải kế hoạch học.
- *
- * `status`: correct | incorrect | unanswered | answered
- * `mode`: 'options' (trắc nghiệm) | 'fill' (điền đáp án) — caller quyết định vì
- * mỗi nguồn dữ liệu trả về câu điền một kiểu khác nhau.
- * Đáp án đúng lấy theo `answer.isCorrect`, nếu BE không trả cờ này thì fallback `correctAnswerId`.
- */
 function ReviewQuestionCard({
   id,
   number,

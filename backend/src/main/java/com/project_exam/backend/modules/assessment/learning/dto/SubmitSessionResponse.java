@@ -28,10 +28,10 @@ public class SubmitSessionResponse {
     public static class ReviewItem {
         private String questionId;
         private String questionText;
-        private String questionType; // MCQ/MSQ/FILL_BLANK/ESSAY FE biết render thế nào
+        private String questionType;
         private List<ReviewAnswer> answers;
         private String selectedAnswerId;
-        private List<String> selectedAnswerIds; // MSQ: các đáp án user đã chọn
+        private List<String> selectedAnswerIds;
         private String correctAnswerId;
         private boolean isCorrect;
         private String explanation;

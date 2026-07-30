@@ -76,17 +76,15 @@ public class SecurityConfig {
 
         JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(jwtService, userDetailsService);
 
-        // 1. Cấu hình Handler để Spring nhận diện Header X-XSRF-TOKEN từ Axios
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        requestHandler.setCsrfRequestAttributeName(null); 
+        requestHandler.setCsrfRequestAttributeName(null);
 
-        // Tự động nhận diện môi trường để cấu hình Secure Cookie
         boolean isProduction = frontendOrigin != null && frontendOrigin.startsWith("https");
 
         http
-                // 2. Cấu hình CSRF với Repository tùy chỉnh
+
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(customCsrfTokenRepository(isProduction)) 
+                        .csrfTokenRepository(customCsrfTokenRepository(isProduction))
                         .csrfTokenRequestHandler(requestHandler)
                         .ignoringRequestMatchers(
                                 "/api/auth/login",
@@ -102,12 +100,9 @@ public class SecurityConfig {
                                 "/login/oauth2/**"
                         )
                 )
-                // .csrf(csrf -> csrf.disable())
 
-                // 3. CORS
                 .cors(cors -> {})
 
-                // 4. Exception Handling
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -115,17 +110,15 @@ public class SecurityConfig {
                             Map<String, String> errorData = new HashMap<>();
                             errorData.put("error", "Unauthorized");
                             errorData.put("message", authException.getMessage());
-                            
+
                             response.getWriter().write(objectMapper.writeValueAsString(errorData));
                         })
                 )
 
-                // 5. Stateless Session
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // 6. Authorize Requests
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
@@ -141,20 +134,19 @@ public class SecurityConfig {
                                 "/api/milestones/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**").permitAll()
-                        // Guest endpoints — không yêu cầu JWT, định danh bằng header X-Guest-Session.
+
                         .requestMatchers(
                                 "/api/user-tests/guest",
                                 "/api/user-tests/guest/**",
                                 "/api/user-tests/*/guest-submit",
                                 "/api/user-answers/guest/**"
                         ).permitAll()
-                        // Ghi nhận lượt truy cập — cho cả khách chưa đăng nhập.
+
                         .requestMatchers(HttpMethod.POST, "/api/analytics/visit").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
-                // 7. OAuth2 Logic
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
@@ -197,7 +189,6 @@ public class SecurityConfig {
                         })
                 );
 
-        // 8. Filters order — rate-limit chạy trước JWT để chặn brute-force ngay từ đầu.
         http.addFilterBefore(authRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
@@ -208,10 +199,10 @@ public class SecurityConfig {
     private CookieCsrfTokenRepository customCsrfTokenRepository(boolean isProduction) {
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         if (!isProduction) {
-            // Localhost: Chấp nhận HTTP, dùng Lax
+
             repository.setCookieCustomizer(cookie -> cookie.secure(false).sameSite("Lax"));
         } else {
-            // Production: Bắt buộc HTTPS, dùng None cho Cross-site
+
             repository.setCookieCustomizer(cookie -> cookie.secure(true).sameSite("None"));
         }
         return repository;
@@ -223,7 +214,7 @@ public class SecurityConfig {
                 throws ServletException, IOException {
             CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
             if (null != csrfToken) {
-                csrfToken.getToken(); 
+                csrfToken.getToken();
             }
             filterChain.doFilter(request, response);
         }

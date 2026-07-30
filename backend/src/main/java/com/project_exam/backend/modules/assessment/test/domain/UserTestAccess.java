@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/** Quyền làm bài user đã mua bằng xu (mua 1 lần, mở khoá vĩnh viễn). */
 @Entity
 @Table(
         name = "user_test_accesses",

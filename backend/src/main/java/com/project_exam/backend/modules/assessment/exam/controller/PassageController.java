@@ -13,10 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Passage được dùng chéo nhiều câu hỏi/đề. Tạo/sửa passage standalone là admin-only;
- * flow tạo câu hỏi kèm passage đi qua {@code QuestionService} (đã có ownership check).
- */
 @RestController
 @RequestMapping("/api/passages")
 @RequiredArgsConstructor

@@ -8,7 +8,7 @@ import java.util.Map;
 @Data
 @Builder
 public class ReactSummaryResponse {
-    private Map<String, Long> counts;       // {"LIKE": 5, "LOVE": 3, ...}
-    private String currentUserReactType;    // null nếu chưa react
+    private Map<String, Long> counts;
+    private String currentUserReactType;
     private long total;
 }

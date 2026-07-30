@@ -10,10 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-/**
- * Harness debug: chạy parser thật trên 1 file Word để xem nó ra bao nhiêu câu,
- * câu nào mất explanation. Bật bằng: mvn -Ddoc=/path/to/file.docx test -Dtest=QuestionImportDebugTest
- */
 class QuestionImportDebugTest {
 
     @Test
@@ -60,7 +56,6 @@ class QuestionImportDebugTest {
         System.out.println("Questions WITH empty stem    : " + emptyStem);
         System.out.println("=============================================\n");
 
-        // Dump explanation câu đầu với newline hiện rõ (¶ = \n) để kiểm tra ngăn đoạn.
         if (!questions.isEmpty()) {
             String expl = questions.get(0).getExplanation();
             System.out.println("--- EXPLANATION[1] raw (¶=newline) ---");
@@ -68,7 +63,6 @@ class QuestionImportDebugTest {
             System.out.println("--------------------------------------\n");
         }
 
-        // Cũng chạy luôn nhánh passage để xem content / translation.
         if (Boolean.getBoolean("passage")) {
             var groups = service.parsePassageQuestionsFromDocument(file);
             System.out.println("\n================ PASSAGE RESULT ================");

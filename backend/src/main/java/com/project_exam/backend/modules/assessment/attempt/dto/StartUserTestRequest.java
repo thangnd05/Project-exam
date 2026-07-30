@@ -14,9 +14,7 @@ import java.util.List;
 public class StartUserTestRequest {
     private String testId;
 
-    // "FULL_TEST" (mặc định) hoặc "PRACTICE". Null -> FULL_TEST.
     private String mode;
 
-    // Danh sách examPartId muốn luyện — chỉ dùng khi mode = PRACTICE.
     private List<String> examPartIds;
 }

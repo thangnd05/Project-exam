@@ -54,7 +54,6 @@ public class RoleController {
         return ResponseEntity.noContent().build();
     }
 
-    /** Gán lại danh sách permission cho role (ma trận phân quyền trên UI admin). */
     @PutMapping("/{id}/permissions")
     public ResponseEntity<RoleResponse> updateRolePermissions(
             @PathVariable String id,

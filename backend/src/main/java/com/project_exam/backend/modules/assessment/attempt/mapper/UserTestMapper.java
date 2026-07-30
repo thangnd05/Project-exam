@@ -11,15 +11,10 @@ import java.util.List;
 @Component
 public class UserTestMapper {
 
-    /**
-     * Map UserTest -> DTO. examTypeId và userName được service resolve (batch-load/lookup)
-     * rồi truyền vào để tránh N+1; userName có thể null nếu không cần.
-     */
     public UserTestResponse toResponse(UserTest userTest, String examTypeId, String userName) {
         return toResponse(userTest, examTypeId, userName, null);
     }
 
-    /** Bản đầy đủ có kèm testTitle (tên bài) — service batch-load Test để tránh N+1. */
     public UserTestResponse toResponse(UserTest userTest, String examTypeId, String userName, String testTitle) {
         return UserTestResponse.builder()
                 .userTestId(userTest.getUserTestId())
@@ -42,7 +37,6 @@ public class UserTestMapper {
                 .build();
     }
 
-    /** CSV examPartId (chỉ có ở mode PRACTICE) -> List; null/blank -> null. */
     private List<String> parsePracticePartIds(String csv) {
         if (csv == null || csv.isBlank()) return null;
         return Arrays.stream(csv.split(","))

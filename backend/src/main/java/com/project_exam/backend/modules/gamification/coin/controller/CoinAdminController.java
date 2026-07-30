@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Quản lý ví xu cho admin: xem danh sách, thêm/sửa/xoá số dư xu của user.
- */
 @RestController
 @RequestMapping("/api/admin/coins")
 @RequiredArgsConstructor

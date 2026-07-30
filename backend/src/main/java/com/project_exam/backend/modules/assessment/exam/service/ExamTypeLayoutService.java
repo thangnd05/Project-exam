@@ -22,10 +22,6 @@ public class ExamTypeLayoutService {
     private final ExamTypeRepository examTypeRepository;
     private final ExamTypeLayoutMapper layoutMapper;
 
-    /**
-     * Layout dùng cho trang làm bài: lấy của examType lá; nếu chưa có thì fallback lên examType cha.
-     * Trả null khi không cấu hình ở cả 2 cấp -> FE dùng layout mặc định.
-     */
     public ExamTypeLayoutResponse getResolved(String examTypeId) {
         ExamType examType = examTypeRepository.findById(examTypeId)
                 .orElseThrow(() -> new NotFoundException("Loại đề không tồn tại"));
@@ -44,7 +40,6 @@ public class ExamTypeLayoutService {
         return null;
     }
 
-    /** Layout gắn TRỰC TIẾP vào examType (không fallback) — dùng cho editor admin. */
     public ExamTypeLayoutResponse getOwn(String examTypeId) {
         return layoutRepository.findByExamTypeId(examTypeId)
                 .map(layoutMapper::toResponse)

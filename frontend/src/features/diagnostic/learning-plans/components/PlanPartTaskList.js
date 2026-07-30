@@ -29,10 +29,8 @@ const TASK_STATUS = {
 
 const CAPSTONE_TYPES = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 
-/** Gap còn lại đủ nhỏ thì gắn nhãn "Sắp vượt" để tạo động lực đánh nốt. */
 const NEAR_PASS_GAP = 10;
 
-// Toạ độ bản đồ: x theo % — S nhẹ, hàng gần nhau để map đỡ cao.
 const NODE_X = [50, 62, 50, 38];
 const ROW_STEP = 108;
 const MAP_TOP = 56;
@@ -46,12 +44,10 @@ function nodeY(i) {
   return MAP_TOP + i * ROW_STEP;
 }
 
-/** Node lệch trái → nhãn sang phải (và ngược lại). */
 function labelSide(i) {
   return nodeX(i) >= 50 ? 'right' : 'left';
 }
 
-/** Nhãn trên map: bỏ phần trong ngoặc, cắt ngắn. */
 function shortMapLabel(name, max = 32) {
   if (!name) return '';
   const primary = name.split(/\s*[–—(]/)[0].trim();
@@ -60,7 +56,6 @@ function shortMapLabel(name, max = 32) {
   return `${cut || primary.slice(0, max - 1)}…`;
 }
 
-/** Đường cong nối ải `from` → ải `to` — cubic với control point dọc để thành hình rắn lượn. */
 function buildPathD(from, to) {
   if (to <= from) return '';
   let d = `M ${nodeX(from)} ${nodeY(from)}`;
@@ -71,13 +66,11 @@ function buildPathD(from, to) {
   return d;
 }
 
-/** Chấm mini-map: chỉ sáng khi đã vượt — qua 1 ải mới sáng 1 chấm. */
 function taskDotState(task) {
   if (task.status === 'PASSED') return 'partDotPassed';
   return 'partDotPending';
 }
 
-/** Index ải cuối cùng đã vượt — đoạn đường tô xanh chạy tới đây. */
 function lastPassedIndex(tasks) {
   let last = -1;
   tasks.forEach((t, i) => {
@@ -86,7 +79,6 @@ function lastPassedIndex(tasks) {
   return last;
 }
 
-/** Mở sẵn chặng đang học (chứa ải gợi ý), nếu không có thì chặng chưa xong đầu tiên. */
 function defaultOpenParts(groups, recommendedTaskId) {
   if (!groups.length) return new Set();
   if (recommendedTaskId) {
@@ -113,7 +105,7 @@ function PlanPartTaskList({
     () => defaultOpenParts(orderedGroups, recommendedTaskId),
     [orderedGroups, recommendedTaskId],
   );
-  // null = chưa can thiệp → dùng mặc định (chặng đang học); có Set = user tự chọn.
+
   const [openOverride, setOpenOverride] = useState(null);
   const openIds = openOverride ?? fallbackOpen;
 
@@ -204,7 +196,6 @@ function PlanPartTaskList({
   );
 }
 
-/** Bản đồ màn chơi của một chặng: đường đi + medallion từng ải + bảng chi tiết ải đang chọn. */
 function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStudyTask }) {
   const tasks = group.tasks || [];
   const defaultSelected = useMemo(() => {

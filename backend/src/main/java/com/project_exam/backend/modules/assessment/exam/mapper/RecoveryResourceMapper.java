@@ -10,9 +10,6 @@ import java.util.List;
 @Component
 public class RecoveryResourceMapper {
 
-    /**
-     * Mapper thuần: {@code tags} và tên ExamType/Part cần truy vấn DB nên service tính sẵn và truyền vào.
-     */
     public RecoveryResourceResponse toResponse(RecoveryResource resource, List<TagResponse> tags,
                                                String examTypeName, String examPartName) {
         return RecoveryResourceResponse.builder()

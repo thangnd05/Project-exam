@@ -13,14 +13,14 @@ public class QuestionCreateRequest {
     private String examPartId;
     private String classId;
     private String chapterId;
-    private PassageRequest passage; // optional
+    private PassageRequest passage;
     private String questionText;
     private Question.QuestionType questionType;
     private List<AnswerRequest> answers;
-    /** true = lưu vào kho; false = chỉ gắn đề (tạo gắn thẳng). Mặc định service set theo API. */
+
     private Boolean isBank;
     private String collectionId;
     private String explanation;
-    private List<String> tagIds; // optional: danh sách tag gắn cho câu hỏi
+    private List<String> tagIds;
 }
 

@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils; //  ĐÃ THÊM DÒNG NÀY
+import org.springframework.util.StringUtils;
 import javax.crypto.SecretKey;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -34,18 +34,16 @@ public class JwtService {
     private SecretKey cachedSigningKey;
     private UserRepository userRepository;
 
-    // Khởi tạo key từ secretKey
     @PostConstruct
     private void init() {
         byte[] keyBytes = Decoders.BASE64URL.decode(secretKey);
         this.cachedSigningKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // Tạo Access Token
     public String generateToken(UserDetails userDetails, Map<String, Object> extraClaims) {
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername()) // ở đây = email
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(cachedSigningKey, SignatureAlgorithm.HS256)
@@ -56,7 +54,6 @@ public class JwtService {
         return generateToken(userDetails, new HashMap<>());
     }
 
-    // Tạo Refresh Token gắn với 1 family (fid) và id riêng (jti) — phục vụ rotation/replay-detection.
     public String generateRefreshToken(UserDetails userDetails, String familyId, String jti) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "refresh");
@@ -80,18 +77,15 @@ public class JwtService {
         return extractClaim(token, Claims::getId);
     }
 
-    // Trích xuất username từ token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Trích xuất claim cụ thể
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claims != null ? claimsResolver.apply(claims) : null;
     }
 
-    // Trích xuất tất cả claims
     public Claims extractAllClaims(String token) {
         try {
             return Jwts.parserBuilder()
@@ -106,15 +100,11 @@ public class JwtService {
         }
     }
 
-    // Kiểm tra token hợp lệ
     public boolean isTokenValid(String token, UserDetails userDetails) {
         String username = extractUsername(token);
         return username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    // Thêm hàm trong JwtService
-
-    // Kiểm tra token có phải Refresh Token không
     public boolean isRefreshToken(String token) {
         Claims claims = extractAllClaims(token);
         if (claims == null) return false;
@@ -128,9 +118,8 @@ public class JwtService {
         return expiration != null && expiration.before(new Date());
     }
 
-    // Trong JwtAuthenticationFilter.java
 public String resolveToken(HttpServletRequest request) {
-        // 1. Kiểm tra trong Cookie
+
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("accessToken".equals(cookie.getName())) {
@@ -138,7 +127,7 @@ public String resolveToken(HttpServletRequest request) {
                 }
             }
         }
-        // 2. Fallback kiểm tra trong Header
+
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
@@ -149,12 +138,11 @@ public String resolveToken(HttpServletRequest request) {
     public Claims extractAllClaimsFromRequest(HttpServletRequest request) {
         String token = null;
 
-        // Ưu tiên Authorization header
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
         }
-        // Nếu không có thì lấy từ cookie
+
         else if (request.getCookies() != null) {
             for (var cookie : request.getCookies()) {
                 if ("accessToken".equals(cookie.getName())) {

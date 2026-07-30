@@ -23,7 +23,7 @@ public class PostViewThrottleService {
             Boolean isFirstSeen = redisTemplate.opsForValue().setIfAbsent(key, "1", VIEW_TTL);
             return Boolean.TRUE.equals(isFirstSeen);
         } catch (DataAccessException ex) {
-            // Fallback: nếu Redis lỗi thì vẫn cho tăng view để không ảnh hưởng UX.
+
             return true;
         }
     }
@@ -39,8 +39,7 @@ public class PostViewThrottleService {
     }
 
     private String extractClientIp(HttpServletRequest request) {
-        // Dùng getRemoteAddr() (an toàn nhờ forward-headers-strategy=native: RemoteIpValve chỉ tin
-        // proxy nội bộ). Không đọc thẳng X-Forwarded-For/X-Real-IP vì client giả mạo được -> vượt throttle.
+
         String remoteAddr = request.getRemoteAddr();
         return remoteAddr == null ? "unknown" : remoteAddr;
     }

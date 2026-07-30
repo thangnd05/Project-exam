@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/** Quản lý cosmetic (khung avatar / huy hiệu) cho admin. */
 @RestController
 @RequestMapping("/api/admin/cosmetics")
 @RequiredArgsConstructor

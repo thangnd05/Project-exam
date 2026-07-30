@@ -4,17 +4,17 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter 
-@Setter 
-@Builder 
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PracticeQuestionResponse {
     private String vocabId;
-    private String type; // MULTICHOICE hoặc LISTENING_EN
+    private String type;
     private String questionText;
     private String voiceUrl;
     private String word;
     private String meaning;
-    private List<String> options; // 4 đáp án nghĩa
+    private List<String> options;
 }

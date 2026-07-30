@@ -33,11 +33,6 @@ public class SavedPostService {
     private final AuthUtils authUtils;
     private final SavedPostMapper savedPostMapper;
 
-    /**
-     * Toggle save:
-     * - Chưa save tạo mới
-     * - Đã save xóa
-     */
     @Transactional
     public SavedPostStatusResponse toggleSave(String postId, HttpServletRequest httpRequest) {
         Post post = postRepository.findById(postId)
@@ -80,8 +75,7 @@ public class SavedPostService {
         String userId = authUtils.getUserId(httpRequest);
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 10 : Math.min(size, 100);
-        // Truyền chuỗi rỗng khi không tìm kiếm (LIKE '%%' khớp tất cả) — tránh lỗi Hibernate
-        // không suy được kiểu cho tham số null trong mệnh đề IS NULL.
+
         String normalizedKeyword = (keyword == null) ? "" : keyword.trim();
 
         Pageable pageable = PageRequest.of(safePage, safeSize);

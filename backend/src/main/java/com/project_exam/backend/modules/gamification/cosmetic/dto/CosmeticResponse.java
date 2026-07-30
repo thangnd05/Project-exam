@@ -4,7 +4,6 @@ import com.project_exam.backend.modules.gamification.cosmetic.domain.CosmeticTyp
 import lombok.Builder;
 import lombok.Getter;
 
-/** Cosmetic kèm trạng thái với user (owned/equipped). Dùng cho cả cửa hàng user lẫn admin. */
 @Getter
 @Builder
 public class CosmeticResponse {
@@ -19,6 +18,6 @@ public class CosmeticResponse {
     private String imageUrl;
     private Boolean active;
     private Integer displayOrder;
-    private Boolean owned;    // user đã sở hữu chưa (null ở ngữ cảnh admin)
-    private Boolean equipped; // user đang đeo không (null ở ngữ cảnh admin)
+    private Boolean owned;
+    private Boolean equipped;
 }

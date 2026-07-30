@@ -69,7 +69,6 @@ public class PracticeService {
     public Optional<PracticeQuestionResponse> generateOneRandomQuestion(HttpServletRequest request, String albumId) {
         String userId = authUtils.getUserId(request);
 
-        // 1⃣ Lấy các vocab user chưa mastered
         List<String> masteredIds = userVocabularyRepository
                 .findVocabIdsByUserIdAndStatus(userId, UserVocabulary.Status.mastered);
         List<Vocabulary> all = vocabularyRepository.findByAlbumId(albumId);
@@ -79,13 +78,10 @@ public class PracticeService {
 
         if (available.isEmpty()) return Optional.empty();
 
-        // 2⃣ Random vocab
         Vocabulary vocab = available.get(ThreadLocalRandom.current().nextInt(available.size()));
 
-        // 3⃣ Random loại câu hỏi
         String type = ThreadLocalRandom.current().nextBoolean() ? "MULTICHOICE" : "LISTENING_EN";
 
-        // 4⃣ MULTICHOICE: tạo 4 đáp án
         List<String> options = null;
         if (type.equals("MULTICHOICE")) {
             List<Vocabulary> distractors = all.stream()
@@ -127,7 +123,6 @@ public class PracticeService {
 
         userVocabularyRepository.save(uv);
 
-        // Học từ vựng -> ghi nhận streak (side-effect, không phá luồng)
         try {
             streakService.recordActivity(currentUserId, StreakActivityType.VOCAB_PRACTICE);
         } catch (Exception ignored) {
@@ -149,7 +144,6 @@ public class PracticeService {
             correct = en && vi;
         }
 
-        //  Cập nhật tiến trình học
         UserVocabulary uv = userVocabularyRepository
                 .findByUserIdAndVocabId(userId, vocab.getVocabId())
                 .orElse(new UserVocabulary(userId, vocab.getVocabId()));
@@ -165,7 +159,6 @@ public class PracticeService {
         uv.setLastReviewed(Instant.now());
         userVocabularyRepository.save(uv);
 
-        // Luyện từ vựng -> ghi nhận streak (side-effect, không phá luồng)
         try {
             streakService.recordActivity(userId, StreakActivityType.VOCAB_PRACTICE);
         } catch (Exception ignored) {

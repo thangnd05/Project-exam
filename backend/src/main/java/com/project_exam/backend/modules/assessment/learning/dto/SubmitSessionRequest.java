@@ -19,9 +19,9 @@ public class SubmitSessionRequest {
     public static class AnswerItem {
         @NotBlank
         private String questionId;
-        // MCQ: 1 đáp án (có thể null nếu MSQ). Bỏ @NotBlank vì MSQ dùng selectedAnswerIds.
+
         private String selectedAnswerId;
-        // MSQ: nhiều đáp án.
+
         private List<String> selectedAnswerIds;
     }
 }

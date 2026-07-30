@@ -22,21 +22,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Mapper THUẦN entity -> DTO cho sub-module ASSESSMENT/TEST.
- * Không truy cập repository/DB; mọi giá trị cần DB/tính toán (maxAttempts, attemptsUsed,
- * status đã tính, examTypeId, danh sách parts/groups/questions/answers, canDoTest, owned,
- * costCoins, locked...) được service tính sẵn rồi truyền vào qua tham số.
- *
- * LƯU Ý ĐA SHAPE: TestResponse được dựng ở nhiều nơi với tập field KHÁC HẲN nhau,
- * nên có nhiều method riêng (toFullResponse, toEmptyResponse, toSummaryResponse,
- * toLoginRequiredResponse, toPaymentRequiredResponse, toLimitExceededResponse) —
- * mỗi method copy CHÍNH XÁC các field mà site gốc set.
- */
 @Component
 public class TestMapper {
-
-    // ===================== QuickChallenge =====================
 
     public QuickChallengeCardResponse.PartSummary toPartSummary(String name, int numQuestions, int displayOrder) {
         return QuickChallengeCardResponse.PartSummary.builder()
@@ -63,12 +50,6 @@ public class TestMapper {
                 .build();
     }
 
-    // ===================== TestResponse — SUMMARY shape (parts = null) =====================
-
-    /**
-     * Shape dùng cho danh sách (buildUserTestSummaryFromCounts / buildUserTestSummary):
-     * đầy đủ field tóm tắt, parts = null.
-     */
     public TestResponse toSummaryResponse(
             Test test, Integer maxAttempts, int attemptsUsed, Integer remainingAttempts,
             long totalAttempts, boolean canDoTest, boolean owned, boolean locked, String status) {
@@ -98,12 +79,6 @@ public class TestMapper {
                 .build();
     }
 
-    // ===================== TestResponse — LOGIN_REQUIRED shape =====================
-
-    /**
-     * Shape tối giản cho guest không đủ điều kiện xem (getTestFullById):
-     * chỉ testId, title, status, canDoTest. KHÔNG set field khác.
-     */
     public TestResponse toLoginRequiredResponse(Test test, String status, boolean canDoTest) {
         return TestResponse.builder()
                 .testId(test.getTestId())
@@ -113,12 +88,6 @@ public class TestMapper {
                 .build();
     }
 
-    // ===================== TestResponse — PAYMENT_REQUIRED shape =====================
-
-    /**
-     * Shape bài trả phí chưa mở khoá (getTestFullById): KHÔNG kèm parts để tránh lộ câu hỏi.
-     * Copy đúng tập field site gốc set (không có createdAt/availableFrom/... /maxAttempts...).
-     */
     public TestResponse toPaymentRequiredResponse(
             Test test, String status, boolean canDoTest, boolean owned, boolean locked) {
         return TestResponse.builder()
@@ -139,11 +108,6 @@ public class TestMapper {
                 .build();
     }
 
-    // ===================== TestResponse — FULL shape (kèm parts, classId, chapterId) =====================
-
-    /**
-     * Shape đầy đủ kèm parts (buildUserTestResponse): set cả classId + chapterId.
-     */
     public TestResponse toFullResponse(
             Test test, Integer maxAttempts, int attemptsUsed, Integer remaining,
             long totalAttempts, boolean canDoTest, boolean owned, boolean locked,
@@ -176,12 +140,6 @@ public class TestMapper {
                 .build();
     }
 
-    // ===================== TestResponse — EMPTY shape (parts rỗng, KHÔNG classId/chapterId) =====================
-
-    /**
-     * Shape khi đề chưa có part (buildEmptyUserTestResponse): parts = empty list.
-     * Khác toFullResponse ở chỗ KHÔNG set classId/chapterId.
-     */
     public TestResponse toEmptyResponse(
             Test test, Integer maxAttempts, int attemptsUsed, Integer remaining,
             long totalAttempts, boolean canDoTest, boolean owned, boolean locked,
@@ -212,12 +170,6 @@ public class TestMapper {
                 .build();
     }
 
-    // ===================== TestResponse — LIMIT EXCEEDED shape (FORBIDDEN) =====================
-
-    /**
-     * Shape khi hết lượt làm (buildLimitExceededResponse): subset field, status FORBIDDEN.
-     * Copy đúng tập field site gốc set (không có examTypeId/createdBy/bannerUrl/...).
-     */
     public TestResponse toLimitExceededResponse(
             Test test, int used, Integer rem, long total, String status,
             boolean canDoTest, boolean owned, boolean locked) {
@@ -241,11 +193,6 @@ public class TestMapper {
                 .build();
     }
 
-    // ===================== TestAdminResponse =====================
-
-    /**
-     * Shape tóm tắt admin (buildAdminTestSummaryFromCount): parts = null.
-     */
     public TestAdminResponse toAdminSummaryResponse(Test test, long totalAttempts, String status) {
         return TestAdminResponse.builder()
                 .testId(test.getTestId())
@@ -268,9 +215,6 @@ public class TestMapper {
                 .build();
     }
 
-    /**
-     * Shape admin đầy đủ kèm parts (buildAdminTestResponse).
-     */
     public TestAdminResponse toAdminFullResponse(
             Test test, long totalAttempts, String status, List<TestPartAdminResponse> partResponses) {
         return TestAdminResponse.builder()
@@ -294,9 +238,6 @@ public class TestMapper {
                 .build();
     }
 
-    /**
-     * Shape admin khi đề chưa có part (buildEmptyAdminResponse): parts = empty list.
-     */
     public TestAdminResponse toAdminEmptyResponse(
             Test test, long totalAttempts, String status, List<TestPartAdminResponse> partResponses) {
         return TestAdminResponse.builder()
@@ -320,8 +261,6 @@ public class TestMapper {
                 .build();
     }
 
-    // ===================== User part / group / question =====================
-
     public QuestionResponse toQuestionResponse(Question q, String testPartId, List<AnswerResponse> answers) {
         return QuestionResponse.builder()
                 .questionId(q.getQuestionId())
@@ -334,9 +273,6 @@ public class TestMapper {
                 .build();
     }
 
-    /**
-     * Nhóm theo passage (questions là list mutable rỗng để service add dần).
-     */
     public QuestionGroupResponse toQuestionGroupWithPassage(PassageResponse passage, List<QuestionResponse> questions) {
         return QuestionGroupResponse.builder()
                 .passage(passage)
@@ -344,9 +280,6 @@ public class TestMapper {
                 .build();
     }
 
-    /**
-     * Nhóm câu đơn (không passage).
-     */
     public QuestionGroupResponse toSingleQuestionGroup(List<QuestionResponse> questions) {
         return QuestionGroupResponse.builder()
                 .passage(null)
@@ -363,8 +296,6 @@ public class TestMapper {
                 .questionGroups(questionGroups)
                 .build();
     }
-
-    // ===================== Admin part / group / question =====================
 
     public TestPartAdminResponse toTestPartAdminResponse(
             TestPart tp, String partName, List<QuestionGroupAdminResponse> questionGroups) {
@@ -398,8 +329,6 @@ public class TestMapper {
                 .answers(answers)
                 .build();
     }
-
-    // ===================== TestPartSimpleResponse / TestQuestionResponse =====================
 
     public TestPartSimpleResponse toTestPartSimpleResponse(TestPart testPart) {
         return TestPartSimpleResponse.builder()

@@ -9,5 +9,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CategoryRequest {
     private String name;
-    private String slug; // optional — tự generate từ name nếu để trống
+    private String slug;
 }

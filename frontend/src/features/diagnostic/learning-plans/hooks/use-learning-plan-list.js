@@ -20,7 +20,7 @@ async function fetchPlanList({ loadAll, filterExamTypeId }) {
   let merged = [];
 
   if (loadAll) {
-    // BE trả lộ trình của mọi kỳ thi trong 1 lần gọi (trước đây gọi lặp theo từng examType).
+
     const all = await listPlans().catch(() => []);
     merged = (all || []).map((p) => ({
       ...p,

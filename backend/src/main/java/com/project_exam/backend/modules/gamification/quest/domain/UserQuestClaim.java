@@ -6,10 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/**
- * Ghi nhận 1 user đã nhận xu của 1 nhiệm vụ. UNIQUE(userId, questId) -> nhận 1 lần.
- * Giữ lại làm lịch sử kể cả khi nhiệm vụ đã hết hạn.
- */
 @Entity
 @Table(
         name = "user_quest_claims",
@@ -33,7 +29,6 @@ public class UserQuestClaim {
     @Column(nullable = false)
     private String questId;
 
-    /** Snapshot số xu đã thưởng (để xem lịch sử kể cả khi quest đổi reward). */
     @Column(nullable = false)
     private Integer rewardCoins;
 

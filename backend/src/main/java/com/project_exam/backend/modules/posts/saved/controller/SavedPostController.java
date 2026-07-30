@@ -16,7 +16,6 @@ public class SavedPostController {
 
     private final SavedPostService savedPostService;
 
-    // ─── GET danh sách bài đã lưu của user (auth) ─
     @GetMapping("/saved")
     public ResponseEntity<PageResponse<PostSummaryResponse>> getMySaved(
             @RequestParam(defaultValue = "0") int page,
@@ -27,7 +26,6 @@ public class SavedPostController {
         return ResponseEntity.ok(savedPostService.getMySavedPosts(page, size, keyword, httpRequest));
     }
 
-    // ─── GET trạng thái save của 1 post (public) ──
     @GetMapping("/{postId}/save")
     public ResponseEntity<SavedPostStatusResponse> getSaveStatus(
             @PathVariable String postId,
@@ -36,7 +34,6 @@ public class SavedPostController {
         return ResponseEntity.ok(savedPostService.getStatus(postId, httpRequest));
     }
 
-    // ─── POST toggle save (auth) ──────────────────
     @PostMapping("/{postId}/save")
     public ResponseEntity<SavedPostStatusResponse> toggleSave(
             @PathVariable String postId,

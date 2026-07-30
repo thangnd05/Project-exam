@@ -45,18 +45,13 @@ public class CommentService {
         return commentMapper.toResponse(c, replies, authorName, authorAvatar, equipped);
     }
 
-    /**
-     * Lấy toàn bộ comments của post và xây dựng cấu trúc cây (đa cấp)
-     */
     public List<CommentResponse> getCommentsByPost(String postId) {
         if (!postRepository.existsById(postId)) {
             throw new NotFoundException("Post không tồn tại");
         }
 
-        // 1. Lấy tất cả comments của post
         List<Comment> allComments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
 
-        // 2. Batch-load author 1 lần để tránh N+1
         Set<String> authorIds = allComments.stream()
                 .map(Comment::getUserId)
                 .filter(id -> id != null && !id.isBlank())
@@ -66,10 +61,8 @@ public class CommentService {
                 : userRepository.findAllById(authorIds).stream()
                         .collect(Collectors.toMap(User::getUserId, u -> u));
 
-        // Batch-load khung/huy hiệu đang đeo của các tác giả (tránh N+1).
         Map<String, EquippedCosmeticsResponse> equippedMap = cosmeticService.getEquippedForUsers(authorIds);
 
-        // 3. Chuyển sang DTO (chưa có replies)
         List<CommentResponse> allDtos = allComments.stream()
                 .map(c -> {
                     User author = authorMap.get(c.getUserId());
@@ -80,7 +73,6 @@ public class CommentService {
                 })
                 .collect(Collectors.toList());
 
-        // 3. Xây dựng cây bằng Map để đạt hiệu năng O(N)
         Map<String, CommentResponse> dtoMap = allDtos.stream()
                 .collect(Collectors.toMap(CommentResponse::getId, dto -> dto));
 
@@ -109,7 +101,6 @@ public class CommentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nội dung comment không được trống");
         }
 
-        // Nếu là reply, kiểm tra parent comment tồn tại
         if (request.getParentId() != null && !request.getParentId().isBlank()) {
             Comment parent = commentRepository.findById(request.getParentId())
                     .orElseThrow(() -> new NotFoundException("Comment cha không tồn tại"));

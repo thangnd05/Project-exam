@@ -58,7 +58,7 @@ public class VocabularyController {
         }
 
         String result = geminiService.standardizeVocabulary(rawText);
-        // Loại bỏ markdown code fences nếu Gemini lỡ trả về (không bắt buộc, nhưng phòng hờ)
+
         String cleaned = result.replaceAll("(?s)```json\\s*|```", "").trim();
 
         return ResponseEntity.ok(Map.of("data", cleaned));

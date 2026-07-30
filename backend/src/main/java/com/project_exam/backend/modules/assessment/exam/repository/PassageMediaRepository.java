@@ -10,7 +10,6 @@ public interface PassageMediaRepository extends JpaRepository<PassageMedia, Stri
 
     List<PassageMedia> findByPassageId(String passageId);
 
-    // Sắp theo id (UUIDv7 time-ordered) để các đoạn TEXT bổ sung + media giữ đúng thứ tự thêm.
     List<PassageMedia> findByPassageIdOrderByIdAsc(String passageId);
 
     void deleteByPassageId(String passageId);

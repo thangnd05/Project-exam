@@ -10,14 +10,12 @@ export const getPlanById = (learningPlanId) => {
   return axios.get(`${BASE_URL}/${learningPlanId}`).then((res) => res.data);
 };
 
-/** Bỏ trống examTypeId = lấy lộ trình của tất cả kỳ thi trong 1 request. */
 export const listPlans = (examTypeId) => {
   return axios
     .get(BASE_URL, { params: examTypeId ? { examTypeId } : undefined })
     .then((res) => res.data);
 };
 
-/** Chỉ đọc: trạng thái kế hoạch, phiên đang làm dở, hoặc bài đã nộp (includeReview). */
 export const getCurrentSession = (learningPlanId, taskId, includeReview = false) => {
   const params = {};
   if (taskId) params.taskId = taskId;
@@ -27,7 +25,6 @@ export const getCurrentSession = (learningPlanId, taskId, includeReview = false)
     .then((res) => res.data);
 };
 
-/** Bắt đầu/quay lại phiên luyện của một ải — endpoint có ghi DB nên là POST. */
 export const startTaskSession = (learningPlanId, taskId) => {
   return axios
     .post(`${BASE_URL}/${learningPlanId}/sessions/start`, null, {
@@ -42,7 +39,6 @@ export const submitSession = (learningPlanId, sessionId, answers) => {
     .then((res) => res.data);
 };
 
-/** Xem lại bài làm của đúng một phiên trong lịch sử (câu hỏi + lựa chọn đã chọn + đáp án đúng). */
 export const getSessionReview = (learningPlanId, sessionId) => {
   return axios
     .get(`${BASE_URL}/${learningPlanId}/sessions/${sessionId}/review`)

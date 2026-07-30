@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import java.time.Instant;
 
-/** Một lần luyện ải (1 row trong learning_plan_sessions). */
 @Getter
 @Setter
 @Builder

@@ -17,15 +17,11 @@ public interface SavedPostRepository extends JpaRepository<SavedPost, String> {
     Optional<SavedPost> findByPostIdAndUserId(String postId, String userId);
     boolean existsByPostIdAndUserId(String postId, String userId);
     long countByPostId(String postId);
-    /** Batch count theo nhiều postId 1 lần — tránh N+1 trong list post. */
+
     @Query("SELECT sp.postId, COUNT(sp) FROM SavedPost sp WHERE sp.postId IN :postIds GROUP BY sp.postId")
     List<Object[]> countGroupedByPostIdIn(@Param("postIds") java.util.Collection<String> postIds);
     List<SavedPost> findByUserIdOrderByCreatedAtDesc(String userId);
 
-    /**
-     * Bài đã lưu (chỉ APPROVED) của user, lọc theo keyword tiêu đề, sắp theo thời điểm lưu mới nhất.
-     * Trả thẳng Post để build summary; phân trang qua Pageable (không truyền Sort vì đã ORDER BY trong query).
-     */
     @Query(value = "SELECT p FROM SavedPost sp, Post p "
             + "WHERE p.id = sp.postId AND sp.userId = :userId "
             + "AND p.status = :status "

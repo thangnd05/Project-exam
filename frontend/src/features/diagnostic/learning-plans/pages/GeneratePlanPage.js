@@ -19,7 +19,6 @@ import {
 
 const cx = classNames.bind(styles);
 
-/** Bài luyện theo Part chỉ chấm các Part đã chọn -> chẩn đoán không phủ hết đề. */
 const isPracticeAttempt = (userTest) => (userTest?.practicePartIds?.length ?? 0) > 0;
 
 function GeneratePlanPage() {
@@ -128,7 +127,7 @@ function GeneratePlanPage() {
         if (data?.examTypeId) {
           setFilterExamTypeId(data.examTypeId);
         }
-        // Đổi refreshKey đã đủ để query danh sách chạy lại (reload() nữa là gọi API 2 lần).
+
         setListRefreshKey((k) => k + 1);
       },
       onError: (err) => {

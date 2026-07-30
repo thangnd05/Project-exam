@@ -1,13 +1,11 @@
 package com.project_exam.backend.modules.assessment.test.service;
 
-// --- Shared ---
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 
-// --- Assessment: Test (module này) ---
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
@@ -31,7 +29,6 @@ import com.project_exam.backend.modules.assessment.test.repository.UserTestAcces
 import com.project_exam.backend.modules.gamification.coin.service.CoinService;
 import com.project_exam.backend.modules.classroom.member.domain.ClassMember.MemberStatus;
 
-// --- Assessment: Exam ---
 import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamType;
@@ -52,21 +49,17 @@ import com.project_exam.backend.modules.assessment.exam.repository.PassageReposi
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 
-// --- Assessment: Attempt ---
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 
-// --- Users ---
 import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.user.service.AdminUserProvider;
 
-// --- Classroom ---
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 
-// --- Jakarta & Spring ---
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +71,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-// --- Java ---
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -113,7 +105,6 @@ public class TestService {
     private final com.project_exam.backend.modules.assessment.test.mapper.TestMapper testMapper;
     private final com.project_exam.backend.modules.assessment.exam.repository.QuestionCollectionRepository questionCollectionRepository;
 
-    /** User có quyền làm bài chưa: miễn phí, hoặc là người tạo, hoặc đã mua. */
     private boolean hasTestAccess(Test test, String userId) {
         if (test.getCostCoins() == null || test.getCostCoins() <= 0) return true;
         if (userId == null) return false;
@@ -126,23 +117,17 @@ public class TestService {
         return buildUserTestSummariesBatch(tests, null);
     }
 
-    /**
-     * Danh sách bài Quick Challenge cho Hero landing page (guest xem được).
-     * Trả về test + các part (tên + số câu), bỏ qua bài đã hết hạn (ENDED).
-     * Cố tình không kèm % / điểm — chỉ preview cấu trúc bài để user chọn làm.
-     */
     public List<QuickChallengeCardResponse> getQuickChallengeTests() {
         String categoryId = examCategoryRepository.findByCode("QUICK_CHALLENGE")
                 .map(ExamCategory::getExamCategoryId)
                 .orElse(null);
         if (categoryId == null) {
-            return List.of(); // chưa seed category -> hero tự fallback ảnh
+            return List.of();
         }
         List<Test> tests = testRepository.findByExamCategoryId(categoryId).stream()
                 .filter(t -> t.calculateStatus() != TestStatus.ENDED)
                 .toList();
 
-        // Batch map examTypeId -> name để dựng tab phân loại (tránh N+1)
         Set<String> examTypeIds = tests.stream()
                 .map(Test::getExamTypeId)
                 .filter(Objects::nonNull)
@@ -158,7 +143,6 @@ public class TestService {
     private QuickChallengeCardResponse buildQuickChallengeCard(Test test, String examTypeName) {
         List<TestPart> testParts = testPartRepository.findByTestId(test.getTestId());
 
-        // Batch load ExamPart (tránh N+1)
         Set<String> examPartIds = testParts.stream()
                 .map(TestPart::getExamPartId)
                 .filter(Objects::nonNull)
@@ -166,11 +150,9 @@ public class TestService {
         Map<String, ExamPart> examPartMap = examPartRepository.findAllById(examPartIds).stream()
                 .collect(Collectors.toMap(ExamPart::getExamPartId, ep -> ep));
 
-        // Gom theo SKILL nếu part có kỹ năng (gọn hơn, vd 7 part TOEIC -> 2 skill Listening/Reading).
-        // Part không gắn skill thì giữ riêng theo part. agg: key -> [tổng số câu, displayOrder nhỏ nhất]
         Map<String, int[]> agg = new LinkedHashMap<>();
-        Map<String, String> skillKeyIds = new HashMap<>(); // key (skill) -> skillId để resolve tên
-        Map<String, String> partNames = new HashMap<>();   // key (part) -> tên part
+        Map<String, String> skillKeyIds = new HashMap<>();
+        Map<String, String> partNames = new HashMap<>();
 
         for (TestPart tp : testParts) {
             ExamPart ep = examPartMap.get(tp.getExamPartId());
@@ -196,7 +178,6 @@ public class TestService {
             }
         }
 
-        // Resolve tên skill
         Map<String, String> skillNames = skillRepository.findAllById(new HashSet<>(skillKeyIds.values())).stream()
                 .collect(Collectors.toMap(Skill::getSkillId, Skill::getName));
 
@@ -219,10 +200,6 @@ public class TestService {
                 test, examTypeName, test.calculateStatus().name(), totalQuestions, parts);
     }
 
-    /**
-     * Trả về các đề thi do ADMIN tạo theo examTypeId, dùng cho danh sách chung
-     * mà mọi user đều thấy (không lộ đề cá nhân của user khác).
-     */
     public List<TestResponse> getAdminTestsByExamType(String examTypeId) {
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) return new ArrayList<>();
@@ -235,10 +212,6 @@ public class TestService {
         return buildUserTestSummariesBatch(filtered, null);
     }
 
-    /**
-     * Bản phân trang của getAdminTestsByExamType — dùng cho danh sách test theo examType.
-     * Why: trang user có thể có rất nhiều đề admin tạo, không nên load all rồi filter in-memory.
-     */
     public PageResponse<TestResponse> getAdminTestsByExamTypePaged(String examTypeId, int page, int size, String userId) {
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 12 : Math.min(size, 100);
@@ -250,11 +223,9 @@ public class TestService {
         Page<Test> testPage = testRepository
                 .findByExamTypeIdAndClassIdIsNullAndCreatedByIn(examTypeId, adminIds, pageable);
 
-        // Truyền userId để biết bài nào đã mở khoá (owner/đã mua) -> badge hiển thị đúng.
         return toTestPageResponse(testPage, userId);
     }
 
-    /** collectionId của bộ đề + tất cả collection con trực tiếp (collection chỉ 2 cấp). */
     private Set<String> collectionWithChildrenIds(String collectionId) {
         Set<String> ids = new HashSet<>();
         ids.add(collectionId);
@@ -263,9 +234,6 @@ public class TestService {
         return ids;
     }
 
-    /**
-     * Danh sách folder bộ đề (collection cha) của một loại kỳ thi, kèm số đề bên trong (gộp con).
-     */
     public List<TestCollectionResponse> getTestCollectionsByExamType(String examTypeId) {
         Set<String> adminIds = adminUserProvider.adminUserIds();
         return questionCollectionRepository.findByExamTypeIdAndParentIdIsNull(examTypeId).stream()
@@ -284,9 +252,6 @@ public class TestService {
                 .toList();
     }
 
-    /**
-     * Đề (công khai) thuộc một bộ đề: nếu collection là cha thì gộp luôn đề của các con.
-     */
     public PageResponse<TestResponse> getTestsByCollectionPaged(
             String collectionId, int page, int size, String userId) {
         int safePage = Math.max(page, 0);
@@ -305,10 +270,6 @@ public class TestService {
         return PageResponse.from(testPage, buildUserTestSummariesBatch(testPage.getContent(), userId));
     }
 
-    /**
-     * Build list TestResponse hiệu năng cao — group count attempts thay vì query per-test.
-     * Trước: N+1 với 200 test = 400+ count query. Sau: 2 query bất kể số test.
-     */
     private List<TestResponse> buildUserTestSummariesBatch(List<Test> tests, String userId) {
         if (tests.isEmpty()) return List.of();
         List<String> testIds = tests.stream().map(Test::getTestId).toList();
@@ -322,7 +283,6 @@ public class TestService {
                         .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]))
                 : Map.of();
 
-        // Quyền đã mua: 1 query, gom thành set để tránh N+1 khi build từng item.
         Set<String> ownedTestIds = userId != null
                 ? userTestAccessRepository.findByUserId(userId).stream()
                         .map(UserTestAccess::getTestId)
@@ -363,7 +323,6 @@ public class TestService {
         return testRepository.findById(id);
     }
 
-
     public TestResponse buildUserTestSummary(Test test, String userId) {
 
         long attemptsUsed = 0;
@@ -400,9 +359,6 @@ public class TestService {
         return buildAdminTestSummariesBatch(result);
     }
 
-    /**
-     * Build list TestAdminResponse — group count thay N queries countByTestId.
-     */
     private List<TestAdminResponse> buildAdminTestSummariesBatch(List<Test> tests) {
         if (tests.isEmpty()) return List.of();
         List<String> testIds = tests.stream().map(Test::getTestId).toList();
@@ -437,7 +393,7 @@ public class TestService {
 
     @Transactional
     public TestResponse getTestFullById(String testId, HttpServletRequest httpRequest) {
-        // 1. Lấy thông tin người dùng (guest -> null, không lỗi).
+
         String currentUserId;
         try {
             currentUserId = authUtils.getUserId(httpRequest);
@@ -447,7 +403,6 @@ public class TestService {
 
         Test test = testRepository.findById(testId).orElseThrow(() -> new NotFoundException("Test not found"));
 
-        // 2. Guest: chỉ cho xem nếu test thuộc ExamCategory có guestAllowed=true và không gắn lớp.
         boolean isGuest = (currentUserId == null);
         if (isGuest) {
             boolean guestEligible = test.getClassId() == null
@@ -461,7 +416,6 @@ public class TestService {
             }
         }
 
-        // 2b. Bài trả phí chưa mở khoá: KHÔNG trả đề (parts) để tránh lộ câu hỏi.
         boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
         if (paid && !hasTestAccess(test, currentUserId)) {
             return testMapper.toPaymentRequiredResponse(
@@ -472,13 +426,10 @@ public class TestService {
                 ? null
                 : userTestRepository.findTopByUserIdAndTestIdOrderByStartedAtDesc(currentUserId, testId).orElse(null);
 
-        // 3. Logic Auto-Submit — chỉ áp dụng cho user đã đăng nhập.
         if (!isGuest) {
             handleAutoSubmit(test, latest);
         }
 
-        // 4. Kiểm tra số lượt làm bài — guest không bị giới hạn theo user.
-        // Lượt luyện tập theo Part KHÔNG tính vào maxAttempts -> loại mode PRACTICE.
         int attemptsUsed = isGuest
                 ? 0
                 : userTestRepository.countCompletedExcludingMode(
@@ -491,22 +442,17 @@ public class TestService {
             return buildLimitExceededResponse(test, attemptsUsed, remaining, totalAttempts);
         }
 
-        // 5. Load data
         TestUserDataBundle data = loadUserTestData(testId);
         if (data.testParts().isEmpty()) {
             return buildEmptyUserTestResponse(test, maxAttempts, attemptsUsed, remaining);
         }
 
-        // 6. Shuffle seed
         long seed = (latest != null ? latest.getUserTestId() : testId).hashCode();
 
-        // 7. Build responses
         List<TestPartResponse> partResponses = buildUserPartResponses(data, seed);
 
         return buildUserTestResponse(test, maxAttempts, attemptsUsed, remaining, totalAttempts, partResponses);
     }
-
-    // ================= USER VERSION REFACTORING =================
 
     private record TestUserDataBundle(
             List<TestPart> testParts,
@@ -565,7 +511,6 @@ public class TestService {
         );
     }
 
-    /** Map examPartId -> tên part (ExamPart.name) cho danh sách testParts. */
     private Map<String, String> loadExamPartNames(List<TestPart> testParts) {
         Set<String> examPartIds = testParts.stream()
                 .map(TestPart::getExamPartId).filter(Objects::nonNull)
@@ -576,10 +521,6 @@ public class TestService {
                 .collect(Collectors.toMap(ExamPart::getExamPartId, ExamPart::getName));
     }
 
-    /**
-     * Tóm tắt các Part của đề (tên, số câu, skill) cho modal "Chọn chế độ".
-     * Nhẹ: chỉ đếm số câu theo testPart, không load nội dung câu hỏi.
-     */
     public List<TestPartSummaryResponse> getPartsSummary(String testId) {
         testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
@@ -643,7 +584,7 @@ public class TestService {
                     String groupKey = "P_" + q.getPassageId();
                     if (!groupsMap.containsKey(groupKey)) {
                         Passage p = data.passageMap().get(q.getPassageId());
-                        // Bài thi: KHÔNG trả bản dịch (includeTranslation = false).
+
                         PassageResponse pDto = (p != null)
                                 ? passageMapper.toResponse(
                                         p,
@@ -675,8 +616,6 @@ public class TestService {
                 true, true, false, test.calculateStatus().name(), partResponses);
     }
 
-    // ================= END USER REFACTORING =================
-
     private TestResponse buildEmptyUserTestResponse(Test test, Integer maxAttempts, int attemptsUsed, Integer remaining) {
         long totalAttempts = userTestRepository.countByTestId(test.getTestId());
         return testMapper.toEmptyResponse(
@@ -684,13 +623,12 @@ public class TestService {
                 true, true, false, test.calculateStatus().name(), Collections.emptyList());
     }
 
-    // Hàm bổ trợ để xử lý Auto-submit (Tách ra cho gọn code)
 private void handleAutoSubmit(Test test, UserTest latest) {
     Integer duration = test.getDurationMinutes();
     if (latest != null && latest.getStatus() == UserTest.Status.IN_PROGRESS && duration != null && duration > 0) {
         Instant endTime = latest.getStartedAt().plus(Duration.ofMinutes(duration));
         if (test.getAvailableTo() != null && test.getAvailableTo().isBefore(endTime)) endTime = test.getAvailableTo();
-        
+
         if (!Instant.now().isBefore(endTime)) {
             try {
                 userTestService.submitTest(latest.getUserTestId(), latest.getUserId());
@@ -703,13 +641,10 @@ private void handleAutoSubmit(Test test, UserTest latest) {
     }
 }
 
-// Hàm bổ trợ build Response khi hết lượt làm (Tách ra cho gọn)
 private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem, long total) {
     return testMapper.toLimitExceededResponse(
             test, used, rem, total, "FORBIDDEN", false, true, false);
 }
-
-// ================= ADMIN VERSION REFACTORING =================
 
     public TestAdminResponse getTestFullByIdAdmin(String testId) {
         Test test = testRepository.findById(testId)
@@ -773,7 +708,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         Set<String> examPartIds = questionMap.values().stream()
                 .map(Question::getExamPartId).collect(Collectors.toSet());
-        // Gồm cả examPartId của các TestPart để lấy đúng tên part kể cả khi part rỗng câu hỏi.
+
         testParts.stream().map(TestPart::getExamPartId).filter(Objects::nonNull).forEach(examPartIds::add);
         Map<String, ExamPart> examPartMap = examPartRepository.findAllById(examPartIds).stream()
                 .collect(Collectors.toMap(ExamPart::getExamPartId, e -> e));
@@ -787,7 +722,6 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         );
     }
 
-    /** Batch-load audio/ảnh của các passage, gom theo passageId (rỗng nếu không có). */
     private Map<String, List<PassageMediaResponse>> loadPassageMediaByPassageId(Set<String> passageIds) {
         if (passageIds == null || passageIds.isEmpty()) return Collections.emptyMap();
         return passageMediaRepository.findByPassageIdInOrderByIdAsc(passageIds).stream()
@@ -863,17 +797,13 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 test, totalAttempts, test.calculateStatus().name(), Collections.emptyList());
     }
 
-    // ================= END ADMIN REFACTORING =================
-
-
     public List<TestResponse> getTestByClassId(String classId, HttpServletRequest request) {
-        // Lấy user hiện tại từ token
+
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
-        // Kiểm tra quyền truy cập lớp
         boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
                 classId, currentUserId, MemberStatus.APPROVED);
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
@@ -882,18 +812,16 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             throw new ForbiddenException("Bạn không có quyền xem bài kiểm tra của lớp này!");
         }
 
-        //  Nếu hợp lệ, trả danh sách bài kiểm tra
         return buildUserTestSummariesBatch(testRepository.findByClassId(classId), currentUserId);
     }
 
     public List<TestResponse> getTestByClassIdAndChapterId(String classId,String chapterId, HttpServletRequest request) {
-        // Lấy user hiện tại từ token
+
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
-        // Kiểm tra quyền truy cập lớp
         boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
                 classId, currentUserId, MemberStatus.APPROVED);
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
@@ -902,19 +830,17 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
             throw new ForbiddenException("Bạn không có quyền xem bài kiểm tra của lớp này!");
         }
 
-        //  Nếu hợp lệ, trả danh sách bài kiểm tra
         return buildUserTestSummariesBatch(
                 testRepository.findByClassIdAndChapterId(classId, chapterId), currentUserId);
     }
 
     public List<TestResponse> getTestByCreateBy(HttpServletRequest request) {
-        // Lấy user hiện tại từ token
+
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
-        //  Nếu hợp lệ, trả danh sách bài kiểm tra
         return buildUserTestSummariesBatch(testRepository.findByCreatedBy(currentUserId), currentUserId);
     }
 
@@ -934,9 +860,6 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         return buildUserTestSummariesBatch(tests, currentUserId);
     }
 
-    /**
-     * Bản phân trang của getMyPersonalTests — dùng cho trang "Bài kiểm tra của tôi".
-     */
     public PageResponse<TestResponse> getMyPersonalTestsPaged(HttpServletRequest request, int page, int size) {
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
@@ -955,6 +878,5 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         return toTestPageResponse(testPage, currentUserId);
     }
-
 
 }

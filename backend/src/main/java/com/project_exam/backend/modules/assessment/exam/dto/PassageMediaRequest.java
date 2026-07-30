@@ -12,5 +12,5 @@ public class PassageMediaRequest {
 
     private String mediaUrl;
 
-    private String mediaType; // IMAGE / AUDIO
+    private String mediaType;
 }

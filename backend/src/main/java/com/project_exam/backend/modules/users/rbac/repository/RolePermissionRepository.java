@@ -15,7 +15,6 @@ public interface RolePermissionRepository extends JpaRepository<RolePermission, 
 
     boolean existsByRoleIdAndPermissionId(String roleId, String permissionId);
 
-    /** Lấy thẳng danh sách permission code của một role (nối qua id, một truy vấn). */
     @Query("SELECT p.code FROM Permission p, RolePermission rp " +
            "WHERE p.permissionId = rp.permissionId AND rp.roleId = :roleId")
     List<String> findPermissionCodesByRoleId(@Param("roleId") String roleId);

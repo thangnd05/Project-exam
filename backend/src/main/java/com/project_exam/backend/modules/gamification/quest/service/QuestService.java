@@ -32,9 +32,6 @@ public class QuestService {
     private final CoinService coinService;
     private final QuestMapper questMapper;
 
-    // ---------------- User ----------------
-
-    /** Nhiệm vụ user nhìn thấy: đang bật + trong thời gian hiệu lực (ẩn hết hạn / chưa mở). */
     @Transactional(readOnly = true)
     public List<UserQuestResponse> getAvailableForUser(String userId) {
         Instant now = Instant.now();
@@ -48,7 +45,6 @@ public class QuestService {
                 .toList();
     }
 
-    /** User nhận xu của 1 nhiệm vụ. */
     @Transactional
     public QuestClaimResponse claim(String userId, String questId) {
         Quest quest = questRepository.findById(questId)
@@ -85,8 +81,6 @@ public class QuestService {
         return questMapper.toClaimResponse(questId, quest.getRewardCoins(), newBalance);
     }
 
-    // ---------------- Admin ----------------
-
     @Transactional(readOnly = true)
     public List<QuestResponse> findAll() {
         return questRepository.findAllByOrderByCreatedAtDesc().stream()
@@ -116,8 +110,6 @@ public class QuestService {
                 .orElseThrow(() -> new NotFoundException("Nhiệm vụ không tồn tại"));
         questRepository.delete(quest);
     }
-
-    // ---------------- Helpers ----------------
 
     private void applyRequest(Quest quest, QuestRequest request) {
         quest.setTitle(request.getTitle());

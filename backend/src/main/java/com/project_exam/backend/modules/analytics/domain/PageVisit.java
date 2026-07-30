@@ -6,12 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/**
- * Một lượt xem trang (page view) do FE ping mỗi lần vào/chuyển route — nguồn dữ liệu "lượt truy cập".
- *
- * <p>sessionKey = định danh trình duyệt ổn định (tái dùng guestSessionId ở localStorage) để đếm
- * khách duy nhất / đang online. userId chỉ có khi người dùng đã đăng nhập (đọc từ JWT), null = khách.
- */
 @Entity
 @Table(name = "page_visits",
         indexes = {
@@ -36,12 +30,11 @@ public class PageVisit {
     private String sessionKey;
 
     @Column(name = "user_id", length = 255)
-    private String userId; // null = khách chưa đăng nhập
+    private String userId;
 
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
 
-    // Geo-IP: mã ISO alpha-2 + tên quốc gia. 'LO'/'Local' cho IP nội bộ; null nếu không tra được.
     @Column(name = "country_code", length = 2)
     private String countryCode;
 

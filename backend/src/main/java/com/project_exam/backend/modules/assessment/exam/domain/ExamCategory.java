@@ -17,7 +17,6 @@ public class ExamCategory {
     @Column(name = "exam_category_id")
     private String examCategoryId;
 
-    // Định danh để code check logic (QUICK_CHALLENGE, FULL_MOCK, RECOVERY...)
     @Column(nullable = false, unique = true, length = 50)
     private String code;
 
@@ -27,7 +26,6 @@ public class ExamCategory {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // Giữ cái này vì nó quyết định access flow (P0 trong PRD)
     @Column(name = "guest_allowed", nullable = false)
     private Boolean guestAllowed = false;
 

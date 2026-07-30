@@ -1,5 +1,4 @@
-// Nội dung tooltip giải thích thuật ngữ của luồng chẩn đoán / learning plan.
-// Tập trung 1 chỗ để mọi trang dùng chung (tránh mỗi file khai báo lại — dễ lệch chữ).
+
 
 export const TERM_TIPS = {
   readiness:

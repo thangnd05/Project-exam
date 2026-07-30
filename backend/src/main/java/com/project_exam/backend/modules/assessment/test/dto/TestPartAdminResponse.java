@@ -16,7 +16,7 @@ public class TestPartAdminResponse {
 
     private String examPartId;
 
-    private String partName; // Tên part lấy từ ExamPart.name
+    private String partName;
 
     private List<QuestionGroupAdminResponse> questionGroups;
 }

@@ -16,6 +16,6 @@ public class PassageResponse {
     private String contentTranslation;
     private String mediaUrl;
     private Passage.PassageType passageType;
-    /** Danh sách audio/ảnh của passage (bảng passage_media). Rỗng nếu không có. */
+
     private List<PassageMediaResponse> passageMedias;
 }

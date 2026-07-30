@@ -159,7 +159,6 @@ public class UserService {
 
     public User createUser(User user) {
 
-        //  Auto avatar mặc định theo username (giống Google)
         String defaultAvatar =
                 "https://ui-avatars.com/api/?name="
                         + user.getUserName()
@@ -184,7 +183,6 @@ public class UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        //  Update thông tin profile
         String newEmail = updatedUser.getEmail();
         boolean emailChanged = newEmail != null && !newEmail.isBlank()
                 && !newEmail.equalsIgnoreCase(existingUser.getEmail());
@@ -193,18 +191,15 @@ public class UserService {
         existingUser.setUserName(updatedUser.getUserName());
         existingUser.setEmail(newEmail);
 
-        //  Đổi sang email mới -> phải xác minh lại (tránh giữ trạng thái verified của email cũ).
         if (emailChanged) {
             existingUser.setVerified(false);
         }
 
-        //  Upload avatar nếu có
         if (avatar != null && !avatar.isEmpty()) {
             String avatarUrl = cloudinaryService.uploadImage(avatar);
             existingUser.setAvatarUrl(avatarUrl);
         }
 
-        //  Admin đổi trạng thái xác thực (đặt sau reset email để lựa chọn của admin thắng).
         if (verifiedOverride != null) {
             existingUser.setVerified(verifiedOverride);
         }
@@ -218,7 +213,6 @@ public class UserService {
         updatedUser.setUserName(request.getUserName());
         updatedUser.setEmail(request.getEmail());
 
-        //  Chỉ admin (USER_MANAGE) mới được đổi trạng thái xác thực qua endpoint này.
         Boolean verifiedOverride =
                 (request.getVerified() != null && authUtils.hasPermission(PermissionCatalog.USER_MANAGE))
                         ? request.getVerified()
@@ -300,7 +294,6 @@ public class UserService {
             year = currentYear;
         }
 
-        // Phạm vi query gộp: bao trùm cả tháng đang xem (biểu đồ ngày) lẫn cả năm đang xem (biểu đồ tháng).
         java.time.LocalDateTime monthStart = month.atDay(1).atStartOfDay();
         java.time.LocalDateTime monthEnd = month.plusMonths(1).atDay(1).atStartOfDay();
         java.time.LocalDateTime yearStart = java.time.LocalDate.of(year, 1, 1).atStartOfDay();
@@ -310,7 +303,6 @@ public class UserService {
 
         List<UserTest> attempts = userTestRepository.findByUserIdAndStartedAtRange(userId, AppTime.instant(rangeStart), AppTime.instant(rangeEnd));
 
-        // Thời lượng tối đa từng đề để chặn trường hợp mở bài rồi bỏ đó (elapsed bị thổi phồng).
         java.util.Map<String, Integer> durationByTestId = new java.util.HashMap<>();
         List<String> testIds = attempts.stream().map(UserTest::getTestId).distinct().toList();
         if (!testIds.isEmpty()) {
@@ -318,9 +310,8 @@ public class UserService {
                     .forEach(t -> durationByTestId.put(t.getTestId(), t.getDurationMinutes()));
         }
 
-        // Cộng dồn thời gian (phút) theo ngày-trong-tháng-xem và theo từng tháng-trong-năm-xem.
         java.util.Map<Integer, Long> minutesByDay = new java.util.HashMap<>();
-        long[] minutesByMonthOfYear = new long[13]; // index 1..12
+        long[] minutesByMonthOfYear = new long[13];
         for (UserTest ut : attempts) {
             long mins = elapsedMinutes(ut, durationByTestId.get(ut.getTestId()));
             if (mins <= 0) continue;
@@ -348,7 +339,6 @@ public class UserService {
                     .build());
         }
 
-        // Đủ 12 tháng của năm đang xem (tháng 1 -> 12), điền đủ kể cả tháng 0 phút.
         List<ProfileActivityResponse.MonthTime> monthlyTime = new java.util.ArrayList<>();
         for (int mo = 1; mo <= 12; mo++) {
             monthlyTime.add(ProfileActivityResponse.MonthTime.builder()
@@ -357,7 +347,6 @@ public class UserService {
                     .build());
         }
 
-        // Danh sách tháng/năm có thể chọn: từ thời điểm làm bài sớm nhất tới hiện tại (mới nhất trước).
         java.time.Instant earliest = userTestRepository.findEarliestStartedAt(userId);
         java.time.YearMonth fromMonth = earliest != null ? AppTime.yearMonth(earliest) : currentMonth;
         if (month.isBefore(fromMonth)) fromMonth = month;
@@ -384,12 +373,11 @@ public class UserService {
                 .build();
     }
 
-    /** Thời gian làm 1 bài (phút) = finishedAt - startedAt, chặn trên theo thời lượng đề. */
     private long elapsedMinutes(UserTest ut, Integer testDurationMinutes) {
         if (ut.getStartedAt() == null || ut.getFinishedAt() == null) return 0;
         long minutes = Math.round(
                 java.time.Duration.between(ut.getStartedAt(), ut.getFinishedAt()).getSeconds() / 60.0);
-        if (minutes <= 0) minutes = 1; // bài rất nhanh vẫn tính 1 phút
+        if (minutes <= 0) minutes = 1;
         if (testDurationMinutes != null && testDurationMinutes > 0 && minutes > testDurationMinutes) {
             minutes = testDurationMinutes;
         }
@@ -406,7 +394,7 @@ public class UserService {
     }
 
     public boolean deleteUser(String id, HttpServletRequest httpRequest) {
-        //  Chỉ admin được xoá user khác. User tự xoá account của mình cũng được.
+
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isSelf = currentUserId != null && currentUserId.equals(id);
         if (!isSelf && !authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
@@ -418,14 +406,12 @@ public class UserService {
         }).orElse(false);
     }
 
-    /** Guard: chỉ admin được tạo user qua endpoint admin (đăng ký user mới phải qua /api/auth/register). */
     public void requireAdminToManageUsers(HttpServletRequest httpRequest) {
         if (!authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được thao tác trực tiếp trên user.");
         }
     }
 
-    /** Guard cho update user: cho phép chính chủ hoặc admin. */
     public void requireSelfOrAdminForUser(String targetUserId, HttpServletRequest httpRequest) {
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isSelf = currentUserId != null && currentUserId.equals(targetUserId);

@@ -22,10 +22,10 @@ public class ClassMember {
     private String id;
 
     @Column(name = "class_id", nullable = false)
-    private String classId; // FK -> classes.class_id
+    private String classId;
 
     @Column(name = "user_id", nullable = false)
-    private String userId; // FK -> users.user_id
+    private String userId;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
@@ -34,7 +34,6 @@ public class ClassMember {
     @Column(name = "joined_at")
     private Instant joinedAt = Instant.now();
 
-    // enum trạng thái
     public enum MemberStatus {
         PENDING,
         APPROVED

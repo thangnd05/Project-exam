@@ -52,7 +52,6 @@ const AnalyticsPage = () => {
     const topTests = content?.topTests ?? [];
     const topPracticeTests = content?.topPracticeTests ?? [];
 
-    // Bộ chọn năm dùng chung cho mọi biểu đồ theo tháng của trang Thống kê.
     const yearSelect = (
         <select
             className={cx('yearSelect')}
@@ -114,7 +113,6 @@ const AnalyticsPage = () => {
                         </Col>
                     </Row>
 
-                    {/* Vị trí truy cập + Top quốc gia (lên đầu, trước các biểu đồ) */}
                     <Row className={cx('chartsRow')}>
                         <Col lg={8}>
                             <ChartCard title="Vị trí truy cập" delay={0.3}>
@@ -128,7 +126,6 @@ const AnalyticsPage = () => {
                         </Col>
                     </Row>
 
-                    {/* Hoạt động theo tháng: lượt truy cập, lượt thi & tỉ lệ hoàn thành — theo năm được chọn */}
                     <Row className={cx('chartsRow')}>
                         <Col lg={12}>
                             <ChartCard
@@ -142,7 +139,6 @@ const AnalyticsPage = () => {
                         </Col>
                     </Row>
 
-                    {/* Người dùng mới theo tháng + tình trạng lượt thi */}
                     <Row className={cx('chartsRow')}>
                         <Col lg={8}>
                             <ChartCard
@@ -161,7 +157,6 @@ const AnalyticsPage = () => {
                         </Col>
                     </Row>
 
-                    {/* Đề thi công khai — làm full & luyện tập nhiều nhất */}
                     <Row className={cx('chartsRow')}>
                         <Col lg={6}>
                             <ChartCard title="Bài thi nhiều nhất" delay={0.6}>

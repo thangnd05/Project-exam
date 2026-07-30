@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ReactRequest {
-    private React.ReactType type; // LIKE, LOVE, HAHA, WOW, SAD, ANGRY
+    private React.ReactType type;
 }

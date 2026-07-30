@@ -35,47 +35,37 @@ public class Test {
 
     private Instant createdAt = Instant.now();
 
-    // Thời gian giới hạn làm bài (null = không giới hạn)
     @Column(nullable = true)
     private Integer durationMinutes;
 
-    // Khoảng thời gian mở đề (optional)
     private Instant availableFrom;
 
     private Instant availableTo;
 
-    @Column(length = 500) // đủ dài để chứa URL
+    @Column(length = 500)
     private String bannerUrl;
 
-    // Số lần làm bài cho phép (null = không giới hạn)
     private Integer maxAttempts;
 
     @Column(name = "class_id")
-    private String classId; // FK -> exam_parts
+    private String classId;
 
     @Column(name ="chapter_id")
     private String chapterId;
 
-    // Phân loại bài thi (Quick Challenge / Full Mock / Recovery / Mini Quiz...)
-    // Nullable: test cũ và TOEIC legacy không bắt buộc gắn category.
     @Column(name = "exam_category_id")
-    private String examCategoryId; // FK -> exam_categories.exam_category_id
+    private String examCategoryId;
 
-    // Bộ đề (folder) mà đề này thuộc về — FK -> question_collections.collection_id (nullable).
-    // Gắn vào collection con (vd "ETS 2026 1") hoặc cha; trang khám phá gom đề theo collection cha.
     @Column(name = "collection_id")
     private String collectionId;
 
-    // Giá xu để mở khoá bài (chỉ admin đặt, chỉ áp dụng cho bài công khai).
-    // null/0 = miễn phí; >0 = user phải mua 1 lần để mở khoá vĩnh viễn.
     @Column(name = "cost_coins")
     private Integer costCoins;
 
-    //  Method tính trạng thái thực tế
     public TestStatus calculateStatus() {
         Instant now = Instant.now();
         if (availableFrom == null && availableTo == null) {
-            return TestStatus.OPEN; // luôn mở
+            return TestStatus.OPEN;
         }
         if (availableFrom != null && now.isBefore(availableFrom)) {
             return TestStatus.NOT_STARTED;

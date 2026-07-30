@@ -16,13 +16,11 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    // ─── GET comments theo post (public) ─────────
     @GetMapping("/api/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponse>> getComments(@PathVariable String postId) {
         return ResponseEntity.ok(commentService.getCommentsByPost(postId));
     }
 
-    // ─── POST thêm comment/reply (auth) ──────────
     @PostMapping("/api/posts/{postId}/comments")
     public ResponseEntity<CommentResponse> addComment(
             @PathVariable String postId,
@@ -32,7 +30,6 @@ public class CommentController {
         return ResponseEntity.ok(commentService.addComment(postId, request, httpRequest));
     }
 
-    // ─── PUT sửa comment (auth, owner only) ──────
     @PutMapping("/api/comments/{id}")
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable String id,
@@ -42,7 +39,6 @@ public class CommentController {
         return ResponseEntity.ok(commentService.updateComment(id, request, httpRequest));
     }
 
-    // ─── DELETE xóa comment (auth, owner only) ───
     @DeleteMapping("/api/comments/{id}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable String id,

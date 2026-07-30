@@ -39,7 +39,6 @@ public class LearningPlanController {
         return ResponseEntity.ok(learningPlanService.getPlan(userId, learningPlanId));
     }
 
-    /** Không truyền examTypeId = lấy lộ trình của mọi kỳ thi trong 1 lần gọi. */
     @GetMapping
     public ResponseEntity<List<PlanResponse>> list(
             @RequestParam(required = false) String examTypeId,
@@ -68,7 +67,6 @@ public class LearningPlanController {
         return ResponseEntity.noContent().build();
     }
 
-    /** Chỉ đọc: trạng thái kế hoạch / phiên đang làm dở / xem lại bài đã nộp. */
     @GetMapping("/{learningPlanId}/current-session")
     public ResponseEntity<CurrentSessionResponse> currentSession(
             @PathVariable String learningPlanId,
@@ -81,7 +79,6 @@ public class LearningPlanController {
                 userId, learningPlanId, taskId, includeReview));
     }
 
-    /** Bắt đầu/quay lại phiên luyện của một ải — có ghi DB nên tách khỏi GET ở trên. */
     @PostMapping("/{learningPlanId}/sessions/start")
     public ResponseEntity<CurrentSessionResponse> startSession(
             @PathVariable String learningPlanId,

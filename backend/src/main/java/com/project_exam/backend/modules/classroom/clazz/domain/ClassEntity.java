@@ -31,7 +31,7 @@ public class ClassEntity {
     private String description;
 
     @Column(name = "teacher_id", nullable = false)
-    private String teacherId; // FK -> users.user_id
+    private String teacherId;
 
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();

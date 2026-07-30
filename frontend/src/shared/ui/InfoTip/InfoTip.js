@@ -5,10 +5,6 @@ import styles from './InfoTip.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Icon ⓘ nhỏ kèm tooltip giải thích thuật ngữ (độ sẵn sàng, ải, ngưỡng pass...).
- * Dùng OverlayTrigger của react-bootstrap (pattern như TestManagementTable).
- */
 function InfoTip({ text, placement = 'top', className }) {
   if (!text) return null;
   return (

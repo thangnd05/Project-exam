@@ -80,7 +80,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     try {
       const data = await getAdminTestById(id);
       setTestDetail(data);
-      // Row ở bảng list có thể thiếu examCategoryId — bổ sung từ detail nếu form đang trống.
+
       if (data?.examCategoryId) {
         setFormData((prev) =>
           prev.examCategoryId ? prev : { ...prev, examCategoryId: data.examCategoryId },
@@ -163,7 +163,6 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       description: formData.description || null,
       examTypeId: String(formData.examTypeId),
 
-      // examCategoryId: gửi chuỗi rỗng để gỡ phân loại, có giá trị để gán/đổi (giống collectionId).
       examCategoryId: formData.examCategoryId ? String(formData.examCategoryId) : '',
       collectionId: formData.collectionId ? String(formData.collectionId) : '',
       durationMinutes:

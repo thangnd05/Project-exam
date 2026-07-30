@@ -19,7 +19,6 @@ import { useMyAlbums } from './hooks/useMyAlbums';
 
 const cx = classNames.bind(styles);
 
-// Vòng tiến độ: cung màu chính (đã thuộc) + phần còn lại màu track
 const buildRingGradient = (pct) => {
   const p = Math.max(0, Math.min(100, pct));
   return `conic-gradient(var(--primary) ${p}%, #e9eef5 ${p}% 100%)`;

@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddRandomQuestionsResponse {
 
-    /** Số câu đã thêm vào test part. */
     private int addedCount;
 }

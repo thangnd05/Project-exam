@@ -9,10 +9,6 @@ import java.util.List;
 @Component
 public class PracticeMapper {
 
-    /**
-     * type/questionText/options được tính ở service (random, distractors...) nên
-     * truyền vào qua tham số; mapper chỉ dựng DTO.
-     */
     public PracticeQuestionResponse toQuestionResponse(
             String vocabId,
             String type,

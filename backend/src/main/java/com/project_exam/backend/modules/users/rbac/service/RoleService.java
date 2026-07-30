@@ -60,12 +60,11 @@ public class RoleService {
     public void delete(String id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Role không tồn tại"));
-        // Gỡ các liên kết permission trước khi xóa role để không để lại dòng mồ côi.
+
         rolePermissionRepository.deleteByRoleId(id);
         roleRepository.delete(role);
     }
 
-    /** Gán lại toàn bộ permission cho role theo danh sách code (replace, không cộng dồn). */
     @Transactional
     public RoleResponse updatePermissions(String roleId, List<String> codes) {
         Role role = roleRepository.findById(roleId)

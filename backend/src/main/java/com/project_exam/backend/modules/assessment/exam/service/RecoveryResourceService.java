@@ -44,8 +44,6 @@ public class RecoveryResourceService {
     private final CloudinaryService cloudinaryService;
     private final AuthUtils authUtils;
 
-    // ==================== CREATE ====================
-
     @Transactional
     public RecoveryResourceResponse createResource(
             RecoveryResourceRequest request,
@@ -81,8 +79,6 @@ public class RecoveryResourceService {
         return toResponse(resource);
     }
 
-    // ==================== UPDATE ====================
-
     @Transactional
     public RecoveryResourceResponse updateResource(
             String resourceId,
@@ -101,7 +97,7 @@ public class RecoveryResourceService {
         }
 
         if (file != null && !file.isEmpty()) {
-            // Xóa file cũ trên Cloudinary
+
             if (resource.getCloudinaryPublicId() != null) {
                 try { cloudinaryService.deleteFile(resource.getCloudinaryPublicId()); } catch (Exception ignored) {}
             }
@@ -126,8 +122,6 @@ public class RecoveryResourceService {
         return toResponse(resource);
     }
 
-    // ==================== DELETE ====================
-
     @Transactional
     public void deleteResource(String resourceId) {
         RecoveryResource resource = resourceRepository.findById(resourceId)
@@ -140,8 +134,6 @@ public class RecoveryResourceService {
         resourceTagRepository.deleteByResourceId(resourceId);
         resourceRepository.deleteById(resourceId);
     }
-
-    // ==================== QUERY ====================
 
     public List<RecoveryResourceResponse> getAllResources() {
         return resourceRepository.findAll().stream()
@@ -176,14 +168,12 @@ public class RecoveryResourceService {
                 .collect(Collectors.toList());
     }
 
-    /** Tài liệu gắn Part (vd giới thiệu/cách làm Part) — dùng cho trang luyện tập theo Part. */
     public List<RecoveryResourceResponse> getResourcesByExamPartId(String examPartId) {
         return resourceRepository.findByExamPartIdOrderByCreatedAtAsc(examPartId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
-    /** Tài liệu gắn nhiều Part cùng lúc (FE tự nhóm theo examPartId trong response). */
     public List<RecoveryResourceResponse> getResourcesByExamPartIds(List<String> examPartIds) {
         if (examPartIds == null || examPartIds.isEmpty()) {
             return List.of();
@@ -193,11 +183,6 @@ public class RecoveryResourceService {
                 .collect(Collectors.toList());
     }
 
-    // ==================== HELPERS ====================
-
-    /**
-     * Upload file lên Cloudinary, tự detect loại từ content type.
-     */
     private String uploadFile(MultipartFile file) throws IOException {
         String contentType = file.getContentType();
         if (contentType != null && (contentType.startsWith("audio/") || contentType.startsWith("video/"))) {
@@ -229,10 +214,6 @@ public class RecoveryResourceService {
         }
     }
 
-    /**
-     * Gắn tài liệu vào Part: validate Part tồn tại rồi denormalize examTypeId từ Part.
-     * examPartId rỗng ("") = gỡ gắn Part; null không đi vào đây (update giữ nguyên).
-     */
     private void applyExamPart(RecoveryResource resource, String examPartId) {
         if (examPartId == null || examPartId.isBlank()) {
             resource.setExamPartId(null);

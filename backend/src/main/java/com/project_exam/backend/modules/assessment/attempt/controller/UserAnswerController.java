@@ -104,8 +104,6 @@ public class UserAnswerController {
         return ResponseEntity.ok(enhancedResultService.getEnhancedResult(userTestId, userId));
     }
 
-    // ===== GUEST FLOW =====
-
     @PostMapping("/guest/batch")
     public ResponseEntity<List<UserAnswerResponse>> saveGuestAnswers(
             @Valid @RequestBody List<UserAnswerRequest> requests,

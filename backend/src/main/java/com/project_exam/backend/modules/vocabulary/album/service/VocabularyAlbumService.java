@@ -30,9 +30,6 @@ public class VocabularyAlbumService {
     private final VocabularyRepository vocabularyRepository;
     private final UserVocabularyRepository userVocabularyRepository;
 
-    // =========================
-    // GET ALL
-    // =========================
     public List<VocabularyAlbumResponse> findAll() {
         return repository.findAll()
                 .stream()
@@ -40,9 +37,6 @@ public class VocabularyAlbumService {
                 .toList();
     }
 
-    // =========================
-    // GET BY ID
-    // =========================
     public VocabularyAlbumResponse findById(String id) {
         VocabularyAlbum album = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
@@ -50,9 +44,6 @@ public class VocabularyAlbumService {
         return toResponse(album);
     }
 
-    // =========================
-    // CREATE
-    // =========================
     public VocabularyAlbumResponse create(
             VocabularyAlbumRequest request,
             HttpServletRequest httpRequest
@@ -70,9 +61,6 @@ public class VocabularyAlbumService {
         return toResponse(album);
     }
 
-    // =========================
-    // UPDATE
-    // =========================
     public VocabularyAlbumResponse update(String id, VocabularyAlbumRequest request, HttpServletRequest httpRequest) {
 
         VocabularyAlbum album = repository.findById(id)
@@ -87,9 +75,6 @@ public class VocabularyAlbumService {
         return toResponse(album);
     }
 
-    // =========================
-    // DELETE
-    // =========================
     public void delete(String id, HttpServletRequest httpRequest) {
 
         VocabularyAlbum album = repository.findById(id)
@@ -99,7 +84,6 @@ public class VocabularyAlbumService {
         repository.delete(album);
     }
 
-    // Chỉ chủ album (hoặc người có VOCABULARY:MANAGE) mới được sửa/xóa.
     private void requireOwner(VocabularyAlbum album, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         if (!userId.equals(album.getUserId()) && !authUtils.hasPermission(PermissionCatalog.VOCABULARY_MANAGE)) {
@@ -107,9 +91,6 @@ public class VocabularyAlbumService {
         }
     }
 
-    // =========================
-    // GET MY ALBUMS
-    // =========================
     public List<VocabularyAlbumResponse> findAllByUserId(HttpServletRequest request) {
 
         String currentUserId = authUtils.getUserId(request);
@@ -138,9 +119,6 @@ public class VocabularyAlbumService {
                 .toList();
     }
 
-    // =========================
-    // MAPPER
-    // =========================
     private VocabularyAlbumResponse toResponse(VocabularyAlbum album) {
         return vocabularyAlbumMapper.toResponse(album);
     }

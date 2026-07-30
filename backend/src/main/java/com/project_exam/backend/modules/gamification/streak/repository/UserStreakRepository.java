@@ -15,11 +15,9 @@ import java.util.Optional;
 public interface UserStreakRepository extends JpaRepository<UserStreak, String> {
     Optional<UserStreak> findByUserId(String userId);
 
-    // Khóa ghi hàng streak để serialize cập nhật đồng thời (chống lost-update / double-increment).
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM UserStreak s WHERE s.userId = :userId")
     Optional<UserStreak> findByUserIdForUpdate(@Param("userId") String userId);
 
-    // Dành cho leaderboard streak trong tương lai (chưa dùng).
     List<UserStreak> findTop10ByOrderByCurrentStreakDesc();
 }

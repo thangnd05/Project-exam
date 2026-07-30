@@ -6,10 +6,6 @@ const cx = classNames.bind(styles);
 
 const HOUR_TICKS = [0, 3, 6, 9, 12, 15, 18, 21];
 
-/**
- * Lưới nhiệt lượt truy cập (phiên) theo NGÀY × GIỜ.
- * data: [{ day: 'Mon', hours: [24 số] }] — ô càng đậm càng đông.
- */
 const TrafficHeatmap = ({ data = [] }) => {
     if (!data.length) {
         return <div className={cx('empty')}>Chưa có dữ liệu truy cập</div>;

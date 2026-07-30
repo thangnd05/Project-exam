@@ -45,7 +45,7 @@ function ExamLayoutRenderer({
   interactive = false,
   selectedId = null,
   onSelectBlock,
-  // Paged (TOEIC-style)
+
   isPaged = false,
   flowSteps = [],
   currentStepIndex = 0,
@@ -60,7 +60,6 @@ function ExamLayoutRenderer({
   const answered = Object.keys(userAnswers).length;
   const total = allQuestions.length;
 
-  // Ở chế độ paged, palette nhảy thẳng tới bước chứa câu (thay vì cuộn).
   const currentStepQuestionIds = isPaged
     ? new Set((flowSteps[currentStepIndex]?.questions || []).map((q) => q.questionId))
     : null;
@@ -79,7 +78,6 @@ function ExamLayoutRenderer({
     }
   };
 
-  // Điều hướng palette: paged -> nhảy bước; all-at-once -> cuộn tới câu.
   const navigateToQuestion = (questionId) => {
     if (isPaged) {
       goToQuestion?.(questionId);

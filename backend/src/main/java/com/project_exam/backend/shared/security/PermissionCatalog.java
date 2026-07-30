@@ -2,28 +2,15 @@ package com.project_exam.backend.shared.security;
 
 import java.util.List;
 
-/**
- * Danh mục permission cố định của hệ thống (RBAC granular — mỗi hành động quản lý là một permission).
- *
- * <p>Các hằng số {@code String} dùng tại điểm check quyền (controller/service) để tránh gõ sai chuỗi.
- * {@link #ALL} là nguồn seed: DataLoader upsert toàn bộ vào bảng {@code permissions} và gán hết cho role ADMIN.
- *
- * <p>Quy ước code: {@code RESOURCE:ACTION}. {@code :MANAGE} bao gồm create/update/delete của resource đó.
- * Các permission {@code :MANAGE}/{@code :MODERATE} trên resource do người dùng tạo (post, test, question…)
- * đại diện cho quyền "admin can ghi đè quyền sở hữu" — phần ownership của user vẫn giữ nguyên.
- */
 public final class PermissionCatalog {
 
     private PermissionCatalog() {}
 
-    /** Một định nghĩa permission để seed + hiển thị trên UI. */
     public record Def(String code, String groupName, String description) {}
 
-    // ── Người dùng & phân quyền ────────────────────────────────
     public static final String USER_MANAGE = "USER:MANAGE";
     public static final String ROLE_MANAGE = "ROLE:MANAGE";
 
-    // ── Đề thi & nội dung kiểm tra ─────────────────────────────
     public static final String EXAM_TYPE_MANAGE = "EXAM_TYPE:MANAGE";
     public static final String EXAM_TYPE_LAYOUT_MANAGE = "EXAM_TYPE:LAYOUT";
     public static final String EXAM_CATEGORY_MANAGE = "EXAM_CATEGORY:MANAGE";
@@ -40,27 +27,22 @@ public final class PermissionCatalog {
     public static final String MILESTONE_MANAGE = "MILESTONE:MANAGE";
     public static final String RECOVERY_RESOURCE_MANAGE = "RECOVERY_RESOURCE:MANAGE";
 
-    // ── Bài kiểm tra & lượt làm ────────────────────────────────
     public static final String TEST_MANAGE = "TEST:MANAGE";
     public static final String TEST_MANAGE_PRICING = "TEST:MANAGE_PRICING";
     public static final String ATTEMPT_MANAGE = "ATTEMPT:MANAGE";
     public static final String EVALUATION_MANAGE = "EVALUATION:MANAGE";
 
-    // ── Bài viết & từ vựng ─────────────────────────────────────
     public static final String POST_MODERATE = "POST:MODERATE";
     public static final String POST_CATEGORY_MANAGE = "POST_CATEGORY:MANAGE";
     public static final String VOCABULARY_MANAGE = "VOCABULARY:MANAGE";
 
-    // ── Lớp học ────────────────────────────────────────────────
     public static final String CLASS_MANAGE = "CLASS:MANAGE";
 
-    // ── Game hóa ───────────────────────────────────────────────
     public static final String QUEST_MANAGE = "QUEST:MANAGE";
     public static final String COSMETIC_MANAGE = "COSMETIC:MANAGE";
     public static final String COIN_MANAGE = "COIN:MANAGE";
     public static final String STREAK_CONFIG_MANAGE = "STREAK_CONFIG:MANAGE";
 
-    // ── Hệ thống ───────────────────────────────────────────────
     public static final String AUDIT_VIEW = "AUDIT:VIEW";
     public static final String DASHBOARD_VIEW = "DASHBOARD:VIEW";
 

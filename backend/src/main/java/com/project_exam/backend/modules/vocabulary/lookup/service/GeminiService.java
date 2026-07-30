@@ -83,10 +83,6 @@ public class GeminiService {
         }
     }
 
-    /**
-     * Gọi Gemini API để giải thích câu hỏi trắc nghiệm.
-     * @param passage có thể null nếu câu hỏi không có ngữ cảnh.
-     */
     public String explainQuestion(Question question, List<Answer> answers, Passage passage) {
         if (question == null) {
             throw new BadRequestException("Câu hỏi không được để trống.");
@@ -111,8 +107,6 @@ public class GeminiService {
         String prompt = buildVocabularyPrompt(rawText);
         return callGeminiApi(prompt, VOCAB_TEMPERATURE, VOCAB_MAX_TOKENS);
     }
-
-    // ---------- PROMPT BUILDERS ----------
 
     private String buildExplainPrompt(Question question, List<Answer> answers, Passage passage) {
         StringBuilder userData = new StringBuilder(512);
@@ -147,8 +141,6 @@ public class GeminiService {
     private String buildVocabularyPrompt(String rawText) {
         return vocabularyPromptTemplate.replace("{{rawText}}", rawText);
     }
-
-    // ---------- API CALL ----------
 
     private String callGeminiApi(String prompt, double temperature, int maxTokens) {
         Map<String, Object> requestBody = buildRequestBody(prompt, temperature, maxTokens);
@@ -235,7 +227,6 @@ public class GeminiService {
             throw new BadRequestException("Gemini trả về phản hồi rỗng.");
         }
 
-        // Xử lý trường hợp prompt bị chặn bởi safety filter
         Map<String, Object> promptFeedback = (Map<String, Object>) body.get("promptFeedback");
         if (promptFeedback != null && promptFeedback.get("blockReason") != null) {
             String reason = String.valueOf(promptFeedback.get("blockReason"));

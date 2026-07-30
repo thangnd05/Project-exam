@@ -19,7 +19,7 @@ public class User {
     private String userId;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String userName; // nickname / tên đăng nhập
+    private String userName;
 
     @Column(nullable = false, length = 100)
     private String fullName;

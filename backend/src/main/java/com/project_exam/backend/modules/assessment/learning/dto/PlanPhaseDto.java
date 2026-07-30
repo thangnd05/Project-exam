@@ -21,19 +21,14 @@ public class PlanPhaseDto {
     private Integer daysAllocated;
     private Integer practiceSize;
 
-    /** % đúng tại part này khi chẩn đoán. */
     private BigDecimal currentPercentage;
 
-    /** weakness score đã tính (cao = ưu tiên). */
     private BigDecimal weaknessScore;
 
-    /** Tag yếu nhất, có name để hiển thị. */
     private List<WeakTagDto> weakTags;
 
-    /** Tài liệu phương pháp gợi ý đọc trước khi luyện (lấy từ RecoveryResource theo tag). */
     private List<RecommendedResourceDto> recommendedResources;
 
-    /** Câu hỏi đề xuất luyện trong phase này. */
     private List<String> recommendedQuestionIds;
 
     private Integer completedPractices;

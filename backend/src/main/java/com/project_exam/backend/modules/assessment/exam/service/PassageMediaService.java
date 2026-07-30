@@ -24,7 +24,6 @@ public class PassageMediaService {
         this.passageMediaMapper = passageMediaMapper;
     }
 
-    // CREATE
     public PassageMediaResponse create(PassageMediaRequest request) {
 
         PassageMedia media = new PassageMedia();
@@ -37,7 +36,6 @@ public class PassageMediaService {
         return toResponse(media);
     }
 
-    // GET BY ID
     public PassageMediaResponse getById(String id) {
 
         PassageMedia media = repository.findById(id)
@@ -46,7 +44,6 @@ public class PassageMediaService {
         return toResponse(media);
     }
 
-    // GET BY PASSAGE
     public List<PassageMediaResponse> getByPassageId(String passageId) {
 
         return repository.findByPassageId(passageId)
@@ -55,7 +52,6 @@ public class PassageMediaService {
                 .collect(Collectors.toList());
     }
 
-    // UPDATE
     public PassageMediaResponse update(String id, PassageMediaRequest request) {
 
         PassageMedia media = repository.findById(id)
@@ -67,12 +63,10 @@ public class PassageMediaService {
         return toResponse(repository.save(media));
     }
 
-    // DELETE
     public void delete(String id) {
         repository.deleteById(id);
     }
 
-    // MAPPER
     private PassageMediaResponse toResponse(PassageMedia media) {
         return passageMediaMapper.toResponse(media);
     }

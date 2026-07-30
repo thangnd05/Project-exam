@@ -2,13 +2,10 @@ package com.project_exam.backend.modules.assessment.learning.support;
 
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 
-/**
- * Số câu mục tiêu mỗi phiên ải. Thực tế = min(mục tiêu, số câu lấy được từ kho).
- */
 public final class LearningPlanQuestionTargets {
 
     public static final int TAG_TARGET = 50;
-    /** Mỗi ải cuối Part = 200% số câu chuẩn của Part. */
+
     public static final int CAPSTONE_MULTIPLIER = 2;
     public static final int DEFAULT_PART_QUESTIONS_WHEN_UNSET = 30;
     public static final int MIN_POOL_FETCH = 120;

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class NoteMapper {
 
-    /** userId không trả về DTO: API chỉ phục vụ ghi chú của chính người đang đăng nhập. */
     public NoteResponse toResponse(Note note) {
         return NoteResponse.builder()
                 .noteId(note.getNoteId())

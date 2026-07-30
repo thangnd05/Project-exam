@@ -32,7 +32,7 @@ public class CloudinaryService {
 
     public String uploadAudio(MultipartFile file) throws IOException {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap("resource_type", "auto")); // hoặc "video"
+                ObjectUtils.asMap("resource_type", "auto"));
         return (String) uploadResult.get("secure_url");
     }
 
@@ -41,7 +41,7 @@ public class CloudinaryService {
         Map uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap(
-                        "resource_type", "raw", // quan trọng
+                        "resource_type", "raw",
                         "folder", "english_exam/documents",
                         "use_filename", true,
                         "unique_filename", true

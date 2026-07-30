@@ -8,10 +8,6 @@ import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Trang kết quả của một ải — có URL riêng nên F5 vẫn giữ kết quả.
- * Đọc lại phiên đã nộp gần nhất của ải qua current-session?includeReview=true.
- */
 function PlanResultPage() {
   const { learningPlanId, taskId } = useParams();
   const navigate = useNavigate();
@@ -20,7 +16,7 @@ function PlanResultPage() {
     queryKey: ['plan-result', learningPlanId, taskId],
     queryFn: () => getCurrentSession(learningPlanId, taskId, true),
     enabled: !!learningPlanId && !!taskId,
-    // Luyện lại rồi nộp tiếp phải thấy bài LẦN MỚI, không phải kết quả lần trước còn trong cache.
+
     staleTime: 0,
     gcTime: 0,
   });

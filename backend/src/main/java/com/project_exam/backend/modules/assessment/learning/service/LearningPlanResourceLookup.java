@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** Tài liệu ôn (RecoveryResource) gắn tag — dùng trước khi luyện ải. */
 @Component
 @RequiredArgsConstructor
 public class LearningPlanResourceLookup {
@@ -26,9 +25,6 @@ public class LearningPlanResourceLookup {
         return Optional.ofNullable(findFirstByTagIds(List.of(tagId)).get(tagId));
     }
 
-    /**
-     * Mỗi tagId tài liệu đầu tiên (theo thứ tự resource_tag).
-     */
     public Map<String, PlanPhaseDto.RecommendedResourceDto> findFirstByTagIds(Collection<String> tagIds) {
         if (tagIds == null || tagIds.isEmpty()) {
             return Map.of();
@@ -62,10 +58,6 @@ public class LearningPlanResourceLookup {
         return result;
     }
 
-    /**
-     * Tài liệu gắn Part (giới thiệu/cách làm Part) theo từng examPartId —
-     * hiển thị đầu nhóm Part trong kế hoạch, trước tài liệu theo tag.
-     */
     public Map<String, List<PlanPhaseDto.RecommendedResourceDto>> findByExamPartIds(Collection<String> examPartIds) {
         if (examPartIds == null || examPartIds.isEmpty()) {
             return Map.of();

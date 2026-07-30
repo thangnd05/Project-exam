@@ -21,15 +21,13 @@ public class UserTest {
     @UuidV7
     private String userTestId;
 
-    // Nullable: guest không có userId, phải dùng guestSessionId.
-    private String userId; // FK -> users.user_id
+    private String userId;
 
-    // Định danh phiên cho guest (UUID do client sinh, lưu trong localStorage).
     @Column(name = "guest_session_id", length = 64)
     private String guestSessionId;
 
     @Column(nullable = false)
-    private String testId; // FK -> tests.test_id
+    private String testId;
 
     @Column(nullable = false)
     private Instant startedAt = Instant.now();
@@ -40,18 +38,12 @@ public class UserTest {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private Status status = Status.IN_PROGRESS; // mặc định khi bắt đầu thi
+    private Status status = Status.IN_PROGRESS;
 
-    // FULL_TEST = làm cả đề, có giới hạn giờ, tính lượt/xu, lên bảng xếp hạng.
-    // PRACTICE  = luyện tập theo Part, không giới hạn giờ, miễn phí/không tốn lượt,
-    //             lưu lịch sử nhưng KHÔNG lên bảng xếp hạng.
-    // Cột mới (ddl-auto=update) -> row cũ = NULL, được coi như FULL_TEST ở mọi nơi.
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Mode mode = Mode.FULL_TEST;
 
-    // Danh sách examPartId được luyện (CSV đã sort), chỉ có khi mode = PRACTICE.
-    // Dùng để tính mẫu số chấm điểm đúng theo số câu của các Part đã chọn.
     @Column(name = "practice_part_ids", length = 500)
     private String practicePartIds;
 
@@ -69,7 +61,6 @@ public class UserTest {
         PRACTICE
     }
 
-    /** Row cũ (mode = NULL) coi như FULL_TEST. */
     public boolean isPractice() {
         return mode == Mode.PRACTICE;
     }

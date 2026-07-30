@@ -40,7 +40,6 @@
   z-index: 2;
 }
 
-/* ---- Màn hình MacBook (viền nhôm mảnh, bezel đen) ---- */
 .screen {
   position: relative;
   padding: 1.8%;
@@ -69,7 +68,7 @@
   overflow: hidden;
   border-radius: 4px;
   background: #0f172a;
-  /* Khớp tỉ lệ ảnh screenshot (~2:1) để tránh co méo */
+
   aspect-ratio: 2 / 1;
 }
 
@@ -83,13 +82,12 @@
   height: 100%;
   object-fit: cover;
   object-position: top center;
-  /* Zoom nhẹ để chữ UI lớn hơn, nhìn nét hơn trong màn nhỏ */
+
   transform: scale(1.08);
   transform-origin: top center;
   image-rendering: -webkit-optimize-contrast;
 }
 
-/* ---- Placeholder page ---- */
 .browser {
   display: flex;
   flex-direction: column;

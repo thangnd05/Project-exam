@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class QuestionGroupAdminResponse {
 
-    private PassageResponse passage; // có thể null
+    private PassageResponse passage;
 
     private List<QuestionAdminResponse> questions;
 }

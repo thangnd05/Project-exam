@@ -15,7 +15,6 @@ public class ReactController {
 
     private final ReactService reactService;
 
-    // ─── GET thống kê react (public) ─────────────
     @GetMapping
     public ResponseEntity<ReactSummaryResponse> getReacts(
             @PathVariable String postId,
@@ -24,7 +23,6 @@ public class ReactController {
         return ResponseEntity.ok(reactService.getReactSummary(postId, httpRequest));
     }
 
-    // ─── POST toggle react (auth) ─────────────────
     @PostMapping
     public ResponseEntity<ReactSummaryResponse> toggleReact(
             @PathVariable String postId,

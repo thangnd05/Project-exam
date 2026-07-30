@@ -45,7 +45,6 @@ function QuestModal({show, onClose}) {
   const claimMutation = useClaimQuest();
   const claimingId = claimMutation.isPending ? claimMutation.variables : null;
 
-  // Danh sách nhiệm vụ qua React Query — chỉ fetch khi modal mở; useClaimQuest tự invalidate.
   const {
     data: quests = [],
     isLoading: loading,

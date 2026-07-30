@@ -14,7 +14,7 @@ public class PlanTaskDto {
     private String taskId;
     private Integer taskOrder;
     private String tagId;
-    /** TAG | PART_CAPSTONE_1 | PART_CAPSTONE_2 */
+
     private String taskType;
     private Integer targetQuestionCount;
     private String tagName;
@@ -26,7 +26,6 @@ public class PlanTaskDto {
     private BigDecimal bestAccuracy;
     private Integer attemptCount;
 
-    /** Tài liệu đọc trước khi luyện (RecoveryResource gắn tag). */
     private PlanPhaseDto.RecommendedResourceDto studyResource;
 
     private Integer priorityScore;

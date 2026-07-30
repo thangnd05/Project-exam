@@ -35,21 +35,16 @@ public class AnswerService {
     public List<Answer> syncAnswers(String questionId, List<AnswerRequest> requests) {
         if (requests == null) return new ArrayList<>();
 
-        // 1. Lấy tất cả Answer hiện có của câu hỏi này trong DB
         List<Answer> existingInDb = answerRepository.findByQuestionId(questionId);
 
-        // 2. Tạo Map để tra cứu nhanh Answer cũ theo ID (tăng hiệu năng)
         Map<String, Answer> dbMap = existingInDb.stream()
                 .collect(Collectors.toMap(Answer::getAnswerId, a -> a));
 
-        // 3. Xác định các ID mà Frontend muốn giữ lại
         Set<String> idsToKeep = requests.stream()
                 .map(AnswerRequest::getAnswerId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        // 4. XÓA: Những cái có trong DB nhưng không có trong danh sách gửi lên
-        // (Nghĩa là người dùng đã xóa chúng trên giao diện)
         List<Answer> toDelete = existingInDb.stream()
                 .filter(a -> !idsToKeep.contains(a.getAnswerId()))
                 .collect(Collectors.toList());
@@ -57,20 +52,18 @@ public class AnswerService {
             answerRepository.deleteAll(toDelete);
         }
 
-        // 5. CẬP NHẬT hoặc THÊM MỚI
         List<Answer> results = new ArrayList<>();
         for (AnswerRequest req : requests) {
             Answer answer;
             if (req.getAnswerId() != null && dbMap.containsKey(req.getAnswerId())) {
-                // Trường hợp UPDATE: Lấy object cũ từ Map ra để set lại giá trị
+
                 answer = dbMap.get(req.getAnswerId());
             } else {
-                // Trường hợp INSERT: Tạo mới hoàn toàn (do id null hoặc id không khớp)
+
                 answer = new Answer();
                 answer.setQuestionId(questionId);
             }
 
-            // Map dữ liệu từ DTO vào Entity
             answer.setAnswerText(req.getAnswerText());
             answer.setIsCorrect(req.getIsCorrect() != null ? req.getIsCorrect() : false);
             answer.setAnswerLabel(req.getAnswerLabel());
@@ -141,7 +134,7 @@ public class AnswerService {
 
         return allAnswers.stream()
                 .collect(Collectors.groupingBy(
-                        Answer::getQuestionId,   // group bằng entity trước
+                        Answer::getQuestionId,
                         Collectors.mapping(
                                 answerMapper::toResponse,
                                 Collectors.collectingAndThen(
@@ -155,7 +148,6 @@ public class AnswerService {
                 ));
     }
 
-    // Hàm helper (cần cải tiến nếu Answer không có questionId)
     private String findQuestionIdForAnswer(List<Answer> allAnswers, String answerId) {
         return allAnswers.stream()
                 .filter(a -> a.getAnswerId().equals(answerId))

@@ -385,7 +385,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
-  /* Fade in near the front only (smooth with orbit, no hard toggle). */
+
   opacity: calc(max(0, var(--frontness, 0) - 0.55) / 0.45);
 }
 

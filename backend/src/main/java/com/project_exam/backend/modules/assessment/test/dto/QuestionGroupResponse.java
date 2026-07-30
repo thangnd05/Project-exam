@@ -15,6 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionGroupResponse {
-    private PassageResponse passage; // Đoạn văn chung cho nhóm (có thể null nếu là câu đơn)
-    private List<QuestionResponse> questions; // Danh sách câu hỏi trong nhóm
+    private PassageResponse passage;
+    private List<QuestionResponse> questions;
 }

@@ -18,7 +18,7 @@ export default function NotFoundPage() {
                         fill="none"
                         aria-hidden="true"
                     >
-                        {/* bóng đổ */}
+
                         <ellipse
                             className={cx("shadow")}
                             cx="80"
@@ -28,7 +28,7 @@ export default function NotFoundPage() {
                             fill={brandColors.primary}
                         />
                         <g className={cx("mascot")}>
-                            {/* thân tròn mềm */}
+
                             <rect
                                 x="26"
                                 y="30"
@@ -37,18 +37,18 @@ export default function NotFoundPage() {
                                 rx="42"
                                 fill="url(#nf-body)"
                             />
-                            {/* má hồng */}
+
                             <circle cx="52" cy="92" r="8" fill="#ffb0c4" opacity="0.75" />
                             <circle cx="108" cy="92" r="8" fill="#ffb0c4" opacity="0.75" />
-                            {/* mắt */}
+
                             <circle className={cx("eye")} cx="62" cy="76" r="6.5" fill="#1e293b" />
                             <circle className={cx("eye")} cx="98" cy="76" r="6.5" fill="#1e293b" />
                             <circle cx="64" cy="74" r="2" fill="#ffffff" />
                             <circle cx="100" cy="74" r="2" fill="#ffffff" />
-                            {/* miệng chữ o ngơ ngác */}
+
                             <ellipse cx="80" cy="102" rx="5" ry="6" fill="#1e293b" />
                         </g>
-                        {/* dấu hỏi nảy nảy */}
+
                         <text
                             className={cx("question")}
                             x="128"

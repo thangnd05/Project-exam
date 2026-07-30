@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "learning_plan_tasks", indexes = {
-        // learning_plan_id đã được index dẫn đầu bởi idx_learning_plan_tasks_plan (learning_plan_id, task_order)
+
         @Index(name = "idx_learning_plan_tasks_tag_id", columnList = "tag_id"),
         @Index(name = "idx_learning_plan_tasks_exam_part_id", columnList = "exam_part_id")
 })
@@ -33,7 +33,6 @@ public class LearningPlanTask {
     @Column(name = "task_type", nullable = false, length = 30)
     private PlanTaskType taskType = PlanTaskType.TAG;
 
-    /** Số câu mục tiêu phiên học (50 tag / 200% Part cho capstone). */
     @Column(name = "target_question_count")
     private Integer targetQuestionCount;
 
@@ -62,7 +61,6 @@ public class LearningPlanTask {
     @Column(name = "passed_at")
     private Instant passedAt;
 
-    /** Ưu tiên gợi ý học (cao = nên học trước). */
     @Column(name = "priority_score", nullable = false)
     private Integer priorityScore = 0;
 

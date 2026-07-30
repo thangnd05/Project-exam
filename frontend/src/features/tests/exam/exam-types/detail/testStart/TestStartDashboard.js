@@ -33,7 +33,7 @@ function TestStartDashboard({
               (Array.isArray(userAnswers[q.questionId]?.selectedAnswerIds) &&
                 userAnswers[q.questionId].selectedAnswerIds.length > 0) ||
               !!userAnswers[q.questionId]?.answerText;
-            // Paged: câu ở bước chưa mở khoá / phần nghe đã qua thì khoá (không nhảy được).
+
             const locked =
               isPaged && typeof canNavigateToQuestion === 'function'
                 ? !canNavigateToQuestion(q.questionId)

@@ -32,9 +32,6 @@ public class VocabularyService {
     private final AuthUtils authUtils;
     private final VocabularyMapper vocabularyMapper;
 
-    // =========================
-    // GET ALL
-    // =========================
     public List<VocabularyResponse> findAll() {
         return repository.findAll()
                 .stream()
@@ -42,9 +39,6 @@ public class VocabularyService {
                 .toList();
     }
 
-    // =========================
-    // GET BY ID
-    // =========================
     public VocabularyResponse findById(String id) {
         Vocabulary vocab = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Vocabulary không tồn tại"));
@@ -52,9 +46,6 @@ public class VocabularyService {
         return toResponse(vocab);
     }
 
-    // =========================
-    // DELETE
-    // =========================
     public void delete(String id) {
         Vocabulary vocab = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Vocabulary không tồn tại"));
@@ -62,9 +53,6 @@ public class VocabularyService {
         repository.delete(vocab);
     }
 
-    // =========================
-    // CREATE
-    // =========================
     public VocabularyResponse createVocabulary(VocabularyRequest request) {
 
         VocabularyAlbum album;
@@ -111,9 +99,6 @@ public class VocabularyService {
         return requests.stream().map(this::createVocabulary).toList();
     }
 
-    // =========================
-    // UPDATE
-    // =========================
     public VocabularyResponse updateVocabulary(String vocabId, VocabularyRequest request) {
 
         Vocabulary vocab = repository.findById(vocabId)
@@ -147,9 +132,6 @@ public class VocabularyService {
         return toResponse(vocab);
     }
 
-    // =========================
-    // FIND BY ALBUM
-    // =========================
     public List<VocabularyResponse> findAllByAlbumId(String albumId, HttpServletRequest request) {
 
         String currentUserId = authUtils.getUserId(request);
@@ -167,9 +149,6 @@ public class VocabularyService {
                 .toList();
     }
 
-    // =========================
-    // MAPPER ENTITY -> DTO
-    // =========================
     private VocabularyResponse toResponse(Vocabulary vocab) {
 
         VocabularyResponse response = vocabularyMapper.toResponse(vocab);

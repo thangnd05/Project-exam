@@ -8,7 +8,6 @@ import OverviewCard from './OverviewCard';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import { useDashboardStats, useTrafficHeatmap } from './hooks/useDashboardStats';
 
-/** Ngày hôm nay dạng 'yyyy-MM-dd' theo giờ địa phương (không lệch múi giờ như toISOString). */
 const localISODate = (d = new Date()) => {
     const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
     return local.toISOString().slice(0, 10);
@@ -24,10 +23,6 @@ const EMPTY_TRAFFIC = {
     topCountries: [],
 };
 
-/**
- * Card heatmap ngày×giờ có bộ lọc ngày: mặc định 7 ngày gần nhất, chọn ngày (chỉ hôm nay & quá khứ)
- * để xem tuần kết thúc ở ngày đó — giữ nguyên giao diện heatmap.
- */
 const TrafficHeatmapCard = ({ delay }) => {
     const today = localISODate();
     const [endDate, setEndDate] = useState(today);
@@ -89,7 +84,7 @@ const AdminDashboard = () => {
                 </div>
             ) : (
                 <>
-                    {/* Card số liệu tổng quan — cùng 1 dòng, giao diện đồng nhất */}
+
                     <Row className={cx('kpiRow')}>
                         <Col lg={3} md={6} sm={12}>
                             <OverviewCard
@@ -124,7 +119,6 @@ const AdminDashboard = () => {
                         </Col>
                     </Row>
 
-                    {/* Heatmap tuần × giờ, lọc theo ngày ngay trong card */}
                     <Row className={cx('chartsRow')}>
                         <Col lg={12}>
                             <TrafficHeatmapCard delay={0.5} />

@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Skill (Listening/Reading/Speaking/Writing) là reference data hệ thống.
- * GET mở (frontend hiển thị danh mục), CUD admin-only.
- */
 @RestController
 @RequestMapping("/api/skills")
 @RequiredArgsConstructor

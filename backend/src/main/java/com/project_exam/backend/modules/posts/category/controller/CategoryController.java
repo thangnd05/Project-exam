@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Category dùng chung cho post. GET mở (frontend hiển thị), CUD admin-only —
- * tránh user xoá category đang gắn vào nhiều bài viết.
- */
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor

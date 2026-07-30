@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter @Setter
 public class PracticeCheckRequest {
     private String vocabId;
-    private String type; // MULTICHOICE / LISTENING_EN
-    private String selectedOptionText; // nếu MULTICHOICE
-    private String userEnglish; // nếu LISTENING_EN
-    private String userVietnamese; // nếu LISTENING_EN
+    private String type;
+    private String selectedOptionText;
+    private String userEnglish;
+    private String userVietnamese;
 }

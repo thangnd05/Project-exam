@@ -64,8 +64,6 @@ export function useUsers({page, size, keyword, roleId, verified}) {
     (role) => role.role_name === 'TEACHER',
   )?.role_id;
 
-  // Thống kê tổng toàn hệ thống (không phụ thuộc filter/trang hiện tại).
-  // Đọc totalElements từ endpoint phân trang với size=1 nên rất nhẹ.
   const readTotal = (userPage) => userPage?.totalElements || 0;
 
   const totalStatQuery = useQuery({

@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/** Một ghi chú trong sổ tay cá nhân của user. */
 @Entity
 @Table(name = "notes", indexes = {
     @Index(name = "idx_notes_user_id", columnList = "user_id")
@@ -22,7 +21,7 @@ public class Note {
     private String noteId;
 
     @Column(nullable = false)
-    private String userId; // FK -> users.user_id
+    private String userId;
 
     @Column(nullable = false, length = 200)
     private String title;

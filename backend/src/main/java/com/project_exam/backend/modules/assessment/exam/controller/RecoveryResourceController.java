@@ -31,8 +31,6 @@ public class RecoveryResourceController {
     private final ObjectMapper objectMapper;
     private final AuthUtils authUtils;
 
-    // =================== CREATE ===================
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RecoveryResourceResponse> createResource(
             @RequestPart("request") String requestJson,
@@ -44,8 +42,6 @@ public class RecoveryResourceController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(resourceService.createResource(request, file, httpRequest));
     }
-
-    // =================== UPDATE ===================
 
     @PutMapping(value = "/{resourceId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RecoveryResourceResponse> updateResource(
@@ -69,16 +65,12 @@ public class RecoveryResourceController {
         return ResponseEntity.ok(resourceService.updateResource(resourceId, request, null, httpRequest));
     }
 
-    // =================== DELETE ===================
-
     @DeleteMapping("/{resourceId}")
     public ResponseEntity<Void> deleteResource(@PathVariable String resourceId) {
         authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         resourceService.deleteResource(resourceId);
         return ResponseEntity.noContent().build();
     }
-
-    // =================== GET ===================
 
     @GetMapping
     public ResponseEntity<List<RecoveryResourceResponse>> getAllResources() {
@@ -90,26 +82,16 @@ public class RecoveryResourceController {
         return ResponseEntity.ok(resourceService.getResourceById(resourceId));
     }
 
-    /**
-     * Tìm tài liệu theo tag (dùng cho chẩn đoán: tag yếu -> gợi ý tài liệu ôn tập).
-     */
     @GetMapping("/by-tag/{tagId}")
     public ResponseEntity<List<RecoveryResourceResponse>> getResourcesByTag(@PathVariable String tagId) {
         return ResponseEntity.ok(resourceService.getResourcesByTagId(tagId));
     }
 
-    /**
-     * Tìm tài liệu gắn Part (vd giới thiệu/cách làm Part) — dùng cho trang luyện tập theo Part.
-     */
     @GetMapping("/by-part/{examPartId}")
     public ResponseEntity<List<RecoveryResourceResponse>> getResourcesByPart(@PathVariable String examPartId) {
         return ResponseEntity.ok(resourceService.getResourcesByExamPartId(examPartId));
     }
 
-    /**
-     * Tìm tài liệu gắn nhiều Part cùng lúc (query param: ?examPartIds=id1,id2) —
-     * dùng cho modal chọn chế độ luyện tập (1 request cho cả danh sách Part của đề).
-     */
     @GetMapping("/by-parts")
     public ResponseEntity<List<RecoveryResourceResponse>> getResourcesByParts(
             @RequestParam List<String> examPartIds
@@ -117,9 +99,6 @@ public class RecoveryResourceController {
         return ResponseEntity.ok(resourceService.getResourcesByExamPartIds(examPartIds));
     }
 
-    /**
-     * Tìm tài liệu match tất cả tags (query param: ?tagIds=id1,id2,id3).
-     */
     @GetMapping("/by-tags")
     public ResponseEntity<List<RecoveryResourceResponse>> getResourcesByTags(
             @RequestParam List<String> tagIds
@@ -127,27 +106,21 @@ public class RecoveryResourceController {
         return ResponseEntity.ok(resourceService.getResourcesByTags(tagIds));
     }
 
-    /**
-     * Proxy xem file: fetch từ Cloudinary, trả về đúng Content-Type + inline
-     * để trình duyệt mở trực tiếp (PDF render, ảnh hiện, audio/video phát).
-     */
     @GetMapping("/{resourceId}/view")
     public ResponseEntity<byte[]> viewResource(@PathVariable String resourceId) throws IOException {
         RecoveryResourceResponse resource = resourceService.getResourceById(resourceId);
         String url = resource.getUrl();
         String fileName = resource.getOriginalFileName();
 
-        // Detect content type từ tên file gốc
         String contentType = resolveContentType(fileName, url);
 
-        // Fetch file từ Cloudinary
         try (InputStream in = URI.create(url).toURL().openStream()) {
             byte[] data = in.readAllBytes();
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType(contentType));
             headers.setContentLength(data.length);
-            // inline = mở trực tiếp, không trigger download
+
             headers.set(HttpHeaders.CONTENT_DISPOSITION,
                     "inline; filename=\"" + (fileName != null ? fileName : "file") + "\"");
 

@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "learning_plan_sessions", indexes = {
-        // learning_plan_id đã được index dẫn đầu bởi idx_learning_plan_sessions_plan_status (learning_plan_id, status)
+
         @Index(name = "idx_learning_plan_sessions_task_id", columnList = "task_id"),
         @Index(name = "idx_learning_plan_sessions_resource_id", columnList = "resource_id")
 })
@@ -49,7 +49,6 @@ public class LearningPlanSession {
     @Column(name = "passed")
     private Boolean passed;
 
-    /** True khi session bị huỷ tự động (user switch task), phân biệt với fail thật 0%. */
     @Column(name = "abandoned", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean abandoned = false;
 

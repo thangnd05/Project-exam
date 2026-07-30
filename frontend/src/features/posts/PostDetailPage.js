@@ -45,7 +45,6 @@ function PostDetailPage() {
   const [replyIndentPx, setReplyIndentPx] = useState(40);
   const [expandedReplies, setExpandedReplies] = useState({});
 
-  // Server-state qua React Query để có cache/retry/error state đồng bộ.
   const postQuery = useQuery({
     queryKey: ['post', postId],
     queryFn: () => getPostById(postId),
@@ -82,18 +81,15 @@ function PostDetailPage() {
   const isReacting = reactMutation.isPending;
   const isSaving = saveMutation.isPending;
 
-  // Seed trạng thái optimistic (like/bookmark) từ post — chỉ khi ĐỔI bài (post.id),
-  // để refetch nền không ghi đè thao tác optimistic của user.
   useEffect(() => {
     if (!post) return;
     setLiked(post.currentUserReactType === 'LIKE');
     setLikeCount(post.reactCounts?.LIKE || 0);
     setBookmarked(!!post.currentUserSaved);
     setSaveCount(post.saveCount || 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [post?.id]);
 
-  // Đổi trang phục (frame/badge) -> làm mới post + comments để hiển thị đúng.
   const skipFirstCosmeticSync = useRef(true);
   useEffect(() => {
     if (!postId) return;

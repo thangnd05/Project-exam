@@ -22,10 +22,6 @@ public class ClassAccessGuard {
     private final ChapterRepository chapterRepository;
     private final AuthUtils authUtils;
 
-    /**
-     * Member đã được duyệt (APPROVED) hoặc teacher của lớp. Admin luôn pass.
-     * PENDING (mới nộp đơn join, chưa được duyệt) KHÔNG đủ quyền — phải đợi teacher approve.
-     */
     public void requireMemberOrTeacher(String classId, String userId, HttpServletRequest request) {
         if (classId == null) {
             throw new BadRequestException("classId không được để trống.");
@@ -42,7 +38,6 @@ public class ClassAccessGuard {
         }
     }
 
-    /** Chỉ teacher của lớp mới được thao tác (tạo đề/gắn câu hỏi…). Admin luôn pass. */
     public void requireTeacher(String classId, String userId, HttpServletRequest request) {
         if (classId == null) {
             throw new BadRequestException("classId không được để trống.");
@@ -56,7 +51,6 @@ public class ClassAccessGuard {
         }
     }
 
-    /** Đảm bảo chapter thuộc đúng class được chỉ định, đồng thời chapter tồn tại. */
     public void requireChapterInClass(String chapterId, String classId) {
         if (chapterId == null) return;
         if (classId == null) {

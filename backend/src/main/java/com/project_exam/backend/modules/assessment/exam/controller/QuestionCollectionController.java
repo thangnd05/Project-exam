@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Bộ sưu tập câu hỏi (gom nhiều câu hỏi theo chủ đề/nguồn). GET mở để frontend
- * lọc/hiển thị, CUD admin-only.
- */
 @RestController
 @RequestMapping("/api/question-collections")
 @RequiredArgsConstructor

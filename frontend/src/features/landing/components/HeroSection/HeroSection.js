@@ -21,7 +21,6 @@ const normalizeExamTypes = (payload) => {
   return [];
 };
 
-/** Prefer primary title before dash; keep readable length for the ring. */
 const shortExamName = (name) => {
   if (!name) return '';
   const primary = name.split(/\s*[–—]\s*/)[0].trim();

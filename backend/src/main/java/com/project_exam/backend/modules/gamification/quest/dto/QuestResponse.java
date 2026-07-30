@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import java.time.Instant;
 
-/** Nhiệm vụ đầy đủ — dùng cho trang quản lý admin. */
 @Getter
 @Builder
 public class QuestResponse {
@@ -21,5 +20,5 @@ public class QuestResponse {
     private Instant endAt;
     private Boolean active;
     private Instant createdAt;
-    private Long claimCount; // số user đã nhận
+    private Long claimCount;
 }

@@ -37,7 +37,7 @@ function PlanComparisonPage() {
   const chartData = useMemo(() => {
     return sorted.map((p, idx) => {
       const prev = idx > 0 ? sorted[idx - 1] : null;
-      // Cột biểu đồ cần số; plan cũ (trước khi có baselineReadiness) coi như 0.
+
       const readiness = p.baselineReadiness ?? 0;
       const prevReadiness = prev ? prev.baselineReadiness ?? null : null;
       const diffVsPrev =

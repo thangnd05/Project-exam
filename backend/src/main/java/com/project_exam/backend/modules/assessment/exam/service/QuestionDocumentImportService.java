@@ -32,49 +32,23 @@ import java.util.regex.Pattern;
 public class QuestionDocumentImportService {
     private static final Logger log = LoggerFactory.getLogger(QuestionDocumentImportService.class);
 
-    // =========================================================================
-    // CONFIG — đổi rule ở đây, không động logic bên dưới
-    // =========================================================================
-
-    /**
-     * Nhãn đáp án hợp lệ. Đổi sang ["A","B","C","D","E"] nếu hỗ trợ 5 lựa chọn,
-     * hoặc ["1","2","3","4"] nếu dùng số. Khi đổi PHẢI đồng bộ {@link #ALLOWED_LABEL_CLASS}.
-     */
     private static final List<String> ALLOWED_LABELS = List.of("A", "B", "C", "D");
 
-    /** Regex character-class tương ứng với {@link #ALLOWED_LABELS}. */
     private static final String ALLOWED_LABEL_CLASS = "[A-D]";
 
-    /** Từ khoá mở đầu câu hỏi. Thêm "Q", "No" nếu cần. */
     private static final String QUESTION_KEYWORDS = "Câu|Question|Bài";
 
-    /** Marker đặt cuối option để đánh dấu đáp án đúng. Vd: "A. London*". */
     private static final List<String> CORRECT_ANSWER_MARKERS = List.of("*");
 
-    /**
-     * Heuristic option dạng "A across" (không có dấu phân cách).
-     * Vượt quá 2 ngưỡng này -> coi là stem "A ..." chứ không phải option A,
-     * tránh nuốt câu dẫn trong đề TOEIC.
-     */
     private static final int MAX_INLINE_OPTION_CHARS = 100;
     private static final int MAX_INLINE_OPTION_WORDS = 15;
 
-    /** Cắt question text khi log để tránh spam. */
     private static final int LOG_QUESTION_PREVIEW_LIMIT = 120;
 
-    /** Giới hạn kích thước file upload (byte). */
-    private static final long MAX_FILE_SIZE_BYTES = 20L * 1024 * 1024; // 20MB
+    private static final long MAX_FILE_SIZE_BYTES = 20L * 1024 * 1024;
 
-    /**
-     * Ngưỡng tối thiểu (ký tự) để fallback styled-run match được tin tưởng qua substring.
-     * Cũ: 3 -> dễ dính từ phổ biến như "the", "and". Nâng lên 6 để giảm false positive.
-     */
     private static final int MIN_FALLBACK_STYLED_RUN_LENGTH = 6;
 
-    /**
-     * Dòng nên bỏ qua. Đặc thù môn Tiếng Anh — nếu import môn khác, chỉnh ở đây.
-     * Lower-case khi so sánh.
-     */
     private static final List<String> SKIPPABLE_PREFIXES = List.of(
             "part ",
             "choose the correct answer",
@@ -87,50 +61,28 @@ public class QuestionDocumentImportService {
             "pronunciation in the following questions"
     );
 
-    // =========================================================================
-    // PATTERNS (build từ config phía trên)
-    // =========================================================================
-
-    // "21.", "Câu 21.", "(21).", "21", "21 nội dung"
     private static final Pattern QUESTION_START_PATTERN = Pattern.compile(
             "^\\s*(?:(?:" + QUESTION_KEYWORDS + ")\\s*)?\\(?(\\d+)\\)?"
                     + "\\s*(?:(?:[\\.:\\-\\)]\\s*(.*))|(\\S.*))?\\s*$",
             Pattern.CASE_INSENSITIVE
     );
 
-    // Câu hỏi có tiền tố keyword rõ ràng ("Câu 21", "Question 21", "Bài 21").
-    // Dùng để phân biệt câu hỏi thật với dòng số trần bên trong nội dung passage
-    // (giờ "8:00", mã bưu chính "10719 Berlin", ngày "2 August", hàng bảng lịch trình).
     private static final Pattern QUESTION_KEYWORD_PREFIX_PATTERN = Pattern.compile(
             "^\\s*(?:" + QUESTION_KEYWORDS + ")\\s*\\(?\\d",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
-    // A. / A) / (A) / A: / A- / A <text>
-    // Negative lookahead (?![-_]{2,}) — sau separator/space, nếu là chuỗi gạch/gạch dưới
-    // (fill-in-blank), KHÔNG coi là option line.
     private static final Pattern OPTION_PATTERN = Pattern.compile(
             "^\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?(?:\\s*[\\.\\):\\-](?![-_]{2,})|\\s+(?![-_]{2,}))\\s*(.*)$",
             Pattern.CASE_INSENSITIVE
     );
 
-    // Vị trí bắt đầu option trên cùng một dòng (dàn ngang nhiều đáp án).
-    // - Có dấu phân cách -> chấp nhận đứng sau bất kỳ whitespace nào.
-    // - Không dấu phân cách -> bắt buộc >=2 spaces hoặc Tab để tránh nuốt stem.
-    // - Negative lookahead (?![-_]{2,}): nếu phía sau là chuỗi dấu gạch/gạch dưới
-    //   (fill-in-blank cloze), KHÔNG coi là option. Tránh "began a ------- agreement"
-    //   bị tách thành option A.
-    // - Negative lookahead (?![Mm]\\.): "A." trong "A.M." / "P.M." (viết tắt giờ) KHÔNG coi
-    //   là nhãn option. Tránh đáp án dạng "At 8:00 A.M." bị cắt đôi thành option A giả.
     private static final Pattern OPTION_LABEL_START = Pattern.compile(
             "(?:^|\\s)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s*[\\.\\):\\-](?![-_]{2,})(?![Mm]\\.)"
                     + "|(?:^|\\s{2,}|\\t)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s+(?![-_]{2,})",
             Pattern.CASE_INSENSITIVE
     );
 
-    // "B. READING & WRITING" — heading section, KHÔNG phải option
-    // Yêu cầu body bắt đầu bằng CHỮ CÁI VIẾT HOA (không phải digit) để tránh
-    // false positive với option dạng "A. 10", "B. 9", v.v.
     private static final Pattern SECTION_HEADING_OPTION_LIKE_PATTERN = Pattern.compile(
             "^" + ALLOWED_LABEL_CLASS + "\\.\\s*[A-Z][A-Z0-9\\s&/\\-,:]*$"
     );
@@ -146,58 +98,37 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE
     );
 
-    // "Đoạn 2:", "Đoạn 3.", "Văn bản 4 -" — marker phân tách đoạn văn CON trong cùng 1 passage
-    // (passage nhiều đoạn). Bắt buộc có số + dấu phân tách để tránh nuốt nhầm câu văn bắt đầu
-    // bằng "Đoạn". Đoạn đầu -> passage.content, các đoạn sau -> passage.extraContents.
     private static final Pattern PASSAGE_SEGMENT_PATTERN = Pattern.compile(
             "^\\s*(?:Đoạn|Văn\\s*bản)\\s+(\\d+)\\s*[:\\.\\-]\\s*(.*)$",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
-    // "Giải thích: ...", "Lời giải: ...", "Hướng dẫn: ...", "Explanation: ..."
-    // Marker phân tách (: . -) là optional để chấp nhận "Giải thích Paris là ...".
-    // UNICODE_CASE để case-insensitive hoạt động đúng với chữ Việt có dấu.
     private static final Pattern EXPLANATION_START_PATTERN = Pattern.compile(
             "^\\s*(?:Giải\\s*thích|Lời\\s*giải|Hướng\\s*dẫn|Explanation)\\s*[:\\.\\-]?\\s*(.*)$",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
-    // "Tags: Grammar, Tense", "Tag: ...", "Thẻ: ...", "Nhãn: ..."
-    // Marker (: hoặc -) BẮT BUỘC để tránh nuốt nhầm câu/giải thích bắt đầu bằng "Tag".
-    // Tên tag phân tách bằng dấu phẩy hoặc chấm phẩy.
     private static final Pattern TAGS_START_PATTERN = Pattern.compile(
             "^\\s*(?:Tags?|Thẻ|Nhãn)\\s*[:\\-]\\s*(.*)$",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
-    // "Dịch: ...", "Bản dịch: ...", "Dịch nghĩa: ...", "Translation: ..."
-    // Trong phần header của passage, marker này chia đoạn thành 2 phần:
-    // trước nó -> content (bản gốc), sau nó -> contentTranslation (bản dịch).
     private static final Pattern TRANSLATION_START_PATTERN = Pattern.compile(
             "^\\s*(?:Dịch(?:\\s*nghĩa)?|Bản\\s*dịch|Translation)\\s*[:\\.\\-]?\\s*(.*)$",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
-    // Whitespace chars "lạ" gặp trong Word: NBSP, ZWSP, ideographic space, NNBSP
     private static final Pattern WEIRD_WHITESPACE_PATTERN =
             Pattern.compile("[\\u00A0\\u200B\\u3000\\u202F]");
 
-    // Dòng bắt đầu bằng ký tự bullet/dash — coi là 1 dòng không tách theo option label.
-    // Tránh trường hợp "• A. across (ngang qua), C. inside ..." trong giải thích bị
-    // splitLineByOptionLabels cắt thành các option giả A/C/D.
     private static final Pattern BULLET_LINE_PATTERN = Pattern.compile(
             "^[\\u2022\\u00B7\\u2023\\u25AA\\u25E6\\u25CB\\u25CF\\u2605\\u2606\\-*+]\\s+\\S.*$"
     );
-
-    // =========================================================================
-    // ENTRY POINT
-    // =========================================================================
 
     public List<NormalQuestionRequest> parseQuestionsFromDocument(MultipartFile file) throws IOException {
         validateFile(file);
         List<ParsedLine> allLines = extractLinesFromDoc(file);
 
-        // Collector cho flat questions (không có passage).
         FlatQuestionCollector collector = new FlatQuestionCollector();
         new LineProcessor(collector).process(allLines);
         List<NormalQuestionRequest> parsedQuestions = collector.getResults();
@@ -215,7 +146,6 @@ public class QuestionDocumentImportService {
         validateFile(file);
         List<ParsedLine> allLines = extractLinesFromDoc(file);
 
-        // Collector cho passage groups.
         PassageGroupCollector collector = new PassageGroupCollector();
         new LineProcessor(collector).process(allLines);
         List<PassageQuestionGroup> parsedGroups = collector.getResults();
@@ -240,10 +170,6 @@ public class QuestionDocumentImportService {
         }
     }
 
-    // =========================================================================
-    // EXTRACT LINES — .doc / .docx
-    // =========================================================================
-
     private List<ParsedLine> extractLinesFromDoc(MultipartFile file) throws IOException {
         String filename = Optional.ofNullable(file.getOriginalFilename())
                 .orElse("")
@@ -256,18 +182,12 @@ public class QuestionDocumentImportService {
         if (filename.endsWith(".doc")) {
             return extractFromLegacyDoc(bytes);
         }
-        // Đây là validation error, không phải I/O.
+
         throw new IllegalArgumentException("Unsupported file type. Only .doc and .docx are accepted.");
     }
 
     private List<ParsedLine> extractFromDocx(byte[] bytes) throws IOException {
-        // Ưu tiên Mammoth (giữ được style qua HTML để detect đáp án đúng).
-        // Fallback POI khi Mammoth không trả về gì.
-        //
-        // Mammoth BỎ các đoạn rỗng khi convert sang HTML -> mất dòng trống ngăn cách
-        // đoạn (vd transcript / bản dịch). Vì vậy ta tính trước "đoạn nào có dòng trống
-        // theo sau" bằng POI (giữ nguyên đoạn rỗng) rồi chèn lại blank marker vào kết
-        // quả Mammoth, căn theo thứ tự các đoạn KHÔNG rỗng.
+
         List<Boolean> blankAfter = computeBlankAfterFlags(bytes);
         List<ParsedLine> mammothLines =
                 extractLinesFromDocxWithMammoth(new ByteArrayInputStream(bytes), blankAfter);
@@ -282,12 +202,6 @@ public class QuestionDocumentImportService {
         return lines;
     }
 
-    /**
-     * Dùng POI tính: với mỗi đoạn (paragraph) KHÔNG rỗng theo thứ tự tài liệu, có
-     * đoạn rỗng nào ngay sau nó không (true = có dòng trống ngăn cách). Danh sách này
-     * căn 1-1 với các block không rỗng mà Mammoth tạo ra (Mammoth bỏ hết đoạn rỗng).
-     * Trả về list rỗng nếu không đọc được -> khi đó không chèn blank (an toàn).
-     */
     private List<Boolean> computeBlankAfterFlags(byte[] bytes) {
         List<Boolean> flags = new ArrayList<>();
         try (InputStream is = new ByteArrayInputStream(bytes);
@@ -296,7 +210,7 @@ public class QuestionDocumentImportService {
                 String t = para.getParagraphText();
                 boolean empty = t == null || t.trim().isEmpty();
                 if (empty) {
-                    // Đánh dấu đoạn không rỗng gần nhất là "có dòng trống theo sau".
+
                     if (!flags.isEmpty()) {
                         flags.set(flags.size() - 1, Boolean.TRUE);
                     }
@@ -312,8 +226,7 @@ public class QuestionDocumentImportService {
     }
 
     private List<ParsedLine> extractFromLegacyDoc(byte[] bytes) throws IOException {
-        // Lưu ý: nhánh .doc KHÔNG detect được style (HWPF API hạn chế).
-        // Đáp án bôi đậm trong .doc sẽ rơi vào needsManualCorrect.
+
         List<ParsedLine> lines = new ArrayList<>();
         try (InputStream is = new ByteArrayInputStream(bytes);
              HWPFDocument doc = new HWPFDocument(is);
@@ -339,22 +252,18 @@ public class QuestionDocumentImportService {
             Document dom = Jsoup.parse(html);
             Elements blocks = dom.select("p, li, td");
             List<ParsedLine> lines = new ArrayList<>();
-            // Chỉ số block KHÔNG rỗng, để tra blankAfter (Mammoth đã bỏ các đoạn rỗng).
+
             int nonEmptyBlockIdx = 0;
             for (Element block : blocks) {
-                // Giữ <br/> (soft line break Shift+Enter trong Word) thành xuống dòng.
-                // block.text() gộp hết <br> thành 1 dòng, làm "Câu 7.A.B. *C.Giải thích:
-                // Where...(A)...(B)...(C)..." dính liền -> số câu bị vỡ, (A)(B)(C) trong
-                // transcript bị cắt thành option giả, "Giải thích:" dính C. nên không vào.
+
                 block.select("br").forEach(br -> br.replaceWith(new TextNode("\n")));
                 String blockText = block.wholeText();
                 if (blockText == null || blockText.trim().isEmpty()) {
-                    // Đoạn rỗng (Enter 2 lần trong Word) -> giữ làm ngăn cách đoạn.
+
                     addBlankMarker(lines);
                     continue;
                 }
-                // Chỉ lấy style liên quan đến đánh dấu đáp án đúng (bold/underline/highlight/màu).
-                // KHÔNG lấy span[style] chung chung vì sẽ dính cả style font/align/line-height.
+
                 Elements styledElements = block.select(
                         "strong, b, u, em, mark,"
                                 + " span[style*=color],"
@@ -368,7 +277,7 @@ public class QuestionDocumentImportService {
                 for (String logicalLine : blockText.split("\\R")) {
                     String cleanLine = cleanWhitespace(logicalLine);
                     if (cleanLine.isEmpty()) {
-                        // Dòng trống do soft-break (Shift+Enter 2 lần) -> ngăn cách đoạn.
+
                         addBlankMarker(lines);
                         continue;
                     }
@@ -386,8 +295,7 @@ public class QuestionDocumentImportService {
                         lines.add(new ParsedLine(cleanSeg, isStyled));
                     }
                 }
-                // Đoạn (không rỗng) này có dòng trống theo sau trong file Word gốc?
-                // -> chèn blank marker để giữ ngăn cách đoạn (Mammoth đã bỏ đoạn rỗng).
+
                 if (blankAfter != null && nonEmptyBlockIdx < blankAfter.size()
                         && Boolean.TRUE.equals(blankAfter.get(nonEmptyBlockIdx))) {
                     addBlankMarker(lines);
@@ -396,22 +304,12 @@ public class QuestionDocumentImportService {
             }
             return lines;
         } catch (Exception e) {
-            // Mammoth có thể throw nhiều loại exception (parser, IO).
-            // Bắt rộng để fallback POI thay vì fail toàn bộ import.
+
             log.warn("Mammoth docx->html failed, fallback to POI parser: {}", e.getMessage());
             return List.of();
         }
     }
 
-    /**
-     * Detect option có được style (bold/underline/highlight/màu) hay không, dựa trên
-     * text đã trích từ các tag style của block HTML.
-     *
-     * <p>Yêu cầu match phần BODY của option (nội dung sau dấu chấm) — KHÔNG match nhãn,
-     * vì nhãn chỉ là 1 ký tự A/B/C/D rất dễ trùng với chữ cái khác trong text bold.
-     * Nếu cần check nhãn được bold riêng, dùng dạng "A." (kèm dấu phân cách) để tránh
-     * trùng với chữ A đơn lẻ trong câu.
-     */
     private boolean isStyledByHtmlSegment(String styledRawText,
                                           String normalizedStyledText,
                                           String segmentText) {
@@ -425,9 +323,6 @@ public class QuestionDocumentImportService {
         String label = om.group(1).toUpperCase(Locale.ROOT);
         String body = om.group(2) == null ? "" : om.group(2).trim();
 
-        // (1) Nhãn được style theo dạng "A." — match raw text để tránh normalize làm
-        //     mất dấu chấm và dính ký tự khác.
-        // (Không check label đơn lẻ vì 1 ký tự quá dễ false-positive.)
         if (styledRawText.contains(label + ".")
                 || styledRawText.contains(label + ")")
                 || styledRawText.contains("(" + label + ")")
@@ -435,8 +330,6 @@ public class QuestionDocumentImportService {
             return true;
         }
 
-        // (2) Nội dung được style/highlight: A. <strong>London</strong>
-        //     Yêu cầu body phải đủ "đặc trưng" — không phải 1 ký tự lẻ.
         if (body.length() < 2) {
             return false;
         }
@@ -447,10 +340,6 @@ public class QuestionDocumentImportService {
         return normalizedStyledText.contains(normalizedBody);
     }
 
-    /**
-     * Thêm marker dòng trống để giữ khoảng cách đoạn trong "Giải thích:".
-     * Bỏ qua nếu list rỗng hoặc dòng cuối đã là blank — tránh blank thừa/đầu chuỗi.
-     */
     private void addBlankMarker(List<ParsedLine> lines) {
         if (lines.isEmpty() || lines.get(lines.size() - 1).blank) {
             return;
@@ -476,7 +365,7 @@ public class QuestionDocumentImportService {
     private void processParagraph(XWPFParagraph para, List<ParsedLine> lines) {
         String text = para.getParagraphText();
         if (text == null || text.trim().isEmpty()) {
-            // Đoạn rỗng -> giữ làm ngăn cách đoạn (cho "Giải thích:" nhiều đoạn).
+
             addBlankMarker(lines);
             return;
         }
@@ -529,36 +418,22 @@ public class QuestionDocumentImportService {
         }
     }
 
-    // =========================================================================
-    // LINE PROCESSOR — state machine dùng chung cho flat & passage
-    // =========================================================================
-
-    /**
-     * Callback interface để LineProcessor giao tiếp với "consumer" (flat list hoặc
-     * passage groups). Refactor này tránh duplicate logic giữa
-     * processLinesIntoQuestions và processLinesIntoPassageGroups.
-     */
     private interface QuestionCollector {
-        /** Đẩy 1 câu hỏi đã parse hoàn chỉnh vào collector. */
+
         void emitQuestion(ParsedQuestion q);
 
-        /** Bắt đầu một passage mới (chỉ PassageGroupCollector quan tâm). */
         default void startPassage() {
         }
 
-        /** Set content cho passage hiện tại (chỉ PassageGroupCollector quan tâm). */
         default void setPassageContent(String content) {
         }
 
-        /** Set bản dịch cho passage hiện tại (chỉ PassageGroupCollector quan tâm). */
         default void setPassageTranslation(String translation) {
         }
 
-        /** Set các đoạn văn bổ sung (passage nhiều đoạn) cho passage hiện tại. */
         default void setPassageExtraContents(List<String> extraContents) {
         }
 
-        /** True nếu collector hỗ trợ passage (để LineProcessor biết có nên match PASSAGE_START_PATTERN không). */
         default boolean supportsPassage() {
             return false;
         }
@@ -567,29 +442,22 @@ public class QuestionDocumentImportService {
     private class LineProcessor {
         private final QuestionCollector collector;
 
-        // State
         private ParsedQuestion currentQuestion;
         private String lastLabel;
-        // Buffer các dòng "tail" sau khi câu hiện tại đã đủ options.
-        // Dùng làm question text cho câu kế tiếp nếu câu đó thiếu số ở đầu,
-        // hoặc làm passage content nếu đang trong passage header.
+
         private final StringBuilder pendingText = new StringBuilder();
-        // Buffer phần bản dịch của passage (các dòng sau marker "Dịch:" trong passage header).
+
         private final StringBuilder pendingTranslation = new StringBuilder();
-        // Các đoạn văn đã "chốt" trước đoạn đang gom (pendingText), do gặp marker "Đoạn N:".
-        // Đoạn đầu tiên -> content, các đoạn sau -> extraContents.
+
         private final List<String> passageSegments = new ArrayList<>();
         private boolean inPassageHeader = false;
-        // True khi đang ở trong passage header VÀ đã gặp marker "Dịch:" -> các dòng tiếp
-        // theo gom vào pendingTranslation thay vì pendingText.
+
         private boolean inPassageTranslation = false;
-        // Sau khi gặp "Giải thích:", các dòng tiếp theo gom vào explanation
-        // cho đến khi gặp câu mới / passage mới / option mới.
+
         private boolean inExplanation = false;
-        // True khi vừa gặp 1 dòng trống trong khối explanation -> dòng explanation
-        // kế tiếp sẽ ngăn cách bằng dòng trống ("\n\n") thay vì 1 lần xuống dòng.
+
         private boolean pendingExplanationBlank = false;
-        // Tương tự cho passage header (nội dung gốc / bản dịch): giữ khoảng cách đoạn.
+
         private boolean pendingPassageBlank = false;
 
         LineProcessor(QuestionCollector collector) {
@@ -601,22 +469,21 @@ public class QuestionDocumentImportService {
                 handleLine(pl);
             }
             flushCurrentQuestion();
-            // PassageGroupCollector cần finalize group cuối cùng.
+
             if (collector instanceof PassageGroupCollector) {
                 ((PassageGroupCollector) collector).finalizeLastGroup();
             }
         }
 
         private void handleLine(ParsedLine pl) {
-            // Dòng trống: chỉ có ý nghĩa khi đang trong khối "Giải thích:" — đánh dấu
-            // để ngăn cách đoạn. Ngoài explanation thì bỏ qua (không phải nội dung).
+
             if (pl.blank) {
                 if (inExplanation && currentQuestion != null
                         && currentQuestion.explanation != null
                         && !currentQuestion.explanation.isBlank()) {
                     pendingExplanationBlank = true;
                 } else if (inPassageHeader) {
-                    // Giữ khoảng cách đoạn cho nội dung gốc / bản dịch của passage.
+
                     StringBuilder target = inPassageTranslation ? pendingTranslation : pendingText;
                     if (target.length() > 0) {
                         pendingPassageBlank = true;
@@ -630,7 +497,6 @@ public class QuestionDocumentImportService {
                 return;
             }
 
-            // (0) Passage start — chỉ check khi collector hỗ trợ passage.
             if (collector.supportsPassage()) {
                 Matcher pm = PASSAGE_START_PATTERN.matcher(text);
                 if (pm.matches()) {
@@ -653,12 +519,6 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (1) Câu hỏi mới explicit (có số ở đầu) — luôn break inExplanation.
-            // NGOẠI LỆ: khi đang gom nội dung passage (inPassageHeader), một dòng số TRẦN
-            // (không có keyword "Câu/Question/Bài") thường là NỘI DUNG passage — giờ "8:00",
-            // mã bưu chính "10719 Berlin", ngày "2 August", hàng bảng "10:00 A.M. | ...".
-            // Nếu coi nó là câu hỏi sẽ cắt ngang passage và làm MẤT phần nội dung còn lại.
-            // Chỉ câu có keyword rõ ràng mới được đóng passage header.
             Matcher qm = QUESTION_START_PATTERN.matcher(text);
             if (qm.matches()
                     && inPassageHeader
@@ -669,7 +529,7 @@ public class QuestionDocumentImportService {
             if (qm.matches()) {
                 inExplanation = false;
                 if (inPassageHeader) {
-                    // Đóng phần passage header — chốt các đoạn văn + bản dịch.
+
                     finalizePassageSegments();
                     inPassageHeader = false;
                     inPassageTranslation = false;
@@ -684,12 +544,11 @@ public class QuestionDocumentImportService {
                 return;
             }
 
-            // (1b) Trong passage header gặp marker "Dịch:" -> chuyển sang gom phần bản dịch.
             if (inPassageHeader) {
                 Matcher tm = TRANSLATION_START_PATTERN.matcher(text);
                 if (tm.matches()) {
                     inPassageTranslation = true;
-                    // Chuyển buffer content -> translation: bỏ blank pending của content.
+
                     pendingPassageBlank = false;
                     String tail = tm.group(1) == null ? "" : tm.group(1).trim();
                     if (!tail.isEmpty()) {
@@ -702,8 +561,6 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (1b-2) Marker "Đoạn N:" trong passage header (TRƯỚC "Dịch:") -> chốt đoạn đang
-            //        gom, mở đoạn mới. Cho phép passage nhiều đoạn văn (double/triple passage).
             if (inPassageHeader && !inPassageTranslation) {
                 Matcher sm = PASSAGE_SEGMENT_PATTERN.matcher(text);
                 if (sm.matches()) {
@@ -712,7 +569,7 @@ public class QuestionDocumentImportService {
                         passageSegments.add(seg);
                     }
                     pendingText.setLength(0);
-                    // "Đoạn N:" là ngắt đoạn cứng -> bỏ blank pending trước đó.
+
                     pendingPassageBlank = false;
                     String tail = sm.group(2) == null ? "" : sm.group(2).trim();
                     if (!tail.isEmpty()) {
@@ -722,14 +579,11 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (1c) Dòng "Tags: a, b, c" — gom tên tag cho câu hiện tại. Đặt TRƯỚC khối
-            //      explanation/option để không bị nuốt nhầm. Chỉ xử lý khi đã có câu.
             if (currentQuestion != null && !inPassageHeader) {
                 Matcher tagm = TAGS_START_PATTERN.matcher(text);
                 if (tagm.matches()) {
                     String body = tagm.group(1) == null ? "" : tagm.group(1).trim();
-                    // Tách nhiều tag bằng ';' (KHÔNG dùng ',' vì tên tag có thể chứa dấu phẩy,
-                    // vd "Chủ đề, mục đích"). Mỗi spec có thể là "Cha > Con" để chỉ rõ tag cha.
+
                     for (String name : body.split(";")) {
                         String n = name.trim();
                         if (!n.isEmpty() && !currentQuestion.tagNames.contains(n)) {
@@ -740,14 +594,10 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (2) Đang trong khối giải thích: gom tất cả vào explanation, KHÔNG cho phép
-            //     option pattern (A./B./C./D.) ăn dòng giải thích "• A. across (...), C. ..."
-            //     thành option giả. Chỉ "Câu N." / "Passage" mới được phép thoát ra (đã check trên).
             if (inExplanation && currentQuestion != null) {
                 Matcher em = EXPLANATION_START_PATTERN.matcher(text);
                 if (em.matches()) {
-                    // Đang trong explanation lại gặp "Giải thích:" — coi như continuation,
-                    // chỉ append phần body.
+
                     String tail = em.group(1) == null ? "" : em.group(1).trim();
                     if (!tail.isEmpty()) {
                         appendExplanation(tail);
@@ -758,7 +608,6 @@ public class QuestionDocumentImportService {
                 return;
             }
 
-            // (3) Dòng option A/B/C/D
             Matcher om = OPTION_PATTERN.matcher(text);
             if (om.matches() && currentQuestion != null && !inPassageHeader && !isSectionHeadingOptionLike(text)) {
                 ParsedOption parsedOption = parseOptionText(om.group(2));
@@ -768,8 +617,6 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (4) Mở khối giải thích — yêu cầu câu hiện tại đã có ít nhất 1 option,
-            //     tránh ngộ nhận "Giải thích:" trước khi có options là metadata khác.
             if (currentQuestion != null && !inPassageHeader && !currentQuestion.options.isEmpty()) {
                 Matcher em = EXPLANATION_START_PATTERN.matcher(text);
                 if (em.matches()) {
@@ -783,26 +630,15 @@ public class QuestionDocumentImportService {
                 }
             }
 
-            // (5) Dòng tiếp nối thường (không phải explanation)
             handleContinuationLine(text);
         }
 
-        /**
-         * Append 1 dòng vào explanation. Nếu trước đó có dòng trống ngăn cách
-         * (pendingExplanationBlank) thì dùng "\n\n" để giữ khoảng cách đoạn,
-         * ngược lại chỉ xuống dòng đơn "\n". Frontend render pre-wrap nên "\n\n"
-         * hiển thị thành 1 dòng trống giữa 2 đoạn.
-         */
         private void appendExplanation(String addition) {
             String separator = pendingExplanationBlank ? "\n\n" : "\n";
             currentQuestion.explanation = appendLine(currentQuestion.explanation, addition, separator);
             pendingExplanationBlank = false;
         }
 
-        /**
-         * Chốt passage header: gộp các đoạn đã thu (passageSegments + pendingText hiện tại),
-         * đoạn đầu -> content, các đoạn sau -> extraContents, cộng bản dịch.
-         */
         private void finalizePassageSegments() {
             List<String> segments = new ArrayList<>(passageSegments);
             String last = pendingText.toString().trim();
@@ -820,15 +656,6 @@ public class QuestionDocumentImportService {
         private void handleOptionLine(String rawLabel, ParsedOption parsedOption, boolean isStyled) {
             String label = rawLabel.toUpperCase(Locale.ROOT);
 
-            // Label trùng -> 2 trường hợp:
-            //
-            // (a) Câu hiện tại đã (gần) đủ options -> đây là câu mới bị thiếu số.
-            //     Flush câu cũ, tạo câu mới với question text từ pendingText.
-            //
-            // (b) Câu hiện tại mới chỉ có 1-2 options -> option đầu nhiều khả năng
-            //     là FALSE POSITIVE (vd: dòng "A as a small family..." không có
-            //     dấu phân cách bị match nhãn A). Đẩy option cũ về question text
-            //     và cho option mới làm option thật, KHÔNG flush câu cũ.
             if (currentQuestion.options.containsKey(label)) {
                 boolean nearlyComplete = currentQuestion.options.size() >= ALLOWED_LABELS.size() - 1;
                 if (nearlyComplete) {
@@ -852,7 +679,7 @@ public class QuestionDocumentImportService {
                             label,
                             currentQuestion.options.size()
                     );
-                    // Chỉ append body, KHÔNG thêm label.
+
                     currentQuestion.questionText = appendLine(
                             currentQuestion.questionText,
                             oldValue,
@@ -872,10 +699,10 @@ public class QuestionDocumentImportService {
 
         private void handleContinuationLine(String text) {
             if (inPassageHeader) {
-                // Sau marker "Dịch:" -> gom vào bản dịch; trước đó -> content gốc.
+
                 StringBuilder target = inPassageTranslation ? pendingTranslation : pendingText;
                 if (target.length() > 0) {
-                    // Giữ dòng trống ngăn cách đoạn (pendingPassageBlank) thành "\n\n".
+
                     target.append(pendingPassageBlank ? "\n\n" : "\n");
                 }
                 pendingPassageBlank = false;
@@ -886,17 +713,16 @@ public class QuestionDocumentImportService {
                 return;
             }
             if (currentQuestion.options.isEmpty()) {
-                // Chưa có option -> nối vào question text
+
                 currentQuestion.questionText = appendLine(currentQuestion.questionText, text, "\n");
             } else if (currentQuestion.options.size() >= ALLOWED_LABELS.size()) {
-                // Đã đủ options -> KHÔNG nối vào option D nữa.
-                // Lưu vào buffer; dùng làm question text cho câu mới ngầm (nếu có).
+
                 if (pendingText.length() > 0) {
                     pendingText.append("\n");
                 }
                 pendingText.append(text);
             } else if (lastLabel != null) {
-                // Chưa đủ options -> option có thể tràn dòng, nối vào option cuối
+
                 String lastValue = currentQuestion.options.getOrDefault(lastLabel, "");
                 currentQuestion.options.put(lastLabel, appendLine(lastValue, text, " "));
             }
@@ -917,7 +743,6 @@ public class QuestionDocumentImportService {
         }
     }
 
-    /** Collector cho flat questions (không có passage). */
     private class FlatQuestionCollector implements QuestionCollector {
         private final List<NormalQuestionRequest> results = new ArrayList<>();
 
@@ -931,7 +756,6 @@ public class QuestionDocumentImportService {
         }
     }
 
-    /** Collector cho passage-based questions. */
     private class PassageGroupCollector implements QuestionCollector {
         private final List<PassageQuestionGroup> groups = new ArrayList<>();
         private PassageQuestionGroup currentGroup;
@@ -943,7 +767,7 @@ public class QuestionDocumentImportService {
 
         @Override
         public void startPassage() {
-            // Đóng group cũ nếu có question đã collect
+
             finalizeLastGroup();
             currentGroup = createEmptyGroup();
         }
@@ -980,7 +804,7 @@ public class QuestionDocumentImportService {
 
         @Override
         public void emitQuestion(ParsedQuestion q) {
-            // Trường hợp file có question trước khi gặp Passage marker -> tạo group rỗng
+
             if (currentGroup == null) {
                 currentGroup = createEmptyGroup();
             }
@@ -1009,10 +833,6 @@ public class QuestionDocumentImportService {
         }
     }
 
-    // =========================================================================
-    // PARSING HELPERS
-    // =========================================================================
-
     private String extractQuestionText(Matcher qm) {
         if (qm.groupCount() >= 2 && qm.group(2) != null) {
             return qm.group(2).trim();
@@ -1038,7 +858,7 @@ public class QuestionDocumentImportService {
         if (trimmed.length() < 2) {
             return false;
         }
-        // Có dấu phân cách (A. / A) / A: / A-) -> luôn là option.
+
         int i = 0;
         while (i < trimmed.length() && Character.isWhitespace(trimmed.charAt(i))) {
             i++;
@@ -1052,7 +872,7 @@ public class QuestionDocumentImportService {
         if (i >= trimmed.length()) {
             return false;
         }
-        i++; // skip label char
+        i++;
         while (i < trimmed.length() && Character.isWhitespace(trimmed.charAt(i))) {
             i++;
         }
@@ -1062,8 +882,7 @@ public class QuestionDocumentImportService {
                 return true;
             }
         }
-        // Không có dấu phân cách -> dạng "A across".
-        // Heuristic: option dạng này thường ngắn; loại "A <sentence...>".
+
         String t = optionText == null ? "" : optionText.trim();
         if (t.isEmpty()) {
             return false;
@@ -1072,7 +891,6 @@ public class QuestionDocumentImportService {
         return t.length() <= MAX_INLINE_OPTION_CHARS && wordCount <= MAX_INLINE_OPTION_WORDS;
     }
 
-    /** Tách một dòng thành các đoạn bắt đầu bằng nhãn option (hỗ trợ dàn ngang nhiều đáp án). */
     private List<String> splitLineByOptionLabels(String line) {
         if (line == null || line.isBlank()) {
             return List.of();
@@ -1080,9 +898,9 @@ public class QuestionDocumentImportService {
         Matcher m = OPTION_LABEL_START.matcher(line);
         List<Integer> starts = new ArrayList<>();
         while (m.find()) {
-            // group 1: nhãn có dấu phân cách; group 2: nhãn không dấu phân cách
+
             int s = m.group(1) != null ? m.start(1) : m.start(2);
-            // Giữ dấu '(' của nhãn "(A)" cùng segment, tránh tách "(" lẻ ra dòng riêng.
+
             if (s > 0 && line.charAt(s - 1) == '(') {
                 s--;
             }
@@ -1092,8 +910,7 @@ public class QuestionDocumentImportService {
             return List.of(line);
         }
         List<String> out = new ArrayList<>();
-        // Giữ phần đầu (trước option đầu tiên) — thường là question text khi
-        // câu hỏi và options nằm chung một dòng.
+
         int firstStart = starts.get(0);
         if (firstStart > 0) {
             String head = line.substring(0, firstStart).trim();
@@ -1111,10 +928,6 @@ public class QuestionDocumentImportService {
         }
         return out;
     }
-
-    // =========================================================================
-    // STYLE DETECTION (POI path — để tìm đáp án đúng qua bold/highlight/underline/màu)
-    // =========================================================================
 
     private boolean isOptionSegmentStyled(XWPFParagraph para, String segmentText) {
         if (segmentText == null || segmentText.isBlank()) {
@@ -1155,13 +968,6 @@ public class QuestionDocumentImportService {
         return false;
     }
 
-    /**
-     * Khi text từ runs và getParagraphText() lệch nhau (do field code, bookmark, ...):
-     * gần đúng theo từng run trong segment.
-     *
-     * <p>Run 1 ký tự được xử lý riêng — chỉ chấp nhận khi body của option chính xác là
-     * chữ số đó (không dùng endsWith để tránh "5" match "15").
-     */
     private boolean fallbackStyledRunTouchesSegment(String trimmedSeg, XWPFParagraph para) {
         String normSeg = normalizeText(trimmedSeg);
         for (XWPFRun run : para.getRuns()) {
@@ -1179,12 +985,10 @@ public class QuestionDocumentImportService {
                 }
                 continue;
             }
-            // Yêu cầu run đủ "đặc trưng" (>= MIN_FALLBACK_STYLED_RUN_LENGTH ký tự sau normalize)
-            // để tránh các từ phổ biến như "the", "and" gây false positive.
+
             String normRun = normalizeText(t);
             if (normRun.length() < MIN_FALLBACK_STYLED_RUN_LENGTH) {
-                // Vẫn cho phép nếu nguyên đoạn run xuất hiện trong segment ở dạng raw —
-                // case này mạnh hơn substring trên text đã normalize.
+
                 if (trimmedSeg.contains(t) && t.length() >= 3) {
                     return true;
                 }
@@ -1197,11 +1001,6 @@ public class QuestionDocumentImportService {
         return false;
     }
 
-    /**
-     * Tránh contains("5") khớp nhầm với "15": chỉ chấp nhận khi body của option
-     * chính xác là chữ số đó. Bỏ nhánh endsWith để loại trừ trường hợp "15" bị
-     * đánh dấu correct chỉ vì 1 run styled chứa "5".
-     */
     private boolean singleDigitStyledMatchesOptionBody(String trimmedSeg, String digit) {
         Matcher om = OPTION_PATTERN.matcher(trimmedSeg);
         if (!om.matches()) {
@@ -1241,10 +1040,6 @@ public class QuestionDocumentImportService {
         return run.getTextHightlightColor() != null
                 && !"none".equalsIgnoreCase(String.valueOf(run.getTextHightlightColor()));
     }
-
-    // =========================================================================
-    // GENERIC HELPERS
-    // =========================================================================
 
     private ParsedOption parseOptionText(String rawOptionText) {
         if (rawOptionText == null) {
@@ -1295,15 +1090,10 @@ public class QuestionDocumentImportService {
         if (s == null) {
             return "";
         }
-        // Gom các whitespace "lạ" (NBSP, ZWSP, ideographic space, NNBSP) về space thường.
+
         return WEIRD_WHITESPACE_PATTERN.matcher(s).replaceAll(" ").trim();
     }
 
-    /**
-     * Dòng bullet trong giải thích (vd: "• A. across (ngang qua), C. inside (bên trong) sai vì ...")
-     * có thể chứa "A.", "C." khiến splitLineByOptionLabels cắt thành option giả.
-     * Khi line bắt đầu bằng bullet, giữ nguyên là 1 dòng — pha LineProcessor sẽ gom vào explanation.
-     */
     private boolean isBulletLine(String text) {
         if (text == null || text.isEmpty()) {
             return false;
@@ -1337,7 +1127,7 @@ public class QuestionDocumentImportService {
         String questionText = q.questionText == null ? "" : q.questionText.trim();
         NormalQuestionRequest request = new NormalQuestionRequest();
         request.setQuestionText(questionText);
-        // 1 đáp án đúng -> MCQ; nhiều đáp án đúng (nhiều dấu *) -> MSQ.
+
         request.setQuestionType(correctLabels.size() > 1
                 ? Question.QuestionType.MSQ
                 : Question.QuestionType.MCQ);
@@ -1356,8 +1146,7 @@ public class QuestionDocumentImportService {
     }
 
     private Set<String> normalizeCorrectLabels(ParsedQuestion q) {
-        // Hỗ trợ MSQ: nhiều đáp án đánh dấu (*) -> giữ nguyên cả tập (câu trở thành MSQ).
-        // 0 đáp án -> để người duyệt chọn tay (needsManualCorrect).
+
         return q.correctLabels;
     }
 
@@ -1375,15 +1164,10 @@ public class QuestionDocumentImportService {
         );
     }
 
-    // =========================================================================
-    // VALUE OBJECTS
-    // =========================================================================
-
     private static class ParsedLine {
         final String text;
         final boolean isStyled;
-        // Đánh dấu dòng trống (ngăn cách đoạn). KHÔNG mang nội dung — chỉ dùng để
-        // giữ khoảng cách giữa các đoạn trong khối "Giải thích:".
+
         final boolean blank;
 
         ParsedLine(String text, boolean isStyled) {

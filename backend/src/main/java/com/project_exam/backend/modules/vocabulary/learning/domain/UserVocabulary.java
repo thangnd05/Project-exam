@@ -20,16 +20,16 @@ public class UserVocabulary {
     private String id;
 
     @Column(nullable = false)
-    private String userId; // FK -> users.user_id
+    private String userId;
 
     @Column(nullable = false)
-    private String vocabId; // FK -> vocabulary.vocab_id
+    private String vocabId;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.learning;
 
     private Instant lastReviewed = Instant.now();
-    private int correctCount = 0; // số lần trả lời đúng liên tiếp
+    private int correctCount = 0;
 
     public UserVocabulary(String currentUserId, String vocabId) {
         this.userId = currentUserId;

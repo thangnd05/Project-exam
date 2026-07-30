@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface EvaluationRepository extends JpaRepository<Evaluation, String>, JpaSpecificationExecutor<Evaluation> {
 
-    // Lấy tất cả đánh giá theo user
     List<Evaluation> findByUserId(String userId);
 
     List<Evaluation> findByUserIdOrderByCreatedAtDesc(String userId);

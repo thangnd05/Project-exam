@@ -13,7 +13,6 @@ public interface LearningPlanTaskRepository extends JpaRepository<LearningPlanTa
 
     List<LearningPlanTask> findByLearningPlanIdOrderByTaskOrderAsc(String learningPlanId);
 
-    /** Ải của nhiều plan trong 1 query — dùng cho danh sách lộ trình (tránh N+1). */
     List<LearningPlanTask> findByLearningPlanIdInOrderByTaskOrderAsc(Collection<String> learningPlanIds);
 
     long countByLearningPlanId(String learningPlanId);

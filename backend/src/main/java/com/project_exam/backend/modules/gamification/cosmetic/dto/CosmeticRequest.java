@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
-/** Tạo/cập nhật cosmetic (admin). */
 @Data
 public class CosmeticRequest {
     @NotBlank(message = "Tên không được để trống")

@@ -16,9 +16,6 @@ function itemStatus(item) {
   return item.correct ? 'correct' : 'incorrect';
 }
 
-/**
- * Màn giải thích / xem lại ải — dùng chung thẻ câu hỏi + footer với trang review thi.
- */
 function PlanResultView({ result, onRetry, onPickAnother }) {
   const items = useMemo(
     () =>

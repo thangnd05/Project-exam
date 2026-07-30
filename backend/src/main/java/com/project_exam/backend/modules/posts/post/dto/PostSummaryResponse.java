@@ -21,7 +21,7 @@ public class PostSummaryResponse {
     private String title;
     private Post.PostStatus status;
     private Instant createdAt;
-    private String thumbnailUrl; // URL từ entity hoặc ảnh đầu tiên
+    private String thumbnailUrl;
     private List<CategoryResponse> categories;
     private long commentCount;
     private long totalReacts;

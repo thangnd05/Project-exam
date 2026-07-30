@@ -39,16 +39,10 @@ function formatDuration(seconds) {
   return `${minutes}m ${remSeconds}s`;
 }
 
-/**
- * Biểu đồ tiến triển + bảng các bài đã làm, nhúng trong trang Tổng quan mục tiêu.
- * Luôn bám theo kỳ thi đang chọn ở đầu trang — biểu đồ chỉ có nghĩa trong phạm vi
- * một kỳ thi (điểm và ngưỡng mục tiêu khác nhau giữa các kỳ). Bảng gập lại mặc định
- * để không lấn phần tổng quan.
- */
 function MockHistoryPanel({ examTypeId, examTypeName }) {
   const [tableOpen, setTableOpen] = useState(false);
   const [page, setPage] = useState(0);
-  // Các bài người dùng bấm "Tải" thủ công ở bảng (ngoài tập bài của biểu đồ).
+
   const [requestedIds, setRequestedIds] = useState(() => new Set());
 
   const {
@@ -64,8 +58,6 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
   const totalPages = tablePage?.totalPages ?? 0;
   const currentPage = tablePage?.currentPage ?? page;
 
-  // Nạp readiness (enhanced result) cho các bài trong biểu đồ + các bài bấm "Tải" ở
-  // bảng. BE đã loại Quick Challenge nên mọi bài ở đây đều có điểm tổng chuẩn.
   const enhancedIds = useMemo(() => {
     const ids = new Set(chartTests.map((t) => t.userTestId));
     requestedIds.forEach((id) => ids.add(id));
@@ -80,13 +72,11 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
     })),
   });
 
-  // Tra nhanh query theo id để biết trạng thái tải của từng dòng bảng.
   const enhancedQueryById = {};
   enhancedIds.forEach((id, i) => {
     enhancedQueryById[id] = enhancedQueries[i];
   });
 
-  // Chữ ký trạng thái để memo hoá map kết quả (giữ chartData ổn định giữa các render).
   const enhancedSignature = enhancedIds
     .map((id, i) => {
       const q = enhancedQueries[i];
@@ -94,7 +84,6 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
     })
     .join('|');
 
-  // enhancedById giữ đúng shape cũ: id -> data, hoặc { error: true } khi lỗi.
   const enhancedById = useMemo(() => {
     const map = {};
     enhancedIds.forEach((id, i) => {
@@ -104,7 +93,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
       else if (q.data !== undefined) map[id] = q.data;
     });
     return map;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [enhancedSignature]);
 
   const chartLoading = chartTests.some((t) => {
@@ -115,7 +104,6 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
   const chartData = useMemo(() => {
     const chronological = [...chartTests].reverse();
 
-    // Đếm số bài mỗi ngày để phân biệt các lần thi trùng ngày bằng giờ.
     const dayCounts = chronological.reduce((acc, t) => {
       const day = formatDayMonth(t.finishedAt);
       acc[day] = (acc[day] || 0) + 1;
@@ -145,8 +133,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
   }, [chartTests, enhancedById]);
 
   const loadEnhanced = (userTestId) => {
-    // Đưa id vào danh sách cần nạp -> useQueries sẽ tự fetch. Đã nạp (có kết quả
-    // hoặc đã lỗi) thì không nạp lại.
+
     setRequestedIds((prev) => {
       if (prev.has(userTestId)) return prev;
       const next = new Set(prev);

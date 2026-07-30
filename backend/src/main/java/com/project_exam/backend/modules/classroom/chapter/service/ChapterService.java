@@ -44,16 +44,10 @@ public class ChapterService {
         }
     }
 
-    // ============================
-    //  Helper convert Entity DTO
-    // ============================
     private ChapterResponse toResponse(Chapter c) {
         return chapterMapper.toResponse(c);
     }
 
-    // ============================
-    //  CREATE
-    // ============================
     public ChapterResponse create(HttpServletRequest httpRequest, ChapterRequest request) {
 
         String currentUserId = authUtils.getUserId(httpRequest);
@@ -70,9 +64,6 @@ public class ChapterService {
         return toResponse(saved);
     }
 
-    // ============================
-    //  GET ALL — chỉ admin được xem toàn bộ chapter.
-    // ============================
     public List<ChapterResponse> getAll(HttpServletRequest httpRequest) {
         if (!authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ chapter.");
@@ -83,11 +74,8 @@ public class ChapterService {
                 .toList();
     }
 
-    // ============================
-    //  GET BY CLASS
-    // ============================
     public List<ChapterResponse> getByClassId(String classId, HttpServletRequest httpRequest) {
-        //  Chỉ thành viên/giáo viên của lớp (hoặc admin) mới được liệt kê chapter của lớp.
+
         String currentUserId = authUtils.getUserId(httpRequest);
         classAccessGuard.requireMemberOrTeacher(classId, currentUserId, httpRequest);
 
@@ -97,24 +85,17 @@ public class ChapterService {
                 .toList();
     }
 
-    // ============================
-    //  GET BY ID
-    // ============================
     public ChapterResponse getById(String chapterId, HttpServletRequest httpRequest) {
 
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
-        //  Chỉ thành viên/giáo viên của lớp chứa chapter mới được xem.
         String currentUserId = authUtils.getUserId(httpRequest);
         classAccessGuard.requireMemberOrTeacher(chapter.getClassId(), currentUserId, httpRequest);
 
         return toResponse(chapter);
     }
 
-    // ============================
-    //  UPDATE
-    // ============================
     public ChapterResponse update(HttpServletRequest httpRequest,
                                   String chapterId,
                                   ChapterRequest request) {
@@ -137,9 +118,6 @@ public class ChapterService {
         return toResponse(chapterRepository.save(chapter));
     }
 
-    // ============================
-    //  DELETE — cascade xoá toàn bộ questions thuộc chapter
-    // ============================
     @Transactional
     public void delete(HttpServletRequest httpRequest, String chapterId) {
 
@@ -148,10 +126,8 @@ public class ChapterService {
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
-        //  check teacher
         checkTeacherPermission(chapter.getClassId(), currentUserId);
 
-        // Cascade: xoá toàn bộ questions (kèm answers/test_questions/user_answers) thuộc chapter này.
         questionService.cascadeDeleteQuestionsByChapter(chapterId);
 
         chapterRepository.deleteById(chapterId);

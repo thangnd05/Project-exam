@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/** Quản lý nhiệm vụ cho admin. */
 @RestController
 @RequestMapping("/api/admin/quests")
 @RequiredArgsConstructor

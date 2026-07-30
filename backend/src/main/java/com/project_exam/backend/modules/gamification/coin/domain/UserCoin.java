@@ -6,10 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/**
- * Ví xu của user — 1 record / user, chỉ giữ số dư hiện tại.
- * Logic kiếm/tiêu xu (nhiệm vụ, đổi thưởng) sẽ làm sau, bảng này chỉ là nơi lưu số dư.
- */
 @Entity
 @Table(name = "user_coins", indexes = {
         @Index(name = "idx_user_coins_user_id", columnList = "user_id")
@@ -24,7 +20,7 @@ public class UserCoin {
     private String userCoinId;
 
     @Column(nullable = false, unique = true)
-    private String userId; // 1 record / user
+    private String userId;
 
     @Column(nullable = false)
     private Integer balance = 0;

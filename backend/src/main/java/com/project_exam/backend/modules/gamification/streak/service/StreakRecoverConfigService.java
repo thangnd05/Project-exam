@@ -11,10 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
-/**
- * Quản lý cấu hình khôi phục chuỗi (giá xu + bật/tắt). Chỉ giữ 1 dòng cấu hình;
- * nếu chưa có thì coi như mặc định (50 xu, đang bật).
- */
 @Service
 @RequiredArgsConstructor
 public class StreakRecoverConfigService {
@@ -24,7 +20,6 @@ public class StreakRecoverConfigService {
     private final StreakRecoverConfigRepository configRepository;
     private final StreakMapper streakMapper;
 
-    /** Đọc cấu hình hiện tại (không ghi DB) — trả mặc định nếu chưa có dòng nào. */
     @Transactional(readOnly = true)
     public StreakRecoverConfigResponse get() {
         return configRepository.findAll().stream().findFirst()
@@ -33,7 +28,6 @@ public class StreakRecoverConfigService {
                 .orElse(streakMapper.toConfigResponse(DEFAULT_COST, true));
     }
 
-    /** Cập nhật giá / bật-tắt (admin). Tạo dòng cấu hình nếu chưa có. */
     @Transactional
     public StreakRecoverConfigResponse update(StreakRecoverConfigRequest request) {
         StreakRecoverConfig config = configRepository.findAll().stream().findFirst()

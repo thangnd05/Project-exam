@@ -15,20 +15,14 @@ public class PageResponse<T> {
     private int totalPages;
     private boolean hasNext;
 
-    /** Khi content đã sẵn đúng kiểu T (vd Page<UserResponse>). */
     public static <T> PageResponse<T> from(Page<T> page) {
         return from(page, page.getContent());
     }
 
-    /** Khi cần map từng phần tử entity -> DTO. */
     public static <E, T> PageResponse<T> from(Page<E> page, Function<E, T> mapper) {
         return from(page, page.getContent().stream().map(mapper).toList());
     }
 
-    /**
-     * Khi content được build sẵn bên ngoài (vd batch query để tránh N+1).
-     * Metadata phân trang vẫn lấy từ page gốc.
-     */
     public static <E, T> PageResponse<T> from(Page<E> page, List<T> content) {
         PageResponse<T> response = new PageResponse<>();
         response.setContent(content);
@@ -40,7 +34,6 @@ public class PageResponse<T> {
         return response;
     }
 
-    /** Trang rỗng khi không có dữ liệu (vẫn giữ page/size client gửi lên). */
     public static <T> PageResponse<T> empty(int page, int size) {
         PageResponse<T> response = new PageResponse<>();
         response.setContent(List.of());

@@ -21,8 +21,6 @@ public class TagController {
     private final TagService tagService;
     private final AuthUtils authUtils;
 
-    // =================== CREATE ===================
-
     @PostMapping
     public ResponseEntity<TagResponse> createTag(
             @RequestBody TagRequest request,
@@ -31,8 +29,6 @@ public class TagController {
         authUtils.requirePermission(PermissionCatalog.TAG_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(tagService.createTag(request));
     }
-
-    // =================== UPDATE ===================
 
     @PutMapping("/{tagId}")
     public ResponseEntity<TagResponse> updateTag(
@@ -44,8 +40,6 @@ public class TagController {
         return ResponseEntity.ok(tagService.updateTag(tagId, request));
     }
 
-    // =================== DELETE ===================
-
     @DeleteMapping("/{tagId}")
     public ResponseEntity<Void> deleteTag(
             @PathVariable String tagId,
@@ -56,27 +50,16 @@ public class TagController {
         return ResponseEntity.noContent().build();
     }
 
-    // =================== GET ===================
-
-    /**
-     * Lấy danh sách tag theo examTypeId dạng cây (tree).
-     */
     @GetMapping("/tree/{examTypeId}")
     public ResponseEntity<List<TagResponse>> getTagTree(@PathVariable String examTypeId) {
         return ResponseEntity.ok(tagService.getTagTreeByExamType(examTypeId));
     }
 
-    /**
-     * Lấy danh sách tag phẳng (flat) theo examTypeId.
-     */
     @GetMapping("/flat/{examTypeId}")
     public ResponseEntity<List<TagResponse>> getTagsFlat(@PathVariable String examTypeId) {
         return ResponseEntity.ok(tagService.getTagsFlatByExamType(examTypeId));
     }
 
-    /**
-     * Lấy danh sách tag của một câu hỏi.
-     */
     @GetMapping("/question/{questionId}")
     public ResponseEntity<List<TagResponse>> getTagsByQuestion(@PathVariable String questionId) {
         return ResponseEntity.ok(tagService.getTagsByQuestionId(questionId));

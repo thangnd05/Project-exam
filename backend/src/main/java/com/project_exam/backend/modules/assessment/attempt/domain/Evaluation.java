@@ -24,7 +24,6 @@ public class Evaluation {
     @UuidV7
     private String id;
 
-    // FK tới users
     @Column(name = "user_id", nullable = false)
     private String userId;
 

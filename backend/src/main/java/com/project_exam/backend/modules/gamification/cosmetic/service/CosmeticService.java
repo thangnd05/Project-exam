@@ -32,9 +32,6 @@ public class CosmeticService {
     private final CoinService coinService;
     private final CosmeticMapper cosmeticMapper;
 
-    // ---------------- User ----------------
-
-    /** Cửa hàng: cosmetic đang bật + cờ owned/equipped của user. */
     @Transactional(readOnly = true)
     public List<CosmeticResponse> getShopForUser(String userId) {
         Map<String, UserCosmetic> ownedById = userCosmeticRepository.findByUserId(userId).stream()
@@ -48,7 +45,6 @@ public class CosmeticService {
                 .toList();
     }
 
-    /** Cosmetic user đang đeo — để hiển thị quanh avatar. */
     @Transactional(readOnly = true)
     public EquippedCosmeticsResponse getEquipped(String userId) {
         List<UserCosmetic> equipped = userCosmeticRepository.findByUserIdAndEquippedTrue(userId);
@@ -71,7 +67,6 @@ public class CosmeticService {
         return builder.build();
     }
 
-    /** Cosmetic đang đeo của NHIỀU user 1 lần (tránh N+1) — vd hiển thị avatar tác giả comment/bài viết. */
     @Transactional(readOnly = true)
     public Map<String, EquippedCosmeticsResponse> getEquippedForUsers(java.util.Collection<String> userIds) {
         if (userIds == null || userIds.isEmpty()) {
@@ -101,7 +96,6 @@ public class CosmeticService {
         return result;
     }
 
-    /** Mua cosmetic bằng xu. */
     @Transactional
     public CosmeticResponse buy(String userId, String cosmeticId) {
         Cosmetic cosmetic = cosmeticRepository.findById(cosmeticId)
@@ -125,7 +119,6 @@ public class CosmeticService {
         return cosmeticMapper.toResponse(cosmetic, true, false);
     }
 
-    /** Đeo cosmetic (tự tháo cái cùng loại đang đeo). */
     @Transactional
     public void equip(String userId, String cosmeticId) {
         UserCosmetic target = userCosmeticRepository.findByUserIdAndCosmeticId(userId, cosmeticId)
@@ -133,7 +126,6 @@ public class CosmeticService {
         Cosmetic cosmetic = cosmeticRepository.findById(cosmeticId)
                 .orElseThrow(() -> new NotFoundException("Vật phẩm không tồn tại"));
 
-        // Tháo các cosmetic cùng loại đang đeo.
         List<UserCosmetic> equipped = userCosmeticRepository.findByUserIdAndEquippedTrue(userId);
         if (!equipped.isEmpty()) {
             Set<String> sameTypeIds = cosmeticRepository.findAllById(
@@ -154,7 +146,6 @@ public class CosmeticService {
         userCosmeticRepository.save(target);
     }
 
-    /** Tháo cosmetic. */
     @Transactional
     public void unequip(String userId, String cosmeticId) {
         UserCosmetic target = userCosmeticRepository.findByUserIdAndCosmeticId(userId, cosmeticId)
@@ -162,8 +153,6 @@ public class CosmeticService {
         target.setEquipped(false);
         userCosmeticRepository.save(target);
     }
-
-    // ---------------- Admin ----------------
 
     @Transactional(readOnly = true)
     public List<CosmeticResponse> findAll() {
@@ -194,8 +183,6 @@ public class CosmeticService {
                 .orElseThrow(() -> new NotFoundException("Vật phẩm không tồn tại"));
         cosmeticRepository.delete(cosmetic);
     }
-
-    // ---------------- Helpers ----------------
 
     private void applyRequest(Cosmetic cosmetic, CosmeticRequest request) {
         cosmetic.setName(request.getName());

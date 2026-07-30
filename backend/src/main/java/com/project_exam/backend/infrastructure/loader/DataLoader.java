@@ -29,7 +29,6 @@ public class DataLoader implements CommandLineRunner {
     private final RolePermissionRepository rolePermissionRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Thông tin admin mặc định — lấy từ env, không hardcode. Password để trống => bỏ qua seed.
     @Value("${app.admin.username:}")
     private String adminUsername;
     @Value("${app.admin.email:}")
@@ -41,7 +40,7 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 1) Upsert toàn bộ permission từ catalog (idempotent theo code)
+
         for (PermissionCatalog.Def def : PermissionCatalog.ALL) {
             Permission permission = permissionRepository.findByCode(def.code()).orElseGet(Permission::new);
             permission.setCode(def.code());
@@ -50,7 +49,6 @@ public class DataLoader implements CommandLineRunner {
             permissionRepository.save(permission);
         }
 
-        // 2) Role ADMIN — luôn được gán đủ mọi permission (nối qua bảng role_permissions)
         Role adminRole = roleRepository.findByRoleName("ADMIN");
         if (adminRole == null) {
             adminRole = new Role();
@@ -67,7 +65,6 @@ public class DataLoader implements CommandLineRunner {
             }
         }
 
-        // 3) Role USER — mặc định không có permission quản trị (đăng ký/OAuth lookup role này)
         Role userRole = roleRepository.findByRoleName("USER");
         if (userRole == null) {
             userRole = new Role();
@@ -76,8 +73,6 @@ public class DataLoader implements CommandLineRunner {
             roleRepository.save(userRole);
         }
 
-        // 4) User admin mặc định — chỉ seed khi đã cấu hình đủ username + password qua env.
-        //    Thiếu bất kỳ giá trị nhạy cảm nào => bỏ qua (không tạo tài khoản mật khẩu yếu mặc định).
         if (!StringUtils.hasText(adminUsername) || !StringUtils.hasText(adminPassword)) {
             return;
         }

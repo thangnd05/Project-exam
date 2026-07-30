@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class QuestionCollectionMapper {
 
-    /**
-     * Mapper thuần: các số đếm và {@code parentName} cần truy vấn DB nên service tính sẵn và truyền vào.
-     */
     public QuestionCollectionResponse toResponse(
             QuestionCollection collection,
             Long questionCount,

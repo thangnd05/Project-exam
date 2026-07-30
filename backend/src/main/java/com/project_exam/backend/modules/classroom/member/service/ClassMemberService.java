@@ -58,42 +58,34 @@ public class ClassMemberService {
         return toResponse(member);
     }
 
-    // Duyệt 1 học sinh (teacher duyệt)
     @Transactional
     public void approveSingle(String classId, String userId, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
 
-        // Kiểm tra lớp tồn tại
         ClassEntity clazz = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
-        // Kiểm tra quyền
         if (!clazz.getTeacherId().equals(currentUserId)) {
             throw new ForbiddenException("You are not authorized to approve this class!");
         }
 
-        // Tiến hành duyệt
         int updated = classMemberRepository.approveSingle(classId, userId);
         if (updated == 0) {
             throw new BadRequestException("Member not found or already approved!");
         }
     }
 
-    // Duyệt tất cả học sinh đang chờ trong lớp
     @Transactional
     public int approveAll(String classId, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
 
-        // Kiểm tra lớp tồn tại
         ClassEntity clazz = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
-        // Kiểm tra quyền (chỉ giáo viên tạo lớp mới được duyệt)
         if (!clazz.getTeacherId().equals(currentUserId)) {
             throw new ForbiddenException("You are not authorized to approve all members in this class!");
         }
 
-        // Duyệt tất cả học sinh đang chờ
         return classMemberRepository.approveAllPending(classId);
     }
 
@@ -114,14 +106,12 @@ public class ClassMemberService {
         return classMemberMapper.toResponse(m, user);
     }
 
-    // Rút khỏi lớp (student tự rời lớp)
     @Transactional
     public void leaveClass(String classId, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
         classMemberRepository.removeStudent(classId, currentUserId);
     }
 
-    // Giáo viên xóa học sinh khỏi lớp
     @Transactional
     public void removeMember(String classId, String userId, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
@@ -141,7 +131,6 @@ public class ClassMemberService {
 
         Map<String, Object> result = new HashMap<>();
 
-        // 1⃣ Lớp mà tôi đang học (đã được duyệt)
         List<ClassMember> classMembers =
                 classMemberRepository.findByUserIdAndStatus(currentUserId, ClassMember.MemberStatus.APPROVED);
 
@@ -150,7 +139,6 @@ public class ClassMemberService {
                     .orElse(null);
             if (clazz == null) return null;
 
-            // Lấy tên giáo viên từ teacherId
             String teacherName = userRepository.findById(clazz.getTeacherId())
                     .map(User::getFullName)
                     .orElse("Unknown");
@@ -158,7 +146,6 @@ public class ClassMemberService {
             return classMapper.toStudentResponse(clazz, teacherName);
         }).filter(Objects::nonNull).toList();
 
-        // 2⃣ Lớp mà tôi dạy (nếu là giáo viên)
         List<ClassEntity> teachingClasses = classRepository.findByTeacherId(currentUserId);
         List<ClassStudentResponse> teachingResponses = teachingClasses.stream()
                 .map(clazz -> classMapper.toStudentResponse(clazz,
@@ -167,7 +154,6 @@ public class ClassMemberService {
                                 .orElse("Unknown")))
                 .toList();
 
-        //  3⃣ Trả kết quả gộp
         result.put("teachingClasses", teachingResponses);
         result.put("learningClasses", learningClasses);
 

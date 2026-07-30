@@ -27,21 +27,18 @@ public class ExamTypeService {
                 .toList();
     }
 
-    /** Loại kỳ thi chuẩn (flexible=false/null) — dùng cho trang chọn loại đề (ẩn "Thông Thường"). */
     public List<ExamTypeResponse> findStandard() {
         return examTypeRepository.findStandard().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    /** Loại kỳ thi linh hoạt (flexible=true). */
     public List<ExamTypeResponse> findFlexible() {
         return examTypeRepository.findFlexible().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    /** examType con trực tiếp của 1 examType cha (cho drill-in AWS các cert). */
     public List<ExamTypeResponse> findChildren(String parentId) {
         return examTypeRepository.findByParentId(parentId).stream()
                 .map(this::toResponse)
@@ -77,7 +74,7 @@ public class ExamTypeService {
         if (request.getDurationMinutes() != null) type.setDurationMinutes(request.getDurationMinutes());
         if (request.getScoringMethod() != null) type.setScoringMethod(request.getScoringMethod());
         if (request.getFlexible() != null) type.setFlexible(request.getFlexible());
-        // parentId == null trong request = không đụng tới; gửi chuỗi rỗng để gỡ cha.
+
         if (request.getParentId() != null) {
             type.setParentId(resolveParentId(request.getParentId(), id));
         }
@@ -88,7 +85,7 @@ public class ExamTypeService {
     public void delete(String id) {
         ExamType type = examTypeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
-        //  Chặn xoá examType cha khi còn con — tránh con mồ côi.
+
         if (examTypeRepository.existsByParentId(id)) {
             throw new ConflictException(
                     "Không thể xoá: loại kỳ thi này đang chứa các loại con. Hãy xoá/tách chúng trước.");
@@ -107,11 +104,6 @@ public class ExamTypeService {
         return examTypeMapper.toResponse(t, parentName, childCount);
     }
 
-    /**
-     * Chuẩn hoá & validate parentId. Trả parentId hợp lệ hoặc null (examType gốc).
-     * Quy tắc: cha tồn tại, không tự trỏ, cha phải là gốc (tối đa 2 cấp),
-     * và bản thân không được đang có con (nếu không sẽ thành 3 cấp).
-     */
     private String resolveParentId(String rawParentId, String selfId) {
         String parentId = rawParentId == null ? null : rawParentId.trim();
         if (parentId == null || parentId.isEmpty()) {

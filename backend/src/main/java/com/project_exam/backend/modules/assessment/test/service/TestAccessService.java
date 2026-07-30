@@ -20,10 +20,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Tách khỏi TestService: kiểm soát QUYỀN LÀM BÀI — điều kiện bắt đầu (canStartTest)
- * và mua quyền bài trả phí bằng xu (purchaseTestAccess).
- */
 @Service
 @RequiredArgsConstructor
 public class TestAccessService {
@@ -32,7 +28,7 @@ public class TestAccessService {
     private final UserTestRepository userTestRepository;
     private final UserTestAccessRepository userTestAccessRepository;
     private final CoinService coinService;
-    private final TestService testService; // dùng lại buildUserTestSummary (query)
+    private final TestService testService;
 
     private boolean hasTestAccess(Test test, String userId) {
         if (test.getCostCoins() == null || test.getCostCoins() <= 0) return true;
@@ -40,7 +36,6 @@ public class TestAccessService {
         if (userId.equals(test.getCreatedBy())) return true;
         return userTestAccessRepository.existsByUserIdAndTestId(userId, test.getTestId());
     }
-
 
     public Map<String, Object> canStartTest(String userId, Test test) {
         Instant now = Instant.now();
@@ -70,7 +65,6 @@ public class TestAccessService {
             return result;
         }
 
-        // Bài trả phí: lộ giá + trạng thái sở hữu để FE hiển thị nút "Mở khoá".
         boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
         boolean owned = hasTestAccess(test, userId);
         result.put("costCoins", test.getCostCoins());
@@ -87,7 +81,6 @@ public class TestAccessService {
         return result;
     }
 
-    /** Mua quyền làm bài trả phí (trừ xu 1 lần, mở khoá vĩnh viễn). */
     @Transactional
     public TestResponse purchaseTestAccess(String userId, String testId) {
         Test test = testRepository.findById(testId)
@@ -103,7 +96,7 @@ public class TestAccessService {
             throw new ConflictException("Bạn đã mở khoá bài này.");
         }
 
-        coinService.spend(userId, cost); // ném lỗi nếu không đủ xu
+        coinService.spend(userId, cost);
 
         UserTestAccess access = new UserTestAccess();
         access.setUserId(userId);

@@ -100,7 +100,6 @@ public class LearningPlanService {
             throw new BadRequestException("Bài thi không có dữ liệu phân tích phần, không thể sinh kế hoạch");
         }
 
-        // Bài nguồn có thể là bài cũ -> service tự bỏ qua nếu điểm Part đã được cập nhật từ bài mới hơn.
         userTargetProgressService.syncPartScoresFromMock(
                 userId, examTypeId, request.getUserTestId(), userTest.getFinishedAt(), result);
 
@@ -223,7 +222,6 @@ public class LearningPlanService {
                 loadDiagnosisSources(List.of(plan)));
     }
 
-    /** examTypeId rỗng = mọi kỳ thi (FE "tất cả lộ trình" chỉ gọi 1 lần thay vì mỗi kỳ thi một lần). */
     @Transactional(readOnly = true)
     public List<PlanResponse> listPlans(String userId, String examTypeId) {
         List<LearningPlan> plans = examTypeId == null || examTypeId.isBlank()
@@ -233,7 +231,6 @@ public class LearningPlanService {
             return List.of();
         }
 
-        // Toàn bộ ải của mọi plan trong 1 query; Tag/ExamPart/tài liệu batch-load 1 lần dùng chung.
         List<String> planIds = plans.stream().map(LearningPlan::getLearningPlanId).toList();
         Map<String, List<LearningPlanTask>> tasksByPlan = taskRepository
                 .findByLearningPlanIdInOrderByTaskOrderAsc(planIds).stream()
@@ -256,13 +253,11 @@ public class LearningPlanService {
                 .toList();
     }
 
-    /** Mục tiêu hiện tại của user theo examTypeId — dùng chung cho cờ targetOutdated của mọi plan. */
     private Map<String, UserTarget> loadCurrentTargets(String userId) {
         return userTargetRepository.findByUserId(userId).stream()
                 .collect(Collectors.toMap(UserTarget::getExamTypeId, t -> t, (a, b) -> a));
     }
 
-    /** Loại bài chẩn đoán nguồn của từng plan (category + có phải bài luyện theo Part không). */
     private Map<String, DiagnosisSource> loadDiagnosisSources(List<LearningPlan> plans) {
         Set<String> userTestIds = plans.stream()
                 .map(LearningPlan::getSourceUserTestId)
@@ -280,7 +275,6 @@ public class LearningPlanService {
         return result;
     }
 
-    /** Bài chẩn đoán nguồn: code ExamCategory + có phải bài luyện theo Part (chỉ phủ vài Part). */
     private record DiagnosisSource(String categoryCode, boolean practice) {}
 
     @Transactional
@@ -356,7 +350,6 @@ public class LearningPlanService {
         return candidates;
     }
 
-    /** Giống logic "Việc cần làm ngay" trên màn kết quả. */
     private boolean partNeedsFocus(PartBreakdownDto part) {
         if (part.getIsTargetMet() != null) {
             return !part.getIsTargetMet();
@@ -418,10 +411,6 @@ public class LearningPlanService {
         return result;
     }
 
-    /**
-     * Mỗi Part chưa đạt target (isTargetMet = false) phải có ít nhất 1 ải.
-     * Tag từ bài thi; nếu không có tag trên câu lấy tag từ kho câu theo Part.
-     */
     private List<TaskCandidate> collectTasksForPart(
             PartBreakdownDto part,
             double threshold,
@@ -463,8 +452,6 @@ public class LearningPlanService {
             }
         }
 
-        // Thứ tự học nền tảng (Tag.sortOrder) làm khóa chính; độ yếu (priorityScore) phá hòa
-        // và sắp các tag chưa đặt lộ trình. Capstone thêm sau nên luôn ở cuối.
         Map<String, Integer> sortOrderByTag = loadTagSortOrders(partTasks);
         partTasks.sort(
                 Comparator.<TaskCandidate>comparingInt(t -> tagSortRank(sortOrderByTag.get(t.tagId())))
@@ -479,10 +466,6 @@ public class LearningPlanService {
         return partTasks;
     }
 
-    /**
-     * Thứ tự học nền tảng do admin đặt trên Tag.sortOrder (nhỏ = học trước).
-     * Batch-load 1 query/Part để tránh N+1; tag chưa đặt sortOrder bị bỏ khỏi map.
-     */
     private Map<String, Integer> loadTagSortOrders(List<TaskCandidate> tasks) {
         Set<String> tagIds = tasks.stream()
                 .map(TaskCandidate::tagId)
@@ -496,7 +479,6 @@ public class LearningPlanService {
                 .collect(Collectors.toMap(Tag::getTagId, Tag::getSortOrder, (a, b) -> a));
     }
 
-    /** sortOrder null (chưa đặt lộ trình) -> đẩy xuống cuối. */
     private int tagSortRank(Integer sortOrder) {
         return sortOrder != null ? sortOrder : Integer.MAX_VALUE;
     }
@@ -650,7 +632,6 @@ public class LearningPlanService {
         response.setDiagnosisSourcePractice(source != null && source.practice());
     }
 
-    /** Ghép tên Part chưa có ải thành 1 chuỗi để lưu (null nếu rỗng). Xem {@link #splitPartsWithoutTasks}. */
     private static String joinPartsWithoutTasks(List<String> names) {
         if (names == null || names.isEmpty()) {
             return null;
@@ -658,7 +639,6 @@ public class LearningPlanService {
         return String.join("\n", names);
     }
 
-    /** Tách chuỗi đã lưu về lại danh sách tên Part; rỗng nếu null/blank. */
     private static List<String> splitPartsWithoutTasks(String raw) {
         if (raw == null || raw.isBlank()) {
             return List.of();
@@ -666,21 +646,16 @@ public class LearningPlanService {
         return List.of(raw.split("\n"));
     }
 
-    /**
-     * Plan ACTIVE nhưng target lúc sinh khác target hiện tại (đã đổi/xoá) → ngưỡng ải là snapshot cũ.
-     * So sánh null-safe: plan sinh không target + giờ đã có target cũng tính là outdated.
-     */
     private boolean isTargetOutdated(LearningPlan plan, UserTarget currentTarget) {
         if (plan.getStatus() != LearningPlan.Status.ACTIVE) {
             return false;
         }
         String currentTargetId = currentTarget != null ? currentTarget.getUserTargetId() : null;
-        // Mục tiêu đã đổi/xoá (khác id, hoặc plan sinh không target giờ đã có) → ngưỡng ải là snapshot cũ.
+
         if (!Objects.equals(plan.getUserTargetId(), currentTargetId)) {
             return true;
         }
-        // Cùng userTargetId nhưng sửa mục tiêu tại chỗ (createOrUpdate giữ nguyên id): điểm mục tiêu
-        // đổi thì plan vẫn theo điểm cũ → vẫn coi là outdated để nhắc sinh lại.
+
         Integer currentScore = currentTarget != null ? currentTarget.getTargetScore() : null;
         return !Objects.equals(plan.getTargetScore(), currentScore);
     }

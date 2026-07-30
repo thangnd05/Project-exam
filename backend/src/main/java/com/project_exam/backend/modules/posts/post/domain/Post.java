@@ -21,7 +21,7 @@ public class Post {
     private String id;
 
     @Column(name = "user_id", nullable = false)
-    private String userId; // FK -> users.user_id
+    private String userId;
 
     @Column(nullable = false, length = 255)
     private String title;

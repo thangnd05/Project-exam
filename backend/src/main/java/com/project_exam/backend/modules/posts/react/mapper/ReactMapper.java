@@ -8,10 +8,6 @@ import java.util.Map;
 @Component
 public class ReactMapper {
 
-    /**
-     * Map sang ReactSummaryResponse. counts/total/currentUserReactType do service
-     * tính sẵn rồi truyền vào.
-     */
     public ReactSummaryResponse toSummary(Map<String, Long> counts,
                                           String currentUserReactType,
                                           long total) {

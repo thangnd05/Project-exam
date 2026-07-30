@@ -30,9 +30,9 @@ public class Question {
     private Instant createdAt;
 
     @Column(nullable = false)
-    private String examPartId; // FK -> exam_parts
+    private String examPartId;
 
-    private String passageId; // FK -> passages (nullable)
+    private String passageId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String questionText;
@@ -44,11 +44,11 @@ public class Question {
     private QuestionType questionType;
 
     @Column(columnDefinition = "TEXT")
-    private String explanation; // optional: có thể AI generate
+    private String explanation;
 
     public enum QuestionType {
-        MCQ,        // trắc nghiệm 1 đáp án đúng
-        MSQ,        // trắc nghiệm NHIỀU đáp án đúng (chọn nhiều, chấm all-or-nothing)
+        MCQ,
+        MSQ,
         FILL_BLANK,
         ESSAY
     }
@@ -63,9 +63,8 @@ public class Question {
     private Boolean isBank;
 
     @Column(name = "collection_id")
-    private String collectionId; // FK -> question_collections (nullable)
+    private String collectionId;
 
-    /** Số thứ tự câu trong kho theo part + phạm vi (cá nhân/lớp/admin). */
     @Column(name = "question_number")
     private Integer questionNumber;
 

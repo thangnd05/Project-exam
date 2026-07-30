@@ -80,7 +80,6 @@ public class EnhancedResultService {
                     .build();
         }
 
-        // 1. Load test metadata
         Test test = testRepository.findById(userTest.getTestId())
                 .orElseThrow(() -> new NotFoundException("Test not found"));
 
@@ -95,8 +94,6 @@ public class EnhancedResultService {
                     .orElse(null);
         }
 
-        // 2. Load question IDs from test structure (not just answered ones).
-        // Mode PRACTICE chỉ phân tích các Part đã chọn, không lấy toàn bộ đề.
         Set<String> allTestQuestionIds = getAnalyzedQuestionIds(userTest);
         long totalQuestions = allTestQuestionIds.size();
 
@@ -107,14 +104,12 @@ public class EnhancedResultService {
                     .build();
         }
 
-        // 3. Load user answers + deduplicate
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTest.getUserTestId());
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
 
         Map<String, UserAnswer> answeredMap = uniqueAnswers.stream()
                 .collect(Collectors.toMap(UserAnswer::getQuestionId, ua -> ua, (a1, a2) -> a1));
 
-        // 4. Load ALL questions + correct answers (cả câu chưa khoanh)
         Map<String, Question> questionMap = questionRepository.findAllById(allTestQuestionIds).stream()
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q, (q1, q2) -> q1));
 
@@ -122,7 +117,6 @@ public class EnhancedResultService {
                 .findByQuestionIdInAndIsCorrectTrue(new ArrayList<>(allTestQuestionIds)).stream()
                 .collect(Collectors.groupingBy(Answer::getQuestionId));
 
-        // 5. Check correctness per question — câu không khoanh = SAI
         Map<String, Boolean> correctnessMap = new HashMap<>();
         long totalCorrect = 0;
         for (String qId : allTestQuestionIds) {
@@ -136,7 +130,6 @@ public class EnhancedResultService {
             if (ua != null && correctAnswers != null && !correctAnswers.isEmpty()) {
                 isCorrect = checkCorrectness(ua, question, correctAnswers);
             }
-            // Câu không khoanh (ua == null) isCorrect = false (SAI)
 
             correctnessMap.put(qId, isCorrect);
             if (isCorrect) totalCorrect++;
@@ -145,7 +138,6 @@ public class EnhancedResultService {
         long normalizedCorrect = Math.min(totalCorrect, totalQuestions);
         long totalWrong = totalQuestions - normalizedCorrect;
 
-        // 4b. Trạng thái từng câu (correct/wrong/skipped) + số câu theo thứ tự hiển thị.
         Map<String, String> statusMap = new HashMap<>();
         for (String qId : allTestQuestionIds) {
             UserAnswer ua = answeredMap.get(qId);
@@ -160,7 +152,6 @@ public class EnhancedResultService {
         }
         Map<String, Integer> questionNumberMap = buildQuestionNumberMap(userTest.getTestId());
 
-        // 5. Load ExamParts + Skills
         Set<String> examPartIds = questionMap.values().stream()
                 .map(Question::getExamPartId)
                 .collect(Collectors.toSet());
@@ -177,7 +168,6 @@ public class EnhancedResultService {
         Map<String, Skill> skillMap = skillRepository.findAllById(skillIds).stream()
                 .collect(Collectors.toMap(Skill::getSkillId, s -> s));
 
-        // 6. Load tags for all questions (for tầng 3)
         List<QuestionTag> allQuestionTags = allTestQuestionIds.isEmpty()
                 ? List.of()
                 : questionTagRepository.findByQuestionIdIn(allTestQuestionIds);
@@ -194,7 +184,6 @@ public class EnhancedResultService {
                 : tagRepository.findAllById(allTagIds).stream()
                 .collect(Collectors.toMap(Tag::getTagId, t -> t));
 
-        // 7. Load Target
         Optional<UserTarget> userTargetOpt = test.getExamTypeId() != null ?
                 userTargetRepository.findByUserIdAndExamTypeId(userTest.getUserId(), test.getExamTypeId()) :
                 Optional.empty();
@@ -207,28 +196,22 @@ public class EnhancedResultService {
             }
         }
 
-        // 8. Build Part breakdown (tầng 2.5 + tầng 3)
         List<PartBreakdownDto> partBreakdown = buildPartBreakdown(
                 questionMap, correctnessMap, statusMap, questionNumberMap,
                 examPartMap, skillMap, tagsByQuestion, tagMap, targetParts, examTypeName);
 
-        // 9. Build Skill breakdown (tầng 2) - aggregate from parts
         List<SkillBreakdownDto> skillBreakdown = buildSkillBreakdown(
                 partBreakdown, test.getExamTypeId(), skillMap, examTypeName);
 
-        // 9. Calculate readiness
         double overallPercentage = totalQuestions > 0
                 ? (double) normalizedCorrect / totalQuestions * 100 : 0;
         int readinessScore = calculateReadinessScore(skillBreakdown, overallPercentage);
         String readinessLevel = getReadinessLevel(readinessScore);
 
-        // 10. Calculate percentile
         Integer percentile = calculatePercentile(userTest.getTestId(), userTest.getTotalScore());
 
-        // 11. Pass/fail
         boolean passed = overallPercentage >= 70;
 
-        // 12. Compute gauge fields
         int percentage = (int) Math.round(overallPercentage);
         boolean isQuickChallenge = "QUICK_CHALLENGE".equals(examCategoryCode);
         boolean hasTarget = userTargetOpt.isPresent();
@@ -239,17 +222,14 @@ public class EnhancedResultService {
         GaugeInfo gauge = computeGauge(isQuickChallenge, percentage, hasTarget, targetScore,
                 totalScoreVal, readinessScore, readinessLevel);
 
-        // 13. Compute isTargetMet (top-level)
         Boolean isTargetMetResult = null;
         if (hasTarget && targetScore != null && totalScoreVal != null) {
             isTargetMetResult = totalScoreVal >= targetScore;
         }
 
-        // 14. Build recovery recommendations
         List<RecoveryRecommendationDto> recommendations = buildRecommendations(
                 partBreakdown, tagMap, allTagIds);
 
-        // 15. Recovery message
         String recoveryMessage = buildRecoveryMessage(hasTarget, isTargetMetResult, readinessScore);
 
         return EnhancedResultDto.builder()
@@ -279,8 +259,6 @@ public class EnhancedResultService {
                 .build();
     }
 
-    // --- Helper methods ---
-
     private boolean checkCorrectness(UserAnswer ua, Question question, List<Answer> correctAnswers) {
         return AnswerGradingUtil.isCorrect(question.getQuestionType(),
                 ua.getSelectedAnswerId(), ua.getSelectedAnswerIds(),
@@ -300,14 +278,9 @@ public class EnhancedResultService {
         return "Chung";
     }
 
-    /** 5 field của "đồng hồ" kết quả (gauge) hiển thị ở đầu trang kết quả. */
     private record GaugeInfo(int gaugePercentage, String displayValue, String gaugeLabel,
                              String gaugeTitle, String gaugeMessage) {}
 
-    /**
-     * Tính gauge theo ngữ cảnh: Quick Challenge (theo % chính xác), có Target (theo điểm mục tiêu),
-     * hoặc mặc định (theo readiness). Chỉ dựng dữ liệu hiển thị — không đổi so với bản inline cũ.
-     */
     private GaugeInfo computeGauge(boolean isQuickChallenge, int percentage, boolean hasTarget,
                                    Integer targetScore, Long totalScoreVal,
                                    int readinessScore, String readinessLevel) {
@@ -343,7 +316,6 @@ public class EnhancedResultService {
                 getGaugeTitle(readinessLevel), getGaugeMessage(readinessLevel));
     }
 
-    /** Thông điệp gợi ý lộ trình (null nếu đã đạt target / readiness đủ cao). Giữ nguyên logic cũ. */
     private String buildRecoveryMessage(boolean hasTarget, Boolean isTargetMetResult, int readinessScore) {
         if (hasTarget && !Boolean.TRUE.equals(isTargetMetResult)) {
             return "Mục tiêu của bạn: Lấp đầy khoảng trống kiến thức để đạt target. " +
@@ -368,7 +340,6 @@ public class EnhancedResultService {
             Map<String, Integer> targetParts,
             String examTypeName) {
 
-        // Group questions by examPartId
         Map<String, List<String>> questionsByPart = new HashMap<>();
         for (Map.Entry<String, Question> entry : questionMap.entrySet()) {
             String qId = entry.getKey();
@@ -417,7 +388,6 @@ public class EnhancedResultService {
                 }
             }
 
-            // Tầng 3: Tag breakdown cho tất cả câu hỏi trong part
             List<TagBreakdownDto> weakTags = buildTagBreakdown(
                     qIds, statusMap, questionNumberMap, tagsByQuestion, tagMap);
 
@@ -437,8 +407,6 @@ public class EnhancedResultService {
                     .build());
         }
 
-        // Thứ tự hiển thị theo ExamPart.displayOrder (cùng nguồn với lộ trình học, để 2 màn không
-        // sắp khác nhau); Part chưa đặt thứ tự thì suy từ số trong tên rồi tới tên.
         parts.sort(
                 Comparator.comparingInt((PartBreakdownDto part) ->
                                 partDisplayOrder(examPartMap.get(part.getExamPartId())))
@@ -455,7 +423,6 @@ public class EnhancedResultService {
             Map<String, List<QuestionTag>> tagsByQuestion,
             Map<String, Tag> tagMap) {
 
-        // Aggregate per tag: [correct, wrong, skipped] + danh sách câu
         Map<String, int[]> tagStats = new HashMap<>();
         Map<String, List<TagQuestionRefDto>> tagQuestions = new HashMap<>();
 
@@ -507,12 +474,10 @@ public class EnhancedResultService {
                     .build());
         }
 
-        // Sort by percentage ascending (weakest first)
         tags.sort(Comparator.comparingDouble(TagBreakdownDto::getPercentage));
         return tags;
     }
 
-    /** Map questionId -> số câu (đánh số liên tục theo thứ tự part rồi displayOrder). */
     private Map<String, Integer> buildQuestionNumberMap(String testId) {
         List<com.project_exam.backend.modules.assessment.test.domain.TestPart> parts =
                 testPartRepository.findByTestId(testId);
@@ -543,8 +508,7 @@ public class EnhancedResultService {
             Map<String, Skill> skillMap,
             String examTypeName) {
 
-        // Aggregate parts by skill
-        Map<String, int[]> skillStats = new LinkedHashMap<>(); // skillId -> [correct, wrong]
+        Map<String, int[]> skillStats = new LinkedHashMap<>();
 
         for (PartBreakdownDto part : partBreakdown) {
             int[] stats = skillStats.computeIfAbsent(part.getSkillId(), k -> new int[]{0, 0});
@@ -563,7 +527,6 @@ public class EnhancedResultService {
 
             Skill skill = skillMap.get(skillId);
 
-            // Try to get converted score (TOEIC style)
             Integer convertedScore = null;
             if (examTypeId != null) {
                 convertedScore = scoringConversionRepository
@@ -590,7 +553,7 @@ public class EnhancedResultService {
         if (skillBreakdown.isEmpty()) {
             return (int) Math.round(overallPercentage);
         }
-        // Weighted average (equal weight for MVP)
+
         double sum = skillBreakdown.stream()
                 .mapToDouble(SkillBreakdownDto::getPercentage)
                 .sum();
@@ -638,13 +601,12 @@ public class EnhancedResultService {
             Map<String, Tag> tagMap,
             Set<String> allTagIds) {
 
-        // Collect weak tag IDs (percentage < 60%)
         Set<String> weakTagIds = new LinkedHashSet<>();
         Map<String, String> tagToSkillName = new HashMap<>();
 
         for (PartBreakdownDto part : partBreakdown) {
             if (part.getWeakTags() == null) continue;
-            
+
             boolean shouldFocus = false;
             if (part.getIsTargetMet() != null) {
                 shouldFocus = !part.getIsTargetMet();
@@ -665,7 +627,6 @@ public class EnhancedResultService {
 
         if (weakTagIds.isEmpty()) return List.of();
 
-        // Find recovery resources linked to weak tags
         List<ResourceTag> resourceTags = resourceTagRepository.findByTagIdIn(weakTagIds);
 
         Set<String> resourceIds = resourceTags.stream()
@@ -678,7 +639,6 @@ public class EnhancedResultService {
                 .findAllById(resourceIds).stream()
                 .collect(Collectors.toMap(RecoveryResource::getResourceId, r -> r));
 
-        // Build recommendations (deduplicate by resourceId, collect all tags)
         Map<String, RecoveryRecommendationDto> seen = new LinkedHashMap<>();
         for (ResourceTag rt : resourceTags) {
             RecoveryResource resource = resourceMap.get(rt.getResourceId());
@@ -713,10 +673,6 @@ public class EnhancedResultService {
         return new ArrayList<>(seen.values());
     }
 
-    /**
-     * Các câu hỏi cần phân tích cho kết quả. Mode FULL_TEST lấy toàn bộ đề;
-     * mode PRACTICE chỉ lấy các Part người dùng đã chọn luyện tập (practicePartIds).
-     */
     private Set<String> getAnalyzedQuestionIds(UserTest userTest) {
         Set<String> practicePartIds = userTest.isPractice()
                 ? parsePracticePartIds(userTest.getPracticePartIds())
@@ -749,7 +705,6 @@ public class EnhancedResultService {
         return new ArrayList<>(uniqueByQuestionId.values());
     }
 
-    /** Part chưa đặt "Thứ tự" thì xếp sau các Part đã đặt. */
     private int partDisplayOrder(ExamPart part) {
         return part != null && part.getDisplayOrder() != null
                 ? part.getDisplayOrder()

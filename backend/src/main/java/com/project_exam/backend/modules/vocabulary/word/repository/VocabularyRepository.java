@@ -13,7 +13,6 @@ import java.util.List;
 public interface VocabularyRepository extends JpaRepository<Vocabulary, String> {
     List<Vocabulary> findByAlbumId(String albumId);
 
-    // Tổng số từ theo từng album: [albumId, count]
     @Query("SELECT v.albumId, COUNT(v) FROM Vocabulary v WHERE v.albumId IN :albumIds GROUP BY v.albumId")
     List<Object[]> countGroupedByAlbumIds(@Param("albumIds") Collection<String> albumIds);
 

@@ -11,16 +11,16 @@ import java.util.List;
 @Builder
 public class UserTestResponse {
     private String userTestId;
-    private String userId;     // thêm
+    private String userId;
     private String userName;
-    private String testId;     // thêm
-    private String testTitle;  // thêm — tên bài kiểm tra để FE hiển thị (vd dropdown chọn bài)
-    private String examTypeId; // thêm — để FE lọc mock theo kỳ thi
+    private String testId;
+    private String testTitle;
+    private String examTypeId;
     private Instant startedAt;
     private Instant finishedAt;
     private Integer totalScore;
     private String status;
-    private String mode; // FULL_TEST | PRACTICE (null dữ liệu cũ = FULL_TEST)
-    private List<String> practicePartIds; // examPartId các Part đã luyện, chỉ có khi mode = PRACTICE
-    private Long durationTaken; // Thời gian làm bài (giây) = finishedAt - startedAt
+    private String mode;
+    private List<String> practicePartIds;
+    private Long durationTaken;
 }

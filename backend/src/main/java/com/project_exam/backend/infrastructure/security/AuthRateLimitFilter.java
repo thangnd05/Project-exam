@@ -18,7 +18,6 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
 
     private static final long WINDOW_MS = 60_000L;
 
-    /** Mỗi path có giới hạn riêng. Path không có trong map không rate-limit. */
     private static final Map<String, Integer> LIMITS = Map.of(
             "/api/auth/login", 10,
             "/api/auth/register", 5,
@@ -48,13 +47,13 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
 
         Deque<Long> dq = hits.computeIfAbsent(key, k -> new ArrayDeque<>());
         synchronized (dq) {
-            // bỏ các hit cũ hơn 60s
+
             while (!dq.isEmpty() && (now - dq.peekFirst()) > WINDOW_MS) {
                 dq.pollFirst();
             }
             if (dq.size() >= limit) {
                 long retryAfterSec = Math.max(1, (WINDOW_MS - (now - dq.peekFirst())) / 1000);
-                response.setStatus(429); // Too Many Requests
+                response.setStatus(429);
                 response.setHeader("Retry-After", String.valueOf(retryAfterSec));
                 response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().write(
@@ -70,10 +69,7 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
     }
 
     private String clientIp(HttpServletRequest request) {
-        // KHÔNG đọc trực tiếp X-Forwarded-For / X-Real-IP: client tự đặt được -> mỗi request 1 IP giả
-        // => mỗi IP 1 bucket mới => vượt hết rate-limit. Dùng getRemoteAddr(): với
-        // server.forward-headers-strategy=native, Tomcat RemoteIpValve chỉ áp XFF từ proxy nội bộ
-        // đáng tin, nên đây là IP client thật (không giả mạo được từ ngoài).
+
         String ip = request.getRemoteAddr();
         return ip == null ? "unknown" : ip;
     }

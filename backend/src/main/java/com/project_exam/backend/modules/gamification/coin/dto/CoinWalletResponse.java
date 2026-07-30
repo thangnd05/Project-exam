@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.time.Instant;
 
-/** 1 dòng ví xu kèm thông tin user — dùng cho bảng quản lý ở admin. */
 @Getter
 @Builder
 public class CoinWalletResponse {

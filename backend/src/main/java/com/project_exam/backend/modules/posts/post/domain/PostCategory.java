@@ -24,8 +24,8 @@ public class PostCategory {
     private String id;
 
     @Column(name = "post_id", nullable = false)
-    private String postId; // FK -> posts.id
+    private String postId;
 
     @Column(name = "category_id", nullable = false)
-    private String categoryId; // FK -> categories.id
+    private String categoryId;
 }

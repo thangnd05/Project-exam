@@ -12,11 +12,10 @@ import java.util.List;
 @Builder
 public class CurrentSessionResponse {
 
-    /** PICK = chọn ải; QUIZ = đang làm bài; MOCK = đã xong ải. */
     private String mode;
 
     private String learningPlanId;
-    /** Kỳ thi của plan — FE cần để trỏ sang danh sách đề khi đã hết ải (stage MOCK). */
+
     private String examTypeId;
     private String planStage;
     private String sessionId;
@@ -25,7 +24,7 @@ public class CurrentSessionResponse {
     private PlanPhaseDto.RecommendedResourceDto resource;
     private Integer questionCount;
     private Integer passAccuracyRequired;
-    // Kết quả của phiên đã nộp gần nhất (mode REVIEW) — để trang kết quả sống sót khi F5.
+
     private Integer correctCount;
     private Integer totalCount;
     private Integer accuracy;
@@ -34,7 +33,7 @@ public class CurrentSessionResponse {
     private Integer totalTasks;
     private Integer passedTasks;
     private String message;
-    /** Cảnh báo cần nhấn mạnh cho user (ải bị bỏ qua vì kho câu rỗng...) — FE hiện dạng alert. */
+
     private String notice;
     private List<PlanPartGroupDto> partGroups;
     private List<PlanTaskDto> tasks;

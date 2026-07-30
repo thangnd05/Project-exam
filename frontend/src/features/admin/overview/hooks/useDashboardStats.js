@@ -14,7 +14,6 @@ export const dashboardKeys = {
   contentInsights: ['admin-dashboard-content-insights'],
 };
 
-/** Số liệu tổng quan cho Dashboard admin — tự làm mới mỗi 30s và khi quay lại tab. */
 export function useDashboardStats() {
   return useQuery({
     queryKey: dashboardKeys.stats,
@@ -25,7 +24,6 @@ export function useDashboardStats() {
   });
 }
 
-/** Hiệu suất đủ 12 tháng của năm được chọn (year = undefined → năm hiện tại). */
 export function useMonthlyPerformance(year) {
   return useQuery({
     queryKey: dashboardKeys.monthlyPerformance(year),
@@ -35,7 +33,6 @@ export function useMonthlyPerformance(year) {
   });
 }
 
-/** Phân tích nội dung (bài hot & câu khó) — số liệu nặng, ít đổi, chỉ trang Thống kê dùng. */
 export function useContentInsights() {
   return useQuery({
     queryKey: dashboardKeys.contentInsights,
@@ -44,7 +41,6 @@ export function useContentInsights() {
   });
 }
 
-/** Heatmap ngày×giờ cho 7 ngày kết thúc ở endDate ('yyyy-MM-dd'; undefined → hôm nay). */
 export function useTrafficHeatmap(endDate) {
   return useQuery({
     queryKey: dashboardKeys.trafficHeatmap(endDate),

@@ -33,9 +33,6 @@ public class EvaluationService {
     private final AuthUtils authUtils;
     private final EvaluationMapper evaluationMapper;
 
-    // ============================
-    //  Helper convert Entity DTO
-    // ============================
     private EvaluationResponse toResponse(Evaluation e) {
 
         User user = userRepository.findById(e.getUserId())
@@ -44,9 +41,6 @@ public class EvaluationService {
         return evaluationMapper.toResponse(e, user);
     }
 
-    // ============================
-    //  CREATE
-    // ============================
     public EvaluationResponse create(HttpServletRequest httpRequest, EvaluationRequest request) {
 
         String currentUserId = authUtils.getUserId(httpRequest);
@@ -61,9 +55,6 @@ public class EvaluationService {
         return toResponse(saved);
     }
 
-    // ============================
-    //  GET ALL
-    // ============================
     public List<EvaluationResponse> getAll() {
         return evaluationRepository.findAll()
                 .stream()
@@ -94,9 +85,6 @@ public class EvaluationService {
         return PageResponse.from(evaluationPage, this::toResponse);
     }
 
-    // ============================
-    //  GET BY USER
-    // ============================
     public List<EvaluationResponse> getByUser(String userId) {
         return evaluationRepository.findByUserId(userId)
                 .stream()
@@ -112,13 +100,10 @@ public class EvaluationService {
                 .toList();
     }
 
-    // ============================
-    //  UPDATE
-    // ============================
     public EvaluationResponse update(String id, EvaluationRequest request, HttpServletRequest httpRequest) {
         Evaluation evaluation = evaluationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-        //  Chỉ chính chủ (hoặc admin) mới được sửa.
+
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {
@@ -138,7 +123,7 @@ public class EvaluationService {
     public void delete(String id, HttpServletRequest httpRequest) {
         Evaluation evaluation = evaluationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-        //  Chỉ chính chủ (hoặc admin) mới được xoá.
+
         String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {

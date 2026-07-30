@@ -101,7 +101,7 @@ function ExamTypeLayoutEditor() {
     enabled: !!examTypeId,
   });
   const loading = layoutQuery.isLoading;
-  
+
   useEffect(() => {
     if (layoutQuery.data !== undefined) {
       setConfig(resolveLayoutConfig(layoutQuery.data));

@@ -30,8 +30,6 @@ public class TagService {
     private final ExamTypeRepository examTypeRepository;
     private final TagMapper tagMapper;
 
-    // ==================== CRUD ====================
-
     public TagResponse createTag(TagRequest request) {
         if (request.getName() == null || request.getName().isBlank()) {
             throw new BadRequestException("Tên tag không được để trống.");
@@ -78,7 +76,7 @@ public class TagService {
             }
             tag.setParentId(normalizeParentId(request.getParentId()));
         }
-        // Set thẳng (không guard null) để admin có thể xoá thứ tự về "chưa xếp".
+
         tag.setSortOrder(request.getSortOrder());
 
         tag = tagRepository.save(tag);
@@ -91,7 +89,6 @@ public class TagService {
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new NotFoundException("Tag không tồn tại: " + tagId));
 
-        // Xoá cascade: tất cả tag con + question_tags liên quan
         deleteTagRecursive(tagId);
     }
 
@@ -105,14 +102,8 @@ public class TagService {
         tagRepository.deleteById(tagId);
     }
 
-    // ==================== QUERY ====================
-
-    /**
-     * Lấy danh sách tag theo examTypeId dạng cây (tree).
-     */
     public List<TagResponse> getTagTreeByExamType(String examTypeId) {
-        // 1 query: lấy hết tag đã sắp theo sortOrder. Root = tag không có parent, lọc tại chỗ
-        // (bao gồm cả tag cũ parent_id = ''). buildChildren chỉ .filter() nên con giữ đúng thứ tự.
+
         List<Tag> allTags = tagRepository.findByExamTypeIdOrderBySortOrderAsc(examTypeId);
         return allTags.stream()
                 .filter(t -> t.getParentId() == null || t.getParentId().isBlank())
@@ -120,18 +111,12 @@ public class TagService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Lấy danh sách tag phẳng (flat) theo examTypeId.
-     */
     public List<TagResponse> getTagsFlatByExamType(String examTypeId) {
         return tagRepository.findByExamTypeId(examTypeId).stream()
                 .map(t -> toResponse(t, null))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Lấy danh sách tag của một question.
-     */
     public List<TagResponse> getTagsByQuestionId(String questionId) {
         List<QuestionTag> questionTags = questionTagRepository.findByQuestionId(questionId);
         return questionTags.stream()
@@ -141,11 +126,6 @@ public class TagService {
                 .collect(Collectors.toList());
     }
 
-    // ==================== QUESTION-TAG LINKING ====================
-
-    /**
-     * Gắn tags cho câu hỏi. Xoá hết tag cũ rồi gắn lại.
-     */
     @Transactional
     public void syncQuestionTags(String questionId, List<String> tagIds) {
         questionTagRepository.deleteByQuestionId(questionId);
@@ -161,21 +141,6 @@ public class TagService {
         }
     }
 
-    /**
-     * Resolve danh sách SPEC tag (đọc từ dòng "Tags:" trong file import) -> tagId,
-     * trong phạm vi 1 examType. Mỗi spec là 1 phần tử (đã tách theo ';' ở parser).
-     *
-     * <p>Cú pháp mỗi spec:</p>
-     * <ul>
-     *   <li>{@code "Cha > Con"} — chỉ rõ tag cha, khớp CHÍNH XÁC con thuộc cha đó.
-     *       Dùng khi tên con trùng ở nhiều cha (vd "danh tính người nói" có ở Part 3 lẫn Part 4).</li>
-     *   <li>{@code "Con"} — không ghi cha, thứ tự ưu tiên:
-     *     (1) con thuộc cha = Part đang import; (2) chính tag Part đó; (3) nếu tên chỉ có DUY NHẤT
-     *     1 tag thì lấy; (4) trùng nhiều cha mà không xác định được -> BỎ QUA (log warn).</li>
-     * </ul>
-     * Tên tag có thể chứa dấu phẩy (vd "Chủ đề, mục đích") — KHÔNG tách theo ','.
-     * CHỈ khớp tag CÓ SẴN, không tự tạo tag mới. Tên/cha không khớp -> bỏ qua (log warn).
-     */
     public List<String> resolveTagIdsByNames(Collection<String> specs, String examTypeId, String partTagName) {
         if (specs == null || specs.isEmpty() || examTypeId == null) {
             return List.of();
@@ -184,7 +149,6 @@ public class TagService {
         Map<String, Tag> idToTag = new HashMap<>();
         for (Tag t : all) idToTag.put(t.getTagId(), t);
 
-        // Tag root tương ứng Part đang import (vd "Part 3")
         String partRootId = null;
         if (partTagName != null && !partTagName.isBlank()) {
             for (Tag t : all) {
@@ -209,7 +173,6 @@ public class TagService {
             String spec = rawSpec.trim();
             if (spec.isEmpty()) continue;
 
-            // Tách "Cha > Con" (chỉ ở dấu '>' đầu tiên)
             String parentName = null;
             String childName = spec;
             int gt = spec.indexOf('>');
@@ -224,7 +187,7 @@ public class TagService {
 
             Tag chosen = null;
             if (parentName != null && !parentName.isEmpty()) {
-                // Khớp đúng con thuộc cha ghi rõ
+
                 final String pn = parentName;
                 for (Tag t : cands) {
                     Tag p = (t.getParentId() == null) ? null : idToTag.get(t.getParentId());
@@ -232,7 +195,7 @@ public class TagService {
                 }
                 if (chosen == null) { unmatched.add(spec); continue; }
             } else {
-                // Không ghi cha -> suy theo Part đang import
+
                 if (partRootId != null) {
                     for (Tag t : cands) if (partRootId.equals(t.getParentId())) { chosen = t; break; }
                     if (chosen == null) for (Tag t : cands) if (partRootId.equals(t.getTagId())) { chosen = t; break; }
@@ -259,8 +222,6 @@ public class TagService {
         return t.getName() != null && name != null
                 && t.getName().trim().equalsIgnoreCase(name.trim());
     }
-
-    // ==================== HELPERS ====================
 
     private List<TagResponse> buildChildren(String parentId, List<Tag> allTags) {
         return allTags.stream()

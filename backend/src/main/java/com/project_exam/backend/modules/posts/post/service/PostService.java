@@ -56,10 +56,6 @@ public class PostService {
     private final CategoryMapper categoryMapper;
     private final PostMapper postMapper;
 
-    // ─────────────────────────────────────────────
-    // MAPPING
-    // ─────────────────────────────────────────────
-
     private CategoryResponse toCategoryResponse(Category c) {
         return categoryMapper.toResponse(c);
     }
@@ -131,10 +127,6 @@ public class PostService {
                 thumbnailUrl, categories, commentCount, totalReacts, saveCount);
     }
 
-    // ─────────────────────────────────────────────
-    // CRUD
-    // ─────────────────────────────────────────────
-
     @Transactional
     public PostResponse createPost(PostUpsertRequest request,
                                    MultipartFile thumbnailFile,
@@ -151,7 +143,7 @@ public class PostService {
                 .thumbnailUrl(request.getThumbnailUrl())
                 .status(initialStatus)
                 .build();
-                
+
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
             try {
                 String url = cloudinaryService.uploadImage(thumbnailFile);
@@ -163,7 +155,6 @@ public class PostService {
 
         post = postRepository.save(post);
 
-        // Gán categories
         saveCategories(post.getId(), request.getCategoryIds());
 
         return toFullResponse(post, userId);
@@ -186,7 +177,7 @@ public class PostService {
         if (request.getThumbnailUrl() != null && !request.getThumbnailUrl().isBlank()) {
             post.setThumbnailUrl(request.getThumbnailUrl());
         }
-        
+
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
             try {
                 String url = cloudinaryService.uploadImage(thumbnailFile);
@@ -199,7 +190,6 @@ public class PostService {
         if (request.getStatus() != null) post.setStatus(request.getStatus());
         postRepository.save(post);
 
-        // Cập nhật categories
         if (request.getCategoryIds() != null) {
             postCategoryRepository.deleteByPostId(id);
             saveCategories(id, request.getCategoryIds());
@@ -279,7 +269,6 @@ public class PostService {
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Specification<Post> spec = Specification.where(null);
 
-        // User thường chỉ thấy bài APPROVED. Admin có thể xem mọi status hoặc lọc theo status truyền vào.
         Post.PostStatus effectiveStatus = status;
         if (!authUtils.hasPermission(PermissionCatalog.POST_MODERATE)) {
             effectiveStatus = Post.PostStatus.APPROVED;
@@ -317,7 +306,6 @@ public class PostService {
 
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // Bài của chính user xem được mọi status. Cho phép lọc thêm theo keyword (tiêu đề) và status.
         Specification<Post> spec = (root, query, cb) -> cb.equal(root.get("userId"), userId);
         if (keyword != null && !keyword.isBlank()) {
             String like = "%" + keyword.trim().toLowerCase() + "%";
@@ -332,10 +320,6 @@ public class PostService {
         return PageResponse.from(postPage, buildSummaryResponses(postPage.getContent()));
     }
 
-    /**
-     * Batch-build summary cho list post — 1 query/loại thay vì N query/post.
-     * Why: getPostsPaged trước đây bắn ~5 query cho mỗi post (author, categories, count comment/react/save).
-     */
     private List<PostSummaryResponse> buildSummaryResponses(List<Post> posts) {
         if (posts == null || posts.isEmpty()) return List.of();
 
@@ -391,10 +375,6 @@ public class PostService {
         }
         return map;
     }
-
-    // ─────────────────────────────────────────────
-    // HELPERS
-    // ─────────────────────────────────────────────
 
     private void saveCategories(String postId, List<String> categoryIds) {
         if (categoryIds == null || categoryIds.isEmpty()) return;

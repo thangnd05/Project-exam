@@ -20,7 +20,6 @@ public interface UserCoinRepository extends JpaRepository<UserCoin, String> {
             + "WHERE u.userId = :userId AND u.balance >= :amount")
     int deduct(@Param("userId") String userId, @Param("amount") int amount);
 
-    // Cộng xu atomic ở DB (tránh lost-update khi cộng đồng thời). 0 = ví chưa tồn tại.
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE UserCoin u SET u.balance = u.balance + :amount, u.updatedAt = CURRENT_TIMESTAMP "
             + "WHERE u.userId = :userId")

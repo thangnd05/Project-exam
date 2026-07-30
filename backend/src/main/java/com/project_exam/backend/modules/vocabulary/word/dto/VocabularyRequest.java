@@ -10,12 +10,12 @@ public class VocabularyRequest {
     private String meaning;
     private String example;
 
-    private String albumId;        // chọn album có sẵn
+    private String albumId;
 
-    private String newAlbumName; // nếu tạo album mới
+    private String newAlbumName;
     private String newAlbumDesc;
 
     private String userId;
 
-    private String voiceUrl;     // audio pronunciation
+    private String voiceUrl;
 }

@@ -6,12 +6,9 @@ export const getMyUserTests = (params = {}) => {
   return axios.get(`${BASE_URL}/my`, { params }).then((res) => res.data);
 };
 
-// Bài đã hoàn thành, BE đã lọc + sort mới→cũ (không sort ở FE).
 export const getMyCompletedUserTests = (examTypeId) =>
   getMyUserTests({ status: 'COMPLETED', ...(examTypeId ? { examTypeId } : {}) });
 
-// Lịch sử mock (phân trang) — BE đã loại luyện tập theo Part & Quick Challenge.
-// Trả PageResponse: { content, currentPage, size, totalElements, totalPages, hasNext }.
 export const getMockHistory = ({ page = 0, size = 10, examTypeId } = {}) => {
   const params = { page, size };
   if (examTypeId) params.examTypeId = examTypeId;

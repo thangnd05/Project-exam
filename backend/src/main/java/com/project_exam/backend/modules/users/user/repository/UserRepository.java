@@ -16,12 +16,9 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     Optional<User> findByUserName(String userName);
     List<User> findByRoleId(String id);
 
-    // ── Thống kê Dashboard admin ──────────────────────────────
-    /** Thời điểm đăng ký của các tài khoản từ mốc :from — dựng biểu đồ người dùng mới theo tháng. */
     @Query("SELECT u.createdAt FROM User u WHERE u.createdAt >= :from")
     List<Instant> findCreatedAtSince(Instant from);
 
-    /** Thời điểm đăng ký sớm nhất toàn hệ thống — dựng danh sách năm chọn. */
     @Query("SELECT MIN(u.createdAt) FROM User u")
     Instant findEarliestCreatedAt();
 }

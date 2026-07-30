@@ -18,7 +18,6 @@ public class CoinController {
     private final CoinService coinService;
     private final AuthUtils authUtils;
 
-    // Số dư xu của chính user đang đăng nhập
     @GetMapping("/me")
     public ResponseEntity<CoinResponse> getMyBalance(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);

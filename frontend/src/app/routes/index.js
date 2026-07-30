@@ -1,8 +1,6 @@
 import { lazy } from 'react';
 import routes from '~/shared/config/Routes';
 
-// Lazy-load tất cả trang -> mỗi route thành 1 chunk riêng, giảm bundle khởi tạo.
-// (App.js bọc <Routes> trong <Suspense>.)
 const Login = lazy(() => import('~/features/user/login/login'));
 const ForgotPassword = lazy(() => import('~/features/user/login/forgot'));
 const ResetPassWord = lazy(() => import('~/features/user/login/reset'));

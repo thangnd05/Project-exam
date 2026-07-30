@@ -6,11 +6,9 @@ export const getExamTypes = () => {
   return axios.get(BASE_URL).then((response) => response.data);
 };
 
-
 export const getStandardExamTypes = () => {
   return axios.get(`${BASE_URL}/standard`).then((response) => response.data);
 };
-
 
 export const getFlexibleExamTypes = () => {
   return axios.get(`${BASE_URL}/flexible`).then((response) => response.data);
@@ -19,7 +17,6 @@ export const getFlexibleExamTypes = () => {
 export const getExamTypeById = (examTypeId) => {
   return axios.get(`${BASE_URL}/${examTypeId}`).then((response) => response.data);
 };
-
 
 export const getExamTypeChildren = (examTypeId) => {
   return axios.get(`${BASE_URL}/${examTypeId}/children`).then((response) => response.data);
@@ -39,9 +36,6 @@ export const deleteExamType = (examTypeId) => {
   return axios.delete(`${BASE_URL}/${examTypeId}`).then(() => {});
 };
 
-
-
-
 export const getExamTypeLayout = (examTypeId) => {
   return axios
     .get(`${BASE_URL}/${examTypeId}/layout`)
@@ -52,13 +46,11 @@ export const getExamTypeLayout = (examTypeId) => {
     });
 };
 
-
 export const getOwnExamTypeLayout = (examTypeId) => {
   return axios
     .get(`${BASE_URL}/${examTypeId}/layout/own`)
     .then((res) => (res.status === 204 ? null : res.data));
 };
-
 
 export const updateExamTypeLayout = (examTypeId, config) => {
   return axios

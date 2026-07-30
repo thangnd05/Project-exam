@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, String> {
 
-    /** Ghi chú của user, mới sửa gần nhất xếp trước — thứ tự chốt ở BE, FE chỉ render. */
     List<Note> findAllByUserIdOrderByUpdatedAtDesc(String userId);
 }

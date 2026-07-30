@@ -24,18 +24,17 @@ public class UserAnswer {
     private String userAnswerId;
 
     @Column(nullable = false)
-    private String userTestId; // FK -> user_tests.user_test_id
+    private String userTestId;
 
     @Column(nullable = false)
-    private String questionId; // FK -> questions.question_id
+    private String questionId;
 
-    private String selectedAnswerId; // FK -> answers.answer_id (MCQ; null nếu tự luận/MSQ)
+    private String selectedAnswerId;
 
-    // Lựa chọn cho câu MSQ (nhiều đáp án): CSV các answer_id. null với MCQ/FILL/ESSAY.
     @Column(name = "selected_answer_ids", columnDefinition = "TEXT")
     private String selectedAnswerIds;
 
     @Column(columnDefinition = "TEXT")
-    private String answerText; // cho tự luận
+    private String answerText;
 
 }

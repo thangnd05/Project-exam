@@ -14,10 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Danh mục permission để trang quản trị dựng ma trận phân quyền. Chỉ người có quyền
- * quản lý vai trò (ROLE:MANAGE) mới xem được.
- */
 @RestController
 @RequestMapping("/api/permissions")
 @RequiredArgsConstructor

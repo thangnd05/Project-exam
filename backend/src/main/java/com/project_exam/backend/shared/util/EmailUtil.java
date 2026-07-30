@@ -22,7 +22,6 @@ public class EmailUtil {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-        // Thêm người gửi (rất quan trọng để Gmail không đánh dấu spam)
         try {
             helper.setFrom("Thang10072005@gmail.com", "WinDe Exam");
         } catch (UnsupportedEncodingException e) {
@@ -31,7 +30,6 @@ public class EmailUtil {
         helper.setTo(email);
         helper.setSubject("Xác thực tài khoản WinDe Exam");
 
-        // HTML nội dung email (nút đẹp, giao diện gọn)
         String content = """
             <div style="font-family:Arial, sans-serif; background:#f9f9f9; padding:20px; border-radius:10px;">
                 <h2 style="color:#2c3e50;">Xin chào!</h2>
@@ -40,7 +38,7 @@ public class EmailUtil {
                     Vui lòng ấn vào nút bên dưới để xác thực tài khoản của bạn:
                 </p>
                 <div style="margin:25px 0;">
-                    <a href="http://localhost:3000/verify?token=%s"
+                    <a href="http:
                        style="background-color:#00c6ff; color:white; text-decoration:none;
                               padding:12px 20px; border-radius:8px; font-weight:bold;">
                         Xác thực ngay

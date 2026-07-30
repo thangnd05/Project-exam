@@ -1,5 +1,4 @@
 package com.project_exam.backend.modules.auth.dto;
-// src/main/java/com/example/english_exam/dto/RegisterRequest.java
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

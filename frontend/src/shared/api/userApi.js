@@ -33,7 +33,6 @@ export const getProfileOverview = () => {
   return axios.get(`${BASE_URL}/me/profile-overview`).then((response) => response.data);
 };
 
-
 export const getMyActivity = ({ month, year } = {}) => {
   const params = new URLSearchParams();
   if (month) params.set('month', month);
@@ -47,7 +46,6 @@ export const getMyActivity = ({ month, year } = {}) => {
 export const getMyInfo = () => {
   return axios.get(`${BASE_URL}/me/info-user`).then((response) => response.data);
 };
-
 
 export const updateUser = (userId, formData) => {
   return axios

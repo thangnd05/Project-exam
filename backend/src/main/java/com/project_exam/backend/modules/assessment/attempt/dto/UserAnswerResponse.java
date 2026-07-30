@@ -14,6 +14,6 @@ public class UserAnswerResponse {
     private String userTestId;
     private String questionId;
     private String selectedAnswerId;
-    private List<String> selectedAnswerIds; // MSQ
+    private List<String> selectedAnswerIds;
     private String answerText;
 }

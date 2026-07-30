@@ -10,15 +10,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Logic chấm điểm dùng chung cho mọi nơi (đề thi, learning plan): MCQ 1 đáp án,
- * MSQ nhiều đáp án (all-or-nothing), FILL_BLANK so text. ESSAY chấm tay luôn false ở đây.
- */
 public final class AnswerGradingUtil {
 
     private AnswerGradingUtil() {}
 
-    /** Tách chuỗi id đáp án (lưu dạng CSV) thành set, bỏ phần tử rỗng. */
     public static Set<String> parseIds(String csv) {
         if (csv == null || csv.isBlank()) return Set.of();
         return Arrays.stream(csv.split(","))
@@ -27,20 +22,11 @@ public final class AnswerGradingUtil {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    /** Gộp danh sách id thành CSV (để lưu lựa chọn MSQ của user). */
     public static String toCsv(Collection<String> ids) {
         if (ids == null || ids.isEmpty()) return null;
         return ids.stream().filter(s -> s != null && !s.isBlank()).distinct().collect(Collectors.joining(","));
     }
 
-    /**
-     * Chấm 1 câu.
-     * @param type          loại câu hỏi
-     * @param selectedAnswerId   lựa chọn đơn (MCQ)
-     * @param selectedIdsCsv     lựa chọn nhiều (MSQ), CSV id
-     * @param answerText         text tự điền (FILL_BLANK)
-     * @param correctAnswers     danh sách đáp án đúng của câu (isCorrect=true)
-     */
     public static boolean isCorrect(
             Question.QuestionType type,
             String selectedAnswerId,
@@ -56,7 +42,7 @@ public final class AnswerGradingUtil {
                         && correctAnswers.stream().anyMatch(a -> selectedAnswerId.equals(a.getAnswerId()));
 
             case MSQ: {
-                // all-or-nothing: tập chọn == tập đáp án đúng, không thiếu không thừa.
+
                 Set<String> correctIds = correctAnswers.stream()
                         .map(Answer::getAnswerId)
                         .collect(Collectors.toSet());
@@ -71,7 +57,7 @@ public final class AnswerGradingUtil {
                                         && a.getAnswerText().trim().equalsIgnoreCase(answerText.trim()));
 
             default:
-                return false; // ESSAY: chấm tay
+                return false;
         }
     }
 }

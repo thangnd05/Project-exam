@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/** Quản lý cấu hình khôi phục chuỗi (giá xu + bật/tắt) cho admin. */
 @RestController
 @RequestMapping("/api/admin/streak/recover-config")
 @RequiredArgsConstructor

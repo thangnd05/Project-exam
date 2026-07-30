@@ -27,11 +27,9 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     @Query("SELECT COUNT(q) FROM Question q WHERE q.examPartId = :examPartId")
     long countByExamPartId(@Param("examPartId") String examPartId);
 
-    // Random 1 câu (để kiểm tra có passage hay không)
     @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findOneRandomQuestion(@Param("examPartId") String examPartId);
 
-    //  Bổ sung các hàm có lọc theo classId
     @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId AND class_id = :classId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findOneRandomQuestionByClass(@Param("examPartId") String examPartId, @Param("classId") String classId);
 
@@ -44,7 +42,6 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     @Query("SELECT q FROM Question q WHERE q.passageId = :passageId AND q.classId = :classId")
     List<Question> findByPassageIdAndClassId(@Param("passageId") String passageId, @Param("classId") String classId);
 
-    // ========== Kho theo lớp/chapter, KHÔNG cần examPartId ==========
     @Query("SELECT q FROM Question q WHERE q.classId = :classId AND q.createdBy = :createdBy AND q.isBank = true ORDER BY q.questionNumber ASC NULLS LAST, q.createdAt ASC, q.questionId ASC")
     List<Question> findByClassIdAndCreatedByAndIsBankTrue(@Param("classId") String classId, @Param("createdBy") String createdBy);
 
@@ -90,7 +87,6 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
             Pageable pageable
     );
 
-    // ========== Cá nhân theo user đăng nhập (created_by = userId, class_id/chapter_id NULL) ==========
     @Query("""
         SELECT q FROM Question q
         WHERE q.examPartId = :examPartId
@@ -106,7 +102,6 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     long countByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
             String examPartId, String createdBy);
 
-    // ========== Kho admin: do bất kỳ admin nào tạo, public cho mọi user ==========
     @Query("""
         SELECT q FROM Question q
         WHERE q.examPartId = :examPartId
@@ -186,7 +181,6 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
 
     long countByCollectionId(String collectionId);
 
-    /** Đếm câu hỏi gắn vào bất kỳ collection nào trong danh sách (dùng để gộp con-cháu). */
     long countByCollectionIdIn(Collection<String> collectionIds);
 
     @Query("""

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClassMapper {
 
-    /** teacherName được resolve ở service (cần truy DB) rồi truyền vào. */
     public ClassStudentResponse toStudentResponse(ClassEntity clazz, String teacherName) {
         return ClassStudentResponse.builder()
                 .classId(clazz.getClassId())

@@ -56,7 +56,6 @@ import com.project_exam.backend.modules.audit.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -98,7 +97,6 @@ public class UserTestService {
 
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
-    /** Code ExamCategory của Quick Challenge — bài này không có điểm tổng chuẩn nên loại khỏi lịch sử mock. */
     private static final String QUICK_CHALLENGE_CODE = "QUICK_CHALLENGE";
 
     public UserTestResponse toResponse(UserTest userTest) {
@@ -107,7 +105,6 @@ public class UserTestService {
         return toResponse(userTest, test);
     }
 
-    /** Map 1 UserTest, lấy examTypeId + testTitle từ Test đã resolve (null-safe). */
     private UserTestResponse toResponse(UserTest userTest, Test test) {
         return userTestMapper.toResponse(
                 userTest,
@@ -116,7 +113,6 @@ public class UserTestService {
                 test != null ? test.getTitle() : null);
     }
 
-    /** Batch-load Test theo testId để tránh N+1 khi map list UserTest (dùng cả examTypeId lẫn title). */
     private Map<String, Test> loadTestsByTestId(Collection<UserTest> userTests) {
         Set<String> testIds = userTests.stream()
                 .map(UserTest::getTestId)
@@ -146,9 +142,8 @@ public class UserTestService {
         }
 
         userTest.setFinishedAt(Instant.now());
-        userTest.setStatus(UserTest.Status.COMPLETED); // Cập nhật trạng thái đã nộp
+        userTest.setStatus(UserTest.Status.COMPLETED);
 
-        // Ghi nhận streak (side-effect, không được làm hỏng luồng nộp bài)
         AfterCommitTasks.runQuietly(
                 () -> streakService.recordActivity(currentUserId, StreakActivityType.TEST_SUBMIT));
 
@@ -164,8 +159,6 @@ public class UserTestService {
         ExamType examType = examTypeRepository.findById(test.getExamTypeId())
                 .orElseThrow(() -> new NotFoundException("ExamType not found"));
 
-        // Luyện tập theo Part: quy đổi TOEIC cho kỹ năng được luyện TRỌN section,
-        // còn lại chấm thang % (xem scorePractice).
         if (userTest.isPractice()) {
             userTest.setTotalScore(scorePractice(userTest, userAnswers, examType));
             UserTest saved = userTestRepository.save(userTest);
@@ -182,11 +175,6 @@ public class UserTestService {
         return saved;
     }
 
-    /**
-     * Cập nhật điểm hiện tại từng Part + cờ đạt mục tiêu ngay khi nộp bài, thay vì đợi tới lúc
-     * sinh lộ trình. Side-effect: lỗi ở đây không được làm hỏng việc nộp bài.
-     * Chỉ chạy khi người dùng đã đặt mục tiêu cho loại kỳ thi này.
-     */
     private void syncTargetProgressAfterSubmit(UserTest userTest, String examTypeId) {
         if (examTypeId == null || userTest.getUserId() == null) {
             return;
@@ -194,7 +182,7 @@ public class UserTestService {
         String userId = userTest.getUserId();
         String userTestId = userTest.getUserTestId();
         Instant finishedAt = userTest.getFinishedAt();
-        // Chạy sau commit: đọc đúng bài đã chốt điểm, và lỗi đồng bộ không kéo đổ việc nộp bài.
+
         AfterCommitTasks.runQuietly(() -> {
             if (userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId).isEmpty()) {
                 return;
@@ -206,11 +194,10 @@ public class UserTestService {
         });
     }
 
-    /** Tổng số câu của các Part được luyện (mẫu số chấm % cho mode PRACTICE). */
     private int countQuestionsForPractice(UserTest userTest) {
         Set<String> examPartIds = parsePracticePartIds(userTest.getPracticePartIds());
         if (examPartIds.isEmpty()) {
-            // Không rõ Part -> fallback về toàn bộ đề để không chia cho 0.
+
             return calculateTotalQuestionsInTest(userTest.getTestId());
         }
         List<String> testPartIds = testPartRepository.findByTestId(userTest.getTestId()).stream()
@@ -235,15 +222,6 @@ public class UserTestService {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Chấm điểm mode PRACTICE — chấm theo đúng phương pháp của dạng đề (giống full test),
-     * chỉ giới hạn phạm vi vào các Part đã luyện:
-     * - TOEIC (toeic_scale): kỹ năng nào được luyện TRỌN (đủ mọi Part của kỹ năng đó trong
-     *   đề) thì quy đổi điểm thang (Listening/Reading tối đa 495). Kỹ năng luyện lẻ vài Part
-     *   không quy đổi được (bảng quy đổi giả định làm đủ section) -> fallback thang %.
-     * - AWS (aws_scale): thang scaled 100–1000 trên số câu của các Part đã luyện.
-     * - Khác (default): thang % (số câu đúng / tổng câu đã luyện).
-     */
     private int scorePractice(UserTest userTest, List<UserAnswer> userAnswers, ExamType examType) {
         String scoringMethod = examType.getScoringMethod() != null
                 ? examType.getScoringMethod().toLowerCase() : "default";
@@ -254,7 +232,7 @@ public class UserTestService {
             if (!fullyPracticedSkillIds.isEmpty()) {
                 return testScorer.scoreToeicForSkills(userAnswers, examType, fullyPracticedSkillIds);
             }
-            return testScorer.scoreDefault(userAnswers, practiceTotal); // luyện lẻ chưa đủ section -> %
+            return testScorer.scoreDefault(userAnswers, practiceTotal);
         }
         if ("aws_scale".equalsIgnoreCase(scoringMethod)) {
             return testScorer.scoreAwsScale(userAnswers, practiceTotal);
@@ -262,10 +240,6 @@ public class UserTestService {
         return testScorer.scoreDefault(userAnswers, practiceTotal);
     }
 
-    /**
-     * Các kỹ năng (skillId) được luyện TRỌN: mọi Part của kỹ năng đó có trong đề
-     * đều nằm trong danh sách Part đã chọn luyện.
-     */
     private Set<String> getFullyPracticedSkillIds(UserTest userTest) {
         Set<String> practicedPartIds = parsePracticePartIds(userTest.getPracticePartIds());
         if (practicedPartIds.isEmpty()) return Collections.emptySet();
@@ -278,7 +252,6 @@ public class UserTestService {
                 .filter(ep -> ep.getSkillId() != null)
                 .collect(Collectors.toMap(ExamPart::getExamPartId, ExamPart::getSkillId));
 
-        // Nhóm examPartId (trong đề) theo skill.
         Map<String, Set<String>> skillToParts = new HashMap<>();
         for (String partId : testExamPartIds) {
             String skillId = partToSkill.get(partId);
@@ -309,10 +282,8 @@ public class UserTestService {
                 .count();
     }
 
-    // --- Các phương thức CRUD khác ---
     public List<UserTest> findAll() { return userTestRepository.findAll(); }
 
-    /** Chỉ admin được liệt kê toàn bộ user-tests. */
     public List<UserTestResponse> findAllResponses(jakarta.servlet.http.HttpServletRequest httpRequest) {
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ user-tests.");
@@ -325,10 +296,6 @@ public class UserTestService {
         return toResponseListBatched(findByUserId(userId));
     }
 
-    /**
-     * Bài đã hoàn thành của user, đã sắp xếp mới→cũ ở DB (thay việc FE tự lọc+sort).
-     * examTypeId null/blank = mọi kỳ thi; giữ cả bài không xác định examType (khớp lọc cũ ở FE).
-     */
     public List<UserTestResponse> findCompletedResponsesByUserId(String userId, String examTypeId) {
         List<UserTest> completed = userTestRepository
                 .findByUserIdAndStatusAndFinishedAtIsNotNullOrderByFinishedAtDesc(userId, UserTest.Status.COMPLETED);
@@ -345,11 +312,6 @@ public class UserTestService {
                 .toList();
     }
 
-    /**
-     * Lịch sử mock (phân trang) cho trang Lịch sử bài thi: bỏ PRACTICE và Quick Challenge,
-     * chỉ giữ bài làm đề đầy đủ có điểm tổng chuẩn. examTypeId null/blank = tất cả kỳ thi.
-     * Dùng Specification + findAll(spec, pageable) như các trang phân trang khác (UserService).
-     */
     public PageResponse<UserTestResponse> getMockHistory(String userId, String examTypeId, int page, int size) {
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 10 : Math.min(size, 100);
@@ -358,12 +320,11 @@ public class UserTestService {
         Specification<UserTest> spec = Specification.<UserTest>where(null)
                 .and((root, q, cb) -> cb.equal(root.get("userId"), userId))
                 .and((root, q, cb) -> cb.equal(root.get("status"), UserTest.Status.COMPLETED))
-                // Bỏ luyện tập theo Part; mode NULL (dữ liệu cũ) coi như full nên vẫn giữ.
+
                 .and((root, q, cb) -> cb.or(
                         cb.isNull(root.get("mode")),
                         cb.notEqual(root.get("mode"), UserTest.Mode.PRACTICE)));
 
-        // Bỏ Quick Challenge (đề ngắn, không có điểm tổng chuẩn) — lọc theo testId thuộc category đó.
         List<String> quickTestIds = examCategoryRepository.findByCode(QUICK_CHALLENGE_CODE)
                 .map(c -> testRepository.findByExamCategoryId(c.getExamCategoryId()).stream()
                         .map(Test::getTestId).toList())
@@ -372,7 +333,6 @@ public class UserTestService {
             spec = spec.and((root, q, cb) -> cb.not(root.get("testId").in(quickTestIds)));
         }
 
-        // Lọc theo kỳ thi (nếu có) — không có test nào thì trả trang rỗng.
         if (examTypeId != null && !examTypeId.isBlank()) {
             List<String> examTypeTestIds = testRepository.findByExamTypeId(examTypeId).stream()
                     .map(Test::getTestId).toList();
@@ -385,7 +345,6 @@ public class UserTestService {
     }
     public List<UserTest> findByTestId(String testId) { return userTestRepository.findByTestId(testId); }
 
-    /** Chỉ chủ đề (hoặc admin) được xem toàn bộ attempts của một bài test. */
     public List<UserTestResponse> findResponsesByTestId(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         requireTestOwnerOrAdmin(testId, httpRequest);
         return toResponseListBatched(findByTestId(testId));
@@ -441,10 +400,6 @@ public class UserTestService {
         boolean isPractice = mode == UserTest.Mode.PRACTICE;
         String practicePartIds = isPractice ? normalizeParts(examPartIds) : null;
 
-        //  RESUME: nếu user đã có attempt đang làm dở, trả về luôn — không áp dụng
-        // các guard time-window/max-attempts nữa, vì user đã start hợp lệ trước đó.
-        // (Class membership cũng skip cho resume — user vào lớp rồi rời ra vẫn được hoàn thành.)
-        // Practice resume phải khớp đúng bộ Part để không lẫn với full test / bộ Part khác.
         Optional<UserTest> existing = isPractice
                 ? userTestRepository
                         .findTopByUserIdAndTestIdAndStatusAndModeAndPracticePartIdsOrderByStartedAtDesc(
@@ -455,7 +410,6 @@ public class UserTestService {
             return existing.get();
         }
 
-        //  Tạo NEW attempt: phải pass mọi guard.
         if (test.getClassId() != null) {
             boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
                     test.getClassId(), userId, MemberStatus.APPROVED);
@@ -472,7 +426,6 @@ public class UserTestService {
             throw new ForbiddenException("Bài kiểm tra đã kết thúc.");
         }
 
-        // Luyện tập theo Part: MIỄN PHÍ, KHÔNG tốn lượt -> bỏ qua guard maxAttempts & xu.
         if (!isPractice) {
             Integer maxAttempts = test.getMaxAttempts();
             if (maxAttempts != null && maxAttempts > 0) {
@@ -483,7 +436,6 @@ public class UserTestService {
                 }
             }
 
-            // Bài trả phí: phải đã mua quyền (người tạo được miễn). Resume ở trên không qua đây.
             if (test.getCostCoins() != null && test.getCostCoins() > 0
                     && !userId.equals(test.getCreatedBy())
                     && !userTestAccessRepository.existsByUserIdAndTestId(userId, testId)) {
@@ -491,7 +443,6 @@ public class UserTestService {
             }
         }
 
-        //  Tạo mới user_test
         UserTest newTest = new UserTest();
         newTest.setUserId(userId);
         newTest.setTestId(testId);
@@ -513,7 +464,6 @@ public class UserTestService {
         }
     }
 
-    /** Chuẩn hoá danh sách examPartId thành CSV đã sort/distinct để so khớp resume ổn định. */
     private String normalizeParts(List<String> examPartIds) {
         if (examPartIds == null || examPartIds.isEmpty()) return null;
         String csv = examPartIds.stream()
@@ -531,7 +481,6 @@ public class UserTestService {
                 userId, testId, UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE);
     }
 
-    /** Resume tra cứu theo mode (dùng cho check-active): practice cần đúng bộ Part. */
     public Optional<UserTest> findActiveUserTest(String userId, String testId, String modeRaw, List<String> examPartIds) {
         if (parseMode(modeRaw) == UserTest.Mode.PRACTICE) {
             return userTestRepository
@@ -546,8 +495,6 @@ public class UserTestService {
         return userTestRepository.findActiveGuestUserTest(guestSessionId, testId, UserTest.Status.IN_PROGRESS);
     }
 
-    // ===== GUEST FLOW =====
-
     @Transactional
     public UserTest startGuestUserTest(String testId, String guestSessionId) {
         if (guestSessionId == null || guestSessionId.isBlank()) {
@@ -556,7 +503,6 @@ public class UserTestService {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
 
-        // Bắt buộc test phải thuộc ExamCategory cho phép guest.
         if (test.getExamCategoryId() == null) {
             throw new ForbiddenException("Bài thi này yêu cầu đăng nhập.");
         }
@@ -565,16 +511,15 @@ public class UserTestService {
         if (!Boolean.TRUE.equals(category.getGuestAllowed())) {
             throw new ForbiddenException("Bài thi này yêu cầu đăng nhập.");
         }
-        // Guest không hỗ trợ test gắn lớp.
+
         if (test.getClassId() != null) {
             throw new ForbiddenException("Bài thi của lớp yêu cầu đăng nhập.");
         }
-        // Guest không mua được bài trả phí (không có ví xu).
+
         if (test.getCostCoins() != null && test.getCostCoins() > 0) {
             throw new ForbiddenException("Bài trả phí yêu cầu đăng nhập và mở khoá bằng xu.");
         }
 
-        //  RESUME: nếu guest session đã có attempt đang dở thì trả về luôn.
         Optional<UserTest> existing = userTestRepository.findActiveGuestUserTest(
                 guestSessionId, testId, UserTest.Status.IN_PROGRESS);
         if (existing.isPresent()) {
@@ -641,13 +586,6 @@ public class UserTestService {
         return toResponse(ut);
     }
 
-    /**
-     * Gắn (claim) các bài làm của phiên guest vào tài khoản vừa đăng nhập.
-     * Gọi ngay sau khi login/OAuth thành công: mọi UserTest có guestSessionId này
-     * (cả IN_PROGRESS đang làm dở lẫn COMPLETED đã nộp) sẽ chuyển về userId để
-     * hiện trong lịch sử và cho phép làm tiếp. Idempotent: chạy lại là no-op vì
-     * guestSessionId đã bị xoá khỏi các bài đã claim.
-     */
     @Transactional
     public int claimGuestTests(String userId, String guestSessionId) {
         if (userId == null || guestSessionId == null || guestSessionId.isBlank()) return 0;
@@ -657,11 +595,8 @@ public class UserTestService {
 
         List<UserTest> toSave = new ArrayList<>();
         for (UserTest ut : guestTests) {
-            if (ut.getUserId() != null) continue; // đã có chủ, không đụng vào
+            if (ut.getUserId() != null) continue;
 
-            // Tránh 2 attempt IN_PROGRESS cùng (user, test) làm hỏng resume
-            // (findActiveUserTest trả Optional): nếu user đã có bài dở cho đề này
-            // thì đánh dấu bài guest là EXPIRED — vẫn giữ lịch sử, không xung đột.
             if (ut.getStatus() == UserTest.Status.IN_PROGRESS
                     && findActiveUserTest(userId, ut.getTestId()).isPresent()) {
                 ut.setStatus(UserTest.Status.EXPIRED);
@@ -676,13 +611,6 @@ public class UserTestService {
         return toSave.size();
     }
 
-    /**
-     * Dọn MỘT LÔ bài làm dở của đề KHÔNG giới hạn giờ (không tự nộp được) đã quá ngưỡng.
-     * Xoá hẳn UserTest + UserAnswer để tránh phình DB bởi các attempt bỏ ngang.
-     * Mỗi lời gọi = 1 transaction nhỏ (tối đa `batchSize` bản ghi) không bao giờ ôm
-     * giao dịch khổng lồ. Scheduler lặp gọi tới khi hết (có trần số lô/lần chạy).
-     * Trả về số bản ghi đã xoá trong lô này (0 = đã hết). Bài CÓ giờ không đụng tới.
-     */
     @Transactional
     public int purgeAbandonedUntimed(long thresholdHours, int batchSize) {
         Instant cutoff = Instant.now().minus(Duration.ofHours(thresholdHours));
@@ -694,7 +622,7 @@ public class UserTestService {
         List<String> ids = abandoned.stream()
                 .map(UserTest::getUserTestId)
                 .collect(Collectors.toList());
-        userAnswerRepository.deleteByUserTestIdIn(ids); // xoá answers trước (FK)
+        userAnswerRepository.deleteByUserTestIdIn(ids);
         userTestRepository.deleteAll(abandoned);
         return abandoned.size();
     }
@@ -703,15 +631,14 @@ public class UserTestService {
 
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
-    
+
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;
-    
-        // chỉ chặn khi có giới hạn thời gian nhưng chưa hết
+
         if (!isUnlimited && !isEnded) {
             return Collections.emptyList();
         }
-    
+
         List<UserTest> list = userTestRepository.findByUserIdAndTestIdOrderByStartedAtDesc(userId, testId);
         Map<String, String> userNameById = loadUserNames(list);
 
@@ -723,19 +650,16 @@ public class UserTestService {
     public TestLeaderboardResponse getAttemptsByTest(String testId,HttpServletRequest httpRequest) {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
-        //  Đề của lớp -> chỉ thành viên lớp xem; đề public theo exam_type -> mọi user đăng nhập xem được.
+
         requireLeaderboardViewAccess(test, httpRequest);
 
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;
 
-        //  chỉ chặn khi có giới hạn thời gian nhưng chưa hết
         if (!isUnlimited && !isEnded) {
             return leaderboardMapper.toEmpty();
         }
 
-        // Bảng xếp hạng CHỈ tính lượt full-test; loại các lượt luyện tập theo Part.
-        // (mode NULL của dữ liệu cũ != PRACTICE -> vẫn được giữ.)
         List<UserTest> list = userTestRepository.findByTestIdAndStatus(testId, UserTest.Status.COMPLETED).stream()
                 .filter(u -> u.getMode() != UserTest.Mode.PRACTICE)
                 .toList();
@@ -750,7 +674,6 @@ public class UserTestService {
         }
         Map<String, String> userNameById = loadUserNames(bestAttemptByUser.values());
 
-        // Toàn bộ bảng đã xếp hạng (chưa cắt) — dùng để tính hạng thật của người xem.
         List<UserTestResponse> ranked = bestAttemptByUser.values().stream()
                 .map(u -> userTestMapper.toResponse(u, test.getExamTypeId(), userNameById.get(u.getUserId())))
                 .sorted(
@@ -760,7 +683,6 @@ public class UserTestService {
                 )
                 .collect(Collectors.toList());
 
-        // Hạng của chính người đang xem — tính trên TOÀN bảng (kể cả khi nằm ngoài top hiển thị).
         TestLeaderboardResponse.MyRank me = null;
         String viewerId = authUtils.getUserId(httpRequest);
         if (viewerId != null) {
@@ -777,7 +699,6 @@ public class UserTestService {
             }
         }
 
-        // Chỉ trả top N để giảm payload/độ nặng khi render; me vẫn giữ hạng thật ở trên.
         List<UserTestResponse> entries = ranked.size() > LEADERBOARD_TOP_LIMIT
                 ? new ArrayList<>(ranked.subList(0, LEADERBOARD_TOP_LIMIT))
                 : ranked;
@@ -785,12 +706,6 @@ public class UserTestService {
         return leaderboardMapper.toResponse(entries, me, ranked.size());
     }
 
-    /**
-     * Quyền xem bảng xếp hạng của 1 đề:
-     * - Admin / người tạo đề: luôn xem được.
-     * - Đề thuộc lớp (classId != null): chỉ giáo viên lớp hoặc thành viên đã được duyệt.
-     * - Đề public theo exam_type (classId == null): mọi user đã đăng nhập đều xem được.
-     */
     private void requireLeaderboardViewAccess(Test test, jakarta.servlet.http.HttpServletRequest httpRequest) {
         if (authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) return;
 
@@ -802,7 +717,7 @@ public class UserTestService {
 
         String classId = test.getClassId();
         if (classId == null || classId.isBlank()) {
-            return; // đề public -> ai đăng nhập cũng xem được
+            return;
         }
 
         boolean isTeacher = classRepository.existsByClassIdAndTeacherId(classId, currentUserId);
@@ -836,7 +751,7 @@ public class UserTestService {
     public UserTestResponse getMeta(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         var ut = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
-        //  Chỉ user sở hữu attempt, chủ đề (giáo viên), hoặc admin được xem.
+
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             String currentUserId = authUtils.getUserId(httpRequest);
             boolean isOwner = currentUserId != null && currentUserId.equals(ut.getUserId());

@@ -15,7 +15,7 @@ function RecoveryPlan({
   isGuest,
 }) {
   const navigate = useNavigate();
-  // Chỉ 1 nút mỗi trạng thái: chưa có target → tab Mục tiêu; có target chưa đạt → Lập kế hoạch.
+
   const canCreateTarget = !isGuest && !hasTarget && Boolean(examTypeId);
   const canCreatePlan = !isGuest && hasTarget && !isTargetMet;
 

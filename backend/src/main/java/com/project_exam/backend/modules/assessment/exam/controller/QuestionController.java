@@ -45,18 +45,12 @@ public class QuestionController {
     private final ObjectMapper objectMapper;
     private final AuthUtils authUtils;
 
-    // =================== GET ===================
-
-    // Trả QuestionAdminResponse (kèm cờ isCorrect) -> chỉ người có quyền quản lý câu hỏi.
-    // Không gate sẽ lộ đáp án cho mọi user đã đăng nhập (gian lận thi).
     @GetMapping
     public ResponseEntity<List<QuestionAdminResponse>> getAllQuestions() {
         authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(questionService.findAllAdminSummaries());
     }
 
-    // Chi tiết câu hỏi (kèm isCorrect): người tạo hoặc người có QUESTION_MANAGE — check trong service
-    // (giống ràng buộc PUT/DELETE, để owner vẫn sửa được câu mình tạo dù không có quyền quản lý).
     @GetMapping("/{id}")
     public ResponseEntity<QuestionAdminResponse> getQuestionById(
             @PathVariable String id,
@@ -66,12 +60,6 @@ public class QuestionController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Lấy câu hỏi theo part:
-     * - bank=admin kho admin (do admin tạo, public cho mọi user)
-     * - Cá nhân: không gửi classId/chapterId (lấy theo user JWT)
-     * - Lớp: gửi classId (+ chapterId)
-     */
     @GetMapping("/by-part/{examPartId}")
     public ResponseEntity<List<QuestionResponse>> getQuestionsByPart(
             @PathVariable String examPartId,
@@ -88,7 +76,6 @@ public class QuestionController {
         return ResponseEntity.ok(questions);
     }
 
-    /** Đếm câu hỏi theo part. Hỗ trợ bank=admin tương tự /by-part. */
     @GetMapping("/count/by-part/{examPartId}")
     public ResponseEntity<Long> countQuestionsByPart(
             @PathVariable String examPartId,
@@ -105,7 +92,6 @@ public class QuestionController {
         return ResponseEntity.ok(count);
     }
 
-    /** Lấy kho câu hỏi theo lớp của user đang login (không cần examPartId). Có thể lọc thêm chapterId. */
     @GetMapping("/bank/my-class")
     public ResponseEntity<List<QuestionResponse>> getBankQuestionsByCurrentUserClass(
             @RequestParam(required = false) String classId,
@@ -116,7 +102,6 @@ public class QuestionController {
         return ResponseEntity.ok(questions);
     }
 
-    /** Đếm kho câu hỏi theo lớp của user đang login (không cần examPartId). Có thể lọc thêm chapterId. */
     @GetMapping("/bank/my-class/count")
     public ResponseEntity<Long> countBankQuestionsByCurrentUserClass(
             @RequestParam(required = false) String classId,
@@ -126,9 +111,6 @@ public class QuestionController {
         long count = questionService.countBankQuestionsByCurrentUserClass(classId, chapterId, request);
         return ResponseEntity.ok(count);
     }
-
-    // =================== CREATE ===================
-    // Tạo câu hỏi thông thường vào kho (không passage). Gắn đề qua API riêng.
 
     @PostMapping(
             value = "/bulk",
@@ -170,7 +152,6 @@ public class QuestionController {
             HttpServletRequest httpRequest
     ) throws IOException {
 
-        // Lấy toàn bộ file từ request
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) httpRequest;
         Map<String, MultipartFile> files = multipartRequest.getFileMap();
 
@@ -235,9 +216,6 @@ public class QuestionController {
         return ResponseEntity.ok(responses);
     }
 
-    // =================== UPDATE ===================
-
-    /** Cập nhật câu hỏi (JSON). Body: QuestionCreateRequest (patch). */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<QuestionAdminResponse> updateQuestion(
             @PathVariable String id,
@@ -248,10 +226,6 @@ public class QuestionController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Cập nhật câu hỏi kèm upload ảnh / audio / tài liệu (multipart).
-     * Part {@code request}: JSON string {@link QuestionCreateRequest}. Các part file: key tùy ý (vd. {@code file0}, {@code audio}).
-     */
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<QuestionAdminResponse> updateQuestionWithFiles(
             @PathVariable String id,
@@ -266,8 +240,6 @@ public class QuestionController {
                 questionService.updateQuestion(id, request, httpRequest, files);
         return ResponseEntity.ok(response);
     }
-
-    // =================== DELETE ===================
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteQuestion(@PathVariable String id, HttpServletRequest httpRequest) {
@@ -284,17 +256,13 @@ public class QuestionController {
             HttpServletRequest httpRequest
     ) throws IOException {
 
-        // 1. Ép kiểu request sang MultipartRequest
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) httpRequest;
 
-        // 2. Lấy toàn bộ Map chứa các file (key là tên media_x_x, value là file)
         Map<String, MultipartFile> files = multipartRequest.getFileMap();
 
-        // 3. Parse JSON thủ công
         BulkPassageGroupRequest request =
                 objectMapper.readValue(requestJson, BulkPassageGroupRequest.class);
 
-        // 4. Gọi service
         List<QuestionAdminResponse> result =
                 questionService.createBulkGroups(request, httpRequest, files);
 

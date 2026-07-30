@@ -27,12 +27,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Tổng hợp số liệu Dashboard admin từ DB (đọc thuần, {@code readOnly}).
- *
- * <p>Dữ liệu ở quy mô đồ án nên các biểu đồ theo ngày/tháng lấy list trong cửa sổ thời gian rồi
- * gom nhóm bằng Java — vừa gọn vừa không phụ thuộc hàm date của một hệ CSDL cụ thể.
- */
 @Service
 @RequiredArgsConstructor
 public class DashboardService {
@@ -56,27 +50,22 @@ public class DashboardService {
         );
     }
 
-    /** Khoảng nghỉ (phút) để tách 2 phiên truy cập: quay lại sau ngần này = phiên mới. */
     private static final long SESSION_GAP_MINUTES = 30;
-    /** Cùng ngưỡng nhưng tính theo giây để so sánh chính xác (không cắt cụt phần giây). */
+
     private static final long SESSION_GAP_SECONDS = SESSION_GAP_MINUTES * 60;
 
-    // ── Traffic thật (bảng page_visits) ──────────────────────────
     private Traffic buildTraffic(LocalDate today) {
         LocalDateTime todayStart = today.atStartOfDay();
         LocalDate weekStartDate = today.minusDays(6);
         LocalDateTime weekStart = weekStartDate.atStartOfDay();
 
-        // Gom "phiên truy cập" theo quy tắc nghỉ 30 phút. Quét 8 ngày (đủ cho heatmap 7 ngày + đệm).
         List<SessionStart> sessions = computeSessionStarts(today.minusDays(8).atStartOfDay());
 
         long visitsToday = sessions.stream()
                 .filter(s -> !s.time().isBefore(todayStart)).count();
 
-        // Heatmap lượt TRUY CẬP (phiên) theo NGÀY × GIỜ, 7 ngày gần nhất.
         List<DayHours> heatmap = buildHeatmap(today);
 
-        // Top quốc gia (geo-IP) — 7 ngày.
         List<CountryTraffic> topCountries = pageVisitRepository.findTopCountriesSince(AppTime.instant(weekStart), PageRequest.of(0, 50))
                 .stream()
                 .map(row -> new CountryTraffic((String) row[0], (String) row[1], ((Number) row[2]).longValue()))
@@ -89,27 +78,19 @@ public class DashboardService {
         );
     }
 
-    /**
-     * Điểm bắt đầu mỗi phiên (thời điểm + userId) — 1 phiên = chuỗi lượt xem cách nhau ≤ 30 phút.
-     *
-     * <p>{@code from} là mốc theo lịch địa phương (báo cáo cắt theo ngày VN); DB lưu
-     * {@link Instant} nên quy đổi ở đúng ranh giới này qua {@link AppTime}.
-     */
     private List<SessionStart> computeSessionStarts(LocalDateTime from) {
         return sessionStartsFromRows(pageVisitRepository.findSessionRowsSince(AppTime.instant(from)));
     }
 
-    /** Gom các dòng (sessionKey, createdAt, userId) đã sort thành điểm bắt đầu phiên (nghỉ > 30 phút = phiên mới). */
     private List<SessionStart> sessionStartsFromRows(List<Object[]> rows) {
         List<SessionStart> starts = new ArrayList<>();
         String prevKey = null;
         LocalDateTime prevTime = null;
         for (Object[] row : rows) {
-            String key = (String) row[0]; // sessionKey = analyticsVisitorId (ổn định qua login/logout)
+            String key = (String) row[0];
             LocalDateTime ts = AppTime.local((Instant) row[1]);
             String userId = (String) row[2];
-            // Không có sessionKey -> không định danh được khách, coi mỗi lượt là 1 phiên riêng
-            // (tránh gộp nhầm nhiều khách key null — vốn sort cạnh nhau — thành chung phiên).
+
             boolean newSession = key == null
                     || !java.util.Objects.equals(key, prevKey)
                     || prevTime == null
@@ -125,24 +106,17 @@ public class DashboardService {
 
     private record SessionStart(LocalDateTime time, String userId) {}
 
-    /**
-     * Heatmap lượt truy cập (phiên) theo NGÀY × GIỜ cho 7 ngày kết thúc ở {@code endDate}.
-     * Dùng cho card Dashboard: mặc định 7 ngày gần nhất, lọc theo ngày để xem tuần trong quá khứ.
-     */
     @Transactional(readOnly = true)
     public List<DayHours> getTrafficHeatmap(LocalDate endDateParam) {
         LocalDate today = AppTime.today();
-        // Chỉ tính hiện tại & quá khứ — ngày tương lai (hoặc bỏ trống) đưa về hôm nay.
+
         LocalDate end = (endDateParam == null || endDateParam.isAfter(today)) ? today : endDateParam;
         return buildHeatmap(end);
     }
 
-    /** Dựng heatmap NGÀY × GIỜ cho cửa sổ 7 ngày kết thúc ở {@code endDate}. */
     private List<DayHours> buildHeatmap(LocalDate endDate) {
         LocalDate startDate = endDate.minusDays(6);
-        // Quét thêm 1 ngày đệm trước ngày đầu: phiên bắt đầu từ hôm trước rồi kéo qua nửa đêm
-        // sẽ được nhận diện đúng là phiên cũ (không bị tính thành phiên mới của ngày đầu).
-        // Bucket bên dưới chỉ có 7 ngày nên các phiên rơi vào ngày đệm tự bị bỏ qua.
+
         LocalDateTime scanFrom = startDate.minusDays(1).atStartOfDay();
         LocalDateTime scanTo = endDate.plusDays(1).atStartOfDay();
 
@@ -166,7 +140,6 @@ public class DashboardService {
         return heatmap;
     }
 
-    // ── Thẻ tổng quan ────────────────────────────────────────────
     private Stats buildStats() {
         return new Stats(
                 userRepository.count(),
@@ -179,13 +152,11 @@ public class DashboardService {
         );
     }
 
-    // ── Hiệu suất 12 tháng của một năm được chọn ─────────────────
     @Transactional(readOnly = true)
     public MonthlyPerformanceResponse getMonthlyPerformance(Integer yearParam) {
         int currentYear = AppTime.today().getYear();
         int year = yearParam == null ? currentYear : yearParam;
 
-        // Danh sách năm chọn: từ năm hiện tại về năm có dữ liệu sớm nhất (lượt thi HOẶC đăng ký).
         Instant earliestAttempt = userTestRepository.findEarliestStartedAt();
         Instant earliestUser = userRepository.findEarliestCreatedAt();
         int startYear = currentYear;
@@ -196,7 +167,6 @@ public class DashboardService {
 
         LocalDateTime yearStart = LocalDate.of(year, 1, 1).atStartOfDay();
 
-        // Gom lượt thi của năm được chọn theo 12 tháng: [total, completed].
         long[][] buckets = new long[12][2];
         for (Object[] row : userTestRepository.findAttemptsSince(AppTime.instant(yearStart))) {
             LocalDateTime startedAt = AppTime.local((Instant) row[0]);
@@ -207,7 +177,6 @@ public class DashboardService {
             if (status == UserTest.Status.COMPLETED) b[1]++;
         }
 
-        // Gom người dùng mới đăng ký của năm được chọn theo 12 tháng.
         long[] newUsers = new long[12];
         for (Instant createdAtUtc : userRepository.findCreatedAtSince(AppTime.instant(yearStart))) {
             LocalDateTime createdAt = AppTime.local(createdAtUtc);
@@ -215,9 +184,8 @@ public class DashboardService {
             newUsers[createdAt.getMonthValue() - 1]++;
         }
 
-        // Gom lượt truy cập (phiên) của năm được chọn theo 12 tháng, kèm phân bố giờ để tìm giờ cao điểm.
         long[] visits = new long[12];
-        long[][] hourHistogram = new long[12][24]; // [tháng][giờ] = số phiên
+        long[][] hourHistogram = new long[12][24];
         for (SessionStart s : computeSessionStarts(yearStart)) {
             if (s.time().getYear() != year) continue;
             int m = s.time().getMonthValue() - 1;
@@ -236,7 +204,6 @@ public class DashboardService {
         return new MonthlyPerformanceResponse(year, availableYears, months);
     }
 
-    /** Giờ có nhiều phiên nhất trong 1 tháng (0..23); {@code null} nếu tháng chưa có truy cập. */
     private static Integer peakHour(long[] hourHistogram) {
         int best = -1;
         long max = 0;
@@ -249,7 +216,6 @@ public class DashboardService {
         return best < 0 ? null : best;
     }
 
-    // ── Tình trạng lượt thi ──────────────────────────────────────
     private List<NameValue> buildStatusDistribution() {
         List<NameValue> result = new ArrayList<>();
         result.add(new NameValue("Hoàn thành", userTestRepository.countByStatus(UserTest.Status.COMPLETED)));
@@ -258,7 +224,6 @@ public class DashboardService {
         return result;
     }
 
-    // ── Phân tích nội dung: bài công khai làm nhiều nhất ─────────
     private static final int TOP_TESTS_LIMIT = 8;
 
     @Transactional(readOnly = true)
@@ -271,7 +236,6 @@ public class DashboardService {
         );
     }
 
-    /** Top bài theo tổng lượt làm (từ rows đã gom theo bài); kèm tỉ lệ hoàn thành & điểm TB. */
     private List<TestStat> buildTopTests(List<Object[]> aggregated) {
         List<Object[]> rows = new ArrayList<>(aggregated);
         rows.sort((a, b) -> Long.compare(((Number) b[1]).longValue(), ((Number) a[1]).longValue()));

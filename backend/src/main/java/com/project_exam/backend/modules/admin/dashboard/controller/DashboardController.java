@@ -26,14 +26,12 @@ public class DashboardController {
     private final DashboardService dashboardService;
     private final AuthUtils authUtils;
 
-    /** Tổng quan thống kê hệ thống cho trang Dashboard admin. */
     @GetMapping("/stats")
     public ResponseEntity<DashboardStatsResponse> getStats() {
         authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         return ResponseEntity.ok(dashboardService.getStats());
     }
 
-    /** Hiệu suất đủ 12 tháng của một năm được chọn (mặc định năm hiện tại). */
     @GetMapping("/monthly-performance")
     public ResponseEntity<MonthlyPerformanceResponse> getMonthlyPerformance(
             @RequestParam(required = false) Integer year) {
@@ -41,14 +39,12 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getMonthlyPerformance(year));
     }
 
-    /** Phân tích nội dung: bài thi hoạt động nhiều nhất & câu hỏi khó nhất (chỉ trang Thống kê gọi). */
     @GetMapping("/content-insights")
     public ResponseEntity<ContentInsightsResponse> getContentInsights() {
         authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         return ResponseEntity.ok(dashboardService.getContentInsights());
     }
 
-    /** Heatmap NGÀY × GIỜ cho 7 ngày kết thúc ở ngày được chọn (mặc định/tương lai → hôm nay). */
     @GetMapping("/traffic-heatmap")
     public ResponseEntity<List<DayHours>> getTrafficHeatmap(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {

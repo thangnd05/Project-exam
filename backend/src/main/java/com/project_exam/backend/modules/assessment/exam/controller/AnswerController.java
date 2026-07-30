@@ -13,12 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- *  SECURITY: Tất cả endpoint ở đây trả về flag <code>isCorrect</code>.
- * Để tránh student cheat bằng cách query đáp án đúng, mọi endpoint đều yêu cầu admin.
- * Edit answer trong flow tạo/sửa câu hỏi đi qua {@code QuestionService.updateQuestion}
- * (đã có ownership check) service nội bộ gọi {@code AnswerService.syncAnswers} không qua HTTP.
- */
 @RestController
 @RequestMapping("/api/answers")
 @RequiredArgsConstructor

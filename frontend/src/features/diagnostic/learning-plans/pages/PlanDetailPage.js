@@ -11,7 +11,6 @@ import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Tìm ải được BE gợi ý làm tiếp.
 function findRecommendedTask(plan) {
   if (!plan?.recommendedTaskId) return null;
   const all = (plan.partGroups || []).flatMap((g) => g.tasks || []);
@@ -19,7 +18,6 @@ function findRecommendedTask(plan) {
   return pool.find((t) => t.taskId === plan.recommendedTaskId) || null;
 }
 
-// Câu cổ vũ theo tiến độ — thay câu tóm tắt kỹ thuật của BE.
 function progressCheer(passed, total, pct) {
   if (total === 0) return 'Lộ trình đang chờ ải đầu tiên.';
   if (passed === 0) return 'Vượt ải đầu tiên hôm nay để khởi động lộ trình.';

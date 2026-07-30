@@ -10,6 +10,6 @@ public class ExamTypeRequest {
     private Integer durationMinutes;
     private String scoringMethod;
     private Boolean flexible;
-    /** examType cha (gom nhóm). null/rỗng = examType gốc/lá. Cha phải là examType gốc (tối đa 2 cấp). */
+
     private String parentId;
 }

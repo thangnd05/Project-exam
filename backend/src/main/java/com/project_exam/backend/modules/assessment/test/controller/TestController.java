@@ -43,10 +43,9 @@ public class TestController {
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
 
-    // Lấy tất cả tests
     @GetMapping
     public ResponseEntity<List<TestResponse>> getAllTests() {
-        return ResponseEntity.ok(testService.getAllTests()); // 200 OK
+        return ResponseEntity.ok(testService.getAllTests());
     }
 
     @GetMapping("/usertest/{testId}")
@@ -61,7 +60,6 @@ public class TestController {
         return ResponseEntity.ok(response);
     }
 
-    /** Tóm tắt các Part (tên + số câu) để dựng modal chọn chế độ luyện tập. */
     @GetMapping("/{testId}/parts-summary")
     public ResponseEntity<List<com.project_exam.backend.modules.assessment.test.dto.TestPartSummaryResponse>>
             getPartsSummary(@PathVariable String testId) {
@@ -80,12 +78,12 @@ public class TestController {
             HttpServletRequest httpRequest
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
-        //  Khi đề được gắn vào lớp: user phải là teacher của lớp đó (admin pass).
+
         if (request.getClassId() != null) {
             classAccessGuard.requireTeacher(request.getClassId(), currentUserId, httpRequest);
             classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
         } else if (request.getChapterId() != null) {
-            // Có chapterId mà không có classId là không hợp lệ.
+
             throw new com.project_exam.backend.shared.exception.BadRequestException(
                     "Khi có chapterId thì phải có classId.");
         }
@@ -102,7 +100,7 @@ public class TestController {
         test.setCollectionId(request.getCollectionId());
         test.setAvailableFrom(request.getAvailableFrom());
         test.setAvailableTo(request.getAvailableTo());
-        // Giá xu: chỉ admin set được, và chỉ cho bài công khai (không gắn lớp).
+
         if (request.getCostCoins() != null
                 && authUtils.hasPermission(PermissionCatalog.TEST_MANAGE_PRICING)
                 && request.getClassId() == null) {
@@ -115,7 +113,6 @@ public class TestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /** Gắn câu hỏi từ kho vào part của đề (chỉ tạo test_questions). Không tạo câu hỏi mới. */
     @PostMapping("/parts/questions")
     public ResponseEntity<Void> addQuestionsToTestPart(
             @Valid @RequestBody AddQuestionsToTestRequest request,
@@ -125,7 +122,6 @@ public class TestController {
         return ResponseEntity.noContent().build();
     }
 
-    /** Lấy câu hỏi random từ kho và gắn vào part. Cá nhân: không gửi classId/chapterId (theo user JWT). Lớp: gửi classId (+ chapterId). */
     @PostMapping("/parts/random-questions")
     public ResponseEntity<AddRandomQuestionsResponse> addRandomQuestionsToTestPart(
             @Valid @RequestBody AddRandomQuestionsToTestRequest request,
@@ -136,7 +132,6 @@ public class TestController {
         return ResponseEntity.ok(response);
     }
 
-    // Cập nhật test (dùng chung CreateTestRequest; chỉ ghi đè field gửi lên, không đổi createdBy/createdAt)
     @PutMapping("/{id}")
     public ResponseEntity<TestResponse> updateTest(
             @PathVariable String id,
@@ -147,7 +142,6 @@ public class TestController {
         return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
     }
 
-    // Mua quyền làm bài trả phí bằng xu (mua 1 lần, mở khoá vĩnh viễn)
     @PostMapping("/{testId}/purchase")
     public ResponseEntity<TestResponse> purchaseTestAccess(
             @PathVariable String testId,
@@ -157,7 +151,6 @@ public class TestController {
         return ResponseEntity.ok(testAccessService.purchaseTestAccess(userId, testId));
     }
 
-    // Xoá test
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTest(@PathVariable String id, HttpServletRequest httpRequest) {
         if (testService.getTestById(id).isEmpty()) {
@@ -173,21 +166,11 @@ public class TestController {
         return testService.getAllTestsByAdmin();
     }
 
-    // Lấy test theo user đang đăng nhập (JWT)
     @GetMapping("/my")
     public List<TestResponse> getMyTests(HttpServletRequest request) {
         return testService.getTestsByUser(request);
     }
 
-    // Lấy tất cả tests của Admin theo examTypeId
-    /*
-    Giải thích từng bước:
-
-Bước 1: testService.getAllTestsByAdmin() - Lấy tất cả test từ service (dành cho admin)
-Bước 2: .stream() - Chuyển danh sách thành stream để xử lý functional
-Bước 3: .filter(t -> t.getExamTypeId().equals(examTypeId)) - Lọc chỉ giữ lại các Test có examTypeId khớp với tham số
-Bước 4: .toList() - Chuyển stream kết quả thành List
-     */
     @GetMapping("/admin/by-exam-type/{examTypeId}")
     public ResponseEntity<List<TestAdminResponse>> getAdminTestsByExamType(@PathVariable String examTypeId) {
         authUtils.requirePermission(PermissionCatalog.TEST_MANAGE);
@@ -198,8 +181,6 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         return ResponseEntity.ok(adminTests);
     }
 
-    // Lấy danh sách test theo examTypeId cho user (chỉ trả về đề do admin tạo,
-    // không lộ đề cá nhân của user khác ra danh sách chung). Có phân trang.
     @GetMapping("/user/by-exam-type/{examTypeId}")
     public ResponseEntity<PageResponse<TestResponse>> getTestsByExamType(
             @PathVariable String examTypeId,
@@ -207,7 +188,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
             @RequestParam(defaultValue = "12") int size,
             HttpServletRequest httpRequest
     ) {
-        // Guest -> userId null (không lỗi); user đăng nhập -> biết bài đã mở khoá.
+
         String userId;
         try {
             userId = authUtils.getUserId(httpRequest);
@@ -217,7 +198,6 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         return ResponseEntity.ok(testService.getAdminTestsByExamTypePaged(examTypeId, page, size, userId));
     }
 
-    // Danh sách folder bộ đề (collection cha) của 1 loại kỳ thi, kèm số đề bên trong.
     @GetMapping("/collections/by-exam-type/{examTypeId}")
     public ResponseEntity<List<TestCollectionResponse>> getTestCollectionsByExamType(
             @PathVariable String examTypeId
@@ -225,7 +205,6 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         return ResponseEntity.ok(testService.getTestCollectionsByExamType(examTypeId));
     }
 
-    // Danh sách đề thuộc 1 bộ đề (gộp cả collection con), có phân trang.
     @GetMapping("/user/by-collection/{collectionId}")
     public ResponseEntity<PageResponse<TestResponse>> getTestsByCollection(
             @PathVariable String collectionId,
@@ -242,7 +221,6 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         return ResponseEntity.ok(testService.getTestsByCollectionPaged(collectionId, page, size, userId));
     }
 
-    // Danh sách bài Quick Challenge cho Hero landing page (public, guest xem được)
     @GetMapping("/quick-challenge")
     public ResponseEntity<List<QuickChallengeCardResponse>> getQuickChallengeTests() {
         return ResponseEntity.ok(testService.getQuickChallengeTests());
@@ -256,8 +234,7 @@ Bước 4: .toList() - Chuyển stream kết quả thành List
         String userId = authUtils.getUserId(request);
         Test test = testService.getTestById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
-        //  Nếu đề thuộc 1 lớp, user phải là member/teacher của lớp đó (admin pass).
-        // Tránh leak metadata + countdown của bài kiểm tra cho user ngoài lớp.
+
         if (test.getClassId() != null) {
             classAccessGuard.requireMemberOrTeacher(test.getClassId(), userId, request);
         }

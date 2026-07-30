@@ -32,10 +32,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Tách khỏi TestService: các use-case GẮN CÂU HỎI vào part của đề
- * (thêm theo danh sách id, hoặc lấy ngẫu nhiên/tuần tự từ kho).
- */
 @Service
 @RequiredArgsConstructor
 public class TestQuestionAssignmentService {
@@ -59,10 +55,6 @@ public class TestQuestionAssignmentService {
         return ids;
     }
 
-    /**
-     * Gắn câu hỏi từ kho vào part của đề (chỉ tạo bản ghi test_questions).
-     * Câu hỏi phải đã tồn tại trong kho; không tạo câu hỏi mới ở đây.
-     */
     @Transactional
     public void addQuestionsToTestPart(AddQuestionsToTestRequest request, HttpServletRequest httpRequest) {
         if (request.getTestPartId() == null || request.getQuestionIds() == null || request.getQuestionIds().isEmpty()) {
@@ -79,7 +71,7 @@ public class TestQuestionAssignmentService {
         if (!isOwner && !isAdmin) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
-        //  Pre-compute: admin-bank set & accessible classes của user (cache để tránh query mỗi câu).
+
         Set<String> adminIds = adminUserProvider.adminUserIds();
         Set<String> accessibleClassIds = new HashSet<>();
         if (currentUserId != null) {
@@ -96,10 +88,10 @@ public class TestQuestionAssignmentService {
             if (!question.getExamPartId().equals(testPart.getExamPartId())) {
                 throw new BadRequestException("Câu hỏi " + questionId + " không thuộc examPart của part này.");
             }
-            //  Validate: user phải có quyền đọc câu hỏi này (own / admin bank / lớp mình thuộc / là admin).
+
             if (!isAdmin) {
                 boolean ownQuestion = currentUserId != null && currentUserId.equals(question.getCreatedBy());
-                // Kho quản trị chỉ dùng được nếu có quyền QUESTION:MANAGE (đồng bộ với việc ẩn kho admin).
+
                 boolean inAdminBank = question.getClassId() == null
                         && adminIds.contains(question.getCreatedBy())
                         && authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE);
@@ -119,17 +111,12 @@ public class TestQuestionAssignmentService {
         }
     }
 
-    /**
-     * Lấy câu hỏi random từ kho và gắn vào part.
-     * Cá nhân (không classId/chapterId): chỉ kho của user đăng nhập (created_by = currentUserId).
-     * Lớp: classId (+ chapterId nếu có).
-     */
     public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId, HttpServletRequest httpRequest) {
         if (request.getTestPartId() == null || request.getCount() == null || request.getCount() <= 0) {
             throw new BadRequestException("testPartId và count (số câu) phải hợp lệ.");
         }
         boolean useAdminBank = "admin".equalsIgnoreCase(request.getBank());
-        // Lấy câu hỏi ngẫu nhiên từ kho quản trị cần quyền QUESTION:MANAGE (đồng bộ với việc ẩn kho admin).
+
         if (useAdminBank) {
             authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         }
@@ -143,14 +130,14 @@ public class TestQuestionAssignmentService {
         int count = request.getCount();
         TestPart testPart = testPartRepository.findById(testPartId)
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
-        //  Verify ownership: chỉ người tạo đề (hoặc admin) mới được bơm câu hỏi vào part.
+
         Test parentTest = testRepository.findById(testPart.getTestId())
                 .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
         boolean isOwner = currentUserId != null && currentUserId.equals(parentTest.getCreatedBy());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
-        //  Nếu lấy nguồn từ class bank, user phải là teacher (hoặc thành viên) của lớp đó và chapter phải thuộc lớp.
+
         if (request.getClassId() != null) {
             classAccessGuard.requireMemberOrTeacher(request.getClassId(), currentUserId, httpRequest);
             classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
@@ -167,7 +154,6 @@ public class TestQuestionAssignmentService {
                 .max(Integer::compareTo)
                 .orElse(0) + 1;
 
-        // Lấy TOÀN BỘ ứng viên cho part (KHÔNG limit ở DB) để có thể gom theo passage.
         List<Question> candidates;
         if (useAdminBank) {
             Set<String> adminIds = adminUserProvider.adminUserIds();
@@ -185,8 +171,6 @@ public class TestQuestionAssignmentService {
                     examPartId, currentUserId));
         }
 
-        // Giới hạn theo Bộ đề (collection) nếu có. removeIf giữ nguyên thứ tự còn lại nên
-        // chế độ "tuần tự" vẫn khớp index với danh sách (đã lọc bộ đề) mà FE hiển thị.
         if (request.getCollectionId() != null && !request.getCollectionId().isBlank()) {
             Set<String> collectionScope = collectionWithChildrenIds(request.getCollectionId());
             candidates.removeIf(q -> q.getCollectionId() == null
@@ -204,13 +188,10 @@ public class TestQuestionAssignmentService {
             int actualLimit = Math.min(seqLimit, candidates.size() - actualOffset);
             pool = candidates.subList(actualOffset, actualOffset + actualLimit);
         } else {
-            // RANDOM: gom câu theo passage rồi chọn TRỌN cụm (Part 6/7 mỗi passage 4 câu) để
-            // không bị lẻ; giữ thứ tự câu trong passage theo questionNumber.
+
             pool = pickRandomQuestionsKeepingPassages(candidates, existingIds, count);
         }
 
-        // Sequential giữ hành vi cũ (cắt theo count); random KHÔNG cắt thêm để không vỡ cụm passage
-        // (pool đã được giới hạn ~count ở mức nguyên cụm).
         Stream<String> idStream = pool.stream()
                 .map(Question::getQuestionId)
                 .filter(id -> !existingIds.contains(id));
@@ -233,15 +214,6 @@ public class TestQuestionAssignmentService {
                 .build();
     }
 
-    /**
-     * Chọn ngẫu nhiên câu hỏi nhưng GIỮ TRỌN cụm passage.
-     *
-     * <p>Câu cùng {@code passageId} được gom thành một nhóm và luôn thêm nguyên nhóm (Part 6/7
-     * mỗi passage 4 câu) để passage không bị lẻ. Câu không thuộc passage coi như nhóm 1 phần tử.
-     * Trong mỗi passage, sắp theo {@code questionNumber} để giữ đúng thứ tự câu. Trộn ngẫu nhiên
-     * thứ tự các nhóm rồi thêm nguyên nhóm cho tới khi đạt {@code count} — có thể dôi ra ở nhóm
-     * cuối, KHÔNG bao giờ cắt giữa nhóm.</p>
-     */
     private List<Question> pickRandomQuestionsKeepingPassages(
             List<Question> candidates, Set<String> existingIds, int count) {
         LinkedHashMap<String, List<Question>> passageGroups = new LinkedHashMap<>();

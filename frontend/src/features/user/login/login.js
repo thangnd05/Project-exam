@@ -37,7 +37,6 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // OAuth là full-page redirect sang backend nên cần URL tuyệt đối (không đi qua axios)
   const backendBaseUrl = getApiBaseUrl();
   const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
   const FACEBOOK_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/facebook`;
