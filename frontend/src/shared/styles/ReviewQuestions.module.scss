@@ -1,0 +1,117 @@
+/* Style dùng chung cho trang xem lại / giải thích (thi + ải học). */
+
+.questionItem {
+  padding: 2rem;
+  border-radius: 15px;
+  border: 2px solid #f1f5f9;
+  transition: all 0.3s;
+
+  &.correct {
+    border-color: #10b98140;
+    background: #10b98108;
+  }
+
+  &.incorrect {
+    border-color: #ef444440;
+    background: #ef444408;
+  }
+
+  &.unanswered {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
+}
+
+.qText {
+  font-size: 1.6rem;
+  margin-bottom: 1.4rem;
+  color: var(--dark-color, #0f172a);
+  display: block;
+  line-height: 1.5;
+
+  strong {
+    font-weight: 800;
+  }
+}
+
+.answersOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.answerOption {
+  padding: 1.2rem 1.8rem;
+  border-radius: 10px;
+  background: var(--bg-white, #fff);
+  border: 1px solid #e2e8f0;
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+
+  &.isCorrect {
+    background: #ecfdf5;
+    border-color: var(--success-border, #10b981);
+    color: #059669;
+    font-weight: 700;
+  }
+
+  &.isIncorrectChoice {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #dc2626;
+    font-weight: 700;
+  }
+
+  &.isUserChoice {
+    box-shadow: 0 0 0 2px var(--primary-alpha-15, rgba(13, 148, 136, 0.15));
+  }
+}
+
+.userPill {
+  margin-left: 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.explanationBox {
+  margin-top: 1.4rem;
+  padding: 1.2rem 1.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--primary-alpha-20, rgba(13, 148, 136, 0.2));
+  background: var(--brand-50, #f0fdfa);
+  color: var(--text-color, #0f172a);
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: var(--font-size-md);
+
+  strong {
+    font-weight: 800;
+    color: var(--brand-700, #0f766e);
+  }
+}
+
+.fillRow {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  margin-bottom: 0.8rem;
+
+  strong {
+    font-weight: 800;
+  }
+}
+
+.highlight {
+  animation: reviewFlash 1.6s ease;
+}
+
+@keyframes reviewFlash {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+  }
+  20% {
+    box-shadow: 0 0 0 4px var(--primary-alpha-35, rgba(13, 148, 136, 0.35));
+  }
+}

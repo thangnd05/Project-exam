@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { getSessionReview } from '~/shared/api/learningPlanApi';
 import PlanResultView from '../components/PlanResultView';
+import { toPlanResult } from '../planResult';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -59,15 +60,6 @@ function PlanSessionReviewPage() {
     );
   }
 
-  const result = {
-    reviewItems: data.lastReviewItems,
-    passed: !!data.passed,
-    accuracy: data.accuracy ?? 0,
-    correctCount: data.correctCount ?? 0,
-    totalCount: data.totalCount ?? 0,
-    message: data.message,
-  };
-
   return (
     <div className={cx('wrapper', 'studyWide')}>
       <div className={cx('headerBar')}>
@@ -76,7 +68,7 @@ function PlanSessionReviewPage() {
         </Link>
       </div>
       <PlanResultView
-        result={result}
+        result={toPlanResult(data)}
         onRetry={retry}
         onPickAnother={goToPicker}
       />

@@ -1,15 +1,18 @@
-import { useContext, useEffect, useState, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
-import { IoHomeOutline, IoListOutline, IoCloseOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
+import { IoHomeOutline } from "react-icons/io5";
 
 import { AuthContext } from "~/shared/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/shared/utils/guestSession";
 import { getFullMediaUrl } from "~/shared/utils/mediaUrl";
 import { useTestReview } from "./hooks/useTestReview";
 import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
+import ReviewQuestionCard from "~/shared/ui/Review/ReviewQuestionCard";
+import ReviewFooterNav from "~/shared/ui/Review/ReviewFooterNav";
 import styles from "./TestReviewPage.module.scss";
+import reviewQStyles from "~/shared/styles/ReviewQuestions.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -58,8 +61,6 @@ const TestReviewPage = () => {
     [isGuest],
   );
 
-  const [showNav, setShowNav] = useState(false);
-
   const { data, isLoading, isError } = useTestReview(userTestId, {
     enabled: !authLoading,
     isGuest,
@@ -84,7 +85,7 @@ const TestReviewPage = () => {
           const ua = userAnswers.find(
             (a) => String(a.questionId) === String(q.questionId),
           );
-          list.push({ questionId: q.questionId, status: getQuestionStatus(q, ua) });
+          list.push({ id: q.questionId, status: getQuestionStatus(q, ua) });
         });
       });
     });
@@ -98,7 +99,7 @@ const TestReviewPage = () => {
 
   const questionNumberMap = useMemo(() => {
     const map = new Map();
-    flatQuestions.forEach((q, idx) => map.set(String(q.questionId), idx + 1));
+    flatQuestions.forEach((q, idx) => map.set(String(q.id), idx + 1));
     return map;
   }, [flatQuestions]);
 
@@ -119,8 +120,8 @@ const TestReviewPage = () => {
       if (!el) return;
       const y = el.getBoundingClientRect().top + window.pageYOffset - 90;
       window.scrollTo({ top: y, behavior: "smooth" });
-      el.classList.add(styles.highlight);
-      setTimeout(() => el.classList.remove(styles.highlight), 1600);
+      el.classList.add(reviewQStyles.highlight);
+      setTimeout(() => el.classList.remove(reviewQStyles.highlight), 1600);
     }, 120);
     return () => clearTimeout(timer);
   }, [loading, test]);
@@ -355,164 +356,38 @@ const TestReviewPage = () => {
         ))}
       </Container>
 
-      {flatQuestions.length > 0 && (
-        <div className={cx("footer-actions")}>
-          {showNav && (
-            <div className={cx("footer-panel")}>
-              <div className={cx("nav-card")}>
-                <div className={cx("nav-header")}>
-                  <IoListOutline />
-                  <span>Danh sách câu hỏi</span>
-                </div>
-                <div className={cx("nav-grid")}>
-                  {flatQuestions.map((q, idx) => (
-                    <button
-                      key={q.questionId}
-                      type="button"
-                      className={cx("nav-item", q.status)}
-                      onClick={() => {
-                        scrollToQuestion(q.questionId);
-                        setShowNav(false);
-                      }}
-                      aria-label={`Câu ${idx + 1}`}
-                    >
-                      {idx + 1}
-                    </button>
-                  ))}
-                </div>
-                <div className={cx("nav-legend")}>
-                  <span className={cx("legend-item")}>
-                    <span className={cx("dot", "correct")} /> Đúng
-                  </span>
-                  <span className={cx("legend-item")}>
-                    <span className={cx("dot", "incorrect")} /> Sai
-                  </span>
-                  <span className={cx("legend-item")}>
-                    <span className={cx("dot", "unanswered")} /> Chưa làm
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-          <div className={cx("footer-buttons")}>
-            <Container className={cx("footer-buttons-inner")}>
-              <button
-                type="button"
-                className={cx("btn-toggle-info", { active: showNav })}
-                onClick={() => setShowNav((v) => !v)}
-                aria-expanded={showNav}
-              >
-                {showNav ? <IoCloseOutline size={22} /> : <IoListOutline size={22} />}
-                <span>{showNav ? "Ẩn" : "Danh sách câu"}</span>
-              </button>
-              <div className={cx("footer-score")}>
-                <IoCheckmarkCircleOutline aria-hidden />
-                <span>
-                  {correctCount}/{flatQuestions.length} câu đúng
-                </span>
-              </div>
-            </Container>
-          </div>
-        </div>
-      )}
+      <ReviewFooterNav
+        items={flatQuestions}
+        correctCount={correctCount}
+        onSelect={scrollToQuestion}
+      />
     </div>
   );
 };
 
 function QuestionResult({ question, number, userAnswer, canReview }) {
   const correctAnswer = question.answers?.find((a) => a.isCorrect);
-
-  let isUserCorrect = false;
-  if (question.questionType === "MCQ" && userAnswer && correctAnswer) {
-    isUserCorrect = userAnswer.selectedAnswerId === correctAnswer.answerId;
-  } else if (question.questionType === "MSQ" && userAnswer) {
-    isUserCorrect = isMsqCorrect(question, userAnswer);
-  }
-
-  const answeredAny = !!(
-    userAnswer &&
-    (userAnswer.selectedAnswerId ||
-      userAnswer.answerText ||
-      (userAnswer.selectedAnswerIds && userAnswer.selectedAnswerIds.length))
-  );
-  let resultClass = "unanswered";
-  if (answeredAny) {
-    resultClass = isUserCorrect ? "correct" : "incorrect";
-  }
+  const selectedAnswerIds =
+    question.questionType === "MSQ"
+      ? userAnswer?.selectedAnswerIds || []
+      : userAnswer?.selectedAnswerId
+        ? [userAnswer.selectedAnswerId]
+        : [];
 
   return (
-    <div id={`rq-${question.questionId}`} className={cx("question-item", resultClass)}>
-      <span className={cx("q-text")}>
-        <strong>{number ? `Câu ${number}:` : "Câu hỏi:"}</strong>{" "}
-        {question.questionText}
-      </span>
-
-      {question.questionType === "MCQ" && (
-        <div className={cx("answers-options")}>
-          {question.answers?.map((a) => {
-            const isUserSelected = userAnswer?.selectedAnswerId === a.answerId;
-            return (
-              <div
-                key={a.answerId}
-                className={cx("answer-option", {
-                  "is-correct": canReview && a.isCorrect,
-                  "is-incorrect-choice": isUserSelected && !a.isCorrect,
-                  "is-user-choice": isUserSelected,
-                })}
-              >
-                {a.answerText?.trim()
-                  ? `${a.answerLabel}. ${a.answerText}`
-                  : a.answerLabel}
-                {isUserSelected && <span className={cx("user-pill")}>(Bạn chọn)</span>}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {question.questionType === "MSQ" && (
-        <div className={cx("answers-options")}>
-          {question.answers?.map((a) => {
-            const isUserSelected = (userAnswer?.selectedAnswerIds || []).includes(a.answerId);
-            return (
-              <div
-                key={a.answerId}
-                className={cx("answer-option", {
-                  "is-correct": canReview && a.isCorrect,
-                  "is-incorrect-choice": isUserSelected && !a.isCorrect,
-                  "is-user-choice": isUserSelected,
-                })}
-              >
-                {a.answerText?.trim()
-                  ? `${a.answerLabel}. ${a.answerText}`
-                  : a.answerLabel}
-                {isUserSelected && <span className={cx("user-pill")}>(Bạn chọn)</span>}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {question.questionType === "FILL_BLANK" && (
-        <div>
-          <p className={cx("fill-row")}>
-            <strong>Bạn trả lời:</strong>{" "}
-            {userAnswer?.answerText || "(Chưa trả lời)"}
-          </p>
-          {canReview && correctAnswer && (
-            <p className={cx("fill-row")}>
-              <strong>Đáp án đúng:</strong> {correctAnswer.answerText}
-            </p>
-          )}
-        </div>
-      )}
-
-      {canReview && question.explanation?.trim() && (
-        <div className={cx("explanation-box")}>
-          <strong>Giải thích:</strong> {question.explanation}
-        </div>
-      )}
-    </div>
+    <ReviewQuestionCard
+      id={`rq-${question.questionId}`}
+      number={number}
+      status={getQuestionStatus(question, userAnswer)}
+      questionText={question.questionText}
+      mode={question.questionType === "FILL_BLANK" ? "fill" : "options"}
+      answers={question.answers || []}
+      selectedAnswerIds={selectedAnswerIds}
+      userAnswerText={userAnswer?.answerText}
+      correctAnswerText={correctAnswer?.answerText}
+      explanation={question.explanation}
+      canReview={canReview}
+    />
   );
 }
 
