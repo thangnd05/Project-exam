@@ -1,0 +1,257 @@
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+// ---------- Danh sách ----------
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  // Panel không được cao quá màn hình; danh sách tự cuộn bên trong
+  max-height: min(56vh, 520px);
+  overflow-y: auto;
+}
+
+.newBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+
+  svg {
+    font-size: 2rem;
+  }
+
+  &:hover {
+    border-color: var(--primary);
+    background: rgba(13, 148, 136, 0.06);
+  }
+}
+
+.stateBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  text-align: center;
+
+  .emptyIcon {
+    font-size: 4rem;
+    color: var(--border-color);
+  }
+}
+
+.noteRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-white);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.noteMain {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.noteTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notePreview {
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 6px;
+
+  // Giữ xuống dòng người dùng gõ nhưng chỉ hiện 2 dòng đầu
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+
+  &.isEmpty {
+    font-style: italic;
+    opacity: 0.6;
+  }
+}
+
+.noteTime {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.noteActions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+
+  svg {
+    font-size: 1.7rem;
+  }
+
+  &:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  &.danger:hover {
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+}
+
+.confirmBox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+
+  button {
+    padding: 4px 10px;
+    border-radius: var(--radius-sm, 6px);
+    border: 1px solid transparent;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.confirmYes {
+  background: #dc3545;
+  color: #fff;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.confirmNo {
+  background: transparent;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary);
+}
+
+// ---------- Trình soạn ----------
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  svg {
+    font-size: 1.7rem;
+  }
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.titleInput,
+.contentInput {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-white);
+  color: var(--dark-color);
+  font-size: 1.5rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    border-color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+  }
+}
+
+.titleInput {
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.contentInput {
+  resize: vertical;
+  min-height: 220px;
+  line-height: 1.6;
+  font-family: inherit;
+}

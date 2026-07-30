@@ -1,0 +1,58 @@
+// Khớp với ScrollToTop (layout/ScrollToTop/ScrollToTop.module.scss): cùng kích
+// thước và lề phải để hai nút thành một cột thẳng hàng ở góc phải dưới.
+// Sửa các giá trị dưới đây thì phải sửa cả bên đó.
+$fab-size: 45px;
+$fab-gap: 12px;
+$scroll-bottom: 20px;
+$scroll-bottom-mobile: 72px;
+
+.notesFab {
+  position: fixed;
+  right: 20px;
+  bottom: $scroll-bottom + $fab-size + $fab-gap;
+  width: $fab-size;
+  height: $fab-size;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 2px solid var(--primary);
+  background: var(--primary);
+  color: var(--white);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+  opacity: 0.95;
+  z-index: 1000;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease;
+
+  &:hover {
+    background: transparent;
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  // Mobile có thanh nav dưới nên nút cuộn-lên đã bị đẩy lên, đẩy theo cho khớp.
+  @media (max-width: 991.98px) {
+    bottom: calc(#{$scroll-bottom-mobile + $fab-size + $fab-gap} + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover,
+    &:active {
+      transform: none;
+    }
+  }
+}
