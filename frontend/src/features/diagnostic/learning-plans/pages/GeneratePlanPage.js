@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
@@ -25,7 +25,6 @@ const isPracticeAttempt = (userTest) => (userTest?.practicePartIds?.length ?? 0)
 function GeneratePlanPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const planListRef = useRef(null);
 
   const [userTestId, setUserTestId] = useState(searchParams.get('userTestId') || '');
 
@@ -129,8 +128,8 @@ function GeneratePlanPage() {
         if (data?.examTypeId) {
           setFilterExamTypeId(data.examTypeId);
         }
+        // Đổi refreshKey đã đủ để query danh sách chạy lại (reload() nữa là gọi API 2 lần).
         setListRefreshKey((k) => k + 1);
-        planListRef.current?.reload();
       },
       onError: (err) => {
         setError(err?.response?.data?.message || err.message || 'Lỗi không xác định');
@@ -361,7 +360,6 @@ function GeneratePlanPage() {
       )}
 
       <LearningPlanList
-        ref={planListRef}
         loadAll
         allowAllInFilter
         examTypeId={filterExamTypeId}

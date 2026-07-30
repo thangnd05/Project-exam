@@ -516,7 +516,6 @@ public class LearningPlanService {
                 PlanTaskType.TAG,
                 LearningPlanQuestionTargets.TAG_TARGET,
                 baseline,
-                partPriorityScore(part),
                 passAccuracy,
                 wrong,
                 priorityScore);
@@ -534,7 +533,6 @@ public class LearningPlanService {
                 capstoneType,
                 targetQuestionCount,
                 part.getPercentage(),
-                partPriorityScore(part),
                 passAccuracy,
                 part.getWrong(),
                 capstonePriority);
@@ -574,15 +572,6 @@ public class LearningPlanService {
 
     private boolean matchesFocus(String examPartId, Set<String> focusPartIds) {
         return focusPartIds.isEmpty() || focusPartIds.contains(examPartId);
-    }
-
-    private TagBreakdownDto weakestTag(PartBreakdownDto part) {
-        if (part.getWeakTags() == null || part.getWeakTags().isEmpty()) {
-            return null;
-        }
-        return part.getWeakTags().stream()
-                .min(Comparator.comparingDouble(TagBreakdownDto::getPercentage))
-                .orElse(null);
     }
 
     private double partPriorityScore(PartBreakdownDto part) {
@@ -816,7 +805,6 @@ public class LearningPlanService {
             PlanTaskType taskType,
             int targetQuestionCount,
             double baselinePct,
-            double partPriority,
             int passAccuracy,
             int wrongCount,
             int priorityScore

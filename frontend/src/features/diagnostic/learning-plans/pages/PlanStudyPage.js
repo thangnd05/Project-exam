@@ -3,8 +3,9 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query';
 import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { getCurrentSession } from '~/shared/api/learningPlanApi';
+import { getCurrentSession, startTaskSession } from '~/shared/api/learningPlanApi';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
+import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
 import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
@@ -23,6 +24,14 @@ const ex = classNames.bind(examStyles);
 
 const API_BASE = getApiBaseUrl();
 
+/** Câu đã trả lời: MSQ cần ít nhất 1 lựa chọn, còn lại cần có đáp án được chọn. */
+function isAnswered(question, selections) {
+  const selected = selections[question.questionId];
+  return question.questionType === 'MSQ'
+    ? Array.isArray(selected) && selected.length > 0
+    : Boolean(selected);
+}
+
 const planSessionKeys = {
   session: (learningPlanId, taskId) =>
     ['plan-session', learningPlanId, taskId || null],
@@ -40,18 +49,26 @@ function PlanStudyPage() {
 
   const [selections, setSelections] = useState({});
   const [formError, setFormError] = useState(null);
+  // > 0 = đang hỏi lại vì còn câu chưa trả lời.
+  const [unansweredCount, setUnansweredCount] = useState(0);
 
   const submitMutation = useSubmitSession();
   const submitting = submitMutation.isPending;
 
   const sessionQuery = useQuery({
     queryKey: planSessionKeys.session(learningPlanId, taskIdFromUrl),
-    queryFn: () => getCurrentSession(learningPlanId, taskIdFromUrl || undefined),
+    // Có taskId = vào học ải đó -> gọi endpoint tạo phiên (POST, trả lại phiên đang dở nếu có).
+    // Không có taskId = chỉ xem danh sách ải -> endpoint chỉ đọc.
+    queryFn: () => (taskIdFromUrl
+      ? startTaskSession(learningPlanId, taskIdFromUrl)
+      : getCurrentSession(learningPlanId)),
     enabled: !!learningPlanId,
+    retry: false,
   });
 
   const session = sessionQuery.data ?? null;
-  const loading = sessionQuery.isLoading || sessionQuery.isFetching;
+  // Chỉ chặn màn hình ở lần tải đầu; refetch nền giữ nguyên bài đang làm, không nháy "Đang tải".
+  const loading = sessionQuery.isLoading;
   const loadError = sessionQuery.error
     ? sessionQuery.error?.response?.data?.message || sessionQuery.error.message
     : null;
@@ -98,6 +115,17 @@ function PlanStudyPage() {
 
   const handleSubmit = () => {
     if (!session?.sessionId) return;
+    // Câu bỏ trống bị tính là sai -> hỏi lại trước khi nộp thay vì chấm thẳng.
+    const unanswered = (session.questions || []).filter((q) => !isAnswered(q, selections)).length;
+    if (unanswered > 0) {
+      setUnansweredCount(unanswered);
+      return;
+    }
+    doSubmit();
+  };
+
+  const doSubmit = () => {
+    setUnansweredCount(0);
     const answers = (session.questions || []).map((q) => {
       const sel = selections[q.questionId];
       if (q.questionType === 'MSQ') {
@@ -214,12 +242,7 @@ function PlanStudyPage() {
     );
   }
 
-  const answeredCount = (session?.questions || []).filter((q) => {
-    const sel = selections[q.questionId];
-    return q.questionType === 'MSQ'
-      ? Array.isArray(sel) && sel.length > 0
-      : Boolean(sel);
-  }).length;
+  const answeredCount = (session.questions || []).filter((q) => isAnswered(q, selections)).length;
 
   // Đưa selections về đúng shape userAnswers mà TestStartDashboard (trục câu hỏi) cần.
   const navAnswers = {};
@@ -380,6 +403,16 @@ function PlanStudyPage() {
           </div>
         </>
       )}
+
+      <ConfirmActionModal
+        show={unansweredCount > 0}
+        onClose={() => setUnansweredCount(0)}
+        onConfirm={doSubmit}
+        title="Còn câu chưa trả lời"
+        confirmText="Vẫn nộp bài"
+        cancelText="Quay lại làm tiếp"
+        message={`Bạn còn ${unansweredCount} câu chưa trả lời — các câu này sẽ bị tính là sai khi chấm. Vẫn nộp bài?`}
+      />
     </div>
   );
 }

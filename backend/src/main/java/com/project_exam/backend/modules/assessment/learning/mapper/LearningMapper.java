@@ -249,6 +249,7 @@ public class LearningMapper {
 
     public CurrentSessionResponse toQuizSessionResponse(
             LearningPlan plan,
+            String planStage,
             LearningPlanSession session,
             PlanTaskDto activeTask,
             PlanPhaseDto.RecommendedResourceDto resource,
@@ -260,7 +261,7 @@ public class LearningMapper {
         return CurrentSessionResponse.builder()
                 .mode("QUIZ")
                 .learningPlanId(plan.getLearningPlanId())
-                .planStage(plan.getPlanStage().name())
+                .planStage(planStage)
                 .sessionId(session.getSessionId())
                 .sessionStatus(session.getStatus().name())
                 .activeTask(activeTask)
@@ -295,6 +296,7 @@ public class LearningMapper {
 
     public CurrentSessionResponse toPickResponse(
             LearningPlan plan,
+            String planStage,
             List<PlanPartGroupDto> partGroups,
             List<PlanTaskDto> tasks,
             int totalTasks,
@@ -303,7 +305,8 @@ public class LearningMapper {
         return CurrentSessionResponse.builder()
                 .mode("PICK")
                 .learningPlanId(plan.getLearningPlanId())
-                .planStage(plan.getPlanStage().name())
+                .examTypeId(plan.getExamTypeId())
+                .planStage(planStage)
                 .partGroups(partGroups)
                 .tasks(tasks)
                 .totalTasks(totalTasks)

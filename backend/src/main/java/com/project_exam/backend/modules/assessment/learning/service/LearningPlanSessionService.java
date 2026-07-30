@@ -57,32 +57,56 @@ public class LearningPlanSessionService {
     private final StreakService streakService;
     private final LearningMapper learningMapper;
 
-    @Transactional
+    /**
+     * Trạng thái hiện tại của kế hoạch — CHỈ ĐỌC, không tạo phiên/không đổi trạng thái ải.
+     * Muốn bắt đầu (hoặc quay lại) một ải thì gọi {@link #startTaskSession} (POST).
+     */
+    @Transactional(readOnly = true)
     public CurrentSessionResponse getCurrentSession(
             String userId, String learningPlanId, String taskId, boolean includeReview) {
         LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        PlanStage stage = effectiveStage(plan);
 
-        normalizePlanStage(plan);
-
-        // Không có ải cụ thể: hết ải thì mời đi thi thử, còn lại về màn chọn ải.
         if (taskId == null || taskId.isBlank()) {
-            return plan.getPlanStage() == PlanStage.MOCK
+            return stage == PlanStage.MOCK
                     ? buildMockStageResponse(plan)
-                    : buildPickResponse(plan);
+                    : buildPickResponse(plan, stage);
         }
 
-        LearningPlanTask task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhiệm vụ"));
-        if (!Objects.equals(task.getLearningPlanId(), learningPlanId)) {
-            throw new ForbiddenException("Nhiệm vụ không thuộc kế hoạch này");
-        }
+        LearningPlanTask task = requireTaskOfPlan(learningPlanId, taskId);
 
-        // Xem lại/luyện lại một ải cụ thể vẫn phải chạy được cả khi plan đã sang trạm MOCK
-        // (vượt ải cuối xong mới xem kết quả, hoặc bấm "Luyện lại" ải đã vượt).
+        // Xem lại một ải cụ thể vẫn phải chạy được cả khi plan đã sang trạm MOCK
+        // (vượt ải cuối xong mới xem kết quả).
         if (includeReview) {
             return buildReviewResponse(plan, task);
         }
 
+        // Đã có phiên đang làm dở thì trả về để làm tiếp; còn lại về màn chọn ải.
+        return sessionRepository
+                .findFirstByLearningPlanIdAndTaskIdAndStatusOrderByStartedAtDesc(
+                        learningPlanId, taskId, SessionStatus.IN_PROGRESS)
+                .map(session -> buildSessionResponse(plan, stage, session))
+                .orElseGet(() -> stage == PlanStage.MOCK
+                        ? buildMockStageResponse(plan)
+                        : buildPickResponse(plan, stage));
+    }
+
+    /**
+     * Bắt đầu/quay lại phiên luyện của một ải — đây là đường DUY NHẤT được ghi DB
+     * (tạo phiên, bỏ dở phiên ải khác, bỏ qua ải kho rỗng).
+     */
+    @Transactional
+    public CurrentSessionResponse startTaskSession(String userId, String learningPlanId, String taskId) {
+        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        PlanStage stage = normalizePlanStage(plan);
+
+        if (taskId == null || taskId.isBlank()) {
+            return stage == PlanStage.MOCK
+                    ? buildMockStageResponse(plan)
+                    : buildPickResponse(plan, stage);
+        }
+
+        LearningPlanTask task = requireTaskOfPlan(learningPlanId, taskId);
         if (task.getStatus() == TaskStatus.SKIPPED) {
             throw new BadRequestException("Ải này đã bỏ qua, không thể học.");
         }
@@ -96,7 +120,7 @@ public class LearningPlanSessionService {
                 .findFirstByLearningPlanIdAndTaskIdAndStatusOrderByStartedAtDesc(
                         learningPlanId, taskId, SessionStatus.IN_PROGRESS);
         if (inProgress.isPresent()) {
-            return buildSessionResponse(plan, inProgress.get());
+            return buildSessionResponse(plan, stage, inProgress.get());
         }
 
         // Kho câu của ải rỗng (pool=0) -> không thể pass, sẽ kẹt. Tự SKIP để không chặn tiến độ.
@@ -107,7 +131,7 @@ public class LearningPlanSessionService {
                 return buildMockStageResponse(plan);
             }
             // Nói rõ lý do bị đá về màn chọn ải, không im lặng như trước.
-            CurrentSessionResponse response = buildPickResponse(plan);
+            CurrentSessionResponse response = buildPickResponse(plan, plan.getPlanStage());
             response.setNotice(skipped
                     ? "Ải này chưa có câu hỏi nào trong kho nên đã được bỏ qua — hãy chọn ải khác."
                     : "Ải này hiện chưa có câu hỏi để luyện lại. Hãy chọn ải khác.");
@@ -115,7 +139,16 @@ public class LearningPlanSessionService {
         }
 
         LearningPlanSession session = createQuizSession(plan, task, questionIds);
-        return buildSessionResponse(plan, session);
+        return buildSessionResponse(plan, stage, session);
+    }
+
+    private LearningPlanTask requireTaskOfPlan(String learningPlanId, String taskId) {
+        LearningPlanTask task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhiệm vụ"));
+        if (!Objects.equals(task.getLearningPlanId(), learningPlanId)) {
+            throw new ForbiddenException("Nhiệm vụ không thuộc kế hoạch này");
+        }
+        return task;
     }
 
     /**
@@ -221,23 +254,29 @@ public class LearningPlanSessionService {
         return "Hoàn thành tất cả ải tag của Part này trước khi mở ải tổng ôn.";
     }
 
-    /** Plan cũ ở trạm MIX chuyển về FOUNDATION hoặc MOCK. */
-    private void normalizePlanStage(LearningPlan plan) {
-        if (plan.getPlanStage() == PlanStage.MIX) {
-            long total = taskRepository.countByLearningPlanId(plan.getLearningPlanId());
-            long passed = taskRepository.countByLearningPlanIdAndStatus(
-                    plan.getLearningPlanId(), TaskStatus.PASSED);
-            if (total > 0 && passed == total) {
-                plan.setPlanStage(PlanStage.MOCK);
-            } else {
-                plan.setPlanStage(PlanStage.FOUNDATION);
-            }
+    /** Trạm hiệu lực của plan, KHÔNG ghi DB — plan cũ ở trạm MIX quy về FOUNDATION/MOCK. */
+    private PlanStage effectiveStage(LearningPlan plan) {
+        PlanStage stage = plan.getPlanStage();
+        if (stage == null) {
+            return PlanStage.FOUNDATION;
+        }
+        if (stage != PlanStage.MIX) {
+            return stage;
+        }
+        long total = taskRepository.countByLearningPlanId(plan.getLearningPlanId());
+        long passed = taskRepository.countByLearningPlanIdAndStatus(
+                plan.getLearningPlanId(), TaskStatus.PASSED);
+        return total > 0 && passed == total ? PlanStage.MOCK : PlanStage.FOUNDATION;
+    }
+
+    /** Như {@link #effectiveStage} nhưng lưu lại — chỉ gọi ở luồng vốn đã ghi DB. */
+    private PlanStage normalizePlanStage(LearningPlan plan) {
+        PlanStage stage = effectiveStage(plan);
+        if (plan.getPlanStage() != stage) {
+            plan.setPlanStage(stage);
             planRepository.save(plan);
         }
-        if (plan.getPlanStage() == null) {
-            plan.setPlanStage(PlanStage.FOUNDATION);
-            planRepository.save(plan);
-        }
+        return stage;
     }
 
     @Transactional
@@ -427,6 +466,7 @@ public class LearningPlanSessionService {
     }
 
     /** Lịch sử các phiên luyện của một ải. Mới nhất trước. */
+    @Transactional(readOnly = true)
     public List<TaskSessionHistoryDto> getTaskSessionHistory(
             String userId, String learningPlanId, String taskId) {
         requireOwnedPlan(userId, learningPlanId);
@@ -560,24 +600,39 @@ public class LearningPlanSessionService {
         return selectFromPool(userId, pool, count);
     }
 
-    /** Lấy tối đa {@code count} câu; nếu kho ít hơn thì lấy hết pool. */
+    /**
+     * Lấy tối đa {@code count} câu: ưu tiên câu chưa gặp bao giờ, thiếu thì bù bằng câu
+     * ĐÃ GẶP ÍT NHẤT (trước đây bù bằng đầu pool nên câu vừa làm dễ lặp lại ngay).
+     */
     private List<String> selectFromPool(String userId, List<Question> pool, int count) {
         List<String> ids = pool.stream().map(Question::getQuestionId).distinct().toList();
-        Set<String> seen = new HashSet<>(exposureRepository.findSeenQuestionIds(userId, ids));
-        List<String> result = pool.stream()
-                .map(Question::getQuestionId)
-                .filter(id -> !seen.contains(id))
-                .distinct()
-                .limit(count)
-                .toList();
-        if (result.size() >= count) {
-            return result;
+        if (ids.isEmpty()) {
+            return List.of();
         }
-        return pool.stream()
-                .map(Question::getQuestionId)
-                .distinct()
+        Map<String, Integer> timesSeenById = exposureRepository
+                .findByUserIdAndQuestionIdIn(userId, ids).stream()
+                .collect(Collectors.toMap(
+                        UserQuestionExposure::getQuestionId,
+                        e -> e.getTimesSeen() != null ? e.getTimesSeen() : 1,
+                        (a, b) -> a));
+
+        List<String> unseen = ids.stream()
+                .filter(id -> !timesSeenById.containsKey(id))
                 .limit(count)
                 .toList();
+        if (unseen.size() >= count) {
+            return unseen;
+        }
+
+        List<String> fill = ids.stream()
+                .filter(timesSeenById::containsKey)
+                .sorted(Comparator.comparingInt(timesSeenById::get))
+                .limit((long) count - unseen.size())
+                .toList();
+
+        List<String> result = new ArrayList<>(unseen);
+        result.addAll(fill);
+        return result;
     }
 
     /**
@@ -637,7 +692,8 @@ public class LearningPlanSessionService {
         exposureRepository.saveAll(rows);
     }
 
-    private CurrentSessionResponse buildSessionResponse(LearningPlan plan, LearningPlanSession session) {
+    private CurrentSessionResponse buildSessionResponse(
+            LearningPlan plan, PlanStage stage, LearningPlanSession session) {
         List<LearningPlanSessionQuestion> sqs =
                 sessionQuestionRepository.findBySessionIdOrderByDisplayOrderAsc(session.getSessionId());
         List<String> questionIds = sqs.stream()
@@ -682,6 +738,7 @@ public class LearningPlanSessionService {
 
         return learningMapper.toQuizSessionResponse(
                 plan,
+                stage.name(),
                 session,
                 activeTaskDto,
                 resourceDto,
@@ -705,7 +762,7 @@ public class LearningPlanSessionService {
                 "Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.");
     }
 
-    private CurrentSessionResponse buildPickResponse(LearningPlan plan) {
+    private CurrentSessionResponse buildPickResponse(LearningPlan plan, PlanStage stage) {
         List<LearningPlanTask> taskEntities = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(
                 plan.getLearningPlanId());
         PlanTaskViewAssembler.Lookups lookups = taskViewAssembler.lookupsFor(taskEntities);
@@ -714,6 +771,7 @@ public class LearningPlanSessionService {
 
         return learningMapper.toPickResponse(
                 plan,
+                (stage != null ? stage : PlanStage.FOUNDATION).name(),
                 taskViewAssembler.buildPartGroups(taskEntities, lookups),
                 taskViewAssembler.toTaskDtos(taskEntities, lookups),
                 taskEntities.size(),

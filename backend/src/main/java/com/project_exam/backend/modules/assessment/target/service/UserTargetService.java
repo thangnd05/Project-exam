@@ -18,6 +18,8 @@ public class UserTargetService {
 
     private final UserTargetRepository userTargetRepository;
     private final UserTargetPartRepository userTargetPartRepository;
+    private final ExamTargetMilestoneRepository milestoneRepository;
+    private final TargetPartRequirementRepository partRequirementRepository;
     private final UserTargetMapper userTargetMapper;
 
     public UserTargetResponse getByUserAndExamType(String userId, String examTypeId) {
@@ -68,16 +70,42 @@ public class UserTargetService {
         userTargetRepository.delete(ut);
     }
 
+    /**
+     * Ngưỡng % cần đạt từng Part để dùng làm ngưỡng vượt ải: ưu tiên aim user tự đặt,
+     * chưa có thì lấy mốc mục tiêu admin cấu hình cho đúng điểm target của user.
+     */
     public Map<String, Integer> getEffectiveRequirements(String userId, String examTypeId) {
         Optional<UserTarget> utOpt = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId);
         if (utOpt.isEmpty()) return Map.of();
 
-        List<UserTargetPart> parts = userTargetPartRepository
-                .findByUserTargetId(utOpt.get().getUserTargetId());
-        return parts.stream().collect(Collectors.toMap(
-                UserTargetPart::getExamPartId,
-                UserTargetPart::getCustomPercentage
-        ));
+        UserTarget ut = utOpt.get();
+        Map<String, Integer> userAims = userTargetPartRepository
+                .findByUserTargetId(ut.getUserTargetId()).stream()
+                .filter(p -> p.getExamPartId() != null && p.getCustomPercentage() != null)
+                .collect(Collectors.toMap(
+                        UserTargetPart::getExamPartId,
+                        UserTargetPart::getCustomPercentage,
+                        (a, b) -> a));
+        if (!userAims.isEmpty()) {
+            return userAims;
+        }
+        return milestoneRequirements(examTypeId, ut.getTargetScore());
+    }
+
+    /** Yêu cầu từng Part của mốc điểm do admin cấu hình (rỗng nếu không có mốc khớp). */
+    private Map<String, Integer> milestoneRequirements(String examTypeId, Integer targetScore) {
+        if (targetScore == null) {
+            return Map.of();
+        }
+        return milestoneRepository.findByExamTypeIdAndMilestoneScore(examTypeId, targetScore)
+                .map(m -> partRequirementRepository
+                        .findByExamTargetMilestoneId(m.getExamTargetMilestoneId()).stream()
+                        .filter(r -> r.getExamPartId() != null && r.getRequiredPercentage() != null)
+                        .collect(Collectors.toMap(
+                                TargetPartRequirement::getExamPartId,
+                                TargetPartRequirement::getRequiredPercentage,
+                                (a, b) -> a)))
+                .orElseGet(Map::of);
     }
 
     private void syncParts(String userTargetId, List<UserPartRequirementDto> dtos) {

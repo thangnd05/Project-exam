@@ -17,12 +17,22 @@ export const listPlans = (examTypeId) => {
     .then((res) => res.data);
 };
 
+/** Chỉ đọc: trạng thái kế hoạch, phiên đang làm dở, hoặc bài đã nộp (includeReview). */
 export const getCurrentSession = (learningPlanId, taskId, includeReview = false) => {
   const params = {};
   if (taskId) params.taskId = taskId;
   if (includeReview) params.includeReview = true;
   return axios
     .get(`${BASE_URL}/${learningPlanId}/current-session`, { params })
+    .then((res) => res.data);
+};
+
+/** Bắt đầu/quay lại phiên luyện của một ải — endpoint có ghi DB nên là POST. */
+export const startTaskSession = (learningPlanId, taskId) => {
+  return axios
+    .post(`${BASE_URL}/${learningPlanId}/sessions/start`, null, {
+      params: taskId ? { taskId } : undefined,
+    })
     .then((res) => res.data);
 };
 

@@ -68,6 +68,7 @@ public class LearningPlanController {
         return ResponseEntity.noContent().build();
     }
 
+    /** Chỉ đọc: trạng thái kế hoạch / phiên đang làm dở / xem lại bài đã nộp. */
     @GetMapping("/{learningPlanId}/current-session")
     public ResponseEntity<CurrentSessionResponse> currentSession(
             @PathVariable String learningPlanId,
@@ -78,6 +79,18 @@ public class LearningPlanController {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(learningPlanSessionService.getCurrentSession(
                 userId, learningPlanId, taskId, includeReview));
+    }
+
+    /** Bắt đầu/quay lại phiên luyện của một ải — có ghi DB nên tách khỏi GET ở trên. */
+    @PostMapping("/{learningPlanId}/sessions/start")
+    public ResponseEntity<CurrentSessionResponse> startSession(
+            @PathVariable String learningPlanId,
+            @RequestParam(required = false) String taskId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(learningPlanSessionService.startTaskSession(
+                userId, learningPlanId, taskId));
     }
 
     @PostMapping("/{learningPlanId}/sessions/{sessionId}/submit")

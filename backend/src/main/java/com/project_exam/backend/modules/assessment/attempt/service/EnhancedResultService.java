@@ -437,9 +437,12 @@ public class EnhancedResultService {
                     .build());
         }
 
-        // Giữ thứ tự hiển thị theo part (Part 1 -> Part N), không sort theo % đúng.
+        // Thứ tự hiển thị theo ExamPart.displayOrder (cùng nguồn với lộ trình học, để 2 màn không
+        // sắp khác nhau); Part chưa đặt thứ tự thì suy từ số trong tên rồi tới tên.
         parts.sort(
-                Comparator.comparingInt((PartBreakdownDto part) -> extractPartOrder(part.getPartName()))
+                Comparator.comparingInt((PartBreakdownDto part) ->
+                                partDisplayOrder(examPartMap.get(part.getExamPartId())))
+                        .thenComparingInt(part -> extractPartOrder(part.getPartName()))
                         .thenComparing(PartBreakdownDto::getPartName, String.CASE_INSENSITIVE_ORDER)
         );
         return parts;
@@ -744,6 +747,13 @@ public class EnhancedResultService {
             uniqueByQuestionId.putIfAbsent(ua.getQuestionId(), ua);
         }
         return new ArrayList<>(uniqueByQuestionId.values());
+    }
+
+    /** Part chưa đặt "Thứ tự" thì xếp sau các Part đã đặt. */
+    private int partDisplayOrder(ExamPart part) {
+        return part != null && part.getDisplayOrder() != null
+                ? part.getDisplayOrder()
+                : Integer.MAX_VALUE;
     }
 
     private int extractPartOrder(String partName) {
