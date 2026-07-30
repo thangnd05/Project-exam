@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { toDateTimeLocalInput, fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
 import { Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
@@ -61,12 +62,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
           durationMinutes: test.durationMinutes || '',
           maxAttempts: test.maxAttempts || '',
           bannerUrl: test.bannerUrl || '',
-          availableFrom: test.availableFrom
-            ? test.availableFrom.substring(0, 16)
-            : '',
-          availableTo: test.availableTo
-            ? test.availableTo.substring(0, 16)
-            : '',
+          availableFrom: toDateTimeLocalInput(test.availableFrom),
+          availableTo: toDateTimeLocalInput(test.availableTo),
           costCoins: test.costCoins != null ? test.costCoins : '',
         });
         fetchTestDetail(test.testId || test.id);
@@ -178,10 +175,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
           ? Number(formData.maxAttempts)
           : null,
       bannerUrl: formData.bannerUrl || null,
-      availableFrom: formData.availableFrom
-        ? formData.availableFrom + ':00'
-        : null,
-      availableTo: formData.availableTo ? formData.availableTo + ':00' : null,
+      availableFrom: fromDateTimeLocalInput(formData.availableFrom),
+      availableTo: fromDateTimeLocalInput(formData.availableTo),
       classId: test.classId ? String(test.classId) : null,
       chapterId: test.chapterId ? String(test.chapterId) : null,
 

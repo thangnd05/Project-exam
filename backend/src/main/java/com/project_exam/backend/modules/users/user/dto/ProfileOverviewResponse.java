@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.users.user.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Builder
@@ -16,7 +16,7 @@ public class ProfileOverviewResponse {
     private Boolean verified;
     private String roleId;
     private String roleName;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     private TestStats testStats;
     private VocabularyStats vocabularyStats;
     private ClassStats classStats;
@@ -29,7 +29,7 @@ public class ProfileOverviewResponse {
         private Long inProgressAttempts;
         private Integer bestScore;
         private Double averageScore;
-        private LocalDateTime lastAttemptAt;
+        private Instant lastAttemptAt;
     }
 
     @Getter

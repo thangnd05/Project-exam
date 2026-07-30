@@ -3,6 +3,7 @@ import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {useQuests} from './hooks/useQuests';
+import {toDateTimeLocalInput, fromDateTimeLocalInput} from '~/shared/utils/format-date-time';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
@@ -32,7 +33,7 @@ const defaultFormState = {
   active: true,
 };
 
-const toInputDateTime = (value) => (value ? String(value).slice(0, 16) : '');
+const toInputDateTime = (value) => toDateTimeLocalInput(value);
 
 function QuestsManagement() {
   const [keyword, setKeyword] = useState('');
@@ -113,8 +114,8 @@ function QuestsManagement() {
       conditionType: formState.conditionType,
       conditionTarget:
         formState.conditionType === 'NONE' ? 1 : Number(formState.conditionTarget) || 1,
-      startAt: formState.startAt || null,
-      endAt: formState.endAt || null,
+      startAt: fromDateTimeLocalInput(formState.startAt),
+      endAt: fromDateTimeLocalInput(formState.endAt),
       active: formState.active,
     };
 

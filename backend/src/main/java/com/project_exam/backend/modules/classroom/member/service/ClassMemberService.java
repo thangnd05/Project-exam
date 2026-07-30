@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -51,7 +51,7 @@ public class ClassMemberService {
                 .classId(classId)
                 .userId(currentUserId)
                 .status(MemberStatus.PENDING)
-                .joinedAt(LocalDateTime.now())
+                .joinedAt(Instant.now())
                 .build();
 
         member = classMemberRepository.save(member);

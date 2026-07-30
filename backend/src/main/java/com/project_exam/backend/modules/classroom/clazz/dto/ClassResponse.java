@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -17,5 +17,5 @@ public class ClassResponse {
     private String className;
     private String description;
     private String teacherId;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

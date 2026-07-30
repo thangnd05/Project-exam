@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Ghi nhận 1 user đã nhận xu của 1 nhiệm vụ. UNIQUE(userId, questId) -> nhận 1 lần.
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "user_quest_claims",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "questId"}),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "quest_id"}),
         indexes = {
                 @Index(name = "idx_user_quest_claims_quest_id", columnList = "quest_id")
         }
@@ -38,5 +38,5 @@ public class UserQuestClaim {
     private Integer rewardCoins;
 
     @Column(nullable = false)
-    private LocalDateTime claimedAt = LocalDateTime.now();
+    private Instant claimedAt = Instant.now();
 }

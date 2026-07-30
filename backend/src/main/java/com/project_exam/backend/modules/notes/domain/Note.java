@@ -4,7 +4,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /** Một ghi chú trong sổ tay cá nhân của user. */
 @Entity
@@ -31,10 +31,10 @@ public class Note {
     private String content;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private Instant updatedAt = Instant.now();
 
     public Note(String userId, String title, String content) {
         this.userId = userId;
@@ -44,6 +44,6 @@ public class Note {
 
     @PreUpdate
     void touch() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 }

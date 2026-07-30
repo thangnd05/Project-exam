@@ -19,6 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project_exam.backend.shared.util.AppTime;
+
 import java.time.*;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
@@ -45,8 +47,7 @@ public class DashboardService {
 
     @Transactional(readOnly = true)
     public DashboardStatsResponse getStats() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDate today = now.toLocalDate();
+        LocalDate today = AppTime.today();
 
         return new DashboardStatsResponse(
                 buildStats(),
@@ -76,7 +77,7 @@ public class DashboardService {
         List<DayHours> heatmap = buildHeatmap(today);
 
         // Top quốc gia (geo-IP) — 7 ngày.
-        List<CountryTraffic> topCountries = pageVisitRepository.findTopCountriesSince(weekStart, PageRequest.of(0, 50))
+        List<CountryTraffic> topCountries = pageVisitRepository.findTopCountriesSince(AppTime.instant(weekStart), PageRequest.of(0, 50))
                 .stream()
                 .map(row -> new CountryTraffic((String) row[0], (String) row[1], ((Number) row[2]).longValue()))
                 .collect(Collectors.toList());
@@ -88,9 +89,14 @@ public class DashboardService {
         );
     }
 
-    /** Điểm bắt đầu mỗi phiên (thời điểm + userId) — 1 phiên = chuỗi lượt xem cách nhau ≤ 30 phút. */
+    /**
+     * Điểm bắt đầu mỗi phiên (thời điểm + userId) — 1 phiên = chuỗi lượt xem cách nhau ≤ 30 phút.
+     *
+     * <p>{@code from} là mốc theo lịch địa phương (báo cáo cắt theo ngày VN); DB lưu
+     * {@link Instant} nên quy đổi ở đúng ranh giới này qua {@link AppTime}.
+     */
     private List<SessionStart> computeSessionStarts(LocalDateTime from) {
-        return sessionStartsFromRows(pageVisitRepository.findSessionRowsSince(from));
+        return sessionStartsFromRows(pageVisitRepository.findSessionRowsSince(AppTime.instant(from)));
     }
 
     /** Gom các dòng (sessionKey, createdAt, userId) đã sort thành điểm bắt đầu phiên (nghỉ > 30 phút = phiên mới). */
@@ -100,7 +106,7 @@ public class DashboardService {
         LocalDateTime prevTime = null;
         for (Object[] row : rows) {
             String key = (String) row[0]; // sessionKey = analyticsVisitorId (ổn định qua login/logout)
-            LocalDateTime ts = (LocalDateTime) row[1];
+            LocalDateTime ts = AppTime.local((Instant) row[1]);
             String userId = (String) row[2];
             // Không có sessionKey -> không định danh được khách, coi mỗi lượt là 1 phiên riêng
             // (tránh gộp nhầm nhiều khách key null — vốn sort cạnh nhau — thành chung phiên).
@@ -125,7 +131,7 @@ public class DashboardService {
      */
     @Transactional(readOnly = true)
     public List<DayHours> getTrafficHeatmap(LocalDate endDateParam) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = AppTime.today();
         // Chỉ tính hiện tại & quá khứ — ngày tương lai (hoặc bỏ trống) đưa về hôm nay.
         LocalDate end = (endDateParam == null || endDateParam.isAfter(today)) ? today : endDateParam;
         return buildHeatmap(end);
@@ -144,7 +150,8 @@ public class DashboardService {
         for (int i = 0; i < 7; i++) {
             heatBuckets.put(startDate.plusDays(i), new long[24]);
         }
-        for (SessionStart s : sessionStartsFromRows(pageVisitRepository.findSessionRowsBetween(scanFrom, scanTo))) {
+        for (SessionStart s : sessionStartsFromRows(
+                pageVisitRepository.findSessionRowsBetween(AppTime.instant(scanFrom), AppTime.instant(scanTo)))) {
             long[] hrs = heatBuckets.get(s.time().toLocalDate());
             if (hrs != null) hrs[s.time().getHour()]++;
         }
@@ -175,15 +182,15 @@ public class DashboardService {
     // ── Hiệu suất 12 tháng của một năm được chọn ─────────────────
     @Transactional(readOnly = true)
     public MonthlyPerformanceResponse getMonthlyPerformance(Integer yearParam) {
-        int currentYear = LocalDate.now().getYear();
+        int currentYear = AppTime.today().getYear();
         int year = yearParam == null ? currentYear : yearParam;
 
         // Danh sách năm chọn: từ năm hiện tại về năm có dữ liệu sớm nhất (lượt thi HOẶC đăng ký).
-        LocalDateTime earliestAttempt = userTestRepository.findEarliestStartedAt();
-        LocalDateTime earliestUser = userRepository.findEarliestCreatedAt();
+        Instant earliestAttempt = userTestRepository.findEarliestStartedAt();
+        Instant earliestUser = userRepository.findEarliestCreatedAt();
         int startYear = currentYear;
-        if (earliestAttempt != null) startYear = Math.min(startYear, earliestAttempt.getYear());
-        if (earliestUser != null) startYear = Math.min(startYear, earliestUser.getYear());
+        if (earliestAttempt != null) startYear = Math.min(startYear, AppTime.local(earliestAttempt).getYear());
+        if (earliestUser != null) startYear = Math.min(startYear, AppTime.local(earliestUser).getYear());
         List<Integer> availableYears = new ArrayList<>();
         for (int y = currentYear; y >= startYear; y--) availableYears.add(y);
 
@@ -191,8 +198,8 @@ public class DashboardService {
 
         // Gom lượt thi của năm được chọn theo 12 tháng: [total, completed].
         long[][] buckets = new long[12][2];
-        for (Object[] row : userTestRepository.findAttemptsSince(yearStart)) {
-            LocalDateTime startedAt = (LocalDateTime) row[0];
+        for (Object[] row : userTestRepository.findAttemptsSince(AppTime.instant(yearStart))) {
+            LocalDateTime startedAt = AppTime.local((Instant) row[0]);
             if (startedAt.getYear() != year) continue;
             UserTest.Status status = (UserTest.Status) row[2];
             long[] b = buckets[startedAt.getMonthValue() - 1];
@@ -202,7 +209,8 @@ public class DashboardService {
 
         // Gom người dùng mới đăng ký của năm được chọn theo 12 tháng.
         long[] newUsers = new long[12];
-        for (LocalDateTime createdAt : userRepository.findCreatedAtSince(yearStart)) {
+        for (Instant createdAtUtc : userRepository.findCreatedAtSince(AppTime.instant(yearStart))) {
+            LocalDateTime createdAt = AppTime.local(createdAtUtc);
             if (createdAt.getYear() != year) continue;
             newUsers[createdAt.getMonthValue() - 1]++;
         }

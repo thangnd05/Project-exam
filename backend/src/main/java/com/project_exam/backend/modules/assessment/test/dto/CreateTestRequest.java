@@ -1,7 +1,7 @@
 package com.project_exam.backend.modules.assessment.test.dto;
 
 import lombok.Data;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 public class CreateTestRequest {
@@ -22,8 +22,8 @@ public class CreateTestRequest {
     private String collectionId;
 
     // Hỗ trợ cấu hình thời gian mở/đóng đề
-    private LocalDateTime availableFrom;
-    private LocalDateTime availableTo;
+    private Instant availableFrom;
+    private Instant availableTo;
 
     // Giá xu để mở khoá bài. Chỉ admin set được; user thường / bài lớp sẽ bị ép null.
     private Integer costCoins;

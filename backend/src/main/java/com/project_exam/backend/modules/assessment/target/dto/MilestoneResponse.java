@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -19,6 +19,6 @@ public class MilestoneResponse {
     private String examTypeId;
     private Integer milestoneScore;
     private String description;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     private List<PartRequirementResponse> partRequirements;
 }

@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 @Component
@@ -89,7 +89,7 @@ public class DataLoader implements CommandLineRunner {
             user.setEmail(StringUtils.hasText(adminEmail) ? adminEmail : adminUsername);
             user.setPassword(passwordEncoder.encode(adminPassword));
             user.setRoleId(adminRole.getRoleId());
-            user.setCreatedAt(LocalDateTime.now());
+            user.setCreatedAt(Instant.now());
             user.setVerified(true);
             user.setAvatarUrl(buildDefaultAvatar(user.getFullName()));
             userRepository.save(user);

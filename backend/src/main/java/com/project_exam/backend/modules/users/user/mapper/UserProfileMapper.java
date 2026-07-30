@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.user.dto.ProfileOverviewResponse;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Mapper thuần cho ProfileOverviewResponse. Toàn bộ số liệu thống kê
@@ -23,7 +23,7 @@ public class UserProfileMapper {
             long inProgressAttempts,
             Integer bestScore,
             Double averageScore,
-            LocalDateTime lastAttemptAt,
+            Instant lastAttemptAt,
             // vocabulary stats
             long totalVocabulary,
             long learningVocabulary,

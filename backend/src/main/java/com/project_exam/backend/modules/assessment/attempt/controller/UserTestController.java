@@ -112,7 +112,7 @@ public class UserTestController {
         response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
         response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
         response.put("mode", userTest.getMode() != null ? userTest.getMode().name() : "FULL_TEST");
-        response.put("serverNow", java.time.LocalDateTime.now().toString());
+        response.put("serverNow", java.time.Instant.now().toString());
 
         return ResponseEntity.ok(response);
     }
@@ -165,7 +165,7 @@ public class UserTestController {
 
         Map<String, Object> response = new HashMap<>();
         // serverNow để frontend đồng bộ đồng hồ (tránh clock skew khi tính timer).
-        response.put("serverNow", java.time.LocalDateTime.now().toString());
+        response.put("serverNow", java.time.Instant.now().toString());
         if (active.isPresent()) {
             UserTest userTest = active.get();
             response.put("userTestId", userTest.getUserTestId());
@@ -219,7 +219,7 @@ public class UserTestController {
         response.put("userTestId", userTest.getUserTestId());
         response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
         response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
-        response.put("serverNow", java.time.LocalDateTime.now().toString());
+        response.put("serverNow", java.time.Instant.now().toString());
         return ResponseEntity.ok(response);
     }
 
@@ -243,7 +243,7 @@ public class UserTestController {
         Optional<UserTest> active = userTestService.findActiveGuestUserTest(guestSessionId, testId);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("serverNow", java.time.LocalDateTime.now().toString());
+        response.put("serverNow", java.time.Instant.now().toString());
         if (active.isPresent()) {
             UserTest userTest = active.get();
             response.put("userTestId", userTest.getUserTestId());

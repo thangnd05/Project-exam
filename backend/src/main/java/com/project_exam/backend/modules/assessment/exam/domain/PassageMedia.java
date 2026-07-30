@@ -2,13 +2,19 @@ package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "passage_media", indexes = {
         @Index(name = "idx_passage_media_passage_id", columnList = "passage_id")
 })
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PassageMedia {
 
     @Id

@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -43,7 +43,7 @@ public class CoinService {
         UserCoin w = new UserCoin();
         w.setUserId(userId);
         w.setBalance(amount);
-        w.setUpdatedAt(LocalDateTime.now());
+        w.setUpdatedAt(Instant.now());
         return userCoinRepository.save(w).getBalance();
     }
 
@@ -107,7 +107,7 @@ public class CoinService {
         UserCoin wallet = new UserCoin();
         wallet.setUserId(userId);
         wallet.setBalance(balance);
-        wallet.setUpdatedAt(LocalDateTime.now());
+        wallet.setUpdatedAt(Instant.now());
         wallet = userCoinRepository.save(wallet);
         return coinMapper.toWalletResponse(wallet, user);
     }
@@ -118,7 +118,7 @@ public class CoinService {
         UserCoin wallet = userCoinRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("User này chưa có ví xu"));
         wallet.setBalance(balance);
-        wallet.setUpdatedAt(LocalDateTime.now());
+        wallet.setUpdatedAt(Instant.now());
         wallet = userCoinRepository.save(wallet);
         return coinMapper.toWalletResponse(wallet, userRepository.findById(userId).orElse(null));
     }

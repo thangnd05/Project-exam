@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticRespon
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -15,7 +15,7 @@ public class CommentResponse {
     private String userId;
     private String parentId;
     private String content;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     private String authorName;
     private String authorAvatar;

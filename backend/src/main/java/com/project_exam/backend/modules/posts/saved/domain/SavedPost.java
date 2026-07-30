@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(
@@ -33,5 +33,5 @@ public class SavedPost {
 
     @Builder.Default
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

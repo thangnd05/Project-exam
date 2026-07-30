@@ -26,7 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import java.util.Map;
@@ -109,7 +109,7 @@ public class TestController {
             test.setCostCoins(request.getCostCoins());
         }
         test.setCreatedBy(currentUserId);
-        test.setCreatedAt(LocalDateTime.now());
+        test.setCreatedAt(Instant.now());
         Test savedTest = testCommandService.save(test);
         TestResponse response = testService.buildUserTestSummary(savedTest, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

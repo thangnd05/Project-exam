@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Định nghĩa 1 nhiệm vụ (admin tạo). Người dùng nhận xu 1 lần / nhiệm vụ.
@@ -38,12 +38,12 @@ public class Quest {
     @Column(nullable = false)
     private Integer conditionTarget = 1;
 
-    private LocalDateTime startAt; // null = không giới hạn bắt đầu
-    private LocalDateTime endAt;   // null = không giới hạn kết thúc
+    private Instant startAt; // null = không giới hạn bắt đầu
+    private Instant endAt;   // null = không giới hạn kết thúc
 
     @Column(nullable = false)
     private Boolean active = true;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

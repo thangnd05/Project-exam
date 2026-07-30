@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticRespon
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -20,7 +20,7 @@ public class PostSummaryResponse {
     private CosmeticResponse equippedBadge;
     private String title;
     private Post.PostStatus status;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     private String thumbnailUrl; // URL từ entity hoặc ảnh đầu tiên
     private List<CategoryResponse> categories;
     private long commentCount;

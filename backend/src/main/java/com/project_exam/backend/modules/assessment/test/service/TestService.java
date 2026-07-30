@@ -79,7 +79,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 // --- Java ---
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -687,10 +688,10 @@ public class TestService {
 private void handleAutoSubmit(Test test, UserTest latest) {
     Integer duration = test.getDurationMinutes();
     if (latest != null && latest.getStatus() == UserTest.Status.IN_PROGRESS && duration != null && duration > 0) {
-        LocalDateTime endTime = latest.getStartedAt().plusMinutes(duration);
+        Instant endTime = latest.getStartedAt().plus(Duration.ofMinutes(duration));
         if (test.getAvailableTo() != null && test.getAvailableTo().isBefore(endTime)) endTime = test.getAvailableTo();
         
-        if (!LocalDateTime.now().isBefore(endTime)) {
+        if (!Instant.now().isBefore(endTime)) {
             try {
                 userTestService.submitTest(latest.getUserTestId(), latest.getUserId());
             } catch (Exception e) {

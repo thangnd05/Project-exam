@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
 
 @Service
@@ -66,7 +66,7 @@ public class StreakService {
             }
             streak.setLongestStreak(Math.max(streak.getLongestStreak(), streak.getCurrentStreak()));
             streak.setLastActivityDate(today);
-            streak.setUpdatedAt(LocalDateTime.now());
+            streak.setUpdatedAt(Instant.now());
             userStreakRepository.save(streak);
             increased = true;
         }
@@ -120,7 +120,7 @@ public class StreakService {
 
         // Nối lại: coi như đã học tới hôm qua -> chuỗi 'lost' sống lại, hôm nay học tiếp sẽ +1.
         streak.setLastActivityDate(today.minusDays(1));
-        streak.setUpdatedAt(LocalDateTime.now());
+        streak.setUpdatedAt(Instant.now());
         userStreakRepository.save(streak);
 
         return buildResponse(streak, today, false);

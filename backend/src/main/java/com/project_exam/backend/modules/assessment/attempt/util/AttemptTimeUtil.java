@@ -2,7 +2,8 @@ package com.project_exam.backend.modules.assessment.attempt.util;
 
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Tính hạn nộp phía server cho bài CÓ giới hạn giờ, để chặn gian lận
@@ -20,7 +21,7 @@ public final class AttemptTimeUtil {
     }
 
     /** Hạn nộp của attempt, hoặc {@code null} nếu bài không giới hạn giờ. */
-    public static LocalDateTime deadline(UserTest userTest, Integer durationMinutes) {
+    public static Instant deadline(UserTest userTest, Integer durationMinutes) {
         if (userTest == null || userTest.isPractice()) {
             return null;
         }
@@ -31,13 +32,13 @@ public final class AttemptTimeUtil {
             return null;
         }
         return userTest.getStartedAt()
-                .plusMinutes(durationMinutes)
+                .plus(Duration.ofMinutes(durationMinutes))
                 .plusSeconds(GRACE_SECONDS);
     }
 
     /** True nếu đề có giờ và đã quá hạn (kèm ân hạn) tại thời điểm {@code now}. */
-    public static boolean isExpired(UserTest userTest, Integer durationMinutes, LocalDateTime now) {
-        LocalDateTime deadline = deadline(userTest, durationMinutes);
+    public static boolean isExpired(UserTest userTest, Integer durationMinutes, Instant now) {
+        Instant deadline = deadline(userTest, durationMinutes);
         return deadline != null && now.isAfter(deadline);
     }
 }

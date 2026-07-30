@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "user_targets",
@@ -36,16 +36,16 @@ public class UserTarget {
     private Integer targetReadiness;
 
     @Column(name = "achieved_at")
-    private LocalDateTime achievedAt;
+    private Instant achievedAt;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private Instant updatedAt = Instant.now();
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 }

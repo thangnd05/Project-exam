@@ -20,6 +20,9 @@ function PlanResultPage() {
     queryKey: ['plan-result', learningPlanId, taskId],
     queryFn: () => getCurrentSession(learningPlanId, taskId, true),
     enabled: !!learningPlanId && !!taskId,
+    // Luyện lại rồi nộp tiếp phải thấy bài LẦN MỚI, không phải kết quả lần trước còn trong cache.
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const goToPicker = () => navigate(`/learning-plans/${learningPlanId}`);

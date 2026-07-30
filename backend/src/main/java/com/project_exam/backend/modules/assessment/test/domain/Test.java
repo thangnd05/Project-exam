@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.assessment.test.domain;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "tests",
@@ -33,16 +33,16 @@ public class Test {
 
     private String createdBy;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 
     // Thời gian giới hạn làm bài (null = không giới hạn)
     @Column(nullable = true)
     private Integer durationMinutes;
 
     // Khoảng thời gian mở đề (optional)
-    private LocalDateTime availableFrom;
+    private Instant availableFrom;
 
-    private LocalDateTime availableTo;
+    private Instant availableTo;
 
     @Column(length = 500) // đủ dài để chứa URL
     private String bannerUrl;
@@ -73,7 +73,7 @@ public class Test {
 
     //  Method tính trạng thái thực tế
     public TestStatus calculateStatus() {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         if (availableFrom == null && availableTo == null) {
             return TestStatus.OPEN; // luôn mở
         }

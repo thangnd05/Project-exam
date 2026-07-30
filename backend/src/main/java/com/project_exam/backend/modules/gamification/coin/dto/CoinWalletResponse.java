@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.gamification.coin.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /** 1 dòng ví xu kèm thông tin user — dùng cho bảng quản lý ở admin. */
 @Getter
@@ -15,5 +15,5 @@ public class CoinWalletResponse {
     private String fullName;
     private String email;
     private Integer balance;
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 }

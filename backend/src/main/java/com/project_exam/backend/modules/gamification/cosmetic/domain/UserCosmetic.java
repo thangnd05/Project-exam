@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /** Đồ trang trí user đã sở hữu. equipped = đang đeo (mỗi loại tối đa 1 cái equipped). */
 @Entity
 @Table(
         name = "user_cosmetics",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "cosmeticId"}),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "cosmetic_id"}),
         indexes = {
                 @Index(name = "idx_user_cosmetics_cosmetic_id", columnList = "cosmetic_id")
         }
@@ -34,5 +34,5 @@ public class UserCosmetic {
     private Boolean equipped = false;
 
     @Column(nullable = false)
-    private LocalDateTime ownedAt = LocalDateTime.now();
+    private Instant ownedAt = Instant.now();
 }

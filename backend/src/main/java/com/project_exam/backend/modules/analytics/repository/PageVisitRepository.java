@@ -8,18 +8,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Repository
 public interface PageVisitRepository extends JpaRepository<PageVisit, String> {
 
-    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    long countByCreatedAtBetween(Instant start, Instant end);
 
     /** Xoá hàng loạt các lượt xem cũ hơn :cutoff (retention) — trả về số dòng đã xoá. */
     @Modifying
     @Query("DELETE FROM PageVisit v WHERE v.createdAt < :cutoff")
-    int deleteOlderThan(@Param("cutoff") LocalDateTime cutoff);
+    int deleteOlderThan(@Param("cutoff") Instant cutoff);
 
     /**
      * (sessionKey, createdAt, userId) đã sort theo phiên rồi thời gian — để gom thành "phiên truy cập"
@@ -32,12 +32,12 @@ public interface PageVisitRepository extends JpaRepository<PageVisit, String> {
      */
     @Query("SELECT v.sessionKey, v.createdAt, v.userId FROM PageVisit v WHERE v.createdAt >= :from "
             + "ORDER BY v.sessionKey, v.createdAt")
-    List<Object[]> findSessionRowsSince(@Param("from") LocalDateTime from);
+    List<Object[]> findSessionRowsSince(@Param("from") Instant from);
 
     /** Như trên nhưng giới hạn trong khoảng [from, to) — dùng khi xem lượt truy cập của một ngày cụ thể. */
     @Query("SELECT v.sessionKey, v.createdAt, v.userId FROM PageVisit v "
             + "WHERE v.createdAt >= :from AND v.createdAt < :to ORDER BY v.sessionKey, v.createdAt")
-    List<Object[]> findSessionRowsBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+    List<Object[]> findSessionRowsBetween(@Param("from") Instant from, @Param("to") Instant to);
 
     /**
      * Quốc gia truy cập thật từ :from — (code, name, count) đã sort giảm dần.
@@ -50,5 +50,5 @@ public interface PageVisitRepository extends JpaRepository<PageVisit, String> {
             + "FROM PageVisit v WHERE v.createdAt >= :from "
             + "AND v.countryCode IS NOT NULL AND v.countryCode <> 'LO' "
             + "GROUP BY v.countryCode ORDER BY COUNT(v) DESC")
-    List<Object[]> findTopCountriesSince(@Param("from") LocalDateTime from, Pageable pageable);
+    List<Object[]> findTopCountriesSince(@Param("from") Instant from, Pageable pageable);
 }

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Đồ trang trí (khung avatar / huy hiệu) admin tạo, user đổi bằng xu.
@@ -53,5 +53,5 @@ public class Cosmetic {
     private Integer displayOrder = 0;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

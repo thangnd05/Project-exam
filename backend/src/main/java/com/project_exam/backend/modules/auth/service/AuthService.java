@@ -41,7 +41,8 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -264,7 +265,7 @@ public class AuthService {
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedAt(Instant.now());
         user.setVerified(false);
         user.setAvatarUrl("https://ui-avatars.com/api/?name=" + request.getUserName() + "&background=random&color=fff");
 
@@ -306,7 +307,7 @@ public class AuthService {
             PasswordResetToken resetToken = new PasswordResetToken();
             resetToken.setUserId(user.getUserId());
             resetToken.setToken(token);
-            resetToken.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+            resetToken.setExpiresAt(Instant.now().plus(Duration.ofMinutes(30)));
             resetToken.setUsed(false);
             passwordResetTokenRepository.save(resetToken);
             emailUtil.sendResetPasswordEmail(user.getEmail(), token);
@@ -317,7 +318,7 @@ public class AuthService {
     public AuthMessageResponse resetPassword(ResetPasswordRequest request) {
         validateNewPassword(request.getNewPassword(), request.getConfirmNewPassword());
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken()).orElseThrow(() -> new BadRequestException("Token không hợp lệ"));
-        if (Boolean.TRUE.equals(resetToken.getUsed()) || resetToken.getExpiresAt().isBefore(LocalDateTime.now())) throw new BadRequestException("Token hết hạn hoặc đã dùng");
+        if (Boolean.TRUE.equals(resetToken.getUsed()) || resetToken.getExpiresAt().isBefore(Instant.now())) throw new BadRequestException("Token hết hạn hoặc đã dùng");
         User user = userRepository.findById(resetToken.getUserId()).orElseThrow();
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

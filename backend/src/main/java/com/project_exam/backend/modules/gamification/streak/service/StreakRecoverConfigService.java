@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Quản lý cấu hình khôi phục chuỗi (giá xu + bật/tắt). Chỉ giữ 1 dòng cấu hình;
@@ -40,7 +40,7 @@ public class StreakRecoverConfigService {
                 .orElseGet(StreakRecoverConfig::new);
         config.setCostCoins(request.getCostCoins());
         config.setActive(request.getActive() == null ? Boolean.TRUE : request.getActive());
-        config.setUpdatedAt(LocalDateTime.now());
+        config.setUpdatedAt(Instant.now());
         StreakRecoverConfig saved = configRepository.save(config);
         return streakMapper.toConfigResponse(saved.getCostCoins(), saved.getActive());
     }

@@ -5,7 +5,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "password_reset_tokens", indexes = {
@@ -27,11 +27,11 @@ public class PasswordResetToken {
     private String token;
 
     @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
     @Column(nullable = false)
     private Boolean used = false;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

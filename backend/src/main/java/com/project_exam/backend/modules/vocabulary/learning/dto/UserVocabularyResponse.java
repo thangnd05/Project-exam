@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -17,6 +17,6 @@ public class UserVocabularyResponse {
     private String userId;
     private String vocabId;
     private UserVocabulary.Status status;
-    private LocalDateTime lastReviewed;
+    private Instant lastReviewed;
     private Integer correctCount;
 }

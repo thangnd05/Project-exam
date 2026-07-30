@@ -5,7 +5,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "user_streaks", indexes = {
@@ -33,5 +33,5 @@ public class UserStreak {
     private LocalDate lastActivityDate; // ngày học gần nhất (theo VN zone)
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private Instant updatedAt = Instant.now();
 }

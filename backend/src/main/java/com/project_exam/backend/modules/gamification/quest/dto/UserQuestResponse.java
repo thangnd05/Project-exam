@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.gamification.quest.domain.QuestCondition
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /** Nhiệm vụ hiển thị cho user kèm tiến độ và trạng thái nhận. */
 @Getter
@@ -20,5 +20,5 @@ public class UserQuestResponse {
     private Integer target;
     private Boolean claimed;   // đã nhận chưa
     private Boolean eligible;  // đủ điều kiện để nhận ngay không
-    private LocalDateTime endAt;
+    private Instant endAt;
 }

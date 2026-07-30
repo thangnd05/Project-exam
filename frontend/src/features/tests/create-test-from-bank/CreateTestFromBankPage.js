@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
 import { useMutation } from '@tanstack/react-query';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/shared/api/testApi';
@@ -111,8 +112,8 @@ const CreateTestFromBankPage = () => {
         durationMinutes: testInfo.durationMinutes && Number(testInfo.durationMinutes) > 0 ? Number(testInfo.durationMinutes) : null,
         maxAttempts: testInfo.maxAttempts && Number(testInfo.maxAttempts) > 0 ? Number(testInfo.maxAttempts) : null,
         bannerUrl: testInfo.bannerUrl || null,
-        availableFrom: testInfo.availableFrom ? testInfo.availableFrom + ':00' : null,
-        availableTo: testInfo.availableTo ? testInfo.availableTo + ':00' : null,
+        availableFrom: fromDateTimeLocalInput(testInfo.availableFrom),
+        availableTo: fromDateTimeLocalInput(testInfo.availableTo),
         classId: null,
         chapterId: null,
         costCoins: testInfo.costCoins && Number(testInfo.costCoins) > 0 ? Number(testInfo.costCoins) : null,

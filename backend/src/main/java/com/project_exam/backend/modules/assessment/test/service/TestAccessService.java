@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +43,7 @@ public class TestAccessService {
 
 
     public Map<String, Object> canStartTest(String userId, Test test) {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         Map<String, Object> result = new HashMap<>();
 
         if (test.getAvailableFrom() != null && test.getAvailableFrom().isAfter(now)) {
@@ -108,7 +108,7 @@ public class TestAccessService {
         UserTestAccess access = new UserTestAccess();
         access.setUserId(userId);
         access.setTestId(testId);
-        access.setPurchasedAt(LocalDateTime.now());
+        access.setPurchasedAt(Instant.now());
         userTestAccessRepository.save(access);
 
         return testService.buildUserTestSummary(test, userId);

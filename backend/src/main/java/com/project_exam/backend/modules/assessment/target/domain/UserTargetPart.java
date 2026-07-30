@@ -5,7 +5,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "user_target_parts",
@@ -42,10 +42,10 @@ public class UserTargetPart {
     private String lastUserTestId;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private Instant updatedAt = Instant.now();
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 }

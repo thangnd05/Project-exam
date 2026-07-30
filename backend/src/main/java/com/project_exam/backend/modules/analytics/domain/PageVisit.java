@@ -4,7 +4,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Một lượt xem trang (page view) do FE ping mỗi lần vào/chuyển route — nguồn dữ liệu "lượt truy cập".
@@ -49,5 +49,5 @@ public class PageVisit {
     private String country;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

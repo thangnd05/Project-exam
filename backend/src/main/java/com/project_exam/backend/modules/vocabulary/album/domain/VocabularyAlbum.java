@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.vocabulary.album.domain;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "vocabulary_album", indexes = {
@@ -26,5 +26,5 @@ public class VocabularyAlbum {
     @Column(nullable = false)
     private String userId; // FK -> users.user_id
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.users.user.domain;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -34,7 +34,7 @@ public class User {
     private String roleId;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 
     private Boolean verified = false;
     private String verificationToken;

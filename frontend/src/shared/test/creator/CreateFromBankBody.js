@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
 import { useMutation } from '@tanstack/react-query';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import { getChaptersByClass } from '~/shared/api/chapterApi';
@@ -182,8 +183,8 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         durationMinutes: testInfo.durationMinutes && Number(testInfo.durationMinutes) > 0 ? Number(testInfo.durationMinutes) : null,
         maxAttempts: testInfo.maxAttempts && Number(testInfo.maxAttempts) > 0 ? Number(testInfo.maxAttempts) : null,
         bannerUrl: testInfo.bannerUrl || null,
-        availableFrom: testInfo.availableFrom ? testInfo.availableFrom + ':00' : null,
-        availableTo: testInfo.availableTo ? testInfo.availableTo + ':00' : null,
+        availableFrom: fromDateTimeLocalInput(testInfo.availableFrom),
+        availableTo: fromDateTimeLocalInput(testInfo.availableTo),
         classId: isClassMode ? classId : null,
         chapterId: isClassMode ? (chapterId || null) : null,
         collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,

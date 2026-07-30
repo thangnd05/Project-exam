@@ -11,7 +11,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -59,11 +59,11 @@ public class ExamTypeLayoutService {
                 .orElseGet(() -> {
                     ExamTypeLayout created = new ExamTypeLayout();
                     created.setExamTypeId(examTypeId);
-                    created.setCreatedAt(LocalDateTime.now());
+                    created.setCreatedAt(Instant.now());
                     return created;
                 });
         layout.setConfig(request.getConfig());
-        layout.setUpdatedAt(LocalDateTime.now());
+        layout.setUpdatedAt(Instant.now());
         return layoutMapper.toResponse(layoutRepository.save(layout));
     }
 

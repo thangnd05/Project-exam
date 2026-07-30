@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.classroom.member.domain;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "class_members", indexes = {
@@ -32,7 +32,7 @@ public class ClassMember {
     private MemberStatus status = MemberStatus.PENDING;
 
     @Column(name = "joined_at")
-    private LocalDateTime joinedAt = LocalDateTime.now();
+    private Instant joinedAt = Instant.now();
 
     // enum trạng thái
     public enum MemberStatus {

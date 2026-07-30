@@ -62,6 +62,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import com.project_exam.backend.shared.util.AppTime;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -242,7 +245,7 @@ public class UserService {
                 .orElse(0);
 
         Double averageScore = userTestRepository.findAverageScoreByUserIdAndStatus(userId, UserTest.Status.COMPLETED);
-        LocalDateTime lastAttemptAt = userTestRepository.findTopByUserIdOrderByStartedAtDesc(userId)
+        Instant lastAttemptAt = userTestRepository.findTopByUserIdOrderByStartedAtDesc(userId)
                 .map(UserTest::getStartedAt)
                 .orElse(null);
 
@@ -305,7 +308,7 @@ public class UserService {
         java.time.LocalDateTime rangeStart = monthStart.isBefore(yearStart) ? monthStart : yearStart;
         java.time.LocalDateTime rangeEnd = monthEnd.isAfter(yearEnd) ? monthEnd : yearEnd;
 
-        List<UserTest> attempts = userTestRepository.findByUserIdAndStartedAtRange(userId, rangeStart, rangeEnd);
+        List<UserTest> attempts = userTestRepository.findByUserIdAndStartedAtRange(userId, AppTime.instant(rangeStart), AppTime.instant(rangeEnd));
 
         // Thời lượng tối đa từng đề để chặn trường hợp mở bài rồi bỏ đó (elapsed bị thổi phồng).
         java.util.Map<String, Integer> durationByTestId = new java.util.HashMap<>();
@@ -321,7 +324,7 @@ public class UserService {
         for (UserTest ut : attempts) {
             long mins = elapsedMinutes(ut, durationByTestId.get(ut.getTestId()));
             if (mins <= 0) continue;
-            java.time.LocalDateTime started = ut.getStartedAt();
+            java.time.LocalDateTime started = AppTime.local(ut.getStartedAt());
             if (started.getYear() == year) {
                 minutesByMonthOfYear[started.getMonthValue()] += mins;
             }
@@ -355,8 +358,8 @@ public class UserService {
         }
 
         // Danh sách tháng/năm có thể chọn: từ thời điểm làm bài sớm nhất tới hiện tại (mới nhất trước).
-        java.time.LocalDateTime earliest = userTestRepository.findEarliestStartedAt(userId);
-        java.time.YearMonth fromMonth = earliest != null ? java.time.YearMonth.from(earliest) : currentMonth;
+        java.time.Instant earliest = userTestRepository.findEarliestStartedAt(userId);
+        java.time.YearMonth fromMonth = earliest != null ? AppTime.yearMonth(earliest) : currentMonth;
         if (month.isBefore(fromMonth)) fromMonth = month;
         List<String> availableMonths = new java.util.ArrayList<>();
         for (java.time.YearMonth ym = currentMonth; !ym.isBefore(fromMonth); ym = ym.minusMonths(1)) {

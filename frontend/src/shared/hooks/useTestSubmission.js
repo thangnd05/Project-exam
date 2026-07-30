@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
 import { createTest } from '~/shared/api/testApi';
 import { createTestPart } from '~/shared/api/testPartApi';
 import {
@@ -122,12 +123,8 @@ export const useTestSubmission = ({
                             ? Number(testInfo.maxAttempts)
                             : null,
                     bannerUrl: testInfo.bannerUrl || null,
-                    availableFrom: testInfo.availableFrom
-                        ? testInfo.availableFrom + ':00'
-                        : null,
-                    availableTo: testInfo.availableTo
-                        ? testInfo.availableTo + ':00'
-                        : null,
+                    availableFrom: fromDateTimeLocalInput(testInfo.availableFrom),
+                    availableTo: fromDateTimeLocalInput(testInfo.availableTo),
                     classId: mode === 'class' ? String(classId) : null,
                     chapterId: mode === 'class' ? String(chapterId) : null,
 

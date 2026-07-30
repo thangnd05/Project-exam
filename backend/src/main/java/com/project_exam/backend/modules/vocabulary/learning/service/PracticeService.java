@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -123,7 +123,7 @@ public class PracticeService {
 
         uv.setStatus(UserVocabulary.Status.mastered);
         uv.setCorrectCount(5);
-        uv.setLastReviewed(LocalDateTime.now());
+        uv.setLastReviewed(Instant.now());
 
         userVocabularyRepository.save(uv);
 
@@ -162,7 +162,7 @@ public class PracticeService {
             uv.setStatus(UserVocabulary.Status.learning);
         }
 
-        uv.setLastReviewed(LocalDateTime.now());
+        uv.setLastReviewed(Instant.now());
         userVocabularyRepository.save(uv);
 
         // Luyện từ vựng -> ghi nhận streak (side-effect, không phá luồng)

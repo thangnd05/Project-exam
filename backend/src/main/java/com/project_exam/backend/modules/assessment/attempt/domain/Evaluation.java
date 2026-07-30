@@ -2,11 +2,17 @@ package com.project_exam.backend.modules.assessment.attempt.domain;
 
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "evaluation",
         indexes = {
@@ -28,6 +34,6 @@ public class Evaluation {
     @Column(nullable = false)
     private Integer rating;
 
-    @Column(name = "createdAt")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at")
+    private Instant createdAt = Instant.now();
 }

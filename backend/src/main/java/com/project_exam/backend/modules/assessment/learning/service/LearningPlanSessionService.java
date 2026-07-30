@@ -23,6 +23,7 @@ import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
 import com.project_exam.backend.modules.gamification.streak.service.StreakService;
+import com.project_exam.backend.shared.util.AfterCommitTasks;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -353,12 +354,10 @@ public class LearningPlanSessionService {
         session.setSubmittedAt(Instant.now());
         sessionRepository.save(session);
 
-        // Pass 1 ải learning plan -> ghi nhận streak (side-effect, không phá luồng)
+        // Pass 1 ải learning plan -> ghi nhận streak (side-effect, không phá luồng nộp bài)
         if (passed) {
-            try {
-                streakService.recordActivity(userId, StreakActivityType.LESSON_PASS);
-            } catch (Exception ignored) {
-            }
+            AfterCommitTasks.runQuietly(
+                    () -> streakService.recordActivity(userId, StreakActivityType.LESSON_PASS));
         }
 
         String taskStatus = null;
@@ -384,7 +383,11 @@ public class LearningPlanSessionService {
                 task.setStatus(TaskStatus.ACTIVE);
                 taskStatus = TaskStatus.ACTIVE.name();
             }
-            int consecutiveFails = countConsecutiveFails(learningPlanId, task.getTaskId());
+            // Ải đang ở trạng thái đã vượt thì không tính chuỗi trượt (tránh gắn nhãn "Đang bí"
+            // cho ải đã PASSED chỉ vì luyện lại chưa đạt).
+            int consecutiveFails = taskPassed
+                    ? 0
+                    : countConsecutiveFails(learningPlanId, task.getTaskId());
             task.setConsecutiveFails(consecutiveFails);
             task.setPriorityScore(PlanPrioritySupport.recomputePriorityAfterSession(
                     task.getWrongCountAtDiagnosis(),

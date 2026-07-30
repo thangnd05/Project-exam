@@ -3,6 +3,7 @@ import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.util.AfterCommitTasks;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
 import com.project_exam.backend.modules.gamification.streak.service.StreakService;
@@ -66,7 +67,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -144,14 +145,12 @@ public class UserTestService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã được nộp");
         }
 
-        userTest.setFinishedAt(LocalDateTime.now());
+        userTest.setFinishedAt(Instant.now());
         userTest.setStatus(UserTest.Status.COMPLETED); // Cập nhật trạng thái đã nộp
 
         // Ghi nhận streak (side-effect, không được làm hỏng luồng nộp bài)
-        try {
-            streakService.recordActivity(currentUserId, StreakActivityType.TEST_SUBMIT);
-        } catch (Exception ignored) {
-        }
+        AfterCommitTasks.runQuietly(
+                () -> streakService.recordActivity(currentUserId, StreakActivityType.TEST_SUBMIT));
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {
@@ -192,19 +191,19 @@ public class UserTestService {
         if (examTypeId == null || userTest.getUserId() == null) {
             return;
         }
-        try {
-            if (userTargetRepository.findByUserIdAndExamTypeId(userTest.getUserId(), examTypeId).isEmpty()) {
+        String userId = userTest.getUserId();
+        String userTestId = userTest.getUserTestId();
+        Instant finishedAt = userTest.getFinishedAt();
+        // Chạy sau commit: đọc đúng bài đã chốt điểm, và lỗi đồng bộ không kéo đổ việc nộp bài.
+        AfterCommitTasks.runQuietly(() -> {
+            if (userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId).isEmpty()) {
                 return;
             }
-            EnhancedResultDto result = enhancedResultService.getEnhancedResult(
-                    userTest.getUserTestId(), userTest.getUserId());
+            EnhancedResultDto result = enhancedResultService.getEnhancedResult(userTestId, userId);
             userTargetProgressService.syncPartScoresFromMock(
-                    userTest.getUserId(), examTypeId, userTest.getUserTestId(),
-                    userTest.getFinishedAt(), result);
-            userTargetProgressService.markTargetAchievedIfMet(
-                    userTest.getUserId(), examTypeId, result);
-        } catch (Exception ignored) {
-        }
+                    userId, examTypeId, userTestId, finishedAt, result);
+            userTargetProgressService.markTargetAchievedIfMet(userId, examTypeId, result);
+        });
     }
 
     /** Tổng số câu của các Part được luyện (mẫu số chấm % cho mode PRACTICE). */
@@ -496,7 +495,7 @@ public class UserTestService {
         UserTest newTest = new UserTest();
         newTest.setUserId(userId);
         newTest.setTestId(testId);
-        newTest.setStartedAt(LocalDateTime.now());
+        newTest.setStartedAt(Instant.now());
         newTest.setStatus(UserTest.Status.IN_PROGRESS);
         newTest.setTotalScore(0);
         newTest.setMode(mode);
@@ -594,7 +593,7 @@ public class UserTestService {
         newTest.setUserId(null);
         newTest.setGuestSessionId(guestSessionId);
         newTest.setTestId(testId);
-        newTest.setStartedAt(LocalDateTime.now());
+        newTest.setStartedAt(Instant.now());
         newTest.setStatus(UserTest.Status.IN_PROGRESS);
         newTest.setTotalScore(0);
         return userTestRepository.save(newTest);
@@ -612,7 +611,7 @@ public class UserTestService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã được nộp");
         }
 
-        userTest.setFinishedAt(LocalDateTime.now());
+        userTest.setFinishedAt(Instant.now());
         userTest.setStatus(UserTest.Status.COMPLETED);
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
@@ -686,7 +685,7 @@ public class UserTestService {
      */
     @Transactional
     public int purgeAbandonedUntimed(long thresholdHours, int batchSize) {
-        LocalDateTime cutoff = LocalDateTime.now().minusHours(thresholdHours);
+        Instant cutoff = Instant.now().minus(Duration.ofHours(thresholdHours));
         List<UserTest> abandoned = userTestRepository.findAbandonedUntimed(
                 UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE, cutoff,
                 org.springframework.data.domain.PageRequest.of(0, batchSize));

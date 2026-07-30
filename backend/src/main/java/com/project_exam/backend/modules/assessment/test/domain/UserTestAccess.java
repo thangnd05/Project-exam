@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /** Quyền làm bài user đã mua bằng xu (mua 1 lần, mở khoá vĩnh viễn). */
 @Entity
 @Table(
         name = "user_test_accesses",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "testId"}),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "test_id"}),
         indexes = {
                 @Index(name = "idx_user_test_accesses_test_id", columnList = "test_id")
         }
@@ -31,5 +31,5 @@ public class UserTestAccess {
     private String testId;
 
     @Column(nullable = false)
-    private LocalDateTime purchasedAt = LocalDateTime.now();
+    private Instant purchasedAt = Instant.now();
 }

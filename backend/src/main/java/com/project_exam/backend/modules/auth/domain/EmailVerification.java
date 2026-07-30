@@ -5,7 +5,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "email_verifications", indexes = {
@@ -24,8 +24,8 @@ public class EmailVerification {
     private String userId;
 
     private String token;
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
     private String status = "PENDING";
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 
 }

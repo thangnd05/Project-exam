@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -119,7 +119,7 @@ public class CosmeticService {
         owned.setUserId(userId);
         owned.setCosmeticId(cosmeticId);
         owned.setEquipped(false);
-        owned.setOwnedAt(LocalDateTime.now());
+        owned.setOwnedAt(Instant.now());
         userCosmeticRepository.save(owned);
 
         return cosmeticMapper.toResponse(cosmetic, true, false);
@@ -176,7 +176,7 @@ public class CosmeticService {
     public CosmeticResponse create(CosmeticRequest request) {
         Cosmetic cosmetic = new Cosmetic();
         applyRequest(cosmetic, request);
-        cosmetic.setCreatedAt(LocalDateTime.now());
+        cosmetic.setCreatedAt(Instant.now());
         return cosmeticMapper.toResponse(cosmeticRepository.save(cosmetic), null, null);
     }
 

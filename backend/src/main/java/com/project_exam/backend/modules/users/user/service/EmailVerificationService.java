@@ -13,7 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,7 +38,7 @@ public class EmailVerificationService {
         }
         try {
             String token = UUID.randomUUID().toString();
-            LocalDateTime expiry = LocalDateTime.now().plusHours(24);
+            Instant expiry = Instant.now().plus(Duration.ofHours(24));
 
             EmailVerification verification = new EmailVerification();
             verification.setUserId(user.getUserId()); //  dùng userId thay vì user entity
@@ -78,7 +79,7 @@ public class EmailVerificationService {
         }
 
         // ⏰ Kiểm tra token hết hạn
-        if (ev.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (ev.getExpiresAt().isBefore(Instant.now())) {
             ev.setStatus("EXPIRED");
             emailVerificationRepository.save(ev);
 
@@ -112,7 +113,7 @@ public class EmailVerificationService {
      * Dọn dẹp user chưa xác thực sau khi token hết hạn
      */
     public void cleanExpiredVerifications() {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         List<EmailVerification> expired = emailVerificationRepository
                 .findAllByExpiresAtBeforeAndStatus(now, "PENDING");
 

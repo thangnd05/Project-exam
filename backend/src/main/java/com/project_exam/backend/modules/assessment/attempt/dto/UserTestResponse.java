@@ -1,7 +1,7 @@
 package com.project_exam.backend.modules.assessment.attempt.dto;
 
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -16,8 +16,8 @@ public class UserTestResponse {
     private String testId;     // thêm
     private String testTitle;  // thêm — tên bài kiểm tra để FE hiển thị (vd dropdown chọn bài)
     private String examTypeId; // thêm — để FE lọc mock theo kỳ thi
-    private LocalDateTime startedAt;
-    private LocalDateTime finishedAt;
+    private Instant startedAt;
+    private Instant finishedAt;
     private Integer totalScore;
     private String status;
     private String mode; // FULL_TEST | PRACTICE (null dữ liệu cũ = FULL_TEST)

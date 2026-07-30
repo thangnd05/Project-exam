@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /** Tạo/cập nhật nhiệm vụ (admin). */
 @Data
@@ -26,8 +26,8 @@ public class QuestRequest {
     @PositiveOrZero(message = "Mục tiêu không được âm")
     private Integer conditionTarget;
 
-    private LocalDateTime startAt;
-    private LocalDateTime endAt;
+    private Instant startAt;
+    private Instant endAt;
 
     private Boolean active;
 }

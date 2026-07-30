@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -63,7 +63,7 @@ public class ChapterService {
         chapter.setClassId(request.getClassId());
         chapter.setTitle(request.getTitle());
         chapter.setDescription(request.getDescription());
-        chapter.setCreatedAt(LocalDateTime.now());
+        chapter.setCreatedAt(Instant.now());
 
         Chapter saved = chapterRepository.save(chapter);
 

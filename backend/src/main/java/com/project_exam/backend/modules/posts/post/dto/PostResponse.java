@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.gamification.cosmetic.dto.CosmeticRespon
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public class PostResponse {
     private String title;
     private String content;
     private Post.PostStatus status;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     private String thumbnailUrl;
 
     private List<CategoryResponse> categories;

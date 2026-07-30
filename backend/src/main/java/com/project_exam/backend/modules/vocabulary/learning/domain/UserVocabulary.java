@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.vocabulary.learning.domain;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "user_vocabulary", indexes = {
@@ -28,7 +28,7 @@ public class UserVocabulary {
     @Enumerated(EnumType.STRING)
     private Status status = Status.learning;
 
-    private LocalDateTime lastReviewed = LocalDateTime.now();
+    private Instant lastReviewed = Instant.now();
     private int correctCount = 0; // số lần trả lời đúng liên tiếp
 
     public UserVocabulary(String currentUserId, String vocabId) {

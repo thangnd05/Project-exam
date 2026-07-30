@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.assessment.attempt.domain;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "user_tests",
@@ -32,9 +32,9 @@ public class UserTest {
     private String testId; // FK -> tests.test_id
 
     @Column(nullable = false)
-    private LocalDateTime startedAt = LocalDateTime.now();
+    private Instant startedAt = Instant.now();
 
-    private LocalDateTime finishedAt;
+    private Instant finishedAt;
 
     private Integer totalScore = 0;
 

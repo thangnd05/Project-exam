@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -18,5 +18,5 @@ public class ExamCategoryResponse {
     private String description;
     private Boolean guestAllowed;
     private Integer displayOrder;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

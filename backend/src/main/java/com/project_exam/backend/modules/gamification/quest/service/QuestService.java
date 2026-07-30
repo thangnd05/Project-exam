@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +37,7 @@ public class QuestService {
     /** Nhiệm vụ user nhìn thấy: đang bật + trong thời gian hiệu lực (ẩn hết hạn / chưa mở). */
     @Transactional(readOnly = true)
     public List<UserQuestResponse> getAvailableForUser(String userId) {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         Set<String> claimedQuestIds = claimRepository.findByUserId(userId).stream()
                 .map(UserQuestClaim::getQuestId)
                 .collect(Collectors.toSet());
@@ -54,7 +54,7 @@ public class QuestService {
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new NotFoundException("Nhiệm vụ không tồn tại"));
 
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         if (Boolean.FALSE.equals(quest.getActive())) {
             throw new BadRequestException("Nhiệm vụ chưa được mở");
         }
@@ -98,7 +98,7 @@ public class QuestService {
     public QuestResponse create(QuestRequest request) {
         Quest quest = new Quest();
         applyRequest(quest, request);
-        quest.setCreatedAt(LocalDateTime.now());
+        quest.setCreatedAt(Instant.now());
         return toAdminResponse(questRepository.save(quest));
     }
 
@@ -131,7 +131,7 @@ public class QuestService {
         quest.setActive(request.getActive() == null ? true : request.getActive());
     }
 
-    private boolean isVisible(Quest quest, LocalDateTime now) {
+    private boolean isVisible(Quest quest, Instant now) {
         if (Boolean.FALSE.equals(quest.getActive())) return false;
         if (quest.getStartAt() != null && now.isBefore(quest.getStartAt())) return false;
         if (quest.getEndAt() != null && now.isAfter(quest.getEndAt())) return false;

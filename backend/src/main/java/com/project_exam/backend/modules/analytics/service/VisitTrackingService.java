@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -38,14 +39,14 @@ public class VisitTrackingService {
                 .ipAddress(trim(ipAddress, 45))
                 .countryCode(country.code())
                 .country(trim(country.name(), 100))
-                .createdAt(LocalDateTime.now())
+                .createdAt(Instant.now())
                 .build());
     }
 
     /** Xoá các lượt xem cũ hơn {@code days} ngày (retention) — tránh bảng page_visits phình vô hạn. */
     @Transactional
     public int purgeOlderThan(int days) {
-        return pageVisitRepository.deleteOlderThan(LocalDateTime.now().minusDays(days));
+        return pageVisitRepository.deleteOlderThan(Instant.now().minus(Duration.ofDays(days)));
     }
 
     private String trim(String value, int max) {

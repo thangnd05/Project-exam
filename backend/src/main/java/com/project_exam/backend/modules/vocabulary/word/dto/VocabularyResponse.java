@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -22,6 +22,6 @@ public class VocabularyResponse {
     private String albumDesc;   // thêm để biết mô tả album (optional)
 
     private String voiceUrl;   // thêm field này
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }
 

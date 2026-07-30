@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -16,7 +16,7 @@ public class VocabularyAlbumResponse {
     private String name;
     private String description;
     private String userId;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     // Tiến độ học của người dùng hiện tại (chỉ set ở API "album của tôi")
     private int totalWords;

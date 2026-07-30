@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Cấu hình khôi phục chuỗi ngày: giá xu + bật/tắt. Chỉ giữ 1 dòng (singleton),
@@ -28,5 +28,5 @@ public class StreakRecoverConfig {
     private Boolean active = true;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private Instant updatedAt = Instant.now();
 }

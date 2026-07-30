@@ -71,7 +71,7 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
             + "ORDER BY ut.startedAt ASC")
     List<UserTest> findAbandonedUntimed(@Param("status") UserTest.Status status,
                                         @Param("practiceMode") UserTest.Mode practiceMode,
-                                        @Param("cutoff") java.time.LocalDateTime cutoff,
+                                        @Param("cutoff") java.time.Instant cutoff,
                                         org.springframework.data.domain.Pageable pageable);
 
     List<UserTest> findByUserIdAndTestId(String userId, String testId);
@@ -97,16 +97,16 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     @Query("SELECT ut FROM UserTest ut WHERE ut.userId = :userId "
             + "AND ut.startedAt >= :start AND ut.startedAt < :end ORDER BY ut.startedAt ASC")
     List<UserTest> findByUserIdAndStartedAtRange(@Param("userId") String userId,
-                                                 @Param("start") java.time.LocalDateTime start,
-                                                 @Param("end") java.time.LocalDateTime end);
+                                                 @Param("start") java.time.Instant start,
+                                                 @Param("end") java.time.Instant end);
 
     /** Mốc bắt đầu sớm nhất của user — để dựng danh sách tháng có thể chọn. */
     @Query("SELECT MIN(ut.startedAt) FROM UserTest ut WHERE ut.userId = :userId")
-    java.time.LocalDateTime findEarliestStartedAt(@Param("userId") String userId);
+    java.time.Instant findEarliestStartedAt(@Param("userId") String userId);
 
     /** Mốc bắt đầu sớm nhất toàn hệ thống — dựng danh sách năm chọn cho biểu đồ hiệu suất. */
     @Query("SELECT MIN(ut.startedAt) FROM UserTest ut")
-    java.time.LocalDateTime findEarliestStartedAt();
+    java.time.Instant findEarliestStartedAt();
 
     long countByTestIdAndStatusAndTotalScoreLessThanEqual(String testId, UserTest.Status status, Integer score);
 
@@ -140,7 +140,7 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
 
     /** (startedAt, totalScore, status) từ mốc :from — dựng biểu đồ hiệu suất theo tháng. */
     @Query("SELECT ut.startedAt, ut.totalScore, ut.status FROM UserTest ut WHERE ut.startedAt >= :from")
-    List<Object[]> findAttemptsSince(@Param("from") java.time.LocalDateTime from);
+    List<Object[]> findAttemptsSince(@Param("from") java.time.Instant from);
 
     /**
      * Bài thi CÔNG KHAI (không thuộc lớp) làm nhiều nhất ở chế độ FULL_TEST:

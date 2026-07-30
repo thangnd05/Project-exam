@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import java.util.Locale;
@@ -44,18 +44,12 @@ public class ClassService {
     public ClassResponse createClass(ClassRequest request, HttpServletRequest httpRequest) {
         String currentUserId = authUtils.getUserId(httpRequest);
 
-        String randomId;
-        do {
-            randomId = UUID.randomUUID().toString();
-        } while (classRepository.existsById(randomId));
-
         ClassEntity clazz = ClassEntity.builder()
-                .classId(randomId)
                 .className(request.getClassName())
                 .classQr(generateUniqueClassQr())
                 .description(request.getDescription())
                 .teacherId(currentUserId)
-                .createdAt(LocalDateTime.now())
+                .createdAt(Instant.now())
                 .build();
 
         clazz = classRepository.save(clazz);

@@ -64,6 +64,10 @@ function PlanStudyPage() {
       : getCurrentSession(learningPlanId)),
     enabled: !!learningPlanId,
     retry: false,
+    // Không giữ cache: rời trang rồi quay lại phải hỏi server lại phiên hiện tại.
+    // Nếu cache, sau khi nộp xong mà mở lại ải sẽ thấy phiên CŨ (đã nộp) và bấm nộp lần nữa bị 400.
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const session = sessionQuery.data ?? null;
@@ -74,25 +78,35 @@ function PlanStudyPage() {
     : null;
   const error = formError || loadError;
 
-  // Reset khi đổi ải, đồng thời khôi phục đáp án đã lưu (F5).
+  // Khôi phục đáp án đã lưu khi F5 — chỉ nhận nếu đúng phiên đang mở, vì lần luyện mới
+  // của cùng một ải bốc bộ câu khác, khôi phục nhầm sẽ thấy câu tự dưng đã được chọn.
   useEffect(() => {
     setFormError(null);
+    const sessionId = session?.sessionId;
+    if (!sessionId) {
+      setSelections({});
+      return;
+    }
     try {
-      const saved = sessionStorage.getItem(answersStorageKey);
-      setSelections(saved ? JSON.parse(saved) : {});
+      const saved = JSON.parse(sessionStorage.getItem(answersStorageKey) || 'null');
+      setSelections(saved?.sessionId === sessionId ? saved.selections || {} : {});
     } catch {
       setSelections({});
     }
-  }, [learningPlanId, taskIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [answersStorageKey, session?.sessionId]);
 
   // Lưu đáp án mỗi khi thay đổi, để F5 không mất.
   useEffect(() => {
+    if (!session?.sessionId) return;
     try {
-      sessionStorage.setItem(answersStorageKey, JSON.stringify(selections));
+      sessionStorage.setItem(
+        answersStorageKey,
+        JSON.stringify({ sessionId: session.sessionId, selections }),
+      );
     } catch {
       /* bỏ qua nếu storage đầy/không dùng được */
     }
-  }, [selections, answersStorageKey]);
+  }, [selections, answersStorageKey, session?.sessionId]);
 
   const goToPicker = () => {
     navigate(`/learning-plans/${learningPlanId}`);

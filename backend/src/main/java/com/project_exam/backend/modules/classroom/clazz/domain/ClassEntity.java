@@ -1,8 +1,9 @@
 package com.project_exam.backend.modules.classroom.clazz.domain;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "classes", indexes = {
@@ -16,8 +17,9 @@ import java.time.LocalDateTime;
 public class ClassEntity {
 
     @Id
+    @UuidV7
     @Column(name = "class_id", nullable = false)
-    private String classId; // bạn sẽ tự sinh random ID trong service
+    private String classId;
 
     @Column(name = "class_name", nullable = false, length = 100)
     private String className;
@@ -32,5 +34,5 @@ public class ClassEntity {
     private String teacherId; // FK -> users.user_id
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

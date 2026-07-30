@@ -1,7 +1,7 @@
 package com.project_exam.backend.modules.assessment.test.dto;
 
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -16,11 +16,11 @@ public class TestAdminResponse {
     private String examCategoryId;
     private String collectionId;
     private String createdBy;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     private String bannerUrl;
     private Integer durationMinutes;
-    private LocalDateTime availableFrom;
-    private LocalDateTime availableTo;
+    private Instant availableFrom;
+    private Instant availableTo;
     private String status;
     private Integer maxAttempts;
     private Long totalAttempts;

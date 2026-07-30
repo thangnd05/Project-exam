@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -21,6 +21,6 @@ public class UserTargetResponse {
     private String examTypeId;
     private Integer targetScore;
     private Integer targetReadiness;
-    private LocalDateTime achievedAt;
+    private Instant achievedAt;
     private List<UserTargetPartResponse> partRequirements;
 }

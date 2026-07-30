@@ -42,7 +42,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -247,7 +247,7 @@ public class UserAnswerService {
         Integer durationMinutes = testRepository.findById(userTest.getTestId())
                 .map(Test::getDurationMinutes)
                 .orElse(null);
-        if (AttemptTimeUtil.isExpired(userTest, durationMinutes, LocalDateTime.now())) {
+        if (AttemptTimeUtil.isExpired(userTest, durationMinutes, Instant.now())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Đã hết giờ làm bài, không thể sửa đáp án");
         }

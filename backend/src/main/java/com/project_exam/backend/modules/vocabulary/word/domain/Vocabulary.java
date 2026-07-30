@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.vocabulary.word.domain;
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "vocabulary", indexes = {
@@ -33,6 +33,6 @@ public class Vocabulary {
 
     private String voiceUrl; // URL audio pronunciation
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 
 }
