@@ -22,7 +22,7 @@ function DefaultLayout({
 
   return (
     <div className={cx('wrapper', {examWrapper: examMode, hasMobileNav: showMobileNav})}>
-      <Header />
+      {!examMode && <Header />}
 
       <main className={cx('main', {examMode, flushTop})}>
         {examMode ? (

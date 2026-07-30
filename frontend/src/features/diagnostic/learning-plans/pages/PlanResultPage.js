@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
@@ -15,7 +14,6 @@ const cx = classNames.bind(styles);
 function PlanResultPage() {
   const { learningPlanId, taskId } = useParams();
   const navigate = useNavigate();
-  const [showReview, setShowReview] = useState(true);
 
   const query = useQuery({
     queryKey: ['plan-result', learningPlanId, taskId],
@@ -67,8 +65,6 @@ function PlanResultPage() {
     <div className={cx('wrapper', 'studyWide')}>
       <PlanResultView
         result={result}
-        showReview={showReview}
-        onToggleReview={() => setShowReview((prev) => !prev)}
         onRetry={retry}
         onPickAnother={goToPicker}
       />

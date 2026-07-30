@@ -1666,7 +1666,7 @@
 .reviewTitle {
   font-size: 2.6rem;
   font-weight: var(--font-weight-bold);
-  margin: 2.4rem 0 2rem;
+  margin: 0 0 0.6rem;
   color: var(--dark-color, #0f172a);
   position: relative;
   padding-left: 1.5rem;
@@ -1681,6 +1681,184 @@
     height: 2.8rem;
     background: var(--primary-gradient, linear-gradient(135deg, var(--primary), var(--hover-accent)));
     border-radius: 10px;
+  }
+}
+
+.planReviewWithFooter {
+  padding-bottom: 100px;
+}
+
+.planReviewTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.6rem;
+}
+
+.planReviewMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.2rem;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.planReviewStatus {
+  font-weight: var(--font-weight-bold);
+
+  &.passed {
+    color: #059669;
+  }
+
+  &.failed {
+    color: var(--author-tag-text, #c2410c);
+  }
+}
+
+.reviewTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1.6rem;
+}
+
+.reviewTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &.active {
+    border-color: var(--primary);
+    background: var(--primary-alpha-10);
+    color: var(--primary);
+  }
+}
+
+.reviewTabCount {
+  min-width: 2rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--input-bg, #f1f5f9);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+
+  .reviewTab.active & {
+    background: var(--primary-alpha-15);
+  }
+}
+
+.reviewNavAside {
+  @media (max-width: 991px) {
+    order: -1;
+  }
+}
+
+.reviewNavCard {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.6rem 1.8rem;
+}
+
+.reviewNavHeader {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+  color: var(--primary);
+  margin-bottom: 1.2rem;
+}
+
+.reviewNavGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.4rem, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.reviewNavItem {
+  height: 4rem;
+  border-radius: 0.8rem;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  &.correct {
+    background: #ecfdf5;
+    border-color: #10b981;
+    color: #059669;
+  }
+
+  &.incorrect {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #dc2626;
+  }
+
+  &.unanswered {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #64748b;
+  }
+}
+
+.reviewNavLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.reviewDot {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 0.3rem;
+  display: inline-block;
+
+  &.correct {
+    background: #10b981;
+  }
+
+  &.incorrect {
+    background: #ef4444;
+  }
+
+  &.unanswered {
+    background: #cbd5e1;
   }
 }
 
@@ -1778,15 +1956,16 @@
   margin-top: 1.4rem;
   padding: 1.2rem 1.6rem;
   border-radius: 10px;
-  border: 1px solid var(--author-tag-border);
-  background: var(--author-tag-bg);
-  color: var(--author-tag-text);
+  border: 1px solid var(--primary-alpha-20, rgba(13, 148, 136, 0.2));
+  background: var(--brand-50, #f0fdfa);
+  color: var(--text-color, #0f172a);
   white-space: pre-wrap;
   line-height: 1.6;
   font-size: var(--font-size-md);
 
   strong {
     font-weight: 800;
+    color: var(--brand-700, #0f766e);
   }
 }
 
