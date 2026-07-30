@@ -5,12 +5,18 @@ import com.project_exam.backend.modules.assessment.learning.domain.PlanTaskType;
 import com.project_exam.backend.modules.assessment.learning.domain.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface LearningPlanTaskRepository extends JpaRepository<LearningPlanTask, String> {
 
     List<LearningPlanTask> findByLearningPlanIdOrderByTaskOrderAsc(String learningPlanId);
+
+    /** Ải của nhiều plan trong 1 query — dùng cho danh sách lộ trình (tránh N+1). */
+    List<LearningPlanTask> findByLearningPlanIdInOrderByTaskOrderAsc(Collection<String> learningPlanIds);
+
+    long countByLearningPlanId(String learningPlanId);
 
     List<LearningPlanTask> findByLearningPlanIdAndExamPartIdOrderByTaskOrderAsc(
             String learningPlanId, String examPartId);

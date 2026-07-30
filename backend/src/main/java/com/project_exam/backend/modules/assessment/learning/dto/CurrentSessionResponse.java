@@ -34,6 +34,8 @@ public class CurrentSessionResponse {
     private Integer totalTasks;
     private Integer passedTasks;
     private String message;
+    /** Cảnh báo cần nhấn mạnh cho user (ải bị bỏ qua vì kho câu rỗng...) — FE hiện dạng alert. */
+    private String notice;
     private List<PlanPartGroupDto> partGroups;
     private List<PlanTaskDto> tasks;
     private List<SubmitSessionResponse.ReviewItem> lastReviewItems;

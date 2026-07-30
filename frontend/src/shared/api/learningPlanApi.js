@@ -10,8 +10,11 @@ export const getPlanById = (learningPlanId) => {
   return axios.get(`${BASE_URL}/${learningPlanId}`).then((res) => res.data);
 };
 
+/** Bỏ trống examTypeId = lấy lộ trình của tất cả kỳ thi trong 1 request. */
 export const listPlans = (examTypeId) => {
-  return axios.get(BASE_URL, { params: { examTypeId } }).then((res) => res.data);
+  return axios
+    .get(BASE_URL, { params: examTypeId ? { examTypeId } : undefined })
+    .then((res) => res.data);
 };
 
 export const getCurrentSession = (learningPlanId, taskId, includeReview = false) => {

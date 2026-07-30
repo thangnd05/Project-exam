@@ -19,6 +19,9 @@ import {
 
 const cx = classNames.bind(styles);
 
+/** Bài luyện theo Part chỉ chấm các Part đã chọn -> chẩn đoán không phủ hết đề. */
+const isPracticeAttempt = (userTest) => (userTest?.practicePartIds?.length ?? 0) > 0;
+
 function GeneratePlanPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -254,9 +257,16 @@ function GeneratePlanPage() {
                     <option key={t.userTestId} value={t.userTestId}>
                       {t.testTitle ? `${t.testTitle} — ` : ''}
                       {formatDate(t.finishedAt)} · Điểm {t.totalScore ?? '—'}
+                      {isPracticeAttempt(t) ? ' · Luyện theo Part' : ''}
                     </option>
                   ))}
                 </select>
+              )}
+              {isPracticeAttempt(selectedTest) && (
+                <small className={cx('warningText')}>
+                  Bài này chỉ luyện một phần đề nên lộ trình sinh ra chỉ phủ các Part đã luyện.
+                  Muốn lộ trình đầy đủ, hãy chọn một bài thi thử trọn đề.
+                </small>
               )}
               </div>
             </div>
@@ -319,6 +329,14 @@ function GeneratePlanPage() {
               <div className={cx('alert')}>
                 Lộ trình này chẩn đoán từ một <strong>bài thử thách nhanh</strong>. Ôn xong các ải,
                 hãy làm một <strong>bài thi thử đầy đủ</strong> để chẩn đoán chính xác hơn.
+              </div>
+            )}
+
+            {result.diagnosisSourcePractice && (
+              <div className={cx('alert', 'alertWarning')}>
+                Lộ trình này chẩn đoán từ một <strong>bài luyện theo Part</strong> nên chỉ phủ các
+                Part đã luyện. Làm một <strong>bài thi thử trọn đề</strong> rồi sinh lại để có lộ
+                trình cho toàn bộ kỳ thi.
               </div>
             )}
 

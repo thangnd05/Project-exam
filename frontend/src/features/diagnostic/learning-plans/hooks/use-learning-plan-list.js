@@ -20,21 +20,12 @@ async function fetchPlanList({ loadAll, filterExamTypeId }) {
   let merged = [];
 
   if (loadAll) {
-    const lists = await Promise.all(
-      types.map((et) => listPlans(et.examTypeId).catch(() => [])),
-    );
-    const seen = new Set();
-    merged = lists
-      .flat()
-      .map((p) => ({
-        ...p,
-        examTypeName: nameById[p.examTypeId] || p.examTypeId,
-      }))
-      .filter((p) => {
-        if (seen.has(p.learningPlanId)) return false;
-        seen.add(p.learningPlanId);
-        return true;
-      });
+    // BE trả lộ trình của mọi kỳ thi trong 1 lần gọi (trước đây gọi lặp theo từng examType).
+    const all = await listPlans().catch(() => []);
+    merged = (all || []).map((p) => ({
+      ...p,
+      examTypeName: nameById[p.examTypeId] || p.examTypeId,
+    }));
   } else {
     const id = filterExamTypeId || types[0]?.examTypeId;
     if (!id) {

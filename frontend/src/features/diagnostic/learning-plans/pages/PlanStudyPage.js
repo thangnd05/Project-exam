@@ -185,6 +185,9 @@ function PlanStudyPage() {
         </div>
 
         {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
+        {session.notice && (
+          <div className={cx('alert', 'alertWarning')}>{session.notice}</div>
+        )}
 
         <div className={cx('card')}>
           <div className={cx('cardBody')}>

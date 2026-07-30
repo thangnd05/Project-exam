@@ -43,6 +43,12 @@ public class PlanResponse {
      */
     private String diagnosisSourceCategory;
 
+    /**
+     * true khi bài chẩn đoán nguồn là bài LUYỆN TẬP THEO PART — chỉ phân tích các Part đã luyện,
+     * nên lộ trình chỉ phủ những Part đó. FE nhắc làm bài thi thử đầy đủ để có lộ trình toàn diện.
+     */
+    private Boolean diagnosisSourcePractice;
+
     private String planStage;
     private String userTargetId;
 

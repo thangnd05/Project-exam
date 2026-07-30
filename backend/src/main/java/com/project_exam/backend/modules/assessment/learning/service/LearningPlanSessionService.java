@@ -5,13 +5,11 @@ import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.exam.domain.RecoveryResource;
-import com.project_exam.backend.modules.assessment.exam.domain.Tag;
 import com.project_exam.backend.modules.assessment.exam.repository.AnswerRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.RecoveryResourceRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
-import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 import com.project_exam.backend.modules.assessment.learning.domain.*;
 import com.project_exam.backend.modules.assessment.learning.dto.*;
@@ -20,6 +18,7 @@ import com.project_exam.backend.modules.assessment.learning.repository.*;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanTaskUnlockSupport;
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
+import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
@@ -50,10 +49,10 @@ public class LearningPlanSessionService {
     private final AnswerRepository answerRepository;
     private final AnswerService answerService;
     private final ExamPartRepository examPartRepository;
-    private final TagRepository tagRepository;
     private final ResourceTagRepository resourceTagRepository;
     private final RecoveryResourceRepository recoveryResourceRepository;
     private final LearningPlanResourceLookup resourceLookup;
+    private final PlanTaskViewAssembler taskViewAssembler;
     private final LearningPlanTaskUnlockSupport taskUnlockSupport;
     private final StreakService streakService;
     private final LearningMapper learningMapper;
@@ -103,31 +102,42 @@ public class LearningPlanSessionService {
         // Kho câu của ải rỗng (pool=0) -> không thể pass, sẽ kẹt. Tự SKIP để không chặn tiến độ.
         List<String> questionIds = pickQuestionsForTask(plan, task);
         if (questionIds.isEmpty()) {
-            skipEmptyPoolTask(plan, task);
-            return plan.getPlanStage() == PlanStage.MOCK
-                    ? buildMockStageResponse(plan)
-                    : buildPickResponse(plan);
+            boolean skipped = skipEmptyPoolTask(plan, task);
+            if (plan.getPlanStage() == PlanStage.MOCK) {
+                return buildMockStageResponse(plan);
+            }
+            // Nói rõ lý do bị đá về màn chọn ải, không im lặng như trước.
+            CurrentSessionResponse response = buildPickResponse(plan);
+            response.setNotice(skipped
+                    ? "Ải này chưa có câu hỏi nào trong kho nên đã được bỏ qua — hãy chọn ải khác."
+                    : "Ải này hiện chưa có câu hỏi để luyện lại. Hãy chọn ải khác.");
+            return response;
         }
 
         LearningPlanSession session = createQuizSession(plan, task, questionIds);
         return buildSessionResponse(plan, session);
     }
 
-    /** Ải có kho câu rỗng -> đánh dấu SKIPPED rồi kiểm tra điều kiện lên MOCK. */
-    private void skipEmptyPoolTask(LearningPlan plan, LearningPlanTask task) {
+    /**
+     * Ải có kho câu rỗng -> đánh dấu SKIPPED rồi kiểm tra điều kiện lên MOCK.
+     *
+     * @return true nếu vừa đánh dấu bỏ qua (false = ải đã vượt, không hạ trạng thái).
+     */
+    private boolean skipEmptyPoolTask(LearningPlan plan, LearningPlanTask task) {
         // Ải đã vượt (bấm luyện lại) không bị hạ về SKIPPED chỉ vì kho câu tạm rỗng.
         if (task.getStatus() == TaskStatus.PASSED) {
-            return;
+            return false;
         }
         task.setStatus(TaskStatus.SKIPPED);
         taskRepository.save(task);
         maybeAdvanceToMock(plan);
+        return true;
     }
 
     /** Lên MOCK khi mọi ải đã PASSED hoặc SKIPPED (không còn ải nào phải làm). */
     private void maybeAdvanceToMock(LearningPlan plan) {
         String planId = plan.getLearningPlanId();
-        long total = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(planId).size();
+        long total = taskRepository.countByLearningPlanId(planId);
         long passed = taskRepository.countByLearningPlanIdAndStatus(planId, TaskStatus.PASSED);
         long skipped = taskRepository.countByLearningPlanIdAndStatus(planId, TaskStatus.SKIPPED);
         if (total > 0 && passed + skipped == total) {
@@ -214,8 +224,7 @@ public class LearningPlanSessionService {
     /** Plan cũ ở trạm MIX chuyển về FOUNDATION hoặc MOCK. */
     private void normalizePlanStage(LearningPlan plan) {
         if (plan.getPlanStage() == PlanStage.MIX) {
-            long total = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(
-                    plan.getLearningPlanId()).size();
+            long total = taskRepository.countByLearningPlanId(plan.getLearningPlanId());
             long passed = taskRepository.countByLearningPlanIdAndStatus(
                     plan.getLearningPlanId(), TaskStatus.PASSED);
             if (total > 0 && passed == total) {
@@ -290,7 +299,7 @@ public class LearningPlanSessionService {
             row.setSelectedAnswerIds(selectedIdsCsv);
             row.setIsCorrect(isCorrect);
             rows.add(row);
-            recordExposure(userId, item.getQuestionId());
+            // Không ghi exposure ở đây: đã ghi đủ cho cả phiên lúc tạo session.
         }
         sessionAnswerRepository.saveAll(rows);
 
@@ -503,7 +512,7 @@ public class LearningPlanSessionService {
         session = sessionRepository.save(session);
 
         saveSessionQuestions(session.getSessionId(), questionIds);
-        questionIds.forEach(qid -> recordExposure(plan.getUserId(), qid));
+        recordExposures(plan.getUserId(), questionIds);
         return session;
     }
 
@@ -594,19 +603,38 @@ public class LearningPlanSessionService {
         return streak;
     }
 
-    private void recordExposure(String userId, String questionId) {
-        Optional<UserQuestionExposure> existing = exposureRepository.findByUserIdAndQuestionId(userId, questionId);
-        if (existing.isPresent()) {
-            UserQuestionExposure e = existing.get();
-            e.setTimesSeen(e.getTimesSeen() + 1);
-            e.setLastSeenAt(Instant.now());
-            exposureRepository.save(e);
-        } else {
-            UserQuestionExposure e = new UserQuestionExposure();
-            e.setUserId(userId);
-            e.setQuestionId(questionId);
-            exposureRepository.save(e);
+    /**
+     * Ghi nhận user đã nhìn thấy các câu này (dùng để ưu tiên câu chưa gặp ở phiên sau).
+     * Ghi 1 lần lúc tạo phiên, theo lô — trước đây gọi từng câu ở cả lúc tạo lẫn lúc nộp
+     * nên timesSeen bị đếm gấp đôi và tốn ~2 query/câu.
+     */
+    private void recordExposures(String userId, List<String> questionIds) {
+        if (questionIds == null || questionIds.isEmpty()) {
+            return;
         }
+        List<String> distinctIds = questionIds.stream().filter(Objects::nonNull).distinct().toList();
+        if (distinctIds.isEmpty()) {
+            return;
+        }
+        Map<String, UserQuestionExposure> existing = exposureRepository
+                .findByUserIdAndQuestionIdIn(userId, distinctIds).stream()
+                .collect(Collectors.toMap(UserQuestionExposure::getQuestionId, e -> e, (a, b) -> a));
+
+        Instant now = Instant.now();
+        List<UserQuestionExposure> rows = new ArrayList<>();
+        for (String questionId : distinctIds) {
+            UserQuestionExposure e = existing.get(questionId);
+            if (e == null) {
+                e = new UserQuestionExposure();
+                e.setUserId(userId);
+                e.setQuestionId(questionId);
+            } else {
+                e.setTimesSeen(e.getTimesSeen() + 1);
+                e.setLastSeenAt(now);
+            }
+            rows.add(e);
+        }
+        exposureRepository.saveAll(rows);
     }
 
     private CurrentSessionResponse buildSessionResponse(LearningPlan plan, LearningPlanSession session) {
@@ -635,13 +663,9 @@ public class LearningPlanSessionService {
             Optional<LearningPlanTask> taskOpt = taskRepository.findById(session.getTaskId());
             if (taskOpt.isPresent()) {
                 LearningPlanTask task = taskOpt.get();
-                Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag =
-                        task.getTagId() != null
-                                ? resourceLookup.findFirstByTagIds(List.of(task.getTagId()))
-                                : Map.of();
                 List<LearningPlanTask> singleTaskList = List.of(task);
-                activeTaskDto = toTaskDto(task, resourcesByTag,
-                        loadTagMap(singleTaskList), loadPartMap(singleTaskList));
+                activeTaskDto = taskViewAssembler.toTaskDto(
+                        task, taskViewAssembler.lookupsFor(singleTaskList));
             }
         }
 
@@ -654,7 +678,7 @@ public class LearningPlanSessionService {
 
         long passed = taskRepository.countByLearningPlanIdAndStatus(
                 plan.getLearningPlanId(), TaskStatus.PASSED);
-        long total = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(plan.getLearningPlanId()).size();
+        long total = taskRepository.countByLearningPlanId(plan.getLearningPlanId());
 
         return learningMapper.toQuizSessionResponse(
                 plan,
@@ -671,7 +695,7 @@ public class LearningPlanSessionService {
     private CurrentSessionResponse buildMockStageResponse(LearningPlan plan) {
         long passed = taskRepository.countByLearningPlanIdAndStatus(
                 plan.getLearningPlanId(), TaskStatus.PASSED);
-        long total = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(plan.getLearningPlanId()).size();
+        long total = taskRepository.countByLearningPlanId(plan.getLearningPlanId());
 
         return learningMapper.toMockStageResponse(
                 plan,
@@ -684,93 +708,17 @@ public class LearningPlanSessionService {
     private CurrentSessionResponse buildPickResponse(LearningPlan plan) {
         List<LearningPlanTask> taskEntities = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(
                 plan.getLearningPlanId());
-        List<String> tagIds = taskEntities.stream()
-                .map(LearningPlanTask::getTagId)
-                .filter(Objects::nonNull)
-                .toList();
-        Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag =
-                resourceLookup.findFirstByTagIds(tagIds);
-        Map<String, Tag> tagMap = loadTagMap(taskEntities);
-        Map<String, ExamPart> partMap = loadPartMap(taskEntities);
-        List<PlanTaskDto> taskDtos = taskEntities.stream()
-                .map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap))
-                .toList();
+        PlanTaskViewAssembler.Lookups lookups = taskViewAssembler.lookupsFor(taskEntities);
         long passed = taskRepository.countByLearningPlanIdAndStatus(
                 plan.getLearningPlanId(), TaskStatus.PASSED);
 
         return learningMapper.toPickResponse(
                 plan,
-                buildPartGroups(taskEntities, resourcesByTag, tagMap, partMap),
-                taskDtos,
+                taskViewAssembler.buildPartGroups(taskEntities, lookups),
+                taskViewAssembler.toTaskDtos(taskEntities, lookups),
                 taskEntities.size(),
                 (int) passed,
                 "Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.");
-    }
-
-    /** Batch-load Tag/ExamPart cho list task, tránh N+1 trong toTaskDto. */
-    private Map<String, Tag> loadTagMap(List<LearningPlanTask> tasks) {
-        Set<String> tagIds = tasks.stream()
-                .map(LearningPlanTask::getTagId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        if (tagIds.isEmpty()) return Map.of();
-        return tagRepository.findAllById(tagIds).stream()
-                .collect(Collectors.toMap(Tag::getTagId, t -> t, (a, b) -> a));
-    }
-
-    private Map<String, ExamPart> loadPartMap(List<LearningPlanTask> tasks) {
-        Set<String> partIds = tasks.stream()
-                .map(LearningPlanTask::getExamPartId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        if (partIds.isEmpty()) return Map.of();
-        return examPartRepository.findAllById(partIds).stream()
-                .collect(Collectors.toMap(ExamPart::getExamPartId, p -> p, (a, b) -> a));
-    }
-
-    private List<PlanPartGroupDto> buildPartGroups(
-            List<LearningPlanTask> tasks,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
-            Map<String, Tag> tagMap,
-            Map<String, ExamPart> partMap) {
-        if (tasks.isEmpty()) {
-            return List.of();
-        }
-        Map<String, List<LearningPlanTask>> byPart = tasks.stream()
-                .collect(Collectors.groupingBy(
-                        LearningPlanTask::getExamPartId,
-                        LinkedHashMap::new,
-                        Collectors.toList()));
-
-        // Tài liệu giới thiệu/cách làm gắn trực tiếp Part — hiện đầu nhóm, trước tài liệu theo tag.
-        Map<String, List<PlanPhaseDto.RecommendedResourceDto>> resourcesByPart =
-                resourceLookup.findByExamPartIds(byPart.keySet());
-
-        List<PlanPartGroupDto> groups = new ArrayList<>();
-        for (Map.Entry<String, List<LearningPlanTask>> entry : byPart.entrySet()) {
-            String partId = entry.getKey();
-            List<LearningPlanTask> partTasks = entry.getValue().stream()
-                    .sorted(Comparator.comparingInt(LearningPlanTask::getTaskOrder))
-                    .toList();
-            ExamPart part = partMap.get(partId);
-            int passedInPart = (int) partTasks.stream()
-                    .filter(t -> t.getStatus() == TaskStatus.PASSED)
-                    .count();
-            Integer passAcc = partTasks.isEmpty() ? null : partTasks.get(0).getPassAccuracy();
-            groups.add(learningMapper.toPartGroup(
-                    partId,
-                    part != null ? part.getName() : partId,
-                    part != null ? part.getDisplayOrder() : null,
-                    passAcc,
-                    passedInPart,
-                    partTasks.size(),
-                    resourcesByPart.getOrDefault(partId, List.of()),
-                    partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList()));
-        }
-        // Sắp Part theo displayOrder (cột "Thứ tự" của ExamPart); part không có xếp cuối.
-        groups.sort(Comparator.comparingInt(
-                g -> g.getDisplayOrder() != null ? g.getDisplayOrder() : Integer.MAX_VALUE));
-        return groups;
     }
 
     private String formatSessionMessage(PlanTaskDto active) {
@@ -785,40 +733,6 @@ public class LearningPlanSessionService {
                     target);
         }
         return "Đọc tài liệu, sau đó làm quiz của đúng Part/tag hiện tại.";
-    }
-
-    private PlanTaskDto toTaskDto(
-            LearningPlanTask task,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
-            Map<String, Tag> tagMap,
-            Map<String, ExamPart> partMap) {
-        PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
-        Tag tag = task.getTagId() != null ? tagMap.get(task.getTagId()) : null;
-        ExamPart part = task.getExamPartId() != null ? partMap.get(task.getExamPartId()) : null;
-        PlanPhaseDto.RecommendedResourceDto studyResource = resourcesByTag != null && task.getTagId() != null
-                ? resourcesByTag.get(task.getTagId())
-                : null;
-        int priorityScore = task.getPriorityScore() != null ? task.getPriorityScore() : 0;
-        return learningMapper.toTaskDto(
-                task,
-                taskType.name(),
-                resolveTaskDisplayName(taskType, tag, part),
-                part != null ? part.getName() : null,
-                studyResource,
-                priorityScore);
-    }
-
-    private String resolveTaskDisplayName(PlanTaskType taskType, Tag tag, ExamPart part) {
-        if (taskType == PlanTaskType.PART_CAPSTONE_1) {
-            return "Tổng ôn Part — lần 1 (200%)";
-        }
-        if (taskType == PlanTaskType.PART_CAPSTONE_2) {
-            return "Tổng ôn Part — lần 2 (200%)";
-        }
-        if (tag != null) {
-            return tag.getName();
-        }
-        return part != null ? part.getName() : "Ải tag";
     }
 
     private PlanPhaseDto.RecommendedResourceDto toResourceDto(RecoveryResource r) {

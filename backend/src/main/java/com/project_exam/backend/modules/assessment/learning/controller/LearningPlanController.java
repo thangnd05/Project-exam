@@ -39,9 +39,10 @@ public class LearningPlanController {
         return ResponseEntity.ok(learningPlanService.getPlan(userId, learningPlanId));
     }
 
+    /** Không truyền examTypeId = lấy lộ trình của mọi kỳ thi trong 1 lần gọi. */
     @GetMapping
     public ResponseEntity<List<PlanResponse>> list(
-            @RequestParam String examTypeId,
+            @RequestParam(required = false) String examTypeId,
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);

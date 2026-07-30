@@ -12,6 +12,9 @@ public interface LearningPlanRepository extends JpaRepository<LearningPlan, Stri
 
     List<LearningPlan> findByUserIdAndExamTypeIdOrderByCreatedAtDesc(String userId, String examTypeId);
 
+    /** Toàn bộ plan của user (mọi kỳ thi) — FE "tất cả lộ trình" gọi 1 lần thay vì mỗi examType một lần. */
+    List<LearningPlan> findByUserIdOrderByCreatedAtDesc(String userId);
+
     Optional<LearningPlan> findTopByUserIdAndExamTypeIdAndStatusOrderByCreatedAtDesc(
             String userId, String examTypeId, LearningPlan.Status status);
 

@@ -13,13 +13,11 @@ import com.project_exam.backend.modules.assessment.exam.repository.QuestionTagRe
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.modules.assessment.learning.domain.*;
 import com.project_exam.backend.modules.assessment.learning.dto.GeneratePlanRequest;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupDto;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanPhaseDto;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskDto;
 import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
+import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
 import com.project_exam.backend.modules.assessment.learning.support.ReadinessThresholds;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanPhaseRepository;
@@ -72,7 +70,7 @@ public class LearningPlanService {
     private final QuestionRepository questionRepository;
     private final TestPartRepository testPartRepository;
     private final TestQuestionRepository testQuestionRepository;
-    private final LearningPlanResourceLookup resourceLookup;
+    private final PlanTaskViewAssembler taskViewAssembler;
     private final UserTargetProgressService userTargetProgressService;
     private final LearningPlanSessionRepository sessionRepository;
     private final LearningPlanSessionQuestionRepository sessionQuestionRepository;
@@ -188,9 +186,14 @@ public class LearningPlanService {
         savedTasks = taskRepository.saveAll(savedTasks);
         plan = planRepository.save(plan);
 
-        Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag =
-                loadResourcesForTasks(savedTasks);
-        return buildPlanResponse(plan, result, candidates.size(), savedTasks, partsWithoutTasks, resourcesByTag);
+        return buildPlanResponse(
+                plan,
+                result,
+                candidates.size(),
+                savedTasks,
+                partsWithoutTasks,
+                taskViewAssembler.lookupsFor(savedTasks),
+                loadDiagnosisSources(List.of(plan)).get(plan.getSourceUserTestId()));
     }
 
     private List<String> findPartsWithoutTasks(
@@ -212,17 +215,73 @@ public class LearningPlanService {
     public PlanResponse getPlan(String userId, String learningPlanId) {
         LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
         List<LearningPlanTask> tasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId);
-        return buildPlanResponseFromEntity(plan, tasks, loadResourcesForTasks(tasks));
+        return buildPlanResponseFromEntity(
+                plan,
+                tasks,
+                taskViewAssembler.lookupsFor(tasks),
+                loadCurrentTargets(userId),
+                loadDiagnosisSources(List.of(plan)));
     }
 
+    /** examTypeId rỗng = mọi kỳ thi (FE "tất cả lộ trình" chỉ gọi 1 lần thay vì mỗi kỳ thi một lần). */
     @Transactional(readOnly = true)
     public List<PlanResponse> listPlans(String userId, String examTypeId) {
-        return planRepository
-                .findByUserIdAndExamTypeIdOrderByCreatedAtDesc(userId, examTypeId)
-                .stream()
-                .map(p -> getPlan(userId, p.getLearningPlanId()))
+        List<LearningPlan> plans = examTypeId == null || examTypeId.isBlank()
+                ? planRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                : planRepository.findByUserIdAndExamTypeIdOrderByCreatedAtDesc(userId, examTypeId);
+        if (plans.isEmpty()) {
+            return List.of();
+        }
+
+        // Toàn bộ ải của mọi plan trong 1 query; Tag/ExamPart/tài liệu batch-load 1 lần dùng chung.
+        List<String> planIds = plans.stream().map(LearningPlan::getLearningPlanId).toList();
+        Map<String, List<LearningPlanTask>> tasksByPlan = taskRepository
+                .findByLearningPlanIdInOrderByTaskOrderAsc(planIds).stream()
+                .collect(Collectors.groupingBy(LearningPlanTask::getLearningPlanId));
+        List<LearningPlanTask> allTasks = tasksByPlan.values().stream()
+                .flatMap(List::stream)
+                .toList();
+
+        PlanTaskViewAssembler.Lookups lookups = taskViewAssembler.lookupsFor(allTasks);
+        Map<String, UserTarget> currentTargets = loadCurrentTargets(userId);
+        Map<String, DiagnosisSource> diagnosisSources = loadDiagnosisSources(plans);
+
+        return plans.stream()
+                .map(p -> buildPlanResponseFromEntity(
+                        p,
+                        tasksByPlan.getOrDefault(p.getLearningPlanId(), List.of()),
+                        lookups,
+                        currentTargets,
+                        diagnosisSources))
                 .toList();
     }
+
+    /** Mục tiêu hiện tại của user theo examTypeId — dùng chung cho cờ targetOutdated của mọi plan. */
+    private Map<String, UserTarget> loadCurrentTargets(String userId) {
+        return userTargetRepository.findByUserId(userId).stream()
+                .collect(Collectors.toMap(UserTarget::getExamTypeId, t -> t, (a, b) -> a));
+    }
+
+    /** Loại bài chẩn đoán nguồn của từng plan (category + có phải bài luyện theo Part không). */
+    private Map<String, DiagnosisSource> loadDiagnosisSources(List<LearningPlan> plans) {
+        Set<String> userTestIds = plans.stream()
+                .map(LearningPlan::getSourceUserTestId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (userTestIds.isEmpty()) {
+            return Map.of();
+        }
+        Map<String, DiagnosisSource> result = new HashMap<>();
+        for (Object[] row : userTestRepository.findDiagnosisSourcesByUserTestIdIn(userTestIds)) {
+            result.put((String) row[0], new DiagnosisSource(
+                    (String) row[1],
+                    row[2] == UserTest.Mode.PRACTICE));
+        }
+        return result;
+    }
+
+    /** Bài chẩn đoán nguồn: code ExamCategory + có phải bài luyện theo Part (chỉ phủ vài Part). */
+    private record DiagnosisSource(String categoryCode, boolean practice) {}
 
     @Transactional
     public PlanResponse switchPlan(String userId, String learningPlanId) {
@@ -241,7 +300,12 @@ public class LearningPlanService {
         plan.setReplacedByPlanId(null);
         plan = planRepository.save(plan);
         List<LearningPlanTask> tasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId);
-        return buildPlanResponseFromEntity(plan, tasks, loadResourcesForTasks(tasks));
+        return buildPlanResponseFromEntity(
+                plan,
+                tasks,
+                taskViewAssembler.lookupsFor(tasks),
+                loadCurrentTargets(userId),
+                loadDiagnosisSources(List.of(plan)));
     }
 
     @Transactional
@@ -531,29 +595,19 @@ public class LearningPlanService {
         return Math.max(0, target - part.getPercentage());
     }
 
-    private Map<String, PlanPhaseDto.RecommendedResourceDto> loadResourcesForTasks(
-            List<LearningPlanTask> tasks) {
-        List<String> tagIds = tasks.stream()
-                .map(LearningPlanTask::getTagId)
-                .filter(Objects::nonNull)
-                .toList();
-        return resourceLookup.findFirstByTagIds(tagIds);
-    }
-
     private PlanResponse buildPlanResponse(
             LearningPlan plan,
             EnhancedResultDto result,
             int taskCount,
             List<LearningPlanTask> tasks,
             List<String> partsWithoutTasks,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag) {
+            PlanTaskViewAssembler.Lookups lookups,
+            DiagnosisSource diagnosisSource) {
         int estimatedDays = taskCount * ESTIMATED_DAYS_PER_TASK;
         if (plan.getDeadlineDays() != null) {
             estimatedDays = Math.min(estimatedDays, plan.getDeadlineDays());
         }
         long passed = tasks.stream().filter(t -> t.getStatus() == TaskStatus.PASSED).count();
-        Map<String, Tag> tagMap = loadTagMap(tasks);
-        Map<String, ExamPart> partMap = loadPartMap(tasks);
 
         PlanResponse response = learningMapper.toGeneratedPlanResponse(
                 plan,
@@ -563,31 +617,23 @@ public class LearningPlanService {
                 tasks.size(),
                 (int) passed,
                 estimatedDays,
-                mapTaskDtos(tasks, resourcesByTag, tagMap, partMap),
-                buildPartGroups(tasks, resourcesByTag, tagMap, partMap),
+                taskViewAssembler.toTaskDtos(tasks, lookups),
+                taskViewAssembler.buildPartGroups(tasks, lookups),
                 partsWithoutTasks);
-        response.setRecommendedTaskId(pickRecommendedTaskId(tasks, partMap));
-        response.setDiagnosisSourceCategory(resolveDiagnosisSourceCategory(plan.getSourceUserTestId()));
+        response.setRecommendedTaskId(pickRecommendedTaskId(tasks, lookups));
+        applyDiagnosisSource(response, diagnosisSource);
         return response;
-    }
-
-    /** Code ExamCategory bài chẩn đoán nguồn (QUICK_CHALLENGE / FULL_MOCK / ...); null nếu không gắn category. */
-    private String resolveDiagnosisSourceCategory(String sourceUserTestId) {
-        if (sourceUserTestId == null) {
-            return null;
-        }
-        return userTestRepository.findExamCategoryCodeByUserTestId(sourceUserTestId).orElse(null);
     }
 
     private PlanResponse buildPlanResponseFromEntity(
             LearningPlan plan,
             List<LearningPlanTask> tasks,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag) {
+            PlanTaskViewAssembler.Lookups lookups,
+            Map<String, UserTarget> currentTargets,
+            Map<String, DiagnosisSource> diagnosisSources) {
         long passed = tasks.stream().filter(t -> t.getStatus() == TaskStatus.PASSED).count();
         int remaining = (int) (tasks.size() - passed);
         int estimatedDays = remaining * ESTIMATED_DAYS_PER_TASK;
-        Map<String, Tag> tagMap = loadTagMap(tasks);
-        Map<String, ExamPart> partMap = loadPartMap(tasks);
 
         PlanResponse response = learningMapper.toPlanResponseFromEntity(
                 plan,
@@ -601,13 +647,18 @@ public class LearningPlanService {
                 tasks.size(),
                 (int) passed,
                 estimatedDays,
-                mapTaskDtos(tasks, resourcesByTag, tagMap, partMap),
-                buildPartGroups(tasks, resourcesByTag, tagMap, partMap));
-        response.setRecommendedTaskId(pickRecommendedTaskId(tasks, partMap));
-        response.setTargetOutdated(isTargetOutdated(plan));
-        response.setDiagnosisSourceCategory(resolveDiagnosisSourceCategory(plan.getSourceUserTestId()));
+                taskViewAssembler.toTaskDtos(tasks, lookups),
+                taskViewAssembler.buildPartGroups(tasks, lookups));
+        response.setRecommendedTaskId(pickRecommendedTaskId(tasks, lookups));
+        response.setTargetOutdated(isTargetOutdated(plan, currentTargets.get(plan.getExamTypeId())));
+        applyDiagnosisSource(response, diagnosisSources.get(plan.getSourceUserTestId()));
         response.setPartsWithoutTasks(splitPartsWithoutTasks(plan.getPartsWithoutTasks()));
         return response;
+    }
+
+    private void applyDiagnosisSource(PlanResponse response, DiagnosisSource source) {
+        response.setDiagnosisSourceCategory(source != null ? source.categoryCode() : null);
+        response.setDiagnosisSourcePractice(source != null && source.practice());
     }
 
     /** Ghép tên Part chưa có ải thành 1 chuỗi để lưu (null nếu rỗng). Xem {@link #splitPartsWithoutTasks}. */
@@ -630,20 +681,18 @@ public class LearningPlanService {
      * Plan ACTIVE nhưng target lúc sinh khác target hiện tại (đã đổi/xoá) → ngưỡng ải là snapshot cũ.
      * So sánh null-safe: plan sinh không target + giờ đã có target cũng tính là outdated.
      */
-    private boolean isTargetOutdated(LearningPlan plan) {
+    private boolean isTargetOutdated(LearningPlan plan, UserTarget currentTarget) {
         if (plan.getStatus() != LearningPlan.Status.ACTIVE) {
             return false;
         }
-        Optional<UserTarget> currentOpt = userTargetRepository
-                .findByUserIdAndExamTypeId(plan.getUserId(), plan.getExamTypeId());
-        String currentTargetId = currentOpt.map(UserTarget::getUserTargetId).orElse(null);
+        String currentTargetId = currentTarget != null ? currentTarget.getUserTargetId() : null;
         // Mục tiêu đã đổi/xoá (khác id, hoặc plan sinh không target giờ đã có) → ngưỡng ải là snapshot cũ.
         if (!Objects.equals(plan.getUserTargetId(), currentTargetId)) {
             return true;
         }
         // Cùng userTargetId nhưng sửa mục tiêu tại chỗ (createOrUpdate giữ nguyên id): điểm mục tiêu
         // đổi thì plan vẫn theo điểm cũ → vẫn coi là outdated để nhắc sinh lại.
-        Integer currentScore = currentOpt.map(UserTarget::getTargetScore).orElse(null);
+        Integer currentScore = currentTarget != null ? currentTarget.getTargetScore() : null;
         return !Objects.equals(plan.getTargetScore(), currentScore);
     }
 
@@ -679,50 +728,21 @@ public class LearningPlanService {
         }
     }
 
-    private List<PlanTaskDto> mapTaskDtos(
-            List<LearningPlanTask> tasks,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
-            Map<String, Tag> tagMap,
-            Map<String, ExamPart> partMap) {
-        return tasks.stream()
-                .sorted(Comparator.comparingInt(LearningPlanTask::getTaskOrder))
-                .map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap))
-                .toList();
-    }
-
-    /** Batch-load Tag/ExamPart cho list task, tránh N+1 trong toTaskDto. */
-    private Map<String, Tag> loadTagMap(List<LearningPlanTask> tasks) {
-        Set<String> tagIds = tasks.stream()
-                .map(LearningPlanTask::getTagId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        if (tagIds.isEmpty()) return Map.of();
-        return tagRepository.findAllById(tagIds).stream()
-                .collect(Collectors.toMap(Tag::getTagId, t -> t, (a, b) -> a));
-    }
-
-    private Map<String, ExamPart> loadPartMap(List<LearningPlanTask> tasks) {
-        Set<String> partIds = tasks.stream()
-                .map(LearningPlanTask::getExamPartId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        if (partIds.isEmpty()) return Map.of();
-        return examPartRepository.findAllById(partIds).stream()
-                .collect(Collectors.toMap(ExamPart::getExamPartId, p -> p, (a, b) -> a));
-    }
-
-    private String pickRecommendedTaskId(List<LearningPlanTask> tasks, Map<String, ExamPart> partMap) {
+    private String pickRecommendedTaskId(
+            List<LearningPlanTask> tasks, PlanTaskViewAssembler.Lookups lookups) {
         return tasks.stream()
                 .filter(t -> t.getStatus() == TaskStatus.ACTIVE)
                 .min(Comparator
-                        .comparingInt((LearningPlanTask t) -> partDisplayOrderRank(t, partMap))
+                        .comparingInt((LearningPlanTask t) -> partDisplayOrderRank(t, lookups))
                         .thenComparingInt(t -> t.getTaskOrder() != null ? t.getTaskOrder() : Integer.MAX_VALUE))
                 .map(LearningPlanTask::getTaskId)
                 .orElse(null);
     }
 
-    private int partDisplayOrderRank(LearningPlanTask task, Map<String, ExamPart> partMap) {
-        ExamPart part = task.getExamPartId() != null ? partMap.get(task.getExamPartId()) : null;
+    private int partDisplayOrderRank(LearningPlanTask task, PlanTaskViewAssembler.Lookups lookups) {
+        ExamPart part = task.getExamPartId() != null
+                ? lookups.partsById().get(task.getExamPartId())
+                : null;
         return part != null && part.getDisplayOrder() != null
                 ? part.getDisplayOrder()
                 : Integer.MAX_VALUE;
@@ -746,72 +766,6 @@ public class LearningPlanService {
             return "Đang chuyển sang mock (bỏ trộn đề).";
         }
         return stage.name();
-    }
-
-    private List<PlanPartGroupDto> buildPartGroups(
-            List<LearningPlanTask> tasks,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
-            Map<String, Tag> tagMap,
-            Map<String, ExamPart> partMap) {
-        if (tasks.isEmpty()) {
-            return List.of();
-        }
-        Map<String, List<LearningPlanTask>> byPart = tasks.stream()
-                .collect(Collectors.groupingBy(
-                        LearningPlanTask::getExamPartId,
-                        LinkedHashMap::new,
-                        Collectors.toList()));
-
-        // Tài liệu giới thiệu/cách làm gắn trực tiếp Part — hiện đầu nhóm, trước tài liệu theo tag.
-        Map<String, List<PlanPhaseDto.RecommendedResourceDto>> resourcesByPart =
-                resourceLookup.findByExamPartIds(byPart.keySet());
-
-        List<PlanPartGroupDto> groups = new ArrayList<>();
-        for (Map.Entry<String, List<LearningPlanTask>> entry : byPart.entrySet()) {
-            String partId = entry.getKey();
-            List<LearningPlanTask> partTasks = entry.getValue().stream()
-                    .sorted(Comparator.comparingInt(LearningPlanTask::getTaskOrder))
-                    .toList();
-            ExamPart part = partMap.get(partId);
-            int passedInPart = (int) partTasks.stream()
-                    .filter(t -> t.getStatus() == TaskStatus.PASSED)
-                    .count();
-            Integer passAcc = partTasks.isEmpty() ? null : partTasks.get(0).getPassAccuracy();
-            groups.add(learningMapper.toPartGroup(
-                    partId,
-                    part != null ? part.getName() : partId,
-                    part != null ? part.getDisplayOrder() : null,
-                    passAcc,
-                    passedInPart,
-                    partTasks.size(),
-                    resourcesByPart.getOrDefault(partId, List.of()),
-                    partTasks.stream().map(t -> toTaskDto(t, resourcesByTag, tagMap, partMap)).toList()));
-        }
-        // Sắp Part theo displayOrder (cột "Thứ tự" của ExamPart); part không có xếp cuối.
-        groups.sort(Comparator.comparingInt(
-                g -> g.getDisplayOrder() != null ? g.getDisplayOrder() : Integer.MAX_VALUE));
-        return groups;
-    }
-
-    private PlanTaskDto toTaskDto(
-            LearningPlanTask task,
-            Map<String, PlanPhaseDto.RecommendedResourceDto> resourcesByTag,
-            Map<String, Tag> tagMap,
-            Map<String, ExamPart> partMap) {
-        PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
-        Tag tag = task.getTagId() != null ? tagMap.get(task.getTagId()) : null;
-        ExamPart part = task.getExamPartId() != null ? partMap.get(task.getExamPartId()) : null;
-        PlanPhaseDto.RecommendedResourceDto studyResource = resourcesByTag != null && task.getTagId() != null
-                ? resourcesByTag.get(task.getTagId())
-                : null;
-        int priorityScore = task.getPriorityScore() != null ? task.getPriorityScore() : 0;
-        return learningMapper.toTaskDto(
-                task,
-                taskType.name(),
-                resolveTaskDisplayName(taskType, tag, part),
-                part != null ? part.getName() : null,
-                studyResource,
-                priorityScore);
     }
 
     private Integer resolveTargetScore(
@@ -854,19 +808,6 @@ public class LearningPlanService {
 
     private BigDecimal round2(double v) {
         return BigDecimal.valueOf(v).setScale(2, RoundingMode.HALF_UP);
-    }
-
-    private String resolveTaskDisplayName(PlanTaskType taskType, Tag tag, ExamPart part) {
-        if (taskType == PlanTaskType.PART_CAPSTONE_1) {
-            return "Ải cuôi chặng — lần 1";
-        }
-        if (taskType == PlanTaskType.PART_CAPSTONE_2) {
-            return "Ải cuối chặng — lần 2";
-        }
-        if (tag != null) {
-            return tag.getName();
-        }
-        return part != null ? part.getName() : "Ải tag";
     }
 
     private record TaskCandidate(

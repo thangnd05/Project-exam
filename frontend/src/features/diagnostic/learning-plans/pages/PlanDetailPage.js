@@ -180,6 +180,21 @@ function PlanDetailPage() {
         </div>
       </div>
 
+      {plan.diagnosisSourcePractice && (
+        <div className={cx('alert', 'alertWarning')}>
+          <span>
+            Lộ trình này chẩn đoán từ một <strong>bài luyện theo Part</strong> nên chỉ phủ các Part
+            đã luyện. Làm bài thi thử trọn đề rồi sinh lại để có lộ trình đầy đủ.
+          </span>
+          <Link
+            to={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
+            className={cx('btn', 'btnPrimary', 'btnSm')}
+          >
+            Sinh lộ trình mới
+          </Link>
+        </div>
+      )}
+
       {plan.partsWithoutTasks?.length > 0 && (
         <div className={cx('alert', 'alertWarning')}>
           Part chưa đạt mục tiêu nhưng chưa có ải (thiếu tag trên câu hỏi):{' '}

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -116,16 +117,17 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     List<Object[]> countGroupedByTestIdIn(@Param("testIds") List<String> testIds);
 
     /**
-     * Code ExamCategory của bài chẩn đoán nguồn 1 lộ trình — 1 query thay vì chuỗi lookup,
-     * tránh N+1 khi build PlanResponse trong listPlans. Null nếu test không gắn category.
+     * Nguồn chẩn đoán của các lộ trình: [userTestId, ExamCategory.code (null nếu không gắn),
+     * UserTest.mode] — 1 query cho cả danh sách plan, tránh N+1 khi build PlanResponse.
+     * LEFT JOIN để bài không gắn category vẫn trả về mode.
      */
     @Query("""
-            SELECT c.code FROM UserTest ut
-            JOIN Test t ON t.testId = ut.testId
-            JOIN ExamCategory c ON c.examCategoryId = t.examCategoryId
-            WHERE ut.userTestId = :userTestId
+            SELECT ut.userTestId, c.code, ut.mode FROM UserTest ut
+            LEFT JOIN Test t ON t.testId = ut.testId
+            LEFT JOIN ExamCategory c ON c.examCategoryId = t.examCategoryId
+            WHERE ut.userTestId IN :userTestIds
             """)
-    Optional<String> findExamCategoryCodeByUserTestId(@Param("userTestId") String userTestId);
+    List<Object[]> findDiagnosisSourcesByUserTestIdIn(@Param("userTestIds") Collection<String> userTestIds);
 
     /** Batch count attempt của 1 user trên nhiều testId — tránh N+1 trong list test cho user. */
     @Query("SELECT ut.testId, COUNT(ut) FROM UserTest ut "
