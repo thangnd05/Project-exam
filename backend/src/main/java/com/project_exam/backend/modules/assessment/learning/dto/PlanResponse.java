@@ -48,8 +48,6 @@ public class PlanResponse {
 
     private String recommendedTaskId;
 
-    private List<PlanTaskDto> tasks;
-
     private List<PlanPartGroupDto> partGroups;
 
     private List<String> partsWithoutTasks;

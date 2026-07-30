@@ -9,40 +9,16 @@ import {
   IoCloseOutline,
   IoCheckmarkCircle,
 } from 'react-icons/io5';
+import {
+  getExtraTextContents,
+  getPassageMediaItems,
+  PassageMediaList,
+} from './passageMedia';
 import styles from './EditQuestionModal.module.scss';
 import createStyles from '~/shared/test/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 const cxCreate = classNames.bind(createStyles);
-
-const collectMediaItems = (questionDetail) => {
-  if (!questionDetail) return [];
-  const list = Array.isArray(questionDetail.passageMedia)
-    ? questionDetail.passageMedia
-    : [];
-
-  const items = list
-    .map((m) => ({
-      id: m?.id ?? null,
-      mediaUrl: m?.mediaUrl || '',
-      mediaType: (m?.mediaType || '').toUpperCase(),
-    }))
-    .filter((m) => !!m.mediaUrl);
-
-  const fallbackUrl = questionDetail?.passage?.mediaUrl;
-  if (fallbackUrl && !items.some((m) => m.mediaUrl === fallbackUrl)) {
-    items.push({
-      id: null,
-      mediaUrl: fallbackUrl,
-      mediaType:
-        (questionDetail?.passage?.passageType || '').toUpperCase() ===
-        'LISTENING'
-          ? 'AUDIO'
-          : 'IMAGE',
-    });
-  }
-  return items;
-};
 
 const ViewQuestionModal = ({show, onHide, questionId}) => {
   const onHideRef = useRef(onHide);
@@ -63,13 +39,10 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
   }, [isError]);
 
   const answers = Array.isArray(question?.answers) ? question.answers : [];
-  const mediaItems = collectMediaItems(question);
+  const mediaItems = getPassageMediaItems(question);
   const passageContent = question?.passage?.content || '';
   const passageTranslation = question?.passage?.contentTranslation || '';
-  const extraTexts = (Array.isArray(question?.passageMedia) ? question.passageMedia : [])
-    .filter((m) => (m?.mediaType || '').toUpperCase() === 'TEXT')
-    .map((m) => m?.content || '')
-    .filter(Boolean);
+  const extraTexts = getExtraTextContents(question);
 
   return (
     <BaseModal
@@ -171,56 +144,7 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                   </details>
                 )}
 
-                {mediaItems.length > 0 && (
-                  <div className={cx('existingMediaList')}>
-                    {mediaItems.map((item, idx) => {
-                      const url = item.mediaUrl;
-                      const isAudio =
-                        item.mediaType === 'AUDIO' ||
-                        /\.(mp3|wav|ogg|m4a)(\?.*)?$/i.test(url);
-                      const isImage =
-                        item.mediaType === 'IMAGE' ||
-                        /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(url);
-
-                      return (
-                        <div
-                          key={`${item.id || url}-${idx}`}
-                          className={cx('existingMediaCard')}
-                        >
-                          <div className={cx('existingMediaMeta')}>
-                            <span>
-                              {isAudio
-                                ? 'Audio'
-                                : isImage
-                                  ? 'Ảnh'
-                                  : 'Tài liệu'}{' '}
-                              ·{' '}
-                              <a href={url} target="_blank" rel="noreferrer">
-                                Mở file
-                              </a>
-                            </span>
-                          </div>
-
-                          {isAudio ? (
-                            <audio
-                              controls
-                              src={url}
-                              className={cx('existingMediaAudio')}
-                            />
-                          ) : isImage ? (
-                            <img
-                              src={url}
-                              alt={`passage-media-${idx + 1}`}
-                              className={cx('existingMediaImage')}
-                            />
-                          ) : (
-                            <div className={cx('existingMediaDoc')}>{url}</div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <PassageMediaList items={mediaItems} />
               </>
             )}
 

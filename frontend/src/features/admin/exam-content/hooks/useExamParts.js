@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
+import { useAdminCrud } from '~/features/admin/hooks/useAdminCrud';
 import {
   createExamPart,
   deleteExamPart,
@@ -38,12 +39,13 @@ const mapSkillFromApi = (item) => ({
 });
 
 export function useExamParts() {
-  const qc = useQueryClient();
-
-  const examPartsQuery = useQuery({
+  const crud = useAdminCrud({
     queryKey: examPartsKeys.examParts,
-    queryFn: getExamParts,
-    select: (data) => toArray(data).map(mapExamPartFromApi),
+    list: getExamParts,
+    mapItem: mapExamPartFromApi,
+    create: (payload) => createExamPart(payload),
+    update: ({ id, payload }) => updateExamPart(id, payload),
+    remove: (id) => deleteExamPart(id),
   });
 
   const examTypesQuery = useQuery({
@@ -58,36 +60,15 @@ export function useExamParts() {
     select: (data) => toArray(data).map(mapSkillFromApi),
   });
 
-  const invalidateExamParts = () =>
-    qc.invalidateQueries({ queryKey: examPartsKeys.examParts });
-
-  const createMutation = useMutation({
-    mutationFn: (payload) => createExamPart(payload),
-    onSuccess: invalidateExamParts,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, payload }) => updateExamPart(id, payload),
-    onSuccess: invalidateExamParts,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => deleteExamPart(id),
-    onSuccess: invalidateExamParts,
-  });
-
   return {
-    examParts: examPartsQuery.data ?? [],
+    examParts: crud.items,
     examTypes: examTypesQuery.data ?? [],
     skills: skillsQuery.data ?? [],
     isLoading:
-      examPartsQuery.isLoading ||
-      examTypesQuery.isLoading ||
-      skillsQuery.isLoading,
-    isError:
-      examPartsQuery.isError || examTypesQuery.isError || skillsQuery.isError,
-    createMutation,
-    updateMutation,
-    deleteMutation,
+      crud.isLoading || examTypesQuery.isLoading || skillsQuery.isLoading,
+    isError: crud.isError || examTypesQuery.isError || skillsQuery.isError,
+    createMutation: crud.createMutation,
+    updateMutation: crud.updateMutation,
+    deleteMutation: crud.deleteMutation,
   };
 }

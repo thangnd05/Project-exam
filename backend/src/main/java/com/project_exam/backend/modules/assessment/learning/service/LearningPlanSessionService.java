@@ -17,6 +17,7 @@ import com.project_exam.backend.modules.assessment.learning.mapper.LearningMappe
 import com.project_exam.backend.modules.assessment.learning.repository.*;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanTaskUnlockSupport;
+import com.project_exam.backend.modules.assessment.learning.support.LearningPlanAccess;
 import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
@@ -56,11 +57,12 @@ public class LearningPlanSessionService {
     private final LearningPlanTaskUnlockSupport taskUnlockSupport;
     private final StreakService streakService;
     private final LearningMapper learningMapper;
+    private final LearningPlanAccess planAccess;
 
     @Transactional(readOnly = true)
     public CurrentSessionResponse getCurrentSession(
             String userId, String learningPlanId, String taskId, boolean includeReview) {
-        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
         PlanStage stage = effectiveStage(plan);
 
         if (taskId == null || taskId.isBlank()) {
@@ -86,7 +88,7 @@ public class LearningPlanSessionService {
 
     @Transactional
     public CurrentSessionResponse startTaskSession(String userId, String learningPlanId, String taskId) {
-        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
         PlanStage stage = effectiveStage(plan);
 
         if (taskId == null || taskId.isBlank()) {
@@ -211,7 +213,7 @@ public class LearningPlanSessionService {
     @Transactional(readOnly = true)
     public CurrentSessionResponse getSessionReview(
             String userId, String learningPlanId, String sessionId) {
-        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
 
         LearningPlanSession session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phiên luyện"));
@@ -244,7 +246,7 @@ public class LearningPlanSessionService {
             String learningPlanId,
             String sessionId,
             SubmitSessionRequest request) {
-        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
         LearningPlanSession session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phiên học"));
         if (!Objects.equals(session.getLearningPlanId(), learningPlanId)) {
@@ -315,8 +317,6 @@ public class LearningPlanSessionService {
         }
 
         String taskStatus = null;
-        PlanStage stage = plan.getPlanStage() != null ? plan.getPlanStage() : PlanStage.FOUNDATION;
-
         if (session.getTaskId() != null) {
             LearningPlanTask task = taskRepository.findById(session.getTaskId())
                     .orElseThrow(() -> new NotFoundException("Không tìm thấy nhiệm vụ"));
@@ -358,7 +358,7 @@ public class LearningPlanSessionService {
                 accuracy,
                 passed,
                 taskStatus,
-                (plan.getPlanStage() != null ? plan.getPlanStage() : stage).name(),
+                effectiveStage(plan).name(),
                 message,
                 reviewItems);
     }
@@ -412,7 +412,7 @@ public class LearningPlanSessionService {
     @Transactional(readOnly = true)
     public List<TaskSessionHistoryDto> getTaskSessionHistory(
             String userId, String learningPlanId, String taskId) {
-        requireOwnedPlan(userId, learningPlanId);
+        planAccess.requireOwnedPlan(userId, learningPlanId);
 
         LearningPlanTask task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy nhiệm vụ"));
@@ -427,15 +427,6 @@ public class LearningPlanSessionService {
                 .filter(s -> !Boolean.TRUE.equals(s.getAbandoned()))
                 .map(learningMapper::toTaskSessionHistory)
                 .toList();
-    }
-
-    private LearningPlan requireOwnedPlan(String userId, String learningPlanId) {
-        LearningPlan plan = planRepository.findById(learningPlanId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch học"));
-        if (!Objects.equals(plan.getUserId(), userId)) {
-            throw new ForbiddenException("Bạn không có quyền truy cập kế hoạch này");
-        }
-        return plan;
     }
 
     private void abandonOtherInProgressSessions(String learningPlanId, String keepTaskId) {
@@ -679,7 +670,6 @@ public class LearningPlanSessionService {
                 plan,
                 (stage != null ? stage : PlanStage.FOUNDATION).name(),
                 taskViewAssembler.buildPartGroups(taskEntities, lookups),
-                taskViewAssembler.toTaskDtos(taskEntities, lookups),
                 taskEntities.size(),
                 (int) passed,
                 "Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.");

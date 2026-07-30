@@ -1,6 +1,5 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-
 import {createSkill, deleteSkill, getSkills, updateSkill} from '~/shared/api/skillApi';
+import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const skillKeys = {
   list: () => ['admin-skills'],
@@ -12,41 +11,22 @@ const mapSkillFromApi = (skill) => ({
   description: skill.description || '',
 });
 
-const normalizeSkills = (data) =>
-  (Array.isArray(data) ? data : data?.content ?? []).map(mapSkillFromApi);
-
 export function useSkills() {
-  const queryClient = useQueryClient();
-  const invalidate = () =>
-    queryClient.invalidateQueries({queryKey: skillKeys.list()});
-
-  const skillsQuery = useQuery({
+  const crud = useAdminCrud({
     queryKey: skillKeys.list(),
-    queryFn: getSkills,
-    select: normalizeSkills,
-  });
-
-  const createMutation = useMutation({
-    mutationFn: createSkill,
-    onSuccess: invalidate,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({skillId, payload}) => updateSkill(skillId, payload),
-    onSuccess: invalidate,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteSkill,
-    onSuccess: invalidate,
+    list: getSkills,
+    create: createSkill,
+    update: ({skillId, payload}) => updateSkill(skillId, payload),
+    remove: deleteSkill,
+    mapItem: mapSkillFromApi,
   });
 
   return {
-    skillList: skillsQuery.data ?? [],
-    isLoading: skillsQuery.isLoading,
-    isError: skillsQuery.isError,
-    createSkill: createMutation.mutateAsync,
-    updateSkill: updateMutation.mutateAsync,
-    deleteSkill: deleteMutation.mutateAsync,
+    skillList: crud.items,
+    isLoading: crud.isLoading,
+    isError: crud.isError,
+    createSkill: crud.createMutation.mutateAsync,
+    updateSkill: crud.updateMutation.mutateAsync,
+    deleteSkill: crud.deleteMutation.mutateAsync,
   };
 }

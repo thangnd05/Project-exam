@@ -34,6 +34,5 @@ public class CurrentSessionResponse {
 
     private String notice;
     private List<PlanPartGroupDto> partGroups;
-    private List<PlanTaskDto> tasks;
     private List<SubmitSessionResponse.ReviewItem> lastReviewItems;
 }

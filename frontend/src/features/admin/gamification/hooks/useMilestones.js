@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
+import { useCrudMutations } from '~/features/admin/hooks/useAdminCrud';
 import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { getExamParts } from '~/shared/api/examPartApi';
 import { getSkills } from '~/shared/api/skillApi';
@@ -23,8 +24,6 @@ const normalizeArray = (data) =>
   Array.isArray(data) ? data : data?.content ?? [];
 
 export function useMilestones(examTypeFilter) {
-  const qc = useQueryClient();
-
   const examTypesQuery = useQuery({
     queryKey: milestonesKeys.examTypes,
     queryFn: getStandardExamTypes,
@@ -56,22 +55,11 @@ export function useMilestones(examTypeFilter) {
     select: normalizeArray,
   });
 
-  const invalidateList = () =>
-    qc.invalidateQueries({ queryKey: ['admin-milestones', 'list'] });
-
-  const createMutation = useMutation({
-    mutationFn: (payload) => apiCreateMilestone(payload),
-    onSuccess: invalidateList,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, payload }) => apiUpdateMilestone(id, payload),
-    onSuccess: invalidateList,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => apiDeleteMilestone(id),
-    onSuccess: invalidateList,
+  const { createMutation, updateMutation, deleteMutation } = useCrudMutations({
+    queryKey: ['admin-milestones', 'list'],
+    create: (payload) => apiCreateMilestone(payload),
+    update: ({ id, payload }) => apiUpdateMilestone(id, payload),
+    remove: (id) => apiDeleteMilestone(id),
   });
 
   const loadErrorText = examTypesQuery.isError

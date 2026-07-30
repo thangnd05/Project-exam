@@ -10,7 +10,7 @@ import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
 import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
-import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
+import PlanPartTaskList from '../components/PlanPartTaskList';
 import { useSubmitSession } from './hooks/useSubmitSession';
 import { planStageLabel } from '../planLabels';
 import TestStartDashboard from '~/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
@@ -175,9 +175,7 @@ function PlanStudyPage() {
     );
   }
 
-  const partGroups = session.partGroups?.length
-    ? session.partGroups
-    : groupTasksByPart(session.tasks || []);
+  const partGroups = session.partGroups || [];
 
   const isPickMode = session?.mode === 'PICK' || (!session?.sessionId && session?.mode !== 'MOCK');
   const isMockMode = session?.mode === 'MOCK';

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { ClipboardCheck, Play } from 'lucide-react';
-import PlanPartTaskList, { groupTasksByPart } from '../components/PlanPartTaskList';
+import PlanPartTaskList from '../components/PlanPartTaskList';
 import { usePlanDetail } from './hooks/usePlanDetail';
 import { planStageLabel, planStatusLabel } from '../planLabels';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
@@ -13,9 +13,9 @@ const cx = classNames.bind(styles);
 
 function findRecommendedTask(plan) {
   if (!plan?.recommendedTaskId) return null;
-  const all = (plan.partGroups || []).flatMap((g) => g.tasks || []);
-  const pool = all.length ? all : plan.tasks || [];
-  return pool.find((t) => t.taskId === plan.recommendedTaskId) || null;
+  return (plan.partGroups || [])
+    .flatMap((g) => g.tasks || [])
+    .find((t) => t.taskId === plan.recommendedTaskId) || null;
 }
 
 function progressCheer(passed, total, pct) {
@@ -54,9 +54,7 @@ function PlanDetailPage() {
   }
   if (!plan) return null;
 
-  const partGroups = plan.partGroups?.length
-    ? plan.partGroups
-    : groupTasksByPart(plan.tasks || []);
+  const partGroups = plan.partGroups || [];
   const isReplaced = plan.status === 'REPLACED';
   const recommendedTask = findRecommendedTask(plan);
   const totalTasks = plan.totalTasks ?? 0;

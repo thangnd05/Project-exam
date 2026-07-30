@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.*;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.exam.domain.*;
+import com.project_exam.backend.modules.assessment.attempt.util.ReadinessThresholds;
 import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.exam.repository.*;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
@@ -198,7 +199,7 @@ public class EnhancedResultService {
         double overallPercentage = totalQuestions > 0
                 ? (double) normalizedCorrect / totalQuestions * 100 : 0;
         int readinessScore = calculateReadinessScore(partBreakdown, overallPercentage);
-        String readinessLevel = getReadinessLevel(readinessScore);
+        String readinessLevel = ReadinessThresholds.levelFromScore(readinessScore);
 
         Integer percentile = calculatePercentile(userTest.getTestId(), userTest.getTotalScore());
 
@@ -502,13 +503,6 @@ public class EnhancedResultService {
             sum += Math.round(percentage * 10.0) / 10.0;
         }
         return (int) Math.round(sum / skillStats.size());
-    }
-
-    private String getReadinessLevel(int readinessScore) {
-        if (readinessScore < 60) return "NOT_READY";
-        if (readinessScore < 75) return "NEEDS_IMPROVEMENT";
-        if (readinessScore < 85) return "ALMOST_READY";
-        return "READY";
     }
 
     private Integer calculatePercentile(String testId, Integer totalScore) {

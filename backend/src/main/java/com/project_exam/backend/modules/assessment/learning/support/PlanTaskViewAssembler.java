@@ -71,13 +71,6 @@ public class PlanTaskViewAssembler {
                 resourceLookup.findByExamPartIds(partIds));
     }
 
-    public List<PlanTaskDto> toTaskDtos(List<LearningPlanTask> tasks, Lookups lookups) {
-        return tasks.stream()
-                .sorted(Comparator.comparingInt(PlanTaskViewAssembler::taskOrderOf))
-                .map(t -> toTaskDto(t, lookups))
-                .toList();
-    }
-
     public PlanTaskDto toTaskDto(LearningPlanTask task, Lookups lookups) {
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
         Tag tag = task.getTagId() != null ? lookups.tagsById().get(task.getTagId()) : null;

@@ -128,6 +128,10 @@ public class TestService {
                 .filter(t -> t.calculateStatus() != TestStatus.ENDED)
                 .toList();
 
+        if (tests.isEmpty()) {
+            return List.of();
+        }
+
         Set<String> examTypeIds = tests.stream()
                 .map(Test::getExamTypeId)
                 .filter(Objects::nonNull)
@@ -135,20 +139,42 @@ public class TestService {
         Map<String, String> examTypeNames = examTypeRepository.findAllById(examTypeIds).stream()
                 .collect(Collectors.toMap(ExamType::getExamTypeId, ExamType::getName));
 
-        return tests.stream()
-                .map(t -> buildQuickChallengeCard(t, examTypeNames.get(t.getExamTypeId())))
-                .toList();
-    }
+        // Load testPart / examPart / skill của tất cả đề 1 lần thay vì 3 query mỗi đề.
+        Map<String, List<TestPart>> testPartsByTestId = testPartRepository
+                .findByTestIdIn(tests.stream().map(Test::getTestId).toList()).stream()
+                .collect(Collectors.groupingBy(TestPart::getTestId));
 
-    private QuickChallengeCardResponse buildQuickChallengeCard(Test test, String examTypeName) {
-        List<TestPart> testParts = testPartRepository.findByTestId(test.getTestId());
-
-        Set<String> examPartIds = testParts.stream()
+        Set<String> examPartIds = testPartsByTestId.values().stream()
+                .flatMap(List::stream)
                 .map(TestPart::getExamPartId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         Map<String, ExamPart> examPartMap = examPartRepository.findAllById(examPartIds).stream()
                 .collect(Collectors.toMap(ExamPart::getExamPartId, ep -> ep));
+
+        Set<String> skillIds = examPartMap.values().stream()
+                .map(ExamPart::getSkillId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<String, String> skillNames = skillRepository.findAllById(skillIds).stream()
+                .collect(Collectors.toMap(Skill::getSkillId, Skill::getName));
+
+        return tests.stream()
+                .map(t -> buildQuickChallengeCard(
+                        t,
+                        examTypeNames.get(t.getExamTypeId()),
+                        testPartsByTestId.getOrDefault(t.getTestId(), List.of()),
+                        examPartMap,
+                        skillNames))
+                .toList();
+    }
+
+    private QuickChallengeCardResponse buildQuickChallengeCard(
+            Test test,
+            String examTypeName,
+            List<TestPart> testParts,
+            Map<String, ExamPart> examPartMap,
+            Map<String, String> skillNames) {
 
         Map<String, int[]> agg = new LinkedHashMap<>();
         Map<String, String> skillKeyIds = new HashMap<>();
@@ -177,9 +203,6 @@ public class TestService {
                 cur[1] = Math.min(cur[1], order);
             }
         }
-
-        Map<String, String> skillNames = skillRepository.findAllById(new HashSet<>(skillKeyIds.values())).stream()
-                .collect(Collectors.toMap(Skill::getSkillId, Skill::getName));
 
         List<QuickChallengeCardResponse.PartSummary> parts = agg.entrySet().stream()
                 .map(e -> {

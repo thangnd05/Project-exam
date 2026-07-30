@@ -1,5 +1,9 @@
-package com.project_exam.backend.modules.assessment.learning.support;
+package com.project_exam.backend.modules.assessment.attempt.util;
 
+/**
+ * Ngưỡng readiness — nguồn DUY NHẤT cho cả màn kết quả (EnhancedResultService) lẫn lộ trình học.
+ * Level chỉ phụ thuộc % readiness, không phụ thuộc điểm mục tiêu của user.
+ */
 public final class ReadinessThresholds {
 
     public static final int NOT_READY_MAX = 59;

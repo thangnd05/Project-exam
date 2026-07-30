@@ -1,5 +1,6 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import {keepPreviousData} from '~/shared/config/queryClient';
+import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 import {getExamTypes} from '~/shared/api/examTypeApi';
 import {getExamPartsByExamType} from '~/shared/api/examPartApi';
@@ -24,12 +25,13 @@ const mapExamTypes = (list) =>
   asArray(list).map((item) => ({id: item.examTypeId, name: item.name}));
 
 export function useRecoveryResources() {
-  const qc = useQueryClient();
-
-  const resourcesQuery = useQuery({
+  const crud = useAdminCrud({
     queryKey: recoveryResourceKeys.resources,
-    queryFn: getAllResources,
+    list: getAllResources,
     select: asArray,
+    create: ({payload, file}) => createResource(payload, file),
+    update: ({id, payload, file}) => updateResource(id, payload, file),
+    remove: (id) => deleteResource(id),
   });
 
   const examTypesQuery = useQuery({
@@ -38,32 +40,14 @@ export function useRecoveryResources() {
     select: mapExamTypes,
   });
 
-  const invalidateResources = () =>
-    qc.invalidateQueries({queryKey: recoveryResourceKeys.resources});
-
-  const createMutation = useMutation({
-    mutationFn: ({payload, file}) => createResource(payload, file),
-    onSuccess: invalidateResources,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({id, payload, file}) => updateResource(id, payload, file),
-    onSuccess: invalidateResources,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => deleteResource(id),
-    onSuccess: invalidateResources,
-  });
-
   return {
-    resources: resourcesQuery.data ?? EMPTY,
-    isLoading: resourcesQuery.isLoading,
-    isError: resourcesQuery.isError,
+    resources: crud.items,
+    isLoading: crud.isLoading,
+    isError: crud.isError,
     examTypes: examTypesQuery.data ?? EMPTY,
-    createMutation,
-    updateMutation,
-    deleteMutation,
+    createMutation: crud.createMutation,
+    updateMutation: crud.updateMutation,
+    deleteMutation: crud.deleteMutation,
   };
 }
 

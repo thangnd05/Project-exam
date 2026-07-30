@@ -61,17 +61,31 @@ public class PostService {
     }
 
     private List<CategoryResponse> getCategoryResponses(String postId) {
-        return postCategoryRepository.findByPostId(postId).stream()
-                .map(pc -> categoryRepository.findById(pc.getCategoryId()))
-                .filter(Optional::isPresent)
-                .map(opt -> toCategoryResponse(opt.get()))
+        List<String> categoryIds = postCategoryRepository.findByPostId(postId).stream()
+                .map(PostCategory::getCategoryId)
+                .filter(Objects::nonNull)
+                .toList();
+        if (categoryIds.isEmpty()) {
+            return List.of();
+        }
+        Map<String, Category> categoryMap = categoryRepository.findAllById(categoryIds).stream()
+                .collect(Collectors.toMap(Category::getId, c -> c, (a, b) -> a));
+        return categoryIds.stream()
+                .map(categoryMap::get)
+                .filter(Objects::nonNull)
+                .map(this::toCategoryResponse)
                 .collect(Collectors.toList());
     }
 
     private Map<String, Long> buildReactCounts(String postId) {
+        Map<React.ReactType, Long> byType = new EnumMap<>(React.ReactType.class);
+        for (Object[] row : reactRepository.countGroupedByTypeForPost(postId)) {
+            byType.put((React.ReactType) row[0], ((Number) row[1]).longValue());
+        }
+        // Giữ nguyên thứ tự khai báo enum và bỏ type có count = 0, như bản cũ.
         Map<String, Long> counts = new LinkedHashMap<>();
         for (React.ReactType type : React.ReactType.values()) {
-            long count = reactRepository.countByPostIdAndType(postId, type);
+            long count = byType.getOrDefault(type, 0L);
             if (count > 0) counts.put(type.name(), count);
         }
         return counts;
@@ -104,27 +118,6 @@ public class PostService {
         return postMapper.toFullResponse(post, authorName, authorAvatar, authorCosmetics,
                 categories, reactCounts, currentUserReactType, commentCount, saveCount,
                 currentUserSaved);
-    }
-
-    public PostSummaryResponse toSummaryResponse(Post post) {
-        String thumbnailUrl = post.getThumbnailUrl();
-
-        List<CategoryResponse> categories = getCategoryResponses(post.getId());
-        long commentCount = commentRepository.countByPostId(post.getId());
-        long totalReacts = reactRepository.findByPostId(post.getId()).size();
-        long saveCount = savedPostRepository.countByPostId(post.getId());
-
-        String authorName = "Unknown";
-        String authorAvatar = null;
-        Optional<User> authorOpt = userRepository.findById(post.getUserId());
-        if (authorOpt.isPresent()) {
-            authorName = authorOpt.get().getUserName();
-            authorAvatar = authorOpt.get().getAvatarUrl();
-        }
-        var authorCosmetics = cosmeticService.getEquipped(post.getUserId());
-
-        return postMapper.toSummaryResponse(post, authorName, authorAvatar, authorCosmetics,
-                thumbnailUrl, categories, commentCount, totalReacts, saveCount);
     }
 
     @Transactional
@@ -320,7 +313,7 @@ public class PostService {
         return PageResponse.from(postPage, buildSummaryResponses(postPage.getContent()));
     }
 
-    private List<PostSummaryResponse> buildSummaryResponses(List<Post> posts) {
+    public List<PostSummaryResponse> buildSummaryResponses(List<Post> posts) {
         if (posts == null || posts.isEmpty()) return List.of();
 
         List<String> postIds = posts.stream().map(Post::getId).toList();

@@ -17,8 +17,9 @@ import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
 import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
+import com.project_exam.backend.modules.assessment.learning.support.LearningPlanAccess;
 import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
-import com.project_exam.backend.modules.assessment.learning.support.ReadinessThresholds;
+import com.project_exam.backend.modules.assessment.attempt.util.ReadinessThresholds;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionAnswerRepository;
@@ -75,6 +76,7 @@ public class LearningPlanService {
     private final LearningPlanSessionQuestionRepository sessionQuestionRepository;
     private final LearningPlanSessionAnswerRepository sessionAnswerRepository;
     private final LearningMapper learningMapper;
+    private final LearningPlanAccess planAccess;
 
     @Transactional
     public PlanResponse generatePlan(String userId, GeneratePlanRequest request) {
@@ -108,7 +110,7 @@ public class LearningPlanService {
 
         Optional<UserTarget> userTargetOpt = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId);
         String userTargetId = userTargetOpt.map(UserTarget::getUserTargetId).orElse(null);
-        Integer targetScore = resolveTargetScore(userId, examTypeId, request.getTargetScore(), userTargetOpt);
+        Integer targetScore = resolveTargetScore(request.getTargetScore(), userTargetOpt);
         Map<String, Integer> partRequirements = userTargetService.getEffectiveRequirements(userId, examTypeId);
 
         Set<String> focusPartIds = request.getFocusExamPartIds() == null
@@ -174,7 +176,6 @@ public class LearningPlanService {
         }
         savedTasks = taskRepository.saveAll(savedTasks);
         activateCapstonesWithoutTagPrerequisite(savedTasks);
-        savedTasks = taskRepository.saveAll(savedTasks);
 
         return buildPlanResponse(
                 plan,
@@ -203,7 +204,7 @@ public class LearningPlanService {
 
     @Transactional(readOnly = true)
     public PlanResponse getPlan(String userId, String learningPlanId) {
-        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
         List<LearningPlanTask> tasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId);
         return buildPlanResponseFromEntity(
                 plan,
@@ -270,7 +271,7 @@ public class LearningPlanService {
 
     @Transactional
     public PlanResponse switchPlan(String userId, String learningPlanId) {
-        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
         if (plan.getStatus() == LearningPlan.Status.ACTIVE) {
             throw new BadRequestException("Plan này đang là plan hiện tại rồi");
         }
@@ -295,7 +296,7 @@ public class LearningPlanService {
 
     @Transactional
     public void deletePlan(String userId, String learningPlanId) {
-        LearningPlan plan = requireOwnedPlan(userId, learningPlanId);
+        LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
         List<LearningPlanSession> sessions = sessionRepository.findByLearningPlanId(learningPlanId);
         if (!sessions.isEmpty()) {
             List<String> sessionIds = sessions.stream()
@@ -314,14 +315,11 @@ public class LearningPlanService {
             Map<String, Integer> partRequirements,
             Set<String> focusPartIds,
             Map<String, List<String>> questionIdsByPart) {
-        List<PartBreakdownDto> sortedParts = partBreakdown.stream()
-                .filter(p -> matchesFocus(p.getExamPartId(), focusPartIds))
-                .sorted(Comparator.comparingDouble(this::partPriorityScore).reversed())
-                .toList();
-
+        // partBreakdown đã được sắp theo ExamPart.displayOrder ở EnhancedResultService,
+        // taskOrder cứ theo đó cho khớp thứ tự hiển thị.
         List<TaskCandidate> candidates = new ArrayList<>();
-        for (PartBreakdownDto part : sortedParts) {
-            if (!partNeedsFocus(part)) {
+        for (PartBreakdownDto part : partBreakdown) {
+            if (!matchesFocus(part.getExamPartId(), focusPartIds) || !partNeedsFocus(part)) {
                 continue;
             }
             int passAccuracy = partRequirements.getOrDefault(
@@ -393,7 +391,7 @@ public class LearningPlanService {
                     continue;
                 }
                 addTaskIfNew(partTasks, usedTagIds,
-                        buildTaskCandidate(tag, tag.getTagId(), part, passAccuracy));
+                        buildTaskCandidate(tag.getTagId(), tag, part, passAccuracy));
             }
         }
 
@@ -401,14 +399,14 @@ public class LearningPlanService {
             part.getWeakTags().stream()
                     .filter(t -> t.getTagId() != null)
                     .forEach(tag -> addTaskIfNew(partTasks, usedTagIds,
-                            buildTaskCandidate(tag, tag.getTagId(), part, passAccuracy)));
+                            buildTaskCandidate(tag.getTagId(), tag, part, passAccuracy)));
         }
 
         if (partTasks.isEmpty() && !questionIdsInPart.isEmpty()) {
             List<String> tagIds = questionTagRepository.findDistinctTagIdsByQuestionIdIn(questionIdsInPart);
             for (String tagId : tagIds) {
                 addTaskIfNew(partTasks, usedTagIds,
-                        buildTaskCandidate(null, tagId, part, passAccuracy));
+                        buildTaskCandidate(tagId, null, part, passAccuracy));
             }
         }
 
@@ -416,7 +414,7 @@ public class LearningPlanService {
             String fallbackTagId = resolveTagIdForExamPart(part.getExamPartId());
             if (fallbackTagId != null) {
                 addTaskIfNew(partTasks, usedTagIds,
-                        buildTaskCandidate(null, fallbackTagId, part, passAccuracy));
+                        buildTaskCandidate(fallbackTagId, null, part, passAccuracy));
             }
         }
 
@@ -451,17 +449,17 @@ public class LearningPlanService {
         return sortOrder != null ? sortOrder : Integer.MAX_VALUE;
     }
 
+    /** tag = null khi lấy tag từ kho câu (không có số liệu chẩn đoán riêng cho tag đó). */
     private TaskCandidate buildTaskCandidate(
-            TagBreakdownDto tag,
             String tagId,
+            TagBreakdownDto tag,
             PartBreakdownDto part,
             int passAccuracy) {
-        String resolvedTagId = tagId != null ? tagId : (tag != null ? tag.getTagId() : null);
         int wrong = tag != null ? tag.getWrong() : part.getWrong();
         double baseline = tag != null ? tag.getPercentage() : part.getPercentage();
         int priorityScore = PlanPrioritySupport.computePriorityScore(tag, part, passAccuracy);
         return new TaskCandidate(
-                resolvedTagId,
+                tagId,
                 part.getExamPartId(),
                 PlanTaskType.TAG,
                 LearningPlanQuestionTargets.TAG_TARGET,
@@ -507,7 +505,7 @@ public class LearningPlanService {
             List<TaskCandidate> partTasks,
             Set<String> usedTagIds,
             TaskCandidate candidate) {
-        if (candidate.tagId() != null && usedTagIds.add(candidate.tagId())) {
+        if (usedTagIds.add(candidate.tagId())) {
             partTasks.add(candidate);
         }
     }
@@ -522,16 +520,6 @@ public class LearningPlanService {
 
     private boolean matchesFocus(String examPartId, Set<String> focusPartIds) {
         return focusPartIds.isEmpty() || focusPartIds.contains(examPartId);
-    }
-
-    private double partPriorityScore(PartBreakdownDto part) {
-        if (Boolean.TRUE.equals(part.getIsTargetMet())) {
-            return 0;
-        }
-        double target = part.getTargetPercentage() != null
-                ? part.getTargetPercentage()
-                : DEFAULT_WEAK_TAG_THRESHOLD;
-        return Math.max(0, target - part.getPercentage());
     }
 
     private PlanResponse buildPlanResponse(
@@ -556,7 +544,6 @@ public class LearningPlanService {
                 tasks.size(),
                 (int) passed,
                 estimatedDays,
-                taskViewAssembler.toTaskDtos(tasks, lookups),
                 taskViewAssembler.buildPartGroups(tasks, lookups),
                 partsWithoutTasks);
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, lookups));
@@ -586,7 +573,6 @@ public class LearningPlanService {
                 tasks.size(),
                 (int) passed,
                 estimatedDays,
-                taskViewAssembler.toTaskDtos(tasks, lookups),
                 taskViewAssembler.buildPartGroups(tasks, lookups));
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, lookups));
         response.setTargetOutdated(isTargetOutdated(plan, currentTargets.get(plan.getExamTypeId())));
@@ -698,8 +684,6 @@ public class LearningPlanService {
     }
 
     private Integer resolveTargetScore(
-            String userId,
-            String examTypeId,
             Integer requestTarget,
             Optional<UserTarget> userTargetOpt) {
         if (requestTarget != null) return requestTarget;
@@ -713,9 +697,7 @@ public class LearningPlanService {
             int taskCount,
             List<String> partsWithoutTasks) {
         String target = targetScore == null ? "đạt mục tiêu" : "đạt " + targetScore + " điểm";
-        int readiness = result.getReadinessScore() == 0
-                ? (int) Math.round(result.getPercentage())
-                : result.getReadinessScore();
+        int readiness = resolveReadinessScore(result);
         String base = String.format(
                 "Readiness %d%%. %d ải cho Part chưa đạt mục tiêu — ~%d ngày, để %s.",
                 readiness, taskCount, estimatedDays, target);
@@ -724,15 +706,6 @@ public class LearningPlanService {
         }
         return base + " Chưa tạo ải (thiếu tag trên câu): "
                 + String.join(", ", partsWithoutTasks) + ".";
-    }
-
-    private LearningPlan requireOwnedPlan(String userId, String learningPlanId) {
-        LearningPlan plan = planRepository.findById(learningPlanId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch học"));
-        if (!Objects.equals(plan.getUserId(), userId)) {
-            throw new ForbiddenException("Bạn không có quyền xem kế hoạch này");
-        }
-        return plan;
     }
 
     private BigDecimal round2(double v) {

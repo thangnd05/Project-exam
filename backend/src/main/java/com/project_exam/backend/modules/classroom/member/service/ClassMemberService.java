@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -90,20 +91,39 @@ public class ClassMemberService {
     }
 
     public List<ClassMemberResponse> getAllMembers(String classId) {
-        return classMemberRepository.findByClassId(classId).stream()
-                .map(this::toResponse)
-                .toList();
+        return toResponses(classMemberRepository.findByClassId(classId));
     }
 
     public List<ClassMemberResponse> getPendingMembers(String classId) {
-        return classMemberRepository.findByClassIdAndStatus(classId, MemberStatus.PENDING).stream()
-                .map(this::toResponse)
-                .toList();
+        return toResponses(
+                classMemberRepository.findByClassIdAndStatus(classId, MemberStatus.PENDING));
     }
 
     private ClassMemberResponse toResponse(ClassMember m) {
         User user = userRepository.findById(m.getUserId()).orElse(null);
         return classMemberMapper.toResponse(m, user);
+    }
+
+    private List<ClassMemberResponse> toResponses(List<ClassMember> members) {
+        if (members.isEmpty()) {
+            return List.of();
+        }
+        Map<String, User> usersById = loadUsersById(
+                members.stream().map(ClassMember::getUserId).toList());
+        return members.stream()
+                .map(m -> classMemberMapper.toResponse(m, usersById.get(m.getUserId())))
+                .toList();
+    }
+
+    private Map<String, User> loadUsersById(Collection<String> userIds) {
+        Set<String> distinctIds = userIds.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (distinctIds.isEmpty()) {
+            return Map.of();
+        }
+        return userRepository.findAllById(distinctIds).stream()
+                .collect(Collectors.toMap(User::getUserId, u -> u, (a, b) -> a));
     }
 
     @Transactional
@@ -134,30 +154,45 @@ public class ClassMemberService {
         List<ClassMember> classMembers =
                 classMemberRepository.findByUserIdAndStatus(currentUserId, ClassMember.MemberStatus.APPROVED);
 
-        List<ClassStudentResponse> learningClasses = classMembers.stream().map(member -> {
-            ClassEntity clazz = classRepository.findById(member.getClassId())
-                    .orElse(null);
-            if (clazz == null) return null;
+        Map<String, ClassEntity> classesById = loadClassesById(
+                classMembers.stream().map(ClassMember::getClassId).toList());
+        Map<String, User> teachersById = loadUsersById(
+                classesById.values().stream().map(ClassEntity::getTeacherId).toList());
 
-            String teacherName = userRepository.findById(clazz.getTeacherId())
-                    .map(User::getFullName)
-                    .orElse("Unknown");
+        List<ClassStudentResponse> learningClasses = classMembers.stream()
+                .map(member -> classesById.get(member.getClassId()))
+                .filter(Objects::nonNull)
+                .map(clazz -> classMapper.toStudentResponse(
+                        clazz, teacherName(teachersById.get(clazz.getTeacherId()))))
+                .toList();
 
-            return classMapper.toStudentResponse(clazz, teacherName);
-        }).filter(Objects::nonNull).toList();
-
-        List<ClassEntity> teachingClasses = classRepository.findByTeacherId(currentUserId);
-        List<ClassStudentResponse> teachingResponses = teachingClasses.stream()
-                .map(clazz -> classMapper.toStudentResponse(clazz,
-                        userRepository.findById(clazz.getTeacherId())
-                                .map(User::getFullName)
-                                .orElse("Unknown")))
+        // Lớp mình dạy: teacherId luôn là currentUserId, chỉ cần load 1 lần.
+        String currentUserName = teacherName(userRepository.findById(currentUserId).orElse(null));
+        List<ClassStudentResponse> teachingResponses = classRepository.findByTeacherId(currentUserId).stream()
+                .map(clazz -> classMapper.toStudentResponse(clazz, currentUserName))
                 .toList();
 
         result.put("teachingClasses", teachingResponses);
         result.put("learningClasses", learningClasses);
 
         return result;
+    }
+
+    private Map<String, ClassEntity> loadClassesById(Collection<String> classIds) {
+        Set<String> distinctIds = classIds.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (distinctIds.isEmpty()) {
+            return Map.of();
+        }
+        return classRepository.findAllById(distinctIds).stream()
+                .collect(Collectors.toMap(ClassEntity::getClassId, c -> c, (a, b) -> a));
+    }
+
+    private String teacherName(User teacher) {
+        return teacher != null && teacher.getFullName() != null
+                ? teacher.getFullName()
+                : "Unknown";
     }
 
 }

@@ -9,22 +9,19 @@ import styles from '../../TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
+// BE trả PassageResponse { content, mediaUrl, passageType, passageMedias[] }
+// và PassageMediaResponse { mediaUrl, mediaType, content }.
+const mediaListOf = (passage) =>
+  Array.isArray(passage?.passageMedias) ? passage.passageMedias : [];
+
+const isListening = (passage) => passage?.passageType === 'LISTENING';
+
 const getAudioUrls = (passage) => {
-  const list =
-    passage?.passageMedias ?? passage?.passageMediaList ?? passage?.mediaList ?? passage?.passage_media ?? [];
-  const urls = [];
-  if (Array.isArray(list)) {
-    list.forEach((m) => {
-      if ((m?.mediaType ?? m?.media_type ?? '').toUpperCase() === 'AUDIO') {
-        const u = m?.mediaUrl ?? m?.media_url;
-        if (u) urls.push(u);
-      }
-    });
-  }
-  if (urls.length === 0) {
-    const single = passage?.mediaUrl ?? passage?.media_url;
-    const pType = (passage?.passageType ?? passage?.passage_type ?? '').toUpperCase();
-    if (single && pType === 'LISTENING') urls.push(single);
+  const urls = mediaListOf(passage)
+    .filter((m) => m?.mediaType === 'AUDIO' && m?.mediaUrl)
+    .map((m) => m.mediaUrl);
+  if (urls.length === 0 && passage?.mediaUrl && isListening(passage)) {
+    urls.push(passage.mediaUrl);
   }
   return urls;
 };
@@ -59,26 +56,8 @@ function QuestionAreaBlock({
   }, [isPaged, currentStepIndex]);
 
   const useSide = (config?.passagePosition ?? 'side') === 'side';
-  const hasPassageContent = (passage, fallbackObj) => {
-    const content =
-      passage?.content ??
-      passage?.passage_content ??
-      fallbackObj?.content ??
-      fallbackObj?.passage_content;
-    const mediaList =
-      passage?.passageMediaList ??
-      passage?.passageMedias ??
-      passage?.mediaList ??
-      passage?.passage_media ??
-      [];
-    if (Array.isArray(mediaList) && mediaList.length > 0) return true;
-    const singleUrl =
-      passage?.mediaUrl ??
-      passage?.media_url ??
-      fallbackObj?.mediaUrl ??
-      fallbackObj?.media_url;
-    return Boolean(content || singleUrl);
-  };
+  const hasPassageContent = (passage) =>
+    mediaListOf(passage).length > 0 || Boolean(passage?.content || passage?.mediaUrl);
 
   const renderPassageText = (text, key) => (
     <div key={key} className={cx('passage-content')}>
@@ -94,37 +73,17 @@ function QuestionAreaBlock({
     </div>
   );
 
-  const renderPassage = (passage, fallbackObj, opts = {}) => {
+  const renderPassage = (passage, opts = {}) => {
     const suppressAudio = opts.suppressAudio === true;
-    const content =
-      passage?.content ??
-      passage?.passage_content ??
-      fallbackObj?.content ??
-      fallbackObj?.passage_content;
-    const pType = passage?.passageType ?? passage?.passage_type ?? 'READING';
-
-    const mediaList =
-      passage?.passageMediaList ??
-      passage?.passageMedias ??
-      passage?.mediaList ??
-      passage?.passage_media ??
-      [];
-    const hasMediaList = Array.isArray(mediaList) && mediaList.length > 0;
-
-    const singleMediaUrl =
-      passage?.mediaUrl ??
-      passage?.media_url ??
-      fallbackObj?.mediaUrl ??
-      fallbackObj?.media_url ??
-      fallbackObj?.audioUrl ??
-      fallbackObj?.audio_url ??
-      fallbackObj?.passageMediaUrl;
+    const content = passage?.content;
+    const mediaList = mediaListOf(passage);
+    const hasMediaList = mediaList.length > 0;
+    const singleMediaUrl = passage?.mediaUrl;
 
     const hasContent = !!content;
     const hasAnyMedia = hasMediaList || !!singleMediaUrl;
     const hasNonAudioMedia =
-      hasMediaList &&
-      mediaList.some((m) => (m?.mediaType ?? m?.media_type ?? '').toUpperCase() !== 'AUDIO');
+      hasMediaList && mediaList.some((m) => m?.mediaType !== 'AUDIO');
 
     if (suppressAudio ? !hasContent && !hasNonAudioMedia : !hasContent && !hasAnyMedia) return null;
 
@@ -135,12 +94,11 @@ function QuestionAreaBlock({
 
         {hasMediaList &&
           mediaList.map((m, idx) => {
-            const type = (m.mediaType ?? m.media_type ?? '').toUpperCase();
+            const type = m.mediaType;
             if (type === 'TEXT') {
-              const t = m.content ?? m.content_text;
-              return t ? renderPassageText(t, `media-${idx}`) : null;
+              return m.content ? renderPassageText(m.content, `media-${idx}`) : null;
             }
-            const url = m.mediaUrl ?? m.media_url;
+            const url = m.mediaUrl;
             if (!url) return null;
             if (type === 'AUDIO') {
               if (suppressAudio) return null;
@@ -167,10 +125,7 @@ function QuestionAreaBlock({
             }
             return null;
           })}
-        {!suppressAudio &&
-          !hasMediaList &&
-          singleMediaUrl &&
-          (pType === 'LISTENING' || pType === 'listening') && (
+        {!suppressAudio && !hasMediaList && singleMediaUrl && isListening(passage) && (
             <div className="mb-4">
               <audio
                 controls
@@ -262,7 +217,7 @@ function QuestionAreaBlock({
   };
 
   const renderQuestionCard = (q, absoluteIndex) => {
-    const hasPassage = hasPassageContent(q.passage, q);
+    const hasPassage = hasPassageContent(q.passage);
     const split = hasPassage && useSide;
     const questionCard = renderQuestionOnly(q, absoluteIndex);
 
@@ -277,13 +232,13 @@ function QuestionAreaBlock({
         {split ? (
           <>
             <div className={cx('passage-column')} aria-label="Đọc tài liệu">
-              {renderPassage(q.passage, q)}
+              {renderPassage(q.passage)}
             </div>
             <div className={cx('question-column')}>{questionCard}</div>
           </>
         ) : (
           <>
-            {renderPassage(q.passage, q)}
+            {renderPassage(q.passage)}
             {questionCard}
           </>
         )}
@@ -303,16 +258,8 @@ function QuestionAreaBlock({
     const isLast = currentStepIndex >= flowSteps.length - 1;
     const showManualNext = !gated && !isLast;
 
-    const passageText = String(passage?.content ?? passage?.passage_content ?? '').trim();
-    const mediaItems =
-      passage?.passageMediaList ??
-      passage?.passageMedias ??
-      passage?.mediaList ??
-      passage?.passage_media ??
-      [];
-    const hasNonAudioMedia =
-      Array.isArray(mediaItems) &&
-      mediaItems.some((m) => (m?.mediaType ?? m?.media_type ?? '').toUpperCase() !== 'AUDIO');
+    const passageText = String(passage?.content ?? '').trim();
+    const hasNonAudioMedia = mediaListOf(passage).some((m) => m?.mediaType !== 'AUDIO');
     const passageContentToShow = gated
       ? Boolean(passageText) || hasNonAudioMedia
       : hasPassageContent(passage);
@@ -332,7 +279,7 @@ function QuestionAreaBlock({
           {split ? (
             <>
               <div className={cx('passage-column')} aria-label="Tài liệu / audio">
-                {renderPassage(passage, null, { suppressAudio: gated })}
+                {renderPassage(passage, { suppressAudio: gated })}
               </div>
               <div className={cx('question-column')}>
                 <div className={cx('questions-frame')}>{questionsNode}</div>
@@ -340,7 +287,7 @@ function QuestionAreaBlock({
             </>
           ) : (
             <>
-              {renderPassage(passage, null, { suppressAudio: gated })}
+              {renderPassage(passage, { suppressAudio: gated })}
               {questionsNode}
             </>
           )}

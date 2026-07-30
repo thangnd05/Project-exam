@@ -19,6 +19,11 @@ import { getTagsFlatByExamType } from '~/shared/api/tagApi';
 import { useQuestionCollections } from './hooks/useQuestionCollections';
 import { useUpdateQuestion } from './hooks/useUpdateQuestion';
 import { useDeletePassageMedia } from './hooks/useDeletePassageMedia';
+import {
+  getExtraTextContents,
+  getPassageMediaItems,
+  PassageMediaList,
+} from './passageMedia';
 import styles from './EditQuestionModal.module.scss';
 import createStyles from '~/shared/test/CreateTestModal.module.scss';
 
@@ -28,35 +33,6 @@ const cxCreate = classNames.bind(createStyles);
 const ACCEPT_BY_TYPE = {
   LISTENING: 'audio/*',
   READING: 'image/*',
-};
-
-const getMediaItemsFromQuestion = (questionDetail) => {
-  if (!questionDetail) return [];
-  const list = Array.isArray(questionDetail.passageMedia)
-    ? questionDetail.passageMedia
-    : [];
-
-  const items = list
-    .map((m) => ({
-      id: m?.id ?? null,
-      mediaUrl: m?.mediaUrl || '',
-      mediaType: (m?.mediaType || '').toUpperCase(),
-    }))
-    .filter((m) => !!m.mediaUrl);
-
-  const fallbackUrl = questionDetail?.passage?.mediaUrl;
-  if (fallbackUrl && !items.some((m) => m.mediaUrl === fallbackUrl)) {
-    items.push({
-      id: null,
-      mediaUrl: fallbackUrl,
-      mediaType:
-        (questionDetail?.passage?.passageType || '').toUpperCase() ===
-          'LISTENING'
-          ? 'AUDIO'
-          : 'IMAGE',
-    });
-  }
-  return items;
 };
 
 const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
@@ -147,15 +123,8 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
               : { passageType: 'READING', content: '', contentTranslation: '', mediaUrl: '' },
             options: mappedOptions,
           });
-          setExistingMedia(getMediaItemsFromQuestion(questionDetail));
-
-          const textSegments = (
-            Array.isArray(questionDetail.passageMedia) ? questionDetail.passageMedia : []
-          )
-            .filter((m) => (m?.mediaType || '').toUpperCase() === 'TEXT')
-            .map((m) => m?.content || '')
-            .filter((t) => t !== '');
-          setExtraContents(textSegments);
+          setExistingMedia(getPassageMediaItems(questionDetail));
+          setExtraContents(getExtraTextContents(questionDetail));
 
           const currentTagIds = (questionDetail.tags || []).map((t) => t.tagId);
           setSelectedTagIds(currentTagIds);
@@ -500,69 +469,26 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                   <label className={cx('formLabel')}>
                     Media passage hiện có
                   </label>
-                  <div className={cx('existingMediaList')}>
-                    {existingMedia.map((item, idx) => {
-                      const url = item.mediaUrl;
-                      const isAudio =
-                        item.mediaType === 'AUDIO' ||
-                        /\.(mp3|wav|ogg|m4a)(\?.*)?$/i.test(url);
-                      const isImage =
-                        item.mediaType === 'IMAGE' ||
-                        /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(url);
-                      const deleting = item.id && isDeletingMedia(item.id);
-
+                  <PassageMediaList
+                    items={existingMedia}
+                    renderActions={(item) => {
+                      if (!item.id) return null;
+                      const deleting = isDeletingMedia(item.id);
                       return (
-                        <div
-                          key={`${item.id || url}-${idx}`}
-                          className={cx('existingMediaCard')}
+                        <ButtonPrime
+                          type="button"
+                          size="sm"
+                          variant="dangerGhost"
+                          className={cx('deleteMediaBtn')}
+                          disabled={deleting || saving}
+                          onClick={() => setConfirmDeleteMedia(item)}
                         >
-                          <div className={cx('existingMediaMeta')}>
-                            <span>
-                              {isAudio ? 'Audio' : isImage ? 'Ảnh' : 'Tài liệu'}{' '}
-                              ·{' '}
-                              <a href={url} target="_blank" rel="noreferrer">
-                                Mở file
-                              </a>
-                            </span>
-
-                            {item.id ? (
-                              <ButtonPrime
-                                type="button"
-                                size="sm"
-                                variant="dangerGhost"
-                                className={cx('deleteMediaBtn')}
-                                disabled={deleting || saving}
-                                onClick={() => setConfirmDeleteMedia(item)}
-                              >
-                                {deleting ? (
-                                  <Spinner size="sm" />
-                                ) : (
-                                  <IoTrashOutline />
-                                )}
-                                {!deleting && <span className="ms-1">Xóa</span>}
-                              </ButtonPrime>
-                            ) : null}
-                          </div>
-
-                          {isAudio ? (
-                            <audio
-                              controls
-                              src={url}
-                              className={cx('existingMediaAudio')}
-                            />
-                          ) : isImage ? (
-                            <img
-                              src={url}
-                              alt={`passage-media-${idx + 1}`}
-                              className={cx('existingMediaImage')}
-                            />
-                          ) : (
-                            <div className={cx('existingMediaDoc')}>{url}</div>
-                          )}
-                        </div>
+                          {deleting ? <Spinner size="sm" /> : <IoTrashOutline />}
+                          {!deleting && <span className="ms-1">Xóa</span>}
+                        </ButtonPrime>
                       );
-                    })}
-                  </div>
+                    }}
+                  />
                 </Col>
               )}
 

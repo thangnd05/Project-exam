@@ -1,52 +1,32 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-
 import {
   createCosmetic,
   deleteCosmetic,
   getCosmetics,
   updateCosmetic,
 } from '~/shared/api/cosmeticApi';
+import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const cosmeticKeys = {
   list: () => ['admin-cosmetics'],
 };
 
-const normalizeList = (data) => (Array.isArray(data) ? data : []);
-
 export function useCosmetics() {
-  const qc = useQueryClient();
-
-  const listQuery = useQuery({
+  const crud = useAdminCrud({
     queryKey: cosmeticKeys.list(),
-    queryFn: getCosmetics,
-    select: normalizeList,
-  });
-
-  const invalidate = () => qc.invalidateQueries({queryKey: cosmeticKeys.list()});
-
-  const createMutation = useMutation({
-    mutationFn: createCosmetic,
-    onSuccess: invalidate,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({id, payload}) => updateCosmetic(id, payload),
-    onSuccess: invalidate,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteCosmetic,
-    onSuccess: invalidate,
+    list: getCosmetics,
+    create: createCosmetic,
+    update: ({id, payload}) => updateCosmetic(id, payload),
+    remove: deleteCosmetic,
   });
 
   return {
-    items: listQuery.data ?? [],
-    isLoading: listQuery.isLoading,
-    isError: listQuery.isError,
-    createCosmetic: createMutation.mutateAsync,
-    updateCosmetic: updateMutation.mutateAsync,
-    deleteCosmetic: deleteMutation.mutateAsync,
-    isSubmitting: createMutation.isPending || updateMutation.isPending,
-    isDeleting: deleteMutation.isPending,
+    items: crud.items,
+    isLoading: crud.isLoading,
+    isError: crud.isError,
+    createCosmetic: crud.createMutation.mutateAsync,
+    updateCosmetic: crud.updateMutation.mutateAsync,
+    deleteCosmetic: crud.deleteMutation.mutateAsync,
+    isSubmitting: crud.createMutation.isPending || crud.updateMutation.isPending,
+    isDeleting: crud.deleteMutation.isPending,
   };
 }

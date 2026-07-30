@@ -15,7 +15,6 @@ import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
-import { sortByPartOrder } from '~/shared/utils/partOrder';
 import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '~/shared/utils/taskProgress';
 
 const cx = classNames.bind(styles);
@@ -97,10 +96,8 @@ function PlanPartTaskList({
   onStudyTask,
   roadmapHeading = null,
 }) {
-  const orderedGroups = useMemo(
-    () => sortByPartOrder(partGroups, { nameKey: 'examPartName' }),
-    [partGroups],
-  );
+  // BE đã sắp partGroups theo ExamPart.displayOrder — FE chỉ render.
+  const orderedGroups = partGroups;
   const fallbackOpen = useMemo(
     () => defaultOpenParts(orderedGroups, recommendedTaskId),
     [orderedGroups, recommendedTaskId],
@@ -522,26 +519,3 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
 }
 
 export default PlanPartTaskList;
-
-export function groupTasksByPart(tasks) {
-  const map = new Map();
-  (tasks || []).forEach((t) => {
-    const key = t.examPartId || 'unknown';
-    if (!map.has(key)) {
-      map.set(key, {
-        examPartId: key,
-        examPartName: t.examPartName || key,
-        passAccuracy: t.passAccuracy,
-        passedTasksInPart: 0,
-        totalTasksInPart: 0,
-        tasks: [],
-      });
-    }
-    const g = map.get(key);
-    g.tasks.push(t);
-    g.tasks.sort((a, b) => (a.taskOrder ?? 0) - (b.taskOrder ?? 0));
-    g.totalTasksInPart += 1;
-    if (t.status === 'PASSED') g.passedTasksInPart += 1;
-  });
-  return sortByPartOrder(Array.from(map.values()), { nameKey: 'examPartName' });
-}

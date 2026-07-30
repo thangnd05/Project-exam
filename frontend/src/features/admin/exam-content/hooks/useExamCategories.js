@@ -1,11 +1,10 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-
 import {
   createExamCategory,
   deleteExamCategory,
   getExamCategories,
   updateExamCategory,
 } from '~/shared/api/examCategoryApi';
+import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const examCategoryKeys = {
   list: () => ['exam-categories'],
@@ -20,44 +19,22 @@ const mapFromApi = (item) => ({
   displayOrder: item.displayOrder ?? 0,
 });
 
-const normalizeList = (data) => {
-  const list = Array.isArray(data) ? data : data?.content ?? [];
-  return list.map(mapFromApi);
-};
-
 export function useExamCategories() {
-  const qc = useQueryClient();
-
-  const listQuery = useQuery({
+  const crud = useAdminCrud({
     queryKey: examCategoryKeys.list(),
-    queryFn: getExamCategories,
-    select: normalizeList,
-  });
-
-  const invalidateList = () =>
-    qc.invalidateQueries({queryKey: examCategoryKeys.list()});
-
-  const createMutation = useMutation({
-    mutationFn: createExamCategory,
-    onSuccess: invalidateList,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({id, payload}) => updateExamCategory(id, payload),
-    onSuccess: invalidateList,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteExamCategory,
-    onSuccess: invalidateList,
+    list: getExamCategories,
+    create: createExamCategory,
+    update: ({id, payload}) => updateExamCategory(id, payload),
+    remove: deleteExamCategory,
+    mapItem: mapFromApi,
   });
 
   return {
-    categories: listQuery.data ?? [],
-    isLoading: listQuery.isLoading,
-    isError: listQuery.isError,
-    createMutation,
-    updateMutation,
-    deleteMutation,
+    categories: crud.items,
+    isLoading: crud.isLoading,
+    isError: crud.isError,
+    createMutation: crud.createMutation,
+    updateMutation: crud.updateMutation,
+    deleteMutation: crud.deleteMutation,
   };
 }

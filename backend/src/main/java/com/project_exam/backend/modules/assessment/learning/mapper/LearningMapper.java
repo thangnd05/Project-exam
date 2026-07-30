@@ -30,7 +30,6 @@ public class LearningMapper {
             int totalTasks,
             int passedTasks,
             int estimatedDaysRemaining,
-            List<PlanTaskDto> tasks,
             List<PlanPartGroupDto> partGroups,
             List<String> partsWithoutTasks) {
         return PlanResponse.builder()
@@ -51,7 +50,6 @@ public class LearningMapper {
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
                 .estimatedDaysRemaining(estimatedDaysRemaining)
-                .tasks(tasks)
                 .partGroups(partGroups)
                 .partsWithoutTasks(partsWithoutTasks)
                 .build();
@@ -65,7 +63,6 @@ public class LearningMapper {
             int totalTasks,
             int passedTasks,
             int estimatedDaysRemaining,
-            List<PlanTaskDto> tasks,
             List<PlanPartGroupDto> partGroups) {
         return PlanResponse.builder()
                 .learningPlanId(plan.getLearningPlanId())
@@ -86,7 +83,6 @@ public class LearningMapper {
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
                 .estimatedDaysRemaining(estimatedDaysRemaining)
-                .tasks(tasks)
                 .partGroups(partGroups)
                 .partsWithoutTasks(List.of())
                 .build();
@@ -105,7 +101,6 @@ public class LearningMapper {
                 .baselineReadiness(baselineReadiness)
                 .readinessLevel(readinessLevel)
                 .summary(summary)
-                .tasks(List.of())
                 .partGroups(List.of())
                 .partsWithoutTasks(List.of())
                 .build();
@@ -153,7 +148,6 @@ public class LearningMapper {
                 .passedTasksInPart(passedTasksInPart)
                 .totalTasksInPart(totalTasksInPart)
                 .partResources(partResources)
-                .tasks(tasks)
                 .build();
     }
 
@@ -252,7 +246,6 @@ public class LearningMapper {
             LearningPlan plan,
             String planStage,
             List<PlanPartGroupDto> partGroups,
-            List<PlanTaskDto> tasks,
             int totalTasks,
             int passedTasks,
             String message) {
@@ -262,7 +255,6 @@ public class LearningMapper {
                 .examTypeId(plan.getExamTypeId())
                 .planStage(planStage)
                 .partGroups(partGroups)
-                .tasks(tasks)
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
                 .questions(List.of())

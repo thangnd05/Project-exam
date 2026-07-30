@@ -8,6 +8,7 @@ import {
   updateRolePermissions,
 } from '~/features/admin/api/roleApi';
 import {getPermissions} from '~/features/admin/api/permissionApi';
+import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const roleKeys = {
   roles: ['admin-roles'],
@@ -21,18 +22,18 @@ export const mapRoleFromApi = (role) => ({
   permissions: Array.isArray(role.permissions) ? role.permissions : [],
 });
 
-const normalizeRoles = (data) =>
-  (Array.isArray(data) ? data : []).map(mapRoleFromApi);
-
 const normalizePermissions = (data) => (Array.isArray(data) ? data : []);
 
 export function useRoles() {
   const qc = useQueryClient();
 
-  const rolesQuery = useQuery({
+  const crud = useAdminCrud({
     queryKey: roleKeys.roles,
-    queryFn: getRoles,
-    select: normalizeRoles,
+    list: getRoles,
+    create: createRole,
+    update: ({id, payload}) => updateRole(id, payload),
+    remove: (id) => deleteRole(id),
+    mapItem: mapRoleFromApi,
   });
 
   const permissionsQuery = useQuery({
@@ -41,36 +42,18 @@ export function useRoles() {
     select: normalizePermissions,
   });
 
-  const invalidateRoles = () =>
-    qc.invalidateQueries({queryKey: roleKeys.roles});
-
-  const createRoleMutation = useMutation({
-    mutationFn: createRole,
-    onSuccess: invalidateRoles,
-  });
-
-  const updateRoleMutation = useMutation({
-    mutationFn: ({id, payload}) => updateRole(id, payload),
-    onSuccess: invalidateRoles,
-  });
-
-  const deleteRoleMutation = useMutation({
-    mutationFn: (id) => deleteRole(id),
-    onSuccess: invalidateRoles,
-  });
-
   const updatePermissionsMutation = useMutation({
     mutationFn: ({id, codes}) => updateRolePermissions(id, codes),
-    onSuccess: invalidateRoles,
+    onSuccess: () => qc.invalidateQueries({queryKey: roleKeys.roles}),
   });
 
   return {
-    roleList: rolesQuery.data ?? [],
+    roleList: crud.items,
     permissionCatalog: permissionsQuery.data ?? [],
-    loading: rolesQuery.isLoading,
-    createRoleMutation,
-    updateRoleMutation,
-    deleteRoleMutation,
+    loading: crud.isLoading,
+    createRoleMutation: crud.createMutation,
+    updateRoleMutation: crud.updateMutation,
+    deleteRoleMutation: crud.deleteMutation,
     updatePermissionsMutation,
   };
 }

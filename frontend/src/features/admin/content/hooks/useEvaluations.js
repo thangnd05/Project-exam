@@ -1,4 +1,4 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import {keepPreviousData} from '~/shared/config/queryClient';
 
 import {
@@ -7,6 +7,7 @@ import {
   getEvaluations,
   updateEvaluation,
 } from '~/shared/api/evaluationApi';
+import {useCrudMutations} from '~/features/admin/hooks/useAdminCrud';
 
 export const evaluationKeys = {
   all: ['evaluations'],
@@ -52,22 +53,11 @@ export function useEvaluations({page, size, keyword, rating}) {
 }
 
 export function useEvaluationMutations() {
-  const qc = useQueryClient();
-  const invalidate = () => qc.invalidateQueries({queryKey: evaluationKeys.all});
-
-  const createMutation = useMutation({
-    mutationFn: (payload) => createEvaluation(payload),
-    onSuccess: invalidate,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({id, payload}) => updateEvaluation(id, payload),
-    onSuccess: invalidate,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => deleteEvaluation(id),
-    onSuccess: invalidate,
+  const {createMutation, updateMutation, deleteMutation} = useCrudMutations({
+    queryKey: evaluationKeys.all,
+    create: (payload) => createEvaluation(payload),
+    update: ({id, payload}) => updateEvaluation(id, payload),
+    remove: (id) => deleteEvaluation(id),
   });
 
   return {createMutation, updateMutation, deleteMutation};

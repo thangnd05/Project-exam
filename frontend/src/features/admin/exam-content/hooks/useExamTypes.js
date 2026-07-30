@@ -1,4 +1,4 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
 
 import {
   createExamType,
@@ -7,48 +7,29 @@ import {
   updateExamType,
   updateExamTypeLayout,
 } from '~/shared/api/examTypeApi';
+import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const examTypeKeys = {
   all: ['exam-types'],
   layout: (examTypeId) => ['exam-type-layout', examTypeId ?? null],
 };
 
-const normalizeList = (data) =>
-  Array.isArray(data) ? data : data?.content ?? [];
-
 export function useExamTypes() {
-  const qc = useQueryClient();
-
-  const listQuery = useQuery({
+  const crud = useAdminCrud({
     queryKey: examTypeKeys.all,
-    queryFn: getExamTypes,
-    select: normalizeList,
-  });
-
-  const invalidate = () => qc.invalidateQueries({queryKey: examTypeKeys.all});
-
-  const createMutation = useMutation({
-    mutationFn: createExamType,
-    onSuccess: invalidate,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({id, payload}) => updateExamType(id, payload),
-    onSuccess: invalidate,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteExamType,
-    onSuccess: invalidate,
+    list: getExamTypes,
+    create: createExamType,
+    update: ({id, payload}) => updateExamType(id, payload),
+    remove: deleteExamType,
   });
 
   return {
-    examTypeList: listQuery.data ?? [],
-    isLoading: listQuery.isLoading,
-    isError: listQuery.isError,
-    createMutation,
-    updateMutation,
-    deleteMutation,
+    examTypeList: crud.items,
+    isLoading: crud.isLoading,
+    isError: crud.isError,
+    createMutation: crud.createMutation,
+    updateMutation: crud.updateMutation,
+    deleteMutation: crud.deleteMutation,
   };
 }
 

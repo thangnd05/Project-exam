@@ -31,11 +31,9 @@ function TaskHistoryPage() {
 
   const task = useMemo(() => {
     if (!plan) return null;
-    const allTasks = [
-      ...(plan.tasks || []),
-      ...((plan.partGroups || []).flatMap((g) => g.tasks || [])),
-    ];
-    return allTasks.find((t) => t.taskId === taskId) || null;
+    return (plan.partGroups || [])
+      .flatMap((g) => g.tasks || [])
+      .find((t) => t.taskId === taskId) || null;
   }, [plan, taskId]);
 
   if (loading) {

@@ -1,51 +1,30 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-
 import {
   createCoinWallet,
   deleteCoinWallet,
   getCoinWallets,
   updateCoinBalance,
 } from '~/shared/api/coinApi';
+import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const coinKeys = {
   wallets: ['coin-wallets'],
 };
 
-const normalizeWallets = (data) => (Array.isArray(data) ? data : []);
-
 export function useCoins() {
-  const queryClient = useQueryClient();
-
-  const walletsQuery = useQuery({
+  const crud = useAdminCrud({
     queryKey: coinKeys.wallets,
-    queryFn: getCoinWallets,
-    select: normalizeWallets,
-  });
-
-  const invalidateWallets = () =>
-    queryClient.invalidateQueries({queryKey: coinKeys.wallets});
-
-  const createMutation = useMutation({
-    mutationFn: createCoinWallet,
-    onSuccess: invalidateWallets,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({userId, balance}) => updateCoinBalance(userId, {balance}),
-    onSuccess: invalidateWallets,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (userId) => deleteCoinWallet(userId),
-    onSuccess: invalidateWallets,
+    list: getCoinWallets,
+    create: createCoinWallet,
+    update: ({userId, balance}) => updateCoinBalance(userId, {balance}),
+    remove: (userId) => deleteCoinWallet(userId),
   });
 
   return {
-    wallets: walletsQuery.data ?? [],
-    isLoading: walletsQuery.isLoading,
-    isError: walletsQuery.isError,
-    createMutation,
-    updateMutation,
-    deleteMutation,
+    wallets: crud.items,
+    isLoading: crud.isLoading,
+    isError: crud.isError,
+    createMutation: crud.createMutation,
+    updateMutation: crud.updateMutation,
+    deleteMutation: crud.deleteMutation,
   };
 }
