@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { login as loginRequest, register as registerRequest } from '~/shared/api/authApi';
 import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '~/shared/hooks/useAuth';
 import { toast } from 'react-toastify';
+import {
+  useLoginMutation,
+  useRegisterMutation,
+} from './hooks/useAuthActions';
 import {
   getRedirectTarget,
   saveOAuthRedirect,
@@ -36,6 +39,8 @@ function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const loginMutation = useLoginMutation();
+  const registerMutation = useRegisterMutation();
 
   const backendBaseUrl = getApiBaseUrl();
   const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
@@ -68,7 +73,7 @@ function LoginPage() {
 
     try {
 
-      const userData = await loginRequest({
+      const userData = await loginMutation.mutateAsync({
         identifier: loginIdentifier,
         password: loginPassword,
       });
@@ -106,7 +111,7 @@ function LoginPage() {
     setMessage('');
 
     try {
-      const data = await registerRequest({
+      const data = await registerMutation.mutateAsync({
         userName: regUserName,
         fullName: regFullName,
         email: regEmail,

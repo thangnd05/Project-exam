@@ -4,7 +4,7 @@ import style from './login.module.scss';
 import routes from '~/shared/config/Routes';
 import {Form, Button} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
-import { forgotPassword } from '~/shared/api/authApi';
+import { useForgotPasswordMutation } from './hooks/useAuthActions';
 
 const cx = classNames.bind(style);
 
@@ -15,6 +15,7 @@ function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+  const forgotPasswordMutation = useForgotPasswordMutation();
 
   const handleReset = async (e) => {
     e.preventDefault();
@@ -23,7 +24,7 @@ function ForgotPassword() {
     setError('');
 
     try {
-      await forgotPassword(email);
+      await forgotPasswordMutation.mutateAsync(email);
 
       setMessage('Hãy vào email để lấy token để có thể đổi mật khẩu.');
       setError('Token chỉ có thời lượng là 5 phút');

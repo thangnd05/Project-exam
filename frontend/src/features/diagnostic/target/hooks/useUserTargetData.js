@@ -4,6 +4,7 @@ import { getExamParts } from '~/shared/api/examPartApi';
 import { getSkills } from '~/shared/api/skillApi';
 import { getScoringConversions } from '~/shared/api/scoringConversionApi';
 import { getMilestones } from '~/shared/api/milestoneApi';
+import { getUserTarget } from '~/shared/api/userTargetApi';
 import { sortByPartOrder } from '~/shared/utils/partOrder';
 
 export const userTargetKeys = {
@@ -12,6 +13,7 @@ export const userTargetKeys = {
   skills: ['skills'],
   scoringConversions: ['scoring-conversions'],
   milestones: (examTypeId) => ['milestones', examTypeId],
+  current: (examTypeId) => ['user-target', examTypeId],
 };
 
 const asArray = (data) =>
@@ -52,4 +54,12 @@ export function useUserTargetData(selectedExamTypeId) {
     scoringConversions: scoringConversionsQuery.data ?? [],
     milestones: milestonesQuery.data ?? [],
   };
+}
+
+export function useCurrentUserTarget(selectedExamTypeId) {
+  return useQuery({
+    queryKey: userTargetKeys.current(selectedExamTypeId),
+    queryFn: () => getUserTarget(selectedExamTypeId),
+    enabled: !!selectedExamTypeId,
+  });
 }

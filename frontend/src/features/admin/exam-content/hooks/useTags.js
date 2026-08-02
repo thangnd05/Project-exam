@@ -1,6 +1,8 @@
-import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
-import {createTag, deleteTag, updateTag} from '~/shared/api/tagApi';
+import {getExamTypes} from '~/shared/api/examTypeApi';
+import {createTag, deleteTag, getTagTreeByExamType, getTagsFlatByExamType, updateTag} from '~/shared/api/tagApi';
+import {examTypeKeys} from './useExamTypes';
 
 export const tagKeys = {
   all: ['admin-tags'],
@@ -27,4 +29,35 @@ export function useTags() {
   });
 
   return {createMutation, updateMutation, deleteMutation};
+}
+
+export function useAdminExamTypesForTags() {
+  return useQuery({
+    queryKey: examTypeKeys.all,
+    queryFn: getExamTypes,
+    select: (list) => list.map((item) => ({id: item.examTypeId, name: item.name})),
+  });
+}
+
+export function useTagTree(examTypeId) {
+  const treeQuery = useQuery({
+    queryKey: [...tagKeys.byExamType(examTypeId), 'tree'],
+    queryFn: () => getTagTreeByExamType(examTypeId),
+    enabled: !!examTypeId,
+  });
+  const flatQuery = useQuery({
+    queryKey: [...tagKeys.byExamType(examTypeId), 'flat'],
+    queryFn: () => getTagsFlatByExamType(examTypeId),
+    enabled: !!examTypeId,
+  });
+
+  const refetch = () => Promise.all([treeQuery.refetch(), flatQuery.refetch()]);
+
+  return {
+    tagTree: treeQuery.data ?? [],
+    flatTags: flatQuery.data ?? [],
+    isLoading: treeQuery.isLoading || flatQuery.isLoading,
+    isError: treeQuery.isError || flatQuery.isError,
+    refetch,
+  };
 }

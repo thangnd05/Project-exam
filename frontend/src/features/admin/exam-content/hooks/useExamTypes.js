@@ -1,9 +1,11 @@
-import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {
   createExamType,
   deleteExamType,
+  getExamTypeById,
   getExamTypes,
+  getOwnExamTypeLayout,
   updateExamType,
   updateExamTypeLayout,
 } from '~/shared/api/examTypeApi';
@@ -11,6 +13,7 @@ import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const examTypeKeys = {
   all: ['exam-types'],
+  detail: (examTypeId) => ['exam-type', examTypeId ?? null],
   layout: (examTypeId) => ['exam-type-layout', examTypeId ?? null],
 };
 
@@ -31,6 +34,22 @@ export function useExamTypes() {
     updateMutation: crud.updateMutation,
     deleteMutation: crud.deleteMutation,
   };
+}
+
+export function useExamTypeById(examTypeId) {
+  return useQuery({
+    queryKey: examTypeKeys.detail(examTypeId),
+    queryFn: () => getExamTypeById(examTypeId),
+    enabled: !!examTypeId,
+  });
+}
+
+export function useOwnExamTypeLayout(examTypeId) {
+  return useQuery({
+    queryKey: examTypeKeys.layout(examTypeId),
+    queryFn: () => getOwnExamTypeLayout(examTypeId),
+    enabled: !!examTypeId,
+  });
 }
 
 export function useUpdateExamTypeLayout({onSuccess, onError} = {}) {

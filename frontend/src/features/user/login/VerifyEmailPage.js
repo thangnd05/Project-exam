@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import { verifyEmail } from '~/shared/api/authApi';
+import { useVerifyEmailMutation } from './hooks/useAuthActions';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from './VerifyEmailPage.module.scss';
 
@@ -22,6 +22,7 @@ export default function VerifyEmailPage() {
 
   const [status, setStatus] = useState('loading');
   const [msg, setMsg] = useState('Vui lòng chờ trong giây lát...');
+  const verifyEmailMutation = useVerifyEmailMutation();
 
   useEffect(() => {
     if (!token) {
@@ -30,23 +31,24 @@ export default function VerifyEmailPage() {
       return;
     }
 
-    verifyEmail(token)
-      .then((data) => {
+    verifyEmailMutation.mutate(token, {
+      onSuccess: (data) => {
         setStatus('success');
         setMsg(data.message || 'Tài khoản của bạn đã được xác thực. Đang chuyển đến trang đăng nhập...');
 
         setTimeout(() => {
           navigate('/login');
         }, 2000);
-      })
-      .catch((err) => {
+      },
+      onError: (err) => {
         setStatus('error');
         setMsg(err.response?.data?.message || 'Liên kết xác thực không hợp lệ hoặc đã hết hạn.');
 
         setTimeout(() => {
           navigate('/register');
         }, 2500);
-      });
+      },
+    });
   }, [token, navigate]);
 
   return (

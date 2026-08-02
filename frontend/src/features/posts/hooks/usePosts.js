@@ -1,12 +1,15 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
-import { getPosts, getCategories } from '~/shared/api/postApi';
+import { getPosts, getCategories, getPostById, getComments } from '~/shared/api/postApi';
 
 const PAGE_SIZE = 9;
 
 export const postsKeys = {
   categories: ['post-categories'],
   list: (params) => ['posts', params],
+  detail: (postId) => ['post', postId],
+  comments: (postId) => ['post', postId, 'comments'],
+  related: (categoryId) => ['post', 'related', categoryId],
 };
 
 const selectPosts = (data) => ({
@@ -42,4 +45,33 @@ export function usePosts({ page = 0, categoryId = null, keyword = '', status = '
     isLoading: postsQuery.isLoading || categoriesQuery.isLoading,
     refresh,
   };
+}
+
+export function usePostDetail(postId, { enabled = true } = {}) {
+  return useQuery({
+    queryKey: postsKeys.detail(postId),
+    queryFn: () => getPostById(postId),
+    enabled: enabled && !!postId,
+  });
+}
+
+export function usePostComments(postId, { enabled = true } = {}) {
+  return useQuery({
+    queryKey: postsKeys.comments(postId),
+    queryFn: () => getComments(postId),
+    enabled: enabled && !!postId,
+  });
+}
+
+export function useRelatedPosts({ categoryId, postId, enabled = true } = {}) {
+  return useQuery({
+    queryKey: postsKeys.related(categoryId),
+    queryFn: () => getPosts({ categoryId, size: 8 }),
+    enabled: enabled && !!categoryId,
+    select: (data) => (data?.content || []).filter((p) => p.id !== postId),
+  });
+}
+
+export function fetchPostById(postId) {
+  return getPostById(postId);
 }

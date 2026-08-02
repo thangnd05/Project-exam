@@ -1,13 +1,16 @@
+import {useQuery} from '@tanstack/react-query';
 import {
   createCoinWallet,
   deleteCoinWallet,
   getCoinWallets,
   updateCoinBalance,
 } from '~/shared/api/coinApi';
+import {getUsers} from '~/shared/api/userApi';
 import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const coinKeys = {
   wallets: ['coin-wallets'],
+  userOptions: ['coin-user-options'],
 };
 
 export function useCoins() {
@@ -27,4 +30,16 @@ export function useCoins() {
     updateMutation: crud.updateMutation,
     deleteMutation: crud.deleteMutation,
   };
+}
+
+export function useCoinUserOptions({enabled = false, wallets = []} = {}) {
+  return useQuery({
+    queryKey: coinKeys.userOptions,
+    queryFn: () => getUsers({page: 0, size: 100}),
+    enabled,
+    select: (response) => {
+      const existingUserIds = new Set(wallets.map((wallet) => wallet.userId));
+      return (response?.content || []).filter((user) => !existingUserIds.has(user.id));
+    },
+  });
 }

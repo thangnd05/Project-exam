@@ -1,9 +1,8 @@
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
-import { getSessionReview } from '~/shared/api/learningPlanApi';
 import PlanResultView from '../components/PlanResultView';
 import { toPlanResult } from '../planResult';
+import { usePlanSessionReview } from './hooks/usePlanSessionReview';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -14,11 +13,7 @@ function PlanSessionReviewPage() {
   const taskId = searchParams.get('taskId');
   const navigate = useNavigate();
 
-  const query = useQuery({
-    queryKey: ['plan-session-review', learningPlanId, sessionId],
-    queryFn: () => getSessionReview(learningPlanId, sessionId),
-    enabled: !!learningPlanId && !!sessionId,
-  });
+  const query = usePlanSessionReview(learningPlanId, sessionId);
 
   const backTo = taskId
     ? `/learning-plans/${learningPlanId}/tasks/${taskId}/history`

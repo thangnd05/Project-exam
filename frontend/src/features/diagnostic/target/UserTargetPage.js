@@ -1,16 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import { getUserTarget } from '~/shared/api/userTargetApi';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import styles from './UserTargetPage.module.scss';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
 import useMilestoneScoring from '~/shared/hooks/useMilestoneScoring';
-import { useUserTargetData } from './hooks/useUserTargetData';
+import { useCurrentUserTarget, useUserTargetData } from './hooks/useUserTargetData';
 import {
   useSaveUserTarget,
   useDeleteUserTarget,
@@ -19,21 +17,13 @@ import {
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);
 
-const currentTargetKeys = {
-  detail: (examTypeId) => ['user-target', examTypeId],
-};
-
 function UserTargetPage() {
   const [searchParams] = useSearchParams();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [targetScore, setTargetScore] = useState('');
   const [customParts, setCustomParts] = useState({});
 
-  const targetQuery = useQuery({
-    queryKey: currentTargetKeys.detail(selectedExamTypeId),
-    queryFn: () => getUserTarget(selectedExamTypeId),
-    enabled: !!selectedExamTypeId,
-  });
+  const targetQuery = useCurrentUserTarget(selectedExamTypeId);
   const currentTarget = targetQuery.data?.hasTarget ? targetQuery.data : null;
 
   const { examTypes, examParts, skills, scoringConversions, milestones } =

@@ -1,11 +1,10 @@
-import { useMemo, useState } from 'react';
+import {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Coins, Edit, Plus, Trash2} from 'lucide-react';
 
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 
-import {getUsers} from '~/shared/api/userApi';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {
   AdminFieldError,
@@ -13,7 +12,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import {useCoins} from './hooks/useCoins';
+import {useCoinUserOptions, useCoins} from './hooks/useCoins';
 
 const defaultFormState = {
   userId: '',
@@ -25,9 +24,9 @@ function CoinsManagement() {
   const [showModal, setShowModal] = useState(false);
   const [editingWallet, setEditingWallet] = useState(null);
   const [formState, setFormState] = useState(defaultFormState);
-  const [userOptions, setUserOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingWallet, setDeletingWallet] = useState(null);
+  const [loadUserOptions, setLoadUserOptions] = useState(false);
 
   const {
     wallets,
@@ -37,6 +36,12 @@ function CoinsManagement() {
     updateMutation,
     deleteMutation,
   } = useCoins();
+
+  const userOptionsQuery = useCoinUserOptions({
+    enabled: loadUserOptions,
+    wallets,
+  });
+  const userOptions = userOptionsQuery.data ?? [];
 
   const submitting =
     createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
@@ -61,20 +66,10 @@ function CoinsManagement() {
     setErrorMessage('');
   };
 
-  const openCreateModal = async () => {
+  const openCreateModal = () => {
     resetForm();
     setShowModal(true);
-
-    try {
-      const response = await getUsers({page: 0, size: 100});
-      const existingUserIds = new Set(wallets.map((wallet) => wallet.userId));
-      const available = (response?.content || []).filter(
-        (user) => !existingUserIds.has(user.id),
-      );
-      setUserOptions(available);
-    } catch (error) {
-      setUserOptions([]);
-    }
+    setLoadUserOptions(true);
   };
 
   const openEditModal = (wallet) => {

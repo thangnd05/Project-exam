@@ -14,10 +14,7 @@ import {
 } from 'lucide-react';
 import classNames from 'classnames/bind';
 
-import {useQuery} from '@tanstack/react-query';
-
-import {getExamTypeById, getOwnExamTypeLayout} from '~/shared/api/examTypeApi';
-import {examTypeKeys, useUpdateExamTypeLayout} from './hooks/useExamTypes';
+import {useExamTypeById, useOwnExamTypeLayout, useUpdateExamTypeLayout} from './hooks/useExamTypes';
 import { resolveLayoutConfig } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,
@@ -87,19 +84,10 @@ function ExamTypeLayoutEditor() {
   const saveLayout = useUpdateExamTypeLayout();
   const saving = saveLayout.isPending;
 
-  const examTypeQuery = useQuery({
-    queryKey: ['exam-type', examTypeId],
-    queryFn: () => getExamTypeById(examTypeId),
-    enabled: !!examTypeId,
-    select: (data) => data?.name || '',
-  });
-  const examTypeName = examTypeQuery.data || '';
+  const examTypeQuery = useExamTypeById(examTypeId);
+  const examTypeName = examTypeQuery.data?.name || '';
 
-  const layoutQuery = useQuery({
-    queryKey: examTypeKeys.layout(examTypeId),
-    queryFn: () => getOwnExamTypeLayout(examTypeId),
-    enabled: !!examTypeId,
-  });
+  const layoutQuery = useOwnExamTypeLayout(examTypeId);
   const loading = layoutQuery.isLoading;
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
 import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, IoSearchOutline, IoEllipsisVertical, IoPencilOutline, IoTrashOutline, IoChevronBackOutline, IoChevronForwardOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import { getPostById } from '~/shared/api/postApi';
+import { fetchPostById } from '~/features/posts/hooks/usePosts';
 import CreatePostModal from '~/features/posts/modals/CreatePostModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import routes from '~/shared/config/Routes';
@@ -90,7 +90,7 @@ function MyPostsPage({ embedded = false }) {
   const handleEdit = async (postId) => {
     setActionLoadingId(postId);
     try {
-      const fullPost = await getPostById(postId);
+      const fullPost = await fetchPostById(postId);
       setEditingPost(fullPost);
       setShowEditModal(true);
     } catch (error) {

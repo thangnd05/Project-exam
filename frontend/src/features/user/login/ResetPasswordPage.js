@@ -4,7 +4,7 @@ import style from './login.module.scss';
 import routes from '~/shared/config/Routes';
 import {Form, Button} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
-import { resetPassword } from '~/shared/api/authApi';
+import { useResetPasswordMutation } from './hooks/useAuthActions';
 
 const cx = classNames.bind(style);
 
@@ -15,6 +15,7 @@ function ResetPassWord() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const resetPasswordMutation = useResetPasswordMutation();
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ function ResetPassWord() {
     }
 
     try {
-      await resetPassword(token, newPassword);
+      await resetPasswordMutation.mutateAsync({ token, newPassword });
 
       setMessage('Đặt lại mật khẩu thành công!');
       setTimeout(() => {

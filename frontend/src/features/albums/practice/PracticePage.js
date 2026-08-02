@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import {useParams} from 'react-router-dom';
-import { generatePracticeQuestion } from '~/shared/api/practiceQuestionApi';
 import { getTtsUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import { useMarkVocabKnown } from '~/features/albums/practice/hooks/useMarkVocabKnown';
 import { useCheckPracticeAnswer } from '~/features/albums/practice/hooks/useCheckPracticeAnswer';
+import { useGeneratePracticeQuestion } from '~/features/albums/practice/hooks/useGeneratePracticeQuestion';
 import {Container, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -42,11 +42,12 @@ const PracticePage = () => {
     const markMutation = useMarkVocabKnown(albumId);
     const markingKnown = markMutation.isPending;
     const checkMutation = useCheckPracticeAnswer(albumId);
+    const generateMutation = useGeneratePracticeQuestion(albumId);
 
     const fetchQuestion = useCallback(async () => {
         try {
             setLoading(true);
-            const data = await generatePracticeQuestion(albumId);
+            const data = await generateMutation.mutateAsync();
             if (!data) {
                 setFinished(true);
                 setQuestion(null);
@@ -61,7 +62,7 @@ const PracticePage = () => {
             setSelectedOption(null);
             setUserAnswer({english: '', vietnamese: ''});
         }
-    }, [albumId]);
+    }, [albumId, generateMutation]);
 
     useEffect(() => {
         fetchQuestion();

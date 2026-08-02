@@ -3,12 +3,10 @@ import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronDown, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
 
-import {getExamTypes} from '~/shared/api/examTypeApi';
-import {getTagTreeByExamType, getTagsFlatByExamType} from '~/shared/api/tagApi';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import TagFormModal from '../modals/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
-import {useTags} from './hooks/useTags';
+import {useAdminExamTypesForTags, useTagTree, useTags} from './hooks/useTags';
 import styles from './Tags.module.scss';
 
 const cx = classNames.bind(styles);
@@ -89,59 +87,56 @@ function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, o
 }
 
 function TagsManagement() {
-  const [examTypes, setExamTypes] = useState([]);
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
-  const [tagTree, setTagTree] = useState([]);
-  const [flatTags, setFlatTags] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingTagId, setEditingTagId] = useState(null);
   const [formState, setFormState] = useState(emptyForm);
-  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingTag, setDeletingTag] = useState(null);
   const [expandedIds, setExpandedIds] = useState(new Set());
+  const [preserveExpandedOnRefetch, setPreserveExpandedOnRefetch] = useState(false);
+
+  const examTypesQuery = useAdminExamTypesForTags();
+  const examTypes = examTypesQuery.data ?? [];
+
+  const {
+    tagTree,
+    flatTags,
+    isLoading: loading,
+    isError: tagLoadError,
+    refetch: refetchTags,
+  } = useTagTree(selectedExamTypeId);
 
   const {createMutation, updateMutation, deleteMutation} = useTags();
   const submitting =
     createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
   useEffect(() => {
-    getExamTypes()
-      .then((list) => {
-        const mapped = list.map((item) => ({id: item.examTypeId, name: item.name}));
-        setExamTypes(mapped);
-        if (mapped.length > 0) setSelectedExamTypeId(mapped[0].id);
-      })
-      .catch(() => {});
-  }, []);
+    if (examTypes.length > 0 && !selectedExamTypeId) {
+      setSelectedExamTypeId(examTypes[0].id);
+    }
+  }, [examTypes, selectedExamTypeId]);
+
+  useEffect(() => {
+    if (tagLoadError) {
+      setErrorMessage('Không thể tải danh sách tag.');
+    }
+  }, [tagLoadError]);
+
+  useEffect(() => {
+    if (preserveExpandedOnRefetch || tagTree.length === 0) return;
+    setExpandedIds(new Set(tagTree.map((t) => t.tagId)));
+  }, [tagTree, preserveExpandedOnRefetch]);
 
   const fetchTags = useCallback(async (examTypeIdOverride, {preserveExpanded = false} = {}) => {
     const examTypeId = examTypeIdOverride || selectedExamTypeId;
     if (!examTypeId) return;
-    setLoading(true);
+    setPreserveExpandedOnRefetch(preserveExpanded);
     setErrorMessage('');
-    try {
-      const [tree, flat] = await Promise.all([
-        getTagTreeByExamType(examTypeId),
-        getTagsFlatByExamType(examTypeId),
-      ]);
-      setTagTree(tree);
-      setFlatTags(flat);
-
-      if (!preserveExpanded) {
-        setExpandedIds(new Set(tree.map((t) => t.tagId)));
-      }
-    } catch {
-      setErrorMessage('Không thể tải danh sách tag.');
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedExamTypeId]);
-
-  useEffect(() => {
-    fetchTags();
-  }, [fetchTags]);
+    await refetchTags();
+    setPreserveExpandedOnRefetch(false);
+  }, [refetchTags, selectedExamTypeId]);
 
   const toggleExpand = useCallback((tagId) => {
     setExpandedIds((prev) => {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '~/shared/hooks/useAuth';
-import { getCurrentUser } from '~/shared/api/authApi';
+import { fetchCurrentUser } from './hooks/useAuthActions';
 import { claimGuestAfterLogin, takeOAuthRedirect } from '~/shared/utils/authRedirect';
 
 function OAuth2Redirect() {
@@ -11,7 +11,7 @@ function OAuth2Redirect() {
     useEffect(() => {
         const syncUser = async () => {
             try {
-                const userData = await getCurrentUser();
+                const userData = await fetchCurrentUser();
 
                 if (userData) {
 

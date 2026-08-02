@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import DOMPurify from 'dompurify';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
@@ -17,7 +17,7 @@ import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes from '~/shared/config/Routes';
 import styles from './PostDetailPage.module.scss';
-import { getPosts, getPostById, getComments } from '~/shared/api/postApi';
+import { postsKeys, usePostDetail, usePostComments, useRelatedPosts } from './hooks/usePosts';
 import { useAddComment, useUpdateComment, useDeleteComment } from './hooks/useComments';
 import { useToggleReact, useToggleSavePost } from './hooks/usePostReactions';
 
@@ -45,16 +45,8 @@ function PostDetailPage() {
   const [replyIndentPx, setReplyIndentPx] = useState(40);
   const [expandedReplies, setExpandedReplies] = useState({});
 
-  const postQuery = useQuery({
-    queryKey: ['post', postId],
-    queryFn: () => getPostById(postId),
-    enabled: !!postId,
-  });
-  const commentsQuery = useQuery({
-    queryKey: ['post', postId, 'comments'],
-    queryFn: () => getComments(postId),
-    enabled: !!postId,
-  });
+  const postQuery = usePostDetail(postId);
+  const commentsQuery = usePostComments(postId);
 
   const post = postQuery.data;
   const loading = postQuery.isLoading;
@@ -62,16 +54,11 @@ function PostDetailPage() {
   const comments = commentsQuery.data || [];
 
   const categoryId = post?.categories?.[0]?.id;
-  const relatedQuery = useQuery({
-    queryKey: ['post', 'related', categoryId],
-    queryFn: () => getPosts({ categoryId, size: 8 }),
-    enabled: !!categoryId,
-    select: (data) => (data?.content || []).filter((p) => p.id !== postId),
-  });
+  const relatedQuery = useRelatedPosts({ categoryId, postId, enabled: !!categoryId });
   const relatedPosts = relatedQuery.data || [];
 
   const reloadComments = () =>
-    queryClient.invalidateQueries({ queryKey: ['post', postId, 'comments'] });
+    queryClient.invalidateQueries({ queryKey: postsKeys.comments(postId) });
 
   const addCommentMutation = useAddComment();
   const updateCommentMutation = useUpdateComment();
@@ -97,8 +84,8 @@ function PostDetailPage() {
       skipFirstCosmeticSync.current = false;
       return;
     }
-    queryClient.invalidateQueries({ queryKey: ['post', postId] });
-    queryClient.invalidateQueries({ queryKey: ['post', postId, 'comments'] });
+    queryClient.invalidateQueries({ queryKey: postsKeys.detail(postId) });
+    queryClient.invalidateQueries({ queryKey: postsKeys.comments(postId) });
   }, [cosmeticFrame, cosmeticBadge, postId, queryClient]);
 
   useEffect(() => {

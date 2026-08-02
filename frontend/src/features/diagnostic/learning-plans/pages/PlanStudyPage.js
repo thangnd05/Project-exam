@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { getCurrentSession, startTaskSession } from '~/shared/api/learningPlanApi';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
@@ -12,6 +10,7 @@ import { getApiBaseUrl, getFullMediaUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import { useSubmitSession } from './hooks/useSubmitSession';
+import { usePlanSession } from './hooks/usePlanSession';
 import { planNoticeText, planStageLabel, taskDisplayName } from '../planLabels';
 import TestStartDashboard from '~/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
 import ProgressBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/ProgressBlock';
@@ -30,11 +29,6 @@ function isAnswered(question, selections) {
     ? Array.isArray(selected) && selected.length > 0
     : Boolean(selected);
 }
-
-const planSessionKeys = {
-  session: (learningPlanId, taskId) =>
-    ['plan-session', learningPlanId, taskId || null],
-};
 
 // Gom các câu hỏi cùng passage vào một nhóm để chỉ hiển thị đoạn văn/audio một lần.
 function groupQuestionsByPassage(questions) {
@@ -133,18 +127,7 @@ function PlanStudyPage() {
   const submitMutation = useSubmitSession();
   const submitting = submitMutation.isPending;
 
-  const sessionQuery = useQuery({
-    queryKey: planSessionKeys.session(learningPlanId, taskIdFromUrl),
-
-    queryFn: () => (taskIdFromUrl
-      ? startTaskSession(learningPlanId, taskIdFromUrl)
-      : getCurrentSession(learningPlanId)),
-    enabled: !!learningPlanId,
-    retry: false,
-
-    staleTime: 0,
-    gcTime: 0,
-  });
+  const sessionQuery = usePlanSession(learningPlanId, taskIdFromUrl);
 
   const session = sessionQuery.data ?? null;
 
