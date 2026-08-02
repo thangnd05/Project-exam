@@ -18,7 +18,6 @@ import com.project_exam.backend.modules.assessment.learning.mapper.LearningMappe
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanProgressSupport;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanTaskUnlockSupport;
-import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanAccess;
 import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
 import com.project_exam.backend.modules.assessment.attempt.util.ReadinessThresholds;
@@ -422,9 +421,7 @@ public class LearningPlanService {
         }
 
         Map<String, Integer> sortOrderByTag = loadTagSortOrders(partTasks);
-        partTasks.sort(
-                Comparator.<TaskCandidate>comparingInt(t -> tagSortRank(sortOrderByTag.get(t.tagId())))
-                        .thenComparing(Comparator.comparingInt(TaskCandidate::priorityScore).reversed()));
+        partTasks.sort(Comparator.comparingInt(t -> tagSortRank(sortOrderByTag.get(t.tagId()))));
 
         ExamPart examPart = examPartRepository.findById(part.getExamPartId()).orElse(null);
         int capstoneTarget = LearningPlanQuestionTargets.resolveCapstoneTarget(examPart);
@@ -460,7 +457,6 @@ public class LearningPlanService {
             int passAccuracy) {
         int wrong = tag != null ? tag.getWrong() : part.getWrong();
         double baseline = tag != null ? tag.getPercentage() : part.getPercentage();
-        int priorityScore = PlanPrioritySupport.computePriorityScore(tag, part, passAccuracy);
         return new TaskCandidate(
                 tagId,
                 part.getExamPartId(),
@@ -468,8 +464,7 @@ public class LearningPlanService {
                 LearningPlanQuestionTargets.TAG_TARGET,
                 baseline,
                 passAccuracy,
-                wrong,
-                priorityScore);
+                wrong);
     }
 
     private TaskCandidate buildCapstoneCandidate(
@@ -477,7 +472,6 @@ public class LearningPlanService {
             int passAccuracy,
             PlanTaskType capstoneType,
             int targetQuestionCount) {
-        int capstonePriority = capstoneType == PlanTaskType.PART_CAPSTONE_1 ? 1 : 0;
         return new TaskCandidate(
                 null,
                 part.getExamPartId(),
@@ -485,8 +479,7 @@ public class LearningPlanService {
                 targetQuestionCount,
                 part.getPercentage(),
                 passAccuracy,
-                part.getWrong(),
-                capstonePriority);
+                part.getWrong());
     }
 
     private void activateCapstonesWithoutTagPrerequisite(List<LearningPlanTask> tasks) {
@@ -684,7 +677,6 @@ public class LearningPlanService {
             int targetQuestionCount,
             double baselinePct,
             int passAccuracy,
-            int wrongCount,
-            int priorityScore
+            int wrongCount
     ) {}
 }
