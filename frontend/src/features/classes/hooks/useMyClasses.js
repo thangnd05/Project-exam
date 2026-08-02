@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getMyClasses, joinClass } from '~/features/classes/api/classMemberApi';
+import { getMyClasses, joinClass } from '~/shared/api/classMemberApi';
 import { createClass, updateClass, deleteClass } from '~/shared/api/classApi';
 
 export const myClassesKeys = {

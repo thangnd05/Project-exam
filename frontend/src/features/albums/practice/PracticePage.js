@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import {useParams} from 'react-router-dom';
-import { generatePracticeQuestion } from '~/features/albums/practice/api/practiceQuestionApi';
+import { generatePracticeQuestion } from '~/shared/api/practiceQuestionApi';
 import { getTtsUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import { useMarkVocabKnown } from '~/features/albums/practice/hooks/useMarkVocabKnown';

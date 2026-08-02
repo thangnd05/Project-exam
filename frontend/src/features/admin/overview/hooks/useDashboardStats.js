@@ -5,7 +5,7 @@ import {
   getDashboardStats,
   getMonthlyPerformance,
   getTrafficHeatmap,
-} from '~/features/admin/api/dashboardApi';
+} from '~/shared/api/dashboardApi';
 
 export const dashboardKeys = {
   stats: ['admin-dashboard-stats'],

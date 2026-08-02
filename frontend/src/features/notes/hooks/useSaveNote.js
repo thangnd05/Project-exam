@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createNote, updateNote } from '~/features/notes/api/noteApi';
+import { createNote, updateNote } from '~/shared/api/noteApi';
 import { noteKeys } from './useNotes';
 
 export function useSaveNote({ onSuccess, onError } = {}) {

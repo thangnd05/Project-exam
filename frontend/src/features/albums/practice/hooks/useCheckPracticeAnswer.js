@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { checkPracticeAnswer } from '~/features/albums/practice/api/practiceQuestionApi';
+import { checkPracticeAnswer } from '~/shared/api/practiceQuestionApi';
 import { albumKeys } from '~/features/albums/list/hooks/useMyAlbums';
 import { albumDeltaKeys } from '~/features/albums/detail/hooks/useAlbumVocabularies';
 

@@ -1,4 +1,4 @@
-import axios from '~/shared/api/axiosClient';
+import axios from './axiosClient';
 
 const BASE_URL = '/api/vocabulary-albums';
 

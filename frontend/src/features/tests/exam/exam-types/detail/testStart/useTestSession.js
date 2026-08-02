@@ -2,7 +2,7 @@ import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'r
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '~/shared/api/userTestApi';
-import { getAnswersByUserTest, batchSaveAnswers } from '~/features/tests/exam/api/userAnswerApi';
+import { getAnswersByUserTest, batchSaveAnswers } from '~/shared/api/userAnswerApi';
 import { getUserTestInfo, purchaseTestAccess } from '~/shared/api/testApi';
 import { getPassageMediaByPassageId } from '~/shared/api/passageMediaApi';
 import { getExamTypeLayout } from '~/shared/api/examTypeApi';

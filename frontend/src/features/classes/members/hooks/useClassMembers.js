@@ -8,7 +8,7 @@ import {
   approveMember,
   approveAllMembers,
   removeMember,
-} from '~/features/classes/api/classMemberApi';
+} from '~/shared/api/classMemberApi';
 
 export const classMemberKeys = {
   info: (classId) => ['class-info', classId],

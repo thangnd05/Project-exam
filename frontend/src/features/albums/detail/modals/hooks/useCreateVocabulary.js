@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createVocabulary } from '~/features/albums/detail/api/vocabularyApi';
+import { createVocabulary } from '~/shared/api/vocabularyApi';
 import { albumDeltaKeys } from '~/features/albums/detail/hooks/useAlbumVocabularies';
 
 export function useCreateVocabulary(albumId, { onSuccess, onError } = {}) {

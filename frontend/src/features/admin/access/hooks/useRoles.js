@@ -6,8 +6,8 @@ import {
   getRoles,
   updateRole,
   updateRolePermissions,
-} from '~/features/admin/api/roleApi';
-import {getPermissions} from '~/features/admin/api/permissionApi';
+} from '~/shared/api/roleApi';
+import {getPermissions} from '~/shared/api/permissionApi';
 import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 
 export const roleKeys = {

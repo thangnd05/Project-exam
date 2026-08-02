@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMyNotes, deleteNote } from '~/features/notes/api/noteApi';
+import { getMyNotes, deleteNote } from '~/shared/api/noteApi';
 
 export const noteKeys = { my: ['my-notes'] };
 
