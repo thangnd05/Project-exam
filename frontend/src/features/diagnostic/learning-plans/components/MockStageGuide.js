@@ -4,11 +4,10 @@ import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import { getMyCompletedUserTests } from '~/shared/api/userTestApi';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
+import { isPracticeAttempt } from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
-
-const isPracticeAttempt = (userTest) => (userTest?.practicePartIds?.length ?? 0) > 0;
 
 /**
  * Tìm bài đã hoàn thành SAU khi lộ trình này được tạo (bài mock "chốt kết quả").

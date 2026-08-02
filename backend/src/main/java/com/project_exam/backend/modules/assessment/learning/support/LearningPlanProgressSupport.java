@@ -82,9 +82,13 @@ public class LearningPlanProgressSupport {
     }
 
     private boolean hasQuestionsForTask(LearningPlanTask task) {
-        int targetCount = resolveTargetQuestionCount(task);
-        int poolSize = LearningPlanQuestionTargets.poolFetchSize(targetCount);
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
+        ExamPart part = taskType != PlanTaskType.TAG
+                ? examPartRepository.findById(task.getExamPartId()).orElse(null)
+                : null;
+        int targetCount = LearningPlanQuestionTargets.resolveTargetCount(
+                task.getTargetQuestionCount(), taskType, part);
+        int poolSize = LearningPlanQuestionTargets.poolFetchSize(targetCount);
         List<Question> pool;
         if (taskType == PlanTaskType.TAG) {
             pool = questionRepository.findRandomQuestionsByTagAndExamPart(
@@ -94,17 +98,5 @@ public class LearningPlanProgressSupport {
                     task.getExamPartId(), PageRequest.of(0, poolSize));
         }
         return pool != null && !pool.isEmpty();
-    }
-
-    private int resolveTargetQuestionCount(LearningPlanTask task) {
-        if (task.getTargetQuestionCount() != null && task.getTargetQuestionCount() > 0) {
-            return task.getTargetQuestionCount();
-        }
-        PlanTaskType type = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
-        if (type == PlanTaskType.TAG) {
-            return LearningPlanQuestionTargets.TAG_TARGET;
-        }
-        ExamPart part = examPartRepository.findById(task.getExamPartId()).orElse(null);
-        return LearningPlanQuestionTargets.resolveCapstoneTarget(part);
     }
 }

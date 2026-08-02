@@ -7,7 +7,7 @@ import PlanPartTaskList from '../components/PlanPartTaskList';
 import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
-import { buildPlanSummary, planStageLabel } from '../planLabels';
+import { buildPlanSummary, isPracticeAttempt, planStageLabel } from '../planLabels';
 import { getReadinessLabel } from '~/features/diagnostic/target/utils/readiness-label';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import {
@@ -18,8 +18,6 @@ import {
 } from './hooks/useGeneratePlan';
 
 const cx = classNames.bind(styles);
-
-const isPracticeAttempt = (userTest) => (userTest?.practicePartIds?.length ?? 0) > 0;
 
 function GeneratePlanPage() {
   const navigate = useNavigate();

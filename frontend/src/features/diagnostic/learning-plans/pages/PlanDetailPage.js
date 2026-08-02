@@ -9,7 +9,7 @@ import PlanCongratsModal, {
 } from '../components/PlanCongratsModal';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import { usePlanDetail } from './hooks/usePlanDetail';
-import { planStageLabel, planStatusLabel } from '../planLabels';
+import { planStageLabel, planStatusLabel, taskDisplayName } from '../planLabels';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
@@ -154,7 +154,7 @@ function PlanDetailPage() {
               {plan.planStage === 'MOCK'
                 ? 'Đã vượt hết ải — sẵn sàng thi thử!'
                 : recommendedTask
-                  ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${recommendedTask.tagName}`
+                  ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${taskDisplayName(recommendedTask)}`
                   : 'Chinh phục từng ải để chạm mục tiêu'}
             </h2>
             <p className={cx('planHeroCheer')}>

@@ -4,16 +4,10 @@ import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/shared/utils/format-date-time';
 import { useTaskHistory } from './hooks/useTaskHistory';
+import { taskDisplayName, taskStatusLabel } from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
-
-const TASK_STATUS_LABEL = {
-  ACTIVE: 'Đang học',
-  PASSED: 'Đã vượt',
-  SKIPPED: 'Bỏ qua',
-  LOCKED: 'Khoá',
-};
 
 function pct(v) {
   if (v == null) return '—';
@@ -65,7 +59,7 @@ function TaskHistoryPage() {
 
   const baseline = task.baselineAccuracy != null ? Number(task.baselineAccuracy) : null;
   const best = task.bestAccuracy != null ? Number(task.bestAccuracy) : null;
-  const pass = task.passAccuracy ?? 70;
+  const pass = task.passAccuracy;
   const delta = baseline != null && best != null ? best - baseline : null;
 
   return (
@@ -86,14 +80,14 @@ function TaskHistoryPage() {
       </div>
 
       <h2 className={cx('title')}>
-        {task.examPartName || 'Part'} · Ải {task.tagName || '—'}
+        {task.examPartName || 'Part'} · Ải {taskDisplayName(task)}
       </h2>
       <div className={cx('actionBar')} style={{ marginBottom: '2rem' }}>
         <span className={cx('badge', 'badgeMuted')}>
-          Trạng thái: {TASK_STATUS_LABEL[task.status] || task.status}
+          Trạng thái: {taskStatusLabel(task.status)}
         </span>
         <span className={cx('badge', 'badgeMuted')}>
-          Cần ≥ {pass}% để vượt ải
+          Cần ≥ {pass != null ? `${pass}%` : '—'} để vượt ải
         </span>
       </div>
 
@@ -130,8 +124,8 @@ function TaskHistoryPage() {
 
         <div className={cx('statTile')}>
           <div className={cx('statLabel')}>Ngưỡng vượt ải</div>
-          <div className={cx('statValue')}>{pass}%</div>
-          {best != null && (
+          <div className={cx('statValue')}>{pass != null ? `${pass}%` : '—'}</div>
+          {best != null && pass != null && (
             <div className={cx('statHint', best >= pass ? 'successText' : 'warningText')}>
               {best >= pass ? 'Đã đạt ngưỡng' : `Còn ${(pass - best).toFixed(1)}%`}
             </div>
@@ -150,25 +144,29 @@ function TaskHistoryPage() {
                 title={`Ban đầu ${pct(baseline)}`}
               />
               <div
-                className={cx('progressBest', { reached: best >= pass })}
+                className={cx('progressBest', { reached: pass != null && best >= pass })}
                 style={{ width: `${Math.min(100, best)}%` }}
                 title={`Tốt nhất ${pct(best)}`}
               />
-              <div
-                className={cx('progressPassLine')}
-                style={{ left: `${pass}%` }}
-                title={`Ngưỡng vượt ải ${pass}%`}
-              />
+              {pass != null && (
+                <div
+                  className={cx('progressPassLine')}
+                  style={{ left: `${pass}%` }}
+                  title={`Ngưỡng vượt ải ${pass}%`}
+                />
+              )}
             </div>
             <div className={cx('progressLegend')}>
               <span>0%</span>
-              <span className={cx('dangerText')}>Pass {pass}%</span>
+              <span className={cx('dangerText')}>
+                Pass {pass != null ? `${pass}%` : '—'}
+              </span>
               <span>100%</span>
             </div>
             <div style={{ marginTop: '0.8rem', fontSize: 'var(--font-size-sm)' }}>
               <span className={cx('badge', 'badgeWarning')}>Ban đầu</span>{' '}
               {pct(baseline)}{' '}·{' '}
-              <span className={cx('badge', best >= pass ? 'badgeSuccess' : 'badgePrimary')}>Tốt nhất</span>{' '}
+              <span className={cx('badge', pass != null && best >= pass ? 'badgeSuccess' : 'badgePrimary')}>Tốt nhất</span>{' '}
               {pct(best)}
             </div>
           </div>

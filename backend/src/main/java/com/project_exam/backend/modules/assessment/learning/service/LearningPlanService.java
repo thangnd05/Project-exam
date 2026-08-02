@@ -79,6 +79,7 @@ public class LearningPlanService {
     private final LearningMapper learningMapper;
     private final LearningPlanAccess planAccess;
     private final LearningPlanProgressSupport progressSupport;
+    private final LearningPlanTaskUnlockSupport taskUnlockSupport;
 
     @Transactional
     public PlanResponse generatePlan(String userId, GeneratePlanRequest request) {
@@ -177,7 +178,8 @@ public class LearningPlanService {
             savedTasks.add(task);
         }
         savedTasks = taskRepository.saveAll(savedTasks);
-        activateCapstonesWithoutTagPrerequisite(savedTasks);
+        taskUnlockSupport.reconcileLockedTasks(plan.getLearningPlanId());
+        savedTasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(plan.getLearningPlanId());
 
         return buildPlanResponse(
                 plan,
@@ -480,21 +482,6 @@ public class LearningPlanService {
                 part.getPercentage(),
                 passAccuracy,
                 part.getWrong());
-    }
-
-    private void activateCapstonesWithoutTagPrerequisite(List<LearningPlanTask> tasks) {
-        Map<String, List<LearningPlanTask>> byPart = tasks.stream()
-                .collect(Collectors.groupingBy(LearningPlanTask::getExamPartId));
-        for (List<LearningPlanTask> partTasks : byPart.values()) {
-            boolean hasTagTasks = partTasks.stream()
-                    .anyMatch(t -> t.getTaskType() == PlanTaskType.TAG);
-            if (!hasTagTasks) {
-                partTasks.stream()
-                        .filter(t -> t.getTaskType() == PlanTaskType.PART_CAPSTONE_1)
-                        .filter(t -> t.getStatus() == TaskStatus.LOCKED)
-                        .forEach(t -> t.setStatus(TaskStatus.ACTIVE));
-            }
-        }
     }
 
     private void addTaskIfNew(

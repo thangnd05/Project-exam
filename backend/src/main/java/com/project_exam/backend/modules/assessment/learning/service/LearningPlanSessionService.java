@@ -473,15 +473,12 @@ public class LearningPlanSessionService {
     }
 
     private int resolveTargetQuestionCount(LearningPlanTask task) {
-        if (task.getTargetQuestionCount() != null && task.getTargetQuestionCount() > 0) {
-            return task.getTargetQuestionCount();
-        }
         PlanTaskType type = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
-        if (type == PlanTaskType.TAG) {
-            return LearningPlanQuestionTargets.TAG_TARGET;
-        }
-        ExamPart part = examPartRepository.findById(task.getExamPartId()).orElse(null);
-        return LearningPlanQuestionTargets.resolveCapstoneTarget(part);
+        ExamPart part = type != PlanTaskType.TAG
+                ? examPartRepository.findById(task.getExamPartId()).orElse(null)
+                : null;
+        return LearningPlanQuestionTargets.resolveTargetCount(
+                task.getTargetQuestionCount(), type, part);
     }
 
     private void saveSessionQuestions(String sessionId, List<String> questionIds) {

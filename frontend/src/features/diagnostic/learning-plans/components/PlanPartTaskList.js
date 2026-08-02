@@ -16,17 +16,14 @@ import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '~/shared/utils/taskProgress';
+import {
+  CAPSTONE_TYPES,
+  TASK_STATUS,
+  isCapstoneTask,
+  taskDisplayName,
+} from '../planLabels';
 
 const cx = classNames.bind(styles);
-
-const TASK_STATUS = {
-  PASSED: { text: 'Đã vượt', variant: 'badgeSuccess' },
-  ACTIVE: { text: 'Chưa vượt', variant: 'badgePrimary' },
-  LOCKED: { text: 'Chưa mở', variant: 'badgeMuted' },
-  SKIPPED: { text: 'Bỏ qua', variant: 'badgeMuted' },
-};
-
-const CAPSTONE_TYPES = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 
 const NEAR_PASS_GAP = 10;
 
@@ -329,7 +326,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
 }
 
 function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }) {
-  const isCapstone = CAPSTONE_TYPES.has(task.taskType);
+  const isCapstone = isCapstoneTask(task);
   const isPassed = task.status === 'PASSED';
   const isLocked = task.status === 'LOCKED';
   const state = isPassed
@@ -348,7 +345,7 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }
       style={{ left: `${nodeX(index)}%`, top: `${nodeY(index)}px` }}
       onClick={onSelect}
       aria-pressed={isSelected}
-      aria-label={`Ải ${task.taskOrder}: ${task.tagName}`}
+      aria-label={`Ải ${task.taskOrder}: ${taskDisplayName(task)}`}
     >
       {isRecommended && <span className={cx('stagePin')}>Bạn ở đây</span>}
       <span
@@ -372,7 +369,7 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }
           stageNodeLabelActive: isSelected || isRecommended,
         })}
       >
-        {isCapstone ? 'Tổng hợp' : shortMapLabel(task.tagName)}
+        {isCapstone ? 'Tổng hợp' : shortMapLabel(taskDisplayName(task))}
       </span>
     </button>
   );
@@ -380,7 +377,7 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }
 
 function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onStudyTask }) {
   const status = TASK_STATUS[task.status] || TASK_STATUS.ACTIVE;
-  const isCapstone = CAPSTONE_TYPES.has(task.taskType);
+  const isCapstone = isCapstoneTask(task);
   const isPassed = task.status === 'PASSED';
   const isLocked = task.status === 'LOCKED';
   const canStudy = task.status !== 'SKIPPED' && !isLocked;
@@ -425,7 +422,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
         <span className={cx('badge', status.variant)}>{status.text}</span>
       </div>
 
-      <h5 className={cx('stagePanelTitle')}>{task.tagName}</h5>
+      <h5 className={cx('stagePanelTitle')}>{taskDisplayName(task)}</h5>
 
       <div className={cx('taskBadges')}>
         {isRecommended && (

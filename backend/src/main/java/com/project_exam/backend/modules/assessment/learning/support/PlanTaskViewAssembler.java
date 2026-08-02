@@ -80,7 +80,7 @@ public class PlanTaskViewAssembler {
         return learningMapper.toTaskDto(
                 task,
                 taskType.name(),
-                resolveTaskDisplayName(taskType, tag, part),
+                tag != null ? tag.getName() : null,
                 part != null ? part.getName() : null,
                 studyResource);
     }
@@ -123,18 +123,5 @@ public class PlanTaskViewAssembler {
 
     private static int taskOrderOf(LearningPlanTask task) {
         return task.getTaskOrder() != null ? task.getTaskOrder() : Integer.MAX_VALUE;
-    }
-
-    private static String resolveTaskDisplayName(PlanTaskType taskType, Tag tag, ExamPart part) {
-        if (taskType == PlanTaskType.PART_CAPSTONE_1) {
-            return "Ải cuối chặng — lần 1";
-        }
-        if (taskType == PlanTaskType.PART_CAPSTONE_2) {
-            return "Ải cuối chặng — lần 2";
-        }
-        if (tag != null) {
-            return tag.getName();
-        }
-        return part != null ? part.getName() : "Ải tag";
     }
 }

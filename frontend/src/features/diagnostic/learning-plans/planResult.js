@@ -4,8 +4,5 @@ export function toPlanResult(data) {
     reviewItems: data.lastReviewItems,
     passed: !!data.passed,
     accuracy: data.accuracy ?? 0,
-    correctCount: data.correctCount ?? 0,
-    totalCount: data.totalCount ?? 0,
-    planStage: data.planStage,
   };
 }

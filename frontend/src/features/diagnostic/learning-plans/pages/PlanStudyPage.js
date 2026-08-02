@@ -12,7 +12,7 @@ import { getApiBaseUrl, getFullMediaUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import { useSubmitSession } from './hooks/useSubmitSession';
-import { planNoticeText, planStageLabel } from '../planLabels';
+import { planNoticeText, planStageLabel, taskDisplayName } from '../planLabels';
 import TestStartDashboard from '~/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
 import ProgressBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/ProgressBlock';
 import SubmitBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/SubmitBlock';
@@ -378,7 +378,7 @@ function PlanStudyPage() {
                 <div className={cx('statLabel')}>Đang học</div>
                 <h3 className={cx('activeTaskTitle')}>
                   {session.activeTask?.examPartName || 'Part'}
-                  {' · Ải '}{session.activeTask?.tagName || '—'}
+                  {' · Ải '}{taskDisplayName(session.activeTask)}
                 </h3>
                 <div className={cx('actionBar')}>
                   <span className={cx('badge', 'badgePrimary')}>
