@@ -7,6 +7,7 @@ import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.user.dto.UserResponse;
 import com.project_exam.backend.modules.users.user.service.UserService;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        userService.requireAdminToManageUsers();
+        authUtils.requirePermission(PermissionCatalog.USER_MANAGE);
         return ResponseEntity.ok(userService.findAllResponses());
     }
 
@@ -44,7 +45,7 @@ public class UserController {
             @RequestParam(required = false) String roleId,
             @RequestParam(required = false) Boolean verified
     ) {
-        userService.requireAdminToManageUsers();
+        authUtils.requirePermission(PermissionCatalog.USER_MANAGE);
         return ResponseEntity.ok(userService.findAllPaged(page, size, keyword, roleId, verified));
     }
 
@@ -88,7 +89,7 @@ public class UserController {
     public ResponseEntity<UserResponse> createUser(
             @Valid @RequestBody UserUpsertRequest request
     ) {
-        userService.requireAdminToManageUsers();
+        authUtils.requirePermission(PermissionCatalog.USER_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 

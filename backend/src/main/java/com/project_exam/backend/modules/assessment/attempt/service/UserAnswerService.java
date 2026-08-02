@@ -69,9 +69,6 @@ public class UserAnswerService {
     }
 
     public List<UserAnswerResponse> findAllResponses() {
-        if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
-            throw new ForbiddenException("Chỉ admin được xem toàn bộ đáp án.");
-        }
         return findAll().stream()
                 .map(this::toResponse)
                 .toList();
@@ -129,9 +126,6 @@ public class UserAnswerService {
     }
 
     public List<UserAnswerResponse> findResponsesByQuestionId(String questionId) {
-        if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
-            throw new ForbiddenException("Chỉ admin được liệt kê đáp án theo câu hỏi.");
-        }
         return findByQuestionId(questionId).stream()
                 .map(this::toResponse)
                 .toList();

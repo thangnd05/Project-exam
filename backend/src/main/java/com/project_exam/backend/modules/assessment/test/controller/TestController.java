@@ -134,6 +134,9 @@ public class TestController {
             @Valid @RequestBody AddRandomQuestionsToTestRequest request,
             HttpServletRequest httpRequest
     ) {
+        if ("admin".equalsIgnoreCase(request.getBank())) {
+            authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
+        }
         String currentUserId = authUtils.getUserId(httpRequest);
         AddRandomQuestionsResponse response = testQuestionAssignmentService.addRandomQuestionsToTestPart(request, currentUserId);
         return ResponseEntity.ok(response);

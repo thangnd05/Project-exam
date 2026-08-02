@@ -8,8 +8,6 @@ import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionRes
 import com.project_exam.backend.modules.assessment.exam.domain.ScoringConversion;
 import com.project_exam.backend.modules.assessment.exam.mapper.ScoringConversionMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ScoringConversionRepository;
-import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,6 @@ public class ScoringConversionService {
 
     private final ScoringConversionRepository scoringConversionRepository;
     private final ScoringConversionMapper scoringConversionMapper;
-    private final AuthUtils authUtils;
 
     public List<ScoringConversionResponse> findAll() {
         return scoringConversionRepository.findAll().stream()
@@ -54,7 +51,6 @@ public class ScoringConversionService {
     }
 
     public ScoringConversionResponse create(ScoringConversionRequest request) {
-        authUtils.requirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE);
         validateRequest(request);
         ScoringConversion c = new ScoringConversion();
         c.setExamTypeId(request.getExamTypeId().trim());
@@ -66,7 +62,6 @@ public class ScoringConversionService {
     }
 
     public List<ScoringConversionResponse> createBulk(List<ScoringConversionRequest> requests) {
-        authUtils.requirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE);
         if (requests == null || requests.isEmpty()) {
             throw new BadRequestException("Danh sách quy đổi không được để trống");
         }
@@ -88,7 +83,6 @@ public class ScoringConversionService {
     }
 
     public ScoringConversionResponse update(String id, ScoringConversionRequest request) {
-        authUtils.requirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE);
         ScoringConversion c = scoringConversionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Scoring conversion không tồn tại"));
         if (request.getExamTypeId() != null) c.setExamTypeId(request.getExamTypeId());
@@ -100,7 +94,6 @@ public class ScoringConversionService {
     }
 
     public void delete(String id) {
-        authUtils.requirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE);
         ScoringConversion c = scoringConversionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Scoring conversion không tồn tại"));
         scoringConversionRepository.delete(c);

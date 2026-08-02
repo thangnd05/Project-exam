@@ -1,8 +1,6 @@
 package com.project_exam.backend.modules.assessment.exam.service;
 
 import com.project_exam.backend.shared.exception.NotFoundException;
-import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
 
 import com.project_exam.backend.modules.assessment.exam.dto.SkillRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.SkillResponse;
@@ -20,7 +18,6 @@ public class SkillService {
 
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
-    private final AuthUtils authUtils;
 
     public List<SkillResponse> findAll() {
         return skillRepository.findAll().stream()
@@ -35,7 +32,6 @@ public class SkillService {
     }
 
     public SkillResponse create(SkillRequest request) {
-        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
         Skill skill = new Skill();
         skill.setName(request.getName());
         skill.setDescription(request.getDescription());
@@ -44,7 +40,6 @@ public class SkillService {
     }
 
     public SkillResponse update(String id, SkillRequest request) {
-        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Skill không tồn tại"));
         if (request.getName() != null) skill.setName(request.getName());
@@ -54,7 +49,6 @@ public class SkillService {
     }
 
     public void delete(String id) {
-        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Skill không tồn tại"));
         skillRepository.delete(skill);

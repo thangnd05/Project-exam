@@ -8,8 +8,6 @@ import com.project_exam.backend.modules.assessment.exam.mapper.ExamTypeLayoutMap
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeLayoutRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +21,6 @@ public class ExamTypeLayoutService {
     private final ExamTypeLayoutRepository layoutRepository;
     private final ExamTypeRepository examTypeRepository;
     private final ExamTypeLayoutMapper layoutMapper;
-    private final AuthUtils authUtils;
 
     public ExamTypeLayoutResponse getResolved(String examTypeId) {
         ExamType examType = examTypeRepository.findById(examTypeId)
@@ -44,14 +41,12 @@ public class ExamTypeLayoutService {
     }
 
     public ExamTypeLayoutResponse getOwn(String examTypeId) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_LAYOUT_MANAGE);
         return layoutRepository.findByExamTypeId(examTypeId)
                 .map(layoutMapper::toResponse)
                 .orElse(null);
     }
 
     public ExamTypeLayoutResponse upsert(String examTypeId, ExamTypeLayoutRequest request) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_LAYOUT_MANAGE);
         if (!examTypeRepository.existsById(examTypeId)) {
             throw new NotFoundException("Loại đề không tồn tại");
         }

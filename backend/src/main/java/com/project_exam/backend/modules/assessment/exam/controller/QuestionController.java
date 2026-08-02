@@ -20,6 +20,7 @@ import com.project_exam.backend.modules.classroom.member.dto.*;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,6 +47,7 @@ public class QuestionController {
 
     @GetMapping
     public ResponseEntity<List<QuestionAdminResponse>> getAllQuestions() {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(questionService.findAllAdminSummaries());
     }
 
@@ -68,6 +70,7 @@ public class QuestionController {
             HttpServletRequest request
     ) {
         if ("admin".equalsIgnoreCase(bank)) {
+            authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
             return ResponseEntity.ok(questionService.getAdminBankQuestionsByPart(examPartId));
         }
         String userId = authUtils.getUserId(request);
@@ -84,6 +87,7 @@ public class QuestionController {
             HttpServletRequest request
     ) {
         if ("admin".equalsIgnoreCase(bank)) {
+            authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
             return ResponseEntity.ok(questionService.countAdminBankQuestionsByPart(examPartId));
         }
         String userId = authUtils.getUserId(request);

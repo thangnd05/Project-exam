@@ -115,9 +115,6 @@ public class TestQuestionAssignmentService {
         }
         boolean useAdminBank = "admin".equalsIgnoreCase(request.getBank());
 
-        if (useAdminBank) {
-            authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
-        }
         if (!useAdminBank && request.getClassId() == null && currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng hiện tại.");
         }

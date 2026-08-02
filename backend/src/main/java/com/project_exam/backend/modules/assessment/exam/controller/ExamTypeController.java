@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeResponse;
 import com.project_exam.backend.modules.assessment.exam.service.ExamTypeService;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 public class ExamTypeController {
 
     private final ExamTypeService examTypeService;
+    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<List<ExamTypeResponse>> getAllExamTypes() {
@@ -45,6 +48,7 @@ public class ExamTypeController {
 
     @PostMapping
     public ResponseEntity<ExamTypeResponse> createExamType(@Valid @RequestBody ExamTypeRequest request) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(examTypeService.create(request));
     }
 
@@ -53,11 +57,13 @@ public class ExamTypeController {
             @PathVariable String id,
             @Valid @RequestBody ExamTypeRequest request
     ) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         return ResponseEntity.ok(examTypeService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExamType(@PathVariable String id) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         examTypeService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -284,9 +284,6 @@ public class UserTestService {
     public List<UserTest> findAll() { return userTestRepository.findAll(); }
 
     public List<UserTestResponse> findAllResponses() {
-        if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
-            throw new ForbiddenException("Chỉ admin được xem toàn bộ user-tests.");
-        }
         return toResponseListBatched(findAll());
     }
     public Optional<UserTest> findById(String id) { return userTestRepository.findById(id); }

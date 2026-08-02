@@ -398,11 +398,6 @@ public class UserService {
         }).orElse(false);
     }
 
-    public void requireAdminToManageUsers() {
-        if (!authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
-            throw new ForbiddenException("Chỉ admin được thao tác trực tiếp trên user.");
-        }
-    }
 
     public void requireSelfOrAdminForUser(String targetUserId, String currentUserId) {
         boolean isSelf = currentUserId != null && currentUserId.equals(targetUserId);

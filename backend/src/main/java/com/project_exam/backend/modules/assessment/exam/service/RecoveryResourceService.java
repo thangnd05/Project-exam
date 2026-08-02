@@ -16,8 +16,6 @@ import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRe
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,7 +40,6 @@ public class RecoveryResourceService {
     private final TagMapper tagMapper;
     private final RecoveryResourceMapper recoveryResourceMapper;
     private final CloudinaryService cloudinaryService;
-    private final AuthUtils authUtils;
 
     @Transactional
     public RecoveryResourceResponse createResource(
@@ -50,7 +47,6 @@ public class RecoveryResourceService {
             MultipartFile file,
             String currentUserId
     ) throws IOException {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         if (request.getTitle() == null || request.getTitle().isBlank()) {
             throw new BadRequestException("Tiêu đề không được để trống.");
         }
@@ -85,7 +81,6 @@ public class RecoveryResourceService {
             RecoveryResourceRequest request,
             MultipartFile file
     ) throws IOException {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new NotFoundException("Tài liệu không tồn tại: " + resourceId));
 
@@ -124,7 +119,6 @@ public class RecoveryResourceService {
 
     @Transactional
     public void deleteResource(String resourceId) {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new NotFoundException("Tài liệu không tồn tại: " + resourceId));
 

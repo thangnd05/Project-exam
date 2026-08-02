@@ -190,9 +190,6 @@ public class PostService {
 
     @Transactional
     public PostResponse updatePostStatus(String id, Post.PostStatus status, String userId) {
-        if (!authUtils.hasPermission(PermissionCatalog.POST_MODERATE)) {
-            throw new ForbiddenException("Chỉ admin được duyệt/từ chối bài viết");
-        }
         if (status == null) {
             throw new BadRequestException("Trạng thái không được để trống");
         }

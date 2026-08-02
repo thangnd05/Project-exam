@@ -4,6 +4,8 @@ import com.project_exam.backend.modules.assessment.exam.dto.AnswerRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,9 +19,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AnswerController {
     private final AnswerService answerService;
+    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<List<AnswerAdminResponse>> getAllAnswer() {
+        authUtils.requirePermission(PermissionCatalog.ANSWER_VIEW);
         return ResponseEntity.ok(answerService.findAllResponses());
     }
 
@@ -27,6 +31,7 @@ public class AnswerController {
     public ResponseEntity<List<AnswerAdminResponse>> getAnswersByQuestion(
             @PathVariable String questionId
     ) {
+        authUtils.requirePermission(PermissionCatalog.ANSWER_VIEW);
         return ResponseEntity.ok(answerService.findResponsesByQuestionId(questionId));
     }
 
@@ -34,6 +39,7 @@ public class AnswerController {
     public ResponseEntity<AnswerAdminResponse> createAnswer(
             @Valid @RequestBody AnswerRequest request
     ) {
+        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(answerService.createFromRequest(request));
     }
 
@@ -42,6 +48,7 @@ public class AnswerController {
             @PathVariable String id,
             @Valid @RequestBody AnswerRequest request
     ) {
+        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         AnswerAdminResponse response = answerService.updateFromRequest(id, request)
                 .orElseThrow(() -> new NotFoundException("Answer không tồn tại"));
         return ResponseEntity.ok(response);
@@ -49,6 +56,7 @@ public class AnswerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnswer(@PathVariable String id) {
+        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         if (answerService.findById(id).isEmpty()) {
             throw new NotFoundException("Answer không tồn tại");
         }

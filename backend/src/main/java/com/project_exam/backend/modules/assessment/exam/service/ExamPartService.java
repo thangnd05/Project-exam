@@ -2,8 +2,6 @@ package com.project_exam.backend.modules.assessment.exam.service;
 
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.exception.BadRequestException;
-import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
 
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartResponse;
@@ -24,7 +22,6 @@ public class ExamPartService {
     private final ExamPartRepository examPartRepository;
     private final ExamTypeRepository examTypeRepository;
     private final ExamPartMapper examPartMapper;
-    private final AuthUtils authUtils;
 
     public List<ExamPartResponse> findAll() {
         return examPartRepository.findAllOrdered().stream()
@@ -45,7 +42,6 @@ public class ExamPartService {
     }
 
     public ExamPartResponse create(ExamPartRequest request) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_PART_MANAGE);
         String normalizedSkillId = normalizeSkillId(request.getSkillId());
         validateSkillRequirement(request.getExamTypeId(), normalizedSkillId);
 
@@ -61,7 +57,6 @@ public class ExamPartService {
     }
 
     public ExamPartResponse update(String id, ExamPartRequest request) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_PART_MANAGE);
         ExamPart part = examPartRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam part không tồn tại"));
 
@@ -82,7 +77,6 @@ public class ExamPartService {
     }
 
     public void delete(String id) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_PART_MANAGE);
         ExamPart part = examPartRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam part không tồn tại"));
         examPartRepository.delete(part);

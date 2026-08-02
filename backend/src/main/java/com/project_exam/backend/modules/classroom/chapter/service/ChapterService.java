@@ -1,5 +1,4 @@
 package com.project_exam.backend.modules.classroom.chapter.service;
-import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
@@ -13,7 +12,6 @@ import com.project_exam.backend.modules.classroom.chapter.mapper.ChapterMapper;
 import com.project_exam.backend.modules.classroom.chapter.repository.ChapterRepository;
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
-import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,6 @@ public class ChapterService {
 
     private final ChapterRepository chapterRepository;
     private final ClassRepository classRepository;
-    private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
     private final QuestionService questionService;
     private final ChapterMapper chapterMapper;
@@ -62,9 +59,6 @@ public class ChapterService {
     }
 
     public List<ChapterResponse> getAll() {
-        if (!authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) {
-            throw new ForbiddenException("Chỉ admin được xem toàn bộ chapter.");
-        }
         return chapterRepository.findAll()
                 .stream()
                 .map(this::toResponse)

@@ -6,8 +6,6 @@ import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Answer;
 import com.project_exam.backend.modules.assessment.exam.mapper.AnswerMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.AnswerRepository;
-import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,6 @@ import java.util.stream.Collectors;
 public class AnswerService {
     private final AnswerRepository answerRepository;
     private final AnswerMapper answerMapper;
-    private final AuthUtils authUtils;
 
     private AnswerAdminResponse toAdminResponse(Answer answer) {
         return answerMapper.toAdminResponse(answer);
@@ -83,7 +80,6 @@ public class AnswerService {
     }
 
     public List<AnswerAdminResponse> findAllResponses() {
-        authUtils.requirePermission(PermissionCatalog.ANSWER_VIEW);
         return findAll().stream()
                 .map(this::toAdminResponse)
                 .toList();
@@ -94,7 +90,6 @@ public class AnswerService {
     }
 
     public List<AnswerAdminResponse> findResponsesByQuestionId(String questionId) {
-        authUtils.requirePermission(PermissionCatalog.ANSWER_VIEW);
         return findByQuestionId(questionId).stream()
                 .map(this::toAdminResponse)
                 .toList();
@@ -109,13 +104,11 @@ public class AnswerService {
     }
 
     public AnswerAdminResponse createFromRequest(AnswerRequest request) {
-        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         Answer saved = save(toEntity(request, request.getQuestionId()));
         return toAdminResponse(saved);
     }
 
     public Optional<AnswerAdminResponse> updateFromRequest(String id, AnswerRequest request) {
-        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         return findById(id)
                 .map(existing -> {
                     Answer updatedAnswer = toEntity(request, existing.getQuestionId());
@@ -125,7 +118,6 @@ public class AnswerService {
     }
 
     public void deleteById(String id) {
-        authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         answerRepository.deleteById(id);
     }
 

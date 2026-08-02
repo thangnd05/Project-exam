@@ -11,6 +11,7 @@ import com.project_exam.backend.modules.posts.post.domain.Post;
 import com.project_exam.backend.modules.posts.post.service.PostService;
 import com.project_exam.backend.modules.posts.post.service.PostViewThrottleService;
 import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -104,6 +105,7 @@ public class PostController {
             @RequestBody UpdatePostStatusRequest request,
             HttpServletRequest httpRequest
     ) {
+        authUtils.requirePermission(PermissionCatalog.POST_MODERATE);
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(postService.updatePostStatus(id, request.getStatus(), userId));
     }

@@ -7,6 +7,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerRespons
 import com.project_exam.backend.modules.assessment.attempt.service.UserAnswerService;
 import com.project_exam.backend.modules.assessment.attempt.service.EnhancedResultService;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -28,6 +29,7 @@ public class UserAnswerController {
 
     @GetMapping
     public ResponseEntity<List<UserAnswerResponse>> getAll() {
+        authUtils.requirePermission(PermissionCatalog.ATTEMPT_MANAGE);
         return ResponseEntity.ok(userAnswerService.findAllResponses());
     }
 
@@ -52,6 +54,7 @@ public class UserAnswerController {
     public ResponseEntity<List<UserAnswerResponse>> getByQuestion(
             @PathVariable String questionId
     ) {
+        authUtils.requirePermission(PermissionCatalog.ATTEMPT_MANAGE);
         return ResponseEntity.ok(userAnswerService.findResponsesByQuestionId(questionId));
     }
 
