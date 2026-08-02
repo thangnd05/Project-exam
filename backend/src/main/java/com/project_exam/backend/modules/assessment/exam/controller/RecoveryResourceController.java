@@ -3,7 +3,6 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResponse;
 import com.project_exam.backend.modules.assessment.exam.service.RecoveryResourceService;
-import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +36,6 @@ public class RecoveryResourceController {
             @RequestPart(value = "file", required = false) MultipartFile file,
             HttpServletRequest httpRequest
     ) throws IOException {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -50,7 +48,6 @@ public class RecoveryResourceController {
             @RequestPart("request") String requestJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
         return ResponseEntity.ok(resourceService.updateResource(resourceId, request, file));
     }
@@ -60,13 +57,11 @@ public class RecoveryResourceController {
             @PathVariable String resourceId,
             @RequestBody RecoveryResourceRequest request
     ) throws IOException {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         return ResponseEntity.ok(resourceService.updateResource(resourceId, request, null));
     }
 
     @DeleteMapping("/{resourceId}")
     public ResponseEntity<Void> deleteResource(@PathVariable String resourceId) {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         resourceService.deleteResource(resourceId);
         return ResponseEntity.noContent().build();
     }

@@ -11,6 +11,8 @@ import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRe
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +31,10 @@ public class TagService {
     private final ResourceTagRepository resourceTagRepository;
     private final ExamTypeRepository examTypeRepository;
     private final TagMapper tagMapper;
+    private final AuthUtils authUtils;
 
     public TagResponse createTag(TagRequest request) {
+        authUtils.requirePermission(PermissionCatalog.TAG_MANAGE);
         if (request.getName() == null || request.getName().isBlank()) {
             throw new BadRequestException("Tên tag không được để trống.");
         }
@@ -59,6 +63,7 @@ public class TagService {
     }
 
     public TagResponse updateTag(String tagId, TagRequest request) {
+        authUtils.requirePermission(PermissionCatalog.TAG_MANAGE);
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new NotFoundException("Tag không tồn tại: " + tagId));
 
@@ -86,6 +91,7 @@ public class TagService {
 
     @Transactional
     public void deleteTag(String tagId) {
+        authUtils.requirePermission(PermissionCatalog.TAG_MANAGE);
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new NotFoundException("Tag không tồn tại: " + tagId));
 

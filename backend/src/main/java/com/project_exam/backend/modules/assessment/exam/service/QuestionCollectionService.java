@@ -9,6 +9,8 @@ import com.project_exam.backend.modules.assessment.exam.domain.QuestionCollectio
 import com.project_exam.backend.modules.assessment.exam.mapper.QuestionCollectionMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionCollectionRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class QuestionCollectionService {
     private final QuestionCollectionRepository collectionRepository;
     private final QuestionRepository questionRepository;
     private final QuestionCollectionMapper questionCollectionMapper;
+    private final AuthUtils authUtils;
 
     public List<QuestionCollectionResponse> findAll() {
 
@@ -47,6 +50,7 @@ public class QuestionCollectionService {
 
     @Transactional
     public QuestionCollectionResponse create(QuestionCollectionRequest request) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_COLLECTION_MANAGE);
         String name = normalize(request.getName());
         if (name == null) {
             throw new BadRequestException("Tên bộ sưu tập không được để trống.");
@@ -71,6 +75,7 @@ public class QuestionCollectionService {
 
     @Transactional
     public QuestionCollectionResponse update(String id, QuestionCollectionRequest request) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_COLLECTION_MANAGE);
         QuestionCollection collection = collectionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bộ sưu tập câu hỏi không tồn tại"));
 
@@ -119,6 +124,7 @@ public class QuestionCollectionService {
 
     @Transactional
     public void delete(String id) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_COLLECTION_MANAGE);
         QuestionCollection collection = collectionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bộ sưu tập câu hỏi không tồn tại"));
 

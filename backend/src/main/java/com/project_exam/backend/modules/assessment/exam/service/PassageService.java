@@ -5,21 +5,21 @@ import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Passage;
 import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.PassageRepository;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PassageService {
 
     private final PassageRepository passageRepository;
     private final PassageMapper passageMapper;
-
-    public PassageService(PassageRepository passageRepository, PassageMapper passageMapper) {
-        this.passageRepository = passageRepository;
-        this.passageMapper = passageMapper;
-    }
+    private final AuthUtils authUtils;
 
     private PassageResponse toResponse(Passage passage) {
         return passageMapper.toResponse(passage);
@@ -57,10 +57,12 @@ public class PassageService {
     }
 
     public PassageResponse create(PassageRequest request) {
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         return toResponse(save(toEntity(request)));
     }
 
     public Optional<PassageResponse> update(String id, PassageRequest request) {
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         return findById(id)
                 .map(existing -> {
                     Passage updatedPassage = toEntity(request);
@@ -70,6 +72,7 @@ public class PassageService {
     }
 
     public void deleteById(String id) {
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         passageRepository.deleteById(id);
     }
 }

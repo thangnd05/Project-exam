@@ -124,6 +124,7 @@ public class QuestionService {
     }
 
     public List<QuestionAdminResponse> findAllAdminSummaries() {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return findAll().stream()
                 .map(question -> questionMapper.toAdminResponseSummary(
                         question,
@@ -264,6 +265,7 @@ public class QuestionService {
     }
 
     public List<QuestionResponse> getAdminBankQuestionsByPart(String examPartId) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return Collections.emptyList();
@@ -276,6 +278,7 @@ public class QuestionService {
     }
 
     public long countAdminBankQuestionsByPart(String examPartId) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return 0L;

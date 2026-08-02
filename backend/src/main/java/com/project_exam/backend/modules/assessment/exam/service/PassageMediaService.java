@@ -7,24 +7,24 @@ import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaResponse
 import com.project_exam.backend.modules.assessment.exam.domain.PassageMedia;
 import com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.PassageMediaRepository;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PassageMediaService {
 
     private final PassageMediaRepository repository;
     private final PassageMediaMapper passageMediaMapper;
-
-    public PassageMediaService(PassageMediaRepository repository, PassageMediaMapper passageMediaMapper) {
-        this.repository = repository;
-        this.passageMediaMapper = passageMediaMapper;
-    }
+    private final AuthUtils authUtils;
 
     public PassageMediaResponse create(PassageMediaRequest request) {
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MEDIA_MANAGE);
 
         PassageMedia media = new PassageMedia();
         media.setPassageId(request.getPassageId());
@@ -53,6 +53,7 @@ public class PassageMediaService {
     }
 
     public PassageMediaResponse update(String id, PassageMediaRequest request) {
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MEDIA_MANAGE);
 
         PassageMedia media = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Media không tồn tại"));
@@ -64,6 +65,7 @@ public class PassageMediaService {
     }
 
     public void delete(String id) {
+        authUtils.requirePermission(PermissionCatalog.PASSAGE_MEDIA_MANAGE);
         repository.deleteById(id);
     }
 
