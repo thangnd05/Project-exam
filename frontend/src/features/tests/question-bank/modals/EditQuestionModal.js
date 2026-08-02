@@ -11,10 +11,10 @@ import { buildCollectionTree } from '~/shared/utils/collectionTree';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import {
-  IoCheckmarkCircleOutline,
-  IoCreateOutline,
-  IoTrashOutline,
-} from 'react-icons/io5';
+  CheckCircle2,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 import { getTagsFlatByExamType } from '~/shared/api/tagApi';
 import { useQuestionCollections } from './hooks/useQuestionCollections';
 import { useUpdateQuestion } from './hooks/useUpdateQuestion';
@@ -347,7 +347,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
           cancelLabel="Hủy"
           submitLabel="Lưu cập nhật"
           loadingLabel="Đang lưu..."
-          submitIcon={IoCheckmarkCircleOutline}
+          submitIcon={CheckCircle2}
         />
       }
     >
@@ -483,7 +483,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                           disabled={deleting || saving}
                           onClick={() => setConfirmDeleteMedia(item)}
                         >
-                          {deleting ? <Spinner size="sm" /> : <IoTrashOutline />}
+                          {deleting ? <Spinner size="sm" /> : <Trash2 size={16} />}
                           {!deleting && <span className="ms-1">Xóa</span>}
                         </ButtonPrime>
                       );
@@ -515,7 +515,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                       onClick={() => removeExtraContent(idx)}
                       aria-label={`Xóa đoạn văn bổ sung ${idx + 2}`}
                     >
-                      <IoTrashOutline size={18} />
+                      <Trash2 size={18} />
                     </ButtonPrime>
                   </label>
                   <textarea
@@ -534,7 +534,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                   size="sm"
                   onClick={addExtraContent}
                 >
-                  <IoCreateOutline className="me-1" /> Thêm đoạn văn
+                  <Pencil className="me-1" size={16} /> Thêm đoạn văn
                 </ButtonPrime>
               </Col>
 
@@ -585,7 +585,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                       disabled={formData.options.length <= 2}
                       aria-label={`Xóa đáp án ${opt.answerLabel}`}
                     >
-                      <IoTrashOutline size={18} />
+                      <Trash2 size={18} />
                     </ButtonPrime>
                   </div>
                 </Col>
@@ -598,7 +598,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }) => {
                   onClick={addAnswer}
                   disabled={formData.options.length >= 10}
                 >
-                  <IoCreateOutline className="me-1" /> Thêm đáp án
+                  <Pencil className="me-1" size={16} /> Thêm đáp án
                 </ButtonPrime>
               </Col>
 

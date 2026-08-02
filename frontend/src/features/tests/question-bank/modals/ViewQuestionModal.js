@@ -6,9 +6,9 @@ import {toast} from 'react-toastify';
 import {useQuestionDetail} from './hooks/useQuestionDetail';
 import classNames from 'classnames/bind';
 import {
-  IoCloseOutline,
-  IoCheckmarkCircle,
-} from 'react-icons/io5';
+  CheckCircle,
+  X,
+} from 'lucide-react';
 import {
   getExtraTextContents,
   getPassageMediaItems,
@@ -52,7 +52,7 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
       maxWidth={800}
       footer={
         <ButtonPrime variant="ghost" size="lg" onClick={onHide}>
-          <IoCloseOutline size={20} className="me-1" /> Đóng
+          <X size={20} className="me-1" /> Đóng
         </ButtonPrime>
       }
     >
@@ -190,7 +190,7 @@ const ViewQuestionModal = ({show, onHide, questionId}) => {
                             fontWeight: 700,
                           }}
                         >
-                          <IoCheckmarkCircle size={20} /> Đáp án đúng
+                          <CheckCircle size={20} /> Đáp án đúng
                         </span>
                       )}
                     </div>

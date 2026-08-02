@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
 import { createTest } from '~/shared/api/testApi';
 import { createTestPart } from '~/shared/api/testPartApi';
@@ -33,6 +33,13 @@ export const useTestSubmission = ({
     emptyQuestion,
     createInitialGroup,
 }) => {
+    const queryClient = useQueryClient();
+
+    const invalidateQuestionBank = () => {
+      // Matches questionBankKeys.* prefix in usePersonalQuestionBank
+      queryClient.invalidateQueries({ queryKey: ['question-bank'] });
+    };
+
     const hasQuestionContent = (question) => {
         const hasQuestionText = Boolean(question?.questionText?.trim());
         const hasUploadedMedia = Array.isArray(question?.mediaFiles) && question.mediaFiles.length > 0;
@@ -267,6 +274,7 @@ export const useTestSubmission = ({
             setNotification({});
         },
         onSuccess: (_data, creatorType) => {
+            invalidateQuestionBank();
             if (creatorType === CREATOR_TYPES.TEST) {
                 setNotification({
                     type: 'success',

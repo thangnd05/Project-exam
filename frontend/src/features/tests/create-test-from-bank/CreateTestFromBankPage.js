@@ -1,65 +1,46 @@
 import { useEffect, useState } from 'react';
-import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
-import { useMutation } from '@tanstack/react-query';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
-import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/shared/api/testApi';
-import { createTestPart } from '~/shared/api/testPartApi';
-import CoinPriceField from '~/shared/test/CoinPriceField';
 import classNames from 'classnames/bind';
-import { toast } from 'react-toastify';
 import {
-  IoLibraryOutline,
-  IoSettingsOutline,
-  IoCheckboxOutline,
-  IoShuffleOutline,
-  IoBookOutline,
-  IoTimeOutline,
-  IoRocketOutline,
-  IoChevronDownOutline,
-  IoChevronUpOutline,
-  IoCreateOutline,
-} from 'react-icons/io5';
+  BookOpen,
+  CheckSquare,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Library,
+  Pencil,
+  Rocket,
+  Settings,
+  Shuffle,
+} from 'lucide-react';
+import CoinPriceField from '~/shared/test/CoinPriceField';
 import { useBaseMetaData } from '~/shared/hooks/useBaseMetaData';
 import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
 import EditQuestionModal from '~/features/tests/question-bank/modals/EditQuestionModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
-import { getExamCategories } from '~/shared/api/examCategoryApi';
 import {
   useBankTestBuilder,
   SELECTION_MODES,
   defaultPartConfig,
   groupQuestionsByPassage,
 } from '~/shared/hooks/useBankTestBuilder';
+import {
+  emptyTestInfo,
+  useCreateTestFromBank,
+  useExamCategories,
+} from './hooks/useCreateTestFromBank';
 import styles from './CreateTestFromBankPage.module.scss';
 
 const cx = classNames.bind(styles);
 
 const CreateTestFromBankPage = () => {
-  const [testInfo, setTestInfo] = useState({
-    title: '',
-    description: '',
-    durationMinutes: '',
-    maxAttempts: '',
-    examTypeId: '',
-    examCategoryId: '',
-    bannerUrl: '',
-    availableFrom: '',
-    availableTo: '',
-    costCoins: '',
-  });
-
-  const [examCategories, setExamCategories] = useState([]);
-  useEffect(() => {
-    getExamCategories()
-      .then((list) => setExamCategories(Array.isArray(list) ? list : []))
-      .catch(() => setExamCategories([]));
-  }, []);
-
+  const [testInfo, setTestInfo] = useState(emptyTestInfo);
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingPartId, setEditingPartId] = useState(null);
 
+  const examCategories = useExamCategories();
   const { examTypes, examParts } = useBaseMetaData(testInfo.examTypeId);
 
   const {
@@ -74,6 +55,14 @@ const CreateTestFromBankPage = () => {
     getPartEffectiveCount,
     hasPartWithQuestions,
   } = useBankTestBuilder();
+
+  const createTestMutation = useCreateTestFromBank({
+    testInfo,
+    setTestInfo,
+    partConfigs,
+    getPartEffectiveCount,
+    setNotification,
+  });
 
   useEffect(() => {
     if (!testInfo.examTypeId || !examParts?.length) {
@@ -92,74 +81,15 @@ const CreateTestFromBankPage = () => {
   }, [testInfo.examTypeId, examParts]);
 
   const handleEditQuestionSuccess = () => {
-      setEditingQuestionId(null);
-      if (editingPartId) {
-          loadQuestionsForPart(editingPartId);
-      }
+    setEditingQuestionId(null);
+    if (editingPartId) {
+      loadQuestionsForPart(editingPartId);
+    }
   };
 
   const handleExamTypeChange = (value) => {
     setTestInfo((prev) => ({ ...prev, examTypeId: value }));
   };
-
-  const createTestMutation = useMutation({
-    mutationFn: async (partsToAdd) => {
-      const testData = await createTest({
-        title: testInfo.title.trim(),
-        description: testInfo.description || null,
-        examTypeId: testInfo.examTypeId,
-        examCategoryId: testInfo.examCategoryId || null,
-        durationMinutes: testInfo.durationMinutes && Number(testInfo.durationMinutes) > 0 ? Number(testInfo.durationMinutes) : null,
-        maxAttempts: testInfo.maxAttempts && Number(testInfo.maxAttempts) > 0 ? Number(testInfo.maxAttempts) : null,
-        bannerUrl: testInfo.bannerUrl || null,
-        availableFrom: fromDateTimeLocalInput(testInfo.availableFrom),
-        availableTo: fromDateTimeLocalInput(testInfo.availableTo),
-        classId: null,
-        chapterId: null,
-        costCoins: testInfo.costCoins && Number(testInfo.costCoins) > 0 ? Number(testInfo.costCoins) : null,
-      });
-
-      const newTestId = testData.testId ?? testData.id;
-      if (!newTestId) throw new Error('Không nhận được testId từ server.');
-
-      for (const part of partsToAdd) {
-        const cfg = partConfigs[part.examPartId];
-        const numQuestions = getPartEffectiveCount(part.examPartId);
-        if (numQuestions <= 0) continue;
-
-        const partData = await createTestPart({
-          testId: String(newTestId),
-          examPartId: String(part.examPartId),
-          numQuestions,
-        });
-        const newPartId = partData.testPartId ?? partData.id;
-        if (!newPartId) throw new Error(`Không nhận được testPartId cho part ${part.name}.`);
-
-        if (cfg.mode === SELECTION_MODES.RANDOM || cfg.mode === SELECTION_MODES.SEQUENTIAL) {
-          await addRandomQuestionsToPart({
-            testPartId: String(newPartId),
-            count: numQuestions,
-            isSequential: cfg.mode === SELECTION_MODES.SEQUENTIAL,
-            fromIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.fromIndex, 10) : undefined,
-            toIndex: cfg.mode === SELECTION_MODES.SEQUENTIAL ? parseInt(cfg.toIndex, 10) : undefined,
-          });
-        } else {
-          await addQuestionsToPart({
-            testPartId: String(newPartId),
-            questionIds: (cfg.selectedIds || []).map(String),
-          });
-        }
-      }
-    },
-    onSuccess: () => {
-      setTestInfo((prev) => ({ ...prev, title: '', description: '' }));
-      toast.success('Đã tạo đề thi từ kho câu hỏi!');
-    },
-    onError: (error) => {
-      const msg = error.response?.data?.message ?? error.response?.data ?? error.message;
-      setNotification({ type: 'danger', message: 'Lỗi: ' + (typeof msg === 'string' ? msg : JSON.stringify(msg)) });
-    },
-  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -170,7 +100,11 @@ const CreateTestFromBankPage = () => {
 
     const partsToAdd = examParts.filter(hasPartWithQuestions);
     if (partsToAdd.length === 0) {
-      setNotification({ type: 'warning', message: 'Vui lòng cấu hình ít nhất một part có câu hỏi (số câu > 0 hoặc chọn thủ công).' });
+      setNotification({
+        type: 'warning',
+        message:
+          'Vui lòng cấu hình ít nhất một part có câu hỏi (số câu > 0 hoặc chọn thủ công).',
+      });
       return;
     }
 
@@ -178,8 +112,13 @@ const CreateTestFromBankPage = () => {
     createTestMutation.mutate(partsToAdd);
   };
 
-  const totalSelected = (examParts || []).reduce((sum, p) => sum + getPartEffectiveCount(p.examPartId), 0);
-  const hasAnyPartWithQuestions = (examParts || []).some((p) => getPartEffectiveCount(p.examPartId) > 0);
+  const totalSelected = (examParts || []).reduce(
+    (sum, p) => sum + getPartEffectiveCount(p.examPartId),
+    0,
+  );
+  const hasAnyPartWithQuestions = (examParts || []).some(
+    (p) => getPartEffectiveCount(p.examPartId) > 0,
+  );
 
   return (
     <div className={cx('wrapper')}>
@@ -189,14 +128,19 @@ const CreateTestFromBankPage = () => {
           title="Tạo đề thi từ kho câu hỏi"
           badgeLabel={
             <>
-              <IoLibraryOutline />
+              <Library size={16} />
               <span>Cấu hình từng Part (random hoặc chọn thủ công) rồi tạo đề từ kho cá nhân.</span>
             </>
           }
         />
 
         {notification.message && (
-          <Alert variant={notification.type} className="mb-3" dismissible onClose={() => setNotification({})}>
+          <Alert
+            variant={notification.type}
+            className="mb-3"
+            dismissible
+            onClose={() => setNotification({})}
+          >
             {notification.message}
           </Alert>
         )}
@@ -204,7 +148,7 @@ const CreateTestFromBankPage = () => {
         <Form onSubmit={handleSubmit}>
           <div className={cx('configCard')}>
             <div className={cx('sectionTitle')}>
-              <IoSettingsOutline /> 1. Thông tin đề thi
+              <Settings size={18} /> 1. Thông tin đề thi
             </div>
             <Row className="g-3">
               <Col md={8}>
@@ -222,13 +166,17 @@ const CreateTestFromBankPage = () => {
               </Col>
               <Col md={4}>
                 <div className={cx('formGroup')}>
-                  <label><IoTimeOutline /> Thời gian (phút)</label>
+                  <label>
+                    <Clock size={14} /> Thời gian (phút)
+                  </label>
                   <input
                     type="number"
                     min={0}
                     className={cx('input')}
                     value={testInfo.durationMinutes}
-                    onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })}
+                    onChange={(e) =>
+                      setTestInfo({ ...testInfo, durationMinutes: e.target.value })
+                    }
                     placeholder="VD: 60"
                     aria-label="Thời gian làm bài"
                   />
@@ -245,14 +193,18 @@ const CreateTestFromBankPage = () => {
                   >
                     <option value="">-- Chọn --</option>
                     {(examTypes || []).map((t) => (
-                      <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>
+                      <option key={t.examTypeId} value={t.examTypeId}>
+                        {t.name}
+                      </option>
                     ))}
                   </select>
                 </div>
               </Col>
               <Col md={4}>
                 <div className={cx('formGroup')}>
-                  <label><IoRocketOutline /> Số lượt làm tối đa</label>
+                  <label>
+                    <Rocket size={14} /> Số lượt làm tối đa
+                  </label>
                   <input
                     type="number"
                     min={0}
@@ -276,7 +228,9 @@ const CreateTestFromBankPage = () => {
                   <select
                     className={cx('input')}
                     value={testInfo.examCategoryId}
-                    onChange={(e) => setTestInfo({ ...testInfo, examCategoryId: e.target.value })}
+                    onChange={(e) =>
+                      setTestInfo({ ...testInfo, examCategoryId: e.target.value })
+                    }
                     aria-label="Phân loại bài thi"
                   >
                     <option value="">-- Không phân loại --</option>
@@ -307,10 +261,13 @@ const CreateTestFromBankPage = () => {
           {testInfo.examTypeId && (examParts || []).length > 0 && (
             <div className={cx('configCard')}>
               <div className={cx('sectionTitle')}>
-                <IoLibraryOutline /> 2. Cấu hình từng Part
+                <Library size={18} /> 2. Cấu hình từng Part
               </div>
               <p className={cx('hint')}>
-                Mỗi part: <strong>Random theo số lượng</strong> (BE lấy ngẫu nhiên từ kho cá nhân) hoặc <strong>Chọn thủ công</strong>. Với part có passage (vd. Part 3, 4, 6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng, không chọn lẻ từng câu.
+                Mỗi part: <strong>Random theo số lượng</strong> (BE lấy ngẫu nhiên từ kho cá
+                nhân) hoặc <strong>Chọn thủ công</strong>. Với part có passage (vd. Part 3, 4,
+                6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng,
+                không chọn lẻ từng câu.
               </p>
 
               {(examParts || []).map((part) => {
@@ -328,10 +285,10 @@ const CreateTestFromBankPage = () => {
                       aria-expanded={cfg.expanded}
                     >
                       <span className={cx('partName')}>
-                        <IoBookOutline size={20} /> {part.name}
+                        <BookOpen size={20} /> {part.name}
                       </span>
                       <span className={cx('partBadge')}>{count} câu</span>
-                      {cfg.expanded ? <IoChevronUpOutline size={22} /> : <IoChevronDownOutline size={22} />}
+                      {cfg.expanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
                     </button>
 
                     {cfg.expanded && (
@@ -339,27 +296,43 @@ const CreateTestFromBankPage = () => {
                         <div className={cx('modeTabs')}>
                           <button
                             type="button"
-                            className={cx('modeTab', { active: cfg.mode === SELECTION_MODES.RANDOM })}
-                            onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM)}
+                            className={cx('modeTab', {
+                              active: cfg.mode === SELECTION_MODES.RANDOM,
+                            })}
+                            onClick={() =>
+                              updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM)
+                            }
                             aria-pressed={cfg.mode === SELECTION_MODES.RANDOM}
                           >
-                            <IoShuffleOutline size={18} /> Random theo số lượng
+                            <Shuffle size={18} /> Random theo số lượng
                           </button>
                           <button
                             type="button"
-                            className={cx('modeTab', { active: cfg.mode === SELECTION_MODES.SEQUENTIAL })}
-                            onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.SEQUENTIAL)}
+                            className={cx('modeTab', {
+                              active: cfg.mode === SELECTION_MODES.SEQUENTIAL,
+                            })}
+                            onClick={() =>
+                              updatePartConfig(
+                                part.examPartId,
+                                'mode',
+                                SELECTION_MODES.SEQUENTIAL,
+                              )
+                            }
                             aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
                           >
-                            <IoRocketOutline size={18} /> Lấy tuần tự
+                            <Rocket size={18} /> Lấy tuần tự
                           </button>
                           <button
                             type="button"
-                            className={cx('modeTab', { active: cfg.mode === SELECTION_MODES.MANUAL })}
-                            onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.MANUAL)}
+                            className={cx('modeTab', {
+                              active: cfg.mode === SELECTION_MODES.MANUAL,
+                            })}
+                            onClick={() =>
+                              updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.MANUAL)
+                            }
                             aria-pressed={cfg.mode === SELECTION_MODES.MANUAL}
                           >
-                            <IoCheckboxOutline size={18} /> Chọn thủ công
+                            <CheckSquare size={18} /> Chọn thủ công
                           </button>
                         </div>
 
@@ -372,15 +345,22 @@ const CreateTestFromBankPage = () => {
                               max={Math.max(maxInBank, 0)}
                               className={cx('input', 'randomInput')}
                               value={cfg.randomCount}
-                              onChange={(e) => updatePartConfig(part.examPartId, 'randomCount', e.target.value)}
+                              onChange={(e) =>
+                                updatePartConfig(part.examPartId, 'randomCount', e.target.value)
+                              }
                               aria-label={`Số câu random ${part.name}`}
                             />
-                            <span className={cx('randomHint')}>Tối đa {maxInBank} câu trong kho</span>
+                            <span className={cx('randomHint')}>
+                              Tối đa {maxInBank} câu trong kho
+                            </span>
                           </div>
                         )}
 
                         {cfg.mode === SELECTION_MODES.SEQUENTIAL && (
-                          <div className={cx('randomRow')} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                          <div
+                            className={cx('randomRow')}
+                            style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}
+                          >
                             <label className={cx('randomLabel')}>Từ câu:</label>
                             <input
                               type="number"
@@ -388,7 +368,9 @@ const CreateTestFromBankPage = () => {
                               max={Math.max(maxInBank, 1)}
                               className={cx('input', 'randomInput')}
                               value={cfg.fromIndex}
-                              onChange={(e) => updatePartConfig(part.examPartId, 'fromIndex', e.target.value)}
+                              onChange={(e) =>
+                                updatePartConfig(part.examPartId, 'fromIndex', e.target.value)
+                              }
                               aria-label={`Từ câu ${part.name}`}
                             />
                             <label className={cx('randomLabel')}>Đến câu:</label>
@@ -398,92 +380,127 @@ const CreateTestFromBankPage = () => {
                               max={Math.max(maxInBank, 1)}
                               className={cx('input', 'randomInput')}
                               value={cfg.toIndex}
-                              onChange={(e) => updatePartConfig(part.examPartId, 'toIndex', e.target.value)}
+                              onChange={(e) =>
+                                updatePartConfig(part.examPartId, 'toIndex', e.target.value)
+                              }
                               aria-label={`Đến câu ${part.name}`}
                             />
-                            <span className={cx('randomHint')}>Tối đa {maxInBank} câu trong kho</span>
+                            <span className={cx('randomHint')}>
+                              Tối đa {maxInBank} câu trong kho
+                            </span>
                           </div>
                         )}
 
                         {cfg.loading && (
                           <div className={cx('loadingWrap')}>
-                            <Spinner animation="border" size="sm" /> <span>Đang tải câu hỏi...</span>
+                            <Spinner animation="border" size="sm" />{' '}
+                            <span>Đang tải câu hỏi...</span>
                           </div>
                         )}
 
                         {!cfg.loading && maxInBank === 0 && (
-                          <Alert variant="info" className="mb-0 mt-2">Chưa có câu hỏi trong kho (cá nhân) cho part này.</Alert>
+                          <Alert variant="info" className="mb-0 mt-2">
+                            Chưa có câu hỏi trong kho (cá nhân) cho part này.
+                          </Alert>
                         )}
 
-                        {!cfg.loading && cfg.mode === SELECTION_MODES.MANUAL && maxInBank > 0 && (() => {
-                          const groups = groupQuestionsByPassage(cfg.bankQuestions);
-                          return (
-                            <>
-                              <div className={cx('selectAllRow')}>
-                                <Form.Check
-                                  type="checkbox"
-                                  id={`select-all-${part.examPartId}`}
-                                  label={`Chọn tất cả (${maxInBank} câu)`}
-                                  checked={allSelected}
-                                  onChange={(e) => toggleSelectAll(part.examPartId, e.target.checked)}
-                                  aria-label={`Chọn tất cả ${part.name}`}
-                                />
-                              </div>
-                              <div className={cx('groupList')}>
-                                {(() => {
-                                  let listOffset = 0;
-                                  return groups.map((gr) => {
-                                  const grSelected = isGroupSelected(part.examPartId, gr.groupKey);
-                                  const grLabel = gr.passageId != null
-                                    ? `Nhóm passage (${gr.questions.length} câu)`
-                                    : `Câu độc lập (${gr.questions.length} câu)`;
-                                  const groupStartOffset = listOffset;
-                                  listOffset += gr.questions.length;
-                                  return (
-                                    <div key={gr.groupKey} className={cx('passageGroup', { selected: grSelected })}>
-                                      <div className={cx('groupHeader')}>
-                                        <Form.Check
-                                          type="checkbox"
-                                          id={`gr-${part.examPartId}-${gr.groupKey}`}
-                                          checked={grSelected}
-                                          onChange={() => toggleGroup(part.examPartId, gr.groupKey)}
-                                          aria-label={grLabel}
-                                        />
-                                        <span className={cx('groupLabel')}>{grLabel}</span>
-                                      </div>
-                                      <ul className={cx('questionList')}>
-                                        {gr.questions.map((q, index) => {
-                                          const id = q.questionId ?? q.id;
-                                          if (id == null) return null;
-                                          const checked = (cfg.selectedIds || []).includes(id);
-                                          const displayNo = getQuestionDisplayNumber(q, groupStartOffset + index);
-                                          return (
-                                            <li key={id} className={cx('questionItem', { selected: checked })}>
-                                              <span className={cx('questionIndex')}>{displayNo}.</span>
-                                              <span className={cx('questionText')}>{q.questionText || '(Không có nội dung)'}</span>
-                                              <button
-                                                type="button"
-                                                className={cx('btnEditQuestion')}
-                                                onClick={() => {
-                                                    setEditingPartId(part.examPartId);
-                                                    setEditingQuestionId(id);
-                                                }}
-                                                title="Sửa câu hỏi này"
-                                              >
-                                                  <IoCreateOutline size={18} />
-                                              </button>
-                                            </li>
-                                          );
-                                        })}
-                                      </ul>
-                                    </div>
-                                  );
-                                });
-                                })()}
-                              </div>
-                            </>
-                          );
-                        })()}
+                        {!cfg.loading &&
+                          cfg.mode === SELECTION_MODES.MANUAL &&
+                          maxInBank > 0 &&
+                          (() => {
+                            const groups = groupQuestionsByPassage(cfg.bankQuestions);
+                            return (
+                              <>
+                                <div className={cx('selectAllRow')}>
+                                  <Form.Check
+                                    type="checkbox"
+                                    id={`select-all-${part.examPartId}`}
+                                    label={`Chọn tất cả (${maxInBank} câu)`}
+                                    checked={allSelected}
+                                    onChange={(e) =>
+                                      toggleSelectAll(part.examPartId, e.target.checked)
+                                    }
+                                    aria-label={`Chọn tất cả ${part.name}`}
+                                  />
+                                </div>
+                                <div className={cx('groupList')}>
+                                  {(() => {
+                                    let listOffset = 0;
+                                    return groups.map((gr) => {
+                                      const grSelected = isGroupSelected(
+                                        part.examPartId,
+                                        gr.groupKey,
+                                      );
+                                      const grLabel =
+                                        gr.passageId != null
+                                          ? `Nhóm passage (${gr.questions.length} câu)`
+                                          : `Câu độc lập (${gr.questions.length} câu)`;
+                                      const groupStartOffset = listOffset;
+                                      listOffset += gr.questions.length;
+                                      return (
+                                        <div
+                                          key={gr.groupKey}
+                                          className={cx('passageGroup', {
+                                            selected: grSelected,
+                                          })}
+                                        >
+                                          <div className={cx('groupHeader')}>
+                                            <Form.Check
+                                              type="checkbox"
+                                              id={`gr-${part.examPartId}-${gr.groupKey}`}
+                                              checked={grSelected}
+                                              onChange={() =>
+                                                toggleGroup(part.examPartId, gr.groupKey)
+                                              }
+                                              aria-label={grLabel}
+                                            />
+                                            <span className={cx('groupLabel')}>{grLabel}</span>
+                                          </div>
+                                          <ul className={cx('questionList')}>
+                                            {gr.questions.map((q, index) => {
+                                              const id = q.questionId ?? q.id;
+                                              if (id == null) return null;
+                                              const checked = (cfg.selectedIds || []).includes(id);
+                                              const displayNo = getQuestionDisplayNumber(
+                                                q,
+                                                groupStartOffset + index,
+                                              );
+                                              return (
+                                                <li
+                                                  key={id}
+                                                  className={cx('questionItem', {
+                                                    selected: checked,
+                                                  })}
+                                                >
+                                                  <span className={cx('questionIndex')}>
+                                                    {displayNo}.
+                                                  </span>
+                                                  <span className={cx('questionText')}>
+                                                    {q.questionText || '(Không có nội dung)'}
+                                                  </span>
+                                                  <button
+                                                    type="button"
+                                                    className={cx('btnEditQuestion')}
+                                                    onClick={() => {
+                                                      setEditingPartId(part.examPartId);
+                                                      setEditingQuestionId(id);
+                                                    }}
+                                                    title="Sửa câu hỏi này"
+                                                  >
+                                                    <Pencil size={18} />
+                                                  </button>
+                                                </li>
+                                              );
+                                            })}
+                                          </ul>
+                                        </div>
+                                      );
+                                    });
+                                  })()}
+                                </div>
+                              </>
+                            );
+                          })()}
                       </div>
                     )}
                   </div>
@@ -501,9 +518,21 @@ const CreateTestFromBankPage = () => {
               type="submit"
               variant="primary"
               size="md"
-              disabled={createTestMutation.isPending || !hasAnyPartWithQuestions || !testInfo.examTypeId}
+              disabled={
+                createTestMutation.isPending ||
+                !hasAnyPartWithQuestions ||
+                !testInfo.examTypeId
+              }
             >
-              {createTestMutation.isPending ? <><Spinner animation="border" size="sm" /> Đang tạo đề...</> : <><IoRocketOutline /> Tạo đề thi từ kho</>}
+              {createTestMutation.isPending ? (
+                <>
+                  <Spinner animation="border" size="sm" /> Đang tạo đề...
+                </>
+              ) : (
+                <>
+                  <Rocket size={16} /> Tạo đề thi từ kho
+                </>
+              )}
             </ButtonPrime>
           </div>
         </Form>
