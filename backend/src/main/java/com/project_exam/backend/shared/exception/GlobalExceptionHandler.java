@@ -102,6 +102,18 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getStatus(), ex.getMessage(), request);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("IllegalArgumentException: {}", ex.getMessage());
+        String message = ex.getMessage() != null && !ex.getMessage().isBlank()
+                ? ex.getMessage()
+                : "Dữ liệu đầu vào không hợp lệ";
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, message, request);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiErrorResponse> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
         log.error("Unhandled RuntimeException: {}", ex.getMessage(), ex);

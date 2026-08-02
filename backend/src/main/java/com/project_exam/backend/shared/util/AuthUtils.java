@@ -20,6 +20,15 @@ public class AuthUtils {
         return authService.getCurrentUserInfo(request).getUserId();
     }
 
+    /** Returns userId when authenticated; otherwise null (for public endpoints with optional auth). */
+    public String findUserIdOrNull(HttpServletRequest request) {
+        try {
+            return getUserId(request);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
     public String getRoleId(HttpServletRequest request) {
         return authService.getCurrentUserInfo(request).getRoleId();
     }

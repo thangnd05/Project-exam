@@ -69,9 +69,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthMessageResponse> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request, response);
-        return ResponseEntity.ok(Map.of("message", "Đã logout"));
+        return ResponseEntity.ok(AuthMessageResponse.builder().message("Đã logout").build());
     }
 
     @GetMapping("/verify")

@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.posts.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project_exam.backend.modules.posts.post.dto.ImageUploadResponse;
 import com.project_exam.backend.modules.posts.post.dto.PostUpsertRequest;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.posts.post.dto.PostResponse;
@@ -9,6 +10,7 @@ import com.project_exam.backend.modules.posts.post.dto.UpdatePostStatusRequest;
 import com.project_exam.backend.modules.posts.post.domain.Post;
 import com.project_exam.backend.modules.posts.post.service.PostService;
 import com.project_exam.backend.modules.posts.post.service.PostViewThrottleService;
+import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +48,7 @@ public class PostController {
             @PathVariable String id,
             HttpServletRequest httpRequest
     ) {
-        String currentUserId = null;
-        try {
-            currentUserId = authUtils.getUserId(httpRequest);
-        } catch (Exception ignored) {
-        }
+        String currentUserId = authUtils.findUserIdOrNull(httpRequest);
         String clientIp = postViewThrottleService.extractClientIp(httpRequest);
         return ResponseEntity.ok(postService.getPostById(id, currentUserId, clientIp));
     }
@@ -73,13 +71,9 @@ public class PostController {
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnailFile,
             HttpServletRequest httpRequest
     ) {
-        try {
-            PostUpsertRequest request = objectMapper.readValue(requestJson, PostUpsertRequest.class);
-            String userId = authUtils.getUserId(httpRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(request, thumbnailFile, userId));
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        PostUpsertRequest request = parsePostRequest(requestJson);
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(request, thumbnailFile, userId));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -89,13 +83,9 @@ public class PostController {
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnailFile,
             HttpServletRequest httpRequest
     ) {
-        try {
-            PostUpsertRequest request = objectMapper.readValue(requestJson, PostUpsertRequest.class);
-            String userId = authUtils.getUserId(httpRequest);
-            return ResponseEntity.ok(postService.updatePost(id, request, thumbnailFile, userId));
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        PostUpsertRequest request = parsePostRequest(requestJson);
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(postService.updatePost(id, request, thumbnailFile, userId));
     }
 
     @DeleteMapping("/{id}")
@@ -119,12 +109,20 @@ public class PostController {
     }
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image) {
+    public ResponseEntity<ImageUploadResponse> uploadImage(@RequestParam("image") MultipartFile image) {
         try {
             String url = postService.uploadImage(image);
-            return ResponseEntity.ok(java.util.Map.of("url", url));
+            return ResponseEntity.ok(ImageUploadResponse.builder().url(url).build());
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Upload failed"));
+            throw new BadRequestException("Upload ảnh thất bại");
+        }
+    }
+
+    private PostUpsertRequest parsePostRequest(String requestJson) {
+        try {
+            return objectMapper.readValue(requestJson, PostUpsertRequest.class);
+        } catch (IOException e) {
+            throw new BadRequestException("Request body không hợp lệ");
         }
     }
 }

@@ -7,6 +7,8 @@ import com.project_exam.backend.modules.assessment.exam.mapper.ExamCategoryMappe
 import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ public class ExamCategoryService {
 
     private final ExamCategoryRepository examCategoryRepository;
     private final ExamCategoryMapper examCategoryMapper;
+    private final AuthUtils authUtils;
 
     public List<ExamCategoryResponse> findAll() {
         return examCategoryRepository.findAll().stream()
@@ -42,6 +45,7 @@ public class ExamCategoryService {
     }
 
     public ExamCategoryResponse create(ExamCategoryRequest request) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
         String code = normalizeCode(request.getCode());
         if (examCategoryRepository.existsByCode(code)) {
             throw new BadRequestException("Code đã tồn tại: " + code);
@@ -56,6 +60,7 @@ public class ExamCategoryService {
     }
 
     public ExamCategoryResponse update(String id, ExamCategoryRequest request) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
         ExamCategory category = examCategoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam category không tồn tại"));
 
@@ -74,6 +79,7 @@ public class ExamCategoryService {
     }
 
     public void delete(String id) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
         ExamCategory category = examCategoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam category không tồn tại"));
         examCategoryRepository.delete(category);
@@ -87,5 +93,4 @@ public class ExamCategoryService {
     private String normalizeCode(String raw) {
         return raw.trim().toUpperCase().replaceAll("\\s+", "_");
     }
-
 }

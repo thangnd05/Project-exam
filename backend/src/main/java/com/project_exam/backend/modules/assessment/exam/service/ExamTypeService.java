@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.assessment.exam.service;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.util.AuthUtils;
 
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeResponse;
@@ -20,6 +22,7 @@ public class ExamTypeService {
 
     private final ExamTypeRepository examTypeRepository;
     private final ExamTypeMapper examTypeMapper;
+    private final AuthUtils authUtils;
 
     public List<ExamTypeResponse> findAll() {
         return examTypeRepository.findAll().stream()
@@ -53,6 +56,7 @@ public class ExamTypeService {
     }
 
     public ExamTypeResponse create(ExamTypeRequest request) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         ExamType type = new ExamType();
         type.setName(request.getName());
         type.setDescription(request.getDescription());
@@ -66,6 +70,7 @@ public class ExamTypeService {
     }
 
     public ExamTypeResponse update(String id, ExamTypeRequest request) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         ExamType type = examTypeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
         if (request.getName() != null) type.setName(request.getName());
@@ -83,6 +88,7 @@ public class ExamTypeService {
     }
 
     public void delete(String id) {
+        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_MANAGE);
         ExamType type = examTypeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
 

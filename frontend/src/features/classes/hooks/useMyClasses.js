@@ -12,12 +12,22 @@ const normalizeMyClasses = (data) => ({
   message: data?.message || '',
 });
 
+/** Domain-unwrapped hook (prefer this shape for feature hooks). */
 export function useMyClasses() {
-  return useQuery({
+  const classesQuery = useQuery({
     queryKey: myClassesKeys.all,
     queryFn: getMyClasses,
     select: normalizeMyClasses,
   });
+
+  return {
+    teachingClasses: classesQuery.data?.teachingClasses ?? [],
+    learningClasses: classesQuery.data?.learningClasses ?? [],
+    message: classesQuery.data?.message || '',
+    isLoading: classesQuery.isLoading,
+    isError: classesQuery.isError,
+    refetch: classesQuery.refetch,
+  };
 }
 
 export function useCreateClass({ onSuccess, onError } = {}) {

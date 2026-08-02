@@ -349,7 +349,7 @@ public class QuestionService {
         return questionDocumentImportService.parseQuestionsFromDocument(file);
     }
 
-    public List<PassageQuestionGroup> previewPassageQuestionsFromDocument(MultipartFile file) throws IOException {
+    public List<PassageQuestionGroupRequest> previewPassageQuestionsFromDocument(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new BadRequestException("Vui lòng chọn file Word.");
         }
@@ -1123,7 +1123,7 @@ public class QuestionService {
         for (int gIndex = 0; gIndex < request.getGroups().size(); gIndex++) {
             final int finalGIndex = gIndex;
 
-            PassageQuestionGroup group = request.getGroups().get(gIndex);
+            PassageQuestionGroupRequest group = request.getGroups().get(gIndex);
             PassageRequest pReq = group.getPassage();
 
             Passage passage = new Passage();

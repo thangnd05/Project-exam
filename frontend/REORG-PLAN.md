@@ -68,11 +68,9 @@ src/
 - [x] **B5 — re-home `components/*`** ✅ `coin cosmetic resources streak test` →
       `shared/` (đều dùng-chéo); `Comment/` **xoá** (dead, 0 importer). `components/`
       giải tán hoàn toàn.
-- [x] **B6 — co-locate API** ✅ 8 API 1-chủ → owner (`classMemberApi`→myclass,
-      `practiceQuestionApi`→album-pratice, `userAnswerApi`→exam, `vocabularyAlbumApi`→
-      album-voca, `vocabularyApi`→album-delta, `adminAuditApi/permissionApi/roleApi`→
-      admin); 28 API dùng-chéo → `shared/api/`. Sibling `./axiosClient` trong file
-      co-locate sửa về `~/shared/api/`.
+- [x] **B6 — co-locate API** ⚠️ *đánh dấu lại*: kế hoạch co-locate 1-chủ chưa phản ánh
+      đúng tree hiện tại — **toàn bộ `*Api.js` vẫn ở `shared/api/`**. Batch co-locate
+      thật sự còn mở.
 - [x] **B7 — `app/` bootstrap** ✅ `index.js App.js routes/`→`app/`; entry
       `index.html`→`/src/app/index.js`. (`setupTests.js` để lại gốc — vite.config trỏ tới.)
 - [x] **B8 — admin/ domain-slice** ✅ gom 27 trang phẳng thành 5 domain (access,

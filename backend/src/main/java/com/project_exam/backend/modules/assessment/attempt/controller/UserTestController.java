@@ -1,12 +1,15 @@
 package com.project_exam.backend.modules.assessment.attempt.controller;
 
+import com.project_exam.backend.modules.assessment.attempt.dto.ClaimGuestTestsResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.StartUserTestRequest;
+import com.project_exam.backend.modules.assessment.attempt.dto.StartUserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestUpdateRequest;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 import com.project_exam.backend.shared.dto.PageResponse;
+import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.Cookie;
@@ -89,25 +92,26 @@ public class UserTestController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> startUserTest(
+    public ResponseEntity<StartUserTestResponse> startUserTest(
             @Valid @RequestBody StartUserTestRequest request,
             HttpServletRequest httpRequest
     ) {
-        if (request == null || request.getTestId() == null || request.getTestId().isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Missing testId"));
+        if (request.getTestId() == null || request.getTestId().isBlank()) {
+            throw new BadRequestException("testId không được để trống");
         }
 
         String userId = authUtils.getUserId(httpRequest);
         UserTest userTest = userTestService.startUserTest(
                 request.getTestId(), userId, request.getMode(), request.getExamPartIds());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Bắt đầu làm bài thành công");
-        response.put("userTestId", userTest.getUserTestId());
-        response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
-        response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
-        response.put("mode", userTest.getMode() != null ? userTest.getMode().name() : "FULL_TEST");
-        response.put("serverNow", java.time.Instant.now().toString());
+        StartUserTestResponse response = StartUserTestResponse.builder()
+                .message("Bắt đầu làm bài thành công")
+                .userTestId(userTest.getUserTestId())
+                .status(userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN")
+                .startedAt(userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null)
+                .mode(userTest.getMode() != null ? userTest.getMode().name() : "FULL_TEST")
+                .serverNow(java.time.Instant.now().toString())
+                .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -118,8 +122,8 @@ public class UserTestController {
             @Valid @RequestBody UserTestUpdateRequest request,
             HttpServletRequest httpRequest
     ) {
-        if (request == null || request.getStatus() == null) {
-            return ResponseEntity.badRequest().build();
+        if (request.getStatus() == null) {
+            throw new BadRequestException("status không được để trống");
         }
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(userTestService.updateStatusByOwner(id, userId, request.getStatus()));
@@ -192,24 +196,26 @@ public class UserTestController {
     }
 
     @PostMapping("/guest")
-    public ResponseEntity<Map<String, Object>> startGuestUserTest(
+    public ResponseEntity<StartUserTestResponse> startGuestUserTest(
             @Valid @RequestBody StartUserTestRequest request,
             @RequestHeader("X-Guest-Session") String guestSessionId,
             HttpServletResponse httpResponse
     ) {
-        if (request == null || request.getTestId() == null || request.getTestId().isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Missing testId"));
+        if (request.getTestId() == null || request.getTestId().isBlank()) {
+            throw new BadRequestException("testId không được để trống");
         }
         UserTest userTest = userTestService.startGuestUserTest(request.getTestId(), guestSessionId);
 
         setGuestSessionCookie(httpResponse, guestSessionId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Bắt đầu làm bài (guest) thành công");
-        response.put("userTestId", userTest.getUserTestId());
-        response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
-        response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
-        response.put("serverNow", java.time.Instant.now().toString());
+        StartUserTestResponse response = StartUserTestResponse.builder()
+                .message("Bắt đầu làm bài (guest) thành công")
+                .userTestId(userTest.getUserTestId())
+                .status(userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN")
+                .startedAt(userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null)
+                .mode(userTest.getMode() != null ? userTest.getMode().name() : "FULL_TEST")
+                .serverNow(java.time.Instant.now().toString())
+                .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -256,18 +262,18 @@ public class UserTestController {
     }
 
     @PostMapping("/claim-guest")
-    public ResponseEntity<Map<String, Object>> claimGuestTests(
+    public ResponseEntity<ClaimGuestTestsResponse> claimGuestTests(
             HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
         String userId = authUtils.getUserId(httpRequest);
         String guestSessionId = readGuestSessionCookie(httpRequest);
         if (guestSessionId == null || guestSessionId.isBlank()) {
-            return ResponseEntity.ok(Map.of("claimed", 0));
+            return ResponseEntity.ok(ClaimGuestTestsResponse.builder().claimed(0).build());
         }
         int claimed = userTestService.claimGuestTests(userId, guestSessionId);
         clearGuestSessionCookie(response);
-        return ResponseEntity.ok(Map.of("claimed", claimed));
+        return ResponseEntity.ok(ClaimGuestTestsResponse.builder().claimed(claimed).build());
     }
 
     private boolean isSecureCookie() {

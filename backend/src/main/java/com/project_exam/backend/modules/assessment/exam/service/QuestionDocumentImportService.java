@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.Passage;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.NormalQuestionRequest;
-import com.project_exam.backend.modules.assessment.exam.dto.PassageQuestionGroup;
+import com.project_exam.backend.modules.assessment.exam.dto.PassageQuestionGroupRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageRequest;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
@@ -142,13 +142,13 @@ public class QuestionDocumentImportService {
         return parsedQuestions;
     }
 
-    public List<PassageQuestionGroup> parsePassageQuestionsFromDocument(MultipartFile file) throws IOException {
+    public List<PassageQuestionGroupRequest> parsePassageQuestionsFromDocument(MultipartFile file) throws IOException {
         validateFile(file);
         List<ParsedLine> allLines = extractLinesFromDoc(file);
 
         PassageGroupCollector collector = new PassageGroupCollector();
         new LineProcessor(collector).process(allLines);
-        List<PassageQuestionGroup> parsedGroups = collector.getResults();
+        List<PassageQuestionGroupRequest> parsedGroups = collector.getResults();
 
         log.info(
                 "Imported Passage Document '{}' -> lines={}, groups={}",
@@ -757,8 +757,8 @@ public class QuestionDocumentImportService {
     }
 
     private class PassageGroupCollector implements QuestionCollector {
-        private final List<PassageQuestionGroup> groups = new ArrayList<>();
-        private PassageQuestionGroup currentGroup;
+        private final List<PassageQuestionGroupRequest> groups = new ArrayList<>();
+        private PassageQuestionGroupRequest currentGroup;
 
         @Override
         public boolean supportsPassage() {
@@ -818,12 +818,12 @@ public class QuestionDocumentImportService {
             currentGroup = null;
         }
 
-        List<PassageQuestionGroup> getResults() {
+        List<PassageQuestionGroupRequest> getResults() {
             return groups;
         }
 
-        private PassageQuestionGroup createEmptyGroup() {
-            PassageQuestionGroup group = new PassageQuestionGroup();
+        private PassageQuestionGroupRequest createEmptyGroup() {
+            PassageQuestionGroupRequest group = new PassageQuestionGroupRequest();
             PassageRequest pr = new PassageRequest();
             pr.setPassageType(Passage.PassageType.READING);
             pr.setContent("");

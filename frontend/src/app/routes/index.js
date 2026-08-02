@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import routes from '~/shared/config/Routes';
 
-const Login = lazy(() => import('~/features/user/login/login'));
-const ForgotPassword = lazy(() => import('~/features/user/login/forgot'));
-const ResetPassWord = lazy(() => import('~/features/user/login/reset'));
+const Login = lazy(() => import('~/features/user/login/LoginPage'));
+const ForgotPassword = lazy(() => import('~/features/user/login/ForgotPasswordPage'));
+const ResetPassWord = lazy(() => import('~/features/user/login/ResetPasswordPage'));
 const TestPage = lazy(() => import('~/features/landing/HomePage'));
 const TestByExamTypePage = lazy(() => import('~/features/tests/exam/exam-types/detail/TestByExamTypePage'));
 const TestByCollectionPage = lazy(() => import('~/features/tests/exam/exam-types/detail/TestByCollectionPage'));
@@ -14,8 +14,8 @@ const TestHistoryPage = lazy(() => import('~/features/tests/history/TestHistoryP
 const TestLeaderboardPage = lazy(() => import('~/features/tests/leaderboard/TestLeaderboardPage'));
 const MyClassesPage = lazy(() => import('~/features/classes/MyClassPage'));
 const TestByClassPage = lazy(() => import('~/features/classes/class-tests/TestByClassPage'));
-const Policy = lazy(() => import('~/features/landing/policy/policy'));
-const Service = lazy(() => import('~/features/landing/policy/service'));
+const Policy = lazy(() => import('~/features/landing/policy/PolicyPage'));
+const Service = lazy(() => import('~/features/landing/policy/ServicePage'));
 const About = lazy(() => import('~/features/landing/about'));
 const PostsPage = lazy(() => import('~/features/posts/PostsPage'));
 const PostDetailPage = lazy(() => import('~/features/posts/PostDetailPage'));

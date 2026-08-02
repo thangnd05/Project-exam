@@ -217,10 +217,10 @@ public class QuestionController {
     }
 
     @PostMapping(value = "/preview/passage-document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<PassageQuestionGroup>> previewPassageQuestionsFromDocument(
+    public ResponseEntity<List<PassageQuestionGroupRequest>> previewPassageQuestionsFromDocument(
             @RequestPart("file") MultipartFile file
     ) throws IOException {
-        List<PassageQuestionGroup> responses = questionService.previewPassageQuestionsFromDocument(file);
+        List<PassageQuestionGroupRequest> responses = questionService.previewPassageQuestionsFromDocument(file);
         return ResponseEntity.ok(responses);
     }
 

@@ -25,12 +25,16 @@ const MyClassesPage = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const { data, isLoading: loading, isError } = useMyClasses();
+  const {
+    teachingClasses,
+    learningClasses,
+    message: classesMessage,
+    isLoading: loading,
+    isError,
+  } = useMyClasses();
   const deleteMutation = useDeleteClass();
 
-  const teachingClasses = data?.teachingClasses ?? [];
-  const learningClasses = data?.learningClasses ?? [];
-  const message = data?.message || (isError ? 'Không thể kết nối đến máy chủ ' : '');
+  const message = classesMessage || (isError ? 'Không thể kết nối đến máy chủ ' : '');
 
   const handleViewTests = (classId) => {
     const path = routes.classChapterPage.replace(':classId', classId);

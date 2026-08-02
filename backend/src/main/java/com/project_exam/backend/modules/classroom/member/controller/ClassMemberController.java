@@ -4,6 +4,8 @@ import com.project_exam.backend.modules.classroom.member.dto.ClassMemberActionRe
 import com.project_exam.backend.modules.classroom.member.dto.ClassMemberJoinRequest;
 import com.project_exam.backend.modules.classroom.member.dto.ClassMemberResponse;
 import com.project_exam.backend.modules.classroom.member.service.ClassMemberService;
+import com.project_exam.backend.shared.dto.MessageResponse;
+import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 import java.util.Map;
 
 @RestController
@@ -33,7 +34,7 @@ public class ClassMemberController {
     ) {
         String classQr = body.getClassQr();
         if (classQr == null || classQr.isBlank()) {
-            return ResponseEntity.badRequest().build();
+            throw new BadRequestException("Mã QR lớp không được để trống");
         }
         String userId = authUtils.getUserId(request);
         ClassMemberResponse member = classMemberService.joinClassByQr(classQr.trim(), userId);
@@ -41,39 +42,39 @@ public class ClassMemberController {
     }
 
     @DeleteMapping("/leave")
-    public ResponseEntity<Map<String, String>> leaveClass(
+    public ResponseEntity<MessageResponse> leaveClass(
             @Valid @RequestBody ClassMemberJoinRequest body,
             HttpServletRequest request
     ) {
         String classId = body.getClassId();
-        if (classId == null) {
-            return ResponseEntity.badRequest().build();
+        if (classId == null || classId.isBlank()) {
+            throw new BadRequestException("classId không được để trống");
         }
         String userId = authUtils.getUserId(request);
         classMemberService.leaveClass(classId, userId);
-        return ResponseEntity.ok(Map.of("message", "You have left the class successfully"));
+        return ResponseEntity.ok(MessageResponse.of("Bạn đã rời lớp thành công"));
     }
 
     @PutMapping("/approve")
-    public ResponseEntity<Map<String, String>> approveSingle(
+    public ResponseEntity<MessageResponse> approveSingle(
             @Valid @RequestBody ClassMemberActionRequest body,
             HttpServletRequest request
     ) {
         String classId = body.getClassId();
         String targetUserId = body.getUserId();
-        if (classId == null || targetUserId == null) {
-            return ResponseEntity.badRequest().build();
+        if (classId == null || classId.isBlank() || targetUserId == null || targetUserId.isBlank()) {
+            throw new BadRequestException("classId và userId không được để trống");
         }
         String currentUserId = authUtils.getUserId(request);
         classMemberService.approveSingle(classId, targetUserId, currentUserId);
-        return ResponseEntity.ok(Map.of("message", "Member approved successfully"));
+        return ResponseEntity.ok(MessageResponse.of("Đã duyệt thành viên thành công"));
     }
 
     @PutMapping("/approve-all/{classId}")
-    public ResponseEntity<Map<String, String>> approveAll(@PathVariable String classId, HttpServletRequest request) {
+    public ResponseEntity<MessageResponse> approveAll(@PathVariable String classId, HttpServletRequest request) {
         String currentUserId = authUtils.getUserId(request);
         int count = classMemberService.approveAll(classId, currentUserId);
-        return ResponseEntity.ok(Map.of("message", "Approved " + count + " pending members"));
+        return ResponseEntity.ok(MessageResponse.of("Đã duyệt " + count + " thành viên đang chờ"));
     }
 
     @GetMapping("/class/{classId}")
@@ -95,18 +96,18 @@ public class ClassMemberController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<Map<String, String>> removeMember(
+    public ResponseEntity<MessageResponse> removeMember(
             @Valid @RequestBody ClassMemberActionRequest body,
             HttpServletRequest request
     ) {
         String classId = body.getClassId();
         String targetUserId = body.getUserId();
-        if (classId == null || targetUserId == null) {
-            return ResponseEntity.badRequest().build();
+        if (classId == null || classId.isBlank() || targetUserId == null || targetUserId.isBlank()) {
+            throw new BadRequestException("classId và userId không được để trống");
         }
         String currentUserId = authUtils.getUserId(request);
         classMemberService.removeMember(classId, targetUserId, currentUserId);
-        return ResponseEntity.ok(Map.of("message", "Member removed successfully"));
+        return ResponseEntity.ok(MessageResponse.of("Đã xóa thành viên thành công"));
     }
 
     @GetMapping("/my-classes")

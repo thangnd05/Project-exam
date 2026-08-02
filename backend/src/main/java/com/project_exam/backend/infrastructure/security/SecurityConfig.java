@@ -2,6 +2,7 @@ package com.project_exam.backend.infrastructure.security;
 
 import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
+import com.project_exam.backend.shared.exception.ApiErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,11 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,12 +35,12 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Configuration
-@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtService jwtService;
@@ -107,10 +108,16 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json;charset=UTF-8");
-                            Map<String, String> errorData = new HashMap<>();
-                            errorData.put("error", "Unauthorized");
-                            errorData.put("message", authException.getMessage());
-
+                            String message = authException.getMessage() != null && !authException.getMessage().isBlank()
+                                    ? authException.getMessage()
+                                    : "Unauthorized";
+                            ApiErrorResponse errorData = ApiErrorResponse.builder()
+                                    .status(HttpStatus.UNAUTHORIZED.value())
+                                    .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                                    .message(message)
+                                    .path(request.getRequestURI())
+                                    .timestamp(Instant.now())
+                                    .build();
                             response.getWriter().write(objectMapper.writeValueAsString(errorData));
                         })
                 )

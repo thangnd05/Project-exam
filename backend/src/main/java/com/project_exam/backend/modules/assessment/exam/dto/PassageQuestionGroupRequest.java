@@ -4,7 +4,7 @@ import lombok.Data;
 
 import java.util.List;
 @Data
-public class PassageQuestionGroup {
+public class PassageQuestionGroupRequest {
 
     private PassageRequest passage;
     private List<NormalQuestionRequest> questions;

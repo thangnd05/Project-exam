@@ -376,7 +376,7 @@ public class PostService {
 
     public String uploadImage(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File không hợp lệ");
+            throw new BadRequestException("File không hợp lệ");
         }
         return cloudinaryService.uploadImage(file);
     }

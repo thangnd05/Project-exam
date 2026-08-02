@@ -10,6 +10,6 @@ public class BulkPassageGroupRequest {
     private String classId;
     private String chapterId;
 
-    private List<PassageQuestionGroup> groups;
+    private List<PassageQuestionGroupRequest> groups;
 }
 

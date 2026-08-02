@@ -1,104 +1,95 @@
 # Kiến trúc Frontend — Feature-Slice
 
-> Tài liệu này định nghĩa cách tổ chức code FE và lộ trình di dời về chuẩn
-> **feature-slice**. Mẫu tham chiếu đã có sẵn: [`src/pages/learning-plan/`](src/pages/learning-plan).
+> Tài liệu phản ánh cấu trúc **hiện tại** sau reorg B1–B8.
+> Mẫu tham chiếu sạch: `src/features/albums/`, `src/features/classes/`.
 
 ## 1. Nguyên tắc
 
-Code được nhóm **theo feature (tính năng nghiệp vụ)**, không theo loại file. Mỗi
-feature tự chứa mọi thứ nó cần (UI, modal, hook, style). Chỉ những thứ **thật sự
-dùng chung nhiều feature** mới nằm ở `components/common/`.
+Code nhóm **theo feature**, không theo loại file. Mỗi feature tự chứa UI / modal /
+hook / style nó cần. Chỉ thứ **dùng chung thật sự** nằm ở `shared/` hoặc `layout/`.
 
 ## 2. Cấu trúc thư mục
 
 ```
 src/
-  components/
-    common/              # CHỈ UI/infra dùng chung thật sự
-      modal/             # CommonFormModal, ModalActionFooter (vỏ form chung)
-                         # ConfirmModal + ConfirmActionModal + ConfirmDeleteModal (confirm dùng chéo)
-      BackgroundDecor/  MotionSection/  PageHeader/
-  pages/
-    <feature>/           # gốc của một feature, vd: myclass, album-voca, profile
-      components/        # component riêng của feature
-      hooks/             # hook riêng của feature
-      modals/            # modal riêng của feature
-      pages/             # các trang (route) của feature
-      styles/            # *.module.scss của feature
-  admin/                 # khu admin, cũng feature-slice (pages/, modals/, ...)
-  api/  config/  context/  hooks/  layout/  routes/  utils/  assets/
+  app/                 # bootstrap: index.js, App.js, routes/, error/
+  features/            # lát cắt nghiệp vụ
+    <feature>/
+      hooks/  modals/  components/  pages/  styles/   # có gì tạo nấy
+  shared/
+    api/               # axiosClient + *Api.js (hiện gom tại đây)
+    ui/  hooks/  utils/  config/  context/  styles/  assets/
+    test/  coin/  cosmetic/  streak/  resources/     # domain widgets dùng-chéo
+  layout/              # Header, Footer, DefaultLayout
 ```
 
-> Không bắt buộc feature nào cũng đủ 5 thư mục con — có gì tạo nấy. Feature nhỏ
-> có thể chỉ cần `modals/` + file trang phẳng.
+API co-locate `features/*/api/` **chưa làm** — mọi `*Api.js` vẫn ở `shared/api/`.
+Quy tắc đích (khi migrate tiếp): 1 feature → co-locate; ≥3 / hạ tầng → `shared/api/`.
 
 ## 3. Quy ước đặt tên
 
-- **Thư mục gom nhóm** (bucket) → **lowercase**: `pages`, `components`, `common`,
-  `modals`, `hooks`, `admin`, `layout`, `api`...
-- **Thư mục đại diện một component** → **PascalCase**: `PageHeader/`, `ClassCard/`,
-  `GlobalStyles/`, `Comment/`, `Header/`...
-- File component React: **PascalCase** (`CreatePostModal.js`). Hook: `use-kebab.js`
-  hoặc `useCamel.js` (giữ theo cái đang có trong feature).
+| Loại | Convention | Ví dụ |
+|------|------------|--------|
+| Thư mục bucket | lowercase | `hooks/`, `modals/`, `components/` |
+| Component / Page file | PascalCase | `CreateClassModal.js`, `LoginPage.js` |
+| Hook file + function | `use` + CamelCase | `useMyAlbums.js` → `useMyAlbums` |
+| API module | camelCase `*Api.js` | `learningPlanApi.js` |
+| Style | `*.module.scss` | `MyClassPage.module.scss` |
+
+Tránh tên file lowercase cho page (`login.js` → `LoginPage.js`).
 
 ## 4. Quy ước import
 
-- **Trong cùng feature** → đường dẫn tương đối: `./modals/X`, `../hooks/Y`.
-- **Chéo feature / tới shared** → dùng alias `~/`: `~/components/common/...`,
-  `~/api/axiosClient`, `~/hooks/useAuth`.
-- Tránh `../../../..` chui nhiều cấp ra ngoài feature — đổi sang alias `~/` cho
-  bền khi di chuyển file.
+- Trong cùng feature → relative `./`, `../`
+- Chéo feature / shared → alias `~/features/...`, `~/shared/...`
+- Tránh `../../../..` ra ngoài feature
 
-## 5. Bản đồ sở hữu — modal nào thuộc feature nào
+## 5. Data layer (bắt buộc cho code mới)
 
-| Feature | Modal | Component rải rác cần gom về |
-|---|---|---|
-| **shared** → `components/common/modal/` | ConfirmModal, ConfirmActionModal, ConfirmDeleteModal | CommonFormModal, ModalActionFooter |
-| **profile** → `pages/profile/` | ChangePasswordModal, UpdateProfileModal | |
-| **album** → `pages/album-voca/` | CreateAlbumModal, UpdateAlbumModal | `components/vocabulary/*` (Create/Bulk/UpdateVocabularyModal) |
-| **myclass** → `pages/myclass/` | CreateChapterModal, UpdateChapterModal, CreateClassModal, EditClassModal, JoinClassModal | `common/`: ClassCard, ClassListContainer, ClassManagementTable, ChapterManagementTable |
-| **posts** → `pages/posts/` | CreatePostModal | `components/Comment/` |
-| **test/creator** → `pages/mytest/` (hoặc feature `test`) | CreateTestModal, EditTestModal | `components/creator/*`, `common/`: TestCard, TestListContainer, TestManagementTable |
-| **question-bank** → `pages/question-bank/` | EditQuestionModal, ViewQuestionModal | |
-| **evaluation** → `pages/evaluation/` | EvaluationModal | `components/result/*` |
-| **admin** → `admin/modals/` | ExamCategoryFormModal, ExamTypeFormModal, RecoveryResourceFormModal, TagFormModal | `common/AlbumManagementTable` (cần xác minh nơi dùng) |
+```
+Page → feature hook → shared/api/*Api.js → axiosClient
+```
 
-## 6. Lộ trình di dời (incremental — mỗi batch 1 commit + `pnpm build` verify)
+- **Không** gọi `*Api` trực tiếp trong page/component lớn (trừ bootstrap auth đơn giản).
+- Hook **unwrap domain** (ưu tiên), mẫu `useMyAlbums` / `useMyClasses`:
 
-Làm từ feature nhỏ/độc lập → cross-cutting để giảm rủi ro. **Không big-bang.**
+```js
+return {
+  items: query.data ?? [],
+  isLoading: query.isLoading,
+  isError: query.isError,
+  // mutations…
+};
+```
 
-- [x] **Batch 1 — profile**: ChangePasswordModal, UpdateProfileModal → `pages/profile/modals/`
-- [x] **Batch 2 — album**: 2 album modal → `pages/album-voca/modals/`; 3 vocabulary modal → `pages/album-delta/modals/` (co-locate theo importer thật)
-- [x] **Batch 3 — posts**: CreatePostModal → `pages/posts/modals/`. (`components/Comment/` để lại — xem mục 7.)
-- [x] **Batch 4 — question-bank**: EditQuestionModal, ViewQuestionModal → `pages/question-bank/modals/`
-- [x] **Batch 5 — evaluation**: EvaluationModal → `pages/evaluation/modals/`; `result/*` → `pages/exam/.../result/components/` (importer thật là TestResultPage, KHÔNG phải evaluation)
-- [x] **Batch 6 — admin**: 4 form modal → `admin/modals/`
-- [x] **Batch 7 — myclass**: 5 modal → `pages/myclass/modals/`; ClassCard/ClassListContainer/ClassManagementTable/ChapterManagementTable → `pages/myclass/components/`
-- [x] **Batch 8 — test/creator**: gom TẤT CẢ vào `components/test/` (module domain shared, vì dùng chéo exam/myclass/mytest/question-bank/Header): CreateTestModal(+scss), EditTestModal, `creator/*`, TestCard/TestListContainer/TestManagementTable
-- [x] **Batch 9 — shared + dọn common/**: Confirm{,Action,Delete}Modal → `components/common/modal/`; AlbumManagementTable → `pages/album-voca/components/`; **`components/modals/` đã xoá hẳn**; `components/common/` còn lại toàn UI generic (BackgroundDecor, MotionSection, PageHeader, modal/)
+- Tránh trả raw `useQuery()` trừ khi hook chỉ là wrapper mỏng cho admin CRUD factory.
+- Query key factory: `export const fooKeys = { list: ['foo'] }`.
+- Tên hook **không trùng** giữa shared và admin (`useCoins` admin → `useAdminCoins`).
 
-> **Kết quả**: thùng rác `components/modals/` (31 file) đã giải tán hoàn toàn. Mỗi batch đã `pnpm build` xanh.
+## 6. Error & message từ API
 
-### Quy trình mỗi batch
-1. `git mv` file vào thư mục feature đích.
-2. Sửa import nội bộ file vừa chuyển (relative → `~/` nếu chui ra ngoài feature).
-3. Cập nhật các file import nó.
-4. `grep` xác nhận 0 đường dẫn cũ sót lại.
-5. `pnpm build` → phải compiled successfully.
-6. Commit.
+- Đọc lỗi qua `err.response?.data?.message` (shape `ApiErrorResponse`).
+- Ưu tiên helper `~/shared/utils/apiError` (`getApiErrorMessage`) thay vì copy inline.
 
-### ⚠️ Hai bẫy đã vấp (đừng lặp lại)
-- **Import sibling dạng bare `./X`**: grep theo `oldpath/X` sẽ BỎ SÓT, vì chuỗi import
-  không chứa `oldpath/`. Khi tách 2 file từng ở chung 1 thư mục, phải kiểm tra cả
-  `./` import giữa chúng (vd `EditTestModal` dùng lại `./EditQuestionModal`).
-- **`@import` trong `.module.scss`**: Sass **KHÔNG** hiểu alias `~/` (nó trỏ
-  `node_modules`). Mọi `@import '../../GlobalStyles/...'` tương đối sẽ lệch khi đổi
-  độ sâu thư mục → phải tính lại relative path. GlobalStyles ở
-  `src/components/GlobalStyles/`.
-- **Verify build cho đúng**: `cmd > log; echo $?` trả exit của `echo` (luôn 0). Phải
-  đọc exit của chính `npm` hoặc `grep "Failed to compile"` trong log.
+## 7. UI / icons / forms
 
-## 7. Việc cần làm riêng (đã phát hiện, chưa thuộc batch nào)
+- Form: controlled `useState` + react-bootstrap (chưa dùng form lib).
+- Modal user: `CommonFormModal` + `ModalActionFooter`; admin: `BaseModal` được chấp nhận.
+- **Icon mới:** dùng `lucide-react`. Không thêm Font Awesome / `react-icons` mới.
+  (Code cũ giữ nguyên; migrate dần khi đụng file.)
+- Style: `*.module.scss` + `classNames/bind` (`cx`). Global tokens qua
+  `shared/styles/GlobalStyles/GlobalStyles.module.scss` (`@import` hoặc `@use`).
 
-- `components/Comment/RenderComment.js` import `~/layout/comment/comment.module.scss`
-  nhưng thư mục đó **không tồn tại** → import hỏng / dead code. Xử lý khi làm Batch 3.
+## 8. Auth / RBAC (đối chiếu BE)
+
+Frontend không check permission chi tiết; backend:
+
+- RBAC: `AuthUtils.requirePermission` **trong service**
+- Ownership: `*Access` guard (vd `LearningPlanAccess`)
+- Controller chỉ lấy `userId` / gọi service
+- Không dùng `@PreAuthorize`
+
+## 9. Lịch sử migrate
+
+Chi tiết batch B1–B8: xem [REORG-PLAN.md](REORG-PLAN.md). Reorg thư mục đã xong;
+còn nợ: co-locate API, thống nhất icon, page fat (question-bank) tách hook.
