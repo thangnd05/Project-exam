@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class CommentController {
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(commentService.addComment(postId, request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.addComment(postId, request, userId));
     }
 
     @PutMapping("/api/comments/{id}")

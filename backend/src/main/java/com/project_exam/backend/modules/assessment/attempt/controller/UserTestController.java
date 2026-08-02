@@ -7,6 +7,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardRe
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 import com.project_exam.backend.shared.dto.PageResponse;
+import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -107,7 +109,7 @@ public class UserTestController {
         response.put("mode", userTest.getMode() != null ? userTest.getMode().name() : "FULL_TEST");
         response.put("serverNow", java.time.Instant.now().toString());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
@@ -126,7 +128,7 @@ public class UserTestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userTestService.findById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("User test không tồn tại");
         }
         String userId = authUtils.getUserId(httpRequest);
         userTestService.delete(id, userId);
@@ -208,7 +210,7 @@ public class UserTestController {
         response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
         response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
         response.put("serverNow", java.time.Instant.now().toString());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/{userTestId}/guest-submit")

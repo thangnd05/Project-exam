@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/passage-media")
@@ -26,7 +27,7 @@ public class PassageMediaController {
             HttpServletRequest httpRequest
     ) {
         authUtils.requirePermission(PermissionCatalog.PASSAGE_MEDIA_MANAGE);
-        return ResponseEntity.ok(service.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
     }
 
     @GetMapping("/{id}")

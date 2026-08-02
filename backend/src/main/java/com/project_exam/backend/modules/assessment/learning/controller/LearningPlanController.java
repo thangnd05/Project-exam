@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/learning-plans")
@@ -27,7 +28,7 @@ public class LearningPlanController {
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(learningPlanService.generatePlan(userId, request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(learningPlanService.generatePlan(userId, request));
     }
 
     @GetMapping("/{learningPlanId}")
@@ -86,7 +87,7 @@ public class LearningPlanController {
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(learningPlanSessionService.startTaskSession(
+        return ResponseEntity.status(HttpStatus.CREATED).body(learningPlanSessionService.startTaskSession(
                 userId, learningPlanId, taskId));
     }
 

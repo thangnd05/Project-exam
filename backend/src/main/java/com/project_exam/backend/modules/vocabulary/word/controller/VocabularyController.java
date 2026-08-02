@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/vocabularies")
@@ -38,7 +39,7 @@ public class VocabularyController {
     @PostMapping
     public ResponseEntity<VocabularyResponse> create(@Valid @RequestBody VocabularyRequest request) {
         authUtils.requirePermission(PermissionCatalog.VOCABULARY_MANAGE);
-        return ResponseEntity.ok(service.createVocabulary(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createVocabulary(request));
     }
 
     @PostMapping("/bulk")
@@ -46,7 +47,7 @@ public class VocabularyController {
             @RequestBody List<VocabularyRequest> requests
     ) {
         authUtils.requirePermission(PermissionCatalog.VOCABULARY_MANAGE);
-        return ResponseEntity.ok(service.createVocabularies(requests));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createVocabularies(requests));
     }
 
     @PostMapping("/standardize")

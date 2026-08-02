@@ -6,10 +6,12 @@ import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerResponse;
 import com.project_exam.backend.modules.assessment.attempt.service.UserAnswerService;
 import com.project_exam.backend.modules.assessment.attempt.service.EnhancedResultService;
+import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +34,9 @@ public class UserAnswerController {
     @GetMapping("/{id}")
     public ResponseEntity<UserAnswerResponse> getById(@PathVariable String id, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        return userAnswerService.findResponseById(id, userId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        UserAnswerResponse response = userAnswerService.findResponseById(id, userId)
+                .orElseThrow(() -> new NotFoundException("User answer không tồn tại"));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user-test/{userTestId}")
@@ -59,7 +61,7 @@ public class UserAnswerController {
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(userAnswerService.create(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userAnswerService.create(request, userId));
     }
 
     @PutMapping("/{id}")
@@ -75,7 +77,7 @@ public class UserAnswerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userAnswerService.findById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("User answer không tồn tại");
         }
         String userId = authUtils.getUserId(httpRequest);
         userAnswerService.delete(id, userId);

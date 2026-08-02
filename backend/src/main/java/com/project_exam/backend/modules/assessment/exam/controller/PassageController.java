@@ -4,10 +4,12 @@ import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.service.PassageService;
+import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +30,9 @@ public class PassageController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PassageResponse> getPassageById(@PathVariable String id) {
-        return passageService.findResponseById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        PassageResponse response = passageService.findResponseById(id)
+                .orElseThrow(() -> new NotFoundException("Passage không tồn tại"));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -39,7 +41,7 @@ public class PassageController {
             HttpServletRequest httpRequest
     ) {
         authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
-        return ResponseEntity.ok(passageService.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(passageService.create(request));
     }
 
     @PutMapping("/{id}")
@@ -49,16 +51,16 @@ public class PassageController {
             HttpServletRequest httpRequest
     ) {
         authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
-        return passageService.update(id, request)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        PassageResponse response = passageService.update(id, request)
+                .orElseThrow(() -> new NotFoundException("Passage không tồn tại"));
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePassage(@PathVariable String id, HttpServletRequest httpRequest) {
         authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         if (passageService.findById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("Passage không tồn tại");
         }
         passageService.deleteById(id);
         return ResponseEntity.noContent().build();

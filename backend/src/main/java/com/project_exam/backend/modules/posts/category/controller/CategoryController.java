@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -36,7 +37,7 @@ public class CategoryController {
             HttpServletRequest httpRequest
     ) {
         authUtils.requirePermission(PermissionCatalog.POST_CATEGORY_MANAGE);
-        return ResponseEntity.ok(categoryService.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
     }
 
     @PutMapping("/{id}")

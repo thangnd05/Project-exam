@@ -162,7 +162,7 @@ public class TestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTest(@PathVariable String id, HttpServletRequest httpRequest) {
         if (testService.getTestById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("Test không tồn tại");
         }
         String userId = authUtils.getUserId(httpRequest);
         testCommandService.deleteTest(id, userId);

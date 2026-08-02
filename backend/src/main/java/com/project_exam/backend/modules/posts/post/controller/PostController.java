@@ -12,6 +12,7 @@ import com.project_exam.backend.modules.posts.post.service.PostViewThrottleServi
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -75,7 +76,7 @@ public class PostController {
         try {
             PostUpsertRequest request = objectMapper.readValue(requestJson, PostUpsertRequest.class);
             String userId = authUtils.getUserId(httpRequest);
-            return ResponseEntity.ok(postService.createPost(request, thumbnailFile, userId));
+            return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(request, thumbnailFile, userId));
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }

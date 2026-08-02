@@ -3,10 +3,12 @@ package com.project_exam.backend.modules.assessment.test.controller;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartRequest;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartSimpleResponse;
 import com.project_exam.backend.modules.assessment.test.service.TestPartService;
+import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +34,9 @@ public class TestPartController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TestPartSimpleResponse> getTestPartById(@PathVariable String id) {
-        return testPartService.findResponseById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        TestPartSimpleResponse response = testPartService.findResponseById(id)
+                .orElseThrow(() -> new NotFoundException("Test part không tồn tại"));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -43,7 +45,7 @@ public class TestPartController {
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(testPartService.saveResponse(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(testPartService.saveResponse(request, userId));
     }
 
     @PutMapping("/{id}")

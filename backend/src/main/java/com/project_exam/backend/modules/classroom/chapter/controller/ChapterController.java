@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/chapters")
@@ -25,7 +26,7 @@ public class ChapterController {
             @RequestBody ChapterRequest request
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(chapterService.create(userId, request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(chapterService.create(userId, request));
     }
 
     @GetMapping

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class VocabularyAlbumController {
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(service.create(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request, userId));
     }
 
     @PutMapping("/{id}")

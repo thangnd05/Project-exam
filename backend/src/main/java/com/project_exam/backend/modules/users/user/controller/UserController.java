@@ -6,11 +6,13 @@ import com.project_exam.backend.modules.users.user.dto.ProfileActivityResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.user.dto.UserResponse;
 import com.project_exam.backend.modules.users.user.service.UserService;
+import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,17 +55,17 @@ public class UserController {
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
         userService.requireSelfOrAdminForUser(id, currentUserId);
-        return userService.findResponseById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        UserResponse response = userService.findResponseById(id)
+                .orElseThrow(() -> new NotFoundException("User không tồn tại"));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me/info-user")
     public ResponseEntity<UserResponse> getUserInfo(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        return userService.getUserCurrentResponse(userId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        UserResponse response = userService.getUserCurrentResponse(userId)
+                .orElseThrow(() -> new NotFoundException("User không tồn tại"));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me/profile-overview")
@@ -87,7 +89,7 @@ public class UserController {
             @Valid @RequestBody UserUpsertRequest request
     ) {
         userService.requireAdminToManageUsers();
-        return ResponseEntity.ok(userService.createUser(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -106,7 +108,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id, HttpServletRequest httpRequest) {
         if (userService.findById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("User không tồn tại");
         }
         String currentUserId = authUtils.getUserId(httpRequest);
         userService.deleteUser(id, currentUserId);

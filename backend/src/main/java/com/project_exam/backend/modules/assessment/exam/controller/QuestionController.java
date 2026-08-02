@@ -167,7 +167,7 @@ public class QuestionController {
         QuestionAdminResponse result =
                 questionService.createQuestionAndAttachToTest(request, authUtils.getUserId(httpRequest), files);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PostMapping(value = "/create-and-attach/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -276,7 +276,7 @@ public class QuestionController {
         List<QuestionAdminResponse> result =
                 questionService.createBulkGroups(request, authUtils.getUserId(httpRequest), files);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
 }

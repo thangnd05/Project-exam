@@ -3,11 +3,13 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
+import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +43,7 @@ public class AnswerController {
             HttpServletRequest httpRequest
     ) {
         authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
-        return ResponseEntity.ok(answerService.createFromRequest(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(answerService.createFromRequest(request));
     }
 
     @PutMapping("/{id}")
@@ -51,16 +53,16 @@ public class AnswerController {
             HttpServletRequest httpRequest
     ) {
         authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
-        return answerService.updateFromRequest(id, request)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        AnswerAdminResponse response = answerService.updateFromRequest(id, request)
+                .orElseThrow(() -> new NotFoundException("Answer không tồn tại"));
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnswer(@PathVariable String id, HttpServletRequest httpRequest) {
         authUtils.requirePermission(PermissionCatalog.ANSWER_MANAGE);
         if (answerService.findById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("Answer không tồn tại");
         }
         answerService.deleteById(id);
         return ResponseEntity.noContent().build();
