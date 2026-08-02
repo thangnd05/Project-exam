@@ -437,12 +437,18 @@ public class LearningPlanSessionService {
     }
 
     private int resolvePassAccuracy(LearningPlan plan, LearningPlanSession session) {
-        if (session.getTaskId() == null) {
-            return plan.getPassAccuracyDefault() != null ? plan.getPassAccuracyDefault() : 70;
+        if (session.getTaskId() != null) {
+            Integer fromTask = taskRepository.findById(session.getTaskId())
+                    .map(LearningPlanTask::getPassAccuracy)
+                    .orElse(null);
+            if (fromTask != null) {
+                return fromTask;
+            }
         }
-        return taskRepository.findById(session.getTaskId())
-                .map(LearningPlanTask::getPassAccuracy)
-                .orElse(plan.getPassAccuracyDefault() != null ? plan.getPassAccuracyDefault() : 70);
+        if (plan.getPassAccuracyDefault() != null) {
+            return plan.getPassAccuracyDefault();
+        }
+        throw new BadRequestException("Thiếu ngưỡng vượt ải cho phiên luyện này.");
     }
 
     private List<String> pickQuestionsForTask(LearningPlan plan, LearningPlanTask task) {

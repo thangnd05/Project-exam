@@ -54,9 +54,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LearningPlanService {
 
-    private static final int DEFAULT_PASS_ACCURACY = 70;
-    private static final int DEFAULT_WEAK_TAG_THRESHOLD = 60;
-
     private final EnhancedResultService enhancedResultService;
     private final LearningPlanRepository planRepository;
     private final LearningPlanTaskRepository taskRepository;
@@ -110,10 +107,15 @@ public class LearningPlanService {
             return buildTargetAchievedResponse(userId, examTypeId, result);
         }
 
-        Optional<UserTarget> userTargetOpt = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId);
-        String userTargetId = userTargetOpt.map(UserTarget::getUserTargetId).orElse(null);
-        Integer targetScore = resolveTargetScore(request.getTargetScore(), userTargetOpt);
+        UserTarget userTarget = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId)
+                .orElseThrow(() -> new BadRequestException(
+                        "Chưa đặt mục tiêu cho kỳ thi này. Hãy đặt mục tiêu trước khi sinh lộ trình."));
+        Integer targetScore = resolveTargetScore(request.getTargetScore(), Optional.of(userTarget));
         Map<String, Integer> partRequirements = userTargetService.getEffectiveRequirements(userId, examTypeId);
+        if (partRequirements.isEmpty()) {
+            throw new BadRequestException(
+                    "Mục tiêu chưa có ngưỡng % từng Part. Hãy đặt aim từng Part hoặc chọn mốc có cấu hình sẵn, rồi thử lại.");
+        }
 
         Set<String> focusPartIds = request.getFocusExamPartIds() == null
                 ? Set.of()
@@ -125,7 +127,7 @@ public class LearningPlanService {
         List<TaskCandidate> candidates = buildTaskCandidates(
                 partBreakdown, partRequirements, focusPartIds, questionIdsByPart);
         List<String> partsWithoutTasks = findPartsWithoutTasks(
-                partBreakdown, focusPartIds, candidates);
+                partBreakdown, focusPartIds, partRequirements, candidates);
 
         if (candidates.isEmpty()) {
             String detail = partsWithoutTasks.isEmpty()
@@ -141,12 +143,12 @@ public class LearningPlanService {
         plan.setUserId(userId);
         plan.setExamTypeId(examTypeId);
         plan.setSourceUserTestId(request.getUserTestId());
-        plan.setUserTargetId(userTargetId);
+        plan.setUserTargetId(userTarget.getUserTargetId());
         plan.setTargetScore(targetScore);
         plan.setDeadlineDays(request.getDeadlineDays());
         plan.setBaselineReadiness(resolveReadinessScore(result));
         plan.setPlanStage(PlanStage.FOUNDATION);
-        plan.setPassAccuracyDefault(DEFAULT_PASS_ACCURACY);
+        plan.setPassAccuracyDefault(Collections.min(partRequirements.values()));
         plan.setStatus(LearningPlan.Status.ACTIVE);
         plan.setPlanSequence(planSequence);
         plan.setPartsWithoutTasks(joinPartsWithoutTasks(partsWithoutTasks));
@@ -191,13 +193,14 @@ public class LearningPlanService {
     private List<String> findPartsWithoutTasks(
             List<PartBreakdownDto> partBreakdown,
             Set<String> focusPartIds,
+            Map<String, Integer> partRequirements,
             List<TaskCandidate> candidates) {
         Set<String> partsWithTasks = candidates.stream()
                 .map(TaskCandidate::examPartId)
                 .collect(Collectors.toSet());
         return partBreakdown.stream()
                 .filter(p -> matchesFocus(p.getExamPartId(), focusPartIds))
-                .filter(this::partNeedsFocus)
+                .filter(p -> partNeedsFocus(p, requirePartThreshold(p, partRequirements)))
                 .filter(p -> !partsWithTasks.contains(p.getExamPartId()))
                 .map(PartBreakdownDto::getPartName)
                 .toList();
@@ -321,33 +324,37 @@ public class LearningPlanService {
         // taskOrder cứ theo đó cho khớp thứ tự hiển thị.
         List<TaskCandidate> candidates = new ArrayList<>();
         for (PartBreakdownDto part : partBreakdown) {
-            if (!matchesFocus(part.getExamPartId(), focusPartIds) || !partNeedsFocus(part)) {
+            if (!matchesFocus(part.getExamPartId(), focusPartIds)) {
                 continue;
             }
-            int passAccuracy = partRequirements.getOrDefault(
-                    part.getExamPartId(), DEFAULT_PASS_ACCURACY);
-            double threshold = part.getTargetPercentage() != null
-                    ? part.getTargetPercentage()
-                    : DEFAULT_WEAK_TAG_THRESHOLD;
+            int requiredPercent = requirePartThreshold(part, partRequirements);
+            if (!partNeedsFocus(part, requiredPercent)) {
+                continue;
+            }
 
             List<String> questionIdsInPart = questionIdsByPart.getOrDefault(
                     part.getExamPartId(), List.of());
 
             List<TaskCandidate> partTasks = collectTasksForPart(
-                    part, threshold, passAccuracy, questionIdsInPart);
+                    part, requiredPercent, requiredPercent, questionIdsInPart);
             candidates.addAll(partTasks);
         }
         return candidates;
     }
 
-    private boolean partNeedsFocus(PartBreakdownDto part) {
-        if (part.getIsTargetMet() != null) {
-            return !part.getIsTargetMet();
+    private int requirePartThreshold(PartBreakdownDto part, Map<String, Integer> partRequirements) {
+        Integer required = partRequirements.get(part.getExamPartId());
+        if (required == null) {
+            throw new BadRequestException(
+                    "Thiếu ngưỡng % cho Part \""
+                            + (part.getPartName() != null ? part.getPartName() : part.getExamPartId())
+                            + "\". Cập nhật mục tiêu (aim từng Part / mốc) rồi thử lại.");
         }
-        double threshold = part.getTargetPercentage() != null
-                ? part.getTargetPercentage()
-                : DEFAULT_WEAK_TAG_THRESHOLD;
-        return part.getPercentage() < threshold;
+        return required;
+    }
+
+    private boolean partNeedsFocus(PartBreakdownDto part, int requiredPercent) {
+        return part.getPercentage() < requiredPercent;
     }
 
     private Map<String, List<String>> buildQuestionIdsByPartForTest(String testId) {
