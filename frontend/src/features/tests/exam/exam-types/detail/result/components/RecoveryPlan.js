@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import routes from '~/shared/config/Routes';
-import { buildRecoveryMessage } from '../utils/gauge-copy';
+import { buildRecoveryMessage } from '~/features/diagnostic/target/utils/readiness-label';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);
