@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.exam.service;
 
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.exception.BadRequestException;
 
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartResponse;
@@ -10,9 +11,7 @@ import com.project_exam.backend.modules.assessment.exam.mapper.ExamPartMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -101,10 +100,7 @@ public class ExamPartService {
 
         String scoringMethod = examType.getScoringMethod();
         if ("TOEIC_SCALE".equalsIgnoreCase(scoringMethod) && skillId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "skillId là bắt buộc với exam type dùng TOEIC_SCALE"
-            );
+            throw new BadRequestException("skillId là bắt buộc với exam type dùng TOEIC_SCALE");
         }
     }
 }

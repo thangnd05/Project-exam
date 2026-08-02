@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.exam.service;
 
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.exception.BadRequestException;
 
 import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionResponse;
@@ -8,9 +9,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.ScoringConversion
 import com.project_exam.backend.modules.assessment.exam.mapper.ScoringConversionMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ScoringConversionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +63,7 @@ public class ScoringConversionService {
 
     public List<ScoringConversionResponse> createBulk(List<ScoringConversionRequest> requests) {
         if (requests == null || requests.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Danh sách quy đổi không được để trống");
+            throw new BadRequestException("Danh sách quy đổi không được để trống");
         }
 
         List<ScoringConversion> conversions = new ArrayList<>();
@@ -102,19 +101,19 @@ public class ScoringConversionService {
 
     private void validateRequest(ScoringConversionRequest request) {
         if (request == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payload quy đổi không hợp lệ");
+            throw new BadRequestException("Payload quy đổi không hợp lệ");
         }
         if (request.getExamTypeId() == null || request.getExamTypeId().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "examTypeId là bắt buộc");
+            throw new BadRequestException("examTypeId là bắt buộc");
         }
         if (request.getSkillId() == null || request.getSkillId().trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "skillId là bắt buộc");
+            throw new BadRequestException("skillId là bắt buộc");
         }
         if (request.getNumCorrect() == null || request.getNumCorrect() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "numCorrect phải lớn hơn hoặc bằng 0");
+            throw new BadRequestException("numCorrect phải lớn hơn hoặc bằng 0");
         }
         if (request.getConvertedScore() == null || request.getConvertedScore() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "convertedScore phải lớn hơn hoặc bằng 0");
+            throw new BadRequestException("convertedScore phải lớn hơn hoặc bằng 0");
         }
     }
 }

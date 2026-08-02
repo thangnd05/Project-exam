@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.posts.comment.dto.CommentRequest;
 import com.project_exam.backend.modules.posts.comment.dto.CommentResponse;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.modules.posts.comment.domain.Comment;
 import com.project_exam.backend.modules.posts.comment.mapper.CommentMapper;
 import com.project_exam.backend.modules.posts.comment.repository.CommentRepository;
@@ -11,10 +12,8 @@ import com.project_exam.backend.modules.posts.post.repository.PostRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.gamification.cosmetic.dto.EquippedCosmeticsResponse;
@@ -98,14 +97,14 @@ public class CommentService {
             throw new NotFoundException("Post không tồn tại");
         }
         if (request.getContent() == null || request.getContent().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nội dung comment không được trống");
+            throw new BadRequestException("Nội dung comment không được trống");
         }
 
         if (request.getParentId() != null && !request.getParentId().isBlank()) {
             Comment parent = commentRepository.findById(request.getParentId())
                     .orElseThrow(() -> new NotFoundException("Comment cha không tồn tại"));
             if (!parent.getPostId().equals(postId)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Comment cha không thuộc post này");
+                throw new BadRequestException("Comment cha không thuộc post này");
             }
         }
 
@@ -133,7 +132,7 @@ public class CommentService {
         }
 
         if (request.getContent() == null || request.getContent().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nội dung comment không được trống");
+            throw new BadRequestException("Nội dung comment không được trống");
         }
 
         comment.setContent(request.getContent().trim());

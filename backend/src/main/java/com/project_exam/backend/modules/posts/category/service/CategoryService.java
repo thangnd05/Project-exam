@@ -2,14 +2,13 @@ package com.project_exam.backend.modules.posts.category.service;
 
 import com.project_exam.backend.modules.posts.category.dto.CategoryRequest;
 import com.project_exam.backend.modules.posts.category.dto.CategoryResponse;
+import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.posts.category.domain.Category;
 import com.project_exam.backend.modules.posts.category.mapper.CategoryMapper;
 import com.project_exam.backend.modules.posts.category.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.text.Normalizer;
 import java.util.List;
@@ -41,7 +40,7 @@ public class CategoryService {
     public CategoryResponse create(CategoryRequest request) {
         String slug = resolveSlug(request.getSlug(), request.getName());
         if (categoryRepository.existsBySlug(slug)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slug đã tồn tại: " + slug);
+            throw new ConflictException("Slug đã tồn tại: " + slug);
         }
         Category c = Category.builder()
                 .name(request.getName())
@@ -57,7 +56,7 @@ public class CategoryService {
         String slug = resolveSlug(request.getSlug(), request.getName());
 
         if (!slug.equals(c.getSlug()) && categoryRepository.existsBySlug(slug)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slug đã tồn tại: " + slug);
+            throw new ConflictException("Slug đã tồn tại: " + slug);
         }
         c.setName(request.getName());
         c.setSlug(slug);

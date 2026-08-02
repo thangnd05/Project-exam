@@ -23,16 +23,16 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.shared.exception.InternalServerException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.*;
@@ -142,7 +142,7 @@ public class PostService {
                 String url = cloudinaryService.uploadImage(thumbnailFile);
                 post.setThumbnailUrl(url);
             } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi upload ảnh bìa");
+                throw new InternalServerException("Lỗi upload ảnh bìa");
             }
         }
 
@@ -176,7 +176,7 @@ public class PostService {
                 String url = cloudinaryService.uploadImage(thumbnailFile);
                 post.setThumbnailUrl(url);
             } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi upload ảnh bìa");
+                throw new InternalServerException("Lỗi upload ảnh bìa");
             }
         }
 
@@ -198,7 +198,7 @@ public class PostService {
             throw new ForbiddenException("Chỉ admin được duyệt/từ chối bài viết");
         }
         if (status == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trạng thái không được để trống");
+            throw new BadRequestException("Trạng thái không được để trống");
         }
 
         Post post = postRepository.findById(id)
@@ -239,7 +239,7 @@ public class PostService {
             boolean isOwner = currentUserId != null && currentUserId.equals(post.getUserId());
             boolean isAdmin = currentUserId != null && authUtils.hasPermission(PermissionCatalog.POST_MODERATE);
             if (!isOwner && !isAdmin) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post không tồn tại");
+                throw new NotFoundException("Post không tồn tại");
             }
         }
 

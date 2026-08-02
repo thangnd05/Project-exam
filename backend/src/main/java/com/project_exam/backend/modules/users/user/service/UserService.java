@@ -3,6 +3,7 @@ import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.exception.BadRequestException;
 
 import com.project_exam.backend.infrastructure.cloudinary.CloudinaryService;
 import com.project_exam.backend.modules.users.user.dto.UserUpsertRequest;
@@ -57,9 +58,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import com.project_exam.backend.shared.util.AppTime;
@@ -91,7 +90,7 @@ public class UserService {
 
     private User toEntity(UserUpsertRequest request) {
         if (request.getPassword() == null || request.getPassword().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password không được để trống");
+            throw new BadRequestException("Password không được để trống");
         }
         User user = new User();
         user.setUserName(request.getUserName());

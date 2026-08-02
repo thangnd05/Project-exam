@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.test.service;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.exception.UnauthorizedException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 
@@ -67,9 +68,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -824,7 +823,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập để xem bài kiểm tra.");
+            throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
         boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
@@ -842,7 +841,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập để xem bài kiểm tra.");
+            throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
         boolean isMember = classMemberRepository.existsByClassIdAndUserIdAndStatus(
@@ -861,7 +860,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập để xem bài kiểm tra.");
+            throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
         return buildUserTestSummariesBatch(testRepository.findByCreatedBy(currentUserId), currentUserId);
@@ -871,10 +870,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
 
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Bạn cần đăng nhập để xem bài kiểm tra."
-            );
+            throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
         List<Test> tests =
@@ -886,10 +882,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
     public PageResponse<TestResponse> getMyPersonalTestsPaged(HttpServletRequest request, int page, int size) {
         String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Bạn cần đăng nhập để xem bài kiểm tra."
-            );
+            throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
 
         int safePage = Math.max(page, 0);

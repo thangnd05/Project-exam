@@ -3,6 +3,9 @@ import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.shared.exception.ConflictException;
+import com.project_exam.backend.shared.exception.UnauthorizedException;
 import com.project_exam.backend.shared.util.AuthUtils;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryDto;
@@ -38,9 +41,7 @@ import com.project_exam.backend.modules.classroom.member.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.*;
@@ -151,7 +152,7 @@ public class UserAnswerService {
         validateOwnershipAndInProgress(request.getUserTestId(), currentUserId);
 
         UserAnswer existing = userAnswerRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserAnswer not found"));
+                .orElseThrow(() -> new NotFoundException("UserAnswer not found"));
         if (!Objects.equals(existing.getUserTestId(), request.getUserTestId())) {
             throw new ForbiddenException("Đáp án không thuộc bài làm này.");
         }
@@ -203,30 +204,30 @@ public class UserAnswerService {
 
     private void validateUserAnswerRequest(UserAnswerRequest request) {
         if (request == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request không được để trống");
+            throw new BadRequestException("Request không được để trống");
         }
         if (request.getUserTestId() == null || request.getUserTestId().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu userTestId");
+            throw new BadRequestException("Thiếu userTestId");
         }
         if (request.getQuestionId() == null || request.getQuestionId().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu questionId");
+            throw new BadRequestException("Thiếu questionId");
         }
     }
 
     private void validateOwnershipAndInProgress(String userTestId, String currentUserId) {
         if (currentUserId == null || currentUserId.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         UserTest userTest = userTestRepository.findById(userTestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
+                .orElseThrow(() -> new NotFoundException("UserTest not found"));
 
         if (!currentUserId.equals(userTest.getUserId())) {
             throw new ForbiddenException("Bạn không có quyền truy cập bài thi này");
         }
 
         if (userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã nộp, không thể sửa đáp án");
+            throw new ConflictException("Bài thi đã nộp, không thể sửa đáp án");
         }
 
         assertWithinTimeLimit(userTest);
@@ -237,8 +238,7 @@ public class UserAnswerService {
                 .map(Test::getDurationMinutes)
                 .orElse(null);
         if (AttemptTimeUtil.isExpired(userTest, durationMinutes, Instant.now())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Đã hết giờ làm bài, không thể sửa đáp án");
+            throw new ConflictException("Đã hết giờ làm bài, không thể sửa đáp án");
         }
     }
 
@@ -262,16 +262,16 @@ public class UserAnswerService {
 
     private void validateGuestOwnershipAndInProgress(String userTestId, String guestSessionId) {
         if (guestSessionId == null || guestSessionId.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu guest session id");
+            throw new BadRequestException("Thiếu guest session id");
         }
         UserTest userTest = userTestRepository.findById(userTestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
+                .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (userTest.getGuestSessionId() == null
                 || !userTest.getGuestSessionId().equals(guestSessionId)) {
             throw new ForbiddenException("Phiên guest không hợp lệ.");
         }
         if (userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã nộp, không thể sửa đáp án");
+            throw new ConflictException("Bài thi đã nộp, không thể sửa đáp án");
         }
 
         assertWithinTimeLimit(userTest);
@@ -279,7 +279,7 @@ public class UserAnswerService {
 
     public ResultSummaryDto getGuestResultSummary(String userTestId, String guestSessionId) {
         UserTest userTest = userTestRepository.findById(userTestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
+                .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (userTest.getGuestSessionId() == null
                 || !userTest.getGuestSessionId().equals(guestSessionId)) {
             throw new ForbiddenException("Phiên guest không hợp lệ.");
@@ -358,7 +358,7 @@ public class UserAnswerService {
 
     public ResultSummaryDto getResultSummary(String userTestId, String currentUserId) {
         UserTest userTest = userTestRepository.findById(userTestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTest not found"));
+                .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
             throw new ForbiddenException("Bạn không có quyền xem kết quả bài thi này");
         }

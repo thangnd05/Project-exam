@@ -3,6 +3,8 @@ import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.util.AfterCommitTasks;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
@@ -61,9 +63,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -138,7 +138,7 @@ public class UserTestService {
             throw new ForbiddenException("Bạn không có quyền nộp bài thi này");
         }
         if (userTest.getStatus() == UserTest.Status.COMPLETED) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã được nộp");
+            throw new ConflictException("Bài thi đã được nộp");
         }
 
         userTest.setFinishedAt(Instant.now());
@@ -364,12 +364,12 @@ public class UserTestService {
     @Transactional
     public UserTestResponse updateStatusByOwner(String userTestId, String currentUserId, UserTest.Status status) {
         UserTest userTest = userTestRepository.findById(userTestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
+                .orElseThrow(() -> new NotFoundException("userTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
             throw new ForbiddenException("Bạn không có quyền cập nhật bài thi này");
         }
         if (userTest.getStatus() == UserTest.Status.COMPLETED) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã nộp, không thể cập nhật trạng thái");
+            throw new ConflictException("Bài thi đã nộp, không thể cập nhật trạng thái");
         }
         userTest.setStatus(status);
         return toResponse(userTestRepository.save(userTest));
@@ -498,7 +498,7 @@ public class UserTestService {
     @Transactional
     public UserTest startGuestUserTest(String testId, String guestSessionId) {
         if (guestSessionId == null || guestSessionId.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu guest session id");
+            throw new BadRequestException("Thiếu guest session id");
         }
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found with id: " + testId));
@@ -553,7 +553,7 @@ public class UserTestService {
             throw new ForbiddenException("Phiên guest không hợp lệ.");
         }
         if (userTest.getStatus() == UserTest.Status.COMPLETED) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bài thi đã được nộp");
+            throw new ConflictException("Bài thi đã được nộp");
         }
 
         userTest.setFinishedAt(Instant.now());
@@ -579,7 +579,7 @@ public class UserTestService {
 
     public UserTestResponse getMetaForGuest(String userTestId, String guestSessionId) {
         UserTest ut = userTestRepository.findById(userTestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
+                .orElseThrow(() -> new NotFoundException("userTest not found"));
         if (ut.getGuestSessionId() == null || !ut.getGuestSessionId().equals(guestSessionId)) {
             throw new ForbiddenException("Phiên guest không hợp lệ.");
         }
@@ -750,7 +750,7 @@ public class UserTestService {
 
     public UserTestResponse getMeta(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
         var ut = userTestRepository.findById(userTestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "userTest not found"));
+                .orElseThrow(() -> new NotFoundException("userTest not found"));
 
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             String currentUserId = authUtils.getUserId(httpRequest);
