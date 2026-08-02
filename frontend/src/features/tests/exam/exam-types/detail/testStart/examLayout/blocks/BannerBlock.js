@@ -1,7 +1,7 @@
 import classNames from 'classnames/bind';
 
 import { getFullMediaUrl } from '~/shared/utils/mediaUrl';
-import styles from '../examLayout.module.scss';
+import styles from '~/features/tests/exam/exam-types/detail/testStart/examLayout/examLayout.module.scss';
 
 const cx = classNames.bind(styles);
 

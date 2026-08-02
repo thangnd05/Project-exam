@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import styles from '~/shared/ui/modal/CommonFormModal.module.scss';
-import { useCreateVocabulary } from '../hooks/useCreateVocabulary';
+import { useCreateVocabulary } from '~/features/albums/detail/hooks/useCreateVocabulary';
 
 const cx = classNames.bind(styles);
 

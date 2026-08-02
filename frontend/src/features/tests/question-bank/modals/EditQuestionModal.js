@@ -16,9 +16,9 @@ import {
   Trash2,
 } from 'lucide-react';
 import { getTagsFlatByExamType } from '~/shared/api/tagApi';
-import { useQuestionCollections } from '../hooks/useQuestionCollections';
-import { useUpdateQuestion } from '../hooks/useUpdateQuestion';
-import { useDeletePassageMedia } from '../hooks/useDeletePassageMedia';
+import { useQuestionCollections } from '~/features/tests/question-bank/hooks/useQuestionCollections';
+import { useUpdateQuestion } from '~/features/tests/question-bank/hooks/useUpdateQuestion';
+import { useDeletePassageMedia } from '~/features/tests/question-bank/hooks/useDeletePassageMedia';
 import {
   getExtraTextContents,
   getPassageMediaItems,

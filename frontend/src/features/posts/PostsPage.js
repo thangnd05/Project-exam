@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
-import { usePosts } from './hooks/usePosts';
+import { usePosts } from '~/features/posts/hooks/usePosts';
 import routes from '~/shared/config/Routes';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import Pagination from '~/shared/ui/Pagination/Pagination';

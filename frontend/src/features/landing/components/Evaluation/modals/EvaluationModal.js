@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaStar, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import { useCreateEvaluation } from '../hooks/useEvaluations';
+import { useCreateEvaluation } from '~/features/landing/components/Evaluation/hooks/useEvaluations';
 import { toast } from 'react-toastify';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';

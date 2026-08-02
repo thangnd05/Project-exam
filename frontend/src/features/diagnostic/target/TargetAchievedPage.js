@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
-import { useTargetAchieved } from './hooks/useTargetAchieved';
+import { useTargetAchieved } from '~/features/diagnostic/target/hooks/useTargetAchieved';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 

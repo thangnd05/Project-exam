@@ -1,4 +1,4 @@
-import { defaultLayoutConfig, BLOCK_TYPES } from './layoutSchema';
+import { defaultLayoutConfig, BLOCK_TYPES } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/layoutSchema';
 
 export function resolveLayoutConfig(raw) {
   const parsed = parseRaw(raw);

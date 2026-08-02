@@ -10,7 +10,7 @@ import { useAuth } from '~/shared/hooks/useAuth';
 import style from './TestByExamTypePage.module.scss';
 import TestListContainer from '~/features/tests/components/TestListContainer/TestListContainer';
 import Pagination from '~/shared/ui/Pagination/Pagination';
-import { useTestsByExamType } from './hooks/useTestsByExamType';
+import { useTestsByExamType } from '~/features/tests/exam/exam-types/detail/hooks/useTestsByExamType';
 
 const cx = classNames.bind(style);
 

@@ -29,7 +29,7 @@ import {
   emptyTestInfo,
   useCreateTestFromBank,
   useExamCategories,
-} from './hooks/useCreateTestFromBank';
+} from '~/features/tests/create-test-from-bank/hooks/useCreateTestFromBank';
 import styles from './CreateTestFromBankPage.module.scss';
 
 const cx = classNames.bind(styles);

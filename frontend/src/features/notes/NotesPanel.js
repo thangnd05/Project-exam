@@ -13,8 +13,8 @@ import {
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { formatDateTime } from '~/shared/utils/format-date-time';
-import { useNotes } from './hooks/useNotes';
-import { useSaveNote } from './hooks/useSaveNote';
+import { useNotes } from '~/features/notes/hooks/useNotes';
+import { useSaveNote } from '~/features/notes/hooks/useSaveNote';
 import styles from './NotesPanel.module.scss';
 
 const cx = classNames.bind(styles);

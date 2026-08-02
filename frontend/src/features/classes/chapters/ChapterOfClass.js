@@ -13,7 +13,7 @@ import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import PageHeaderViewToggle from '~/shared/ui/PageHeader/PageHeaderViewToggle';
 import ChapterManagementTable from '../components/ChapterManagementTable/ChapterManagementTable';
 import routes from '~/shared/config/Routes';
-import { useChaptersOfClass } from './hooks/useChaptersOfClass';
+import { useChaptersOfClass } from '~/features/classes/chapters/hooks/useChaptersOfClass';
 
 const cx = classNames.bind(styles);
 

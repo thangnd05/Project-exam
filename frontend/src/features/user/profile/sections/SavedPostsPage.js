@@ -7,7 +7,7 @@ import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, I
 import { toast } from 'react-toastify';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import routes from '~/shared/config/Routes';
-import { useSavedPosts, useUnsavePost } from '../hooks/useSavedPosts';
+import { useSavedPosts, useUnsavePost } from '~/features/user/profile/hooks/useSavedPosts';
 import styles from './PostsListPage.module.scss';
 
 const cx = classNames.bind(styles);

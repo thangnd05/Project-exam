@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 
 import { getFullMediaUrl } from '~/shared/utils/mediaUrl';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
-import GatedAudioPlayer from './GatedAudioPlayer';
+import GatedAudioPlayer from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/GatedAudioPlayer';
 import styles from '../../TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);

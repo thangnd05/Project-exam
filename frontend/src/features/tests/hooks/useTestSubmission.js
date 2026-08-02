@@ -9,7 +9,7 @@ import {
   bulkCreateQuestionGroups,
 } from '~/shared/api/questionApi';
 import { toast } from 'react-toastify';
-import { CREATOR_TYPES } from './useCreateTest';
+import { CREATOR_TYPES } from '~/features/tests/hooks/useCreateTest';
 
 const TOAST_VALIDATION_MS = 8000;
 

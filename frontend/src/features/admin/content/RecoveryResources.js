@@ -8,7 +8,7 @@ import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {isMarkdownResource} from '~/shared/utils/recoveryResource';
-import {usePartsByExamType, useRecoveryResources, useTagsByExamType} from './hooks/useRecoveryResources';
+import {usePartsByExamType, useRecoveryResources, useTagsByExamType} from '~/features/admin/content/hooks/useRecoveryResources';
 import styles from './RecoveryResources.module.scss';
 
 const cx = classNames.bind(styles);

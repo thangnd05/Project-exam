@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {useQuests} from './hooks/useQuests';
+import {useQuests} from '~/features/admin/gamification/hooks/useQuests';
 import {toDateTimeLocalInput, fromDateTimeLocalInput} from '~/shared/utils/format-date-time';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';

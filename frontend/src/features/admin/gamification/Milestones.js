@@ -11,7 +11,7 @@ import {
   AdminPageHeader,
   AdminToolbar,
 } from '../components/common';
-import {useMilestones} from './hooks/useMilestones';
+import {useMilestones} from '~/features/admin/gamification/hooks/useMilestones';
 import styles from './Milestones.module.scss';
 
 const cx = classNames.bind(styles);

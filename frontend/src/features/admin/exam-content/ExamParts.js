@@ -3,7 +3,7 @@ import {Button, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {useExamParts} from './hooks/useExamParts';
+import {useExamParts} from '~/features/admin/exam-content/hooks/useExamParts';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';

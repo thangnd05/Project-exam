@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import {
   useLoginMutation,
   useRegisterMutation,
-} from './hooks/useAuthActions';
+} from '~/features/user/login/hooks/useAuthActions';
 import {
   getRedirectTarget,
   saveOAuthRedirect,

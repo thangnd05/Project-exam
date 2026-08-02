@@ -12,7 +12,7 @@ import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common'
 import styles from '../components/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
-import { usePosts, useApprovePost, useDeletePost } from './hooks/usePosts';
+import { usePosts, useApprovePost, useDeletePost } from '~/features/admin/content/hooks/usePosts';
 
 const STATUS_VARIANT = { APPROVED: 'success', PENDING: 'warning' };
 

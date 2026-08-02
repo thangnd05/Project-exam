@@ -10,7 +10,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import {useExamCategories} from './hooks/useExamCategories';
+import {useExamCategories} from '~/features/admin/exam-content/hooks/useExamCategories';
 
 const emptyForm = {
   code: '',

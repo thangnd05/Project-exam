@@ -5,15 +5,15 @@ import { IoGridOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
 import TestStartDashboard from '../TestStartDashboard';
-import QuestionAreaBlock from './blocks/QuestionAreaBlock';
-import TimerBlock from './blocks/TimerBlock';
-import ProgressBlock from './blocks/ProgressBlock';
-import SubmitBlock from './blocks/SubmitBlock';
-import QuestionNavBlock from './blocks/QuestionNavBlock';
-import BannerBlock from './blocks/BannerBlock';
-import { BLOCK_TYPES, ZONES } from './layoutSchema';
+import QuestionAreaBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/QuestionAreaBlock';
+import TimerBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/TimerBlock';
+import ProgressBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/ProgressBlock';
+import SubmitBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/SubmitBlock';
+import QuestionNavBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/QuestionNavBlock';
+import BannerBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/BannerBlock';
+import { BLOCK_TYPES, ZONES } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/layoutSchema';
 import pageStyles from '../TestStartPage.module.scss';
-import zoneStyles from './examLayout.module.scss';
+import zoneStyles from '~/features/tests/exam/exam-types/detail/testStart/examLayout/examLayout.module.scss';
 
 const cx = classNames.bind(pageStyles);
 const zx = classNames.bind(zoneStyles);

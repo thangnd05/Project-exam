@@ -7,7 +7,7 @@ import { sortPartsByLookup } from '~/shared/utils/partOrder';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import MockHistoryPanel from '~/features/diagnostic/mock-history/MockHistoryPanel';
 import TargetDashboardPartChart from './components/TargetDashboardPartChart';
-import { useTargetDashboard } from './hooks/useTargetDashboard';
+import { useTargetDashboard } from '~/features/diagnostic/target/hooks/useTargetDashboard';
 import { getReadinessClassName, getReadinessLabel } from './utils/readiness-label';
 import pageStyles from './TargetDashboardPage.module.scss';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';

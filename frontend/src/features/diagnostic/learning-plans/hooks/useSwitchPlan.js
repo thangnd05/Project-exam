@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { switchPlan } from '~/shared/api/learningPlanApi';
-import { invalidatePlanQueries } from './plan-cache';
+import { invalidatePlanQueries } from '~/features/diagnostic/learning-plans/hooks/plan-cache';
 
 export function useSwitchPlan({ onSuccess, onError } = {}) {
   const qc = useQueryClient();

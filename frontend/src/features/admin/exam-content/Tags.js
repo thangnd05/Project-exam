@@ -6,7 +6,7 @@ import {ChevronDown, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import TagFormModal from '../modals/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
-import {useAdminExamTypesForTags, useTagTree, useTags} from './hooks/useTags';
+import {useAdminExamTypesForTags, useTagTree, useTags} from '~/features/admin/exam-content/hooks/useTags';
 import styles from './Tags.module.scss';
 
 const cx = classNames.bind(styles);

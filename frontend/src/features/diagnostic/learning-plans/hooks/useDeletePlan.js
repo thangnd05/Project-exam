@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deletePlan } from '~/shared/api/learningPlanApi';
-import { invalidatePlanQueries } from './plan-cache';
+import { invalidatePlanQueries } from '~/features/diagnostic/learning-plans/hooks/plan-cache';
 
 export function useDeletePlan({ onSuccess, onError } = {}) {
   const qc = useQueryClient();

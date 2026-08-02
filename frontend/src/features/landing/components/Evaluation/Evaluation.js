@@ -11,7 +11,7 @@ import {useAuth} from '~/shared/hooks/useAuth';
 import {useNavigate} from 'react-router-dom';
 import routes from '~/shared/config/Routes';
 import EvaluationModal from './modals/EvaluationModal';
-import {useEvaluations} from './hooks/useEvaluations';
+import {useEvaluations} from '~/features/landing/components/Evaluation/hooks/useEvaluations';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);

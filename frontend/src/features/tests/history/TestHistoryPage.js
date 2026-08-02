@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTestHistory } from './hooks/useTestHistory';
+import { useTestHistory } from '~/features/tests/history/hooks/useTestHistory';
 import { Container, Table, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { IoEyeOutline, IoCalendarOutline, IoStatsChartOutline, IoCheckmarkCircleOutline, IoHourglassOutline, IoCloseCircleOutline, IoDocumentTextOutline } from 'react-icons/io5';

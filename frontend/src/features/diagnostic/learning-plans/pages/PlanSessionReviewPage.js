@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import classNames from 'classnames/bind';
 import PlanResultView from '../components/PlanResultView';
 import { toPlanResult } from '../planResult';
-import { usePlanSessionReview } from '../hooks/usePlanSessionReview';
+import { usePlanSessionReview } from '~/features/diagnostic/learning-plans/hooks/usePlanSessionReview';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);

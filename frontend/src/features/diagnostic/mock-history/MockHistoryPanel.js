@@ -11,7 +11,7 @@ import {
   formatHourMinute24,
 } from '~/shared/utils/format-date-time';
 import MockHistoryCharts from './components/MockHistoryCharts';
-import { useMockHistory } from './hooks/useMockHistory';
+import { useMockHistory } from '~/features/diagnostic/mock-history/hooks/useMockHistory';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);

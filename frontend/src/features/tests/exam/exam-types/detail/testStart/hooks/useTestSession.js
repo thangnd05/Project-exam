@@ -6,8 +6,8 @@ import { getAnswersByUserTest, batchSaveAnswers } from '~/shared/api/userAnswerA
 import { getUserTestInfo, purchaseTestAccess } from '~/shared/api/testApi';
 import { getPassageMediaByPassageId } from '~/shared/api/passageMediaApi';
 import { getExamTypeLayout } from '~/shared/api/examTypeApi';
-import { resolveLayoutConfig } from '../examLayout/resolveLayoutConfig';
-import { defaultLayoutConfig } from '../examLayout/layoutSchema';
+import { resolveLayoutConfig } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/resolveLayoutConfig';
+import { defaultLayoutConfig } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/layoutSchema';
 import { getApiErrorMessage } from '~/shared/utils/apiError';
 import { AuthContext } from '~/shared/context/AuthContext';
 import { useStreak } from '~/shared/hooks/useStreak';

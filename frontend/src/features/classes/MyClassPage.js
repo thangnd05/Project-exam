@@ -14,7 +14,7 @@ import {
   myClassesKeys,
   useMyClasses,
   useDeleteClass,
-} from './hooks/useMyClasses';
+} from '~/features/classes/hooks/useMyClasses';
 
 const cx = classNames.bind(styles);
 

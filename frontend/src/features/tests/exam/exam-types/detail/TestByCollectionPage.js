@@ -6,7 +6,7 @@ import routes, { buildExamTypeDetailPath } from '~/shared/config/Routes';
 
 import TestListContainer from '~/features/tests/components/TestListContainer/TestListContainer';
 import Pagination from '~/shared/ui/Pagination/Pagination';
-import { useCollectionTests, useCollectionName } from './hooks/useCollectionTests';
+import { useCollectionTests, useCollectionName } from '~/features/tests/exam/exam-types/detail/hooks/useCollectionTests';
 
 const PAGE_SIZE = 12;
 

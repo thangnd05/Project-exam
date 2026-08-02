@@ -2,7 +2,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {getExamTypes} from '~/shared/api/examTypeApi';
 import {createTag, deleteTag, getTagTreeByExamType, getTagsFlatByExamType, updateTag} from '~/shared/api/tagApi';
-import {examTypeKeys} from './useExamTypes';
+import {examTypeKeys} from '~/features/admin/exam-content/hooks/useExamTypes';
 
 export const tagKeys = {
   all: ['admin-tags'],

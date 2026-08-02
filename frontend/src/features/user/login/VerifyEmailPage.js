@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import { useVerifyEmailMutation } from './hooks/useAuthActions';
+import { useVerifyEmailMutation } from '~/features/user/login/hooks/useAuthActions';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from './VerifyEmailPage.module.scss';
 

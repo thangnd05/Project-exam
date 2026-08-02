@@ -6,7 +6,7 @@ import { IoDocumentTextOutline, IoAddCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 
 import styles from './TestByClassPage.module.scss';
-import { useTestByClass } from './hooks/useTestByClass';
+import { useTestByClass } from '~/features/classes/class-tests/hooks/useTestByClass';
 import CreateTestModal from '~/features/tests/components/CreateTestModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import TestListContainer from '~/features/tests/components/TestListContainer/TestListContainer';

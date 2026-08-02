@@ -7,7 +7,7 @@ import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import useDebouncedValue from '~/shared/hooks/useDebouncedValue';
-import {useUsers} from './hooks/useUsers';
+import {useUsers} from '~/features/admin/access/hooks/useUsers';
 import {
   AdminFieldError,
   AdminPageHeader,

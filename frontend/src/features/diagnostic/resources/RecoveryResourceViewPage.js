@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import { Spinner } from 'react-bootstrap';
 import { Printer } from 'lucide-react';
 import routes from '~/shared/config/Routes';
-import { useRecoveryResourceView } from './hooks/useRecoveryResourceView';
+import { useRecoveryResourceView } from '~/features/diagnostic/resources/hooks/useRecoveryResourceView';
 import styles from './RecoveryResourceViewPage.module.scss';
 
 const cx = classNames.bind(styles);

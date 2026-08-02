@@ -7,7 +7,7 @@ import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
-import {useQuestionCollections} from './hooks/useQuestionCollections';
+import {useQuestionCollections} from '~/features/admin/exam-content/hooks/useQuestionCollections';
 import styles from './QuestionCollections.module.scss';
 
 const cx = classNames.bind(styles);

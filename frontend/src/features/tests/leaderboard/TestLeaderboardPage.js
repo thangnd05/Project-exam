@@ -7,7 +7,7 @@ import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from './TestLeaderboardPage.module.scss';
 import routes from '~/shared/config/Routes';
-import {useTestLeaderboard} from './hooks/useTestLeaderboard';
+import {useTestLeaderboard} from '~/features/tests/leaderboard/hooks/useTestLeaderboard';
 import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);

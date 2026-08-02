@@ -3,7 +3,7 @@ import {Badge, Form} from 'react-bootstrap';
 
 import {formatDateTime} from '~/shared/utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
-import {useAuditLogs} from './hooks/useAuditLogs';
+import {useAuditLogs} from '~/features/admin/overview/hooks/useAuditLogs';
 
 const methodColorMap = {
   GET: 'info',

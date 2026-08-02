@@ -20,11 +20,11 @@ import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
 import { buildCollectionTree } from '~/shared/utils/collectionTree';
 import EditQuestionModal from './modals/EditQuestionModal';
 import ViewQuestionModal from './modals/ViewQuestionModal';
-import { useDeleteQuestion } from './hooks/useDeleteQuestion';
+import { useDeleteQuestion } from '~/features/tests/question-bank/hooks/useDeleteQuestion';
 import {
   BANK_SCOPE,
   usePersonalQuestionBank,
-} from './hooks/usePersonalQuestionBank';
+} from '~/features/tests/question-bank/hooks/usePersonalQuestionBank';
 import styles from './PersonalQuestionBankPage.module.scss';
 
 const cx = classNames.bind(styles);

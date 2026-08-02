@@ -6,7 +6,7 @@ import { Calendar } from 'lucide-react';
 import TrafficHeatmap from '../components/TrafficHeatmap';
 import OverviewCard from './OverviewCard';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
-import { useDashboardStats, useTrafficHeatmap } from './hooks/useDashboardStats';
+import { useDashboardStats, useTrafficHeatmap } from '~/features/admin/overview/hooks/useDashboardStats';
 
 const localISODate = (d = new Date()) => {
     const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);

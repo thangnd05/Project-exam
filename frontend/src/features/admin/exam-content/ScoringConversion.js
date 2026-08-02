@@ -17,7 +17,7 @@ import {
 import styles from '../components/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
-import {useScoringConversion} from './hooks/useScoringConversion';
+import {useScoringConversion} from '~/features/admin/exam-content/hooks/useScoringConversion';
 
 const defaultFormState = {
   exam_type_id: '',

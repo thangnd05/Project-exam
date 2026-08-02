@@ -12,7 +12,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import {useCoinUserOptions, useCoins} from './hooks/useCoins';
+import {useCoinUserOptions, useCoins} from '~/features/admin/gamification/hooks/useCoins';
 
 const defaultFormState = {
   userId: '',

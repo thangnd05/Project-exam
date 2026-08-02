@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { getFullMediaUrl } from '~/shared/utils/mediaUrl';
-import styles from './GatedAudioPlayer.module.scss';
+import styles from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/GatedAudioPlayer.module.scss';
 
 const cx = classNames.bind(styles);
 

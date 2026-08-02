@@ -7,7 +7,7 @@ import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import commonModalStyles from '~/shared/ui/modal/CommonFormModal.module.scss';
 import styles from './UpdateProfileModal.module.scss';
-import { useMyInfo, useUpdateProfile } from '../hooks/useUpdateProfile';
+import { useMyInfo, useUpdateProfile } from '~/features/user/profile/hooks/useUpdateProfile';
 
 const cmx = classNames.bind(commonModalStyles);
 const cx = classNames.bind(styles);

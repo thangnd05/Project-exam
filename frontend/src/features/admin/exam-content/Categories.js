@@ -10,7 +10,7 @@ import {
     AdminToolbar,
     AdminTable,
 } from '../components/common';
-import { useCategories } from './hooks/useCategories';
+import { useCategories } from '~/features/admin/exam-content/hooks/useCategories';
 
 const Categories = () => {
     const {

@@ -3,10 +3,10 @@ import {
   createOrUpdateUserTarget,
   deleteUserTarget,
 } from '~/shared/api/userTargetApi';
-import { targetDashboardKeys } from './useTargetDashboard';
-import { targetAchievedKeys } from './useTargetAchieved';
-import { generatePlanKeys } from '../../learning-plans/hooks/useGeneratePlan';
-import { invalidatePlanQueries } from '../../learning-plans/hooks/plan-cache';
+import { targetDashboardKeys } from '~/features/diagnostic/target/hooks/useTargetDashboard';
+import { targetAchievedKeys } from '~/features/diagnostic/target/hooks/useTargetAchieved';
+import { generatePlanKeys } from '~/features/diagnostic/learning-plans/hooks/useGeneratePlan';
+import { invalidatePlanQueries } from '~/features/diagnostic/learning-plans/hooks/plan-cache';
 
 // Các truy vấn đang hiển thị mục tiêu theo examTypeId (dashboard, đã đạt, trang sinh lộ trình,
 // và mục tiêu hiện tại ở trang Mục tiêu của tôi). Kèm cả các query plan vì đổi/xoá mục tiêu

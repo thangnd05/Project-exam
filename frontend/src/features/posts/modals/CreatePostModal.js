@@ -11,7 +11,7 @@ import 'react-quill/dist/quill.snow.css';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import styles from '~/shared/ui/modal/CommonFormModal.module.scss';
-import { useSavePost } from '../hooks/useSavePost';
+import { useSavePost } from '~/features/posts/hooks/useSavePost';
 
 const cx = classNames.bind(styles);
 

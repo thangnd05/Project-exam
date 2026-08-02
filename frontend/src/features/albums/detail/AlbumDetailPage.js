@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAlbumVocabularies, useDeleteVocabulary } from './hooks/useAlbumVocabularies';
+import { useAlbumVocabularies, useDeleteVocabulary } from '~/features/albums/detail/hooks/useAlbumVocabularies';
 import { getTtsUrl } from '~/shared/utils/mediaUrl';
 import {
   Container,

@@ -20,7 +20,7 @@ import {
   useProfileOverview,
   useMyTargets,
   useMyActivity,
-} from './hooks/useProfileDashboard';
+} from '~/features/user/profile/hooks/useProfileDashboard';
 
 const cx = classNames.bind(styles);
 

@@ -9,7 +9,7 @@ import styles from './ClassMemberManagementPage.module.scss';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
-import { useClassMembers } from './hooks/useClassMembers';
+import { useClassMembers } from '~/features/classes/members/hooks/useClassMembers';
 
 const cx = classNames.bind(styles);
 

@@ -17,9 +17,9 @@ import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes from '~/shared/config/Routes';
 import styles from './PostDetailPage.module.scss';
-import { postsKeys, usePostDetail, usePostComments, useRelatedPosts } from './hooks/usePosts';
-import { useAddComment, useUpdateComment, useDeleteComment } from './hooks/useComments';
-import { useToggleReact, useToggleSavePost } from './hooks/usePostReactions';
+import { postsKeys, usePostDetail, usePostComments, useRelatedPosts } from '~/features/posts/hooks/usePosts';
+import { useAddComment, useUpdateComment, useDeleteComment } from '~/features/posts/hooks/useComments';
+import { useToggleReact, useToggleSavePost } from '~/features/posts/hooks/usePostReactions';
 
 const cx = classNames.bind(styles);
 const MAX_REPLY_DEPTH = 4;

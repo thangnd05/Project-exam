@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { submitSession } from '~/shared/api/learningPlanApi';
-import { planDetailKeys } from './usePlanDetail';
-import { taskHistoryKeys } from './useTaskHistory';
-import { invalidatePlanQueries } from './plan-cache';
+import { planDetailKeys } from '~/features/diagnostic/learning-plans/hooks/usePlanDetail';
+import { invalidatePlanQueries } from '~/features/diagnostic/learning-plans/hooks/plan-cache';
 
 export function useSubmitSession({ onSuccess, onError } = {}) {
   const qc = useQueryClient();

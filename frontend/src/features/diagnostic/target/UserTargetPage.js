@@ -8,11 +8,11 @@ import planStyles from '~/features/diagnostic/styles/PersonalizedPlan.module.scs
 import styles from './UserTargetPage.module.scss';
 import { sortPartsByLookup } from '~/shared/utils/partOrder';
 import useMilestoneScoring from '~/shared/hooks/useMilestoneScoring';
-import { useCurrentUserTarget, useUserTargetData } from './hooks/useUserTargetData';
+import { useCurrentUserTarget, useUserTargetData } from '~/features/diagnostic/target/hooks/useUserTargetData';
 import {
   useSaveUserTarget,
   useDeleteUserTarget,
-} from './hooks/useUserTargetMutations';
+} from '~/features/diagnostic/target/hooks/useUserTargetMutations';
 
 const cx = classNames.bind(styles);
 const planCx = classNames.bind(planStyles);

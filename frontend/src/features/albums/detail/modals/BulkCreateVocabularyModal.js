@@ -7,7 +7,7 @@ import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import styles from '~/shared/ui/modal/CommonFormModal.module.scss';
-import { useBulkCreateVocabularies } from '../hooks/useBulkCreateVocabularies';
+import { useBulkCreateVocabularies } from '~/features/albums/detail/hooks/useBulkCreateVocabularies';
 
 const cx = classNames.bind(styles);
 

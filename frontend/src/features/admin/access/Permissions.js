@@ -5,7 +5,7 @@ import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 
 import {AdminFieldError, AdminPageHeader} from '../components/common';
-import {usePermissionsMatrix} from './hooks/usePermissionsMatrix';
+import {usePermissionsMatrix} from '~/features/admin/access/hooks/usePermissionsMatrix';
 import styles from '../components/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);

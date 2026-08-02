@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/shared/utils/format-date-time';
-import { useTaskHistory } from '../hooks/useTaskHistory';
+import { useTaskHistory } from '~/features/diagnostic/learning-plans/hooks/useTaskHistory';
 import { taskDisplayName, taskStatusLabel } from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 

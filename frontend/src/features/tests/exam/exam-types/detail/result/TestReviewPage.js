@@ -7,7 +7,7 @@ import { IoHomeOutline } from "react-icons/io5";
 import { AuthContext } from "~/shared/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/shared/utils/guestSession";
 import { getFullMediaUrl } from "~/shared/utils/mediaUrl";
-import { useTestReview } from "./hooks/useTestReview";
+import { useTestReview } from "~/features/tests/exam/exam-types/detail/result/hooks/useTestReview";
 import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
 import ReviewQuestionCard from "~/shared/ui/Review/ReviewQuestionCard";
 import ReviewFooterNav from "~/shared/ui/Review/ReviewFooterNav";

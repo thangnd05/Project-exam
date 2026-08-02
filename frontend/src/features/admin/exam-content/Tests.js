@@ -10,7 +10,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import { useAdminTests } from './hooks/useAdminTests';
+import { useAdminTests } from '~/features/admin/exam-content/hooks/useAdminTests';
 
 const parseOptionalId = (value) => {
   const trimmed = String(value).trim();

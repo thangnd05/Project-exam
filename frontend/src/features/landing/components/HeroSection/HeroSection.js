@@ -6,7 +6,7 @@ import {AnimatePresence, motion} from 'framer-motion';
 
 import styles from './HeroSection.module.scss';
 import {calculateAllowedTime} from '~/shared/utils/testStatusHelper';
-import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
+import {useQuickChallengeTests} from '~/features/landing/components/HeroSection/hooks/useQuickChallengeTests';
 import {brandColors} from '~/shared/styles/brandColors';
 import {getStandardExamTypes} from '~/shared/api/examTypeApi';
 import {examTypeKeys} from '~/features/tests/exam/exam-types/examTypeKeys';

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateQuestion } from '~/shared/api/questionApi';
-import { questionDetailKeys } from './useQuestionDetail';
+import { questionDetailKeys } from '~/features/tests/question-bank/hooks/useQuestionDetail';
 
 export function useUpdateQuestion({ onSuccess, onError } = {}) {
   const qc = useQueryClient();

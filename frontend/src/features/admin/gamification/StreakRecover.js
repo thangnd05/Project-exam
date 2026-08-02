@@ -5,7 +5,7 @@ import { Flame } from 'lucide-react';
 
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { AdminCard, AdminFieldError, AdminPageHeader } from '../components/common';
-import { useStreakRecoverConfig } from './hooks/useStreakRecoverConfig';
+import { useStreakRecoverConfig } from '~/features/admin/gamification/hooks/useStreakRecoverConfig';
 
 function StreakRecoverManagement() {
   const [costCoins, setCostCoins] = useState(50);

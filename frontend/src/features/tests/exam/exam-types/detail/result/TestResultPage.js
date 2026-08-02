@@ -14,7 +14,7 @@ import {
 
 import { AuthContext } from "~/shared/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/shared/utils/guestSession";
-import { useTestResult } from "./hooks/useTestResult";
+import { useTestResult } from "~/features/tests/exam/exam-types/detail/result/hooks/useTestResult";
 import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
 import ReadinessGauge from "./components/ReadinessGauge";
 import RecoveryPlan from "./components/RecoveryPlan";

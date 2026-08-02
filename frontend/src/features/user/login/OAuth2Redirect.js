@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '~/shared/hooks/useAuth';
-import { fetchCurrentUser } from './hooks/useAuthActions';
+import { fetchCurrentUser } from '~/features/user/login/hooks/useAuthActions';
 import { claimGuestAfterLogin, takeOAuthRedirect } from '~/shared/utils/authRedirect';
 
 function OAuth2Redirect() {

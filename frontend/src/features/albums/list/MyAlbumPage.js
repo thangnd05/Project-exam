@@ -15,7 +15,7 @@ import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import PageHeaderViewToggle from '~/shared/ui/PageHeader/PageHeaderViewToggle';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import AlbumManagementTable from './components/AlbumManagementTable/AlbumManagementTable';
-import { useMyAlbums } from './hooks/useMyAlbums';
+import { useMyAlbums } from '~/features/albums/list/hooks/useMyAlbums';
 
 const cx = classNames.bind(styles);
 

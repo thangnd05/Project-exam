@@ -4,7 +4,7 @@ import style from './login.module.scss';
 import routes from '~/shared/config/Routes';
 import {Form, Button} from 'react-bootstrap';
 import {Link, useNavigate} from 'react-router-dom';
-import { useForgotPasswordMutation } from './hooks/useAuthActions';
+import { useForgotPasswordMutation } from '~/features/user/login/hooks/useAuthActions';
 
 const cx = classNames.bind(style);
 

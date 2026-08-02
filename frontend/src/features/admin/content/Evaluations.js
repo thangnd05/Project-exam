@@ -12,7 +12,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import {useEvaluationMutations, useEvaluations} from './hooks/useEvaluations';
+import {useEvaluationMutations, useEvaluations} from '~/features/admin/content/hooks/useEvaluations';
 
 const emptyForm = {
   content: '',

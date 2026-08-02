@@ -3,7 +3,7 @@ import {Badge, Form} from 'react-bootstrap';
 
 import {formatDateTime} from '~/shared/utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
-import {useLoginAudit} from './hooks/useLoginAudit';
+import {useLoginAudit} from '~/features/admin/overview/hooks/useLoginAudit';
 
 function LoginAudit() {
   const ITEMS_PER_PAGE = 20;

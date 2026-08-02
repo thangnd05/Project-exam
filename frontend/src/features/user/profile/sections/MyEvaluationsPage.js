@@ -7,7 +7,7 @@ import {toast} from 'react-toastify';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes from '~/shared/config/Routes';
-import {useMyEvaluations} from '../hooks/useMyEvaluations';
+import {useMyEvaluations} from '~/features/user/profile/hooks/useMyEvaluations';
 import styles from './MyEvaluationsPage.module.scss';
 
 const cx = classNames.bind(styles);
