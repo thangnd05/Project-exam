@@ -43,8 +43,6 @@ import com.project_exam.backend.modules.classroom.member.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
 import com.project_exam.backend.modules.gamification.streak.service.StreakService;
-import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,13 +60,10 @@ public class PracticeService {
 
     private final VocabularyRepository vocabularyRepository;
     private final UserVocabularyRepository userVocabularyRepository;
-    private final AuthUtils authUtils;
     private final StreakService streakService;
     private final PracticeMapper practiceMapper;
 
-    public Optional<PracticeQuestionResponse> generateOneRandomQuestion(HttpServletRequest request, String albumId) {
-        String userId = authUtils.getUserId(request);
-
+    public Optional<PracticeQuestionResponse> generateOneRandomQuestion(String userId, String albumId) {
         List<String> masteredIds = userVocabularyRepository
                 .findVocabIdsByUserIdAndStatus(userId, UserVocabulary.Status.mastered);
         List<Vocabulary> all = vocabularyRepository.findByAlbumId(albumId);
@@ -111,11 +106,9 @@ public class PracticeService {
         ));
     }
 
-        public void markWordAsKnown(HttpServletRequest httpRequest, String vocabId) {
-        String currentUserId = authUtils.getUserId(httpRequest);
-
-        UserVocabulary uv = userVocabularyRepository.findByUserIdAndVocabId(currentUserId, vocabId)
-                .orElse(new UserVocabulary(currentUserId, vocabId));
+    public void markWordAsKnown(String userId, String vocabId) {
+        UserVocabulary uv = userVocabularyRepository.findByUserIdAndVocabId(userId, vocabId)
+                .orElse(new UserVocabulary(userId, vocabId));
 
         uv.setStatus(UserVocabulary.Status.mastered);
         uv.setCorrectCount(5);
@@ -124,13 +117,12 @@ public class PracticeService {
         userVocabularyRepository.save(uv);
 
         try {
-            streakService.recordActivity(currentUserId, StreakActivityType.VOCAB_PRACTICE);
+            streakService.recordActivity(userId, StreakActivityType.VOCAB_PRACTICE);
         } catch (Exception ignored) {
         }
     }
 
-    public PracticeCheckResponse checkAnswer(HttpServletRequest request, PracticeCheckRequest req) {
-        String userId = authUtils.getUserId(request);
+    public PracticeCheckResponse checkAnswer(String userId, PracticeCheckRequest req) {
         Vocabulary vocab = vocabularyRepository.findById(req.getVocabId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy từ vựng"));
 

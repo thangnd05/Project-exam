@@ -40,8 +40,8 @@ public class UserTestController {
     private String frontendOrigin;
 
     @GetMapping
-    public ResponseEntity<List<UserTestResponse>> getAll(HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(userTestService.findAllResponses(httpRequest));
+    public ResponseEntity<List<UserTestResponse>> getAll() {
+        return ResponseEntity.ok(userTestService.findAllResponses());
     }
 
     @GetMapping("/{userTestId}")
@@ -49,7 +49,8 @@ public class UserTestController {
             @PathVariable String userTestId,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(userTestService.getMeta(userTestId, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userTestService.getMeta(userTestId, userId));
     }
 
     @GetMapping("/my")
@@ -81,7 +82,8 @@ public class UserTestController {
             @PathVariable String testId,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(userTestService.findResponsesByTestId(testId, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userTestService.findResponsesByTestId(testId, userId));
     }
 
     @PostMapping
@@ -126,7 +128,8 @@ public class UserTestController {
         if (userTestService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        userTestService.delete(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        userTestService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -181,7 +184,8 @@ public class UserTestController {
             @PathVariable String testId,
             HttpServletRequest httpRequest
     ) {
-        TestLeaderboardResponse res = userTestService.getAttemptsByTest(testId, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        TestLeaderboardResponse res = userTestService.getAttemptsByTest(testId, userId);
         return ResponseEntity.ok(res);
     }
 

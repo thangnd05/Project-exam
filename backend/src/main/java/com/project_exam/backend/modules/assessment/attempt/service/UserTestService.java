@@ -10,7 +10,6 @@ import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
 import com.project_exam.backend.modules.gamification.streak.service.StreakService;
 import com.project_exam.backend.modules.classroom.member.domain.ClassMember.MemberStatus;
-import jakarta.servlet.http.HttpServletRequest;
 
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto;
@@ -284,7 +283,7 @@ public class UserTestService {
 
     public List<UserTest> findAll() { return userTestRepository.findAll(); }
 
-    public List<UserTestResponse> findAllResponses(jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public List<UserTestResponse> findAllResponses() {
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ user-tests.");
         }
@@ -345,18 +344,17 @@ public class UserTestService {
     }
     public List<UserTest> findByTestId(String testId) { return userTestRepository.findByTestId(testId); }
 
-    public List<UserTestResponse> findResponsesByTestId(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
-        requireTestOwnerOrAdmin(testId, httpRequest);
+    public List<UserTestResponse> findResponsesByTestId(String testId, String currentUserId) {
+        requireTestOwnerOrAdmin(testId, currentUserId);
         return toResponseListBatched(findByTestId(testId));
     }
     public UserTest save(UserTest userTest) { return userTestRepository.save(userTest); }
     public UserTestResponse saveResponse(UserTest userTest) { return toResponse(save(userTest)); }
 
-    private void requireTestOwnerOrAdmin(String testId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    private void requireTestOwnerOrAdmin(String testId, String currentUserId) {
         if (authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) return;
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null || !currentUserId.equals(test.getCreatedBy())) {
             throw new ForbiddenException("Bạn không có quyền xem dữ liệu của đề này.");
         }
@@ -374,9 +372,8 @@ public class UserTestService {
         userTest.setStatus(status);
         return toResponse(userTestRepository.save(userTest));
     }
-    public boolean delete(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public boolean delete(String id, String currentUserId) {
         return userTestRepository.findById(id).map(u -> {
-            String currentUserId = authUtils.getUserId(httpRequest);
             boolean isOwner = currentUserId != null && currentUserId.equals(u.getUserId());
             if (!isOwner && !authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
                 throw new ForbiddenException("Bạn không có quyền xoá bài làm này.");
@@ -647,11 +644,11 @@ public class UserTestService {
                 .collect(Collectors.toList());
     }
 
-    public TestLeaderboardResponse getAttemptsByTest(String testId,HttpServletRequest httpRequest) {
+    public TestLeaderboardResponse getAttemptsByTest(String testId, String currentUserId) {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
 
-        requireLeaderboardViewAccess(test, httpRequest);
+        requireLeaderboardViewAccess(test, currentUserId);
 
         boolean isUnlimited = test.getAvailableTo() == null;
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;
@@ -684,11 +681,10 @@ public class UserTestService {
                 .collect(Collectors.toList());
 
         TestLeaderboardResponse.MyRank me = null;
-        String viewerId = authUtils.getUserId(httpRequest);
-        if (viewerId != null) {
+        if (currentUserId != null) {
             for (int i = 0; i < ranked.size(); i++) {
                 UserTestResponse r = ranked.get(i);
-                if (viewerId.equals(r.getUserId())) {
+                if (currentUserId.equals(r.getUserId())) {
                     me = leaderboardMapper.toMyRank(
                             i + 1,
                             r.getUserTestId(),
@@ -706,10 +702,8 @@ public class UserTestService {
         return leaderboardMapper.toResponse(entries, me, ranked.size());
     }
 
-    private void requireLeaderboardViewAccess(Test test, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    private void requireLeaderboardViewAccess(Test test, String currentUserId) {
         if (authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) return;
-
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
             throw new ForbiddenException("Bạn cần đăng nhập để xem bảng xếp hạng.");
         }
@@ -748,12 +742,11 @@ public class UserTestService {
         return Duration.between(userTest.getStartedAt(), userTest.getFinishedAt()).getSeconds();
     }
 
-    public UserTestResponse getMeta(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public UserTestResponse getMeta(String userTestId, String currentUserId) {
         var ut = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new NotFoundException("userTest not found"));
 
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
-            String currentUserId = authUtils.getUserId(httpRequest);
             boolean isOwner = currentUserId != null && currentUserId.equals(ut.getUserId());
             boolean isTestOwner = false;
             if (!isOwner && currentUserId != null) {

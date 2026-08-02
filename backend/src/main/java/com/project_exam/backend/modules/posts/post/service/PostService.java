@@ -26,7 +26,6 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.InternalServerException;
 import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -123,8 +122,7 @@ public class PostService {
     @Transactional
     public PostResponse createPost(PostUpsertRequest request,
                                    MultipartFile thumbnailFile,
-                                   HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+                                   String userId) {
         Post.PostStatus initialStatus = authUtils.hasPermission(PermissionCatalog.POST_MODERATE)
                 ? Post.PostStatus.APPROVED
                 : Post.PostStatus.PENDING;
@@ -156,8 +154,7 @@ public class PostService {
     @Transactional
     public PostResponse updatePost(String id, PostUpsertRequest request,
                                    MultipartFile thumbnailFile,
-                                   HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+                                   String userId) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
 
@@ -192,8 +189,7 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse updatePostStatus(String id, Post.PostStatus status, HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+    public PostResponse updatePostStatus(String id, Post.PostStatus status, String userId) {
         if (!authUtils.hasPermission(PermissionCatalog.POST_MODERATE)) {
             throw new ForbiddenException("Chỉ admin được duyệt/từ chối bài viết");
         }
@@ -211,8 +207,7 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(String id, HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+    public void deletePost(String id, String userId) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
 
@@ -230,10 +225,9 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse getPostById(String id, HttpServletRequest httpRequest) {
+    public PostResponse getPostById(String id, String currentUserId, String clientIp) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
-        String currentUserId = tryGetUserId(httpRequest);
 
         if (post.getStatus() != Post.PostStatus.APPROVED) {
             boolean isOwner = currentUserId != null && currentUserId.equals(post.getUserId());
@@ -243,7 +237,7 @@ public class PostService {
             }
         }
 
-        boolean shouldCountView = postViewThrottleService.shouldCountView(id, currentUserId, httpRequest);
+        boolean shouldCountView = postViewThrottleService.shouldCountView(id, currentUserId, clientIp);
         if (shouldCountView) {
             long currentViews = post.getViewCount() == null ? 0L : post.getViewCount();
             post.setViewCount(currentViews + 1);
@@ -254,8 +248,7 @@ public class PostService {
     }
 
     public PageResponse<PostSummaryResponse> getPostsPaged(int page, int size, String keyword,
-                                          Post.PostStatus status, String categoryId,
-                                          HttpServletRequest httpRequest) {
+                                          Post.PostStatus status, String categoryId) {
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 10 : Math.min(size, 100);
 
@@ -292,8 +285,7 @@ public class PostService {
 
     public PageResponse<PostSummaryResponse> getMyPosts(int page, int size, String keyword,
                                                         Post.PostStatus status,
-                                                        HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+                                                        String userId) {
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 10 : Math.min(size, 100);
 
@@ -379,14 +371,6 @@ public class PostService {
                         .build();
                 postCategoryRepository.save(pc);
             }
-        }
-    }
-
-    private String tryGetUserId(HttpServletRequest httpRequest) {
-        try {
-            return authUtils.getUserId(httpRequest);
-        } catch (Exception e) {
-            return null;
         }
     }
 

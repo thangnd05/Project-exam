@@ -35,7 +35,8 @@ public class ClassMemberController {
         if (classQr == null || classQr.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
-        ClassMemberResponse member = classMemberService.joinClassByQr(classQr.trim(), request);
+        String userId = authUtils.getUserId(request);
+        ClassMemberResponse member = classMemberService.joinClassByQr(classQr.trim(), userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(member);
     }
 
@@ -48,7 +49,8 @@ public class ClassMemberController {
         if (classId == null) {
             return ResponseEntity.badRequest().build();
         }
-        classMemberService.leaveClass(classId, request);
+        String userId = authUtils.getUserId(request);
+        classMemberService.leaveClass(classId, userId);
         return ResponseEntity.ok(Map.of("message", "You have left the class successfully"));
     }
 
@@ -58,17 +60,19 @@ public class ClassMemberController {
             HttpServletRequest request
     ) {
         String classId = body.getClassId();
-        String userId = body.getUserId();
-        if (classId == null || userId == null) {
+        String targetUserId = body.getUserId();
+        if (classId == null || targetUserId == null) {
             return ResponseEntity.badRequest().build();
         }
-        classMemberService.approveSingle(classId, userId, request);
+        String currentUserId = authUtils.getUserId(request);
+        classMemberService.approveSingle(classId, targetUserId, currentUserId);
         return ResponseEntity.ok(Map.of("message", "Member approved successfully"));
     }
 
     @PutMapping("/approve-all/{classId}")
     public ResponseEntity<Map<String, String>> approveAll(@PathVariable String classId, HttpServletRequest request) {
-        int count = classMemberService.approveAll(classId, request);
+        String currentUserId = authUtils.getUserId(request);
+        int count = classMemberService.approveAll(classId, currentUserId);
         return ResponseEntity.ok(Map.of("message", "Approved " + count + " pending members"));
     }
 
@@ -77,8 +81,7 @@ public class ClassMemberController {
             @PathVariable String classId,
             HttpServletRequest request
     ) {
-
-        classAccessGuard.requireMemberOrTeacher(classId, authUtils.getUserId(request), request);
+        classAccessGuard.requireMemberOrTeacher(classId, authUtils.getUserId(request));
         return ResponseEntity.ok(classMemberService.getAllMembers(classId));
     }
 
@@ -87,8 +90,7 @@ public class ClassMemberController {
             @PathVariable String classId,
             HttpServletRequest request
     ) {
-
-        classAccessGuard.requireTeacher(classId, authUtils.getUserId(request), request);
+        classAccessGuard.requireTeacher(classId, authUtils.getUserId(request));
         return ResponseEntity.ok(classMemberService.getPendingMembers(classId));
     }
 
@@ -98,17 +100,19 @@ public class ClassMemberController {
             HttpServletRequest request
     ) {
         String classId = body.getClassId();
-        String userId = body.getUserId();
-        if (classId == null || userId == null) {
+        String targetUserId = body.getUserId();
+        if (classId == null || targetUserId == null) {
             return ResponseEntity.badRequest().build();
         }
-        classMemberService.removeMember(classId, userId, request);
+        String currentUserId = authUtils.getUserId(request);
+        classMemberService.removeMember(classId, targetUserId, currentUserId);
         return ResponseEntity.ok(Map.of("message", "Member removed successfully"));
     }
 
     @GetMapping("/my-classes")
     public ResponseEntity<Map<String, Object>> getMyClasses(HttpServletRequest request) {
-        Map<String, Object> myClasses = classMemberService.getClassesOfCurrentStudent(request);
+        String userId = authUtils.getUserId(request);
+        Map<String, Object> myClasses = classMemberService.getClassesOfCurrentStudent(userId);
         return ResponseEntity.ok(myClasses);
     }
 }

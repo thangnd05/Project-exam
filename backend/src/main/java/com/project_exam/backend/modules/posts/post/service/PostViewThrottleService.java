@@ -15,8 +15,8 @@ public class PostViewThrottleService {
     private static final Duration VIEW_TTL = Duration.ofMinutes(5);
     private final StringRedisTemplate redisTemplate;
 
-    public boolean shouldCountView(String postId, String userId, HttpServletRequest request) {
-        String viewerId = resolveViewerId(userId, request);
+    public boolean shouldCountView(String postId, String userId, String clientIp) {
+        String viewerId = resolveViewerId(userId, clientIp);
         String key = "post:view:" + postId + ":" + viewerId;
 
         try {
@@ -28,18 +28,16 @@ public class PostViewThrottleService {
         }
     }
 
-    private String resolveViewerId(String userId, HttpServletRequest request) {
+    private String resolveViewerId(String userId, String clientIp) {
         if (userId != null && !userId.isBlank()) {
             return "u:" + userId;
         }
 
-        String sessionId = request.getSession(true).getId();
-        String ip = extractClientIp(request);
-        return "g:" + sessionId + ":" + ip;
+        String ip = (clientIp == null || clientIp.isBlank()) ? "unknown" : clientIp;
+        return "g:" + ip;
     }
 
-    private String extractClientIp(HttpServletRequest request) {
-
+    public String extractClientIp(HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();
         return remoteAddr == null ? "unknown" : remoteAddr;
     }

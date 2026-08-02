@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.posts.comment.controller;
 import com.project_exam.backend.modules.posts.comment.dto.CommentRequest;
 import com.project_exam.backend.modules.posts.comment.dto.CommentResponse;
 import com.project_exam.backend.modules.posts.comment.service.CommentService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
+    private final AuthUtils authUtils;
 
     @GetMapping("/api/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponse>> getComments(@PathVariable String postId) {
@@ -27,7 +29,8 @@ public class CommentController {
             @RequestBody CommentRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(commentService.addComment(postId, request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(commentService.addComment(postId, request, userId));
     }
 
     @PutMapping("/api/comments/{id}")
@@ -36,7 +39,8 @@ public class CommentController {
             @RequestBody CommentRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(commentService.updateComment(id, request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(commentService.updateComment(id, request, userId));
     }
 
     @DeleteMapping("/api/comments/{id}")
@@ -44,7 +48,8 @@ public class CommentController {
             @PathVariable String id,
             HttpServletRequest httpRequest
     ) {
-        commentService.deleteComment(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        commentService.deleteComment(id, userId);
         return ResponseEntity.noContent().build();
     }
 }

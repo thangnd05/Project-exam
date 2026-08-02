@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.classroom.clazz.dto.ClassSimpleResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.classroom.clazz.service.ClassService;
 import com.project_exam.backend.modules.assessment.test.service.TestService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,19 +23,22 @@ public class ClassController {
 
     private final ClassService classService;
     private final TestService testService;
+    private final AuthUtils authUtils;
 
     @PostMapping
     public ResponseEntity<ClassResponse> createClass(
             @Valid @RequestBody ClassRequest request,
             HttpServletRequest httpRequest
     ) {
-        ClassResponse created = classService.createClass(request, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        ClassResponse created = classService.createClass(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<ClassSimpleResponse>> getMyClasses(HttpServletRequest request) {
-        List<ClassSimpleResponse> responses = classService.getMyClasses(request);
+    public ResponseEntity<List<ClassSimpleResponse>> getMyClasses(HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        List<ClassSimpleResponse> responses = classService.getMyClasses(userId);
         return ResponseEntity.ok(responses);
     }
 
@@ -43,7 +47,8 @@ public class ClassController {
             @PathVariable String classId,
             @Valid @RequestBody ClassRequest request,
             HttpServletRequest httpRequest) {
-        ClassResponse result = classService.updateClass(classId, request, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        ClassResponse result = classService.updateClass(classId, request, userId);
         return ResponseEntity.ok(result);
     }
 
@@ -58,9 +63,9 @@ public class ClassController {
     }
 
     @DeleteMapping("/{classId}")
-    public ResponseEntity<Void> deleteClass(@PathVariable String classId, HttpServletRequest request) {
-
-        classService.deleteClass(classId, request);
+    public ResponseEntity<Void> deleteClass(@PathVariable String classId, HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        classService.deleteClass(classId, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -69,7 +74,8 @@ public class ClassController {
             @PathVariable String classId,
             @PathVariable String chapterId,
             HttpServletRequest request) {
-        List<TestResponse> responses = testService.getTestByClassIdAndChapterId(classId, chapterId, request);
+        String userId = authUtils.getUserId(request);
+        List<TestResponse> responses = testService.getTestByClassIdAndChapterId(classId, chapterId, userId);
         return ResponseEntity.ok(responses);
     }
 }

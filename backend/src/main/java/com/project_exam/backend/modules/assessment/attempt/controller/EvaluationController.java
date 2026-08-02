@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationRequest
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationResponse;
 import com.project_exam.backend.modules.assessment.attempt.service.EvaluationService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +20,15 @@ import java.util.List;
 public class EvaluationController {
 
     private final EvaluationService evaluationService;
+    private final AuthUtils authUtils;
 
     @PostMapping
     public ResponseEntity<EvaluationResponse> create(
             HttpServletRequest httpRequest,
             @Valid @RequestBody EvaluationRequest request
     ) {
-        EvaluationResponse created = evaluationService.create(httpRequest, request);
+        String userId = authUtils.getUserId(httpRequest);
+        EvaluationResponse created = evaluationService.create(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -51,7 +54,8 @@ public class EvaluationController {
 
     @GetMapping("/me")
     public ResponseEntity<List<EvaluationResponse>> getMyEvaluations(HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(evaluationService.getMyEvaluations(httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(evaluationService.getMyEvaluations(userId));
     }
 
     @PutMapping("/{id}")
@@ -60,12 +64,14 @@ public class EvaluationController {
             @Valid @RequestBody EvaluationRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(evaluationService.update(id, request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(evaluationService.update(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        evaluationService.delete(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        evaluationService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
 }

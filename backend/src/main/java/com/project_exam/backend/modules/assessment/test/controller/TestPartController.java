@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.test.controller;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartRequest;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartSimpleResponse;
 import com.project_exam.backend.modules.assessment.test.service.TestPartService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 public class TestPartController {
 
     private final TestPartService testPartService;
+    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<List<TestPartSimpleResponse>> getAllTestParts() {
@@ -40,7 +42,8 @@ public class TestPartController {
             @Valid @RequestBody TestPartRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(testPartService.saveResponse(request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(testPartService.saveResponse(request, userId));
     }
 
     @PutMapping("/{id}")
@@ -49,12 +52,14 @@ public class TestPartController {
             @Valid @RequestBody TestPartRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(testPartService.updateResponse(id, request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(testPartService.updateResponse(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTestPart(@PathVariable String id, HttpServletRequest httpRequest) {
-        testPartService.deleteById(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        testPartService.deleteById(id, userId);
         return ResponseEntity.noContent().build();
     }
 }

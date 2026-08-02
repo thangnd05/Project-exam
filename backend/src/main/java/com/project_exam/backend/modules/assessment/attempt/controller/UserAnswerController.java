@@ -25,13 +25,14 @@ public class UserAnswerController {
     private final AuthUtils authUtils;
 
     @GetMapping
-    public ResponseEntity<List<UserAnswerResponse>> getAll(HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(userAnswerService.findAllResponses(httpRequest));
+    public ResponseEntity<List<UserAnswerResponse>> getAll() {
+        return ResponseEntity.ok(userAnswerService.findAllResponses());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserAnswerResponse> getById(@PathVariable String id, HttpServletRequest httpRequest) {
-        return userAnswerService.findResponseById(id, httpRequest)
+        String userId = authUtils.getUserId(httpRequest);
+        return userAnswerService.findResponseById(id, userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -41,15 +42,15 @@ public class UserAnswerController {
             @PathVariable String userTestId,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(userAnswerService.findResponsesByUserTestId(userTestId, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userAnswerService.findResponsesByUserTestId(userTestId, userId));
     }
 
     @GetMapping("/question/{questionId}")
     public ResponseEntity<List<UserAnswerResponse>> getByQuestion(
-            @PathVariable String questionId,
-            HttpServletRequest httpRequest
+            @PathVariable String questionId
     ) {
-        return ResponseEntity.ok(userAnswerService.findResponsesByQuestionId(questionId, httpRequest));
+        return ResponseEntity.ok(userAnswerService.findResponsesByQuestionId(questionId));
     }
 
     @PostMapping
@@ -76,7 +77,8 @@ public class UserAnswerController {
         if (userAnswerService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        userAnswerService.delete(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        userAnswerService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
 

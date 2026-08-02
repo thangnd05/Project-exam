@@ -8,6 +8,8 @@ import com.project_exam.backend.modules.posts.post.dto.PostSummaryResponse;
 import com.project_exam.backend.modules.posts.post.dto.UpdatePostStatusRequest;
 import com.project_exam.backend.modules.posts.post.domain.Post;
 import com.project_exam.backend.modules.posts.post.service.PostService;
+import com.project_exam.backend.modules.posts.post.service.PostViewThrottleService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -23,6 +25,8 @@ import java.io.IOException;
 public class PostController {
 
     private final PostService postService;
+    private final PostViewThrottleService postViewThrottleService;
+    private final AuthUtils authUtils;
     private final ObjectMapper objectMapper;
 
     @GetMapping
@@ -31,10 +35,9 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Post.PostStatus status,
-            @RequestParam(required = false) String categoryId,
-            HttpServletRequest httpRequest
+            @RequestParam(required = false) String categoryId
     ) {
-        return ResponseEntity.ok(postService.getPostsPaged(page, size, keyword, status, categoryId, httpRequest));
+        return ResponseEntity.ok(postService.getPostsPaged(page, size, keyword, status, categoryId));
     }
 
     @GetMapping("/{id}")
@@ -42,7 +45,13 @@ public class PostController {
             @PathVariable String id,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(postService.getPostById(id, httpRequest));
+        String currentUserId = null;
+        try {
+            currentUserId = authUtils.getUserId(httpRequest);
+        } catch (Exception ignored) {
+        }
+        String clientIp = postViewThrottleService.extractClientIp(httpRequest);
+        return ResponseEntity.ok(postService.getPostById(id, currentUserId, clientIp));
     }
 
     @GetMapping("/me")
@@ -53,7 +62,8 @@ public class PostController {
             @RequestParam(required = false) Post.PostStatus status,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(postService.getMyPosts(page, size, keyword, status, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(postService.getMyPosts(page, size, keyword, status, userId));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -64,7 +74,8 @@ public class PostController {
     ) {
         try {
             PostUpsertRequest request = objectMapper.readValue(requestJson, PostUpsertRequest.class);
-            return ResponseEntity.ok(postService.createPost(request, thumbnailFile, httpRequest));
+            String userId = authUtils.getUserId(httpRequest);
+            return ResponseEntity.ok(postService.createPost(request, thumbnailFile, userId));
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -79,7 +90,8 @@ public class PostController {
     ) {
         try {
             PostUpsertRequest request = objectMapper.readValue(requestJson, PostUpsertRequest.class);
-            return ResponseEntity.ok(postService.updatePost(id, request, thumbnailFile, httpRequest));
+            String userId = authUtils.getUserId(httpRequest);
+            return ResponseEntity.ok(postService.updatePost(id, request, thumbnailFile, userId));
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -90,7 +102,8 @@ public class PostController {
             @PathVariable String id,
             HttpServletRequest httpRequest
     ) {
-        postService.deletePost(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        postService.deletePost(id, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -100,7 +113,8 @@ public class PostController {
             @RequestBody UpdatePostStatusRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(postService.updatePostStatus(id, request.getStatus(), httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(postService.updatePostStatus(id, request.getStatus(), userId));
     }
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

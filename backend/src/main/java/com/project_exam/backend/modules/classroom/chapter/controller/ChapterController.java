@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.classroom.chapter.controller;
 import com.project_exam.backend.modules.classroom.chapter.dto.ChapterRequest;
 import com.project_exam.backend.modules.classroom.chapter.dto.ChapterResponse;
 import com.project_exam.backend.modules.classroom.chapter.service.ChapterService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,18 +17,20 @@ import java.util.List;
 public class ChapterController {
 
     private final ChapterService chapterService;
+    private final AuthUtils authUtils;
 
     @PostMapping
     public ResponseEntity<ChapterResponse> create(
-            HttpServletRequest requestHttp,
+            HttpServletRequest httpRequest,
             @RequestBody ChapterRequest request
     ) {
-        return ResponseEntity.ok(chapterService.create(requestHttp, request));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(chapterService.create(userId, request));
     }
 
     @GetMapping
-    public ResponseEntity<List<ChapterResponse>> getAll(HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(chapterService.getAll(httpRequest));
+    public ResponseEntity<List<ChapterResponse>> getAll() {
+        return ResponseEntity.ok(chapterService.getAll());
     }
 
     @GetMapping("/class/{classId}")
@@ -35,7 +38,8 @@ public class ChapterController {
             @PathVariable String classId,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(chapterService.getByClassId(classId, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(chapterService.getByClassId(classId, userId));
     }
 
     @GetMapping("/{chapterId}")
@@ -43,24 +47,27 @@ public class ChapterController {
             @PathVariable String chapterId,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(chapterService.getById(chapterId, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(chapterService.getById(chapterId, userId));
     }
 
     @PutMapping("/{chapterId}")
     public ResponseEntity<ChapterResponse> update(
-            HttpServletRequest requestHttp,
+            HttpServletRequest httpRequest,
             @PathVariable String chapterId,
             @RequestBody ChapterRequest request
     ) {
-        return ResponseEntity.ok(chapterService.update(requestHttp, chapterId, request));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(chapterService.update(userId, chapterId, request));
     }
 
     @DeleteMapping("/{chapterId}")
     public ResponseEntity<Void> delete(
-            HttpServletRequest requestHttp,
+            HttpServletRequest httpRequest,
             @PathVariable String chapterId
     ) {
-        chapterService.delete(requestHttp, chapterId);
+        String userId = authUtils.getUserId(httpRequest);
+        chapterService.delete(userId, chapterId);
         return ResponseEntity.noContent().build();
     }
 

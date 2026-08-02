@@ -4,9 +4,6 @@ import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.exception.UnauthorizedException;
-import com.project_exam.backend.shared.util.AuthUtils;
-import com.project_exam.backend.shared.util.ClassAccessGuard;
-
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
@@ -61,7 +58,6 @@ import com.project_exam.backend.modules.users.user.service.AdminUserProvider;
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -91,11 +87,9 @@ public class TestService {
     private final PassageRepository  passageRepository;
     private final UserTestRepository userTestRepository;
     private final UserAnswerRepository userAnswerRepository;
-    private final AuthUtils authUtils;
     private final UserTestService userTestService;
     private final ClassRepository classRepository;
     private final ClassMemberRepository classMemberRepository;
-    private final ClassAccessGuard classAccessGuard;
     private final UserTestAccessRepository userTestAccessRepository;
     private final CoinService coinService;
     private final PassageMapper passageMapper;
@@ -398,15 +392,14 @@ public class TestService {
         return testMapper.toAdminSummaryResponse(test, totalAttempts, test.calculateStatus().name());
     }
 
-    public List<TestAdminResponse> getTestsByUser(String userId) {
+    public List<TestAdminResponse> getAdminTestsByCreatedUser(String userId) {
         if (userId == null) {
             return List.of();
         }
         return buildAdminTestSummariesBatch(testRepository.findByCreatedBy(userId));
     }
 
-    public List<TestResponse> getTestsByUser(HttpServletRequest httpRequest) {
-        String currentUserId = authUtils.getUserId(httpRequest);
+    public List<TestResponse> getTestsByUser(String currentUserId) {
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng.");
         }
@@ -414,14 +407,7 @@ public class TestService {
     }
 
     @Transactional
-    public TestResponse getTestFullById(String testId, HttpServletRequest httpRequest) {
-
-        String currentUserId;
-        try {
-            currentUserId = authUtils.getUserId(httpRequest);
-        } catch (Exception e) {
-            currentUserId = null;
-        }
+    public TestResponse getTestFullById(String testId, String currentUserId) {
 
         Test test = testRepository.findById(testId).orElseThrow(() -> new NotFoundException("Test not found"));
 
@@ -819,9 +805,8 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 test, totalAttempts, test.calculateStatus().name(), Collections.emptyList());
     }
 
-    public List<TestResponse> getTestByClassId(String classId, HttpServletRequest request) {
+    public List<TestResponse> getTestByClassId(String classId, String currentUserId) {
 
-        String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
             throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
@@ -837,9 +822,8 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         return buildUserTestSummariesBatch(testRepository.findByClassId(classId), currentUserId);
     }
 
-    public List<TestResponse> getTestByClassIdAndChapterId(String classId,String chapterId, HttpServletRequest request) {
+    public List<TestResponse> getTestByClassIdAndChapterId(String classId, String chapterId, String currentUserId) {
 
-        String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
             throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
@@ -856,9 +840,8 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
                 testRepository.findByClassIdAndChapterId(classId, chapterId), currentUserId);
     }
 
-    public List<TestResponse> getTestByCreateBy(HttpServletRequest request) {
+    public List<TestResponse> getTestByCreateBy(String currentUserId) {
 
-        String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
             throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
@@ -866,9 +849,8 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         return buildUserTestSummariesBatch(testRepository.findByCreatedBy(currentUserId), currentUserId);
     }
 
-    public List<TestResponse> getMyPersonalTests(HttpServletRequest request) {
+    public List<TestResponse> getMyPersonalTests(String currentUserId) {
 
-        String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
             throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }
@@ -879,8 +861,7 @@ private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem
         return buildUserTestSummariesBatch(tests, currentUserId);
     }
 
-    public PageResponse<TestResponse> getMyPersonalTestsPaged(HttpServletRequest request, int page, int size) {
-        String currentUserId = authUtils.getUserId(request);
+    public PageResponse<TestResponse> getMyPersonalTestsPaged(String currentUserId, int page, int size) {
         if (currentUserId == null) {
             throw new UnauthorizedException("Bạn cần đăng nhập để xem bài kiểm tra.");
         }

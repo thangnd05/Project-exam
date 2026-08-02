@@ -10,8 +10,6 @@ import com.project_exam.backend.modules.posts.post.repository.PostRepository;
 import com.project_exam.backend.modules.posts.saved.repository.SavedPostRepository;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,18 +26,16 @@ public class SavedPostService {
     private final SavedPostRepository savedPostRepository;
     private final PostRepository postRepository;
     private final PostService postService;
-    private final AuthUtils authUtils;
     private final SavedPostMapper savedPostMapper;
 
     @Transactional
-    public SavedPostStatusResponse toggleSave(String postId, HttpServletRequest httpRequest) {
+    public SavedPostStatusResponse toggleSave(String postId, String userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Post không tồn tại"));
         if (post.getStatus() != Post.PostStatus.APPROVED) {
             throw new NotFoundException("Post không tồn tại");
         }
 
-        String userId = authUtils.getUserId(httpRequest);
         Optional<SavedPost> existing = savedPostRepository.findByPostIdAndUserId(postId, userId);
 
         boolean nowSaved;
@@ -58,19 +54,17 @@ public class SavedPostService {
         return savedPostMapper.toStatusResponse(nowSaved, count);
     }
 
-    public SavedPostStatusResponse getStatus(String postId, HttpServletRequest httpRequest) {
+    public SavedPostStatusResponse getStatus(String postId, String userId) {
         if (!postRepository.existsById(postId)) {
             throw new NotFoundException("Post không tồn tại");
         }
-        String userId = tryGetUserId(httpRequest);
         boolean saved = userId != null && savedPostRepository.existsByPostIdAndUserId(postId, userId);
         long count = savedPostRepository.countByPostId(postId);
         return savedPostMapper.toStatusResponse(saved, count);
     }
 
     public PageResponse<PostSummaryResponse> getMySavedPosts(int page, int size, String keyword,
-                                                             HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+                                                             String userId) {
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 10 : Math.min(size, 100);
 
@@ -81,13 +75,5 @@ public class SavedPostService {
                 userId, Post.PostStatus.APPROVED, normalizedKeyword, pageable);
 
         return PageResponse.from(savedPage, postService.buildSummaryResponses(savedPage.getContent()));
-    }
-
-    private String tryGetUserId(HttpServletRequest httpRequest) {
-        try {
-            return authUtils.getUserId(httpRequest);
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

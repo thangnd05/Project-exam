@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.notes.controller;
 import com.project_exam.backend.modules.notes.dto.NoteRequest;
 import com.project_exam.backend.modules.notes.dto.NoteResponse;
 import com.project_exam.backend.modules.notes.service.NoteService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +19,18 @@ import java.util.List;
 public class NoteController {
 
     private final NoteService service;
+    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<List<NoteResponse>> getMyNotes(HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(service.findAllForCurrentUser(httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(service.findAllForCurrentUser(userId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NoteResponse> getById(@PathVariable String id, HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(service.findById(id, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(service.findById(id, userId));
     }
 
     @PostMapping
@@ -34,7 +38,8 @@ public class NoteController {
             @Valid @RequestBody NoteRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request, userId));
     }
 
     @PutMapping("/{id}")
@@ -43,12 +48,14 @@ public class NoteController {
             @Valid @RequestBody NoteRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(service.update(id, request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(service.update(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        service.delete(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        service.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
 }

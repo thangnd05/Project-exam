@@ -71,7 +71,6 @@ import com.project_exam.backend.modules.classroom.member.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -109,14 +108,14 @@ public class QuestionService {
     private final AnswerMapper answerMapper;
     private final QuestionMapper questionMapper;
 
-    private void requireClassWriteAccess(String classId, String chapterId, String currentUserId, HttpServletRequest httpRequest) {
+    private void requireClassWriteAccess(String classId, String chapterId, String currentUserId) {
         if (classId == null) {
             if (chapterId != null) {
                 throw new BadRequestException("Khi có chapterId thì phải có classId.");
             }
             return;
         }
-        classAccessGuard.requireMemberOrTeacher(classId, currentUserId, httpRequest);
+        classAccessGuard.requireMemberOrTeacher(classId, currentUserId);
         classAccessGuard.requireChapterInClass(chapterId, classId);
     }
 
@@ -240,13 +239,11 @@ public class QuestionService {
             String examPartId,
             String classId,
             String chapterId,
-            HttpServletRequest request
+            String currentUserId
     ) {
 
-        String currentUserId = authUtils.getUserId(request);
-
         if (classId != null) {
-            classAccessGuard.requireMemberOrTeacher(classId, currentUserId, request);
+            classAccessGuard.requireMemberOrTeacher(classId, currentUserId);
             classAccessGuard.requireChapterInClass(chapterId, classId);
         } else if (chapterId != null) {
             throw new BadRequestException("Khi có chapterId thì phải có classId.");
@@ -266,8 +263,7 @@ public class QuestionService {
         return buildUserQuestionResponses(questions);
     }
 
-    public List<QuestionResponse> getAdminBankQuestionsByPart(String examPartId, HttpServletRequest request) {
-        authUtils.getUserId(request);
+    public List<QuestionResponse> getAdminBankQuestionsByPart(String examPartId) {
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return Collections.emptyList();
@@ -279,8 +275,7 @@ public class QuestionService {
         return buildUserQuestionResponses(questions);
     }
 
-    public long countAdminBankQuestionsByPart(String examPartId, HttpServletRequest request) {
-        authUtils.getUserId(request);
+    public long countAdminBankQuestionsByPart(String examPartId) {
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return 0L;
@@ -319,9 +314,8 @@ public class QuestionService {
     public List<QuestionResponse> getBankQuestionsByCurrentUserClass(
             String classId,
             String chapterId,
-            HttpServletRequest request
+            String currentUserId
     ) {
-        String currentUserId = authUtils.getUserId(request);
         String resolvedClassId = resolveCurrentUserClassId(currentUserId, classId);
 
         List<Question> questions = (chapterId != null)
@@ -338,9 +332,8 @@ public class QuestionService {
     public long countBankQuestionsByCurrentUserClass(
             String classId,
             String chapterId,
-            HttpServletRequest request
+            String currentUserId
     ) {
-        String currentUserId = authUtils.getUserId(request);
         String resolvedClassId = resolveCurrentUserClassId(currentUserId, classId);
 
         if (chapterId != null) {
@@ -369,7 +362,7 @@ public class QuestionService {
             String examPartId,
             String classId,
             String chapterId,
-            HttpServletRequest httpRequest
+            String currentUserId
     ) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new BadRequestException("Vui lòng chọn file Word.");
@@ -386,7 +379,7 @@ public class QuestionService {
                 parsedQuestions
         );
 
-        return createBulkQuestionsToBankNoPassage(bulkRequest, httpRequest, Collections.emptyMap());
+        return createBulkQuestionsToBankNoPassage(bulkRequest, currentUserId, Collections.emptyMap());
     }
 
     @Transactional
@@ -395,7 +388,7 @@ public class QuestionService {
             String testPartId,
             String classId,
             String chapterId,
-            HttpServletRequest httpRequest
+            String currentUserId
     ) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new BadRequestException("Vui lòng chọn file Word.");
@@ -404,7 +397,6 @@ public class QuestionService {
             throw new BadRequestException("Thiếu testPartId.");
         }
 
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng.");
         }
@@ -418,7 +410,7 @@ public class QuestionService {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
 
-        requireClassWriteAccess(classId, chapterId, currentUserId, httpRequest);
+        requireClassWriteAccess(classId, chapterId, currentUserId);
 
         List<NormalQuestionRequest> parsedQuestions = questionDocumentImportService.parseQuestionsFromDocument(file);
         if (parsedQuestions.isEmpty()) {
@@ -491,10 +483,9 @@ public class QuestionService {
     }
 
     @Transactional
-    public void deleteById(String id, HttpServletRequest httpRequest) {
+    public void deleteById(String id, String currentUserId) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Câu hỏi không tồn tại."));
-        String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(question.getCreatedBy());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá câu hỏi này.");
@@ -527,11 +518,10 @@ public class QuestionService {
         }
     }
 
-    public long countByExamPartId(String examPartId, String classId, String chapterId, HttpServletRequest request) {
-        String currentUserId = authUtils.getUserId(request);
+    public long countByExamPartId(String examPartId, String classId, String chapterId, String currentUserId) {
         if (classId != null) {
 
-            classAccessGuard.requireMemberOrTeacher(classId, currentUserId, request);
+            classAccessGuard.requireMemberOrTeacher(classId, currentUserId);
             classAccessGuard.requireChapterInClass(chapterId, classId);
             if (chapterId != null) {
                 return questionRepository.countByExamPartIdAndClassIdAndChapterId(examPartId, classId, chapterId);
@@ -546,14 +536,13 @@ public class QuestionService {
 
     @Transactional
     public List<QuestionAdminResponse> createBulkQuestionsToBank(BulkQuestionWithPassageRequest request,
-                                                                HttpServletRequest httpRequest,
+                                                                String currentUserId,
                                                                 Map<String, MultipartFile> files) throws IOException {
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng từ token.");
         }
 
-        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
+        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId);
         List<MultipartFile> uploadedFiles = files == null
                 ? List.of()
                 : files.entrySet().stream()
@@ -615,16 +604,15 @@ public class QuestionService {
     @Transactional
     public List<QuestionAdminResponse> createBulkQuestionsToBankNoPassage(
             BulkCreateQuestionsToBankRequest request,
-            HttpServletRequest httpRequest,
+            String currentUserId,
             Map<String, MultipartFile> files
     ) throws IOException {
 
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng từ token.");
         }
 
-        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
+        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId);
 
         if (request.getQuestions() == null || request.getQuestions().isEmpty()) {
             return List.of();
@@ -714,11 +702,10 @@ public class QuestionService {
     @Transactional
     public QuestionAdminResponse createQuestionAndAttachToTest(
             CreateQuestionAndAttachRequest request,
-            HttpServletRequest httpRequest,
+            String currentUserId,
             Map<String, MultipartFile> files
     ) throws IOException {
 
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng.");
         }
@@ -732,7 +719,7 @@ public class QuestionService {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
         }
 
-        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
+        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId);
 
         String passageId = null;
         Passage savedPassage = null;
@@ -930,12 +917,10 @@ public class QuestionService {
                 tagService.getTagsByQuestionId(question.getQuestionId()));
     }
 
-    public QuestionAdminResponse getQuestionDetailAdmin(String questionId, HttpServletRequest httpRequest) {
+    public QuestionAdminResponse getQuestionDetailAdmin(String questionId, String currentUserId) {
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NotFoundException("Question not found"));
-
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null
                 || (!currentUserId.equals(question.getCreatedBy())
                         && !authUtils.hasPermission(PermissionCatalog.QUESTION_MANAGE))) {
@@ -971,18 +956,17 @@ public class QuestionService {
     }
 
     @Transactional
-    public QuestionAdminResponse updateQuestion(String questionId, QuestionCreateRequest request, HttpServletRequest httpRequest) {
-        return updateQuestion(questionId, request, httpRequest, null);
+    public QuestionAdminResponse updateQuestion(String questionId, QuestionCreateRequest request, String currentUserId) {
+        return updateQuestion(questionId, request, currentUserId, null);
     }
 
     @Transactional
     public QuestionAdminResponse updateQuestion(
             String questionId,
             QuestionCreateRequest request,
-            HttpServletRequest httpRequest,
+            String currentUserId,
             Map<String, MultipartFile> files
     ) {
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng từ token.");
         }
@@ -996,7 +980,7 @@ public class QuestionService {
         String effectiveClassId = request.getClassId() != null ? request.getClassId() : question.getClassId();
         String effectiveChapterId = request.getChapterId() != null ? request.getChapterId() : question.getChapterId();
         if (request.getClassId() != null || request.getChapterId() != null) {
-            requireClassWriteAccess(effectiveClassId, effectiveChapterId, currentUserId, httpRequest);
+            requireClassWriteAccess(effectiveClassId, effectiveChapterId, currentUserId);
         }
 
         applyScalarFields(question, request);
@@ -1121,17 +1105,15 @@ public class QuestionService {
     @Transactional
     public List<QuestionAdminResponse> createBulkGroups(
             BulkPassageGroupRequest request,
-            HttpServletRequest httpRequest,
+            String currentUserId,
             Map<String, MultipartFile> files
     ) throws IOException {
-
-        String currentUserId = authUtils.getUserId(httpRequest);
 
         if (currentUserId == null) {
             throw new BadRequestException("Không xác định được người dùng.");
         }
 
-        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId, httpRequest);
+        requireClassWriteAccess(request.getClassId(), request.getChapterId(), currentUserId);
 
         List<QuestionAdminResponse> allResponses = new ArrayList<>();
         int baseMax = resolveMaxQuestionNumber(

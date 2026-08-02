@@ -53,7 +53,13 @@ public class TestController {
             @PathVariable String testId,
             HttpServletRequest httpRequest
     ) {
-        TestResponse response = testService.getTestFullById(testId, httpRequest);
+        String userId;
+        try {
+            userId = authUtils.getUserId(httpRequest);
+        } catch (Exception e) {
+            userId = null;
+        }
+        TestResponse response = testService.getTestFullById(testId, userId);
         if (response == null) {
             throw new NotFoundException("Không tìm thấy bài test");
         }
@@ -80,7 +86,7 @@ public class TestController {
         String currentUserId = authUtils.getUserId(httpRequest);
 
         if (request.getClassId() != null) {
-            classAccessGuard.requireTeacher(request.getClassId(), currentUserId, httpRequest);
+            classAccessGuard.requireTeacher(request.getClassId(), currentUserId);
             classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
         } else if (request.getChapterId() != null) {
 
@@ -118,7 +124,8 @@ public class TestController {
             @Valid @RequestBody AddQuestionsToTestRequest request,
             HttpServletRequest httpRequest
     ) {
-        testQuestionAssignmentService.addQuestionsToTestPart(request, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        testQuestionAssignmentService.addQuestionsToTestPart(request, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -128,7 +135,7 @@ public class TestController {
             HttpServletRequest httpRequest
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
-        AddRandomQuestionsResponse response = testQuestionAssignmentService.addRandomQuestionsToTestPart(request, currentUserId, httpRequest);
+        AddRandomQuestionsResponse response = testQuestionAssignmentService.addRandomQuestionsToTestPart(request, currentUserId);
         return ResponseEntity.ok(response);
     }
 
@@ -138,7 +145,8 @@ public class TestController {
             @Valid @RequestBody CreateTestRequest request,
             HttpServletRequest httpRequest
     ) {
-        Test updated = testCommandService.updateTest(id, request, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        Test updated = testCommandService.updateTest(id, request, userId);
         return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
     }
 
@@ -156,7 +164,8 @@ public class TestController {
         if (testService.getTestById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        testCommandService.deleteTest(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        testCommandService.deleteTest(id, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -168,7 +177,8 @@ public class TestController {
 
     @GetMapping("/my")
     public List<TestResponse> getMyTests(HttpServletRequest request) {
-        return testService.getTestsByUser(request);
+        String userId = authUtils.getUserId(request);
+        return testService.getTestsByUser(userId);
     }
 
     @GetMapping("/admin/by-exam-type/{examTypeId}")
@@ -236,7 +246,7 @@ public class TestController {
                 .orElseThrow(() -> new NotFoundException("Test not found"));
 
         if (test.getClassId() != null) {
-            classAccessGuard.requireMemberOrTeacher(test.getClassId(), userId, request);
+            classAccessGuard.requireMemberOrTeacher(test.getClassId(), userId);
         }
         Map<String, Object> result = testAccessService.canStartTest(userId, test);
 
@@ -252,13 +262,15 @@ public class TestController {
             @PathVariable String classId,
             HttpServletRequest request
     ) {
-        List<TestResponse> responses = testService.getTestByClassId(classId, request);
+        String userId = authUtils.getUserId(request);
+        List<TestResponse> responses = testService.getTestByClassId(classId, userId);
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/my-all-test")
     public ResponseEntity<List<TestResponse>> getTestsCreateBy(HttpServletRequest request) {
-        List<TestResponse> responses = testService.getTestByCreateBy(request);
+        String userId = authUtils.getUserId(request);
+        List<TestResponse> responses = testService.getTestByCreateBy(userId);
         return ResponseEntity.ok(responses);
     }
 
@@ -268,7 +280,8 @@ public class TestController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size
     ) {
-        return ResponseEntity.ok(testService.getMyPersonalTestsPaged(request, page, size));
+        String userId = authUtils.getUserId(request);
+        return ResponseEntity.ok(testService.getMyPersonalTestsPaged(userId, page, size));
     }
 
 }

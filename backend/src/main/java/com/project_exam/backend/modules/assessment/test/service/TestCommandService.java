@@ -16,7 +16,6 @@ import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,10 +39,9 @@ public class TestCommandService {
     }
 
     @Transactional
-    public void deleteTest(String id, HttpServletRequest httpRequest) {
+    public void deleteTest(String id, String currentUserId) {
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + id));
-        String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xóa đề này.");
@@ -71,11 +69,10 @@ public class TestCommandService {
         testRepository.deleteById(testId);
     }
 
-    public Test updateTest(String id, CreateTestRequest request, HttpServletRequest httpRequest) {
+    public Test updateTest(String id, CreateTestRequest request, String currentUserId) {
 
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Test không tồn tại: " + id));
-        String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đề này.");
@@ -84,7 +81,7 @@ public class TestCommandService {
         String effectiveClassId = request.getClassId() != null ? request.getClassId() : test.getClassId();
         String effectiveChapterId = request.getChapterId() != null ? request.getChapterId() : test.getChapterId();
         if (request.getClassId() != null) {
-            classAccessGuard.requireTeacher(effectiveClassId, currentUserId, httpRequest);
+            classAccessGuard.requireTeacher(effectiveClassId, currentUserId);
         }
         if (request.getChapterId() != null) {
             classAccessGuard.requireChapterInClass(effectiveChapterId, effectiveClassId);

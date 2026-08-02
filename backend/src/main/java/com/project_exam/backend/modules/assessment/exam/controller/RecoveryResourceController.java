@@ -39,30 +39,29 @@ public class RecoveryResourceController {
     ) throws IOException {
         authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
+        String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(resourceService.createResource(request, file, httpRequest));
+                .body(resourceService.createResource(request, file, userId));
     }
 
     @PutMapping(value = "/{resourceId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RecoveryResourceResponse> updateResource(
             @PathVariable String resourceId,
             @RequestPart("request") String requestJson,
-            @RequestPart(value = "file", required = false) MultipartFile file,
-            HttpServletRequest httpRequest
+            @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
         authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
-        return ResponseEntity.ok(resourceService.updateResource(resourceId, request, file, httpRequest));
+        return ResponseEntity.ok(resourceService.updateResource(resourceId, request, file));
     }
 
     @PutMapping("/{resourceId}")
     public ResponseEntity<RecoveryResourceResponse> updateResourceJson(
             @PathVariable String resourceId,
-            @RequestBody RecoveryResourceRequest request,
-            HttpServletRequest httpRequest
+            @RequestBody RecoveryResourceRequest request
     ) throws IOException {
         authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
-        return ResponseEntity.ok(resourceService.updateResource(resourceId, request, null, httpRequest));
+        return ResponseEntity.ok(resourceService.updateResource(resourceId, request, null));
     }
 
     @DeleteMapping("/{resourceId}")

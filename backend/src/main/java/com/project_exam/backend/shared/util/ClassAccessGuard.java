@@ -9,7 +9,6 @@ import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.security.PermissionCatalog;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ public class ClassAccessGuard {
     private final ChapterRepository chapterRepository;
     private final AuthUtils authUtils;
 
-    public void requireMemberOrTeacher(String classId, String userId, HttpServletRequest request) {
+    public void requireMemberOrTeacher(String classId, String userId) {
         if (classId == null) {
             throw new BadRequestException("classId không được để trống.");
         }
@@ -38,7 +37,7 @@ public class ClassAccessGuard {
         }
     }
 
-    public void requireTeacher(String classId, String userId, HttpServletRequest request) {
+    public void requireTeacher(String classId, String userId) {
         if (classId == null) {
             throw new BadRequestException("classId không được để trống.");
         }

@@ -16,8 +16,6 @@ import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRe
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,15 +40,13 @@ public class RecoveryResourceService {
     private final TagMapper tagMapper;
     private final RecoveryResourceMapper recoveryResourceMapper;
     private final CloudinaryService cloudinaryService;
-    private final AuthUtils authUtils;
 
     @Transactional
     public RecoveryResourceResponse createResource(
             RecoveryResourceRequest request,
             MultipartFile file,
-            HttpServletRequest httpRequest
+            String currentUserId
     ) throws IOException {
-        String currentUserId = authUtils.getUserId(httpRequest);
         if (request.getTitle() == null || request.getTitle().isBlank()) {
             throw new BadRequestException("Tiêu đề không được để trống.");
         }
@@ -83,8 +79,7 @@ public class RecoveryResourceService {
     public RecoveryResourceResponse updateResource(
             String resourceId,
             RecoveryResourceRequest request,
-            MultipartFile file,
-            HttpServletRequest httpRequest
+            MultipartFile file
     ) throws IOException {
         RecoveryResource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new NotFoundException("Tài liệu không tồn tại: " + resourceId));

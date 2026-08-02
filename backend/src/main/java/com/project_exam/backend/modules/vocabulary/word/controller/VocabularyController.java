@@ -83,8 +83,9 @@ public class VocabularyController {
     @GetMapping("/album/{albumId}")
     public ResponseEntity<List<VocabularyResponse>> getVocabulariesByAlbumId(
             @PathVariable String albumId,
-            HttpServletRequest request
+            HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(service.findAllByAlbumId(albumId, request));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(service.findAllByAlbumId(albumId, userId));
     }
 }

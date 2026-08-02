@@ -9,8 +9,6 @@ import com.project_exam.backend.modules.posts.comment.domain.Comment;
 import com.project_exam.backend.modules.posts.comment.mapper.CommentMapper;
 import com.project_exam.backend.modules.posts.comment.repository.CommentRepository;
 import com.project_exam.backend.modules.posts.post.repository.PostRepository;
-import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +29,6 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-    private final AuthUtils authUtils;
     private final com.project_exam.backend.modules.users.user.repository.UserRepository userRepository;
     private final CosmeticService cosmeticService;
     private final CommentMapper commentMapper;
@@ -91,8 +88,7 @@ public class CommentService {
         return rootComments;
     }
 
-    public CommentResponse addComment(String postId, CommentRequest request,
-                                      HttpServletRequest httpRequest) {
+    public CommentResponse addComment(String postId, CommentRequest request, String userId) {
         if (!postRepository.existsById(postId)) {
             throw new NotFoundException("Post không tồn tại");
         }
@@ -108,7 +104,6 @@ public class CommentService {
             }
         }
 
-        String userId = authUtils.getUserId(httpRequest);
         Comment comment = Comment.builder()
                 .postId(postId)
                 .userId(userId)
@@ -122,8 +117,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse updateComment(String id, CommentRequest request, HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+    public CommentResponse updateComment(String id, CommentRequest request, String userId) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Comment không tồn tại"));
 
@@ -140,8 +134,7 @@ public class CommentService {
         return toResponse(comment, null);
     }
 
-    public void deleteComment(String id, HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+    public void deleteComment(String id, String userId) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Comment không tồn tại"));
 

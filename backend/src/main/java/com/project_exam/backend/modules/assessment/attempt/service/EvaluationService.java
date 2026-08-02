@@ -13,7 +13,6 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.assessment.attempt.repository.EvaluationRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,9 +40,7 @@ public class EvaluationService {
         return evaluationMapper.toResponse(e, user);
     }
 
-    public EvaluationResponse create(HttpServletRequest httpRequest, EvaluationRequest request) {
-
-        String currentUserId = authUtils.getUserId(httpRequest);
+    public EvaluationResponse create(String currentUserId, EvaluationRequest request) {
 
         Evaluation evaluation = new Evaluation();
         evaluation.setUserId(currentUserId);
@@ -92,19 +89,16 @@ public class EvaluationService {
                 .toList();
     }
 
-    public List<EvaluationResponse> getMyEvaluations(HttpServletRequest httpRequest) {
-        String currentUserId = authUtils.getUserId(httpRequest);
+    public List<EvaluationResponse> getMyEvaluations(String currentUserId) {
         return evaluationRepository.findByUserIdOrderByCreatedAtDesc(currentUserId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public EvaluationResponse update(String id, EvaluationRequest request, HttpServletRequest httpRequest) {
+    public EvaluationResponse update(String id, EvaluationRequest request, String currentUserId) {
         Evaluation evaluation = evaluationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-
-        String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa đánh giá này.");
@@ -120,11 +114,9 @@ public class EvaluationService {
         return toResponse(evaluation);
     }
 
-    public void delete(String id, HttpServletRequest httpRequest) {
+    public void delete(String id, String currentUserId) {
         Evaluation evaluation = evaluationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-
-        String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá đánh giá này.");

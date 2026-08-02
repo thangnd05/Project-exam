@@ -13,8 +13,6 @@ import com.project_exam.backend.modules.vocabulary.album.repository.VocabularyAl
 import com.project_exam.backend.modules.vocabulary.word.repository.VocabularyRepository;
 import com.project_exam.backend.modules.vocabulary.lookup.service.DictionaryApiService;
 import com.project_exam.backend.modules.vocabulary.lookup.service.TextToSpeechService;
-import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,6 @@ public class VocabularyService {
     private final VocabularyAlbumRepository albumRepository;
     private final DictionaryApiService dictionaryApiService;
     private final TextToSpeechService textToSpeechService;
-    private final AuthUtils authUtils;
     private final VocabularyMapper vocabularyMapper;
 
     public List<VocabularyResponse> findAll() {
@@ -132,14 +129,11 @@ public class VocabularyService {
         return toResponse(vocab);
     }
 
-    public List<VocabularyResponse> findAllByAlbumId(String albumId, HttpServletRequest request) {
-
-        String currentUserId = authUtils.getUserId(request);
-
+    public List<VocabularyResponse> findAllByAlbumId(String albumId, String userId) {
         VocabularyAlbum album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
 
-        if (!album.getUserId().equals(currentUserId)) {
+        if (!album.getUserId().equals(userId)) {
             throw new AccessDeniedException("Bạn không có quyền truy cập album này!");
         }
 

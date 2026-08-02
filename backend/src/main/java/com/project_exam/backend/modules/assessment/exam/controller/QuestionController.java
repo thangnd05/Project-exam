@@ -56,7 +56,8 @@ public class QuestionController {
             @PathVariable String id,
             HttpServletRequest httpRequest
     ) {
-        QuestionAdminResponse response = questionService.getQuestionDetailAdmin(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        QuestionAdminResponse response = questionService.getQuestionDetailAdmin(id, userId);
         return ResponseEntity.ok(response);
     }
 
@@ -70,9 +71,10 @@ public class QuestionController {
     ) {
         if ("admin".equalsIgnoreCase(bank)) {
             authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
-            return ResponseEntity.ok(questionService.getAdminBankQuestionsByPart(examPartId, request));
+            return ResponseEntity.ok(questionService.getAdminBankQuestionsByPart(examPartId));
         }
-        List<QuestionResponse> questions = questionService.getQuestionsByPart(examPartId, classId, chapterId, request);
+        String userId = authUtils.getUserId(request);
+        List<QuestionResponse> questions = questionService.getQuestionsByPart(examPartId, classId, chapterId, userId);
         return ResponseEntity.ok(questions);
     }
 
@@ -86,9 +88,10 @@ public class QuestionController {
     ) {
         if ("admin".equalsIgnoreCase(bank)) {
             authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
-            return ResponseEntity.ok(questionService.countAdminBankQuestionsByPart(examPartId, request));
+            return ResponseEntity.ok(questionService.countAdminBankQuestionsByPart(examPartId));
         }
-        long count = questionService.countByExamPartId(examPartId, classId, chapterId, request);
+        String userId = authUtils.getUserId(request);
+        long count = questionService.countByExamPartId(examPartId, classId, chapterId, userId);
         return ResponseEntity.ok(count);
     }
 
@@ -98,7 +101,8 @@ public class QuestionController {
             @RequestParam(required = false) String chapterId,
             HttpServletRequest request
     ) {
-        List<QuestionResponse> questions = questionService.getBankQuestionsByCurrentUserClass(classId, chapterId, request);
+        String userId = authUtils.getUserId(request);
+        List<QuestionResponse> questions = questionService.getBankQuestionsByCurrentUserClass(classId, chapterId, userId);
         return ResponseEntity.ok(questions);
     }
 
@@ -108,7 +112,8 @@ public class QuestionController {
             @RequestParam(required = false) String chapterId,
             HttpServletRequest request
     ) {
-        long count = questionService.countBankQuestionsByCurrentUserClass(classId, chapterId, request);
+        String userId = authUtils.getUserId(request);
+        long count = questionService.countBankQuestionsByCurrentUserClass(classId, chapterId, userId);
         return ResponseEntity.ok(count);
     }
 
@@ -124,10 +129,11 @@ public class QuestionController {
         BulkCreateQuestionsToBankRequest request =
                 objectMapper.readValue(requestJson, BulkCreateQuestionsToBankRequest.class);
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) httpRequest;
+        String userId = authUtils.getUserId(httpRequest);
         List<QuestionAdminResponse> responses =
                 questionService.createBulkQuestionsToBankNoPassage(
                         request,
-                        httpRequest,
+                        userId,
                         multipartRequest.getFileMap()
                 );
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
@@ -142,7 +148,7 @@ public class QuestionController {
                 objectMapper.readValue(requestJson, BulkQuestionWithPassageRequest.class);
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) httpRequest;
         List<QuestionAdminResponse> responses =
-                questionService.createBulkQuestionsToBank(request, httpRequest, multipartRequest.getFileMap());
+                questionService.createBulkQuestionsToBank(request, authUtils.getUserId(httpRequest), multipartRequest.getFileMap());
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
@@ -159,7 +165,7 @@ public class QuestionController {
                 objectMapper.readValue(requestJson, CreateQuestionAndAttachRequest.class);
 
         QuestionAdminResponse result =
-                questionService.createQuestionAndAttachToTest(request, httpRequest, files);
+                questionService.createQuestionAndAttachToTest(request, authUtils.getUserId(httpRequest), files);
 
         return ResponseEntity.ok(result);
     }
@@ -172,12 +178,13 @@ public class QuestionController {
             @RequestParam(required = false) String chapterId,
             HttpServletRequest httpRequest
     ) throws IOException {
+        String userId = authUtils.getUserId(httpRequest);
         List<QuestionAdminResponse> responses = questionService.createQuestionsFromDocumentAndAttachToTest(
                 file,
                 testPartId,
                 classId,
                 chapterId,
-                httpRequest
+                userId
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
@@ -190,12 +197,13 @@ public class QuestionController {
             @RequestParam(required = false) String chapterId,
             HttpServletRequest httpRequest
     ) throws IOException {
+        String userId = authUtils.getUserId(httpRequest);
         List<QuestionAdminResponse> responses = questionService.importQuestionsFromDocument(
                 file,
                 examPartId,
                 classId,
                 chapterId,
-                httpRequest
+                userId
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
@@ -222,7 +230,8 @@ public class QuestionController {
             @Valid @RequestBody QuestionCreateRequest request,
             HttpServletRequest httpRequest
     ) {
-        QuestionAdminResponse response = questionService.updateQuestion(id, request, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        QuestionAdminResponse response = questionService.updateQuestion(id, request, userId);
         return ResponseEntity.ok(response);
     }
 
@@ -237,13 +246,14 @@ public class QuestionController {
         QuestionCreateRequest request =
                 objectMapper.readValue(requestJson, QuestionCreateRequest.class);
         QuestionAdminResponse response =
-                questionService.updateQuestion(id, request, httpRequest, files);
+                questionService.updateQuestion(id, request, authUtils.getUserId(httpRequest), files);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteQuestion(@PathVariable String id, HttpServletRequest httpRequest) {
-        questionService.deleteById(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        questionService.deleteById(id, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -264,7 +274,7 @@ public class QuestionController {
                 objectMapper.readValue(requestJson, BulkPassageGroupRequest.class);
 
         List<QuestionAdminResponse> result =
-                questionService.createBulkGroups(request, httpRequest, files);
+                questionService.createBulkGroups(request, authUtils.getUserId(httpRequest), files);
 
         return ResponseEntity.ok(result);
     }

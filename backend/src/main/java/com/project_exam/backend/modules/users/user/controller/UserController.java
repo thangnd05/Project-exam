@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.users.user.dto.ProfileActivityResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.user.dto.UserResponse;
 import com.project_exam.backend.modules.users.user.service.UserService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,10 +26,11 @@ public class UserController {
 
     private final UserService userService;
     private final ObjectMapper objectMapper;
+    private final AuthUtils authUtils;
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers(HttpServletRequest httpRequest) {
-        userService.requireAdminToManageUsers(httpRequest);
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        userService.requireAdminToManageUsers();
         return ResponseEntity.ok(userService.findAllResponses());
     }
 
@@ -38,10 +40,9 @@ public class UserController {
             @RequestParam(defaultValue = "20") Integer size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String roleId,
-            @RequestParam(required = false) Boolean verified,
-            HttpServletRequest httpRequest
+            @RequestParam(required = false) Boolean verified
     ) {
-        userService.requireAdminToManageUsers(httpRequest);
+        userService.requireAdminToManageUsers();
         return ResponseEntity.ok(userService.findAllPaged(page, size, keyword, roleId, verified));
     }
 
@@ -50,7 +51,8 @@ public class UserController {
             @PathVariable String id,
             HttpServletRequest httpRequest
     ) {
-        userService.requireSelfOrAdminForUser(id, httpRequest);
+        String currentUserId = authUtils.getUserId(httpRequest);
+        userService.requireSelfOrAdminForUser(id, currentUserId);
         return userService.findResponseById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -58,14 +60,16 @@ public class UserController {
 
     @GetMapping("/me/info-user")
     public ResponseEntity<UserResponse> getUserInfo(HttpServletRequest httpRequest) {
-        return userService.getUserCurrentResponse(httpRequest)
+        String userId = authUtils.getUserId(httpRequest);
+        return userService.getUserCurrentResponse(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/me/profile-overview")
     public ResponseEntity<ProfileOverviewResponse> getMyProfileOverview(HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(userService.getMyProfileOverview(httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userService.getMyProfileOverview(userId));
     }
 
     @GetMapping("/me/activity")
@@ -74,15 +78,15 @@ public class UserController {
             @RequestParam(required = false) String year,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(userService.getMyActivity(httpRequest, month, year));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(userService.getMyActivity(userId, month, year));
     }
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(
-            @Valid @RequestBody UserUpsertRequest request,
-            HttpServletRequest httpRequest
+            @Valid @RequestBody UserUpsertRequest request
     ) {
-        userService.requireAdminToManageUsers(httpRequest);
+        userService.requireAdminToManageUsers();
         return ResponseEntity.ok(userService.createUser(request));
     }
 
@@ -93,7 +97,8 @@ public class UserController {
             @RequestPart(value = "avatar", required = false) MultipartFile avatar,
             HttpServletRequest httpRequest
     ) throws IOException {
-        userService.requireSelfOrAdminForUser(id, httpRequest);
+        String currentUserId = authUtils.getUserId(httpRequest);
+        userService.requireSelfOrAdminForUser(id, currentUserId);
         UserUpsertRequest request = objectMapper.readValue(userJson, UserUpsertRequest.class);
         return ResponseEntity.ok(userService.updateUser(id, request, avatar));
     }
@@ -103,7 +108,8 @@ public class UserController {
         if (userService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        userService.deleteUser(id, httpRequest);
+        String currentUserId = authUtils.getUserId(httpRequest);
+        userService.deleteUser(id, currentUserId);
         return ResponseEntity.noContent().build();
     }
 }

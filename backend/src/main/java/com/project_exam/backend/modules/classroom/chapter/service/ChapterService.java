@@ -15,7 +15,6 @@ import com.project_exam.backend.modules.classroom.clazz.repository.ClassReposito
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,10 +47,8 @@ public class ChapterService {
         return chapterMapper.toResponse(c);
     }
 
-    public ChapterResponse create(HttpServletRequest httpRequest, ChapterRequest request) {
-
-        String currentUserId = authUtils.getUserId(httpRequest);
-        checkTeacherPermission(request.getClassId(), currentUserId);
+    public ChapterResponse create(String userId, ChapterRequest request) {
+        checkTeacherPermission(request.getClassId(), userId);
 
         Chapter chapter = new Chapter();
         chapter.setClassId(request.getClassId());
@@ -64,7 +61,7 @@ public class ChapterService {
         return toResponse(saved);
     }
 
-    public List<ChapterResponse> getAll(HttpServletRequest httpRequest) {
+    public List<ChapterResponse> getAll() {
         if (!authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ chapter.");
         }
@@ -74,10 +71,8 @@ public class ChapterService {
                 .toList();
     }
 
-    public List<ChapterResponse> getByClassId(String classId, HttpServletRequest httpRequest) {
-
-        String currentUserId = authUtils.getUserId(httpRequest);
-        classAccessGuard.requireMemberOrTeacher(classId, currentUserId, httpRequest);
+    public List<ChapterResponse> getByClassId(String classId, String userId) {
+        classAccessGuard.requireMemberOrTeacher(classId, userId);
 
         return chapterRepository.findByClassId(classId)
                 .stream()
@@ -85,27 +80,22 @@ public class ChapterService {
                 .toList();
     }
 
-    public ChapterResponse getById(String chapterId, HttpServletRequest httpRequest) {
-
+    public ChapterResponse getById(String chapterId, String userId) {
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
-        String currentUserId = authUtils.getUserId(httpRequest);
-        classAccessGuard.requireMemberOrTeacher(chapter.getClassId(), currentUserId, httpRequest);
+        classAccessGuard.requireMemberOrTeacher(chapter.getClassId(), userId);
 
         return toResponse(chapter);
     }
 
-    public ChapterResponse update(HttpServletRequest httpRequest,
+    public ChapterResponse update(String userId,
                                   String chapterId,
                                   ChapterRequest request) {
-
-        String currentUserId = authUtils.getUserId(httpRequest);
-
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
-        checkTeacherPermission(chapter.getClassId(), currentUserId);
+        checkTeacherPermission(chapter.getClassId(), userId);
 
         if (request.getClassId() != null &&
                 !request.getClassId().equals(chapter.getClassId())) {
@@ -119,14 +109,11 @@ public class ChapterService {
     }
 
     @Transactional
-    public void delete(HttpServletRequest httpRequest, String chapterId) {
-
-        String currentUserId = authUtils.getUserId(httpRequest);
-
+    public void delete(String userId, String chapterId) {
         Chapter chapter = chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new NotFoundException("Chapter not found"));
 
-        checkTeacherPermission(chapter.getClassId(), currentUserId);
+        checkTeacherPermission(chapter.getClassId(), userId);
 
         questionService.cascadeDeleteQuestionsByChapter(chapterId);
 

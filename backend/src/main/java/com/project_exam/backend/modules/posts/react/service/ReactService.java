@@ -7,8 +7,6 @@ import com.project_exam.backend.modules.posts.react.domain.React;
 import com.project_exam.backend.modules.posts.react.mapper.ReactMapper;
 import com.project_exam.backend.modules.posts.post.repository.PostRepository;
 import com.project_exam.backend.modules.posts.react.repository.ReactRepository;
-import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,16 +21,13 @@ public class ReactService {
 
     private final ReactRepository reactRepository;
     private final PostRepository postRepository;
-    private final AuthUtils authUtils;
     private final ReactMapper reactMapper;
 
     @Transactional
-    public ReactSummaryResponse toggleReact(String postId, ReactRequest request,
-                                            HttpServletRequest httpRequest) {
+    public ReactSummaryResponse toggleReact(String postId, ReactRequest request, String userId) {
         if (!postRepository.existsById(postId)) {
             throw new NotFoundException("Post không tồn tại");
         }
-        String userId = authUtils.getUserId(httpRequest);
         Optional<React> existing = reactRepository.findByPostIdAndUserId(postId, userId);
 
         if (existing.isPresent()) {
@@ -58,11 +53,10 @@ public class ReactService {
         return buildSummary(postId, userId);
     }
 
-    public ReactSummaryResponse getReactSummary(String postId, HttpServletRequest httpRequest) {
+    public ReactSummaryResponse getReactSummary(String postId, String currentUserId) {
         if (!postRepository.existsById(postId)) {
             throw new NotFoundException("Post không tồn tại");
         }
-        String currentUserId = tryGetUserId(httpRequest);
         return buildSummary(postId, currentUserId);
     }
 
@@ -84,13 +78,5 @@ public class ReactService {
         }
 
         return reactMapper.toSummary(counts, currentUserReactType, total);
-    }
-
-    private String tryGetUserId(HttpServletRequest httpRequest) {
-        try {
-            return authUtils.getUserId(httpRequest);
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

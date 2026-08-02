@@ -23,7 +23,6 @@ import com.project_exam.backend.modules.users.user.service.AdminUserProvider;
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -56,7 +55,7 @@ public class TestQuestionAssignmentService {
     }
 
     @Transactional
-    public void addQuestionsToTestPart(AddQuestionsToTestRequest request, HttpServletRequest httpRequest) {
+    public void addQuestionsToTestPart(AddQuestionsToTestRequest request, String currentUserId) {
         if (request.getTestPartId() == null || request.getQuestionIds() == null || request.getQuestionIds().isEmpty()) {
             throw new BadRequestException("testPartId và questionIds không được rỗng.");
         }
@@ -65,7 +64,6 @@ public class TestQuestionAssignmentService {
                 .orElseThrow(() -> new NotFoundException("TestPart không tồn tại: " + testPartId));
         Test parentTest = testRepository.findById(testPart.getTestId())
                 .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testPart.getTestId()));
-        String currentUserId = authUtils.getUserId(httpRequest);
         boolean isOwner = currentUserId != null && currentUserId.equals(parentTest.getCreatedBy());
         boolean isAdmin = authUtils.hasPermission(PermissionCatalog.TEST_MANAGE);
         if (!isOwner && !isAdmin) {
@@ -111,7 +109,7 @@ public class TestQuestionAssignmentService {
         }
     }
 
-    public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId, HttpServletRequest httpRequest) {
+    public AddRandomQuestionsResponse addRandomQuestionsToTestPart(AddRandomQuestionsToTestRequest request, String currentUserId) {
         if (request.getTestPartId() == null || request.getCount() == null || request.getCount() <= 0) {
             throw new BadRequestException("testPartId và count (số câu) phải hợp lệ.");
         }
@@ -139,7 +137,7 @@ public class TestQuestionAssignmentService {
         }
 
         if (request.getClassId() != null) {
-            classAccessGuard.requireMemberOrTeacher(request.getClassId(), currentUserId, httpRequest);
+            classAccessGuard.requireMemberOrTeacher(request.getClassId(), currentUserId);
             classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
         }
         String examPartId = testPart.getExamPartId();

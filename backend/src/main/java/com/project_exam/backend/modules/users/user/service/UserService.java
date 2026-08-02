@@ -49,7 +49,6 @@ import com.project_exam.backend.modules.classroom.chapter.repository.*;
 import com.project_exam.backend.modules.classroom.member.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -266,14 +265,11 @@ public class UserService {
         );
     }
 
-    public ProfileOverviewResponse getMyProfileOverview(HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+    public ProfileOverviewResponse getMyProfileOverview(String userId) {
         return getProfileOverview(userId);
     }
 
-    public ProfileActivityResponse getMyActivity(HttpServletRequest httpRequest, String monthParam, String yearParam) {
-        String userId = authUtils.getUserId(httpRequest);
-
+    public ProfileActivityResponse getMyActivity(String userId, String monthParam, String yearParam) {
         java.time.YearMonth currentMonth = java.time.YearMonth.now();
         int currentYear = currentMonth.getYear();
 
@@ -383,18 +379,15 @@ public class UserService {
         return minutes;
     }
 
-    public Optional<User> getUserCurrent(HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+    public Optional<User> getUserCurrent(String userId) {
         return userRepository.findById(userId);
     }
 
-    public Optional<UserResponse> getUserCurrentResponse(HttpServletRequest httpRequest) {
-        return getUserCurrent(httpRequest).map(this::toResponse);
+    public Optional<UserResponse> getUserCurrentResponse(String userId) {
+        return getUserCurrent(userId).map(this::toResponse);
     }
 
-    public boolean deleteUser(String id, HttpServletRequest httpRequest) {
-
-        String currentUserId = authUtils.getUserId(httpRequest);
+    public boolean deleteUser(String id, String currentUserId) {
         boolean isSelf = currentUserId != null && currentUserId.equals(id);
         if (!isSelf && !authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá user này.");
@@ -405,14 +398,13 @@ public class UserService {
         }).orElse(false);
     }
 
-    public void requireAdminToManageUsers(HttpServletRequest httpRequest) {
+    public void requireAdminToManageUsers() {
         if (!authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được thao tác trực tiếp trên user.");
         }
     }
 
-    public void requireSelfOrAdminForUser(String targetUserId, HttpServletRequest httpRequest) {
-        String currentUserId = authUtils.getUserId(httpRequest);
+    public void requireSelfOrAdminForUser(String targetUserId, String currentUserId) {
         boolean isSelf = currentUserId != null && currentUserId.equals(targetUserId);
         if (!isSelf && !authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
             throw new ForbiddenException("Bạn chỉ có thể thao tác trên tài khoản của chính mình.");

@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.vocabulary.album.controller;
 import com.project_exam.backend.modules.vocabulary.album.dto.VocabularyAlbumRequest;
 import com.project_exam.backend.modules.vocabulary.album.dto.VocabularyAlbumResponse;
 import com.project_exam.backend.modules.vocabulary.album.service.VocabularyAlbumService;
+import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 public class VocabularyAlbumController {
 
     private final VocabularyAlbumService service;
+    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<List<VocabularyAlbumResponse>> getAll() {
@@ -32,7 +34,8 @@ public class VocabularyAlbumController {
             @RequestBody VocabularyAlbumRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(service.create(request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(service.create(request, userId));
     }
 
     @PutMapping("/{id}")
@@ -41,17 +44,20 @@ public class VocabularyAlbumController {
             @RequestBody VocabularyAlbumRequest request,
             HttpServletRequest httpRequest
     ) {
-        return ResponseEntity.ok(service.update(id, request, httpRequest));
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(service.update(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        service.delete(id, httpRequest);
+        String userId = authUtils.getUserId(httpRequest);
+        service.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/my-albums")
-    public ResponseEntity<List<VocabularyAlbumResponse>> getMyAlbums(HttpServletRequest request) {
-        return ResponseEntity.ok(service.findAllByUserId(request));
+    public ResponseEntity<List<VocabularyAlbumResponse>> getMyAlbums(HttpServletRequest httpRequest) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(service.findAllByUserId(userId));
     }
 }

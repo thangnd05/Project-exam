@@ -17,7 +17,6 @@ import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import com.project_exam.backend.modules.assessment.test.service.TestCommandService;
 import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,14 +40,12 @@ public class ClassService {
     private final ClassMapper classMapper;
 
     @Transactional
-    public ClassResponse createClass(ClassRequest request, HttpServletRequest httpRequest) {
-        String currentUserId = authUtils.getUserId(httpRequest);
-
+    public ClassResponse createClass(ClassRequest request, String userId) {
         ClassEntity clazz = ClassEntity.builder()
                 .className(request.getClassName())
                 .classQr(generateUniqueClassQr())
                 .description(request.getDescription())
-                .teacherId(currentUserId)
+                .teacherId(userId)
                 .createdAt(Instant.now())
                 .build();
 
@@ -62,9 +59,8 @@ public class ClassService {
                 .toList();
     }
 
-    public List<ClassSimpleResponse> getMyClasses(HttpServletRequest request) {
-        String teacherId = authUtils.getUserId(request);
-        return classRepository.findByTeacherId(teacherId).stream()
+    public List<ClassSimpleResponse> getMyClasses(String userId) {
+        return classRepository.findByTeacherId(userId).stream()
                 .map(classMapper::toSimpleResponse)
                 .toList();
     }
@@ -76,12 +72,11 @@ public class ClassService {
     }
 
     @Transactional
-    public void deleteClass(String classId, HttpServletRequest httpRequest) {
+    public void deleteClass(String classId, String userId) {
         ClassEntity existing = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found!"));
 
-        String currentUserId = authUtils.getUserId(httpRequest);
-        boolean isTeacher = currentUserId != null && currentUserId.equals(existing.getTeacherId());
+        boolean isTeacher = userId != null && userId.equals(existing.getTeacherId());
         if (!isTeacher && !authUtils.hasPermission(PermissionCatalog.CLASS_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá lớp này.");
         }
@@ -99,17 +94,12 @@ public class ClassService {
         classRepository.deleteById(classId);
     }
 
-    public String getCurrentTeacherId(HttpServletRequest request) {
-        return authUtils.getUserId(request);
-    }
-
     @Transactional
-    public ClassResponse updateClass(String classId, ClassRequest request, HttpServletRequest httpRequest) {
-        String currentUserId = authUtils.getUserId(httpRequest);
+    public ClassResponse updateClass(String classId, ClassRequest request, String userId) {
         ClassEntity existing = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
-        if (!existing.getTeacherId().equals(currentUserId)) {
+        if (!existing.getTeacherId().equals(userId)) {
             throw new ForbiddenException("You are not authorized to update this class!");
         }
 

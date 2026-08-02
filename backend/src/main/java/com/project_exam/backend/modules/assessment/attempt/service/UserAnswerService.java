@@ -68,7 +68,7 @@ public class UserAnswerService {
         return userAnswerRepository.findAll();
     }
 
-    public List<UserAnswerResponse> findAllResponses(jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public List<UserAnswerResponse> findAllResponses() {
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được xem toàn bộ đáp án.");
         }
@@ -81,12 +81,11 @@ public class UserAnswerService {
         return userAnswerRepository.findById(id);
     }
 
-    public Optional<UserAnswerResponse> findResponseById(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public Optional<UserAnswerResponse> findResponseById(String id, String currentUserId) {
         return findById(id).map(ua -> {
             if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
                 UserTest ut = userTestRepository.findById(ua.getUserTestId())
                         .orElseThrow(() -> new NotFoundException("UserTest not found"));
-                String currentUserId = authUtils.getUserId(httpRequest);
                 boolean isAttemptOwner = currentUserId != null && currentUserId.equals(ut.getUserId());
                 boolean isTestOwner = false;
                 if (!isAttemptOwner && currentUserId != null) {
@@ -105,12 +104,11 @@ public class UserAnswerService {
         return userAnswerRepository.findByUserTestId(userTestId);
     }
 
-    public List<UserAnswerResponse> findResponsesByUserTestId(String userTestId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public List<UserAnswerResponse> findResponsesByUserTestId(String userTestId, String currentUserId) {
 
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             UserTest ut = userTestRepository.findById(userTestId)
                     .orElseThrow(() -> new NotFoundException("UserTest not found"));
-            String currentUserId = authUtils.getUserId(httpRequest);
             boolean isAttemptOwner = currentUserId != null && currentUserId.equals(ut.getUserId());
             boolean isTestOwner = false;
             if (!isAttemptOwner && currentUserId != null) {
@@ -130,7 +128,7 @@ public class UserAnswerService {
         return userAnswerRepository.findByQuestionId(questionId);
     }
 
-    public List<UserAnswerResponse> findResponsesByQuestionId(String questionId, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public List<UserAnswerResponse> findResponsesByQuestionId(String questionId) {
         if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
             throw new ForbiddenException("Chỉ admin được liệt kê đáp án theo câu hỏi.");
         }
@@ -340,11 +338,10 @@ public class UserAnswerService {
                 .toList();
     }
 
-    public boolean delete(String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
+    public boolean delete(String id, String currentUserId) {
         return userAnswerRepository.findById(id).map(u -> {
 
             if (!authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
-                String currentUserId = authUtils.getUserId(httpRequest);
                 UserTest ut = userTestRepository.findById(u.getUserTestId())
                         .orElseThrow(() -> new NotFoundException("UserTest not found"));
                 if (currentUserId == null || !currentUserId.equals(ut.getUserId())) {

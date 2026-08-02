@@ -13,7 +13,6 @@ import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.mapper.TestMapper;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +63,7 @@ public class TestPartService {
     }
 
     @Transactional
-    public TestPart save(TestPartRequest dto, HttpServletRequest request) {
+    public TestPart save(TestPartRequest dto, String currentUserId) {
 
         if (dto.getTestId() == null) {
             throw new BadRequestException("Test ID không được để trống!");
@@ -73,7 +72,6 @@ public class TestPartService {
         Test test = testRepository.findById(dto.getTestId())
                 .orElseThrow(() -> new NotFoundException("Bài test không tồn tại!"));
 
-        String currentUserId = authUtils.getUserId(request);
         if (currentUserId == null) {
             throw new ForbiddenException("Chưa xác định được người dùng.");
         }
@@ -91,19 +89,18 @@ public class TestPartService {
     }
 
     @Transactional
-    public TestPartSimpleResponse saveResponse(TestPartRequest dto, HttpServletRequest request) {
-        return toResponse(save(dto, request));
+    public TestPartSimpleResponse saveResponse(TestPartRequest dto, String currentUserId) {
+        return toResponse(save(dto, currentUserId));
     }
 
     @Transactional
-    public TestPart update(String id, TestPartRequest dto, HttpServletRequest request) {
+    public TestPart update(String id, TestPartRequest dto, String currentUserId) {
         TestPart existing = testPartRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy Part để cập nhật"));
 
         Test test = testRepository.findById(existing.getTestId())
                 .orElseThrow(() -> new NotFoundException("Bài test không tồn tại!"));
 
-        String currentUserId = authUtils.getUserId(request);
         boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền sửa part của đề này.");
@@ -116,18 +113,17 @@ public class TestPartService {
     }
 
     @Transactional
-    public TestPartSimpleResponse updateResponse(String id, TestPartRequest dto, HttpServletRequest request) {
-        return toResponse(update(id, dto, request));
+    public TestPartSimpleResponse updateResponse(String id, TestPartRequest dto, String currentUserId) {
+        return toResponse(update(id, dto, currentUserId));
     }
 
     @Transactional
-    public void deleteById(String id, HttpServletRequest request) {
+    public void deleteById(String id, String currentUserId) {
         TestPart existing = testPartRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy Part để xóa"));
         Test test = testRepository.findById(existing.getTestId())
                 .orElseThrow(() -> new NotFoundException("Bài test không tồn tại!"));
 
-        String currentUserId = authUtils.getUserId(request);
         boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xóa part của đề này.");

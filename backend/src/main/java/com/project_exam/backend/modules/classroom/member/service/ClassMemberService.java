@@ -15,8 +15,6 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
-import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -31,26 +29,24 @@ import java.util.stream.Collectors;
 public class ClassMemberService {
 
     private final ClassMemberRepository classMemberRepository;
-    private final AuthUtils authUtils;
     private final ClassRepository classRepository;
     private final UserRepository userRepository;
     private final ClassMemberMapper classMemberMapper;
     private final ClassMapper classMapper;
 
     @Transactional
-    public ClassMemberResponse joinClassByQr(String classQr, HttpServletRequest request) {
-        String currentUserId = authUtils.getUserId(request);
+    public ClassMemberResponse joinClassByQr(String classQr, String userId) {
         ClassEntity clazz = classRepository.findByClassQr(classQr)
                 .orElseThrow(() -> new NotFoundException("Class not found with QR: " + classQr));
         String classId = clazz.getClassId();
 
-        if (classMemberRepository.existsByClassIdAndUserId(classId, currentUserId)) {
+        if (classMemberRepository.existsByClassIdAndUserId(classId, userId)) {
             throw new BadRequestException("You have already requested or joined this class!");
         }
 
         ClassMember member = ClassMember.builder()
                 .classId(classId)
-                .userId(currentUserId)
+                .userId(userId)
                 .status(MemberStatus.PENDING)
                 .joinedAt(Instant.now())
                 .build();
@@ -60,9 +56,7 @@ public class ClassMemberService {
     }
 
     @Transactional
-    public void approveSingle(String classId, String userId, HttpServletRequest request) {
-        String currentUserId = authUtils.getUserId(request);
-
+    public void approveSingle(String classId, String targetUserId, String currentUserId) {
         ClassEntity clazz = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
@@ -70,16 +64,14 @@ public class ClassMemberService {
             throw new ForbiddenException("You are not authorized to approve this class!");
         }
 
-        int updated = classMemberRepository.approveSingle(classId, userId);
+        int updated = classMemberRepository.approveSingle(classId, targetUserId);
         if (updated == 0) {
             throw new BadRequestException("Member not found or already approved!");
         }
     }
 
     @Transactional
-    public int approveAll(String classId, HttpServletRequest request) {
-        String currentUserId = authUtils.getUserId(request);
-
+    public int approveAll(String classId, String currentUserId) {
         ClassEntity clazz = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
@@ -127,15 +119,12 @@ public class ClassMemberService {
     }
 
     @Transactional
-    public void leaveClass(String classId, HttpServletRequest request) {
-        String currentUserId = authUtils.getUserId(request);
-        classMemberRepository.removeStudent(classId, currentUserId);
+    public void leaveClass(String classId, String userId) {
+        classMemberRepository.removeStudent(classId, userId);
     }
 
     @Transactional
-    public void removeMember(String classId, String userId, HttpServletRequest request) {
-        String currentUserId = authUtils.getUserId(request);
-
+    public void removeMember(String classId, String targetUserId, String currentUserId) {
         ClassEntity clazz = classRepository.findById(classId)
                 .orElseThrow(() -> new NotFoundException("Class not found with ID: " + classId));
 
@@ -143,16 +132,14 @@ public class ClassMemberService {
             throw new ForbiddenException("You are not authorized to remove members from this class!");
         }
 
-        classMemberRepository.removeStudent(classId, userId);
+        classMemberRepository.removeStudent(classId, targetUserId);
     }
 
-    public Map<String, Object> getClassesOfCurrentStudent(HttpServletRequest request) {
-        String currentUserId = authUtils.getUserId(request);
-
+    public Map<String, Object> getClassesOfCurrentStudent(String userId) {
         Map<String, Object> result = new HashMap<>();
 
         List<ClassMember> classMembers =
-                classMemberRepository.findByUserIdAndStatus(currentUserId, ClassMember.MemberStatus.APPROVED);
+                classMemberRepository.findByUserIdAndStatus(userId, ClassMember.MemberStatus.APPROVED);
 
         Map<String, ClassEntity> classesById = loadClassesById(
                 classMembers.stream().map(ClassMember::getClassId).toList());
@@ -166,9 +153,8 @@ public class ClassMemberService {
                         clazz, teacherName(teachersById.get(clazz.getTeacherId()))))
                 .toList();
 
-        // Lớp mình dạy: teacherId luôn là currentUserId, chỉ cần load 1 lần.
-        String currentUserName = teacherName(userRepository.findById(currentUserId).orElse(null));
-        List<ClassStudentResponse> teachingResponses = classRepository.findByTeacherId(currentUserId).stream()
+        String currentUserName = teacherName(userRepository.findById(userId).orElse(null));
+        List<ClassStudentResponse> teachingResponses = classRepository.findByTeacherId(userId).stream()
                 .map(clazz -> classMapper.toStudentResponse(clazz, currentUserName))
                 .toList();
 

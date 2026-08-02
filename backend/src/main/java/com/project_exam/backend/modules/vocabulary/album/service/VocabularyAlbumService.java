@@ -12,7 +12,6 @@ import com.project_exam.backend.modules.vocabulary.learning.repository.UserVocab
 import com.project_exam.backend.modules.vocabulary.word.repository.VocabularyRepository;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,11 +45,8 @@ public class VocabularyAlbumService {
 
     public VocabularyAlbumResponse create(
             VocabularyAlbumRequest request,
-            HttpServletRequest httpRequest
+            String userId
     ) {
-
-        String userId = authUtils.getUserId(httpRequest);
-
         VocabularyAlbum album = new VocabularyAlbum();
         album.setName(request.getName());
         album.setDescription(request.getDescription());
@@ -61,11 +57,10 @@ public class VocabularyAlbumService {
         return toResponse(album);
     }
 
-    public VocabularyAlbumResponse update(String id, VocabularyAlbumRequest request, HttpServletRequest httpRequest) {
-
+    public VocabularyAlbumResponse update(String id, VocabularyAlbumRequest request, String userId) {
         VocabularyAlbum album = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
-        requireOwner(album, httpRequest);
+        requireOwner(album, userId);
 
         album.setName(request.getName());
         album.setDescription(request.getDescription());
@@ -75,27 +70,22 @@ public class VocabularyAlbumService {
         return toResponse(album);
     }
 
-    public void delete(String id, HttpServletRequest httpRequest) {
-
+    public void delete(String id, String userId) {
         VocabularyAlbum album = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
-        requireOwner(album, httpRequest);
+        requireOwner(album, userId);
 
         repository.delete(album);
     }
 
-    private void requireOwner(VocabularyAlbum album, HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
+    private void requireOwner(VocabularyAlbum album, String userId) {
         if (!userId.equals(album.getUserId()) && !authUtils.hasPermission(PermissionCatalog.VOCABULARY_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền thao tác album này.");
         }
     }
 
-    public List<VocabularyAlbumResponse> findAllByUserId(HttpServletRequest request) {
-
-        String currentUserId = authUtils.getUserId(request);
-
-        List<VocabularyAlbum> albums = repository.findAllByUserId(currentUserId);
+    public List<VocabularyAlbumResponse> findAllByUserId(String userId) {
+        List<VocabularyAlbum> albums = repository.findAllByUserId(userId);
         List<String> albumIds = albums.stream().map(VocabularyAlbum::getAlbumId).toList();
 
         Map<String, Long> totalMap = new HashMap<>();
@@ -104,7 +94,7 @@ public class VocabularyAlbumService {
             for (Object[] row : vocabularyRepository.countGroupedByAlbumIds(albumIds)) {
                 totalMap.put((String) row[0], (Long) row[1]);
             }
-            for (Object[] row : userVocabularyRepository.countMasteredGroupedByAlbumIds(currentUserId, albumIds)) {
+            for (Object[] row : userVocabularyRepository.countMasteredGroupedByAlbumIds(userId, albumIds)) {
                 masteredMap.put((String) row[0], (Long) row[1]);
             }
         }
