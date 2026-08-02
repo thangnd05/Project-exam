@@ -5,6 +5,7 @@ import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 
 import com.project_exam.backend.modules.classroom.member.dto.ClassMemberResponse;
+import com.project_exam.backend.modules.classroom.member.dto.MyClassesResponse;
 import com.project_exam.backend.modules.classroom.clazz.dto.ClassStudentResponse;
 import com.project_exam.backend.modules.classroom.clazz.domain.ClassEntity;
 import com.project_exam.backend.modules.classroom.member.domain.ClassMember;
@@ -135,9 +136,7 @@ public class ClassMemberService {
         classMemberRepository.removeStudent(classId, targetUserId);
     }
 
-    public Map<String, Object> getClassesOfCurrentStudent(String userId) {
-        Map<String, Object> result = new HashMap<>();
-
+    public MyClassesResponse getClassesOfCurrentStudent(String userId) {
         List<ClassMember> classMembers =
                 classMemberRepository.findByUserIdAndStatus(userId, ClassMember.MemberStatus.APPROVED);
 
@@ -158,10 +157,10 @@ public class ClassMemberService {
                 .map(clazz -> classMapper.toStudentResponse(clazz, currentUserName))
                 .toList();
 
-        result.put("teachingClasses", teachingResponses);
-        result.put("learningClasses", learningClasses);
-
-        return result;
+        return MyClassesResponse.builder()
+                .teachingClasses(teachingResponses)
+                .learningClasses(learningClasses)
+                .build();
     }
 
     private Map<String, ClassEntity> loadClassesById(Collection<String> classIds) {

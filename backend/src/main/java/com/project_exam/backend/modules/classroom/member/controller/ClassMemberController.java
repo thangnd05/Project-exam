@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.classroom.member.controller;
 import com.project_exam.backend.modules.classroom.member.dto.ClassMemberActionRequest;
 import com.project_exam.backend.modules.classroom.member.dto.ClassMemberJoinRequest;
 import com.project_exam.backend.modules.classroom.member.dto.ClassMemberResponse;
+import com.project_exam.backend.modules.classroom.member.dto.MyClassesResponse;
 import com.project_exam.backend.modules.classroom.member.service.ClassMemberService;
 import com.project_exam.backend.shared.dto.MessageResponse;
 import com.project_exam.backend.shared.exception.BadRequestException;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/class-members")
@@ -111,9 +111,8 @@ public class ClassMemberController {
     }
 
     @GetMapping("/my-classes")
-    public ResponseEntity<Map<String, Object>> getMyClasses(HttpServletRequest request) {
+    public ResponseEntity<MyClassesResponse> getMyClasses(HttpServletRequest request) {
         String userId = authUtils.getUserId(request);
-        Map<String, Object> myClasses = classMemberService.getClassesOfCurrentStudent(userId);
-        return ResponseEntity.ok(myClasses);
+        return ResponseEntity.ok(classMemberService.getClassesOfCurrentStudent(userId));
     }
 }

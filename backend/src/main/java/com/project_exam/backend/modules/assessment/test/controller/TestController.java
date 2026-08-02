@@ -6,6 +6,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.modules.assessment.test.dto.AddQuestionsToTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.AddRandomQuestionsToTestRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsResponse;
+import com.project_exam.backend.modules.assessment.test.dto.CanStartTestResponse;
 import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
@@ -28,8 +29,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tests")
@@ -240,7 +239,7 @@ public class TestController {
     }
 
     @GetMapping("/{testId}/can-start")
-    public ResponseEntity<Map<String, Object>> canStartTest(
+    public ResponseEntity<CanStartTestResponse> canStartTest(
             @PathVariable String testId,
             HttpServletRequest request
     ) {
@@ -251,9 +250,9 @@ public class TestController {
         if (test.getClassId() != null) {
             classAccessGuard.requireMemberOrTeacher(test.getClassId(), userId);
         }
-        Map<String, Object> result = testAccessService.canStartTest(userId, test);
+        CanStartTestResponse result = testAccessService.canStartTest(userId, test);
 
-        if (!(Boolean) result.get("canStart")) {
+        if (!result.isCanStart()) {
             return ResponseEntity.badRequest().body(result);
         }
 

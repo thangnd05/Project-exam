@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 @RestController
@@ -37,7 +36,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthMessageResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
@@ -64,7 +63,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<Map<String, Object>> refresh(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthMessageResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
         return ResponseEntity.ok(authService.refresh(request, response));
     }
 
@@ -75,8 +74,8 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<Map<String, Object>> verifyEmail(@RequestParam String token) {
-        return emailVerificationService.verifyToken(token);
+    public ResponseEntity<AuthMessageResponse> verifyEmail(@RequestParam String token) {
+        return ResponseEntity.ok(emailVerificationService.verifyToken(token));
     }
 
 }

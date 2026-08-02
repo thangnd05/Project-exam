@@ -112,7 +112,7 @@ public class AuthService {
         return response;
     }
 
-    public Map<String, Object> refresh(HttpServletRequest request, HttpServletResponse response) {
+    public AuthMessageResponse refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshTokenFromCookie(request);
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new UnauthorizedException("Không tìm thấy refresh token");
@@ -151,7 +151,7 @@ public class AuthService {
         setAccessTokenCookie(newAccessToken, response);
         setRefreshTokenCookie(newRefreshToken, response);
 
-        return Map.of("message", "Cấp access token mới thành công");
+        return AuthMessageResponse.builder().message("Cấp access token mới thành công").build();
     }
 
     public void logout(HttpServletRequest request, HttpServletResponse response) {
@@ -232,7 +232,7 @@ public class AuthService {
     }
 
     @Transactional
-    public Map<String, Object> register(RegisterRequest request) {
+    public AuthMessageResponse register(RegisterRequest request) {
         if (userRepository.findByUserName(request.getUserName()).isPresent())
             throw new ConflictException("Tên đăng nhập đã tồn tại");
 
@@ -263,7 +263,9 @@ public class AuthService {
             userRepository.delete(user);
             throw new BadRequestException("Không thể gửi email xác thực.");
         }
-        return Map.of("message", "Đăng ký thành công! Vui lòng kiểm tra email.");
+        return AuthMessageResponse.builder()
+                .message("Đăng ký thành công! Vui lòng kiểm tra email.")
+                .build();
     }
 
     public UserResponse me(HttpServletRequest request) {

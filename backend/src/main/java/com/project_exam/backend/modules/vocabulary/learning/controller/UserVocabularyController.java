@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.vocabulary.learning.controller;
 import com.project_exam.backend.modules.vocabulary.learning.dto.UserVocabularyRequest;
 import com.project_exam.backend.modules.vocabulary.learning.dto.UserVocabularyResponse;
 import com.project_exam.backend.modules.vocabulary.learning.service.UserVocabularyService;
+import com.project_exam.backend.shared.dto.MessageResponse;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -59,9 +60,9 @@ public class UserVocabularyController {
     }
 
     @DeleteMapping("/delete-all")
-    public ResponseEntity<String> deleteAll(HttpServletRequest httpRequest) {
+    public ResponseEntity<MessageResponse> deleteAll(HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         service.deleteAllForCurrentUser(userId);
-        return ResponseEntity.ok("Đã xóa toàn bộ từ vựng của bạn!");
+        return ResponseEntity.ok(MessageResponse.of("Đã xóa toàn bộ từ vựng của bạn!"));
     }
 }

@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.PracticeCheckRequ
 import com.project_exam.backend.modules.assessment.attempt.dto.PracticeCheckResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.PracticeQuestionResponse;
 import com.project_exam.backend.modules.vocabulary.learning.service.PracticeService;
+import com.project_exam.backend.shared.dto.MessageResponse;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +29,10 @@ public class PracticeController {
     }
 
     @PostMapping("/mark-known/{vocabId}")
-    public ResponseEntity<String> markWordKnown(@PathVariable String vocabId, HttpServletRequest httpRequest) {
+    public ResponseEntity<MessageResponse> markWordKnown(@PathVariable String vocabId, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         practiceService.markWordAsKnown(userId, vocabId);
-        return ResponseEntity.ok("Đã đánh dấu từ này là đã biết");
+        return ResponseEntity.ok(MessageResponse.of("Đã đánh dấu từ này là đã biết"));
     }
 
     @PostMapping("/check")

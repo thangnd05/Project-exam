@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.attempt.controller;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.ClaimGuestTestsResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.ActiveUserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.StartUserTestRequest;
 import com.project_exam.backend.modules.assessment.attempt.dto.StartUserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestUpdateRequest;
@@ -152,7 +153,7 @@ public class UserTestController {
     }
 
     @GetMapping("/check-active")
-    public ResponseEntity<Map<String, Object>> checkActiveUserTest(
+    public ResponseEntity<ActiveUserTestResponse> checkActiveUserTest(
             @RequestParam String testId,
             @RequestParam(required = false) String mode,
             @RequestParam(required = false) List<String> examPartIds,
@@ -160,21 +161,17 @@ public class UserTestController {
     ) {
         String userId = authUtils.getUserId(httpRequest);
         Optional<UserTest> active = userTestService.findActiveUserTest(userId, testId, mode, examPartIds);
-
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("serverNow", java.time.Instant.now().toString());
-        if (active.isPresent()) {
-            UserTest userTest = active.get();
-            response.put("userTestId", userTest.getUserTestId());
-            response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
-            response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
-        } else {
-            response.put("userTestId", null);
-            response.put("status", "NONE");
-            response.put("startedAt", null);
+        String serverNow = java.time.Instant.now().toString();
+        if (active.isEmpty()) {
+            return ResponseEntity.ok(ActiveUserTestResponse.none(serverNow));
         }
-        return ResponseEntity.ok(response);
+        UserTest userTest = active.get();
+        return ResponseEntity.ok(ActiveUserTestResponse.builder()
+                .serverNow(serverNow)
+                .userTestId(userTest.getUserTestId())
+                .status(userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN")
+                .startedAt(userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null)
+                .build());
     }
 
     @GetMapping("/my/by-test/{testId}")
@@ -234,25 +231,22 @@ public class UserTestController {
     }
 
     @GetMapping("/guest/check-active")
-    public ResponseEntity<Map<String, Object>> checkActiveGuestUserTest(
+    public ResponseEntity<ActiveUserTestResponse> checkActiveGuestUserTest(
             @RequestParam String testId,
             @RequestHeader("X-Guest-Session") String guestSessionId
     ) {
         Optional<UserTest> active = userTestService.findActiveGuestUserTest(guestSessionId, testId);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("serverNow", java.time.Instant.now().toString());
-        if (active.isPresent()) {
-            UserTest userTest = active.get();
-            response.put("userTestId", userTest.getUserTestId());
-            response.put("status", userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN");
-            response.put("startedAt", userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null);
-        } else {
-            response.put("userTestId", null);
-            response.put("status", "NONE");
-            response.put("startedAt", null);
+        String serverNow = java.time.Instant.now().toString();
+        if (active.isEmpty()) {
+            return ResponseEntity.ok(ActiveUserTestResponse.none(serverNow));
         }
-        return ResponseEntity.ok(response);
+        UserTest userTest = active.get();
+        return ResponseEntity.ok(ActiveUserTestResponse.builder()
+                .serverNow(serverNow)
+                .userTestId(userTest.getUserTestId())
+                .status(userTest.getStatus() != null ? userTest.getStatus().name() : "UNKNOWN")
+                .startedAt(userTest.getStartedAt() != null ? userTest.getStartedAt().toString() : null)
+                .build());
     }
 
     @GetMapping("/guest/{userTestId}")

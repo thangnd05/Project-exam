@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.assessment.test.service;
 
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.UserTestAccess;
+import com.project_exam.backend.modules.assessment.test.dto.CanStartTestResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import com.project_exam.backend.modules.assessment.test.repository.UserTestAccessRepository;
@@ -17,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -37,48 +36,56 @@ public class TestAccessService {
         return userTestAccessRepository.existsByUserIdAndTestId(userId, test.getTestId());
     }
 
-    public Map<String, Object> canStartTest(String userId, Test test) {
+    public CanStartTestResponse canStartTest(String userId, Test test) {
         Instant now = Instant.now();
-        Map<String, Object> result = new HashMap<>();
 
         if (test.getAvailableFrom() != null && test.getAvailableFrom().isAfter(now)) {
-            result.put("canStart", false);
-            result.put("message", "Bài kiểm tra chưa bắt đầu");
-            return result;
+            return CanStartTestResponse.builder()
+                    .canStart(false)
+                    .message("Bài kiểm tra chưa bắt đầu")
+                    .build();
         }
 
         if (test.getAvailableTo() != null && test.getAvailableTo().isBefore(now)) {
-            result.put("canStart", false);
-            result.put("message", "Bài kiểm tra đã kết thúc");
-            return result;
+            return CanStartTestResponse.builder()
+                    .canStart(false)
+                    .message("Bài kiểm tra đã kết thúc")
+                    .build();
         }
 
         int attemptsUsed = userTestRepository.countByUserIdAndTestIdAndStatus(
                 userId,
                 test.getTestId(),
                 UserTest.Status.COMPLETED
-        );        Integer maxAttempts = test.getMaxAttempts();
+        );
+        Integer maxAttempts = test.getMaxAttempts();
 
         if (maxAttempts != null && attemptsUsed >= maxAttempts) {
-            result.put("canStart", false);
-            result.put("message", "Bạn đã hết số lượt làm bài");
-            return result;
+            return CanStartTestResponse.builder()
+                    .canStart(false)
+                    .message("Bạn đã hết số lượt làm bài")
+                    .build();
         }
 
         boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
         boolean owned = hasTestAccess(test, userId);
-        result.put("costCoins", test.getCostCoins());
-        result.put("owned", owned);
-        result.put("requiresPayment", paid && !owned);
         if (paid && !owned) {
-            result.put("canStart", false);
-            result.put("message", "Bài này cần mở khoá bằng xu trước khi làm.");
-            return result;
+            return CanStartTestResponse.builder()
+                    .canStart(false)
+                    .message("Bài này cần mở khoá bằng xu trước khi làm.")
+                    .costCoins(test.getCostCoins())
+                    .owned(false)
+                    .requiresPayment(true)
+                    .build();
         }
 
-        result.put("canStart", true);
-        result.put("message", "OK");
-        return result;
+        return CanStartTestResponse.builder()
+                .canStart(true)
+                .message("OK")
+                .costCoins(test.getCostCoins())
+                .owned(owned)
+                .requiresPayment(false)
+                .build();
     }
 
     @Transactional
