@@ -30,8 +30,6 @@ const routes = {
   adminExamParts: '/admin/exam-parts',
   adminClasses: '/admin/classes',
   adminTests: '/admin/tests',
-  adminQuestions: '/admin/questions',
-  adminVocabulary: '/admin/vocabulary',
   adminCategories: '/admin/categories',
   adminQuestionCollections: '/admin/question-collections',
   adminPosts: '/admin/posts',
