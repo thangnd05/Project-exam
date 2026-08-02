@@ -148,6 +148,7 @@ public class LearningMapper {
                 .passedTasksInPart(passedTasksInPart)
                 .totalTasksInPart(totalTasksInPart)
                 .partResources(partResources)
+                .tasks(tasks)
                 .build();
     }
 
