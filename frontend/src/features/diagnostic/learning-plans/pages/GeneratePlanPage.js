@@ -7,7 +7,7 @@ import PlanPartTaskList from '../components/PlanPartTaskList';
 import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
-import { planStageLabel } from '../planLabels';
+import { buildPlanSummary, planStageLabel } from '../planLabels';
 import { getReadinessLabel } from '~/features/diagnostic/target/utils/readiness-label';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 import {
@@ -288,7 +288,7 @@ function GeneratePlanPage() {
       {result?.targetAchieved && (
         <div className={cx('alert', 'alertSuccess')}>
           <span>
-            {result.summary}
+            Bạn đã đạt mục tiêu (readiness {result.baselineReadiness ?? 0}%) — chưa cần sinh lộ trình mới.
             <br />
             <small>Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài thi thử để duy trì phong độ.</small>
           </span>
@@ -311,7 +311,7 @@ function GeneratePlanPage() {
             </button>
           </div>
           <div className={cx('cardBody')}>
-            <p>{result.summary}</p>
+            <p>{buildPlanSummary(result)}</p>
             <ul className={cx('metaList')}>
               <li><strong>Giai đoạn:</strong> {planStageLabel(result.planStage)}</li>
               <li>

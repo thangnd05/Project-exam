@@ -12,7 +12,7 @@ import { getApiBaseUrl, getFullMediaUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import { useSubmitSession } from './hooks/useSubmitSession';
-import { planStageLabel } from '../planLabels';
+import { planNoticeText, planStageLabel } from '../planLabels';
 import TestStartDashboard from '~/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
 import ProgressBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/ProgressBlock';
 import SubmitBlock from '~/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/SubmitBlock';
@@ -265,7 +265,7 @@ function PlanStudyPage() {
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertSuccess')}>
           <span>
-            {session.message}
+            Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.
             <br />
             <small>
               Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang kế hoạch —
@@ -301,8 +301,8 @@ function PlanStudyPage() {
         </div>
 
         {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
-        {session.notice && (
-          <div className={cx('alert', 'alertWarning')}>{session.notice}</div>
+        {planNoticeText(session.noticeCode) && (
+          <div className={cx('alert', 'alertWarning')}>{planNoticeText(session.noticeCode)}</div>
         )}
 
         <div className={cx('card')}>
@@ -310,7 +310,9 @@ function PlanStudyPage() {
             <h3 className={cx('title', 'pickTitle')}>
               Chọn Part và ải để học
             </h3>
-            <p className={cx('muted')} style={{ marginBottom: '1.2rem' }}>{session.message}</p>
+            <p className={cx('muted')} style={{ marginBottom: '1.2rem' }}>
+              Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.
+            </p>
             <div className={cx('actionBar')}>
               <span className={cx('badge', 'badgeMuted')}>
                 Tiến độ: {session.passedTasks}/{session.totalTasks} ải

@@ -40,8 +40,6 @@ public class PlanResponse {
 
     private Instant createdAt;
 
-    private String summary;
-
     private Integer totalTasks;
     private Integer passedTasks;
     private Integer estimatedDaysRemaining;

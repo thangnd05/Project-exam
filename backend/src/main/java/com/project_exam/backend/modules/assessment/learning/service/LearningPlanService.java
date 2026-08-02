@@ -182,7 +182,6 @@ public class LearningPlanService {
 
         return buildPlanResponse(
                 plan,
-                result,
                 candidates.size(),
                 savedTasks,
                 partsWithoutTasks,
@@ -528,7 +527,6 @@ public class LearningPlanService {
 
     private PlanResponse buildPlanResponse(
             LearningPlan plan,
-            EnhancedResultDto result,
             int taskCount,
             List<LearningPlanTask> tasks,
             List<String> partsWithoutTasks,
@@ -544,7 +542,6 @@ public class LearningPlanService {
                 plan,
                 ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()),
                 plan.getPlanStage().name(),
-                buildSummary(result, plan.getTargetScore(), estimatedDays, taskCount, partsWithoutTasks),
                 tasks.size(),
                 (int) cleared,
                 estimatedDays,
@@ -569,11 +566,6 @@ public class LearningPlanService {
                 plan,
                 ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()),
                 plan.getPlanStage() != null ? plan.getPlanStage().name() : PlanStage.FOUNDATION.name(),
-                String.format(
-                        "Plan #%s — %d/%d ải đã xong. %s",
-                        plan.getPlanSequence() != null ? plan.getPlanSequence() : "?",
-                        cleared, tasks.size(),
-                        stageLabel(plan.getPlanStage())),
                 tasks.size(),
                 (int) cleared,
                 estimatedDays,
@@ -625,10 +617,7 @@ public class LearningPlanService {
                 userId,
                 examTypeId,
                 readiness,
-                ReadinessThresholds.levelFromScore(readiness),
-                String.format(
-                        "Bạn đã đạt mục tiêu (readiness %d%%). Có thể đặt mục tiêu cao hơn hoặc làm mock kiểm tra trước khi thi thật.",
-                        readiness));
+                ReadinessThresholds.levelFromScore(readiness));
     }
 
     private void closeActivePlans(
@@ -677,39 +666,11 @@ public class LearningPlanService {
         return (int) Math.round(result.getPercentage());
     }
 
-    private String stageLabel(PlanStage stage) {
-        if (stage == null || stage == PlanStage.FOUNDATION) {
-            return "Đang ôn từng Part từng tag.";
-        }
-        if (stage == PlanStage.MOCK) {
-            return "Đã xong ải — làm mock kiểm tra readiness.";
-        }
-        return stage.name();
-    }
-
     private Integer resolveTargetScore(
             Integer requestTarget,
             Optional<UserTarget> userTargetOpt) {
         if (requestTarget != null) return requestTarget;
         return userTargetOpt.map(UserTarget::getTargetScore).orElse(null);
-    }
-
-    private String buildSummary(
-            EnhancedResultDto result,
-            Integer targetScore,
-            int estimatedDays,
-            int taskCount,
-            List<String> partsWithoutTasks) {
-        String target = targetScore == null ? "đạt mục tiêu" : "đạt " + targetScore + " điểm";
-        int readiness = resolveReadinessScore(result);
-        String base = String.format(
-                "Readiness %d%%. %d ải cho Part chưa đạt mục tiêu — ~%d ngày, để %s.",
-                readiness, taskCount, estimatedDays, target);
-        if (partsWithoutTasks == null || partsWithoutTasks.isEmpty()) {
-            return base;
-        }
-        return base + " Chưa tạo ải (thiếu tag trên câu): "
-                + String.join(", ", partsWithoutTasks) + ".";
     }
 
     private BigDecimal round2(double v) {

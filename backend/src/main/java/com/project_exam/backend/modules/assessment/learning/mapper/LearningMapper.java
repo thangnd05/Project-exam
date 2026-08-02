@@ -27,7 +27,6 @@ public class LearningMapper {
             LearningPlan plan,
             String readinessLevel,
             String planStage,
-            String summary,
             int totalTasks,
             int passedTasks,
             int estimatedDaysRemaining,
@@ -47,7 +46,6 @@ public class LearningMapper {
                 .status(plan.getStatus().name())
                 .targetAchieved(false)
                 .createdAt(plan.getCreatedAt())
-                .summary(summary)
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
                 .estimatedDaysRemaining(estimatedDaysRemaining)
@@ -60,7 +58,6 @@ public class LearningMapper {
             LearningPlan plan,
             String readinessLevel,
             String planStage,
-            String summary,
             int totalTasks,
             int passedTasks,
             int estimatedDaysRemaining,
@@ -80,7 +77,6 @@ public class LearningMapper {
                 .status(plan.getStatus().name())
                 .targetAchieved(false)
                 .createdAt(plan.getCreatedAt())
-                .summary(summary)
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
                 .estimatedDaysRemaining(estimatedDaysRemaining)
@@ -93,15 +89,13 @@ public class LearningMapper {
             String userId,
             String examTypeId,
             int baselineReadiness,
-            String readinessLevel,
-            String summary) {
+            String readinessLevel) {
         return PlanResponse.builder()
                 .userId(userId)
                 .examTypeId(examTypeId)
                 .targetAchieved(true)
                 .baselineReadiness(baselineReadiness)
                 .readinessLevel(readinessLevel)
-                .summary(summary)
                 .partGroups(List.of())
                 .partsWithoutTasks(List.of())
                 .build();
@@ -184,7 +178,6 @@ public class LearningMapper {
             int totalCount,
             int accuracy,
             boolean passed,
-            String message,
             List<SubmitSessionResponse.ReviewItem> lastReviewItems) {
         return CurrentSessionResponse.builder()
                 .mode("REVIEW")
@@ -197,7 +190,6 @@ public class LearningMapper {
                 .totalCount(totalCount)
                 .accuracy(accuracy)
                 .passed(passed)
-                .message(message)
                 .lastReviewItems(lastReviewItems)
                 .build();
     }
@@ -211,8 +203,7 @@ public class LearningMapper {
             int passAccuracyRequired,
             List<QuestionResponse> questions,
             int totalTasks,
-            int passedTasks,
-            String message) {
+            int passedTasks) {
         return CurrentSessionResponse.builder()
                 .mode("QUIZ")
                 .learningPlanId(plan.getLearningPlanId())
@@ -224,7 +215,6 @@ public class LearningMapper {
                 .questions(questions)
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
-                .message(message)
                 .build();
     }
 
@@ -232,8 +222,7 @@ public class LearningMapper {
             LearningPlan plan,
             String planStage,
             int totalTasks,
-            int passedTasks,
-            String message) {
+            int passedTasks) {
         return CurrentSessionResponse.builder()
                 .mode("MOCK")
                 .learningPlanId(plan.getLearningPlanId())
@@ -242,7 +231,6 @@ public class LearningMapper {
                 .questions(List.of())
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
-                .message(message)
                 .build();
     }
 
@@ -251,8 +239,7 @@ public class LearningMapper {
             String planStage,
             List<PlanPartGroupDto> partGroups,
             int totalTasks,
-            int passedTasks,
-            String message) {
+            int passedTasks) {
         return CurrentSessionResponse.builder()
                 .mode("PICK")
                 .learningPlanId(plan.getLearningPlanId())
@@ -262,7 +249,6 @@ public class LearningMapper {
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
                 .questions(List.of())
-                .message(message)
                 .build();
     }
 
@@ -274,7 +260,6 @@ public class LearningMapper {
             boolean passed,
             String taskStatus,
             String planStage,
-            String message,
             List<SubmitSessionResponse.ReviewItem> reviewItems) {
         return SubmitSessionResponse.builder()
                 .sessionId(sessionId)
@@ -284,7 +269,6 @@ public class LearningMapper {
                 .passed(passed)
                 .taskStatus(taskStatus)
                 .planStage(planStage)
-                .message(message)
                 .reviewItems(reviewItems)
                 .build();
     }

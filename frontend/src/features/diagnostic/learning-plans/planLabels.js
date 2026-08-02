@@ -17,6 +17,20 @@ export const PLAN_STAGE_LABEL = {
   MOCK: 'Thi thử',
 };
 
+// Map mã noticeCode từ BE (trạng thái) sang câu chữ hiển thị.
+export const PLAN_NOTICE_TEXT = {
+  EMPTY_POOL_SKIPPED: 'Ải này chưa có câu hỏi nào trong kho nên đã được bỏ qua — hãy chọn ải khác.',
+  EMPTY_POOL_RETRY: 'Ải này hiện chưa có câu hỏi để luyện lại. Hãy chọn ải khác.',
+};
+
+export const planNoticeText = (code) => PLAN_NOTICE_TEXT[code] || null;
+
+/** Câu tóm tắt cho lộ trình vừa sinh — ghép từ số liệu trong PlanResponse. */
+export function buildPlanSummary(plan) {
+  const target = plan.targetScore == null ? 'đạt mục tiêu' : `đạt ${plan.targetScore} điểm`;
+  return `Readiness ${plan.baselineReadiness ?? 0}%. ${plan.totalTasks ?? 0} ải cho Part chưa đạt mục tiêu — ~${plan.estimatedDaysRemaining ?? 0} ngày, để ${target}.`;
+}
+
 export const planStatusLabel = (status) => PLAN_STATUS_LABEL[status] || status || '—';
 
 export const planStatusVariant = (status) => PLAN_STATUS_VARIANT[status] || 'badgeMuted';

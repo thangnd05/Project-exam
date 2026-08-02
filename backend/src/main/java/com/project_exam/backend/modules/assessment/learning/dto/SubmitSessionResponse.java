@@ -18,7 +18,6 @@ public class SubmitSessionResponse {
     private boolean passed;
     private String taskStatus;
     private String planStage;
-    private String message;
     private List<ReviewItem> reviewItems;
 
     @Getter

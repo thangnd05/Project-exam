@@ -134,9 +134,7 @@ public class LearningPlanSessionService {
             }
 
             CurrentSessionResponse response = buildPickResponse(plan, plan.getPlanStage());
-            response.setNotice(skipped
-                    ? "Ải này chưa có câu hỏi nào trong kho nên đã được bỏ qua — hãy chọn ải khác."
-                    : "Ải này hiện chưa có câu hỏi để luyện lại. Hãy chọn ải khác.");
+            response.setNoticeCode(skipped ? "EMPTY_POOL_SKIPPED" : "EMPTY_POOL_RETRY");
             return response;
         }
 
@@ -207,7 +205,6 @@ public class LearningPlanSessionService {
                 total,
                 accuracy,
                 passed,
-                accuracy + "% (" + correct + "/" + total + " đúng)",
                 reviewItems);
     }
 
@@ -346,10 +343,6 @@ public class LearningPlanSessionService {
             }
         }
 
-        String message = passed
-                ? "Chúc mừng! Bạn đã vượt ải này."
-                : "Chưa đạt ngưỡng " + passRequired + "%. Hãy đọc lại tài liệu và thử lại.";
-
         List<SubmitSessionResponse.ReviewItem> reviewItems =
                 buildReviewItems(sessionQuestions, rows, correctByQuestion);
 
@@ -361,7 +354,6 @@ public class LearningPlanSessionService {
                 passed,
                 taskStatus,
                 effectiveStage(plan).name(),
-                message,
                 reviewItems);
     }
 
@@ -641,8 +633,7 @@ public class LearningPlanSessionService {
                 resolvePassAccuracy(plan, session),
                 questionDtos,
                 (int) total,
-                (int) cleared,
-                formatSessionMessage(activeTaskDto));
+                (int) cleared);
     }
 
     /** Đoạn văn + media (audio/ảnh) kèm câu hỏi, để FE hiển thị được câu Reading/Listening. */
@@ -677,8 +668,7 @@ public class LearningPlanSessionService {
                 plan,
                 PlanStage.MOCK.name(),
                 (int) total,
-                (int) cleared,
-                "Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.");
+                (int) cleared);
     }
 
     private CurrentSessionResponse buildPickResponse(LearningPlan plan, PlanStage stage) {
@@ -692,27 +682,12 @@ public class LearningPlanSessionService {
                 (stage != null ? stage : PlanStage.FOUNDATION).name(),
                 taskViewAssembler.buildPartGroups(taskEntities, lookups),
                 taskEntities.size(),
-                (int) cleared,
-                "Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.");
+                (int) cleared);
     }
 
     private long countClearedTasks(String learningPlanId) {
         return taskRepository.countByLearningPlanIdAndStatus(learningPlanId, TaskStatus.PASSED)
                 + taskRepository.countByLearningPlanIdAndStatus(learningPlanId, TaskStatus.SKIPPED);
-    }
-
-    private String formatSessionMessage(PlanTaskDto active) {
-        if (active != null && active.getExamPartName() != null) {
-            int target = active.getTargetQuestionCount() != null
-                    ? active.getTargetQuestionCount()
-                    : LearningPlanQuestionTargets.TAG_TARGET;
-            return String.format(
-                    "Đang ôn %s — %s (mục tiêu %d câu, chỉ Part này).",
-                    active.getExamPartName(),
-                    active.getTagName(),
-                    target);
-        }
-        return "Đọc tài liệu, sau đó làm quiz của đúng Part/tag hiện tại.";
     }
 
     private RecommendedResourceDto toResourceDto(RecoveryResource r) {

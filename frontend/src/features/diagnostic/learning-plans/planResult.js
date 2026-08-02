@@ -6,7 +6,6 @@ export function toPlanResult(data) {
     accuracy: data.accuracy ?? 0,
     correctCount: data.correctCount ?? 0,
     totalCount: data.totalCount ?? 0,
-    message: data.message,
     planStage: data.planStage,
   };
 }
