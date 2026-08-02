@@ -57,9 +57,15 @@ export function useUserTargetData(selectedExamTypeId) {
 }
 
 export function useCurrentUserTarget(selectedExamTypeId) {
-  return useQuery({
+  const query = useQuery({
     queryKey: userTargetKeys.current(selectedExamTypeId),
     queryFn: () => getUserTarget(selectedExamTypeId),
     enabled: !!selectedExamTypeId,
   });
+
+  return {
+    target: query.data ?? null,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }

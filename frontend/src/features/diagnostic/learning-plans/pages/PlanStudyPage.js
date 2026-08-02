@@ -127,14 +127,11 @@ function PlanStudyPage() {
   const submitMutation = useSubmitSession();
   const submitting = submitMutation.isPending;
 
-  const sessionQuery = usePlanSession(learningPlanId, taskIdFromUrl);
+  const { session, isLoading: loading, error: loadError } = usePlanSession(
+    learningPlanId,
+    taskIdFromUrl,
+  );
 
-  const session = sessionQuery.data ?? null;
-
-  const loading = sessionQuery.isLoading;
-  const loadError = sessionQuery.error
-    ? sessionQuery.error?.response?.data?.message || sessionQuery.error.message
-    : null;
   const error = formError || loadError;
 
   useEffect(() => {

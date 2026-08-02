@@ -84,17 +84,16 @@ function ExamTypeLayoutEditorPage() {
   const saveLayout = useUpdateExamTypeLayout();
   const saving = saveLayout.isPending;
 
-  const examTypeQuery = useExamTypeById(examTypeId);
-  const examTypeName = examTypeQuery.data?.name || '';
+  const { examType } = useExamTypeById(examTypeId);
+  const examTypeName = examType?.name || '';
 
-  const layoutQuery = useOwnExamTypeLayout(examTypeId);
-  const loading = layoutQuery.isLoading;
+  const { layout, isLoading: loading } = useOwnExamTypeLayout(examTypeId);
 
   useEffect(() => {
-    if (layoutQuery.data !== undefined) {
-      setConfig(resolveLayoutConfig(layoutQuery.data));
+    if (layout !== undefined) {
+      setConfig(resolveLayoutConfig(layout));
     }
-  }, [layoutQuery.data]);
+  }, [layout]);
 
   const updateBlocks = useCallback((fn) => {
     setConfig((c) => ({ ...c, blocks: normalizeOrders(fn(c.blocks)) }));

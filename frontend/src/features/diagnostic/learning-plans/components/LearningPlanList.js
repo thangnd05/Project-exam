@@ -40,11 +40,11 @@ const LearningPlanList = forwardRef(function LearningPlanList(
   const {
     examTypes,
     plans,
-    loading,
+    isLoading: loading,
     error,
     filterExamTypeId,
     setFilterExamTypeId,
-    reload,
+    refetch: reload,
   } = useLearningPlanList({
     loadAll,
     examTypeId: isControlled ? examTypeId : undefined,

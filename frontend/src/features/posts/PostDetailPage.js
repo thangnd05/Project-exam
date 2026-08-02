@@ -45,17 +45,15 @@ function PostDetailPage() {
   const [replyIndentPx, setReplyIndentPx] = useState(40);
   const [expandedReplies, setExpandedReplies] = useState({});
 
-  const postQuery = usePostDetail(postId);
-  const commentsQuery = usePostComments(postId);
-
-  const post = postQuery.data;
-  const loading = postQuery.isLoading;
-  const isError = postQuery.isError;
-  const comments = commentsQuery.data || [];
+  const { post, isLoading: loading, isError, refetch } = usePostDetail(postId);
+  const { comments = [] } = usePostComments(postId);
 
   const categoryId = post?.categories?.[0]?.id;
-  const relatedQuery = useRelatedPosts({ categoryId, postId, enabled: !!categoryId });
-  const relatedPosts = relatedQuery.data || [];
+  const { relatedPosts = [] } = useRelatedPosts({
+    categoryId,
+    postId,
+    enabled: !!categoryId,
+  });
 
   const reloadComments = () =>
     queryClient.invalidateQueries({ queryKey: postsKeys.comments(postId) });
@@ -401,7 +399,7 @@ function PostDetailPage() {
           <ButtonPrime variant="outline" onClick={() => navigate(routes.posts || '/posts')}>
             Về danh sách
           </ButtonPrime>
-          <ButtonPrime onClick={() => postQuery.refetch()}>Thử lại</ButtonPrime>
+          <ButtonPrime onClick={() => refetch()}>Thử lại</ButtonPrime>
         </div>
       </div>
     );

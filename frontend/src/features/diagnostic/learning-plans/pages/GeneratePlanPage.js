@@ -36,24 +36,20 @@ function GeneratePlanPage() {
   );
   const [listRefreshKey, setListRefreshKey] = useState(0);
 
-  const examTypesQuery = useExamTypes();
-  const examTypes = examTypesQuery.data ?? [];
+  const { examTypes } = useExamTypes();
 
-  const userTestsQuery = useCompletedUserTests();
-  const userTests = userTestsQuery.data ?? [];
-  const loadingList = userTestsQuery.isLoading;
-  const userTestsError = userTestsQuery.isError
-    ? userTestsQuery.error?.response?.data?.message || userTestsQuery.error?.message
-    : null;
+  const {
+    userTests,
+    isLoading: loadingList,
+    error: userTestsError,
+  } = useCompletedUserTests();
 
-  const targetQuery = useUserTarget(sourceExamTypeId);
-  const userTarget = targetQuery.data ?? null;
-  const loadingTarget = targetQuery.isLoading;
-  const targetError = targetQuery.isError
-    ? targetQuery.error?.response?.data?.message
-      || targetQuery.error?.message
-      || 'Không tải được mục tiêu'
-    : null;
+  const {
+    userTarget,
+    isLoading: loadingTarget,
+    error: targetError,
+    refetch: refetchTarget,
+  } = useUserTarget(sourceExamTypeId);
 
   const generatePlanMutation = useGeneratePlanMutation();
   const submitting = generatePlanMutation.isPending;
@@ -177,7 +173,7 @@ function GeneratePlanPage() {
           <button
             type="button"
             className={cx('btn', 'btnPrimary', 'btnSm')}
-            onClick={() => targetQuery.refetch()}
+            onClick={() => refetchTarget()}
           >
             Thử lại
           </button>

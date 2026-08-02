@@ -27,7 +27,8 @@ export function usePlanComparison(examTypeId) {
   return {
     examTypes: examTypesQuery.data ?? [],
     plans: plansQuery.data ?? [],
-    loading: plansQuery.isLoading,
+    isLoading: plansQuery.isLoading,
+    isError: plansQuery.isError,
     error: plansQuery.error
       ? plansQuery.error?.response?.data?.message || plansQuery.error.message
       : null,

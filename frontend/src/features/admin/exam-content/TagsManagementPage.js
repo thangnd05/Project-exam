@@ -97,8 +97,7 @@ function TagsManagementPage() {
   const [expandedIds, setExpandedIds] = useState(new Set());
   const [preserveExpandedOnRefetch, setPreserveExpandedOnRefetch] = useState(false);
 
-  const examTypesQuery = useAdminExamTypesForTags();
-  const examTypes = examTypesQuery.data ?? [];
+  const { examTypes = [] } = useAdminExamTypesForTags();
 
   const {
     tagTree,

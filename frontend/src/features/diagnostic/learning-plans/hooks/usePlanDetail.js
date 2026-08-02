@@ -14,7 +14,8 @@ export function usePlanDetail(learningPlanId) {
 
   return {
     plan: query.data ?? null,
-    loading: query.isLoading,
+    isLoading: query.isLoading,
+    isError: query.isError,
     error: query.error
       ? query.error?.response?.data?.message || query.error.message
       : null,

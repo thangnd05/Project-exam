@@ -13,7 +13,7 @@ const cmx = classNames.bind(commonModalStyles);
 const cx = classNames.bind(styles);
 
 function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
-  const { data: userInfo, isLoading: loading, isError } = useMyInfo(show);
+  const { userInfo, isLoading: loading, isError } = useMyInfo(show);
   const updateProfileMutation = useUpdateProfile();
   const submitting = updateProfileMutation.isPending;
 

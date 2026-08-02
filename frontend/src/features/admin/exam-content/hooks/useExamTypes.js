@@ -37,19 +37,31 @@ export function useExamTypes() {
 }
 
 export function useExamTypeById(examTypeId) {
-  return useQuery({
+  const query = useQuery({
     queryKey: examTypeKeys.detail(examTypeId),
     queryFn: () => getExamTypeById(examTypeId),
     enabled: !!examTypeId,
   });
+
+  return {
+    examType: query.data ?? null,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function useOwnExamTypeLayout(examTypeId) {
-  return useQuery({
+  const query = useQuery({
     queryKey: examTypeKeys.layout(examTypeId),
     queryFn: () => getOwnExamTypeLayout(examTypeId),
     enabled: !!examTypeId,
   });
+
+  return {
+    layout: query.data,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function useUpdateExamTypeLayout({onSuccess, onError} = {}) {

@@ -32,7 +32,13 @@ const PostsManagementPage = () => {
     const PAGE_SIZE = 10;
     const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
-    const postsQuery = usePosts({
+    const {
+        posts,
+        totalPages,
+        totalElements,
+        isLoading: loading,
+        isError,
+    } = usePosts({
         page: currentPage,
         size: PAGE_SIZE,
         status: statusFilter,
@@ -41,20 +47,15 @@ const PostsManagementPage = () => {
     const approvePost = useApprovePost();
     const deletePostMutation = useDeletePost();
 
-    const posts = postsQuery.data?.content || [];
-    const totalPages = postsQuery.data?.totalPages || 0;
-    const totalElements = postsQuery.data?.totalElements || 0;
-    const loading = postsQuery.isLoading;
-
     useEffect(() => {
         setCurrentPage(0);
     }, [statusFilter, debouncedSearch]);
 
     useEffect(() => {
-        if (postsQuery.isError) {
+        if (isError) {
             toast.error('Lỗi khi tải danh sách bài viết');
         }
-    }, [postsQuery.isError]);
+    }, [isError]);
 
     const handleApprove = () => {
         if (!approvingPost) return;

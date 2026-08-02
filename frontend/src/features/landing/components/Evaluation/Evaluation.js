@@ -31,7 +31,7 @@ const Evaluation = () => {
 
   const [showModal, setShowModal] = useState(false);
 
-  const {reviews, loading, refetchEvaluations} = useEvaluations();
+  const {reviews, isLoading: loading, refetch: refetchEvaluations} = useEvaluations();
 
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1200,

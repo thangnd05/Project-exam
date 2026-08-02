@@ -9,9 +9,15 @@ const normalizeCollections = (data) =>
   Array.isArray(data) ? data : data?.data || data?.content || [];
 
 export function useQuestionCollections() {
-  return useQuery({
+  const query = useQuery({
     queryKey: questionCollectionKeys.list,
     queryFn: getQuestionCollections,
     select: normalizeCollections,
   });
+
+  return {
+    questionCollections: query.data ?? [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }

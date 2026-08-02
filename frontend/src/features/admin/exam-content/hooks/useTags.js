@@ -32,11 +32,17 @@ export function useTags() {
 }
 
 export function useAdminExamTypesForTags() {
-  return useQuery({
+  const query = useQuery({
     queryKey: examTypeKeys.all,
     queryFn: getExamTypes,
-    select: (list) => list.map((item) => ({id: item.examTypeId, name: item.name})),
+    select: (list) => list.map((item) => ({ id: item.examTypeId, name: item.name })),
   });
+
+  return {
+    examTypes: query.data ?? [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function useTagTree(examTypeId) {

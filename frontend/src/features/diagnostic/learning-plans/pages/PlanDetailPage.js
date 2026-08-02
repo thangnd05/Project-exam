@@ -34,7 +34,7 @@ function progressCheer(passed, total, pct) {
 
 function PlanDetailPage() {
   const { learningPlanId } = useParams();
-  const { plan, error, loading } = usePlanDetail(learningPlanId);
+  const { plan, error, isLoading: loading } = usePlanDetail(learningPlanId);
   const [showCongrats, setShowCongrats] = useState(false);
 
   useEffect(() => {

@@ -23,8 +23,8 @@ function UserTargetPage() {
   const [targetScore, setTargetScore] = useState('');
   const [customParts, setCustomParts] = useState({});
 
-  const targetQuery = useCurrentUserTarget(selectedExamTypeId);
-  const currentTarget = targetQuery.data?.hasTarget ? targetQuery.data : null;
+  const { target, isError: targetIsError } = useCurrentUserTarget(selectedExamTypeId);
+  const currentTarget = target?.hasTarget ? target : null;
 
   const { examTypes, examParts, skills, scoringConversions, milestones } =
     useUserTargetData(selectedExamTypeId);
@@ -65,18 +65,18 @@ function UserTargetPage() {
       setCustomParts({});
       return;
     }
-    if (targetQuery.data?.hasTarget) {
-      setTargetScore(String(targetQuery.data.targetScore || ''));
+    if (target?.hasTarget) {
+      setTargetScore(String(target.targetScore || ''));
       const cp = {};
-      (targetQuery.data.partRequirements || []).forEach((p) => {
+      (target.partRequirements || []).forEach((p) => {
         cp[p.examPartId] = p.requiredPercentage;
       });
       setCustomParts(cp);
-    } else if (targetQuery.data || targetQuery.isError) {
+    } else if (target || targetIsError) {
       setTargetScore('');
       setCustomParts({});
     }
-  }, [selectedExamTypeId, targetQuery.data, targetQuery.isError]);
+  }, [selectedExamTypeId, target, targetIsError]);
 
   const matchedMilestone = useMemo(() => {
     if (!targetScore) return null;

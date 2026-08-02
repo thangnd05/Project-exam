@@ -52,13 +52,11 @@ function SavedPostsPage({ embedded = false }) {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const { data, isLoading, isError } = useSavedPosts({
+  const { posts, totalPages, isLoading, isError } = useSavedPosts({
     page: currentPage,
     size: PAGE_SIZE,
     keyword: debouncedSearch,
   });
-  const posts = data?.posts ?? [];
-  const totalPages = data?.totalPages ?? 0;
   const loading = isLoading;
   const errorMessage = isError ? 'Không tải được danh sách bài đã lưu.' : '';
 

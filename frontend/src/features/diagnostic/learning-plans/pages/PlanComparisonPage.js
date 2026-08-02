@@ -17,7 +17,7 @@ function PlanComparisonPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
 
-  const { examTypes, plans, loading, error } = usePlanComparison(examTypeId);
+  const { examTypes, plans, isLoading: loading, error } = usePlanComparison(examTypeId);
 
   useEffect(() => {
     if (!examTypeId && examTypes.length > 0) {

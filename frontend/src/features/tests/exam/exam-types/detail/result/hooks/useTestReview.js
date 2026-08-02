@@ -43,9 +43,18 @@ export function useTestReview(
   userTestId,
   { enabled = true, isGuest = false, guestCfg = {} } = {},
 ) {
-  return useQuery({
+  const query = useQuery({
     queryKey: testReviewKeys.detail(userTestId, isGuest),
     queryFn: () => fetchTestReview(userTestId, isGuest, guestCfg),
     enabled: enabled && !!userTestId,
   });
+
+  return {
+    test: query.data?.test ?? null,
+    userAnswers: query.data?.userAnswers ?? [],
+    canReview: query.data?.canReview ?? false,
+    notReviewable: query.data?.notReviewable ?? false,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }

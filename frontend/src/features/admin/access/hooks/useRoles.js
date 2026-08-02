@@ -50,7 +50,7 @@ export function useRoles() {
   return {
     roleList: crud.items,
     permissionCatalog: permissionsQuery.data ?? [],
-    loading: crud.isLoading,
+    isLoading: crud.isLoading,
     createRoleMutation: crud.createMutation,
     updateRoleMutation: crud.updateMutation,
     deleteRoleMutation: crud.deleteMutation,

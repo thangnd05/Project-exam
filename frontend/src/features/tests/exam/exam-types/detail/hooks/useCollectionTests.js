@@ -3,16 +3,23 @@ import { keepPreviousData } from '~/shared/config/queryClient';
 import { getTestsByCollection, getTestCollectionsByExamType } from '~/shared/api/testApi';
 
 export function useCollectionTests(collectionId, page, size) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['collection-tests', collectionId, page, size],
     queryFn: () => getTestsByCollection(collectionId, { page, size }),
     enabled: !!collectionId,
     placeholderData: keepPreviousData,
   });
+
+  return {
+    tests: Array.isArray(query.data?.content) ? query.data.content : [],
+    totalPages: query.data?.totalPages ?? 0,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function useCollectionName(examTypeId, collectionId) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['exam-collections', examTypeId],
     queryFn: () => getTestCollectionsByExamType(examTypeId),
     enabled: !!examTypeId,
@@ -23,4 +30,10 @@ export function useCollectionName(examTypeId, collectionId) {
       return found?.name || '';
     },
   });
+
+  return {
+    collectionName: query.data ?? '',
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }

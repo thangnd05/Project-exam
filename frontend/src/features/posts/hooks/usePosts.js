@@ -48,28 +48,47 @@ export function usePosts({ page = 0, categoryId = null, keyword = '', status = '
 }
 
 export function usePostDetail(postId, { enabled = true } = {}) {
-  return useQuery({
+  const query = useQuery({
     queryKey: postsKeys.detail(postId),
     queryFn: () => getPostById(postId),
     enabled: enabled && !!postId,
   });
+
+  return {
+    post: query.data ?? null,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: query.refetch,
+  };
 }
 
 export function usePostComments(postId, { enabled = true } = {}) {
-  return useQuery({
+  const query = useQuery({
     queryKey: postsKeys.comments(postId),
     queryFn: () => getComments(postId),
     enabled: enabled && !!postId,
   });
+
+  return {
+    comments: Array.isArray(query.data) ? query.data : [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function useRelatedPosts({ categoryId, postId, enabled = true } = {}) {
-  return useQuery({
+  const query = useQuery({
     queryKey: postsKeys.related(categoryId),
     queryFn: () => getPosts({ categoryId, size: 8 }),
     enabled: enabled && !!categoryId,
     select: (data) => (data?.content || []).filter((p) => p.id !== postId),
   });
+
+  return {
+    relatedPosts: query.data ?? [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function fetchPostById(postId) {

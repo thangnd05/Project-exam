@@ -18,10 +18,8 @@ function TestByCollectionPage() {
   const [currentPage, setCurrentPage] = useState(0);
 
   const testsQuery = useCollectionTests(collectionId, currentPage, PAGE_SIZE);
-  const tests = Array.isArray(testsQuery.data?.content) ? testsQuery.data.content : [];
-  const totalPages = testsQuery.data?.totalPages ?? 0;
-  const loading = testsQuery.isLoading;
-  const folderName = useCollectionName(examTypeId, collectionId).data ?? '';
+  const { tests, totalPages, isLoading: loading } = testsQuery;
+  const { collectionName: folderName = '' } = useCollectionName(examTypeId, collectionId);
 
   useEffect(() => {
     const interval = setInterval(() => {

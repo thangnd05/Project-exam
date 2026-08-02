@@ -6,11 +6,17 @@ export const profileKeys = {
 };
 
 export function useMyInfo(enabled) {
-  return useQuery({
+  const query = useQuery({
     queryKey: profileKeys.me(),
     queryFn: getMyInfo,
     enabled: !!enabled,
   });
+
+  return {
+    userInfo: query.data ?? null,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function useUpdateProfile() {

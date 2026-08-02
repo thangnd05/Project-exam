@@ -34,7 +34,7 @@ function RolesManagementPage() {
   const {
     roleList,
     permissionCatalog,
-    loading,
+    isLoading: loading,
     createRoleMutation,
     updateRoleMutation,
     deleteRoleMutation,

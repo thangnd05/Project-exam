@@ -36,7 +36,7 @@ const AlbumDetailPage = () => {
   const navigate = useNavigate();
 
   const {
-    data: vocabularies = [],
+    vocabularies = [],
     isLoading: loading,
     isError,
     refetch: fetchVocabularies,

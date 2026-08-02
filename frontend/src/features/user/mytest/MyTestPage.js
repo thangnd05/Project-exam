@@ -29,14 +29,12 @@ function MyTestPage() {
   const [testToDelete, setTestToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
 
-  const { data, isPending, isError } = useMyTests({ page: currentPage, size: PAGE_SIZE });
+  const { tests, totalPages, isLoading: loading, isError } = useMyTests({
+    page: currentPage,
+    size: PAGE_SIZE,
+  });
   const deleteTestMutation = useDeleteTest();
   const invalidateMyTests = useInvalidateMyTests();
-
-  const tests = Array.isArray(data?.content) ? data.content : [];
-  const totalPages = data?.totalPages ?? 0;
-
-  const loading = isPending;
 
   const handleDeleteTest = (testId) => {
     const selectedTest = tests.find((testItem) => testItem.testId === testId);

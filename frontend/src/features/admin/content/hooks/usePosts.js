@@ -3,36 +3,44 @@ import { keepPreviousData } from '~/shared/config/queryClient';
 import { getPosts, updatePostStatus, deletePost } from '~/shared/api/postApi';
 
 export const postKeys = {
-    all: ['admin-posts'],
-    list: (params) => ['admin-posts', params],
+  all: ['admin-posts'],
+  list: (params) => ['admin-posts', params],
 };
 
 export function usePosts({ page, size, status, keyword }) {
-    return useQuery({
-        queryKey: postKeys.list({ page, size, status, keyword }),
-        queryFn: () =>
-            getPosts({
-                page,
-                size,
-                status: status === 'ALL' ? undefined : status,
-                keyword,
-            }),
-        placeholderData: keepPreviousData,
-    });
+  const query = useQuery({
+    queryKey: postKeys.list({ page, size, status, keyword }),
+    queryFn: () =>
+      getPosts({
+        page,
+        size,
+        status: status === 'ALL' ? undefined : status,
+        keyword,
+      }),
+    placeholderData: keepPreviousData,
+  });
+
+  return {
+    posts: query.data?.content || [],
+    totalPages: query.data?.totalPages || 0,
+    totalElements: query.data?.totalElements || 0,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function useApprovePost() {
-    const qc = useQueryClient();
-    return useMutation({
-        mutationFn: (id) => updatePostStatus(id, 'APPROVED'),
-        onSuccess: () => qc.invalidateQueries({ queryKey: postKeys.all }),
-    });
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => updatePostStatus(id, 'APPROVED'),
+    onSuccess: () => qc.invalidateQueries({ queryKey: postKeys.all }),
+  });
 }
 
 export function useDeletePost() {
-    const qc = useQueryClient();
-    return useMutation({
-        mutationFn: (id) => deletePost(id),
-        onSuccess: () => qc.invalidateQueries({ queryKey: postKeys.all }),
-    });
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => deletePost(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: postKeys.all }),
+  });
 }

@@ -79,7 +79,8 @@ export function useLearningPlanList({
   return {
     examTypes,
     plans: filteredPlans,
-    loading: query.isLoading,
+    isLoading: query.isLoading,
+    isError: query.isError,
     error: query.error
       ? query.error?.response?.data?.message
         || query.error.message
@@ -87,6 +88,6 @@ export function useLearningPlanList({
       : null,
     filterExamTypeId,
     setFilterExamTypeId,
-    reload: query.refetch,
+    refetch: query.refetch,
   };
 }

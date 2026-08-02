@@ -50,7 +50,7 @@ export function useEditQuestionModal({ show, questionId, onHide, onSuccess }) {
     onHideRef.current = onHide;
   }, [onHide]);
 
-  const { data: questionCollections = [] } = useQuestionCollections();
+  const { questionCollections = [] } = useQuestionCollections();
   const updateMutation = useUpdateQuestion();
   const deleteMediaMutation = useDeletePassageMedia();
   const saving = updateMutation.isPending;

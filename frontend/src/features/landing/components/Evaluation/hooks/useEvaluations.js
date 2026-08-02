@@ -23,8 +23,9 @@ export function useEvaluations() {
 
   return {
     reviews: query.data ?? [],
-    loading: query.isLoading,
-    refetchEvaluations,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: refetchEvaluations,
   };
 }
 

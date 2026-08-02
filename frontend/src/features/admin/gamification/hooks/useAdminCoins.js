@@ -33,7 +33,7 @@ export function useAdminCoins() {
 }
 
 export function useCoinUserOptions({ enabled = false, wallets = [] } = {}) {
-  return useQuery({
+  const query = useQuery({
     queryKey: coinKeys.userOptions,
     queryFn: () => getUsers({ page: 0, size: 100 }),
     enabled,
@@ -42,4 +42,10 @@ export function useCoinUserOptions({ enabled = false, wallets = [] } = {}) {
       return (response?.content || []).filter((user) => !existingUserIds.has(user.id));
     },
   });
+
+  return {
+    userOptions: query.data ?? [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }

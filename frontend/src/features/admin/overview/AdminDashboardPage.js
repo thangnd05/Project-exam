@@ -17,16 +17,10 @@ import styles from './AdminDashboardPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-const EMPTY_TRAFFIC = {
-    visitsToday: 0,
-    heatmap: [],
-    topCountries: [],
-};
-
 const TrafficHeatmapCard = ({ delay }) => {
     const today = localISODate();
     const [endDate, setEndDate] = useState(today);
-    const { data: heatmap = [] } = useTrafficHeatmap(endDate);
+    const { heatmap = [] } = useTrafficHeatmap(endDate);
 
     return (
         <motion.div
@@ -51,10 +45,7 @@ const TrafficHeatmapCard = ({ delay }) => {
 };
 
 const AdminDashboardPage = () => {
-    const { data, isLoading, isError } = useDashboardStats();
-
-    const stats = data?.stats ?? {};
-    const traffic = data?.traffic ?? EMPTY_TRAFFIC;
+    const { stats, traffic, isLoading, isError } = useDashboardStats();
 
     return (
         <div className={cx('dashboard')}>

@@ -8,11 +8,18 @@ export const myTestKeys = {
 };
 
 export function useMyTests({ page = 0, size = 12 } = {}) {
-  return useQuery({
+  const query = useQuery({
     queryKey: myTestKeys.list(page, size),
     queryFn: () => getMyTests({ page, size }),
     placeholderData: keepPreviousData,
   });
+
+  return {
+    tests: Array.isArray(query.data?.content) ? query.data.content : [],
+    totalPages: query.data?.totalPages ?? 0,
+    isLoading: query.isLoading || query.isPending,
+    isError: query.isError,
+  };
 }
 
 export function useDeleteTest() {

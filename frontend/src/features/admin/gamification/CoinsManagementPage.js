@@ -37,11 +37,10 @@ function CoinsManagementPage() {
     deleteMutation,
   } = useAdminCoins();
 
-  const userOptionsQuery = useCoinUserOptions({
+  const { userOptions } = useCoinUserOptions({
     enabled: loadUserOptions,
     wallets,
   });
-  const userOptions = userOptionsQuery.data ?? [];
 
   const submitting =
     createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;

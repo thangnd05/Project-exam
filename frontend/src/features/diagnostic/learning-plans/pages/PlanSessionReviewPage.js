@@ -13,7 +13,10 @@ function PlanSessionReviewPage() {
   const taskId = searchParams.get('taskId');
   const navigate = useNavigate();
 
-  const query = usePlanSessionReview(learningPlanId, sessionId);
+  const { review, isLoading, error: loadError } = usePlanSessionReview(
+    learningPlanId,
+    sessionId,
+  );
 
   const backTo = taskId
     ? `/learning-plans/${learningPlanId}/tasks/${taskId}/history`
@@ -27,7 +30,7 @@ function PlanSessionReviewPage() {
         : `/learning-plans/${learningPlanId}`,
     );
 
-  if (query.isLoading) {
+  if (isLoading) {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('loading')}>Đang tải...</div>
@@ -35,10 +38,7 @@ function PlanSessionReviewPage() {
     );
   }
 
-  const data = query.data;
-  const loadError = query.error
-    ? query.error?.response?.data?.message || query.error.message
-    : null;
+  const data = review;
 
   if (loadError || !data?.lastReviewItems?.length) {
     return (

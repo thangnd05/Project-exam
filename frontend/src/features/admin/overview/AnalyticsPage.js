@@ -33,24 +33,13 @@ const ChartCard = ({ icon, title, height, delay, action, children }) => (
 );
 
 const AnalyticsPage = () => {
-    const { data, isLoading, isError } = useDashboardStats();
-
-    const stats = data?.stats ?? {};
-    const traffic = data?.traffic ?? {
-        visitsToday: 0,
-        heatmap: [], topCountries: [],
-    };
-    const statusDistribution = data?.statusDistribution ?? [];
+    const { stats, traffic, statusDistribution, isLoading, isError } = useDashboardStats();
 
     const currentYear = new Date().getFullYear();
     const [perfYear, setPerfYear] = useState(currentYear);
-    const { data: perf } = useMonthlyPerformance(perfYear);
-    const monthlyPerformance = perf?.months ?? [];
-    const availableYears = perf?.availableYears ?? [currentYear];
+    const { months: monthlyPerformance = [], availableYears } = useMonthlyPerformance(perfYear);
 
-    const { data: content } = useContentInsights();
-    const topTests = content?.topTests ?? [];
-    const topPracticeTests = content?.topPracticeTests ?? [];
+    const { topTests = [], topPracticeTests = [] } = useContentInsights();
 
     const yearSelect = (
         <select

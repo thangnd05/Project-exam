@@ -61,19 +61,23 @@ const TestReviewPage = () => {
     [isGuest],
   );
 
-  const { data, isLoading, isError } = useTestReview(userTestId, {
+  const {
+    test,
+    userAnswers,
+    canReview,
+    notReviewable,
+    isLoading,
+    isError,
+  } = useTestReview(userTestId, {
     enabled: !authLoading,
     isGuest,
     guestCfg,
   });
 
-  const test = data?.test ?? null;
-  const userAnswers = data?.userAnswers ?? [];
-  const canReview = data?.canReview ?? false;
   const loading = authLoading || isLoading;
   const error = isError
     ? "Không thể tải chi tiết câu hỏi. Vui lòng thử lại."
-    : data?.notReviewable
+    : notReviewable
       ? "Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc."
       : "";
 

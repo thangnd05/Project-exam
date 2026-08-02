@@ -14,21 +14,24 @@ function PlanResultPage() {
   const navigate = useNavigate();
   const [showCongrats, setShowCongrats] = useState(false);
 
-  const query = usePlanResult(learningPlanId, taskId);
+  const { result: sessionResult, isLoading, error: loadError } = usePlanResult(
+    learningPlanId,
+    taskId,
+  );
 
   const goToPicker = () => navigate(`/learning-plans/${learningPlanId}`);
   const retry = () => navigate(`/learning-plans/${learningPlanId}/study?taskId=${taskId}`);
 
   // Vượt ải cuối → toàn bộ lộ trình đã xong: bật modal chúc mừng
   // và đánh dấu đã xem để trang kế hoạch không hiện lại lần nữa.
-  const allTasksDone = !!query.data?.passed && query.data?.planStage === 'MOCK';
+  const allTasksDone = !!sessionResult?.passed && sessionResult?.planStage === 'MOCK';
   useEffect(() => {
     if (!allTasksDone) return;
     setShowCongrats(true);
     markCongratsSeen(learningPlanId);
   }, [allTasksDone, learningPlanId]);
 
-  if (query.isLoading) {
+  if (isLoading) {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('loading')}>Đang tải...</div>
@@ -36,12 +39,7 @@ function PlanResultPage() {
     );
   }
 
-  const data = query.data;
-  const loadError = query.error
-    ? query.error?.response?.data?.message || query.error.message
-    : null;
-
-  if (loadError || !data?.lastReviewItems?.length) {
+  if (loadError || !sessionResult?.lastReviewItems?.length) {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
@@ -56,7 +54,7 @@ function PlanResultPage() {
     );
   }
 
-  const result = toPlanResult(data);
+  const result = toPlanResult(sessionResult);
 
   return (
     <div className={cx('wrapper', 'studyWide')}>

@@ -13,12 +13,19 @@ const normalize = (data) => ({
 });
 
 export function useSavedPosts({ page = 0, size = 10, keyword = '' } = {}) {
-  return useQuery({
+  const query = useQuery({
     queryKey: savedPostsKeys.list({ page, size, keyword }),
     queryFn: () => getSavedPosts({ page, size, keyword }),
     placeholderData: keepPreviousData,
     select: normalize,
   });
+
+  return {
+    posts: query.data?.posts ?? [],
+    totalPages: query.data?.totalPages ?? 0,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
 
 export function useUnsavePost() {
