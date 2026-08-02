@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
-import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
+import ConfirmModal from '~/shared/ui/modal/ConfirmModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '~/features/diagnostic/learning-plans/hooks/useLearningPlanList';
 import { useDeletePlan } from '~/features/diagnostic/learning-plans/hooks/useDeletePlan';
@@ -196,7 +196,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
 
   const confirmModals = (
     <>
-      <ConfirmActionModal
+      <ConfirmModal
         show={Boolean(switchTarget)}
         onClose={() => setSwitchTarget(null)}
         onConfirm={handleSwitchConfirm}

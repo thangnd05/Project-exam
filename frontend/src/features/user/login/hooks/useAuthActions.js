@@ -7,9 +7,10 @@ import {
   resetPassword,
   verifyEmail,
 } from '~/shared/api/authApi';
+import { CURRENT_USER_QUERY_KEY } from '~/shared/context/AuthContext';
 
 export const authKeys = {
-  currentUser: ['current-user'],
+  currentUser: CURRENT_USER_QUERY_KEY,
 };
 
 export function useLoginMutation(options = {}) {

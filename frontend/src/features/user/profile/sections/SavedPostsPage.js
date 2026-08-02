@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
 import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, IoSearchOutline, IoEllipsisVertical, IoChevronBackOutline, IoChevronForwardOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
+import ConfirmModal from '~/shared/ui/modal/ConfirmModal';
 import routes from '~/shared/config/Routes';
 import { useSavedPosts, useUnsavePost } from '~/features/user/profile/hooks/useSavedPosts';
 import styles from './PostsListPage.module.scss';
@@ -258,7 +258,7 @@ function SavedPostsPage({ embedded = false }) {
         {!loading && !errorMessage && renderPagination()}
       </div>
 
-      <ConfirmActionModal
+      <ConfirmModal
         show={Boolean(unsavingPost)}
         onClose={() => setUnsavingPost(null)}
         onConfirm={handleUnsave}

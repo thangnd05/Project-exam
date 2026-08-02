@@ -75,6 +75,7 @@ return {
 
 - Form: controlled `useState` + react-bootstrap (chưa dùng form lib).
 - Modal user: `CommonFormModal` + `ModalActionFooter`; admin: `BaseModal` được chấp nhận.
+- Confirm: `ConfirmModal` (chung) + `ConfirmDeleteModal` (preset xóa). Không thêm wrapper confirm mới.
 - **Icon mới:** dùng `lucide-react`. Không thêm Font Awesome / `react-icons` mới.
   (Code cũ giữ nguyên; migrate dần khi đụng file.)
 - Style: `*.module.scss` + `classNames/bind` (`cx`). Global tokens qua
@@ -92,4 +93,4 @@ Frontend không check permission chi tiết; backend:
 ## 9. Lịch sử migrate
 
 Chi tiết batch B1–B8: xem [REORG-PLAN.md](REORG-PLAN.md). Reorg thư mục đã xong;
-còn nợ: co-locate API, thống nhất icon, page fat (question-bank) tách hook.
+còn nợ: co-locate API, thống nhất icon.

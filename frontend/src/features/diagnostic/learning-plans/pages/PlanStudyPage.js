@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
-import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
+import ConfirmModal from '~/shared/ui/modal/ConfirmModal';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
 import { getApiBaseUrl, getFullMediaUrl } from '~/shared/utils/mediaUrl';
@@ -498,7 +498,7 @@ function PlanStudyPage() {
         </>
       )}
 
-      <ConfirmActionModal
+      <ConfirmModal
         show={unansweredCount > 0}
         onClose={() => setUnansweredCount(0)}
         onConfirm={doSubmit}

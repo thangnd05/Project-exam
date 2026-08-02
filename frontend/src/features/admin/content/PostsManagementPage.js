@@ -7,7 +7,7 @@ import classNames from 'classnames/bind';
 import routes from '~/shared/config/Routes';
 import useDebouncedValue from '~/shared/hooks/useDebouncedValue';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
-import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
+import ConfirmModal from '~/shared/ui/modal/ConfirmModal';
 import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common';
 import styles from '../components/common/adminKit.module.scss';
 
@@ -178,7 +178,7 @@ const PostsManagementPage = () => {
                 )}
             />
 
-            <ConfirmActionModal
+            <ConfirmModal
                 show={Boolean(approvingPost)}
                 onClose={() => setApprovingPost(null)}
                 onConfirm={handleApprove}

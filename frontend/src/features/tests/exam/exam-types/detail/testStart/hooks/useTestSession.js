@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '~/shared/api/userTestApi';
 import { getAnswersByUserTest, batchSaveAnswers } from '~/shared/api/userAnswerApi';
 import { getUserTestInfo, purchaseTestAccess } from '~/shared/api/testApi';
-import { getPassageMediaByPassageId } from '~/shared/api/passageMediaApi';
 import { getExamTypeLayout } from '~/shared/api/examTypeApi';
 import { resolveLayoutConfig } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/resolveLayoutConfig';
 import { defaultLayoutConfig } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/layoutSchema';
@@ -13,28 +13,8 @@ import { AuthContext } from '~/shared/context/AuthContext';
 import { useStreak } from '~/shared/hooks/useStreak';
 import { useCoins } from '~/shared/hooks/useCoins';
 import { getOrCreateGuestSessionId, guestHeaders } from '~/shared/utils/guestSession';
-
-const hasMediaList = (p) => {
-  const list = p?.passageMedias ?? p?.passageMediaList ?? p?.passage_media;
-  return Array.isArray(list) && list.length > 0;
-};
-
-const passageHasAudio = (passage) => {
-  const list =
-    passage?.passageMedias ?? passage?.passageMediaList ?? passage?.passage_media ?? [];
-  if (Array.isArray(list)) {
-    const found = list.some(
-      (m) => (m?.mediaType ?? m?.media_type ?? '').toUpperCase() === 'AUDIO' && (m?.mediaUrl ?? m?.media_url),
-    );
-    if (found) return true;
-  }
-  const single = passage?.mediaUrl ?? passage?.media_url;
-  const pType = (passage?.passageType ?? passage?.passage_type ?? '').toUpperCase();
-  return Boolean(single) && pType === 'LISTENING';
-};
-
-const isListeningStep = (step) =>
-  !!step && (step.audioGated === true || step.sectionType === 'LISTENING');
+import { enrichTestWithPassageMedia } from './passageUtils';
+import { useExamFlowNavigation } from './useExamFlowNavigation';
 
 export function useTestSession() {
   const { testId } = useParams();
@@ -78,50 +58,29 @@ export function useTestSession() {
   const submittingRef = useRef(false);
   const [status, setStatus] = useState('loading');
 
-  const [layoutConfig, setLayoutConfig] = useState(defaultLayoutConfig);
+  const visibleParts = useMemo(() => {
+    const parts = test.parts || [];
+    if (!isPractice || selectedPartIds.length === 0) return parts;
+    const set = new Set(selectedPartIds);
+    return parts.filter((p) => set.has(p.examPartId));
+  }, [test.parts, isPractice, selectedPartIds]);
 
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [maxStepIndex, setMaxStepIndex] = useState(0);
-
-  const enrichTestWithPassageMedia = useCallback(async (testData) => {
-    const parts = testData.parts || [];
-    const passageIdsToFetch = new Set();
-    parts.forEach((part) => {
-      (part.questionGroups || []).forEach((group) => {
-        const gpid = group.passage?.passageId ?? group.passage?.passage_id;
-        if (gpid && !hasMediaList(group.passage)) passageIdsToFetch.add(gpid);
-        (group.questions || []).forEach((q) => {
-          const qpid = q.passage?.passageId ?? q.passage?.passage_id ?? q.passageId;
-          if (qpid && !hasMediaList(q.passage)) passageIdsToFetch.add(qpid);
-        });
-      });
-    });
-    if (passageIdsToFetch.size === 0) return testData;
-
-    const ids = [...passageIdsToFetch];
-    const results = await Promise.all(ids.map((id) => getPassageMediaByPassageId(id).catch(() => [])));
-    const mediaMap = Object.fromEntries(ids.map((id, i) => [id, results[i]]));
-
-    const enrichWrapper = (obj) => {
-      const pid = obj?.passage?.passageId ?? obj?.passage?.passage_id ?? obj?.passageId;
-      if (pid && mediaMap[pid]) {
-        return {
-          ...obj,
-          passage: { ...(obj.passage || { passageId: pid }), passageMedias: mediaMap[pid] },
-        };
+  const { data: layoutConfig = defaultLayoutConfig } = useQuery({
+    queryKey: ['exam-type-layout', test?.examTypeId],
+    queryFn: async () => {
+      try {
+        const res = await getExamTypeLayout(test.examTypeId);
+        return resolveLayoutConfig(res);
+      } catch {
+        return defaultLayoutConfig;
       }
-      return obj;
-    };
+    },
+    enabled: Boolean(test?.examTypeId),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: defaultLayoutConfig,
+  });
 
-    const enrichedParts = parts.map((part) => ({
-      ...part,
-      questionGroups: (part.questionGroups || []).map((group) => ({
-        ...enrichWrapper(group),
-        questions: (group.questions || []).map(enrichWrapper),
-      })),
-    }));
-    return { ...testData, parts: enrichedParts };
-  }, []);
+  const flow = useExamFlowNavigation({ visibleParts, layoutConfig });
 
   const loadTest = useCallback(() => {
     const savedState = sessionStorage.getItem(`userTestState-${sessionKey}`);
@@ -133,17 +92,19 @@ export function useTestSession() {
       try {
         parsed = JSON.parse(savedState);
       } catch {
-
         sessionStorage.removeItem(`userTestState-${sessionKey}`);
       }
       if (parsed) {
         setUserTestId(parsed.userTestId || null);
         setUserAnswers(parsed.userAnswers || {});
 
-        const savedStep = Number.isInteger(parsed.currentStepIndex) ? parsed.currentStepIndex : 0;
-        const savedMax = Number.isInteger(parsed.maxStepIndex) ? parsed.maxStepIndex : savedStep;
-        setCurrentStepIndex(savedStep);
-        setMaxStepIndex(Math.max(savedStep, savedMax));
+        const savedStep = Number.isInteger(parsed.currentStepIndex)
+          ? parsed.currentStepIndex
+          : 0;
+        const savedMax = Number.isInteger(parsed.maxStepIndex)
+          ? parsed.maxStepIndex
+          : savedStep;
+        flow.restoreStepState(savedStep, savedMax);
 
         if (typeof parsed.startedAt === 'string') savedStartedAt = parsed.startedAt;
         restored = true;
@@ -204,7 +165,11 @@ export function useTestSession() {
               serverStartedAt = active?.startedAt || null;
 
               if (!restored) {
-                const answers = await getAnswersByUserTest(activeUserTestId, isGuest, guestCfg);
+                const answers = await getAnswersByUserTest(
+                  activeUserTestId,
+                  isGuest,
+                  guestCfg,
+                );
                 const answersMap = {};
                 (answers || []).forEach((a) => {
                   answersMap[a.questionId] = {
@@ -220,7 +185,6 @@ export function useTestSession() {
               restored = true;
             }
           } catch (err) {
-
             console.error('Failed to restore in-progress answers:', err);
           }
         }
@@ -231,7 +195,6 @@ export function useTestSession() {
         }
 
         if (!restored) {
-
           setStatus('open');
         } else {
           setStartedAt(savedStartedAt || serverStartedAt || null);
@@ -239,7 +202,9 @@ export function useTestSession() {
         }
       })
       .catch(() => setStatus('error'));
-  }, [testId, sessionKey, isPractice, selectedPartIds, navigate, enrichTestWithPassageMedia, isGuest, guestCfg]);
+    // flow.restoreStepState is stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [testId, sessionKey, isPractice, selectedPartIds, navigate, isGuest, guestCfg]);
 
   useEffect(() => {
     if (!testId || authLoading) return;
@@ -247,32 +212,17 @@ export function useTestSession() {
   }, [testId, authLoading, loadTest]);
 
   useEffect(() => {
-    const examTypeId = test?.examTypeId;
-    if (!examTypeId) return;
-    let cancelled = false;
-    getExamTypeLayout(examTypeId)
-      .then((res) => {
-        if (!cancelled) setLayoutConfig(resolveLayoutConfig(res));
-      })
-      .catch(() => {
-        if (!cancelled) setLayoutConfig(defaultLayoutConfig);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [test?.examTypeId]);
-
-  useEffect(() => {
     if (status === 'open' && test?.testId) {
       const existing = sessionStorage.getItem(`userTest-${sessionKey}`);
       if (existing) {
         setUserTestId(existing);
-
         try {
-          const saved = JSON.parse(sessionStorage.getItem(`userTestState-${sessionKey}`) || 'null');
+          const saved = JSON.parse(
+            sessionStorage.getItem(`userTestState-${sessionKey}`) || 'null',
+          );
           if (saved?.startedAt) setStartedAt(saved.startedAt);
         } catch {
-
+          /* ignore */
         }
         setStatus('active');
         return;
@@ -284,7 +234,6 @@ export function useTestSession() {
         .then((data) => {
           setUserTestId(data.userTestId);
           sessionStorage.setItem(`userTest-${sessionKey}`, data.userTestId);
-
           if (!isPractice) setStartedAt(data.startedAt || null);
           setStatus('active');
         })
@@ -303,18 +252,26 @@ export function useTestSession() {
           userTestId,
           userAnswers,
           startedAt,
-          currentStepIndex,
-          maxStepIndex,
+          currentStepIndex: flow.currentStepIndex,
+          maxStepIndex: flow.maxStepIndex,
           lastSavedAt: Date.now(),
         }),
       );
     }
-  }, [userAnswers, startedAt, userTestId, status, sessionKey, currentStepIndex, maxStepIndex]);
+  }, [
+    userAnswers,
+    startedAt,
+    userTestId,
+    status,
+    sessionKey,
+    flow.currentStepIndex,
+    flow.maxStepIndex,
+  ]);
 
   useEffect(() => {
-    if (status !== 'active' || !userTestId) return;
+    if (status !== 'active' || !userTestId) return undefined;
     const entries = Object.entries(userAnswers);
-    if (entries.length === 0) return;
+    if (entries.length === 0) return undefined;
     const handle = setTimeout(() => {
       const payload = entries.map(([qid, ans]) => ({
         userTestId,
@@ -323,7 +280,7 @@ export function useTestSession() {
         selectedAnswerIds: ans?.selectedAnswerIds || null,
         answerText: ans?.answerText || null,
       }));
-      batchSaveAnswers(payload, isGuest, guestCfg).catch(() => {  });
+      batchSaveAnswers(payload, isGuest, guestCfg).catch(() => {});
     }, 2000);
     return () => clearTimeout(handle);
   }, [userAnswers, status, userTestId, isGuest, guestCfg]);
@@ -332,15 +289,15 @@ export function useTestSession() {
     if (status === 'locked' && preCountdown !== null) {
       if (preCountdown <= 0) {
         setStatus('open');
-        return;
+        return undefined;
       }
       const timer = setInterval(() => setPreCountdown((p) => p - 1), 1000);
       return () => clearInterval(timer);
     }
+    return undefined;
   }, [preCountdown, status]);
 
   const handleAnswerChange = (questionId, type, value) => {
-
     setUserAnswers((prev) => {
       if (type === 'MSQ') {
         const current = prev[questionId]?.selectedAnswerIds || [];
@@ -367,8 +324,7 @@ export function useTestSession() {
         selectedAnswerIds: ans.selectedAnswerIds || null,
         answerText: ans.answerText || null,
       }));
-      if (payload.length > 0)
-        await batchSaveAnswers(payload, isGuest, guestCfg);
+      if (payload.length > 0) await batchSaveAnswers(payload, isGuest, guestCfg);
       const result = await submitUserTest(userTestId, isGuest, guestCfg);
       sessionStorage.removeItem(`userTest-${sessionKey}`);
       sessionStorage.removeItem(`userTestState-${sessionKey}`);
@@ -396,8 +352,10 @@ export function useTestSession() {
   const deadline = useMemo(() => {
     if (isPractice || !startedAt) return null;
     const durationMinutes = test?.durationMinutes;
-    const durationSec = durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
-    let end = durationSec !== null ? new Date(startedAt).getTime() + durationSec * 1000 : null;
+    const durationSec =
+      durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
+    let end =
+      durationSec !== null ? new Date(startedAt).getTime() + durationSec * 1000 : null;
     const availableToMs = test?.availableTo ? new Date(test.availableTo).getTime() : null;
     if (availableToMs !== null && (end === null || availableToMs < end)) end = availableToMs;
     return end;
@@ -422,137 +380,6 @@ export function useTestSession() {
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [status, deadline]);
-
-  const visibleParts = useMemo(() => {
-    const parts = test.parts || [];
-    if (!isPractice || selectedPartIds.length === 0) return parts;
-    const set = new Set(selectedPartIds);
-    return parts.filter((p) => set.has(p.examPartId));
-  }, [test.parts, isPractice, selectedPartIds]);
-
-  const allQuestions = useMemo(() => {
-    return (
-      visibleParts.reduce((acc, part) => {
-        const groupedQuestions = (part.questionGroups || []).reduce((gAcc, group) => {
-          return [...gAcc, ...(group.questions || [])];
-        }, []);
-        return [...acc, ...groupedQuestions];
-      }, []) || []
-    );
-  }, [visibleParts]);
-
-  const questionIndexMap = useMemo(() => {
-    const map = {};
-    allQuestions.forEach((q, index) => {
-      map[q.questionId] = index + 1;
-    });
-    return map;
-  }, [allQuestions]);
-
-  const isPaged = (layoutConfig?.questionArea?.navigationMode || 'scroll') === 'paged';
-
-  const flowSteps = useMemo(() => {
-    const steps = [];
-    visibleParts.forEach((part) => {
-      (part.questionGroups || []).forEach((group, gi) => {
-        const passage = group.passage || null;
-        const pType = (passage?.passageType ?? passage?.passage_type ?? '').toUpperCase();
-        const sectionType =
-          pType === 'LISTENING' ? 'LISTENING' : pType === 'READING' ? 'READING' : null;
-
-        const audioGated = sectionType === 'LISTENING' && passageHasAudio(passage);
-        steps.push({
-          key: passage?.passageId || group.questions?.[0]?.questionId || `${part.testPartId}-${gi}`,
-          partId: part.testPartId,
-          partName: part.partName || '',
-          sectionType,
-          audioGated,
-          passage,
-          questions: group.questions || [],
-        });
-      });
-    });
-    return steps;
-  }, [visibleParts]);
-
-  const questionStepIndex = useMemo(() => {
-    const map = {};
-    flowSteps.forEach((s, i) => (s.questions || []).forEach((q) => { map[q.questionId] = i; }));
-    return map;
-  }, [flowSteps]);
-
-  useEffect(() => {
-    if (flowSteps.length === 0) return;
-    setCurrentStepIndex((i) => Math.max(0, Math.min(i, flowSteps.length - 1)));
-  }, [flowSteps.length]);
-
-  useEffect(() => {
-    setMaxStepIndex((m) => Math.max(m, currentStepIndex));
-  }, [currentStepIndex]);
-
-  const listeningGateBefore = useMemo(() => {
-    const arr = new Array(flowSteps.length).fill(-1);
-    let last = -1;
-    for (let i = 0; i < flowSteps.length; i += 1) {
-      arr[i] = last;
-      if (isListeningStep(flowSteps[i])) last = i;
-    }
-    return arr;
-  }, [flowSteps]);
-
-  const canGoToStep = useCallback(
-    (target) => {
-      if (target < 0 || target >= flowSteps.length) return false;
-
-      if (isListeningStep(flowSteps[target])) return target === currentStepIndex;
-
-      return maxStepIndex > listeningGateBefore[target];
-    },
-    [flowSteps, maxStepIndex, currentStepIndex, listeningGateBefore],
-  );
-
-  const goToStep = useCallback(
-    (target) => {
-      const t = Math.max(0, Math.min(target, flowSteps.length - 1));
-      if (!canGoToStep(t)) return;
-      setCurrentStepIndex(t);
-    },
-    [canGoToStep, flowSteps.length],
-  );
-
-  const goNext = useCallback(() => {
-    setCurrentStepIndex((prev) => Math.min(prev + 1, flowSteps.length - 1));
-  }, [flowSteps.length]);
-
-  const goPrev = useCallback(() => {
-    setCurrentStepIndex((prev) => {
-      const target = prev - 1;
-      if (target < 0) return prev;
-      if (isListeningStep(flowSteps[target])) return prev;
-      return target;
-    });
-  }, [flowSteps]);
-
-  const goToQuestion = useCallback(
-    (questionId) => {
-      const idx = questionStepIndex[questionId];
-      if (idx == null) return;
-      goToStep(idx);
-    },
-    [questionStepIndex, goToStep],
-  );
-
-  const canNavigateToQuestion = useCallback(
-    (questionId) => {
-      const idx = questionStepIndex[questionId];
-      if (idx == null) return false;
-      return canGoToStep(idx);
-    },
-    [questionStepIndex, canGoToStep],
-  );
-
-  const canGoPrev =
-    isPaged && currentStepIndex > 0 && !isListeningStep(flowSteps[currentStepIndex - 1]);
 
   const handlePurchase = async () => {
     setPurchasing(true);
@@ -581,20 +408,19 @@ export function useTestSession() {
     purchasing,
     balance,
     visibleParts,
-    allQuestions,
-    questionIndexMap,
+    allQuestions: flow.allQuestions,
+    questionIndexMap: flow.questionIndexMap,
     handleAnswerChange,
     handleSubmit,
     handlePurchase,
-
-    isPaged,
-    flowSteps,
-    currentStepIndex,
-    canGoPrev,
-    goNext,
-    goPrev,
-    goToStep,
-    goToQuestion,
-    canNavigateToQuestion,
+    isPaged: flow.isPaged,
+    flowSteps: flow.flowSteps,
+    currentStepIndex: flow.currentStepIndex,
+    canGoPrev: flow.canGoPrev,
+    goNext: flow.goNext,
+    goPrev: flow.goPrev,
+    goToStep: flow.goToStep,
+    goToQuestion: flow.goToQuestion,
+    canNavigateToQuestion: flow.canNavigateToQuestion,
   };
 }

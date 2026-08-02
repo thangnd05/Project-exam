@@ -1,24 +1,24 @@
-import {useQuery} from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   createCoinWallet,
   deleteCoinWallet,
   getCoinWallets,
   updateCoinBalance,
 } from '~/shared/api/coinApi';
-import {getUsers} from '~/shared/api/userApi';
-import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
+import { getUsers } from '~/shared/api/userApi';
+import { useAdminCrud } from '~/features/admin/hooks/useAdminCrud';
 
 export const coinKeys = {
   wallets: ['coin-wallets'],
   userOptions: ['coin-user-options'],
 };
 
-export function useCoins() {
+export function useAdminCoins() {
   const crud = useAdminCrud({
     queryKey: coinKeys.wallets,
     list: getCoinWallets,
     create: createCoinWallet,
-    update: ({userId, balance}) => updateCoinBalance(userId, {balance}),
+    update: ({ userId, balance }) => updateCoinBalance(userId, { balance }),
     remove: (userId) => deleteCoinWallet(userId),
   });
 
@@ -32,10 +32,10 @@ export function useCoins() {
   };
 }
 
-export function useCoinUserOptions({enabled = false, wallets = []} = {}) {
+export function useCoinUserOptions({ enabled = false, wallets = [] } = {}) {
   return useQuery({
     queryKey: coinKeys.userOptions,
-    queryFn: () => getUsers({page: 0, size: 100}),
+    queryFn: () => getUsers({ page: 0, size: 100 }),
     enabled,
     select: (response) => {
       const existingUserIds = new Set(wallets.map((wallet) => wallet.userId));

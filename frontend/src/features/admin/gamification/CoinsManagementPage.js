@@ -12,7 +12,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import {useCoinUserOptions, useCoins} from '~/features/admin/gamification/hooks/useCoins';
+import { useAdminCoins, useCoinUserOptions } from '~/features/admin/gamification/hooks/useAdminCoins';
 
 const defaultFormState = {
   userId: '',
@@ -35,7 +35,7 @@ function CoinsManagementPage() {
     createMutation,
     updateMutation,
     deleteMutation,
-  } = useCoins();
+  } = useAdminCoins();
 
   const userOptionsQuery = useCoinUserOptions({
     enabled: loadUserOptions,
