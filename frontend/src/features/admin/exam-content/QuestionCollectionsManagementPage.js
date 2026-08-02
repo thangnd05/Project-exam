@@ -8,7 +8,7 @@ import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {useQuestionCollections} from '~/features/admin/exam-content/hooks/useQuestionCollections';
-import styles from './QuestionCollections.module.scss';
+import styles from './QuestionCollectionsManagementPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -110,7 +110,7 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
   return nodeContent;
 }
 
-function QuestionCollectionsManagement() {
+function QuestionCollectionsManagementPage() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -477,4 +477,4 @@ function QuestionCollectionsManagement() {
   );
 }
 
-export default QuestionCollectionsManagement;
+export default QuestionCollectionsManagementPage;

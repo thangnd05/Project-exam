@@ -73,7 +73,7 @@ function CosmeticPreview({item, size = 56}) {
   );
 }
 
-function CosmeticsManagement() {
+function CosmeticsManagementPage() {
   const {
     items,
     isLoading: loading,
@@ -420,4 +420,4 @@ function CosmeticsManagement() {
   );
 }
 
-export default CosmeticsManagement;
+export default CosmeticsManagementPage;

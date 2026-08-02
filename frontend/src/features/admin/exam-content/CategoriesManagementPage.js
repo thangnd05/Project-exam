@@ -12,7 +12,7 @@ import {
 } from '../components/common';
 import { useCategories } from '~/features/admin/exam-content/hooks/useCategories';
 
-const Categories = () => {
+const CategoriesManagementPage = () => {
     const {
         categories,
         isLoading: loading,
@@ -153,4 +153,4 @@ const Categories = () => {
     );
 };
 
-export default Categories;
+export default CategoriesManagementPage;

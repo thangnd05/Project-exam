@@ -18,7 +18,7 @@ const defaultFormState = {
   description: '',
 };
 
-function SkillsManagement() {
+function SkillsManagementPage() {
   const {
     skillList,
     isLoading: loading,
@@ -247,4 +247,4 @@ function SkillsManagement() {
   );
 }
 
-export default SkillsManagement;
+export default SkillsManagementPage;

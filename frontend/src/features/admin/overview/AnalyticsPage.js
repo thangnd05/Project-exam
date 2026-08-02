@@ -13,7 +13,7 @@ import { AdminPageHeader } from '../components/common';
 import OverviewCard from './OverviewCard';
 import { useDashboardStats, useMonthlyPerformance, useContentInsights } from '~/features/admin/overview/hooks/useDashboardStats';
 
-import styles from './Analytics.module.scss';
+import styles from './AnalyticsPage.module.scss';
 
 const cx = classNames.bind(styles);
 

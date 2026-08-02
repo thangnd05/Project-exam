@@ -18,7 +18,7 @@ const emptyForm = {
   description: '',
 };
 
-function RolesManagement() {
+function RolesManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingRoleId, setEditingRoleId] = useState(null);
@@ -385,4 +385,4 @@ function RolesManagement() {
   );
 }
 
-export default RolesManagement;
+export default RolesManagementPage;

@@ -13,7 +13,7 @@ const localISODate = (d = new Date()) => {
     return local.toISOString().slice(0, 10);
 };
 
-import styles from './Dashboard.module.scss';
+import styles from './AdminDashboardPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -50,7 +50,7 @@ const TrafficHeatmapCard = ({ delay }) => {
     );
 };
 
-const AdminDashboard = () => {
+const AdminDashboardPage = () => {
     const { data, isLoading, isError } = useDashboardStats();
 
     const stats = data?.stats ?? {};
@@ -130,4 +130,4 @@ const AdminDashboard = () => {
     );
 };
 
-export default AdminDashboard;
+export default AdminDashboardPage;

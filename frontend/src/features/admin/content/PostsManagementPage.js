@@ -22,7 +22,7 @@ const STATUS_FILTERS = [
     { value: 'ALL', label: 'Tất cả' },
 ];
 
-const Posts = () => {
+const PostsManagementPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('PENDING');
     const [currentPage, setCurrentPage] = useState(0);
@@ -199,4 +199,4 @@ const Posts = () => {
     );
 };
 
-export default Posts;
+export default PostsManagementPage;

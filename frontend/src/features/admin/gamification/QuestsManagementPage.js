@@ -35,7 +35,7 @@ const defaultFormState = {
 
 const toInputDateTime = (value) => toDateTimeLocalInput(value);
 
-function QuestsManagement() {
+function QuestsManagementPage() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingQuestId, setEditingQuestId] = useState(null);
@@ -386,4 +386,4 @@ function QuestsManagement() {
   );
 }
 
-export default QuestsManagement;
+export default QuestsManagementPage;

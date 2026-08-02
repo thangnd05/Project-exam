@@ -32,7 +32,7 @@ const createEmptyForm = (examTypes = []) => ({
   chapterId: '',
 });
 
-function TestsManagement() {
+function TestsManagementPage() {
   const {
     tests,
     examTypes,
@@ -351,4 +351,4 @@ function TestsManagement() {
   );
 }
 
-export default TestsManagement;
+export default TestsManagementPage;

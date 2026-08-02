@@ -19,7 +19,7 @@ const emptyForm = {
   rating: 5,
 };
 
-function EvaluationsManagement() {
+function EvaluationsManagementPage() {
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [keyword, setKeyword] = useState('');
@@ -284,4 +284,4 @@ function EvaluationsManagement() {
   );
 }
 
-export default EvaluationsManagement;
+export default EvaluationsManagementPage;

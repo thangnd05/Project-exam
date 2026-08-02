@@ -13,7 +13,7 @@ const methodColorMap = {
   DELETE: 'danger',
 };
 
-function AuditLogs() {
+function AuditLogsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -123,4 +123,4 @@ function AuditLogs() {
   );
 }
 
-export default AuditLogs;
+export default AuditLogsPage;

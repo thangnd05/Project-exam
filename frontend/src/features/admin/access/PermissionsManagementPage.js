@@ -20,7 +20,7 @@ const buildMatrix = (roleList) => {
   return next;
 };
 
-function PermissionsManagement() {
+function PermissionsManagementPage() {
   const {roles, permissions, isLoading, isError, saveMutation} = usePermissionsMatrix();
   const loading = isLoading;
   const saving = saveMutation.isPending;
@@ -230,4 +230,4 @@ function PermissionsManagement() {
   );
 }
 
-export default PermissionsManagement;
+export default PermissionsManagementPage;

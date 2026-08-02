@@ -12,7 +12,7 @@ import {
   AdminToolbar,
 } from '../components/common';
 import {useMilestones} from '~/features/admin/gamification/hooks/useMilestones';
-import styles from './Milestones.module.scss';
+import styles from './MilestonesManagementPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -33,7 +33,7 @@ const sortPartsByNameOrder = (parts) => {
   });
 };
 
-function MilestonesManagement() {
+function MilestonesManagementPage() {
   const [examTypeFilter, setExamTypeFilter] = useState('');
   const [keyword, setKeyword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -429,4 +429,4 @@ function MilestonesManagement() {
   );
 }
 
-export default MilestonesManagement;
+export default MilestonesManagementPage;

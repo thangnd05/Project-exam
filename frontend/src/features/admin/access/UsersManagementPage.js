@@ -16,7 +16,7 @@ import {
   StatCard,
   StatCardGroup,
 } from '../components/common';
-import styles from './Users.module.scss';
+import styles from './UsersManagementPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -37,7 +37,7 @@ const roleColors = {
 
 const ITEMS_PER_PAGE = 10;
 
-function UsersManagement() {
+function UsersManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -488,4 +488,4 @@ function UsersManagement() {
   );
 }
 
-export default UsersManagement;
+export default UsersManagementPage;

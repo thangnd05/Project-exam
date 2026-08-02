@@ -26,7 +26,7 @@ const defaultFormState = {
   converted_score: '',
 };
 
-function ScoringConversionManagement() {
+function ScoringConversionManagementPage() {
   const [keyword, setKeyword] = useState('');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [activeSkillId, setActiveSkillId] = useState('all');
@@ -396,4 +396,4 @@ function ScoringConversionManagement() {
   );
 }
 
-export default ScoringConversionManagement;
+export default ScoringConversionManagementPage;

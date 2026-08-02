@@ -28,7 +28,7 @@ const buildPayload = (formState) => ({
   displayOrder: Number(formState.displayOrder) || 0,
 });
 
-function ExamCategoriesManagement() {
+function ExamCategoriesManagementPage() {
   const {
     categories,
     isLoading: loading,
@@ -222,4 +222,4 @@ function ExamCategoriesManagement() {
   );
 }
 
-export default ExamCategoriesManagement;
+export default ExamCategoriesManagementPage;

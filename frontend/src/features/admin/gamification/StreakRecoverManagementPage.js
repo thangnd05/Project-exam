@@ -7,7 +7,7 @@ import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import { AdminCard, AdminFieldError, AdminPageHeader } from '../components/common';
 import { useStreakRecoverConfig } from '~/features/admin/gamification/hooks/useStreakRecoverConfig';
 
-function StreakRecoverManagement() {
+function StreakRecoverManagementPage() {
   const [costCoins, setCostCoins] = useState(50);
   const [active, setActive] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -97,4 +97,4 @@ function StreakRecoverManagement() {
   );
 }
 
-export default StreakRecoverManagement;
+export default StreakRecoverManagementPage;

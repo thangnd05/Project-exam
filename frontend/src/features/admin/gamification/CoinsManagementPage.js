@@ -19,7 +19,7 @@ const defaultFormState = {
   balance: 0,
 };
 
-function CoinsManagement() {
+function CoinsManagementPage() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingWallet, setEditingWallet] = useState(null);
@@ -282,4 +282,4 @@ function CoinsManagement() {
   );
 }
 
-export default CoinsManagement;
+export default CoinsManagementPage;

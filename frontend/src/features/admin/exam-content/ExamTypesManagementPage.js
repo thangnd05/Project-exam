@@ -11,7 +11,7 @@ import ExamTypeFormModal from '../modals/ExamTypeFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {useExamTypes} from '~/features/admin/exam-content/hooks/useExamTypes';
 
-import styles from './QuestionCollections.module.scss';
+import styles from './QuestionCollectionsManagementPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -138,7 +138,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
   return nodeContent;
 }
 
-function ExamTypesManagement() {
+function ExamTypesManagementPage() {
   const navigate = useNavigate();
   const {examTypeList, isLoading: loading, isError, createMutation, updateMutation, deleteMutation} =
     useExamTypes();
@@ -380,4 +380,4 @@ function ExamTypesManagement() {
   );
 }
 
-export default ExamTypesManagement;
+export default ExamTypesManagementPage;

@@ -7,7 +7,7 @@ import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import TagFormModal from '../modals/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {useAdminExamTypesForTags, useTagTree, useTags} from '~/features/admin/exam-content/hooks/useTags';
-import styles from './Tags.module.scss';
+import styles from './TagsManagementPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -86,7 +86,7 @@ function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, o
   return nodeContent;
 }
 
-function TagsManagement() {
+function TagsManagementPage() {
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
@@ -372,4 +372,4 @@ function TagsManagement() {
   );
 }
 
-export default TagsManagement;
+export default TagsManagementPage;

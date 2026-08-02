@@ -5,7 +5,7 @@ import {formatDateTime} from '~/shared/utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
 import {useLoginAudit} from '~/features/admin/overview/hooks/useLoginAudit';
 
-function LoginAudit() {
+function LoginAuditPage() {
   const ITEMS_PER_PAGE = 20;
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,4 +114,4 @@ function LoginAudit() {
   );
 }
 
-export default LoginAudit;
+export default LoginAuditPage;

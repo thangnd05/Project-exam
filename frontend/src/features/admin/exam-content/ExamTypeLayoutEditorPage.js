@@ -30,7 +30,7 @@ import {
   sampleAllQuestions,
   sampleQuestionIndexMap,
 } from '~/features/tests/exam/exam-types/detail/testStart/examLayout/sampleExamData';
-import styles from './ExamTypeLayoutEditor.module.scss';
+import styles from './ExamTypeLayoutEditorPage.module.scss';
 import { brandColors } from '~/shared/styles/brandColors';
 
 const cx = classNames.bind(styles);
@@ -72,7 +72,7 @@ function normalizeOrders(blocks) {
   });
 }
 
-function ExamTypeLayoutEditor() {
+function ExamTypeLayoutEditorPage() {
   const { examTypeId } = useParams();
   const navigate = useNavigate();
 
@@ -572,4 +572,4 @@ function ExamTypeLayoutEditor() {
   );
 }
 
-export default ExamTypeLayoutEditor;
+export default ExamTypeLayoutEditorPage;

@@ -13,7 +13,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import styles from './ExamParts.module.scss';
+import styles from './ExamPartsManagementPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -26,7 +26,7 @@ const emptyForm = {
   display_order: 999,
 };
 
-function ExamPartsManagement() {
+function ExamPartsManagementPage() {
   const {
     examParts,
     examTypes,
@@ -412,4 +412,4 @@ function ExamPartsManagement() {
   );
 }
 
-export default ExamPartsManagement;
+export default ExamPartsManagementPage;

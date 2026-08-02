@@ -9,7 +9,7 @@ import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
 import {isMarkdownResource} from '~/shared/utils/recoveryResource';
 import {usePartsByExamType, useRecoveryResources, useTagsByExamType} from '~/features/admin/content/hooks/useRecoveryResources';
-import styles from './RecoveryResources.module.scss';
+import styles from './RecoveryResourcesManagementPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -110,7 +110,7 @@ function ResourceCard({
   );
 }
 
-function RecoveryResourcesManagement() {
+function RecoveryResourcesManagementPage() {
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
@@ -528,4 +528,4 @@ function RecoveryResourcesManagement() {
   );
 }
 
-export default RecoveryResourcesManagement;
+export default RecoveryResourcesManagementPage;

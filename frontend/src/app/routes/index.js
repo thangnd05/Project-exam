@@ -33,31 +33,31 @@ const CreateTestFromBankPage = lazy(() => import('~/features/tests/create-test-f
 const PersonalQuestionBankPage = lazy(() => import('~/features/tests/question-bank/PersonalQuestionBankPage'));
 const ProfileOverviewPage = lazy(() => import('~/features/user/profile/ProfileOverviewPage'));
 
-const AdminDashboard = lazy(() => import('~/features/admin/overview/Dashboard'));
-const UsersManagement = lazy(() => import('~/features/admin/access/Users'));
-const RolesManagement = lazy(() => import('~/features/admin/access/Roles'));
-const PermissionsManagement = lazy(() => import('~/features/admin/access/Permissions'));
-const SkillsManagement = lazy(() => import('~/features/admin/exam-content/Skills'));
-const ScoringConversionManagement = lazy(() => import('~/features/admin/exam-content/ScoringConversion'));
-const EvaluationsManagement = lazy(() => import('~/features/admin/content/Evaluations'));
-const AnalyticsPage = lazy(() => import('~/features/admin/overview/Analytics'));
-const AuditLogs = lazy(() => import('~/features/admin/overview/AuditLogs'));
-const LoginAudit = lazy(() => import('~/features/admin/overview/LoginAudit'));
-const TestsManagement = lazy(() => import('~/features/admin/exam-content/Tests'));
-const ExamTypesManagement = lazy(() => import('~/features/admin/exam-content/ExamTypes'));
-const ExamTypeLayoutEditor = lazy(() => import('~/features/admin/exam-content/ExamTypeLayoutEditor'));
-const ExamCategoriesManagement = lazy(() => import('~/features/admin/exam-content/ExamCategories'));
-const ExamPartsManagement = lazy(() => import('~/features/admin/exam-content/ExamParts'));
-const CategoriesManagement = lazy(() => import('~/features/admin/exam-content/Categories'));
-const PostsManagement = lazy(() => import('~/features/admin/content/Posts'));
-const QuestionCollectionsManagement = lazy(() => import('~/features/admin/exam-content/QuestionCollections'));
-const TagsManagement = lazy(() => import('~/features/admin/exam-content/Tags'));
-const RecoveryResourcesManagement = lazy(() => import('~/features/admin/content/RecoveryResources'));
-const MilestonesManagement = lazy(() => import('~/features/admin/gamification/Milestones'));
-const CoinsManagement = lazy(() => import('~/features/admin/gamification/Coins'));
-const QuestsManagement = lazy(() => import('~/features/admin/gamification/Quests'));
-const CosmeticsManagement = lazy(() => import('~/features/admin/gamification/Cosmetics'));
-const StreakRecoverManagement = lazy(() => import('~/features/admin/gamification/StreakRecover'));
+const AdminDashboardPage = lazy(() => import('~/features/admin/overview/AdminDashboardPage'));
+const UsersManagementPage = lazy(() => import('~/features/admin/access/UsersManagementPage'));
+const RolesManagementPage = lazy(() => import('~/features/admin/access/RolesManagementPage'));
+const PermissionsManagementPage = lazy(() => import('~/features/admin/access/PermissionsManagementPage'));
+const SkillsManagementPage = lazy(() => import('~/features/admin/exam-content/SkillsManagementPage'));
+const ScoringConversionManagementPage = lazy(() => import('~/features/admin/exam-content/ScoringConversionManagementPage'));
+const EvaluationsManagementPage = lazy(() => import('~/features/admin/content/EvaluationsManagementPage'));
+const AnalyticsPage = lazy(() => import('~/features/admin/overview/AnalyticsPage'));
+const AuditLogsPage = lazy(() => import('~/features/admin/overview/AuditLogsPage'));
+const LoginAuditPage = lazy(() => import('~/features/admin/overview/LoginAuditPage'));
+const TestsManagementPage = lazy(() => import('~/features/admin/exam-content/TestsManagementPage'));
+const ExamTypesManagementPage = lazy(() => import('~/features/admin/exam-content/ExamTypesManagementPage'));
+const ExamTypeLayoutEditorPage = lazy(() => import('~/features/admin/exam-content/ExamTypeLayoutEditorPage'));
+const ExamCategoriesManagementPage = lazy(() => import('~/features/admin/exam-content/ExamCategoriesManagementPage'));
+const ExamPartsManagementPage = lazy(() => import('~/features/admin/exam-content/ExamPartsManagementPage'));
+const CategoriesManagementPage = lazy(() => import('~/features/admin/exam-content/CategoriesManagementPage'));
+const PostsManagementPage = lazy(() => import('~/features/admin/content/PostsManagementPage'));
+const QuestionCollectionsManagementPage = lazy(() => import('~/features/admin/exam-content/QuestionCollectionsManagementPage'));
+const TagsManagementPage = lazy(() => import('~/features/admin/exam-content/TagsManagementPage'));
+const RecoveryResourcesManagementPage = lazy(() => import('~/features/admin/content/RecoveryResourcesManagementPage'));
+const MilestonesManagementPage = lazy(() => import('~/features/admin/gamification/MilestonesManagementPage'));
+const CoinsManagementPage = lazy(() => import('~/features/admin/gamification/CoinsManagementPage'));
+const QuestsManagementPage = lazy(() => import('~/features/admin/gamification/QuestsManagementPage'));
+const CosmeticsManagementPage = lazy(() => import('~/features/admin/gamification/CosmeticsManagementPage'));
+const StreakRecoverManagementPage = lazy(() => import('~/features/admin/gamification/StreakRecoverManagementPage'));
 const UserTargetPage = lazy(() => import('~/features/diagnostic/target/UserTargetPage'));
 const TargetDashboardPage = lazy(() => import('~/features/diagnostic/target/TargetDashboardPage'));
 const TargetAchievedPage = lazy(() => import('~/features/diagnostic/target/TargetAchievedPage'));
@@ -90,31 +90,31 @@ export const publicRoutes = [
 ];
 
 export const adminRoutes = [
-  { path: routes.adminDashboard, component: AdminDashboard },
-  { path: routes.adminUsers, component: UsersManagement },
-  { path: routes.adminRoles, component: RolesManagement },
-  { path: routes.adminPermissions, component: PermissionsManagement },
-  { path: routes.adminSkills, component: SkillsManagement },
-  { path: routes.adminScoringConversion, component: ScoringConversionManagement },
-  { path: routes.adminEvaluations, component: EvaluationsManagement },
-  { path: routes.adminExamTypes, component: ExamTypesManagement },
-  { path: routes.adminExamTypeLayout, component: ExamTypeLayoutEditor },
-  { path: routes.adminExamCategories, component: ExamCategoriesManagement },
-  { path: routes.adminExamParts, component: ExamPartsManagement },
-  { path: routes.adminTests, component: TestsManagement },
+  { path: routes.adminDashboard, component: AdminDashboardPage },
+  { path: routes.adminUsers, component: UsersManagementPage },
+  { path: routes.adminRoles, component: RolesManagementPage },
+  { path: routes.adminPermissions, component: PermissionsManagementPage },
+  { path: routes.adminSkills, component: SkillsManagementPage },
+  { path: routes.adminScoringConversion, component: ScoringConversionManagementPage },
+  { path: routes.adminEvaluations, component: EvaluationsManagementPage },
+  { path: routes.adminExamTypes, component: ExamTypesManagementPage },
+  { path: routes.adminExamTypeLayout, component: ExamTypeLayoutEditorPage },
+  { path: routes.adminExamCategories, component: ExamCategoriesManagementPage },
+  { path: routes.adminExamParts, component: ExamPartsManagementPage },
+  { path: routes.adminTests, component: TestsManagementPage },
   { path: routes.adminAnalytics, component: AnalyticsPage },
-  { path: routes.adminAuditLogs, component: AuditLogs },
-  { path: routes.adminLoginAudit, component: LoginAudit },
-  { path: routes.adminCategories, component: CategoriesManagement },
-  { path: routes.adminPosts, component: PostsManagement },
-  { path: routes.adminQuestionCollections, component: QuestionCollectionsManagement },
-  { path: routes.adminTags, component: TagsManagement },
-  { path: routes.adminRecoveryResources, component: RecoveryResourcesManagement },
-  { path: routes.adminMilestones, component: MilestonesManagement },
-  { path: routes.adminCoins, component: CoinsManagement },
-  { path: routes.adminQuests, component: QuestsManagement },
-  { path: routes.adminCosmetics, component: CosmeticsManagement },
-  { path: routes.adminStreakRecover, component: StreakRecoverManagement },
+  { path: routes.adminAuditLogs, component: AuditLogsPage },
+  { path: routes.adminLoginAudit, component: LoginAuditPage },
+  { path: routes.adminCategories, component: CategoriesManagementPage },
+  { path: routes.adminPosts, component: PostsManagementPage },
+  { path: routes.adminQuestionCollections, component: QuestionCollectionsManagementPage },
+  { path: routes.adminTags, component: TagsManagementPage },
+  { path: routes.adminRecoveryResources, component: RecoveryResourcesManagementPage },
+  { path: routes.adminMilestones, component: MilestonesManagementPage },
+  { path: routes.adminCoins, component: CoinsManagementPage },
+  { path: routes.adminQuests, component: QuestsManagementPage },
+  { path: routes.adminCosmetics, component: CosmeticsManagementPage },
+  { path: routes.adminStreakRecover, component: StreakRecoverManagementPage },
 ];
 
 export const privateRoutes = [
