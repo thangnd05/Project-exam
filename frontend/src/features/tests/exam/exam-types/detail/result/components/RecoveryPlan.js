@@ -2,19 +2,25 @@ import { useNavigate } from 'react-router-dom';
 import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import routes from '~/shared/config/Routes';
+import { buildRecoveryMessage } from '../utils/gauge-copy';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);
 
 function RecoveryPlan({
-  recoveryMessage,
   userTestId,
   examTypeId,
   hasTarget,
   isTargetMet,
+  readinessScore,
+  readinessLevel,
   isGuest,
 }) {
   const navigate = useNavigate();
+
+  const recoveryMessage = buildRecoveryMessage({
+    hasTarget, isTargetMet, readinessScore, readinessLevel,
+  });
 
   const canCreateTarget = !isGuest && !hasTarget && Boolean(examTypeId);
   const canCreatePlan = !isGuest && hasTarget && !isTargetMet;

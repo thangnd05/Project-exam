@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
+import { buildGaugeView } from '../utils/gauge-copy';
 import styles from './Result.module.scss';
 import { brandColors } from '~/shared/styles/brandColors';
 
@@ -20,25 +21,18 @@ const COLOR_MAP = {
   NOT_READY:         { color: '#ef4444', bg: '#fef2f2' },
 };
 
-const getColorFromPercentage = (pct) => {
-  if (pct >= 85) return COLOR_MAP.EXCELLENT;
-  if (pct >= 60) return COLOR_MAP.GOOD;
-  if (pct >= 30) return COLOR_MAP.FAIR;
-  return COLOR_MAP.WEAK;
-};
-
 function ReadinessGauge({ enhanced }) {
   const navigate = useNavigate();
-  const {
-    examCategoryCode, examTypeId,
-    gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage,
-    readinessLevel, hasTarget, correct, total,
-  } = enhanced;
+  const { examCategoryCode, examTypeId, readinessLevel, hasTarget, correct, total } = enhanced;
+
+  // BE chỉ trả facts — toàn bộ câu chữ/label của gauge dựng tại FE (gauge-copy.js).
+  const { gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage, gaugeLevel } =
+    buildGaugeView(enhanced);
 
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
 
   const { color, bg } = isQuickChallenge
-    ? getColorFromPercentage(gaugePercentage)
+    ? (COLOR_MAP[gaugeLevel] || COLOR_MAP.WEAK)
     : (COLOR_MAP[readinessLevel] || COLOR_MAP.NOT_READY);
 
   const effectiveColor = (!isQuickChallenge && hasTarget)
@@ -79,9 +73,11 @@ function ReadinessGauge({ enhanced }) {
             {gaugeTitle}
             {!isQuickChallenge && !hasTarget && <InfoTip text={TERM_TIPS.readiness} />}
           </h3>
-          <p className={cx('gaugeMessage')}>
-            {gaugeMessage}
-          </p>
+          {gaugeMessage && (
+            <p className={cx('gaugeMessage')}>
+              {gaugeMessage}
+            </p>
+          )}
           {isQuickChallenge && (
             <p className={cx('gaugeStat')}>
               Trả lời đúng <strong>{correct}/{total}</strong> câu

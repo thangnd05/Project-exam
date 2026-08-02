@@ -193,11 +193,12 @@ const TestResultPage = () => {
                 )}
 
                 <RecoveryPlan
-                  recoveryMessage={enhanced.recoveryMessage}
                   userTestId={userTestId}
                   examTypeId={enhanced.examTypeId}
                   hasTarget={enhanced.hasTarget}
                   isTargetMet={enhanced.isTargetMet}
+                  readinessScore={enhanced.readinessScore}
+                  readinessLevel={enhanced.readinessLevel}
                   isGuest={isGuest}
                 />
               </div>

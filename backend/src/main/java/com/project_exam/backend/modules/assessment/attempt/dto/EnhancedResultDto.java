@@ -22,11 +22,6 @@ public class EnhancedResultDto {
     private List<PartBreakdownDto> partBreakdown;
 
     private int percentage;
-    private int gaugePercentage;
-    private String displayValue;
-    private String gaugeLabel;
-    private String gaugeTitle;
-    private String gaugeMessage;
 
     private int readinessScore;
     private String readinessLevel;
@@ -38,6 +33,4 @@ public class EnhancedResultDto {
     private boolean hasTarget;
     private Boolean isTargetMet;
     private Integer targetScore;
-
-    private String recoveryMessage;
 }
