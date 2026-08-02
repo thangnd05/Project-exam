@@ -32,7 +32,7 @@ const normalizeCollections = (data) => (Array.isArray(data) ? data : []).map(map
 const normalizeExamTypes = (data) =>
   Array.isArray(data) ? data : data?.data ?? data?.content ?? [];
 
-export function useQuestionCollections() {
+export function useAdminQuestionCollections() {
   const collectionsQuery = useQuery({
     queryKey: questionCollectionKeys.all,
     queryFn: getQuestionCollections,

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {useCosmetics} from '~/features/admin/gamification/hooks/useCosmetics';
+import {useAdminCosmetics} from '~/features/admin/gamification/hooks/useAdminCosmetics';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
@@ -83,7 +83,7 @@ function CosmeticsManagementPage() {
     deleteCosmetic,
     isSubmitting,
     isDeleting,
-  } = useCosmetics();
+  } = useAdminCosmetics();
 
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);

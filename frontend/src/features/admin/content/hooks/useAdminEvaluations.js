@@ -29,7 +29,7 @@ const normalizePage = (evaluationPage) => ({
   totalPages: Math.max(evaluationPage?.totalPages || 1, 1),
 });
 
-export function useEvaluations({page, size, keyword, rating}) {
+export function useAdminEvaluations({page, size, keyword, rating}) {
   const query = useQuery({
     queryKey: evaluationKeys.list({page, size, keyword, rating}),
     queryFn: () =>

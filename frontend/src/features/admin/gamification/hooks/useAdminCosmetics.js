@@ -10,7 +10,7 @@ export const cosmeticKeys = {
   list: () => ['admin-cosmetics'],
 };
 
-export function useCosmetics() {
+export function useAdminCosmetics() {
   const crud = useAdminCrud({
     queryKey: cosmeticKeys.list(),
     list: getCosmetics,

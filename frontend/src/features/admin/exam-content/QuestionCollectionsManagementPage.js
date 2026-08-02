@@ -7,7 +7,7 @@ import BaseModal from '~/shared/ui/modal/BaseModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
-import {useQuestionCollections} from '~/features/admin/exam-content/hooks/useQuestionCollections';
+import {useAdminQuestionCollections} from '~/features/admin/exam-content/hooks/useAdminQuestionCollections';
 import styles from './QuestionCollectionsManagementPage.module.scss';
 
 const cx = classNames.bind(styles);
@@ -131,7 +131,7 @@ function QuestionCollectionsManagementPage() {
     createCollection,
     updateCollection,
     deleteCollection,
-  } = useQuestionCollections();
+  } = useAdminQuestionCollections();
 
   const applyDefaultExpanded = useCallback((list) => {
     setExpandedIds(new Set(list.filter((c) => c.child_count > 0).map((c) => c.collection_id)));

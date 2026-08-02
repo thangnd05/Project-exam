@@ -12,7 +12,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '../components/common';
-import {useEvaluationMutations, useEvaluations} from '~/features/admin/content/hooks/useEvaluations';
+import {useEvaluationMutations, useAdminEvaluations} from '~/features/admin/content/hooks/useAdminEvaluations';
 
 const emptyForm = {
   content: '',
@@ -38,7 +38,7 @@ function EvaluationsManagementPage() {
     totalPages,
     isLoading: loading,
     isError,
-  } = useEvaluations({
+  } = useAdminEvaluations({
     page: currentPage,
     size: ITEMS_PER_PAGE,
     keyword: debouncedKeyword,

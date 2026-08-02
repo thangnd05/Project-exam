@@ -7,7 +7,7 @@ export const postKeys = {
   list: (params) => ['admin-posts', params],
 };
 
-export function usePosts({ page, size, status, keyword }) {
+export function useAdminPosts({ page, size, status, keyword }) {
   const query = useQuery({
     queryKey: postKeys.list({ page, size, status, keyword }),
     queryFn: () =>

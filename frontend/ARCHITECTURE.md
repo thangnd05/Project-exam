@@ -65,7 +65,8 @@ return {
 - Tránh trả raw `useQuery()` trừ khi hook chỉ là wrapper mỏng cho admin CRUD factory.
 - Mutation-only hook (`useCreateAlbum`, `useUpdateClass`…): được phép `return useMutation(...)` với `onSuccess`/`onError` callback.
 - Query key factory: `export const fooKeys = { list: ['foo'] }`.
-- Tên hook **không trùng** giữa shared và admin (`useCoins` admin → `useAdminCoins`).
+- Tên hook **không trùng** giữa shared và admin (`useCoins` admin → `useAdminCoins`;
+  `usePosts`/`useCosmetics`/`useEvaluations`/`useQuestionCollections` admin → `useAdmin*`).
 - Field loading: luôn `isLoading` (không dùng `loading`).
 
 ## 6. Error & message từ API
