@@ -318,7 +318,7 @@ function GeneratePlanPage() {
                 {result.baselineReadiness ?? '—'}% ({getReadinessLabel(result.readinessLevel)})
               </li>
               <li><strong>Mục tiêu:</strong> {result.targetScore ?? 'N/A'}</li>
-              <li><strong>Ải:</strong> {result.totalTasks} (ước tính ~{result.estimatedDaysRemaining} ngày)</li>
+              <li><strong>Ải:</strong> {result.totalTasks}</li>
             </ul>
 
             {result.diagnosisSourceCategory === 'QUICK_CHALLENGE' && (

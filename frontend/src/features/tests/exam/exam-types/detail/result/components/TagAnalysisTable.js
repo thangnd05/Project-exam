@@ -32,7 +32,7 @@ function TagAnalysisTable({ enhanced, userTestId }) {
     const partTabs = parts.map((p) => ({
       key: p.examPartId,
       label: p.partName || "Phần",
-      tags: p.weakTags || [],
+      tags: p.tags || [],
     }));
 
     return partTabs;

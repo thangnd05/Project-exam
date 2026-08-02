@@ -42,7 +42,6 @@ public class PlanResponse {
 
     private Integer totalTasks;
     private Integer passedTasks;
-    private Integer estimatedDaysRemaining;
 
     private String recommendedTaskId;
 

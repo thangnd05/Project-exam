@@ -57,7 +57,7 @@ export function isCapstoneTask(task) {
 /** Câu tóm tắt cho lộ trình vừa sinh — ghép từ số liệu trong PlanResponse. */
 export function buildPlanSummary(plan) {
   const target = plan.targetScore == null ? 'đạt mục tiêu' : `đạt ${plan.targetScore} điểm`;
-  return `Readiness ${plan.baselineReadiness ?? 0}%. ${plan.totalTasks ?? 0} ải cho Part chưa đạt mục tiêu — ~${plan.estimatedDaysRemaining ?? 0} ngày, để ${target}.`;
+  return `Readiness ${plan.baselineReadiness ?? 0}%. ${plan.totalTasks ?? 0} ải cho Part chưa đạt mục tiêu, để ${target}.`;
 }
 
 export const planStatusLabel = (status) => PLAN_STATUS_LABEL[status] || status || '—';

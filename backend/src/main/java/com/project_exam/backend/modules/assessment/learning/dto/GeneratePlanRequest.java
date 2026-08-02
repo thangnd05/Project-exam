@@ -13,7 +13,7 @@ public class GeneratePlanRequest {
     @NotBlank(message = "userTestId không được để trống")
     private String userTestId;
 
-    /** Optional — FE hiện có thể chưa gửi; dùng để cap estimatedDaysRemaining. */
+    /** Optional — FE hiện có thể chưa gửi; lưu vào LearningPlan.deadlineDays. */
     @Min(value = 3, message = "Cần tối thiểu 3 ngày")
     @Max(value = 365, message = "Tối đa 365 ngày")
     private Integer deadlineDays;

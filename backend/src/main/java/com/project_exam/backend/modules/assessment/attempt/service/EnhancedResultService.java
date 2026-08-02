@@ -304,7 +304,7 @@ public class EnhancedResultService {
                 isTargetMet = percentageRounded >= targetPercentage;
             }
 
-            List<TagBreakdownDto> weakTags = buildTagBreakdown(
+            List<TagBreakdownDto> tags = buildTagBreakdown(
                     qIds, statusMap, questionNumberMap, tagsByQuestion, tagMap);
 
             parts.add(PartBreakdownDto.builder()
@@ -318,7 +318,7 @@ public class EnhancedResultService {
                     .percentage(percentageRounded)
                     .targetPercentage(targetPercentage)
                     .isTargetMet(isTargetMet)
-                    .weakTags(weakTags)
+                    .tags(tags)
                     .build());
         }
 

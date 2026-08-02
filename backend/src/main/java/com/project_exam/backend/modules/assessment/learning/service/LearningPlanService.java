@@ -56,7 +56,6 @@ public class LearningPlanService {
 
     private static final int DEFAULT_PASS_ACCURACY = 70;
     private static final int DEFAULT_WEAK_TAG_THRESHOLD = 60;
-    private static final int ESTIMATED_DAYS_PER_TASK = 2;
 
     private final EnhancedResultService enhancedResultService;
     private final LearningPlanRepository planRepository;
@@ -183,7 +182,6 @@ public class LearningPlanService {
 
         return buildPlanResponse(
                 plan,
-                candidates.size(),
                 savedTasks,
                 partsWithoutTasks,
                 taskViewAssembler.lookupsFor(savedTasks),
@@ -389,8 +387,8 @@ public class LearningPlanService {
         List<TaskCandidate> partTasks = new ArrayList<>();
         Set<String> usedTagIds = new HashSet<>();
 
-        if (part.getWeakTags() != null) {
-            for (TagBreakdownDto tag : part.getWeakTags()) {
+        if (part.getTags() != null) {
+            for (TagBreakdownDto tag : part.getTags()) {
                 if (tag.getTagId() == null || tag.getPercentage() >= threshold) {
                     continue;
                 }
@@ -399,8 +397,8 @@ public class LearningPlanService {
             }
         }
 
-        if (partTasks.isEmpty() && part.getWeakTags() != null) {
-            part.getWeakTags().stream()
+        if (partTasks.isEmpty() && part.getTags() != null) {
+            part.getTags().stream()
                     .filter(t -> t.getTagId() != null)
                     .forEach(tag -> addTaskIfNew(partTasks, usedTagIds,
                             buildTaskCandidate(tag.getTagId(), tag, part, passAccuracy)));
@@ -507,15 +505,10 @@ public class LearningPlanService {
 
     private PlanResponse buildPlanResponse(
             LearningPlan plan,
-            int taskCount,
             List<LearningPlanTask> tasks,
             List<String> partsWithoutTasks,
             PlanTaskViewAssembler.Lookups lookups,
             DiagnosisSource diagnosisSource) {
-        int estimatedDays = taskCount * ESTIMATED_DAYS_PER_TASK;
-        if (plan.getDeadlineDays() != null) {
-            estimatedDays = Math.min(estimatedDays, plan.getDeadlineDays());
-        }
         long cleared = tasks.stream().filter(LearningPlanTaskUnlockSupport::isCleared).count();
 
         PlanResponse response = learningMapper.toGeneratedPlanResponse(
@@ -524,7 +517,6 @@ public class LearningPlanService {
                 plan.getPlanStage().name(),
                 tasks.size(),
                 (int) cleared,
-                estimatedDays,
                 taskViewAssembler.buildPartGroups(tasks, lookups),
                 partsWithoutTasks);
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, lookups));
@@ -539,8 +531,6 @@ public class LearningPlanService {
             Map<String, UserTarget> currentTargets,
             Map<String, DiagnosisSource> diagnosisSources) {
         long cleared = tasks.stream().filter(LearningPlanTaskUnlockSupport::isCleared).count();
-        int remaining = (int) (tasks.size() - cleared);
-        int estimatedDays = remaining * ESTIMATED_DAYS_PER_TASK;
 
         PlanResponse response = learningMapper.toPlanResponseFromEntity(
                 plan,
@@ -548,7 +538,6 @@ public class LearningPlanService {
                 plan.getPlanStage() != null ? plan.getPlanStage().name() : PlanStage.FOUNDATION.name(),
                 tasks.size(),
                 (int) cleared,
-                estimatedDays,
                 taskViewAssembler.buildPartGroups(tasks, lookups));
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, lookups));
         response.setTargetOutdated(isTargetOutdated(plan, currentTargets.get(plan.getExamTypeId())));

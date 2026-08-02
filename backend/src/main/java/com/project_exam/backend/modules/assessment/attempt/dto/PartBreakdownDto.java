@@ -20,5 +20,5 @@ public class PartBreakdownDto {
     private double percentage;
     private Double targetPercentage;
     private Boolean isTargetMet;
-    private List<TagBreakdownDto> weakTags;
+    private List<TagBreakdownDto> tags;
 }

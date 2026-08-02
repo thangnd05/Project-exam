@@ -29,7 +29,6 @@ public class LearningMapper {
             String planStage,
             int totalTasks,
             int passedTasks,
-            int estimatedDaysRemaining,
             List<PlanPartGroupDto> partGroups,
             List<String> partsWithoutTasks) {
         return PlanResponse.builder()
@@ -48,7 +47,6 @@ public class LearningMapper {
                 .createdAt(plan.getCreatedAt())
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
-                .estimatedDaysRemaining(estimatedDaysRemaining)
                 .partGroups(partGroups)
                 .partsWithoutTasks(partsWithoutTasks)
                 .build();
@@ -60,7 +58,6 @@ public class LearningMapper {
             String planStage,
             int totalTasks,
             int passedTasks,
-            int estimatedDaysRemaining,
             List<PlanPartGroupDto> partGroups) {
         return PlanResponse.builder()
                 .learningPlanId(plan.getLearningPlanId())
@@ -79,7 +76,6 @@ public class LearningMapper {
                 .createdAt(plan.getCreatedAt())
                 .totalTasks(totalTasks)
                 .passedTasks(passedTasks)
-                .estimatedDaysRemaining(estimatedDaysRemaining)
                 .partGroups(partGroups)
                 .partsWithoutTasks(List.of())
                 .build();
