@@ -6,7 +6,6 @@ import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepos
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanTask;
 import com.project_exam.backend.modules.assessment.learning.domain.PlanTaskType;
-import com.project_exam.backend.modules.assessment.learning.domain.TaskStatus;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupDto;
 import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceDto;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskDto;
@@ -104,7 +103,7 @@ public class PlanTaskViewAssembler {
                     .toList();
             ExamPart part = lookups.partsById().get(partId);
             int passedInPart = (int) partTasks.stream()
-                    .filter(t -> t.getStatus() == TaskStatus.PASSED)
+                    .filter(LearningPlanTaskUnlockSupport::isCleared)
                     .count();
             groups.add(learningMapper.toPartGroup(
                     partId,

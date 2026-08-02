@@ -8,7 +8,7 @@ import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import ConfirmActionModal from '~/shared/ui/modal/ConfirmActionModal';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { getRecoveryResourceLinkProps } from '~/shared/utils/recoveryResource';
-import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
+import { getApiBaseUrl, getFullMediaUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import { useSubmitSession } from './hooks/useSubmitSession';
@@ -35,6 +35,86 @@ const planSessionKeys = {
   session: (learningPlanId, taskId) =>
     ['plan-session', learningPlanId, taskId || null],
 };
+
+// Gom các câu hỏi cùng passage vào một nhóm để chỉ hiển thị đoạn văn/audio một lần.
+function groupQuestionsByPassage(questions) {
+  const byPassage = new Map();
+  const groups = [];
+  (questions || []).forEach((q) => {
+    const pid = q.passage?.passageId;
+    if (pid && byPassage.has(pid)) {
+      byPassage.get(pid).questions.push(q);
+      return;
+    }
+    const group = { passage: q.passage || null, questions: [q] };
+    if (pid) byPassage.set(pid, group);
+    groups.push(group);
+  });
+  return groups;
+}
+
+function PassageBox({ passage }) {
+  if (!passage) return null;
+  const mediaList = Array.isArray(passage.passageMedias) ? passage.passageMedias : [];
+  const hasContent = Boolean(passage.content);
+  const hasSingleAudio =
+    mediaList.length === 0 && Boolean(passage.mediaUrl) && passage.passageType === 'LISTENING';
+  if (!hasContent && mediaList.length === 0 && !hasSingleAudio) return null;
+
+  const renderText = (text, key) => (
+    <div key={key} className={ex('passage-content')}>
+      {String(text)
+        .split(/\n+/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((para, i) => (
+          <p key={i} className={ex('passage-paragraph')}>
+            {para}
+          </p>
+        ))}
+    </div>
+  );
+
+  return (
+    <div className={ex('passage-box')}>
+      {hasContent && renderText(passage.content, 'main')}
+      {mediaList.map((m, idx) => {
+        if (m?.mediaType === 'TEXT') {
+          return m.content ? renderText(m.content, `media-${idx}`) : null;
+        }
+        if (!m?.mediaUrl) return null;
+        if (m.mediaType === 'AUDIO') {
+          return (
+            <div key={idx} className="mb-3">
+              <audio controls src={getFullMediaUrl(m.mediaUrl)} className={ex('audio-player')} />
+            </div>
+          );
+        }
+        if (m.mediaType === 'IMAGE') {
+          return (
+            <div key={idx} className={ex('passage-image-box')}>
+              <img
+                src={getFullMediaUrl(m.mediaUrl)}
+                alt={`Passage ${idx + 1}`}
+                className={ex('passage-image')}
+              />
+            </div>
+          );
+        }
+        return null;
+      })}
+      {hasSingleAudio && (
+        <div className="mb-4">
+          <audio
+            controls
+            src={getFullMediaUrl(passage.mediaUrl)}
+            className={ex('audio-player')}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 function PlanStudyPage() {
   const { learningPlanId } = useParams();
@@ -184,9 +264,15 @@ function PlanStudyPage() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertSuccess')}>
-          <span>{session.message}</span>
+          <span>
+            {session.message}
+            <br />
+            <small>
+              Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang kế hoạch —
+              hệ thống sẽ gợi ý sinh lộ trình mới từ chính bài vừa làm.
+            </small>
+          </span>
           <div className={cx('actionBar')}>
-
             <Link
               to={buildExamTypeDetailPath(session.examTypeId)}
               className={cx('btn', 'btnPrimary', 'btnSm')}
@@ -197,7 +283,7 @@ function PlanStudyPage() {
               to={`/learning-plans/${learningPlanId}`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
-              Về kế hoạch
+              Xem bước tiếp theo
             </Link>
           </div>
         </div>
@@ -246,6 +332,13 @@ function PlanStudyPage() {
 
   const answeredCount = (session.questions || []).filter((q) => isAnswered(q, selections)).length;
 
+  const questionGroups = groupQuestionsByPassage(session.questions);
+  const orderedQuestions = questionGroups.flatMap((g) => g.questions);
+  const questionNumberById = {};
+  orderedQuestions.forEach((q, i) => {
+    questionNumberById[q.questionId] = i + 1;
+  });
+
   const navAnswers = {};
   (session?.questions || []).forEach((q) => {
     const sel = selections[q.questionId];
@@ -291,7 +384,7 @@ function PlanStudyPage() {
                     {session.planStage === 'MOCK' ? 'Luyện lại' : planStageLabel(session.planStage)}
                   </span>
                   <span className={cx('badge', 'badgeMuted')}>
-                    {session.passedTasks}/{session.totalTasks} ải đã vượt
+                    {session.passedTasks}/{session.totalTasks} ải đã xong
                   </span>
                   {session.passAccuracyRequired != null && (
                     <span className={cx('badge', 'badgePrimary')}>
@@ -329,41 +422,56 @@ function PlanStudyPage() {
 
           <div className={cx('studyLayout')}>
             <div className={cx('studyMain')}>
-              {(session.questions || []).map((q, idx) => {
-                const isMsq = q.questionType === 'MSQ';
-                const sel = selections[q.questionId];
-                return (
-                  <div key={q.questionId} id={`q-${q.questionId}`} className={ex('question-card')}>
-                    <span className={ex('q-text')}>
-                      <span className={ex('q-number')}>Câu {idx + 1}:</span>{' '}
-                      {q.questionText}
-                    </span>
-                    {isMsq && <div className={cx('msqHint')}>Chọn tất cả đáp án đúng:</div>}
-                    <div className={ex('mcq-group')}>
-                      {(q.answers || []).map((a) => {
-                        const checked = isMsq
-                          ? Array.isArray(sel) && sel.includes(a.answerId)
-                          : sel === a.answerId;
-                        return (
-                          <label
-                            key={a.answerId}
-                            className={ex('mcq-option', { selected: checked })}
-                          >
-                            <input
-                              type={isMsq ? 'checkbox' : 'radio'}
-                              name={`q-${q.questionId}`}
-                              checked={checked}
-                              onChange={() => handleSelect(q.questionId, a.answerId, isMsq)}
-                            />
-                            <span>
-                              {a.answerText?.trim()
-                                ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
-                                : a.answerLabel}
-                            </span>
-                          </label>
-                        );
-                      })}
+              {questionGroups.map((group, groupIdx) => {
+                const questionCards = group.questions.map((q) => {
+                  const isMsq = q.questionType === 'MSQ';
+                  const sel = selections[q.questionId];
+                  return (
+                    <div key={q.questionId} id={`q-${q.questionId}`} className={ex('question-card')}>
+                      <span className={ex('q-text')}>
+                        <span className={ex('q-number')}>Câu {questionNumberById[q.questionId]}:</span>{' '}
+                        {q.questionText}
+                      </span>
+                      {isMsq && <div className={cx('msqHint')}>Chọn tất cả đáp án đúng:</div>}
+                      <div className={ex('mcq-group')}>
+                        {(q.answers || []).map((a) => {
+                          const checked = isMsq
+                            ? Array.isArray(sel) && sel.includes(a.answerId)
+                            : sel === a.answerId;
+                          return (
+                            <label
+                              key={a.answerId}
+                              className={ex('mcq-option', { selected: checked })}
+                            >
+                              <input
+                                type={isMsq ? 'checkbox' : 'radio'}
+                                name={`q-${q.questionId}`}
+                                checked={checked}
+                                onChange={() => handleSelect(q.questionId, a.answerId, isMsq)}
+                              />
+                              <span>
+                                {a.answerText?.trim()
+                                  ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
+                                  : a.answerLabel}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
                     </div>
+                  );
+                });
+
+                if (!group.passage) {
+                  return questionCards;
+                }
+                return (
+                  <div
+                    key={group.passage.passageId || groupIdx}
+                    className={ex('group-section')}
+                  >
+                    <PassageBox passage={group.passage} />
+                    {questionCards}
                   </div>
                 );
               })}
@@ -394,7 +502,7 @@ function PlanStudyPage() {
             {(session.questions?.length ?? 0) > 0 && (
               <div className={cx('studySidebar')}>
                 <TestStartDashboard
-                  allQuestions={session.questions}
+                  allQuestions={orderedQuestions}
                   userAnswers={navAnswers}
                   onScrollToQuestion={scrollToQuestion}
                   gridMaxHeight="calc(100vh - 24rem)"

@@ -1,7 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { ClipboardCheck, Play } from 'lucide-react';
+import MockStageGuide from '../components/MockStageGuide';
+import PlanCongratsModal, {
+  congratsSeenKey,
+  markCongratsSeen,
+} from '../components/PlanCongratsModal';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import { usePlanDetail } from './hooks/usePlanDetail';
 import { planStageLabel, planStatusLabel } from '../planLabels';
@@ -30,12 +35,27 @@ function progressCheer(passed, total, pct) {
 function PlanDetailPage() {
   const { learningPlanId } = useParams();
   const { plan, error, loading } = usePlanDetail(learningPlanId);
+  const [showCongrats, setShowCongrats] = useState(false);
 
   useEffect(() => {
     if (!loading && window.location.hash === '#chon-ai-hoc') {
       document.getElementById('chon-ai-hoc')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [loading, plan]);
+
+  // Lần đầu thấy plan đã vượt hết ải → hiện modal chúc mừng (mỗi plan một lần).
+  useEffect(() => {
+    if (!plan || plan.planStage !== 'MOCK' || plan.status === 'REPLACED') return;
+    try {
+      if (localStorage.getItem(congratsSeenKey(plan.learningPlanId))) return;
+    } catch { /* localStorage bị chặn thì vẫn hiện modal */ }
+    setShowCongrats(true);
+  }, [plan]);
+
+  const dismissCongrats = () => {
+    setShowCongrats(false);
+    markCongratsSeen(learningPlanId);
+  };
 
   if (loading) {
     return <div className={cx('wrapper')}><div className={cx('loading')}>Đang tải...</div></div>;
@@ -72,6 +92,13 @@ function PlanDetailPage() {
 
   return (
     <div className={cx('wrapper')}>
+      <PlanCongratsModal
+        show={showCongrats}
+        onClose={dismissCongrats}
+        onNext={dismissCongrats}
+        totalTasks={totalTasks}
+        planSequence={plan.planSequence}
+      />
       <div className={cx('headerBar')}>
         <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
           Quay lại
@@ -164,7 +191,7 @@ function PlanDetailPage() {
 
         <div className={cx('planHeroProgressLabel')}>
           <span>
-            Tiến độ: <strong>{passedTasks}/{totalTasks}</strong> ải đã vượt
+            Tiến độ: <strong>{passedTasks}/{totalTasks}</strong> ải đã xong
           </span>
           <strong>{progressPct}%</strong>
         </div>
@@ -175,6 +202,8 @@ function PlanDetailPage() {
           />
         </div>
       </div>
+
+      {!isReplaced && isMockStage && <MockStageGuide plan={plan} />}
 
       {plan.diagnosisSourcePractice && (
         <div className={cx('alert', 'alertWarning')}>

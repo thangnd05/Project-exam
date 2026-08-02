@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.learning.mapper;
 import com.project_exam.backend.modules.assessment.exam.domain.Answer;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.domain.RecoveryResource;
+import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlan;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanSession;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanTask;
@@ -162,7 +163,8 @@ public class LearningMapper {
                 .build();
     }
 
-    public QuestionResponse toQuestionResponse(Question q, List<AnswerResponse> answers) {
+    public QuestionResponse toQuestionResponse(
+            Question q, PassageResponse passage, List<AnswerResponse> answers) {
         return QuestionResponse.builder()
                 .questionId(q.getQuestionId())
                 .questionNumber(q.getQuestionNumber())
@@ -170,6 +172,7 @@ public class LearningMapper {
                 .questionText(q.getQuestionText())
                 .questionType(q.getQuestionType())
                 .isBank(q.getIsBank())
+                .passage(passage)
                 .answers(answers)
                 .build();
     }

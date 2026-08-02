@@ -155,7 +155,7 @@ function PlanPartTaskList({
                   <strong>
                     {passed}/{total}
                   </strong>{' '}
-                  ải đã vượt
+                  ải đã xong
                   {group.passAccuracy != null && ` · ngưỡng đạt ≥${group.passAccuracy}%`}
                 </span>
                 <span className={cx('partDots')}>
@@ -199,7 +199,9 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
     if (!tasks.length) return null;
     const rec = tasks.find((t) => t.taskId === recommendedTaskId);
     if (rec) return rec.taskId;
-    const next = tasks.find((t) => t.status !== 'PASSED' && t.status !== 'LOCKED');
+    const next = tasks.find(
+      (t) => t.status !== 'PASSED' && t.status !== 'SKIPPED' && t.status !== 'LOCKED',
+    );
     return (next || tasks[0]).taskId;
   }, [tasks, recommendedTaskId]);
 

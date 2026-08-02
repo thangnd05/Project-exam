@@ -1,0 +1,247 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(6, 40, 35, 0.55);
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.25s ease;
+}
+
+.card {
+  position: relative;
+  width: min(46rem, 100%);
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 24px 64px rgba(6, 40, 35, 0.35);
+  text-align: center;
+  animation: popIn 0.35s cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+
+.hero {
+  position: relative;
+  padding: 3.2rem 2.4rem 2.4rem;
+  background: linear-gradient(135deg, #0f766e 0%, #10b981 60%, #34d399 100%);
+  color: #fff;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.32);
+  }
+}
+
+.trophyRing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 8.8rem;
+  height: 8.8rem;
+  margin: 0 auto 1.6rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.22);
+  animation: bounceIn 0.6s cubic-bezier(0.22, 1.4, 0.36, 1) 0.15s backwards;
+
+  svg {
+    width: 4.4rem;
+    height: 4.4rem;
+    color: #fde68a;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+  }
+}
+
+.heroTitle {
+  margin: 0 0 0.6rem;
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.heroSub {
+  margin: 0;
+  font-size: 1.5rem;
+  opacity: 0.92;
+}
+
+.body {
+  padding: 2.4rem;
+}
+
+.progressPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.6rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.nextSteps {
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.nextStep {
+  display: flex;
+  gap: 1.2rem;
+  align-items: flex-start;
+
+  & + & {
+    margin-top: 1.2rem;
+  }
+}
+
+.stepNum {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: #d1fae5;
+  color: #047857;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.stepText {
+  font-size: 1.45rem;
+  color: #334155;
+  line-height: 1.5;
+
+  strong {
+    color: #0f172a;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btnPrimary {
+  padding: 1rem 2.4rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0f766e, #10b981);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+  }
+}
+
+.btnGhost {
+  padding: 1rem 2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  color: #475569;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f8fafc;
+  }
+}
+
+/* Confetti rơi bằng CSS thuần, không cần thư viện */
+.confetti {
+  position: absolute;
+  top: -1.2rem;
+  width: 0.9rem;
+  height: 1.4rem;
+  border-radius: 2px;
+  opacity: 0.9;
+  animation: confettiFall linear infinite;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-2rem) rotate(0deg);
+  }
+  100% {
+    transform: translateY(24rem) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bounceIn {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2.4rem 1.6rem 2rem;
+  }
+  .body {
+    padding: 1.8rem 1.6rem;
+  }
+  .heroTitle {
+    font-size: 2rem;
+  }
+}

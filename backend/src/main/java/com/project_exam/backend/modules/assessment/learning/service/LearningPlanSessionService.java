@@ -5,8 +5,14 @@ import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.exam.domain.RecoveryResource;
+import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaResponse;
+import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
+import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
+import com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.AnswerRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.PassageMediaRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.PassageRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.RecoveryResourceRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
@@ -16,6 +22,7 @@ import com.project_exam.backend.modules.assessment.learning.dto.*;
 import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.repository.*;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
+import com.project_exam.backend.modules.assessment.learning.support.LearningPlanProgressSupport;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanTaskUnlockSupport;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanAccess;
 import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
@@ -49,12 +56,16 @@ public class LearningPlanSessionService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final AnswerService answerService;
+    private final PassageRepository passageRepository;
+    private final PassageMediaRepository passageMediaRepository;
+    private final PassageMapper passageMapper;
+    private final PassageMediaMapper passageMediaMapper;
     private final ExamPartRepository examPartRepository;
     private final ResourceTagRepository resourceTagRepository;
     private final RecoveryResourceRepository recoveryResourceRepository;
     private final LearningPlanResourceLookup resourceLookup;
     private final PlanTaskViewAssembler taskViewAssembler;
-    private final LearningPlanTaskUnlockSupport taskUnlockSupport;
+    private final LearningPlanProgressSupport progressSupport;
     private final StreakService streakService;
     private final LearningMapper learningMapper;
     private final LearningPlanAccess planAccess;
@@ -89,6 +100,7 @@ public class LearningPlanSessionService {
     @Transactional
     public CurrentSessionResponse startTaskSession(String userId, String learningPlanId, String taskId) {
         LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
+        progressSupport.healPlan(plan);
         PlanStage stage = effectiveStage(plan);
 
         if (taskId == null || taskId.isBlank()) {
@@ -142,24 +154,13 @@ public class LearningPlanSessionService {
     }
 
     private boolean skipEmptyPoolTask(LearningPlan plan, LearningPlanTask task) {
-
-        if (task.getStatus() == TaskStatus.PASSED) {
+        if (LearningPlanTaskUnlockSupport.isCleared(task)) {
             return false;
         }
         task.setStatus(TaskStatus.SKIPPED);
         taskRepository.save(task);
-        maybeAdvanceToMock(plan);
+        progressSupport.afterTaskCleared(plan, task);
         return true;
-    }
-
-    private void maybeAdvanceToMock(LearningPlan plan) {
-        String planId = plan.getLearningPlanId();
-        long total = taskRepository.countByLearningPlanId(planId);
-        long passed = taskRepository.countByLearningPlanIdAndStatus(planId, TaskStatus.PASSED);
-        long skipped = taskRepository.countByLearningPlanIdAndStatus(planId, TaskStatus.SKIPPED);
-        if (total > 0 && passed + skipped == total) {
-            advanceToMockStage(plan);
-        }
     }
 
     private CurrentSessionResponse buildReviewResponse(LearningPlan plan, LearningPlanTask task) {
@@ -339,9 +340,10 @@ public class LearningPlanSessionService {
             }
             taskRepository.save(task);
             if (passed) {
-                taskUnlockSupport.onTaskPassed(task, learningPlanId);
+                progressSupport.afterTaskCleared(plan, task);
+            } else {
+                progressSupport.maybeAdvanceToMock(plan);
             }
-            maybeAdvanceToMock(plan);
         }
 
         String message = passed
@@ -442,11 +444,6 @@ public class LearningPlanSessionService {
                 sessionRepository.save(session);
             }
         }
-    }
-
-    private void advanceToMockStage(LearningPlan plan) {
-        plan.setPlanStage(PlanStage.MOCK);
-        planRepository.save(plan);
     }
 
     private int resolvePassAccuracy(LearningPlan plan, LearningPlanSession session) {
@@ -602,13 +599,16 @@ public class LearningPlanSessionService {
                 .collect(Collectors.toMap(Question::getQuestionId, q -> q));
         Map<String, List<AnswerResponse>> answersMap =
                 answerService.getAnswersForMultipleQuestions(questionIds);
+        Map<String, PassageResponse> passagesById = loadPassageDtos(questions);
 
         List<QuestionResponse> questionDtos = new ArrayList<>();
         for (String qid : questionIds) {
             Question q = questionMap.get(qid);
             if (q == null) continue;
             questionDtos.add(learningMapper.toQuestionResponse(
-                    q, answersMap.getOrDefault(qid, List.of())));
+                    q,
+                    q.getPassageId() != null ? passagesById.get(q.getPassageId()) : null,
+                    answersMap.getOrDefault(qid, List.of())));
         }
 
         PlanTaskDto activeTaskDto = null;
@@ -629,8 +629,7 @@ public class LearningPlanSessionService {
                     .orElse(null);
         }
 
-        long passed = taskRepository.countByLearningPlanIdAndStatus(
-                plan.getLearningPlanId(), TaskStatus.PASSED);
+        long cleared = countClearedTasks(plan.getLearningPlanId());
         long total = taskRepository.countByLearningPlanId(plan.getLearningPlanId());
 
         return learningMapper.toQuizSessionResponse(
@@ -642,20 +641,43 @@ public class LearningPlanSessionService {
                 resolvePassAccuracy(plan, session),
                 questionDtos,
                 (int) total,
-                (int) passed,
+                (int) cleared,
                 formatSessionMessage(activeTaskDto));
     }
 
+    /** Đoạn văn + media (audio/ảnh) kèm câu hỏi, để FE hiển thị được câu Reading/Listening. */
+    private Map<String, PassageResponse> loadPassageDtos(List<Question> questions) {
+        Set<String> passageIds = questions.stream()
+                .map(Question::getPassageId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (passageIds.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, List<PassageMediaResponse>> mediaByPassageId = passageMediaRepository
+                .findByPassageIdInOrderByIdAsc(passageIds).stream()
+                .map(passageMediaMapper::toResponse)
+                .collect(Collectors.groupingBy(PassageMediaResponse::getPassageId));
+
+        return passageRepository.findAllById(passageIds).stream()
+                .collect(Collectors.toMap(
+                        p -> p.getPassageId(),
+                        p -> passageMapper.toResponse(
+                                p,
+                                mediaByPassageId.getOrDefault(p.getPassageId(), List.of()),
+                                false)));
+    }
+
     private CurrentSessionResponse buildMockStageResponse(LearningPlan plan) {
-        long passed = taskRepository.countByLearningPlanIdAndStatus(
-                plan.getLearningPlanId(), TaskStatus.PASSED);
+        long cleared = countClearedTasks(plan.getLearningPlanId());
         long total = taskRepository.countByLearningPlanId(plan.getLearningPlanId());
 
         return learningMapper.toMockStageResponse(
                 plan,
                 PlanStage.MOCK.name(),
                 (int) total,
-                (int) passed,
+                (int) cleared,
                 "Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.");
     }
 
@@ -663,16 +685,20 @@ public class LearningPlanSessionService {
         List<LearningPlanTask> taskEntities = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(
                 plan.getLearningPlanId());
         PlanTaskViewAssembler.Lookups lookups = taskViewAssembler.lookupsFor(taskEntities);
-        long passed = taskRepository.countByLearningPlanIdAndStatus(
-                plan.getLearningPlanId(), TaskStatus.PASSED);
+        long cleared = countClearedTasks(plan.getLearningPlanId());
 
         return learningMapper.toPickResponse(
                 plan,
                 (stage != null ? stage : PlanStage.FOUNDATION).name(),
                 taskViewAssembler.buildPartGroups(taskEntities, lookups),
                 taskEntities.size(),
-                (int) passed,
+                (int) cleared,
                 "Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.");
+    }
+
+    private long countClearedTasks(String learningPlanId) {
+        return taskRepository.countByLearningPlanIdAndStatus(learningPlanId, TaskStatus.PASSED)
+                + taskRepository.countByLearningPlanIdAndStatus(learningPlanId, TaskStatus.SKIPPED);
     }
 
     private String formatSessionMessage(PlanTaskDto active) {

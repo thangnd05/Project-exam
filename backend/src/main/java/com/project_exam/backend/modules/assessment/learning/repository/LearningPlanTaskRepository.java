@@ -28,6 +28,9 @@ public interface LearningPlanTaskRepository extends JpaRepository<LearningPlanTa
 
     long countByLearningPlanIdAndStatus(String learningPlanId, TaskStatus status);
 
+    List<LearningPlanTask> findByLearningPlanIdAndStatusOrderByTaskOrderAsc(
+            String learningPlanId, TaskStatus status);
+
     Optional<LearningPlanTask> findFirstByLearningPlanIdAndStatusOrderByTaskOrderAsc(
             String learningPlanId, TaskStatus status);
 

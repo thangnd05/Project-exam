@@ -16,6 +16,8 @@ import com.project_exam.backend.modules.assessment.learning.dto.GeneratePlanRequ
 import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
 import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
+import com.project_exam.backend.modules.assessment.learning.support.LearningPlanProgressSupport;
+import com.project_exam.backend.modules.assessment.learning.support.LearningPlanTaskUnlockSupport;
 import com.project_exam.backend.modules.assessment.learning.support.PlanPrioritySupport;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanAccess;
 import com.project_exam.backend.modules.assessment.learning.support.PlanTaskViewAssembler;
@@ -77,6 +79,7 @@ public class LearningPlanService {
     private final LearningPlanSessionAnswerRepository sessionAnswerRepository;
     private final LearningMapper learningMapper;
     private final LearningPlanAccess planAccess;
+    private final LearningPlanProgressSupport progressSupport;
 
     @Transactional
     public PlanResponse generatePlan(String userId, GeneratePlanRequest request) {
@@ -202,9 +205,10 @@ public class LearningPlanService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PlanResponse getPlan(String userId, String learningPlanId) {
         LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
+        progressSupport.healPlan(plan);
         List<LearningPlanTask> tasks = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId);
         return buildPlanResponseFromEntity(
                 plan,
@@ -534,7 +538,7 @@ public class LearningPlanService {
         if (plan.getDeadlineDays() != null) {
             estimatedDays = Math.min(estimatedDays, plan.getDeadlineDays());
         }
-        long passed = tasks.stream().filter(t -> t.getStatus() == TaskStatus.PASSED).count();
+        long cleared = tasks.stream().filter(LearningPlanTaskUnlockSupport::isCleared).count();
 
         PlanResponse response = learningMapper.toGeneratedPlanResponse(
                 plan,
@@ -542,7 +546,7 @@ public class LearningPlanService {
                 plan.getPlanStage().name(),
                 buildSummary(result, plan.getTargetScore(), estimatedDays, taskCount, partsWithoutTasks),
                 tasks.size(),
-                (int) passed,
+                (int) cleared,
                 estimatedDays,
                 taskViewAssembler.buildPartGroups(tasks, lookups),
                 partsWithoutTasks);
@@ -557,8 +561,8 @@ public class LearningPlanService {
             PlanTaskViewAssembler.Lookups lookups,
             Map<String, UserTarget> currentTargets,
             Map<String, DiagnosisSource> diagnosisSources) {
-        long passed = tasks.stream().filter(t -> t.getStatus() == TaskStatus.PASSED).count();
-        int remaining = (int) (tasks.size() - passed);
+        long cleared = tasks.stream().filter(LearningPlanTaskUnlockSupport::isCleared).count();
+        int remaining = (int) (tasks.size() - cleared);
         int estimatedDays = remaining * ESTIMATED_DAYS_PER_TASK;
 
         PlanResponse response = learningMapper.toPlanResponseFromEntity(
@@ -566,12 +570,12 @@ public class LearningPlanService {
                 ReadinessThresholds.levelFromScore(plan.getBaselineReadiness()),
                 plan.getPlanStage() != null ? plan.getPlanStage().name() : PlanStage.FOUNDATION.name(),
                 String.format(
-                        "Plan #%s — %d/%d ải đã pass. %s",
+                        "Plan #%s — %d/%d ải đã xong. %s",
                         plan.getPlanSequence() != null ? plan.getPlanSequence() : "?",
-                        passed, tasks.size(),
+                        cleared, tasks.size(),
                         stageLabel(plan.getPlanStage())),
                 tasks.size(),
-                (int) passed,
+                (int) cleared,
                 estimatedDays,
                 taskViewAssembler.buildPartGroups(tasks, lookups));
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, lookups));

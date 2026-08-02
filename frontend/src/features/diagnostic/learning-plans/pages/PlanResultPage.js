@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { getCurrentSession } from '~/shared/api/learningPlanApi';
+import PlanCongratsModal, { markCongratsSeen } from '../components/PlanCongratsModal';
 import PlanResultView from '../components/PlanResultView';
 import { toPlanResult } from '../planResult';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
@@ -11,6 +13,7 @@ const cx = classNames.bind(styles);
 function PlanResultPage() {
   const { learningPlanId, taskId } = useParams();
   const navigate = useNavigate();
+  const [showCongrats, setShowCongrats] = useState(false);
 
   const query = useQuery({
     queryKey: ['plan-result', learningPlanId, taskId],
@@ -23,6 +26,15 @@ function PlanResultPage() {
 
   const goToPicker = () => navigate(`/learning-plans/${learningPlanId}`);
   const retry = () => navigate(`/learning-plans/${learningPlanId}/study?taskId=${taskId}`);
+
+  // Vượt ải cuối → toàn bộ lộ trình đã xong: bật modal chúc mừng
+  // và đánh dấu đã xem để trang kế hoạch không hiện lại lần nữa.
+  const allTasksDone = !!query.data?.passed && query.data?.planStage === 'MOCK';
+  useEffect(() => {
+    if (!allTasksDone) return;
+    setShowCongrats(true);
+    markCongratsSeen(learningPlanId);
+  }, [allTasksDone, learningPlanId]);
 
   if (query.isLoading) {
     return (
@@ -52,10 +64,18 @@ function PlanResultPage() {
     );
   }
 
+  const result = toPlanResult(data);
+
   return (
     <div className={cx('wrapper', 'studyWide')}>
+      <PlanCongratsModal
+        show={showCongrats}
+        onClose={() => setShowCongrats(false)}
+        onNext={goToPicker}
+        totalTasks={null}
+      />
       <PlanResultView
-        result={toPlanResult(data)}
+        result={result}
         onRetry={retry}
         onPickAnother={goToPicker}
       />
