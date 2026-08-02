@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class TagBreakdownDto {
+public class TagBreakdownResponse {
     private String tagId;
     private String tagName;
     private int correct;
@@ -18,5 +18,5 @@ public class TagBreakdownDto {
     private int total;
     private double percentage;
 
-    private List<TagQuestionRefDto> questions;
+    private List<TagQuestionRefResponse> questions;
 }

@@ -9,7 +9,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Builder
-public class TaskSessionHistoryDto {
+public class TaskSessionHistoryResponse {
     private String sessionId;
     private String status;
     private Integer questionCount;

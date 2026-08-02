@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.RecoveryResource;
 import com.project_exam.backend.modules.assessment.exam.domain.ResourceTag;
 import com.project_exam.backend.modules.assessment.exam.repository.RecoveryResourceRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
-import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceDto;
+import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,14 +18,14 @@ public class LearningPlanResourceLookup {
     private final ResourceTagRepository resourceTagRepository;
     private final RecoveryResourceRepository recoveryResourceRepository;
 
-    public Optional<RecommendedResourceDto> findFirstByTagId(String tagId) {
+    public Optional<RecommendedResourceResponse> findFirstByTagId(String tagId) {
         if (tagId == null || tagId.isBlank()) {
             return Optional.empty();
         }
         return Optional.ofNullable(findFirstByTagIds(List.of(tagId)).get(tagId));
     }
 
-    public Map<String, RecommendedResourceDto> findFirstByTagIds(Collection<String> tagIds) {
+    public Map<String, RecommendedResourceResponse> findFirstByTagIds(Collection<String> tagIds) {
         if (tagIds == null || tagIds.isEmpty()) {
             return Map.of();
         }
@@ -48,7 +48,7 @@ public class LearningPlanResourceLookup {
                 .stream()
                 .collect(Collectors.toMap(RecoveryResource::getResourceId, r -> r, (a, b) -> a));
 
-        Map<String, RecommendedResourceDto> result = new HashMap<>();
+        Map<String, RecommendedResourceResponse> result = new HashMap<>();
         for (Map.Entry<String, String> entry : tagToResourceId.entrySet()) {
             RecoveryResource r = resourceById.get(entry.getValue());
             if (r != null) {
@@ -58,7 +58,7 @@ public class LearningPlanResourceLookup {
         return result;
     }
 
-    public Map<String, List<RecommendedResourceDto>> findByExamPartIds(Collection<String> examPartIds) {
+    public Map<String, List<RecommendedResourceResponse>> findByExamPartIds(Collection<String> examPartIds) {
         if (examPartIds == null || examPartIds.isEmpty()) {
             return Map.of();
         }
@@ -73,8 +73,8 @@ public class LearningPlanResourceLookup {
                         Collectors.mapping(this::toDto, Collectors.toList())));
     }
 
-    public RecommendedResourceDto toDto(RecoveryResource r) {
-        return RecommendedResourceDto.builder()
+    public RecommendedResourceResponse toDto(RecoveryResource r) {
+        return RecommendedResourceResponse.builder()
                 .resourceId(r.getResourceId())
                 .title(r.getTitle())
                 .description(r.getDescription())

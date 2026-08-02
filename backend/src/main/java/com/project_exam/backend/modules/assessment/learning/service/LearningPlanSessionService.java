@@ -402,7 +402,7 @@ public class LearningPlanSessionService {
     }
 
     @Transactional(readOnly = true)
-    public List<TaskSessionHistoryDto> getTaskSessionHistory(
+    public List<TaskSessionHistoryResponse> getTaskSessionHistory(
             String userId, String learningPlanId, String taskId) {
         planAccess.requireOwnedPlan(userId, learningPlanId);
 
@@ -500,7 +500,7 @@ public class LearningPlanSessionService {
 
     private String resolveResourceId(String tagId) {
         return resourceLookup.findFirstByTagId(tagId)
-                .map(RecommendedResourceDto::getResourceId)
+                .map(RecommendedResourceResponse::getResourceId)
                 .orElse(null);
     }
 
@@ -604,7 +604,7 @@ public class LearningPlanSessionService {
                     answersMap.getOrDefault(qid, List.of())));
         }
 
-        PlanTaskDto activeTaskDto = null;
+        PlanTaskResponse activeTaskDto = null;
         if (session.getTaskId() != null) {
             Optional<LearningPlanTask> taskOpt = taskRepository.findById(session.getTaskId());
             if (taskOpt.isPresent()) {
@@ -615,7 +615,7 @@ public class LearningPlanSessionService {
             }
         }
 
-        RecommendedResourceDto resourceDto = null;
+        RecommendedResourceResponse resourceDto = null;
         if (session.getResourceId() != null) {
             resourceDto = recoveryResourceRepository.findById(session.getResourceId())
                     .map(this::toResourceDto)
@@ -691,7 +691,7 @@ public class LearningPlanSessionService {
                 + taskRepository.countByLearningPlanIdAndStatus(learningPlanId, TaskStatus.SKIPPED);
     }
 
-    private RecommendedResourceDto toResourceDto(RecoveryResource r) {
+    private RecommendedResourceResponse toResourceDto(RecoveryResource r) {
         return learningMapper.toResourceDto(r);
     }
 }

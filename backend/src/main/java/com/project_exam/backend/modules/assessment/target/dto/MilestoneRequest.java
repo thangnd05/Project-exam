@@ -15,5 +15,5 @@ public class MilestoneRequest {
 
     private String description;
 
-    private List<PartRequirementDto> partRequirements;
+    private List<PartRequirementRequest> partRequirements;
 }

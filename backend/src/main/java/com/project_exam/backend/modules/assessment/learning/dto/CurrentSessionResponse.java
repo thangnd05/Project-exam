@@ -19,8 +19,8 @@ public class CurrentSessionResponse {
     private String examTypeId;
     private String planStage;
     private String sessionId;
-    private PlanTaskDto activeTask;
-    private RecommendedResourceDto resource;
+    private PlanTaskResponse activeTask;
+    private RecommendedResourceResponse resource;
     private Integer passAccuracyRequired;
 
     private Integer correctCount;
@@ -33,6 +33,6 @@ public class CurrentSessionResponse {
 
     /** Mã trạng thái bất thường (EMPTY_POOL_SKIPPED / EMPTY_POOL_RETRY) — FE tự map ra câu chữ. */
     private String noticeCode;
-    private List<PlanPartGroupDto> partGroups;
+    private List<PlanPartGroupResponse> partGroups;
     private List<SubmitSessionResponse.ReviewItem> lastReviewItems;
 }

@@ -1,8 +1,8 @@
 package com.project_exam.backend.modules.assessment.attempt.controller;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerRequest;
-import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryDto;
-import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto;
+import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerResponse;
 import com.project_exam.backend.modules.assessment.attempt.service.UserAnswerService;
 import com.project_exam.backend.modules.assessment.attempt.service.EnhancedResultService;
@@ -95,14 +95,14 @@ public class UserAnswerController {
     }
 
     @GetMapping("/user-test/{userTestId}/result")
-    public ResponseEntity<ResultSummaryDto> getResult(@PathVariable String userTestId, HttpServletRequest httpRequest) {
+    public ResponseEntity<ResultSummaryResponse> getResult(@PathVariable String userTestId, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
-        ResultSummaryDto result = userAnswerService.getResultSummary(userTestId, userId);
+        ResultSummaryResponse result = userAnswerService.getResultSummary(userTestId, userId);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/user-test/{userTestId}/result/enhanced")
-    public ResponseEntity<EnhancedResultDto> getEnhancedResult(
+    public ResponseEntity<EnhancedResultResponse> getEnhancedResult(
             @PathVariable String userTestId, HttpServletRequest httpRequest) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(enhancedResultService.getEnhancedResult(userTestId, userId));
@@ -125,7 +125,7 @@ public class UserAnswerController {
     }
 
     @GetMapping("/guest/user-test/{userTestId}/result")
-    public ResponseEntity<ResultSummaryDto> getGuestResult(
+    public ResponseEntity<ResultSummaryResponse> getGuestResult(
             @PathVariable String userTestId,
             @RequestHeader("X-Guest-Session") String guestSessionId
     ) {
@@ -133,7 +133,7 @@ public class UserAnswerController {
     }
 
     @GetMapping("/guest/user-test/{userTestId}/result/enhanced")
-    public ResponseEntity<EnhancedResultDto> getGuestEnhancedResult(
+    public ResponseEntity<EnhancedResultResponse> getGuestEnhancedResult(
             @PathVariable String userTestId,
             @RequestHeader("X-Guest-Session") String guestSessionId
     ) {

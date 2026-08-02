@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class RecommendedResourceDto {
+public class RecommendedResourceResponse {
 
     private String resourceId;
     private String title;

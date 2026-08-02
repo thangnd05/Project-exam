@@ -48,7 +48,7 @@ public class EnhancedResultService {
     private final UserTargetPartRepository userTargetPartRepository;
     private final ExamTypeRepository examTypeRepository;
 
-    public EnhancedResultDto getEnhancedResult(String userTestId, String currentUserId) {
+    public EnhancedResultResponse getEnhancedResult(String userTestId, String currentUserId) {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
@@ -57,7 +57,7 @@ public class EnhancedResultService {
         return buildEnhancedResult(userTest);
     }
 
-    public EnhancedResultDto getGuestEnhancedResult(String userTestId, String guestSessionId) {
+    public EnhancedResultResponse getGuestEnhancedResult(String userTestId, String guestSessionId) {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (userTest.getGuestSessionId() == null
@@ -67,10 +67,10 @@ public class EnhancedResultService {
         return buildEnhancedResult(userTest);
     }
 
-    private EnhancedResultDto buildEnhancedResult(UserTest userTest) {
+    private EnhancedResultResponse buildEnhancedResult(UserTest userTest) {
         log.info("Building enhanced result for userTestId={}, status={}", userTest.getUserTestId(), userTest.getStatus());
         if (userTest.getStatus() != UserTest.Status.COMPLETED) {
-            return EnhancedResultDto.builder()
+            return EnhancedResultResponse.builder()
                     .correct(0).wrong(0).total(0).totalScore(0L)
                     .partBreakdown(List.of())
                     .build();
@@ -94,7 +94,7 @@ public class EnhancedResultService {
         long totalQuestions = allTestQuestionIds.size();
 
         if (allTestQuestionIds.isEmpty()) {
-            return EnhancedResultDto.builder()
+            return EnhancedResultResponse.builder()
                     .correct(0).wrong(0).total(0).totalScore(userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L)
                     .partBreakdown(List.of())
                     .build();
@@ -192,7 +192,7 @@ public class EnhancedResultService {
             }
         }
 
-        List<PartBreakdownDto> partBreakdown = buildPartBreakdown(
+        List<PartBreakdownResponse> partBreakdown = buildPartBreakdown(
                 questionMap, correctnessMap, statusMap, questionNumberMap,
                 examPartMap, skillMap, tagsByQuestion, tagMap, targetParts, examTypeName);
 
@@ -215,7 +215,7 @@ public class EnhancedResultService {
             isTargetMetResult = totalScoreVal >= targetScore;
         }
 
-        return EnhancedResultDto.builder()
+        return EnhancedResultResponse.builder()
                 .correct(normalizedCorrect)
                 .wrong(totalWrong)
                 .total(totalQuestions)
@@ -252,7 +252,7 @@ public class EnhancedResultService {
         return "Chung";
     }
 
-    private List<PartBreakdownDto> buildPartBreakdown(
+    private List<PartBreakdownResponse> buildPartBreakdown(
             Map<String, Question> questionMap,
             Map<String, Boolean> correctnessMap,
             Map<String, String> statusMap,
@@ -271,7 +271,7 @@ public class EnhancedResultService {
             questionsByPart.computeIfAbsent(partId, k -> new ArrayList<>()).add(qId);
         }
 
-        List<PartBreakdownDto> parts = new ArrayList<>();
+        List<PartBreakdownResponse> parts = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : questionsByPart.entrySet()) {
             String partId = entry.getKey();
             List<String> qIds = entry.getValue();
@@ -304,10 +304,10 @@ public class EnhancedResultService {
                 isTargetMet = percentageRounded >= targetPercentage;
             }
 
-            List<TagBreakdownDto> tags = buildTagBreakdown(
+            List<TagBreakdownResponse> tags = buildTagBreakdown(
                     qIds, statusMap, questionNumberMap, tagsByQuestion, tagMap);
 
-            parts.add(PartBreakdownDto.builder()
+            parts.add(PartBreakdownResponse.builder()
                     .examPartId(partId)
                     .partName(examPart.getName())
                     .skillId(examPart.getSkillId())
@@ -323,14 +323,14 @@ public class EnhancedResultService {
         }
 
         parts.sort(
-                Comparator.comparingInt((PartBreakdownDto part) ->
+                Comparator.comparingInt((PartBreakdownResponse part) ->
                                 partDisplayOrder(examPartMap.get(part.getExamPartId())))
-                        .thenComparing(PartBreakdownDto::getPartName, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(PartBreakdownResponse::getPartName, String.CASE_INSENSITIVE_ORDER)
         );
         return parts;
     }
 
-    private List<TagBreakdownDto> buildTagBreakdown(
+    private List<TagBreakdownResponse> buildTagBreakdown(
             List<String> questionIds,
             Map<String, String> statusMap,
             Map<String, Integer> questionNumberMap,
@@ -338,7 +338,7 @@ public class EnhancedResultService {
             Map<String, Tag> tagMap) {
 
         Map<String, int[]> tagStats = new HashMap<>();
-        Map<String, List<TagQuestionRefDto>> tagQuestions = new HashMap<>();
+        Map<String, List<TagQuestionRefResponse>> tagQuestions = new HashMap<>();
 
         for (String qId : questionIds) {
             List<QuestionTag> qTags = tagsByQuestion.getOrDefault(qId, List.of());
@@ -353,7 +353,7 @@ public class EnhancedResultService {
                     default -> stats[2]++;
                 }
                 tagQuestions.computeIfAbsent(qt.getTagId(), k -> new ArrayList<>())
-                        .add(TagQuestionRefDto.builder()
+                        .add(TagQuestionRefResponse.builder()
                                 .questionId(qId)
                                 .questionNumber(number)
                                 .status(status)
@@ -361,7 +361,7 @@ public class EnhancedResultService {
             }
         }
 
-        List<TagBreakdownDto> tags = new ArrayList<>();
+        List<TagBreakdownResponse> tags = new ArrayList<>();
         for (Map.Entry<String, int[]> entry : tagStats.entrySet()) {
             String tagId = entry.getKey();
             int[] stats = entry.getValue();
@@ -373,10 +373,10 @@ public class EnhancedResultService {
 
             Tag tag = tagMap.get(tagId);
 
-            List<TagQuestionRefDto> qs = tagQuestions.getOrDefault(tagId, new ArrayList<>());
-            qs.sort(Comparator.comparingInt(TagQuestionRefDto::getQuestionNumber));
+            List<TagQuestionRefResponse> qs = tagQuestions.getOrDefault(tagId, new ArrayList<>());
+            qs.sort(Comparator.comparingInt(TagQuestionRefResponse::getQuestionNumber));
 
-            tags.add(TagBreakdownDto.builder()
+            tags.add(TagBreakdownResponse.builder()
                     .tagId(tagId)
                     .tagName(tag != null ? tag.getName() : "Unknown")
                     .correct(correct)
@@ -388,7 +388,7 @@ public class EnhancedResultService {
                     .build());
         }
 
-        tags.sort(Comparator.comparingDouble(TagBreakdownDto::getPercentage));
+        tags.sort(Comparator.comparingDouble(TagBreakdownResponse::getPercentage));
         return tags;
     }
 
@@ -420,9 +420,9 @@ public class EnhancedResultService {
      * Readiness = trung bình % đúng của từng Skill (mỗi Skill trọng số như nhau), gộp từ partBreakdown.
      * Không dựng DTO theo Skill vì FE chỉ hiển thị readiness + breakdown theo Part.
      */
-    private int calculateReadinessScore(List<PartBreakdownDto> partBreakdown, double overallPercentage) {
+    private int calculateReadinessScore(List<PartBreakdownResponse> partBreakdown, double overallPercentage) {
         Map<String, int[]> skillStats = new LinkedHashMap<>();
-        for (PartBreakdownDto part : partBreakdown) {
+        for (PartBreakdownResponse part : partBreakdown) {
             int[] stats = skillStats.computeIfAbsent(part.getSkillId(), k -> new int[]{0, 0});
             stats[0] += part.getCorrect();
             stats[1] += part.getWrong();

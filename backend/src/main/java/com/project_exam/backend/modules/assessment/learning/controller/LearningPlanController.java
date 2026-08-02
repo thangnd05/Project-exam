@@ -115,7 +115,7 @@ public class LearningPlanController {
     }
 
     @GetMapping("/{learningPlanId}/tasks/{taskId}/sessions")
-    public ResponseEntity<List<TaskSessionHistoryDto>> taskSessionHistory(
+    public ResponseEntity<List<TaskSessionHistoryResponse>> taskSessionHistory(
             @PathVariable String learningPlanId,
             @PathVariable String taskId,
             HttpServletRequest httpRequest

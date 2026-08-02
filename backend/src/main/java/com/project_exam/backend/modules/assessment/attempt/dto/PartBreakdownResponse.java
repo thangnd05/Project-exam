@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class PartBreakdownDto {
+public class PartBreakdownResponse {
     private String examPartId;
     private String partName;
     private String skillId;
@@ -20,5 +20,5 @@ public class PartBreakdownDto {
     private double percentage;
     private Double targetPercentage;
     private Boolean isTargetMet;
-    private List<TagBreakdownDto> tags;
+    private List<TagBreakdownResponse> tags;
 }

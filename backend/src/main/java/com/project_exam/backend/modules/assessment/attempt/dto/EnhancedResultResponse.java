@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class EnhancedResultDto {
+public class EnhancedResultResponse {
 
     private long correct;
     private long wrong;
@@ -19,7 +19,7 @@ public class EnhancedResultDto {
     private String examCategoryCode;
     private String examTypeId;
 
-    private List<PartBreakdownDto> partBreakdown;
+    private List<PartBreakdownResponse> partBreakdown;
 
     private int percentage;
 

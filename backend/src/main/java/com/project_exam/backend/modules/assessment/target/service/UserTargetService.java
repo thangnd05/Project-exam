@@ -108,7 +108,7 @@ public class UserTargetService {
                 .orElseGet(Map::of);
     }
 
-    private void syncParts(String userTargetId, List<UserPartRequirementDto> dtos) {
+    private void syncParts(String userTargetId, List<UserPartRequirementRequest> dtos) {
         if (dtos == null || dtos.isEmpty()) {
             return;
         }
@@ -118,7 +118,7 @@ public class UserTargetService {
 
         List<UserTargetPart> toSave = new ArrayList<>();
         Map<String, UserTargetPart> kept = new HashMap<>();
-        for (UserPartRequirementDto dto : dtos) {
+        for (UserPartRequirementRequest dto : dtos) {
             if (dto.getExamPartId() == null) {
                 continue;
             }

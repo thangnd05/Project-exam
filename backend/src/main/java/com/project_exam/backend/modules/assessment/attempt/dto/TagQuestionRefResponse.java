@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class TagQuestionRefDto {
+public class TagQuestionRefResponse {
     private String questionId;
     private int questionNumber;
 

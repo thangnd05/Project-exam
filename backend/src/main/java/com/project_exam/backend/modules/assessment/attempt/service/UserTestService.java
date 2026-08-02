@@ -12,7 +12,7 @@ import com.project_exam.backend.modules.gamification.streak.service.StreakServic
 import com.project_exam.backend.modules.classroom.member.domain.ClassMember.MemberStatus;
 
 import com.project_exam.backend.shared.dto.PageResponse;
-import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto;
+import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
@@ -186,7 +186,7 @@ public class UserTestService {
             if (userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId).isEmpty()) {
                 return;
             }
-            EnhancedResultDto result = enhancedResultService.getEnhancedResult(userTestId, userId);
+            EnhancedResultResponse result = enhancedResultService.getEnhancedResult(userTestId, userId);
             userTargetProgressService.syncPartScoresFromMock(
                     userId, examTypeId, userTestId, finishedAt, result);
             userTargetProgressService.markTargetAchievedIfMet(userId, examTypeId, result);

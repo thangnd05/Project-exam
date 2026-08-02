@@ -1,9 +1,9 @@
 package com.project_exam.backend.modules.assessment.learning.service;
 
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
-import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto;
-import com.project_exam.backend.modules.assessment.attempt.dto.PartBreakdownDto;
-import com.project_exam.backend.modules.assessment.attempt.dto.TagBreakdownDto;
+import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.PartBreakdownResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.TagBreakdownResponse;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.attempt.service.EnhancedResultService;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
@@ -92,9 +92,9 @@ public class LearningPlanService {
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy đề thi"));
         String examTypeId = test.getExamTypeId();
 
-        EnhancedResultDto result = enhancedResultService.getEnhancedResult(
+        EnhancedResultResponse result = enhancedResultService.getEnhancedResult(
                 request.getUserTestId(), userId);
-        List<PartBreakdownDto> partBreakdown = result.getPartBreakdown();
+        List<PartBreakdownResponse> partBreakdown = result.getPartBreakdown();
         if (partBreakdown == null || partBreakdown.isEmpty()) {
             throw new BadRequestException("Bài thi không có dữ liệu phân tích phần, không thể sinh kế hoạch");
         }
@@ -191,7 +191,7 @@ public class LearningPlanService {
     }
 
     private List<String> findPartsWithoutTasks(
-            List<PartBreakdownDto> partBreakdown,
+            List<PartBreakdownResponse> partBreakdown,
             Set<String> focusPartIds,
             Map<String, Integer> partRequirements,
             List<TaskCandidate> candidates) {
@@ -202,7 +202,7 @@ public class LearningPlanService {
                 .filter(p -> matchesFocus(p.getExamPartId(), focusPartIds))
                 .filter(p -> partNeedsFocus(p, requirePartThreshold(p, partRequirements)))
                 .filter(p -> !partsWithTasks.contains(p.getExamPartId()))
-                .map(PartBreakdownDto::getPartName)
+                .map(PartBreakdownResponse::getPartName)
                 .toList();
     }
 
@@ -316,14 +316,14 @@ public class LearningPlanService {
     }
 
     private List<TaskCandidate> buildTaskCandidates(
-            List<PartBreakdownDto> partBreakdown,
+            List<PartBreakdownResponse> partBreakdown,
             Map<String, Integer> partRequirements,
             Set<String> focusPartIds,
             Map<String, List<String>> questionIdsByPart) {
         // partBreakdown đã được sắp theo ExamPart.displayOrder ở EnhancedResultService,
         // taskOrder cứ theo đó cho khớp thứ tự hiển thị.
         List<TaskCandidate> candidates = new ArrayList<>();
-        for (PartBreakdownDto part : partBreakdown) {
+        for (PartBreakdownResponse part : partBreakdown) {
             if (!matchesFocus(part.getExamPartId(), focusPartIds)) {
                 continue;
             }
@@ -342,7 +342,7 @@ public class LearningPlanService {
         return candidates;
     }
 
-    private int requirePartThreshold(PartBreakdownDto part, Map<String, Integer> partRequirements) {
+    private int requirePartThreshold(PartBreakdownResponse part, Map<String, Integer> partRequirements) {
         Integer required = partRequirements.get(part.getExamPartId());
         if (required == null) {
             throw new BadRequestException(
@@ -353,7 +353,7 @@ public class LearningPlanService {
         return required;
     }
 
-    private boolean partNeedsFocus(PartBreakdownDto part, int requiredPercent) {
+    private boolean partNeedsFocus(PartBreakdownResponse part, int requiredPercent) {
         return part.getPercentage() < requiredPercent;
     }
 
@@ -387,7 +387,7 @@ public class LearningPlanService {
     }
 
     private List<TaskCandidate> collectTasksForPart(
-            PartBreakdownDto part,
+            PartBreakdownResponse part,
             double threshold,
             int passAccuracy,
             List<String> questionIdsInPart) {
@@ -395,7 +395,7 @@ public class LearningPlanService {
         Set<String> usedTagIds = new HashSet<>();
 
         if (part.getTags() != null) {
-            for (TagBreakdownDto tag : part.getTags()) {
+            for (TagBreakdownResponse tag : part.getTags()) {
                 if (tag.getTagId() == null || tag.getPercentage() >= threshold) {
                     continue;
                 }
@@ -459,8 +459,8 @@ public class LearningPlanService {
     /** tag = null khi lấy tag từ kho câu (không có số liệu chẩn đoán riêng cho tag đó). */
     private TaskCandidate buildTaskCandidate(
             String tagId,
-            TagBreakdownDto tag,
-            PartBreakdownDto part,
+            TagBreakdownResponse tag,
+            PartBreakdownResponse part,
             int passAccuracy) {
         int wrong = tag != null ? tag.getWrong() : part.getWrong();
         double baseline = tag != null ? tag.getPercentage() : part.getPercentage();
@@ -475,7 +475,7 @@ public class LearningPlanService {
     }
 
     private TaskCandidate buildCapstoneCandidate(
-            PartBreakdownDto part,
+            PartBreakdownResponse part,
             int passAccuracy,
             PlanTaskType capstoneType,
             int targetQuestionCount) {
@@ -587,7 +587,7 @@ public class LearningPlanService {
     }
 
     private PlanResponse buildTargetAchievedResponse(
-            String userId, String examTypeId, EnhancedResultDto result) {
+            String userId, String examTypeId, EnhancedResultResponse result) {
         int readiness = resolveReadinessScore(result);
         return learningMapper.toTargetAchievedResponse(
                 userId,
@@ -635,7 +635,7 @@ public class LearningPlanService {
                 : Integer.MAX_VALUE;
     }
 
-    private int resolveReadinessScore(EnhancedResultDto result) {
+    private int resolveReadinessScore(EnhancedResultResponse result) {
         if (result.getReadinessScore() != 0) {
             return result.getReadinessScore();
         }

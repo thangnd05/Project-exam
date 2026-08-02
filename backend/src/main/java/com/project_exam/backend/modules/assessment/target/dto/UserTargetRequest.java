@@ -16,5 +16,5 @@ public class UserTargetRequest {
     /** Optional. Bổ sung target_score: mục tiêu % readiness. */
     private Integer targetReadiness;
 
-    private List<UserPartRequirementDto> customParts;
+    private List<UserPartRequirementRequest> customParts;
 }

@@ -45,7 +45,7 @@ public class PlanResponse {
 
     private String recommendedTaskId;
 
-    private List<PlanPartGroupDto> partGroups;
+    private List<PlanPartGroupResponse> partGroups;
 
     private List<String> partsWithoutTasks;
 }

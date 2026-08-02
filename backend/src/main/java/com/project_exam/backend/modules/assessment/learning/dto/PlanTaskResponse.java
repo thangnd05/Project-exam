@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Builder
-public class PlanTaskDto {
+public class PlanTaskResponse {
 
     private String taskId;
     private Integer taskOrder;
@@ -26,7 +26,7 @@ public class PlanTaskDto {
     private BigDecimal bestAccuracy;
     private Integer attemptCount;
 
-    private RecommendedResourceDto studyResource;
+    private RecommendedResourceResponse studyResource;
 
     private Integer wrongCountAtDiagnosis;
 }

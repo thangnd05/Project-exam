@@ -1,7 +1,7 @@
 package com.project_exam.backend.modules.assessment.target.service;
 
-import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultDto;
-import com.project_exam.backend.modules.assessment.attempt.dto.PartBreakdownDto;
+import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.PartBreakdownResponse;
 import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
 import com.project_exam.backend.modules.assessment.target.domain.UserTargetPart;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetPartRepository;
@@ -37,11 +37,11 @@ public class UserTargetProgressService {
             String examTypeId,
             String userTestId,
             Instant finishedAt,
-            EnhancedResultDto result) {
+            EnhancedResultResponse result) {
         if (result == null || QUICK_CHALLENGE_CODE.equals(result.getExamCategoryCode())) {
             return;
         }
-        List<PartBreakdownDto> partBreakdown = result.getPartBreakdown();
+        List<PartBreakdownResponse> partBreakdown = result.getPartBreakdown();
         if (partBreakdown == null || partBreakdown.isEmpty()) {
             return;
         }
@@ -55,7 +55,7 @@ public class UserTargetProgressService {
                 .collect(Collectors.toMap(UserTargetPart::getExamPartId, p -> p, (a, b) -> a));
 
         List<UserTargetPart> changed = new ArrayList<>();
-        for (PartBreakdownDto part : partBreakdown) {
+        for (PartBreakdownResponse part : partBreakdown) {
             if (part.getExamPartId() == null) {
                 continue;
             }
@@ -79,7 +79,7 @@ public class UserTargetProgressService {
     }
 
     @Transactional
-    public boolean markTargetAchievedIfMet(String userId, String examTypeId, EnhancedResultDto result) {
+    public boolean markTargetAchievedIfMet(String userId, String examTypeId, EnhancedResultResponse result) {
         if (!result.isHasTarget() || !Boolean.TRUE.equals(result.getIsTargetMet())) {
             return false;
         }

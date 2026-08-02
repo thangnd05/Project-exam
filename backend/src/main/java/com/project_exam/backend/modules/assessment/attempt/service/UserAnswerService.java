@@ -8,7 +8,7 @@ import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.UnauthorizedException;
 import com.project_exam.backend.shared.util.AuthUtils;
 
-import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryDto;
+import com.project_exam.backend.modules.assessment.attempt.dto.ResultSummaryResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerRequest;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserAnswerResponse;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserAnswerMapper;
@@ -275,7 +275,7 @@ public class UserAnswerService {
         assertWithinTimeLimit(userTest);
     }
 
-    public ResultSummaryDto getGuestResultSummary(String userTestId, String guestSessionId) {
+    public ResultSummaryResponse getGuestResultSummary(String userTestId, String guestSessionId) {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (userTest.getGuestSessionId() == null
@@ -284,14 +284,14 @@ public class UserAnswerService {
         }
 
         if (userTest.getStatus() != UserTest.Status.COMPLETED) {
-            return new ResultSummaryDto(0, 0, 0, 0);
+            return new ResultSummaryResponse(0, 0, 0, 0);
         }
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {
 
             long total = getTotalQuestionsForResult(userTest);
-            return new ResultSummaryDto(0, total, total, userTest.getTotalScore());
+            return new ResultSummaryResponse(0, total, total, userTest.getTotalScore());
         }
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
 
@@ -324,7 +324,7 @@ public class UserAnswerService {
         long totalQuestions = getTotalQuestionsForResult(userTest);
         long normalizedCorrectCount = Math.min(correctCount, totalQuestions);
         long wrongCount = Math.max(totalQuestions - normalizedCorrectCount, 0);
-        return new ResultSummaryDto(normalizedCorrectCount, wrongCount, totalQuestions, userTest.getTotalScore());
+        return new ResultSummaryResponse(normalizedCorrectCount, wrongCount, totalQuestions, userTest.getTotalScore());
     }
 
     public List<UserAnswerResponse> findResponsesByUserTestIdForGuest(String userTestId, String guestSessionId) {
@@ -353,7 +353,7 @@ public class UserAnswerService {
         }).orElse(false);
     }
 
-    public ResultSummaryDto getResultSummary(String userTestId, String currentUserId) {
+    public ResultSummaryResponse getResultSummary(String userTestId, String currentUserId) {
         UserTest userTest = userTestRepository.findById(userTestId)
                 .orElseThrow(() -> new NotFoundException("UserTest not found"));
         if (!Objects.equals(userTest.getUserId(), currentUserId)) {
@@ -367,14 +367,14 @@ public class UserAnswerService {
         boolean isEnded = test.calculateStatus() == TestStatus.ENDED;
 
         if (!isUnlimited && !isEnded) {
-            return new ResultSummaryDto(0, 0, 0, 0);
+            return new ResultSummaryResponse(0, 0, 0, 0);
         }
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
         if (userAnswers.isEmpty()) {
 
             long total = getTotalQuestionsForResult(userTest);
-            return new ResultSummaryDto(0, total, total, userTest.getTotalScore());
+            return new ResultSummaryResponse(0, total, total, userTest.getTotalScore());
         }
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
 
@@ -407,7 +407,7 @@ public class UserAnswerService {
         long totalQuestions = getTotalQuestionsForResult(userTest);
         long normalizedCorrectCount = Math.min(correctCount, totalQuestions);
         long wrongCount = Math.max(totalQuestions - normalizedCorrectCount, 0);
-        return new ResultSummaryDto(normalizedCorrectCount, wrongCount, totalQuestions, userTest.getTotalScore());
+        return new ResultSummaryResponse(normalizedCorrectCount, wrongCount, totalQuestions, userTest.getTotalScore());
     }
 
     private long getTotalQuestionsForResult(UserTest userTest) {

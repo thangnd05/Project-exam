@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class PlanPartGroupDto {
+public class PlanPartGroupResponse {
 
     private String examPartId;
     private String examPartName;
@@ -18,6 +18,6 @@ public class PlanPartGroupDto {
     private int passedTasksInPart;
     private int totalTasksInPart;
 
-    private List<RecommendedResourceDto> partResources;
-    private List<PlanTaskDto> tasks;
+    private List<RecommendedResourceResponse> partResources;
+    private List<PlanTaskResponse> tasks;
 }

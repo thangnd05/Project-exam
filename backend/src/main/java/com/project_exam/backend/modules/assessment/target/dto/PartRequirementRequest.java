@@ -3,7 +3,7 @@ package com.project_exam.backend.modules.assessment.target.dto;
 import lombok.Data;
 
 @Data
-public class UserPartRequirementDto {
+public class PartRequirementRequest {
     private String examPartId;
-    private Integer customPercentage;
+    private Integer requiredPercentage;
 }

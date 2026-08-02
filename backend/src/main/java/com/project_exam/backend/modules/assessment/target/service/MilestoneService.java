@@ -75,9 +75,9 @@ public class MilestoneService {
         milestoneRepository.delete(m);
     }
 
-    private void savePartRequirements(String milestoneId, List<PartRequirementDto> dtos) {
+    private void savePartRequirements(String milestoneId, List<PartRequirementRequest> dtos) {
         List<TargetPartRequirement> entities = new ArrayList<>();
-        for (PartRequirementDto dto : dtos) {
+        for (PartRequirementRequest dto : dtos) {
             TargetPartRequirement r = new TargetPartRequirement();
             r.setExamTargetMilestoneId(milestoneId);
             r.setExamPartId(dto.getExamPartId());

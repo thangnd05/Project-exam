@@ -8,12 +8,12 @@ import com.project_exam.backend.modules.assessment.learning.domain.LearningPlan;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanSession;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanTask;
 import com.project_exam.backend.modules.assessment.learning.dto.CurrentSessionResponse;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupDto;
-import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceDto;
+import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupResponse;
+import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskDto;
+import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.SubmitSessionResponse;
-import com.project_exam.backend.modules.assessment.learning.dto.TaskSessionHistoryDto;
+import com.project_exam.backend.modules.assessment.learning.dto.TaskSessionHistoryResponse;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ public class LearningMapper {
             String planStage,
             int totalTasks,
             int passedTasks,
-            List<PlanPartGroupDto> partGroups,
+            List<PlanPartGroupResponse> partGroups,
             List<String> partsWithoutTasks) {
         return PlanResponse.builder()
                 .learningPlanId(plan.getLearningPlanId())
@@ -58,7 +58,7 @@ public class LearningMapper {
             String planStage,
             int totalTasks,
             int passedTasks,
-            List<PlanPartGroupDto> partGroups) {
+            List<PlanPartGroupResponse> partGroups) {
         return PlanResponse.builder()
                 .learningPlanId(plan.getLearningPlanId())
                 .userId(plan.getUserId())
@@ -97,13 +97,13 @@ public class LearningMapper {
                 .build();
     }
 
-    public PlanTaskDto toTaskDto(
+    public PlanTaskResponse toTaskDto(
             LearningPlanTask task,
             String taskType,
             String tagName,
             String examPartName,
-            RecommendedResourceDto studyResource) {
-        return PlanTaskDto.builder()
+            RecommendedResourceResponse studyResource) {
+        return PlanTaskResponse.builder()
                 .taskId(task.getTaskId())
                 .taskOrder(task.getTaskOrder())
                 .taskType(taskType)
@@ -122,16 +122,16 @@ public class LearningMapper {
                 .build();
     }
 
-    public PlanPartGroupDto toPartGroup(
+    public PlanPartGroupResponse toPartGroup(
             String examPartId,
             String examPartName,
             Integer displayOrder,
             Integer passAccuracy,
             int passedTasksInPart,
             int totalTasksInPart,
-            List<RecommendedResourceDto> partResources,
-            List<PlanTaskDto> tasks) {
-        return PlanPartGroupDto.builder()
+            List<RecommendedResourceResponse> partResources,
+            List<PlanTaskResponse> tasks) {
+        return PlanPartGroupResponse.builder()
                 .examPartId(examPartId)
                 .examPartName(examPartName)
                 .displayOrder(displayOrder)
@@ -143,8 +143,8 @@ public class LearningMapper {
                 .build();
     }
 
-    public RecommendedResourceDto toResourceDto(RecoveryResource r) {
-        return RecommendedResourceDto.builder()
+    public RecommendedResourceResponse toResourceDto(RecoveryResource r) {
+        return RecommendedResourceResponse.builder()
                 .resourceId(r.getResourceId())
                 .title(r.getTitle())
                 .description(r.getDescription())
@@ -194,8 +194,8 @@ public class LearningMapper {
             LearningPlan plan,
             String planStage,
             LearningPlanSession session,
-            PlanTaskDto activeTask,
-            RecommendedResourceDto resource,
+            PlanTaskResponse activeTask,
+            RecommendedResourceResponse resource,
             int passAccuracyRequired,
             List<QuestionResponse> questions,
             int totalTasks,
@@ -233,7 +233,7 @@ public class LearningMapper {
     public CurrentSessionResponse toPickResponse(
             LearningPlan plan,
             String planStage,
-            List<PlanPartGroupDto> partGroups,
+            List<PlanPartGroupResponse> partGroups,
             int totalTasks,
             int passedTasks) {
         return CurrentSessionResponse.builder()
@@ -298,8 +298,8 @@ public class LearningMapper {
                 .build();
     }
 
-    public TaskSessionHistoryDto toTaskSessionHistory(LearningPlanSession s) {
-        return TaskSessionHistoryDto.builder()
+    public TaskSessionHistoryResponse toTaskSessionHistory(LearningPlanSession s) {
+        return TaskSessionHistoryResponse.builder()
                 .sessionId(s.getSessionId())
                 .status(s.getStatus() != null ? s.getStatus().name() : null)
                 .questionCount(s.getQuestionCount())

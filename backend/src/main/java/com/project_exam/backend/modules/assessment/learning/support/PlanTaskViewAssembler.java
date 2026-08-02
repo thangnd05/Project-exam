@@ -6,9 +6,9 @@ import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepos
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanTask;
 import com.project_exam.backend.modules.assessment.learning.domain.PlanTaskType;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupDto;
-import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceDto;
-import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskDto;
+import com.project_exam.backend.modules.assessment.learning.dto.PlanPartGroupResponse;
+import com.project_exam.backend.modules.assessment.learning.dto.RecommendedResourceResponse;
+import com.project_exam.backend.modules.assessment.learning.dto.PlanTaskResponse;
 import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.service.LearningPlanResourceLookup;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +35,8 @@ public class PlanTaskViewAssembler {
     public record Lookups(
             Map<String, Tag> tagsById,
             Map<String, ExamPart> partsById,
-            Map<String, RecommendedResourceDto> resourcesByTag,
-            Map<String, List<RecommendedResourceDto>> resourcesByPart) {
+            Map<String, RecommendedResourceResponse> resourcesByTag,
+            Map<String, List<RecommendedResourceResponse>> resourcesByPart) {
 
         public static Lookups empty() {
             return new Lookups(Map.of(), Map.of(), Map.of(), Map.of());
@@ -70,11 +70,11 @@ public class PlanTaskViewAssembler {
                 resourceLookup.findByExamPartIds(partIds));
     }
 
-    public PlanTaskDto toTaskDto(LearningPlanTask task, Lookups lookups) {
+    public PlanTaskResponse toTaskDto(LearningPlanTask task, Lookups lookups) {
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
         Tag tag = task.getTagId() != null ? lookups.tagsById().get(task.getTagId()) : null;
         ExamPart part = task.getExamPartId() != null ? lookups.partsById().get(task.getExamPartId()) : null;
-        RecommendedResourceDto studyResource = task.getTagId() != null
+        RecommendedResourceResponse studyResource = task.getTagId() != null
                 ? lookups.resourcesByTag().get(task.getTagId())
                 : null;
         return learningMapper.toTaskDto(
@@ -85,7 +85,7 @@ public class PlanTaskViewAssembler {
                 studyResource);
     }
 
-    public List<PlanPartGroupDto> buildPartGroups(List<LearningPlanTask> tasks, Lookups lookups) {
+    public List<PlanPartGroupResponse> buildPartGroups(List<LearningPlanTask> tasks, Lookups lookups) {
         if (tasks == null || tasks.isEmpty()) {
             return List.of();
         }
@@ -95,7 +95,7 @@ public class PlanTaskViewAssembler {
                         LinkedHashMap::new,
                         Collectors.toList()));
 
-        List<PlanPartGroupDto> groups = new ArrayList<>();
+        List<PlanPartGroupResponse> groups = new ArrayList<>();
         for (Map.Entry<String, List<LearningPlanTask>> entry : byPart.entrySet()) {
             String partId = entry.getKey();
             List<LearningPlanTask> partTasks = entry.getValue().stream()

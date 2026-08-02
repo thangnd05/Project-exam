@@ -1,33 +1,83 @@
 package com.project_exam.backend.modules.admin.dashboard.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
-public record DashboardStatsResponse(
-        Stats stats,
-        Traffic traffic,
-        List<NameValue> statusDistribution
-) {
-    public record Stats(
-            long totalUsers,
-            long totalTests,
-            long totalQuestions,
-            long totalClasses,
-            long totalExamsTaken,
-            long completedExams,
-            long totalExamTypes
-    ) {}
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class DashboardStatsResponse {
+    private Stats stats;
+    private Traffic traffic;
+    private List<NameValue> statusDistribution;
 
-    public record NameValue(String name, long value) {}
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Stats {
+        private long totalUsers;
+        private long totalTests;
+        private long totalQuestions;
+        private long totalClasses;
+        private long totalExamsTaken;
+        private long completedExams;
+        private long totalExamTypes;
+    }
 
-    public record Traffic(
-            long visitsToday,
-            List<DayHours> heatmap,
-            List<CountryTraffic> topCountries
-    ) {}
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NameValue {
+        private String name;
+        private long value;
+    }
 
-    public record DayHours(String day, List<Long> hours) {}
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Traffic {
+        private long visitsToday;
+        private List<DayHours> heatmap;
+        private List<CountryTraffic> topCountries;
+    }
 
-    public record CountryTraffic(String code, String name, long value) {}
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DayHours {
+        private String day;
+        private List<Long> hours;
+    }
 
-    public record MonthPerformance(String month, long tests, long rate, long newUsers, long visits, Integer peakHour) {}
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CountryTraffic {
+        private String code;
+        private String name;
+        private long value;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MonthPerformance {
+        private String month;
+        private long tests;
+        private long rate;
+        private long newUsers;
+        private long visits;
+        private Integer peakHour;
+    }
 }
