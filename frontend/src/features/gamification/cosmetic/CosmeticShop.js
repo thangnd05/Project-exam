@@ -6,7 +6,7 @@ import { CircleDollarSign, Check } from 'lucide-react';
 
 import { getCosmeticShop } from '~/shared/api/cosmeticApi';
 import { useCoins } from '~/shared/hooks/useCoins';
-import { useBuyCosmetic, useEquipCosmetic, useUnequipCosmetic } from './useCosmeticShop';
+import { useBuyCosmetic, useEquipCosmetic, useUnequipCosmetic } from './hooks/useCosmeticShop';
 import AvatarWithCosmetic from './AvatarWithCosmetic';
 import images from '~/shared/assets/images';
 import styles from './CosmeticShop.module.scss';

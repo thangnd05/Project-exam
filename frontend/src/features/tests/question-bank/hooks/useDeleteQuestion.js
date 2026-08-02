@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteQuestion } from '~/shared/api/questionApi';
-import { questionDetailKeys } from '~/features/tests/question-bank/modals/hooks/useQuestionDetail';
+import { questionDetailKeys } from '~/features/tests/question-bank/hooks/useQuestionDetail';
 
 export function useDeleteQuestion({ onSuccess, onError } = {}) {
   const qc = useQueryClient();

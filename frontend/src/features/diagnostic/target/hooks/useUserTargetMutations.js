@@ -5,7 +5,7 @@ import {
 } from '~/shared/api/userTargetApi';
 import { targetDashboardKeys } from './useTargetDashboard';
 import { targetAchievedKeys } from './useTargetAchieved';
-import { generatePlanKeys } from '../../learning-plans/pages/hooks/useGeneratePlan';
+import { generatePlanKeys } from '../../learning-plans/hooks/useGeneratePlan';
 import { invalidatePlanQueries } from '../../learning-plans/hooks/plan-cache';
 
 // Các truy vấn đang hiển thị mục tiêu theo examTypeId (dashboard, đã đạt, trang sinh lộ trình,

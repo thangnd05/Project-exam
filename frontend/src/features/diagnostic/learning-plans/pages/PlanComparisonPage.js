@@ -5,7 +5,7 @@ import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import PlanComparisonCharts from '../components/PlanComparisonCharts';
-import { usePlanComparison } from './hooks/usePlanComparison';
+import { usePlanComparison } from '../hooks/usePlanComparison';
 import { planStageLabel, planStatusLabel, planStatusVariant } from '../planLabels';
 import pageStyles from '../styles/PlanComparisonPage.module.scss';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';

@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import PlanCongratsModal, { markCongratsSeen } from '../components/PlanCongratsModal';
 import PlanResultView from '../components/PlanResultView';
 import { toPlanResult } from '../planResult';
-import { usePlanResult } from './hooks/usePlanResult';
+import { usePlanResult } from '../hooks/usePlanResult';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);

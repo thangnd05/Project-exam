@@ -9,7 +9,7 @@ import { fetchPostById } from '~/features/posts/hooks/usePosts';
 import CreatePostModal from '~/features/posts/modals/CreatePostModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import routes from '~/shared/config/Routes';
-import { useMyPosts } from './useMyPosts';
+import { useMyPosts } from '../hooks/useMyPosts';
 import styles from './PostsListPage.module.scss';
 
 const cx = classNames.bind(styles);

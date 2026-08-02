@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import { useChangePassword } from './hooks/useChangePassword';
+import { useChangePassword } from '../hooks/useChangePassword';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';

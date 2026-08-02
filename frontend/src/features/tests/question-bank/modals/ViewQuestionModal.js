@@ -3,7 +3,7 @@ import {Spinner, Alert} from 'react-bootstrap';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import {toast} from 'react-toastify';
-import {useQuestionDetail} from './hooks/useQuestionDetail';
+import {useQuestionDetail} from '../hooks/useQuestionDetail';
 import classNames from 'classnames/bind';
 import {
   CheckCircle,

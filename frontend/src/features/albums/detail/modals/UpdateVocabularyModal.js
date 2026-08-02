@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import styles from '~/shared/ui/modal/CommonFormModal.module.scss';
-import { useUpdateVocabulary } from './hooks/useUpdateVocabulary';
+import { useUpdateVocabulary } from '../hooks/useUpdateVocabulary';
 
 const cx = classNames.bind(styles);
 

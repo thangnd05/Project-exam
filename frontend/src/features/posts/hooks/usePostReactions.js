@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toggleReact, toggleSavePost } from '~/shared/api/postApi';
-import { savedPostsKeys } from '~/features/user/profile/sections/useSavedPosts';
+import { savedPostsKeys } from '~/features/user/profile/hooks/useSavedPosts';
 
 export function useToggleReact({ onSuccess, onError } = {}) {
   return useMutation({

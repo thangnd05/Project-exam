@@ -6,7 +6,7 @@ import { IoSaveOutline } from "react-icons/io5";
 import CommonFormModal from "~/shared/ui/modal/CommonFormModal";
 import ModalActionFooter from "~/shared/ui/modal/ModalActionFooter";
 import styles from "~/shared/ui/modal/CommonFormModal.module.scss";
-import { useUpdateAlbum } from "./hooks/useUpdateAlbum";
+import { useUpdateAlbum } from "../hooks/useUpdateAlbum";
 
 const cx = classNames.bind(styles);
 

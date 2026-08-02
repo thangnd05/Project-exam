@@ -15,7 +15,7 @@ import {
   useExamTypes,
   useGeneratePlanMutation,
   useUserTarget,
-} from './hooks/useGeneratePlan';
+} from '../hooks/useGeneratePlan';
 
 const cx = classNames.bind(styles);
 

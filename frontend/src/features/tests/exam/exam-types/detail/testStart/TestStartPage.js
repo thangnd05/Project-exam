@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import TestStateScreens from './TestStateScreens';
-import { useTestSession } from './useTestSession';
+import { useTestSession } from './hooks/useTestSession';
 import ExamLayoutRenderer from './examLayout/ExamLayoutRenderer';
 
 const STATE_SCREEN_STATUSES = ['loading', 'payment', 'no-attempts', 'locked', 'closed'];

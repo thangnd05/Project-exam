@@ -8,7 +8,7 @@ import PlanCongratsModal, {
   markCongratsSeen,
 } from '../components/PlanCongratsModal';
 import PlanPartTaskList from '../components/PlanPartTaskList';
-import { usePlanDetail } from './hooks/usePlanDetail';
+import { usePlanDetail } from '../hooks/usePlanDetail';
 import { planStageLabel, planStatusLabel, taskDisplayName } from '../planLabels';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
