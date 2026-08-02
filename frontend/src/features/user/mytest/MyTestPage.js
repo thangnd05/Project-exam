@@ -11,9 +11,9 @@ import {
 import styles from './MyTestPage.module.scss';
 import { useAuth } from '~/shared/hooks/useAuth';
 import { useMyTests, useDeleteTest, useInvalidateMyTests } from '~/shared/hooks/useMyTests';
-import CreateTestModal from '~/shared/test/CreateTestModal';
+import CreateTestModal from '~/features/tests/components/CreateTestModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
-import TestListContainer from '~/shared/test/TestListContainer/TestListContainer';
+import TestListContainer from '~/features/tests/components/TestListContainer/TestListContainer';
 import Pagination from '~/shared/ui/Pagination/Pagination';
 
 const cx = classNames.bind(styles);

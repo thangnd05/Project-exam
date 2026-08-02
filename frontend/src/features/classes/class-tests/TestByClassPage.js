@@ -7,9 +7,9 @@ import { toast } from 'react-toastify';
 
 import styles from './TestByClassPage.module.scss';
 import { useTestByClass } from './hooks/useTestByClass';
-import CreateTestModal from '~/shared/test/CreateTestModal';
+import CreateTestModal from '~/features/tests/components/CreateTestModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
-import TestListContainer from '~/shared/test/TestListContainer/TestListContainer';
+import TestListContainer from '~/features/tests/components/TestListContainer/TestListContainer';
 
 const cx = classNames.bind(styles);
 

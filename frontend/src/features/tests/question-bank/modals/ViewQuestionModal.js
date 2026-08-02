@@ -15,7 +15,7 @@ import {
   PassageMediaList,
 } from './passageMedia';
 import styles from './EditQuestionModal.module.scss';
-import createStyles from '~/shared/test/CreateTestModal.module.scss';
+import createStyles from '~/features/tests/components/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 const cxCreate = classNames.bind(createStyles);

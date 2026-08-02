@@ -5,7 +5,7 @@ import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/shar
 import { createTestPart } from '~/shared/api/testPartApi';
 import { getExamCategories } from '~/shared/api/examCategoryApi';
 import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
-import { SELECTION_MODES } from '~/shared/hooks/useBankTestBuilder';
+import { SELECTION_MODES } from '~/features/tests/hooks/useBankTestBuilder';
 
 const emptyTestInfo = () => ({
   title: '',

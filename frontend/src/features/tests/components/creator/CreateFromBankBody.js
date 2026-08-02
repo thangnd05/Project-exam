@@ -25,7 +25,7 @@ import {
 import { useBaseMetaData } from '~/shared/hooks/useBaseMetaData';
 import { useHasPermission } from '~/shared/hooks/usePermission';
 import { brandColors } from '~/shared/styles/brandColors';
-import CoinPriceField from '~/shared/test/CoinPriceField';
+import CoinPriceField from '~/features/tests/components/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
 import EditQuestionModal from '~/features/tests/question-bank/modals/EditQuestionModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
@@ -35,7 +35,7 @@ import {
   SELECTION_MODES,
   defaultPartConfig,
   groupQuestionsByPassage,
-} from '~/shared/hooks/useBankTestBuilder';
+} from '~/features/tests/hooks/useBankTestBuilder';
 import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);

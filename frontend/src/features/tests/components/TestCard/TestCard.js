@@ -16,7 +16,7 @@ import {
     formatDateTime,
     formatFullDateTime,
 } from '~/shared/utils/testStatusHelper';
-import TestModeModal from '~/shared/test/TestModeModal/TestModeModal';
+import TestModeModal from '~/features/tests/components/TestModeModal/TestModeModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);

@@ -20,7 +20,7 @@ import {useCosmetics} from '~/shared/hooks/useCosmetics';
 import images from '~/shared/assets/images';
 import JoinClassModal from '~/features/classes/modals/JoinClassModal';
 import CreateClassModal from '~/features/classes/modals/CreateClassModal';
-import CreateTestModal from '~/shared/test/CreateTestModal';
+import CreateTestModal from '~/features/tests/components/CreateTestModal';
 import StreakBadge from '~/shared/streak/StreakBadge';
 import CoinQuestMenu from '~/shared/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';

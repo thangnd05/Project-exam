@@ -1,6 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
-import { CREATOR_TYPES } from '~/shared/hooks/useCreateTest';
+import { CREATOR_TYPES } from '~/features/tests/hooks/useCreateTest';
 
 const cx = classNames.bind(styles);
 
