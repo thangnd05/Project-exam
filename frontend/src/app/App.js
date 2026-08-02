@@ -11,7 +11,7 @@ import { AuthProvider } from '~/shared/context/AuthContext';
 import { StreakProvider } from '~/shared/context/StreakContext';
 import { CoinProvider } from '~/shared/context/CoinContext';
 import { CosmeticProvider } from '~/shared/context/CosmeticContext';
-import StreakCelebration from '~/shared/streak/StreakCelebration';
+import StreakCelebration from '~/features/gamification/streak/StreakCelebration';
 import ScrollHandler from '~/layout/ScrollToTopOnRouteChange';
 import VisitTracker from '~/layout/VisitTracker';
 import { ToastContainer } from 'react-toastify';

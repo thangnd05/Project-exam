@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useBaseMetaData } from './useBaseMetaData';
+import { useBaseMetaData } from '~/shared/hooks/useBaseMetaData';
 import { useTestSubmission } from './useTestSubmission';
 
 export const CREATOR_TYPES = {

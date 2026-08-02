@@ -5,7 +5,7 @@ import { Flame, CircleDollarSign } from 'lucide-react';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import { useStreak } from '~/shared/hooks/useStreak';
 import { useCoins } from '~/shared/hooks/useCoins';
-import { useRestoreStreak } from '~/shared/streak/useRestoreStreak';
+import { useRestoreStreak } from '~/features/gamification/streak/useRestoreStreak';
 import styles from './StreakRestoreModal.module.scss';
 
 const cx = classNames.bind(styles);

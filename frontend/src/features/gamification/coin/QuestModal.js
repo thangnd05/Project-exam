@@ -9,7 +9,7 @@ import {getMyQuests, QUESTS_QUERY_KEY} from '~/shared/api/questApi';
 import {useCoins} from '~/shared/hooks/useCoins';
 import {useClaimQuest} from './useClaimQuest';
 import BaseModal from '~/shared/ui/modal/BaseModal';
-import CosmeticShop from '~/shared/cosmetic/CosmeticShop';
+import CosmeticShop from '~/features/gamification/cosmetic/CosmeticShop';
 import styles from './QuestModal.module.scss';
 
 const cx = classNames.bind(styles);

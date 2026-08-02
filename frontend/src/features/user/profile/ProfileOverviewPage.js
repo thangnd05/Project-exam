@@ -14,7 +14,7 @@ import styles from './ProfileOverviewPage.module.scss';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes from '~/shared/config/Routes';
 import { brandColors } from '~/shared/styles/brandColors';
-import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '~/features/gamification/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
 import {
   useProfileOverview,

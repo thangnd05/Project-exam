@@ -21,9 +21,9 @@ import images from '~/shared/assets/images';
 import JoinClassModal from '~/features/classes/modals/JoinClassModal';
 import CreateClassModal from '~/features/classes/modals/CreateClassModal';
 import CreateTestModal from '~/features/tests/components/CreateTestModal';
-import StreakBadge from '~/shared/streak/StreakBadge';
-import CoinQuestMenu from '~/shared/coin/CoinQuestMenu';
-import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
+import StreakBadge from '~/features/gamification/streak/StreakBadge';
+import CoinQuestMenu from '~/features/gamification/coin/CoinQuestMenu';
+import AvatarWithCosmetic from '~/features/gamification/cosmetic/AvatarWithCosmetic';
 
 const cx = classNames.bind(styles);
 

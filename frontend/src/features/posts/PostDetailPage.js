@@ -12,7 +12,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '~/shared/hooks/useAuth';
 import { useCosmetics } from '~/shared/hooks/useCosmetics';
-import AvatarWithCosmetic from '~/shared/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '~/features/gamification/cosmetic/AvatarWithCosmetic';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import routes from '~/shared/config/Routes';
