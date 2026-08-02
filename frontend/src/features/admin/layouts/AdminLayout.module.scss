@@ -1,8 +1,8 @@
-$sidebar-bg: #1e293b;
-$sidebar-dark: #0f172a;
-$sidebar-hover: #334155;
-$sidebar-text: #94a3b8;
-$sidebar-text-light: #e2e8f0;
+$sidebar-bg: var(--brand-800);
+$sidebar-dark: var(--brand-900);
+$sidebar-hover: var(--brand-700);
+$sidebar-text: rgba(255, 255, 255, 0.62);
+$sidebar-text-light: rgba(255, 255, 255, 0.92);
 $header-bg: #ffffff;
 $content-bg: #f1f5f9;
 $primary: var(--accent-act-color);
@@ -95,20 +95,21 @@ $transition: all 0.3s ease;
     top: 64px;
     width: 28px;
     height: 28px;
-    background: $primary;
-    border: 2px solid white;
+    background: $sidebar-hover;
+    border: 2px solid $sidebar-bg;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: white;
+    color: $sidebar-text-light;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     transition: $transition;
     z-index: 1100;
 
     &:hover {
-        background: $sidebar-hover;
+        background: $primary;
+        border-color: white;
         color: white;
         transform: scale(1.08);
     }
@@ -167,11 +168,11 @@ $transition: all 0.3s ease;
     }
 
     &.active {
-        background: rgba(20, 184, 166, 0.15);
-        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        color: $sidebar-text-light;
 
         .navIcon {
-            color: $primary;
+            color: var(--brand-300);
         }
     }
 }
