@@ -26,8 +26,6 @@ public class EnhancedResultDto {
     private int readinessScore;
     private String readinessLevel;
 
-    private boolean passed;
-
     private Integer percentile;
 
     private boolean hasTarget;

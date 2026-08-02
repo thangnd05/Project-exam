@@ -203,8 +203,6 @@ public class EnhancedResultService {
 
         Integer percentile = calculatePercentile(userTest.getTestId(), userTest.getTotalScore());
 
-        boolean passed = overallPercentage >= 70;
-
         int percentage = (int) Math.round(overallPercentage);
         boolean isQuickChallenge = "QUICK_CHALLENGE".equals(examCategoryCode);
         boolean hasTarget = userTargetOpt.isPresent();
@@ -231,7 +229,6 @@ public class EnhancedResultService {
                 .partBreakdown(partBreakdown)
                 .readinessScore(readinessScore)
                 .readinessLevel(readinessLevel)
-                .passed(passed)
                 .percentile(percentile)
                 .build();
     }
@@ -328,7 +325,6 @@ public class EnhancedResultService {
         parts.sort(
                 Comparator.comparingInt((PartBreakdownDto part) ->
                                 partDisplayOrder(examPartMap.get(part.getExamPartId())))
-                        .thenComparingInt(part -> extractPartOrder(part.getPartName()))
                         .thenComparing(PartBreakdownDto::getPartName, String.CASE_INSENSITIVE_ORDER)
         );
         return parts;
@@ -491,20 +487,5 @@ public class EnhancedResultService {
         return part != null && part.getDisplayOrder() != null
                 ? part.getDisplayOrder()
                 : Integer.MAX_VALUE;
-    }
-
-    private int extractPartOrder(String partName) {
-        if (partName == null) {
-            return Integer.MAX_VALUE;
-        }
-        String digits = partName.replaceAll("[^0-9]", "");
-        if (digits.isEmpty()) {
-            return Integer.MAX_VALUE;
-        }
-        try {
-            return Integer.parseInt(digits);
-        } catch (NumberFormatException exception) {
-            return Integer.MAX_VALUE;
-        }
     }
 }

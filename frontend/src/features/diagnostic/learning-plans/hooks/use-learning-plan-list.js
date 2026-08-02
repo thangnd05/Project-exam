@@ -4,7 +4,6 @@ import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { listPlans } from '~/shared/api/learningPlanApi';
 
 export const learningPlanListKeys = {
-  all: ['learning-plan-list'],
   list: (loadAll, examTypeId, refreshKey) => [
     'learning-plan-list',
     { loadAll, examTypeId: examTypeId || null, refreshKey },
@@ -80,7 +79,6 @@ export function useLearningPlanList({
   return {
     examTypes,
     plans: filteredPlans,
-    allPlansCount: plans.length,
     loading: query.isLoading,
     error: query.error
       ? query.error?.response?.data?.message

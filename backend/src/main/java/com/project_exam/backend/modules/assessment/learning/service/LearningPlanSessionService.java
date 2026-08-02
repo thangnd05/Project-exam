@@ -15,7 +15,6 @@ import com.project_exam.backend.modules.assessment.exam.repository.PassageMediaR
 import com.project_exam.backend.modules.assessment.exam.repository.PassageRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.RecoveryResourceRepository;
-import com.project_exam.backend.modules.assessment.exam.repository.ResourceTagRepository;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 import com.project_exam.backend.modules.assessment.learning.domain.*;
 import com.project_exam.backend.modules.assessment.learning.dto.*;
@@ -61,7 +60,6 @@ public class LearningPlanSessionService {
     private final PassageMapper passageMapper;
     private final PassageMediaMapper passageMediaMapper;
     private final ExamPartRepository examPartRepository;
-    private final ResourceTagRepository resourceTagRepository;
     private final RecoveryResourceRepository recoveryResourceRepository;
     private final LearningPlanResourceLookup resourceLookup;
     private final PlanTaskViewAssembler taskViewAssembler;

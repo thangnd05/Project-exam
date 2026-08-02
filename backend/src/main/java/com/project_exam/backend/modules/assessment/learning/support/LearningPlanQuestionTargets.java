@@ -16,14 +16,14 @@ public final class LearningPlanQuestionTargets {
     }
 
     public static int resolveCapstoneTarget(ExamPart part) {
-       
+
         // return TAG_TARGET;
-        
+
         int base = part != null && part.getDefaultNumQuestions() != null && part.getDefaultNumQuestions() > 0
                 ? part.getDefaultNumQuestions()
                 : DEFAULT_PART_QUESTIONS_WHEN_UNSET;
         return base * CAPSTONE_MULTIPLIER;
-        
+
     }
 
     public static int poolFetchSize(int targetCount) {

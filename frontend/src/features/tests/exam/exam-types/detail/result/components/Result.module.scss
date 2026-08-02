@@ -50,24 +50,6 @@
   }
 }
 
-.gaugeBadge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: var(--font-size-smd);
-  font-weight: 700;
-}
-
-.gaugeBadgePass {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.gaugeBadgeFail {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
 .actionButton {
   margin-top: 16px;
   padding: 12px 20px;
