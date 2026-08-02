@@ -648,8 +648,8 @@
 }
 
 .partCrestDone {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 4px 0 #15803d;
+  background: var(--primary-btn-gradient);
+  box-shadow: 0 4px 0 var(--brand-800);
 }
 
 .partCrestLabel {
@@ -705,7 +705,7 @@
 }
 
 .partDotPassed {
-  background: #16a34a;
+  background: var(--brand-600);
 }
 
 .partDotPending {
@@ -810,7 +810,7 @@
 }
 
 .stagePathDone {
-  stroke: #4ade80;
+  stroke: var(--brand-500);
   stroke-width: 10;
 }
 
@@ -884,23 +884,24 @@
 }
 
 .nodePassed {
-  background: linear-gradient(180deg, #22c55e, #16a34a);
+  background: var(--primary-btn-gradient);
   color: var(--white);
-  box-shadow: 0 4px 0 #15803d;
+  border: 0;
+  box-shadow: none;
 }
 
 .nodeCurrent {
   background: var(--bg-white);
   color: var(--brand-700);
   border: 3px solid var(--brand-600);
-  box-shadow: 0 4px 0 var(--brand-700);
+  box-shadow: none;
 }
 
 .nodeOpen {
   background: var(--bg-white);
   color: var(--text-secondary);
   border: 3px solid var(--border-strong);
-  box-shadow: 0 4px 0 var(--border-color);
+  box-shadow: none;
 }
 
 .nodeLocked {
@@ -912,10 +913,10 @@
 
 .stageNodeCapstone {
   transform: scale(1.08);
-  background: linear-gradient(180deg, #fbbf24, #d97706);
+  background: linear-gradient(180deg, var(--brand-unique), var(--brand-unique-hover));
   color: var(--white);
   border: 0;
-  box-shadow: 0 4px 0 #b45309;
+  box-shadow: none;
 
   .stageNodeWrap:hover & {
     transform: scale(1.08) translateY(-2px);
@@ -932,17 +933,21 @@
     background: var(--bg-white);
     color: var(--brand-700);
     border: 3px solid var(--brand-600);
-    box-shadow: 0 4px 0 var(--brand-700);
+    box-shadow: none;
+  }
+
+  &.nodePassed {
+    background: linear-gradient(180deg, var(--brand-unique), var(--brand-unique-hover));
   }
 }
 
 .stageNodeSelected {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-alpha-35);
 }
 
 .nodeCurrent.stageNodeSelected {
-  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-alpha-35);
 }
 
 .stageNodeLabel {
@@ -1153,7 +1158,7 @@
 }
 
 .meterFillDone {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: var(--primary-gradient);
 }
 
 .meterMark {
