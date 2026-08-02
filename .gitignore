@@ -38,6 +38,7 @@ frontend/.env.example
 frontend/build/
 frontend/dist/
 frontend/*.log
+frontend/package-lock.json
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*

@@ -63,7 +63,7 @@ src/
 | **evaluation** → `pages/evaluation/` | EvaluationModal | `components/result/*` |
 | **admin** → `admin/modals/` | ExamCategoryFormModal, ExamTypeFormModal, RecoveryResourceFormModal, TagFormModal | `common/AlbumManagementTable` (cần xác minh nơi dùng) |
 
-## 6. Lộ trình di dời (incremental — mỗi batch 1 commit + `npm run build` verify)
+## 6. Lộ trình di dời (incremental — mỗi batch 1 commit + `pnpm build` verify)
 
 Làm từ feature nhỏ/độc lập → cross-cutting để giảm rủi ro. **Không big-bang.**
 
@@ -77,14 +77,14 @@ Làm từ feature nhỏ/độc lập → cross-cutting để giảm rủi ro. **
 - [x] **Batch 8 — test/creator**: gom TẤT CẢ vào `components/test/` (module domain shared, vì dùng chéo exam/myclass/mytest/question-bank/Header): CreateTestModal(+scss), EditTestModal, `creator/*`, TestCard/TestListContainer/TestManagementTable
 - [x] **Batch 9 — shared + dọn common/**: Confirm{,Action,Delete}Modal → `components/common/modal/`; AlbumManagementTable → `pages/album-voca/components/`; **`components/modals/` đã xoá hẳn**; `components/common/` còn lại toàn UI generic (BackgroundDecor, MotionSection, PageHeader, modal/)
 
-> **Kết quả**: thùng rác `components/modals/` (31 file) đã giải tán hoàn toàn. Mỗi batch đã `npm run build` xanh.
+> **Kết quả**: thùng rác `components/modals/` (31 file) đã giải tán hoàn toàn. Mỗi batch đã `pnpm build` xanh.
 
 ### Quy trình mỗi batch
 1. `git mv` file vào thư mục feature đích.
 2. Sửa import nội bộ file vừa chuyển (relative → `~/` nếu chui ra ngoài feature).
 3. Cập nhật các file import nó.
 4. `grep` xác nhận 0 đường dẫn cũ sót lại.
-5. `npm run build` → phải compiled successfully.
+5. `pnpm build` → phải compiled successfully.
 6. Commit.
 
 ### ⚠️ Hai bẫy đã vấp (đừng lặp lại)
