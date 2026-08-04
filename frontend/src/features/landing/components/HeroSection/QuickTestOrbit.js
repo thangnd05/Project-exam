@@ -22,13 +22,13 @@ const MANUAL_PAUSE_MS = 1600;
 // radiusY >= bán kính hub + nửa chiều cao thẻ (đã nhân scale 1.1) thì thẻ ở vị trí
 // trước (đáy vành) mới không đè lên hub. radiusX tính theo bề ngang thật của sân
 // khấu nên vành luôn quét ngang hết chỗ có được.
-// Hub nằm lệch LÊN TRÊN tâm vành (xem --hub-shift trong scss), nhờ vậy vành giữ
-// được dáng dẹt ngang mà thẻ ở vị trí trước vẫn nằm trọn phía dưới hub:
-//   |hubShift| >= bán kính hub + radiusY... không, ràng buộc là:
-//   hubShift + hubR <= radiusY - nửa chiều cao thẻ (đã nhân scale 1.1)
+// Giữ đúng tỉ lệ elip của quỹ đạo gốc (radiusX : radiusY : radiusZ = 250:90:150)
+// để nhịp quay có chiều sâu thật. Hub treo phía trên hàng thẻ (--hub-shift trong
+// scss), thoả: hubShift + bán kính hub <= radiusY - nửa chiều cao thẻ (đã nhân
+// scale 1.1) - khoảng hở.
 const RING = {
-  wide: {cardWidth: 136, radiusY: 80, maxRadiusX: 215, sideRoom: 56},
-  narrow: {cardWidth: 104, radiusY: 64, maxRadiusX: 122, sideRoom: 6},
+  wide: {cardWidth: 168, radiusY: 90, maxRadiusX: 235, sideRoom: 56},
+  narrow: {cardWidth: 116, radiusY: 70, maxRadiusX: 122, sideRoom: 6},
 };
 const MIN_RADIUS_X = 96;
 
@@ -70,7 +70,10 @@ function getOrbitTransform(theta, radius) {
   const depth = (Math.cos(theta) + 1) / 2;
 
   return {
-    x: Math.sin(theta) * radius.radiusX,
+    // fanX: chỉ dùng khi có đúng 2 thẻ — nếu không thẻ phía sau sẽ nằm khuất
+    // hoàn toàn sau thẻ trước (cả hai cùng x = 0). sin(theta/2) liên tục nên
+    // không gây giật khi quay.
+    x: Math.sin(theta) * radius.radiusX + Math.sin(theta / 2) * radius.fanX,
     y: Math.cos(theta) * radius.radiusY,
     z: Math.cos(theta) * radius.radiusZ,
     scale: 0.72 + 0.38 * depth,
@@ -153,9 +156,10 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
     return {
       radiusX,
       radiusY: preset.radiusY,
-      radiusZ: clamp(radiusX * 0.45, 70, 160),
+      radiusZ: clamp(radiusX * 0.6, 90, 150),
+      fanX: count === 2 ? Math.min(radiusX * 0.3, 70) : 0,
     };
-  }, [isNarrow, stageWidth]);
+  }, [count, isNarrow, stageWidth]);
 
   radiusRef.current = radius;
   countRef.current = count;
