@@ -76,10 +76,10 @@ function getOrbitTransform(theta, radius) {
     x: Math.sin(theta) * radius.radiusX + Math.sin(theta / 2) * radius.fanX,
     y: Math.cos(theta) * radius.radiusY,
     z: Math.cos(theta) * radius.radiusZ,
-    scale: 0.72 + 0.38 * depth,
-    opacity: 0.4 + 0.6 * depth,
+    opacity: 0.55 + 0.45 * depth,
     depth,
-    rotateY: -Math.sin(theta) * 32,
+    // Gần như billboard: thẻ hướng về người xem, chỉ nghiêng nhẹ theo hướng bay.
+    rotateY: -Math.sin(theta) * 10,
     zIndex: Math.round(50 + Math.cos(theta) * 50),
   };
 }
@@ -153,11 +153,18 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
       MIN_RADIUS_X,
       preset.maxRadiusX,
     );
+    // Quỹ đạo chỉ là đường tròn thật trong 3D khi radiusY² + radiusZ² = radiusX².
+    // Lệch khỏi hệ thức này là mắt thấy ngay "sai sai".
+    const radiusY = Math.min(preset.radiusY, radiusX - 1);
+    const radiusZ = Math.sqrt(radiusX * radiusX - radiusY * radiusY);
+
     return {
       radiusX,
-      radiusY: preset.radiusY,
-      radiusZ: clamp(radiusX * 0.6, 90, 150),
-      fanX: count === 2 ? Math.min(radiusX * 0.3, 70) : 0,
+      radiusY,
+      radiusZ,
+      // Độ nghiêng của mặt phẳng quỹ đạo, dùng để vẽ đường ray cho khớp.
+      planeTiltDeg: (Math.acos(radiusY / radiusX) * 180) / Math.PI,
+      fanX: count === 2 ? radiusX * 0.15 : 0,
     };
   }, [count, isNarrow, stageWidth]);
 
@@ -192,7 +199,9 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
 
       // translate(-50%, -50%) đặt cuối + transform-origin 0 0: thẻ tự căn giữa
       // quanh điểm quỹ đạo, không cần biết trước kích thước thẻ.
-      el.style.transform = `translate3d(${t.x}px, ${t.y}px, ${t.z}px) rotateY(${t.rotateY}deg) scale(${t.scale}) translate(-50%, -50%)`;
+      // Không nhân scale thủ công: perspective đã tự thu nhỏ thẻ ở xa, nhân
+      // thêm là tính độ sâu hai lần nên chuyển động trông giả.
+      el.style.transform = `translate3d(${t.x}px, ${t.y}px, ${t.z}px) rotateY(${t.rotateY}deg) translate(-50%, -50%)`;
       el.style.opacity = String(t.opacity);
       el.style.setProperty('--frontness', t.depth.toFixed(3));
 
@@ -518,6 +527,16 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
       aria-label="Quỹ đạo đề kiểm tra nhanh"
     >
       <div className={cx('track')}>
+        <div
+          className={cx('orbitPath')}
+          aria-hidden="true"
+          style={{
+            width: radius.radiusX * 2,
+            height: radius.radiusX * 2,
+            transform: `translate(-50%, -50%) rotateX(${radius.planeTiltDeg}deg)`,
+          }}
+        />
+
         <div className={cx('hubStack')}>
           <button
             type="button"
