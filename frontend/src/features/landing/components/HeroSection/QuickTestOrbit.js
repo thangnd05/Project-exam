@@ -27,7 +27,7 @@ const MANUAL_PAUSE_MS = 1600;
 //   |hubShift| >= bán kính hub + radiusY... không, ràng buộc là:
 //   hubShift + hubR <= radiusY - nửa chiều cao thẻ (đã nhân scale 1.1)
 const RING = {
-  wide: {cardWidth: 124, radiusY: 74, maxRadiusX: 158, sideRoom: 54},
+  wide: {cardWidth: 136, radiusY: 80, maxRadiusX: 215, sideRoom: 56},
   narrow: {cardWidth: 104, radiusY: 64, maxRadiusX: 122, sideRoom: 6},
 };
 const MIN_RADIUS_X = 96;

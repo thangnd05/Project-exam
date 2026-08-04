@@ -1,8 +1,8 @@
 .stage {
   position: relative;
   width: 100%;
-  height: 320px;
-  --hub-shift: -78px;
+  height: 340px;
+  --hub-shift: -86px;
   perspective: 1100px;
   perspective-origin: 50% 50%;
   touch-action: pan-y;
@@ -57,8 +57,8 @@
 }
 
 .hub {
-  width: 124px;
-  height: 124px;
+  width: 138px;
+  height: 138px;
   border-radius: 50%;
   border: 1px solid rgba(94, 234, 212, 0.4);
   padding: 0;
@@ -109,7 +109,7 @@
 }
 
 .hubNum {
-  font-size: 3.4rem;
+  font-size: 3.7rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.05em;
@@ -137,8 +137,8 @@
   top: 50%;
   left: 50%;
   transform-origin: 0 0;
-  width: 124px;
-  height: 148px;
+  width: 136px;
+  height: 162px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -173,8 +173,8 @@
 }
 
 .initials {
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
   background: rgba(13, 148, 136, 0.24);
   border: 1px solid rgba(94, 234, 212, 0.35);
