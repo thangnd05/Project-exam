@@ -209,7 +209,7 @@
 .stage {
   position: relative;
   // Khớp bề ngang với vành quỹ đạo để hai nút hai bên bám sát rìa vành.
-  width: min(100%, 660px);
+  width: min(100%, 700px);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -236,7 +236,9 @@
 .switchPrev,
 .switchNext {
   position: absolute;
-  top: 50%;
+  // Ngang tầm quả cầu chứ không ngang tâm vành: chỗ đó vành không với tới nên
+  // thẻ quét ngang không bao giờ chui dưới nút, và vành được nới rộng hết cỡ.
+  top: 78px;
   transform: translateY(-50%);
   z-index: 5;
 }

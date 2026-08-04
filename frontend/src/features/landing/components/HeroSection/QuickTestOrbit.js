@@ -27,7 +27,7 @@ const MANUAL_PAUSE_MS = 1600;
 // scss), thoả: hubShift + bán kính hub <= radiusY - nửa chiều cao thẻ (đã nhân
 // scale 1.1) - khoảng hở.
 const RING = {
-  wide: {cardWidth: 196, radiusY: 110, maxRadiusX: 200, sideRoom: 52},
+  wide: {cardWidth: 196, radiusY: 110, maxRadiusX: 260, sideRoom: 8},
   narrow: {cardWidth: 116, radiusY: 70, maxRadiusX: 122, sideRoom: 6},
 };
 const MIN_RADIUS_X = 96;
@@ -162,8 +162,6 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
       radiusX,
       radiusY,
       radiusZ,
-      // Độ nghiêng của mặt phẳng quỹ đạo, dùng để vẽ đường ray cho khớp.
-      planeTiltDeg: (Math.acos(radiusY / radiusX) * 180) / Math.PI,
       fanX: count === 2 ? radiusX * 0.15 : 0,
     };
   }, [count, isNarrow, stageWidth]);
@@ -527,16 +525,6 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
       aria-label="Quỹ đạo đề kiểm tra nhanh"
     >
       <div className={cx('track')}>
-        <div
-          className={cx('orbitPath')}
-          aria-hidden="true"
-          style={{
-            width: radius.radiusX * 2,
-            height: radius.radiusX * 2,
-            transform: `translate(-50%, -50%) rotateX(${radius.planeTiltDeg}deg)`,
-          }}
-        />
-
         <div className={cx('hubStack')}>
           <button
             type="button"
