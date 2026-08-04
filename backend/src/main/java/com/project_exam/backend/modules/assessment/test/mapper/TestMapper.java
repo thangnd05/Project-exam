@@ -34,7 +34,7 @@ public class TestMapper {
     }
 
     public QuickChallengeCardResponse toQuickChallengeCard(
-            Test test, String examTypeName, String status, int totalQuestions,
+            Test test, String examTypeName, String examTypeImageUrl, String status, int totalQuestions,
             List<QuickChallengeCardResponse.PartSummary> parts) {
         return QuickChallengeCardResponse.builder()
                 .testId(test.getTestId())
@@ -44,6 +44,7 @@ public class TestMapper {
                 .bannerUrl(test.getBannerUrl())
                 .examTypeId(test.getExamTypeId())
                 .examTypeName(examTypeName != null ? examTypeName : "Khác")
+                .examTypeImageUrl(examTypeImageUrl)
                 .status(status)
                 .totalQuestions(totalQuestions)
                 .parts(parts)

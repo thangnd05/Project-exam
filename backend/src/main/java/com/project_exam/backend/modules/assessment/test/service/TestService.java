@@ -129,8 +129,8 @@ public class TestService {
                 .map(Test::getExamTypeId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-        Map<String, String> examTypeNames = examTypeRepository.findAllById(examTypeIds).stream()
-                .collect(Collectors.toMap(ExamType::getExamTypeId, ExamType::getName));
+        Map<String, ExamType> examTypeMap = examTypeRepository.findAllById(examTypeIds).stream()
+                .collect(Collectors.toMap(ExamType::getExamTypeId, et -> et));
 
         // Load testPart / examPart / skill của tất cả đề 1 lần thay vì 3 query mỗi đề.
         Map<String, List<TestPart>> testPartsByTestId = testPartRepository
@@ -155,7 +155,7 @@ public class TestService {
         return tests.stream()
                 .map(t -> buildQuickChallengeCard(
                         t,
-                        examTypeNames.get(t.getExamTypeId()),
+                        examTypeMap.get(t.getExamTypeId()),
                         testPartsByTestId.getOrDefault(t.getTestId(), List.of()),
                         examPartMap,
                         skillNames))
@@ -164,7 +164,7 @@ public class TestService {
 
     private QuickChallengeCardResponse buildQuickChallengeCard(
             Test test,
-            String examTypeName,
+            ExamType examType,
             List<TestPart> testParts,
             Map<String, ExamPart> examPartMap,
             Map<String, String> skillNames) {
@@ -213,7 +213,10 @@ public class TestService {
                 .sum();
 
         return testMapper.toQuickChallengeCard(
-                test, examTypeName, test.calculateStatus().name(), totalQuestions, parts);
+                test,
+                examType != null ? examType.getName() : null,
+                examType != null ? examType.getImageUrl() : null,
+                test.calculateStatus().name(), totalQuestions, parts);
     }
 
     public List<TestResponse> getAdminTestsByExamType(String examTypeId) {

@@ -4,6 +4,7 @@ import {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -18,10 +19,18 @@ const ORBIT_PERIOD_MS = 20_000;
 const ORBIT_SPEED = (Math.PI * 2) / ORBIT_PERIOD_MS;
 const MANUAL_PAUSE_MS = 1600;
 
-// Vành nghiêng: radiusY >= bán kính hub + nửa chiều cao thẻ (đã nhân scale 1.1)
-// để thẻ ở vị trí trước (đáy vành) không đè lên hub.
-const DESKTOP_RADIUS = {radiusX: 150, radiusY: 182, radiusZ: 100};
-const MOBILE_RADIUS = {radiusX: 118, radiusY: 146, radiusZ: 72};
+// radiusY >= bán kính hub + nửa chiều cao thẻ (đã nhân scale 1.1) thì thẻ ở vị trí
+// trước (đáy vành) mới không đè lên hub. radiusX tính theo bề ngang thật của sân
+// khấu nên vành luôn quét ngang hết chỗ có được.
+// Hub nằm lệch LÊN TRÊN tâm vành (xem --hub-shift trong scss), nhờ vậy vành giữ
+// được dáng dẹt ngang mà thẻ ở vị trí trước vẫn nằm trọn phía dưới hub:
+//   |hubShift| >= bán kính hub + radiusY... không, ràng buộc là:
+//   hubShift + hubR <= radiusY - nửa chiều cao thẻ (đã nhân scale 1.1)
+const RING = {
+  wide: {cardWidth: 124, radiusY: 74, maxRadiusX: 158, sideRoom: 54},
+  narrow: {cardWidth: 104, radiusY: 64, maxRadiusX: 122, sideRoom: 6},
+};
+const MIN_RADIUS_X = 96;
 
 // Kéo ngang bao nhiêu px thì quỹ đạo quay trọn 1 vòng (theo bán kính hiện tại).
 const DRAG_TURN_FACTOR = 3.6;
@@ -118,7 +127,8 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   const hoverCountRef = useRef(0);
   const pointerPausedRef = useRef(false);
   const previousFrontRef = useRef(0);
-  const radiusRef = useRef(isNarrow ? MOBILE_RADIUS : DESKTOP_RADIUS);
+  const radiusRef = useRef(RING.wide);
+  const stageRef = useRef(null);
   const countRef = useRef(0);
   const testsRef = useRef([]);
   const cardRefs = useRef([]);
@@ -127,10 +137,25 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
 
   const [frontIndex, setFrontIndex] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [stageWidth, setStageWidth] = useState(0);
 
   const count = tests.length;
-  const radius = isNarrow ? MOBILE_RADIUS : DESKTOP_RADIUS;
   const step = count > 0 ? TWO_PI / count : 0;
+
+  const radius = useMemo(() => {
+    const preset = isNarrow ? RING.narrow : RING.wide;
+    const halfStage = (stageWidth || preset.maxRadiusX * 2.5) / 2;
+    const radiusX = clamp(
+      halfStage - preset.cardWidth / 2 - preset.sideRoom,
+      MIN_RADIUS_X,
+      preset.maxRadiusX,
+    );
+    return {
+      radiusX,
+      radiusY: preset.radiusY,
+      radiusZ: clamp(radiusX * 0.45, 70, 160),
+    };
+  }, [isNarrow, stageWidth]);
 
   radiusRef.current = radius;
   countRef.current = count;
@@ -222,9 +247,20 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   }, [count]);
 
   useLayoutEffect(() => {
+    const el = stageRef.current;
+    if (!el) return undefined;
+
+    const apply = () => setStageWidth(el.getBoundingClientRect().width);
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useLayoutEffect(() => {
     if (reduceMotion || count === 0) return;
     applyTransforms();
-  }, [applyTransforms, count, tests, isNarrow, reduceMotion]);
+  }, [applyTransforms, count, tests, radius, reduceMotion]);
 
   const pauseAuto = useCallback((ms = MANUAL_PAUSE_MS) => {
     pauseUntilRef.current = Date.now() + ms;
@@ -443,6 +479,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
 
   return (
     <div
+      ref={stageRef}
       className={cx('stage', {dragging, reduceMotion})}
       onPointerDown={onPointerDown}
       onKeyDown={onStageKeyDown}
@@ -521,11 +558,26 @@ function OrbitCards({tests, setCardRef, onActivate, onHoverChange}) {
 }
 
 function CardFace({test}) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = Boolean(test.examTypeImageUrl) && !imageFailed;
+
   return (
     <>
-      <span className={cx('initials')} aria-hidden="true">
-        {getInitials(test.examTypeName)}
-      </span>
+      {showImage ? (
+        <img
+          className={cx('logo')}
+          src={test.examTypeImageUrl}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          draggable={false}
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <span className={cx('initials')} aria-hidden="true">
+          {getInitials(test.examTypeName)}
+        </span>
+      )}
       <h3 className={cx('name')} title={test.examTypeName}>
         {shortExamName(test.examTypeName)}
       </h3>

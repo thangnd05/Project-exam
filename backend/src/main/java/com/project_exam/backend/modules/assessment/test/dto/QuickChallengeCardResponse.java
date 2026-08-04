@@ -15,6 +15,7 @@ public class QuickChallengeCardResponse {
     private String bannerUrl;
     private String examTypeId;
     private String examTypeName;
+    private String examTypeImageUrl;
     private String status;
     private int totalQuestions;
     private List<PartSummary> parts;

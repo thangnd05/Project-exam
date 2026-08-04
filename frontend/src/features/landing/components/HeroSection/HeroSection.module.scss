@@ -202,7 +202,7 @@
 
 .stage {
   position: relative;
-  // Bó sát bề ngang của vành để hai nút hai bên không bị văng ra xa.
+  // Khớp bề ngang với vành quỹ đạo để hai nút hai bên bám sát rìa vành.
   width: min(100%, 520px);
   margin-inline: auto;
   display: flex;
@@ -214,8 +214,8 @@
 .stageEmpty {
   display: grid;
   place-items: center;
-  width: min(100%, 420px);
-  height: clamp(300px, 34vw, 360px);
+  width: 100%;
+  height: 320px;
   margin: 0;
   font-size: 1.4rem;
   color: rgba(255, 255, 255, 0.55);
