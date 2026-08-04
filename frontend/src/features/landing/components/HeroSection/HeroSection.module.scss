@@ -221,7 +221,7 @@
   display: grid;
   place-items: center;
   width: 100%;
-  height: 420px;
+  height: 470px;
   margin: 0;
   font-size: 1.4rem;
   color: rgba(255, 255, 255, 0.55);
@@ -282,6 +282,58 @@
   }
 }
 
+.scrollCue {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(20px, 4vh, 40px);
+  transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  svg {
+    display: block;
+    animation: scrollCueBounce 2.2s ease-in-out infinite;
+  }
+
+  &:hover {
+    color: var(--brand-300, #5eead4);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-unique, #f59e0b);
+    outline-offset: 2px;
+  }
+}
+
+.scrollCueLabel {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@keyframes scrollCueBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 768px) {
   // Màn hẹp không đủ chỗ hai bên vành: trả hai nút về thành hàng dưới.
   .switcher {
@@ -308,7 +360,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .orb {
+  .orb,
+  .scrollCue svg {
     animation: none;
   }
 }
