@@ -13,16 +13,23 @@ const cx = classNames.bind(styles);
 const ORBIT_PERIOD_MS = 18_000;
 const ORBIT_SPEED = (Math.PI * 2) / ORBIT_PERIOD_MS;
 const MANUAL_PAUSE_MS = 1600;
-const SWIPE_THRESHOLD = 48;
 const MAX_ORBIT_ITEMS = 8;
 
 const DESKTOP_RADIUS = {radiusX: 250, radiusY: 90, radiusZ: 150};
 const MOBILE_RADIUS = {radiusX: 140, radiusY: 70, radiusZ: 110};
 
-const HUB_DIAMETER_DESKTOP = 148;
-const HUB_DIAMETER_MOBILE = 120;
+// Kéo ngang bao nhiêu px thì quỹ đạo quay trọn 1 vòng (theo bán kính hiện tại).
+const DRAG_TURN_FACTOR = 3.6;
+// Di chuyển quá ngưỡng này mới tính là kéo (để không nuốt cú click chọn thẻ).
+const DRAG_TOLERANCE_PX = 6;
+// Quán tính khi thả tay: chiếu vận tốc thêm chừng này mili-giây.
+const FLICK_PROJECTION_MS = 140;
+// Hằng số thời gian của chuyển động trượt về nấc gần nhất.
+const SETTLE_TAU_MS = 110;
 
 const TWO_PI = Math.PI * 2;
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const normalizeExamTypes = (payload) => {
   if (Array.isArray(payload)) return payload;
@@ -100,7 +107,8 @@ function ExploreOrb() {
   const reduceMotion = useReducedMotion();
   const isNarrow = useIsNarrow();
   const pauseUntilRef = useRef(0);
-  const pointerStartX = useRef(null);
+  const dragRef = useRef(null);
+  const settleRef = useRef(null);
   const didSwipeRef = useRef(false);
   const rotationRef = useRef(0);
   const lastTsRef = useRef(null);
@@ -116,6 +124,7 @@ function ExploreOrb() {
 
   const [frontIndex, setFrontIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   const {data: examTypes = [], isLoading} = useQuery({
     queryKey: examTypeKeys.standard,
@@ -128,11 +137,7 @@ function ExploreOrb() {
 
   const count = examTypes.length;
   const radius = isNarrow ? MOBILE_RADIUS : DESKTOP_RADIUS;
-  const hubDiameter = isNarrow ? HUB_DIAMETER_MOBILE : HUB_DIAMETER_DESKTOP;
-  const rippleScaleX = (radius.radiusX * 2) / hubDiameter;
-  const rippleScaleY = (radius.radiusY * 2) / hubDiameter;
 
-  const cardStepMs = count > 0 ? ORBIT_PERIOD_MS / count : ORBIT_PERIOD_MS;
   const step = count > 0 ? TWO_PI / count : 0;
 
   radiusRef.current = radius;
@@ -234,36 +239,47 @@ function ExploreOrb() {
     pauseUntilRef.current = Date.now() + ms;
   }, []);
 
+  const settleTo = useCallback(
+    (targetRotation) => {
+      pauseAuto();
+      if (reduceMotion) {
+        settleRef.current = null;
+        rotationRef.current = targetRotation;
+        applyTransforms();
+        return;
+      }
+      settleRef.current = targetRotation;
+    },
+    [applyTransforms, pauseAuto, reduceMotion],
+  );
+
   const goTo = useCallback(
     (index) => {
       if (count === 0) return;
       const target = (((index % count) + count) % count) * step;
-      const current = rotationRef.current;
+      const current = settleRef.current ?? rotationRef.current;
       const currentNorm = ((current % TWO_PI) + TWO_PI) % TWO_PI;
       const targetNorm = ((target % TWO_PI) + TWO_PI) % TWO_PI;
       let delta = targetNorm - currentNorm;
       if (delta > Math.PI) delta -= TWO_PI;
       if (delta < -Math.PI) delta += TWO_PI;
-      rotationRef.current = current + delta;
-      applyTransforms();
-      pauseAuto();
+      settleTo(current + delta);
     },
-    [applyTransforms, count, pauseAuto, step],
+    [count, settleTo, step],
   );
 
-  const goPrev = useCallback(() => {
-    if (count < 2) return;
-    rotationRef.current -= step;
-    applyTransforms();
-    pauseAuto();
-  }, [applyTransforms, count, pauseAuto, step]);
+  // Luôn về đúng nấc: làm tròn vị trí hiện tại rồi cộng/trừ một bước.
+  const nudge = useCallback(
+    (direction) => {
+      if (count < 2) return;
+      const base = settleRef.current ?? rotationRef.current;
+      settleTo((Math.round(base / step) + direction) * step);
+    },
+    [count, settleTo, step],
+  );
 
-  const goNext = useCallback(() => {
-    if (count < 2) return;
-    rotationRef.current += step;
-    applyTransforms();
-    pauseAuto();
-  }, [applyTransforms, count, pauseAuto, step]);
+  const goPrev = useCallback(() => nudge(-1), [nudge]);
+  const goNext = useCallback(() => nudge(1), [nudge]);
 
   const scrollToAll = useCallback(() => {
     document
@@ -300,12 +316,27 @@ function ExploreOrb() {
     const tick = (ts) => {
       const last = lastTsRef.current;
       lastTsRef.current = ts;
+      const deltaMs = last == null ? 0 : Math.min(ts - last, 64);
 
-      const hoveringOrHeld = hoverPausedRef.current || pointerPausedRef.current;
-      const timedPause = Date.now() < pauseUntilRef.current;
-
-      if (!hoveringOrHeld && !timedPause && last != null) {
-        const deltaMs = Math.min(ts - last, 64);
+      if (dragRef.current) {
+        // Đang kéo: góc quay do pointermove quyết định.
+      } else if (settleRef.current != null) {
+        const target = settleRef.current;
+        const diff = target - rotationRef.current;
+        if (Math.abs(diff) < 0.002) {
+          rotationRef.current = target;
+          settleRef.current = null;
+          pauseAuto();
+        } else {
+          rotationRef.current += diff * (1 - Math.exp(-deltaMs / SETTLE_TAU_MS));
+        }
+        applyTransforms();
+      } else if (
+        deltaMs > 0 &&
+        !hoverPausedRef.current &&
+        !pointerPausedRef.current &&
+        Date.now() >= pauseUntilRef.current
+      ) {
         rotationRef.current += ORBIT_SPEED * deltaMs;
         applyTransforms();
       }
@@ -318,7 +349,7 @@ function ExploreOrb() {
       window.cancelAnimationFrame(rafId);
       lastTsRef.current = null;
     };
-  }, [applyTransforms, count, reduceMotion]);
+  }, [applyTransforms, count, pauseAuto, reduceMotion]);
 
   const frontType = count > 0 ? examTypes[frontIndex] : null;
 
@@ -344,38 +375,83 @@ function ExploreOrb() {
   const onPointerDown = useCallback(
     (e) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (reduceMotion || countRef.current < 2) return;
+
       didSwipeRef.current = false;
-      pointerStartX.current = e.clientX;
+      settleRef.current = null;
       pointerPausedRef.current = true;
       updatePausedFlag();
+      setDragging(true);
+
+      const drag = {
+        id: e.pointerId,
+        startX: e.clientX,
+        lastX: e.clientX,
+        lastTime: e.timeStamp,
+        velocity: 0,
+        moved: false,
+        startRotation: rotationRef.current,
+        // px kéo -> radian quay, co giãn theo bán kính quỹ đạo hiện tại
+        rotPerPx: TWO_PI / (radiusRef.current.radiusX * DRAG_TURN_FACTOR),
+      };
+
+      const onMove = (ev) => {
+        if (ev.pointerId !== drag.id) return;
+        const dx = ev.clientX - drag.startX;
+        if (Math.abs(dx) > DRAG_TOLERANCE_PX) drag.moved = true;
+
+        const dt = ev.timeStamp - drag.lastTime;
+        if (dt > 0) {
+          drag.velocity = (ev.clientX - drag.lastX) / dt;
+          drag.lastX = ev.clientX;
+          drag.lastTime = ev.timeStamp;
+        }
+
+        rotationRef.current = drag.startRotation - dx * drag.rotPerPx;
+        applyTransforms();
+      };
+
+      const finish = () => {
+        drag.cleanup();
+        dragRef.current = null;
+        pointerPausedRef.current = false;
+        updatePausedFlag();
+        setDragging(false);
+        pauseAuto();
+
+        const n = countRef.current;
+        if (!drag.moved || n < 2) return;
+
+        didSwipeRef.current = true;
+        const stepRad = TWO_PI / n;
+        const flick = clamp(
+          -drag.velocity * drag.rotPerPx * FLICK_PROJECTION_MS,
+          -stepRad,
+          stepRad,
+        );
+        settleRef.current =
+          Math.round((rotationRef.current + flick) / stepRad) * stepRad;
+      };
+
+      const onEnd = (ev) => {
+        if (ev.pointerId === drag.id) finish();
+      };
+
+      drag.cleanup = () => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onEnd);
+        window.removeEventListener('pointercancel', onEnd);
+      };
+
+      dragRef.current = drag;
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onEnd);
+      window.addEventListener('pointercancel', onEnd);
     },
-    [updatePausedFlag],
+    [applyTransforms, pauseAuto, reduceMotion, updatePausedFlag],
   );
 
-  const onPointerUp = useCallback(
-    (e) => {
-      pointerPausedRef.current = false;
-      updatePausedFlag();
-
-      if (pointerStartX.current == null || count < 2) {
-        pointerStartX.current = null;
-        return;
-      }
-      const delta = e.clientX - pointerStartX.current;
-      pointerStartX.current = null;
-      if (Math.abs(delta) < SWIPE_THRESHOLD) return;
-      didSwipeRef.current = true;
-      if (delta > 0) goPrev();
-      else goNext();
-    },
-    [count, goNext, goPrev, updatePausedFlag],
-  );
-
-  const onPointerCancel = useCallback(() => {
-    pointerStartX.current = null;
-    pointerPausedRef.current = false;
-    updatePausedFlag();
-  }, [updatePausedFlag]);
+  useEffect(() => () => dragRef.current?.cleanup(), []);
 
   const onStageKeyDown = useCallback(
     (e) => {
@@ -406,7 +482,6 @@ function ExploreOrb() {
       <div className={cx('atmosphere')} aria-hidden="true">
         <span className={cx('orb', 'orbA')} />
         <span className={cx('orb', 'orbB')} />
-        <span className={cx('scan')} />
       </div>
 
       <div className={cx('inner')}>
@@ -433,39 +508,16 @@ function ExploreOrb() {
               </button>
 
               <div
-                className={cx('stage')}
+                className={cx('stage', {dragging})}
                 onPointerDown={onPointerDown}
-                onPointerUp={onPointerUp}
-                onPointerCancel={onPointerCancel}
                 onKeyDown={onStageKeyDown}
                 tabIndex={0}
                 role="group"
                 aria-roledescription="carousel"
                 aria-label="Quỹ đạo loại đề"
               >
-                <div
-                  className={cx('orbitPath')}
-                  aria-hidden="true"
-                  style={{
-                    width: radius.radiusX * 2,
-                    height: radius.radiusY * 2,
-                  }}
-                />
-
                 <div className={cx('track')}>
-                  <div
-                    className={cx('hubStack')}
-                    style={{
-                      '--ripple-scale-x': rippleScaleX,
-                      '--ripple-scale-y': rippleScaleY,
-                      '--ripple-duration': `${cardStepMs}ms`,
-                    }}
-                  >
-                    <span
-                      key={cardStepMs}
-                      className={cx('hubRipple')}
-                      aria-hidden="true"
-                    />
+                  <div className={cx('hubStack')}>
                     <button
                       type="button"
                       className={cx('hub')}

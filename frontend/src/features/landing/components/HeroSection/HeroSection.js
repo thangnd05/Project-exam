@@ -110,7 +110,6 @@ function HeroSection() {
       <div className={cx('atmosphere')} aria-hidden="true">
         <span className={cx('orb', 'orbA')} />
         <span className={cx('orb', 'orbB')} />
-        <span className={cx('scan')} />
       </div>
 
       <div className={cx('shell')}>

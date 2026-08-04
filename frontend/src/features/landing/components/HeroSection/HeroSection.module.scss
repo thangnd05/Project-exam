@@ -1,7 +1,9 @@
 .hero {
   position: relative;
   isolation: isolate;
-  min-height: min(100vh, 920px);
+  // Phủ trọn khung nhìn: main đã bị kéo lên -72px nên hero bắt đầu từ đỉnh màn hình.
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -9,7 +11,6 @@
   background: var(--hero-bg, #042f2e);
   color: #fff;
   overflow: hidden;
-  border-bottom: 2px solid var(--brand-unique, #f59e0b);
 }
 
 .atmosphere {
@@ -45,33 +46,12 @@
   animation-delay: -4s;
 }
 
-.scan {
-  position: absolute;
-  inset: -20% 0;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(94, 234, 212, 0.04) 48%,
-    transparent 52%
-  );
-  animation: scan 7s linear infinite;
-}
-
 @keyframes drift {
   from {
     transform: translate3d(0, 0, 0) scale(1);
   }
   to {
     transform: translate3d(-18px, 24px, 0) scale(1.08);
-  }
-}
-
-@keyframes scan {
-  from {
-    transform: translateY(-30%);
-  }
-  to {
-    transform: translateY(30%);
   }
 }
 
@@ -417,7 +397,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .orb,
-  .scan,
   .ring,
   .ringHole,
   .ringPulse {
