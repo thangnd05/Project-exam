@@ -1,11 +1,11 @@
 .stage {
   position: relative;
   width: 100%;
-  height: 490px;
-  --hub-shift: -140px;
+  height: 500px;
+  --hub-shift: -142px;
   // Kéo cả cụm cho cân giữa sân khấu.
   --ring-shift: -20px;
-  perspective: 1100px;
+  perspective: 1400px;
   perspective-origin: 50% 50%;
   touch-action: pan-y;
   user-select: none;

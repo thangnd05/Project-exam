@@ -27,7 +27,7 @@ const MANUAL_PAUSE_MS = 1600;
 // scss), thoả: hubShift + bán kính hub <= radiusY - nửa chiều cao thẻ (đã nhân
 // scale 1.1) - khoảng hở.
 const RING = {
-  wide: {cardWidth: 196, radiusY: 110, maxRadiusX: 260, sideRoom: 8},
+  wide: {cardWidth: 196, radiusY: 110, maxRadiusX: 320, sideRoom: 8},
   narrow: {cardWidth: 116, radiusY: 70, maxRadiusX: 122, sideRoom: 6},
 };
 const MIN_RADIUS_X = 96;
@@ -40,6 +40,9 @@ const DRAG_TOLERANCE_PX = 6;
 const FLICK_PROJECTION_MS = 140;
 // Hằng số thời gian của chuyển động trượt về nấc gần nhất (càng lớn càng thong thả).
 const SETTLE_TAU_MS = 170;
+// Biên độ nghiêng theo chuột (độ). Giữ nhỏ vì bán kính vành lớn.
+const TILT_Y_DEG = 4;
+const TILT_X_DEG = 2.5;
 
 const TWO_PI = Math.PI * 2;
 
@@ -469,12 +472,17 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
     (e) => {
       const el = stageRef.current;
       // Chỉ chuột mới nghiêng: chạm thì không có hover để trả về 0.
-      if (!el || reduceMotion || e.pointerType !== 'mouse') return;
+      // Đang kéo thì thôi, không chồng thêm chuyển động.
+      if (!el || reduceMotion || dragRef.current || e.pointerType !== 'mouse') {
+        return;
+      }
       const rect = el.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5;
       const py = (e.clientY - rect.top) / rect.height - 0.5;
-      el.style.setProperty('--tilt-y', `${(px * 12).toFixed(2)}deg`);
-      el.style.setProperty('--tilt-x', `${(-py * 8).toFixed(2)}deg`);
+      // Biên độ phải nhỏ: nghiêng θ đẩy thẻ ở rìa lùi/tiến radiusX·sin(θ) theo
+      // trục z, với radiusX ~300 thì 12° đã là ~60px — thẻ trông như bị hụt về sau.
+      el.style.setProperty('--tilt-y', `${(px * TILT_Y_DEG).toFixed(2)}deg`);
+      el.style.setProperty('--tilt-x', `${(-py * TILT_X_DEG).toFixed(2)}deg`);
     },
     [reduceMotion],
   );
