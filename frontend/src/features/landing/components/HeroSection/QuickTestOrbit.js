@@ -27,7 +27,7 @@ const MANUAL_PAUSE_MS = 1600;
 // scss), thoả: hubShift + bán kính hub <= radiusY - nửa chiều cao thẻ (đã nhân
 // scale 1.1) - khoảng hở.
 const RING = {
-  wide: {cardWidth: 150, radiusY: 84, maxRadiusX: 170, sideRoom: 52},
+  wide: {cardWidth: 176, radiusY: 80, maxRadiusX: 190, sideRoom: 52},
   narrow: {cardWidth: 116, radiusY: 70, maxRadiusX: 122, sideRoom: 6},
 };
 const MIN_RADIUS_X = 96;
