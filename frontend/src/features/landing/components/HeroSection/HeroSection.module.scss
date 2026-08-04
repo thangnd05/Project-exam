@@ -238,19 +238,20 @@
 .switchPrev,
 .switchNext {
   position: absolute;
-  // Ngang tầm quả cầu chứ không ngang tâm vành: chỗ đó vành không với tới nên
-  // thẻ quét ngang không bao giờ chui dưới nút, và vành được nới rộng hết cỡ.
+  // Kẹp hai bên quả cầu: cùng độ cao với nó, cách tâm --nav-x. Ở độ cao này
+  // vành không với tới nên thẻ quét ngang không bao giờ chui dưới nút.
   top: 72px;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(calc(-50% + var(--nav-x, 0px)), -50%);
   z-index: 5;
 }
 
 .switchPrev {
-  left: 0;
+  --nav-x: -132px;
 }
 
 .switchNext {
-  right: 0;
+  --nav-x: 132px;
 }
 
 .switchBtn {
@@ -258,7 +259,10 @@
   height: 48px;
   border-radius: 50%;
   border: 1.5px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(4, 47, 46, 0.35);
+  // Thẻ ở nửa trên vành có lúc lướt qua sau nút; blur cho ra chất kính, nhìn
+  // thành lớp trước - lớp sau thay vì chồng lộn xộn.
+  backdrop-filter: blur(8px);
   color: #fff;
   cursor: pointer;
   display: inline-flex;
@@ -281,7 +285,7 @@
   }
 
   &:active {
-    transform: translateY(-50%) scale(0.94);
+    transform: translate(calc(-50% + var(--nav-x, 0px)), -50%) scale(0.94);
     background: rgba(94, 234, 212, 0.22);
   }
 }
