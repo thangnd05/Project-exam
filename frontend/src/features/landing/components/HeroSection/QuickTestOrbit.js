@@ -27,7 +27,7 @@ const MANUAL_PAUSE_MS = 1600;
 // scss), thoả: hubShift + bán kính hub <= radiusY - nửa chiều cao thẻ (đã nhân
 // scale 1.1) - khoảng hở.
 const RING = {
-  wide: {cardWidth: 168, radiusY: 90, maxRadiusX: 235, sideRoom: 56},
+  wide: {cardWidth: 150, radiusY: 84, maxRadiusX: 170, sideRoom: 52},
   narrow: {cardWidth: 116, radiusY: 70, maxRadiusX: 122, sideRoom: 6},
 };
 const MIN_RADIUS_X = 96;
@@ -456,6 +456,29 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
 
   useEffect(() => () => dragRef.current?.cleanup(), []);
 
+  // Nghiêng nhẹ cả cụm theo vị trí con trỏ — cảm giác 3D của bản three.js nhưng
+  // chỉ tốn 2 biến CSS.
+  const onStagePointerMove = useCallback(
+    (e) => {
+      const el = stageRef.current;
+      // Chỉ chuột mới nghiêng: chạm thì không có hover để trả về 0.
+      if (!el || reduceMotion || e.pointerType !== 'mouse') return;
+      const rect = el.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      el.style.setProperty('--tilt-y', `${(px * 12).toFixed(2)}deg`);
+      el.style.setProperty('--tilt-x', `${(-py * 8).toFixed(2)}deg`);
+    },
+    [reduceMotion],
+  );
+
+  const onStagePointerLeave = useCallback(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    el.style.setProperty('--tilt-y', '0deg');
+    el.style.setProperty('--tilt-x', '0deg');
+  }, []);
+
   const onStageKeyDown = useCallback(
     (e) => {
       if (count < 2) return;
@@ -486,6 +509,8 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
       ref={stageRef}
       className={cx('stage', {dragging, reduceMotion})}
       onPointerDown={onPointerDown}
+      onPointerMove={onStagePointerMove}
+      onPointerLeave={onStagePointerLeave}
       onKeyDown={onStageKeyDown}
       tabIndex={0}
       role="group"

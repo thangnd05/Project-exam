@@ -58,12 +58,12 @@
 .shell {
   position: relative;
   z-index: 1;
-  width: min(1280px, 100%);
+  width: min(1180px, 100%);
   margin-inline: auto;
   display: grid;
-  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   align-items: center;
-  gap: clamp(28px, 5vw, 72px);
+  gap: clamp(24px, 3.2vw, 52px);
 
   @media (max-width: 960px) {
     grid-template-columns: 1fr;
@@ -203,7 +203,7 @@
 .stage {
   position: relative;
   // Khớp bề ngang với vành quỹ đạo để hai nút hai bên bám sát rìa vành.
-  width: min(100%, 680px);
+  width: min(100%, 560px);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -215,7 +215,7 @@
   display: grid;
   place-items: center;
   width: 100%;
-  height: 400px;
+  height: 370px;
   margin: 0;
   font-size: 1.4rem;
   color: rgba(255, 255, 255, 0.55);
