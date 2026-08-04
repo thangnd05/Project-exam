@@ -1,6 +1,6 @@
 import HeroSection from './components/HeroSection/HeroSection';
 import JourneySection from './components/JourneySection/JourneySection';
-import ExploreOrb from './components/ExploreOrb/ExploreOrb';
+import ExamTypeGrid from './components/ExamTypeGrid/ExamTypeGrid';
 import WhyWinDe from './components/WhyWinDe/WhyWinDe';
 import FaqSection from './components/FaqSection/FaqSection';
 
@@ -9,7 +9,7 @@ export default function HomePage() {
     <div>
       <HeroSection />
       <JourneySection />
-      <ExploreOrb />
+      <ExamTypeGrid />
       <WhyWinDe />
       <FaqSection />
     </div>

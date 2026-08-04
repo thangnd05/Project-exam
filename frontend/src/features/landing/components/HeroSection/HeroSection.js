@@ -1,13 +1,13 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
-import {AnimatePresence, motion} from 'framer-motion';
+import {motion} from 'framer-motion';
 
 import styles from './HeroSection.module.scss';
 import {calculateAllowedTime} from '~/shared/utils/testStatusHelper';
 import {useQuickChallengeTests} from '~/features/landing/components/HeroSection/hooks/useQuickChallengeTests';
-import {brandColors} from '~/shared/styles/brandColors';
+import QuickTestOrbit from './QuickTestOrbit';
 import {getStandardExamTypes} from '~/shared/api/examTypeApi';
 import {examTypeKeys} from '~/features/tests/exam/exam-types/examTypeKeys';
 import {name as brandName} from '~/shared/assets/images';
@@ -21,36 +21,11 @@ const normalizeExamTypes = (payload) => {
   return [];
 };
 
-const shortExamName = (name) => {
-  if (!name) return '';
-  const primary = name.split(/\s*[–—]\s*/)[0].trim();
-  if (primary.length <= 40) return primary;
-  const cut = primary.slice(0, 38).replace(/\s+\S*$/, '');
-  return `${cut || primary.slice(0, 38)}…`;
-};
-
-const COLOR_DARK = brandColors.primary;
-const COLOR_LIGHT = brandColors.brand300;
-const partColor = (idx) => (idx % 2 === 0 ? COLOR_DARK : COLOR_LIGHT);
-
-const buildRingGradient = (parts, total) => {
-  if (!total || !parts.length) {
-    return `conic-gradient(from 210deg, ${COLOR_DARK}, ${COLOR_LIGHT}, ${brandColors.unique}, ${COLOR_DARK})`;
-  }
-  let acc = 0;
-  const stops = parts.map((part, idx) => {
-    const start = (acc / total) * 100;
-    acc += part.numQuestions;
-    const end = (acc / total) * 100;
-    return `${partColor(idx)} ${start}% ${end}%`;
-  });
-  return `conic-gradient(from 210deg, ${stops.join(', ')})`;
-};
-
 function HeroSection() {
   const navigate = useNavigate();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
   const [activeIdx, setActiveIdx] = useState(0);
+  const orbitRef = useRef(null);
 
   const {data: examTypeCount = 0} = useQuery({
     queryKey: examTypeKeys.standard,
@@ -78,32 +53,30 @@ function HeroSection() {
 
   const active = cards[activeIdx] ?? null;
   const hasQuick = !loading && Boolean(active);
-  const parts = active?.parts || [];
-  const total = active?.totalQuestions || 0;
 
   const handleScrollToExam = () => {
-    document.getElementById('explore-orb')?.scrollIntoView({behavior: 'smooth'});
+    document.getElementById('exam-types')?.scrollIntoView({behavior: 'smooth'});
   };
+
+  const startTest = useCallback(
+    (test) => {
+      navigate(`/tests/${test.testId}/start`, {
+        state: {allowedTime: calculateAllowedTime(test)},
+      });
+    },
+    [navigate],
+  );
 
   const handleStartQuick = useCallback(() => {
     if (!active) {
       handleScrollToExam();
       return;
     }
-    navigate(`/tests/${active.testId}/start`, {
-      state: {allowedTime: calculateAllowedTime(active)},
-    });
-  }, [active, navigate]);
+    startTest(active);
+  }, [active, startTest]);
 
-  const goPrev = () => {
-    if (cards.length < 2) return;
-    setActiveIdx((i) => (i - 1 + cards.length) % cards.length);
-  };
-
-  const goNext = () => {
-    if (cards.length < 2) return;
-    setActiveIdx((i) => (i + 1) % cards.length);
-  };
+  const goPrev = () => orbitRef.current?.goPrev();
+  const goNext = () => orbitRef.current?.goNext();
 
   return (
     <section id="hero" className={cx('hero')}>
@@ -153,45 +126,27 @@ function HeroSection() {
           animate={{opacity: 1, scale: 1}}
           transition={{duration: 1.1, delay: 0.15, ease: [0.22, 1, 0.36, 1]}}
         >
-          <div className={cx('ringWrap')}>
-            <div
-              className={cx('ring')}
-              style={{background: buildRingGradient(parts, total)}}
-            >
-              <div className={cx('ringHole')}>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={active?.testId ?? 'empty'}
-                    className={cx('ringCore')}
-                    initial={{opacity: 0, y: 12}}
-                    animate={{opacity: 1, y: 0}}
-                    exit={{opacity: 0, y: -12}}
-                    transition={{duration: 0.35}}
-                  >
-                    {loading ? (
-                      <span className={cx('coreMuted')}>Đang tải…</span>
-                    ) : hasQuick ? (
-                      <>
-                        <span className={cx('coreBadge')}>Kiểm tra nhanh</span>
-                        <span className={cx('coreNum')}>{total || '—'}</span>
-                        <span className={cx('coreUnit')}>câu hỏi</span>
-                        <span className={cx('coreName')} title={active.examTypeName}>
-                          {shortExamName(active.examTypeName)}
-                        </span>
-                      </>
-                    ) : (
-                      <span className={cx('coreMuted')}>Sẵn sàng khám phá</span>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </div>
-            <div className={cx('ringPulse')} aria-hidden="true" />
-          </div>
+          {hasQuick ? (
+            <QuickTestOrbit
+              ref={orbitRef}
+              tests={cards}
+              onOpen={startTest}
+              onFrontChange={setActiveIdx}
+            />
+          ) : (
+            <p className={cx('stageEmpty')}>
+              {loading ? 'Đang tải đề kiểm tra nhanh…' : 'Sẵn sàng khám phá'}
+            </p>
+          )}
 
           {cards.length > 1 && (
             <div className={cx('switcher')}>
-              <button type="button" className={cx('switchBtn')} onClick={goPrev} aria-label="Trước">
+              <button
+                type="button"
+                className={cx('switchBtn', 'switchPrev')}
+                onClick={goPrev}
+                aria-label="Trước"
+              >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                   <path
                     d="M12.5 4.5L7 10l5.5 5.5"
@@ -202,20 +157,12 @@ function HeroSection() {
                   />
                 </svg>
               </button>
-              <div className={cx('dots')} role="tablist" aria-label="Loại kiểm tra nhanh">
-                {cards.map((c, i) => (
-                  <button
-                    key={c.testId}
-                    type="button"
-                    role="tab"
-                    aria-selected={i === activeIdx}
-                    className={cx('dot', {active: i === activeIdx})}
-                    onClick={() => setActiveIdx(i)}
-                    aria-label={`Chọn kiểm tra ${i + 1}`}
-                  />
-                ))}
-              </div>
-              <button type="button" className={cx('switchBtn')} onClick={goNext} aria-label="Sau">
+              <button
+                type="button"
+                className={cx('switchBtn', 'switchNext')}
+                onClick={goNext}
+                aria-label="Sau"
+              >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                   <path
                     d="M7.5 4.5L13 10l-5.5 5.5"
