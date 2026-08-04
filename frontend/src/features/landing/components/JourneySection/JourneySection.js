@@ -50,7 +50,7 @@ export default function JourneySection() {
           <p className={cx('eyebrow')}>Cách WinDe hoạt động</p>
           <h2 className={cx('title')}>Ba bước tối ưu hóa thời gian</h2>
           <p className={cx('subtitle')}>
-            Không luyện mù quáng làm thử, xem rõ điểm yếu, rồi ôn đúng chỗ.
+            Không luyện mù quáng, làm thử, xem rõ điểm yếu, rồi ôn đúng chỗ.
             Hệ thống học tập thông minh giúp bạn tối ưu hóa thời gian đạt mục
             tiêu.
           </p>
