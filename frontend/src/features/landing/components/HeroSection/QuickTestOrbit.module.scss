@@ -65,7 +65,7 @@
   width: 168px;
   height: 168px;
   border-radius: 50%;
-  border: 1px solid rgba(94, 234, 212, 0.4);
+  border: 1px solid rgba(94, 234, 212, 0.45);
   padding: 0;
   display: grid;
   place-items: center;
@@ -74,15 +74,16 @@
   pointer-events: auto;
   position: relative;
   color: #fff;
+  // Glow nhẹ hơn ở tâm để chữ không bị loá.
   background:
-    radial-gradient(circle at 42% 30%, rgba(104, 250, 221, 0.5), transparent 52%),
-    radial-gradient(circle at 50% 50%, #0f766e 0%, #04302c 72%);
+    radial-gradient(circle at 42% 28%, rgba(94, 234, 212, 0.22), transparent 48%),
+    radial-gradient(circle at 50% 55%, #0d5c56 0%, #032422 78%);
   box-shadow:
-    inset 0 0 34px rgba(4, 47, 46, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 0 0 1px rgba(94, 234, 212, 0.3),
-    0 0 42px rgba(20, 184, 166, 0.38),
-    0 0 90px rgba(20, 184, 166, 0.16);
+    inset 0 0 28px rgba(2, 24, 23, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(94, 234, 212, 0.28),
+    0 0 42px rgba(20, 184, 166, 0.32),
+    0 0 90px rgba(20, 184, 166, 0.14);
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
@@ -93,9 +94,9 @@
     transform: scale(1.03);
     border-color: rgba(94, 234, 212, 0.8);
     box-shadow:
-      inset 0 0 40px rgba(4, 47, 46, 0.5),
+      inset 0 0 32px rgba(2, 24, 23, 0.55),
       0 0 0 1px rgba(94, 234, 212, 0.35),
-      0 0 44px rgba(13, 148, 136, 0.45);
+      0 0 44px rgba(13, 148, 136, 0.42);
   }
 
   &:focus-visible {
@@ -114,10 +115,11 @@
     content: '';
     position: absolute;
     inset: -14%;
+    z-index: 0;
     border-radius: 50%;
     background: radial-gradient(
       circle,
-      rgba(68, 221, 193, 0.28) 38%,
+      rgba(68, 221, 193, 0.22) 38%,
       transparent 68%
     );
     pointer-events: none;
@@ -129,25 +131,38 @@
   0%,
   100% {
     transform: scale(0.94);
-    opacity: 0.55;
+    opacity: 0.5;
   }
   50% {
     transform: scale(1.06);
-    opacity: 0.95;
+    opacity: 0.85;
   }
 }
 
 .hubCore {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  max-width: 78%;
+  max-width: 82%;
   padding: 4px 0;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+}
+
+.hubLabel {
+  margin-bottom: 2px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.2;
 }
 
 .hubNum {
-  font-size: 4.2rem;
+  font-size: 3.6rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.05em;
@@ -155,18 +170,19 @@
 }
 
 .hubUnit {
-  margin-top: 2px;
-  font-size: 1.05rem;
-  color: rgba(255, 255, 255, 0.55);
+  margin-top: 1px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .hubCta {
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: #5eead4;
 }
 
 .card {

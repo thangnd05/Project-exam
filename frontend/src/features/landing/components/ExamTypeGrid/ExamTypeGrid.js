@@ -134,7 +134,7 @@ function ExamTypeGrid() {
           <p className={cx('subtitle')}>
             {isDrill
               ? `Đang xem các kỳ thi trong ${drill.name}`
-              : 'Chạm vào kỳ thi bạn đang theo đuổi để bắt đầu hành trình'}
+              : 'Chạm vào kỳ thi bạn đang theo đuổi'}
           </p>
         </header>
 
@@ -159,6 +159,8 @@ function ExamTypeGrid() {
                   exit="exit"
                   transition={{duration: reduceMotion ? 0.15 : 0.42, ease: EASE}}
                 >
+                  {/* Giữ chiều cao bằng tầng drill (có drillBar) để khung không nhảy size. */}
+                  <div className={cx('drillBar', 'drillBarSpacer')} aria-hidden="true" />
                   <div className={cx('grid')}>
                     {examTypes.map((type) => (
                       <ExamTypeCard
@@ -283,9 +285,6 @@ function ExamTypeCard({type, onOpenParent, onPrefetch}) {
       </div>
       <h3 className={cx('cardName')}>{type.name}</h3>
       <p className={cx('cardMeta')}>{getSubtitle(type)}</p>
-      <span className={cx('cardCta')} aria-hidden="true">
-        {expandable ? 'Xem các kỳ thi' : 'Chọn để mở'}
-      </span>
     </>
   );
 

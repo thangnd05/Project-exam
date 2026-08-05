@@ -113,10 +113,10 @@
 
 .lede {
   margin: 0 0 26px;
-  max-width: 36ch;
-  font-size: clamp(1.4rem, 1.65vw, 1.65rem);
+  max-width: 38ch;
+  font-size: clamp(1.35rem, 1.55vw, 1.55rem);
   line-height: 1.55;
-  color: rgba(226, 232, 240, 0.72);
+  color: rgba(241, 245, 249, 0.82);
 
   @media (max-width: 960px) {
     margin-inline: auto;

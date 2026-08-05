@@ -103,22 +103,28 @@ function HeroSection() {
             <span className={cx('accent')}>lộ trình</span> dành riêng bạn
           </h1>
           <p className={cx('lede')}>
-            Chẩn đoán điểm yếu, dựng lộ trình cá nhân, luyện mock sát đề thật.
+            Thử kiểm tra nhanh để lộ điểm yếu và ôn theo lộ trình sát đề thật.
           </p>
           <div className={cx('ctaBlock')}>
             <div className={cx('actions')}>
               <button type="button" className={cx('btnPrimary')} onClick={handleStartQuick}>
-                {hasQuick ? 'Trải nghiệm kiểm tra nhanh' : 'Khám phá kỳ thi'}
+                {hasQuick ? 'Làm kiểm tra nhanh' : 'Khám phá kỳ thi'}
               </button>
-              <button type="button" className={cx('btnGhost')} onClick={handleScrollToExam}>
-                Khám phá các kỳ thi
-              </button>
+              {hasQuick && (
+                <button type="button" className={cx('btnGhost')} onClick={handleScrollToExam}>
+                  Khám phá kỳ thi
+                </button>
+              )}
             </div>
             <p className={cx('trustLine')}>
-              <span>{examTypeCount > 0 ? `${examTypeCount} kỳ thi` : '50+ bộ đề'}</span>
-              <span className={cx('trustSep')} aria-hidden="true">
-                ·
-              </span>
+              {examTypeCount > 0 && (
+                <>
+                  <span>{examTypeCount} kỳ thi</span>
+                  <span className={cx('trustSep')} aria-hidden="true">
+                    ·
+                  </span>
+                </>
+              )}
               <span>Không cần đăng ký</span>
             </p>
           </div>

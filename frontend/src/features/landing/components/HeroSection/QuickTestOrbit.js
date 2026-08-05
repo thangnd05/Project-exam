@@ -554,6 +554,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
                 exit={{opacity: 0, y: -10}}
                 transition={{duration: reduceMotion ? 0 : 0.3}}
               >
+                <span className={cx('hubLabel')}>Kiểm tra nhanh</span>
                 <span className={cx('hubNum')}>
                   {frontTest?.totalQuestions || '—'}
                 </span>
