@@ -193,11 +193,11 @@
     .btnSubmit {
         background: var(--accent-color);
         color: #fff;
-        box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
+        box-shadow: 0 4px 15px rgba(224, 177, 42, 0.3);
 
         &:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(13, 148, 136, 0.4);
+            box-shadow: 0 8px 25px rgba(224, 177, 42, 0.4);
         }
     }
 }

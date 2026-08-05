@@ -2,43 +2,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
+  /* Black gold — nền than ấm (không đen tuyệt đối), vàng sáng rõ. */
+  --primary: #e0b12a;
+  --primary-color: #e0b12a;
+  --accent-color: #e0b12a;
+  --accent-act-color: #f0d060;
+  --hover-accent: #c99612;
 
-  --primary: #0d9488;
-  --primary-color: #0d9488;
-  --accent-color: #0d9488;
-  --accent-act-color: #14b8a6;
-  --hover-accent: #0f766e;
+  --brand-unique: #f5e08a;
+  --brand-unique-hover: #e8c547;
 
-  --brand-unique: #f59e0b;
-  --brand-unique-hover: #d97706;
-
-  --hero-bg: #042f2e;
-  --footer-bg: #042f2e;
+  --hero-bg: #1a1610;
+  --footer-bg: #1a1610;
   --dark-color: #1e293b;
 
-  --brand-50: #f0fdfa;
-  --brand-100: #ccfbf1;
-  --brand-200: #99f6e4;
-  --brand-300: #5eead4;
-  --brand-400: #2dd4bf;
-  --brand-500: #14b8a6;
-  --brand-600: #0d9488;
-  --brand-700: #0f766e;
-  --brand-800: #134e4a;
-  --brand-900: #042f2e;
+  --brand-50: #fbf8ef;
+  --brand-100: #f5edd6;
+  --brand-200: #ead9a0;
+  --brand-300: #f5e08a;
+  --brand-400: #f0d060;
+  --brand-500: #e0b12a;
+  --brand-600: #c99612;
+  --brand-700: #a07810;
+  --brand-800: #5a4210;
+  --brand-900: #1a1610;
 
-  --primary-alpha-08: rgba(13, 148, 136, 0.08);
-  --primary-alpha-10: rgba(13, 148, 136, 0.1);
-  --primary-alpha-15: rgba(13, 148, 136, 0.15);
-  --primary-alpha-20: rgba(13, 148, 136, 0.2);
-  --primary-alpha-28: rgba(13, 148, 136, 0.28);
-  --primary-alpha-35: rgba(13, 148, 136, 0.35);
-  --primary-alpha-45: rgba(13, 148, 136, 0.45);
+  --primary-alpha-08: rgba(224, 177, 42, 0.08);
+  --primary-alpha-10: rgba(224, 177, 42, 0.1);
+  --primary-alpha-15: rgba(224, 177, 42, 0.15);
+  --primary-alpha-20: rgba(224, 177, 42, 0.2);
+  --primary-alpha-28: rgba(224, 177, 42, 0.28);
+  --primary-alpha-35: rgba(224, 177, 42, 0.35);
+  --primary-alpha-45: rgba(224, 177, 42, 0.45);
 
   --primary-gradient: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-act-color) 100%);
-  --primary-btn-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 100%);
+  --primary-btn-gradient: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%);
   --primary-btn-shadow: 0 10px 22px var(--primary-alpha-28);
-  --primary-btn-shadow-hover: 0 14px 28px rgba(13, 148, 136, 0.38);
+  --primary-btn-shadow-hover: 0 14px 28px rgba(224, 177, 42, 0.42);
   --primary-btn-shadow-disabled: 0 8px 18px var(--primary-alpha-20);
 
   --black: #000;
@@ -46,16 +46,16 @@
   --text-color: #161823;
   --text-secondary: #64748b;
 
-  --bg-body: #f8fafc;
+  --bg-body: #f7f5f0;
   --bg-white: #ffffff;
-  --input-bg: #f1f5f9;
-  --border-color: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --hover-color: #f8f9fa;
+  --input-bg: #f2efe6;
+  --border-color: #e6e0d2;
+  --border-strong: #d2c9b4;
+  --hover-color: #f5f1e8;
   --surface-tint: var(--brand-50);
-  --author-tag-bg: #fff4e5;
-  --author-tag-text: #b45309;
-  --author-tag-border: #fcd9a5;
+  --author-tag-bg: #fff8e8;
+  --author-tag-text: #92400e;
+  --author-tag-border: #f5dfb0;
 
   --success-bg: #dcfce7;
   --success-text: #166534;
