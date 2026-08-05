@@ -66,7 +66,7 @@
 
 .header {
   text-align: center;
-  max-width: 36rem;
+  max-width: 40rem;
 }
 
 .title {
@@ -85,6 +85,112 @@
   line-height: 1.5;
 }
 
+.stage {
+  position: relative;
+  width: 100%;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.face {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 2.5vw, 28px);
+  transform-origin: center center;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.drillBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 18px;
+  width: 100%;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem 0.45rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+
+  svg {
+    display: block;
+  }
+
+  &:hover {
+    color: #5eead4;
+    border-color: rgba(94, 234, 212, 0.65);
+    background: rgba(94, 234, 212, 0.12);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-unique, #f59e0b);
+    outline-offset: 2px;
+  }
+}
+
+.parentChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.85rem 0.35rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: rgba(13, 148, 136, 0.18);
+  color: #fff;
+}
+
+.parentChipMark {
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--brand-300, #5eead4);
+  background: rgba(13, 148, 136, 0.35);
+  border: 1px solid rgba(94, 234, 212, 0.4);
+  overflow: hidden;
+
+  &.hasImage {
+    background: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.parentChipName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
 .grid {
   display: grid;
   // Card không kéo dãn quá 240px để vài kỳ thi vẫn ra hình khối gọn, và canh giữa.
@@ -100,6 +206,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
+  width: 100%;
   min-height: 220px;
   padding: 1.6rem 1.2rem 1.4rem;
   box-sizing: border-box;
@@ -107,8 +214,12 @@
   border: 1px solid rgba(94, 234, 212, 0.22);
   background: linear-gradient(160deg, rgba(20, 78, 74, 0.78), rgba(6, 47, 46, 0.82));
   color: #fff;
+  font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
   text-align: center;
   text-decoration: none;
+  cursor: pointer;
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
   transition:
     transform 0.2s ease,
@@ -214,6 +325,11 @@
   text-align: center;
 }
 
+.emptySpan {
+  grid-column: 1 / -1;
+  padding-block: 1.5rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .orb,
   .skeleton {
@@ -226,6 +342,14 @@
     &:hover {
       transform: none;
     }
+  }
+
+  .backBtn {
+    transition: none;
+  }
+
+  .face {
+    will-change: auto;
   }
 }
 
