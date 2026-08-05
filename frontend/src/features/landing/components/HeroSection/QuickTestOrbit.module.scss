@@ -13,7 +13,7 @@
   cursor: grab;
 
   &:focus-visible {
-    outline: 2px solid rgba(245, 224, 138, 0.55);
+    outline: 2px solid rgba(232, 213, 163, 0.55);
     outline-offset: 6px;
     border-radius: 12px;
   }
@@ -65,7 +65,7 @@
   width: 168px;
   height: 168px;
   border-radius: 50%;
-  border: 1px solid rgba(245, 224, 138, 0.45);
+  border: 1px solid rgba(232, 213, 163, 0.45);
   padding: 0;
   display: grid;
   place-items: center;
@@ -74,16 +74,16 @@
   pointer-events: auto;
   position: relative;
   color: #fff;
-  // Glow nhẹ hơn ở tâm để chữ không bị loá.
+  // Champagne glow — highlight kem, nền ấm.
   background:
-    radial-gradient(circle at 42% 28%, rgba(245, 224, 138, 0.2), transparent 48%),
-    radial-gradient(circle at 50% 55%, #4a3f24 0%, #1a1610 78%);
+    radial-gradient(circle at 42% 28%, rgba(232, 213, 163, 0.28), transparent 52%),
+    radial-gradient(circle at 50% 55%, #2a2418 0%, #14110d 78%);
   box-shadow:
-    inset 0 0 24px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0 0 1px rgba(245, 224, 138, 0.32),
-    0 0 48px rgba(240, 208, 96, 0.4),
-    0 0 96px rgba(240, 208, 96, 0.2);
+    inset 0 0 22px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0 1px rgba(232, 213, 163, 0.28),
+    0 0 48px rgba(201, 168, 75, 0.28),
+    0 0 96px rgba(201, 168, 75, 0.14);
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
@@ -92,11 +92,11 @@
 
   &:hover:not(:disabled) {
     transform: scale(1.03);
-    border-color: rgba(245, 224, 138, 0.8);
+    border-color: rgba(232, 213, 163, 0.8);
     box-shadow:
       inset 0 0 32px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(245, 224, 138, 0.35),
-      0 0 44px rgba(224, 177, 42, 0.42);
+      0 0 0 1px rgba(232, 213, 163, 0.35),
+      0 0 44px rgba(201, 168, 75, 0.42);
   }
 
   &:focus-visible {
@@ -119,7 +119,7 @@
     border-radius: 50%;
     background: radial-gradient(
       circle,
-      rgba(245, 224, 138, 0.22) 38%,
+      rgba(232, 213, 163, 0.22) 38%,
       transparent 68%
     );
     pointer-events: none;
@@ -157,7 +157,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #fff;
+  color: #e8d5a3;
   line-height: 1.2;
 }
 
@@ -166,14 +166,14 @@
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.05em;
-  color: #fff;
+  color: #f5f1e8;
 }
 
 .hubUnit {
   margin-top: 1px;
   font-size: 0.95rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(232, 228, 220, 0.78);
 }
 
 .hubCta {
@@ -182,7 +182,7 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #f5e08a;
+  color: #e8d5a3;
 }
 
 .card {
@@ -201,19 +201,19 @@
   padding: 1.1rem 0.8rem;
   box-sizing: border-box;
   border-radius: 16px;
-  border: 1px solid rgba(245, 224, 138, calc(0.22 + 0.55 * var(--frontness)));
+  border: 1px solid rgba(232, 213, 163, calc(0.22 + 0.55 * var(--frontness)));
   background: linear-gradient(
     160deg,
-    rgba(42, 36, 24, calc(0.42 + 0.24 * var(--frontness))),
-    rgba(26, 22, 16, calc(0.5 + 0.24 * var(--frontness)))
+    rgba(40, 34, 24, calc(0.42 + 0.24 * var(--frontness))),
+    rgba(20, 17, 13, calc(0.5 + 0.24 * var(--frontness)))
   );
   backdrop-filter: blur(12px);
   color: #fff;
   cursor: pointer;
   text-align: center;
   box-shadow:
-    0 0 0 1px rgba(245, 224, 138, calc(0.28 * var(--frontness))),
-    0 0 calc(6px + 26px * var(--frontness)) rgba(224, 177, 42, calc(0.45 * var(--frontness))),
+    0 0 0 1px rgba(232, 213, 163, calc(0.28 * var(--frontness))),
+    0 0 calc(6px + 26px * var(--frontness)) rgba(201, 168, 75, calc(0.45 * var(--frontness))),
     0 10px 26px rgba(0, 0, 0, 0.3);
   transform-style: preserve-3d;
   will-change: transform, opacity;
@@ -231,14 +231,14 @@
   width: 4.8rem;
   height: 4.8rem;
   border-radius: 50%;
-  background: rgba(224, 177, 42, 0.24);
-  border: 1px solid rgba(245, 224, 138, 0.35);
+  background: rgba(201, 168, 75, 0.24);
+  border: 1px solid rgba(232, 213, 163, 0.35);
   flex-shrink: 0;
   display: grid;
   place-items: center;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--brand-300, #f5e08a);
+  color: var(--brand-300, #e8d5a3);
 }
 
 // Có logo thật thì để trần cho to, không nhốt trong khung tròn.
@@ -267,7 +267,7 @@
 .count {
   font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(245, 224, 138, 0.85);
+  color: rgba(232, 213, 163, 0.85);
 }
 
 @media (max-width: 768px) {

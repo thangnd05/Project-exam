@@ -12,7 +12,7 @@
   pointer-events: none;
   background: radial-gradient(
     ellipse 62% 55% at 50% 42%,
-    rgba(240, 208, 96, 0.3),
+    rgba(220, 192, 122, 0.3),
     transparent 66%
   );
   filter: blur(28px);
@@ -29,7 +29,7 @@
   pointer-events: none;
   background: radial-gradient(
     ellipse at center,
-    rgba(26, 22, 16, 0.32),
+    rgba(20, 17, 13, 0.32),
     transparent 72%
   );
   filter: blur(14px);
@@ -148,7 +148,7 @@
   width: 64px;
   height: 16px;
   border-radius: 6px;
-  background: linear-gradient(135deg, #e0b12a, #a07810);
+  background: linear-gradient(135deg, #c9a84b, #7d672c);
 }
 
 .navPill {
@@ -168,7 +168,7 @@
   gap: 8px;
   padding: 14px 16px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #1a1610 0%, #a07810 100%);
+  background: linear-gradient(135deg, #14110d 0%, #7d672c 100%);
 }
 
 .heroLine {
@@ -204,5 +204,5 @@
   border-radius: 8px;
   background: #fff;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 10px rgba(224, 177, 42, 0.08);
+  box-shadow: 0 4px 10px rgba(201, 168, 75, 0.08);
 }

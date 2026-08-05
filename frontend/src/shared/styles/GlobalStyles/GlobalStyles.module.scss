@@ -2,60 +2,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Black gold — nền than ấm (không đen tuyệt đối), vàng sáng rõ. */
-  --primary: #e0b12a;
-  --primary-color: #e0b12a;
-  --accent-color: #e0b12a;
-  --accent-act-color: #f0d060;
-  --hover-accent: #c99612;
+  /* Champagne luxury — vàng kem kim loại, nền ấm, chữ off-white. */
+  --primary: #c9a84b;
+  --primary-color: #c9a84b;
+  --accent-color: #c9a84b;
+  --accent-act-color: #e8d5a3;
+  --hover-accent: #a88b3a;
 
-  --brand-unique: #f5e08a;
-  --brand-unique-hover: #e8c547;
+  --brand-unique: #e8d5a3;
+  --brand-unique-hover: #dcc07a;
 
-  --hero-bg: #1a1610;
-  --footer-bg: #1a1610;
+  --hero-bg: #14110d;
+  --footer-bg: #14110d;
   --dark-color: #1e293b;
 
-  --brand-50: #fbf8ef;
-  --brand-100: #f5edd6;
-  --brand-200: #ead9a0;
-  --brand-300: #f5e08a;
-  --brand-400: #f0d060;
-  --brand-500: #e0b12a;
-  --brand-600: #c99612;
-  --brand-700: #a07810;
-  --brand-800: #5a4210;
-  --brand-900: #1a1610;
+  --brand-50: #faf7f0;
+  --brand-100: #f3ebda;
+  --brand-200: #e8d5a3;
+  --brand-300: #e8d5a3;
+  --brand-400: #dcc07a;
+  --brand-500: #c9a84b;
+  --brand-600: #a88b3a;
+  --brand-700: #7d672c;
+  --brand-800: #3f3420;
+  --brand-900: #14110d;
 
-  --primary-alpha-08: rgba(224, 177, 42, 0.08);
-  --primary-alpha-10: rgba(224, 177, 42, 0.1);
-  --primary-alpha-15: rgba(224, 177, 42, 0.15);
-  --primary-alpha-20: rgba(224, 177, 42, 0.2);
-  --primary-alpha-28: rgba(224, 177, 42, 0.28);
-  --primary-alpha-35: rgba(224, 177, 42, 0.35);
-  --primary-alpha-45: rgba(224, 177, 42, 0.45);
+  --primary-alpha-08: rgba(201, 168, 75, 0.08);
+  --primary-alpha-10: rgba(201, 168, 75, 0.1);
+  --primary-alpha-15: rgba(201, 168, 75, 0.15);
+  --primary-alpha-20: rgba(201, 168, 75, 0.2);
+  --primary-alpha-28: rgba(201, 168, 75, 0.28);
+  --primary-alpha-35: rgba(201, 168, 75, 0.35);
+  --primary-alpha-45: rgba(201, 168, 75, 0.45);
 
-  --primary-gradient: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-act-color) 100%);
-  --primary-btn-gradient: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%);
-  --primary-btn-shadow: 0 10px 22px var(--primary-alpha-28);
-  --primary-btn-shadow-hover: 0 14px 28px rgba(224, 177, 42, 0.42);
-  --primary-btn-shadow-disabled: 0 8px 18px var(--primary-alpha-20);
+  --primary-gradient: linear-gradient(135deg, #e8d5a3 0%, #c9a84b 52%, #a88b3a 100%);
+  --primary-btn-gradient: linear-gradient(145deg, #f0e4c4 0%, #e8d5a3 28%, #c9a84b 62%, #a88b3a 100%);
+  --primary-btn-shadow: 0 10px 26px rgba(201, 168, 75, 0.32);
+  --primary-btn-shadow-hover: 0 14px 32px rgba(201, 168, 75, 0.42);
+  --primary-btn-shadow-disabled: 0 8px 18px rgba(201, 168, 75, 0.2);
+
+  --text-on-dark: #e8e4dc;
+  --text-on-dark-muted: rgba(232, 228, 220, 0.72);
 
   --black: #000;
   --white: #fff;
   --text-color: #161823;
   --text-secondary: #64748b;
 
-  --bg-body: #f7f5f0;
+  --bg-body: #f6f3ec;
   --bg-white: #ffffff;
-  --input-bg: #f2efe6;
-  --border-color: #e6e0d2;
-  --border-strong: #d2c9b4;
-  --hover-color: #f5f1e8;
+  --input-bg: #f1ece2;
+  --border-color: #e4ddd0;
+  --border-strong: #d0c6b4;
+  --hover-color: #f3efe6;
   --surface-tint: var(--brand-50);
-  --author-tag-bg: #fff8e8;
-  --author-tag-text: #92400e;
-  --author-tag-border: #f5dfb0;
+  --author-tag-bg: #faf4e6;
+  --author-tag-text: #7d672c;
+  --author-tag-border: #e8d5a3;
 
   --success-bg: #dcfce7;
   --success-text: #166534;
