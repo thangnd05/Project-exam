@@ -1,6 +1,6 @@
 .treeWrapper {
   background: #fff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--gray-200);
   border-radius: 1.2rem;
   overflow: hidden;
 }
@@ -10,13 +10,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.6rem;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid var(--gray-200);
+  background: var(--gray-50);
 }
 
 .treeCount {
   font-size: var(--font-size-smd);
-  color: #6b7280;
+  color: var(--gray-500);
   font-weight: 500;
 }
 
@@ -42,7 +42,7 @@
 
 .rootGroup {
   &:not(:last-child) {
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--gray-200);
   }
 }
 
@@ -51,11 +51,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.2rem 1.6rem 1.2rem 1.2rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--gray-100);
   transition: background-color 0.15s;
 
   &:hover {
-    background-color: #f9fafb;
+    background-color: var(--gray-50);
 
     .treeNodeActions {
       opacity: 1;
@@ -84,13 +84,13 @@
   background: none;
   border-radius: 0.6rem;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--gray-500);
   flex-shrink: 0;
   transition: all 0.15s;
 
   &:hover {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--gray-200);
+    color: var(--gray-700);
   }
 }
 
@@ -102,7 +102,7 @@
 
 .tagName {
   font-size: var(--font-size-md);
-  color: #374151;
+  color: var(--gray-700);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -110,14 +110,14 @@
   &.root {
     font-weight: 700;
     font-size: 1.6rem;
-    color: #1e293b;
+    color: var(--slate-800);
   }
 }
 
 .childCount {
   font-size: 1.2rem;
-  color: #9ca3af;
-  background: #f3f4f6;
+  color: var(--gray-400);
+  background: var(--gray-100);
   padding: 0.1rem 0.7rem;
   border-radius: 1rem;
   flex-shrink: 0;
@@ -130,7 +130,7 @@
   transition: opacity 0.15s;
 
   button {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-200);
     background: #fff;
     border-radius: 0.6rem;
     width: 3.2rem;
@@ -139,25 +139,25 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--gray-500);
     transition: all 0.15s;
 
     &:hover {
-      border-color: #d1d5db;
-      background: #f9fafb;
-      color: #374151;
+      border-color: var(--gray-300);
+      background: var(--gray-50);
+      color: var(--gray-700);
     }
 
     &:nth-child(3):hover {
-      color: #dc2626;
-      border-color: #fecaca;
-      background: #fef2f2;
+      color: var(--red-600);
+      border-color: var(--red-200);
+      background: var(--red-50);
     }
 
     &:first-child:hover {
-      color: #16a34a;
-      border-color: #bbf7d0;
-      background: #f0fdf4;
+      color: var(--green-600);
+      border-color: var(--green-200);
+      background: var(--green-50);
     }
   }
 }
@@ -173,6 +173,6 @@
     left: 1.6rem;
     bottom: 1.2rem;
     width: 1px;
-    background: #e5e7eb;
+    background: var(--gray-200);
   }
 }

@@ -7,8 +7,8 @@ $bg-body: var(--bg-body);
 $bg-white: var(--bg-white);
 $input-bg: var(--input-bg);
 $border-color: var(--border-color);
-$success: #16a34a;
-$danger: #ef4444;
+$success: var(--green-600);
+$danger: var(--red-500);
 $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -257,7 +257,7 @@ $transition: all 0.3s ease;
 
     &:hover {
         background: var(--input-bg);
-        border-color: rgba(13, 148, 136, 0.3);
+        border-color: rgb(var(--teal-600-rgb) / 0.3);
     }
 
     &.selected {
@@ -266,12 +266,12 @@ $transition: all 0.3s ease;
     }
 
     &.correct {
-        background: rgba($success, 0.1);
+        background: rgb(var(--green-600-rgb) / 0.1);
         border-color: $success;
     }
 
     &.wrong {
-        background: rgba($danger, 0.1);
+        background: rgb(var(--red-500-rgb) / 0.1);
         border-color: $danger;
     }
 }
@@ -373,13 +373,13 @@ $transition: all 0.3s ease;
     overflow: hidden;
 
     &.correct {
-        background: rgba($success, 0.08);
-        border: 1px solid rgba($success, 0.2);
+        background: rgb(var(--green-600-rgb) / 0.08);
+        border: 1px solid rgb(var(--green-600-rgb) / 0.2);
     }
 
     &.wrong {
-        background: rgba($danger, 0.08);
-        border: 1px solid rgba($danger, 0.2);
+        background: rgb(var(--red-500-rgb) / 0.08);
+        border: 1px solid rgb(var(--red-500-rgb) / 0.2);
     }
 }
 

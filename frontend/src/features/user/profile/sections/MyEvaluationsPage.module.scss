@@ -89,7 +89,7 @@
 }
 
 .starInactive {
-  color: #cbd5e1;
+  color: var(--slate-300);
 }
 
 .date {
@@ -102,7 +102,7 @@
 
 .content {
   margin: 0;
-  color: #334155;
+  color: var(--slate-700);
   line-height: 1.45;
   font-size: 1.35rem;
   white-space: pre-wrap;
@@ -135,7 +135,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 10px 12px;
-  color: #334155;
+  color: var(--slate-700);
   font-size: 1.35rem;
   min-height: 100px;
   resize: vertical;

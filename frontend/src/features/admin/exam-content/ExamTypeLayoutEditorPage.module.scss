@@ -25,7 +25,7 @@
   }
 
   .subtitle {
-    color: var(--text-secondary, #64748b);
+    color: var(--text-secondary);
     font-size: var(--font-size-smd);
   }
 }
@@ -41,11 +41,11 @@
   align-items: center;
   gap: 0.6rem;
   background: transparent;
-  border: 1px solid var(--border-color, #e2e8f0);
+  border: 1px solid var(--border-color);
   border-radius: 0.8rem;
   padding: 0.7rem 1.2rem;
   cursor: pointer;
-  color: var(--text-color, #161823);
+  color: var(--text-color);
 }
 
 .workspace {
@@ -56,8 +56,8 @@
 }
 
 .panel {
-  background: var(--bg-white, #fff);
-  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
   border-radius: 1.2rem;
   padding: 1.4rem;
   display: flex;
@@ -76,7 +76,7 @@
     margin: 0;
     font-size: 1.4rem;
     font-weight: 700;
-    color: var(--text-color, #161823);
+    color: var(--text-color);
   }
 }
 
@@ -88,16 +88,16 @@
 
   label {
     font-weight: 600;
-    color: var(--text-secondary, #64748b);
+    color: var(--text-secondary);
   }
 
   input,
   select {
     padding: 0.7rem 0.9rem;
-    border: 1px solid var(--border-color, #e2e8f0);
+    border: 1px solid var(--border-color);
     border-radius: 0.7rem;
     font-size: var(--font-size-smd);
-    background: var(--input-bg, #f8fafc);
+    background: var(--input-bg);
   }
 
   input[type='color'] {
@@ -108,7 +108,7 @@
 }
 
 .zoneGroup {
-  border: 1px dashed var(--border-color, #cbd5e1);
+  border: 1px dashed var(--border-color);
   border-radius: 0.9rem;
   padding: 0.8rem;
   display: flex;
@@ -118,21 +118,21 @@
 
   &.dropActive {
     border-color: var(--primary);
-    background: rgba(13, 148, 136, 0.05);
+    background: rgb(var(--teal-600-rgb) / 0.05);
   }
 }
 
 .zoneTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .zoneEmpty {
   font-size: 1.2rem;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary);
   font-style: italic;
   padding: 0.4rem 0.2rem;
 }
@@ -142,9 +142,9 @@
   align-items: center;
   gap: 0.6rem;
   padding: 0.7rem 0.8rem;
-  border: 1px solid var(--border-color, #e2e8f0);
+  border: 1px solid var(--border-color);
   border-radius: 0.7rem;
-  background: var(--bg-white, #fff);
+  background: var(--bg-white);
   cursor: grab;
   font-size: var(--font-size-smd);
 
@@ -162,7 +162,7 @@
   }
 
   .grip {
-    color: var(--text-secondary, #94a3b8);
+    color: var(--text-secondary);
     display: flex;
   }
 
@@ -177,7 +177,7 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    color: var(--text-secondary, #64748b);
+    color: var(--text-secondary);
     display: flex;
     padding: 0.2rem;
 
@@ -198,7 +198,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 1rem;
-  border: 1px dashed var(--border-color, #cbd5e1);
+  border: 1px dashed var(--border-color);
   border-radius: 0.7rem;
   background: transparent;
   cursor: pointer;
@@ -211,9 +211,9 @@
 }
 
 .previewWrap {
-  border: 1px solid var(--border-color, #e2e8f0);
+  border: 1px solid var(--border-color);
   border-radius: 1.2rem;
-  background: var(--bg-body, #f0f2f5);
+  background: var(--bg-body);
   overflow: hidden;
   max-height: calc(100vh - 16rem);
   overflow-y: auto;
@@ -225,10 +225,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.7rem 1.2rem;
-  background: var(--bg-white, #fff);
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
   font-size: 1.2rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
   position: sticky;
   top: 0;
   z-index: 2;
@@ -240,12 +240,12 @@
 
 .hint {
   font-size: 1.2rem;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
 .emptyRight {
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary);
   font-size: var(--font-size-smd);
   text-align: center;
   padding: 2rem 1rem;
@@ -256,9 +256,9 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1rem;
-  border: 1px solid var(--danger-border, #fecaca);
-  color: var(--danger-text, #b91c1c);
-  background: var(--danger-bg, #fef2f2);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  background: var(--danger-bg);
   border-radius: 0.7rem;
   cursor: pointer;
   font-size: var(--font-size-smd);

@@ -25,7 +25,7 @@
   font-size: 2.6rem;
   font-weight: var(--font-weight-bold);
   margin-bottom: 26px;
-  color: var(--dark-color, #0f172a);
+  color: var(--dark-color);
   position: relative;
   padding-left: 15px;
 
@@ -37,18 +37,18 @@
     transform: translateY(-50%);
     width: 5px;
     height: 28px;
-    background: var(--primary-gradient, linear-gradient(135deg, var(--primary), var(--hover-accent)));
+    background: var(--primary-gradient);
     border-radius: 10px;
   }
 }
 
 .part-section {
   background: white;
-  border-radius: var(--radius-lg, 16px);
+  border-radius: var(--radius-lg);
   padding: 28px;
   margin-bottom: 36px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--slate-100);
 }
 
 .group-section {
@@ -91,10 +91,10 @@
 }
 
 .passage-box {
-  background: #f8fafc;
+  background: var(--slate-50);
   padding: 22px;
   border-radius: 15px;
-  border-left: 4px solid #cbd5e1;
+  border-left: 4px solid var(--slate-300);
 
   .audio-label {
     display: flex;
@@ -124,7 +124,7 @@
   .passage-image-box {
     padding: 10px;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--slate-200);
     border-radius: 12px;
     margin-bottom: 16px;
 
@@ -141,11 +141,11 @@
     font-size: 1.4rem;
     line-height: 1.5;
     white-space: pre-wrap;
-    color: #111827;
+    color: var(--gray-900);
     margin-bottom: 16px;
     padding: 16px 20px;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--slate-200);
     border-radius: 12px;
 
     &:last-child {

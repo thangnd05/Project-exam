@@ -16,7 +16,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(15, 23, 42, 0.6);
+    background: rgb(var(--slate-900-rgb) / 0.6);
     backdrop-filter: blur(4px);
     z-index: 10001;
 
@@ -106,16 +106,16 @@
     }
 
     &::-webkit-scrollbar-track {
-        background: #f1f5f9;
+        background: var(--slate-100);
         border-radius: 10px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: var(--slate-300);
         border-radius: 10px;
 
         &:hover {
-            background: #94a3b8;
+            background: var(--slate-400);
         }
     }
 }
@@ -133,11 +133,11 @@
     border-radius: 20px;
     padding: 24px;
     margin-bottom: 24px;
-    border: 2px solid #f1f5f9;
+    border: 2px solid var(--slate-100);
     transition: all 0.3s;
 
     &:hover {
-        border-color: #e2e8f0;
+        border-color: var(--slate-200);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 }
@@ -145,7 +145,7 @@
 .sectionTitle {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--slate-800);
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -163,14 +163,14 @@
     label {
         font-size: 1.4rem;
         font-weight: 700;
-        color: #475569;
+        color: var(--slate-600);
         margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 6px;
 
         svg {
-            color: #94a3b8;
+            color: var(--slate-400);
         }
     }
 }
@@ -179,11 +179,11 @@
     width: 100%;
     padding: 12px 16px;
     border-radius: 12px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--slate-200);
     font-size: 1.4rem;
-    font-family: var(--font-family, sans-serif);
-    color: #1e293b;
-    background: #f8fafc;
+    font-family: var(--font-family);
+    color: var(--slate-800);
+    background: var(--slate-50);
     transition: all 0.3s;
 
     &:focus {
@@ -207,28 +207,28 @@
 }
 
 .inputDisabled {
-    background: #e2e8f0 !important;
-    color: #64748b !important;
+    background: var(--slate-200) !important;
+    color: var(--slate-500) !important;
     font-weight: 600;
     cursor: not-allowed !important;
-    border-color: #cbd5e1 !important;
+    border-color: var(--slate-300) !important;
 
     &:focus {
         box-shadow: none !important;
-        border-color: #cbd5e1 !important;
+        border-color: var(--slate-300) !important;
     }
 }
 
 .partBlock {
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
+    background: var(--slate-50);
+    border: 2px solid var(--slate-200);
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 16px;
     transition: all 0.3s;
 
     &:hover {
-        border-color: #cbd5e1;
+        border-color: var(--slate-300);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
@@ -245,11 +245,11 @@
     padding: 12px;
     background: #fff;
     border-radius: 12px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--slate-200);
     transition: all 0.2s;
 
     &:hover {
-        border-color: #cbd5e1;
+        border-color: var(--slate-300);
     }
 
     input[type="radio"] {
@@ -284,11 +284,11 @@
         gap: 8px;
         padding: 10px 18px;
         border-radius: 12px;
-        border: 2px solid #e2e8f0;
-        background: #f8fafc;
+        border: 2px solid var(--slate-200);
+        background: var(--slate-50);
         font-size: var(--font-size-smd);
         font-weight: 600;
-        color: #64748b;
+        color: var(--slate-500);
         cursor: pointer;
         transition: all 0.2s;
 
@@ -306,7 +306,7 @@
 
 .groupCard {
     background: #fff;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--slate-200);
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 20px;
@@ -329,7 +329,7 @@
     gap: 12px;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--slate-200);
 }
 
 .groupToggleBtn {
@@ -367,7 +367,7 @@
 .groupSummaryBadge {
     font-size: 1.2rem;
     font-weight: 500;
-    color: #64748b;
+    color: var(--slate-500);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -375,12 +375,12 @@
 
 .removeBtn {
     padding: 6px 10px !important;
-    color: #dc2626 !important;
+    color: var(--red-600) !important;
     min-width: auto !important;
 
     &:hover {
-        color: #b91c1c !important;
-        background: #fef2f2 !important;
+        color: var(--red-700) !important;
+        background: var(--red-50) !important;
     }
 }
 
@@ -400,7 +400,7 @@
     border-radius: 10px;
     font-size: var(--font-size-smd);
     font-weight: 600;
-    color: #475569;
+    color: var(--slate-600);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -420,17 +420,17 @@
 
 .bankHint {
     font-size: var(--font-size-smd);
-    color: #64748b;
+    color: var(--slate-500);
     margin-bottom: 18px;
     line-height: 1.6;
 
     strong {
-        color: #475569;
+        color: var(--slate-600);
     }
 }
 
 .bankPartCard {
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--slate-200);
     border-radius: 16px;
     margin-bottom: 14px;
     overflow: hidden;
@@ -438,7 +438,7 @@
     transition: border-color 0.2s;
 
     &:hover {
-        border-color: #cbd5e1;
+        border-color: var(--slate-300);
     }
 }
 
@@ -448,16 +448,16 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 18px;
-    background: #f8fafc;
+    background: var(--slate-50);
     border: none;
     cursor: pointer;
     font-size: 1.4rem;
-    color: #1e293b;
+    color: var(--slate-800);
     transition: background 0.2s;
     gap: 12px;
 
     &:hover {
-        background: #f1f5f9;
+        background: var(--slate-100);
     }
 }
 
@@ -483,7 +483,7 @@
 
 .bankPartBody {
     padding: 18px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--slate-200);
     background: #fff;
 }
 
@@ -500,11 +500,11 @@
     gap: 6px;
     padding: 10px 16px;
     border-radius: 12px;
-    border: 2px solid #e2e8f0;
-    background: #f8fafc;
+    border: 2px solid var(--slate-200);
+    background: var(--slate-50);
     font-size: var(--font-size-smd);
     font-weight: 600;
-    color: #64748b;
+    color: var(--slate-500);
     cursor: pointer;
     transition: all 0.2s;
 
@@ -531,7 +531,7 @@
 .bankRandomLabel {
     font-size: var(--font-size-smd);
     font-weight: 600;
-    color: #475569;
+    color: var(--slate-600);
 }
 
 .bankRandomInput {
@@ -541,7 +541,7 @@
 
 .bankRandomHint {
     font-size: 1.2rem;
-    color: #94a3b8;
+    color: var(--slate-400);
 }
 
 .bankLoadingWrap {
@@ -550,7 +550,7 @@
     gap: 10px;
     padding: 20px;
     justify-content: center;
-    color: #64748b;
+    color: var(--slate-500);
     font-size: var(--font-size-smd);
 }
 
@@ -567,7 +567,7 @@
 }
 
 .bankPassageGroup {
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--slate-200);
     border-radius: 12px;
     overflow: hidden;
     background: #fff;
@@ -584,14 +584,14 @@
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
+    background: var(--slate-50);
+    border-bottom: 1px solid var(--slate-200);
 }
 
 .bankGroupLabel {
     font-size: var(--font-size-smd);
     font-weight: 600;
-    color: #475569;
+    color: var(--slate-600);
 }
 
 .bankQuestionList {
@@ -616,18 +616,18 @@
     }
 
     &:hover {
-        background: #f1f5f9;
+        background: var(--slate-100);
     }
 
     &.selected {
         background: var(--brand-100);
-        border: 1px solid #c7d2fe;
+        border: 1px solid var(--indigo-200);
     }
 }
 
 .bankQuestionIndex {
     font-weight: 700;
-    color: #64748b;
+    color: var(--slate-500);
     min-width: 24px;
     font-size: 1.2rem;
 }
@@ -635,7 +635,7 @@
 .bankQuestionText {
     flex: 1;
     font-size: var(--font-size-smd);
-    color: #334155;
+    color: var(--slate-700);
     line-height: 1.45;
     word-break: break-word;
 }
@@ -643,7 +643,7 @@
 .bankBtnEdit {
     background: transparent;
     border: none;
-    color: #94a3b8;
+    color: var(--slate-400);
     cursor: pointer;
     padding: 4px;
     border-radius: 6px;
@@ -661,7 +661,7 @@
 
 .bankTotalCount {
     font-size: 1.4rem;
-    color: #475569;
+    color: var(--slate-600);
     margin-top: 14px;
     margin-bottom: 0;
 

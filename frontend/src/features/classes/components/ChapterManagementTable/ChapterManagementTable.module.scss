@@ -105,9 +105,9 @@
 }
 
 .btn-action.delete {
-  color: #ef4444;
+  color: var(--red-500);
 }
 .btn-action.delete:hover {
-  background: #fef2f2;
-  border-color: #fee2e2;
+  background: var(--red-50);
+  border-color: var(--red-100);
 }

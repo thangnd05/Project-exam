@@ -3,29 +3,29 @@
 .questionItem {
   padding: 2rem;
   border-radius: 15px;
-  border: 2px solid #f1f5f9;
+  border: 2px solid var(--slate-100);
   transition: all 0.3s;
 
   &.correct {
-    border-color: #10b98140;
-    background: #10b98108;
+    border-color: rgb(var(--emerald-500-rgb) / 0.25);
+    background: rgb(var(--emerald-500-rgb) / 0.03);
   }
 
   &.incorrect {
-    border-color: #ef444440;
-    background: #ef444408;
+    border-color: rgb(var(--red-500-rgb) / 0.25);
+    background: rgb(var(--red-500-rgb) / 0.03);
   }
 
   &.unanswered {
-    border-color: #cbd5e1;
-    background: #f8fafc;
+    border-color: var(--slate-300);
+    background: var(--slate-50);
   }
 }
 
 .qText {
   font-size: 1.6rem;
   margin-bottom: 1.4rem;
-  color: var(--dark-color, #0f172a);
+  color: var(--dark-color);
   display: block;
   line-height: 1.5;
 
@@ -43,28 +43,28 @@
 .answerOption {
   padding: 1.2rem 1.8rem;
   border-radius: 10px;
-  background: var(--bg-white, #fff);
-  border: 1px solid #e2e8f0;
+  background: var(--bg-white);
+  border: 1px solid var(--slate-200);
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   transition: all 0.2s;
 
   &.isCorrect {
-    background: #ecfdf5;
-    border-color: var(--success-border, #10b981);
-    color: #059669;
+    background: var(--emerald-50);
+    border-color: var(--success-border);
+    color: var(--emerald-600);
     font-weight: 700;
   }
 
   &.isIncorrectChoice {
-    background: #fef2f2;
-    border-color: #ef4444;
-    color: #dc2626;
+    background: var(--red-50);
+    border-color: var(--red-500);
+    color: var(--red-600);
     font-weight: 700;
   }
 
   &.isUserChoice {
-    box-shadow: 0 0 0 2px var(--primary-alpha-15, rgba(13, 148, 136, 0.15));
+    box-shadow: 0 0 0 2px var(--primary-alpha-15);
   }
 }
 
@@ -79,16 +79,16 @@
   margin-top: 1.4rem;
   padding: 1.2rem 1.6rem;
   border-radius: 10px;
-  border: 1px solid var(--primary-alpha-20, rgba(13, 148, 136, 0.2));
-  background: var(--brand-50, #f0fdfa);
-  color: var(--text-color, #0f172a);
+  border: 1px solid var(--primary-alpha-20);
+  background: var(--brand-50);
+  color: var(--text-color);
   white-space: pre-wrap;
   line-height: 1.6;
   font-size: var(--font-size-md);
 
   strong {
     font-weight: 800;
-    color: var(--brand-700, #0f766e);
+    color: var(--brand-700);
   }
 }
 
@@ -109,9 +109,9 @@
 @keyframes reviewFlash {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+    box-shadow: 0 0 0 0 rgb(var(--teal-600-rgb) / 0);
   }
   20% {
-    box-shadow: 0 0 0 4px var(--primary-alpha-35, rgba(13, 148, 136, 0.35));
+    box-shadow: 0 0 0 4px var(--primary-alpha-35);
   }
 }

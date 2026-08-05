@@ -1,17 +1,17 @@
 .wrapper {
   background: white;
-  border-radius: var(--radius-lg, 16px);
+  border-radius: var(--radius-lg);
   padding: 28px;
   margin-top: 28px;
   box-shadow: var(--shadow-sm);
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--slate-100);
 }
 
 .title {
   font-size: 2rem;
   font-weight: var(--font-weight-bold);
   margin-bottom: 18px;
-  color: var(--dark-color, #0f172a);
+  color: var(--dark-color);
 }
 
 .tabs {
@@ -24,8 +24,8 @@
 .tab {
   padding: 8px 18px;
   border-radius: 999px;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border: 1px solid var(--slate-200);
+  background: var(--slate-50);
   color: var(--text-secondary);
   font-weight: 700;
   font-size: 1.4rem;
@@ -37,7 +37,7 @@
   }
 
   &.active {
-    background: rgba(13, 148, 136, 0.06);
+    background: rgb(var(--teal-600-rgb) / 0.06);
     border-color: var(--accent-color);
     color: var(--accent-color);
   }
@@ -56,7 +56,7 @@
   td {
     padding: 14px 16px;
     text-align: left;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--slate-100);
     vertical-align: middle;
   }
 
@@ -65,11 +65,11 @@
     color: var(--text-secondary);
     font-size: var(--font-size-smd);
     white-space: nowrap;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--slate-200);
   }
 
   tbody tr:hover {
-    background: #f8fafc;
+    background: var(--slate-50);
   }
 
   td {
@@ -90,7 +90,7 @@
   td {
     font-weight: var(--font-weight-bold);
     color: var(--dark-color);
-    border-top: 2px solid #e2e8f0;
+    border-top: 2px solid var(--slate-200);
     border-bottom: none;
   }
 }
@@ -105,8 +105,8 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1.5px solid #cbd5e1;
-  background: #f8fafc;
+  border: 1.5px solid var(--slate-300);
+  background: var(--slate-50);
   color: var(--text-secondary);
   font-weight: 700;
   font-size: var(--font-size-smd);
@@ -120,20 +120,20 @@
 
   &.correct {
     border-color: var(--success-border);
-    color: #059669;
-    background: #ecfdf5;
+    color: var(--emerald-600);
+    background: var(--emerald-50);
   }
 
   &.wrong {
-    border-color: #ef4444;
-    color: #dc2626;
-    background: #fef2f2;
+    border-color: var(--red-500);
+    color: var(--red-600);
+    background: var(--red-50);
   }
 
   &.skipped {
-    border-color: #cbd5e1;
+    border-color: var(--slate-300);
     color: var(--text-secondary);
-    background: #f1f5f9;
+    background: var(--slate-100);
   }
 }
 

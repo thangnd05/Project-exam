@@ -1,7 +1,7 @@
 @import 'shared/styles/GlobalStyles/GlobalStyles.module.scss';
 
 .modalCustom {
-    background: rgba(15, 23, 42, 0.4);
+    background: rgb(var(--slate-900-rgb) / 0.4);
     backdrop-filter: blur(4px);
 
     :global(.modal-content) {
@@ -15,7 +15,7 @@
 .header {
     background: #fff;
     padding: 24px 30px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--slate-100);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -33,14 +33,14 @@
         .title {
             font-size: 2.22rem;
             font-weight: 800;
-            color: #1e293b;
+            color: var(--slate-800);
             margin: 0;
             letter-spacing: -0.5px;
         }
     }
 
     .closeBtn {
-        background: #f1f5f9;
+        background: var(--slate-100);
         border: none;
         width: 36px;
         height: 36px;
@@ -48,13 +48,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #64748b;
+        color: var(--slate-500);
         cursor: pointer;
         transition: all 0.2s;
 
         &:hover {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: var(--slate-200);
+            color: var(--slate-800);
             transform: rotate(90deg);
         }
     }
@@ -66,7 +66,7 @@
     .label {
         font-size: var(--font-size-md);
         font-weight: 700;
-        color: #475569;
+        color: var(--slate-600);
         margin-bottom: 12px;
         display: block;
     }
@@ -79,7 +79,7 @@
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
+            color: var(--slate-400);
             font-size: 1.8rem;
             pointer-events: none;
             transition: all 0.3s;
@@ -89,15 +89,15 @@
             width: 100%;
             padding: 14px 16px 14px 48px;
             border-radius: 16px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--slate-200);
             font-size: 1.6rem;
             font-family: var(--font-family);
-            color: #1e293b;
+            color: var(--slate-800);
             transition: all 0.3s;
-            background: #f8fafc;
+            background: var(--slate-50);
 
             &::placeholder {
-                color: #94a3b8;
+                color: var(--slate-400);
             }
 
             &:focus {
@@ -116,13 +116,13 @@
     .tip {
         margin-top: 16px;
         font-size: var(--font-size-smd);
-        color: #64748b;
+        color: var(--slate-500);
         display: flex;
         align-items: center;
         gap: 6px;
 
         svg {
-            color: #fbbf24;
+            color: var(--amber-400);
         }
     }
 }
@@ -146,23 +146,23 @@
     }
 
     .btnCancel {
-        background: #f1f5f9;
-        color: #64748b;
+        background: var(--slate-100);
+        color: var(--slate-500);
 
         &:hover {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: var(--slate-200);
+            color: var(--slate-800);
         }
     }
 
     .btnSubmit {
         background: var(--accent-color);
         color: #fff;
-        box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
+        box-shadow: 0 4px 15px rgb(var(--teal-600-rgb) / 0.3);
 
         &:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(13, 148, 136, 0.4);
+            box-shadow: 0 8px 25px rgb(var(--teal-600-rgb) / 0.4);
         }
 
         &:disabled {

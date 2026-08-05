@@ -2,7 +2,7 @@
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
-  border-bottom: 2px solid #f1f5f9;
+  border-bottom: 2px solid var(--slate-100);
 }
 
 .tab {
@@ -11,14 +11,14 @@
   padding: 8px 18px;
   font-size: var(--font-size-md);
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--slate-400);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
   transition: color 0.2s ease, border-color 0.2s ease;
 
   &:hover {
-    color: #475569;
+    color: var(--slate-600);
   }
 
   &.active {
@@ -42,7 +42,7 @@
 .placeholder {
   padding: 56px 0;
   text-align: center;
-  color: #6b7280;
+  color: var(--gray-500);
   font-size: var(--font-size-md);
 }
 
@@ -56,7 +56,7 @@
   margin: 0 0 14px;
   font-size: 1.6rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--slate-700);
   padding-bottom: 8px;
   border-bottom: 1px solid #eef2f7;
 }
@@ -72,7 +72,7 @@
   flex-direction: column;
   gap: 12px;
   background: #fff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--gray-200);
   border-radius: 14px;
   padding: 18px;
   transition: box-shadow 0.2s ease;
@@ -114,7 +114,7 @@
 
 .desc {
   margin: 0;
-  color: #4b5563;
+  color: var(--gray-600);
   font-size: var(--font-size-md);
 }
 
@@ -140,7 +140,7 @@
 
 .progressText {
   font-size: var(--font-size-smd);
-  color: #6b7280;
+  color: var(--gray-500);
 }
 
 .deadline {

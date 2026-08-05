@@ -281,8 +281,8 @@
   }
 
   pre {
-    background-color: #1e293b;
-    color: #e2e8f0;
+    background-color: var(--slate-800);
+    color: var(--slate-200);
     padding: 24px;
     border-radius: var(--radius-md);
     overflow-x: auto;

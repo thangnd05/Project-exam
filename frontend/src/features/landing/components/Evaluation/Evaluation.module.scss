@@ -25,14 +25,14 @@
 .section-title {
   font-size: var(--font-size-3xl);
   font-weight: 800;
-  color: var(--dark-color, #1e293b);
+  color: var(--dark-color);
   margin-bottom: 10px;
   letter-spacing: -0.5px;
 }
 
 .section-subtitle {
   font-size: var(--font-size-lg);
-  color: #64748b;
+  color: var(--slate-500);
   font-weight: 500;
   line-height: 1.6;
 }
@@ -60,7 +60,7 @@
 
 .review-content {
   font-size: var(--font-size-ssm);
-  color: #334155;
+  color: var(--slate-700);
   line-height: 1.65;
   margin-bottom: 25px;
   flex-grow: 1;
@@ -124,12 +124,12 @@
   margin-bottom: 16px;
 
   .star-filled {
-    color: #fbbf24;
+    color: var(--amber-400);
     font-size: 1.4rem;
   }
 
   .star-empty {
-    color: #e2e8f0;
+    color: var(--slate-200);
     font-size: 1.4rem;
   }
 }
@@ -181,7 +181,7 @@
             content: '•' !important;
             text-align: center;
             opacity: 0.3 !important;
-            color: #94a3b8 !important;
+            color: var(--slate-400) !important;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             transition: all 0.3s ease;
@@ -211,7 +211,7 @@
 
       &:before {
         font-size: var(--font-size-3xl);
-        color: #94a3b8;
+        color: var(--slate-400);
         opacity: 0.7;
         transition: all 0.3s;
       }

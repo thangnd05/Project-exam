@@ -1,5 +1,5 @@
-$text-primary: #0f172a;
-$text-secondary: #64748b;
+$text-primary: var(--slate-900);
+$text-secondary: var(--slate-500);
 
 .userCell {
     display: flex;

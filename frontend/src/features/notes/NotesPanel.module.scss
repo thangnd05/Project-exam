@@ -43,7 +43,7 @@
 
   &:hover {
     border-color: var(--primary);
-    background: rgba(13, 148, 136, 0.06);
+    background: rgb(var(--teal-600-rgb) / 0.06);
   }
 }
 
@@ -168,7 +168,7 @@
 
   button {
     padding: 4px 10px;
-    border-radius: var(--radius-sm, 6px);
+    border-radius: var(--radius-sm);
     border: 1px solid transparent;
     font-size: 1.3rem;
     font-weight: 700;

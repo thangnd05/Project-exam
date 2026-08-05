@@ -12,11 +12,11 @@
 
 .card {
   background: #fff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--slate-200);
   border-radius: 16px;
   padding: 18px;
   margin-bottom: 16px;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 6px 16px rgb(var(--slate-900-rgb) / 0.04);
 }
 
 .sectionTitle {
@@ -24,7 +24,7 @@
   align-items: center;
   gap: 8px;
   margin: 0 0 14px 0;
-  color: #1e293b;
+  color: var(--slate-800);
   font-size: 1.8rem;
   font-weight: 800;
 }
@@ -44,12 +44,12 @@
 
 .selectField {
   width: 100%;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--slate-200);
   border-radius: 12px;
   padding: 11px 14px;
-  background: #f8fafc;
+  background: var(--slate-50);
   font-size: 1.35rem;
-  color: #0f172a;
+  color: var(--slate-900);
 }
 
 .includeChildrenToggle {
@@ -58,7 +58,7 @@
   gap: 6px;
   margin-top: 8px;
   font-size: var(--font-size-smd);
-  color: #334155;
+  color: var(--slate-700);
   cursor: pointer;
   user-select: none;
 
@@ -82,7 +82,7 @@
   gap: 12px;
   padding: 14px 16px;
   border: none;
-  background: #f8fafc;
+  background: var(--slate-50);
 }
 
 .partName {
@@ -93,7 +93,7 @@
   text-align: left;
   font-size: 1.45rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--slate-900);
 }
 
 .partBadge {
@@ -108,13 +108,13 @@
 }
 
 .partCardBody {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--slate-200);
   background: #fff;
   padding: 12px;
 }
 
 .chapterGroup {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--slate-200);
   border-radius: 12px;
   padding: 10px;
   margin-bottom: 10px;
@@ -125,14 +125,14 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
-  color: #334155;
+  color: var(--slate-700);
   font-weight: 700;
   font-size: var(--font-size-smd);
 }
 
 .chapterBadge {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--slate-100);
+  color: var(--slate-600);
   border-radius: 999px;
   padding: 2px 8px;
   font-size: 1.15rem;
@@ -151,20 +151,20 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--slate-200);
   border-radius: 10px;
   padding: 8px 10px;
 }
 
 .questionIndex {
-  color: #64748b;
+  color: var(--slate-500);
   min-width: 20px;
   font-weight: 700;
 }
 
 .questionText {
   flex: 1;
-  color: #0f172a;
+  color: var(--slate-900);
   font-size: 1.35rem;
 }
 
@@ -177,17 +177,17 @@
   border-radius: 999px;
   font-size: var(--font-size-xs2);
   font-weight: 600;
-  background: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+  background: var(--sky-100);
+  color: var(--sky-700);
+  border: 1px solid var(--sky-200);
   vertical-align: middle;
   white-space: nowrap;
 }
 
 .collectionBadgeEmpty {
-  background: #f1f5f9;
-  color: #94a3b8;
-  border-color: #e2e8f0;
+  background: var(--slate-100);
+  color: var(--slate-400);
+  border-color: var(--slate-200);
   font-weight: 500;
 }
 
@@ -210,7 +210,7 @@
   gap: 10px;
   justify-content: center;
   padding: 16px;
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 .questionMain {
@@ -232,7 +232,7 @@
   display: inline-flex;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--gray-200);
 }
 
 .mediaThumb {

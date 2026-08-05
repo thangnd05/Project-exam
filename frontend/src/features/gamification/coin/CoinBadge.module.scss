@@ -4,8 +4,8 @@
   gap: 6px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(234, 179, 8, 0.1);
-  color: #ca8a04;
+  background: rgb(var(--yellow-500-rgb) / 0.1);
+  color: var(--yellow-600);
   font-weight: 700;
   font-size: var(--font-size-md);
   user-select: none;

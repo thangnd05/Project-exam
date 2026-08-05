@@ -51,7 +51,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.4rem 1.6rem;
-  background: #f9fafb;
+  background: var(--gray-50);
   border-bottom: 1px solid var(--border-color);
 
   h5 {
@@ -82,7 +82,7 @@
   align-items: center;
   gap: 0.8rem;
   padding: 1rem 1.2rem;
-  background: #f3f4f6;
+  background: var(--gray-100);
   border-radius: var(--radius-md);
   font-size: var(--font-size-ssm);
 
@@ -154,7 +154,7 @@
   transition: all 0.15s;
 
   &:hover {
-    background: #f3f4f6;
+    background: var(--gray-100);
   }
 
   &.danger:hover {
@@ -183,7 +183,7 @@
   }
 
   &.under {
-    background: #fffbeb;
+    background: var(--amber-50);
   }
 }
 

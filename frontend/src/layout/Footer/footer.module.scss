@@ -180,7 +180,7 @@ $text-soft: rgba(255, 255, 255, 0.82);
     &:hover {
       color: #fff;
       border-color: rgba(255, 255, 255, 0.35);
-      background: rgba(13, 148, 136, 0.85);
+      background: rgb(var(--teal-600-rgb) / 0.85);
       transform: translateY(-2px);
       box-shadow: 0 6px 18px var(--primary-alpha-35);
     }
@@ -367,7 +367,7 @@ $text-soft: rgba(255, 255, 255, 0.82);
   gap: 14px;
   padding: 12px 16px;
   border-radius: 12px;
-  background: rgba(4, 47, 46, 0.35);
+  background: rgb(var(--teal-950-rgb) / 0.35);
   border: 1px solid rgba(255, 255, 255, 0.08);
 
   @media (max-width: 991px) {
@@ -424,7 +424,7 @@ $text-soft: rgba(255, 255, 255, 0.82);
 }
 
 .copyrightText {
-  font-size: var(--font-size-smd, 1.2rem);
+  font-size: var(--font-size-smd);
   color: rgba(255, 255, 255, 0.48);
   text-align: right;
 

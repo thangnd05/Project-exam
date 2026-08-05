@@ -17,8 +17,8 @@
   }
 
   &.active {
-    background: rgba(249, 115, 22, 0.1);
-    color: #ea580c;
+    background: rgb(var(--orange-500-rgb) / 0.1);
+    color: var(--orange-600);
     box-shadow: none;
 
     .icon {

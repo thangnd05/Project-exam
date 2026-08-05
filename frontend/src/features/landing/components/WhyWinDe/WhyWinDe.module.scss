@@ -2,7 +2,7 @@
   position: relative;
   padding: clamp(48px, 6vw, 88px) clamp(20px, 4vw, 48px);
   background: #fff;
-  color: #0f172a;
+  color: var(--slate-900);
 }
 
 .inner {
@@ -23,7 +23,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--brand-700, #7d672c);
+  color: var(--brand-700);
 }
 
 .title {
@@ -32,7 +32,7 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.15;
-  color: #0f172a;
+  color: var(--slate-900);
 }
 
 .subtitle {
@@ -40,7 +40,7 @@
   max-width: 52ch;
   font-size: clamp(1.4rem, 1.55vw, 1.65rem);
   line-height: 1.55;
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 .list {
@@ -71,7 +71,7 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1.2;
-  color: var(--brand-600, #c9a84b);
+  color: var(--brand-600);
   opacity: 0.55;
 }
 
@@ -85,12 +85,12 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.25;
-  color: #0f172a;
+  color: var(--slate-900);
 }
 
 .itemText {
   margin: 0;
   font-size: clamp(1.3rem, 1.4vw, 1.5rem);
   line-height: 1.55;
-  color: #64748b;
+  color: var(--slate-500);
 }

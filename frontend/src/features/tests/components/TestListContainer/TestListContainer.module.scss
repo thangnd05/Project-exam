@@ -2,8 +2,8 @@
 
 $brand-primary: var(--accent-color);
 $brand-secondary: var(--accent-act-color);
-$brand-light: #f8fafc;
-$brand-border: #e2e8f0;
+$brand-light: var(--slate-50);
+$brand-border: var(--slate-200);
 
 .wrapper {
   padding: 60px 0;
@@ -43,26 +43,26 @@ $brand-border: #e2e8f0;
   padding: 80px 40px;
   background: white;
   border-radius: 32px;
-  border: 2px dashed #cbd5e1;
+  border: 2px dashed var(--slate-300);
   width: 100%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 
   .icon {
     font-size: 8rem;
-    color: #cbd5e1;
+    color: var(--slate-300);
     margin-bottom: 24px;
   }
 
   h4 {
     font-size: 2.6rem;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--slate-800);
     margin-bottom: 12px;
   }
 
   p {
     font-size: 1.7rem;
-    color: #64748b;
+    color: var(--slate-500);
     margin-bottom: 32px;
     max-width: 500px;
     margin-left: auto;

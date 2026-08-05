@@ -157,8 +157,8 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: rgba(13, 148, 136, 0.06);
-  border: 2px solid rgba(13, 148, 136, 0.25);
+  background: rgb(var(--teal-600-rgb) / 0.06);
+  border: 2px solid rgb(var(--teal-600-rgb) / 0.25);
   border-radius: 12px;
   color: var(--accent-color);
   font-weight: 700;
@@ -176,7 +176,7 @@
     border-color: var(--accent-color);
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+    box-shadow: 0 4px 12px rgb(var(--teal-600-rgb) / 0.25);
   }
 }
 

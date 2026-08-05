@@ -4,13 +4,13 @@ $sidebar-hover: var(--brand-700);
 $sidebar-text: rgba(255, 255, 255, 0.62);
 $sidebar-text-light: rgba(255, 255, 255, 0.92);
 $header-bg: #ffffff;
-$content-bg: #f1f5f9;
+$content-bg: var(--slate-100);
 $primary: var(--accent-act-color);
-$success: #10b981;
-$danger: #ef4444;
-$text-primary: #1e293b;
-$text-secondary: #64748b;
-$border-color: #e2e8f0;
+$success: var(--emerald-500);
+$danger: var(--red-500);
+$text-primary: var(--slate-800);
+$text-secondary: var(--slate-500);
+$border-color: var(--slate-200);
 $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 $transition: all 0.3s ease;
@@ -297,7 +297,7 @@ $transition: all 0.3s ease;
         outline: none;
         border-color: $primary;
         background: white;
-        box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        box-shadow: 0 0 0 3px rgb(var(--teal-500-rgb) / 0.1);
     }
 
     &::placeholder {
@@ -326,7 +326,7 @@ $transition: all 0.3s ease;
     transition: $transition;
 
     &:hover {
-        background: darken($content-bg, 5%);
+        background: var(--slate-200);
         color: $text-primary;
     }
 }
@@ -358,7 +358,7 @@ $transition: all 0.3s ease;
     transition: $transition;
 
     &:hover {
-        background: darken($content-bg, 3%);
+        background: var(--slate-200);
     }
 }
 

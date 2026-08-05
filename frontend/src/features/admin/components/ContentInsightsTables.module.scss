@@ -1,8 +1,8 @@
-$text-primary: #1e293b;
-$text-secondary: #64748b;
-$border-color: #e2e8f0;
-$success: #10b981;
-$danger: #ef4444;
+$text-primary: var(--slate-800);
+$text-secondary: var(--slate-500);
+$border-color: var(--slate-200);
+$success: var(--emerald-500);
+$danger: var(--red-500);
 
 .tableWrap {
     width: 100%;
@@ -25,7 +25,7 @@ $danger: #ef4444;
 
     tbody td {
         padding: 12px;
-        border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+        border-bottom: 1px solid rgb(var(--slate-200-rgb) / 0.6);
         color: $text-primary;
         vertical-align: middle;
     }
@@ -35,7 +35,7 @@ $danger: #ef4444;
     }
 
     tbody tr:hover td {
-        background: rgba(20, 184, 166, 0.04);
+        background: rgb(var(--teal-500-rgb) / 0.04);
     }
 }
 
@@ -95,7 +95,7 @@ $danger: #ef4444;
 
 .empty {
     text-align: center;
-    color: #94a3b8;
+    color: var(--slate-400);
     padding: 28px 0;
 }
 

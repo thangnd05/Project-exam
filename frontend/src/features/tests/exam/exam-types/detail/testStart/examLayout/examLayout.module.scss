@@ -7,8 +7,8 @@
   gap: 1.2rem;
   flex-wrap: wrap;
   padding: 1rem 1.6rem;
-  background: var(--bg-white, #fff);
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .scrollBody {
@@ -62,7 +62,7 @@
   scrollbar-color: transparent transparent;
 
   &:hover {
-    scrollbar-color: #cbd5e1 transparent;
+    scrollbar-color: var(--slate-300) transparent;
   }
 
   &::-webkit-scrollbar {
@@ -79,10 +79,10 @@
   }
 
   &:hover::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--slate-300);
 
     &:hover {
-      background: #94a3b8;
+      background: var(--slate-400);
     }
   }
 }
@@ -138,9 +138,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary, #64748b);
-  background: var(--input-bg, #f1f5f9);
-  border: 1px dashed var(--border-color, #cbd5e1);
+  color: var(--text-secondary);
+  background: var(--input-bg);
+  border: 1px dashed var(--border-color);
   border-radius: var(--exam-radius, 1.2rem);
 }
 

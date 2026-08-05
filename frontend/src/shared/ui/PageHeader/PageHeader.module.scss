@@ -1,7 +1,7 @@
 @import 'shared/styles/GlobalStyles/GlobalStyles.module.scss';
 
 .headerHero {
-  background: linear-gradient(135deg, var(--brand-700, #0f766e) 0%, var(--brand-500, #14b8a6) 100%);
+  background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
   padding: 48px 48px;
   border-radius: 24px;
   margin-bottom: 40px;
@@ -11,7 +11,7 @@
   align-items: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 30px var(--primary-alpha-28, rgba(13, 148, 136, 0.28));
+  box-shadow: 0 12px 30px var(--primary-alpha-28);
 
   &::after {
     content: '';
@@ -120,7 +120,7 @@
     font-weight: var(--font-weight-semibold);
     font-size: 1.4rem;
     padding: 10px 20px;
-    color: var(--brand-700, #0f766e);
+    color: var(--brand-700);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
     transition: all 0.2s ease;
 
@@ -128,7 +128,7 @@
     &:focus,
     &:active {
       background: #fff;
-      color: var(--brand-600, #0d9488);
+      color: var(--brand-600);
       transform: translateY(-2px);
       box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     }
@@ -146,7 +146,7 @@
   font-size: var(--font-size-base);
   font-weight: 700;
   background: #fff;
-  color: var(--brand-700, #0f766e);
+  color: var(--brand-700);
   border: none;
   cursor: pointer;
   white-space: nowrap;
@@ -156,7 +156,7 @@
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    color: var(--brand-600, #0d9488);
+    color: var(--brand-600);
   }
 
   @media (max-width: 576px) {
@@ -216,7 +216,7 @@
 
   &.active {
     background: white;
-    color: var(--brand-700, #0f766e);
+    color: var(--brand-700);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: scale(1.05);
   }

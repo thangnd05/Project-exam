@@ -12,7 +12,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
+    background: var(--slate-200);
     border-radius: 10px;
   }
 }
@@ -27,7 +27,7 @@
     padding: 20px 16px;
     font-size: var(--font-size-smd);
     font-weight: 800;
-    color: #64748b;
+    color: var(--slate-500);
     text-transform: uppercase;
     letter-spacing: 1px;
   }
@@ -36,8 +36,8 @@
     padding: 22px 16px;
     vertical-align: middle;
     font-size: 1.6rem;
-    color: #334155;
-    border-bottom: 1px solid #f8fafc;
+    color: var(--slate-700);
+    border-bottom: 1px solid var(--slate-50);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -80,7 +80,7 @@
   strong {
     display: block;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--slate-800);
     transition: color 0.2s;
   }
 }
@@ -94,17 +94,17 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 
   &.bg-success {
-    background: #ecfdf5 !important;
-    color: #059669 !important;
+    background: var(--emerald-50) !important;
+    color: var(--emerald-600) !important;
   }
 
   &.bg-danger {
-    background: #fef2f2 !important;
-    color: #dc2626 !important;
+    background: var(--red-50) !important;
+    color: var(--red-600) !important;
   }
 
   &.bg-warning {
-    background: #fffbeb !important;
+    background: var(--amber-50) !important;
     color: var(--brand-unique-hover) !important;
   }
 }
@@ -112,7 +112,7 @@
 .test-duration,
 .test-participants {
   font-weight: 700;
-  color: #475569;
+  color: var(--slate-600);
   font-size: 1.4rem;
 
   &::after {
@@ -137,8 +137,8 @@
   border-radius: 12px;
   font-size: 2rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #f8fafc;
-  border: 1px solid #f1f5f9;
+  background: var(--slate-50);
+  border: 1px solid var(--slate-100);
 
   &:hover {
     transform: translateY(-3px) scale(1.05);
@@ -155,20 +155,20 @@
   }
 
   &.delete {
-    color: #ef4444;
+    color: var(--red-500);
 
     &:hover {
-      background: #fef2f2;
-      border-color: #fee2e2;
+      background: var(--red-50);
+      border-color: var(--red-100);
     }
   }
 
   &.stats {
-    color: #10b981;
+    color: var(--emerald-500);
 
     &:hover {
-      background: #ecfdf5;
-      border-color: #d1fae5;
+      background: var(--emerald-50);
+      border-color: var(--emerald-100);
     }
   }
 }

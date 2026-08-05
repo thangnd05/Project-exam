@@ -1,10 +1,10 @@
-$success: #10b981;
-$danger: #ef4444;
-$purple: #8b5cf6;
-$text-primary: #1e293b;
-$text-secondary: #64748b;
+$success: var(--emerald-500);
+$danger: var(--red-500);
+$purple: var(--violet-500);
+$text-primary: var(--slate-800);
+$text-secondary: var(--slate-500);
 $bg-white: #ffffff;
-$border-color: #e2e8f0;
+$border-color: var(--slate-200);
 $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 $radius-md: 12px;
@@ -108,7 +108,7 @@ $radius-lg: 16px;
     padding: 6px 12px;
     border: 1px solid $border-color;
     border-radius: 8px;
-    background: var(--bg-white, #fff);
+    background: var(--bg-white);
     color: $text-primary;
     font-size: var(--font-size-ssm);
     font-weight: var(--font-weight-medium);
@@ -116,7 +116,7 @@ $radius-lg: 16px;
     transition: border-color 0.2s ease;
 
     &:hover { border-color: var(--accent-act-color); }
-    &:focus { outline: none; border-color: var(--accent-act-color); box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15); }
+    &:focus { outline: none; border-color: var(--accent-act-color); box-shadow: 0 0 0 3px rgb(var(--teal-500-rgb) / 0.15); }
 }
 
 @media (max-width: 992px) {
@@ -139,7 +139,7 @@ $radius-lg: 16px;
 .emptyCell {
     display: block;
     text-align: center;
-    color: #94a3b8;
+    color: var(--slate-400);
     padding: 24px 0;
 }
 
