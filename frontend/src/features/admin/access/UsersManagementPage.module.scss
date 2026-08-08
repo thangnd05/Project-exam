@@ -10,8 +10,8 @@ $text-secondary: var(--slate-500);
 .userAvatar {
     width: 42px;
     height: 42px;
-    // User thường: tông xanh dương gốc của nhánh admin
-    background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-300) 100%);
+    // User thường: tông teal (xanh ngọc)
+    background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-500) 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -20,7 +20,7 @@ $text-secondary: var(--slate-500);
     font-size: 1.5rem;
     font-weight: 700;
     flex-shrink: 0;
-    box-shadow: 0 4px 10px rgb(var(--blue-500-rgb) / 0.25);
+    box-shadow: 0 4px 10px rgb(var(--teal-600-rgb) / 0.25);
     text-transform: uppercase;
 
     // User premium: tông vàng kim loại

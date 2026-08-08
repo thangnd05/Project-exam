@@ -28,7 +28,9 @@ const MANUAL_PAUSE_MS = 1600;
 // scale 1.1) - khoảng hở.
 const RING = {
   wide: {cardWidth: 196, radiusY: 110, maxRadiusX: 320, sideRoom: 8},
-  narrow: {cardWidth: 116, radiusY: 70, maxRadiusX: 122, sideRoom: 6},
+  // Preset gọn dùng chung cho tablet→phone: maxRadiusX rộng để tablet trải đủ,
+  // còn máy hẹp thì radiusX tự co theo bề rộng stage (clamp bên dưới).
+  narrow: {cardWidth: 140, radiusY: 88, maxRadiusX: 220, sideRoom: 8},
 };
 const MIN_RADIUS_X = 96;
 
@@ -102,7 +104,7 @@ function getFrontIndex(rotation, n) {
   return best;
 }
 
-function useIsNarrow(breakpoint = 768) {
+function useIsNarrow(breakpoint = 960) {
   const [narrow, setNarrow] = useState(false);
 
   useEffect(() => {

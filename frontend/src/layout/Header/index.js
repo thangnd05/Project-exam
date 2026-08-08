@@ -148,6 +148,7 @@ function Header() {
                         <AvatarWithCosmetic
                           src={user?.avatarUrl}
                           fallbackSrc={images.avtImage}
+                          name={user?.userName || user?.fullName}
                           size={32}
                           frame={cosmeticFrame}
                           badge={cosmeticBadge}

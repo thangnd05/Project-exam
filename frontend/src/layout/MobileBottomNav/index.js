@@ -164,6 +164,7 @@ function MobileBottomNav() {
             <AvatarWithCosmetic
               src={user?.avatarUrl}
               fallbackSrc={images.avtImage}
+              name={user?.userName || user?.fullName}
               size={24}
               frame={cosmeticFrame}
               badge={cosmeticBadge}
@@ -241,6 +242,7 @@ function MobileBottomNav() {
                       <AvatarWithCosmetic
                         src={user?.avatarUrl}
                         fallbackSrc={images.avtImage}
+                        name={user?.userName || user?.fullName}
                         size={40}
                         frame={cosmeticFrame}
                         badge={cosmeticBadge}

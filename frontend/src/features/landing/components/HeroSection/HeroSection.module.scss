@@ -351,8 +351,13 @@
   }
 }
 
-@media (max-width: 768px) {
-  // Màn hẹp không đủ chỗ hai bên vành: trả hai nút về thành hàng dưới.
+@media (max-width: 960px) {
+  // Layout dồn 1 cột: ẩn cụm "Cuộn xuống" cho gọn.
+  .scrollCue {
+    display: none;
+  }
+
+  // Trả hai nút ‹ › về thành hàng dưới vành cho gọn.
   .switcher {
     display: flex;
     align-items: center;

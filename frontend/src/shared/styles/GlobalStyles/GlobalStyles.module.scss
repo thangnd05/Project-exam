@@ -201,12 +201,6 @@
   --violet-500-rgb: 139 92 246;
   --violet-500: rgb(var(--violet-500-rgb));
 
-  /* Xanh dương — tông "admin" gốc (#0061f2 → #00c6ff), dùng cho user thường */
-  --blue-500-rgb: 0 97 242;
-  --blue-300-rgb: 0 198 255;
-  --blue-500: rgb(var(--blue-500-rgb));
-  --blue-300: rgb(var(--blue-300-rgb));
-
   --black: #000;
   --white: #fff;
 
@@ -323,34 +317,66 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   THEME "NORMAL" (user thường / khách) — tông XANH DƯƠNG gốc của
-   nhánh admin (#0061f2 → #00c6ff). Chỉ cần remap tầng primitive
-   --brand-* + neutral ấm; toàn bộ semantic/gradient/alpha đang trỏ
-   tới brand nên tự đổi theo. Premium = KHÔNG có data-theme => giữ
-   tông champagne/vàng mặc định ở :root.
+   THEME "NORMAL" (user thường / khách) — tông TEAL (xanh ngọc
+   #0d9488) là theme GỐC ban đầu. Champagne (vàng) = premium, giữ
+   mặc định ở :root. Lưu ý: theme teal map --primary = brand-600
+   (champagne map brand-500), điểm nhấn --brand-unique là cam hổ phách,
+   nên phải override cả ramp lẫn các token semantic bị lệch vị trí.
    ══════════════════════════════════════════════════════════════ */
 :root[data-theme='normal'] {
-  /* Ramp thương hiệu -> xanh dương */
-  --brand-50-rgb: 239 246 255;
-  --brand-100-rgb: 219 234 254;
-  --brand-150-rgb: 191 219 254;
-  --brand-200-rgb: 147 197 253;
-  --brand-300-rgb: 96 165 250;
-  --brand-400-rgb: 59 130 246;
-  --brand-500-rgb: 0 97 242;
-  --brand-600-rgb: 0 86 210;
-  --brand-700-rgb: 29 78 216;
-  --brand-800-rgb: 30 58 138;
-  --brand-900-rgb: 11 44 77;
+  /* Ramp thương hiệu -> teal (xanh ngọc) */
+  --brand-50-rgb: 240 253 250;
+  --brand-100-rgb: 204 251 241;
+  --brand-150-rgb: 179 247 234;
+  --brand-200-rgb: 153 246 228;
+  --brand-300-rgb: 94 234 212;
+  --brand-400-rgb: 45 212 191;
+  --brand-500-rgb: 20 184 166;
+  --brand-600-rgb: 13 148 136;
+  --brand-700-rgb: 15 118 110;
+  --brand-800-rgb: 19 78 74;
+  --brand-900-rgb: 4 47 46;
   --text-on-dark-rgb: 226 232 240;
 
-  /* Neutral ấm champagne -> neutral lạnh */
-  --warm-bg: #f0f2f5;
+  /* Semantic: teal dùng brand-600 làm primary (champagne dùng brand-500) */
+  --primary: var(--brand-600);
+  --primary-color: var(--brand-600);
+  --accent-color: var(--brand-600);
+  --accent-act-color: var(--brand-500);
+  --hover-accent: var(--brand-700);
+  --primary-rgb: var(--brand-600-rgb);
+
+  /* Điểm nhấn cam hổ phách của theme teal (#f59e0b / #d97706) */
+  --brand-unique: var(--amber-500);
+  --brand-unique-hover: var(--amber-600);
+
+  /* Alpha primary theo brand-600 */
+  --primary-alpha-08: rgb(var(--brand-600-rgb) / 0.08);
+  --primary-alpha-10: rgb(var(--brand-600-rgb) / 0.1);
+  --primary-alpha-15: rgb(var(--brand-600-rgb) / 0.15);
+  --primary-alpha-20: rgb(var(--brand-600-rgb) / 0.2);
+  --primary-alpha-28: rgb(var(--brand-600-rgb) / 0.28);
+  --primary-alpha-35: rgb(var(--brand-600-rgb) / 0.35);
+  --primary-alpha-45: rgb(var(--brand-600-rgb) / 0.45);
+
+  /* Gradient / nút theo teal */
+  --primary-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-500) 100%);
+  --primary-btn-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 100%);
+  --primary-btn-shadow: 0 10px 22px var(--primary-alpha-28);
+  --primary-btn-shadow-hover: 0 14px 28px rgb(var(--brand-600-rgb) / 0.38);
+  --primary-btn-shadow-disabled: 0 8px 18px var(--primary-alpha-20);
+
+  /* Neutral lạnh */
+  --warm-bg: #f8fafc;
   --warm-input: #f1f5f9;
   --warm-hover: #f8f9fa;
   --warm-border: #e2e8f0;
   --warm-border-strong: #cbd5e1;
-  --warm-tag-bg: #eff6ff;
+  --warm-tag-bg: #fff4e5;
+
+  /* Author tag = cam hổ phách */
+  --author-tag-text: var(--amber-700);
+  --author-tag-border: #fcd9a5;
 }
 
 .shadow-md {

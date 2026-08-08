@@ -10,7 +10,7 @@ function resolveStyle(frame) {
   return 'COLOR';
 }
 
-function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', size = 40, frame, badge, className }) {
+function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', name, size = 40, frame, badge, className }) {
   const ring = Math.max(2, Math.round(size * 0.07));
 
   const badgeRatio = size <= 48 ? (badge?.imageUrl ? 0.9 : 0.72) : (badge?.imageUrl ? 0.68 : 0.56);
@@ -25,7 +25,22 @@ function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', size = 40, frame
   const pad = isColor || isEffect ? ring : 0;
   const box = size + pad * 2;
 
-  const imgEl = (
+  // Không có ảnh thật (rỗng hoặc chỉ là avatar mặc định ui-avatars) => hiện
+  // chữ cái đầu với nền theo theme (--primary-gradient: teal thường / vàng premium)
+  const label = (name || (alt !== 'Avatar' ? alt : '') || '').trim();
+  const initial = label ? label.charAt(0).toUpperCase() : '';
+  const isDefaultAvatar = !src || /ui-avatars\.com/i.test(src);
+  const useInitials = isDefaultAvatar && Boolean(initial);
+
+  const imgEl = useInitials ? (
+    <span
+      className={cx('fallback')}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.44) }}
+      aria-label={alt}
+    >
+      {initial}
+    </span>
+  ) : (
     <img
       src={src || fallbackSrc}
       alt={alt}
