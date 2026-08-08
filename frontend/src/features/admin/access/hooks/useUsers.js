@@ -20,6 +20,7 @@ const normalizeUser = (user) => ({
     typeof user.verified === 'boolean'
       ? user.verified
       : user.isVerified ?? null,
+  is_premium: user.isPremium === true || user.is_premium === true,
   created_at: user.createdAt ?? user.created_at ?? null,
 });
 

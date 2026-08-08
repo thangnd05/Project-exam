@@ -27,4 +27,5 @@ public class UserUpsertRequest {
     private String password;
     private String roleId;
     private Boolean verified;
+    private Boolean isPremium;
 }

@@ -16,6 +16,7 @@ public class UserMapper {
                 .roleId(user.getRoleId())
                 .avatarUrl(user.getAvatarUrl())
                 .verified(user.getVerified())
+                .isPremium(user.getIsPremium())
                 .build();
     }
 }

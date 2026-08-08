@@ -21,6 +21,11 @@ $text-secondary: var(--slate-500);
     flex-shrink: 0;
     box-shadow: 0 4px 10px var(--primary-alpha-15);
     text-transform: uppercase;
+
+    &.premium {
+        background: linear-gradient(135deg, var(--amber-400) 0%, var(--amber-600) 100%);
+        box-shadow: 0 4px 12px rgb(var(--amber-500-rgb) / 0.35);
+    }
 }
 
 .userInfo {
@@ -38,6 +43,22 @@ $text-secondary: var(--slate-500);
 .userUsername {
     font-size: 1.2rem;
     font-weight: 500;
+    color: $text-secondary;
+}
+
+.premiumBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--amber-700);
+    background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
+    border: 1px solid var(--amber-400);
+}
+
+.premiumNone {
     color: $text-secondary;
 }
 

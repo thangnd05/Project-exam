@@ -19,6 +19,7 @@ public class UserResponse {
     private String roleId;
     private String avatarUrl;
     private Boolean verified;
+    private Boolean isPremium;
 
     private String roleName;
     private List<String> permissions;

@@ -18,6 +18,7 @@ const normalizeUser = (data) => ({
 
   permissions: Array.isArray(data.permissions) ? data.permissions : [],
   avatarUrl: data.avatarUrl,
+  isPremium: data.isPremium === true,
 });
 
 export const AuthProvider = ({ children }) => {
@@ -112,6 +113,7 @@ export const AuthProvider = ({ children }) => {
       roleName: user?.roleName,
       permissions: user?.permissions ?? [],
       avatarUrl: user?.avatarUrl,
+      isPremium: user?.isPremium ?? false,
       isAuthenticated: !!user?.userId,
     }),
     [user, loading, login, logout, refreshUser]

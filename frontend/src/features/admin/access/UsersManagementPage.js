@@ -27,6 +27,7 @@ const emptyCreateForm = {
   password: '',
   roleId: '',
   verified: false,
+  isPremium: false,
 };
 
 const roleColors = {
@@ -53,6 +54,7 @@ function UsersManagementPage() {
     userName: '',
     email: '',
     verified: false,
+    isPremium: false,
   });
   const [editError, setEditError] = useState('');
 
@@ -118,7 +120,9 @@ function UsersManagementPage() {
 
   const updateCreateField = (field) => (event) => {
     const value =
-      field === 'verified' ? event.target.checked : event.target.value;
+      field === 'verified' || field === 'isPremium'
+        ? event.target.checked
+        : event.target.value;
     setCreateForm((previous) => ({...previous, [field]: value}));
   };
 
@@ -139,6 +143,7 @@ function UsersManagementPage() {
         password: createForm.password,
         roleId: createForm.roleId || null,
         verified: createForm.verified,
+        isPremium: createForm.isPremium,
       });
       setShowCreateModal(false);
       setCurrentPage(1);
@@ -158,6 +163,7 @@ function UsersManagementPage() {
       userName: user.user_name || '',
       email: user.email || '',
       verified: user.verified === true,
+      isPremium: user.is_premium === true,
     });
     setEditingUser(user);
   };
@@ -185,7 +191,13 @@ function UsersManagementPage() {
     try {
       await updateUserMutation.mutateAsync({
         userId: editingUser.user_id,
-        values: {fullName, userName, email, verified: editForm.verified},
+        values: {
+          fullName,
+          userName,
+          email,
+          verified: editForm.verified,
+          isPremium: editForm.isPremium,
+        },
       });
       setEditingUser(null);
     } catch (error) {
@@ -214,7 +226,7 @@ function UsersManagementPage() {
       header: 'Người dùng',
       render: (user) => (
         <div className={cx('userCell')}>
-          <div className={cx('userAvatar')}>
+          <div className={cx('userAvatar', {premium: user.is_premium})}>
             {(user.full_name || '?').charAt(0)}
           </div>
           <div className={cx('userInfo')}>
@@ -255,6 +267,16 @@ function UsersManagementPage() {
               : 'Không có dữ liệu'}
         </Badge>
       ),
+    },
+    {
+      key: 'premium',
+      header: 'Premium',
+      render: (user) =>
+        user.is_premium ? (
+          <span className={cx('premiumBadge')}>Premium</span>
+        ) : (
+          <span className={cx('premiumNone')}>—</span>
+        ),
     },
     {
       key: 'created_at',
@@ -421,6 +443,13 @@ function UsersManagementPage() {
           checked={createForm.verified}
           onChange={updateCreateField('verified')}
         />
+        <Form.Check
+          type="switch"
+          id="create-user-premium"
+          label="Tài khoản Premium"
+          checked={createForm.isPremium}
+          onChange={updateCreateField('isPremium')}
+        />
       </BaseModal>
 
       <BaseModal
@@ -468,6 +497,15 @@ function UsersManagementPage() {
           checked={editForm.verified}
           onChange={(event) =>
             setEditForm((previous) => ({...previous, verified: event.target.checked}))
+          }
+        />
+        <Form.Check
+          type="switch"
+          id="edit-user-premium"
+          label="Tài khoản Premium"
+          checked={editForm.isPremium}
+          onChange={(event) =>
+            setEditForm((previous) => ({...previous, isPremium: event.target.checked}))
           }
         />
       </BaseModal>

@@ -100,6 +100,9 @@ public class UserService {
         if (request.getVerified() != null) {
             user.setVerified(request.getVerified());
         }
+        if (request.getIsPremium() != null) {
+            user.setIsPremium(request.getIsPremium());
+        }
         return user;
     }
 
@@ -177,6 +180,12 @@ public class UserService {
 
     public User updateUser(String id, User updatedUser, MultipartFile avatar, Boolean verifiedOverride)
             throws IOException {
+        return updateUser(id, updatedUser, avatar, verifiedOverride, null);
+    }
+
+    public User updateUser(String id, User updatedUser, MultipartFile avatar, Boolean verifiedOverride,
+                           Boolean premiumOverride)
+            throws IOException {
 
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -202,6 +211,10 @@ public class UserService {
             existingUser.setVerified(verifiedOverride);
         }
 
+        if (premiumOverride != null) {
+            existingUser.setIsPremium(premiumOverride);
+        }
+
         return userRepository.save(existingUser);
     }
 
@@ -215,7 +228,11 @@ public class UserService {
                 (request.getVerified() != null && authUtils.hasPermission(PermissionCatalog.USER_MANAGE))
                         ? request.getVerified()
                         : null;
-        return toResponse(updateUser(id, updatedUser, avatar, verifiedOverride));
+        Boolean premiumOverride =
+                (request.getIsPremium() != null && authUtils.hasPermission(PermissionCatalog.USER_MANAGE))
+                        ? request.getIsPremium()
+                        : null;
+        return toResponse(updateUser(id, updatedUser, avatar, verifiedOverride, premiumOverride));
     }
 
     public ProfileOverviewResponse getProfileOverview(String id) {

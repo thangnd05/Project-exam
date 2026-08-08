@@ -42,4 +42,7 @@ public class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "is_premium", nullable = false)
+    private Boolean isPremium = false;
+
 }
