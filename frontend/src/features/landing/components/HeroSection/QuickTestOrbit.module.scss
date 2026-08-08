@@ -166,7 +166,7 @@
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.05em;
-  color: #f5f1e8;
+  color: var(--text-on-dark);
 }
 
 .hubUnit {
@@ -201,19 +201,19 @@
   padding: 1.1rem 0.8rem;
   box-sizing: border-box;
   border-radius: 16px;
-  border: 1px solid rgba(232, 213, 163, calc(0.22 + 0.55 * var(--frontness)));
+  border: 1px solid rgb(var(--brand-200-rgb) / calc(0.22 + 0.55 * var(--frontness)));
   background: linear-gradient(
     160deg,
-    rgba(40, 34, 24, calc(0.42 + 0.24 * var(--frontness))),
-    rgba(20, 17, 13, calc(0.5 + 0.24 * var(--frontness)))
+    rgb(var(--brand-800-rgb) / calc(0.42 + 0.24 * var(--frontness))),
+    rgb(var(--brand-900-rgb) / calc(0.5 + 0.24 * var(--frontness)))
   );
   backdrop-filter: blur(12px);
   color: #fff;
   cursor: pointer;
   text-align: center;
   box-shadow:
-    0 0 0 1px rgba(232, 213, 163, calc(0.28 * var(--frontness))),
-    0 0 calc(6px + 26px * var(--frontness)) rgba(201, 168, 75, calc(0.45 * var(--frontness))),
+    0 0 0 1px rgb(var(--brand-200-rgb) / calc(0.28 * var(--frontness))),
+    0 0 calc(6px + 26px * var(--frontness)) rgb(var(--brand-500-rgb) / calc(0.45 * var(--frontness))),
     0 10px 26px rgba(0, 0, 0, 0.3);
   transform-style: preserve-3d;
   will-change: transform, opacity;

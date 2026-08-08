@@ -201,6 +201,12 @@
   --violet-500-rgb: 139 92 246;
   --violet-500: rgb(var(--violet-500-rgb));
 
+  /* Xanh dương — tông "admin" gốc (#0061f2 → #00c6ff), dùng cho user thường */
+  --blue-500-rgb: 0 97 242;
+  --blue-300-rgb: 0 198 255;
+  --blue-500: rgb(var(--blue-500-rgb));
+  --blue-300: rgb(var(--blue-300-rgb));
+
   --black: #000;
   --white: #fff;
 
@@ -314,6 +320,37 @@
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 20px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THEME "NORMAL" (user thường / khách) — tông XANH DƯƠNG gốc của
+   nhánh admin (#0061f2 → #00c6ff). Chỉ cần remap tầng primitive
+   --brand-* + neutral ấm; toàn bộ semantic/gradient/alpha đang trỏ
+   tới brand nên tự đổi theo. Premium = KHÔNG có data-theme => giữ
+   tông champagne/vàng mặc định ở :root.
+   ══════════════════════════════════════════════════════════════ */
+:root[data-theme='normal'] {
+  /* Ramp thương hiệu -> xanh dương */
+  --brand-50-rgb: 239 246 255;
+  --brand-100-rgb: 219 234 254;
+  --brand-150-rgb: 191 219 254;
+  --brand-200-rgb: 147 197 253;
+  --brand-300-rgb: 96 165 250;
+  --brand-400-rgb: 59 130 246;
+  --brand-500-rgb: 0 97 242;
+  --brand-600-rgb: 0 86 210;
+  --brand-700-rgb: 29 78 216;
+  --brand-800-rgb: 30 58 138;
+  --brand-900-rgb: 11 44 77;
+  --text-on-dark-rgb: 226 232 240;
+
+  /* Neutral ấm champagne -> neutral lạnh */
+  --warm-bg: #f0f2f5;
+  --warm-input: #f1f5f9;
+  --warm-hover: #f8f9fa;
+  --warm-border: #e2e8f0;
+  --warm-border-strong: #cbd5e1;
+  --warm-tag-bg: #eff6ff;
 }
 
 .shadow-md {

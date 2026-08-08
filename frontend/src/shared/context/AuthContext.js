@@ -85,6 +85,12 @@ export const AuthProvider = ({ children }) => {
     if (user) expiredToastShownRef.current = false;
   }, [user]);
 
+  // Theme toàn app theo trạng thái premium: premium -> tông vàng kim loại
+  // (mặc định :root), user thường/khách -> tông xanh dương (data-theme="normal").
+  useEffect(() => {
+    document.documentElement.dataset.theme = user?.isPremium ? 'premium' : 'normal';
+  }, [user?.isPremium]);
+
   const login = useCallback((userData) => {
     queryClient.setQueryData(CURRENT_USER_QUERY_KEY, userData);
   }, []);

@@ -39,7 +39,7 @@
   height: min(45vw, 420px);
   bottom: 5%;
   left: -8%;
-  background: radial-gradient(circle, rgb(var(--amber-500-rgb) / 0.38), transparent 70%);
+  background: radial-gradient(circle, rgb(var(--brand-500-rgb) / 0.38), transparent 70%);
   animation-delay: -4s;
 }
 
@@ -221,7 +221,7 @@
   box-sizing: border-box;
   border-radius: 16px;
   border: 1px solid rgb(var(--brand-200-rgb) / 0.22);
-  background: linear-gradient(160deg, rgba(40, 34, 24, 0.66), rgb(var(--brand-900-rgb) / 0.74));
+  background: linear-gradient(160deg, rgb(var(--brand-800-rgb) / 0.66), rgb(var(--brand-900-rgb) / 0.74));
   backdrop-filter: blur(12px);
   color: #fff;
   font: inherit;
@@ -254,7 +254,7 @@
 
 .skeleton {
   border-color: rgb(var(--brand-200-rgb) / 0.12);
-  background: rgba(40, 34, 24, 0.45);
+  background: rgb(var(--brand-800-rgb) / 0.45);
   box-shadow: none;
   animation: pulse 1.4s ease-in-out infinite;
 }
