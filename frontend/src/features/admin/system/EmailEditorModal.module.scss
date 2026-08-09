@@ -1,0 +1,87 @@
+// Chỉnh CSS mặc định của Quill cho vừa với modal. Dùng :global vì .ql-* là class do thư
+// viện sinh ra, không đi qua CSS module.
+.editor {
+  position: relative;
+
+  // Đặt chiều cao ở phần soạn thảo thay vì cả khối: nếu đặt cho cả khối thì thanh công cụ
+  // ăn thêm chiều cao và phần cuối tràn đè lên các trường bên dưới.
+  :global(.ql-container) {
+    height: 24rem;
+    border-bottom-left-radius: 0.6rem;
+    border-bottom-right-radius: 0.6rem;
+    border-color: var(--border-color);
+  }
+
+  :global(.ql-toolbar) {
+    border-top-left-radius: 0.6rem;
+    border-top-right-radius: 0.6rem;
+    border-color: var(--border-color);
+  }
+
+  // Xem trước sát với email thật: hộp thư hiển thị bằng font hệ thống, không phải font của
+  // giao diện quản trị.
+  :global(.ql-editor) {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.5rem;
+  }
+
+  // Ô nhập link: Quill định vị bằng style inline tính theo con trỏ, trong modal thì ra
+  // ngoài khung và bị cắt mất. Ghim về mép trái của editor.
+  :global(.ql-snow .ql-tooltip) {
+    left: 0 !important;
+    z-index: 5;
+    border-color: var(--border-color);
+    background: var(--bg-white);
+    color: var(--text-color);
+    border-radius: 0.6rem;
+    box-shadow: var(--shadow-lg);
+  }
+
+  // Hai dropdown cạnh nhau mà cùng hiện chữ "Normal" thì không biết đâu là gì — đặt tên
+  // tiếng Việt cho từng mục.
+  :global(.ql-snow .ql-picker.ql-header .ql-picker-label)::before,
+  :global(.ql-snow .ql-picker.ql-header .ql-picker-item)::before {
+    content: 'Đoạn văn';
+  }
+
+  :global(.ql-snow .ql-picker.ql-header .ql-picker-label[data-value='1'])::before,
+  :global(.ql-snow .ql-picker.ql-header .ql-picker-item[data-value='1'])::before {
+    content: 'Tiêu đề 1';
+  }
+
+  :global(.ql-snow .ql-picker.ql-header .ql-picker-label[data-value='2'])::before,
+  :global(.ql-snow .ql-picker.ql-header .ql-picker-item[data-value='2'])::before {
+    content: 'Tiêu đề 2';
+  }
+
+  :global(.ql-snow .ql-picker.ql-header .ql-picker-label[data-value='3'])::before,
+  :global(.ql-snow .ql-picker.ql-header .ql-picker-item[data-value='3'])::before {
+    content: 'Tiêu đề 3';
+  }
+
+  :global(.ql-snow .ql-picker.ql-size .ql-picker-label)::before,
+  :global(.ql-snow .ql-picker.ql-size .ql-picker-item)::before {
+    content: 'Chữ thường';
+  }
+
+  :global(.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='small'])::before,
+  :global(.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='small'])::before {
+    content: 'Chữ nhỏ';
+  }
+
+  :global(.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='large'])::before,
+  :global(.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='large'])::before {
+    content: 'Chữ lớn';
+  }
+
+  :global(.ql-snow .ql-picker.ql-size .ql-picker-label[data-value='huge'])::before,
+  :global(.ql-snow .ql-picker.ql-size .ql-picker-item[data-value='huge'])::before {
+    content: 'Chữ rất lớn';
+  }
+
+  // Nhãn tiếng Việt dài hơn "Normal" nên nới bề ngang cho khỏi bị cắt.
+  :global(.ql-snow .ql-picker.ql-header),
+  :global(.ql-snow .ql-picker.ql-size) {
+    width: 11rem;
+  }
+}

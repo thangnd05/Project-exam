@@ -49,6 +49,13 @@ public class EmailHtmlNormalizer {
             "ql-align-justify", "text-align:justify;"
     );
 
+    /** Cỡ chữ của trình soạn thảo cũng là class, phải quy ra px cụ thể cho hộp thư. */
+    private static final Map<String, String> SIZE_CLASSES = Map.of(
+            "ql-size-small", "font-size:13px;",
+            "ql-size-large", "font-size:20px;",
+            "ql-size-huge", "font-size:28px;"
+    );
+
     private static final String INDENT_CLASS_PREFIX = "ql-indent-";
     private static final int INDENT_STEP_PX = 24;
 
@@ -114,6 +121,11 @@ public class EmailHtmlNormalizer {
             String alignStyle = ALIGN_CLASSES.get(className);
             if (alignStyle != null) {
                 styles.append(alignStyle);
+                continue;
+            }
+            String sizeStyle = SIZE_CLASSES.get(className);
+            if (sizeStyle != null) {
+                styles.append(sizeStyle);
                 continue;
             }
             if (className.startsWith(INDENT_CLASS_PREFIX)) {

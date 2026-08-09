@@ -3,6 +3,7 @@ import {Form} from 'react-bootstrap';
 import {Eye, Send} from 'lucide-react';
 import {toast} from 'react-toastify';
 import ReactQuill from 'react-quill';
+import classNames from 'classnames/bind';
 import 'react-quill/dist/quill.snow.css';
 
 import BaseModal from '~/shared/ui/modal/BaseModal';
@@ -10,22 +11,28 @@ import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import {AdminFieldError} from '../components/common';
 import {useEmailMutations} from './hooks/useAdminEmails';
+import styles from './EmailEditorModal.module.scss';
+
+const cx = classNames.bind(styles);
 
 const emptyForm = {name: '', description: '', subject: '', bodyHtml: '', active: true};
 
 const QUILL_MODULES = {
   toolbar: [
-    [{header: [1, 2, 3, false]}],
+    [{header: [1, 2, 3, false]}, {size: ['small', false, 'large', 'huge']}],
     ['bold', 'italic', 'underline', 'strike'],
     [{color: []}, {background: []}],
-    [{list: 'ordered'}, {list: 'bullet'}, {align: []}],
+    [{list: 'ordered'}, {list: 'bullet'}],
+    // Tách thành 4 nút riêng thay vì dropdown: dropdown 4 mục rất dễ bấm nhầm "căn đều"
+    // (justify) thành "căn giữa", mà một dòng ngắn căn đều thì trông y hệt căn trái.
+    [{align: ''}, {align: 'center'}, {align: 'right'}, {align: 'justify'}],
     ['link', 'blockquote'],
     ['clean'],
   ],
 };
 
 const QUILL_FORMATS = [
-  'header',
+  'header', 'size',
   'bold', 'italic', 'underline', 'strike',
   'color', 'background',
   'list', 'bullet', 'align',
@@ -33,9 +40,8 @@ const QUILL_FORMATS = [
 ];
 
 /**
- * Soạn nội dung email bằng trình soạn thảo, kèm tab HTML thô cho ai muốn dán mẫu có sẵn.
- * Backend tự đổi HTML của trình soạn thảo sang style inline lúc gửi (EmailHtmlNormalizer)
- * vì hộp thư không đọc CSS ngoài.
+ * Soạn nội dung email bằng trình soạn thảo. Backend tự đổi HTML của trình soạn thảo sang
+ * style inline lúc gửi (EmailHtmlNormalizer) vì hộp thư không đọc CSS ngoài.
  */
 function EmailEditorModal({show, email, onClose}) {
   const isAuto = email?.type === 'AUTO';
@@ -45,7 +51,6 @@ function EmailEditorModal({show, email, onClose}) {
   const isLayout = email?.code === 'LAYOUT_BASE';
 
   const [form, setForm] = useState(emptyForm);
-  const [editorTab, setEditorTab] = useState('rich');
   const [errorMessage, setErrorMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
@@ -68,7 +73,6 @@ function EmailEditorModal({show, email, onClose}) {
           }
         : emptyForm,
     );
-    setEditorTab(email?.code === 'LAYOUT_BASE' ? 'html' : 'rich');
     setErrorMessage('');
     setPreviewHtml('');
     setTestEmail('');
@@ -199,43 +203,22 @@ function EmailEditorModal({show, email, onClose}) {
         />
       </Form.Group>
 
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <Form.Label className="mb-0">Nội dung</Form.Label>
-        {!isLayout && (
-          <div className="btn-group btn-group-sm">
-            <button
-              type="button"
-              className={`btn btn-outline-secondary ${editorTab === 'rich' ? 'active' : ''}`}
-              onClick={() => setEditorTab('rich')}
-            >
-              Soạn thảo
-            </button>
-            <button
-              type="button"
-              className={`btn btn-outline-secondary ${editorTab === 'html' ? 'active' : ''}`}
-              onClick={() => setEditorTab('html')}
-            >
-              HTML thô
-            </button>
-          </div>
-        )}
-      </div>
+      <Form.Label>Nội dung</Form.Label>
 
-      {editorTab === 'rich' && hasHandwrittenLayout && (
+      {!isLayout && hasHandwrittenLayout && (
         <div className="alert alert-warning py-2 small">
           Nội dung này có khối HTML viết tay (nút bấm, khung màu). Trình soạn thảo không
-          hiểu chúng nên nếu bạn gõ ở đây thì các khối đó sẽ mất định dạng — muốn giữ
-          nguyên thì sửa ở tab <b>HTML thô</b>.
+          hiểu chúng nên nếu bạn sửa ở đây thì các khối đó sẽ mất định dạng.
         </div>
       )}
 
-      {editorTab === 'rich' ? (
-        <div className="mb-5">
+      {!isLayout ? (
+        <div className={cx('editor', 'mb-3')}>
           <ReactQuill
             theme="snow"
             value={form.bodyHtml}
             // Chỉ nhận thay đổi do người dùng gõ. Quill chuẩn hóa lại HTML ngay khi nạp và
-            // cũng bắn onChange — nếu nhận luôn thì chỉ mở tab lên đã làm hỏng nội dung.
+            // cũng bắn onChange — nhận luôn thì chỉ mở modal lên đã làm hỏng nội dung.
             onChange={(value, _delta, source) => {
               if (source === 'user') {
                 setField('bodyHtml', value);
@@ -244,7 +227,6 @@ function EmailEditorModal({show, email, onClose}) {
             modules={QUILL_MODULES}
             formats={QUILL_FORMATS}
             placeholder="Viết nội dung email tại đây..."
-            style={{height: '28rem'}}
           />
         </div>
       ) : (

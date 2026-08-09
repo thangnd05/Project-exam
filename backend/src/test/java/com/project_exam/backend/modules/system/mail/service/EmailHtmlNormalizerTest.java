@@ -34,6 +34,22 @@ class EmailHtmlNormalizerTest {
     }
 
     @Test
+    void doiClassCoChuThanhFontSizeCuThe() {
+        String result = normalizer.toEmailHtml("<p><span class=\"ql-size-huge\">To</span></p>");
+
+        assertTrue(result.contains("font-size:28px;"));
+        assertFalse(result.contains("ql-size-huge"));
+    }
+
+    @Test
+    void coChuNguoiDungChonDeLenCoMacDinhCuaThe() {
+        String result = normalizer.toEmailHtml("<h2 class=\"ql-size-small\">Nhỏ</h2>");
+
+        // Hai khai báo cùng nằm trong một style, khai báo sau thắng.
+        assertTrue(result.indexOf("font-size:13px;") > result.indexOf("font-size:20px"));
+    }
+
+    @Test
     void giuNguyenStyleTacGiaTuViet() {
         String button = "<a href=\"https://x.dev\" style=\"background:#0d9488;padding:12px 22px;\">Bấm</a>";
 
