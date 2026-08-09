@@ -23,6 +23,7 @@ import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.infrastructure.security.CustomUserDetailsService;
 import com.project_exam.backend.infrastructure.security.JwtService;
+import com.project_exam.backend.infrastructure.security.RecaptchaService;
 import com.project_exam.backend.infrastructure.security.RefreshTokenStore;
 import com.project_exam.backend.modules.system.mail.domain.MailTemplateCode;
 import com.project_exam.backend.modules.system.mail.service.MailService;
@@ -66,6 +67,7 @@ public class AuthService {
     private final EmailVerificationRepository emailVerificationRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final MailService mailService;
+    private final RecaptchaService recaptchaService;
     private final RefreshTokenStore refreshTokenStore;
 
     @Value("${app.frontend.origin}")
@@ -235,6 +237,8 @@ public class AuthService {
 
     @Transactional
     public AuthMessageResponse register(RegisterRequest request) {
+        recaptchaService.verify(request.getRecaptchaToken());
+
         if (userRepository.findByUserName(request.getUserName()).isPresent())
             throw new ConflictException("Tên đăng nhập đã tồn tại");
 

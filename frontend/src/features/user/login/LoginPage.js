@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '~/shared/hooks/useAuth';
@@ -17,8 +17,12 @@ import style from './login.module.scss';
 import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { name } from '~/shared/assets/images';
+import RecaptchaCheckbox from '~/shared/ui/Recaptcha/RecaptchaCheckbox';
 
 const cx = classNames.bind(style);
+
+// Chưa cấu hình khóa (máy dev) thì bỏ qua bước xác minh thay vì chặn đăng ký.
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
 
 function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -30,7 +34,8 @@ function LoginPage() {
   const [regUserName, setRegUserName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const recaptchaRef = useRef(null);
 
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -102,8 +107,8 @@ function LoginPage() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!agreeTerms) {
-      setMessage('Bạn phải đồng ý với điều khoản & điều kiện.');
+    if (RECAPTCHA_SITE_KEY && !recaptchaToken) {
+      setMessage('Vui lòng xác nhận bạn không phải là người máy.');
       setMessageType('error');
       return;
     }
@@ -116,6 +121,7 @@ function LoginPage() {
         fullName: regFullName,
         email: regEmail,
         password: regPassword,
+        recaptchaToken,
       });
 
       // [TẮT XÁC THỰC EMAIL] Tài khoản active ngay, không cần vào mail bấm link nữa.
@@ -133,6 +139,10 @@ function LoginPage() {
       setMessage(errorMessage);
       setMessageType('error');
     } finally {
+      // Mỗi token chỉ dùng được một lần, dù thành công hay thất bại đều phải làm mới ô
+      // xác minh cho lần đăng ký sau.
+      recaptchaRef.current?.reset();
+      setRecaptchaToken('');
       setLoading(false);
     }
   };
@@ -166,10 +176,14 @@ function LoginPage() {
             </div>
 
             <div className={cx('agreement')}>
-              <label>
-                <input type="checkbox" checked={agreeTerms} onChange={(e) => setAgreeTerms(e.target.checked)} />
-                <span>Tôi đồng ý với điều khoản & điều kiện</span>
-              </label>
+              <RecaptchaCheckbox
+                ref={recaptchaRef}
+                siteKey={RECAPTCHA_SITE_KEY}
+                onChange={setRecaptchaToken}
+              />
+              <span className={cx('termsNote')}>
+                Bằng việc đăng ký, bạn đồng ý với điều khoản &amp; điều kiện của chúng tôi.
+              </span>
             </div>
 
             {isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}

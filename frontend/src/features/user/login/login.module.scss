@@ -247,6 +247,18 @@
     align-items: center;
     gap: 8px;
   }
+
+  // Ô reCAPTCHA có kích thước cố định 304px của Google, canh giữa cho cân với form.
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.termsNote {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 .forgot-link {
