@@ -27,9 +27,10 @@ export const changePassword = (payload) => {
   return axios.post(`${BASE_URL}/change-password`, payload).then((res) => res.data);
 };
 
-export const verifyEmail = (token) => {
-  return axios.get(`${BASE_URL}/verify?token=${token}`).then((res) => res.data);
-};
+// [TẮT XÁC THỰC EMAIL] Không còn luồng xác thực qua link trong mail.
+// export const verifyEmail = (token) => {
+//   return axios.get(`${BASE_URL}/verify?token=${token}`).then((res) => res.data);
+// };
 
 export const forgotPassword = (email) => {
   const params = new URLSearchParams();

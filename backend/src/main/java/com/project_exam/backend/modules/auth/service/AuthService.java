@@ -79,9 +79,10 @@ public class AuthService {
                 .or(() -> userRepository.findByEmail(identifier))
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng"));
 
-        if (!user.getVerified()) {
-            throw new UnauthorizedException("Tài khoản chưa xác thực email");
-        }
+        // [TẮT XÁC THỰC EMAIL] Không chặn đăng nhập theo cờ verified nữa.
+        // if (!user.getVerified()) {
+        //     throw new UnauthorizedException("Tài khoản chưa xác thực email");
+        // }
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(identifier);
 
@@ -250,21 +251,24 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCreatedAt(Instant.now());
-        user.setVerified(false);
+        // [TẮT XÁC THỰC EMAIL] Tài khoản active ngay khi đăng ký, không cần bấm link trong mail.
+        user.setVerified(true);
+        // user.setVerified(false);
         user.setAvatarUrl("https://ui-avatars.com/api/?name=" + request.getUserName() + "&background=random&color=fff");
 
         Role userRole = roleRepository.findByRoleName("USER");
         user.setRoleId(userRole.getRoleId());
         userRepository.save(user);
 
-        try {
-            emailVerificationService.createVerification(user);
-        } catch (Exception e) {
-            userRepository.delete(user);
-            throw new BadRequestException("Không thể gửi email xác thực.");
-        }
+        // [TẮT XÁC THỰC EMAIL] Không gửi mail xác thực nữa.
+        // try {
+        //     emailVerificationService.createVerification(user);
+        // } catch (Exception e) {
+        //     userRepository.delete(user);
+        //     throw new BadRequestException("Không thể gửi email xác thực.");
+        // }
         return AuthMessageResponse.builder()
-                .message("Đăng ký thành công! Vui lòng kiểm tra email.")
+                .message("Đăng ký thành công! Bạn có thể đăng nhập ngay.")
                 .build();
     }
 

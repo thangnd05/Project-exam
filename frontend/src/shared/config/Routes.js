@@ -67,7 +67,7 @@ const routes = {
   login: '/login',
   forgot: '/forgot',
   reset: '/reset',
-  verifyEmail: '/verify',
+  // [TẮT XÁC THỰC EMAIL] verifyEmail: '/verify',
   profile: '/profile',
   myTarget: '/my-target',
   targetDashboard: '/my-target/dashboard',

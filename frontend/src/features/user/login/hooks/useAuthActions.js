@@ -5,7 +5,7 @@ import {
   login,
   register,
   resetPassword,
-  verifyEmail,
+  // [TẮT XÁC THỰC EMAIL] verifyEmail,
 } from '~/shared/api/authApi';
 import { CURRENT_USER_QUERY_KEY } from '~/shared/context/AuthContext';
 
@@ -41,12 +41,13 @@ export function useResetPasswordMutation(options = {}) {
   });
 }
 
-export function useVerifyEmailMutation(options = {}) {
-  return useMutation({
-    mutationFn: verifyEmail,
-    ...options,
-  });
-}
+// [TẮT XÁC THỰC EMAIL]
+// export function useVerifyEmailMutation(options = {}) {
+//   return useMutation({
+//     mutationFn: verifyEmail,
+//     ...options,
+//   });
+// }
 
 export function useCurrentUserQuery(options = {}) {
   return useQuery({

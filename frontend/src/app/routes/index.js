@@ -24,7 +24,7 @@ const MyAlbumsPage = lazy(() => import('~/features/albums/list/MyAlbumPage'));
 const AlbumDetailPage = lazy(() => import('~/features/albums/detail/AlbumDetailPage'));
 const PracticePage = lazy(() => import('~/features/albums/practice/PracticePage'));
 const MyTestPage = lazy(() => import('~/features/user/mytest/MyTestPage'));
-const VerifyEmailPage = lazy(() => import('~/features/user/login/VerifyEmailPage'));
+// [TẮT XÁC THỰC EMAIL] const VerifyEmailPage = lazy(() => import('~/features/user/login/VerifyEmailPage'));
 const OAuth2Redirect = lazy(() => import('~/features/user/login/OAuth2Redirect'));
 const NotFoundPage = lazy(() => import('~/app/error/NotFoundPage'));
 const ChapterOfClass = lazy(() => import('~/features/classes/chapters/ChapterOfClass'));
@@ -84,7 +84,7 @@ export const publicRoutes = [
   { path: routes.posts, component: PostsPage },
   { path: routes.postDetail, component: PostDetailPage },
   { path: routes.recoveryResourceView, component: RecoveryResourceViewPage, noLayout: true },
-  { path: routes.verifyEmail, component: VerifyEmailPage },
+  // [TẮT XÁC THỰC EMAIL] { path: routes.verifyEmail, component: VerifyEmailPage },
   { path: routes.notFoundPage, component: NotFoundPage, noLayout: true },
   { path: routes.notFound, component: NotFoundPage, noLayout: true },
 ];

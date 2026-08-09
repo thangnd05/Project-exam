@@ -19,10 +19,11 @@ public class UserCleanupScheduler {
     private final EmailVerificationService emailVerificationService;
     private final UserTestService userTestService;
 
-    @Scheduled(cron = "0 0 3 * * ?")
-    public void cleanExpiredUsers() {
-        emailVerificationService.cleanExpiredVerifications();
-    }
+    // [TẮT XÁC THỰC EMAIL] Không còn tài khoản chờ xác thực nên bỏ job dọn user hết hạn.
+    // @Scheduled(cron = "0 0 3 * * ?")
+    // public void cleanExpiredUsers() {
+    //     emailVerificationService.cleanExpiredVerifications();
+    // }
 
     @Scheduled(cron = "0 0 * * * ?")
     public void cleanAbandonedUntimedTests() {

@@ -73,9 +73,10 @@ public class AuthController {
         return ResponseEntity.ok(AuthMessageResponse.builder().message("Đã logout").build());
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<AuthMessageResponse> verifyEmail(@RequestParam String token) {
-        return ResponseEntity.ok(emailVerificationService.verifyToken(token));
-    }
+    // [TẮT XÁC THỰC EMAIL] Endpoint xác thực qua link trong mail — không dùng nữa.
+    // @GetMapping("/verify")
+    // public ResponseEntity<AuthMessageResponse> verifyEmail(@RequestParam String token) {
+    //     return ResponseEntity.ok(emailVerificationService.verifyToken(token));
+    // }
 
 }

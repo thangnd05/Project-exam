@@ -133,7 +133,7 @@ public class SecurityConfig {
                                 "/api/exam-categories/**",
                                 "/api/evaluations/**",
                                 "/api/tests/**",
-                                "/api/auth/verify",
+                                // [TẮT XÁC THỰC EMAIL] "/api/auth/verify",
                                 "/api/posts/**",
                                 "/api/categories/**",
                                 "/api/tags/**",

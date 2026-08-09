@@ -24,8 +24,8 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
             "/api/auth/forgot-password", 3,
             "/api/auth/reset-password", 5,
             "/api/auth/change-password", 5,
-            "/api/auth/refresh", 30,
-            "/api/auth/verify", 10
+            "/api/auth/refresh", 30
+            // [TẮT XÁC THỰC EMAIL] , "/api/auth/verify", 10
     );
 
     private final Map<String, Deque<Long>> hits = new ConcurrentHashMap<>();

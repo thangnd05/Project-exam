@@ -118,9 +118,11 @@ function LoginPage() {
         password: regPassword,
       });
 
-      setMessage(data.message || 'Đăng ký thành công! Vui lòng xác thực email.');
+      // [TẮT XÁC THỰC EMAIL] Tài khoản active ngay, không cần vào mail bấm link nữa.
+      setMessage(data.message || 'Đăng ký thành công! Bạn có thể đăng nhập ngay.');
       setMessageType('success');
-      toast.info('Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
+      toast.success('Đăng ký thành công! Đăng nhập để bắt đầu nhé.');
+      // toast.info('Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
       setIsSignUp(false);
     } catch (err) {
       const errorMessage =

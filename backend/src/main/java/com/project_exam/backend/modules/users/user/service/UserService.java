@@ -198,9 +198,10 @@ public class UserService {
         existingUser.setUserName(updatedUser.getUserName());
         existingUser.setEmail(newEmail);
 
-        if (emailChanged) {
-            existingUser.setVerified(false);
-        }
+        // [TẮT XÁC THỰC EMAIL] Đổi email không hạ cờ verified nữa (nếu hạ sẽ khoá luôn tài khoản).
+        // if (emailChanged) {
+        //     existingUser.setVerified(false);
+        // }
 
         if (avatar != null && !avatar.isEmpty()) {
             String avatarUrl = cloudinaryService.uploadImage(avatar);

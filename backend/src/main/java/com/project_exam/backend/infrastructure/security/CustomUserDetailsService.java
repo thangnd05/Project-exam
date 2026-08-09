@@ -50,9 +50,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Không tìm thấy người dùng với: " + input));
 
-        if (!user.getVerified()) {
-            throw new UsernameNotFoundException("Tài khoản chưa được xác thực qua email.");
-        }
+        // [TẮT XÁC THỰC EMAIL] Không chặn đăng nhập theo cờ verified nữa.
+        // if (!user.getVerified()) {
+        //     throw new UsernameNotFoundException("Tài khoản chưa được xác thực qua email.");
+        // }
 
         Role role = roleRepository.findById(user.getRoleId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy Role ID: " + user.getRoleId()));
