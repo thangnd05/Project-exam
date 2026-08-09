@@ -52,7 +52,10 @@ function loadRecaptchaScript() {
  * Token trả về qua onChange chỉ sống vài phút và dùng được một lần — backend xác minh lại
  * với Google, nên bỏ qua bước đó thì bot gọi thẳng API vẫn đăng ký được.
  */
-const RecaptchaCheckbox = forwardRef(function RecaptchaCheckbox({siteKey, onChange}, ref) {
+const RecaptchaCheckbox = forwardRef(function RecaptchaCheckbox(
+  {siteKey, onChange, className},
+  ref,
+) {
   const containerRef = useRef(null);
   const widgetIdRef = useRef(null);
   const onChangeRef = useRef(onChange);
@@ -99,7 +102,7 @@ const RecaptchaCheckbox = forwardRef(function RecaptchaCheckbox({siteKey, onChan
     return null;
   }
 
-  return <div ref={containerRef} />;
+  return <div ref={containerRef} className={className} />;
 });
 
 export default RecaptchaCheckbox;

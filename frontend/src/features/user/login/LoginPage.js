@@ -14,7 +14,6 @@ import {
 } from '~/shared/utils/authRedirect';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
-import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { name } from '~/shared/assets/images';
 import RecaptchaCheckbox from '~/shared/ui/Recaptcha/RecaptchaCheckbox';
@@ -49,7 +48,6 @@ function LoginPage() {
 
   const backendBaseUrl = getApiBaseUrl();
   const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
-  const FACEBOOK_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/facebook`;
 
   useEffect(() => {
 
@@ -157,10 +155,8 @@ function LoginPage() {
             <div className={cx('social-login')}>
               <div className={cx('social-btns')}>
                 <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FcGoogle size={24} /></a>
-                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FaFacebook size={24} color="#1877F2" /></a>
               </div>
             </div>
-            <p className={cx('subtitle')}>Sử dụng thông tin của bạn để đăng ký</p>
 
             <div className={cx('input-box')}>
               <input type="text" placeholder="Họ và tên" required value={regFullName} onChange={(e) => setRegFullName(e.target.value)} />
@@ -180,10 +176,8 @@ function LoginPage() {
                 ref={recaptchaRef}
                 siteKey={RECAPTCHA_SITE_KEY}
                 onChange={setRecaptchaToken}
+                className={cx('recaptchaBox')}
               />
-              <span className={cx('termsNote')}>
-                Bằng việc đăng ký, bạn đồng ý với điều khoản &amp; điều kiện của chúng tôi.
-              </span>
             </div>
 
             {isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
@@ -203,11 +197,8 @@ function LoginPage() {
             <div className={cx('social-login')}>
               <div className={cx('social-btns')}>
                 <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FcGoogle size={24} /></a>
-                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FaFacebook size={24} color="#1877F2" /></a>
               </div>
             </div>
-            <p className={cx('subtitle')}>Sử dụng tài khoản của bạn</p>
-
             <div className={cx('input-box')}>
               <input type="text" placeholder="Email hoặc Tên đăng nhập" required value={loginIdentifier} onChange={(e) => setLoginIdentifier(e.target.value)} disabled={loading} />
             </div>
