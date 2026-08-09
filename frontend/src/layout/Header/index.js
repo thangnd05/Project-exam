@@ -27,7 +27,9 @@ import {useCosmetics} from '~/shared/hooks/useCosmetics';
 const cx = classNames.bind(style);
 
 function Header() {
-  const {user, logout} = useAuth();
+  const {user, logout, roleName} = useAuth();
+  // Tạo bài kiểm tra là việc của quản trị, người dùng thường không thấy nút này.
+  const canCreateTest = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -39,11 +41,24 @@ function Header() {
     navigate(routes.home);
   };
 
+  /**
+   * Các thao tác mở modal không đi qua router nên ProtectedRoute không chặn được — phải tự
+   * kiểm tra đăng nhập tại đây.
+   */
+  const requireLogin = (message) => {
+    if (user) {
+      return false;
+    }
+    toast.warning(message);
+    navigate(routes.login, {state: {mode: 'signin'}});
+    return true;
+  };
+
+  const handleCreateTest = () => setShowCreateTestModal(true);
+
   const handleClassAction = (e, targetRoute, modalType = null) => {
     e.preventDefault();
-    if (!user) {
-      toast.warning('Bạn cần đăng nhập để thao tác lớp học!');
-      navigate(routes.login);
+    if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
       return;
     }
 
@@ -86,11 +101,12 @@ function Header() {
                 <Nav.Link as={NavLink} to={routes.posts} className={cx('home')}>
                   Bài viết
                 </Nav.Link>
-                {user && (
-                  <Nav.Link as={NavLink} to={routes.myTarget} className={cx('home')}>
-                    Lộ trình
-                  </Nav.Link>
-                )}
+                {/* Các mục dưới đây đều là trang riêng tư nhưng vẫn hiện khi chưa đăng nhập:
+                    ProtectedRoute sẽ đưa về trang đăng nhập kèm lời nhắc rồi quay lại đúng
+                    trang này sau khi đăng nhập xong. */}
+                <Nav.Link as={NavLink} to={routes.myTarget} className={cx('home')}>
+                  Lộ trình
+                </Nav.Link>
                 <Nav.Link as={NavLink} to={routes.myAlbums} className={cx('home')}>
                   Từ vựng
                 </Nav.Link>
@@ -114,7 +130,7 @@ function Header() {
               </Nav>
               <Nav className={cx('desktopNav')}>
                 {!user ? (
-                  <>
+                  <div className={cx('userMenuWrapper')}>
                     <Nav.Link
                       as={Link}
                       to={routes.login}
@@ -131,16 +147,18 @@ function Header() {
                     >
                       Đăng ký
                     </Nav.Link>
-                  </>
+                  </div>
                 ) : (
                   <div className={cx('userMenuWrapper')}>
-                    <Button
-                      variant=""
-                      className={cx('new-test')}
-                      onClick={() => setShowCreateTestModal(true)}
-                    >
-                      Tạo bài kiểm tra
-                    </Button>
+                    {canCreateTest && (
+                      <Button
+                        variant=""
+                        className={cx('new-test')}
+                        onClick={handleCreateTest}
+                      >
+                        Tạo bài kiểm tra
+                      </Button>
+                    )}
                     <StreakBadge />
                     <CoinQuestMenu />
                     <Dropdown>

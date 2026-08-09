@@ -12,6 +12,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
+import {toast} from 'react-toastify';
 
 import styles from './MobileBottomNav.module.scss';
 import routes from '~/shared/config/Routes';
@@ -43,7 +44,9 @@ function isHiddenRoute(pathname) {
 function MobileBottomNav() {
   const {pathname} = useLocation();
   const navigate = useNavigate();
-  const {user, logout} = useAuth();
+  const {user, logout, roleName} = useAuth();
+  // Tạo bài kiểm tra là việc của quản trị, người dùng thường không thấy nút này.
+  const canCreateTest = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   const [activeSheet, setActiveSheet] = useState(null);
   const [showJoinModal, setShowJoinModal] = useState(false);
@@ -80,18 +83,24 @@ function MobileBottomNav() {
     pathname.startsWith('/practice/');
   const isProfileActive = pathname.startsWith('/profile');
 
-  const handleCreateTest = () => {
-    if (!user) {
-      navigate(routes.login);
-      return;
+  /**
+   * Thao tác mở modal không đi qua router nên ProtectedRoute không chặn được — phải tự
+   * kiểm tra đăng nhập tại đây.
+   */
+  const requireLogin = (message) => {
+    if (user) {
+      return false;
     }
-    setShowCreateTestModal(true);
+    toast.warning(message);
+    navigate(routes.login, {state: {mode: 'signin'}});
+    setActiveSheet(null);
+    return true;
   };
 
+  const handleCreateTest = () => setShowCreateTestModal(true);
+
   const handleClassAction = (modalType, targetRoute) => {
-    if (!user) {
-      navigate(routes.login);
-      setActiveSheet(null);
+    if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
       return;
     }
     if (modalType === 'join') {
@@ -133,14 +142,16 @@ function MobileBottomNav() {
           <span className={cx('tabLabel')}>Bài viết</span>
         </Link>
 
-        <button
-          type="button"
-          className={cx('createBtn')}
-          onClick={handleCreateTest}
-          aria-label="Tạo bài kiểm tra"
-        >
-          <FontAwesomeIcon icon={faPlus} />
-        </button>
+        {canCreateTest && (
+          <button
+            type="button"
+            className={cx('createBtn')}
+            onClick={handleCreateTest}
+            aria-label="Tạo bài kiểm tra"
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </button>
+        )}
 
         <button
           type="button"
@@ -258,15 +269,15 @@ function MobileBottomNav() {
                   )}
 
                   <div className={cx('menuList')}>
-                    {user && (
-                      <Link
-                        to={routes.myTarget}
-                        className={cx('menuItem')}
-                        onClick={closeSheet}
-                      >
-                        Lộ trình
-                      </Link>
-                    )}
+                    {/* Vẫn hiện khi chưa đăng nhập: ProtectedRoute sẽ đưa về trang đăng nhập
+                        kèm lời nhắc rồi quay lại đúng trang này sau khi đăng nhập. */}
+                    <Link
+                      to={routes.myTarget}
+                      className={cx('menuItem')}
+                      onClick={closeSheet}
+                    >
+                      Lộ trình
+                    </Link>
                     <Link
                       to={routes.myAlbums}
                       className={cx('menuItem')}
