@@ -3,13 +3,16 @@ import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import routes from '~/shared/config/Routes';
 import {Form, Button} from 'react-bootstrap';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import { useResetPasswordMutation } from '~/features/user/login/hooks/useAuthActions';
 
 const cx = classNames.bind(style);
 
 function ResetPassWord() {
-  const [token, setToken] = useState('');
+  const [searchParams] = useSearchParams();
+  // Link trong email đặt lại mật khẩu trỏ tới /reset?token=... nên điền sẵn giúp người dùng;
+  // ô nhập vẫn giữ để ai copy token thủ công vẫn dùng được.
+  const [token, setToken] = useState(() => searchParams.get('token') || '');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');

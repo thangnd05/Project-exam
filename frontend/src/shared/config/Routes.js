@@ -35,6 +35,7 @@ const routes = {
   adminPosts: '/admin/posts',
   adminMilestones: '/admin/milestones',
   adminAnalytics: '/admin/analytics',
+  adminEmails: '/admin/emails',
   adminAuditLogs: '/admin/audit-logs',
   adminLoginAudit: '/admin/audit-login',
   adminCoins: '/admin/coins',

@@ -42,6 +42,7 @@ const ScoringConversionManagementPage = lazy(() => import('~/features/admin/exam
 const EvaluationsManagementPage = lazy(() => import('~/features/admin/content/EvaluationsManagementPage'));
 const AnalyticsPage = lazy(() => import('~/features/admin/overview/AnalyticsPage'));
 const AuditLogsPage = lazy(() => import('~/features/admin/overview/AuditLogsPage'));
+const EmailsManagementPage = lazy(() => import('~/features/admin/system/EmailsManagementPage'));
 const LoginAuditPage = lazy(() => import('~/features/admin/overview/LoginAuditPage'));
 const TestsManagementPage = lazy(() => import('~/features/admin/exam-content/TestsManagementPage'));
 const ExamTypesManagementPage = lazy(() => import('~/features/admin/exam-content/ExamTypesManagementPage'));
@@ -103,6 +104,7 @@ export const adminRoutes = [
   { path: routes.adminExamParts, component: ExamPartsManagementPage },
   { path: routes.adminTests, component: TestsManagementPage },
   { path: routes.adminAnalytics, component: AnalyticsPage },
+  { path: routes.adminEmails, component: EmailsManagementPage },
   { path: routes.adminAuditLogs, component: AuditLogsPage },
   { path: routes.adminLoginAudit, component: LoginAuditPage },
   { path: routes.adminCategories, component: CategoriesManagementPage },

@@ -24,8 +24,8 @@ import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.infrastructure.security.CustomUserDetailsService;
 import com.project_exam.backend.infrastructure.security.JwtService;
 import com.project_exam.backend.infrastructure.security.RefreshTokenStore;
-import com.project_exam.backend.modules.users.user.service.EmailVerificationService;
-import com.project_exam.backend.shared.util.EmailUtil;
+import com.project_exam.backend.modules.system.mail.domain.MailTemplateCode;
+import com.project_exam.backend.modules.system.mail.service.MailService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -53,6 +53,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final long RESET_TOKEN_EXPIRE_MINUTES = 30;
+
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final CustomUserDetailsService customUserDetailsService;
@@ -61,10 +63,9 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final RolePermissionRepository rolePermissionRepository;
     private final UserMapper userMapper;
-    private final EmailVerificationService emailVerificationService;
     private final EmailVerificationRepository emailVerificationRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final EmailUtil emailUtil;
+    private final MailService mailService;
     private final RefreshTokenStore refreshTokenStore;
 
     @Value("${app.frontend.origin}")
@@ -267,6 +268,16 @@ public class AuthService {
         //     userRepository.delete(user);
         //     throw new BadRequestException("Không thể gửi email xác thực.");
         // }
+
+        // Thay bằng email chào mừng. Gửi nền, mail lỗi không làm hỏng lượt đăng ký.
+        mailService.sendAuto(MailTemplateCode.WELCOME_REGISTER, user.getEmail(), user.getUserId(),
+                Map.of(
+                        "fullName", user.getFullName(),
+                        "userName", user.getUserName(),
+                        "email", user.getEmail(),
+                        "loginUrl", frontendOrigin + "/login"
+                ));
+
         return AuthMessageResponse.builder()
                 .message("Đăng ký thành công! Bạn có thể đăng nhập ngay.")
                 .build();
@@ -296,10 +307,16 @@ public class AuthService {
             PasswordResetToken resetToken = new PasswordResetToken();
             resetToken.setUserId(user.getUserId());
             resetToken.setToken(token);
-            resetToken.setExpiresAt(Instant.now().plus(Duration.ofMinutes(30)));
+            resetToken.setExpiresAt(Instant.now().plus(Duration.ofMinutes(RESET_TOKEN_EXPIRE_MINUTES)));
             resetToken.setUsed(false);
             passwordResetTokenRepository.save(resetToken);
-            emailUtil.sendResetPasswordEmail(user.getEmail(), token);
+
+            mailService.sendAuto(MailTemplateCode.RESET_PASSWORD, user.getEmail(), user.getUserId(),
+                    Map.of(
+                            "fullName", user.getFullName(),
+                            "actionUrl", frontendOrigin + "/reset?token=" + token,
+                            "expireMinutes", String.valueOf(RESET_TOKEN_EXPIRE_MINUTES)
+                    ));
         }
         return AuthMessageResponse.builder().message("Nếu email tồn tại, chúng tôi đã gửi liên kết đặt lại mật khẩu.").build();
     }
@@ -315,6 +332,7 @@ public class AuthService {
         passwordResetTokenRepository.save(resetToken);
 
         refreshTokenStore.revokeAllForUser(user.getUserId());
+        notifyPasswordChanged(user);
         return AuthMessageResponse.builder().message("Đặt lại mật khẩu thành công").build();
     }
 
@@ -327,7 +345,17 @@ public class AuthService {
 
         refreshTokenStore.revokeAllForUser(user.getUserId());
         logout(httpRequest, httpResponse);
+        notifyPasswordChanged(user);
         return AuthMessageResponse.builder().message("Đổi mật khẩu thành công").build();
+    }
+
+    /** Cảnh báo bảo mật: mật khẩu vừa đổi, dù là tự đổi hay qua luồng quên mật khẩu. */
+    private void notifyPasswordChanged(User user) {
+        mailService.sendAuto(MailTemplateCode.PASSWORD_CHANGED, user.getEmail(), user.getUserId(),
+                Map.of(
+                        "fullName", user.getFullName(),
+                        "changedAt", mailService.formatDateTime(Instant.now())
+                ));
     }
 
     private void validateNewPassword(String newPassword, String confirmNewPassword) {

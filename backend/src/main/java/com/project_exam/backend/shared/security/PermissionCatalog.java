@@ -45,6 +45,7 @@ public final class PermissionCatalog {
 
     public static final String AUDIT_VIEW = "AUDIT:VIEW";
     public static final String DASHBOARD_VIEW = "DASHBOARD:VIEW";
+    public static final String EMAIL_MANAGE = "EMAIL:MANAGE";
 
     private static final String G_USER = "Người dùng & phân quyền";
     private static final String G_EXAM = "Đề thi & nội dung kiểm tra";
@@ -91,6 +92,7 @@ public final class PermissionCatalog {
             new Def(STREAK_CONFIG_MANAGE, G_GAME, "Quản lý cấu hình streak"),
 
             new Def(AUDIT_VIEW, G_SYSTEM, "Xem nhật ký hoạt động"),
-            new Def(DASHBOARD_VIEW, G_SYSTEM, "Xem tổng quan Dashboard quản trị (thống kê hệ thống)")
+            new Def(DASHBOARD_VIEW, G_SYSTEM, "Xem tổng quan Dashboard quản trị (thống kê hệ thống)"),
+            new Def(EMAIL_MANAGE, G_SYSTEM, "Quản lý nội dung email và gửi email cho người dùng")
     );
 }

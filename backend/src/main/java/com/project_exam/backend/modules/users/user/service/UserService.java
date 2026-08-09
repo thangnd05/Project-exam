@@ -49,6 +49,8 @@ import com.project_exam.backend.modules.classroom.chapter.repository.*;
 import com.project_exam.backend.modules.classroom.member.repository.*;
 import com.project_exam.backend.modules.audit.repository.*;
 import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.modules.system.mail.domain.MailTemplateCode;
+import com.project_exam.backend.modules.system.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -82,6 +84,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
+    private final MailService mailService;
 
     private UserResponse toResponse(User user) {
         return userMapper.toResponse(user);
@@ -191,8 +194,9 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         String newEmail = updatedUser.getEmail();
+        String oldEmail = existingUser.getEmail();
         boolean emailChanged = newEmail != null && !newEmail.isBlank()
-                && !newEmail.equalsIgnoreCase(existingUser.getEmail());
+                && !newEmail.equalsIgnoreCase(oldEmail);
 
         existingUser.setFullName(updatedUser.getFullName());
         existingUser.setUserName(updatedUser.getUserName());
@@ -216,7 +220,26 @@ public class UserService {
             existingUser.setIsPremium(premiumOverride);
         }
 
-        return userRepository.save(existingUser);
+        User saved = userRepository.save(existingUser);
+        if (emailChanged) {
+            notifyEmailChanged(saved, oldEmail, newEmail);
+        }
+        return saved;
+    }
+
+    /**
+     * Cảnh báo bảo mật khi đổi email. Gửi tới CẢ địa chỉ cũ lẫn mới: địa chỉ cũ mới là nơi
+     * chủ tài khoản thật đọc được nếu ai đó chiếm tài khoản rồi đổi email.
+     */
+    private void notifyEmailChanged(User user, String oldEmail, String newEmail) {
+        java.util.Map<String, String> vars = java.util.Map.of(
+                "fullName", user.getFullName() != null ? user.getFullName() : user.getUserName(),
+                "oldEmail", oldEmail != null ? oldEmail : "(không có)",
+                "newEmail", newEmail,
+                "changedAt", mailService.formatDateTime(Instant.now())
+        );
+        mailService.sendAuto(MailTemplateCode.EMAIL_CHANGED, oldEmail, user.getUserId(), vars);
+        mailService.sendAuto(MailTemplateCode.EMAIL_CHANGED, newEmail, user.getUserId(), vars);
     }
 
     public UserResponse updateUser(String id, UserUpsertRequest request, MultipartFile avatar) throws IOException {
