@@ -5,7 +5,6 @@ import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.exception.UnauthorizedException;
 
-import com.project_exam.backend.modules.auth.dto.UserTokenInfo;
 import com.project_exam.backend.modules.auth.dto.ChangePasswordRequest;
 import com.project_exam.backend.modules.auth.dto.ForgotPasswordRequest;
 import com.project_exam.backend.modules.auth.dto.RegisterRequest;
@@ -93,10 +92,10 @@ public class AuthService {
         String jti = UUID.randomUUID().toString();
         refreshTokenStore.createFamily(user.getUserId(), familyId, jti);
 
+        // Không đưa roleId vào token: phân quyền đọc lại từ DB mỗi request nên claim này chỉ là
+        // dữ liệu lạc hậu chờ ai đó lỡ tin.
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId());
-        claims.put("roleId", user.getRoleId());
-
         claims.put("fid", familyId);
 
         String accessToken = jwtService.generateToken(userDetails, claims);
@@ -146,8 +145,6 @@ public class AuthService {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId());
-        claims.put("roleId", user.getRoleId());
-
         claims.put("fid", familyId);
 
         String newAccessToken = jwtService.generateToken(userDetails, claims);
@@ -293,10 +290,14 @@ public class AuthService {
         return enrichWithRoleAndPermissions(userMapper.toResponse(user), user.getRoleId());
     }
 
-    public UserTokenInfo getCurrentUserInfo(HttpServletRequest request) {
+    /**
+     * Chỉ lấy userId từ token. Vai trò/quyền cố ý KHÔNG đọc từ đây: token là ảnh chụp lúc đăng
+     * nhập, còn phân quyền phải theo DB hiện tại (xem AuthUtils.hasPermission).
+     */
+    public String getCurrentUserId(HttpServletRequest request) {
         try {
             Claims claims = jwtService.extractAllClaimsFromRequest(request);
-            return new UserTokenInfo((String) claims.get("userId"), (String) claims.get("roleId"));
+            return (String) claims.get("userId");
         } catch (Exception e) {
             throw new UnauthorizedException("Không thể xác định thông tin người dùng.");
         }
@@ -342,7 +343,7 @@ public class AuthService {
 
     public AuthMessageResponse changePassword(ChangePasswordRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         validateNewPassword(request.getNewPassword(), request.getConfirmNewPassword());
-        User user = userRepository.findById(getCurrentUserInfo(httpRequest).getUserId()).orElseThrow();
+        User user = userRepository.findById(getCurrentUserId(httpRequest)).orElseThrow();
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) throw new BadRequestException("Mật khẩu cũ không đúng");
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

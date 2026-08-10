@@ -7,6 +7,7 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.rbac.repository.PermissionRepository;
 import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
 import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
+import com.project_exam.backend.modules.users.rbac.service.RoleAuthorityCache;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final RolePermissionRepository rolePermissionRepository;
+    private final RoleAuthorityCache roleAuthorityCache;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.admin.username:}")
@@ -64,6 +66,10 @@ public class DataLoader implements CommandLineRunner {
                         .build());
             }
         }
+
+        // Server đã nhận request được từ trước khi CommandLineRunner chạy xong, nên nếu vừa cấp
+        // thêm quyền cho ADMIN thì xoá cache để không phục vụ bộ quyền thiếu đến hết TTL.
+        roleAuthorityCache.invalidateAll();
 
         Role userRole = roleRepository.findByRoleName("USER");
         if (userRole == null) {

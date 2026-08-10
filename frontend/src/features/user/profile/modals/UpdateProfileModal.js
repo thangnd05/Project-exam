@@ -111,8 +111,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
         userName: formValues.userName,
         fullName: formValues.fullName,
         email: formValues.email,
-        roleId: userInfo.roleId,
-        password: userInfo.password,
         verified: userInfo.verified
       };
 

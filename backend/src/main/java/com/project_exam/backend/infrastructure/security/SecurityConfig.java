@@ -172,7 +172,6 @@ public class SecurityConfig {
 
                             Map<String, Object> claims = new HashMap<>();
                             claims.put("userId", user.getUserId());
-                            claims.put("roleId", user.getRoleId());
 
                             String familyId = java.util.UUID.randomUUID().toString();
                             String jti = java.util.UUID.randomUUID().toString();

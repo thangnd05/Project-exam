@@ -1,6 +1,5 @@
 package com.project_exam.backend.shared.util;
 
-import com.project_exam.backend.modules.auth.dto.UserTokenInfo;
 import com.project_exam.backend.modules.auth.service.AuthService;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +16,7 @@ public class AuthUtils {
     private final AuthService authService;
 
     public String getUserId(HttpServletRequest request) {
-        return authService.getCurrentUserInfo(request).getUserId();
+        return authService.getCurrentUserId(request);
     }
 
     /** Returns userId when authenticated; otherwise null (for public endpoints with optional auth). */
@@ -29,14 +28,14 @@ public class AuthUtils {
         }
     }
 
-    public String getRoleId(HttpServletRequest request) {
-        return authService.getCurrentUserInfo(request).getRoleId();
-    }
-
-    public UserTokenInfo getUserInfo(HttpServletRequest request) {
-        return authService.getCurrentUserInfo(request);
-    }
-
+    /**
+     * Kiểm tra quyền theo authorities trong SecurityContext — được JwtAuthenticationFilter dựng
+     * lại từ DB ở mỗi request, KHÔNG lấy từ claim của token. Nhờ vậy đổi vai trò của user hoặc
+     * gỡ quyền của vai trò là có hiệu lực ngay, không phải chờ access token hết hạn.
+     *
+     * Vì lý do đó, đừng thêm lại kiểu lấy roleId từ token để tự so sánh: token là ảnh chụp lúc
+     * đăng nhập nên sẽ lạc hậu.
+     */
     public boolean hasPermission(String permissionCode) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) return false;

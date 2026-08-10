@@ -3,6 +3,8 @@ package com.project_exam.backend.modules.users.rbac.service;
 import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -17,8 +19,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * ngay, không phải chờ token hết hạn), nhưng như vậy mỗi lần gọi API tốn thêm một query đọc
  * role_permissions. Số vai trò thì rất ít và đổi rất hiếm nên cache trong tiến trình là đủ.
  *
- * TTL ngắn + xoá cache ngay khi RoleService đổi quyền: cùng một instance thì thấy tức thì,
- * nhiều instance thì chậm nhất là hết TTL.
+ * Đường ghi role_permissions duy nhất là RoleService, và nó gọi invalidateAfterCommit() nên
+ * cùng một instance thì quyền mới có hiệu lực tức thì. TTL chỉ là lưới an toàn cho trường hợp
+ * chạy nhiều instance (instance không nhận request sửa quyền sẽ tự hết hạn sau TTL).
  */
 @Component
 @RequiredArgsConstructor
@@ -50,6 +53,26 @@ public class RoleAuthorityCache {
 
     public void invalidate(String roleId) {
         cache.remove(roleId);
+    }
+
+    /**
+     * Xoá cache của vai trò, và xoá lại một lần nữa sau khi transaction kết thúc.
+     *
+     * Gọi invalidate() trần bên trong @Transactional là chưa đủ: quyền mới chưa commit, nên một
+     * request khác xen vào giữa lúc đó sẽ đọc DB ra bộ quyền CŨ rồi nạp lại vào cache và giữ
+     * nguyên đến hết TTL. Xoá thêm ở afterCompletion để lần đọc kế tiếp chắc chắn thấy dữ liệu
+     * đã commit (rollback cũng xoá — chỉ tốn đúng một lần đọc lại).
+     */
+    public void invalidateAfterCommit(String roleId) {
+        cache.remove(roleId);
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    cache.remove(roleId);
+                }
+            });
+        }
     }
 
     public void invalidateAll() {

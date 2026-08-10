@@ -91,7 +91,7 @@ public class RoleService {
 
         rolePermissionRepository.deleteByRoleId(id);
         roleRepository.delete(role);
-        roleAuthorityCache.invalidate(id);
+        roleAuthorityCache.invalidateAfterCommit(id);
         AuditContext.describe("Xoá vai trò '" + role.getRoleName() + "'");
     }
 
@@ -114,7 +114,7 @@ public class RoleService {
                     .build());
         }
 
-        roleAuthorityCache.invalidate(roleId);
+        roleAuthorityCache.invalidateAfterCommit(roleId);
         AuditContext.describe(describePermissionDiff(role.getRoleName(), before, new LinkedHashSet<>(requested)));
         return toResponse(role);
     }
