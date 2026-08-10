@@ -5,12 +5,14 @@ import {
   getDashboardStats,
   getMonthlyPerformance,
   getTrafficHeatmap,
+  getTrafficLocations,
 } from '~/shared/api/dashboardApi';
 
 export const dashboardKeys = {
   stats: ['admin-dashboard-stats'],
   monthlyPerformance: (year) => ['admin-dashboard-monthly-performance', year ?? 'current'],
   trafficHeatmap: (endDate) => ['admin-dashboard-traffic-heatmap', endDate ?? 'today'],
+  trafficLocations: (month) => ['admin-dashboard-traffic-locations', month ?? 'current'],
   contentInsights: ['admin-dashboard-content-insights'],
 };
 
@@ -62,6 +64,24 @@ export function useContentInsights() {
   return {
     topTests: query.data?.topTests ?? [],
     topPracticeTests: query.data?.topPracticeTests ?? [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
+}
+
+export function useTrafficLocations(month) {
+  const query = useQuery({
+    queryKey: dashboardKeys.trafficLocations(month),
+    queryFn: () => getTrafficLocations(month),
+    staleTime: 60 * 1000,
+    keepPreviousData: true,
+  });
+
+  return {
+    month: query.data?.month ?? month,
+    totalVisits: query.data?.totalVisits ?? 0,
+    availableMonths: query.data?.availableMonths ?? [],
+    topCountries: query.data?.topCountries ?? [],
     isLoading: query.isLoading,
     isError: query.isError,
   };

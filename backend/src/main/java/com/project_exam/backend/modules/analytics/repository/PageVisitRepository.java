@@ -33,4 +33,11 @@ public interface PageVisitRepository extends JpaRepository<PageVisit, String> {
             + "AND v.countryCode IS NOT NULL AND v.countryCode <> 'LO' "
             + "GROUP BY v.countryCode ORDER BY COUNT(v) DESC")
     List<Object[]> findTopCountriesSince(@Param("from") Instant from, Pageable pageable);
+
+    @Query("SELECT v.sessionKey, v.createdAt, v.countryCode, v.country FROM PageVisit v "
+            + "WHERE v.createdAt >= :from AND v.createdAt < :to ORDER BY v.sessionKey, v.createdAt")
+    List<Object[]> findLocationRowsBetween(@Param("from") Instant from, @Param("to") Instant to);
+
+    @Query("SELECT MIN(v.createdAt) FROM PageVisit v")
+    Instant findEarliestCreatedAt();
 }

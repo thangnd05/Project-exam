@@ -5,6 +5,7 @@ $sidebar-text: rgba(255, 255, 255, 0.62);
 $sidebar-text-light: rgba(255, 255, 255, 0.92);
 $header-bg: #ffffff;
 $content-bg: var(--slate-100);
+$page-bg: #ffffff;
 $primary: var(--accent-act-color);
 $success: var(--emerald-500);
 $danger: var(--red-500);
@@ -18,7 +19,7 @@ $transition: all 0.3s ease;
 .adminWrapper {
     display: flex;
     min-height: 100vh;
-    background: $content-bg;
+    background: $page-bg;
 }
 
 .sidebar {

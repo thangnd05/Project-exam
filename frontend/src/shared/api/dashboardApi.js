@@ -13,6 +13,11 @@ export const getMonthlyPerformance = (year) =>
 export const getContentInsights = () =>
   axios.get(`${BASE_DASHBOARD_URL}/content-insights`).then((response) => response.data);
 
+export const getTrafficLocations = (month) =>
+  axios
+    .get(`${BASE_DASHBOARD_URL}/traffic-locations`, {params: month ? {month} : {}})
+    .then((response) => response.data);
+
 export const getTrafficHeatmap = (endDate) =>
   axios
     .get(`${BASE_DASHBOARD_URL}/traffic-heatmap`, {params: endDate ? {endDate} : {}})

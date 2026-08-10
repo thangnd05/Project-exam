@@ -11,7 +11,12 @@ import { TopTestsTable } from '../components/ContentInsightsTables';
 import LocationsMap, { TopCountriesList } from '../components/LocationsMap';
 import { AdminPageHeader } from '../components/common';
 import OverviewCard from './OverviewCard';
-import { useDashboardStats, useMonthlyPerformance, useContentInsights } from '~/features/admin/overview/hooks/useDashboardStats';
+import {
+    useDashboardStats,
+    useMonthlyPerformance,
+    useContentInsights,
+    useTrafficLocations,
+} from '~/features/admin/overview/hooks/useDashboardStats';
 
 import styles from './AnalyticsPage.module.scss';
 
@@ -32,14 +37,47 @@ const ChartCard = ({ icon, title, height, delay, action, children }) => (
     </motion.div>
 );
 
+const monthLabel = (month) => {
+    const [y, m] = (month || '').split('-');
+    return y && m ? `Tháng ${Number(m)}/${y}` : month;
+};
+
+const currentMonthKey = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+};
+
 const AnalyticsPage = () => {
-    const { stats, traffic, statusDistribution, isLoading, isError } = useDashboardStats();
+    const { stats, statusDistribution, isLoading, isError } = useDashboardStats();
 
     const currentYear = new Date().getFullYear();
     const [perfYear, setPerfYear] = useState(currentYear);
     const { months: monthlyPerformance = [], availableYears } = useMonthlyPerformance(perfYear);
 
+    const [locMonth, setLocMonth] = useState(currentMonthKey);
+    const {
+        totalVisits: locTotalVisits,
+        availableMonths: locAvailableMonths,
+        topCountries: locCountries,
+    } = useTrafficLocations(locMonth);
+
     const { topTests = [], topPracticeTests = [] } = useContentInsights();
+
+    const monthOptions = locAvailableMonths.includes(locMonth)
+        ? locAvailableMonths
+        : [locMonth, ...locAvailableMonths];
+
+    const monthSelect = (
+        <select
+            className={cx('yearSelect')}
+            value={locMonth}
+            onChange={(e) => setLocMonth(e.target.value)}
+        >
+            {monthOptions.map((m) => (
+                <option key={m} value={m}>{monthLabel(m)}</option>
+            ))}
+        </select>
+    );
 
     const yearSelect = (
         <select
@@ -104,13 +142,23 @@ const AnalyticsPage = () => {
 
                     <Row className={cx('chartsRow')}>
                         <Col lg={8}>
-                            <ChartCard title="Vị trí truy cập" delay={0.3}>
-                                <LocationsMap countries={traffic.topCountries ?? []} />
+                            <ChartCard title="Vị trí truy cập" delay={0.3} action={monthSelect}>
+                                <div className={cx('monthSummary')}>
+                                    <span className={cx('summaryValue')}>{locTotalVisits.toLocaleString('vi-VN')}</span>
+                                    <span className={cx('summaryLabel')}>
+                                        lượt truy cập từ IP công cộng trong {monthLabel(locMonth).toLowerCase()}
+                                    </span>
+                                </div>
+                                <LocationsMap countries={locCountries} />
                             </ChartCard>
                         </Col>
                         <Col lg={4}>
-                            <ChartCard title="Top quốc gia" delay={0.35}>
-                                <TopCountriesList countries={traffic.topCountries ?? []} />
+                            <ChartCard
+                                title="Top quốc gia"
+                                delay={0.35}
+                                action={<span className={cx('monthTag')}>{monthLabel(locMonth)}</span>}
+                            >
+                                <TopCountriesList countries={locCountries} />
                             </ChartCard>
                         </Col>
                     </Row>

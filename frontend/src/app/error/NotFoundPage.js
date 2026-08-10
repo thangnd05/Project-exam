@@ -1,6 +1,5 @@
 import classNames from "classnames/bind";
 import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
-import { brandColors } from "~/shared/styles/brandColors";
 import styles from "./errorPage.module.scss";
 
 const cx = classNames.bind(styles);
@@ -25,7 +24,7 @@ export default function NotFoundPage() {
                             cy="146"
                             rx="42"
                             ry="8"
-                            fill={brandColors.primary}
+                            fill="var(--primary)"
                         />
                         <g className={cx("mascot")}>
 
@@ -55,15 +54,15 @@ export default function NotFoundPage() {
                             y="42"
                             fontSize="34"
                             fontWeight="800"
-                            fill={brandColors.primary}
+                            fill="var(--primary)"
                             textAnchor="middle"
                         >
                             ?
                         </text>
                         <defs>
                             <linearGradient id="nf-body" x1="26" y1="30" x2="134" y2="130" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#cfe4ff" />
-                                <stop offset="1" stopColor="#a9d3ff" />
+                                <stop stopColor="var(--brand-100)" />
+                                <stop offset="1" stopColor="var(--brand-200)" />
                             </linearGradient>
                         </defs>
                     </svg>

@@ -119,6 +119,37 @@ $radius-lg: 16px;
     &:focus { outline: none; border-color: var(--accent-act-color); box-shadow: 0 0 0 3px rgb(var(--teal-500-rgb) / 0.15); }
 }
 
+.monthSummary {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.summaryValue {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1.1;
+}
+
+.summaryLabel {
+    font-size: var(--font-size-ssm);
+    color: $text-secondary;
+}
+
+.monthTag {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgb(var(--teal-500-rgb) / 0.1);
+    color: var(--accent-act-color);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+}
+
 @media (max-width: 992px) {
     .pageHeader h1 {
         font-size: var(--font-size-2xl);

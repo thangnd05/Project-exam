@@ -2,6 +2,7 @@ import {useMemo, useState} from 'react';
 import {Button} from 'react-bootstrap';
 import {Edit, History, Plus, Send, Trash2} from 'lucide-react';
 import {toast} from 'react-toastify';
+import classNames from 'classnames/bind';
 
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import {
@@ -12,10 +13,13 @@ import {
   StatCard,
   StatCardGroup,
 } from '../components/common';
+import styles from '../components/common/adminKit.module.scss';
 import EmailEditorModal from './EmailEditorModal';
 import EmailRecipientsModal from './EmailRecipientsModal';
 import SendEmailModal from './SendEmailModal';
 import {useAutoEmails, useEmailMutations, useManualEmails} from './hooks/useAdminEmails';
+
+const cx = classNames.bind(styles);
 
 const PAGE_SIZE = 10;
 
@@ -175,19 +179,19 @@ function EmailsManagementPage() {
         )}
       </AdminPageHeader>
 
-      <ul className="nav nav-pills gap-2">
+      <div className="d-flex gap-2">
         {TABS.map((tab) => (
-          <li className="nav-item" key={tab.key}>
-            <button
-              type="button"
-              className={`nav-link ${activeTab === tab.key ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-            </button>
-          </li>
+          <Button
+            key={tab.key}
+            type="button"
+            size="sm"
+            className={cx('pillBtn', {active: activeTab === tab.key})}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            {tab.label}
+          </Button>
         ))}
-      </ul>
+      </div>
 
       {!isAutoTab && (
         <StatCardGroup>

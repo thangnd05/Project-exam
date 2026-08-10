@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.admin.dashboard.dto.ContentInsightsRespo
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse.DayHours;
 import com.project_exam.backend.modules.admin.dashboard.dto.MonthlyPerformanceResponse;
+import com.project_exam.backend.modules.admin.dashboard.dto.TrafficLocationsResponse;
 import com.project_exam.backend.modules.admin.dashboard.service.DashboardService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -43,6 +46,21 @@ public class DashboardController {
     public ResponseEntity<ContentInsightsResponse> getContentInsights() {
         authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         return ResponseEntity.ok(dashboardService.getContentInsights());
+    }
+
+    @GetMapping("/traffic-locations")
+    public ResponseEntity<TrafficLocationsResponse> getTrafficLocations(
+            @RequestParam(required = false) String month) {
+        authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
+        YearMonth parsed = null;
+        if (month != null && !month.isBlank()) {
+            try {
+                parsed = YearMonth.parse(month.trim());
+            } catch (DateTimeParseException ex) {
+                throw new IllegalArgumentException("Tháng không hợp lệ, cần định dạng yyyy-MM");
+            }
+        }
+        return ResponseEntity.ok(dashboardService.getTrafficLocations(parsed));
     }
 
     @GetMapping("/traffic-heatmap")

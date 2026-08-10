@@ -1,6 +1,5 @@
 import { Component } from 'react';
 import ButtonPrime from './Button/ButtonPrime';
-import { brandColors } from '~/shared/styles/brandColors';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -35,7 +34,7 @@ class ErrorBoundary extends Component {
             justifyContent: 'center',
             padding: '2.4rem',
             background:
-              'radial-gradient(1200px 600px at 50% -10%, rgba(13, 148, 136, 0.08), transparent 60%)',
+              'radial-gradient(1200px 600px at 50% -10%, var(--primary-alpha-08), transparent 60%)',
           }}
         >
           <div
@@ -104,7 +103,7 @@ class ErrorBoundary extends Component {
                   cy="146"
                   rx="42"
                   ry="8"
-                  fill={brandColors.primary}
+                  fill="var(--primary)"
                 />
                 <g className="eb-mascot">
 
@@ -136,13 +135,13 @@ class ErrorBoundary extends Component {
                   <path
                     className="eb-drop"
                     d="M126 58 c0 5 -6 8 -6 13 a6 6 0 0 0 12 0 c0 -5 -6 -8 -6 -13 Z"
-                    fill="#7cc4ff"
+                    fill="var(--brand-400)"
                   />
                 </g>
                 <defs>
                   <linearGradient id="eb-body" x1="26" y1="30" x2="134" y2="130" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#cfe4ff" />
-                    <stop offset="1" stopColor="#a9d3ff" />
+                    <stop stopColor="var(--brand-100)" />
+                    <stop offset="1" stopColor="var(--brand-200)" />
                   </linearGradient>
                 </defs>
               </svg>

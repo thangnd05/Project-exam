@@ -5,6 +5,7 @@ import com.project_exam.backend.modules.admin.dashboard.dto.ContentInsightsRespo
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse.*;
 import com.project_exam.backend.modules.admin.dashboard.dto.MonthlyPerformanceResponse;
+import com.project_exam.backend.modules.admin.dashboard.dto.TrafficLocationsResponse;
 import com.project_exam.backend.modules.analytics.repository.PageVisitRepository;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
@@ -105,6 +106,66 @@ public class DashboardService {
     }
 
     private record SessionStart(LocalDateTime time, String userId) {}
+
+    private static final int TOP_COUNTRIES_LIMIT = 50;
+
+    @Transactional(readOnly = true)
+    public TrafficLocationsResponse getTrafficLocations(YearMonth monthParam) {
+        YearMonth currentMonth = YearMonth.from(AppTime.today());
+        YearMonth month = (monthParam == null || monthParam.isAfter(currentMonth)) ? currentMonth : monthParam;
+
+        Instant earliestVisit = pageVisitRepository.findEarliestCreatedAt();
+        YearMonth startMonth = earliestVisit == null ? currentMonth : AppTime.yearMonth(earliestVisit);
+        if (startMonth.isAfter(month)) startMonth = month;
+        List<String> availableMonths = new ArrayList<>();
+        for (YearMonth m = currentMonth; !m.isBefore(startMonth); m = m.minusMonths(1)) {
+            availableMonths.add(m.toString());
+        }
+
+        LocalDateTime monthStart = month.atDay(1).atStartOfDay();
+        LocalDateTime monthEnd = month.plusMonths(1).atDay(1).atStartOfDay();
+
+        // quét sớm 1 ngày để nhận diện phiên bắt đầu từ tháng trước, rồi loại chúng ra
+        List<Object[]> rows = pageVisitRepository.findLocationRowsBetween(
+                AppTime.instant(monthStart.minusDays(1)), AppTime.instant(monthEnd));
+
+        Map<String, long[]> countByCode = new HashMap<>();
+        Map<String, String> nameByCode = new HashMap<>();
+
+        String prevKey = null;
+        LocalDateTime prevTime = null;
+        for (Object[] row : rows) {
+            String key = (String) row[0];
+            LocalDateTime ts = AppTime.local((Instant) row[1]);
+            String code = (String) row[2];
+            String name = (String) row[3];
+
+            boolean newSession = key == null
+                    || !Objects.equals(key, prevKey)
+                    || prevTime == null
+                    || ChronoUnit.SECONDS.between(prevTime, ts) > SESSION_GAP_SECONDS;
+            prevKey = key;
+            prevTime = ts;
+
+            // chỉ tính phiên bắt đầu trong tháng và đến từ IP công cộng
+            if (!newSession || ts.isBefore(monthStart) || code == null || "LO".equals(code)) continue;
+
+            countByCode.computeIfAbsent(code, k -> new long[1])[0]++;
+            if (name != null) nameByCode.putIfAbsent(code, name);
+        }
+
+        List<CountryTraffic> topCountries = countByCode.entrySet().stream()
+                .map(e -> new CountryTraffic(e.getKey(), nameByCode.getOrDefault(e.getKey(), e.getKey()), e.getValue()[0]))
+                .sorted(Comparator.comparingLong(CountryTraffic::getValue).reversed()
+                        .thenComparing(CountryTraffic::getName))
+                .limit(TOP_COUNTRIES_LIMIT)
+                .collect(Collectors.toList());
+
+        long totalVisits = countByCode.values().stream().mapToLong(v -> v[0]).sum();
+
+        return new TrafficLocationsResponse(
+                month.toString(), totalVisits, availableMonths, topCountries);
+    }
 
     @Transactional(readOnly = true)
     public List<DayHours> getTrafficHeatmap(LocalDate endDateParam) {
