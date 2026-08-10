@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -31,6 +31,8 @@ import {
   Mail,
 } from 'lucide-react';
 import routes from '~/shared/config/Routes';
+import { adminPermissionByPath } from '~/app/routes';
+import { useAuth } from '~/shared/hooks/useAuth';
 import styles from './AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);
@@ -107,6 +109,21 @@ function AdminLayout({children}) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const {permissions} = useAuth();
+
+  // Chỉ hiện mục mà vai trò hiện tại mở được — bấm vào rồi mới ăn 403 thì rất khó chịu.
+  const visibleGroups = useMemo(() => {
+    const allowed = Array.isArray(permissions) ? permissions : [];
+    return adminRouteGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => {
+          const required = adminPermissionByPath[item.path];
+          return !required || allowed.includes(required);
+        }),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [permissions]);
 
   useEffect(() => {
     const mql = window.matchMedia('(max-width: 1024px)');
@@ -151,7 +168,7 @@ function AdminLayout({children}) {
           </button>
 
           <nav className={cx('nav')}>
-            {adminRouteGroups.map((group) => (
+            {visibleGroups.map((group) => (
               <div key={group.label} className={cx('navSection')}>
                 {!collapsed && <span className={cx('navLabel')}>{group.label}</span>}
                 {group.items.map((route) => (

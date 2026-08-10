@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { getUserTestMeta } from '~/shared/api/userTestApi';
+import { getUserTestMeta, getReviewTest } from '~/shared/api/userTestApi';
 import { getAnswersByUserTest } from '~/shared/api/userAnswerApi';
-import { getUserTestInfo, getAdminTestById } from '~/shared/api/testApi';
+import { getUserTestInfo } from '~/shared/api/testApi';
 
 export const testReviewKeys = {
   detail: (userTestId, isGuest) => ['test-review', userTestId, isGuest],
@@ -21,7 +21,7 @@ async function fetchTestReview(userTestId, isGuest, guestCfg) {
   }
 
   const [testData, answersData] = await Promise.all([
-    getAdminTestById(testId),
+    getReviewTest(userTestId, isGuest, guestCfg),
     getAnswersByUserTest(userTestId, isGuest, guestCfg),
   ]);
 

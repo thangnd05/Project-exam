@@ -1,8 +1,5 @@
 package com.project_exam.backend.modules.assessment.learning.support;
 
-import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
-import com.project_exam.backend.modules.assessment.exam.domain.Question;
-import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlan;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanTask;
@@ -12,7 +9,6 @@ import com.project_exam.backend.modules.assessment.learning.domain.TaskStatus;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanTaskRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,7 +24,6 @@ public class LearningPlanProgressSupport {
     private final LearningPlanTaskRepository taskRepository;
     private final LearningPlanTaskUnlockSupport taskUnlockSupport;
     private final QuestionRepository questionRepository;
-    private final ExamPartRepository examPartRepository;
 
     /** Sau khi PASSED/SKIPPED một ải: mở khóa → bỏ qua ải trống kế tiếp → có thể sang MOCK. */
     public void afterTaskCleared(LearningPlan plan, LearningPlanTask clearedTask) {
@@ -81,22 +76,12 @@ public class LearningPlanProgressSupport {
         }
     }
 
+    /** Chỉ cần biết ải có câu hay không → EXISTS, không bốc pool (trước đây fetch tới 600 câu để test rỗng). */
     private boolean hasQuestionsForTask(LearningPlanTask task) {
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
-        ExamPart part = taskType != PlanTaskType.TAG
-                ? examPartRepository.findById(task.getExamPartId()).orElse(null)
-                : null;
-        int targetCount = LearningPlanQuestionTargets.resolveTargetCount(
-                task.getTargetQuestionCount(), taskType, part);
-        int poolSize = LearningPlanQuestionTargets.poolFetchSize(targetCount);
-        List<Question> pool;
         if (taskType == PlanTaskType.TAG) {
-            pool = questionRepository.findRandomQuestionsByTagAndExamPart(
-                    task.getTagId(), task.getExamPartId(), PageRequest.of(0, poolSize));
-        } else {
-            pool = questionRepository.findRandomQuestionsByExamPartId(
-                    task.getExamPartId(), PageRequest.of(0, poolSize));
+            return questionRepository.existsByTagAndExamPart(task.getTagId(), task.getExamPartId());
         }
-        return pool != null && !pool.isEmpty();
+        return questionRepository.existsByExamPartId(task.getExamPartId());
     }
 }

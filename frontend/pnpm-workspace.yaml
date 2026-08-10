@@ -1,3 +1,7 @@
+# react-simple-maps kéo theo d3-color 2.x dính ReDoS; 3.x cùng API nên ép cả cây lên.
+overrides:
+  d3-color: ^3.1.0
+
 allowBuilds:
   '@fortawesome/fontawesome-common-types': true
   '@fortawesome/fontawesome-svg-core': true

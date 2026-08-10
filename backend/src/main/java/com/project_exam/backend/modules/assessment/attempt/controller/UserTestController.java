@@ -8,7 +8,9 @@ import com.project_exam.backend.modules.assessment.attempt.dto.UserTestUpdateReq
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
+import com.project_exam.backend.modules.assessment.attempt.service.TestReviewService;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
+import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -35,6 +37,7 @@ import java.util.*;
 public class UserTestController {
 
     private final UserTestService userTestService;
+    private final TestReviewService testReviewService;
     private final AuthUtils authUtils;
 
     @Value("${app.guest.cookie-name}")
@@ -59,6 +62,24 @@ public class UserTestController {
     ) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(userTestService.getMeta(userTestId, userId));
+    }
+
+    /** Đáp án + giải thích của đề, chỉ mở cho chủ bài làm và chỉ khi bài đã nộp. */
+    @GetMapping("/{userTestId}/review-test")
+    public ResponseEntity<TestAdminResponse> getReviewTest(
+            @PathVariable String userTestId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(testReviewService.getReviewTestForUser(userTestId, userId));
+    }
+
+    @GetMapping("/guest/{userTestId}/review-test")
+    public ResponseEntity<TestAdminResponse> getGuestReviewTest(
+            @PathVariable String userTestId,
+            @RequestHeader("X-Guest-Session") String guestSessionId
+    ) {
+        return ResponseEntity.ok(testReviewService.getReviewTestForGuest(userTestId, guestSessionId));
     }
 
     @GetMapping("/my")
@@ -160,7 +181,7 @@ public class UserTestController {
             HttpServletRequest httpRequest
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        Optional<UserTest> active = userTestService.findActiveUserTest(userId, testId, mode, examPartIds);
+        Optional<UserTest> active = userTestService.resolveActiveUserTest(userId, testId, mode, examPartIds);
         String serverNow = java.time.Instant.now().toString();
         if (active.isEmpty()) {
             return ResponseEntity.ok(ActiveUserTestResponse.none(serverNow));
@@ -235,7 +256,7 @@ public class UserTestController {
             @RequestParam String testId,
             @RequestHeader("X-Guest-Session") String guestSessionId
     ) {
-        Optional<UserTest> active = userTestService.findActiveGuestUserTest(guestSessionId, testId);
+        Optional<UserTest> active = userTestService.resolveActiveGuestUserTest(guestSessionId, testId);
         String serverNow = java.time.Instant.now().toString();
         if (active.isEmpty()) {
             return ResponseEntity.ok(ActiveUserTestResponse.none(serverNow));

@@ -64,6 +64,20 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
                                         @Param("cutoff") java.time.Instant cutoff,
                                         org.springframework.data.domain.Pageable pageable);
 
+    /**
+     * Ứng viên "bài có giờ bỏ dở": mở đã lâu hơn cutoff mà vẫn IN_PROGRESS. Hạn thật của từng
+     * bài phụ thuộc durationMinutes của đề nên việc lọc chính xác để cho service làm.
+     */
+    @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.mode <> :practiceMode "
+            + "AND ut.startedAt < :cutoff "
+            + "AND EXISTS (SELECT t FROM Test t WHERE t.testId = ut.testId "
+            + "AND t.durationMinutes IS NOT NULL AND t.durationMinutes > 0) "
+            + "ORDER BY ut.startedAt ASC")
+    List<UserTest> findStaleTimedAttempts(@Param("status") UserTest.Status status,
+                                          @Param("practiceMode") UserTest.Mode practiceMode,
+                                          @Param("cutoff") java.time.Instant cutoff,
+                                          org.springframework.data.domain.Pageable pageable);
+
     List<UserTest> findByUserIdAndTestId(String userId, String testId);
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
     List<UserTest> findByTestIdAndStatus(String testId, UserTest.Status status);

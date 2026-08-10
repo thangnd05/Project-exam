@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import routes from '~/shared/config/Routes';
+import { PERMISSIONS as P } from '~/shared/config/permissions';
 
 const Login = lazy(() => import('~/features/user/login/LoginPage'));
 const ForgotPassword = lazy(() => import('~/features/user/login/ForgotPasswordPage'));
@@ -90,34 +91,44 @@ export const publicRoutes = [
   { path: routes.notFound, component: NotFoundPage, noLayout: true },
 ];
 
+/**
+ * Mỗi trang admin khai báo đúng quyền mà backend đòi ở các API của trang đó, để một vai trò
+ * tự tạo (không phải ADMIN) vẫn vào được đúng phần được giao. Thiếu `permission` thì App.js
+ * rơi về khoá cứng vai trò ADMIN.
+ */
 export const adminRoutes = [
-  { path: routes.adminDashboard, component: AdminDashboardPage },
-  { path: routes.adminUsers, component: UsersManagementPage },
-  { path: routes.adminRoles, component: RolesManagementPage },
-  { path: routes.adminPermissions, component: PermissionsManagementPage },
-  { path: routes.adminSkills, component: SkillsManagementPage },
-  { path: routes.adminScoringConversion, component: ScoringConversionManagementPage },
-  { path: routes.adminEvaluations, component: EvaluationsManagementPage },
-  { path: routes.adminExamTypes, component: ExamTypesManagementPage },
-  { path: routes.adminExamTypeLayout, component: ExamTypeLayoutEditorPage },
-  { path: routes.adminExamCategories, component: ExamCategoriesManagementPage },
-  { path: routes.adminExamParts, component: ExamPartsManagementPage },
-  { path: routes.adminTests, component: TestsManagementPage },
-  { path: routes.adminAnalytics, component: AnalyticsPage },
-  { path: routes.adminEmails, component: EmailsManagementPage },
-  { path: routes.adminAuditLogs, component: AuditLogsPage },
-  { path: routes.adminLoginAudit, component: LoginAuditPage },
-  { path: routes.adminCategories, component: CategoriesManagementPage },
-  { path: routes.adminPosts, component: PostsManagementPage },
-  { path: routes.adminQuestionCollections, component: QuestionCollectionsManagementPage },
-  { path: routes.adminTags, component: TagsManagementPage },
-  { path: routes.adminRecoveryResources, component: RecoveryResourcesManagementPage },
-  { path: routes.adminMilestones, component: MilestonesManagementPage },
-  { path: routes.adminCoins, component: CoinsManagementPage },
-  { path: routes.adminQuests, component: QuestsManagementPage },
-  { path: routes.adminCosmetics, component: CosmeticsManagementPage },
-  { path: routes.adminStreakRecover, component: StreakRecoverManagementPage },
+  { path: routes.adminDashboard, component: AdminDashboardPage, permission: P.DASHBOARD_VIEW },
+  { path: routes.adminUsers, component: UsersManagementPage, permission: P.USER_MANAGE },
+  { path: routes.adminRoles, component: RolesManagementPage, permission: P.ROLE_MANAGE },
+  { path: routes.adminPermissions, component: PermissionsManagementPage, permission: P.ROLE_MANAGE },
+  { path: routes.adminSkills, component: SkillsManagementPage, permission: P.SKILL_MANAGE },
+  { path: routes.adminScoringConversion, component: ScoringConversionManagementPage, permission: P.SCORING_CONVERSION_MANAGE },
+  { path: routes.adminEvaluations, component: EvaluationsManagementPage, permission: P.EVALUATION_MANAGE },
+  { path: routes.adminExamTypes, component: ExamTypesManagementPage, permission: P.EXAM_TYPE_MANAGE },
+  { path: routes.adminExamTypeLayout, component: ExamTypeLayoutEditorPage, permission: P.EXAM_TYPE_LAYOUT_MANAGE },
+  { path: routes.adminExamCategories, component: ExamCategoriesManagementPage, permission: P.EXAM_CATEGORY_MANAGE },
+  { path: routes.adminExamParts, component: ExamPartsManagementPage, permission: P.EXAM_PART_MANAGE },
+  { path: routes.adminTests, component: TestsManagementPage, permission: P.TEST_MANAGE },
+  { path: routes.adminAnalytics, component: AnalyticsPage, permission: P.DASHBOARD_VIEW },
+  { path: routes.adminEmails, component: EmailsManagementPage, permission: P.EMAIL_MANAGE },
+  { path: routes.adminAuditLogs, component: AuditLogsPage, permission: P.AUDIT_VIEW },
+  { path: routes.adminLoginAudit, component: LoginAuditPage, permission: P.AUDIT_VIEW },
+  { path: routes.adminCategories, component: CategoriesManagementPage, permission: P.POST_CATEGORY_MANAGE },
+  { path: routes.adminPosts, component: PostsManagementPage, permission: P.POST_MODERATE },
+  { path: routes.adminQuestionCollections, component: QuestionCollectionsManagementPage, permission: P.QUESTION_COLLECTION_MANAGE },
+  { path: routes.adminTags, component: TagsManagementPage, permission: P.TAG_MANAGE },
+  { path: routes.adminRecoveryResources, component: RecoveryResourcesManagementPage, permission: P.RECOVERY_RESOURCE_MANAGE },
+  { path: routes.adminMilestones, component: MilestonesManagementPage, permission: P.MILESTONE_MANAGE },
+  { path: routes.adminCoins, component: CoinsManagementPage, permission: P.COIN_MANAGE },
+  { path: routes.adminQuests, component: QuestsManagementPage, permission: P.QUEST_MANAGE },
+  { path: routes.adminCosmetics, component: CosmeticsManagementPage, permission: P.COSMETIC_MANAGE },
+  { path: routes.adminStreakRecover, component: StreakRecoverManagementPage, permission: P.STREAK_CONFIG_MANAGE },
 ];
+
+/** Tra quyền theo path, để sidebar ẩn mục mà người dùng không mở được. */
+export const adminPermissionByPath = Object.fromEntries(
+  adminRoutes.filter((route) => route.permission).map((route) => [route.path, route.permission]),
+);
 
 export const privateRoutes = [
   {

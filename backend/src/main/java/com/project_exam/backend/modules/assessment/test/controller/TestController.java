@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.assessment.test.controller;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 
+import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 
 import com.project_exam.backend.modules.assessment.test.dto.AddQuestionsToTestRequest;
@@ -71,10 +72,23 @@ public class TestController {
         return ResponseEntity.ok(testService.getPartsSummary(testId));
     }
 
+    /**
+     * Trả cả đáp án đúng + giải thích nên chỉ dành cho người soạn đề. Người làm bài muốn xem lại
+     * đáp án thì đi qua GET /api/user-tests/{userTestId}/review-test (có kiểm tra đã nộp bài).
+     */
     @GetMapping("/admintest/{testId}")
-    public ResponseEntity<TestAdminResponse> getTestByIdAdmin(@PathVariable String testId) {
-        TestAdminResponse response = testService.getTestFullByIdAdmin(testId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<TestAdminResponse> getTestByIdAdmin(
+            @PathVariable String testId,
+            HttpServletRequest httpRequest
+    ) {
+        Test test = testService.getTestById(testId)
+                .orElseThrow(() -> new NotFoundException("Test không tồn tại"));
+        String userId = authUtils.getUserId(httpRequest);
+        boolean isOwner = userId != null && userId.equals(test.getCreatedBy());
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
+            throw new ForbiddenException("Bạn không có quyền xem chi tiết đề này.");
+        }
+        return ResponseEntity.ok(testService.getTestFullByIdAdmin(testId));
     }
 
     @PostMapping

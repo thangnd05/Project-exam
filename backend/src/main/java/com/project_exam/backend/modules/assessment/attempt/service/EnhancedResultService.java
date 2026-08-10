@@ -10,6 +10,7 @@ import com.project_exam.backend.modules.assessment.attempt.util.ReadinessThresho
 import com.project_exam.backend.modules.assessment.exam.util.AnswerGradingUtil;
 import com.project_exam.backend.modules.assessment.exam.repository.*;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
+import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
@@ -90,7 +91,8 @@ public class EnhancedResultService {
                     .orElse(null);
         }
 
-        Set<String> allTestQuestionIds = getAnalyzedQuestionIds(userTest);
+        TestLayout layout = loadTestLayout(userTest.getTestId());
+        Set<String> allTestQuestionIds = getAnalyzedQuestionIds(userTest, layout);
         long totalQuestions = allTestQuestionIds.size();
 
         if (allTestQuestionIds.isEmpty()) {
@@ -146,7 +148,7 @@ public class EnhancedResultService {
                 statusMap.put(qId, Boolean.TRUE.equals(correctnessMap.get(qId)) ? "correct" : "wrong");
             }
         }
-        Map<String, Integer> questionNumberMap = buildQuestionNumberMap(userTest.getTestId());
+        Map<String, Integer> questionNumberMap = buildQuestionNumberMap(layout);
 
         Set<String> examPartIds = questionMap.values().stream()
                 .map(Question::getExamPartId)
@@ -392,21 +394,32 @@ public class EnhancedResultService {
         return tags;
     }
 
-    private Map<String, Integer> buildQuestionNumberMap(String testId) {
-        List<com.project_exam.backend.modules.assessment.test.domain.TestPart> parts =
-                testPartRepository.findByTestId(testId);
-        if (parts.isEmpty()) return Map.of();
+    /**
+     * Cấu trúc đề (TestPart + TestQuestion) đọc MỘT lần cho cả lượt dựng kết quả:
+     * trước đây getAnalyzedQuestionIds và buildQuestionNumberMap mỗi bên đọc lại 2 bảng này.
+     */
+    private record TestLayout(List<TestPart> parts, Map<String, List<TestQuestion>> questionsByPart) {
+    }
 
-        List<String> partIds = parts.stream()
-                .map(com.project_exam.backend.modules.assessment.test.domain.TestPart::getTestPartId)
-                .toList();
+    private TestLayout loadTestLayout(String testId) {
+        List<TestPart> parts = testPartRepository.findByTestId(testId);
+        if (parts.isEmpty()) {
+            return new TestLayout(List.of(), Map.of());
+        }
+        List<String> partIds = parts.stream().map(TestPart::getTestPartId).toList();
         Map<String, List<TestQuestion>> byPart = testQuestionRepository.findByTestPartIdIn(partIds).stream()
                 .collect(Collectors.groupingBy(TestQuestion::getTestPartId));
+        return new TestLayout(parts, byPart);
+    }
+
+    private Map<String, Integer> buildQuestionNumberMap(TestLayout layout) {
+        if (layout.parts().isEmpty()) return Map.of();
 
         Map<String, Integer> numberMap = new HashMap<>();
         int num = 0;
-        for (com.project_exam.backend.modules.assessment.test.domain.TestPart tp : parts) {
-            List<TestQuestion> qs = new ArrayList<>(byPart.getOrDefault(tp.getTestPartId(), List.of()));
+        for (TestPart tp : layout.parts()) {
+            List<TestQuestion> qs = new ArrayList<>(
+                    layout.questionsByPart().getOrDefault(tp.getTestPartId(), List.of()));
             qs.sort(Comparator.comparingInt(tq ->
                     tq.getDisplayOrder() == null ? Integer.MAX_VALUE : tq.getDisplayOrder()));
             for (TestQuestion tq : qs) {
@@ -451,19 +464,21 @@ public class EnhancedResultService {
         return (int) Math.round((double) (scoreLessOrEqual - 1) / (totalCompleted - 1) * 100);
     }
 
-    private Set<String> getAnalyzedQuestionIds(UserTest userTest) {
+    private Set<String> getAnalyzedQuestionIds(UserTest userTest, TestLayout layout) {
         Set<String> practicePartIds = userTest.isPractice()
                 ? parsePracticePartIds(userTest.getPracticePartIds())
                 : Collections.emptySet();
 
-        List<String> testPartIds = testPartRepository.findByTestId(userTest.getTestId()).stream()
-                .filter(tp -> practicePartIds.isEmpty() || practicePartIds.contains(tp.getExamPartId()))
-                .map(tp -> tp.getTestPartId())
-                .toList();
-        if (testPartIds.isEmpty()) return Set.of();
-        return testQuestionRepository.findByTestPartIdIn(testPartIds).stream()
-                .map(TestQuestion::getQuestionId)
-                .collect(Collectors.toSet());
+        Set<String> questionIds = new HashSet<>();
+        for (TestPart tp : layout.parts()) {
+            if (!practicePartIds.isEmpty() && !practicePartIds.contains(tp.getExamPartId())) {
+                continue;
+            }
+            for (TestQuestion tq : layout.questionsByPart().getOrDefault(tp.getTestPartId(), List.of())) {
+                questionIds.add(tq.getQuestionId());
+            }
+        }
+        return questionIds;
     }
 
     private Set<String> parsePracticePartIds(String csv) {

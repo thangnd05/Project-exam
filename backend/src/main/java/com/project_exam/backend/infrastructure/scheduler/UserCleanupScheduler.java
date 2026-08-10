@@ -25,8 +25,22 @@ public class UserCleanupScheduler {
     //     emailVerificationService.cleanExpiredVerifications();
     // }
 
+    /** Bài có giờ quá hạn này mà vẫn IN_PROGRESS thì coi như người dùng không quay lại nữa. */
+    private static final long EXPIRED_TIMED_STALE_HOURS = 6;
+
+    /**
+     * Dọn bài làm dở mỗi giờ. Hai loại phải xử lý khác nhau nên đi thành hai bước:
+     * bài có giờ thì CHỐT ĐIỂM theo đáp án đã lưu (xoá là mất bài của người ta),
+     * còn bài không giờ bỏ dở thì XOÁ hẳn cho khỏi phình DB.
+     */
     @Scheduled(cron = "0 0 * * * ?")
-    public void cleanAbandonedUntimedTests() {
+    public void cleanAbandonedTests() {
+        for (int i = 0; i < ABANDONED_MAX_BATCHES_PER_RUN; i++) {
+            int finalized = userTestService.finalizeExpiredTimedAttempts(
+                    EXPIRED_TIMED_STALE_HOURS, ABANDONED_BATCH_SIZE);
+            if (finalized < ABANDONED_BATCH_SIZE) break;
+        }
+
         for (int i = 0; i < ABANDONED_MAX_BATCHES_PER_RUN; i++) {
             int deleted = userTestService.purgeAbandonedUntimed(
                     ABANDONED_UNTIMED_THRESHOLD_HOURS, ABANDONED_BATCH_SIZE);

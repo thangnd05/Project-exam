@@ -102,7 +102,10 @@ function App() {
                   key={`admin-${index}`}
                   path={route.path}
                   element={
-                    <ProtectedRoute requiredRoleName="ADMIN">
+                    <ProtectedRoute
+                      requiredPermission={route.permission}
+                      requiredRoleName={route.permission ? undefined : 'ADMIN'}
+                    >
                       <AdminLayout>
                         <Page />
                       </AdminLayout>

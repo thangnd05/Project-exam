@@ -17,6 +17,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
+import com.project_exam.backend.modules.assessment.attempt.util.AttemptTimeUtil;
 import com.project_exam.backend.modules.assessment.attempt.mapper.LeaderboardMapper;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.users.user.domain.*;
@@ -140,38 +141,68 @@ public class UserTestService {
             throw new ConflictException("Bài thi đã được nộp");
         }
 
-        userTest.setFinishedAt(Instant.now());
-        userTest.setStatus(UserTest.Status.COMPLETED);
-
         AfterCommitTasks.runQuietly(
                 () -> streakService.recordActivity(currentUserId, StreakActivityType.TEST_SUBMIT));
 
-        List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTestId);
+        return finalizeAttempt(userTest, Instant.now());
+    }
+
+    /**
+     * Chốt một lượt làm bài: chấm điểm rồi chuyển sang COMPLETED.
+     *
+     * Dùng chung cho nộp bài thủ công và cho việc dọn bài quá giờ mà người dùng không nộp
+     * (đóng tab, mất mạng). finishedAt không bao giờ vượt quá hạn làm bài, nếu không thì
+     * bài dọn muộn 3 ngày sẽ hiện "làm trong 3 ngày".
+     */
+    @Transactional
+    public UserTest finalizeAttempt(UserTest userTest, Instant now) {
+        Test test = testRepository.findById(userTest.getTestId())
+                .orElseThrow(() -> new NotFoundException("Test not found"));
+
+        Instant deadline = AttemptTimeUtil.deadline(userTest, test.getDurationMinutes());
+        userTest.setFinishedAt(deadline != null && now.isAfter(deadline) ? deadline : now);
+        userTest.setStatus(UserTest.Status.COMPLETED);
+
+        List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTest.getUserTestId());
         if (userAnswers.isEmpty()) {
             userTest.setTotalScore(0);
             return userTestRepository.save(userTest);
         }
-
-        Test test = testRepository.findById(userTest.getTestId())
-                .orElseThrow(() -> new NotFoundException("Test not found"));
 
         ExamType examType = examTypeRepository.findById(test.getExamTypeId())
                 .orElseThrow(() -> new NotFoundException("ExamType not found"));
 
         if (userTest.isPractice()) {
             userTest.setTotalScore(scorePractice(userTest, userAnswers, examType));
-            UserTest saved = userTestRepository.save(userTest);
-            syncTargetProgressAfterSubmit(saved, test.getExamTypeId());
-            return saved;
+        } else {
+            int totalQuestionsInTest = calculateTotalQuestionsInTest(userTest.getTestId());
+            userTest.setTotalScore(
+                    testScorer.scoreFullTest(userAnswers, test, examType, totalQuestionsInTest));
         }
 
-        int totalQuestionsInTest = calculateTotalQuestionsInTest(userTest.getTestId());
-        int totalScore = testScorer.scoreFullTest(userAnswers, test, examType, totalQuestionsInTest);
-
-        userTest.setTotalScore(totalScore);
         UserTest saved = userTestRepository.save(userTest);
         syncTargetProgressAfterSubmit(saved, test.getExamTypeId());
         return saved;
+    }
+
+    /**
+     * Lượt làm bài quá giờ mà chưa nộp thì tự chốt, trả về true nếu vừa chốt.
+     * Không có bước này thì bài treo IN_PROGRESS vĩnh viễn: lần sau bấm "Làm bài" người dùng
+     * rơi lại đúng bài đã hết giờ, không lưu được đáp án nào và cũng không mở được lượt mới.
+     */
+    @Transactional
+    public boolean finalizeIfExpired(UserTest userTest) {
+        if (userTest == null || userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
+            return false;
+        }
+        Integer durationMinutes = testRepository.findById(userTest.getTestId())
+                .map(Test::getDurationMinutes)
+                .orElse(null);
+        if (!AttemptTimeUtil.isExpired(userTest, durationMinutes, Instant.now())) {
+            return false;
+        }
+        finalizeAttempt(userTest, Instant.now());
+        return true;
     }
 
     private void syncTargetProgressAfterSubmit(UserTest userTest, String examTypeId) {
@@ -400,7 +431,8 @@ public class UserTestService {
                                 userId, testId, UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE, practicePartIds)
                 : userTestRepository.findActiveUserTest(
                         userId, testId, UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE);
-        if (existing.isPresent()) {
+        // Bài dở còn giờ thì vào tiếp; hết giờ thì chốt luôn rồi mở lượt mới bên dưới.
+        if (existing.isPresent() && !finalizeIfExpired(existing.get())) {
             return existing.get();
         }
 
@@ -489,6 +521,25 @@ public class UserTestService {
         return userTestRepository.findActiveGuestUserTest(guestSessionId, testId, UserTest.Status.IN_PROGRESS);
     }
 
+    /**
+     * Như findActiveUserTest nhưng bài đã quá giờ thì chốt luôn và coi như không còn bài dở,
+     * để màn hình "bạn đang có bài làm dở" không mời người dùng quay lại một bài đã chết.
+     */
+    @Transactional
+    public Optional<UserTest> resolveActiveUserTest(String userId, String testId, String modeRaw,
+                                                    List<String> examPartIds) {
+        return dropIfExpired(findActiveUserTest(userId, testId, modeRaw, examPartIds));
+    }
+
+    @Transactional
+    public Optional<UserTest> resolveActiveGuestUserTest(String guestSessionId, String testId) {
+        return dropIfExpired(findActiveGuestUserTest(guestSessionId, testId));
+    }
+
+    private Optional<UserTest> dropIfExpired(Optional<UserTest> active) {
+        return active.filter(ut -> !finalizeIfExpired(ut));
+    }
+
     @Transactional
     public UserTest startGuestUserTest(String testId, String guestSessionId) {
         if (guestSessionId == null || guestSessionId.isBlank()) {
@@ -516,7 +567,7 @@ public class UserTestService {
 
         Optional<UserTest> existing = userTestRepository.findActiveGuestUserTest(
                 guestSessionId, testId, UserTest.Status.IN_PROGRESS);
-        if (existing.isPresent()) {
+        if (existing.isPresent() && !finalizeIfExpired(existing.get())) {
             return existing.get();
         }
 
@@ -603,6 +654,26 @@ public class UserTestService {
 
         if (!toSave.isEmpty()) userTestRepository.saveAll(toSave);
         return toSave.size();
+    }
+
+    /**
+     * Backstop cho những bài có giờ mà người dùng không bao giờ quay lại: chốt điểm theo đáp án
+     * đã lưu được. Luồng tương tác (start / check-active) đã tự xử lý ngay khi người dùng quay
+     * lại, job này chỉ để bảng thống kê không đọng bài IN_PROGRESS treo mãi.
+     */
+    @Transactional
+    public int finalizeExpiredTimedAttempts(long staleAfterHours, int batchSize) {
+        Instant now = Instant.now();
+        List<UserTest> candidates = userTestRepository.findStaleTimedAttempts(
+                UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE,
+                now.minus(Duration.ofHours(staleAfterHours)),
+                org.springframework.data.domain.PageRequest.of(0, batchSize));
+
+        int finalized = 0;
+        for (UserTest attempt : candidates) {
+            if (finalizeIfExpired(attempt)) finalized++;
+        }
+        return finalized;
     }
 
     @Transactional

@@ -21,8 +21,17 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
     List<Question> findRandomByExamPart(@Param("examPartId") String examPartId, @Param("limit") int limit);
 
-    @Query("SELECT q FROM Question q WHERE q.examPartId = :examPartId ORDER BY function('RANDOM')")
-    List<Question> findRandomQuestionsByExamPartId(@Param("examPartId") String examPartId, Pageable pageable);
+    /**
+     * Bốc ngẫu nhiên chỉ lấy question_id: ORDER BY RANDOM() phải sort toàn bộ câu của Part,
+     * chiếu về 1 cột id để Postgres không kéo theo nội dung câu hỏi (pool tới 600 dòng/phiên).
+     */
+    @Query(value = "SELECT question_id FROM questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT :limit",
+            nativeQuery = true)
+    List<String> findRandomQuestionIdsByExamPartId(
+            @Param("examPartId") String examPartId,
+            @Param("limit") int limit);
+
+    boolean existsByExamPartId(String examPartId);
 
     @Query("SELECT COUNT(q) FROM Question q WHERE q.examPartId = :examPartId")
     long countByExamPartId(@Param("examPartId") String examPartId);
@@ -230,14 +239,27 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
             @Param("examPartId") String examPartId,
             @Param("creatorIds") Collection<String> creatorIds);
 
+    /** Xem ghi chú ở {@link #findRandomQuestionIdsByExamPartId}: chỉ chiếu question_id. */
     @Query(value = """
-            SELECT q.* FROM questions q
+            SELECT q.question_id FROM questions q
             INNER JOIN question_tags qt ON qt.question_id = q.question_id
             WHERE qt.tag_id = :tagId AND q.exam_part_id = :examPartId
             ORDER BY RANDOM()
+            LIMIT :limit
             """, nativeQuery = true)
-    List<Question> findRandomQuestionsByTagAndExamPart(
+    List<String> findRandomQuestionIdsByTagAndExamPart(
             @Param("tagId") String tagId,
             @Param("examPartId") String examPartId,
-            Pageable pageable);
+            @Param("limit") int limit);
+
+    @Query(value = """
+            SELECT EXISTS (
+                SELECT 1 FROM questions q
+                INNER JOIN question_tags qt ON qt.question_id = q.question_id
+                WHERE qt.tag_id = :tagId AND q.exam_part_id = :examPartId
+            )
+            """, nativeQuery = true)
+    boolean existsByTagAndExamPart(
+            @Param("tagId") String tagId,
+            @Param("examPartId") String examPartId);
 }

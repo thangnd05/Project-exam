@@ -8,6 +8,7 @@ import styles from './HeroSection.module.scss';
 import {calculateAllowedTime} from '~/shared/utils/testStatusHelper';
 import {useQuickChallengeTests} from '~/features/landing/components/HeroSection/hooks/useQuickChallengeTests';
 import QuickTestOrbit from './QuickTestOrbit';
+import QuickTestConfirmModal from './QuickTestConfirmModal';
 import {getStandardExamTypes} from '~/shared/api/examTypeApi';
 import {examTypeKeys} from '~/features/tests/exam/exam-types/examTypeKeys';
 import {name as brandName} from '~/shared/assets/images';
@@ -25,6 +26,7 @@ function HeroSection() {
   const navigate = useNavigate();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
   const [activeIdx, setActiveIdx] = useState(0);
+  const [pendingTest, setPendingTest] = useState(null);
   const orbitRef = useRef(null);
 
   const {data: examTypeCount = 0} = useQuery({
@@ -67,13 +69,30 @@ function HeroSection() {
     [navigate],
   );
 
+  const requestStart = useCallback((test) => {
+    if (!test) return;
+    setPendingTest(test);
+  }, []);
+
+  const closeConfirm = useCallback(() => {
+    setPendingTest(null);
+  }, []);
+
+  const confirmStart = useCallback(
+    (test) => {
+      setPendingTest(null);
+      startTest(test);
+    },
+    [startTest],
+  );
+
   const handleStartQuick = useCallback(() => {
     if (!active) {
       handleScrollToExam();
       return;
     }
-    startTest(active);
-  }, [active, startTest]);
+    requestStart(active);
+  }, [active, requestStart]);
 
   const goPrev = () => orbitRef.current?.goPrev();
   const goNext = () => orbitRef.current?.goNext();
@@ -140,7 +159,7 @@ function HeroSection() {
             <QuickTestOrbit
               ref={orbitRef}
               tests={cards}
-              onOpen={startTest}
+              onOpen={requestStart}
               onFrontChange={setActiveIdx}
             />
           ) : (
@@ -205,6 +224,13 @@ function HeroSection() {
           />
         </svg>
       </button>
+
+      <QuickTestConfirmModal
+        show={Boolean(pendingTest)}
+        test={pendingTest}
+        onClose={closeConfirm}
+        onConfirm={confirmStart}
+      />
     </section>
   );
 }

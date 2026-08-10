@@ -38,6 +38,17 @@ export const getUserTestMeta = (userTestId, isGuest, config = {}) => {
   return axios.get(url, config).then((res) => res.data);
 };
 
+/**
+ * Đề kèm đáp án đúng để xem lại. Chỉ chủ bài làm mới gọi được và phải nộp bài rồi —
+ * server tự kiểm tra, đừng gọi lại /api/tests/admintest cho luồng học viên.
+ */
+export const getReviewTest = (userTestId, isGuest, config = {}) => {
+  const url = isGuest
+    ? `${BASE_URL}/guest/${userTestId}/review-test`
+    : `${BASE_URL}/${userTestId}/review-test`;
+  return axios.get(url, config).then((res) => res.data);
+};
+
 export const startUserTest = (testId, isGuest, config = {}, { mode, examPartIds } = {}) => {
   const url = isGuest ? `${BASE_URL}/guest` : BASE_URL;
   const body = { testId };

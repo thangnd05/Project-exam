@@ -48,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -121,8 +122,10 @@ public class LearningPlanService {
                 ? Set.of()
                 : new HashSet<>(request.getFocusExamPartIds());
 
-        Map<String, List<String>> questionIdsByPart =
-                buildQuestionIdsByPartForTest(userTest.getTestId());
+        // Nạp lười: chỉ nhánh dự phòng "Part không có tag nào trong kết quả" mới cần, nên đường
+        // thường tốn 0 query thay vì đọc lại testPart + testQuestion + questions (lần thứ 3).
+        Supplier<Map<String, List<String>>> questionIdsByPart =
+                lazy(() -> buildQuestionIdsByPartForTest(userTest.getTestId()));
 
         List<TaskCandidate> candidates = buildTaskCandidates(
                 partBreakdown, partRequirements, focusPartIds, questionIdsByPart);
@@ -319,9 +322,7 @@ public class LearningPlanService {
             List<PartBreakdownResponse> partBreakdown,
             Map<String, Integer> partRequirements,
             Set<String> focusPartIds,
-            Map<String, List<String>> questionIdsByPart) {
-        // partBreakdown đã được sắp theo ExamPart.displayOrder ở EnhancedResultService,
-        // taskOrder cứ theo đó cho khớp thứ tự hiển thị.
+            Supplier<Map<String, List<String>>> questionIdsByPart) {
         List<TaskCandidate> candidates = new ArrayList<>();
         for (PartBreakdownResponse part : partBreakdown) {
             if (!matchesFocus(part.getExamPartId(), focusPartIds)) {
@@ -332,11 +333,8 @@ public class LearningPlanService {
                 continue;
             }
 
-            List<String> questionIdsInPart = questionIdsByPart.getOrDefault(
-                    part.getExamPartId(), List.of());
-
             List<TaskCandidate> partTasks = collectTasksForPart(
-                    part, requiredPercent, requiredPercent, questionIdsInPart);
+                    part, requiredPercent, requiredPercent, questionIdsByPart);
             candidates.addAll(partTasks);
         }
         return candidates;
@@ -355,6 +353,21 @@ public class LearningPlanService {
 
     private boolean partNeedsFocus(PartBreakdownResponse part, int requiredPercent) {
         return part.getPercentage() < requiredPercent;
+    }
+
+    /** Supplier nhớ kết quả: loader chỉ chạy lần đầu có người gọi get(). */
+    private static <T> Supplier<T> lazy(Supplier<T> loader) {
+        return new Supplier<>() {
+            private T value;
+
+            @Override
+            public T get() {
+                if (value == null) {
+                    value = loader.get();
+                }
+                return value;
+            }
+        };
     }
 
     private Map<String, List<String>> buildQuestionIdsByPartForTest(String testId) {
@@ -390,7 +403,7 @@ public class LearningPlanService {
             PartBreakdownResponse part,
             double threshold,
             int passAccuracy,
-            List<String> questionIdsInPart) {
+            Supplier<Map<String, List<String>>> questionIdsByPart) {
         List<TaskCandidate> partTasks = new ArrayList<>();
         Set<String> usedTagIds = new HashSet<>();
 
@@ -411,11 +424,15 @@ public class LearningPlanService {
                             buildTaskCandidate(tag.getTagId(), tag, part, passAccuracy)));
         }
 
-        if (partTasks.isEmpty() && !questionIdsInPart.isEmpty()) {
-            List<String> tagIds = questionTagRepository.findDistinctTagIdsByQuestionIdIn(questionIdsInPart);
-            for (String tagId : tagIds) {
-                addTaskIfNew(partTasks, usedTagIds,
-                        buildTaskCandidate(tagId, null, part, passAccuracy));
+        if (partTasks.isEmpty()) {
+            List<String> questionIdsInPart = questionIdsByPart.get()
+                    .getOrDefault(part.getExamPartId(), List.of());
+            if (!questionIdsInPart.isEmpty()) {
+                List<String> tagIds = questionTagRepository.findDistinctTagIdsByQuestionIdIn(questionIdsInPart);
+                for (String tagId : tagIds) {
+                    addTaskIfNew(partTasks, usedTagIds,
+                            buildTaskCandidate(tagId, null, part, passAccuracy));
+                }
             }
         }
 

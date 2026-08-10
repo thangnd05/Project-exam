@@ -34,7 +34,6 @@ import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -488,14 +487,19 @@ public class LearningPlanSessionService {
     }
 
     private void saveSessionQuestions(String sessionId, List<String> questionIds) {
+        if (questionIds.isEmpty()) {
+            return;
+        }
+        List<LearningPlanSessionQuestion> rows = new ArrayList<>(questionIds.size());
         int order = 1;
         for (String qid : questionIds) {
             LearningPlanSessionQuestion sq = new LearningPlanSessionQuestion();
             sq.setSessionId(sessionId);
             sq.setQuestionId(qid);
             sq.setDisplayOrder(order++);
-            sessionQuestionRepository.save(sq);
+            rows.add(sq);
         }
+        sessionQuestionRepository.saveAll(rows);
     }
 
     private String resolveResourceId(String tagId) {
@@ -507,20 +511,19 @@ public class LearningPlanSessionService {
     private List<String> pickQuestionsForTag(
             String userId, String tagId, String examPartId, int count) {
         int poolSize = LearningPlanQuestionTargets.poolFetchSize(count);
-        List<Question> pool = questionRepository.findRandomQuestionsByTagAndExamPart(
-                tagId, examPartId, PageRequest.of(0, poolSize));
+        List<String> pool = questionRepository.findRandomQuestionIdsByTagAndExamPart(
+                tagId, examPartId, poolSize);
         return selectFromPool(userId, pool, count);
     }
 
     private List<String> pickQuestionsForPart(String userId, String examPartId, int count) {
         int poolSize = LearningPlanQuestionTargets.poolFetchSize(count);
-        List<Question> pool = questionRepository.findRandomQuestionsByExamPartId(
-                examPartId, PageRequest.of(0, poolSize));
+        List<String> pool = questionRepository.findRandomQuestionIdsByExamPartId(examPartId, poolSize);
         return selectFromPool(userId, pool, count);
     }
 
-    private List<String> selectFromPool(String userId, List<Question> pool, int count) {
-        List<String> ids = pool.stream().map(Question::getQuestionId).distinct().toList();
+    private List<String> selectFromPool(String userId, List<String> pool, int count) {
+        List<String> ids = pool.stream().distinct().toList();
         if (ids.isEmpty()) {
             return List.of();
         }
