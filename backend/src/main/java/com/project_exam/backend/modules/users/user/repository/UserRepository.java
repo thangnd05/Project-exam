@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     Optional<User> findByEmail(String email);
     Optional<User> findByUserName(String userName);
     List<User> findByRoleId(String id);
+    long countByRoleId(String roleId);
 
     @Query("SELECT u.createdAt FROM User u WHERE u.createdAt >= :from")
     List<Instant> findCreatedAtSince(Instant from);

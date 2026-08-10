@@ -20,6 +20,7 @@ const normalizeAuditData = (response) => {
       endpoint: item.endpoint || '',
       action: item.action || '',
       ip_address: item.ipAddress || '',
+      details: item.details || '',
       success: Boolean(item.success),
       created_at: item.createdAt || '',
     })),

@@ -23,6 +23,7 @@ public class AuditLogMapper {
                 .userAgent(auditLog.getUserAgent())
                 .statusCode(auditLog.getStatusCode())
                 .success(auditLog.getSuccess())
+                .details(auditLog.getDetails())
                 .createdAt(auditLog.getCreatedAt())
                 .build();
     }

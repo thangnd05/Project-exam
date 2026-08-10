@@ -1,6 +1,7 @@
 package com.project_exam.backend.infrastructure.web;
 
 import com.project_exam.backend.modules.audit.domain.AuditLog;
+import com.project_exam.backend.modules.audit.service.AuditContext;
 import com.project_exam.backend.modules.audit.service.AuditLogService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +45,11 @@ public class AuditLogInterceptor implements HandlerInterceptor {
         auditLog.setResourceId(resolveResourceId(endpoint));
         auditLog.setIpAddress(request.getRemoteAddr());
         auditLog.setUserAgent(request.getHeader("User-Agent"));
+
+        Object details = request.getAttribute(AuditContext.ATTRIBUTE);
+        if (details != null) {
+            auditLog.setDetails(String.valueOf(details));
+        }
 
         int statusCode = response.getStatus();
         auditLog.setStatusCode(statusCode);

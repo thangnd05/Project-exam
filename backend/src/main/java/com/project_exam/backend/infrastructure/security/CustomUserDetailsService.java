@@ -4,7 +4,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 
 import com.project_exam.backend.modules.users.rbac.domain.Role;
 import com.project_exam.backend.modules.users.user.domain.User;
-import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
+import com.project_exam.backend.modules.users.rbac.service.RoleAuthorityCache;
 import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +30,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final RolePermissionRepository rolePermissionRepository;
+    private final RoleAuthorityCache roleAuthorityCache;
     private final PasswordEncoder passwordEncoder;
 
     public CustomUserDetailsService(UserRepository userRepository, RoleRepository roleRepository,
-                                    RolePermissionRepository rolePermissionRepository,
+                                    RoleAuthorityCache roleAuthorityCache,
                                     @Lazy PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.rolePermissionRepository = rolePermissionRepository;
+        this.roleAuthorityCache = roleAuthorityCache;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -60,7 +60,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName().toUpperCase()));
-        for (String code : rolePermissionRepository.findPermissionCodesByRoleId(role.getRoleId())) {
+        for (String code : roleAuthorityCache.permissionCodesOf(role.getRoleId())) {
             authorities.add(new SimpleGrantedAuthority(code));
         }
 

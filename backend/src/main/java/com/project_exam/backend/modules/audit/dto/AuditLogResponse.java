@@ -25,5 +25,6 @@ public class AuditLogResponse {
     private String userAgent;
     private Integer statusCode;
     private Boolean success;
+    private String details;
     private Instant createdAt;
 }

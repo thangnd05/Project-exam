@@ -36,7 +36,8 @@ function AuditLogsPage() {
         log.action.toLowerCase().includes(normalizedSearch) ||
         log.endpoint.toLowerCase().includes(normalizedSearch) ||
         (log.full_name || '').toLowerCase().includes(normalizedSearch) ||
-        (log.user_name || '').toLowerCase().includes(normalizedSearch);
+        (log.user_name || '').toLowerCase().includes(normalizedSearch) ||
+        (log.details || '').toLowerCase().includes(normalizedSearch);
 
       const matchesStatus =
         statusFilter === 'all' ||
@@ -65,6 +66,18 @@ function AuditLogsPage() {
           <span>{log.endpoint}</span>
         </div>
       ),
+    },
+    {
+      key: 'details',
+      header: 'Nội dung thay đổi',
+      render: (log) =>
+        log.details ? (
+          <span title={log.details} style={{whiteSpace: 'pre-wrap', wordBreak: 'break-word'}}>
+            {log.details}
+          </span>
+        ) : (
+          '-'
+        ),
     },
     {
       key: 'full_name',

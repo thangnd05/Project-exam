@@ -56,6 +56,9 @@ public class AuditLog {
     @Column(nullable = false)
     private Boolean success;
 
+    @Column(columnDefinition = "TEXT")
+    private String details;
+
     @Column(nullable = false)
     private Instant createdAt;
 

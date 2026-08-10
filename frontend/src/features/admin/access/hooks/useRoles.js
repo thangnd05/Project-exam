@@ -9,6 +9,7 @@ import {
 } from '~/shared/api/roleApi';
 import {getPermissions} from '~/shared/api/permissionApi';
 import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
+import {CURRENT_USER_QUERY_KEY} from '~/shared/context/AuthContext';
 
 export const roleKeys = {
   roles: ['admin-roles'],
@@ -44,7 +45,11 @@ export function useRoles() {
 
   const updatePermissionsMutation = useMutation({
     mutationFn: ({id, codes}) => updateRolePermissions(id, codes),
-    onSuccess: () => qc.invalidateQueries({queryKey: roleKeys.roles}),
+    onSuccess: () => {
+      qc.invalidateQueries({queryKey: roleKeys.roles});
+      // Quyền của chính mình có thể vừa đổi — nạp lại /me để menu/route khớp với backend.
+      qc.invalidateQueries({queryKey: CURRENT_USER_QUERY_KEY});
+    },
   });
 
   return {
