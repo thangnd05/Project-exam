@@ -1471,7 +1471,7 @@
   position: relative;
   overflow: hidden;
   background: var(--primary-btn-gradient);
-  color: var(--white);
+  color: var(--on-primary-gradient);
   border-radius: var(--radius-xl);
   padding: 2.4rem 2.8rem;
   margin-bottom: 1.6rem;
@@ -1524,7 +1524,8 @@
 .planHeroCheer {
   font-size: var(--font-size-ssm);
   margin: 0 0 1rem;
-  opacity: 0.92;
+  color: var(--on-primary-gradient-muted);
+  opacity: 1;
 }
 
 .planHeroEyebrow {
@@ -1532,7 +1533,8 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: var(--font-weight-semibold);
-  opacity: 0.85;
+  color: var(--on-primary-gradient-subtle);
+  opacity: 1;
   margin-bottom: 0.4rem;
 }
 
@@ -1553,9 +1555,9 @@
   font-size: var(--font-size-sm);
   padding: 0.3rem 0.9rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: inherit;
+  background: var(--on-primary-gradient-soft);
+  border: 1px solid var(--on-primary-gradient-border);
+  color: var(--on-primary-gradient-muted);
   white-space: nowrap;
 }
 
@@ -1569,7 +1571,8 @@
 
 .planHeroCtaHint {
   font-size: var(--font-size-sm);
-  opacity: 0.85;
+  color: var(--on-primary-gradient-subtle);
+  opacity: 1;
   white-space: nowrap;
 }
 
@@ -1580,7 +1583,7 @@
   padding: 1.1rem 2.2rem;
   border-radius: var(--radius-md);
   background: var(--white);
-  color: var(--primary);
+  color: var(--on-primary-gradient-cta);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
@@ -1590,7 +1593,7 @@
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-    color: var(--primary);
+    color: var(--on-primary-gradient-cta);
   }
 }
 
@@ -1600,24 +1603,26 @@
   align-items: baseline;
   gap: 1rem;
   font-size: var(--font-size-sm);
+  color: var(--on-primary-gradient-muted);
   margin-bottom: 0.5rem;
 
   strong {
     font-size: var(--font-size-md);
+    color: var(--on-primary-gradient);
   }
 }
 
 .planHeroProgressBar {
   height: 1rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--on-primary-gradient-track);
   overflow: hidden;
 }
 
 .planHeroProgressFill {
   height: 100%;
   border-radius: 999px;
-  background: var(--white);
+  background: var(--on-primary-gradient-fill);
   transition: width 0.6s ease;
 }
 

@@ -11,7 +11,7 @@ const steps = [
     id: 'try',
     index: '01',
     title: 'Làm bài thử',
-    text: 'Bài ngắn, đủ để lộ điểm yếu — không cần ngồi cả buổi. Chúng tôi thiết kế các bài đánh giá nhanh nhưng chính xác, giúp bạn xác định lỗ hổng kiến thức ngay từ 15 phút đầu tiên.',
+    text: 'Bài ngắn, khoảng 15 phút. Đủ để lộ điểm yếu mà không cần ngồi cả buổi.',
     hint: 'Có timer · như thi thật',
     shot: images.quickImage,
     shotAlt: 'Màn hình làm đề trên WinDe',
@@ -20,7 +20,7 @@ const steps = [
     id: 'see',
     index: '02',
     title: 'Nhận chẩn đoán',
-    text: 'Biết chỗ nào đang kéo điểm, ưu tiên sửa phần nào trước. Hệ thống phân tích sâu kết quả làm bài, hiển thị trực quan các nhóm kỹ năng yếu nhất cần được cải thiện ngay lập tức.',
+    text: 'Xem rõ kỹ năng nào đang kéo điểm và nên sửa phần nào trước.',
     hint: 'Theo từng kỹ năng',
     shot: images.dignos,
     shotAlt: 'Trang chẩn đoán năng lực trên WinDe',
@@ -29,7 +29,7 @@ const steps = [
     id: 'path',
     index: '03',
     title: 'Luyện theo kế hoạch',
-    text: 'Nhận lộ trình cá nhân: làm đúng thứ tự, đúng chỗ còn yếu. Không còn bối rối giữa hàng ngàn tài liệu, WinDe tự động sắp xếp những gì quan trọng nhất vào lịch học hàng ngày của bạn.',
+    text: 'Nhận lộ trình cá nhân: đúng thứ tự, đúng chỗ còn yếu. Không còn mò giữa hàng đống tài liệu.',
     hint: 'Luyện đúng chỗ hổng',
     shot: images.learningPlan,
     shotAlt: 'Trang lộ trình cá nhân trên WinDe',
@@ -50,9 +50,7 @@ export default function JourneySection() {
           <p className={cx('eyebrow')}>Cách WinDe hoạt động</p>
           <h2 className={cx('title')}>Ba bước tối ưu hóa thời gian</h2>
           <p className={cx('subtitle')}>
-            Không luyện mù quáng, làm thử, xem rõ điểm yếu, rồi ôn đúng chỗ.
-            Hệ thống học tập thông minh giúp bạn tối ưu hóa thời gian đạt mục
-            tiêu.
+            Làm thử, xem rõ điểm yếu, rồi ôn đúng chỗ. Không luyện mù quáng.
           </p>
         </motion.header>
 

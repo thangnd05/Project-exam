@@ -384,8 +384,7 @@ function UserTargetPage() {
 
           {targetScore && hasSavedTarget && (
             <div className={planCx('alert', 'alertWarning')} style={{ marginTop: '0.8rem' }}>
-              Bạn đang chỉnh sửa mục tiêu hiện tại — lưu sẽ cập nhật đè. Nếu đang có lộ trình,
-              nó sẽ cần <strong>sinh lại</strong> để áp ngưỡng theo mục tiêu mới.
+              Bạn đang chỉnh sửa mục tiêu nó sẽ được ghi đè lên mục tiêu hiện tại. 
             </div>
           )}
 

@@ -12,7 +12,7 @@
 .album-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 28rem), 400px));
-    justify-content: center;
+    justify-content: start;
     gap: 3.5rem;
 
     @media (max-width: 768px) {
@@ -36,7 +36,7 @@
     min-width: 0;
     width: 100%;
     max-width: 400px;
-    justify-self: center;
+    justify-self: start;
 
     @media (max-width: 768px) {
         max-width: none;

@@ -234,6 +234,16 @@
   --text-on-dark-muted: rgb(var(--text-on-dark-rgb) / 0.72);
   --text-on-brand: var(--brand-900);
 
+  /* Chữ trên --primary-btn-gradient: champagne sáng → mực tối; teal tối override ở theme normal */
+  --on-primary-gradient: var(--text-on-brand);
+  --on-primary-gradient-muted: var(--brand-800);
+  --on-primary-gradient-subtle: var(--brand-700);
+  --on-primary-gradient-soft: rgb(var(--brand-900-rgb) / 0.08);
+  --on-primary-gradient-border: rgb(var(--brand-700-rgb) / 0.35);
+  --on-primary-gradient-track: rgb(var(--brand-900-rgb) / 0.18);
+  --on-primary-gradient-fill: var(--brand-800);
+  --on-primary-gradient-cta: var(--brand-800);
+
   --text-color: var(--ink);
   --text-secondary: var(--slate-500);
 
@@ -365,6 +375,16 @@
   --primary-btn-shadow: 0 10px 22px var(--primary-alpha-28);
   --primary-btn-shadow-hover: 0 14px 28px rgb(var(--brand-600-rgb) / 0.38);
   --primary-btn-shadow-disabled: 0 8px 18px var(--primary-alpha-20);
+
+  /* Gradient teal tối → chữ trắng (ngược champagne) */
+  --on-primary-gradient: var(--white);
+  --on-primary-gradient-muted: rgb(255 255 255 / 0.92);
+  --on-primary-gradient-subtle: rgb(255 255 255 / 0.85);
+  --on-primary-gradient-soft: rgba(255, 255, 255, 0.18);
+  --on-primary-gradient-border: rgba(255, 255, 255, 0.3);
+  --on-primary-gradient-track: rgba(255, 255, 255, 0.25);
+  --on-primary-gradient-fill: var(--white);
+  --on-primary-gradient-cta: var(--primary);
 
   /* Neutral lạnh */
   --warm-bg: #f8fafc;
