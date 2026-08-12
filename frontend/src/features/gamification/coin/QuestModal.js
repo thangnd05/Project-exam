@@ -74,7 +74,7 @@ function QuestModal({show, onClose}) {
   const balanceBadge = (
     <span className={cx('balanceBadge')}>
       <CircleDollarSign size={15} />
-      {balance} xu
+      {Number(balance).toLocaleString('vi-VN')} xu
     </span>
   );
 

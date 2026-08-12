@@ -7,18 +7,19 @@ import style from './CoinQuestMenu.module.scss';
 
 const cx = classNames.bind(style);
 
-function CoinQuestMenu() {
+function CoinQuestMenu({variant = 'default', className}) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <button
         type="button"
-        className={cx('trigger')}
+        className={cx('trigger', className)}
         onClick={() => setOpen(true)}
         title="Xem nhiệm vụ"
+        aria-label="Xem số dư xu và nhiệm vụ"
       >
-        <CoinBadge />
+        <CoinBadge variant={variant} />
       </button>
       <QuestModal show={open} onClose={() => setOpen(false)} />
     </>

@@ -2,8 +2,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 32px;
   padding: 4px 12px;
   border-radius: 999px;
+  border: 1px solid transparent;
   background: rgb(var(--yellow-500-rgb) / 0.1);
   color: var(--yellow-600);
   font-weight: 700;
@@ -11,10 +13,26 @@
   user-select: none;
   cursor: default;
   box-shadow: none;
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 
   .icon {
     font-size: var(--font-size-base);
     filter: none;
+  }
+
+  .count {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  &.onDark {
+    background: rgb(255 255 255 / 0.08);
+    border-color: rgb(255 255 255 / 0.12);
+    color: var(--amber-400);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 }

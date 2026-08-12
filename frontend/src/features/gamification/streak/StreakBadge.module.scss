@@ -2,18 +2,27 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 32px;
   padding: 4px 12px;
   border-radius: 999px;
+  border: 1px solid transparent;
   background: #f1f3f5;
   color: #adb5bd;
   font-weight: 700;
   font-size: var(--font-size-md);
   user-select: none;
   cursor: default;
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 
   .icon {
     font-size: var(--font-size-base);
+  }
+
+  .count {
+    font-variant-numeric: tabular-nums;
   }
 
   &.active {
@@ -45,6 +54,32 @@
 
     &:hover {
       background: #e9ecef;
+    }
+  }
+
+  &.onDark {
+    background: rgb(255 255 255 / 0.08);
+    border-color: rgb(255 255 255 / 0.12);
+    color: rgb(var(--text-on-dark-rgb) / 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    &.active {
+      background: rgb(255 255 255 / 0.08);
+      border-color: rgb(255 255 255 / 0.12);
+      color: var(--orange-500);
+    }
+
+    &.recoverable {
+      color: var(--text-on-dark);
+
+      &::after {
+        box-shadow: 0 0 0 2px rgb(var(--brand-900-rgb) / 0.85);
+      }
+
+      &:hover {
+        background: rgb(255 255 255 / 0.12);
+      }
     }
   }
 }

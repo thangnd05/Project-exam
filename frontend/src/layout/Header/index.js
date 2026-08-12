@@ -1,12 +1,5 @@
-import {
-  Nav,
-  Container,
-  Navbar,
-  Button,
-  Dropdown,
-  Image,
-} from 'react-bootstrap';
-import { useState } from 'react';
+import {Button, Dropdown, Image} from 'react-bootstrap';
+import {useState} from 'react';
 import {Link, NavLink, useNavigate} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -72,85 +65,121 @@ function Header() {
   };
 
   return (
-    <div className={cx('wrapper')}>
+    <header className={cx('wrapper')}>
       <div className={cx('pill')}>
-        <Navbar expand="lg" className={cx('navbarRoot')}>
-          <Container fluid>
-            <Navbar.Brand as={Link} to={routes.home} className={cx('brand')}>
-              <div className={cx('brandInner')}>
+        <div className={cx('barRow')}>
+          {/* Zone 1 — Brand */}
+          <div className={cx('zoneLeft')}>
+            <Link to={routes.home} className={cx('brand')}>
+              <span className={cx('brandInner')}>
                 <Image
                   src={images.logoW}
-                  alt="logo"
+                  alt="WinDe"
                   height="32"
                   loading="lazy"
                   className={cx('logo-brand')}
                 />
                 <span className={cx('brandName')}>{name}</span>
-              </div>
-            </Navbar.Brand>
+              </span>
+            </Link>
+          </div>
 
+          {/* Zone 2 — Primary navigation (desktop) */}
+          <nav className={cx('zoneCenter')} aria-label="Điều hướng chính">
+            <div className={cx('navTrack')}>
+              <NavLink
+                to={routes.posts}
+                className={({isActive}) => cx('home', {active: isActive})}
+              >
+                Bài viết
+              </NavLink>
+              {/* Các mục dưới đây đều là trang riêng tư nhưng vẫn hiện khi chưa đăng nhập:
+                  ProtectedRoute sẽ đưa về trang đăng nhập kèm lời nhắc rồi quay lại đúng
+                  trang này sau khi đăng nhập xong. */}
+              <NavLink
+                to={routes.myTarget}
+                className={({isActive}) => cx('home', {active: isActive})}
+              >
+                Lộ trình
+              </NavLink>
+              <NavLink
+                to={routes.myAlbums}
+                className={({isActive}) => cx('home', {active: isActive})}
+              >
+                Từ vựng
+              </NavLink>
+              <NavLink
+                to={routes.MyTest}
+                className={({isActive}) => cx('home', {active: isActive})}
+              >
+                Bài đã tạo
+              </NavLink>
+              <Dropdown className={cx('customMenu')} align="start">
+                <Dropdown.Toggle
+                  as="button"
+                  type="button"
+                  className={cx('menuTitle')}
+                  id="header-class-menu"
+                >
+                  Lớp học
+                </Dropdown.Toggle>
+                <Dropdown.Menu className={cx('classDropdown')}>
+                  <Dropdown.Item
+                    as="button"
+                    onClick={(e) => handleClassAction(e, null, 'join')}
+                  >
+                    Tham gia lớp học
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    as="button"
+                    onClick={(e) => handleClassAction(e, routes.myClasses)}
+                  >
+                    Vào lớp học
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    as="button"
+                    onClick={(e) => handleClassAction(e, null, 'create')}
+                  >
+                    Tạo lớp học
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          </nav>
+
+          {/* Zone 3 — CTA + stats + account */}
+          <div className={cx('zoneRight')}>
             {user && (
-              <div className={cx('mobileHeaderActions', 'd-lg-none')}>
-                <StreakBadge />
-                <CoinQuestMenu />
+              <div className={cx('mobileHeaderActions')}>
+                <div className={cx('statsCluster')}>
+                  <StreakBadge variant="onDark" />
+                  <CoinQuestMenu variant="onDark" />
+                </div>
               </div>
             )}
 
-            <Navbar.Collapse id="basic-navbar-nav" className={cx('desktopCollapse')}>
-              <Nav className={cx('desktopNav')}>
-                <Nav.Link as={NavLink} to={routes.posts} className={cx('home')}>
-                  Bài viết
-                </Nav.Link>
-                {/* Các mục dưới đây đều là trang riêng tư nhưng vẫn hiện khi chưa đăng nhập:
-                    ProtectedRoute sẽ đưa về trang đăng nhập kèm lời nhắc rồi quay lại đúng
-                    trang này sau khi đăng nhập xong. */}
-                <Nav.Link as={NavLink} to={routes.myTarget} className={cx('home')}>
-                  Lộ trình
-                </Nav.Link>
-                <Nav.Link as={NavLink} to={routes.myAlbums} className={cx('home')}>
-                  Từ vựng
-                </Nav.Link>
-                <Nav.Link as={NavLink} to={routes.MyTest} className={cx('home')}>
-                  Bài đã tạo
-                </Nav.Link>
-                <div className={cx('customMenu')}>
-                  <span className={cx('menuTitle')}>Lớp học</span>
-                  <div className={cx('menuDropdown')}>
-                    <button onClick={(e) => handleClassAction(e, null, 'join')}>
-                      Tham gia lớp học
-                    </button>
-                    <button onClick={(e) => handleClassAction(e, routes.myClasses)}>
-                      Vào lớp học
-                    </button>
-                    <button onClick={(e) => handleClassAction(e, null, 'create')}>
-                      Tạo lớp học
-                    </button>
-                  </div>
+            <div className={cx('desktopUtils')}>
+              {!user ? (
+                <div className={cx('authLinks')}>
+                  <Link
+                    to={routes.login}
+                    state={{mode: 'signin'}}
+                    className={cx('home')}
+                  >
+                    Đăng nhập
+                  </Link>
+                  <Link
+                    to={routes.login}
+                    state={{mode: 'signup'}}
+                    className={cx('home')}
+                  >
+                    Đăng ký
+                  </Link>
                 </div>
-              </Nav>
-              <Nav className={cx('desktopNav')}>
-                {!user ? (
-                  <div className={cx('userMenuWrapper')}>
-                    <Nav.Link
-                      as={Link}
-                      to={routes.login}
-                      state={{mode: 'signin'}}
-                      className={cx('home')}
-                    >
-                      Đăng nhập
-                    </Nav.Link>
-                    <Nav.Link
-                      as={Link}
-                      to={routes.login}
-                      state={{mode: 'signup'}}
-                      className={cx('home')}
-                    >
-                      Đăng ký
-                    </Nav.Link>
-                  </div>
-                ) : (
-                  <div className={cx('userMenuWrapper')}>
-                    {canCreateTest && (
+              ) : (
+                <div className={cx('userMenuWrapper')}>
+                  {canCreateTest && (
+                    <div className={cx('ctaSlot')}>
                       <Button
                         variant=""
                         className={cx('new-test')}
@@ -158,36 +187,44 @@ function Header() {
                       >
                         Tạo bài kiểm tra
                       </Button>
-                    )}
-                    <StreakBadge />
-                    <CoinQuestMenu />
-                    <Dropdown>
-                      <Dropdown.Toggle as="div" className={cx('user-info')}>
-                        <AvatarWithCosmetic
-                          src={user?.avatarUrl}
-                          fallbackSrc={images.avtImage}
-                          name={user?.userName || user?.fullName}
-                          size={32}
-                          frame={cosmeticFrame}
-                          badge={cosmeticBadge}
-                        />
-                        <div className={cx('userNameWrapper')}>
-                          <span className={cx('username')}>{user.userName}</span>
-                        </div>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu className={cx('custom-dropdown')}>
-                        <Dropdown.Item as={Link} to={routes.profile}>
-                          Hồ sơ
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={handleLogout}>Đăng xuất</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
+                    </div>
+                  )}
+                  <div className={cx('statsCluster')}>
+                    <StreakBadge variant="onDark" />
+                    <CoinQuestMenu variant="onDark" />
                   </div>
-                )}
-              </Nav>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
+                  <Dropdown>
+                    <Dropdown.Toggle
+                      as="div"
+                      className={cx('user-info')}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Tài khoản ${user.userName || ''}`}
+                    >
+                      <AvatarWithCosmetic
+                        src={user?.avatarUrl}
+                        fallbackSrc={images.avtImage}
+                        name={user?.userName || user?.fullName}
+                        size={32}
+                        frame={cosmeticFrame}
+                        badge={cosmeticBadge}
+                      />
+                      <div className={cx('userNameWrapper')}>
+                        <span className={cx('username')}>{user.userName}</span>
+                      </div>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu className={cx('custom-dropdown')}>
+                      <Dropdown.Item as={Link} to={routes.profile}>
+                        Hồ sơ
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={handleLogout}>Đăng xuất</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
@@ -198,7 +235,7 @@ function Header() {
         mode="personal"
         onSuccess={() => setShowCreateTestModal(false)}
       />
-    </div>
+    </header>
   );
 }
 

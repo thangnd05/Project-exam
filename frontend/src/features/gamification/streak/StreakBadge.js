@@ -8,7 +8,7 @@ import StreakRestoreModal from './StreakRestoreModal';
 
 const cx = classNames.bind(style);
 
-function StreakBadge({ className }) {
+function StreakBadge({ className, variant = 'default' }) {
   const { currentStreak, lostStreak, canRecover } = useStreak();
   const [showRestore, setShowRestore] = useState(false);
 
@@ -25,10 +25,26 @@ function StreakBadge({ className }) {
   return (
     <>
       <div
-        className={cx('streakBadge', { active, recoverable }, className)}
+        className={cx(
+          'streakBadge',
+          { active, recoverable },
+          variant === 'onDark' && 'onDark',
+          className
+        )}
         title={title}
         role={recoverable ? 'button' : undefined}
+        tabIndex={recoverable ? 0 : undefined}
         onClick={recoverable ? () => setShowRestore(true) : undefined}
+        onKeyDown={
+          recoverable
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setShowRestore(true);
+                }
+              }
+            : undefined
+        }
       >
         <FontAwesomeIcon icon={faFire} className={cx('icon')} />
         <span className={cx('count')}>{display}</span>
