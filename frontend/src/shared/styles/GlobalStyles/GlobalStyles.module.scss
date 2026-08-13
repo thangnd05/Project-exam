@@ -205,7 +205,6 @@
   --white: #fff;
 
   /* Neutral ấm — dẫn xuất từ tông champagne, đổi cùng lúc với brand */
-  --warm-bg: #f6f3ec;
   --warm-input: #f1ece2;
   --warm-hover: #f3efe6;
   --warm-border: #e4ddd0;
@@ -234,7 +233,7 @@
   --text-on-dark-muted: rgb(var(--text-on-dark-rgb) / 0.72);
   --text-on-brand: var(--brand-900);
 
-  /* Chữ trên --primary-btn-gradient: champagne sáng → mực tối; teal tối override ở theme normal */
+  /* Chữ trên --primary-btn-bg: champagne sáng → mực tối; teal tối override ở theme normal */
   --on-primary-gradient: var(--text-on-brand);
   --on-primary-gradient-muted: var(--brand-800);
   --on-primary-gradient-subtle: var(--brand-700);
@@ -247,7 +246,9 @@
   --text-color: var(--ink);
   --text-secondary: var(--slate-500);
 
-  --bg-body: var(--warm-bg);
+  /* Nền trang trắng ở cả 2 theme. Trước đây là neutral ấm (#f6f3ec kem ở
+     premium / #f8fafc xám lạnh ở normal) nên trang nào cũng lẫn 2-3 sắc nền. */
+  --bg-body: var(--white);
   --bg-white: var(--white);
   --input-bg: var(--warm-input);
   --border-color: var(--warm-border);
@@ -275,7 +276,12 @@
   --primary-alpha-45: rgb(var(--brand-500-rgb) / 0.45);
 
   --primary-gradient: linear-gradient(135deg, var(--brand-200) 0%, var(--brand-500) 52%, var(--brand-600) 100%);
-  --primary-btn-gradient: linear-gradient(145deg, var(--brand-150) 0%, var(--brand-200) 28%, var(--brand-500) 62%, var(--brand-600) 100%);
+
+  /* Nút primary: MÀU PHẲNG, không gradient. Gradient champagne sáng→tối làm nút
+     trông loang hai tông và chữ chỉ đọc được ở nửa dưới, nên bỏ hẳn. Mỗi theme
+     tự lấy --primary của mình (champagne brand-500 / teal brand-600) nên
+     không cần override ở :root[data-theme='normal']. */
+  --primary-btn-bg: var(--primary);
   --primary-btn-shadow: 0 10px 26px rgb(var(--brand-500-rgb) / 0.32);
   --primary-btn-shadow-hover: 0 14px 32px rgb(var(--brand-500-rgb) / 0.42);
   --primary-btn-shadow-disabled: 0 8px 18px rgb(var(--brand-500-rgb) / 0.2);
@@ -369,9 +375,8 @@
   --primary-alpha-35: rgb(var(--brand-600-rgb) / 0.35);
   --primary-alpha-45: rgb(var(--brand-600-rgb) / 0.45);
 
-  /* Gradient / nút theo teal */
+  /* Gradient / nút theo teal (--primary-btn-bg tự bám --primary = brand-600) */
   --primary-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-500) 100%);
-  --primary-btn-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 100%);
   --primary-btn-shadow: 0 10px 22px var(--primary-alpha-28);
   --primary-btn-shadow-hover: 0 14px 28px rgb(var(--brand-600-rgb) / 0.38);
   --primary-btn-shadow-disabled: 0 8px 18px var(--primary-alpha-20);
@@ -387,7 +392,6 @@
   --on-primary-gradient-cta: var(--primary);
 
   /* Neutral lạnh */
-  --warm-bg: #f8fafc;
   --warm-input: #f1f5f9;
   --warm-hover: #f8f9fa;
   --warm-border: #e2e8f0;
@@ -614,16 +618,17 @@ li {
 }
 
 @mixin primaryGradientButton {
-  background: var(--primary-btn-gradient);
+  background: var(--primary-btn-bg);
   border-color: transparent;
-  color: var(--white);
+  color: var(--on-primary-gradient);
   transition: all 0.25s ease;
   box-shadow: var(--primary-btn-shadow);
 
   &:hover {
+    background: var(--hover-accent);
     transform: translateY(-2px);
     box-shadow: var(--primary-btn-shadow-hover);
-    color: var(--white);
+    color: var(--on-primary-gradient);
   }
 
   &:active {

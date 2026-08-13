@@ -115,7 +115,7 @@
     padding: 13px 16px;
     border-radius: 14px;
     border: 2px solid var(--slate-200);
-    background: var(--slate-50);
+    background: var(--bg-white);
     font-size: var(--font-size-md);
     line-height: 1.5;
     color: var(--slate-800);
@@ -156,7 +156,7 @@
 .footer {
   padding: 20px 30px;
   border-top: 1px solid var(--slate-100);
-  background: var(--slate-50);
+  background: var(--bg-white);
   display: flex;
   gap: 12px;
   justify-content: flex-end;

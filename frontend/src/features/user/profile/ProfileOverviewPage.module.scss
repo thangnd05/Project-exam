@@ -101,7 +101,7 @@
   gap: 10px;
   align-items: flex-start;
   text-align: left;
-  background: var(--input-bg);
+  background: var(--bg-white);
   padding: 16px;
   border-radius: 12px;
   margin-bottom: 20px;
@@ -251,7 +251,7 @@
 
 .monthSelect {
   appearance: auto;
-  background: var(--input-bg);
+  background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 6px 10px;
@@ -323,7 +323,7 @@
   text-align: center;
   gap: 14px;
   padding: 24px 16px;
-  background: var(--input-bg);
+  background: var(--bg-white);
   border: 1px dashed var(--slate-300);
   border-radius: 12px;
 }

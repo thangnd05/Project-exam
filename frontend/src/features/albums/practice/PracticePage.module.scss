@@ -181,7 +181,7 @@ $transition: all 0.3s ease;
 }
 
 .questionSection {
-    background: var(--primary-btn-gradient);
+    background: var(--primary-btn-bg);
     padding: 2.5rem 2rem;
     text-align: center;
 }
@@ -189,7 +189,7 @@ $transition: all 0.3s ease;
 .questionText {
     font-size: 2rem;
     font-weight: 600;
-    color: white;
+    color: var(--on-primary-gradient);
     margin-bottom: 1.5rem;
     line-height: 1.4;
 }

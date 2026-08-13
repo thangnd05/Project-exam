@@ -183,7 +183,7 @@
     font-size: 1.4rem;
     font-family: var(--font-family);
     color: var(--slate-800);
-    background: var(--slate-50);
+    background: var(--bg-white);
     transition: all 0.3s;
 
     &:focus {
@@ -220,7 +220,7 @@
 }
 
 .partBlock {
-    background: var(--slate-50);
+    background: var(--bg-white);
     border: 2px solid var(--slate-200);
     border-radius: 16px;
     padding: 20px;
@@ -584,7 +584,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
-    background: var(--slate-50);
+    background: var(--bg-white);
     border-bottom: 1px solid var(--slate-200);
 }
 

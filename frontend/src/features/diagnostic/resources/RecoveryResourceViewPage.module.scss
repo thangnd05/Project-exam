@@ -175,12 +175,12 @@
   }
 
   &.primary {
-    background: var(--primary-btn-gradient);
+    background: var(--primary-btn-bg);
     border-color: transparent;
-    color: var(--white);
+    color: var(--on-primary-gradient);
 
     &:hover {
-      color: var(--white);
+      color: var(--on-primary-gradient);
       opacity: 0.92;
     }
   }

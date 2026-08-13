@@ -28,9 +28,9 @@
   }
 
   &.active {
-    background: var(--primary-btn-gradient);
+    background: var(--primary-btn-bg);
     border-color: transparent;
-    color: white;
+    color: var(--on-primary-gradient);
     box-shadow: var(--primary-btn-shadow);
   }
 

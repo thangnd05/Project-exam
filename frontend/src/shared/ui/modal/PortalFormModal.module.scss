@@ -112,7 +112,7 @@
   font-size: var(--font-size-md);
   font-family: var(--font-family);
   color: var(--slate-800);
-  background: var(--slate-50);
+  background: var(--bg-white);
   transition: all 0.3s;
   resize: none;
 }
@@ -132,7 +132,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--slate-50);
+  background: var(--bg-white);
   padding: 12px 20px;
   border-radius: 16px;
   border: 2px solid var(--slate-200);

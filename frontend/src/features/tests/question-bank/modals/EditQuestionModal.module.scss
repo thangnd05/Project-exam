@@ -38,7 +38,7 @@
 
 .modalBody {
   padding: 24px;
-  background-color: var(--slate-50);
+  background-color: var(--bg-white);
 }
 
 .formGroup {
@@ -72,7 +72,7 @@
   border: 2px solid var(--slate-200);
   border-radius: 12px;
   font-size: 1.35rem;
-  background-color: var(--slate-50);
+  background-color: var(--bg-white);
   transition:
     border-color 0.2s,
     box-shadow 0.2s;

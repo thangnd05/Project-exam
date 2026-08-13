@@ -177,14 +177,33 @@
 }
 
 .new-test {
+  /* Đây là <Button> của react-bootstrap nên luôn kèm class .btn, mà .btn:hover
+     và .btn:active ghi đè background-color + color qua các biến --bs-btn-*.
+     Với variant rỗng thì mấy biến đó không có giá trị nên hover = nền trong
+     suốt. Hồi nút còn gradient thì không lộ, vì gradient nằm ở background-image
+     — Bootstrap chỉ đụng background-color. Cấp giá trị cho chính biến của
+     Bootstrap thay vì đấu specificity. */
+  --bs-btn-color: var(--on-primary-gradient);
+  --bs-btn-bg: var(--primary-btn-bg);
+  --bs-btn-border-color: rgba(255, 255, 255, 0.18);
+  --bs-btn-hover-color: var(--on-primary-gradient);
+  --bs-btn-hover-bg: var(--hover-accent);
+  --bs-btn-hover-border-color: rgba(255, 255, 255, 0.18);
+  --bs-btn-active-color: var(--on-primary-gradient);
+  --bs-btn-active-bg: var(--hover-accent);
+  --bs-btn-active-border-color: rgba(255, 255, 255, 0.18);
+  --bs-btn-disabled-color: var(--on-primary-gradient);
+  --bs-btn-disabled-bg: var(--primary-btn-bg);
+  --bs-btn-disabled-border-color: rgba(255, 255, 255, 0.18);
+
   font-size: 1.35rem;
   font-weight: 700;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  color: var(--text-on-brand);
+  color: var(--on-primary-gradient);
   white-space: nowrap;
   padding: 9px 16px;
-  background: var(--primary-btn-gradient);
+  background: var(--primary-btn-bg);
   box-shadow:
     0 4px 18px rgb(var(--primary-rgb) / 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
@@ -194,7 +213,8 @@
     filter 0.2s ease;
 
   &:hover {
-    color: var(--text-on-brand);
+    background: var(--hover-accent);
+    color: var(--on-primary-gradient);
     filter: brightness(1.06);
     box-shadow:
       0 6px 22px rgb(var(--primary-rgb) / 0.4),
