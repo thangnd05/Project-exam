@@ -10,7 +10,7 @@
 -- Việc quy đổi sang lịch địa phương (báo cáo theo ngày/tháng, chuỗi streak) dồn
 -- về một chỗ duy nhất: shared/util/AppTime.java.
 --
--- Wall-time đang lưu là GIỜ VN — cùng kết luận đã xác minh thực nghiệm ở
+-- Wall-time đang lưu là GIỜ VN  cùng kết luận đã xác minh thực nghiệm ở
 -- V202607161 (JVM tz Asia/Ho_Chi_Minh -> pgjdbc cast timestamptz về wall VN khi
 -- ghi vào cột timestamp). Vì vậy convert bằng AT TIME ZONE 'Asia/Ho_Chi_Minh'
 -- để giữ nguyên thời điểm thật. VN không có DST nên an toàn tuyệt đối.

@@ -14,7 +14,7 @@ function CoinBadge({ className, variant = 'default' }) {
   return (
     <div
       className={cx('coinBadge', variant === 'onDark' && 'onDark', className)}
-      title={`${fullBalance} xu — bấm để xem nhiệm vụ`}
+      title={`${fullBalance} xu  bấm để xem nhiệm vụ`}
     >
       <FontAwesomeIcon icon={faCircleDollarToSlot} className={cx('icon')} />
       <span className={cx('count')}>{formatCompactNumber(balance)}</span>

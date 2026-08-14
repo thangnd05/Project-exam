@@ -407,7 +407,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
           <p className={cx('bankHint')}>
             Chọn kho lấy câu hỏi để tạo đề. <strong>Kho cá nhân</strong> chứa các câu hỏi do chính bạn lưu.
             {isClassMode && (
-              <> <strong>Kho lớp học</strong> là kho câu hỏi của lớp hiện tại — có thể lọc theo chapter.</>
+              <> <strong>Kho lớp học</strong> là kho câu hỏi của lớp hiện tại  có thể lọc theo chapter.</>
             )}
             {canAccessAdminBank && (
               <> <strong>Kho quản trị</strong> là kho do admin cung cấp, dùng làm nguồn tạo đề.</>

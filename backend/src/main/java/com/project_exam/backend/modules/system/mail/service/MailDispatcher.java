@@ -18,7 +18,7 @@ import java.time.Instant;
 /**
  * Nơi duy nhất thực sự đẩy mail ra SMTP và ghi kết quả vào email_recipients.
  *
- * Tách khỏi MailService vì @Async chỉ hoạt động khi gọi qua proxy Spring — gọi method
+ * Tách khỏi MailService vì @Async chỉ hoạt động khi gọi qua proxy Spring  gọi method
  * @Async trong cùng một bean sẽ chạy đồng bộ như thường.
  */
 @Slf4j
@@ -42,7 +42,7 @@ public class MailDispatcher {
     }
 
     /**
-     * Gửi ngay trên luồng hiện tại — dùng cho worker gửi hàng loạt (bản thân nó đã chạy
+     * Gửi ngay trên luồng hiện tại  dùng cho worker gửi hàng loạt (bản thân nó đã chạy
      * nền, nếu bắn tiếp @Async cho từng mail thì hàng nghìn task sẽ tràn queue).
      *
      * @return true nếu gửi thành công.

@@ -31,7 +31,7 @@ public class CurrentSessionResponse {
     private Integer totalTasks;
     private Integer passedTasks;
 
-    /** Mã trạng thái bất thường (EMPTY_POOL_SKIPPED / EMPTY_POOL_RETRY) — FE tự map ra câu chữ. */
+    /** Mã trạng thái bất thường (EMPTY_POOL_SKIPPED / EMPTY_POOL_RETRY)  FE tự map ra câu chữ. */
     private String noticeCode;
     private List<PlanPartGroupResponse> partGroups;
     private List<SubmitSessionResponse.ReviewItem> lastReviewItems;

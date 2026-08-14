@@ -203,7 +203,7 @@ function TestLeaderboardPage() {
               </>
             ) : (
               <span className={cx('myRankEmptyText')}>
-                Bạn chưa có kết quả trên bảng này — hãy làm bài để được xếp hạng.
+                Bạn chưa có kết quả trên bảng này  hãy làm bài để được xếp hạng.
               </span>
             )}
           </div>

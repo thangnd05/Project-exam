@@ -186,7 +186,7 @@ function TargetDashboardPage() {
                 </div>
               )}
               {!mockScore && (
-                <div className={cx('statHint')}>Chưa có mock — làm bài để xem tiến độ.</div>
+                <div className={cx('statHint')}>Chưa có mock  làm bài để xem tiến độ.</div>
               )}
             </div>
 
@@ -252,7 +252,7 @@ function TargetDashboardPage() {
           </div>
 
           <div className={classNames(cx('card'), pageCx('partSection'))}>
-            <div className={cx('cardHeader')}>% từng Part — hiện tại vs aim</div>
+            <div className={cx('cardHeader')}>% từng Part  hiện tại vs aim</div>
             <div className={cx('cardBody')}>
               <TargetDashboardPartChart rows={partChartRows} />
             </div>
@@ -266,7 +266,7 @@ function TargetDashboardPage() {
         <MockHistoryPanel examTypeId={examTypeId} examTypeName={examTypeName} />
       )}
 
-      {/* Hành động chốt trang — đặt cuối để người dùng đọc hết số liệu rồi mới quyết. */}
+      {/* Hành động chốt trang  đặt cuối để người dùng đọc hết số liệu rồi mới quyết. */}
       {!loading && (
         <div className={cx('actionBar', 'dashboardFooterActions')}>
           <ButtonPrime as="link" to={nextStepTo} variant="primary" size="lg">

@@ -192,7 +192,7 @@ function TestModeModal({ show, test, onClose, onStart }) {
       ) : (
         <div className={cx('practice')}>
           <p className={cx('practice-hint')}>
-            Chọn Part để luyện — <strong>không giới hạn thời gian</strong>.
+            Chọn Part để luyện  <strong>không giới hạn thời gian</strong>.
           </p>
 
           {partResources.length > 0 && (

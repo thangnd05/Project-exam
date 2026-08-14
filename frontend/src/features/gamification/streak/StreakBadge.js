@@ -17,7 +17,7 @@ function StreakBadge({ className, variant = 'default' }) {
   const display = recoverable ? lostStreak : currentStreak;
 
   const title = recoverable
-    ? `Đã đứt chuỗi ${lostStreak} ngày — bấm để khôi phục`
+    ? `Đã đứt chuỗi ${lostStreak} ngày  bấm để khôi phục`
     : active
       ? `Chuỗi ${currentStreak} ngày học liên tiếp`
       : 'Học hôm nay để bắt đầu chuỗi!';

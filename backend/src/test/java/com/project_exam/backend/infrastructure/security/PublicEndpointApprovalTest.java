@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Không có gì báo, vì "quên một dòng" thì compiler không thấy.
  *
  * Test này liệt kê mọi handler rơi vào vùng permitAll rồi so với danh sách đã duyệt bên dưới.
- * Thêm endpoint mới vào vùng public là test đỏ — buộc người thêm phải chọn: gắn kiểm tra quyền,
+ * Thêm endpoint mới vào vùng public là test đỏ  buộc người thêm phải chọn: gắn kiểm tra quyền,
  * hay ghi tên nó vào đây một cách có ý thức.
  *
  * LƯU Ý: PERMIT_ALL phải soi gương với SecurityConfig.authorizeHttpRequests. Sửa một bên thì
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class PublicEndpointApprovalTest {
 
-    /** (method, ant-pattern) — "*" nghĩa là mọi HTTP method. Chép từ SecurityConfig. */
+    /** (method, ant-pattern)  "*" nghĩa là mọi HTTP method. Chép từ SecurityConfig. */
     private static final List<String[]> PERMIT_ALL = List.of(
             new String[]{"POST", "/api/auth/**"},
             new String[]{"GET", "/api/exam-types/**"},
@@ -86,7 +86,7 @@ class PublicEndpointApprovalTest {
             "GET /api/milestones",
             "GET /api/milestones/{id}",
 
-            // Kho tài liệu ôn tập — nội dung học, không phải đáp án đề thi.
+            // Kho tài liệu ôn tập  nội dung học, không phải đáp án đề thi.
             "GET /api/recovery-resources",
             "GET /api/recovery-resources/{resourceId}",
             "GET /api/recovery-resources/{resourceId}/view",

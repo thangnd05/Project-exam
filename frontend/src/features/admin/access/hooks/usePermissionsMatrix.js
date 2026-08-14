@@ -38,7 +38,7 @@ export function usePermissionsMatrix() {
     onSuccess: () => {
       qc.invalidateQueries({queryKey: permissionsKeys.roles()});
       // Nếu vừa sửa chính vai trò của mình thì backend đã đổi quyền ngay, nhưng sidebar và
-      // ProtectedRoute vẫn đang dùng danh sách quyền lấy lúc đăng nhập — nạp lại /me cho khớp.
+      // ProtectedRoute vẫn đang dùng danh sách quyền lấy lúc đăng nhập  nạp lại /me cho khớp.
       qc.invalidateQueries({queryKey: CURRENT_USER_QUERY_KEY});
     },
   });

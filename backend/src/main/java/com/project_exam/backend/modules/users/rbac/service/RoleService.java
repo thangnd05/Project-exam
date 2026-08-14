@@ -31,7 +31,7 @@ public class RoleService {
 
     /**
      * Vai trò quản trị gốc. DataLoader gán lại toàn bộ quyền cho nó ở mỗi lần khởi động, nên
-     * đây là đường thoát cuối nếu ai đó lỡ tay — không được phép đổi tên, xoá, hay gỡ quyền
+     * đây là đường thoát cuối nếu ai đó lỡ tay  không được phép đổi tên, xoá, hay gỡ quyền
      * của nó qua API, nếu không sẽ tự khoá cả hệ thống (sửa lại cũng cần ROLE:MANAGE).
      */
     private static final String PROTECTED_ROLE = "ADMIN";
@@ -82,7 +82,7 @@ public class RoleService {
         requireNotProtected(role, "xoá");
 
         // FK users.role_id là ON DELETE RESTRICT nên DB cũng chặn, nhưng lỗi ràng buộc thô
-        // chỉ ra "vi phạm ràng buộc" — admin không biết vướng ở đâu.
+        // chỉ ra "vi phạm ràng buộc"  admin không biết vướng ở đâu.
         long inUse = userRepository.countByRoleId(id);
         if (inUse > 0) {
             throw new ConflictException(

@@ -46,7 +46,7 @@ const QUILL_FORMATS = [
 function EmailEditorModal({show, email, onClose}) {
   const isAuto = email?.type === 'AUTO';
   const isEditing = Boolean(email?.emailId);
-  // Khung chung là HTML email viết tay (div lồng nhau, style inline) — nạp vào trình soạn
+  // Khung chung là HTML email viết tay (div lồng nhau, style inline)  nạp vào trình soạn
   // thảo là mất hết bố cục, nên chỉ cho sửa ở dạng HTML.
   const isLayout = email?.code === 'LAYOUT_BASE';
 
@@ -180,7 +180,7 @@ function EmailEditorModal({show, email, onClose}) {
     >
       {isAuto && (
         <div className="alert alert-info py-2 small">
-          Mẫu tự động <b>{email.code}</b> — {email.description}
+          Mẫu tự động <b>{email.code}</b>  {email.description}
         </div>
       )}
 
@@ -218,7 +218,7 @@ function EmailEditorModal({show, email, onClose}) {
             theme="snow"
             value={form.bodyHtml}
             // Chỉ nhận thay đổi do người dùng gõ. Quill chuẩn hóa lại HTML ngay khi nạp và
-            // cũng bắn onChange — nhận luôn thì chỉ mở modal lên đã làm hỏng nội dung.
+            // cũng bắn onChange  nhận luôn thì chỉ mở modal lên đã làm hỏng nội dung.
             onChange={(value, _delta, source) => {
               if (source === 'user') {
                 setField('bodyHtml', value);
@@ -244,7 +244,7 @@ function EmailEditorModal({show, email, onClose}) {
       {isLayout && (
         <div className="alert alert-secondary py-2 small">
           Đây là khung bọc ngoài mọi email nên chỉ sửa được ở dạng HTML. Giữ nguyên vị trí{' '}
-          <code>{'{{content}}'}</code> — đó là chỗ nội dung từng email được chèn vào.
+          <code>{'{{content}}'}</code>  đó là chỗ nội dung từng email được chèn vào.
         </div>
       )}
 

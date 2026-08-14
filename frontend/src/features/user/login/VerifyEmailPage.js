@@ -1,4 +1,4 @@
-// [TẮT XÁC THỰC EMAIL] Trang xác thực qua link trong mail — đã bỏ khỏi router, giữ lại phòng khi cần bật lại.
+// [TẮT XÁC THỰC EMAIL] Trang xác thực qua link trong mail  đã bỏ khỏi router, giữ lại phòng khi cần bật lại.
 /*
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';

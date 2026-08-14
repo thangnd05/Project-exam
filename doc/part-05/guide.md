@@ -1,4 +1,4 @@
-# Part 5 — Incomplete Sentences
+# Part 5  Incomplete Sentences
 
 ## Tổng quan
 
@@ -39,13 +39,13 @@ Bước 4 (5s)  → Chọn đáp án, đi tiếp
 |---|------------|
 | 1 | **Ngữ pháp trước, nghĩa sau** |
 | 2 | **Đọc cả câu** |
-| 3 | **30 giây/câu** — dành thời gian Part 7 |
-| 4 | Đánh dấu câu khó — quay lại sau |
+| 3 | **30 giây/câu**  dành thời gian Part 7 |
+| 4 | Đánh dấu câu khó  quay lại sau |
 | 5 | **Cùng gốc từ = câu từ loại** |
 
 ### Phân bổ thời gian
 
-- Part 5: **≤15 phút** — dành thời gian cho Part 7.
+- Part 5: **≤15 phút**  dành thời gian cho Part 7.
 - Tie-breaker: từ loại/thì → collocation → nghĩa ngữ cảnh.
 
 ## Bẫy kinh điển Part 5
@@ -76,7 +76,7 @@ Bước 4 (5s)  → Chọn đáp án, đi tiếp
 <a id="so-sanh-part-5--part-6"></a>
 ## So sánh Part 5 & Part 6
 
-# Reading Part 5 & Part 6 — Ngữ pháp dùng chung
+# Reading Part 5 & Part 6  Ngữ pháp dùng chung
 
 Part 5 (Incomplete Sentences) và Part 6 (Text Completion) kiểm tra **cùng 7 tag ngữ pháp**. Lý thuyết đầy đủ nằm trong thư mục này.
 
@@ -88,24 +88,24 @@ Part 5 (Incomplete Sentences) và Part 6 (Text Completion) kiểm tra **cùng 7 
 | **Thời gian** | ~15 phút (~30 giây/câu) | ~8 phút (~2 phút/đoạn) |
 | **Ngữ cảnh** | 1 câu đơn lẻ | Đoạn văn (email, memo, article...) |
 | **Điền câu** | Không có | ~5% (link [sentence-insertion](../sentence-insertion/dien-cau-vao-doan.md)) |
-| **Từ nối** | ~5% | ~10% (quan trọng hơn — đọc quan hệ 2 câu) |
+| **Từ nối** | ~5% | ~10% (quan trọng hơn  đọc quan hệ 2 câu) |
 | **Đại từ** | ~10% | ~10% (cần tìm danh từ tham chiếu trong đoạn) |
 
 ## Khác biệt chiến thuật quan trọng
 
 ### Part 5
 
-- **Ngữ pháp trước, nghĩa sau** — loại sai ngữ pháp trước.
-- **30 giây/câu** — dành thời gian cho Part 7.
-- **Cùng gốc từ = câu từ loại** — làm nhanh.
+- **Ngữ pháp trước, nghĩa sau**  loại sai ngữ pháp trước.
+- **30 giây/câu**  dành thời gian cho Part 7.
+- **Cùng gốc từ = câu từ loại**  làm nhanh.
 - 4 đáp án (A–D).
 
 ### Part 6
 
-- **Đọc lướt toàn đoạn** trước khi điền — nắm chủ đề + loại văn bản.
-- **4 chỗ trống liên quan** — chỗ sau có thể gợi ý chỗ trước.
-- **Từ nối là chìa khóa** — ~30% câu liên quan discourse markers.
-- **Register** — email/memo dùng từ trang trọng (obtain, advise) thay vì get.
+- **Đọc lướt toàn đoạn** trước khi điền  nắm chủ đề + loại văn bản.
+- **4 chỗ trống liên quan**  chỗ sau có thể gợi ý chỗ trước.
+- **Từ nối là chìa khóa**  ~30% câu liên quan discourse markers.
+- **Register**  email/memo dùng từ trang trọng (obtain, advise) thay vì get.
 - Đọc lại đoạn sau khi điền hết 4 chỗ.
 
 ## Danh sách tag
@@ -130,7 +130,7 @@ Part 5 (Incomplete Sentences) và Part 6 (Text Completion) kiểm tra **cùng 7 
 
 
 
-> **Ghi chú riêng:** Part 5: 30 giây/câu — 4 đáp án cùng gốc từ = câu từ loại, làm nhanh.
+> **Ghi chú riêng:** Part 5: 30 giây/câu  4 đáp án cùng gốc từ = câu từ loại, làm nhanh.
 
 
 
@@ -159,7 +159,7 @@ Chọn **danh từ / động từ / tính từ / trạng từ** đúng vị trí
 
 **Nếu 4 đáp án cùng gốc từ** (differ, different, difference, differently) → **chắc chắn là câu từ loại**.
 
-## Part 6 — Khác biệt
+## Part 6  Khác biệt
 
 - Đọc câu **trước và sau** chỗ trống trong đoạn văn.
 - Có thể cần xét **register** (email trang trọng) sau khi xác định đúng loại từ.
@@ -168,7 +168,7 @@ Chọn **danh từ / động từ / tính từ / trạng từ** đúng vị trí
 
 > The project was a complete ___ .  
 > (A) succeed (B) successful (C) successfully (D) success  
-> Bẫy: successful (adj) — cần **success** (N) sau "a"
+> Bẫy: successful (adj)  cần **success** (N) sau "a"
 
 ## Mini-practice
 
@@ -179,7 +179,7 @@ The committee needs a more ___ approach to solving the problem.
 - (C) creative
 - (D) creation
 
-**Đáp án: (C)** — more + **Adj** + N (approach).
+**Đáp án: (C)**  more + **Adj** + N (approach).
 
 ---
 
@@ -197,7 +197,7 @@ The committee needs a more ___ approach to solving the problem.
 | Từ | Dùng khi |
 |----|----------|
 | **who** | Người (chủ ngữ) |
-| **whom** | Người (tân ngữ) — ít gặp |
+| **whom** | Người (tân ngữ)  ít gặp |
 | **which** | Vật |
 | **that** | Người hoặc vật |
 | **where** | Địa điểm |
@@ -231,7 +231,7 @@ The candidate ___ resume impressed the hiring committee was offered the position
 - (C) which
 - (D) whom
 
-**Đáp án: (B)** — whose resume = resume của người đó.
+**Đáp án: (B)**  whose resume = resume của người đó.
 
 ---
 
@@ -255,7 +255,7 @@ The candidate ___ resume impressed the hiring committee was offered the position
 | **Unless** | + clause | Trừ khi |
 | **Until** | + clause | Cho đến khi |
 
-## Despite vs Although — Bẫy kinh điển
+## Despite vs Although  Bẫy kinh điển
 
 > ___ the rain, the event continued.  
 > Bẫy: Although (cần clause: Although it rained)  
@@ -271,7 +271,7 @@ The candidate ___ resume impressed the hiring committee was offered the position
 | attend | **to** |
 | by the end of | **by** (deadline) |
 
-## Part 6 — Khác biệt
+## Part 6  Khác biệt
 
 - Chú ý **mối quan hệ giữa các câu** trong đoạn.
 - Câu trước positive → câu sau negative → cần **However / Although**.
@@ -285,7 +285,7 @@ All employees must comply ___ the new safety regulations.
 - (C) for
 - (D) by
 
-**Đáp án: (B)** — comply **with**.
+**Đáp án: (B)**  comply **with**.
 
 ---
 
@@ -296,7 +296,7 @@ ___ the heavy rain, the outdoor concert was not canceled.
 - (C) Because
 - (D) However
 
-**Đáp án: (B)** — Despite + N.
+**Đáp án: (B)**  Despite + N.
 
 ---
 
@@ -331,7 +331,7 @@ ___ the heavy rain, the outdoor concert was not canceled.
 > Bẫy: It → Đúng: **They**
 
 > The company updated its software programs, and ___ are now available...  
-> Đáp án: **they** (thay thế programs — số nhiều)
+> Đáp án: **they** (thay thế programs  số nhiều)
 
 ## Mini-practice
 
@@ -342,7 +342,7 @@ The company updated its software programs, and ___ are now available for downloa
 - (C) this
 - (D) that
 
-**Đáp án: (B)** — Thay thế **software programs** (số nhiều).
+**Đáp án: (B)**  Thay thế **software programs** (số nhiều).
 
 ---
 
@@ -357,7 +357,7 @@ The company updated its software programs, and ___ are now available for downloa
 
 ## Nguyên tắc
 
-- Học **collocation** — từ đi kèm từ, không chọn theo nghĩa điển hình đơn lẻ.
+- Học **collocation**  từ đi kèm từ, không chọn theo nghĩa điển hình đơn lẻ.
 - Khi 2 đáp án cùng đúng ngữ pháp → chọn **collocation chuẩn** + **nghĩa ngữ cảnh**.
 
 ## Collocation kinh điển TOEIC
@@ -372,9 +372,9 @@ The company updated its software programs, and ___ are now available for downloa
 | take advantage of | ~~make advantage of~~ |
 | raise awareness | ~~lift awareness~~ |
 | comply with regulations | ~~comply to~~ |
-| issue a refund | — |
-| extend the deadline | — |
-| launch a campaign | — |
+| issue a refund |  |
+| extend the deadline |  |
+| launch a campaign |  |
 
 ## Cặp từ dễ nhầm
 
@@ -389,7 +389,7 @@ The company updated its software programs, and ___ are now available for downloa
 | **stationary** | đứng yên | stationary equipment |
 | **stationery** | văn phòng phẩm | office stationery |
 
-## Part 6 — Collocation trong văn bản công sở
+## Part 6  Collocation trong văn bản công sở
 
 | Cụm | Ngữ cảnh |
 |-----|----------|
@@ -412,7 +412,7 @@ Employees are encouraged to ___ advantage of the new training program.
 - (C) do
 - (D) have
 
-**Đáp án: (B)** — take advantage of.
+**Đáp án: (B)**  take advantage of.
 
 ---
 
@@ -437,7 +437,7 @@ Employees are encouraged to ___ advantage of the new training program.
 | every day, usually | **Present simple** |
 | now, currently | **Present continuous** |
 
-## Chủ vị ngữ — Bẫy kinh điển
+## Chủ vị ngữ  Bẫy kinh điển
 
 | Câu | Động từ |
 |-----|---------|
@@ -469,7 +469,7 @@ The marketing team ___ the campaign results by the end of last month.
 - (C) had analyzed
 - (D) will analyze
 
-**Đáp án: (C)** — by the end of **last month** → Past perfect.
+**Đáp án: (C)**  by the end of **last month** → Past perfect.
 
 ---
 
@@ -480,7 +480,7 @@ A number of technical issues ___ reported during the software update.
 - (C) has been
 - (D) is
 
-**Đáp án: (B)** — A number of + N số nhiều → were.
+**Đáp án: (B)**  A number of + N số nhiều → were.
 
 ---
 
@@ -506,7 +506,7 @@ A number of technical issues ___ reported during the software update.
 | **Điều kiện / Cảnh báo** | Otherwise |
 | **Thứ tự** | First, Next, Then, Finally |
 
-## Part 6 — Quan trọng hơn Part 5 (~10% vs ~5%)
+## Part 6  Quan trọng hơn Part 5 (~10% vs ~5%)
 
 - **~30% câu Part 6** liên quan discourse markers.
 - Đọc câu **trước + sau** chỗ trống:
@@ -532,7 +532,7 @@ The first quarter results were strong. ___, the company plans to open two new br
 - (C) Otherwise
 - (D) Instead
 
-**Đáp án: (B)** — Kết quả tốt → hệ quả mở chi nhánh.
+**Đáp án: (B)**  Kết quả tốt → hệ quả mở chi nhánh.
 
 ---
 
@@ -543,4 +543,4 @@ Thank you for your hard work. Sales figures have exceeded expectations. **(131)_
 - (C) Otherwise
 - (D) Instead
 
-**Đáp án: (B)** — Sales vượt kỳ vọng → do đó mở rộng.
+**Đáp án: (B)**  Sales vượt kỳ vọng → do đó mở rộng.

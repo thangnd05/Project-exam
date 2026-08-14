@@ -78,7 +78,7 @@ function LoginAuditPage() {
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
         title="Audit đăng nhập"
-        description="Lịch sử đăng nhập thành công / thất bại (bảng login_audit — dữ liệu demo)."
+        description="Lịch sử đăng nhập thành công / thất bại (bảng login_audit  dữ liệu demo)."
       />
 
       <AdminToolbar

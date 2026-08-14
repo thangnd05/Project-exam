@@ -2,26 +2,26 @@
 -- Thêm toàn bộ khoá ngoại cho schema.
 --
 -- Trước migration này DB không có một FK nào: 59 bảng, ~101 cột *_id trỏ lẫn
--- nhau nhưng không ràng buộc. Hậu quả đã xảy ra thật — khảo sát ngày 30/07/2026
+-- nhau nhưng không ràng buộc. Hậu quả đã xảy ra thật  khảo sát ngày 30/07/2026
 -- tìm thấy 120 dòng `answers` và 41 dòng `question_tags` trỏ tới question đã bị
 -- xoá. Các service vốn đã cascade thủ công đúng (QuestionService, TagService,
 -- TestCommandService...); FK ở đây là lưới an toàn cho những đường xoá bị sót.
 --
 -- Quy ước ON DELETE:
---   CASCADE  (69) — cột NOT NULL: con không thể tồn tại thiếu cha (answers ->
+--   CASCADE  (69)  cột NOT NULL: con không thể tồn tại thiếu cha (answers ->
 --                   questions, test_parts -> tests, bảng nối, dữ liệu gamification
 --                   theo user...). Khớp đúng hành vi cascade thủ công hiện có.
---   SET NULL (27) — cột nullable: con vẫn có nghĩa khi mất cha (user_tests của
+--   SET NULL (27)  cột nullable: con vẫn có nghĩa khi mất cha (user_tests của
 --                   guest, learning_plans.user_target_id, các parent_id tự trỏ...).
---   RESTRICT  (5) — dữ liệu danh mục / lịch sử không được biến mất khi còn bị
+--   RESTRICT  (5)  dữ liệu danh mục / lịch sử không được biến mất khi còn bị
 --                   tham chiếu: roles, skills, exam_categories, quests.
 --
 -- Tên FK theo mẫu fk_<bang_con>_<cot>.
 --
 -- 3 cột *_id KHÔNG phải khoá ngoại nên cố ý bỏ qua:
---   audit_logs.resource_id             — đa hình, cặp với cột `resource`
---   recovery_resources.cloudinary_public_id — id bên ngoài (Cloudinary)
---   user_tests.guest_session_id        — token phiên khách, không có bảng cha
+--   audit_logs.resource_id              đa hình, cặp với cột `resource`
+--   recovery_resources.cloudinary_public_id  id bên ngoài (Cloudinary)
+--   user_tests.guest_session_id         token phiên khách, không có bảng cha
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------

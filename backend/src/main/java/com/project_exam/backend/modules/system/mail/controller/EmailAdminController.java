@@ -22,7 +22,7 @@ public class EmailAdminController {
     private final EmailAdminService emailAdminService;
     private final AuthUtils authUtils;
 
-    /** Các mẫu email tự động (đăng ký, đổi mật khẩu...) — cố định, chỉ sửa nội dung. */
+    /** Các mẫu email tự động (đăng ký, đổi mật khẩu...)  cố định, chỉ sửa nội dung. */
     @GetMapping("/auto")
     public ResponseEntity<List<EmailResponse>> getAutoEmails() {
         authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);

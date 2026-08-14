@@ -11,7 +11,7 @@ function About() {
         <h1>Giới thiệu về hệ thống {name}</h1>
 
         <p>
-          Xin chào! Chào mừng bạn đến với <strong>{name}</strong> — nền tảng học
+          Xin chào! Chào mừng bạn đến với <strong>{name}</strong>  nền tảng học
           tập và kiểm tra trực tuyến hiện đại, được xây dựng để hỗ trợ giáo viên
           và học sinh trong việc tạo, tham gia và quản lý bài thi một cách nhanh
           chóng, thuận tiện và hiệu quả.

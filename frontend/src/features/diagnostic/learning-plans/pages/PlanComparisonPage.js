@@ -121,7 +121,7 @@ function PlanComparisonPage() {
                   <ul className={cx('metaList')}>
                     <li>
                       <strong>Độ sẵn sàng ban đầu:</strong>
-                      {cur != null ? ` ${cur}%` : ' —'}
+                      {cur != null ? ` ${cur}%` : ' '}
                       {diff != null && (
                         <span
                           className={cx('statDelta', {

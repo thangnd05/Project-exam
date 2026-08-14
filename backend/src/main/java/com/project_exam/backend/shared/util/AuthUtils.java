@@ -29,7 +29,7 @@ public class AuthUtils {
     }
 
     /**
-     * Kiểm tra quyền theo authorities trong SecurityContext — được JwtAuthenticationFilter dựng
+     * Kiểm tra quyền theo authorities trong SecurityContext  được JwtAuthenticationFilter dựng
      * lại từ DB ở mỗi request, KHÔNG lấy từ claim của token. Nhờ vậy đổi vai trò của user hoặc
      * gỡ quyền của vai trò là có hiệu lực ngay, không phải chờ access token hết hạn.
      *

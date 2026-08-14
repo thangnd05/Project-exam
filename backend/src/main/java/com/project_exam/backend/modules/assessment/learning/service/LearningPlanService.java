@@ -195,7 +195,7 @@ public class LearningPlanService {
 
         if (candidates.isEmpty()) {
             String detail = partsWithoutTasks.isEmpty()
-                    ? "Các phần trong bài này đều đã đạt ngưỡng riêng — hãy làm một bài thi thử đầy đủ để nâng đều điểm."
+                    ? "Các phần trong bài này đều đã đạt ngưỡng riêng  hãy làm một bài thi thử đầy đủ để nâng đều điểm."
                     : "Các phần cần cải thiện (" + String.join(", ", partsWithoutTasks)
                         + ") chưa có ải vì câu hỏi chưa được gắn tag. Gắn tag (admin) rồi sinh lại.";
             throw new BadRequestException("Chưa tạo được lộ trình từ bài này. " + detail);
@@ -723,7 +723,7 @@ public class LearningPlanService {
         }
     }
 
-    /** Hai thay đổi khiến lộ trình còn ải chưa xong — dùng để đưa planStage về nền tảng. */
+    /** Hai thay đổi khiến lộ trình còn ải chưa xong  dùng để đưa planStage về nền tảng. */
     private record PlanChanges(int added, int reopened) {}
 
     private PlanResponse buildPlanResponse(

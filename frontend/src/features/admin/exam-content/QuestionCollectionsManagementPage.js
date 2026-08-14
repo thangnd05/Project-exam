@@ -291,10 +291,10 @@ function QuestionCollectionsManagementPage() {
   const deleteBlockReason = (() => {
     if (!deletingItem) return '';
     if (deletingItem.question_count > 0) {
-      return `Bộ sưu tập "${deletingItem.name}" đang chứa ${deletingItem.question_count} câu hỏi — backend sẽ chặn xoá. Hãy bỏ liên kết các câu hỏi trước.`;
+      return `Bộ sưu tập "${deletingItem.name}" đang chứa ${deletingItem.question_count} câu hỏi  backend sẽ chặn xoá. Hãy bỏ liên kết các câu hỏi trước.`;
     }
     if (deletingItem.child_count > 0) {
-      return `Bộ sưu tập "${deletingItem.name}" đang chứa ${deletingItem.child_count} nhóm con — backend sẽ chặn xoá. Hãy xoá/tách nhóm con trước.`;
+      return `Bộ sưu tập "${deletingItem.name}" đang chứa ${deletingItem.child_count} nhóm con  backend sẽ chặn xoá. Hãy xoá/tách nhóm con trước.`;
     }
     return `Bạn có chắc muốn xóa "${deletingItem.name || ''}" không?`;
   })();

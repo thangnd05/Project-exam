@@ -3,12 +3,12 @@
 
 :root {
   /* ══════════════════════════════════════════════════════════════
-     1. PRIMITIVE — bảng màu gốc. ĐỔI TÔNG THƯƠNG HIỆU CHỈ Ở ĐÂY.
+     1. PRIMITIVE  bảng màu gốc. ĐỔI TÔNG THƯƠNG HIỆU CHỈ Ở ĐÂY.
      Mỗi màu khai báo một lần duy nhất dưới dạng kênh RGB (--x-rgb)
      để dùng được với alpha:  rgb(var(--primary-rgb) / 0.32)
      ══════════════════════════════════════════════════════════════ */
 
-  /* Champagne — màu thương hiệu */
+  /* Champagne  màu thương hiệu */
   --brand-50-rgb: 250 247 240;
   --brand-100-rgb: 243 235 218;
   --brand-150-rgb: 240 228 196;
@@ -35,7 +35,7 @@
   --brand-900: rgb(var(--brand-900-rgb));
   --text-on-dark: rgb(var(--text-on-dark-rgb));
 
-  /* Champagne CỐ ĐỊNH — cùng sắc với ramp brand ở theme premium nhưng KHÔNG
+  /* Champagne CỐ ĐỊNH  cùng sắc với ramp brand ở theme premium nhưng KHÔNG
      bị theme "normal" (teal) override. Dùng cho dấu hiệu nhận biết Premium
      (badge, avatar) để nó luôn là vàng kim loại dù người xem đang ở theme nào. */
   --gold-100-rgb: 243 235 218;
@@ -75,7 +75,7 @@
   --slate-900: rgb(var(--slate-900-rgb));
   --slate-950: rgb(var(--slate-950-rgb));
 
-  /* Trung tính — ramp thứ 2, nên gộp dần về slate */
+  /* Trung tính  ramp thứ 2, nên gộp dần về slate */
   --gray-50-rgb: 249 250 251;
   --gray-100-rgb: 243 244 246;
   --gray-200-rgb: 229 231 235;
@@ -163,7 +163,7 @@
   --green-700: rgb(var(--green-700-rgb));
   --green-800: rgb(var(--green-800-rgb));
 
-  /* Thành công — ramp thứ 2, nên gộp dần về green */
+  /* Thành công  ramp thứ 2, nên gộp dần về green */
   --emerald-50-rgb: 236 253 245;
   --emerald-100-rgb: 209 250 229;
   --emerald-200-rgb: 167 243 208;
@@ -181,7 +181,7 @@
   --emerald-700: rgb(var(--emerald-700-rgb));
   --emerald-800: rgb(var(--emerald-800-rgb));
 
-  /* Tông cũ trước khi đổi sang champagne — vẫn phủ phần lớn app */
+  /* Tông cũ trước khi đổi sang champagne  vẫn phủ phần lớn app */
   --teal-50-rgb: 240 253 250;
   --teal-200-rgb: 153 246 228;
   --teal-500-rgb: 20 184 166;
@@ -220,7 +220,7 @@
   --black: #000;
   --white: #fff;
 
-  /* Neutral ấm — dẫn xuất từ tông champagne, đổi cùng lúc với brand */
+  /* Neutral ấm  dẫn xuất từ tông champagne, đổi cùng lúc với brand */
   --warm-input: #f1ece2;
   --warm-hover: #f3efe6;
   --warm-border: #e4ddd0;
@@ -229,7 +229,7 @@
   --ink: #161823;
 
   /* ══════════════════════════════════════════════════════════════
-     2. SEMANTIC — vai trò trong giao diện. Component chỉ nên dùng
+     2. SEMANTIC  vai trò trong giao diện. Component chỉ nên dùng
      tầng này; chỉ trỏ tới primitive, không viết mã màu trực tiếp.
      ══════════════════════════════════════════════════════════════ */
 
@@ -243,7 +243,7 @@
   --brand-unique: var(--brand-200);
   --brand-unique-hover: var(--brand-400);
 
-  /* Dấu hiệu Premium — cố định champagne ở mọi theme (xem ramp --gold-*) */
+  /* Dấu hiệu Premium  cố định champagne ở mọi theme (xem ramp --gold-*) */
   --premium-gradient: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-600) 100%);
   --premium-shadow: 0 4px 12px rgb(var(--gold-600-rgb) / 0.32);
   --premium-on-gradient: var(--ink);
@@ -318,7 +318,7 @@
      Mỗi theme tự lấy --primary của mình (champagne brand-500 / teal brand-600). */
   --brand-surface: var(--primary);
 
-  /* Nút primary: nền TRẮNG, chữ màu thương hiệu, bóng mềm trung tính — kiểu
+  /* Nút primary: nền TRẮNG, chữ màu thương hiệu, bóng mềm trung tính  kiểu
      nút hành động trên banner (PageHeader .actionBtn). Không gradient, không
      nền đặc: nền đặc champagne làm nút nặng và lẫn với banner gold. */
   --primary-btn-bg: var(--bg-white);
@@ -376,7 +376,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   THEME "NORMAL" (user thường / khách) — tông TEAL (xanh ngọc
+   THEME "NORMAL" (user thường / khách)  tông TEAL (xanh ngọc
    #0d9488) là theme GỐC ban đầu. Champagne (vàng) = premium, giữ
    mặc định ở :root. Lưu ý: theme teal map --primary = brand-600
    (champagne map brand-500), điểm nhấn --brand-unique là cam hổ phách,

@@ -1,4 +1,4 @@
-# Quy hoạch tái cấu trúc FE — sang `features/` + `shared/` (co-locate API)
+# Quy hoạch tái cấu trúc FE  sang `features/` + `shared/` (co-locate API)
 
 > Kế thừa tinh thần [ARCHITECTURE.md](ARCHITECTURE.md) (feature-slice) nhưng đẩy lên
 > mức đầy đủ: **mỗi feature tự chứa cả `api/` của nó**, chỉ hạ tầng + thứ dùng-chéo
@@ -9,7 +9,7 @@
 ```
 src/
   app/                 # bootstrap: index.js, App.js, routes/, providers
-  shared/              # "core" — hạ tầng & UI generic dùng chung THẬT SỰ
+  shared/              # "core"  hạ tầng & UI generic dùng chung THẬT SỰ
     api/               #   axiosClient + API dùng-chéo (test/exam core, auth)
     ui/                #   ButtonPrime, BaseModal, PageHeader, Pagination, modal/…
     styles/            #   GlobalStyles
@@ -21,13 +21,13 @@ src/
   admin/               # cũng feature-slice (admin/<x>/{api,pages,components})
 ```
 
-**Nguyên tắc "có gì tạo nấy"** — KHÔNG ép mỗi feature đủ bộ folder (tránh folder rỗng).
+**Nguyên tắc "có gì tạo nấy"**  KHÔNG ép mỗi feature đủ bộ folder (tránh folder rỗng).
 
 ## 2. Quy tắc đặt API (áp dụng máy móc theo số feature import)
 
 | Số feature import | Đặt ở |
 |---|---|
-| 1 feature | `features/<đó>/api/` — co-locate |
+| 1 feature | `features/<đó>/api/`  co-locate |
 | 2 feature | feature **sở hữu nghiệp vụ** giữ; feature kia import qua `~/features/x/api` |
 | ≥3 / hạ tầng | `shared/api/` |
 
@@ -58,22 +58,22 @@ src/
 
 ## 5. Lộ trình batch (nhỏ → cross-cutting)
 
-- [x] **B1 — `pages/ → features/`** ✅ build xanh. Sửa 55 `~/pages/` + 1 import lạc.
-- [x] **B2 — Foundation scss** ✅ sass `loadPaths=[srcDir]`; 35 tham chiếu GlobalStyles
+- [x] **B1  `pages/ → features/`** ✅ build xanh. Sửa 55 `~/pages/` + 1 import lạc.
+- [x] **B2  Foundation scss** ✅ sass `loadPaths=[srcDir]`; 35 tham chiếu GlobalStyles
       (@import + @use) chuẩn hoá về path ổn định. De-risk mọi batch sau.
-- [x] **B3 — `shared/` (JS buckets)** ✅ `hooks utils config context assets` → `shared/*`.
+- [x] **B3  `shared/` (JS buckets)** ✅ `hooks utils config context assets` → `shared/*`.
       Đã đưa ref băng-ranh-giới về `~/` trước khi move (giữ `../hooks` feature-local).
-- [x] **B4 — `shared/ui` + `shared/styles`** ✅ `components/common`→`shared/ui` (146 ref),
+- [x] **B4  `shared/ui` + `shared/styles`** ✅ `components/common`→`shared/ui` (146 ref),
       `components/GlobalStyles`→`shared/styles/GlobalStyles`.
-- [x] **B5 — re-home `components/*`** ✅ `coin cosmetic resources streak test` →
+- [x] **B5  re-home `components/*`** ✅ `coin cosmetic resources streak test` →
       `shared/` (đều dùng-chéo); `Comment/` **xoá** (dead, 0 importer). `components/`
       giải tán hoàn toàn.
-- [x] **B6 — co-locate API** ⚠️ *đánh dấu lại*: kế hoạch co-locate 1-chủ chưa phản ánh
-      đúng tree hiện tại — **toàn bộ `*Api.js` vẫn ở `shared/api/`**. Batch co-locate
+- [x] **B6  co-locate API** ⚠️ *đánh dấu lại*: kế hoạch co-locate 1-chủ chưa phản ánh
+      đúng tree hiện tại  **toàn bộ `*Api.js` vẫn ở `shared/api/`**. Batch co-locate
       thật sự còn mở.
-- [x] **B7 — `app/` bootstrap** ✅ `index.js App.js routes/`→`app/`; entry
-      `index.html`→`/src/app/index.js`. (`setupTests.js` để lại gốc — vite.config trỏ tới.)
-- [x] **B8 — admin/ domain-slice** ✅ gom 27 trang phẳng thành 5 domain (access,
+- [x] **B7  `app/` bootstrap** ✅ `index.js App.js routes/`→`app/`; entry
+      `index.html`→`/src/app/index.js`. (`setupTests.js` để lại gốc  vite.config trỏ tới.)
+- [x] **B8  admin/ domain-slice** ✅ gom 27 trang phẳng thành 5 domain (access,
       exam-content, gamification, content, overview), mỗi domain có `hooks/` riêng;
       giữ `components/ modals/ data/ api/ layouts/` shared ở gốc admin (domain cùng cấp
       `pages/` nên `../components`/`../modals`/`../data` tự đúng). Xoá barrel `index.js` dead.

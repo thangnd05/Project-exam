@@ -76,11 +76,11 @@ public class MailService {
         try {
             Email template = emailRepository.findByCode(code).orElse(null);
             if (template == null) {
-                log.warn("Không tìm thấy mẫu email {} — bỏ qua lần gửi này", code);
+                log.warn("Không tìm thấy mẫu email {}  bỏ qua lần gửi này", code);
                 return;
             }
             if (!Boolean.TRUE.equals(template.getActive())) {
-                log.info("Mẫu email {} đang tắt — bỏ qua lần gửi này", code);
+                log.info("Mẫu email {} đang tắt  bỏ qua lần gửi này", code);
                 return;
             }
 

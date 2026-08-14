@@ -33,7 +33,7 @@ const TrafficHeatmap = ({ data = [] }) => {
                                 key={h}
                                 className={cx('cell')}
                                 style={{ background: shade(v) }}
-                                title={`${row.day} ${String(h).padStart(2, '0')}:00 — ${v} lượt truy cập`}
+                                title={`${row.day} ${String(h).padStart(2, '0')}:00  ${v} lượt truy cập`}
                             />
                         ))}
                     </div>

@@ -39,7 +39,7 @@ export const getUserTestMeta = (userTestId, isGuest, config = {}) => {
 };
 
 /**
- * Đề kèm đáp án đúng để xem lại. Chỉ chủ bài làm mới gọi được và phải nộp bài rồi —
+ * Đề kèm đáp án đúng để xem lại. Chỉ chủ bài làm mới gọi được và phải nộp bài rồi 
  * server tự kiểm tra, đừng gọi lại /api/tests/admintest cho luồng học viên.
  */
 export const getReviewTest = (userTestId, isGuest, config = {}) => {

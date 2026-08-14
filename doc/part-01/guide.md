@@ -1,4 +1,4 @@
-# Part 1 — Photographs
+# Part 1  Photographs
 
 ## Tổng quan
 
@@ -51,7 +51,7 @@ Bước 4 (2s)    → Chọn đáp án còn lại, không đổi đáp án
 
 ### Chiến thuật nâng cao (900+)
 
-#### Tie-breaker — khi còn 2 đáp án
+#### Tie-breaker  khi còn 2 đáp án
 
 ```
 1. Giới từ / vị trí (in, on, at, inside, outside)
@@ -67,7 +67,7 @@ Bước 4 (2s)    → Chọn đáp án còn lại, không đổi đáp án
 |---|-----|----------|
 | 1 | Từ đồng âm | sailing/selling, writing/riding |
 | 2 | Hành động gần đúng | reading vs writing, pushing vs pulling |
-| 3 | Đúng hành động — sai chủ thể | Sai người mặc áo / vai trò |
+| 3 | Đúng hành động  sai chủ thể | Sai người mặc áo / vai trò |
 | 4 | Sai vị trí/bối cảnh | inside vs outside |
 | 5 | Chi tiết thừa | Câu dài, 1 từ sai |
 | 6 | Vật không có trong ảnh | umbrella khi trời nắng |
@@ -79,7 +79,7 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 
 | Trường | Ghi chú |
 |--------|---------|
-| **Đề / Câu số** | ETS 2024 — Test 1 — Q2 |
+| **Đề / Câu số** | ETS 2024  Test 1  Q2 |
 | **Loại bẫy** | Bẫy 1–7 / careless / near-miss |
 | **Nguyên nhân** | Nghe / Nhìn / Vội / Đổi đáp án |
 | **Từ khóa sai** | *inside* (đúng: *outside*) |
@@ -92,12 +92,12 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 - [ ] Chủ thể đúng (người / vật)?
 - [ ] Hành động / trạng thái khớp ảnh?
 - [ ] Tranh tả vật: áp dụng **Bẫy 7**
-- [ ] Số lượng đúng — đã nghe đuôi -s?
+- [ ] Số lượng đúng  đã nghe đuôi -s?
 - [ ] Vị trí đúng (in/on/at, inside/outside)?
 - [ ] Đồ vật nhắc đến có trong ảnh?
 - [ ] Không bị lừa bởi từ đồng âm?
 
-**Tiếp theo:** [Part 2 — Question-Response](../part-02/guide.md)
+**Tiếp theo:** [Part 2  Question-Response](../part-02/guide.md)
 
 ---
 
@@ -124,7 +124,7 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 
 | Tình huống | Cách xử lý |
 |------------|------------|
-| 2+ người, hành động khác nhau | Gán nhãn: *Người A — standing / Người B — sitting* |
+| 2+ người, hành động khác nhau | Gán nhãn: *Người A  standing / Người B  sitting* |
 | Người ở background | Chủ thể = người lớn hơn, gần camera, ở giữa |
 | Chỉ thấy một phần cơ thể | Chỉ chọn câu mô tả **phần nhìn thấy** |
 | Hành động phụ | Đáp án đúng mô tả **hành động chính** |
@@ -152,13 +152,13 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 ## Bẫy thường gặp (tranh tả người)
 
 - **Bẫy 2:** Hành động gần đúng (reading vs writing, pushing vs pulling).
-- **Bẫy 3:** Đúng hành động — sai chủ thể (sai người mặc áo).
+- **Bẫy 3:** Đúng hành động  sai chủ thể (sai người mặc áo).
 - **Bẫy 4:** Sai vị trí (inside vs outside).
 - **Bẫy 1:** Từ đồng âm (writing/riding).
 
 ## Mini-practice
 
-### Câu 1 — Tư thế + hành động
+### Câu 1  Tư thế + hành động
 
 **Ảnh:** Người phụ nữ mặc blouse trắng đứng sau quầy lễ tân, cầm điện thoại nghe và viết vào sổ.
 
@@ -167,7 +167,7 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 - (C) A woman is **typing** on a computer at her desk.
 - (D) A woman is **handing** a document to a visitor.
 
-### Câu 2 — Near-miss (inside/outside)
+### Câu 2  Near-miss (inside/outside)
 
 **Ảnh:** Người đàn ông vest xám đứng **bên ngoài** cửa kính tòa nhà văn phòng, nhìn điện thoại.
 
@@ -176,14 +176,14 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 
 **Tie-breaker:** Kiểm tra inside/outside trước.
 
-### Câu 3 — Sai chủ thể (Bẫy 3)
+### Câu 3  Sai chủ thể (Bẫy 3)
 
 **Ảnh:** Hai người phụ nữ. Người áo xanh đang bắt tay người áo đen.
 
 - (D) A woman **in a blue shirt** is **shaking hands** with another woman. ✅
 - (C) The woman **in black** is shaking hands... ❌ (sai chủ thể)
 
-### Câu 4 — Hành động gần đúng
+### Câu 4  Hành động gần đúng
 
 **Ảnh:** Nhân viên kho đang **kéo** (pulling) xe đẩy dọc lối đi giữa kệ.
 
@@ -202,7 +202,7 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 
 ## Mô tả
 
-Ảnh tập trung vào đồ vật, cảnh vật — không có người hoặc người không phải trọng tâm. Tần suất ~30–40% Part 1.
+Ảnh tập trung vào đồ vật, cảnh vật  không có người hoặc người không phải trọng tâm. Tần suất ~30–40% Part 1.
 
 ## Chiến thuật
 
@@ -211,7 +211,7 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 - Chú ý **bối cảnh** (indoor/outdoor, office, warehouse, street).
 - **Phân biệt trạng thái vs hành động:** Ảnh chỉ thấy vật xếp/đặt sẵn, không thấy ai đang làm → đáp án đúng thường **bị động tĩnh** (*have been stacked, is parked*), không phải *is stacking / is being loaded*.
 
-## Bẫy 7 — Bị động tĩnh vs hành động ⭐
+## Bẫy 7  Bị động tĩnh vs hành động ⭐
 
 | Trong ảnh | Đáp án thường ĐÚNG | Bẫy ETS thường SAI |
 |-----------|-------------------|-------------------|
@@ -227,7 +227,7 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 - The packages **have been placed** on the counter.
 - Tables **have been set** for a meeting.
 
-→ **Không phải bẫy** — mô tả kết quả đã hoàn tất khi ảnh chỉ cho thấy trạng thái cuối.
+→ **Không phải bẫy**  mô tả kết quả đã hoàn tất khi ảnh chỉ cho thấy trạng thái cuối.
 
 | Cấu trúc | Khi nào đúng |
 |----------|--------------|
@@ -258,21 +258,21 @@ Chi tiết từng bẫy + ví dụ: xem #tag-tranh-ta-nguoi và #tag-tranh-ta-va
 
 ## Mini-practice
 
-### Câu 1 — Bẫy 7 (xe tải)
+### Câu 1  Bẫy 7 (xe tải)
 
 **Ảnh:** Xe tải trắng đỗ lề đường, thùng mở, carton xếp chồng bên trong.
 
 - (B) A delivery truck is **parked** on the street with its **rear doors open**. ✅
 - (A) A truck is **being loaded** with boxes **in a warehouse**. ❌ (cần thấy người bốc)
 
-### Câu 2 — Phòng họp trống
+### Câu 2  Phòng họp trống
 
 **Ảnh:** Phòng họp trống. Bàn đã bày ly, tài liệu, bút. Ghế xếp đều.
 
 - (B) Tables **have been set** for a conference. ✅
 - (A) People **are setting** the table for a meeting. ❌ (Bẫy 7)
 
-### Câu 3 — Số lượng + giới từ
+### Câu 3  Số lượng + giới từ
 
 **Ảnh:** Ba ô tô đậu **dọc theo** cạnh bãi đỗ trống.
 

@@ -8,7 +8,7 @@ import java.time.Instant;
 
 /**
  * Một lần gửi tới một người: vừa là hàng chờ của worker, vừa là nhật ký đã gửi.
- * Chỉ giữ "gửi email nào, cho ai, kết quả ra sao" — nội dung nằm ở {@link Email}.
+ * Chỉ giữ "gửi email nào, cho ai, kết quả ra sao"  nội dung nằm ở {@link Email}.
  */
 @Entity
 @Table(name = "email_recipients", indexes = {
@@ -28,7 +28,7 @@ public class EmailRecipient {
     @Column(name = "email_id", nullable = false)
     private String emailId;
 
-    /** Null khi tài khoản đã bị xoá — dòng nhật ký vẫn giữ lại địa chỉ đã gửi. */
+    /** Null khi tài khoản đã bị xoá  dòng nhật ký vẫn giữ lại địa chỉ đã gửi. */
     @Column(name = "user_id")
     private String userId;
 

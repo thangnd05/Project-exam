@@ -1,4 +1,4 @@
-# Kiến trúc Frontend — Feature-Slice
+# Kiến trúc Frontend  Feature-Slice
 
 > Tài liệu phản ánh cấu trúc **hiện tại** sau reorg B1–B8.
 > Mẫu tham chiếu sạch: `src/features/albums/`, `src/features/classes/`.
@@ -23,7 +23,7 @@ src/
   layout/              # Header, Footer, DefaultLayout
 ```
 
-API co-locate `features/*/api/` **chưa làm** — mọi `*Api.js` vẫn ở `shared/api/`.
+API co-locate `features/*/api/` **chưa làm**  mọi `*Api.js` vẫn ở `shared/api/`.
 Quy tắc đích (khi migrate tiếp): 1 feature → co-locate; ≥3 / hạ tầng → `shared/api/`.
 
 ## 3. Quy ước đặt tên

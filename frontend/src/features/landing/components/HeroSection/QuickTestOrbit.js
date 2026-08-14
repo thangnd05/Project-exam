@@ -75,7 +75,7 @@ function getOrbitTransform(theta, radius) {
   const depth = (Math.cos(theta) + 1) / 2;
 
   return {
-    // fanX: chỉ dùng khi có đúng 2 thẻ — nếu không thẻ phía sau sẽ nằm khuất
+    // fanX: chỉ dùng khi có đúng 2 thẻ  nếu không thẻ phía sau sẽ nằm khuất
     // hoàn toàn sau thẻ trước (cả hai cùng x = 0). sin(theta/2) liên tục nên
     // không gây giật khi quay.
     x: Math.sin(theta) * radius.radiusX + Math.sin(theta / 2) * radius.fanX,
@@ -468,7 +468,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
 
   useEffect(() => () => dragRef.current?.cleanup(), []);
 
-  // Nghiêng nhẹ cả cụm theo vị trí con trỏ — cảm giác 3D của bản three.js nhưng
+  // Nghiêng nhẹ cả cụm theo vị trí con trỏ  cảm giác 3D của bản three.js nhưng
   // chỉ tốn 2 biến CSS.
   const onStagePointerMove = useCallback(
     (e) => {
@@ -482,7 +482,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
       const px = (e.clientX - rect.left) / rect.width - 0.5;
       const py = (e.clientY - rect.top) / rect.height - 0.5;
       // Biên độ phải nhỏ: nghiêng θ đẩy thẻ ở rìa lùi/tiến radiusX·sin(θ) theo
-      // trục z, với radiusX ~300 thì 12° đã là ~60px — thẻ trông như bị hụt về sau.
+      // trục z, với radiusX ~300 thì 12° đã là ~60px  thẻ trông như bị hụt về sau.
       el.style.setProperty('--tilt-y', `${(px * TILT_Y_DEG).toFixed(2)}deg`);
       el.style.setProperty('--tilt-x', `${(-py * TILT_X_DEG).toFixed(2)}deg`);
     },

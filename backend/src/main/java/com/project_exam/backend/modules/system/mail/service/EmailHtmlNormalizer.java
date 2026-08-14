@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * Biến HTML của trình soạn thảo thành HTML chạy được trong hộp thư.
  *
- * Trình soạn thảo (Quill) xuất ra HTML ngữ nghĩa kèm class riêng — ví dụ
- * {@code <p class="ql-align-center">} — trong khi email client bỏ qua CSS ngoài và phần
+ * Trình soạn thảo (Quill) xuất ra HTML ngữ nghĩa kèm class riêng  ví dụ
+ * {@code <p class="ql-align-center">}  trong khi email client bỏ qua CSS ngoài và phần
  * lớn không đọc cả thẻ {@code <style>}; muốn hiển thị đúng thì mọi định dạng phải nằm ở
  * thuộc tính style ngay trên thẻ. Lớp này làm đúng việc đó: dịch class của editor thành
  * style inline và gắn style mặc định cho các thẻ thường gặp.

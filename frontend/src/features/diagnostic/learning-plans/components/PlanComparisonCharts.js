@@ -187,7 +187,7 @@ function PlanComparisonCharts({ chartData, examTypeName }) {
 
         <p className={cx('chartLegendNote')}>
           Xanh dương = đang học · xanh lá = hoàn thành · xám = đã thay · đỏ = đã bỏ.
-          Mốc ban đầu không đổi khi qua ải — chỉ bài thi thử mới + lộ trình mới mới tăng độ sẵn sàng.
+          Mốc ban đầu không đổi khi qua ải  chỉ bài thi thử mới + lộ trình mới mới tăng độ sẵn sàng.
         </p>
       </div>
     </div>

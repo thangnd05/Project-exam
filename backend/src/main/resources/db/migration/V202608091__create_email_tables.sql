@@ -4,11 +4,11 @@
 -- Trước migration này toàn bộ HTML email nằm hardcode trong EmailUtil.java, muốn
 -- sửa một chữ cũng phải build lại backend. Sau migration chỉ cần 2 bảng:
 --
---   emails            — một dòng là một nội dung email.
+--   emails             một dòng là một nội dung email.
 --                       type = AUTO   : mẫu gắn với sự kiện (đăng ký, đổi mật khẩu...),
 --                                       có `code` cố định để code Java gọi tới.
 --                       type = MANUAL : nội dung admin soạn tay để gửi cho người dùng.
---   email_recipients  — một dòng là một lần gửi tới một người: email_id + user_id +
+--   email_recipients   một dòng là một lần gửi tới một người: email_id + user_id +
 --                       trạng thái gửi. Dùng chung cho cả AUTO lẫn MANUAL nên nhật ký
 --                       và chức năng gửi lại chỉ có một đường duy nhất.
 --
@@ -18,7 +18,7 @@
 --
 -- Quy ước template: nội dung dùng placeholder {{tenBien}}, renderer thay bằng giá trị
 -- thật lúc gửi. Dòng AUTO có code LAYOUT_BASE là khung bọc ngoài (header/footer) chứa
--- {{content}} — sửa một chỗ là đổi giao diện toàn bộ email.
+-- {{content}}  sửa một chỗ là đổi giao diện toàn bộ email.
 --
 -- `code` do code Java tham chiếu (MailTemplateCode) nên admin KHÔNG được đổi/xoá dòng
 -- AUTO, chỉ sửa được subject + body_html + active.
@@ -45,7 +45,7 @@ CREATE TABLE emails (
     CONSTRAINT uk_emails_code UNIQUE (code)
 );
 
--- Chỉ lưu "gửi cái gì, cho ai, kết quả ra sao" — nội dung luôn dựng từ emails lúc gửi
+-- Chỉ lưu "gửi cái gì, cho ai, kết quả ra sao"  nội dung luôn dựng từ emails lúc gửi
 -- nên không nhân bản cùng một khối HTML ra hàng nghìn dòng.
 --
 -- to_email lưu riêng chứ không suy từ users.email: mail cảnh báo đổi email phải gửi về

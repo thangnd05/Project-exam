@@ -84,7 +84,7 @@ function MobileBottomNav() {
   const isProfileActive = pathname.startsWith('/profile');
 
   /**
-   * Thao tác mở modal không đi qua router nên ProtectedRoute không chặn được — phải tự
+   * Thao tác mở modal không đi qua router nên ProtectedRoute không chặn được  phải tự
    * kiểm tra đăng nhập tại đây.
    */
   const requireLogin = (message) => {

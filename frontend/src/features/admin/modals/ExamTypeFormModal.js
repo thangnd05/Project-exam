@@ -126,7 +126,7 @@ function ExamTypeFormModal({
           <Form.Check
             type="switch"
             id="exam-type-flexible"
-            label="Loại linh hoạt (cho user tự tạo bài — ẩn khỏi dropdown loại kỳ thi chuẩn)"
+            label="Loại linh hoạt (cho user tự tạo bài  ẩn khỏi dropdown loại kỳ thi chuẩn)"
             checked={Boolean(formState.flexible)}
             onChange={(event) => onChangeField('flexible', event.target.checked)}
           />

@@ -115,7 +115,7 @@ public class EmailAdminService {
     @Transactional
     public EmailResponse update(String emailId, EmailSaveRequest request, String adminId) {
         Email email = getEmail(emailId);
-        // Mẫu AUTO giữ nguyên `code` và `type` — code Java tham chiếu trực tiếp tới chúng.
+        // Mẫu AUTO giữ nguyên `code` và `type`  code Java tham chiếu trực tiếp tới chúng.
         if (email.getType() == EmailType.MANUAL) {
             email.setName(request.getName());
             email.setDescription(request.getDescription());

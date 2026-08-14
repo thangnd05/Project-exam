@@ -125,10 +125,10 @@ function UserTargetPage() {
         onSuccess: () => {
           toast.success(
             isUpdate
-              ? 'Đã cập nhật mục tiêu. Lộ trình đang chạy sẽ hiện nút "Cập nhật theo mục tiêu mới" — bấm là xong, không cần thi lại.'
+              ? 'Đã cập nhật mục tiêu. Lộ trình đang chạy sẽ hiện nút "Cập nhật theo mục tiêu mới"  bấm là xong, không cần thi lại.'
               : 'Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.',
           );
-          // Card "Mục tiêu hiện tại" nằm đầu trang — kéo lên cho user thấy ngay.
+          // Card "Mục tiêu hiện tại" nằm đầu trang  kéo lên cho user thấy ngay.
           window.scrollTo({ top: 0, behavior: 'smooth' });
         },
         onError: () => toast.error('Lỗi khi lưu mục tiêu.'),
@@ -302,13 +302,13 @@ function UserTargetPage() {
                 {targetScore && matchedMilestone && (
                   <span className={cx('milestoneHint', 'matched')}>
                     Trùng mốc &quot;{matchedMilestone.milestoneScore}
-                    {matchedMilestone.description && ` — ${matchedMilestone.description}`}
-                    &quot; — dùng cấu hình admin
+                    {matchedMilestone.description && `  ${matchedMilestone.description}`}
+                    &quot;  dùng cấu hình admin
                   </span>
                 )}
                 {targetScore && !matchedMilestone && (
                   <span className={cx('milestoneHint', 'custom')}>
-                    Không trùng mốc nào — chia đều {evenPctForScore(targetScore)}% mỗi part
+                    Không trùng mốc nào  chia đều {evenPctForScore(targetScore)}% mỗi part
                   </span>
                 )}
               </div>

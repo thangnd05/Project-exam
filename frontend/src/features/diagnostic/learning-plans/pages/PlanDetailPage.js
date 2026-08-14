@@ -34,9 +34,9 @@ function findRecommendedTask(plan) {
 function progressCheer(passed, total, pct) {
   if (total === 0) return 'Lộ trình đang chờ ải đầu tiên.';
   if (passed === 0) return 'Vượt ải đầu tiên hôm nay để khởi động lộ trình.';
-  if (pct >= 100) return 'Bạn đã vượt toàn bộ ải — đến lúc thi thử để chốt kết quả!';
+  if (pct >= 100) return 'Bạn đã vượt toàn bộ ải  đến lúc thi thử để chốt kết quả!';
   if (pct >= 75) return `Chỉ còn ${total - passed} ải nữa là hết lộ trình. Về đích thôi!`;
-  if (pct >= 40) return `Đã đi được hơn nửa chặng — còn ${total - passed} ải.`;
+  if (pct >= 40) return `Đã đi được hơn nửa chặng  còn ${total - passed} ải.`;
   return `Đã vượt ${passed} ải, đang có đà. Giữ nhịp mỗi ngày một ải nhé.`;
 }
 
@@ -48,7 +48,7 @@ function PlanDetailPage() {
   const resyncMutation = useResyncPlan({
     onSuccess: (updatedPlan) => {
       toast.success(buildResyncMessage(updatedPlan));
-      // Cập nhật tại chỗ nên vẫn là plan này — query đã invalidate, trang tự refetch.
+      // Cập nhật tại chỗ nên vẫn là plan này  query đã invalidate, trang tự refetch.
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || 'Không cập nhật được lộ trình');
@@ -150,9 +150,9 @@ function PlanDetailPage() {
       {!isReplaced && plan.targetOutdated && (
         <div className={cx('alert', 'alertWarning')}>
           <span>
-            Lộ trình này sinh theo <strong>mục tiêu cũ</strong> — ngưỡng vượt ải chưa áp
+            Lộ trình này sinh theo <strong>mục tiêu cũ</strong>  ngưỡng vượt ải chưa áp
             mục tiêu hiện tại. Cập nhật lại ngay từ chính bài chẩn đoán cũ,{' '}
-            <strong>không cần thi lại</strong> — tiến độ các ải đã vượt được giữ nguyên.
+            <strong>không cần thi lại</strong>  tiến độ các ải đã vượt được giữ nguyên.
           </span>
           <button
             type="button"
@@ -173,7 +173,7 @@ function PlanDetailPage() {
         label={`Lộ trình #${plan.planSequence ?? '?'} · ${planStatusLabel(plan.status)}`}
         title={
           plan.planStage === 'MOCK'
-            ? 'Đã vượt hết ải — sẵn sàng thi thử!'
+            ? 'Đã vượt hết ải  sẵn sàng thi thử!'
             : recommendedTask
               ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${taskDisplayName(recommendedTask)}`
               : 'Chinh phục từng ải để chạm mục tiêu'

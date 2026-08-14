@@ -247,7 +247,7 @@ function GeneratePlanPage() {
                   <option value="">-- Chọn bài thi --</option>
                   {filteredUserTests.map((t) => (
                     <option key={t.userTestId} value={t.userTestId}>
-                      {t.testTitle ? `${t.testTitle} — ` : ''}
+                      {t.testTitle ? `${t.testTitle}  ` : ''}
                       {formatDate(t.finishedAt)} · Điểm {t.totalScore ?? '—'}
                       {isPracticeAttempt(t) ? ' · Luyện theo Part' : ''}
                     </option>
@@ -282,7 +282,7 @@ function GeneratePlanPage() {
       {result?.targetAchieved && (
         <div className={cx('alert', 'alertSuccess')}>
           <span>
-            Bạn đã đạt mục tiêu (readiness {result.baselineReadiness ?? 0}%) — chưa cần sinh lộ trình mới.
+            Bạn đã đạt mục tiêu (readiness {result.baselineReadiness ?? 0}%)  chưa cần sinh lộ trình mới.
             <br />
             <small>Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài thi thử để duy trì phong độ.</small>
           </span>

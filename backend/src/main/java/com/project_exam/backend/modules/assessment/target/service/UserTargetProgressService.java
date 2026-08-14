@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Cập nhật điểm Part từ mock — tách khỏi aim ({@code customPercentage}) và khỏi plan ải.
+ * Cập nhật điểm Part từ mock  tách khỏi aim ({@code customPercentage}) và khỏi plan ải.
  */
 @Service
 @RequiredArgsConstructor

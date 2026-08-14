@@ -49,7 +49,7 @@ function loadRecaptchaScript() {
  * Không dùng thư viện bọc sẵn để khỏi thêm phụ thuộc: widget này chỉ cần script của Google
  * cộng một lời gọi grecaptcha.render.
  *
- * Token trả về qua onChange chỉ sống vài phút và dùng được một lần — backend xác minh lại
+ * Token trả về qua onChange chỉ sống vài phút và dùng được một lần  backend xác minh lại
  * với Google, nên bỏ qua bước đó thì bot gọi thẳng API vẫn đăng ký được.
  */
 const RecaptchaCheckbox = forwardRef(function RecaptchaCheckbox(

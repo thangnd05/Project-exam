@@ -1,4 +1,4 @@
-# TAG-INDEX — Ánh xạ tag → guide
+# TAG-INDEX  Ánh xạ tag → guide
 
 > Dùng cho recovery resource mapping. Mỗi tag trỏ tới file guide và anchor `#tag-{slug}`.
 
@@ -6,13 +6,13 @@
 |----------|--------------|-------|--------|
 | `tranh-ta-nguoi` | Tranh tả người | [part-01/guide.md](./part-01/guide.md) | [#tag-tranh-ta-nguoi](./part-01/guide.md#tag-tranh-ta-nguoi) |
 | `tranh-ta-vat` | Tranh tả vật | [part-01/guide.md](./part-01/guide.md) | [#tag-tranh-ta-vat](./part-01/guide.md#tag-tranh-ta-vat) |
-| `who` | Who — Ai? | [part-02/guide.md](./part-02/guide.md) | [#tag-who](./part-02/guide.md#tag-who) |
-| `where` | Where — Ở đâu? | [part-02/guide.md](./part-02/guide.md) | [#tag-where](./part-02/guide.md#tag-where) |
-| `when` | When — Khi nào? | [part-02/guide.md](./part-02/guide.md) | [#tag-when](./part-02/guide.md#tag-when) |
-| `why` | Why — Tại sao? | [part-02/guide.md](./part-02/guide.md) | [#tag-why](./part-02/guide.md#tag-why) |
-| `how` | How — Như thế nào? | [part-02/guide.md](./part-02/guide.md) | [#tag-how](./part-02/guide.md#tag-how) |
-| `what` | What — Cái gì? | [part-02/guide.md](./part-02/guide.md) | [#tag-what](./part-02/guide.md#tag-what) |
-| `which` | Which — Cái nào? | [part-02/guide.md](./part-02/guide.md) | [#tag-which](./part-02/guide.md#tag-which) |
+| `who` | Who  Ai? | [part-02/guide.md](./part-02/guide.md) | [#tag-who](./part-02/guide.md#tag-who) |
+| `where` | Where  Ở đâu? | [part-02/guide.md](./part-02/guide.md) | [#tag-where](./part-02/guide.md#tag-where) |
+| `when` | When  Khi nào? | [part-02/guide.md](./part-02/guide.md) | [#tag-when](./part-02/guide.md#tag-when) |
+| `why` | Why  Tại sao? | [part-02/guide.md](./part-02/guide.md) | [#tag-why](./part-02/guide.md#tag-why) |
+| `how` | How  Như thế nào? | [part-02/guide.md](./part-02/guide.md) | [#tag-how](./part-02/guide.md#tag-how) |
+| `what` | What  Cái gì? | [part-02/guide.md](./part-02/guide.md) | [#tag-what](./part-02/guide.md#tag-what) |
+| `which` | Which  Cái nào? | [part-02/guide.md](./part-02/guide.md) | [#tag-which](./part-02/guide.md#tag-which) |
 | `yes-no` | Yes-No | [part-02/guide.md](./part-02/guide.md) | [#tag-yes-no](./part-02/guide.md#tag-yes-no) |
 | `lua-chon` | Lựa chọn (Choice) | [part-02/guide.md](./part-02/guide.md) | [#tag-lua-chon](./part-02/guide.md#tag-lua-chon) |
 | `phu-dinh` | Phủ định (Negative) | [part-02/guide.md](./part-02/guide.md) | [#tag-phu-dinh](./part-02/guide.md#tag-phu-dinh) |

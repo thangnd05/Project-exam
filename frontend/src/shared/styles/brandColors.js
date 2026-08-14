@@ -1,6 +1,6 @@
 /**
  * Bảng màu thương hiệu cho các chỗ BẮT BUỘC dùng JS (Recharts, react-simple-maps,
- * SVG inline, <input type="color">) — nơi không viết được var(--...) trong CSS.
+ * SVG inline, <input type="color">)  nơi không viết được var(--...) trong CSS.
  *
  * KHÔNG khai màu ở đây. Giá trị đọc thẳng từ các primitive `--brand-*-rgb`
  * trong GlobalStyles.module.scss, nên đổi tông vẫn chỉ sửa đúng một file.

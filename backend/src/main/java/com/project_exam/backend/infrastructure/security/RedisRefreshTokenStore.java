@@ -100,7 +100,7 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
             if (prevJti != null && prevAt != null
                     && prevJti.toString().equals(oldJti)
                     && (System.currentTimeMillis() - Long.parseLong(prevAt.toString())) <= GRACE_WINDOW_MS) {
-                log.debug("REFRESH_GRACE_HIT uid={} fid={} — late client caught up", userId, familyId);
+                log.debug("REFRESH_GRACE_HIT uid={} fid={}  late client caught up", userId, familyId);
                 return currentJti;
             }
 

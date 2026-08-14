@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * Cửa duy nhất để người làm bài lấy đáp án đúng + giải thích.
  *
- * Trước đây màn xem lại gọi thẳng GET /api/tests/admintest/{testId} — endpoint đó public nên
+ * Trước đây màn xem lại gọi thẳng GET /api/tests/admintest/{testId}  endpoint đó public nên
  * ai cũng tải được đáp án của mọi đề mà không cần làm bài. Giờ mọi yêu cầu xem đáp án phải đi
  * kèm một lượt làm bài của chính mình, và lượt đó phải đã nộp.
  */
@@ -62,7 +62,7 @@ public class TestReviewService {
         Test test = testRepository.findById(userTest.getTestId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài kiểm tra"));
 
-        // Đề còn trong thời gian mở thì chưa lộ đáp án — người nộp sớm không được phép
+        // Đề còn trong thời gian mở thì chưa lộ đáp án  người nộp sớm không được phép
         // đi mách cho người chưa làm.
         if (test.getAvailableTo() != null && Instant.now().isBefore(test.getAvailableTo())) {
             throw new ForbiddenException("Đề vẫn đang mở, chưa tới lúc xem đáp án.");

@@ -1,4 +1,4 @@
-# Part 7 — Reading Comprehension
+# Part 7  Reading Comprehension
 
 ## Tổng quan
 
@@ -55,10 +55,10 @@ Bước 5 → Loại trừ → chọn đáp án
 | # | Nguyên tắc |
 |---|------------|
 | 1 | **Câu hỏi trước, bài sau** |
-| 2 | **Không đọc hết từng từ** — skim/scan |
+| 2 | **Không đọc hết từng từ**  skim/scan |
 | 3 | **Paraphrase là chuẩn** |
 | 4 | **Loại trừ** hiệu quả hơn tìm đúng |
-| 5 | **Quản lý thời gian** — bỏ câu khó, quay lại |
+| 5 | **Quản lý thời gian**  bỏ câu khó, quay lại |
 | 6 | **Đáp án có bằng chứng** |
 
 ### Phân bổ thời gian thực chiến
@@ -77,7 +77,7 @@ Bước 5 → Loại trừ → chọn đáp án
 | Paraphrase gây nhầm | Hiểu nghĩa, không tìm từ y hệt |
 | Partially true | Loại nếu thiếu/sai phần còn lại |
 | Sai ngữ cảnh | Khớp đúng câu hỏi |
-| Extreme inference | all, never, definitely — cần bằng chứng |
+| Extreme inference | all, never, definitely  cần bằng chứng |
 | NOT/True nhầm | Gạch NOT, tìm False |
 | Vocabulary sai context | Đọc câu chứa từ |
 | Double/triple nhầm passage | Xác định Passage 1/2/3 |
@@ -93,7 +93,7 @@ Bước 5 → Loại trừ → chọn đáp án
 - [ ] Đã loại partially true / extreme?
 - [ ] Inference có bằng chứng trong bài?
 - [ ] Double/triple: đúng passage được hỏi?
-- [ ] Quản lý thời gian — single trước, triple cuối?
+- [ ] Quản lý thời gian  single trước, triple cuối?
 
 ---
 
@@ -122,7 +122,7 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 
 ### Cách nhận biết
 
-- Nghe **câu mở đầu** — thường nêu lý do gọi điện / gặp mặt / chủ đề bài nói.
+- Nghe **câu mở đầu**  thường nêu lý do gọi điện / gặp mặt / chủ đề bài nói.
 - Từ khóa mở đầu:
   - *I'm calling about...*
   - *The reason I wanted to talk to you is...*
@@ -132,7 +132,7 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 
 ### Cách chọn đáp án
 
-- Đáp án đúng thường **tổng quát**, bao quát toàn bộ — không quá chi tiết.
+- Đáp án đúng thường **tổng quát**, bao quát toàn bộ  không quá chi tiết.
 - Loại đáp án **quá hẹp** (chỉ 1 chi tiết phụ) hoặc **quá rộng** (không khớp bài).
 - Part 4: câu đầu + câu cuối thường chứa main idea.
 - Part 4: phân biệt **main purpose** vs **call-to-action cuối bài** (xem [Các bẫy kinh điển](#cac-bay-kinh-dien) Bẫy 7).
@@ -171,7 +171,7 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 
 ## Mini-practice
 
-**Part 3 — Transcript rút gọn:**
+**Part 3  Transcript rút gọn:**
 
 > **W:** I'm calling to reserve a conference room for the board meeting on April 10th.  
 > **M:** We have the Grand Hall available that day...
@@ -182,11 +182,11 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 - (B) Reserving a meeting room
 - (C) Ordering catering for an event
 
-**Đáp án: (B)** — Câu mở đầu nêu rõ mục đích đặt phòng họp.
+**Đáp án: (B)**  Câu mở đầu nêu rõ mục đích đặt phòng họp.
 
 ---
 
-**Part 4 — Transcript rút gọn:**
+**Part 4  Transcript rút gọn:**
 
 > Good afternoon. This is a reminder about tomorrow's **annual safety inspection**...
 
@@ -196,7 +196,7 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 - (B) To prepare staff for an inspection
 - (C) To recruit safety inspectors
 
-**Đáp án: (B)** — (A) bẫy vì chỉ nhắc lunch phụ.
+**Đáp án: (B)**  (A) bẫy vì chỉ nhắc lunch phụ.
 
 ### Ghi chú Part 7 (Reading)
 
@@ -224,8 +224,8 @@ Câu hỏi về **chi tiết cụ thể**: thời gian, địa điểm, số li�
 ### Quy trình
 
 1. **Đọc câu hỏi trước** → biết cần nghe gì (when, where, how much, how many).
-2. **Note ngay** khi nghe — số, tên, ngày, giờ.
-3. Thông tin thường nói **1 lần** — bỏ lỡ khó tìm lại.
+2. **Note ngay** khi nghe  số, tên, ngày, giờ.
+3. Thông tin thường nói **1 lần**  bỏ lỡ khó tìm lại.
 4. Chú ý **paraphrase**: đề hỏi "deadline" → audio nói "due date".
 
 ### Kỹ thuật ghi chú
@@ -243,16 +243,16 @@ Câu hỏi về **chi tiết cụ thể**: thời gian, địa điểm, số li�
 
 ## Bẫy thường gặp
 
-- **Thông tin nhiễu:** audio nhắc Monday, room 302, Mr. Lee — câu hỏi chỉ hỏi 1 trong số đó.
+- **Thông tin nhiễu:** audio nhắc Monday, room 302, Mr. Lee  câu hỏi chỉ hỏi 1 trong số đó.
 - **Sai thời điểm:** was postponed (quá khứ) vs will be on Friday (tương lai).
-- **Giữ số cũ:** ban đầu 50, đổi thành 75 — vẫn chọn 50.
+- **Giữ số cũ:** ban đầu 50, đổi thành 75  vẫn chọn 50.
 - **Schedule change (P4):** originally March 5 → moved to March 12.
 
 ## Mini-practice
 
 **Part 3:**
 
-> **W:** Actually, we need to change that to **75** — more people registered than expected.  
+> **W:** Actually, we need to change that to **75**  more people registered than expected.  
 > **M:** We received your request for **50** boxed lunches.
 
 **Câu hỏi:** How many boxed lunches will be ordered?
@@ -261,7 +261,7 @@ Câu hỏi về **chi tiết cụ thể**: thời gian, địa điểm, số li�
 - (B) 65
 - (C) 75
 
-**Đáp án: (C)** — (A) là số cũ (Bẫy thông tin cũ).
+**Đáp án: (C)**  (A) là số cũ (Bẫy thông tin cũ).
 
 ---
 
@@ -275,7 +275,7 @@ Câu hỏi về **chi tiết cụ thể**: thời gian, địa điểm, số li�
 - (B) At lunchtime
 - (C) In the afternoon
 
-**Đáp án: (A)** — (B) bẫy vì lunch được nhắc nhưng không phải giờ đến.
+**Đáp án: (A)**  (B) bẫy vì lunch được nhắc nhưng không phải giờ đến.
 
 ### Ghi chú Part 7 (Reading)
 
@@ -294,7 +294,7 @@ Part 7: **scan** từ khóa trong bài; paraphrase là chuẩn; câu hỏi thư�
 
 ## Mô tả tag
 
-Chọn **cả câu** phù hợp điền vào chỗ trống trong đoạn văn — không chỉ 1 từ.
+Chọn **cả câu** phù hợp điền vào chỗ trống trong đoạn văn  không chỉ 1 từ.
 
 **Tần suất ước tính:** Part 6 ~5% · Part 7 ~10%
 
@@ -330,7 +330,7 @@ Chọn **cả câu** phù hợp điền vào chỗ trống trong đoạn văn �
 
 Câu điền vào **lặp lại** thông tin đã có trong đoạn → loại ngay.
 
-### Quá phù hợp (Too perfect) — Part 7
+### Quá phù hợp (Too perfect)  Part 7
 
 Câu nghe rất hay nhưng **lặp thông tin** đã có → loại.
 
@@ -342,7 +342,7 @@ Câu nghe rất hay nhưng **lặp thông tin** đã có → loại.
 
 Câu trước positive, câu sau cần contrast → không chọn *Therefore*.
 
-## Mini-practice — Part 6
+## Mini-practice  Part 6
 
 **Câu cần điền:** *This change will help reduce shipping delays.*
 
@@ -353,11 +353,11 @@ Câu trước positive, câu sau cần contrast → không chọn *Therefore*.
 - (C) Many providers offer competitive rates.
 - (D) Customers can track packages online.
 
-**Đáp án: (A)** — *This change* tham chiếu đổi provider; nối với *transition will begin*.
+**Đáp án: (A)**  *This change* tham chiếu đổi provider; nối với *transition will begin*.
 
 ---
 
-## Mini-practice — Part 7
+## Mini-practice  Part 7
 
 **Câu cần điền:** *Such programs can also improve employee morale.*
 
@@ -368,11 +368,11 @@ Câu trước positive, câu sau cần contrast → không chọn *Therefore*.
 - (C) Wellness initiatives are expensive to maintain.
 - (D) Several departments are hiring new staff.
 
-**Đáp án: (A)** — *Such programs* → wellness initiatives; nối với *As a result, absenteeism declined*.
+**Đáp án: (A)**  *Such programs* → wellness initiatives; nối với *As a result, absenteeism declined*.
 
 ### Ghi chú Part 7 (Reading)
 
-Part 7: ~10%. Kiểm tra *Such programs*, *However*, *As a result*. Cẩn thận bẫy *Too perfect* — câu nghe hay nhưng lặp thông tin.
+Part 7: ~10%. Kiểm tra *Such programs*, *However*, *As a result*. Cẩn thận bẫy *Too perfect*  câu nghe hay nhưng lặp thông tin.
 
 ---
 
@@ -386,7 +386,7 @@ Part 7: ~10%. Kiểm tra *Such programs*, *However*, *As a result*. Cẩn thận
 
 ## Mô tả
 
-Đáp án **không nói thẳng** trong bài — phải suy ra từ bằng chứng. Tần suất ~15% Part 7.
+Đáp án **không nói thẳng** trong bài  phải suy ra từ bằng chứng. Tần suất ~15% Part 7.
 
 **Câu hỏi thường gặp:**
 - What can be inferred about...?
@@ -397,7 +397,7 @@ Part 7: ~10%. Kiểm tra *Such programs*, *However*, *As a result*. Cẩn thận
 
 1. Đọc câu hỏi → xác định đối tượng cần suy luận.
 2. Tìm **bằng chứng** trong bài (không suy diễn quá xa).
-3. Chọn đáp án **hợp lý nhất**, **vừa phải** — không cực đoan.
+3. Chọn đáp án **hợp lý nhất**, **vừa phải**  không cực đoan.
 4. Loại đáp án **không có căn cứ** hoặc dùng *definitely, all, never, main reason* khi bài không nói.
 
 ## Bẫy thường gặp
@@ -422,7 +422,7 @@ Part 7: ~10%. Kiểm tra *Such programs*, *However*, *As a result*. Cẩn thận
 | Đáp án | Phân tích |
 |--------|-----------|
 | **(B) ✅** | decline in productivity → suy ra productivity có thể giảm. |
-| (A) ❌ | Bài không nói eliminate — quá xa. |
+| (A) ❌ | Bài không nói eliminate  quá xa. |
 | (C) ❌ | Không có bằng chứng. |
 | (D) ❌ | Không có bằng chứng về tỷ lệ remote. |
 
@@ -471,7 +471,7 @@ Câu hỏi yêu cầu tìm điều **KHÔNG đúng**, **ĐÚNG**, hoặc **KHÔN
 - (C) A meal will be included in the registration. → **NOT** ✅
 - (D) There is a charge for some participants. → Stated ✅
 
-**Đáp án: (C)** — Lunch will not be provided → (C) nói ngược lại.
+**Đáp án: (C)**  Lunch will not be provided → (C) nói ngược lại.
 
 ---
 
@@ -479,7 +479,7 @@ Câu hỏi yêu cầu tìm điều **KHÔNG đúng**, **ĐÚNG**, hoặc **KHÔN
 
 **Passage:** expanded into **Asia and Europe**, offices in Tokyo and Berlin.
 
-- (A) It focused exclusively on Asian markets. ❌ — có Asia nhưng *exclusively* sai.
+- (A) It focused exclusively on Asian markets. ❌  có Asia nhưng *exclusively* sai.
 - (B) It included new offices in two regions. ✅
 
 ---
@@ -494,7 +494,7 @@ Câu hỏi yêu cầu tìm điều **KHÔNG đúng**, **ĐÚNG**, hoặc **KHÔN
 
 ## Mô tả
 
-Từ/cụm **được gạch chân** trong bài — chọn nghĩa gần nhất **trong ngữ cảnh**. Tần suất ~10% Part 7.
+Từ/cụm **được gạch chân** trong bài  chọn nghĩa gần nhất **trong ngữ cảnh**. Tần suất ~10% Part 7.
 
 **Câu hỏi thường gặp:**
 - The word "X" is closest in meaning to...
@@ -504,7 +504,7 @@ Từ/cụm **được gạch chân** trong bài — chọn nghĩa gần nhất *
 
 1. Tìm từ/cụm được gạch chân.
 2. Đọc **câu chứa từ** + câu trước/sau → đoán nghĩa trong ngữ cảnh.
-3. Chọn đáp án **gần nghĩa nhất** — không dùng nghĩa điển hình nếu lệch ngữ cảnh.
+3. Chọn đáp án **gần nghĩa nhất**  không dùng nghĩa điển hình nếu lệch ngữ cảnh.
 
 ## Cặp paraphrase hay gặp Part 7
 
@@ -522,7 +522,7 @@ Từ/cụm **được gạch chân** trong bài — chọn nghĩa gần nhất *
 ## Bẫy thường gặp
 
 - Đúng nghĩa **điển hình**, sai **ngữ cảnh**:
-  - *aggressive* (marketing) = mạnh mẽ, tích cực — không phải hostile/violent.
+  - *aggressive* (marketing) = mạnh mẽ, tích cực  không phải hostile/violent.
 
 ## Mini-practice
 
@@ -533,7 +533,7 @@ The company plans to **streamline** its production process next quarter.
 - (C) expand
 - (D) document
 
-**Đáp án: (B)** — streamline = tối ưu hóa, đơn giản hóa quy trình.
+**Đáp án: (B)**  streamline = tối ưu hóa, đơn giản hóa quy trình.
 
 ---
 
@@ -548,7 +548,7 @@ The company plans to **streamline** its production process next quarter.
 
 ## Mô tả tag
 
-Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không nói thẳng.
+Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc**  không nói thẳng.
 
 **Câu hỏi thường gặp:**
 - What does the woman mean?
@@ -559,11 +559,11 @@ Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không n
 
 ## Chiến thuật
 
-### Part 3 — Phổ biến hơn
+### Part 3  Phổ biến hơn
 
 - Nghe **giọng điệu** + **từ ngữ gián tiếp**:
   - *I was hoping..., I thought we agreed..., That's not what I expected...*
-- Không hiểu **literal** — hỏi: *"Người nói muốn truyền đạt gì?"*
+- Không hiểu **literal**  hỏi: *"Người nói muốn truyền đạt gì?"*
 - Đáp án đúng = ý **ngụ ý**, không phải nghĩa đen từng từ.
 
 ### Part 4
@@ -580,7 +580,7 @@ Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không n
 | I'd rather not. | Từ chối lịch sự |
 | Sounds good to me. | Đồng ý |
 | It's not like I have much choice. | Không có lựa chọn / phải chấp nhận |
-| I know. The data came in late. | Giải thích — không phải lỗi mình |
+| I know. The data came in late. | Giải thích  không phải lỗi mình |
 
 ## Bẫy thường gặp
 
@@ -601,11 +601,11 @@ Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không n
 - (B) The delay was not her fault.
 - (C) The finance team is being replaced.
 
-**Đáp án: (B)** — Giải thích data đến muộn → trễ vì bên khác.
+**Đáp án: (B)**  Giải thích data đến muộn → trễ vì bên khác.
 
 ---
 
-**Part 3 — Near-miss:**
+**Part 3  Near-miss:**
 
 > Woman: "Maybe we should **ask the IT department first**."
 
@@ -614,11 +614,11 @@ Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không n
 - (A) The IT department should handle the problem.
 - (B) They should consult IT before proceeding.
 
-**Đáp án: (B)** — (A) kết luận quá mạnh; (B) khớp *ask first*.
+**Đáp án: (B)**  (A) kết luận quá mạnh; (B) khớp *ask first*.
 
 ### Ghi chú Part 7 (Reading)
 
-Part 7: *The author mentions X in order to...* — mục đích nêu X. Tìm lý do tác giả đưa ví dụ/chi tiết, không chọn nghĩa literal.
+Part 7: *The author mentions X in order to...*  mục đích nêu X. Tìm lý do tác giả đưa ví dụ/chi tiết, không chọn nghĩa literal.
 
 ---
 
@@ -641,7 +641,7 @@ So sánh **2–3 văn bản** trong bài double/triple passage. Tần suất ~10
 
 ## Chiến thuật
 
-1. Đọc **câu hỏi trước** — xác định hỏi về passage nào.
+1. Đọc **câu hỏi trước**  xác định hỏi về passage nào.
 2. Skim đúng passage được hỏi **trước** khi chọn.
 3. Không chọn thông tin từ passage sai dù cùng chủ đề.
 
@@ -651,7 +651,7 @@ So sánh **2–3 văn bản** trong bài double/triple passage. Tần suất ~10
 | According to Passage 1, but Passage 2... | Đọc riêng từng bài |
 | Passage 2 suggests that Passage 1's... | So sánh quan điểm |
 
-## Bẫy 8 — Nhầm passage ⭐
+## Bẫy 8  Nhầm passage ⭐
 
 > **Hỏi:** According to **Passage 2**, what is true about the merger?  
 > **Bẫy:** Chọn thông tin có trong Passage 1 (cùng chủ đề merger)  
@@ -668,7 +668,7 @@ So sánh **2–3 văn bản** trong bài double/triple passage. Tần suất ~10
 
 ## Mini-practice
 
-**Tình huống:** Double passage — Passage 1: email từ HR về chính sách mới. Passage 2: bài báo phản ứng của nhân viên.
+**Tình huống:** Double passage  Passage 1: email từ HR về chính sách mới. Passage 2: bài báo phản ứng của nhân viên.
 
 **Câu hỏi:** Both passages mention which topic?
 

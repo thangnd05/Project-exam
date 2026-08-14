@@ -1,6 +1,6 @@
 -- Bỏ cột consecutive_fails của learning_plan_tasks.
 --
--- Nhãn "Đang bí" trên UI giờ tính bằng: ải chưa PASSED và attempt_count >= 3 — tức
+-- Nhãn "Đang bí" trên UI giờ tính bằng: ải chưa PASSED và attempt_count >= 3  tức
 -- "đã luyện 3 lượt mà chưa qua", đúng thứ người học thấy trong lịch sử ải. Cột cũ đếm
 -- chuỗi TRƯỢT LIÊN TIẾP: là trạng thái dẫn xuất phải tự cập nhật mỗi lần nộp (kèm 1 query
 -- lấy 5 phiên gần nhất), dễ lệch, và không giải thích được cho người dùng.

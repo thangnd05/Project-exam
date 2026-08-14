@@ -102,7 +102,7 @@ function EmailRecipientsModal({show, email, onClose}) {
         )}
         {email?.type === 'AUTO' && (
           <span className="small text-muted">
-            Email tự động không gửi lại được — nội dung phụ thuộc dữ liệu của lần gửi đó.
+            Email tự động không gửi lại được  nội dung phụ thuộc dữ liệu của lần gửi đó.
           </span>
         )}
       </div>

@@ -35,7 +35,7 @@ function Header() {
   };
 
   /**
-   * Các thao tác mở modal không đi qua router nên ProtectedRoute không chặn được — phải tự
+   * Các thao tác mở modal không đi qua router nên ProtectedRoute không chặn được  phải tự
    * kiểm tra đăng nhập tại đây.
    */
   const requireLogin = (message) => {
@@ -68,7 +68,7 @@ function Header() {
     <header className={cx('wrapper')}>
       <div className={cx('pill')}>
         <div className={cx('barRow')}>
-          {/* Zone 1 — Brand */}
+          {/* Zone 1  Brand */}
           <div className={cx('zoneLeft')}>
             <Link to={routes.home} className={cx('brand')}>
               <span className={cx('brandInner')}>
@@ -84,7 +84,7 @@ function Header() {
             </Link>
           </div>
 
-          {/* Zone 2 — Primary navigation (desktop) */}
+          {/* Zone 2  Primary navigation (desktop) */}
           <nav className={cx('zoneCenter')} aria-label="Điều hướng chính">
             <div className={cx('navTrack')}>
               <NavLink
@@ -147,7 +147,7 @@ function Header() {
             </div>
           </nav>
 
-          {/* Zone 3 — CTA + stats + account */}
+          {/* Zone 3  CTA + stats + account */}
           <div className={cx('zoneRight')}>
             {user && (
               <div className={cx('mobileHeaderActions')}>

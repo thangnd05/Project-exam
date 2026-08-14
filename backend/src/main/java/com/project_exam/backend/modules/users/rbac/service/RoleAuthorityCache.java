@@ -61,7 +61,7 @@ public class RoleAuthorityCache {
      * Gọi invalidate() trần bên trong @Transactional là chưa đủ: quyền mới chưa commit, nên một
      * request khác xen vào giữa lúc đó sẽ đọc DB ra bộ quyền CŨ rồi nạp lại vào cache và giữ
      * nguyên đến hết TTL. Xoá thêm ở afterCompletion để lần đọc kế tiếp chắc chắn thấy dữ liệu
-     * đã commit (rollback cũng xoá — chỉ tốn đúng một lần đọc lại).
+     * đã commit (rollback cũng xoá  chỉ tốn đúng một lần đọc lại).
      */
     public void invalidateAfterCommit(String roleId) {
         cache.remove(roleId);

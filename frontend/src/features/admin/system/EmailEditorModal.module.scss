@@ -37,7 +37,7 @@
     box-shadow: var(--shadow-lg);
   }
 
-  // Hai dropdown cạnh nhau mà cùng hiện chữ "Normal" thì không biết đâu là gì — đặt tên
+  // Hai dropdown cạnh nhau mà cùng hiện chữ "Normal" thì không biết đâu là gì  đặt tên
   // tiếng Việt cho từng mục.
   :global(.ql-snow .ql-picker.ql-header .ql-picker-label)::before,
   :global(.ql-snow .ql-picker.ql-header .ql-picker-item)::before {

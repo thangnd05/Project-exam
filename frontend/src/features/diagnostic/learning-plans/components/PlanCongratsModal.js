@@ -60,7 +60,7 @@ function PlanCongratsModal({ show, onClose, onNext, totalTasks, planSequence }) 
             <li className={cx('nextStep')}>
               <span className={cx('stepNum')}>2</span>
               <span className={cx('stepText')}>
-                Quay lại trang kế hoạch và <strong>sinh lộ trình mới từ chính bài đó</strong> —
+                Quay lại trang kế hoạch và <strong>sinh lộ trình mới từ chính bài đó</strong> 
                 lặp đến khi đạt mục tiêu.
               </span>
             </li>

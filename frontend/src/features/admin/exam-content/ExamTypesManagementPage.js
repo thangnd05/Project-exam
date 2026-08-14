@@ -289,7 +289,7 @@ function ExamTypesManagementPage() {
   };
 
   const deleteMessage = deletingExamType?.child_count > 0
-    ? `Loại "${deletingExamType?.name}" đang chứa ${deletingExamType.child_count} loại con — backend sẽ chặn xoá. Hãy xoá/tách loại con trước.`
+    ? `Loại "${deletingExamType?.name}" đang chứa ${deletingExamType.child_count} loại con  backend sẽ chặn xoá. Hãy xoá/tách loại con trước.`
     : `Bạn có chắc muốn xóa "${deletingExamType?.name || ''}" không?`;
 
   return (

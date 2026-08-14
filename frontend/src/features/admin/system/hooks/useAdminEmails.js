@@ -49,7 +49,7 @@ export function useEmailRecipients(emailId, page, size) {
     queryKey: emailKeys.recipients(emailId, page),
     queryFn: () => getEmailRecipients(emailId, {page, size}),
     enabled: Boolean(emailId),
-    // Worker gửi nền nên trạng thái đổi sau khi mở bảng — tự làm mới trong lúc đang xem.
+    // Worker gửi nền nên trạng thái đổi sau khi mở bảng  tự làm mới trong lúc đang xem.
     refetchInterval: 5000,
   });
   return {

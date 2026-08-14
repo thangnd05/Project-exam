@@ -101,7 +101,7 @@ function TagAnalysisTable({ enhanced, userTestId }) {
                         type="button"
                         className={cx("q-circle", q.status)}
                         onClick={() => goToQuestion(q.questionId)}
-                        title={`Câu ${q.questionNumber} — xem giải thích`}
+                        title={`Câu ${q.questionNumber}  xem giải thích`}
                       >
                         {q.questionNumber}
                       </button>

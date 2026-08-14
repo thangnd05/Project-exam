@@ -200,7 +200,7 @@ function CosmeticsManagementPage() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Cửa hàng xu — Trang trí"
+        title="Cửa hàng xu  Trang trí"
         description="Quản lý khung avatar & huy hiệu user đổi bằng xu."
       >
         <Button onClick={openCreateModal}>
@@ -324,7 +324,7 @@ function CosmeticsManagementPage() {
               <Form.Control
                 value={formState.imageUrl}
                 onChange={(e) => setFormState((p) => ({...p, imageUrl: e.target.value}))}
-                placeholder="https://.../badge.gif — để trống nếu dùng emoji"
+                placeholder="https://.../badge.gif  để trống nếu dùng emoji"
               />
               <Form.Text muted>Có URL ảnh thì dùng ảnh; bỏ trống thì dùng emoji bên dưới.</Form.Text>
             </Form.Group>

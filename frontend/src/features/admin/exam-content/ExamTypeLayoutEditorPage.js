@@ -230,7 +230,7 @@ function ExamTypeLayoutEditorPage() {
           <div>
             <h2>Giao diện làm bài</h2>
             <div className={cx('subtitle')}>
-              Loại đề: <strong>{examTypeName || examTypeId}</strong> — kéo các yếu tố vào vùng
+              Loại đề: <strong>{examTypeName || examTypeId}</strong>  kéo các yếu tố vào vùng
               bất kỳ.
             </div>
           </div>
@@ -264,7 +264,7 @@ function ExamTypeLayoutEditorPage() {
               >
                 <span className={cx('zoneTitle')}>{zone.label}</span>
                 {blocksByZone[zone.key].length === 0 && (
-                  <span className={cx('zoneEmpty')}>— thả yếu tố vào đây —</span>
+                  <span className={cx('zoneEmpty')}>— thả yếu tố vào đây </span>
                 )}
                 {blocksByZone[zone.key].map((block) => {
                   const meta = BLOCK_META[block.type] || { label: block.type };
@@ -411,7 +411,7 @@ function ExamTypeLayoutEditorPage() {
                 onChange={(e) => patchQuestionArea({ navigationMode: e.target.value })}
               >
                 <option value="scroll">Cuộn tất cả (mặc định)</option>
-                <option value="paged">Từng câu/nhóm — kiểu TOEIC (nghe tự chuyển, đọc bấm)</option>
+                <option value="paged">Từng câu/nhóm  kiểu TOEIC (nghe tự chuyển, đọc bấm)</option>
               </select>
             </div>
             <div className={cx('field')}>

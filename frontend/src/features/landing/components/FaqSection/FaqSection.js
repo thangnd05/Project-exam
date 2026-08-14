@@ -14,7 +14,7 @@ const faqs = [
   {
     id: 'signup',
     q: 'Khi nào mình cần đăng ký?',
-    a: 'Khi muốn giữ kết quả lâu dài, theo lộ trình cá nhân, hoặc dùng tính năng cần lưu hồ sơ. Còn muốn thử trước thì cứ làm bài — không bắt buộc tạo tài khoản ngay.',
+    a: 'Khi muốn giữ kết quả lâu dài, theo lộ trình cá nhân, hoặc dùng tính năng cần lưu hồ sơ. Còn muốn thử trước thì cứ làm bài  không bắt buộc tạo tài khoản ngay.',
   },
   {
     id: 'quick',
@@ -24,7 +24,7 @@ const faqs = [
   {
     id: 'path',
     q: 'Có lộ trình cá nhân thật không?',
-    a: 'Có. Sau khi làm bài và xem chẩn đoán, WinDe gợi ý thứ tự ôn theo chỗ bạn còn yếu — thay vì tự mò giữa hàng loạt tài liệu.',
+    a: 'Có. Sau khi làm bài và xem chẩn đoán, WinDe gợi ý thứ tự ôn theo chỗ bạn còn yếu  thay vì tự mò giữa hàng loạt tài liệu.',
   },
   {
     id: 'exams',

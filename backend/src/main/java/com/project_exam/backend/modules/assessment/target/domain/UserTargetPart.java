@@ -30,7 +30,7 @@ public class UserTargetPart {
     @Column(name = "exam_part_id", nullable = false)
     private String examPartId;
 
-    /** Ngưỡng % cần đạt trên Part (aim) — không phải điểm mock hiện tại. */
+    /** Ngưỡng % cần đạt trên Part (aim)  không phải điểm mock hiện tại. */
     @Column(nullable = false)
     private Integer customPercentage;
 

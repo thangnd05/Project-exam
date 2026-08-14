@@ -12,6 +12,6 @@ public interface UserTargetRepository extends JpaRepository<UserTarget, String> 
 
     Optional<UserTarget> findByUserIdAndExamTypeId(String userId, String examTypeId);
 
-    /** Mọi mục tiêu của user — dùng khi dựng danh sách plan nhiều kỳ thi (tránh query từng plan). */
+    /** Mọi mục tiêu của user  dùng khi dựng danh sách plan nhiều kỳ thi (tránh query từng plan). */
     List<UserTarget> findByUserId(String userId);
 }

@@ -150,7 +150,7 @@ function ExamCategoriesManagementPage() {
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
         title="Phân loại bài thi"
-        description="Cấu hình các loại bài thi (Quick Challenge, Full Mock, Recovery...) — gán vào Test khi tạo đề."
+        description="Cấu hình các loại bài thi (Quick Challenge, Full Mock, Recovery...)  gán vào Test khi tạo đề."
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />

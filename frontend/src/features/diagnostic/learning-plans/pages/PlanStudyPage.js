@@ -248,7 +248,7 @@ function PlanStudyPage() {
             Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.
             <br />
             <small>
-              Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang kế hoạch —
+              Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang kế hoạch 
               hệ thống sẽ gợi ý sinh lộ trình mới từ chính bài vừa làm.
             </small>
           </span>
@@ -502,7 +502,7 @@ function PlanStudyPage() {
         title="Còn câu chưa trả lời"
         confirmText="Vẫn nộp bài"
         cancelText="Quay lại làm tiếp"
-        message={`Bạn còn ${unansweredCount} câu chưa trả lời — các câu này sẽ bị tính là sai khi chấm. Vẫn nộp bài?`}
+        message={`Bạn còn ${unansweredCount} câu chưa trả lời  các câu này sẽ bị tính là sai khi chấm. Vẫn nộp bài?`}
       />
     </div>
   );

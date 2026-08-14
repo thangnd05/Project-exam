@@ -1,4 +1,4 @@
-# Part 4 — Talks
+# Part 4  Talks
 
 ## Tổng quan
 
@@ -51,12 +51,12 @@ KẾT (10–15s)     → Tóm tắt / hành động cần làm
 | 2 | **3 câu hỏi = 3 phần bài** |
 | 3 | Chú ý *First, Next, Finally, However, In addition* |
 | 4 | **Advertisement vs Announcement** |
-| 5 | Không panic khi bỏ lỡ — 2/3 câu đúng vẫn tốt |
+| 5 | Không panic khi bỏ lỡ  2/3 câu đúng vẫn tốt |
 
 ### Chuyển tiếp Part 3 → Part 4
 
-- 2 người đối thoại → **1 người nói liên tục** — cấu trúc rõ hơn.
-- Nghe **câu đầu** kỹ hơn — cho biết loại bài + người nói.
+- 2 người đối thoại → **1 người nói liên tục**  cấu trúc rõ hơn.
+- Nghe **câu đầu** kỹ hơn  cho biết loại bài + người nói.
 
 ## Bẫy riêng Part 4
 
@@ -87,13 +87,13 @@ Chi tiết: [Các bẫy kinh điển](#cac-bay-kinh-dien)
 <a id="so-sanh-part-3--part-4"></a>
 ## So sánh Part 3 & Part 4
 
-# Listening Part 3 & Part 4 — Nội dung dùng chung
+# Listening Part 3 & Part 4  Nội dung dùng chung
 
 Part 3 (Conversations) và Part 4 (Talks) dùng **cùng 7 tag câu hỏi**. Lý thuyết đầy đủ nằm trong thư mục này; mỗi Part chỉ bổ sung ghi chú riêng trong `part-03/` và `part-04/`.
 
 ## So sánh nhanh
 
-| Hạng mục | Part 3 — Conversations | Part 4 — Talks |
+| Hạng mục | Part 3  Conversations | Part 4  Talks |
 |----------|------------------------|----------------|
 | **Số câu** | 39 (13 đoạn × 3) | 30 (10 đoạn × 3) |
 | **Thời gian/đoạn** | ~70–75 giây | ~90 giây |
@@ -105,18 +105,18 @@ Part 3 (Conversations) và Part 4 (Talks) dùng **cùng 7 tag câu hỏi**. Lý 
 
 ## Khác biệt chiến thuật quan trọng
 
-### Part 3 — Conversations
+### Part 3  Conversations
 
-- **Đọc 3 câu hỏi trước** khi nghe — bắt buộc.
-- Phân biệt **Man / Woman** — hay nhầm ai sẽ làm gì (Bẫy đảo vai).
+- **Đọc 3 câu hỏi trước** khi nghe  bắt buộc.
+- Phân biệt **Man / Woman**  hay nhầm ai sẽ làm gì (Bẫy đảo vai).
 - Câu **cuối hội thoại** thường quyết định hành động tiếp theo.
 - Hàm ý xuất hiện nhiều: *What does the woman mean?*, *What is implied?*
 
-### Part 4 — Talks
+### Part 4  Talks
 
-- **Câu đầu tiên = vàng** — thường cho biết ai nói + loại bài.
+- **Câu đầu tiên = vàng**  thường cho biết ai nói + loại bài.
 - Map **3 câu hỏi = 3 phần bài** (First, Next, Finally).
-- Phân biệt **Advertisement vs Announcement** — quảng cáo kêu gọi mua, thông báo cung cấp thông tin.
+- Phân biệt **Advertisement vs Announcement**  quảng cáo kêu gọi mua, thông báo cung cấp thông tin.
 - Cẩn thận **call-to-action cuối bài** vs **main purpose** (Bẫy 7 Part 4).
 - Câu Why → tìm *because / due to*, không chọn kết quả (Bẫy cause/effect).
 
@@ -140,7 +140,7 @@ Part 3 (Conversations) và Part 4 (Talks) dùng **cùng 7 tag câu hỏi**. Lý 
 <a id="cac-bay-kinh-dien"></a>
 ## Các bẫy kinh điển (Part 3 & 4)
 
-# Bẫy kinh điển — Part 3 & Part 4 (dùng chung)
+# Bẫy kinh điển  Part 3 & Part 4 (dùng chung)
 
 > Bẫy riêng từng Part: [Part 3 overview](../part-03/guide.md) · [Part 4 overview](../part-04/guide.md)
 
@@ -152,9 +152,9 @@ Audio nhắc nhiều chi tiết, chỉ **1 chi tiết** là đáp án.
 > Câu hỏi: Where will the meeting take place?  
 > Bẫy: Monday / Mr. Lee
 
-**Cách xử lý:** Khớp đúng câu hỏi — đọc câu hỏi trước khi nghe.
+**Cách xử lý:** Khớp đúng câu hỏi  đọc câu hỏi trước khi nghe.
 
-## Bẫy 2: Đúng thông tin — sai thời điểm
+## Bẫy 2: Đúng thông tin  sai thời điểm
 
 | Audio nói | Bẫy | Đúng |
 |-----------|-----|------|
@@ -163,7 +163,7 @@ Audio nhắc nhiều chi tiết, chỉ **1 chi tiết** là đáp án.
 | **Planning to** expand | Đã mở rộng | Dự định mở rộng |
 | Originally March 5 → moved to March 12 | March 5 | March 12 |
 
-**Cách xử lý:** Nghe tín hiệu *actually, instead, no wait* — ưu tiên thông tin **mới nhất**.
+**Cách xử lý:** Nghe tín hiệu *actually, instead, no wait*  ưu tiên thông tin **mới nhất**.
 
 ## Bẫy 3: Đảo vai / Đảo người nói
 
@@ -190,10 +190,10 @@ Audio nhắc nhiều chi tiết, chỉ **1 chi tiết** là đáp án.
 
 ## Bẫy 6: Đáp án quá chung / quá cụ thể
 
-- Quá chung: "A business matter." — thiếu chi tiết.
+- Quá chung: "A business matter."  thiếu chi tiết.
 - Quá cụ thể: thêm thông tin **không có** trong audio.
 
-## Bẫy 7: Near-miss — hai đáp án cùng hợp lý
+## Bẫy 7: Near-miss  hai đáp án cùng hợp lý
 
 > **Hỏi:** What does the woman suggest?  
 > **(A)** The IT department should handle the problem. ← gần đúng  
@@ -226,7 +226,7 @@ Audio nhắc nhiều chi tiết, chỉ **1 chi tiết** là đáp án.
 
 ### Graphic trap
 
-Tranh hiển thị nhiều thông tin — audio chỉ nói về **1 phần**.
+Tranh hiển thị nhiều thông tin  audio chỉ nói về **1 phần**.
 
 ### Từ khóa lặp sai ngữ cảnh
 
@@ -276,7 +276,7 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 
 ### Cách nhận biết
 
-- Nghe **câu mở đầu** — thường nêu lý do gọi điện / gặp mặt / chủ đề bài nói.
+- Nghe **câu mở đầu**  thường nêu lý do gọi điện / gặp mặt / chủ đề bài nói.
 - Từ khóa mở đầu:
   - *I'm calling about...*
   - *The reason I wanted to talk to you is...*
@@ -286,7 +286,7 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 
 ### Cách chọn đáp án
 
-- Đáp án đúng thường **tổng quát**, bao quát toàn bộ — không quá chi tiết.
+- Đáp án đúng thường **tổng quát**, bao quát toàn bộ  không quá chi tiết.
 - Loại đáp án **quá hẹp** (chỉ 1 chi tiết phụ) hoặc **quá rộng** (không khớp bài).
 - Part 4: câu đầu + câu cuối thường chứa main idea.
 - Part 4: phân biệt **main purpose** vs **call-to-action cuối bài** (xem [Các bẫy kinh điển](#cac-bay-kinh-dien) Bẫy 7).
@@ -325,7 +325,7 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 
 ## Mini-practice
 
-**Part 3 — Transcript rút gọn:**
+**Part 3  Transcript rút gọn:**
 
 > **W:** I'm calling to reserve a conference room for the board meeting on April 10th.  
 > **M:** We have the Grand Hall available that day...
@@ -336,11 +336,11 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 - (B) Reserving a meeting room
 - (C) Ordering catering for an event
 
-**Đáp án: (B)** — Câu mở đầu nêu rõ mục đích đặt phòng họp.
+**Đáp án: (B)**  Câu mở đầu nêu rõ mục đích đặt phòng họp.
 
 ---
 
-**Part 4 — Transcript rút gọn:**
+**Part 4  Transcript rút gọn:**
 
 > Good afternoon. This is a reminder about tomorrow's **annual safety inspection**...
 
@@ -350,7 +350,7 @@ Câu hỏi về **nội dung chính** của hội thoại/bài nói hoặc **m�
 - (B) To prepare staff for an inspection
 - (C) To recruit safety inspectors
 
-**Đáp án: (B)** — (A) bẫy vì chỉ nhắc lunch phụ.
+**Đáp án: (B)**  (A) bẫy vì chỉ nhắc lunch phụ.
 
 ---
 
@@ -380,14 +380,14 @@ Xác định **ai đang nói**, **vai trò/nghề nghiệp** của người nói
 
 ## Chiến thuật
 
-### Part 3 — Hội thoại
+### Part 3  Hội thoại
 
 - Xác định **Man / Woman** qua giọng nói.
 - Suy ra vai trò qua ngữ cảnh: *our department, the client, the manager, I'm here to repair...*
 - Câu hỏi "Who most likely is the man?" → tìm man nói gì, làm gì.
-- Chú ý **đảo vai** — ai nói "I'll..." thì người đó sẽ làm (xem [Các bẫy kinh điển](#cac-bay-kinh-dien)).
+- Chú ý **đảo vai**  ai nói "I'll..." thì người đó sẽ làm (xem [Các bẫy kinh điển](#cac-bay-kinh-dien)).
 
-### Part 4 — Bài nói
+### Part 4  Bài nói
 
 - Nghe **câu đầu**: *I'm the HR manager, Welcome to our store, This is Janet from Marketing...*
 - Suy ra từ ngữ cảnh:
@@ -413,7 +413,7 @@ Xác định **ai đang nói**, **vai trò/nghề nghiệp** của người nói
 - (B) A building manager
 - (C) A tenant
 
-**Đáp án: (B)** — Woman tự giới thiệu vai trò.
+**Đáp án: (B)**  Woman tự giới thiệu vai trò.
 
 ---
 
@@ -445,10 +445,10 @@ Câu hỏi về việc **sẽ làm gì tiếp**, **ai cần làm gì**, hoặc *
 
 ### Part 3
 
-- Nghe **câu cuối** hội thoại — thường quyết định bước tiếp theo.
+- Nghe **câu cuối** hội thoại  thường quyết định bước tiếp theo.
 - Từ khóa: *I'll..., Could you..., Let me..., Why don't we..., I'll get back to you...*
 - Đáp án đúng = hành động **sẽ xảy ra**, không phải đã xảy ra.
-- Xác định **ai nói câu cam kết** (I'll...) — không nhầm vì nghe giọng nam/nữ cuối đoạn.
+- Xác định **ai nói câu cam kết** (I'll...)  không nhầm vì nghe giọng nam/nữ cuối đoạn.
 
 ### Part 4
 
@@ -484,7 +484,7 @@ Câu hỏi về việc **sẽ làm gì tiếp**, **ai cần làm gì**, hoặc *
 - (B) Send an updated bill
 - (C) Prepare vegetarian meals
 
-**Đáp án: (B)** — *revised invoice* = hóa đơn cập nhật.
+**Đáp án: (B)**  *revised invoice* = hóa đơn cập nhật.
 
 ---
 
@@ -498,7 +498,7 @@ Câu hỏi về việc **sẽ làm gì tiếp**, **ai cần làm gì**, hoặc *
 - (B) Complete their purchases soon
 - (C) Visit the second floor
 
-**Đáp án: (B)** — Hoàn tất mua hàng trước khi đóng cửa.
+**Đáp án: (B)**  Hoàn tất mua hàng trước khi đóng cửa.
 
 ---
 
@@ -527,8 +527,8 @@ Câu hỏi kèm **tranh minh họa** (biểu đồ, lịch, sơ đồ, bản đ�
 
 ```
 1. Đọc câu hỏi
-2. Xem tranh — xác định loại graphic và yếu tố chính
-3. Nghe audio — tìm thông tin khớp yếu tố trên hình
+2. Xem tranh  xác định loại graphic và yếu tố chính
+3. Nghe audio  tìm thông tin khớp yếu tố trên hình
 4. Chọn đáp án khớp CẢ audio VÀ graphic
 ```
 
@@ -544,19 +544,19 @@ Câu hỏi kèm **tranh minh họa** (biểu đồ, lịch, sơ đồ, bản đ�
 
 ### Lưu ý
 
-- **Đọc câu hỏi + xem tranh TRƯỚC** khi nghe — không có thời gian xem lại sau.
-- Audio thường chỉ nói về **1 phần** của graphic phức tạp — đọc câu hỏi để biết xem phần nào.
-- Thông tin có thể **paraphrase** — không tìm từ y hệt trên hình.
+- **Đọc câu hỏi + xem tranh TRƯỚC** khi nghe  không có thời gian xem lại sau.
+- Audio thường chỉ nói về **1 phần** của graphic phức tạp  đọc câu hỏi để biết xem phần nào.
+- Thông tin có thể **paraphrase**  không tìm từ y hệt trên hình.
 
 ## Bẫy thường gặp
 
-- **Graphic trap:** tranh có nhiều thông tin, audio chỉ nói 1 phần — chọn nhầm phần khác.
+- **Graphic trap:** tranh có nhiều thông tin, audio chỉ nói 1 phần  chọn nhầm phần khác.
 - Nhìn sai **cột/dòng** trên bảng hoặc biểu đồ.
 - Giữ **thông tin cũ** trên lịch khi audio nói đổi lịch.
 
 ## Mini-practice
 
-**Tình huống:** Graphic là lịch họp với 3 sự kiện. Câu hỏi hỏi thời gian **workshop** — chỉ xem dòng workshop, bỏ qua các sự kiện khác.
+**Tình huống:** Graphic là lịch họp với 3 sự kiện. Câu hỏi hỏi thời gian **workshop**  chỉ xem dòng workshop, bỏ qua các sự kiện khác.
 
 **Mẹo:** Gạch chân từ khóa trong câu hỏi (workshop, Gate 15, Room 302...) rồi tìm trên graphic trước khi nghe.
 
@@ -586,8 +586,8 @@ Câu hỏi về **chi tiết cụ thể**: thời gian, địa điểm, số li�
 ### Quy trình
 
 1. **Đọc câu hỏi trước** → biết cần nghe gì (when, where, how much, how many).
-2. **Note ngay** khi nghe — số, tên, ngày, giờ.
-3. Thông tin thường nói **1 lần** — bỏ lỡ khó tìm lại.
+2. **Note ngay** khi nghe  số, tên, ngày, giờ.
+3. Thông tin thường nói **1 lần**  bỏ lỡ khó tìm lại.
 4. Chú ý **paraphrase**: đề hỏi "deadline" → audio nói "due date".
 
 ### Kỹ thuật ghi chú
@@ -605,16 +605,16 @@ Câu hỏi về **chi tiết cụ thể**: thời gian, địa điểm, số li�
 
 ## Bẫy thường gặp
 
-- **Thông tin nhiễu:** audio nhắc Monday, room 302, Mr. Lee — câu hỏi chỉ hỏi 1 trong số đó.
+- **Thông tin nhiễu:** audio nhắc Monday, room 302, Mr. Lee  câu hỏi chỉ hỏi 1 trong số đó.
 - **Sai thời điểm:** was postponed (quá khứ) vs will be on Friday (tương lai).
-- **Giữ số cũ:** ban đầu 50, đổi thành 75 — vẫn chọn 50.
+- **Giữ số cũ:** ban đầu 50, đổi thành 75  vẫn chọn 50.
 - **Schedule change (P4):** originally March 5 → moved to March 12.
 
 ## Mini-practice
 
 **Part 3:**
 
-> **W:** Actually, we need to change that to **75** — more people registered than expected.  
+> **W:** Actually, we need to change that to **75**  more people registered than expected.  
 > **M:** We received your request for **50** boxed lunches.
 
 **Câu hỏi:** How many boxed lunches will be ordered?
@@ -623,7 +623,7 @@ Câu hỏi về **chi tiết cụ thể**: thời gian, địa điểm, số li�
 - (B) 65
 - (C) 75
 
-**Đáp án: (C)** — (A) là số cũ (Bẫy thông tin cũ).
+**Đáp án: (C)**  (A) là số cũ (Bẫy thông tin cũ).
 
 ---
 
@@ -637,7 +637,7 @@ Câu hỏi về **chi tiết cụ thể**: thời gian, địa điểm, số li�
 - (B) At lunchtime
 - (C) In the afternoon
 
-**Đáp án: (A)** — (B) bẫy vì lunch được nhắc nhưng không phải giờ đến.
+**Đáp án: (A)**  (B) bẫy vì lunch được nhắc nhưng không phải giờ đến.
 
 ---
 
@@ -694,7 +694,7 @@ Câu hỏi về **khó khăn, sự cố, nguyên nhân** thay đổi hoặc trì
 
 - Chọn **hướng dẫn xử lý** thay vì **vấn đề** (ví dụ: turn off valve vs leak).
 - Chọn **kết quả** thay vì **nguyên nhân** (flights delayed vs heavy snow).
-- Suy diễn quá xa — thông tin không có trong audio.
+- Suy diễn quá xa  thông tin không có trong audio.
 
 ## Mini-practice
 
@@ -708,7 +708,7 @@ Câu hỏi về **khó khăn, sự cố, nguyên nhân** thay đổi hoặc trì
 - (B) The water valve is broken.
 - (C) The access panel is locked.
 
-**Đáp án: (A)** — Leak = rò rỉ. (B) valve chỉ là hướng dẫn xử lý tạm.
+**Đáp án: (A)**  Leak = rò rỉ. (B) valve chỉ là hướng dẫn xử lý tạm.
 
 ---
 
@@ -722,7 +722,7 @@ Câu hỏi về **khó khăn, sự cố, nguyên nhân** thay đổi hoặc trì
 - (B) Her flight was canceled.
 - (C) She will present a different topic.
 
-**Đáp án: (B)** — Nguyên nhân trực tiếp.
+**Đáp án: (B)**  Nguyên nhân trực tiếp.
 
 ---
 
@@ -741,7 +741,7 @@ Câu hỏi về **khó khăn, sự cố, nguyên nhân** thay đổi hoặc trì
 
 ## Mô tả tag
 
-Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không nói thẳng.
+Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc**  không nói thẳng.
 
 **Câu hỏi thường gặp:**
 - What does the woman mean?
@@ -752,11 +752,11 @@ Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không n
 
 ## Chiến thuật
 
-### Part 3 — Phổ biến hơn
+### Part 3  Phổ biến hơn
 
 - Nghe **giọng điệu** + **từ ngữ gián tiếp**:
   - *I was hoping..., I thought we agreed..., That's not what I expected...*
-- Không hiểu **literal** — hỏi: *"Người nói muốn truyền đạt gì?"*
+- Không hiểu **literal**  hỏi: *"Người nói muốn truyền đạt gì?"*
 - Đáp án đúng = ý **ngụ ý**, không phải nghĩa đen từng từ.
 
 ### Part 4
@@ -773,7 +773,7 @@ Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không n
 | I'd rather not. | Từ chối lịch sự |
 | Sounds good to me. | Đồng ý |
 | It's not like I have much choice. | Không có lựa chọn / phải chấp nhận |
-| I know. The data came in late. | Giải thích — không phải lỗi mình |
+| I know. The data came in late. | Giải thích  không phải lỗi mình |
 
 ## Bẫy thường gặp
 
@@ -794,11 +794,11 @@ Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không n
 - (B) The delay was not her fault.
 - (C) The finance team is being replaced.
 
-**Đáp án: (B)** — Giải thích data đến muộn → trễ vì bên khác.
+**Đáp án: (B)**  Giải thích data đến muộn → trễ vì bên khác.
 
 ---
 
-**Part 3 — Near-miss:**
+**Part 3  Near-miss:**
 
 > Woman: "Maybe we should **ask the IT department first**."
 
@@ -807,4 +807,4 @@ Câu hỏi về **ý nghĩa ẩn**, **thái độ**, **cảm xúc** — không n
 - (A) The IT department should handle the problem.
 - (B) They should consult IT before proceeding.
 
-**Đáp án: (B)** — (A) kết luận quá mạnh; (B) khớp *ask first*.
+**Đáp án: (B)**  (A) kết luận quá mạnh; (B) khớp *ask first*.

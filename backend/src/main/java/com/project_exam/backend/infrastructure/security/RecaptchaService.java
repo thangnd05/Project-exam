@@ -39,7 +39,7 @@ public class RecaptchaService {
             return;
         }
         if (secretKey == null || secretKey.isBlank()) {
-            log.warn("Đã bật reCAPTCHA nhưng thiếu app.recaptcha.secret — bỏ qua bước xác minh");
+            log.warn("Đã bật reCAPTCHA nhưng thiếu app.recaptcha.secret  bỏ qua bước xác minh");
             return;
         }
         if (token == null || token.isBlank()) {

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-/** Kiểm tra quyền sở hữu kế hoạch học — dùng chung cho mọi service của learning. */
+/** Kiểm tra quyền sở hữu kế hoạch học  dùng chung cho mọi service của learning. */
 @Component
 @RequiredArgsConstructor
 public class LearningPlanAccess {

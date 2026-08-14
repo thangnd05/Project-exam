@@ -45,7 +45,7 @@ public class Email {
     @Column(name = "body_html", nullable = false, columnDefinition = "TEXT")
     private String bodyHtml;
 
-    /** Danh sách biến {{...}} hợp lệ, ngăn cách bởi dấu phẩy — chỉ để gợi ý trên UI. */
+    /** Danh sách biến {{...}} hợp lệ, ngăn cách bởi dấu phẩy  chỉ để gợi ý trên UI. */
     @Column(name = "available_vars", length = 500)
     private String availableVars;
 

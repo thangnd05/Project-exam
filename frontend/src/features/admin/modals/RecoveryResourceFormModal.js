@@ -94,7 +94,7 @@ function RecoveryResourceFormModal({
             value={formExamTypeId}
             onChange={(e) => onExamTypeChange(e.target.value)}
           >
-            <option value="">— Chọn loại kỳ thi —</option>
+            <option value="">— Chọn loại kỳ thi </option>
             {examTypes.map((et) => (
               <option key={et.id} value={et.id}>
                 {et.name}
@@ -110,7 +110,7 @@ function RecoveryResourceFormModal({
               value={formState.examPartId || ''}
               onChange={(e) => onChangeField('examPartId', e.target.value)}
             >
-              <option value="">— Không gắn Part —</option>
+              <option value="">— Không gắn Part </option>
               {availableParts.map((part) => (
                 <option key={part.examPartId} value={part.examPartId}>
                   {part.name}

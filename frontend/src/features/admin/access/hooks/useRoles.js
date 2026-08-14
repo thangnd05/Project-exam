@@ -47,7 +47,7 @@ export function useRoles() {
     mutationFn: ({id, codes}) => updateRolePermissions(id, codes),
     onSuccess: () => {
       qc.invalidateQueries({queryKey: roleKeys.roles});
-      // Quyền của chính mình có thể vừa đổi — nạp lại /me để menu/route khớp với backend.
+      // Quyền của chính mình có thể vừa đổi  nạp lại /me để menu/route khớp với backend.
       qc.invalidateQueries({queryKey: CURRENT_USER_QUERY_KEY});
     },
   });

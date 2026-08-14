@@ -24,7 +24,7 @@ const READINESS_CLASS = {
   NOT_READY: 'readinessNotReady',
 };
 
-// Bậc Quick Challenge — duyệt từ cao xuống, lấy bậc đầu tiên đạt min.
+// Bậc Quick Challenge  duyệt từ cao xuống, lấy bậc đầu tiên đạt min.
 const QUICK_CHALLENGE_TIERS = [
   { min: 85, level: 'EXCELLENT', title: 'Xuất sắc' },
   { min: 60, level: 'GOOD', title: 'Khá tốt' },

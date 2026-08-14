@@ -51,7 +51,7 @@ function MockStageGuide({ plan }) {
             <div>
               <div className={cx('stepTitle')}>Làm một bài thi thử trọn đề</div>
               <div className={cx('stepDesc')}>
-                Bài Full Mock chấm lại độ sẵn sàng thật sau khi luyện — chính xác hơn luyện lẻ từng Part.
+                Bài Full Mock chấm lại độ sẵn sàng thật sau khi luyện  chính xác hơn luyện lẻ từng Part.
               </div>
               {!freshMock && (
                 <Link
@@ -80,14 +80,14 @@ function MockStageGuide({ plan }) {
             <span>
               Bạn đã có bài mới hoàn thành:{' '}
               <strong>
-                {freshMock.testTitle ? `${freshMock.testTitle} — ` : ''}
+                {freshMock.testTitle ? `${freshMock.testTitle}  ` : ''}
                 {formatDate(freshMock.finishedAt)}
                 {freshMock.totalScore != null ? ` · Điểm ${freshMock.totalScore}` : ''}
               </strong>
               {isPracticeAttempt(freshMock) && (
                 <>
                   {' '}
-                  <small>(bài luyện theo Part — lộ trình sinh ra chỉ phủ Part đã luyện)</small>
+                  <small>(bài luyện theo Part  lộ trình sinh ra chỉ phủ Part đã luyện)</small>
                 </>
               )}
             </span>
@@ -97,7 +97,7 @@ function MockStageGuide({ plan }) {
           </div>
         ) : (
           <p className={cx('muted')} style={{ marginTop: '1.2rem', marginBottom: 0 }}>
-            Sau khi nộp bài thi thử, quay lại đây — nút <strong>Sinh lộ trình từ bài này</strong> sẽ
+            Sau khi nộp bài thi thử, quay lại đây  nút <strong>Sinh lộ trình từ bài này</strong> sẽ
             hiện sẵn để bạn không phải tự tìm.
           </p>
         )}

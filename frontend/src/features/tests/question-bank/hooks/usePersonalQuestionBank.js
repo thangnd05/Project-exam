@@ -44,7 +44,7 @@ const normalizeChapterQuestions = (raw) =>
   Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : []);
 
 /**
- * Data layer for PersonalQuestionBankPage — page keeps only UI/modal state.
+ * Data layer for PersonalQuestionBankPage  page keeps only UI/modal state.
  */
 export function usePersonalQuestionBank({
   bankScope,

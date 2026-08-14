@@ -164,7 +164,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
               {p.targetOutdated && (
                 <span
                   className={cx('badge', 'badgeWarning')}
-                  title="Lộ trình sinh theo mục tiêu cũ — cập nhật để áp ngưỡng mục tiêu hiện tại"
+                  title="Lộ trình sinh theo mục tiêu cũ  cập nhật để áp ngưỡng mục tiêu hiện tại"
                 >
                   Mục tiêu cũ
                 </span>

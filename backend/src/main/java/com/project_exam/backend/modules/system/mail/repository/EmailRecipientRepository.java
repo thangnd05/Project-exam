@@ -19,7 +19,7 @@ public interface EmailRecipientRepository extends JpaRepository<EmailRecipient, 
 
     List<EmailRecipient> findByEmailIdAndStatus(String emailId, EmailStatus status);
 
-    /** Đếm gộp theo (emailId, status) cho danh sách — tránh N+1 khi dựng bảng. */
+    /** Đếm gộp theo (emailId, status) cho danh sách  tránh N+1 khi dựng bảng. */
     @Query("SELECT r.emailId, r.status, COUNT(r) FROM EmailRecipient r "
             + "WHERE r.emailId IN :emailIds GROUP BY r.emailId, r.status")
     List<Object[]> countGroupedByEmailIds(Collection<String> emailIds);

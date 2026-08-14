@@ -1,4 +1,4 @@
-# Part 2 — Question-Response
+# Part 2  Question-Response
 
 ## Tổng quan
 
@@ -80,7 +80,7 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 
 - [ ] Xác định loại câu hỏi trong 5 giây đầu?
 - [ ] Loại lạc đề (sai Wh-)?
-- [ ] How many/much/long/often — bắt trọn cụm?
+- [ ] How many/much/long/often  bắt trọn cụm?
 - [ ] Cẩn thận đáp án gián tiếp?
 - [ ] Không chọn echo trap?
 
@@ -88,11 +88,11 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 
 <a id="tag-who"></a>
 
-## Tag: Who — Ai?
+## Tag: Who  Ai?
 
 
 
-# Tag: Who — Ai?
+# Tag: Who  Ai?
 
 ## Chiến thuật
 
@@ -110,11 +110,11 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 
 <a id="tag-where"></a>
 
-## Tag: Where — Ở đâu?
+## Tag: Where  Ở đâu?
 
 
 
-# Tag: Where — Ở đâu?
+# Tag: Where  Ở đâu?
 
 ## Chiến thuật
 
@@ -125,18 +125,18 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 **Nghe:** "Where is the supply closet on this floor?"
 
 - (A) Next to the break room. ✅
-- (B) The supply closet is locked today. ❌ (echo — trạng thái, không phải vị trí)
+- (B) The supply closet is locked today. ❌ (echo  trạng thái, không phải vị trí)
 - (C) We ordered more paper yesterday. ❌ (lạc đề)
 
 ---
 
 <a id="tag-when"></a>
 
-## Tag: When — Khi nào?
+## Tag: When  Khi nào?
 
 
 
-# Tag: When — Khi nào?
+# Tag: When  Khi nào?
 
 ## Chiến thuật
 
@@ -147,18 +147,18 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 **Nghe:** "When is the training session scheduled to begin?"
 
 - (A) In the main auditorium. ❌ (Where)
-- (B) It was postponed last week. ✅ (gián tiếp — không còn lịch cố định)
+- (B) It was postponed last week. ✅ (gián tiếp  không còn lịch cố định)
 - (C) The trainer is Mr. Collins. ❌ (Who)
 
 ---
 
 <a id="tag-why"></a>
 
-## Tag: Why — Tại sao?
+## Tag: Why  Tại sao?
 
 
 
-# Tag: Why — Tại sao?
+# Tag: Why  Tại sao?
 
 ## Chiến thuật
 
@@ -166,17 +166,17 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 
 ## Mini-practice
 
-**Mẹo:** Phân biệt câu hỏi Why thật vs *Why don't we...?* (đề nghị — xem [de-nghi](#tag-de-nghi)).
+**Mẹo:** Phân biệt câu hỏi Why thật vs *Why don't we...?* (đề nghị  xem [de-nghi](#tag-de-nghi)).
 
 ---
 
 <a id="tag-how"></a>
 
-## Tag: How — Như thế nào?
+## Tag: How  Như thế nào?
 
 
 
-# Tag: How — Như thế nào?
+# Tag: How  Như thế nào?
 
 ## Chiến thuật
 
@@ -184,17 +184,17 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 
 ## Mini-practice
 
-**Lưu ý:** Bắt trọn *How many/much/long/often* — không chỉ nghe How (Bẫy 8 — xem overview).
+**Lưu ý:** Bắt trọn *How many/much/long/often*  không chỉ nghe How (Bẫy 8  xem overview).
 
 ---
 
 <a id="tag-what"></a>
 
-## Tag: What — Cái gì?
+## Tag: What  Cái gì?
 
 
 
-# Tag: What — Cái gì?
+# Tag: What  Cái gì?
 
 ## Chiến thuật
 
@@ -208,11 +208,11 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 
 <a id="tag-which"></a>
 
-## Tag: Which — Cái nào?
+## Tag: Which  Cái nào?
 
 
 
-# Tag: Which — Cái nào?
+# Tag: Which  Cái nào?
 
 ## Chiến thuật
 
@@ -234,7 +234,7 @@ Bước 3 (5s)   → Chọn đáp án hợp lý nhất
 
 ## Chiến thuật
 
-Đáp án: **Yes/No + bổ sung** HOẶC **gián tiếp** xác nhận/phủ nhận. Không tìm Yes/No cứng — hiểu nghĩa trước.
+Đáp án: **Yes/No + bổ sung** HOẶC **gián tiếp** xác nhận/phủ nhận. Không tìm Yes/No cứng  hiểu nghĩa trước.
 
 ## Mini-practice
 
@@ -299,7 +299,7 @@ Câu có **not, never, hardly**. *Isn't...?* → **No** = xác nhận phủ đ�
 
 ## Chiến thuật
 
-Không phải câu hỏi — **câu thông báo**. Đáp án: **phản hồi phù hợp** (OK, I'll update my calendar / That's too bad).
+Không phải câu hỏi  **câu thông báo**. Đáp án: **phản hồi phù hợp** (OK, I'll update my calendar / That's too bad).
 
 ## Mini-practice
 
@@ -328,7 +328,7 @@ Không phải câu hỏi — **câu thông báo**. Đáp án: **phản hồi ph�
 **Nghe:** "Why don't we order lunch from the new restaurant downstairs?"
 
 - (B) That sounds like a great idea. ✅
-- (A) Because it's too expensive. ❌ (nhầm loại — trả Why)
+- (A) Because it's too expensive. ❌ (nhầm loại  trả Why)
 - (C) The restaurant closes at nine. ❌ (lạc đề)
 
 ---
