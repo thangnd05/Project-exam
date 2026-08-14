@@ -177,11 +177,11 @@
   &.primary {
     background: var(--primary-btn-bg);
     border-color: transparent;
-    color: var(--on-primary-gradient);
+    color: var(--primary-btn-fg);
 
     &:hover {
-      color: var(--on-primary-gradient);
-      opacity: 0.92;
+      border-color: var(--primary);
+      color: var(--primary-btn-fg-hover);
     }
   }
 }

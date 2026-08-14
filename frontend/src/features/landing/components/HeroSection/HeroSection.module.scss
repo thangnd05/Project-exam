@@ -179,7 +179,7 @@
 .btnPrimary,
 .btnGhost {
   appearance: none;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   font-weight: 700;
   font-size: 1.45rem;
@@ -189,7 +189,7 @@
 }
 
 .btnPrimary {
-  color: var(--on-primary-gradient);
+  color: var(--primary-btn-fg);
   background: var(--primary-btn-bg);
   box-shadow:
     0 12px 32px rgb(var(--primary-rgb) / 0.32),
@@ -197,8 +197,11 @@
 
   &:hover {
     transform: translateY(-2px);
+    border-color: var(--primary);
+    color: var(--primary-btn-fg-hover);
     box-shadow:
       0 16px 36px rgb(var(--primary-rgb) / 0.4),
+      0 0 0 3px var(--primary-alpha-35),
       inset 0 1px 0 rgba(255, 255, 255, 0.45);
   }
 }

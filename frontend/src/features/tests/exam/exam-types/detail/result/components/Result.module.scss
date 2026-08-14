@@ -197,17 +197,19 @@
   gap: 8px;
   width: 100%;
   padding: 14px 20px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 12px;
   background: var(--primary-btn-bg);
-  color: var(--on-primary-gradient);
+  color: var(--primary-btn-fg);
   font-size: var(--font-size-ssm);
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgb(var(--teal-600-rgb) / 0.25);
+    border-color: var(--primary);
+    color: var(--primary-btn-fg-hover);
+    box-shadow: var(--primary-btn-shadow-hover);
   }
 }

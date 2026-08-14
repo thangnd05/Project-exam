@@ -277,14 +277,21 @@
 
   --primary-gradient: linear-gradient(135deg, var(--brand-200) 0%, var(--brand-500) 52%, var(--brand-600) 100%);
 
-  /* Nút primary: MÀU PHẲNG, không gradient. Gradient champagne sáng→tối làm nút
-     trông loang hai tông và chữ chỉ đọc được ở nửa dưới, nên bỏ hẳn. Mỗi theme
-     tự lấy --primary của mình (champagne brand-500 / teal brand-600) nên
-     không cần override ở :root[data-theme='normal']. */
-  --primary-btn-bg: var(--primary);
-  --primary-btn-shadow: 0 10px 26px rgb(var(--brand-500-rgb) / 0.32);
-  --primary-btn-shadow-hover: 0 14px 32px rgb(var(--brand-500-rgb) / 0.42);
-  --primary-btn-shadow-disabled: 0 8px 18px rgb(var(--brand-500-rgb) / 0.2);
+  /* Khối đặc mang màu thương hiệu: pagination active, avatar, huy hiệu chặng,
+     ô icon... Không phải nút. Chữ trên nền này dùng --on-primary-gradient.
+     Mỗi theme tự lấy --primary của mình (champagne brand-500 / teal brand-600). */
+  --brand-surface: var(--primary);
+
+  /* Nút primary: nền TRẮNG, chữ màu thương hiệu, bóng mềm trung tính — kiểu
+     nút hành động trên banner (PageHeader .actionBtn). Không gradient, không
+     nền đặc: nền đặc champagne làm nút nặng và lẫn với banner gold. */
+  --primary-btn-bg: var(--bg-white);
+  --primary-btn-fg: var(--brand-700);
+  --primary-btn-fg-hover: var(--brand-600);
+  --primary-btn-shadow: 0 8px 18px rgb(0 0 0 / 0.08);
+  /* Hover kèm quầng viền sáng màu brand, giống nút ghost "Khám phá kỳ thi" */
+  --primary-btn-shadow-hover: 0 12px 24px rgb(0 0 0 / 0.15), 0 0 0 3px var(--primary-alpha-20);
+  --primary-btn-shadow-disabled: 0 4px 10px rgb(0 0 0 / 0.06);
 
   --glass-bg: rgb(255 255 255 / 0.7);
   --glass-border: rgb(255 255 255 / 0.5);
@@ -375,11 +382,9 @@
   --primary-alpha-35: rgb(var(--brand-600-rgb) / 0.35);
   --primary-alpha-45: rgb(var(--brand-600-rgb) / 0.45);
 
-  /* Gradient / nút theo teal (--primary-btn-bg tự bám --primary = brand-600) */
+  /* Gradient theo teal. --brand-surface tự bám --primary = brand-600; nút
+     primary trắng nên bóng của nó trung tính, dùng chung định nghĩa ở :root. */
   --primary-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-500) 100%);
-  --primary-btn-shadow: 0 10px 22px var(--primary-alpha-28);
-  --primary-btn-shadow-hover: 0 14px 28px rgb(var(--brand-600-rgb) / 0.38);
-  --primary-btn-shadow-disabled: 0 8px 18px var(--primary-alpha-20);
 
   /* Gradient teal tối → chữ trắng (ngược champagne) */
   --on-primary-gradient: var(--white);
@@ -620,15 +625,19 @@ li {
 @mixin primaryGradientButton {
   background: var(--primary-btn-bg);
   border-color: transparent;
-  color: var(--on-primary-gradient);
+  color: var(--primary-btn-fg);
   transition: all 0.25s ease;
   box-shadow: var(--primary-btn-shadow);
 
+  /* Hover: viền brand hiện ra như nút ghost "Khám phá kỳ thi". Nền giữ trắng
+     nên viền là tín hiệu chính; base đã có border 1px trong suốt sẵn để không
+     nhảy layout khi viền xuất hiện. */
   &:hover {
-    background: var(--hover-accent);
+    background: var(--primary-btn-bg);
+    border-color: var(--primary);
     transform: translateY(-2px);
     box-shadow: var(--primary-btn-shadow-hover);
-    color: var(--on-primary-gradient);
+    color: var(--primary-btn-fg-hover);
   }
 
   &:active {
