@@ -87,6 +87,13 @@ function PlanDetailPage() {
     ? `/learning-plans/generate?examTypeId=${plan.examTypeId}`
     : '/learning-plans/generate';
 
+  // Mục tiêu đổi thì chẩn đoán cũ vẫn dùng được: chọn sẵn đúng bài nguồn để
+  // user sinh lại theo ngưỡng mới mà không phải thi lại.
+  const resyncParams = new URLSearchParams();
+  if (plan.examTypeId) resyncParams.set('examTypeId', plan.examTypeId);
+  if (plan.sourceUserTestId) resyncParams.set('userTestId', plan.sourceUserTestId);
+  const resyncTo = `/learning-plans/generate?${resyncParams.toString()}`;
+
   const passedTasks = plan.passedTasks ?? 0;
   const isMockStage = plan.planStage === 'MOCK';
   const mockTestsTo = buildExamTypeDetailPath(plan.examTypeId);
@@ -134,13 +141,11 @@ function PlanDetailPage() {
         <div className={cx('alert', 'alertWarning')}>
           <span>
             Lộ trình này sinh theo <strong>mục tiêu cũ</strong> — ngưỡng vượt ải chưa áp
-            mục tiêu hiện tại. Sinh lộ trình mới để cập nhật.
+            mục tiêu hiện tại. Cập nhật lại ngay từ chính bài chẩn đoán cũ,{' '}
+            <strong>không cần thi lại</strong>.
           </span>
-          <Link
-            to={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
-            className={cx('btn', 'btnPrimary', 'btnSm')}
-          >
-            Sinh lộ trình mới
+          <Link to={resyncTo} className={cx('btn', 'btnPrimary', 'btnSm')}>
+            Cập nhật theo mục tiêu mới
           </Link>
         </div>
       )}

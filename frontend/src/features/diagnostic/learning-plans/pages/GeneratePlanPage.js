@@ -24,6 +24,8 @@ function GeneratePlanPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [userTestId, setUserTestId] = useState(searchParams.get('userTestId') || '');
+  // Đến từ banner "mục tiêu cũ": bài chẩn đoán đã được chọn sẵn, chỉ cần bấm sinh lại.
+  const [prefilledTestId] = useState(() => searchParams.get('userTestId') || '');
 
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
@@ -262,6 +264,13 @@ function GeneratePlanPage() {
               )}
               </div>
             </div>
+
+            {prefilledTestId && userTestId === prefilledTestId && !result && (
+              <div className={cx('alert')}>
+                Đã chọn sẵn <strong>bài chẩn đoán của lộ trình cũ</strong> — bấm
+                &quot;Sinh lộ trình&quot; để áp mục tiêu mới, không cần thi lại.
+              </div>
+            )}
 
             <button
               type="submit"
