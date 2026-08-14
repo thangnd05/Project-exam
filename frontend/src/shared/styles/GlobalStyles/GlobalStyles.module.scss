@@ -35,6 +35,22 @@
   --brand-900: rgb(var(--brand-900-rgb));
   --text-on-dark: rgb(var(--text-on-dark-rgb));
 
+  /* Champagne CỐ ĐỊNH — cùng sắc với ramp brand ở theme premium nhưng KHÔNG
+     bị theme "normal" (teal) override. Dùng cho dấu hiệu nhận biết Premium
+     (badge, avatar) để nó luôn là vàng kim loại dù người xem đang ở theme nào. */
+  --gold-100-rgb: 243 235 218;
+  --gold-200-rgb: 232 213 163;
+  --gold-400-rgb: 220 192 122;
+  --gold-500-rgb: 201 168 75;
+  --gold-600-rgb: 168 139 58;
+  --gold-700-rgb: 125 103 44;
+  --gold-100: rgb(var(--gold-100-rgb));
+  --gold-200: rgb(var(--gold-200-rgb));
+  --gold-400: rgb(var(--gold-400-rgb));
+  --gold-500: rgb(var(--gold-500-rgb));
+  --gold-600: rgb(var(--gold-600-rgb));
+  --gold-700: rgb(var(--gold-700-rgb));
+
   /* Trung tính lạnh (neutral chính của app) */
   --slate-50-rgb: 248 250 252;
   --slate-100-rgb: 241 245 249;
@@ -226,6 +242,14 @@
 
   --brand-unique: var(--brand-200);
   --brand-unique-hover: var(--brand-400);
+
+  /* Dấu hiệu Premium — cố định champagne ở mọi theme (xem ramp --gold-*) */
+  --premium-gradient: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-600) 100%);
+  --premium-shadow: 0 4px 12px rgb(var(--gold-600-rgb) / 0.32);
+  --premium-on-gradient: var(--ink);
+  --premium-badge-bg: linear-gradient(135deg, var(--gold-100) 0%, var(--gold-200) 100%);
+  --premium-badge-text: var(--gold-700);
+  --premium-badge-border: var(--gold-400);
 
   --hero-bg: var(--brand-900);
   --footer-bg: var(--brand-900);

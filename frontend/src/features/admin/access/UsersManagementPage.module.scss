@@ -23,10 +23,11 @@ $text-secondary: var(--slate-500);
     box-shadow: 0 4px 10px rgb(var(--teal-600-rgb) / 0.25);
     text-transform: uppercase;
 
-    // User premium: tông vàng kim loại
+    // User premium: champagne kim loại (đồng bộ tông thương hiệu premium)
     &.premium {
-        background: linear-gradient(135deg, var(--amber-400) 0%, var(--amber-600) 100%);
-        box-shadow: 0 4px 12px rgb(var(--amber-500-rgb) / 0.35);
+        background: var(--premium-gradient);
+        box-shadow: var(--premium-shadow);
+        color: var(--premium-on-gradient);
     }
 }
 
@@ -55,9 +56,9 @@ $text-secondary: var(--slate-500);
     border-radius: 999px;
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--amber-700);
-    background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
-    border: 1px solid var(--amber-400);
+    color: var(--premium-badge-text);
+    background: var(--premium-badge-bg);
+    border: 1px solid var(--premium-badge-border);
 }
 
 .premiumNone {
