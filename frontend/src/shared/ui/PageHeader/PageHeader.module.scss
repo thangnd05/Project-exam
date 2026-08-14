@@ -1,17 +1,17 @@
 @import 'shared/styles/GlobalStyles/GlobalStyles.module.scss';
 
 .headerHero {
-  background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
+  background: var(--hero-gradient);
   padding: 48px 48px;
   border-radius: 24px;
   margin-bottom: 40px;
-  color: #fff;
+  color: var(--on-hero);
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 30px var(--primary-alpha-28);
+  box-shadow: var(--hero-shadow);
 
   &::after {
     content: '';
@@ -20,8 +20,45 @@
     right: -40px;
     width: 160px;
     height: 160px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgb(255 255 255 / 0.08);
     border-radius: 50%;
+  }
+
+  /* Có footer -> banner xếp dọc: hàng nội dung + hành động, rồi khối footer
+     chạy hết chiều ngang (thanh tiến độ của trang lộ trình). */
+  &.hasFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+
+    .heroMain {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      z-index: 1;
+    }
+
+    .heroContent {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  /* Banner gọn: dùng cho trang có nhiều khối riêng bên dưới (hero lộ trình),
+     tránh chiếm hết màn hình chỉ cho phần đầu trang. */
+  &.compact {
+    padding: 28px 32px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+
+    .heroContent h1 {
+      font-size: var(--font-size-2xl);
+    }
+
+    @media (max-width: 768px) {
+      padding: 20px 18px;
+    }
   }
 
   @media (max-width: 768px) {
@@ -31,6 +68,15 @@
     padding: 24px;
     margin-bottom: 28px;
     border-radius: 20px;
+
+    &.hasFooter {
+      align-items: stretch;
+
+      .heroMain {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   }
 
   @media (max-width: 576px) {
@@ -46,6 +92,16 @@
       right: -32px;
     }
   }
+}
+
+/* Mặc định trong suốt với layout: banner không footer giữ nguyên như trước. */
+.heroMain {
+  display: contents;
+}
+
+.heroFooter {
+  position: relative;
+  z-index: 1;
 }
 
 .heroContent {

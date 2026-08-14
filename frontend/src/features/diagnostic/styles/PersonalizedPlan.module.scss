@@ -1467,97 +1467,22 @@
   }
 }
 
-.planHero {
-  position: relative;
-  overflow: hidden;
-  background: var(--brand-surface);
-  color: var(--on-primary-gradient);
-  border-radius: var(--radius-xl);
-  padding: 2.4rem 2.8rem;
-  margin-bottom: 1.6rem;
-  box-shadow: var(--primary-btn-shadow);
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  &::before {
-    width: 26rem;
-    height: 26rem;
-    top: -14rem;
-    right: -6rem;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 70%);
-  }
-
-  &::after {
-    width: 18rem;
-    height: 18rem;
-    bottom: -12rem;
-    left: 18%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.14), transparent 70%);
-  }
-
-  > * {
-    position: relative;
-    z-index: 1;
-  }
-}
-
-.planHeroTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.6rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.6rem;
-}
-
-.planHeroLead {
-  flex: 1;
-  min-width: 28rem;
-}
-
-.planHeroCheer {
-  font-size: var(--font-size-ssm);
-  margin: 0 0 1rem;
-  color: var(--on-primary-gradient-muted);
-  opacity: 1;
-}
-
-.planHeroEyebrow {
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: var(--font-weight-semibold);
-  color: var(--on-primary-gradient-subtle);
-  opacity: 1;
-  margin-bottom: 0.4rem;
-}
-
-.planHeroTitle {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  margin: 0 0 0.8rem;
-  color: inherit;
-}
-
+/* Banner đầu trang lộ trình dùng chung <PageHeader> (nền + tiêu đề + nút).
+   Dưới đây chỉ còn phần riêng của trang: hàng badge, CTA, thanh tiến độ. */
 .planHeroBadges {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
+  margin-top: 1.2rem;
 }
 
 .planHeroBadge {
   font-size: var(--font-size-sm);
   padding: 0.3rem 0.9rem;
   border-radius: 999px;
-  background: var(--on-primary-gradient-soft);
-  border: 1px solid var(--on-primary-gradient-border);
-  color: var(--on-primary-gradient-muted);
+  background: var(--on-hero-soft);
+  border: 1px solid var(--on-hero-border);
+  color: var(--on-hero-muted);
   white-space: nowrap;
 }
 
@@ -1571,7 +1496,7 @@
 
 .planHeroCtaHint {
   font-size: var(--font-size-sm);
-  color: var(--on-primary-gradient-subtle);
+  color: var(--on-hero-subtle);
   opacity: 1;
   white-space: nowrap;
 }
@@ -1583,7 +1508,7 @@
   padding: 1.1rem 2.2rem;
   border-radius: var(--radius-md);
   background: var(--white);
-  color: var(--on-primary-gradient-cta);
+  color: var(--primary-btn-fg);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
@@ -1593,7 +1518,7 @@
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-    color: var(--on-primary-gradient-cta);
+    color: var(--primary-btn-fg);
   }
 }
 
@@ -1603,26 +1528,26 @@
   align-items: baseline;
   gap: 1rem;
   font-size: var(--font-size-sm);
-  color: var(--on-primary-gradient-muted);
+  color: var(--on-hero-muted);
   margin-bottom: 0.5rem;
 
   strong {
     font-size: var(--font-size-md);
-    color: var(--on-primary-gradient);
+    color: var(--on-hero);
   }
 }
 
 .planHeroProgressBar {
   height: 1rem;
   border-radius: 999px;
-  background: var(--on-primary-gradient-track);
+  background: var(--on-hero-track);
   overflow: hidden;
 }
 
 .planHeroProgressFill {
   height: 100%;
   border-radius: 999px;
-  background: var(--on-primary-gradient-fill);
+  background: var(--on-hero);
   transition: width 0.6s ease;
 }
 

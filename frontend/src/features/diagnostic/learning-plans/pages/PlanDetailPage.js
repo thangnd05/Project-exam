@@ -12,6 +12,7 @@ import { usePlanDetail } from '~/features/diagnostic/learning-plans/hooks/usePla
 import { planStageLabel, planStatusLabel, taskDisplayName } from '../planLabels';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
+import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -144,64 +145,62 @@ function PlanDetailPage() {
         </div>
       )}
 
-      <div className={cx('planHero')}>
-        <div className={cx('planHeroTop')}>
-          <div className={cx('planHeroLead')}>
-            <div className={cx('planHeroEyebrow')}>
-              Lộ trình #{plan.planSequence ?? '?'} · {planStatusLabel(plan.status)}
-            </div>
-            <h2 className={cx('planHeroTitle')}>
-              {plan.planStage === 'MOCK'
-                ? 'Đã vượt hết ải — sẵn sàng thi thử!'
-                : recommendedTask
-                  ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${taskDisplayName(recommendedTask)}`
-                  : 'Chinh phục từng ải để chạm mục tiêu'}
-            </h2>
-            <p className={cx('planHeroCheer')}>
-              {progressCheer(passedTasks, totalTasks, progressPct)}
-            </p>
-            <div className={cx('planHeroBadges')}>
-              <span className={cx('planHeroBadge')}>
-                Giai đoạn: {planStageLabel(plan.planStage)}
-              </span>
-              {plan.targetScore != null && (
-                <span className={cx('planHeroBadge')}>Mục tiêu: {plan.targetScore} điểm</span>
-              )}
-            </div>
+      <PageHeader
+        compact
+        label={`Lộ trình #${plan.planSequence ?? '?'} · ${planStatusLabel(plan.status)}`}
+        title={
+          plan.planStage === 'MOCK'
+            ? 'Đã vượt hết ải — sẵn sàng thi thử!'
+            : recommendedTask
+              ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${taskDisplayName(recommendedTask)}`
+              : 'Chinh phục từng ải để chạm mục tiêu'
+        }
+        description={progressCheer(passedTasks, totalTasks, progressPct)}
+        meta={
+          <div className={cx('planHeroBadges')}>
+            <span className={cx('planHeroBadge')}>
+              Giai đoạn: {planStageLabel(plan.planStage)}
+            </span>
+            {plan.targetScore != null && (
+              <span className={cx('planHeroBadge')}>Mục tiêu: {plan.targetScore} điểm</span>
+            )}
           </div>
-
-          {!isReplaced && isMockStage && (
-            <div className={cx('planHeroCtaBox')}>
-              <Link to={mockTestsTo} className={cx('planHeroCta')}>
-                <ClipboardCheck size={16} /> Làm bài thi thử
-              </Link>
-              <span className={cx('planHeroCtaHint')}>Chấm lại độ sẵn sàng thật</span>
+        }
+        footer={
+          <>
+            <div className={cx('planHeroProgressLabel')}>
+              <span>
+                Tiến độ: <strong>{passedTasks}/{totalTasks}</strong> ải đã xong
+              </span>
+              <strong>{progressPct}%</strong>
             </div>
-          )}
-
-          {!isReplaced && !isMockStage && recommendedTask && (
-            <Link
-              to={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
-              className={cx('planHeroCta')}
-            >
-              <Play size={16} /> Vào ải ngay
+            <div className={cx('planHeroProgressBar')}>
+              <div
+                className={cx('planHeroProgressFill')}
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+          </>
+        }
+      >
+        {!isReplaced && isMockStage && (
+          <div className={cx('planHeroCtaBox')}>
+            <Link to={mockTestsTo} className={cx('planHeroCta')}>
+              <ClipboardCheck size={16} /> Làm bài thi thử
             </Link>
-          )}
-        </div>
+            <span className={cx('planHeroCtaHint')}>Chấm lại độ sẵn sàng thật</span>
+          </div>
+        )}
 
-        <div className={cx('planHeroProgressLabel')}>
-          <span>
-            Tiến độ: <strong>{passedTasks}/{totalTasks}</strong> ải đã xong
-          </span>
-          <strong>{progressPct}%</strong>
-        </div>
-        <div className={cx('planHeroProgressBar')}>
-          <div
-            className={cx('planHeroProgressFill')}
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-      </div>
+        {!isReplaced && !isMockStage && recommendedTask && (
+          <Link
+            to={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
+            className={cx('planHeroCta')}
+          >
+            <Play size={16} /> Vào ải ngay
+          </Link>
+        )}
+      </PageHeader>
 
       {!isReplaced && isMockStage && <MockStageGuide plan={plan} />}
 

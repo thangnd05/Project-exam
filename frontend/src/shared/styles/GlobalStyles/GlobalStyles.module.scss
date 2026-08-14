@@ -301,6 +301,18 @@
 
   --primary-gradient: linear-gradient(135deg, var(--brand-200) 0%, var(--brand-500) 52%, var(--brand-600) 100%);
 
+  /* Banner hero đầu trang (PageHeader "Bài viết", hero lộ trình...): gradient
+     brand đậm → sáng, chữ TRẮNG. Đổi ở đây là mọi banner đổi theo. Khác
+     --brand-surface (khối đặc, chữ theo --on-primary-gradient). */
+  --hero-gradient: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
+  --hero-shadow: 0 12px 30px var(--primary-alpha-28);
+  --on-hero: var(--white);
+  --on-hero-muted: rgb(255 255 255 / 0.85);
+  --on-hero-subtle: rgb(255 255 255 / 0.72);
+  --on-hero-soft: rgb(255 255 255 / 0.15);
+  --on-hero-border: rgb(255 255 255 / 0.28);
+  --on-hero-track: rgb(255 255 255 / 0.25);
+
   /* Khối đặc mang màu thương hiệu: pagination active, avatar, huy hiệu chặng,
      ô icon... Không phải nút. Chữ trên nền này dùng --on-primary-gradient.
      Mỗi theme tự lấy --primary của mình (champagne brand-500 / teal brand-600). */
