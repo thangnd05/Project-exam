@@ -78,8 +78,70 @@ public class LearningPlanService {
     private final LearningPlanProgressSupport progressSupport;
     private final LearningPlanTaskUnlockSupport taskUnlockSupport;
 
+    /** Bài chẩn đoán mới → lộ trình mới (một lộ trình gắn với đúng một bài chẩn đoán). */
     @Transactional
     public PlanResponse generatePlan(String userId, GeneratePlanRequest request) {
+        Blueprint blueprint = prepareBlueprint(userId, request);
+        if (blueprint.targetAchieved()) {
+            closeActivePlans(userId, blueprint.examTypeId(), LearningPlan.Status.COMPLETED, null);
+            return buildTargetAchievedResponse(userId, blueprint.examTypeId(), blueprint.result());
+        }
+        return createPlanFromBlueprint(userId, request, blueprint);
+    }
+
+    /**
+     * Đổi mục tiêu không phải là chẩn đoán mới nên không đẻ lộ trình: cập nhật ngay trên lộ trình
+     * đang học theo ngưỡng mục tiêu hiện tại. Ải giữ nguyên taskId nên tiến độ và lịch sử phiên
+     * học không mất; ải đã vượt mà chưa tới ngưỡng mới thì mở lại.
+     */
+    @Transactional
+    public PlanResponse resyncPlan(String userId, String learningPlanId) {
+        LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
+        if (plan.getStatus() != LearningPlan.Status.ACTIVE) {
+            throw new BadRequestException(
+                    "Chỉ cập nhật được lộ trình đang chạy. Hãy đặt lộ trình này làm hiện tại trước.");
+        }
+        if (plan.getSourceUserTestId() == null) {
+            throw new BadRequestException(
+                    "Lộ trình này không còn bài chẩn đoán gốc. Hãy chọn một bài thi để sinh lộ trình mới.");
+        }
+
+        GeneratePlanRequest request = new GeneratePlanRequest();
+        request.setUserTestId(plan.getSourceUserTestId());
+        request.setDeadlineDays(plan.getDeadlineDays());
+
+        Blueprint blueprint = prepareBlueprint(userId, request);
+        if (blueprint.targetAchieved()) {
+            closeActivePlans(userId, blueprint.examTypeId(), LearningPlan.Status.COMPLETED, null);
+            return buildTargetAchievedResponse(userId, blueprint.examTypeId(), blueprint.result());
+        }
+
+        PlanChanges changes = applyBlueprintInPlace(plan, blueprint);
+        // healPlan chỉ tiến chứ không lùi, nên có ải mới/mở lại thì tự đưa về giai đoạn nền tảng.
+        if (changes.added() > 0 || changes.reopened() > 0) {
+            plan.setPlanStage(PlanStage.FOUNDATION);
+            planRepository.save(plan);
+        }
+        // Ngược lại, mục tiêu hạ xuống có thể làm lộ trình xong luôn → cho sang MOCK ngay.
+        progressSupport.healPlan(plan);
+
+        List<LearningPlanTask> tasks =
+                taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(plan.getLearningPlanId());
+        PlanResponse response = buildPlanResponseFromEntity(
+                plan,
+                tasks,
+                taskViewAssembler.lookupsFor(tasks),
+                loadCurrentTargets(userId),
+                loadDiagnosisSources(List.of(plan)));
+        response.setReopenedTasks(changes.reopened());
+        return response;
+    }
+
+    /**
+     * Phần chung của sinh mới và cập nhật: chẩn đoán từ bài thi nguồn rồi dựng danh sách ải
+     * theo mục tiêu hiện tại. Không đụng tới bảng lộ trình.
+     */
+    private Blueprint prepareBlueprint(String userId, GeneratePlanRequest request) {
         UserTest userTest = userTestRepository.findById(request.getUserTestId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài thi nguồn"));
         if (!Objects.equals(userTest.getUserId(), userId)) {
@@ -104,8 +166,7 @@ public class LearningPlanService {
                 userId, examTypeId, request.getUserTestId(), userTest.getFinishedAt(), result);
 
         if (userTargetProgressService.markTargetAchievedIfMet(userId, examTypeId, result)) {
-            closeActivePlans(userId, examTypeId, LearningPlan.Status.COMPLETED, null);
-            return buildTargetAchievedResponse(userId, examTypeId, result);
+            return Blueprint.targetAchieved(examTypeId, result);
         }
 
         UserTarget userTarget = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId)
@@ -140,46 +201,37 @@ public class LearningPlanService {
             throw new BadRequestException("Chưa tạo được lộ trình từ bài này. " + detail);
         }
 
+        return new Blueprint(
+                false, examTypeId, result, userTarget, targetScore,
+                partRequirements, candidates, partsWithoutTasks);
+    }
+
+    private PlanResponse createPlanFromBlueprint(
+            String userId, GeneratePlanRequest request, Blueprint blueprint) {
+        String examTypeId = blueprint.examTypeId();
         int planSequence = (int) planRepository.countByUserIdAndExamTypeId(userId, examTypeId) + 1;
 
         LearningPlan plan = new LearningPlan();
         plan.setUserId(userId);
         plan.setExamTypeId(examTypeId);
         plan.setSourceUserTestId(request.getUserTestId());
-        plan.setUserTargetId(userTarget.getUserTargetId());
-        plan.setTargetScore(targetScore);
+        plan.setUserTargetId(blueprint.userTarget().getUserTargetId());
+        plan.setTargetScore(blueprint.targetScore());
         plan.setDeadlineDays(request.getDeadlineDays());
-        plan.setBaselineReadiness(resolveReadinessScore(result));
+        plan.setBaselineReadiness(resolveReadinessScore(blueprint.result()));
         plan.setPlanStage(PlanStage.FOUNDATION);
-        plan.setPassAccuracyDefault(Collections.min(partRequirements.values()));
+        plan.setPassAccuracyDefault(Collections.min(blueprint.partRequirements().values()));
         plan.setStatus(LearningPlan.Status.ACTIVE);
         plan.setPlanSequence(planSequence);
-        plan.setPartsWithoutTasks(joinPartsWithoutTasks(partsWithoutTasks));
+        plan.setPartsWithoutTasks(joinPartsWithoutTasks(blueprint.partsWithoutTasks()));
         plan = planRepository.save(plan);
 
         closeActivePlans(userId, examTypeId, LearningPlan.Status.REPLACED, plan.getLearningPlanId());
 
         List<LearningPlanTask> savedTasks = new ArrayList<>();
         int order = 1;
-        for (TaskCandidate c : candidates) {
-            LearningPlanTask task = new LearningPlanTask();
-            task.setLearningPlanId(plan.getLearningPlanId());
-            task.setExamPartId(c.examPartId());
-            task.setTaskType(c.taskType());
-            task.setTargetQuestionCount(c.targetQuestionCount());
-            task.setTaskOrder(order++);
-            task.setPassAccuracy(c.passAccuracy());
-            task.setBaselineAccuracy(round2(c.baselinePct()));
-            task.setAttemptCount(0);
-            task.setWrongCountAtDiagnosis(c.wrongCount());
-            if (c.taskType() == PlanTaskType.TAG) {
-                task.setTagId(c.tagId());
-                task.setStatus(TaskStatus.ACTIVE);
-            } else {
-                task.setTagId(null);
-                task.setStatus(TaskStatus.LOCKED);
-            }
-            savedTasks.add(task);
+        for (TaskCandidate c : blueprint.candidates()) {
+            savedTasks.add(newTaskFrom(plan.getLearningPlanId(), c, order++));
         }
         savedTasks = taskRepository.saveAll(savedTasks);
         taskUnlockSupport.reconcileLockedTasks(plan.getLearningPlanId());
@@ -188,9 +240,30 @@ public class LearningPlanService {
         return buildPlanResponse(
                 plan,
                 savedTasks,
-                partsWithoutTasks,
+                blueprint.partsWithoutTasks(),
                 taskViewAssembler.lookupsFor(savedTasks),
                 loadDiagnosisSources(List.of(plan)).get(plan.getSourceUserTestId()));
+    }
+
+    private LearningPlanTask newTaskFrom(String learningPlanId, TaskCandidate c, int taskOrder) {
+        LearningPlanTask task = new LearningPlanTask();
+        task.setLearningPlanId(learningPlanId);
+        task.setExamPartId(c.examPartId());
+        task.setTaskType(c.taskType());
+        task.setTargetQuestionCount(c.targetQuestionCount());
+        task.setTaskOrder(taskOrder);
+        task.setPassAccuracy(c.passAccuracy());
+        task.setBaselineAccuracy(round2(c.baselinePct()));
+        task.setAttemptCount(0);
+        task.setWrongCountAtDiagnosis(c.wrongCount());
+        if (c.taskType() == PlanTaskType.TAG) {
+            task.setTagId(c.tagId());
+            task.setStatus(TaskStatus.ACTIVE);
+        } else {
+            task.setTagId(null);
+            task.setStatus(TaskStatus.LOCKED);
+        }
+        return task;
     }
 
     private List<String> findPartsWithoutTasks(
@@ -526,6 +599,132 @@ public class LearningPlanService {
     private boolean matchesFocus(String examPartId, Set<String> focusPartIds) {
         return focusPartIds.isEmpty() || focusPartIds.contains(examPartId);
     }
+
+    /**
+     * Áp danh sách ải mới lên chính lộ trình đang học: ải trùng khoá (Part + loại ải + tag) chỉ
+     * đổi ngưỡng nên giữ nguyên taskId cùng toàn bộ tiến độ và lịch sử phiên; ải mới thì thêm;
+     * ải không còn cần thì xoá nếu chưa ai đụng, còn đã có lịch sử thì giữ lại và xếp cuối.
+     */
+    private PlanChanges applyBlueprintInPlace(LearningPlan plan, Blueprint blueprint) {
+        plan.setUserTargetId(blueprint.userTarget().getUserTargetId());
+        plan.setTargetScore(blueprint.targetScore());
+        plan.setPassAccuracyDefault(Collections.min(blueprint.partRequirements().values()));
+        plan.setPartsWithoutTasks(joinPartsWithoutTasks(blueprint.partsWithoutTasks()));
+        planRepository.save(plan);
+
+        String planId = plan.getLearningPlanId();
+        List<LearningPlanTask> existing = taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(planId);
+        Map<String, LearningPlanTask> existingByKey = existing.stream()
+                .collect(Collectors.toMap(LearningPlanService::taskKey, t -> t, (a, b) -> a));
+
+        int added = 0;
+        int reopened = 0;
+        int order = 1;
+        Set<String> wantedKeys = new LinkedHashSet<>();
+        List<LearningPlanTask> toSave = new ArrayList<>();
+        for (TaskCandidate c : blueprint.candidates()) {
+            String key = candidateKey(c);
+            if (!wantedKeys.add(key)) {
+                continue;
+            }
+            LearningPlanTask task = existingByKey.get(key);
+            if (task == null) {
+                task = newTaskFrom(planId, c, order++);
+                added++;
+            } else {
+                // Cùng bài chẩn đoán nên baseline không đổi, chỉ ngưỡng vượt ải chạy theo mục tiêu.
+                task.setPassAccuracy(c.passAccuracy());
+                task.setTargetQuestionCount(c.targetQuestionCount());
+                task.setTaskOrder(order++);
+                if (task.getStatus() == TaskStatus.PASSED
+                        && !meetsAccuracy(task.getBestAccuracy(), c.passAccuracy())) {
+                    task.setStatus(TaskStatus.ACTIVE);
+                    task.setPassedAt(null);
+                    reopened++;
+                }
+            }
+            toSave.add(task);
+        }
+
+        List<LearningPlanTask> obsolete = existing.stream()
+                .filter(t -> !wantedKeys.contains(taskKey(t)))
+                .toList();
+        List<LearningPlanTask> toDelete = new ArrayList<>();
+        Set<String> taskIdsWithSessions = taskIdsWithSessions(planId);
+        for (LearningPlanTask task : obsolete) {
+            if (!hasProgress(task) && !taskIdsWithSessions.contains(task.getTaskId())) {
+                toDelete.add(task);
+                continue;
+            }
+            // Còn lịch sử thì giữ lại cho user xem, nhưng ải dở dang phải chuyển "bỏ qua"
+            // để khỏi kẹt lộ trình ở giai đoạn nền tảng khi nó không còn bắt buộc nữa.
+            task.setTaskOrder(order++);
+            if (!LearningPlanTaskUnlockSupport.isCleared(task)) {
+                task.setStatus(TaskStatus.SKIPPED);
+            }
+            toSave.add(task);
+        }
+
+        taskRepository.saveAll(toSave);
+        if (!toDelete.isEmpty()) {
+            taskRepository.deleteAll(toDelete);
+        }
+        return new PlanChanges(added, reopened);
+    }
+
+    private Set<String> taskIdsWithSessions(String learningPlanId) {
+        return sessionRepository.findByLearningPlanId(learningPlanId).stream()
+                .map(LearningPlanSession::getTaskId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    /** Ải chưa từng làm và chưa bỏ qua thì xoá đi cũng không mất gì. */
+    private static boolean hasProgress(LearningPlanTask task) {
+        return LearningPlanTaskUnlockSupport.isCleared(task)
+                || (task.getAttemptCount() != null && task.getAttemptCount() > 0);
+    }
+
+    private static boolean meetsAccuracy(BigDecimal bestAccuracy, Integer passAccuracy) {
+        if (bestAccuracy == null) {
+            return false;
+        }
+        return bestAccuracy.compareTo(BigDecimal.valueOf(passAccuracy != null ? passAccuracy : 0)) >= 0;
+    }
+
+    private static String taskKey(LearningPlanTask task) {
+        return buildTaskKey(task.getExamPartId(), task.getTaskType(), task.getTagId());
+    }
+
+    private static String candidateKey(TaskCandidate candidate) {
+        return buildTaskKey(
+                candidate.examPartId(),
+                candidate.taskType(),
+                candidate.taskType() == PlanTaskType.TAG ? candidate.tagId() : null);
+    }
+
+    private static String buildTaskKey(String examPartId, PlanTaskType taskType, String tagId) {
+        return examPartId + "|" + taskType + "|" + (tagId != null ? tagId : "");
+    }
+
+    /** Kết quả chẩn đoán + danh sách ải cần có, chưa gắn với lộ trình nào. */
+    private record Blueprint(
+            boolean targetAchieved,
+            String examTypeId,
+            EnhancedResultResponse result,
+            UserTarget userTarget,
+            Integer targetScore,
+            Map<String, Integer> partRequirements,
+            List<TaskCandidate> candidates,
+            List<String> partsWithoutTasks) {
+
+        static Blueprint targetAchieved(String examTypeId, EnhancedResultResponse result) {
+            return new Blueprint(true, examTypeId, result, null, null, Map.of(), List.of(), List.of());
+        }
+    }
+
+    /** Hai thay đổi khiến lộ trình còn ải chưa xong — dùng để đưa planStage về nền tảng. */
+    private record PlanChanges(int added, int reopened) {}
 
     private PlanResponse buildPlanResponse(
             LearningPlan plan,

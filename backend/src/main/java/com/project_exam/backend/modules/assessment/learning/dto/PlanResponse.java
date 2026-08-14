@@ -45,6 +45,13 @@ public class PlanResponse {
 
     private String recommendedTaskId;
 
+    /**
+     * Chỉ có khi cập nhật theo mục tiêu mới (resync): số ải đang "đã vượt" phải làm lại vì
+     * ngưỡng mới cao hơn thành tích cũ. Thay đổi khác (thêm/bớt ải) user nhìn thấy ngay trên
+     * danh sách nên không cần báo.
+     */
+    private Integer reopenedTasks;
+
     private List<PlanPartGroupResponse> partGroups;
 
     private List<String> partsWithoutTasks;

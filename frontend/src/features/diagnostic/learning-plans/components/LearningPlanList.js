@@ -8,8 +8,14 @@ import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '~/features/diagnostic/learning-plans/hooks/useLearningPlanList';
 import { useDeletePlan } from '~/features/diagnostic/learning-plans/hooks/useDeletePlan';
 import { useSwitchPlan } from '~/features/diagnostic/learning-plans/hooks/useSwitchPlan';
+import { useResyncPlan } from '~/features/diagnostic/learning-plans/hooks/useResyncPlan';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
-import { planStageLabel, planStatusLabel, planStatusVariant } from '../planLabels';
+import {
+  buildResyncMessage,
+  planStageLabel,
+  planStatusLabel,
+  planStatusVariant,
+} from '../planLabels';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -60,6 +66,17 @@ const LearningPlanList = forwardRef(function LearningPlanList(
 
   const switchMutation = useSwitchPlan();
   const switching = switchMutation.isPending ? switchMutation.variables : null;
+
+  const resyncMutation = useResyncPlan({
+    onSuccess: (newPlan) => {
+      toast.success(buildResyncMessage(newPlan));
+      reload();
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || 'Không cập nhật được lộ trình');
+    },
+  });
+  const resyncing = resyncMutation.isPending ? resyncMutation.variables : null;
 
   useImperativeHandle(ref, () => ({ reload }), [reload]);
 
@@ -144,6 +161,14 @@ const LearningPlanList = forwardRef(function LearningPlanList(
               {showExamTypeBadge && p.examTypeName && (
                 <span className={cx('badge', 'badgeMuted')}>{p.examTypeName}</span>
               )}
+              {p.targetOutdated && (
+                <span
+                  className={cx('badge', 'badgeWarning')}
+                  title="Lộ trình sinh theo mục tiêu cũ — cập nhật để áp ngưỡng mục tiêu hiện tại"
+                >
+                  Mục tiêu cũ
+                </span>
+              )}
             </div>
             <div className={cx('planListMeta')}>
               Giai đoạn <strong>{planStageLabel(p.planStage)}</strong>
@@ -157,6 +182,17 @@ const LearningPlanList = forwardRef(function LearningPlanList(
             </div>
           </div>
           <div className={cx('actionBar')}>
+            {p.targetOutdated && p.status === 'ACTIVE' && (
+              <button
+                type="button"
+                className={cx('btn', 'btnPrimary', 'btnSm')}
+                disabled={resyncing === p.learningPlanId}
+                title="Sinh lại từ bài chẩn đoán cũ theo mục tiêu hiện tại, giữ tiến độ ải đã vượt"
+                onClick={() => resyncMutation.mutate(p.learningPlanId)}
+              >
+                {resyncing === p.learningPlanId ? 'Đang cập nhật...' : 'Cập nhật mục tiêu'}
+              </button>
+            )}
             {p.status !== 'ACTIVE' && (
               <button
                 type="button"

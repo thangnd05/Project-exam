@@ -6,6 +6,11 @@ export const generatePlan = (payload) => {
   return axios.post(`${BASE_URL}/generate`, payload).then((res) => res.data);
 };
 
+/** Sinh lại lộ trình theo mục tiêu hiện tại từ chính bài chẩn đoán cũ (không cần thi lại). */
+export const resyncPlan = (learningPlanId) => {
+  return axios.post(`${BASE_URL}/${learningPlanId}/resync`).then((res) => res.data);
+};
+
 export const getPlanById = (learningPlanId) => {
   return axios.get(`${BASE_URL}/${learningPlanId}`).then((res) => res.data);
 };

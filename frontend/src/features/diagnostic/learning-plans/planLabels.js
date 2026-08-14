@@ -60,6 +60,18 @@ export function buildPlanSummary(plan) {
   return `Readiness ${plan.baselineReadiness ?? 0}%. ${plan.totalTasks ?? 0} ải cho Part chưa đạt mục tiêu, để ${target}.`;
 }
 
+/** Câu thông báo sau khi sinh lại theo mục tiêu mới — nói rõ giữ được gì, phải làm lại gì. */
+export function buildResyncMessage(plan) {
+  if (plan?.targetAchieved) {
+    return 'Bạn đã đạt mục tiêu mới — lộ trình hiện tại được đánh dấu hoàn thành, chưa cần lộ trình mới.';
+  }
+  const reopened = plan?.reopenedTasks ?? 0;
+  if (reopened > 0) {
+    return `Đã cập nhật theo mục tiêu mới — ${reopened} ải phải vượt lại vì ngưỡng mới cao hơn.`;
+  }
+  return 'Đã cập nhật theo mục tiêu mới — tiến độ giữ nguyên.';
+}
+
 export const planStatusLabel = (status) => PLAN_STATUS_LABEL[status] || status || '—';
 
 export const planStatusVariant = (status) => PLAN_STATUS_VARIANT[status] || 'badgeMuted';

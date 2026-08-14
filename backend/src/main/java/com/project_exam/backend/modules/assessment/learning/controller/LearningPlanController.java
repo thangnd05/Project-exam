@@ -31,6 +31,16 @@ public class LearningPlanController {
         return ResponseEntity.status(HttpStatus.CREATED).body(learningPlanService.generatePlan(userId, request));
     }
 
+    @PostMapping("/{learningPlanId}/resync")
+    public ResponseEntity<PlanResponse> resync(
+            @PathVariable String learningPlanId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(learningPlanService.resyncPlan(userId, learningPlanId));
+    }
+
     @GetMapping("/{learningPlanId}")
     public ResponseEntity<PlanResponse> get(
             @PathVariable String learningPlanId,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { toast } from 'react-toastify';
 import { ClipboardCheck, Play } from 'lucide-react';
 import MockStageGuide from '../components/MockStageGuide';
 import PlanCongratsModal, {
@@ -9,7 +10,13 @@ import PlanCongratsModal, {
 } from '../components/PlanCongratsModal';
 import PlanPartTaskList from '../components/PlanPartTaskList';
 import { usePlanDetail } from '~/features/diagnostic/learning-plans/hooks/usePlanDetail';
-import { planStageLabel, planStatusLabel, taskDisplayName } from '../planLabels';
+import { useResyncPlan } from '~/features/diagnostic/learning-plans/hooks/useResyncPlan';
+import {
+  buildResyncMessage,
+  planStageLabel,
+  planStatusLabel,
+  taskDisplayName,
+} from '../planLabels';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
 import { buildExamTypeDetailPath } from '~/shared/config/Routes';
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
@@ -37,6 +44,16 @@ function PlanDetailPage() {
   const { learningPlanId } = useParams();
   const { plan, error, isLoading: loading } = usePlanDetail(learningPlanId);
   const [showCongrats, setShowCongrats] = useState(false);
+
+  const resyncMutation = useResyncPlan({
+    onSuccess: (updatedPlan) => {
+      toast.success(buildResyncMessage(updatedPlan));
+      // Cập nhật tại chỗ nên vẫn là plan này — query đã invalidate, trang tự refetch.
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || 'Không cập nhật được lộ trình');
+    },
+  });
 
   useEffect(() => {
     if (!loading && window.location.hash === '#chon-ai-hoc') {
@@ -87,13 +104,6 @@ function PlanDetailPage() {
     ? `/learning-plans/generate?examTypeId=${plan.examTypeId}`
     : '/learning-plans/generate';
 
-  // Mục tiêu đổi thì chẩn đoán cũ vẫn dùng được: chọn sẵn đúng bài nguồn để
-  // user sinh lại theo ngưỡng mới mà không phải thi lại.
-  const resyncParams = new URLSearchParams();
-  if (plan.examTypeId) resyncParams.set('examTypeId', plan.examTypeId);
-  if (plan.sourceUserTestId) resyncParams.set('userTestId', plan.sourceUserTestId);
-  const resyncTo = `/learning-plans/generate?${resyncParams.toString()}`;
-
   const passedTasks = plan.passedTasks ?? 0;
   const isMockStage = plan.planStage === 'MOCK';
   const mockTestsTo = buildExamTypeDetailPath(plan.examTypeId);
@@ -142,10 +152,18 @@ function PlanDetailPage() {
           <span>
             Lộ trình này sinh theo <strong>mục tiêu cũ</strong> — ngưỡng vượt ải chưa áp
             mục tiêu hiện tại. Cập nhật lại ngay từ chính bài chẩn đoán cũ,{' '}
-            <strong>không cần thi lại</strong>.
+            <strong>không cần thi lại</strong> — tiến độ các ải đã vượt được giữ nguyên.
           </span>
-          <Link to={resyncTo} className={cx('btn', 'btnPrimary', 'btnSm')}>
-            Cập nhật theo mục tiêu mới
+          <button
+            type="button"
+            className={cx('btn', 'btnPrimary', 'btnSm')}
+            disabled={resyncMutation.isPending}
+            onClick={() => resyncMutation.mutate(plan.learningPlanId)}
+          >
+            {resyncMutation.isPending ? 'Đang cập nhật...' : 'Cập nhật theo mục tiêu mới'}
+          </button>
+          <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+            Sinh lộ trình từ bài thi khác
           </Link>
         </div>
       )}

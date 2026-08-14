@@ -125,7 +125,7 @@ function UserTargetPage() {
         onSuccess: () => {
           toast.success(
             isUpdate
-              ? 'Đã cập nhật mục tiêu. Nếu đang có lộ trình, hãy sinh lại để áp mục tiêu mới.'
+              ? 'Đã cập nhật mục tiêu. Lộ trình đang chạy sẽ hiện nút "Cập nhật theo mục tiêu mới" — bấm là xong, không cần thi lại.'
               : 'Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.',
           );
           // Card "Mục tiêu hiện tại" nằm đầu trang — kéo lên cho user thấy ngay.
