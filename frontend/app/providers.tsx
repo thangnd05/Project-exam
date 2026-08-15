@@ -14,7 +14,7 @@ import { CosmeticProvider } from '@/app/contexts/CosmeticContext';
 import StreakCelebration from '@/app/components/gamification/streak/StreakCelebration';
 import ScrollHandler from '@/app/components/layouts/ScrollToTopOnRouteChange';
 import VisitTracker from '@/app/components/layouts/VisitTracker';
-import ErrorBoundary from '@/app/components/ErrorBoundary';
+import ErrorBoundary from '@/app/components/ErrorBoundary/ErrorBoundary';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (

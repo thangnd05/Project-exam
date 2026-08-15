@@ -5,7 +5,7 @@ import Loading from '@/app/components/Loading/Loading';
 
 // Trang phải đăng nhập, chế độ tập trung: ẩn Footer và nút cuộn lên (đang luyện/đang xem kết quả ải).
 
-import AuthGuard from '@/app/components/AuthGuard';
+import AuthGuard from '@/app/components/AuthGuard/AuthGuard';
 import DefaultLayout from '@/app/components/layouts/DefaultLayout';
 
 export default function Layout({ children }: { children: React.ReactNode }) {

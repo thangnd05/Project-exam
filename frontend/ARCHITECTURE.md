@@ -69,7 +69,28 @@ mà không tự biến thành URL.
 | Server state | TanStack Query, `queryFn` gọi hàm trong `app/apis/` |
 | Kiểu dữ liệu API | lấy từ `@/app/types`, enum từ `@/app/enums` (mirror DTO backend) |
 
-## 4. Điểm cần biết
+## 4. Tra nhanh: tìm code ở đâu
+
+**Quy tắc một câu: URL trên trình duyệt chính là đường dẫn thư mục.** `/my-target/dashboard`
+→ `app/(user)/my-target/dashboard/TargetDashboard.tsx`. Thư mục trong ngoặc không nằm trong URL,
+khi mò thì bỏ qua nó. Nhanh nhất là `Ctrl+P` gõ tên màn hình — mỗi màn hình có đúng một file
+mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc cũ.
+
+| Cần tìm | Vào đâu |
+|---|---|
+| Component/hook chỉ một trang dùng | `_components/`, `_hooks/` ngay trong thư mục trang |
+| Component dùng ≥2 nơi | `app/components/` (xem `index.ts` để biết có sẵn những gì) |
+| Hàm gọi API | `app/apis/<tên>Api.ts` |
+| Kiểu dữ liệu backend trả về | `app/types/` |
+| Màu, biến CSS | `app/assets/styles/GlobalStyles/` |
+
+> **Bẫy hay nhầm nhất:** 27 trang quản trị nằm ở `(admin)/admin/*`, nhưng
+> `/admin/create-test-from-bank` và `/admin/personal-question-bank` lại nằm ở
+> **`(user)/admin/*`**. Hai trang này chỉ cần đăng nhập chứ không cần quyền admin, nên phải
+> ở nhóm có guard khác — URL giống nhau nhưng lớp bảo vệ khác nhau. Tìm trong `(admin)` sẽ
+> không thấy chúng.
+
+## 5. Điểm cần biết
 
 - **Auth vẫn kiểm ở client** (`AuthGuard`) vì JWT chưa nằm trong cookie httpOnly; do đó
   chưa có `middleware.ts`. Muốn chặn ở tầng server thì phải đổi cách lưu token trước.

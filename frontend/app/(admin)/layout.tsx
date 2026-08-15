@@ -11,7 +11,7 @@ import Loading from '@/app/components/Loading/Loading';
 // chứ không ở đây — route group của Next không ảnh hưởng tới URL nên hai nhánh cùng tồn tại được.
 
 import { usePathname } from 'next/navigation';
-import AuthGuard from '@/app/components/AuthGuard';
+import AuthGuard from '@/app/components/AuthGuard/AuthGuard';
 import AdminLayout from '@/app/components/layouts/AdminLayout';
 import { findAdminPermission } from '@/app/configs/adminPermissions';
 

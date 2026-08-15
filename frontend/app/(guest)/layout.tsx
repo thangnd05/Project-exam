@@ -5,7 +5,7 @@ import Loading from '@/app/components/Loading/Loading';
 
 // Khách chưa đăng nhập cũng vào được (luồng làm bài thử).
 
-import AuthGuard from '@/app/components/AuthGuard';
+import AuthGuard from '@/app/components/AuthGuard/AuthGuard';
 import DefaultLayout from '@/app/components/layouts/DefaultLayout';
 
 export default function Layout({ children }: { children: React.ReactNode }) {

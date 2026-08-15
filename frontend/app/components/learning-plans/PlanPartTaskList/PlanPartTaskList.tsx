@@ -13,7 +13,7 @@ import {
   Sparkles,
   Trophy,
 } from 'lucide-react';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
+import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
 import { TERM_TIPS } from '@/app/utils/termTips';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';

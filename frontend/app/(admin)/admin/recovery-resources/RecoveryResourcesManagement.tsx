@@ -9,7 +9,7 @@ import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import RecoveryResourceFormModal, {
   type RecoveryResourceFormState,
 } from './_components/RecoveryResourceFormModal';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
+import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
 import {isMarkdownResource} from '@/app/utils/recoveryResource';
 import type {RecoveryResourceResponse, TagResponse} from '@/app/types';

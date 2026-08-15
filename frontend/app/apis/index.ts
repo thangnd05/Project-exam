@@ -1,0 +1,43 @@
+// Đầu mối tra các hàm gọi API theo domain.
+export * from './adminAuditApi';
+export * from './analyticsApi';
+export * from './authApi';
+export * from './certificateApi';
+export * from './chapterApi';
+export * from './classApi';
+export * from './coinApi';
+export * from './cosmeticApi';
+export * from './dashboardApi';
+export * from './emailApi';
+export * from './enhancedResultApi';
+export * from './evaluationApi';
+export * from './examCategoryApi';
+export * from './examPartApi';
+export * from './examTypeApi';
+export * from './learningPlanApi';
+export * from './milestoneApi';
+export * from './noteApi';
+export * from './passageMediaApi';
+export * from './permissionApi';
+export * from './postApi';
+export * from './practiceQuestionApi';
+export * from './questApi';
+export * from './questionApi';
+export * from './questionCollectionApi';
+export * from './recoveryResourceApi';
+export * from './roleApi';
+export * from './scoringConversionApi';
+export * from './skillApi';
+export * from './streakApi';
+export * from './tagApi';
+export * from './testApi';
+export * from './testPartApi';
+export * from './userAnswerApi';
+export * from './userApi';
+export * from './userTargetApi';
+export * from './userTestApi';
+export * from './vocabularyAlbumApi';
+export * from './vocabularyApi';
+
+// axiosClient là default export (instance) -> import trực tiếp '@/app/apis/axiosClient'.
+// classMemberApi cũng export `getMyClasses` nhưng trả kiểu khác classApi, nên để import riêng.

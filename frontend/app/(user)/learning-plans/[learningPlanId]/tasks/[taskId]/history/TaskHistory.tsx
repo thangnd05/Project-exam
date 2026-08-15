@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
 import classNames from 'classnames/bind';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
+import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '@/app/utils/format-date-time';
 import { useTaskHistory } from './_hooks/useTaskHistory';
 import { taskDisplayName, taskStatusLabel } from '@/app/utils/planLabels';

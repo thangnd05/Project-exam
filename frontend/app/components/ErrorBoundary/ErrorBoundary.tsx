@@ -2,7 +2,7 @@
 
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import ButtonPrime from './Button/ButtonPrime';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 type ErrorBoundaryProps = {
   children?: ReactNode;

@@ -15,7 +15,7 @@ import {
 import { toast } from 'react-toastify';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
+import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
 import { getTestPartsSummary } from '@/app/apis/testApi';
 import { getResourcesByParts } from '@/app/apis/recoveryResourceApi';
 import type { TestPartSummaryResponse, TestResponse } from '@/app/types';
