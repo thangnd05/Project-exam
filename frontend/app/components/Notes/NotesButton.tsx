@@ -11,9 +11,6 @@ import styles from './NotesButton.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Lệch version fontawesome-common-types giữa react-fontawesome@0.1.19 và icon pack 6.x.
-const Icon = FontAwesomeIcon as React.ComponentType<any>;
-
 function NotesButton() {
   const { user } = useAuth();
   const [showPanel, setShowPanel] = useState(false);
@@ -29,7 +26,7 @@ function NotesButton() {
         aria-label="Ghi chú của tôi"
         onClick={() => setShowPanel(true)}
       >
-        <Icon icon={faNoteSticky} />
+        <FontAwesomeIcon icon={faNoteSticky} />
       </button>
 
       <NotesPanel show={showPanel} onClose={() => setShowPanel(false)} />

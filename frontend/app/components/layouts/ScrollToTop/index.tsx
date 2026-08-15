@@ -3,12 +3,8 @@
 import {useEffect, useState} from 'react';
 import classNames from 'classnames/bind';
 import styles from './ScrollToTop.module.scss';
-import {FontAwesomeIcon as FontAwesomeIconBase} from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faArrowUp} from '@fortawesome/free-solid-svg-icons';
-
-// react-fontawesome 0.1.x kéo fontawesome-common-types 0.3 lệch với 6.7 của icon pack
-// -> IconProp không khớp. Cast any tạm thời cho tới khi nâng cấp react-fontawesome.
-const FontAwesomeIcon = FontAwesomeIconBase as React.ComponentType<any>;
 
 const cx = classNames.bind(styles);
 

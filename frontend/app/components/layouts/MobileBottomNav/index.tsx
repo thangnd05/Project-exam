@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
-import {FontAwesomeIcon as FontAwesomeIconBase} from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBook,
   faChalkboardUser,
@@ -29,10 +29,6 @@ import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-
-// react-fontawesome 0.1.x kéo fontawesome-common-types 0.3 lệch với 6.7 của icon pack
-// -> IconProp không khớp. Cast any tạm thời cho tới khi nâng cấp react-fontawesome.
-const FontAwesomeIcon = FontAwesomeIconBase as React.ComponentType<any>;
 
 // Component feature còn là .js nên TS suy props sai (coi prop không default là bắt buộc).
 // Cast any tạm thời — bỏ cast khi file này chuyển sang TS.
