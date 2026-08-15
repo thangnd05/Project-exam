@@ -1,4 +1,4 @@
-import Service from '@/app/features/landing/policy/ServicePage';
+import Service from './Service';
 
 export const metadata = {
   title: 'Điều khoản dịch vụ',

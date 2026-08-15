@@ -36,9 +36,9 @@ const faqs = [
 ];
 
 export default function FaqSection() {
-  const [openId, setOpenId] = useState(faqs[0].id);
+  const [openId, setOpenId] = useState<string | null>(faqs[0].id);
 
-  const toggle = (id) => {
+  const toggle = (id: string) => {
     setOpenId((prev) => (prev === id ? null : id));
   };
 

@@ -1,4 +1,4 @@
-import Policy from '@/app/features/landing/policy/PolicyPage';
+import Policy from './Policy';
 
 export const metadata = {
   title: 'Chính sách bảo mật',

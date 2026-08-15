@@ -5,16 +5,24 @@ import {IoPlayOutline, IoTimeOutline, IoDocumentTextOutline} from 'react-icons/i
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
+import type {QuickChallengeCardResponse} from '@/app/types/test';
 import styles from './QuickTestConfirmModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-function shortExamName(name) {
+function shortExamName(name?: string): string {
   if (!name) return 'Kiểm tra nhanh';
   return name.length > 64 ? `${name.slice(0, 61)}…` : name;
 }
 
-function QuickTestConfirmModal({show, test, onClose, onConfirm}) {
+type QuickTestConfirmModalProps = {
+  show: boolean;
+  test: QuickChallengeCardResponse | null;
+  onClose?: () => void;
+  onConfirm?: (test: QuickChallengeCardResponse) => void;
+};
+
+function QuickTestConfirmModal({show, test, onClose, onConfirm}: QuickTestConfirmModalProps) {
   if (!test) return null;
 
   const durationLabel =

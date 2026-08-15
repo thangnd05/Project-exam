@@ -1,5 +1,5 @@
-import TestPage from '@/app/features/landing/HomePage';
+import Home from './Home';
 
 export default function Page() {
-  return <TestPage />;
+  return <Home />;
 }

@@ -13,6 +13,7 @@ import {
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
 import classNames from 'classnames/bind';
 
+import type {QuickChallengeCardResponse} from '@/app/types/test';
 import styles from './QuickTestOrbit.module.scss';
 
 const cx = classNames.bind(styles);
@@ -50,16 +51,54 @@ const TILT_X_DEG = 2.5;
 
 const TWO_PI = Math.PI * 2;
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+type OrbitRadius = {
+  radiusX: number;
+  radiusY: number;
+  radiusZ: number;
+  fanX: number;
+};
 
-const getInitials = (name) => {
+type DragState = {
+  id: number;
+  startX: number;
+  lastX: number;
+  lastTime: number;
+  velocity: number;
+  moved: boolean;
+  startRotation: number;
+  rotPerPx: number;
+  cleanup: () => void;
+};
+
+type CardVisualState = {
+  active: boolean | null;
+  frontish: boolean | null;
+  z: string | null;
+};
+
+export type QuickTestOrbitHandle = {
+  goPrev: () => void;
+  goNext: () => void;
+  goTo: (index: number) => void;
+};
+
+type QuickTestOrbitProps = {
+  tests: QuickChallengeCardResponse[];
+  onOpen?: (test: QuickChallengeCardResponse) => void;
+  onFrontChange?: (index: number) => void;
+};
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+const getInitials = (name?: string) => {
   if (!name) return '?';
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
 };
 
-const shortExamName = (name) => {
+const shortExamName = (name?: string) => {
   if (!name) return '';
   const primary = name.split(/\s*[–—]\s*/)[0].trim();
   if (primary.length <= 40) return primary;
@@ -67,13 +106,13 @@ const shortExamName = (name) => {
   return `${cut || primary.slice(0, 38)}…`;
 };
 
-function normalizeAngle(theta) {
+function normalizeAngle(theta: number) {
   let t = ((theta % TWO_PI) + TWO_PI) % TWO_PI;
   if (t > Math.PI) t -= TWO_PI;
   return t;
 }
 
-function getOrbitTransform(theta, radius) {
+function getOrbitTransform(theta: number, radius: OrbitRadius) {
   const depth = (Math.cos(theta) + 1) / 2;
 
   return {
@@ -91,7 +130,7 @@ function getOrbitTransform(theta, radius) {
   };
 }
 
-function getFrontIndex(rotation, n) {
+function getFrontIndex(rotation: number, n: number) {
   if (n <= 0) return 0;
   let best = 0;
   let bestAbs = Infinity;
@@ -120,29 +159,29 @@ function useIsNarrow(breakpoint = 960) {
   return narrow;
 }
 
-const QuickTestOrbit = forwardRef(function QuickTestOrbit(
-  {tests, onOpen, onFrontChange},
-  ref,
-) {
+const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
+  function QuickTestOrbit({tests, onOpen, onFrontChange}, ref) {
   const reduceMotion = useReducedMotion();
   const isNarrow = useIsNarrow();
 
   const pauseUntilRef = useRef(0);
-  const dragRef = useRef(null);
-  const settleRef = useRef(null);
+  const dragRef = useRef<DragState | null>(null);
+  const settleRef = useRef<number | null>(null);
   const didSwipeRef = useRef(false);
   const rotationRef = useRef(0);
-  const lastTsRef = useRef(null);
+  const lastTsRef = useRef<number | null>(null);
   const hoverPausedRef = useRef(false);
   const hoverCountRef = useRef(0);
   const pointerPausedRef = useRef(false);
   const previousFrontRef = useRef(0);
-  const radiusRef = useRef(RING.wide);
-  const stageRef = useRef(null);
+  // Giá trị khởi tạo (preset RING) khác shape với radius tính toán, nhưng được gán
+  // lại ngay mỗi lượt render bên dưới nên không bao giờ đọc phải shape cũ → cast.
+  const radiusRef = useRef<OrbitRadius>(RING.wide as unknown as OrbitRadius);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const countRef = useRef(0);
-  const testsRef = useRef([]);
-  const cardRefs = useRef([]);
-  const cardStateRef = useRef([]);
+  const testsRef = useRef<QuickChallengeCardResponse[]>([]);
+  const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const cardStateRef = useRef<Array<CardVisualState | null>>([]);
   const onFrontChangeRef = useRef(onFrontChange);
 
   const [frontIndex, setFrontIndex] = useState(0);
@@ -242,7 +281,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
     }
   }, []);
 
-  const setCardRef = useCallback((index, el) => {
+  const setCardRef = useCallback((index: number, el: HTMLElement | null) => {
     if (cardRefs.current[index] !== el) {
       cardStateRef.current[index] = null;
     }
@@ -285,7 +324,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   }, []);
 
   const settleTo = useCallback(
-    (targetRotation) => {
+    (targetRotation: number) => {
       pauseAuto();
       if (reduceMotion) {
         settleRef.current = null;
@@ -299,7 +338,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   );
 
   const goTo = useCallback(
-    (index) => {
+    (index: number) => {
       if (count === 0) return;
       const target = (((index % count) + count) % count) * step;
       const current = settleRef.current ?? rotationRef.current;
@@ -315,7 +354,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
 
   // Luôn về đúng nấc: làm tròn vị trí hiện tại rồi cộng/trừ một bước.
   const nudge = useCallback(
-    (direction) => {
+    (direction: number) => {
       if (count < 2) return;
       const base = settleRef.current ?? rotationRef.current;
       settleTo((Math.round(base / step) + direction) * step);
@@ -328,7 +367,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
 
   useImperativeHandle(ref, () => ({goPrev, goNext, goTo}), [goPrev, goNext, goTo]);
 
-  const onCardHoverChange = useCallback((hovering) => {
+  const onCardHoverChange = useCallback((hovering: boolean) => {
     hoverCountRef.current = Math.max(0, hoverCountRef.current + (hovering ? 1 : -1));
     hoverPausedRef.current = hoverCountRef.current > 0;
   }, []);
@@ -339,7 +378,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
     let rafId = 0;
     lastTsRef.current = null;
 
-    const tick = (ts) => {
+    const tick = (ts: number) => {
       const last = lastTsRef.current;
       lastTsRef.current = ts;
       const deltaMs = last == null ? 0 : Math.min(ts - last, 64);
@@ -378,7 +417,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   }, [applyTransforms, count, pauseAuto, reduceMotion]);
 
   const handleCardActivate = useCallback(
-    (test, index) => {
+    (test: QuickChallengeCardResponse, index: number) => {
       if (didSwipeRef.current) {
         didSwipeRef.current = false;
         return;
@@ -393,7 +432,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   );
 
   const onPointerDown = useCallback(
-    (e) => {
+    (e: React.PointerEvent<HTMLDivElement>) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (reduceMotion || countRef.current < 2) return;
 
@@ -402,7 +441,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
       pointerPausedRef.current = true;
       setDragging(true);
 
-      const drag = {
+      const drag: DragState = {
         id: e.pointerId,
         startX: e.clientX,
         lastX: e.clientX,
@@ -411,9 +450,11 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
         moved: false,
         startRotation: rotationRef.current,
         rotPerPx: TWO_PI / (radiusRef.current.radiusX * DRAG_TURN_FACTOR),
+        // Gán thật ở dưới (sau khi có onMove/onEnd), trước khi đăng ký listener.
+        cleanup: () => {},
       };
 
-      const onMove = (ev) => {
+      const onMove = (ev: PointerEvent) => {
         if (ev.pointerId !== drag.id) return;
         const dx = ev.clientX - drag.startX;
         if (Math.abs(dx) > DRAG_TOLERANCE_PX) drag.moved = true;
@@ -450,7 +491,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
           Math.round((rotationRef.current + flick) / stepRad) * stepRad;
       };
 
-      const onEnd = (ev) => {
+      const onEnd = (ev: PointerEvent) => {
         if (ev.pointerId === drag.id) finish();
       };
 
@@ -473,7 +514,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   // Nghiêng nhẹ cả cụm theo vị trí con trỏ  cảm giác 3D của bản three.js nhưng
   // chỉ tốn 2 biến CSS.
   const onStagePointerMove = useCallback(
-    (e) => {
+    (e: React.PointerEvent<HTMLDivElement>) => {
       const el = stageRef.current;
       // Chỉ chuột mới nghiêng: chạm thì không có hover để trả về 0.
       // Đang kéo thì thôi, không chồng thêm chuyển động.
@@ -499,7 +540,7 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   }, []);
 
   const onStageKeyDown = useCallback(
-    (e) => {
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (count < 2) return;
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
@@ -584,7 +625,14 @@ const QuickTestOrbit = forwardRef(function QuickTestOrbit(
   );
 });
 
-function OrbitCards({tests, setCardRef, onActivate, onHoverChange}) {
+type OrbitCardsProps = {
+  tests: QuickChallengeCardResponse[];
+  setCardRef: (index: number, el: HTMLElement | null) => void;
+  onActivate: (test: QuickChallengeCardResponse, index: number) => void;
+  onHoverChange: (hovering: boolean) => void;
+};
+
+function OrbitCards({tests, setCardRef, onActivate, onHoverChange}: OrbitCardsProps) {
   return tests.map((test, index) => (
     <article
       key={test.testId}
@@ -606,7 +654,7 @@ function OrbitCards({tests, setCardRef, onActivate, onHoverChange}) {
   ));
 }
 
-function CardFace({test}) {
+function CardFace({test}: {test: QuickChallengeCardResponse}) {
   const [imageFailed, setImageFailed] = useState(false);
   const showImage = Boolean(test.examTypeImageUrl) && !imageFailed;
 

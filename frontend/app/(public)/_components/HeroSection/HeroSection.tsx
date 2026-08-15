@@ -7,17 +7,19 @@ import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 
 import styles from './HeroSection.module.scss';
-import {calculateAllowedTime} from '@/app/utils/testStatusHelper';
-import {useQuickChallengeTests} from '@/app/features/landing/components/HeroSection/hooks/useQuickChallengeTests';
-import QuickTestOrbit from './QuickTestOrbit';
+import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
+import QuickTestOrbit, {type QuickTestOrbitHandle} from './QuickTestOrbit';
 import QuickTestConfirmModal from './QuickTestConfirmModal';
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {examTypeKeys} from '@/app/features/tests/exam/exam-types/examTypeKeys';
 import {name as brandName} from '@/app/assets/images';
+import type {ExamTypeResponse} from '@/app/types/exam-type';
+import type {QuickChallengeCardResponse} from '@/app/types/test';
 
 const cx = classNames.bind(styles);
 
-const normalizeExamTypes = (payload) => {
+// API khai báo trả mảng nhưng normalize phòng cả dạng bọc {data}/{content} → any có chủ đích.
+const normalizeExamTypes = (payload: any): ExamTypeResponse[] => {
   if (Array.isArray(payload)) return payload;
   if (payload && Array.isArray(payload.data)) return payload.data;
   if (payload && Array.isArray(payload.content)) return payload.content;
@@ -28,8 +30,8 @@ function HeroSection() {
   const router = useRouter();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
   const [activeIdx, setActiveIdx] = useState(0);
-  const [pendingTest, setPendingTest] = useState(null);
-  const orbitRef = useRef(null);
+  const [pendingTest, setPendingTest] = useState<QuickChallengeCardResponse | null>(null);
+  const orbitRef = useRef<QuickTestOrbitHandle | null>(null);
 
   const {data: examTypeCount = 0} = useQuery({
     queryKey: examTypeKeys.standard,
@@ -39,8 +41,8 @@ function HeroSection() {
   });
 
   const cards = useMemo(() => {
-    const seen = new Set();
-    const out = [];
+    const seen = new Set<string>();
+    const out: QuickChallengeCardResponse[] = [];
     quickTests.forEach((t) => {
       const key = t.examTypeId ?? '__none__';
       if (!seen.has(key)) {
@@ -63,13 +65,13 @@ function HeroSection() {
   };
 
   const startTest = useCallback(
-    (test) => {
+    (test: QuickChallengeCardResponse) => {
       router.push(`/tests/${test.testId}/start`);
     },
     [router],
   );
 
-  const requestStart = useCallback((test) => {
+  const requestStart = useCallback((test: QuickChallengeCardResponse | null) => {
     if (!test) return;
     setPendingTest(test);
   }, []);
@@ -79,7 +81,7 @@ function HeroSection() {
   }, []);
 
   const confirmStart = useCallback(
-    (test) => {
+    (test: QuickChallengeCardResponse) => {
       setPendingTest(null);
       startTest(test);
     },

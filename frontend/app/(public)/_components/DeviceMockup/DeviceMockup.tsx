@@ -36,7 +36,15 @@ function BrowserPlaceholder() {
   );
 }
 
-export default function DeviceMockup({src, alt = '', className}) {
+type DeviceMockupProps = {
+  // src đến từ static import ảnh trong module .js (type-level là StaticImageData,
+  // runtime đang gắn thẳng vào <img>) → any có chủ đích để giữ nguyên hành vi.
+  src?: any;
+  alt?: string;
+  className?: string;
+};
+
+export default function DeviceMockup({src, alt = '', className}: DeviceMockupProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const showImg = src && !imgFailed;
 

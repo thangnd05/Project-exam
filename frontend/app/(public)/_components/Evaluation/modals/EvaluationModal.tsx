@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FaStar, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import { useCreateEvaluation } from '@/app/features/landing/components/Evaluation/hooks/useEvaluations';
+import { useCreateEvaluation } from '../hooks/useEvaluations';
 import { toast } from 'react-toastify';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -11,14 +11,21 @@ import styles from '@/app/components/modal/PortalFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-const EvaluationModal = ({ show, onClose, onSuccess }) => {
+type EvaluationModalProps = {
+    show: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+};
+
+const EvaluationModal = ({ show, onClose, onSuccess }: EvaluationModalProps) => {
     const [userRating, setUserRating] = useState(5);
     const [content, setContent] = useState('');
     const createMutation = useCreateEvaluation();
     const submitting = createMutation.isPending;
 
-    const handleReviewSubmit = (e) => {
-        e.preventDefault();
+    // Được gọi cả từ <form onSubmit> (FormEvent) lẫn nút footer (MouseEvent) → nhận SyntheticEvent chung.
+    const handleReviewSubmit = (e?: React.SyntheticEvent) => {
+        e?.preventDefault();
         if (!content.trim()) {
             toast.warning('Vui lòng nhập nội dung đánh giá');
             return;
@@ -85,7 +92,7 @@ const EvaluationModal = ({ show, onClose, onSuccess }) => {
                     <div className={cx('inputWrapper')}>
                         <textarea
                             className={cx('inputControl')}
-                            rows="4"
+                            rows={4}
                             placeholder="Bạn cảm thấy trải nghiệm ôn thi tại WinDe thế nào?"
                             required
                             value={content}

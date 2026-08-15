@@ -1,4 +1,4 @@
-import About from '@/app/features/landing/about';
+import About from './About';
 
 export const metadata = {
   title: 'Giới thiệu',

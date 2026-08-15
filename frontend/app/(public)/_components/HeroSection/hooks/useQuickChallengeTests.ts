@@ -3,12 +3,14 @@
 import {useQuery} from '@tanstack/react-query';
 
 import {getQuickChallengeTests} from '@/app/apis/testApi';
+import type {QuickChallengeCardResponse} from '@/app/types/test';
 
 export const quickChallengeKeys = {
   all: ['quick-challenge-tests'],
 };
 
-const normalizeTests = (data) => (Array.isArray(data) ? data : []);
+const normalizeTests = (data: QuickChallengeCardResponse[]): QuickChallengeCardResponse[] =>
+  Array.isArray(data) ? data : [];
 
 export function useQuickChallengeTests() {
   const query = useQuery({

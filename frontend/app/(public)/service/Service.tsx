@@ -2,7 +2,7 @@
 
 import { Container } from "react-bootstrap";
 import classNames from "classnames/bind";
-import style from "./poliSer.module.scss";
+import style from "../policy/poliSer.module.scss";
 
 const cx = classNames.bind(style);
 

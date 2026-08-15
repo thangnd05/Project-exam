@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import {motion} from 'framer-motion';
+import {motion, type Variants} from 'framer-motion';
 import {FaStar} from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import styles from './Evaluation.module.scss';
@@ -13,12 +13,12 @@ import {toast} from 'react-toastify';
 import {useAuth} from '@/app/hooks/useAuth';
 import routes from '@/app/configs/Routes';
 import EvaluationModal from './modals/EvaluationModal';
-import {useEvaluations} from '@/app/features/landing/components/Evaluation/hooks/useEvaluations';
+import {useEvaluations} from './hooks/useEvaluations';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: {opacity: 0, y: 24},
   visible: {
     opacity: 1,
@@ -77,14 +77,14 @@ const Evaluation = () => {
     refetchEvaluations();
   };
 
-  const getInitials = (name) => {
+  const getInitials = (name?: string) => {
     if (!name) return '?';
     const words = name.trim().split(/\s+/).filter(Boolean);
     if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
     return (words[0][0] + words[words.length - 1][0]).toUpperCase();
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
 
@@ -141,7 +141,7 @@ const Evaluation = () => {
                           <FaStar
                             key={i}
                             className={
-                              i < review.rating
+                              i < (review.rating ?? 0)
                                 ? cx('star-filled')
                                 : cx('star-empty')
                             }

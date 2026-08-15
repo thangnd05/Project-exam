@@ -9,39 +9,48 @@ import classNames from 'classnames/bind';
 import {getExamTypeChildren, getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {buildExamTypeDetailPath} from '@/app/configs/Routes';
 import {examTypeKeys} from '@/app/features/tests/exam/exam-types/examTypeKeys';
+import type {ExamTypeResponse} from '@/app/types/exam-type';
 import styles from './ExamTypeGrid.module.scss';
 
 const cx = classNames.bind(styles);
 
 const SKELETON_COUNT = 6;
-const EASE = [0.22, 1, 0.36, 1];
+// Tuple để khớp type Easing (cubic-bezier) của framer-motion, tránh widen thành number[].
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const normalizeExamTypes = (payload) => {
+// API khai báo trả mảng nhưng normalize phòng cả dạng bọc {data}/{content} → any có chủ đích.
+const normalizeExamTypes = (payload: any): ExamTypeResponse[] => {
   if (Array.isArray(payload)) return payload;
   if (payload && Array.isArray(payload.data)) return payload.data;
   if (payload && Array.isArray(payload.content)) return payload.content;
   return [];
 };
 
-const childrenQueryKey = (id) => [...examTypeKeys.standard, 'children', id];
+// { id, name, imageUrl } khi đang xem tầng con; null = lưới gốc.
+type DrillState = {
+  id: string;
+  name?: string;
+  imageUrl: string | null;
+};
 
-const getInitials = (name) => {
+const childrenQueryKey = (id: string | null) => [...examTypeKeys.standard, 'children', id];
+
+const getInitials = (name?: string) => {
   if (!name) return '?';
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
 };
 
-const getSubtitle = (type) =>
-  type.childCount > 0 ? `${type.childCount} kỳ thi` : 'Kỳ thi chuẩn';
+const getSubtitle = (type: ExamTypeResponse) =>
+  (type.childCount ?? 0) > 0 ? `${type.childCount} kỳ thi` : 'Kỳ thi chuẩn';
 
-const hasChildren = (type) => Number(type?.childCount) > 0;
+const hasChildren = (type?: ExamTypeResponse | null) => Number(type?.childCount) > 0;
 
 function ExamTypeGrid() {
   const reduceMotion = useReducedMotion();
   const queryClient = useQueryClient();
-  // { id, name, imageUrl } khi đang xem tầng con; null = lưới gốc.
-  const [drill, setDrill] = useState(null);
+  const [drill, setDrill] = useState<DrillState | null>(null);
 
   const {data: examTypes = [], isLoading} = useQuery({
     queryKey: examTypeKeys.standard,
@@ -57,14 +66,15 @@ function ExamTypeGrid() {
     isError: childrenError,
   } = useQuery({
     queryKey: childrenQueryKey(drillId),
-    queryFn: () => getExamTypeChildren(drillId),
+    // enabled đảm bảo drillId != null khi queryFn chạy.
+    queryFn: () => getExamTypeChildren(drillId as string),
     enabled: drillId != null,
     select: normalizeExamTypes,
   });
 
   const goBack = useCallback(() => setDrill(null), []);
 
-  const openParent = useCallback((type) => {
+  const openParent = useCallback((type: ExamTypeResponse) => {
     setDrill({
       id: type.examTypeId,
       name: type.name,
@@ -73,7 +83,7 @@ function ExamTypeGrid() {
   }, []);
 
   const prefetchChildren = useCallback(
-    (type) => {
+    (type: ExamTypeResponse) => {
       if (!hasChildren(type)) return;
       queryClient.prefetchQuery({
         queryKey: childrenQueryKey(type.examTypeId),
@@ -85,7 +95,7 @@ function ExamTypeGrid() {
 
   useEffect(() => {
     if (drillId == null) return undefined;
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') goBack();
     };
     window.addEventListener('keydown', onKey);
@@ -135,7 +145,7 @@ function ExamTypeGrid() {
           <h2 className={cx('title')}>Chọn kỳ thi của bạn</h2>
           <p className={cx('subtitle')}>
             {isDrill
-              ? `Đang xem các kỳ thi trong ${drill.name}`
+              ? `Đang xem các kỳ thi trong ${drill?.name}`
               : 'Chạm vào kỳ thi bạn đang theo đuổi'}
           </p>
         </header>
@@ -199,8 +209,8 @@ function ExamTypeGrid() {
                     </button>
 
                     <div className={cx('parentChip')} aria-hidden="true">
-                      <ParentMark name={drill.name} imageUrl={drill.imageUrl} />
-                      <span className={cx('parentChipName')}>{drill.name}</span>
+                      <ParentMark name={drill?.name} imageUrl={drill?.imageUrl} />
+                      <span className={cx('parentChipName')}>{drill?.name}</span>
                     </div>
                   </div>
 
@@ -249,14 +259,14 @@ function ExamTypeGrid() {
   );
 }
 
-function ParentMark({name, imageUrl}) {
+function ParentMark({name, imageUrl}: {name?: string; imageUrl?: string | null}) {
   const [imgFailed, setImgFailed] = useState(false);
   const showImage = Boolean(imageUrl) && !imgFailed;
 
   if (showImage) {
     return (
       <span className={cx('parentChipMark', 'hasImage')}>
-        <img src={imageUrl} alt="" onError={() => setImgFailed(true)} />
+        <img src={imageUrl ?? undefined} alt="" onError={() => setImgFailed(true)} />
       </span>
     );
   }
@@ -264,7 +274,13 @@ function ParentMark({name, imageUrl}) {
   return <span className={cx('parentChipMark')}>{getInitials(name)}</span>;
 }
 
-function ExamTypeCard({type, onOpenParent, onPrefetch}) {
+type ExamTypeCardProps = {
+  type: ExamTypeResponse;
+  onOpenParent?: () => void;
+  onPrefetch?: () => void;
+};
+
+function ExamTypeCard({type, onOpenParent, onPrefetch}: ExamTypeCardProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const showImage = Boolean(type.imageUrl) && !imgFailed;
   const expandable = hasChildren(type);

@@ -1,11 +1,12 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 import { createEvaluation, getAllEvaluations } from '@/app/apis/evaluationApi';
+import type { EvaluationRequest, EvaluationResponse } from '@/app/types/attempt';
 
 export const evaluationKeys = { all: ['evaluations'] };
 
-const normalizeEvaluations = (data) => {
+const normalizeEvaluations = (data: EvaluationResponse[]): EvaluationResponse[] => {
   if (Array.isArray(data)) return data;
   console.error('API evaluations returned non-array data:', data);
   return [];
@@ -31,10 +32,16 @@ export function useEvaluations() {
   };
 }
 
-export function useCreateEvaluation({ onSuccess, onError } = {}) {
+// Theo convention hooks chung (useMyClasses): Pick callback từ UseMutationOptions cho khớp arity.
+type UseCreateEvaluationOptions = Pick<
+  UseMutationOptions<EvaluationResponse, any, EvaluationRequest>,
+  'onSuccess' | 'onError'
+>;
+
+export function useCreateEvaluation({ onSuccess, onError }: UseCreateEvaluationOptions = {}) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload) => createEvaluation(payload),
+    mutationFn: (payload: EvaluationRequest) => createEvaluation(payload),
     onSuccess: (...args) => {
       qc.invalidateQueries({ queryKey: evaluationKeys.all });
       onSuccess?.(...args);
