@@ -11,7 +11,7 @@ import { AuthProvider } from '@/app/contexts/AuthContext';
 import { StreakProvider } from '@/app/contexts/StreakContext';
 import { CoinProvider } from '@/app/contexts/CoinContext';
 import { CosmeticProvider } from '@/app/contexts/CosmeticContext';
-import StreakCelebration from '@/app/features/gamification/streak/StreakCelebration';
+import StreakCelebration from '@/app/components/gamification/streak/StreakCelebration';
 import ScrollHandler from '@/app/components/layouts/ScrollToTopOnRouteChange';
 import VisitTracker from '@/app/components/layouts/VisitTracker';
 import ErrorBoundary from '@/app/components/ErrorBoundary';

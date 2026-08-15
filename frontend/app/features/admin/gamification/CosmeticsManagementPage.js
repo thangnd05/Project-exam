@@ -8,7 +8,7 @@ import {useAdminCosmetics} from '@/app/features/admin/gamification/hooks/useAdmi
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import images from '@/app/assets/images';
 import {
   AdminFieldError,

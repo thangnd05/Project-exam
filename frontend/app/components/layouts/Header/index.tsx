@@ -15,17 +15,14 @@ import routes from '@/app/configs/Routes';
 import JoinClassModal from '@/app/features/classes/modals/JoinClassModal';
 import CreateClassModal from '@/app/features/classes/modals/CreateClassModal';
 import CreateTestModalJs from '@/app/features/tests/components/CreateTestModal';
-import StreakBadgeJs from '@/app/features/gamification/streak/StreakBadge';
-import CoinQuestMenuJs from '@/app/features/gamification/coin/CoinQuestMenu';
-import AvatarWithCosmeticJs from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
+import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
+import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import {useCosmetics} from '@/app/hooks/useCosmetics';
 
-// Các component feature còn là .js nên TS suy props sai (coi prop không default là bắt buộc).
-// Cast any tạm thời — bỏ cast khi các file này chuyển sang TS.
+// Component feature còn là .js nên TS suy props sai (coi prop không default là bắt buộc).
+// Cast any tạm thời — bỏ cast khi file này chuyển sang TS.
 const CreateTestModal = CreateTestModalJs as React.ComponentType<any>;
-const StreakBadge = StreakBadgeJs as React.ComponentType<any>;
-const CoinQuestMenu = CoinQuestMenuJs as React.ComponentType<any>;
-const AvatarWithCosmetic = AvatarWithCosmeticJs as React.ComponentType<any>;
 
 const cx = classNames.bind(style);
 

@@ -15,7 +15,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useCosmetics } from '@/app/hooks/useCosmetics';
-import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
