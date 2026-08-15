@@ -15,19 +15,25 @@ import {
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { formatDateTime } from '@/app/utils/format-date-time';
-import { useNotes } from '@/app/features/notes/hooks/useNotes';
-import { useSaveNote } from '@/app/features/notes/hooks/useSaveNote';
+import { useNotes } from '@/app/components/Notes/useNotes';
+import { useSaveNote } from '@/app/components/Notes/useSaveNote';
+import type { NoteResponse } from '@/app/types';
 import styles from './NotesPanel.module.scss';
 
 const cx = classNames.bind(styles);
 
 const EMPTY_DRAFT = { title: '', content: '' };
 
-function NotesPanel({ show, onClose }) {
-  const [view, setView] = useState('list');
-  const [editingId, setEditingId] = useState(null);
+type NotesPanelProps = {
+  show: boolean;
+  onClose: () => void;
+};
+
+function NotesPanel({ show, onClose }: NotesPanelProps) {
+  const [view, setView] = useState<'list' | 'editor'>('list');
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
-  const [confirmingId, setConfirmingId] = useState(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   const { notes, isLoading, deleteNoteMutation } = useNotes({ enabled: show });
   const saveMutation = useSaveNote();
@@ -41,7 +47,7 @@ function NotesPanel({ show, onClose }) {
     setConfirmingId(null);
   }, [show]);
 
-  const openEditor = (note) => {
+  const openEditor = (note: NoteResponse | null) => {
     setEditingId(note?.noteId ?? null);
     setDraft({ title: note?.title ?? '', content: note?.content ?? '' });
     setConfirmingId(null);
@@ -75,7 +81,7 @@ function NotesPanel({ show, onClose }) {
     );
   };
 
-  const handleDelete = (noteId) => {
+  const handleDelete = (noteId: string) => {
     deleteNoteMutation.mutate(noteId, {
       onSuccess: () => toast.success('Đã xóa ghi chú!'),
       onError: (err) => {
@@ -155,7 +161,7 @@ function NotesPanel({ show, onClose }) {
           ) : notes.length === 0 ? (
             <div className={cx('stateBox', 'empty')}>
               <IoDocumentTextOutline className={cx('emptyIcon')} />
-              <span>Sổ tay còn trống  ghi lại điều bạn hay quên nhé.</span>
+              <span>Sổ tay còn trống — ghi lại điều bạn hay quên nhé.</span>
             </div>
           ) : (
             notes.map((note) => (

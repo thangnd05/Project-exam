@@ -5,7 +5,7 @@ import { getMyNotes, deleteNote } from '@/app/apis/noteApi';
 
 export const noteKeys = { my: ['my-notes'] };
 
-export function useNotes({ enabled = true } = {}) {
+export function useNotes({ enabled = true }: { enabled?: boolean } = {}) {
   const qc = useQueryClient();
 
   const notesQuery = useQuery({
@@ -15,7 +15,7 @@ export function useNotes({ enabled = true } = {}) {
   });
 
   const deleteNoteMutation = useMutation({
-    mutationFn: (noteId) => deleteNote(noteId),
+    mutationFn: (noteId: string) => deleteNote(noteId),
     onSuccess: () => qc.invalidateQueries({ queryKey: noteKeys.my }),
   });
 
