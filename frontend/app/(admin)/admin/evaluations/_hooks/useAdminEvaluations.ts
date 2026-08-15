@@ -10,13 +10,30 @@ import {
   updateEvaluation,
 } from '@/app/apis/evaluationApi';
 import {useCrudMutations} from '@/app/hooks/useAdminCrud';
+import type {EvaluationRequest, EvaluationResponse, PageResponse} from '@/app/types';
+
+export interface AdminEvaluation {
+  id: string;
+  content: string;
+  rating: number;
+  created_at: string | null;
+  user_id: string;
+  username: string;
+}
+
+interface EvaluationListParams {
+  page: number;
+  size: number;
+  keyword: string;
+  rating: number | string;
+}
 
 export const evaluationKeys = {
-  all: ['evaluations'],
-  list: (params) => ['evaluations', 'list', params],
+  all: ['evaluations'] as const,
+  list: (params: EvaluationListParams) => ['evaluations', 'list', params] as const,
 };
 
-const normalizeEvaluation = (evaluation) => ({
+const normalizeEvaluation = (evaluation: EvaluationResponse): AdminEvaluation => ({
   id: String(evaluation.id),
   content: evaluation.content || '',
   rating: Number(evaluation.rating || 0),
@@ -25,13 +42,13 @@ const normalizeEvaluation = (evaluation) => ({
   username: evaluation.username || 'Ẩn danh',
 });
 
-const normalizePage = (evaluationPage) => ({
+const normalizePage = (evaluationPage: PageResponse<EvaluationResponse>) => ({
   list: (evaluationPage?.content || []).map(normalizeEvaluation),
   totalElements: evaluationPage?.totalElements || 0,
   totalPages: Math.max(evaluationPage?.totalPages || 1, 1),
 });
 
-export function useAdminEvaluations({page, size, keyword, rating}) {
+export function useAdminEvaluations({page, size, keyword, rating}: EvaluationListParams) {
   const query = useQuery({
     queryKey: evaluationKeys.list({page, size, keyword, rating}),
     queryFn: () =>
@@ -57,9 +74,9 @@ export function useAdminEvaluations({page, size, keyword, rating}) {
 export function useEvaluationMutations() {
   const {createMutation, updateMutation, deleteMutation} = useCrudMutations({
     queryKey: evaluationKeys.all,
-    create: (payload) => createEvaluation(payload),
-    update: ({id, payload}) => updateEvaluation(id, payload),
-    remove: (id) => deleteEvaluation(id),
+    create: (payload: EvaluationRequest) => createEvaluation(payload),
+    update: ({id, payload}: {id: string; payload: EvaluationRequest}) => updateEvaluation(id, payload),
+    remove: (id: string) => deleteEvaluation(id),
   });
 
   return {createMutation, updateMutation, deleteMutation};

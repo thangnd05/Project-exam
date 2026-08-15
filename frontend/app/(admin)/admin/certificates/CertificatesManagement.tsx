@@ -6,7 +6,9 @@ import { Edit, Plus, Trash2, ShieldX } from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
-import CertificateTemplateFormModal from './CertificateTemplateFormModal';
+import CertificateTemplateFormModal, {
+  type CertificateTemplateFormState,
+} from './_components/CertificateTemplateFormModal';
 import {
   AdminFieldError,
   AdminPageHeader,
@@ -16,14 +18,17 @@ import {
   StatCard,
   StatCardGroup,
 } from '@/app/components/admin/common';
+import type { AdminTableColumn } from '@/app/components/admin/common/AdminTable';
+import { CertificateStatus } from '@/app/enums';
+import type { CertificateResponse, CertificateTemplateResponse } from '@/app/types';
 import {
   useCertificateTemplates,
   useIssuedCertificates,
-} from './hooks/useCertificateAdmin';
+} from './_hooks/useCertificateAdmin';
 
 const PAGE_SIZE = 20;
 
-const emptyForm = {
+const emptyForm: CertificateTemplateFormState = {
   examTypeId: '',
   passScore: '',
   title: '',
@@ -40,7 +45,7 @@ const emptyForm = {
   active: true,
 };
 
-const buildPayload = (formState) => ({
+const buildPayload = (formState: CertificateTemplateFormState) => ({
   examTypeId: formState.examTypeId,
   passScore: Number(formState.passScore),
   title: formState.title.trim(),
@@ -57,9 +62,9 @@ const buildPayload = (formState) => ({
   active: formState.active !== false,
 });
 
-const formatDate = (value) => (value ? new Date(value).toLocaleDateString('vi-VN') : '-');
+const formatDate = (value?: string) => (value ? new Date(value).toLocaleDateString('vi-VN') : '-');
 
-function CertificatesManagementPage() {
+function CertificatesManagement() {
   const [tab, setTab] = useState('templates');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -75,17 +80,17 @@ function CertificatesManagementPage() {
   } = useCertificateTemplates();
 
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
-  const [deletingTemplate, setDeletingTemplate] = useState(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<CertificateTemplateFormState>(emptyForm);
+  const [deletingTemplate, setDeletingTemplate] = useState<CertificateTemplateResponse | null>(null);
   const [templateSearch, setTemplateSearch] = useState('');
 
   // ---- chứng chỉ đã cấp
   const [issuedPage, setIssuedPage] = useState(0);
   const [issuedKeyword, setIssuedKeyword] = useState('');
   const [issuedStatus, setIssuedStatus] = useState('');
-  const [revokingCertificate, setRevokingCertificate] = useState(null);
-  const [deletingCertificate, setDeletingCertificate] = useState(null);
+  const [revokingCertificate, setRevokingCertificate] = useState<CertificateResponse | null>(null);
+  const [deletingCertificate, setDeletingCertificate] = useState<CertificateResponse | null>(null);
 
   const issuedParams = useMemo(
     () => ({
@@ -119,7 +124,7 @@ function CertificatesManagementPage() {
   const totalIssued = templates.reduce((sum, item) => sum + (item.issuedCount || 0), 0);
   const activeTemplates = templates.filter((item) => item.active).length;
 
-  const handleChangeField = (field, value) =>
+  const handleChangeField = (field: string, value: string | boolean) =>
     setFormState((prev) => ({ ...prev, [field]: value }));
 
   const openCreateModal = () => {
@@ -129,7 +134,7 @@ function CertificatesManagementPage() {
     setShowFormModal(true);
   };
 
-  const openEditModal = (item) => {
+  const openEditModal = (item: CertificateTemplateResponse) => {
     setEditingId(item.templateId);
     setFormState({
       examTypeId: item.examTypeId || '',
@@ -176,7 +181,7 @@ function CertificatesManagementPage() {
       setShowFormModal(false);
       setFormState(emptyForm);
       setEditingId(null);
-    } catch (error) {
+    } catch (error: any) {
       const message =
         error.response?.data?.message || 'Không thể lưu mẫu chứng chỉ. Vui lòng thử lại.';
       setErrorMessage(typeof message === 'string' ? message : JSON.stringify(message));
@@ -216,24 +221,24 @@ function CertificatesManagementPage() {
     }
   };
 
-  const templateColumns = [
-    { key: 'examTypeName', header: 'Loại đề', render: (item) => item.examTypeName || '-' },
+  const templateColumns: AdminTableColumn[] = [
+    { key: 'examTypeName', header: 'Loại đề', render: (item: CertificateTemplateResponse) => item.examTypeName || '-' },
     { key: 'title', header: 'Tên chứng chỉ' },
     {
       key: 'passScore',
       header: 'Điểm đạt',
-      render: (item) => <Badge bg="primary">{item.passScore}</Badge>,
+      render: (item: CertificateTemplateResponse) => <Badge bg="primary">{item.passScore}</Badge>,
     },
     {
       key: 'validMonths',
       header: 'Thời hạn',
-      render: (item) => (item.validMonths ? `${item.validMonths} tháng` : 'Vô thời hạn'),
+      render: (item: CertificateTemplateResponse) => (item.validMonths ? `${item.validMonths} tháng` : 'Vô thời hạn'),
     },
-    { key: 'issuedCount', header: 'Đã cấp', render: (item) => item.issuedCount ?? 0 },
+    { key: 'issuedCount', header: 'Đã cấp', render: (item: CertificateTemplateResponse) => item.issuedCount ?? 0 },
     {
       key: 'active',
       header: 'Trạng thái',
-      render: (item) =>
+      render: (item: CertificateTemplateResponse) =>
         item.active ? (
           <Badge bg="success">Đang bật</Badge>
         ) : (
@@ -242,21 +247,21 @@ function CertificatesManagementPage() {
     },
   ];
 
-  const issuedColumns = [
+  const issuedColumns: AdminTableColumn[] = [
     { key: 'recipientName', header: 'Người nhận' },
     {
       key: 'certificateCode',
       header: 'Mã chứng chỉ',
-      render: (item) => <code>{item.certificateCode}</code>,
+      render: (item: CertificateResponse) => <code>{item.certificateCode}</code>,
     },
-    { key: 'testTitle', header: 'Bài thi', render: (item) => item.testTitle || '-' },
+    { key: 'testTitle', header: 'Bài thi', render: (item: CertificateResponse) => item.testTitle || '-' },
     { key: 'score', header: 'Điểm' },
-    { key: 'issuedAt', header: 'Ngày cấp', render: (item) => formatDate(item.issuedAt) },
+    { key: 'issuedAt', header: 'Ngày cấp', render: (item: CertificateResponse) => formatDate(item.issuedAt) },
     {
       key: 'status',
       header: 'Trạng thái',
-      render: (item) => {
-        if (item.status === 'REVOKED') return <Badge bg="danger">Đã thu hồi</Badge>;
+      render: (item: CertificateResponse) => {
+        if (item.status === CertificateStatus.REVOKED) return <Badge bg="danger">Đã thu hồi</Badge>;
         if (item.expired) return <Badge bg="warning" text="dark">Hết hạn</Badge>;
         return <Badge bg="success">Còn hiệu lực</Badge>;
       },
@@ -290,7 +295,7 @@ function CertificatesManagementPage() {
 
       <AdminTabs
         activeKey={tab}
-        onSelect={setTab}
+        onSelect={setTab as (key?: string) => void}
         items={[
           {key: 'templates', label: 'Mẫu chứng chỉ'},
           {key: 'issued', label: 'Chứng chỉ đã cấp'},
@@ -308,9 +313,9 @@ function CertificatesManagementPage() {
             columns={templateColumns}
             data={filteredTemplates}
             loading={isLoading}
-            getRowKey={(item) => item.templateId}
+            getRowKey={(item: CertificateTemplateResponse) => item.templateId}
             emptyText="Chưa có mẫu chứng chỉ nào. Hãy tạo mẫu cho loại đề bạn muốn cấp chứng chỉ."
-            rowActions={(item) => (
+            rowActions={(item: CertificateTemplateResponse) => (
               <>
                 <Button variant="light" size="sm" onClick={() => openEditModal(item)}>
                   <Edit size={16} />
@@ -330,7 +335,7 @@ function CertificatesManagementPage() {
         <>
           <AdminToolbar
             searchValue={issuedKeyword}
-            onSearchChange={(value) => {
+            onSearchChange={(value: string) => {
               setIssuedKeyword(value);
               setIssuedPage(0);
             }}
@@ -354,7 +359,7 @@ function CertificatesManagementPage() {
             columns={issuedColumns}
             data={certificates}
             loading={issuedLoading}
-            getRowKey={(item) => item.certificateId}
+            getRowKey={(item: CertificateResponse) => item.certificateId}
             emptyText="Chưa có chứng chỉ nào được cấp."
             itemLabel="chứng chỉ"
             pageSize={PAGE_SIZE}
@@ -362,9 +367,9 @@ function CertificatesManagementPage() {
             totalPages={totalPages}
             totalElements={totalElements}
             onPageChange={setIssuedPage}
-            rowActions={(item) => (
+            rowActions={(item: CertificateResponse) => (
               <>
-                {item.status === 'ACTIVE' && (
+                {item.status === CertificateStatus.ACTIVE && (
                   <Button
                     variant="light"
                     size="sm"
@@ -430,4 +435,4 @@ function CertificatesManagementPage() {
   );
 }
 
-export default CertificatesManagementPage;
+export default CertificatesManagement;

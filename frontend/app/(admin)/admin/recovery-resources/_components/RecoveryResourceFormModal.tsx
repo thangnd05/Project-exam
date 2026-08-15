@@ -4,6 +4,34 @@ import {Form} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import TagSelector from '@/app/components/TagSelector/TagSelector';
+import type {ExamPartResponse, TagResponse} from '@/app/types';
+import type {RecoveryExamTypeOption} from '../_hooks/useRecoveryResources';
+
+export interface RecoveryResourceFormState {
+  title: string;
+  description: string;
+  url: string;
+  tagIds: string[];
+  examPartId: string;
+}
+
+interface RecoveryResourceFormModalProps {
+  show: boolean;
+  isEditing: boolean;
+  formState: RecoveryResourceFormState;
+  examTypes: RecoveryExamTypeOption[];
+  formExamTypeId: string;
+  onExamTypeChange: (examTypeId: string) => void;
+  availableTags: TagResponse[];
+  availableParts: ExamPartResponse[];
+  selectedFile: File | null;
+  onChangeField: (field: string, value: string) => void;
+  onFileChange: (file: File | null) => void;
+  onToggleTag: (tagId: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+  submitting: boolean;
+}
 
 function RecoveryResourceFormModal({
   show,
@@ -21,7 +49,7 @@ function RecoveryResourceFormModal({
   onClose,
   onSubmit,
   submitting,
-}) {
+}: RecoveryResourceFormModalProps) {
   const selectedTagIds = formState.tagIds || [];
 
   return (
@@ -66,7 +94,7 @@ function RecoveryResourceFormModal({
           <Form.Control
             type="file"
             accept=".md,.markdown,.pdf,.doc,.docx,image/*,audio/*,video/*,text/markdown"
-            onChange={(e) => onFileChange(e.target.files[0] || null)}
+            onChange={(e) => onFileChange((e.target as HTMLInputElement).files![0] || null)}
           />
           <Form.Text className="text-muted">
             Hỗ trợ Markdown (.md), PDF, Word, ảnh, audio, video.

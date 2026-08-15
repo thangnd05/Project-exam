@@ -1,5 +1,5 @@
-import QuestsManagementPage from '@/app/features/admin/gamification/QuestsManagementPage';
+import QuestsManagement from './QuestsManagement';
 
 export default function Page() {
-  return <QuestsManagementPage />;
+  return <QuestsManagement />;
 }

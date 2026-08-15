@@ -14,23 +14,29 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/components/admin/common';
-import {useEvaluationMutations, useAdminEvaluations} from '@/app/features/admin/content/hooks/useAdminEvaluations';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import {useEvaluationMutations, useAdminEvaluations, type AdminEvaluation} from './_hooks/useAdminEvaluations';
 
-const emptyForm = {
+interface EvaluationFormState {
+  content: string;
+  rating: number;
+}
+
+const emptyForm: EvaluationFormState = {
   content: '',
   rating: 5,
 };
 
-function EvaluationsManagementPage() {
+function EvaluationsManagement() {
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [keyword, setKeyword] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
   const [errorMessage, setErrorMessage] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingEvaluationId, setEditingEvaluationId] = useState(null);
-  const [deletingEvaluation, setDeletingEvaluation] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
+  const [editingEvaluationId, setEditingEvaluationId] = useState<string | null>(null);
+  const [deletingEvaluation, setDeletingEvaluation] = useState<AdminEvaluation | null>(null);
+  const [formState, setFormState] = useState<EvaluationFormState>(emptyForm);
 
   const debouncedKeyword = useDebouncedValue(keyword, 300);
 
@@ -64,7 +70,7 @@ function EvaluationsManagementPage() {
     setShowFormModal(true);
   };
 
-  const openEditModal = (evaluation) => {
+  const openEditModal = (evaluation: AdminEvaluation) => {
     setEditingEvaluationId(evaluation.id);
     setFormState({
       content: evaluation.content,
@@ -120,22 +126,22 @@ function EvaluationsManagementPage() {
     }
   };
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'username',
       header: 'Người dùng',
-      render: (evaluation) => <div>{evaluation.username}</div>,
+      render: (evaluation: AdminEvaluation) => <div>{evaluation.username}</div>,
     },
     {
       key: 'rating',
       header: 'Rating',
-      render: (evaluation) => <Badge bg="secondary">{evaluation.rating}/5</Badge>,
+      render: (evaluation: AdminEvaluation) => <Badge bg="secondary">{evaluation.rating}/5</Badge>,
     },
-    {key: 'content', header: 'Nội dung', render: (evaluation) => evaluation.content},
+    {key: 'content', header: 'Nội dung', render: (evaluation: AdminEvaluation) => evaluation.content},
     {
       key: 'created_at',
       header: 'Ngày tạo',
-      render: (evaluation) =>
+      render: (evaluation: AdminEvaluation) =>
         evaluation.created_at
           ? new Date(evaluation.created_at).toLocaleString('vi-VN')
           : '-',
@@ -156,7 +162,7 @@ function EvaluationsManagementPage() {
 
       <AdminToolbar
         searchValue={keyword}
-        onSearchChange={(value) => {
+        onSearchChange={(value: string) => {
           setKeyword(value);
           setCurrentPage(1);
         }}
@@ -187,13 +193,13 @@ function EvaluationsManagementPage() {
         columns={columns}
         data={evaluationList}
         loading={loading}
-        getRowKey={(evaluation) => evaluation.id}
+        getRowKey={(evaluation: AdminEvaluation) => evaluation.id}
         page={currentPage - 1}
         totalPages={totalPages}
         totalElements={totalElements}
         pageSize={ITEMS_PER_PAGE}
-        onPageChange={(p) => setCurrentPage(p + 1)}
-        rowActions={(evaluation) => (
+        onPageChange={(p: number) => setCurrentPage(p + 1)}
+        rowActions={(evaluation: AdminEvaluation) => (
           <>
             <button onClick={() => openEditModal(evaluation)} title="Sửa đánh giá">
               <Edit size={14} />
@@ -286,4 +292,4 @@ function EvaluationsManagementPage() {
   );
 }
 
-export default EvaluationsManagementPage;
+export default EvaluationsManagement;

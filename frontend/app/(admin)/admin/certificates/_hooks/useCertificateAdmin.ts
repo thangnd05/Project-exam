@@ -13,21 +13,36 @@ import {
   revokeCertificate,
   updateCertificateTemplate,
 } from '@/app/apis/certificateApi';
+import type {
+  CertificateTemplateRequest,
+  CertificateTemplateResponse,
+  ExamTypeResponse,
+} from '@/app/types';
+
+export interface IssuedCertificateParams {
+  examTypeId?: string;
+  status?: string;
+  keyword?: string;
+  page?: number;
+  size?: number;
+}
 
 export const certificateAdminKeys = {
-  templates: ['admin-certificates', 'templates'],
-  examTypes: ['admin-certificates', 'exam-types'],
-  issued: (params) => ['admin-certificates', 'issued', params],
+  templates: ['admin-certificates', 'templates'] as const,
+  examTypes: ['admin-certificates', 'exam-types'] as const,
+  issued: (params: IssuedCertificateParams) => ['admin-certificates', 'issued', params] as const,
 };
 
-const normalizeArray = (data) => (Array.isArray(data) ? data : data?.content ?? []);
+const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
+  Array.isArray(data) ? data : data?.content ?? [];
 
 export function useCertificateTemplates() {
   const crud = useAdminCrud({
     queryKey: certificateAdminKeys.templates,
     list: getCertificateTemplates,
     create: createCertificateTemplate,
-    update: ({ templateId, payload }) => updateCertificateTemplate(templateId, payload),
+    update: ({ templateId, payload }: { templateId: string; payload: CertificateTemplateRequest }) =>
+      updateCertificateTemplate(templateId, payload),
     remove: deleteCertificateTemplate,
   });
 
@@ -38,8 +53,8 @@ export function useCertificateTemplates() {
   });
 
   return {
-    templates: crud.items,
-    examTypes: examTypesQuery.data ?? [],
+    templates: crud.items as CertificateTemplateResponse[],
+    examTypes: (examTypesQuery.data ?? []) as ExamTypeResponse[],
     isLoading: crud.isLoading,
     isError: crud.isError,
     createMutation: crud.createMutation,
@@ -48,7 +63,7 @@ export function useCertificateTemplates() {
   };
 }
 
-export function useIssuedCertificates(params) {
+export function useIssuedCertificates(params: IssuedCertificateParams) {
   const queryClient = useQueryClient();
 
   const listQuery = useQuery({
@@ -63,12 +78,13 @@ export function useIssuedCertificates(params) {
   };
 
   const revokeMutation = useMutation({
-    mutationFn: ({ certificateId, reason }) => revokeCertificate(certificateId, reason),
+    mutationFn: ({ certificateId, reason }: { certificateId: string; reason?: string }) =>
+      revokeCertificate(certificateId, reason),
     onSuccess: invalidateAll,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (certificateId) => deleteIssuedCertificate(certificateId),
+    mutationFn: (certificateId: string) => deleteIssuedCertificate(certificateId),
     onSuccess: invalidateAll,
   });
 

@@ -1,5 +1,5 @@
-import StreakRecoverManagementPage from '@/app/features/admin/gamification/StreakRecoverManagementPage';
+import StreakRecoverManagement from './StreakRecoverManagement';
 
 export default function Page() {
-  return <StreakRecoverManagementPage />;
+  return <StreakRecoverManagement />;
 }

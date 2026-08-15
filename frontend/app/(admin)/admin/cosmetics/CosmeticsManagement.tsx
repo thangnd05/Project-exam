@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {useAdminCosmetics} from '@/app/features/admin/gamification/hooks/useAdminCosmetics';
+import {useAdminCosmetics} from './_hooks/useAdminCosmetics';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -16,24 +16,33 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/components/admin/common';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import {CosmeticType} from '@/app/enums';
+import type {CosmeticResponse} from '@/app/types';
 
 const TYPES = [
-  {value: 'FRAME', label: 'Khung avatar'},
-  {value: 'BADGE', label: 'Huy hiệu'},
+  {value: CosmeticType.FRAME, label: 'Khung avatar'},
+  {value: CosmeticType.BADGE, label: 'Huy hiệu'},
 ];
 
 const TYPE_ORDER = TYPES.map((t) => t.value);
 
-function groupByType(items) {
-  const groups = new Map();
+interface CosmeticGroup {
+  type?: CosmeticType;
+  typeLabel?: string;
+  items: CosmeticResponse[];
+}
+
+function groupByType(items: CosmeticResponse[]): CosmeticGroup[] {
+  const groups = new Map<CosmeticType | undefined, CosmeticGroup>();
   items.forEach((item) => {
     if (!groups.has(item.type)) {
       groups.set(item.type, {type: item.type, typeLabel: item.typeLabel, items: []});
     }
-    groups.get(item.type).items.push(item);
+    groups.get(item.type)!.items.push(item);
   });
   return Array.from(groups.values()).sort(
-    (a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type),
+    (a, b) => TYPE_ORDER.indexOf(a.type as CosmeticType) - TYPE_ORDER.indexOf(b.type as CosmeticType),
   );
 }
 
@@ -50,10 +59,23 @@ const EFFECT_PRESETS = [
   {value: 'rainbow', label: 'Rainbow (cầu vồng xoay)'},
 ];
 
-const defaultFormState = {
+interface CosmeticFormState {
+  name: string;
+  description: string;
+  type: CosmeticType;
+  frameStyle: string;
+  // costCoins/displayOrder giữ number | string: input number trả string khi gõ
+  costCoins: number | string;
+  assetValue: string;
+  imageUrl: string;
+  active: boolean;
+  displayOrder: number | string;
+}
+
+const defaultFormState: CosmeticFormState = {
   name: '',
   description: '',
-  type: 'FRAME',
+  type: CosmeticType.FRAME,
   frameStyle: 'COLOR',
   costCoins: 0,
   assetValue: '',
@@ -62,8 +84,8 @@ const defaultFormState = {
   displayOrder: 0,
 };
 
-function CosmeticPreview({item, size = 56}) {
-  const isBadge = item.type === 'BADGE';
+function CosmeticPreview({item, size = 56}: {item: Partial<CosmeticResponse>; size?: number}) {
+  const isBadge = item.type === CosmeticType.BADGE;
   return (
     <AvatarWithCosmetic
       src={images.avtImage}
@@ -75,7 +97,7 @@ function CosmeticPreview({item, size = 56}) {
   );
 }
 
-function CosmeticsManagementPage() {
+function CosmeticsManagement() {
   const {
     items,
     isLoading: loading,
@@ -89,10 +111,10 @@ function CosmeticsManagementPage() {
 
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formState, setFormState] = useState(defaultFormState);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<CosmeticFormState>(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deleting, setDeleting] = useState(null);
+  const [deleting, setDeleting] = useState<CosmeticResponse | null>(null);
 
   const submitting = isSubmitting || isDeleting;
   const listErrorMessage = isError ? 'Không thể tải danh sách vật phẩm.' : '';
@@ -119,12 +141,12 @@ function CosmeticsManagementPage() {
     setShowModal(true);
   };
 
-  const openEditModal = (item) => {
+  const openEditModal = (item: CosmeticResponse) => {
     setEditingId(item.cosmeticId);
     setFormState({
       name: item.name || '',
       description: item.description || '',
-      type: item.type || 'FRAME',
+      type: item.type || CosmeticType.FRAME,
       frameStyle: item.frameStyle || 'COLOR',
       costCoins: item.costCoins ?? 0,
       assetValue: item.assetValue || '',
@@ -151,7 +173,7 @@ function CosmeticsManagementPage() {
       name: formState.name.trim(),
       description: formState.description.trim(),
       type: formState.type,
-      frameStyle: formState.type === 'FRAME' ? formState.frameStyle : null,
+      frameStyle: formState.type === CosmeticType.FRAME ? formState.frameStyle : null,
       costCoins: cost,
       assetValue: formState.assetValue.trim(),
       imageUrl: formState.imageUrl.trim(),
@@ -168,7 +190,7 @@ function CosmeticsManagementPage() {
       }
       setShowModal(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(error?.response?.data?.message || 'Không thể lưu vật phẩm.');
     }
   };
@@ -183,11 +205,11 @@ function CosmeticsManagementPage() {
     }
   };
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'preview',
       header: 'Xem trước',
-      render: (item) => <CosmeticPreview item={item} />,
+      render: (item: CosmeticResponse) => <CosmeticPreview item={item} />,
     },
     {key: 'name', header: 'Tên'},
     {key: 'typeLabel', header: 'Loại'},
@@ -195,7 +217,7 @@ function CosmeticsManagementPage() {
     {
       key: 'status',
       header: 'Trạng thái',
-      render: (item) => (item.active ? 'Đang bán' : 'Tắt'),
+      render: (item: CosmeticResponse) => (item.active ? 'Đang bán' : 'Tắt'),
     },
   ];
 
@@ -225,8 +247,8 @@ function CosmeticsManagementPage() {
         columns={columns}
         data={orderedItems}
         loading={loading}
-        getRowKey={(item) => item.cosmeticId}
-        rowActions={(item) => (
+        getRowKey={(item: CosmeticResponse) => item.cosmeticId}
+        rowActions={(item: CosmeticResponse) => (
           <>
             <button title="Sửa" onClick={() => openEditModal(item)}>
               <Edit size={14} />
@@ -293,7 +315,7 @@ function CosmeticsManagementPage() {
             <Form.Label>Loại</Form.Label>
             <Form.Select
               value={formState.type}
-              onChange={(e) => setFormState((p) => ({...p, type: e.target.value}))}
+              onChange={(e) => setFormState((p) => ({...p, type: e.target.value as CosmeticType}))}
             >
               {TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -302,7 +324,7 @@ function CosmeticsManagementPage() {
               ))}
             </Form.Select>
           </Form.Group>
-          {formState.type === 'FRAME' && (
+          {formState.type === CosmeticType.FRAME && (
             <Form.Group className="flex-fill">
               <Form.Label>Kiểu khung</Form.Label>
               <Form.Select
@@ -319,7 +341,7 @@ function CosmeticsManagementPage() {
           )}
         </div>
 
-        {formState.type === 'BADGE' && (
+        {formState.type === CosmeticType.BADGE && (
           <>
             <Form.Group className="mb-3">
               <Form.Label>URL ảnh huy hiệu (PNG/GIF)</Form.Label>
@@ -341,7 +363,7 @@ function CosmeticsManagementPage() {
           </>
         )}
 
-        {formState.type === 'FRAME' && formState.frameStyle === 'COLOR' && (
+        {formState.type === CosmeticType.FRAME && formState.frameStyle === 'COLOR' && (
           <Form.Group className="mb-3">
             <Form.Label>Màu / gradient</Form.Label>
             <Form.Control
@@ -352,7 +374,7 @@ function CosmeticsManagementPage() {
           </Form.Group>
         )}
 
-        {formState.type === 'FRAME' && formState.frameStyle === 'EFFECT' && (
+        {formState.type === CosmeticType.FRAME && formState.frameStyle === 'EFFECT' && (
           <Form.Group className="mb-3">
             <Form.Label>Hiệu ứng</Form.Label>
             <Form.Select
@@ -369,7 +391,7 @@ function CosmeticsManagementPage() {
           </Form.Group>
         )}
 
-        {formState.type === 'FRAME' && formState.frameStyle === 'IMAGE' && (
+        {formState.type === CosmeticType.FRAME && formState.frameStyle === 'IMAGE' && (
           <Form.Group className="mb-3">
             <Form.Label>URL ảnh khung (PNG/GIF trong suốt)</Form.Label>
             <Form.Control
@@ -422,4 +444,4 @@ function CosmeticsManagementPage() {
   );
 }
 
-export default CosmeticsManagementPage;
+export default CosmeticsManagement;

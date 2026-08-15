@@ -13,19 +13,20 @@ import {
   getMilestones,
   updateMilestone as apiUpdateMilestone,
 } from '@/app/apis/milestoneApi';
+import type { MilestoneRequest } from '@/app/types';
 
 export const milestonesKeys = {
-  examTypes: ['admin-milestones', 'exam-types'],
-  examParts: ['admin-milestones', 'exam-parts'],
-  skills: ['admin-milestones', 'skills'],
-  scoring: ['admin-milestones', 'scoring'],
-  list: (examTypeId) => ['admin-milestones', 'list', examTypeId],
+  examTypes: ['admin-milestones', 'exam-types'] as const,
+  examParts: ['admin-milestones', 'exam-parts'] as const,
+  skills: ['admin-milestones', 'skills'] as const,
+  scoring: ['admin-milestones', 'scoring'] as const,
+  list: (examTypeId?: string) => ['admin-milestones', 'list', examTypeId] as const,
 };
 
-const normalizeArray = (data) =>
+const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
   Array.isArray(data) ? data : data?.content ?? [];
 
-export function useMilestones(examTypeFilter) {
+export function useMilestones(examTypeFilter: string) {
   const examTypesQuery = useQuery({
     queryKey: milestonesKeys.examTypes,
     queryFn: getStandardExamTypes,
@@ -59,9 +60,9 @@ export function useMilestones(examTypeFilter) {
 
   const { createMutation, updateMutation, deleteMutation } = useCrudMutations({
     queryKey: ['admin-milestones', 'list'],
-    create: (payload) => apiCreateMilestone(payload),
-    update: ({ id, payload }) => apiUpdateMilestone(id, payload),
-    remove: (id) => apiDeleteMilestone(id),
+    create: (payload: MilestoneRequest) => apiCreateMilestone(payload),
+    update: ({ id, payload }: { id: string; payload: MilestoneRequest }) => apiUpdateMilestone(id, payload),
+    remove: (id: string) => apiDeleteMilestone(id),
   });
 
   const loadErrorText = examTypesQuery.isError
@@ -81,7 +82,7 @@ export function useMilestones(examTypeFilter) {
     isLoading: milestonesQuery.isLoading,
     loadErrorText,
     createMilestone: createMutation.mutateAsync,
-    updateMilestone: (id, payload) =>
+    updateMilestone: (id: string, payload: MilestoneRequest) =>
       updateMutation.mutateAsync({ id, payload }),
     deleteMilestone: deleteMutation.mutateAsync,
   };

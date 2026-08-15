@@ -1,5 +1,5 @@
-import CoinsManagementPage from '@/app/features/admin/gamification/CoinsManagementPage';
+import CoinsManagement from './CoinsManagement';
 
 export default function Page() {
-  return <CoinsManagementPage />;
+  return <CoinsManagement />;
 }

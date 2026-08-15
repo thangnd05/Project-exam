@@ -7,9 +7,10 @@ import {
   updateCosmetic,
 } from '@/app/apis/cosmeticApi';
 import {useAdminCrud} from '@/app/hooks/useAdminCrud';
+import type {CosmeticRequest, CosmeticResponse} from '@/app/types';
 
 export const cosmeticKeys = {
-  list: () => ['admin-cosmetics'],
+  list: () => ['admin-cosmetics'] as const,
 };
 
 export function useAdminCosmetics() {
@@ -17,12 +18,12 @@ export function useAdminCosmetics() {
     queryKey: cosmeticKeys.list(),
     list: getCosmetics,
     create: createCosmetic,
-    update: ({id, payload}) => updateCosmetic(id, payload),
+    update: ({id, payload}: {id: string; payload: CosmeticRequest}) => updateCosmetic(id, payload),
     remove: deleteCosmetic,
   });
 
   return {
-    items: crud.items,
+    items: crud.items as CosmeticResponse[],
     isLoading: crud.isLoading,
     isError: crud.isError,
     createCosmetic: crud.createMutation.mutateAsync,

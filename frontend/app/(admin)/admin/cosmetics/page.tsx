@@ -1,5 +1,5 @@
-import CosmeticsManagementPage from '@/app/features/admin/gamification/CosmeticsManagementPage';
+import CosmeticsManagement from './CosmeticsManagement';
 
 export default function Page() {
-  return <CosmeticsManagementPage />;
+  return <CosmeticsManagement />;
 }

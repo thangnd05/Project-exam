@@ -13,18 +13,19 @@ import {
   AdminPageHeader,
   AdminToolbar,
 } from '@/app/components/admin/common';
-import {useMilestones} from '@/app/features/admin/gamification/hooks/useMilestones';
-import styles from './MilestonesManagementPage.module.scss';
+import type {ExamPartResponse, MilestoneResponse, PartRequirementResponse} from '@/app/types';
+import {useMilestones} from './_hooks/useMilestones';
+import styles from './MilestonesManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-const extractPartOrder = (partName) => {
+const extractPartOrder = (partName?: string | null) => {
   const normalizedName = String(partName || '').trim();
   const matchedNumber = normalizedName.match(/\d+/);
   return matchedNumber ? Number(matchedNumber[0]) : Number.MAX_SAFE_INTEGER;
 };
 
-const sortPartsByNameOrder = (parts) => {
+const sortPartsByNameOrder = (parts: ExamPartResponse[]) => {
   return [...parts].sort((partA, partB) => {
     const orderA = extractPartOrder(partA.name);
     const orderB = extractPartOrder(partB.name);
@@ -35,14 +36,14 @@ const sortPartsByNameOrder = (parts) => {
   });
 };
 
-function MilestonesManagementPage() {
+function MilestonesManagement() {
   const [examTypeFilter, setExamTypeFilter] = useState('');
   const [keyword, setKeyword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deletingMilestone, setDeletingMilestone] = useState(null);
-  const [editingId, setEditingId] = useState(null);
-  const [editParts, setEditParts] = useState({});
+  const [deletingMilestone, setDeletingMilestone] = useState<MilestoneResponse | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editParts, setEditParts] = useState<Record<string, number>>({});
 
   const [newScore, setNewScore] = useState('');
   const [newDescription, setNewDescription] = useState('');
@@ -94,7 +95,8 @@ function MilestonesManagementPage() {
     examTypes,
     examParts,
     skills,
-    scoringConversions,
+    // TODO: ScoringConversionResponse có field optional trong khi ConversionLike yêu cầu bắt buộc — cast any có chủ đích
+    scoringConversions: scoringConversions as any,
     selectedExamTypeId: examTypeFilter,
   });
 
@@ -137,11 +139,11 @@ function MilestonesManagementPage() {
     }
   };
 
-  const handleStartEdit = (milestone) => {
+  const handleStartEdit = (milestone: MilestoneResponse) => {
     setEditingId(milestone.examTargetMilestoneId);
-    const partsMap = {};
+    const partsMap: Record<string, number> = {};
     (milestone.partRequirements || []).forEach((p) => {
-      partsMap[p.examPartId] = p.requiredPercentage;
+      partsMap[p.examPartId as string] = p.requiredPercentage as number;
     });
 
     filteredParts.forEach((p) => {
@@ -152,7 +154,7 @@ function MilestonesManagementPage() {
     setEditParts(partsMap);
   };
 
-  const handleSaveEdit = async (milestone) => {
+  const handleSaveEdit = async (milestone: MilestoneResponse) => {
     setSubmitting(true);
     setErrorMessage('');
     try {
@@ -165,7 +167,7 @@ function MilestonesManagementPage() {
 
       await updateMilestone(milestone.examTargetMilestoneId, {
         examTypeId: examTypeFilter,
-        milestoneScore: milestone.milestoneScore,
+        milestoneScore: milestone.milestoneScore as number,
         description: milestone.description,
         partRequirements,
       });
@@ -193,10 +195,10 @@ function MilestonesManagementPage() {
     }
   };
 
-  const sortPartRequirements = (partRequirements) => {
+  const sortPartRequirements = (partRequirements?: PartRequirementResponse[]) => {
     return [...(partRequirements || [])].sort((partRequirementA, partRequirementB) => {
-      const partNameA = getPartName(partRequirementA.examPartId);
-      const partNameB = getPartName(partRequirementB.examPartId);
+      const partNameA = getPartName(partRequirementA.examPartId as string);
+      const partNameB = getPartName(partRequirementB.examPartId as string);
       const orderA = extractPartOrder(partNameA);
       const orderB = extractPartOrder(partNameB);
       if (orderA !== orderB) {
@@ -206,7 +208,7 @@ function MilestonesManagementPage() {
     });
   };
 
-  const renderScoreEstimate = (partsConfig, milestoneScore) => {
+  const renderScoreEstimate = (partsConfig: Record<string, number | string>, milestoneScore: number) => {
     const est = estimateScore(partsConfig);
     if (!est) return null;
     const diff = est.totalScore - milestoneScore;
@@ -361,7 +363,7 @@ function MilestonesManagementPage() {
                     );
                   })}
                 </div>
-                {renderScoreEstimate(editParts, m.milestoneScore)}
+                {renderScoreEstimate(editParts, m.milestoneScore as number)}
                 <div className={cx('editActions')}>
                   <ButtonPrime
                     variant="outline"
@@ -386,12 +388,12 @@ function MilestonesManagementPage() {
               <>
               <div className={cx('partGrid')}>
                 {sortPartRequirements(m.partRequirements).map((pr) => {
-                  const total = getPartTotal(pr.examPartId);
-                  const numCorrect = percentToNum(pr.requiredPercentage, total);
+                  const total = getPartTotal(pr.examPartId as string);
+                  const numCorrect = percentToNum(pr.requiredPercentage as number, total);
                   return (
                     <div key={pr.examPartId} className={cx('partItem')}>
                       <span className={cx('partName')}>
-                        {getPartName(pr.examPartId)}
+                        {getPartName(pr.examPartId as string)}
                       </span>
                       <span className={cx('partPercent')}>
                         {numCorrect}/{total} câu ({pr.requiredPercentage}%)
@@ -406,11 +408,11 @@ function MilestonesManagementPage() {
                 )}
               </div>
               {(() => {
-                const partsConfig = {};
+                const partsConfig: Record<string, number> = {};
                 (m.partRequirements || []).forEach((pr) => {
-                  partsConfig[pr.examPartId] = pr.requiredPercentage;
+                  partsConfig[pr.examPartId as string] = pr.requiredPercentage as number;
                 });
-                return renderScoreEstimate(partsConfig, m.milestoneScore);
+                return renderScoreEstimate(partsConfig, m.milestoneScore as number);
               })()}
               </>
             )}
@@ -431,4 +433,4 @@ function MilestonesManagementPage() {
   );
 }
 
-export default MilestonesManagementPage;
+export default MilestonesManagement;

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getStreakRecoverConfig, updateStreakRecoverConfig } from '@/app/apis/streakApi';
 
-export const streakRecoverKeys = { config: ['streak-recover-config'] };
+export const streakRecoverKeys = { config: ['streak-recover-config'] as const };
 
 export function useStreakRecoverConfig() {
   const qc = useQueryClient();

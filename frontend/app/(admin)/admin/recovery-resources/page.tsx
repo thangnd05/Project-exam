@@ -1,5 +1,5 @@
-import RecoveryResourcesManagementPage from '@/app/features/admin/content/RecoveryResourcesManagementPage';
+import RecoveryResourcesManagement from './RecoveryResourcesManagement';
 
 export default function Page() {
-  return <RecoveryResourcesManagementPage />;
+  return <RecoveryResourcesManagement />;
 }

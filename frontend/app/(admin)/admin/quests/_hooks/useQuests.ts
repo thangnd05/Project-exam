@@ -3,10 +3,11 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {createQuest, deleteQuest, getQuests, updateQuest} from '@/app/apis/questApi';
+import type {QuestRequest, QuestResponse} from '@/app/types';
 
-export const questKeys = {all: ['admin-quests']};
+export const questKeys = {all: ['admin-quests'] as const};
 
-const normalizeQuests = (data) => (Array.isArray(data) ? data : []);
+const normalizeQuests = (data: QuestResponse[]): QuestResponse[] => (Array.isArray(data) ? data : []);
 
 export function useQuests() {
   const qc = useQueryClient();
@@ -21,7 +22,7 @@ export function useQuests() {
 
   const createMutation = useMutation({mutationFn: createQuest, onSuccess: invalidate});
   const updateMutation = useMutation({
-    mutationFn: ({id, payload}) => updateQuest(id, payload),
+    mutationFn: ({id, payload}: {id: string; payload: QuestRequest}) => updateQuest(id, payload),
     onSuccess: invalidate,
   });
   const deleteMutation = useMutation({mutationFn: deleteQuest, onSuccess: invalidate});

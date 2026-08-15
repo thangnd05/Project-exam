@@ -1,5 +1,5 @@
-import PostsManagementPage from '@/app/features/admin/content/PostsManagementPage';
+import PostsManagement from './PostsManagement';
 
 export default function Page() {
-  return <PostsManagementPage />;
+  return <PostsManagement />;
 }

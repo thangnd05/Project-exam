@@ -14,20 +14,28 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/components/admin/common';
-import { useAdminCoins, useCoinUserOptions } from '@/app/features/admin/gamification/hooks/useAdminCoins';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import type {CoinWalletResponse} from '@/app/types';
+import { useAdminCoins, useCoinUserOptions } from './_hooks/useAdminCoins';
 
-const defaultFormState = {
+interface CoinFormState {
+  userId: string;
+  // balance giữ number | string: input number của react-bootstrap trả string khi gõ
+  balance: number | string;
+}
+
+const defaultFormState: CoinFormState = {
   userId: '',
   balance: 0,
 };
 
-function CoinsManagementPage() {
+function CoinsManagement() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingWallet, setEditingWallet] = useState(null);
-  const [formState, setFormState] = useState(defaultFormState);
+  const [editingWallet, setEditingWallet] = useState<CoinWalletResponse | null>(null);
+  const [formState, setFormState] = useState<CoinFormState>(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deletingWallet, setDeletingWallet] = useState(null);
+  const [deletingWallet, setDeletingWallet] = useState<CoinWalletResponse | null>(null);
   const [loadUserOptions, setLoadUserOptions] = useState(false);
 
   const {
@@ -73,9 +81,9 @@ function CoinsManagementPage() {
     setLoadUserOptions(true);
   };
 
-  const openEditModal = (wallet) => {
+  const openEditModal = (wallet: CoinWalletResponse) => {
     setEditingWallet(wallet);
-    setFormState({userId: wallet.userId, balance: wallet.balance ?? 0});
+    setFormState({userId: wallet.userId as string, balance: wallet.balance ?? 0});
     setErrorMessage('');
     setShowModal(true);
   };
@@ -96,14 +104,14 @@ function CoinsManagementPage() {
       setShowModal(false);
       resetForm();
     };
-    const onError = (error) =>
+    const onError = (error: any) =>
       setErrorMessage(
         error?.response?.data?.message || 'Không thể lưu ví xu. Vui lòng thử lại.',
       );
 
     if (editingWallet) {
       updateMutation.mutate(
-        {userId: editingWallet.userId, balance: balanceNumber},
+        {userId: editingWallet.userId as string, balance: balanceNumber},
         {onSuccess, onError},
       );
     } else {
@@ -125,22 +133,22 @@ function CoinsManagementPage() {
     });
   };
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'user',
       header: 'Người dùng',
-      render: (wallet) => (
+      render: (wallet: CoinWalletResponse) => (
         <div className="d-flex flex-column">
           <span className="fw-semibold">{wallet.userName || '-'}</span>
           {wallet.fullName && <span className="text-muted small">{wallet.fullName}</span>}
         </div>
       ),
     },
-    {key: 'email', header: 'Email', render: (wallet) => wallet.email || '-'},
+    {key: 'email', header: 'Email', render: (wallet: CoinWalletResponse) => wallet.email || '-'},
     {
       key: 'balance',
       header: 'Số xu',
-      render: (wallet) => (
+      render: (wallet: CoinWalletResponse) => (
         <span className="d-inline-flex align-items-center gap-1">
           <Coins size={14} />
           {wallet.balance}
@@ -150,7 +158,7 @@ function CoinsManagementPage() {
     {
       key: 'updatedAt',
       header: 'Cập nhật',
-      render: (wallet) =>
+      render: (wallet: CoinWalletResponse) =>
         wallet.updatedAt ? new Date(wallet.updatedAt).toLocaleString('vi-VN') : '-',
     },
   ];
@@ -187,8 +195,8 @@ function CoinsManagementPage() {
         columns={columns}
         data={filteredWallets}
         loading={loading}
-        getRowKey={(wallet) => wallet.userId}
-        rowActions={(wallet) => (
+        getRowKey={(wallet: CoinWalletResponse) => wallet.userId as string}
+        rowActions={(wallet: CoinWalletResponse) => (
           <>
             <button title="Sửa" onClick={() => openEditModal(wallet)}>
               <Edit size={14} />
@@ -283,4 +291,4 @@ function CoinsManagementPage() {
   );
 }
 
-export default CoinsManagementPage;
+export default CoinsManagement;

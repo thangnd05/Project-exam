@@ -11,12 +11,15 @@ import useDebouncedValue from '@/app/hooks/useDebouncedValue';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import { AdminPageHeader, AdminTable, AdminToolbar } from '@/app/components/admin/common';
+import type { AdminTableColumn } from '@/app/components/admin/common/AdminTable';
 import styles from '@/app/components/admin/common/adminKit.module.scss';
+import { PostStatus } from '@/app/enums';
+import type { PostSummaryResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
-import { useAdminPosts, useApprovePost, useDeletePost } from '@/app/features/admin/content/hooks/useAdminPosts';
+import { useAdminPosts, useApprovePost, useDeletePost } from './_hooks/useAdminPosts';
 
-const STATUS_VARIANT = { APPROVED: 'success', PENDING: 'warning' };
+const STATUS_VARIANT: Record<string, string> = { APPROVED: 'success', PENDING: 'warning' };
 
 const STATUS_FILTERS = [
     { value: 'PENDING', label: 'Chờ duyệt' },
@@ -24,12 +27,12 @@ const STATUS_FILTERS = [
     { value: 'ALL', label: 'Tất cả' },
 ];
 
-const PostsManagementPage = () => {
+const PostsManagement = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('PENDING');
     const [currentPage, setCurrentPage] = useState(0);
-    const [approvingPost, setApprovingPost] = useState(null);
-    const [deletingPost, setDeletingPost] = useState(null);
+    const [approvingPost, setApprovingPost] = useState<PostSummaryResponse | null>(null);
+    const [deletingPost, setDeletingPost] = useState<PostSummaryResponse | null>(null);
 
     const PAGE_SIZE = 10;
     const debouncedSearch = useDebouncedValue(searchQuery, 300);
@@ -85,11 +88,11 @@ const PostsManagementPage = () => {
         });
     };
 
-    const columns = [
+    const columns: AdminTableColumn[] = [
         {
             key: 'title',
             header: 'Tiêu đề',
-            render: (post) => (
+            render: (post: PostSummaryResponse) => (
                 <div>
                     <div className="fw-semibold">{post.title}</div>
                     <div className="small text-secondary">
@@ -102,13 +105,14 @@ const PostsManagementPage = () => {
         {
             key: 'createdAt',
             header: 'Ngày tạo',
-            render: (post) => new Date(post.createdAt).toLocaleDateString('vi-VN'),
+            render: (post: PostSummaryResponse) =>
+                new Date(post.createdAt as string).toLocaleDateString('vi-VN'),
         },
         {
             key: 'status',
             header: 'Trạng thái',
-            render: (post) => (
-                <Badge bg={STATUS_VARIANT[post.status] || 'secondary'}>{post.status}</Badge>
+            render: (post: PostSummaryResponse) => (
+                <Badge bg={STATUS_VARIANT[post.status as string] || 'secondary'}>{post.status}</Badge>
             ),
         },
     ];
@@ -122,7 +126,7 @@ const PostsManagementPage = () => {
 
             <AdminToolbar
                 searchValue={searchQuery}
-                onSearchChange={(value) => setSearchQuery(value)}
+                onSearchChange={(value: string) => setSearchQuery(value)}
                 searchPlaceholder="Tìm kiếm bài viết..."
             >
                 <div className="d-flex gap-2">
@@ -145,14 +149,14 @@ const PostsManagementPage = () => {
                 data={posts}
                 loading={loading}
                 emptyText="Không có dữ liệu bài viết"
-                getRowKey={(post) => post.id}
+                getRowKey={(post: PostSummaryResponse) => post.id}
                 page={currentPage}
                 totalPages={totalPages}
                 totalElements={totalElements}
                 pageSize={PAGE_SIZE}
                 itemLabel="bài viết"
                 onPageChange={setCurrentPage}
-                rowActions={(post) => (
+                rowActions={(post: PostSummaryResponse) => (
                     <>
                         <button
                             title="Xem chi tiết"
@@ -165,7 +169,7 @@ const PostsManagementPage = () => {
                         >
                             <Eye size={14} />
                         </button>
-                        {post.status !== 'APPROVED' && (
+                        {post.status !== PostStatus.APPROVED && (
                             <button title="Duyệt" onClick={() => setApprovingPost(post)}>
                                 <CheckCircle size={14} />
                             </button>
@@ -202,4 +206,4 @@ const PostsManagementPage = () => {
     );
 };
 
-export default PostsManagementPage;
+export default PostsManagement;

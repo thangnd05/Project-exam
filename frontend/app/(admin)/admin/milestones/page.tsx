@@ -1,5 +1,5 @@
-import MilestonesManagementPage from '@/app/features/admin/gamification/MilestonesManagementPage';
+import MilestonesManagement from './MilestonesManagement';
 
 export default function Page() {
-  return <MilestonesManagementPage />;
+  return <MilestonesManagement />;
 }

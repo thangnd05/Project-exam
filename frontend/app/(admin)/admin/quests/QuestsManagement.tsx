@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {useQuests} from '@/app/features/admin/gamification/hooks/useQuests';
+import {useQuests} from './_hooks/useQuests';
 import {toDateTimeLocalInput, fromDateTimeLocalInput} from '@/app/utils/format-date-time';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -15,36 +15,51 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/components/admin/common';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import {QuestConditionType} from '@/app/enums';
+import type {QuestRequest, QuestResponse} from '@/app/types';
 
 const CONDITION_TYPES = [
-  {value: 'NONE', label: 'Không cần điều kiện (tặng xu)'},
-  {value: 'COMPLETE_TEST', label: 'Hoàn thành bài thi'},
-  {value: 'STREAK_DAYS', label: 'Đạt chuỗi ngày học'},
-  {value: 'CREATE_LEARNING_PLAN', label: 'Tạo lộ trình học'},
-  {value: 'COMPLETE_LEARNING_PLAN', label: 'Hoàn thành lộ trình học'},
+  {value: QuestConditionType.NONE, label: 'Không cần điều kiện (tặng xu)'},
+  {value: QuestConditionType.COMPLETE_TEST, label: 'Hoàn thành bài thi'},
+  {value: QuestConditionType.STREAK_DAYS, label: 'Đạt chuỗi ngày học'},
+  {value: QuestConditionType.CREATE_LEARNING_PLAN, label: 'Tạo lộ trình học'},
+  {value: QuestConditionType.COMPLETE_LEARNING_PLAN, label: 'Hoàn thành lộ trình học'},
 ];
 
-const defaultFormState = {
+interface QuestFormState {
+  title: string;
+  description: string;
+  // rewardCoins/conditionTarget giữ number | string: input number trả string khi gõ
+  rewardCoins: number | string;
+  conditionType: QuestConditionType;
+  conditionTarget: number | string;
+  startAt: string;
+  endAt: string;
+  active: boolean;
+}
+
+const defaultFormState: QuestFormState = {
   title: '',
   description: '',
   rewardCoins: 0,
-  conditionType: 'NONE',
+  conditionType: QuestConditionType.NONE,
   conditionTarget: 1,
   startAt: '',
   endAt: '',
   active: true,
 };
 
-const toInputDateTime = (value) => toDateTimeLocalInput(value);
+const toInputDateTime = (value?: string) => toDateTimeLocalInput(value);
 
-function QuestsManagementPage() {
+function QuestsManagement() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingQuestId, setEditingQuestId] = useState(null);
-  const [formState, setFormState] = useState(defaultFormState);
+  const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<QuestFormState>(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [deletingQuest, setDeletingQuest] = useState(null);
+  const [deletingQuest, setDeletingQuest] = useState<QuestResponse | null>(null);
 
   const {
     quests,
@@ -82,13 +97,13 @@ function QuestsManagementPage() {
     setShowModal(true);
   };
 
-  const openEditModal = (quest) => {
+  const openEditModal = (quest: QuestResponse) => {
     setEditingQuestId(quest.questId);
     setFormState({
       title: quest.title || '',
       description: quest.description || '',
       rewardCoins: quest.rewardCoins ?? 0,
-      conditionType: quest.conditionType || 'NONE',
+      conditionType: quest.conditionType || QuestConditionType.NONE,
       conditionTarget: quest.conditionTarget ?? 1,
       startAt: toInputDateTime(quest.startAt),
       endAt: toInputDateTime(quest.endAt),
@@ -109,17 +124,18 @@ function QuestsManagementPage() {
       return;
     }
 
+    // Cast QuestRequest: fromDateTimeLocalInput trả string | null (giữ nguyên hành vi gửi null lên API)
     const payload = {
       title: formState.title.trim(),
       description: formState.description.trim(),
       rewardCoins: reward,
       conditionType: formState.conditionType,
       conditionTarget:
-        formState.conditionType === 'NONE' ? 1 : Number(formState.conditionTarget) || 1,
+        formState.conditionType === QuestConditionType.NONE ? 1 : Number(formState.conditionTarget) || 1,
       startAt: fromDateTimeLocalInput(formState.startAt),
       endAt: fromDateTimeLocalInput(formState.endAt),
       active: formState.active,
-    };
+    } as QuestRequest;
 
     setSubmitting(true);
     setErrorMessage('');
@@ -131,7 +147,7 @@ function QuestsManagementPage() {
       }
       setShowModal(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(
         error?.response?.data?.message || 'Không thể lưu nhiệm vụ. Vui lòng thử lại.',
       );
@@ -156,14 +172,14 @@ function QuestsManagementPage() {
     }
   };
 
-  const formatDate = (value) =>
+  const formatDate = (value?: string) =>
     value ? new Date(value).toLocaleString('vi-VN') : '—';
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'title',
       header: 'Tiêu đề',
-      render: (quest) => (
+      render: (quest: QuestResponse) => (
         <div className="d-flex flex-column">
           <span className="fw-semibold">{quest.title}</span>
           {quest.description && (
@@ -175,29 +191,29 @@ function QuestsManagementPage() {
     {
       key: 'condition',
       header: 'Điều kiện',
-      render: (quest) => (
+      render: (quest: QuestResponse) => (
         <>
           {quest.conditionLabel}
-          {quest.conditionType !== 'NONE' && ` (x${quest.conditionTarget})`}
+          {quest.conditionType !== QuestConditionType.NONE && ` (x${quest.conditionTarget})`}
         </>
       ),
     },
-    {key: 'rewardCoins', header: 'Xu', render: (quest) => quest.rewardCoins},
+    {key: 'rewardCoins', header: 'Xu', render: (quest: QuestResponse) => quest.rewardCoins},
     {
       key: 'time',
       header: 'Thời gian',
-      render: (quest) => (
+      render: (quest: QuestResponse) => (
         <div className="d-flex flex-column">
           <span>Từ: {formatDate(quest.startAt)}</span>
           <span>Đến: {formatDate(quest.endAt)}</span>
         </div>
       ),
     },
-    {key: 'claimCount', header: 'Đã nhận', render: (quest) => quest.claimCount ?? 0},
+    {key: 'claimCount', header: 'Đã nhận', render: (quest: QuestResponse) => quest.claimCount ?? 0},
     {
       key: 'active',
       header: 'Trạng thái',
-      render: (quest) => (quest.active ? 'Đang bật' : 'Tắt'),
+      render: (quest: QuestResponse) => (quest.active ? 'Đang bật' : 'Tắt'),
     },
   ];
 
@@ -227,8 +243,8 @@ function QuestsManagementPage() {
         columns={columns}
         data={filteredQuests}
         loading={loading}
-        getRowKey={(quest) => quest.questId}
-        rowActions={(quest) => (
+        getRowKey={(quest: QuestResponse) => quest.questId}
+        rowActions={(quest: QuestResponse) => (
           <>
             <button title="Sửa" onClick={() => openEditModal(quest)}>
               <Edit size={14} />
@@ -312,7 +328,7 @@ function QuestsManagementPage() {
             onChange={(event) =>
               setFormState((previous) => ({
                 ...previous,
-                conditionType: event.target.value,
+                conditionType: event.target.value as QuestConditionType,
               }))
             }
           >
@@ -323,7 +339,7 @@ function QuestsManagementPage() {
             ))}
           </Form.Select>
         </Form.Group>
-        {formState.conditionType !== 'NONE' && (
+        {formState.conditionType !== QuestConditionType.NONE && (
           <Form.Group className="mb-3">
             <Form.Label>Số lần cần đạt</Form.Label>
             <Form.Control
@@ -388,4 +404,4 @@ function QuestsManagementPage() {
   );
 }
 
-export default QuestsManagementPage;
+export default QuestsManagement;

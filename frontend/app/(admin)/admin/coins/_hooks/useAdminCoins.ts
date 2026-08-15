@@ -9,10 +9,11 @@ import {
 } from '@/app/apis/coinApi';
 import { getUsers } from '@/app/apis/userApi';
 import { useAdminCrud } from '@/app/hooks/useAdminCrud';
+import type { CoinWalletResponse, PageResponse, UserResponse } from '@/app/types';
 
 export const coinKeys = {
-  wallets: ['coin-wallets'],
-  userOptions: ['coin-user-options'],
+  wallets: ['coin-wallets'] as const,
+  userOptions: ['coin-user-options'] as const,
 };
 
 export function useAdminCoins() {
@@ -20,12 +21,13 @@ export function useAdminCoins() {
     queryKey: coinKeys.wallets,
     list: getCoinWallets,
     create: createCoinWallet,
-    update: ({ userId, balance }) => updateCoinBalance(userId, { balance }),
-    remove: (userId) => deleteCoinWallet(userId),
+    update: ({ userId, balance }: { userId: string; balance: number }) =>
+      updateCoinBalance(userId, { balance }),
+    remove: (userId: string) => deleteCoinWallet(userId),
   });
 
   return {
-    wallets: crud.items,
+    wallets: crud.items as CoinWalletResponse[],
     isLoading: crud.isLoading,
     isError: crud.isError,
     createMutation: crud.createMutation,
@@ -34,12 +36,17 @@ export function useAdminCoins() {
   };
 }
 
-export function useCoinUserOptions({ enabled = false, wallets = [] } = {}) {
+interface CoinUserOptionsParams {
+  enabled?: boolean;
+  wallets?: CoinWalletResponse[];
+}
+
+export function useCoinUserOptions({ enabled = false, wallets = [] }: CoinUserOptionsParams = {}) {
   const query = useQuery({
     queryKey: coinKeys.userOptions,
     queryFn: () => getUsers({ page: 0, size: 100 }),
     enabled,
-    select: (response) => {
+    select: (response: PageResponse<UserResponse>) => {
       const existingUserIds = new Set(wallets.map((wallet) => wallet.userId));
       return (response?.content || []).filter((user) => !existingUserIds.has(user.id));
     },

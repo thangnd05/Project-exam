@@ -6,16 +6,19 @@ import classNames from 'classnames/bind';
 import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
+import RecoveryResourceFormModal, {
+  type RecoveryResourceFormState,
+} from './_components/RecoveryResourceFormModal';
 import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
 import {isMarkdownResource} from '@/app/utils/recoveryResource';
-import {usePartsByExamType, useRecoveryResources, useTagsByExamType} from '@/app/features/admin/content/hooks/useRecoveryResources';
-import styles from './RecoveryResourcesManagementPage.module.scss';
+import type {RecoveryResourceResponse, TagResponse} from '@/app/types';
+import {usePartsByExamType, useRecoveryResources, useTagsByExamType} from './_hooks/useRecoveryResources';
+import styles from './RecoveryResourcesManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-const emptyForm = {
+const emptyForm: RecoveryResourceFormState = {
   title: '',
   description: '',
   url: '',
@@ -23,8 +26,8 @@ const emptyForm = {
   examPartId: '',
 };
 
-const getRootTagId = (tag, tagById) => {
-  let current = tag;
+const getRootTagId = (tag: TagResponse, tagById: Map<string, TagResponse>) => {
+  let current: TagResponse | undefined = tag;
   let depth = 0;
 
   while (current?.parentId && depth < 20) {
@@ -39,6 +42,15 @@ const getRootTagId = (tag, tagById) => {
   return current?.tagId || null;
 };
 
+interface ResourceCardProps {
+  resource: RecoveryResourceResponse;
+  onEdit: (resource: RecoveryResourceResponse) => void;
+  onDelete: (resource: RecoveryResourceResponse) => void;
+  onDownload: (url: string, originalFileName?: string) => void;
+  formatDate: (dateStr?: string) => string;
+  cx: typeof cx;
+}
+
 function ResourceCard({
   resource,
   onEdit,
@@ -46,7 +58,7 @@ function ResourceCard({
   onDownload,
   formatDate,
   cx,
-}) {
+}: ResourceCardProps) {
   return (
     <div className={cx('resourceCard')}>
       <div className={cx('cardHeader')}>
@@ -99,7 +111,7 @@ function ResourceCard({
             <button
               type="button"
               className={cx('viewLink')}
-              onClick={() => onDownload(resource.url, resource.originalFileName)}
+              onClick={() => onDownload(resource.url as string, resource.originalFileName)}
               title={isMarkdownResource(resource) ? 'Tải file markdown gốc (dành cho quản trị)' : 'Tải về'}
             >
               <Download size={14} />
@@ -112,16 +124,16 @@ function ResourceCard({
   );
 }
 
-function RecoveryResourcesManagementPage() {
+function RecoveryResourcesManagement() {
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<RecoveryResourceFormState>(emptyForm);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deletingResource, setDeletingResource] = useState(null);
+  const [deletingResource, setDeletingResource] = useState<RecoveryResourceResponse | null>(null);
   const [selectedParentTagId, setSelectedParentTagId] = useState('');
   const [formExamTypeId, setFormExamTypeId] = useState('');
 
@@ -172,9 +184,9 @@ function RecoveryResourcesManagementPage() {
       }
 
       return (
-        resource.title.toLowerCase().includes(keyword) ||
+        resource.title!.toLowerCase().includes(keyword) ||
         (resource.description || '').toLowerCase().includes(keyword) ||
-        resourceTags.some((tag) => tag.name.toLowerCase().includes(keyword))
+        resourceTags.some((tag) => tag.name!.toLowerCase().includes(keyword))
       );
     });
   }, [resources, searchTerm, selectedExamTypeId]);
@@ -184,17 +196,17 @@ function RecoveryResourcesManagementPage() {
       return null;
     }
 
-    const tagById = new Map(availableTags.map((tag) => [tag.tagId, tag]));
+    const tagById = new Map(availableTags.map((tag): [string, TagResponse] => [tag.tagId, tag]));
     const rootTags = availableTags.filter((tag) => !tag.parentId);
     const groups = rootTags.map((parentTag) => ({
       parentTag,
-      resources: [],
+      resources: [] as RecoveryResourceResponse[],
     }));
-    const groupMap = new Map(groups.map((group) => [group.parentTag.tagId, group]));
-    const ungrouped = [];
-    const ungroupedIds = new Set();
+    const groupMap = new Map(groups.map((group): [string, (typeof groups)[number]] => [group.parentTag.tagId, group]));
+    const ungrouped: RecoveryResourceResponse[] = [];
+    const ungroupedIds = new Set<string>();
 
-    const pushUngrouped = (resource) => {
+    const pushUngrouped = (resource: RecoveryResourceResponse) => {
       if (ungroupedIds.has(resource.resourceId)) {
         return;
       }
@@ -212,7 +224,7 @@ function RecoveryResourcesManagementPage() {
         return;
       }
 
-      const parentIds = new Set();
+      const parentIds = new Set<string>();
       examTags.forEach((tag) => {
         const rootId = tag.parentId ? getRootTagId(tag, tagById) : tag.tagId;
         if (rootId) {
@@ -268,7 +280,7 @@ function RecoveryResourcesManagementPage() {
     };
   }, [parentTagGroups, selectedParentTagId]);
 
-  const renderResourceCard = (resource) => (
+  const renderResourceCard = (resource: RecoveryResourceResponse) => (
     <ResourceCard
       key={resource.resourceId}
       resource={resource}
@@ -294,11 +306,11 @@ function RecoveryResourcesManagementPage() {
     setShowFormModal(true);
   };
 
-  const openEditModal = (resource) => {
+  const openEditModal = (resource: RecoveryResourceResponse) => {
     const tagExamTypeId = (resource.tags || []).find((t) => t.examTypeId)?.examTypeId;
     setEditingId(resource.resourceId);
     setFormState({
-      title: resource.title,
+      title: resource.title as string,
       description: resource.description || '',
       url: resource.url || '',
       tagIds: (resource.tags || []).map((t) => t.tagId),
@@ -315,12 +327,12 @@ function RecoveryResourcesManagementPage() {
     setShowFormModal(true);
   };
 
-  const handleFormExamTypeChange = (examTypeId) => {
+  const handleFormExamTypeChange = (examTypeId: string) => {
     setFormExamTypeId(examTypeId);
     setFormState((prev) => ({...prev, examPartId: ''}));
   };
 
-  const handleToggleTag = (tagId) => {
+  const handleToggleTag = (tagId: string) => {
     setFormState((prev) => {
       const ids = prev.tagIds || [];
       const next = ids.includes(tagId) ? ids.filter((id) => id !== tagId) : [...ids, tagId];
@@ -375,7 +387,7 @@ function RecoveryResourcesManagementPage() {
     }
   };
 
-  const handleDownload = async (url, originalFileName) => {
+  const handleDownload = async (url: string, originalFileName?: string) => {
     try {
       const res = await fetch(url);
       const blob = await res.blob();
@@ -393,7 +405,7 @@ function RecoveryResourcesManagementPage() {
     }
   };
 
-  const formatDate = (dateStr) => {
+  const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('vi-VN');
   };
@@ -530,4 +542,4 @@ function RecoveryResourcesManagementPage() {
   );
 }
 
-export default RecoveryResourcesManagementPage;
+export default RecoveryResourcesManagement;

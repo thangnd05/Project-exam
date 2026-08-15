@@ -13,17 +13,29 @@ import {
   updateResource,
   deleteResource,
 } from '@/app/apis/recoveryResourceApi';
+import type {
+  ExamPartResponse,
+  ExamTypeResponse,
+  RecoveryResourceRequest,
+  RecoveryResourceResponse,
+  TagResponse,
+} from '@/app/types';
+
+export interface RecoveryExamTypeOption {
+  id?: string;
+  name?: string;
+}
 
 export const recoveryResourceKeys = {
-  resources: ['recovery-resources'],
-  examTypes: ['recovery-exam-types'],
-  tags: (examTypeId) => ['recovery-tags-flat', examTypeId ?? null],
-  parts: (examTypeId) => ['recovery-exam-parts', examTypeId ?? null],
+  resources: ['recovery-resources'] as const,
+  examTypes: ['recovery-exam-types'] as const,
+  tags: (examTypeId?: string) => ['recovery-tags-flat', examTypeId ?? null] as const,
+  parts: (examTypeId?: string) => ['recovery-exam-parts', examTypeId ?? null] as const,
 };
 
-const EMPTY = [];
-const asArray = (data) => (Array.isArray(data) ? data : EMPTY);
-const mapExamTypes = (list) =>
+const EMPTY: never[] = [];
+const asArray = <T,>(data: T[] | null | undefined): T[] => (Array.isArray(data) ? data : EMPTY);
+const mapExamTypes = (list: ExamTypeResponse[]): RecoveryExamTypeOption[] =>
   asArray(list).map((item) => ({id: item.examTypeId, name: item.name}));
 
 export function useRecoveryResources() {
@@ -31,9 +43,11 @@ export function useRecoveryResources() {
     queryKey: recoveryResourceKeys.resources,
     list: getAllResources,
     select: asArray,
-    create: ({payload, file}) => createResource(payload, file),
-    update: ({id, payload, file}) => updateResource(id, payload, file),
-    remove: (id) => deleteResource(id),
+    create: ({payload, file}: {payload: RecoveryResourceRequest; file?: File | null}) =>
+      createResource(payload, file),
+    update: ({id, payload, file}: {id: string; payload: RecoveryResourceRequest; file?: File | null}) =>
+      updateResource(id, payload, file),
+    remove: (id: string) => deleteResource(id),
   });
 
   const examTypesQuery = useQuery({
@@ -43,17 +57,17 @@ export function useRecoveryResources() {
   });
 
   return {
-    resources: crud.items,
+    resources: crud.items as RecoveryResourceResponse[],
     isLoading: crud.isLoading,
     isError: crud.isError,
-    examTypes: examTypesQuery.data ?? EMPTY,
+    examTypes: examTypesQuery.data ?? (EMPTY as RecoveryExamTypeOption[]),
     createMutation: crud.createMutation,
     updateMutation: crud.updateMutation,
     deleteMutation: crud.deleteMutation,
   };
 }
 
-export function usePartsByExamType(examTypeId) {
+export function usePartsByExamType(examTypeId: string): ExamPartResponse[] {
   const query = useQuery({
     queryKey: recoveryResourceKeys.parts(examTypeId),
     queryFn: () => getExamPartsByExamType(examTypeId),
@@ -65,7 +79,7 @@ export function usePartsByExamType(examTypeId) {
   return query.data ?? EMPTY;
 }
 
-export function useTagsByExamType(examTypeId) {
+export function useTagsByExamType(examTypeId: string): TagResponse[] {
   const query = useQuery({
     queryKey: recoveryResourceKeys.tags(examTypeId),
     queryFn: () => getTagsFlatByExamType(examTypeId),

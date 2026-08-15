@@ -1,5 +1,5 @@
-import EvaluationsManagementPage from '@/app/features/admin/content/EvaluationsManagementPage';
+import EvaluationsManagement from './EvaluationsManagement';
 
 export default function Page() {
-  return <EvaluationsManagementPage />;
+  return <EvaluationsManagement />;
 }

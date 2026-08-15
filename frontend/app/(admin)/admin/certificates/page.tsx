@@ -1,5 +1,5 @@
-import CertificatesManagementPage from '@/app/features/admin/certificate/CertificatesManagementPage';
+import CertificatesManagement from './CertificatesManagement';
 
 export default function Page() {
-  return <CertificatesManagementPage />;
+  return <CertificatesManagement />;
 }

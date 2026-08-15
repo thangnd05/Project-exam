@@ -5,6 +5,36 @@ import { Form, Row, Col } from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
+import type { ExamTypeResponse } from '@/app/types';
+
+export interface CertificateTemplateFormState {
+  examTypeId: string;
+  // passScore/validMonths giữ number | string: input number trả string khi gõ, '' khi trống
+  passScore: number | string;
+  title: string;
+  subtitle: string;
+  footerNote: string;
+  logoUrl: string;
+  backgroundUrl: string;
+  accentColor: string;
+  issuerName: string;
+  signatureName: string;
+  signatureTitle: string;
+  signatureImageUrl: string;
+  validMonths: number | string;
+  active: boolean;
+}
+
+interface CertificateTemplateFormModalProps {
+  show: boolean;
+  isEditing: boolean;
+  formState: CertificateTemplateFormState;
+  examTypes: ExamTypeResponse[];
+  onChangeField: (field: string, value: string | boolean) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+  submitting: boolean;
+}
 
 /**
  * Form mẫu chứng chỉ. Khung xem trước dùng đúng component vẽ chứng chỉ thật nên
@@ -19,7 +49,7 @@ function CertificateTemplateFormModal({
   onClose,
   onSubmit,
   submitting,
-}) {
+}: CertificateTemplateFormModalProps) {
   const previewDesign = {
     title: formState.title || 'Chứng nhận hoàn thành',
     subtitle: formState.subtitle,

@@ -7,10 +7,11 @@ import { Flame } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { AdminCard, AdminFieldError, AdminPageHeader } from '@/app/components/admin/common';
-import { useStreakRecoverConfig } from '@/app/features/admin/gamification/hooks/useStreakRecoverConfig';
+import { useStreakRecoverConfig } from './_hooks/useStreakRecoverConfig';
 
-function StreakRecoverManagementPage() {
-  const [costCoins, setCostCoins] = useState(50);
+function StreakRecoverManagement() {
+  // costCoins giữ number | string: input number của react-bootstrap trả string khi gõ
+  const [costCoins, setCostCoins] = useState<number | string>(50);
   const [active, setActive] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -41,7 +42,7 @@ function StreakRecoverManagementPage() {
       setCostCoins(data?.costCoins ?? cost);
       setActive(data?.active !== false);
       toast.success('Đã lưu cấu hình khôi phục chuỗi.');
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(error?.response?.data?.message || 'Không thể lưu cấu hình.');
     }
   };
@@ -99,4 +100,4 @@ function StreakRecoverManagementPage() {
   );
 }
 
-export default StreakRecoverManagementPage;
+export default StreakRecoverManagement;
