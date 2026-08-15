@@ -1,0 +1,20 @@
+'use client';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { checkPracticeAnswer } from '@/app/apis/practiceQuestionApi';
+import { albumKeys } from '@/app/features/albums/list/hooks/useMyAlbums';
+import { albumDeltaKeys } from '@/app/features/albums/detail/hooks/useAlbumVocabularies';
+
+export function useCheckPracticeAnswer(albumId, { onSuccess, onError } = {}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => checkPracticeAnswer(payload),
+    onSuccess: (...args) => {
+
+      qc.invalidateQueries({ queryKey: albumKeys.my });
+      qc.invalidateQueries({ queryKey: albumDeltaKeys.vocabularies(albumId) });
+      if (onSuccess) onSuccess(...args);
+    },
+    onError,
+  });
+}

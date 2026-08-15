@@ -1,0 +1,233 @@
+@import 'app/assets/styles/mixins.scss';
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(var(--slate-900-rgb) / 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+  background: #ffffff;
+  width: 100%;
+  max-width: 1200px;
+  max-height: 90vh;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.header {
+  background: var(--primary-gradient);
+  padding: 24px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  svg {
+    color: #fff;
+    font-size: 2.4rem;
+  }
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 !important;
+  letter-spacing: -0.5px;
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+  }
+
+  svg {
+    font-size: 2rem;
+  }
+}
+
+.body {
+  padding: 30px;
+  overflow-y: auto;
+  flex: 1;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--slate-100);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--slate-300);
+    border-radius: 10px;
+
+    &:hover {
+      background: var(--slate-400);
+    }
+  }
+
+  :global(.form-label) {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: var(--slate-600);
+    margin-bottom: 10px;
+  }
+
+  :global(.form-control),
+  :global(.form-select) {
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 2px solid var(--slate-200);
+    background: var(--bg-white);
+    font-size: var(--font-size-md);
+    line-height: 1.5;
+    color: var(--slate-800);
+    box-shadow: none;
+    transition: all 0.2s;
+  }
+
+  :global(.form-control)::placeholder {
+    color: var(--slate-400);
+  }
+
+  :global(.form-control:focus),
+  :global(.form-select:focus) {
+    border-color: var(--accent-color);
+    background: #fff;
+    box-shadow: 0 0 0 4px var(--primary-alpha-10);
+  }
+
+  :global(.form-check-label) {
+    font-size: var(--font-size-md);
+    color: var(--slate-600);
+  }
+
+  :global(.form-check-input) {
+    cursor: pointer;
+
+    &:checked {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 4px var(--primary-alpha-10);
+    }
+  }
+}
+
+.footer {
+  padding: 20px 30px;
+  border-top: 1px solid var(--slate-100);
+  background: var(--bg-white);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+
+  .btnCancel,
+  .btnSubmit {
+    padding: 14px 24px;
+    border-radius: 14px;
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btnCancel {
+    background: var(--slate-100);
+    color: var(--slate-500);
+
+    &:hover:not(:disabled) {
+      background: var(--slate-200);
+      color: var(--slate-800);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  .btnSubmit {
+    background: var(--primary-gradient);
+    color: #fff;
+    box-shadow: 0 4px 15px rgb(var(--teal-600-rgb) / 0.25);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px var(--primary-alpha-35);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

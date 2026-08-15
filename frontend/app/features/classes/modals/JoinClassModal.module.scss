@@ -1,0 +1,186 @@
+@import 'app/assets/styles/mixins.scss';
+
+.modalCustom {
+    background: rgb(var(--slate-900-rgb) / 0.4);
+    backdrop-filter: blur(4px);
+
+    :global(.modal-content) {
+        border: none;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.header {
+    background: #fff;
+    padding: 24px 30px;
+    border-bottom: 1px solid var(--slate-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .titleWrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        svg {
+            color: var(--accent-color);
+            font-size: 2.22rem;
+        }
+
+        .title {
+            font-size: 2.22rem;
+            font-weight: 800;
+            color: var(--slate-800);
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+    }
+
+    .closeBtn {
+        background: var(--slate-100);
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--slate-500);
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: var(--slate-200);
+            color: var(--slate-800);
+            transform: rotate(90deg);
+        }
+    }
+}
+
+.body {
+    padding: 30px;
+
+    .label {
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        color: var(--slate-600);
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .inputWrapper {
+        position: relative;
+
+        .inputIcon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--slate-400);
+            font-size: 1.8rem;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .inputControl {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border-radius: 16px;
+            border: 2px solid var(--slate-200);
+            font-size: 1.6rem;
+            font-family: var(--font-family);
+            color: var(--slate-800);
+            transition: all 0.3s;
+            background: var(--bg-white);
+
+            &::placeholder {
+                color: var(--slate-400);
+            }
+
+            &:focus {
+                outline: none;
+                border-color: var(--accent-color);
+                background: #fff;
+                box-shadow: 0 0 0 4px var(--primary-alpha-10);
+
+                &+.inputIcon {
+                    color: var(--accent-color);
+                }
+            }
+        }
+    }
+
+    .tip {
+        margin-top: 16px;
+        font-size: var(--font-size-smd);
+        color: var(--slate-500);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        svg {
+            color: var(--amber-400);
+        }
+    }
+}
+
+.footer {
+    padding: 0 30px 30px;
+    border: none;
+    display: flex;
+    gap: 12px;
+
+    .btnCancel,
+    .btnSubmit {
+        flex: 1;
+        padding: 14px;
+        border-radius: 14px;
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btnCancel {
+        background: var(--slate-100);
+        color: var(--slate-500);
+
+        &:hover {
+            background: var(--slate-200);
+            color: var(--slate-800);
+        }
+    }
+
+    .btnSubmit {
+        background: var(--accent-color);
+        color: #fff;
+        box-shadow: 0 4px 15px rgb(var(--teal-600-rgb) / 0.3);
+
+        &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgb(var(--teal-600-rgb) / 0.4);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

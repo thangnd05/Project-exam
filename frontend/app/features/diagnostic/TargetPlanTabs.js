@@ -1,0 +1,34 @@
+'use client';
+
+import Link from 'next/link';
+import classNames from 'classnames/bind';
+import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+
+const cx = classNames.bind(styles);
+
+const TABS = [
+  { key: 'target', label: 'Mục tiêu', path: '/my-target' },
+  { key: 'plan', label: 'Lập kế hoạch', path: '/learning-plans/generate' },
+  { key: 'compare', label: 'So sánh lộ trình', path: '/learning-plans/compare' },
+  { key: 'overview', label: 'Tổng quan', path: '/my-target/dashboard' },
+];
+
+function TargetPlanTabs({ active, examTypeId }) {
+  const qs = examTypeId ? `?examTypeId=${encodeURIComponent(examTypeId)}` : '';
+  return (
+    <nav className={cx('pageTabs')} aria-label="Mục tiêu và kế hoạch học">
+      {TABS.map((tab) => (
+        <Link
+          key={tab.key}
+          href={`${tab.path}${qs}`}
+          className={cx('pageTab', { active: tab.key === active })}
+          aria-current={tab.key === active ? 'page' : undefined}
+        >
+          {tab.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+export default TargetPlanTabs;

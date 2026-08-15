@@ -2,7 +2,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
-const srcDir = path.resolve(root, 'src');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -13,17 +12,17 @@ const nextConfig = {
   // thì bổ sung ở đây.
 
   sassOptions: {
-    // Cho phép @use '~/...' và đường dẫn tuyệt đối từ src trong file .scss
-    includePaths: [srcDir],
+    // Cho phép đường dẫn tuyệt đối từ root dự án trong file .scss (app/assets/styles/...)
+    includePaths: [root],
     quietDeps: true,
     silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
   },
 
   webpack: (config) => {
-    // Giữ alias '~' vốn có của bản Vite (74 file đang dùng)
+    // Alias '@' → root, khớp với "paths" trong tsconfig (chuẩn edusoft: @/app/...)
     config.resolve.alias = {
       ...config.resolve.alias,
-      '~': srcDir,
+      '@': root,
     };
     return config;
   },

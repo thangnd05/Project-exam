@@ -1,0 +1,38 @@
+@import 'app/assets/styles/mixins.scss';
+
+.empty-state {
+  width: 100%;
+  margin-top: 8px;
+  padding: 42px 36px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-surface);
+  color: var(--on-primary-gradient);
+  font-size: var(--font-size-2xxl);
+  margin-bottom: 18px;
+}
+
+.empty-state h4 {
+  margin: 0 0 10px;
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  color: var(--dark-color);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1.65rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}

@@ -1,0 +1,95 @@
+@import 'app/assets/styles/mixins.scss';
+
+$brand-primary: var(--accent-color);
+$brand-secondary: var(--accent-act-color);
+$brand-light: var(--slate-50);
+$brand-border: var(--slate-200);
+
+.wrapper {
+  padding: 60px 0;
+  min-height: calc(100vh - 200px);
+
+  @media (max-width: 768px) {
+    padding: 30px 0;
+  }
+}
+
+.content-section {
+  width: 100%;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.test-grid {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(34rem, 1fr));
+  gap: 3rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 40px;
+  background: white;
+  border-radius: 32px;
+  border: 2px dashed var(--slate-300);
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+  .icon {
+    font-size: 8rem;
+    color: var(--slate-300);
+    margin-bottom: 24px;
+  }
+
+  h4 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: var(--slate-800);
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 1.7rem;
+    color: var(--slate-500);
+    margin-bottom: 32px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.btn-primary-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #0f6bdc 0%, #004fb0 100%);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.8rem;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(15, 107, 220, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(15, 107, 220, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}

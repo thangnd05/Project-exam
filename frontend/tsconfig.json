@@ -15,7 +15,7 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "~/*": ["./src/*"]
+      "@/*": ["./*"]
     }
   },
   // Cố tình KHÔNG đưa **/*.js vào: 528 file .js hiện có chạy nguyên qua allowJs mà không bị
