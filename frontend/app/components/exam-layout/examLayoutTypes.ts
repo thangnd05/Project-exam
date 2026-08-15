@@ -41,7 +41,7 @@ export type AnswerChangeHandler = (
   value: string,
 ) => void;
 
-/** Một bước trong chế độ PAGED (từng câu/nhóm kiểu TOEIC), dựng bởi useExamFlowNavigation. */
+/** Một bước trong chế độ PAGED (từng câu/nhóm một), dựng bởi useExamFlowNavigation. */
 export type ExamFlowStep = {
   key: string;
   partId?: string;

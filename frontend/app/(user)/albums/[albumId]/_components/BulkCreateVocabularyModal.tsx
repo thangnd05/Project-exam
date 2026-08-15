@@ -37,7 +37,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
         try {
             const result = await standardizeVocabularies({ rawText: jsonInput });
 
-            let cleanedJson = (result?.data || '')
+            const cleanedJson = (result?.data || '')
                 .replace(/```json\n?|```/g, '')
                 .trim();
 

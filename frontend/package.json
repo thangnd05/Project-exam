@@ -35,7 +35,9 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "browserslist": {
     "production": [
@@ -53,6 +55,8 @@
     "@types/node": "^20.19.43",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.1",
     "sass": "^1.80.6",
     "typescript": "^5.9.3"
   }

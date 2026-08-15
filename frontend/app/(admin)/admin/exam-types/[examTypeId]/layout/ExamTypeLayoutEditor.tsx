@@ -415,7 +415,7 @@ function ExamTypeLayoutEditor() {
                 onChange={(e) => patchQuestionArea({ navigationMode: e.target.value })}
               >
                 <option value="scroll">Cuộn tất cả (mặc định)</option>
-                <option value="paged">Từng câu/nhóm  kiểu TOEIC (nghe tự chuyển, đọc bấm)</option>
+                <option value="paged">Từng câu/nhóm một (nghe tự chuyển, đọc bấm)</option>
               </select>
             </div>
             <div className={cx('field')}>

@@ -50,7 +50,7 @@ export interface LayoutTheme {
 
 export interface LayoutQuestionArea {
   passagePosition?: string;
-  /** 'scroll' = cuộn hết đề, 'paged' = từng câu/nhóm kiểu TOEIC (xem memory paged-presentation-mode) */
+  /** 'scroll' = cuộn hết đề, 'paged' = từng câu/nhóm một (xem memory paged-presentation-mode) */
   navigationMode?: string;
   columns?: number;
   maxWidth?: number | null;

@@ -61,7 +61,7 @@ type ExamLayoutRendererProps = {
   selectedId?: string | null;
   onSelectBlock?: (blockId: string) => void;
 
-  /** Chế độ PAGED: từng câu/nhóm kiểu TOEIC */
+  /** Chế độ PAGED: từng câu/nhóm một */
   isPaged?: boolean;
   flowSteps?: ExamFlowStep[];
   currentStepIndex?: number;

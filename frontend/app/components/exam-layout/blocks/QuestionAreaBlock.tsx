@@ -49,7 +49,7 @@ type QuestionAreaBlockProps = {
   handleAnswerChange: AnswerChangeHandler;
   config?: LayoutQuestionArea;
 
-  /** Chế độ PAGED: hiện từng câu/nhóm kiểu TOEIC (nghe tự chuyển, đọc bấm) */
+  /** Chế độ PAGED: hiện từng câu/nhóm một (nghe tự chuyển, đọc bấm) */
   isPaged?: boolean;
   flowSteps?: ExamFlowStep[];
   currentStepIndex?: number;

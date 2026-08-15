@@ -22,7 +22,7 @@ type TestStartDashboardProps = {
   userAnswers: Record<string, DashboardAnswer | undefined>;
   onScrollToQuestion: (questionId: string) => void;
   columns?: number | null;
-  /** Chế độ PAGED (từng câu/nhóm kiểu TOEIC): câu ngoài bước hiện tại bị khoá. */
+  /** Chế độ PAGED (từng câu/nhóm một): câu ngoài bước hiện tại bị khoá. */
   isPaged?: boolean;
   canNavigateToQuestion?: ((questionId: string) => boolean) | null;
   currentQuestionIds?: Set<string> | null;

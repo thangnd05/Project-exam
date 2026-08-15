@@ -74,7 +74,7 @@ function RecoveryResourceFormModal({
           <Form.Control
             value={formState.title}
             onChange={(e) => onChangeField('title', e.target.value)}
-            placeholder="VD: Mẹo giải bài tập Giới từ TOEIC..."
+            placeholder="VD: Mẹo giải dạng bài hay sai..."
           />
         </Form.Group>
 
