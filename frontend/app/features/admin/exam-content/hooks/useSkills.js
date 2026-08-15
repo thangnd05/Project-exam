@@ -1,7 +1,7 @@
 'use client';
 
 import {createSkill, deleteSkill, getSkills, updateSkill} from '@/app/apis/skillApi';
-import {useAdminCrud} from '@/app/features/admin/hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 
 export const skillKeys = {
   list: () => ['admin-skills'],

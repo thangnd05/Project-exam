@@ -11,7 +11,7 @@ import { Suspense } from 'react';
 
 import { usePathname } from 'next/navigation';
 import AuthGuard from '@/app/components/AuthGuard';
-import AdminLayout from '@/app/features/admin/layouts/AdminLayout';
+import AdminLayout from '@/app/components/layouts/AdminLayout';
 import { findAdminPermission } from '@/app/configs/adminPermissions';
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -15,7 +15,7 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '../components/common';
+} from '@/app/components/admin/common';
 import {
   useCertificateTemplates,
   useIssuedCertificates,

@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 
-import { useAdminCrud } from '@/app/features/admin/hooks/useAdminCrud';
+import { useAdminCrud } from '@/app/hooks/useAdminCrud';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import {
   createCertificateTemplate,

@@ -6,6 +6,17 @@ import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
+type AdminTabItem = {
+  key: string;
+  label: React.ReactNode;
+};
+
+type AdminTabsProps = {
+  items?: AdminTabItem[];
+  activeKey?: string;
+  onSelect?: (key?: string) => void;
+};
+
 /**
  * Tab chuyển khu vực trong một trang quản trị. Bọc Nav của bootstrap để mọi trang dùng
  * chung một kiểu: tab chưa chọn màu chữ phụ, tab đang chọn màu thương hiệu kèm gạch chân
@@ -13,7 +24,7 @@ const cx = classNames.bind(styles);
  *
  * items: [{ key, label }]
  */
-function AdminTabs({items = [], activeKey, onSelect}) {
+function AdminTabs({items = [], activeKey, onSelect}: AdminTabsProps) {
   return (
     <Nav
       variant="tabs"

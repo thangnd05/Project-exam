@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { Flame } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import { AdminCard, AdminFieldError, AdminPageHeader } from '../components/common';
+import { AdminCard, AdminFieldError, AdminPageHeader } from '@/app/components/admin/common';
 import { useStreakRecoverConfig } from '@/app/features/admin/gamification/hooks/useStreakRecoverConfig';
 
 function StreakRecoverManagementPage() {

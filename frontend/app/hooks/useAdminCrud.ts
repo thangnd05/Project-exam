@@ -1,6 +1,6 @@
 'use client';
 
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient, type QueryKey} from '@tanstack/react-query';
 
 /**
  * Khuôn CRUD dùng chung cho các trang admin: 1 query danh sách + create/update/delete,
@@ -9,9 +9,20 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
  * Hook nào có thêm query/mutation riêng thì gọi factory rồi bổ sung, không cần copy khuôn.
  */
 
-const asList = (data) => (Array.isArray(data) ? data : data?.content ?? []);
+// `any` có chủ đích: payload/response của từng trang admin khác nhau hoàn toàn,
+// consumer (hook riêng của từng trang) vẫn là .js nên chưa ràng kiểu chi tiết được.
+type CrudFn = (variables: any) => Promise<any>;
 
-export function useCrudMutations({queryKey, create, update, remove}) {
+const asList = (data: any): any[] => (Array.isArray(data) ? data : data?.content ?? []);
+
+type CrudMutationsOptions = {
+  queryKey: QueryKey;
+  create?: CrudFn;
+  update?: CrudFn;
+  remove?: CrudFn;
+};
+
+export function useCrudMutations({queryKey, create, update, remove}: CrudMutationsOptions) {
   const qc = useQueryClient();
   const invalidate = () => qc.invalidateQueries({queryKey});
 
@@ -22,13 +33,19 @@ export function useCrudMutations({queryKey, create, update, remove}) {
   return {createMutation, updateMutation, deleteMutation, invalidate};
 }
 
-export function useAdminCrud({queryKey, list, create, update, remove, mapItem, select}) {
+type AdminCrudOptions = CrudMutationsOptions & {
+  list: () => Promise<any>;
+  mapItem?: (item: any) => any;
+  select?: (data: any) => any;
+};
+
+export function useAdminCrud({queryKey, list, create, update, remove, mapItem, select}: AdminCrudOptions) {
   const mutations = useCrudMutations({queryKey, create, update, remove});
 
   const listQuery = useQuery({
     queryKey,
     queryFn: list,
-    select: select ?? ((data) => (mapItem ? asList(data).map(mapItem) : asList(data))),
+    select: select ?? ((data: any) => (mapItem ? asList(data).map(mapItem) : asList(data))),
   });
 
   return {

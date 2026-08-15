@@ -5,7 +5,7 @@ import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
-import TrafficHeatmap from '../components/TrafficHeatmap';
+import TrafficHeatmap from '@/app/components/admin/TrafficHeatmap';
 import OverviewCard from './OverviewCard';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import { useDashboardStats, useTrafficHeatmap } from '@/app/features/admin/overview/hooks/useDashboardStats';

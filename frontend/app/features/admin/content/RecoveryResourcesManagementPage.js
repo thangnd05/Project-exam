@@ -8,7 +8,7 @@ import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import RecoveryResourceFormModal from '../modals/RecoveryResourceFormModal';
 import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
 import {isMarkdownResource} from '@/app/utils/recoveryResource';
 import {usePartsByExamType, useRecoveryResources, useTagsByExamType} from '@/app/features/admin/content/hooks/useRecoveryResources';
 import styles from './RecoveryResourcesManagementPage.module.scss';

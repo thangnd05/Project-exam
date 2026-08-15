@@ -15,7 +15,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '../components/common';
+} from '@/app/components/admin/common';
 
 const TYPES = [
   {value: 'FRAME', label: 'Khung avatar'},

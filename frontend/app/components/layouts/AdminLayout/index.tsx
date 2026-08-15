@@ -110,7 +110,11 @@ const adminRouteGroups = [
   },
 ];
 
-function AdminLayout({children}) {
+type AdminLayoutProps = {
+  children?: React.ReactNode;
+};
+
+function AdminLayout({children}: AdminLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
@@ -142,7 +146,7 @@ function AdminLayout({children}) {
     return () => mql.removeEventListener('change', sync);
   }, []);
 
-  const isActive = (path) => pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   return (
     <div className={cx('adminWrapper')}>

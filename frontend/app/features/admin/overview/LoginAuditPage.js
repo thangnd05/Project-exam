@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 
 import {formatDateTime} from '@/app/utils/format-date-time';
-import {AdminPageHeader, AdminTable, AdminToolbar} from '../components/common';
+import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/components/admin/common';
 import {useLoginAudit} from '@/app/features/admin/overview/hooks/useLoginAudit';
 
 function LoginAuditPage() {

@@ -6,7 +6,7 @@ import {
   getCosmetics,
   updateCosmetic,
 } from '@/app/apis/cosmeticApi';
-import {useAdminCrud} from '@/app/features/admin/hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 
 export const cosmeticKeys = {
   list: () => ['admin-cosmetics'],

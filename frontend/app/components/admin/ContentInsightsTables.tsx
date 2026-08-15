@@ -4,10 +4,11 @@ import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 
 import styles from './ContentInsightsTables.module.scss';
+import type { ContentTestStat } from '@/app/types/admin';
 
 const cx = classNames.bind(styles);
 
-const RateBar = ({ value }) => (
+const RateBar = ({ value }: { value: number }) => (
     <div className={cx('rateCell')}>
         <div className={cx('rateTrack')}>
             <div
@@ -19,13 +20,13 @@ const RateBar = ({ value }) => (
     </div>
 );
 
-const EmptyRow = ({ colSpan, message }) => (
+const EmptyRow = ({ colSpan, message }: { colSpan: number; message: string }) => (
     <tr>
         <td colSpan={colSpan} className={cx('empty')}>{message}</td>
     </tr>
 );
 
-export const TopTestsTable = ({ data = [] }) => (
+export const TopTestsTable = ({ data = [] }: { data?: ContentTestStat[] }) => (
     <div className={cx('tableWrap')}>
         <table className={cx('table')}>
             <thead>

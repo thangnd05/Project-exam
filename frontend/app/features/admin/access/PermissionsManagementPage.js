@@ -6,9 +6,9 @@ import {Save, ShieldCheck} from 'lucide-react';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 
-import {AdminFieldError, AdminPageHeader} from '../components/common';
+import {AdminFieldError, AdminPageHeader} from '@/app/components/admin/common';
 import {usePermissionsMatrix} from '@/app/features/admin/access/hooks/usePermissionsMatrix';
-import styles from '../components/common/adminKit.module.scss';
+import styles from '@/app/components/admin/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 

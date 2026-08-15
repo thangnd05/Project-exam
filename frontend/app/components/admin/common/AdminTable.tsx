@@ -9,8 +9,8 @@ import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
-function buildPageItems(current, total) {
-  const items = [];
+function buildPageItems(current: number, total: number): Array<number | '...'> {
+  const items: Array<number | '...'> = [];
   for (let i = 0; i < total; i++) {
     if (i === 0 || i === total - 1 || (i >= current - 1 && i <= current + 1)) {
       items.push(i);
@@ -20,6 +20,38 @@ function buildPageItems(current, total) {
   }
   return items;
 }
+
+// `any` có chủ đích cho bản ghi hàng: mỗi trang admin có kiểu dữ liệu riêng,
+// các trang tiêu thụ vẫn là .js nên chưa ràng generic chi tiết được.
+export type AdminTableColumn = {
+  key: string;
+  header?: React.ReactNode;
+  /* Tên class căn lề trong adminKit (vd 'center') */
+  align?: string;
+  width?: number | string;
+  render?: (row: any, index: number) => React.ReactNode;
+};
+
+type AdminTableProps = {
+  columns?: AdminTableColumn[];
+  data?: any[];
+  loading?: boolean;
+  emptyText?: React.ReactNode;
+  loadingText?: React.ReactNode;
+  getRowKey?: (row: any, index: number) => React.Key;
+  rowActions?: (row: any, index: number) => React.ReactNode;
+  actionsHeader?: React.ReactNode;
+  showIndex?: boolean;
+  indexHeader?: React.ReactNode;
+  paginated?: boolean;
+  pageSize?: number;
+  itemLabel?: string;
+
+  page?: number;
+  totalPages?: number;
+  totalElements?: number;
+  onPageChange?: (page: number) => void;
+};
 
 function AdminTable({
   columns = [],
@@ -40,7 +72,7 @@ function AdminTable({
   totalPages: totalPagesProp,
   totalElements,
   onPageChange,
-}) {
+}: AdminTableProps) {
   const isServer = typeof onPageChange === 'function';
   const hasPager = isServer || paginated;
   const [internalPage, setInternalPage] = useState(0);
@@ -67,12 +99,12 @@ function AdminTable({
     return data.slice(start, start + pageSize);
   }, [paginated, isServer, data, currentPage, pageSize]);
 
-  const goTo = (target) => {
+  const goTo = (target: number) => {
     if (target < 0 || target > totalPages - 1 || target === currentPage) {
       return;
     }
     if (isServer) {
-      onPageChange(target);
+      onPageChange?.(target);
     } else {
       setInternalPage(target);
     }
@@ -98,7 +130,7 @@ function AdminTable({
             {columns.map((col) => (
               <th
                 key={col.key}
-                className={cx({[col.align]: col.align})}
+                className={cx({[col.align as string]: col.align})}
                 style={col.width ? {width: col.width} : undefined}
               >
                 {col.header}
@@ -124,7 +156,7 @@ function AdminTable({
                   <td className={cx('center')}>{indexOffset + index + 1}</td>
                 )}
                 {columns.map((col) => (
-                  <td key={col.key} className={cx({[col.align]: col.align})}>
+                  <td key={col.key} className={cx({[col.align as string]: col.align})}>
                     {col.render ? col.render(row, indexOffset + index) : row[col.key]}
                   </td>
                 ))}

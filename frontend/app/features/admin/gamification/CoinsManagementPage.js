@@ -13,7 +13,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '../components/common';
+} from '@/app/components/admin/common';
 import { useAdminCoins, useCoinUserOptions } from '@/app/features/admin/gamification/hooks/useAdminCoins';
 
 const defaultFormState = {

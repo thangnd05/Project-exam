@@ -12,7 +12,7 @@ import {
   AdminFieldError,
   AdminPageHeader,
   AdminToolbar,
-} from '../components/common';
+} from '@/app/components/admin/common';
 import {useMilestones} from '@/app/features/admin/gamification/hooks/useMilestones';
 import styles from './MilestonesManagementPage.module.scss';
 

@@ -3,12 +3,13 @@
 import classNames from 'classnames/bind';
 
 import styles from './TrafficHeatmap.module.scss';
+import type { DayHours } from '@/app/types/admin';
 
 const cx = classNames.bind(styles);
 
 const HOUR_TICKS = [0, 3, 6, 9, 12, 15, 18, 21];
 
-const TrafficHeatmap = ({ data = [] }) => {
+const TrafficHeatmap = ({ data = [] }: { data?: DayHours[] }) => {
     if (!data.length) {
         return <div className={cx('empty')}>Chưa có dữ liệu truy cập</div>;
     }
@@ -18,7 +19,7 @@ const TrafficHeatmap = ({ data = [] }) => {
         0,
     ) || 1;
 
-    const shade = (v) => {
+    const shade = (v: number) => {
         if (!v) return '#f1f5f9';
         const t = 0.18 + 0.82 * (v / max);
         return `rgba(20, 184, 166, ${t})`;

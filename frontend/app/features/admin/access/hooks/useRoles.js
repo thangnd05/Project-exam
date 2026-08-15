@@ -10,7 +10,7 @@ import {
   updateRolePermissions,
 } from '@/app/apis/roleApi';
 import {getPermissions} from '@/app/apis/permissionApi';
-import {useAdminCrud} from '@/app/features/admin/hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 import {CURRENT_USER_QUERY_KEY} from '@/app/contexts/AuthContext';
 
 export const roleKeys = {

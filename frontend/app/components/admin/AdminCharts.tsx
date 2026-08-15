@@ -22,9 +22,27 @@ import {
     Tooltip,
     Legend,
 } from 'recharts';
+import type { TooltipContentProps } from 'recharts';
 import { brandColors } from '@/app/assets/styles/brandColors';
+import type { MonthPerformance, NameValue } from '@/app/types/admin';
 
-const VIZ = { primary: brandColors.accent, accent: brandColors.unique, muted: '#94a3b8' };
+// `any` có chủ đích: brandColors.js (file JS) dựng object bằng Object.defineProperties
+// (getter động) nên TS suy ra {} — đọc thuộc tính qua any, như ProfileOverview.tsx đã làm.
+const brand: any = brandColors;
+
+// Bản ghi theo ngày cho các chart truy cập/hoạt động (BE trả field nào thì chart đọc field đó).
+type DayTrafficDatum = { day?: string; users?: number; exams?: number; guests?: number };
+// Lượt truy cập theo khung giờ trong ngày.
+type HourDatum = { hour?: string | number; visits?: number };
+// Phân bố điểm theo dải.
+type ScoreRangeDatum = { range?: string; count?: number };
+// Sparkline nhận dataKey động nên bản ghi để Record<string, any> có chủ đích.
+type SparkDatum = Record<string, any>;
+// Tooltip tự vẽ: recharts clone element rồi bơm props lúc runtime, lúc khai báo JSX chưa có
+// nên dùng Partial cho khớp thực tế.
+type ChartTooltipProps = Partial<TooltipContentProps<number, string>>;
+
+const VIZ = { primary: brand.accent, accent: brand.unique, muted: '#94a3b8' };
 
 const STATUS_COLORS = [VIZ.primary, VIZ.accent, VIZ.muted];
 
@@ -43,7 +61,7 @@ const TOOLTIP_STYLE = {
     cursor: { fill: 'rgba(148, 163, 184, 0.1)' },
 };
 
-export const WeeklyActivityArea = ({ data }) => (
+export const WeeklyActivityArea = ({ data }: { data: DayTrafficDatum[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
             <defs>
@@ -85,13 +103,13 @@ export const WeeklyActivityArea = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const MonthlyPerformanceCombo = ({ data }) => (
+export const MonthlyPerformanceCombo = ({ data }: { data: MonthPerformance[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
                 <linearGradient id="acTests" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={VIZ.primary} />
-                    <stop offset="100%" stopColor={brandColors.brand400} />
+                    <stop offset="100%" stopColor={brand.brand400} />
                 </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
@@ -129,7 +147,7 @@ export const MonthlyPerformanceCombo = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const ExamTypeDonut = ({ data }) => (
+export const ExamTypeDonut = ({ data }: { data: NameValue[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <PieChart>
             <Tooltip {...TOOLTIP_STYLE} />
@@ -154,7 +172,7 @@ export const ExamTypeDonut = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const MonthlyNewUsersBar = ({ data }) => (
+export const MonthlyNewUsersBar = ({ data }: { data: MonthPerformance[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
@@ -172,7 +190,7 @@ export const MonthlyNewUsersBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const MonthlyNewUsersLine = ({ data }) => (
+export const MonthlyNewUsersLine = ({ data }: { data: MonthPerformance[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
@@ -199,7 +217,7 @@ export const MonthlyNewUsersLine = ({ data }) => (
     </ResponsiveContainer>
 );
 
-const MonthlyVisitsTooltip = ({ active, payload, label }) => {
+const MonthlyVisitsTooltip = ({ active, payload, label }: ChartTooltipProps) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload ?? {};
     const peak = row.peakHour;
@@ -215,13 +233,13 @@ const MonthlyVisitsTooltip = ({ active, payload, label }) => {
     );
 };
 
-export const MonthlyVisitsBar = ({ data }) => (
+export const MonthlyVisitsBar = ({ data }: { data: MonthPerformance[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
                 <linearGradient id="acVisitsMonth" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={VIZ.primary} />
-                    <stop offset="100%" stopColor={brandColors.brand300} />
+                    <stop offset="100%" stopColor={brand.brand300} />
                 </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
@@ -233,7 +251,7 @@ export const MonthlyVisitsBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-const MonthlyActivityTooltip = ({ active, payload, label }) => {
+const MonthlyActivityTooltip = ({ active, payload, label }: ChartTooltipProps) => {
     if (!active || !payload?.length) return null;
     const row = payload[0].payload ?? {};
     const peak = row.peakHour;
@@ -251,7 +269,7 @@ const MonthlyActivityTooltip = ({ active, payload, label }) => {
     );
 };
 
-export const MonthlyActivityCombo = ({ data }) => (
+export const MonthlyActivityCombo = ({ data }: { data: MonthPerformance[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
@@ -284,7 +302,7 @@ export const MonthlyActivityCombo = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const SkillRadar = ({ data }) => (
+export const SkillRadar = ({ data }: { data: NameValue[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} outerRadius="70%">
             <PolarGrid stroke="rgba(20, 184, 166, 0.18)" />
@@ -303,7 +321,7 @@ export const SkillRadar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const UserGrowthBar = ({ data }) => (
+export const UserGrowthBar = ({ data }: { data: DayTrafficDatum[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
@@ -321,7 +339,12 @@ export const UserGrowthBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const SparkArea = ({ data, dataKey = 'value', color = VIZ.primary, id = 'a' }) => (
+export const SparkArea = ({
+    data,
+    dataKey = 'value',
+    color = VIZ.primary,
+    id = 'a',
+}: { data: SparkDatum[]; dataKey?: string; color?: string; id?: string }) => (
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
             <defs>
@@ -336,7 +359,11 @@ export const SparkArea = ({ data, dataKey = 'value', color = VIZ.primary, id = '
     </ResponsiveContainer>
 );
 
-export const SparkBar = ({ data, dataKey = 'value', color = VIZ.primary }) => (
+export const SparkBar = ({
+    data,
+    dataKey = 'value',
+    color = VIZ.primary,
+}: { data: SparkDatum[]; dataKey?: string; color?: string }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }} barCategoryGap={1}>
             <Bar dataKey={dataKey} fill={color} radius={[2, 2, 0, 0]} isAnimationActive={false} />
@@ -344,7 +371,7 @@ export const SparkBar = ({ data, dataKey = 'value', color = VIZ.primary }) => (
     </ResponsiveContainer>
 );
 
-export const TrafficStackedBar = ({ data }) => (
+export const TrafficStackedBar = ({ data }: { data: DayTrafficDatum[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
@@ -358,7 +385,7 @@ export const TrafficStackedBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const TrafficAreaChart = ({ data }) => (
+export const TrafficAreaChart = ({ data }: { data: DayTrafficDatum[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
             <defs>
@@ -398,7 +425,7 @@ export const TrafficAreaChart = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const TrafficHourBar = ({ data }) => (
+export const TrafficHourBar = ({ data }: { data: HourDatum[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
@@ -416,7 +443,7 @@ export const TrafficHourBar = ({ data }) => (
     </ResponsiveContainer>
 );
 
-export const ScoreDistributionBar = ({ data }) => (
+export const ScoreDistributionBar = ({ data }: { data: ScoreRangeDatum[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>

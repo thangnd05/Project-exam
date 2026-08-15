@@ -6,7 +6,7 @@ import {
   getExamCategories,
   updateExamCategory,
 } from '@/app/apis/examCategoryApi';
-import {useAdminCrud} from '@/app/features/admin/hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 
 export const examCategoryKeys = {
   list: () => ['exam-categories'],

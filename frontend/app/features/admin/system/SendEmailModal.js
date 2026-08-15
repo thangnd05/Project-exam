@@ -6,7 +6,7 @@ import {toast} from 'react-toastify';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
-import {AdminFieldError} from '../components/common';
+import {AdminFieldError} from '@/app/components/admin/common';
 import {useEmailAudience, useEmailMutations} from './hooks/useAdminEmails';
 
 const PREMIUM_FILTERS = [

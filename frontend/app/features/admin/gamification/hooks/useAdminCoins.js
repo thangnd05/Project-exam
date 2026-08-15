@@ -8,7 +8,7 @@ import {
   updateCoinBalance,
 } from '@/app/apis/coinApi';
 import { getUsers } from '@/app/apis/userApi';
-import { useAdminCrud } from '@/app/features/admin/hooks/useAdminCrud';
+import { useAdminCrud } from '@/app/hooks/useAdminCrud';
 
 export const coinKeys = {
   wallets: ['coin-wallets'],

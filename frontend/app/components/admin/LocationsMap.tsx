@@ -7,32 +7,37 @@ import classNames from 'classnames/bind';
 
 import styles from './LocationsMap.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
+import type { CountryTraffic } from '@/app/types/admin';
 
 const cx = classNames.bind(styles);
 
-const norm = (s) =>
+// `any` có chủ đích: brandColors.js (file JS) dựng object bằng Object.defineProperties
+// (getter động) nên TS suy ra {} — đọc thuộc tính qua any, như ProfileOverview.tsx đã làm.
+const brand: any = brandColors;
+
+const norm = (s?: string) =>
     (s || '')
         .toLowerCase()
         .normalize('NFD')
         .replace(/\p{Diacritic}/gu, '')
         .trim();
 
-const ALIAS = {
+const ALIAS: Record<string, string> = {
     'united states': 'united states of america',
     'czechia': 'czech republic',
     'the netherlands': 'netherlands',
 };
-const canon = (name) => ALIAS[norm(name)] || norm(name);
+const canon = (name?: string) => ALIAS[norm(name)] || norm(name);
 
-const isRealCountry = (c) => c.code && c.code !== 'LO' && c.code !== '??';
+const isRealCountry = (c: CountryTraffic) => c.code && c.code !== 'LO' && c.code !== '??';
 
-export const flagLabel = (code) => {
+export const flagLabel = (code?: string) => {
     if (code === 'LO') return '🏠';
     if (!code || code.length !== 2 || code === '??') return '🌐';
     return code.toUpperCase();
 };
 
-export const TopCountriesList = ({ countries = [] }) => {
+export const TopCountriesList = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
 
     const visible = countries.filter((c) => c.code !== 'LO' && c.name !== 'Local');
     const max = visible.reduce((m, c) => Math.max(m, c.value), 0) || 1;
@@ -57,10 +62,10 @@ export const TopCountriesList = ({ countries = [] }) => {
     );
 };
 
-const LocationsMap = ({ countries = [] }) => {
-    const [hover, setHover] = useState(null);
+const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
+    const [hover, setHover] = useState<{ name?: string; v: number } | null>(null);
 
-    const counts = {};
+    const counts: Record<string, number> = {};
     let max = 1;
     countries.filter(isRealCountry).forEach((c) => {
         counts[canon(c.name)] = c.value;
@@ -69,7 +74,7 @@ const LocationsMap = ({ countries = [] }) => {
 
     const hasData = Object.keys(counts).length > 0;
 
-    const fill = (name) => {
+    const fill = (name?: string) => {
         const v = counts[norm(name)];
         if (!v) return '#e9eef5';
         const t = 0.25 + 0.75 * (v / max);
@@ -85,8 +90,9 @@ const LocationsMap = ({ countries = [] }) => {
                 style={{ width: '100%', height: 'auto' }}
             >
                 <Geographies geography={worldGeo}>
-                    {({ geographies }) =>
-                        geographies.map((geo) => {
+                    {/* react-simple-maps không có type — geo/geographies để any có chủ đích */}
+                    {({ geographies }: { geographies: any[] }) =>
+                        geographies.map((geo: any) => {
                             const name = geo.properties.name;
                             const v = counts[norm(name)] || 0;
                             return (
@@ -100,7 +106,7 @@ const LocationsMap = ({ countries = [] }) => {
                                     onMouseLeave={() => setHover(null)}
                                     style={{
                                         default: { outline: 'none' },
-                                        hover: { fill: brandColors.primary, outline: 'none' },
+                                        hover: { fill: brand.primary, outline: 'none' },
                                         pressed: { outline: 'none' },
                                     }}
                                 />

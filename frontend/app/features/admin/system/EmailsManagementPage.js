@@ -14,8 +14,8 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '../components/common';
-import styles from '../components/common/adminKit.module.scss';
+} from '@/app/components/admin/common';
+import styles from '@/app/components/admin/common/adminKit.module.scss';
 import EmailEditorModal from './EmailEditorModal';
 import EmailRecipientsModal from './EmailRecipientsModal';
 import SendEmailModal from './SendEmailModal';

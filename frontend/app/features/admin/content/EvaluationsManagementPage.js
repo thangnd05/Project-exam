@@ -13,7 +13,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '../components/common';
+} from '@/app/components/admin/common';
 import {useEvaluationMutations, useAdminEvaluations} from '@/app/features/admin/content/hooks/useAdminEvaluations';
 
 const emptyForm = {

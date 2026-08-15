@@ -6,7 +6,14 @@ import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
-function AdminCard({children, maxWidth, className, style}) {
+type AdminCardProps = {
+  children?: React.ReactNode;
+  maxWidth?: number | string;
+  className?: string;
+  style?: React.CSSProperties;
+};
+
+function AdminCard({children, maxWidth, className, style}: AdminCardProps) {
   return (
     <div
       className={cx('card') + (className ? ` ${className}` : '')}

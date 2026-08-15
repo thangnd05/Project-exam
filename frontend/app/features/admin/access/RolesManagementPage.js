@@ -13,7 +13,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '../components/common';
+} from '@/app/components/admin/common';
 
 const emptyForm = {
   role_name: '',

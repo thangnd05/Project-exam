@@ -8,7 +8,7 @@ import classNames from 'classnames/bind';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
 import {useAdminQuestionCollections} from '@/app/features/admin/exam-content/hooks/useAdminQuestionCollections';
 import styles from './QuestionCollectionsManagementPage.module.scss';
 

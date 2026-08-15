@@ -10,8 +10,8 @@ import routes from '@/app/configs/Routes';
 import useDebouncedValue from '@/app/hooks/useDebouncedValue';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
-import { AdminPageHeader, AdminTable, AdminToolbar } from '../components/common';
-import styles from '../components/common/adminKit.module.scss';
+import { AdminPageHeader, AdminTable, AdminToolbar } from '@/app/components/admin/common';
+import styles from '@/app/components/admin/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 import { useAdminPosts, useApprovePost, useDeletePost } from '@/app/features/admin/content/hooks/useAdminPosts';

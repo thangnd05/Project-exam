@@ -18,7 +18,7 @@ import 'react-quill/dist/quill.snow.css';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import {AdminFieldError} from '../components/common';
+import {AdminFieldError} from '@/app/components/admin/common';
 import {useEmailMutations} from './hooks/useAdminEmails';
 import styles from './EmailEditorModal.module.scss';
 

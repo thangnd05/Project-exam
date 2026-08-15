@@ -15,8 +15,8 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '../components/common';
-import styles from '../components/common/adminKit.module.scss';
+} from '@/app/components/admin/common';
+import styles from '@/app/components/admin/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 import {useScoringConversion} from '@/app/features/admin/exam-content/hooks/useScoringConversion';

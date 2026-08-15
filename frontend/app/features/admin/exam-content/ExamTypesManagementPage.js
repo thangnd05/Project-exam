@@ -10,7 +10,7 @@ import routes from '@/app/configs/Routes';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamTypeFormModal from '../modals/ExamTypeFormModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '../components/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
 import {useExamTypes} from '@/app/features/admin/exam-content/hooks/useExamTypes';
 
 import styles from './QuestionCollectionsManagementPage.module.scss';

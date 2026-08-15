@@ -11,7 +11,7 @@ import {
   updateExamType,
   updateExamTypeLayout,
 } from '@/app/apis/examTypeApi';
-import {useAdminCrud} from '@/app/features/admin/hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 
 export const examTypeKeys = {
   all: ['exam-types'],

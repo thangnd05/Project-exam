@@ -6,12 +6,19 @@ import AdminSearchInput from './AdminSearchInput';
 
 const cx = classNames.bind(styles);
 
+type AdminToolbarProps = {
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
+  children?: React.ReactNode;
+};
+
 function AdminToolbar({
   searchValue = '',
   onSearchChange,
   searchPlaceholder = 'Tìm kiếm...',
   children,
-}) {
+}: AdminToolbarProps) {
   return (
     <div className={cx('toolbar')}>
       {onSearchChange && (

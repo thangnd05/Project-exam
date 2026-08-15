@@ -17,7 +17,7 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '../components/common';
+} from '@/app/components/admin/common';
 import styles from './UsersManagementPage.module.scss';
 
 const cx = classNames.bind(styles);

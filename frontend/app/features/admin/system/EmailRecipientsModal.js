@@ -6,7 +6,7 @@ import {toast} from 'react-toastify';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import {AdminFieldError, AdminTable, StatCard, StatCardGroup} from '../components/common';
+import {AdminFieldError, AdminTable, StatCard, StatCardGroup} from '@/app/components/admin/common';
 import {useEmailMutations, useEmailRecipients} from './hooks/useAdminEmails';
 
 const PAGE_SIZE = 20;

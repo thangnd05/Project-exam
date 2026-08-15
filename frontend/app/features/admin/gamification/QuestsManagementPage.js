@@ -14,7 +14,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '../components/common';
+} from '@/app/components/admin/common';
 
 const CONDITION_TYPES = [
   {value: 'NONE', label: 'Không cần điều kiện (tặng xu)'},

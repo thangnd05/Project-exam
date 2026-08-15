@@ -6,7 +6,7 @@ import {
     updateCategory,
     deleteCategory,
 } from '@/app/apis/postApi';
-import { useAdminCrud } from '@/app/features/admin/hooks/useAdminCrud';
+import { useAdminCrud } from '@/app/hooks/useAdminCrud';
 
 export const categoriesKeys = {
     all: ['admin-categories'],

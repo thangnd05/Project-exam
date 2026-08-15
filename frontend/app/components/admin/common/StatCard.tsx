@@ -7,11 +7,20 @@ import AdminCard from './AdminCard';
 
 const cx = classNames.bind(styles);
 
-export function StatCardGroup({children}) {
+type StatCardGroupProps = {
+  children?: React.ReactNode;
+};
+
+export function StatCardGroup({children}: StatCardGroupProps) {
   return <div className={cx('statGroup')}>{children}</div>;
 }
 
-export function StatCard({label, value}) {
+type StatCardProps = {
+  label: React.ReactNode;
+  value: React.ReactNode;
+};
+
+export function StatCard({label, value}: StatCardProps) {
   return (
     <AdminCard className={cx('statCard')}>
       <span className={cx('statLabel')}>{label}</span>

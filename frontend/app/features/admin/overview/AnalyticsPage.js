@@ -8,10 +8,10 @@ import {
     MonthlyActivityCombo,
     MonthlyNewUsersLine,
     ExamTypeDonut,
-} from '../components/AdminCharts';
-import { TopTestsTable } from '../components/ContentInsightsTables';
-import LocationsMap, { TopCountriesList } from '../components/LocationsMap';
-import { AdminPageHeader } from '../components/common';
+} from '@/app/components/admin/AdminCharts';
+import { TopTestsTable } from '@/app/components/admin/ContentInsightsTables';
+import LocationsMap, { TopCountriesList } from '@/app/components/admin/LocationsMap';
+import { AdminPageHeader } from '@/app/components/admin/common';
 import OverviewCard from './OverviewCard';
 import {
     useDashboardStats,

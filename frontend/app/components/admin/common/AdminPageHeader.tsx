@@ -2,7 +2,13 @@
 
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 
-function AdminPageHeader({title, description, children}) {
+type AdminPageHeaderProps = {
+  title: string;
+  description?: string;
+  children?: React.ReactNode;
+};
+
+function AdminPageHeader({title, description, children}: AdminPageHeaderProps) {
   return (
     <PageHeader title={title} label={description}>
       {children}

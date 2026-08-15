@@ -9,7 +9,7 @@ import {
   getEvaluations,
   updateEvaluation,
 } from '@/app/apis/evaluationApi';
-import {useCrudMutations} from '@/app/features/admin/hooks/useAdminCrud';
+import {useCrudMutations} from '@/app/hooks/useAdminCrud';
 
 export const evaluationKeys = {
   all: ['evaluations'],

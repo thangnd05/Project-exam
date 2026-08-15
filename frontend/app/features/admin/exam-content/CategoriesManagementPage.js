@@ -11,7 +11,7 @@ import {
     AdminPageHeader,
     AdminToolbar,
     AdminTable,
-} from '../components/common';
+} from '@/app/components/admin/common';
 import { useCategories } from '@/app/features/admin/exam-content/hooks/useCategories';
 
 const CategoriesManagementPage = () => {

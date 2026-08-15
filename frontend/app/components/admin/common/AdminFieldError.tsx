@@ -6,7 +6,11 @@ import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
-function AdminFieldError({message}) {
+type AdminFieldErrorProps = {
+  message?: React.ReactNode;
+};
+
+function AdminFieldError({message}: AdminFieldErrorProps) {
   if (!message) {
     return null;
   }

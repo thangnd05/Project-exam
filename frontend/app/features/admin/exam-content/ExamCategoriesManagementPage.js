@@ -11,7 +11,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '../components/common';
+} from '@/app/components/admin/common';
 import {useExamCategories} from '@/app/features/admin/exam-content/hooks/useExamCategories';
 
 const emptyForm = {
