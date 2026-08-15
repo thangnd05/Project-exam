@@ -2,11 +2,11 @@
 
 import classNames from "classnames/bind";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
-import styles from "./errorPage.module.scss";
+import styles from "./NotFound.module.scss";
 
 const cx = classNames.bind(styles);
 
-export default function NotFoundPage() {
+export default function NotFound() {
     return (
         <div className={cx("wrapper")}>
             <div className={cx("card")}>

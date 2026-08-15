@@ -4,16 +4,25 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Container, Spinner, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { BadgeCheck, Search, ShieldAlert, ShieldX, Clock } from 'lucide-react';
+import { BadgeCheck, Search, ShieldAlert, ShieldX, Clock, type LucideIcon } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import CertificateCanvas from './components/CertificateCanvas';
-import { useCertificateVerification } from './hooks/useCertificates';
-import styles from './CertificateVerifyPage.module.scss';
+import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
+import { useCertificateVerification } from '@/app/hooks/useCertificates';
+import { CertificateVerifyState } from '@/app/enums';
+import styles from './CertificateVerify.module.scss';
 
 const cx = classNames.bind(styles);
 
-const STATE_VIEW = {
+type StateView = {
+  icon: LucideIcon;
+  tone: string;
+  heading: string;
+  message: string;
+  watermark?: string;
+};
+
+const STATE_VIEW: Record<CertificateVerifyState, StateView> = {
   VALID: {
     icon: BadgeCheck,
     tone: 'valid',
@@ -42,14 +51,14 @@ const STATE_VIEW = {
   },
 };
 
-function CertificateVerifyPage() {
-  const { code } = useParams();
+function CertificateVerify() {
+  const { code } = useParams<{ code?: string }>();
   const router = useRouter();
   const [searchCode, setSearchCode] = useState(code || '');
 
   const { data: result, isLoading, isError } = useCertificateVerification(code);
 
-  const handleSearch = (event) => {
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = searchCode.trim();
     if (trimmed) {
@@ -57,12 +66,12 @@ function CertificateVerifyPage() {
     }
   };
 
-  const state = isError ? 'NOT_FOUND' : result?.state;
-  const view = STATE_VIEW[state] || STATE_VIEW.NOT_FOUND;
+  const state = isError ? CertificateVerifyState.NOT_FOUND : result?.state;
+  const view = (state && STATE_VIEW[state]) || STATE_VIEW.NOT_FOUND;
   const StateIcon = view.icon;
   // Tra được thì vẽ lại đúng tấm chứng chỉ như trang xem của chủ sở hữu, kể cả bản
   // đã thu hồi/hết hạn  người tra cứu cần đối chiếu với bản đang cầm trên tay.
-  const showCertificate = Boolean(result) && state !== 'NOT_FOUND';
+  const showCertificate = Boolean(result) && state !== CertificateVerifyState.NOT_FOUND;
 
   return (
     <div className={cx('wrapper')}>
@@ -110,11 +119,11 @@ function CertificateVerifyPage() {
             {showCertificate && (
               <div className={cx('canvasWrap')}>
                 <CertificateCanvas
-                  design={result.design}
-                  recipientName={result.recipientName}
-                  certificateCode={result.certificateCode}
-                  issuedAt={result.issuedAt}
-                  expiresAt={result.expiresAt}
+                  design={result?.design}
+                  recipientName={result?.recipientName}
+                  certificateCode={result?.certificateCode}
+                  issuedAt={result?.issuedAt}
+                  expiresAt={result?.expiresAt}
                   watermark={view.watermark}
                 />
               </div>
@@ -126,4 +135,4 @@ function CertificateVerifyPage() {
   );
 }
 
-export default CertificateVerifyPage;
+export default CertificateVerify;

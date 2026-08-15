@@ -1,4 +1,4 @@
-import CertificateVerifyPage from '@/app/features/certificate/CertificateVerifyPage';
+import CertificateVerify from './CertificateVerify';
 
 export const metadata = {
   title: 'Tra cứu chứng chỉ',
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <CertificateVerifyPage />;
+  return <CertificateVerify />;
 }

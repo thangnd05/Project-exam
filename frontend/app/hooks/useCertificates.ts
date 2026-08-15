@@ -11,9 +11,9 @@ import {
 
 export const certificateKeys = {
   mine: ['certificates', 'mine'],
-  detail: (certificateId) => ['certificates', 'detail', certificateId],
-  verify: (code) => ['certificates', 'verify', code],
-  byAttempt: (userTestId) => ['certificates', 'by-attempt', userTestId],
+  detail: (certificateId?: string) => ['certificates', 'detail', certificateId],
+  verify: (code?: string) => ['certificates', 'verify', code],
+  byAttempt: (userTestId?: string) => ['certificates', 'by-attempt', userTestId],
 };
 
 export function useMyCertificates() {
@@ -24,18 +24,18 @@ export function useMyCertificates() {
   });
 }
 
-export function useCertificateDetail(certificateId) {
+export function useCertificateDetail(certificateId?: string) {
   return useQuery({
     queryKey: certificateKeys.detail(certificateId),
-    queryFn: () => getCertificateById(certificateId),
+    queryFn: () => getCertificateById(certificateId as string),
     enabled: Boolean(certificateId),
   });
 }
 
-export function useCertificateVerification(code) {
+export function useCertificateVerification(code?: string) {
   return useQuery({
     queryKey: certificateKeys.verify(code),
-    queryFn: () => verifyCertificate(code),
+    queryFn: () => verifyCertificate(code as string),
     enabled: Boolean(code),
     retry: false,
   });
@@ -45,10 +45,10 @@ export function useCertificateVerification(code) {
  * Trạng thái chứng chỉ của một lượt làm bài. Chỉ gọi khi đã đăng nhập  khách làm bài
  * không bao giờ được cấp chứng chỉ nên hỏi cũng vô ích.
  */
-export function useAttemptCertificate(userTestId, enabled = true) {
+export function useAttemptCertificate(userTestId?: string, enabled = true) {
   return useQuery({
     queryKey: certificateKeys.byAttempt(userTestId),
-    queryFn: () => getCertificateByAttempt(userTestId),
+    queryFn: () => getCertificateByAttempt(userTestId as string),
     enabled: Boolean(userTestId) && enabled,
     retry: false,
   });

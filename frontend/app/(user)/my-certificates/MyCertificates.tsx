@@ -7,21 +7,22 @@ import { Award, ExternalLink } from 'lucide-react';
 
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import CertificateCanvas from './components/CertificateCanvas';
-import { useMyCertificates } from './hooks/useCertificates';
-import styles from './MyCertificatesPage.module.scss';
+import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
+import { useMyCertificates } from '@/app/hooks/useCertificates';
+import { CertificateStatus } from '@/app/enums';
+import styles from './MyCertificates.module.scss';
 
 const cx = classNames.bind(styles);
 
-const formatDate = (value) =>
+const formatDate = (value?: string) =>
   value ? new Date(value).toLocaleDateString('vi-VN') : '--';
 
-function MyCertificatesPage() {
+function MyCertificates() {
   const router = useRouter();
   const { data: certificates = [], isLoading, isError } = useMyCertificates();
 
   const activeCount = certificates.filter(
-    (c) => c.status === 'ACTIVE' && !c.expired,
+    (c) => c.status === CertificateStatus.ACTIVE && !c.expired,
   ).length;
 
   return (
@@ -65,7 +66,7 @@ function MyCertificatesPage() {
         {!isLoading && certificates.length > 0 && (
           <div className={cx('grid')}>
             {certificates.map((certificate) => {
-              const revoked = certificate.status === 'REVOKED';
+              const revoked = certificate.status === CertificateStatus.REVOKED;
               const expired = certificate.expired;
               return (
                 <article key={certificate.certificateId} className={cx('card')}>
@@ -123,4 +124,4 @@ function MyCertificatesPage() {
   );
 }
 
-export default MyCertificatesPage;
+export default MyCertificates;

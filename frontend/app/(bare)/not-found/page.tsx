@@ -1,5 +1,5 @@
-import NotFoundPage from '@/app/features/error/NotFoundPage';
+import NotFound from '@/app/components/NotFound/NotFound';
 
 export default function Page() {
-  return <NotFoundPage />;
+  return <NotFound />;
 }

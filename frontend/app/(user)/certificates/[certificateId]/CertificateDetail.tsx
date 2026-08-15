@@ -7,14 +7,15 @@ import classNames from 'classnames/bind';
 import { ArrowLeft, Copy, Printer } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import CertificateCanvas from './components/CertificateCanvas';
-import { useCertificateDetail } from './hooks/useCertificates';
-import styles from './CertificateDetailPage.module.scss';
+import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
+import { useCertificateDetail } from '@/app/hooks/useCertificates';
+import { CertificateStatus } from '@/app/enums';
+import styles from './CertificateDetail.module.scss';
 
 const cx = classNames.bind(styles);
 
-function CertificateDetailPage() {
-  const { certificateId } = useParams();
+function CertificateDetail() {
+  const { certificateId } = useParams<{ certificateId: string }>();
   const router = useRouter();
   const { data: certificate, isLoading, isError } = useCertificateDetail(certificateId);
 
@@ -51,7 +52,7 @@ function CertificateDetailPage() {
     );
   }
 
-  const revoked = certificate.status === 'REVOKED';
+  const revoked = certificate.status === CertificateStatus.REVOKED;
   const expired = certificate.expired;
 
   return (
@@ -99,4 +100,4 @@ function CertificateDetailPage() {
   );
 }
 
-export default CertificateDetailPage;
+export default CertificateDetail;

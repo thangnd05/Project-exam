@@ -1,15 +1,15 @@
 'use client';
 
 import classNames from 'classnames/bind';
-import PropTypes from 'prop-types';
 
+import type { CertificateDesign } from '@/app/types';
 import styles from './CertificateCanvas.module.scss';
 
 const cx = classNames.bind(styles);
 
 /* Chữ trên chứng chỉ để tiếng Anh cho giống chứng chỉ quốc tế, nên ngày cũng theo
    kiểu Anh ("15 August 2026") chứ không phải 15/08/2026. */
-const formatDate = (value) => {
+const formatDate = (value?: string) => {
   if (!value) return '--';
   return new Date(value).toLocaleDateString('en-GB', {
     day: '2-digit',
@@ -18,7 +18,17 @@ const formatDate = (value) => {
   });
 };
 
-function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, expiresAt, watermark }) {
+type CertificateCanvasProps = {
+  design?: CertificateDesign;
+  recipientName?: string;
+  certificateCode?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  /** Chữ chìm cảnh báo, ví dụ "ĐÃ THU HỒI" hoặc "XEM TRƯỚC". */
+  watermark?: string;
+};
+
+function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, expiresAt, watermark }: CertificateCanvasProps) {
   const accent = design?.accentColor;
   const issuedYear = issuedAt ? new Date(issuedAt).getFullYear() : null;
   const signatureName = design?.signatureName || design?.issuerName;
@@ -27,7 +37,7 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
     <div
       className={cx('canvas', { hasBackground: Boolean(design?.backgroundUrl) })}
       style={{
-        ...(accent ? { '--certificate-accent': accent } : {}),
+        ...(accent ? ({ '--certificate-accent': accent } as React.CSSProperties) : {}),
         ...(design?.backgroundUrl ? { backgroundImage: `url(${design.backgroundUrl})` } : {}),
       }}
     >
@@ -99,15 +109,5 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
     </div>
   );
 }
-
-CertificateCanvas.propTypes = {
-  design: PropTypes.object,
-  recipientName: PropTypes.string,
-  certificateCode: PropTypes.string,
-  issuedAt: PropTypes.string,
-  expiresAt: PropTypes.string,
-  /** Chữ chìm cảnh báo, ví dụ "ĐÃ THU HỒI" hoặc "XEM TRƯỚC". */
-  watermark: PropTypes.string,
-};
 
 export default CertificateCanvas;

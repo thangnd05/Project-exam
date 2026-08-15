@@ -1,5 +1,5 @@
-import CertificateDetailPage from '@/app/features/certificate/CertificateDetailPage';
+import CertificateDetail from './CertificateDetail';
 
 export default function Page() {
-  return <CertificateDetailPage />;
+  return <CertificateDetail />;
 }

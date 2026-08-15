@@ -4,7 +4,7 @@ import { Form, Row, Col } from 'react-bootstrap';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
-import CertificateCanvas from '@/app/features/certificate/components/CertificateCanvas';
+import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
 
 /**
  * Form mẫu chứng chỉ. Khung xem trước dùng đúng component vẽ chứng chỉ thật nên

@@ -127,7 +127,7 @@ body.recovery-resource-print-page #recovery-resource-print-root {
     width: 100%;
   }
 }
-/* ─── từ features/certificate/CertificateDetailPage.module.scss ─── */
+/* ─── từ (user)/certificates/[certificateId]/CertificateDetail.module.scss ─── */
 @media print {
 body {
     background: var(--white);

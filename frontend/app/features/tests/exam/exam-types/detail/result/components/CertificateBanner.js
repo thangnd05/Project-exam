@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import { Award, Target } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import { useAttemptCertificate } from '@/app/features/certificate/hooks/useCertificates';
+import { useAttemptCertificate } from '@/app/hooks/useCertificates';
 import styles from './CertificateBanner.module.scss';
 
 const cx = classNames.bind(styles);

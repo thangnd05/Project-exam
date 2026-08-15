@@ -1,5 +1,5 @@
-import CertificateVerifyPage from '@/app/features/certificate/CertificateVerifyPage';
+import CertificateVerify from '../CertificateVerify';
 
 export default function Page() {
-  return <CertificateVerifyPage />;
+  return <CertificateVerify />;
 }
