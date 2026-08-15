@@ -20,8 +20,11 @@ OG, sitemap và robots, **phải đổi sang domain thật khi deploy**.
 
 ## Cấu trúc
 
+> Cấu trúc thư mục đầy đủ (sau đợt tái cấu trúc theo chuẩn edusoft-lms) nằm ở
+> [ARCHITECTURE.md](ARCHITECTURE.md). Phần dưới chỉ liệt kê các nhóm route.
+
 ```
-src/app/
+app/
   layout.tsx              <html lang="vi">, metadata/OG mặc định, nạp CSS global
   providers.tsx           'use client' — QueryClient, Auth, Streak, Coin, Cosmetic, Toast
   not-found.tsx           404 thật của Next
@@ -39,7 +42,8 @@ chung một layout/lớp bảo vệ. Nhờ vậy `/admin/dashboard` (nhóm `(adm
 `/admin/create-test-from-bank` (nhóm `(user)`, chỉ cần đăng nhập) cùng nằm dưới `/admin` mà vẫn
 áp hai lớp bảo vệ khác nhau — điều mà bảng route phẳng cũ không diễn đạt nổi.
 
-`src/spa/` (App.js + routes/) đã xoá.
+`src/spa/` (App.js + routes/) đã xoá. Bản thân thư mục `src/` cũng không còn — xem
+[ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Bảng đối chiếu API
 
@@ -51,8 +55,8 @@ chung một layout/lớp bảo vệ. Nhờ vậy `/admin/dashboard` (nhóm `(adm
 | `useLocation().pathname` | `usePathname()` |
 | `<Link to=>` / `<NavLink>` | `<Link href=>` (`next/link`), trạng thái active tự so `usePathname()` |
 | `<Navigate to replace/>` | `router.replace()` trong `useEffect` |
-| `useSearchParams()` (đọc + ghi) | `useSearchParams()` chỉ đọc → dùng `~/shared/hooks/useSearchParamsState` |
-| `<ProtectedRoute>` | `~/shared/ui/AuthGuard` đặt trong layout của nhóm |
+| `useSearchParams()` (đọc + ghi) | `useSearchParams()` chỉ đọc → dùng `@/app/hooks/useSearchParamsState` |
+| `<ProtectedRoute>` | `@/app/components/AuthGuard` đặt trong layout của nhóm |
 
 **`location.state` không có bản tương đương** — Next không mang state qua điều hướng. 5 chỗ đang
 dùng đã chuyển sang query string, giao ước mới:
@@ -80,7 +84,7 @@ Vite chỉ chạy code trong trình duyệt; Next render trước ở server nê
   thật sẽ trượt ⇒ mất lớp kiểm quyền. Đã thêm `findAdminPermission()` so khớp theo mẫu.
 - **`useSearchParams()` phải nằm trong `<Suspense>`** — mỗi layout nhóm đều có sẵn.
 
-61 file component cũ được đánh dấu `'use client'`. Đó là điều bình thường với một SPA chuyển sang
+Phần lớn component được đánh dấu `'use client'`. Đó là điều bình thường với một SPA chuyển sang
 Next: chúng chạy ở client như trước, chỉ có `page.tsx`/`layout.tsx` là server component — vừa đủ
 để khai `metadata`.
 
@@ -94,8 +98,14 @@ Next: chúng chạy ở client như trước, chỉ có `page.tsx`/`layout.tsx` 
 
 ## TypeScript
 
-`allowJs: true`, `tsconfig.json` cố ý **không** include `**/*.js` — 528 file cũ chạy nguyên, không
-bị type-check. File mới viết `.tsx`/`.ts` là được check ngay. Toàn bộ `src/app/**` đã là `.tsx`.
+**Toàn bộ FE đã là TypeScript** — không còn file `.js` nào trong `app/`. Kiểu dữ liệu API lấy từ
+`app/types/` (mirror DTO backend) và `app/enums/`, mọi hàm trong `app/apis/` khai `Promise<T>`
+tường minh. `allowJs` vẫn bật nhưng không còn tác dụng thực tế.
+
+Việc chuyển kiểu đã làm lộ và vá **7 lỗi có sẵn** mà JavaScript nuốt im: thiếu `import routes`
+ở trang đăng nhập, thiếu `import useSearchParamsState` ở 2 trang, và 4 chỗ còn destructure
+`const [searchParams] = useSearchParams()` theo kiểu react-router (Next trả thẳng object nên
+`.get()` không chạy — trang reset mật khẩu không đọc được token).
 
 ## Việc còn lại
 
@@ -112,6 +122,9 @@ HTML của trang riêng tư vẫn được gửi về trước rồi mới chuy�
 đúng chuẩn Next, nhưng chưa tận dụng được điểm mạnh nhất của App Router. Bắt đầu từ trang danh
 sách bài viết và trang chủ.
 
-**Vặt:** `next/image` thay `<img>`; `loading.tsx` cho từng nhóm route; dọn override Bootstrap
-trong `shared/styles/global-overrides.scss`; `REORG-PLAN.md` còn nhắc `index.html`/`vite.config`
-đã bị xoá.
+**Ưu tiên 4 — nâng Next 16 + React 19** cho khớp `edusoft-lms`. Chặn đường: `react-quill@2` dùng
+`findDOMNode` (đã bị xoá ở React 19) — phải thay bằng wrapper viết trên `quill@2` (đã có sẵn
+trong dependencies) ở CreatePostModal và EmailEditorModal trước.
+
+**Vặt:** `next/image` thay `<img>`; `generateMetadata` cho các trang chi tiết còn thiếu; dọn
+override Bootstrap trong `app/assets/styles/global-overrides.scss`.

@@ -1,3 +1,10 @@
+> **TÀI LIỆU ĐÃ HẾT HIỆU LỰC — giữ lại để tra lịch sử.**
+>
+> Kế hoạch dưới đây (chia `features/` + `shared/`, co-locate API theo feature) đã được thực hiện
+> rồi **bị thay thế hoàn toàn** bằng cấu trúc route-colocated theo chuẩn `edusoft-lms`: không còn
+> `src/`, không còn `features/`, code của mỗi màn hình nằm ngay cạnh route của nó.
+> Cấu trúc đang dùng: [ARCHITECTURE.md](ARCHITECTURE.md).
+
 # Quy hoạch tái cấu trúc FE  sang `features/` + `shared/` (co-locate API)
 
 > Kế thừa tinh thần [ARCHITECTURE.md](ARCHITECTURE.md) (feature-slice) nhưng đẩy lên

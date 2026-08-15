@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
+import Loading from '@/app/components/Loading/Loading';
 
 // Khu quản trị. Quyền khác nhau theo từng trang nên không khai cứng được ở đây —
 // tra theo pathname trong bảng adminPermissionByPath, đúng như bản react-router cũ làm.
@@ -20,15 +21,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthGuard requiredPermission={permission}>
-      <AdminLayout><Suspense
-      fallback={
-        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
-          Đang tải...
-        </div>
-      }
-    >
-      {children}
-    </Suspense></AdminLayout>
+      <AdminLayout>
+        <Suspense fallback={<Loading />}>{children}</Suspense>
+      </AdminLayout>
     </AuthGuard>
   );
 }
