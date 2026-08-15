@@ -364,7 +364,8 @@ export function useTestSession() {
     }
   };
 
-  const handleSubmitRef = useRef<() => Promise<void>>();
+  // React 19 buộc useRef phải có giá trị khởi tạo tường minh.
+  const handleSubmitRef = useRef<(() => Promise<void>) | undefined>(undefined);
   handleSubmitRef.current = handleSubmit;
 
   const deadline = useMemo(() => {

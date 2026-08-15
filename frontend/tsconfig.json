@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -11,16 +15,29 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
-  // Cố tình KHÔNG đưa **/*.js vào: 528 file .js hiện có chạy nguyên qua allowJs mà không bị
-  // type-check (đỡ hàng nghìn lỗi implicit any). Viết file MỚI bằng .tsx/.ts là được check ngay;
-  // file cũ đổi đuôi dần khi nào đụng tới.
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  // Toàn bộ FE đã là TypeScript (0 file .js), nên include chỉ cần .ts/.tsx.
+  // `allowJs` giữ lại phòng khi thêm file .js của bên thứ ba, hiện không có tác dụng thực tế.
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

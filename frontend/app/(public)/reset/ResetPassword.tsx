@@ -70,7 +70,7 @@ function ResetPassWord() {
             onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
               (e.target as HTMLInputElement).setCustomValidity('Vui lòng nhập token!');
             }}
-            onInput={(e: React.FormEvent<HTMLInputElement>) => (e.target as HTMLInputElement).setCustomValidity('')}
+            onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </Form.Group>
 
@@ -85,7 +85,7 @@ function ResetPassWord() {
             onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
               (e.target as HTMLInputElement).setCustomValidity('Vui lòng nhập mật khẩu mới!');
             }}
-            onInput={(e: React.FormEvent<HTMLInputElement>) => (e.target as HTMLInputElement).setCustomValidity('')}
+            onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </Form.Group>
 
@@ -100,7 +100,7 @@ function ResetPassWord() {
             onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
               (e.target as HTMLInputElement).setCustomValidity('Xác nhận mật khẩu mới!');
             }}
-            onInput={(e: React.FormEvent<HTMLInputElement>) => (e.target as HTMLInputElement).setCustomValidity('')}
+            onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </Form.Group>
 

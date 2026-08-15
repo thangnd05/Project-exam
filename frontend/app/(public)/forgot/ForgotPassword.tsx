@@ -63,7 +63,7 @@ function ForgotPassword() {
             onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
               (e.target as HTMLInputElement).setCustomValidity('Vui lòng nhập email!');
             }}
-            onInput={(e: React.FormEvent<HTMLInputElement>) => (e.target as HTMLInputElement).setCustomValidity('')}
+            onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </Form.Group>
 
