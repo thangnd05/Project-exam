@@ -7,7 +7,15 @@ import styles from './OverviewCard.module.scss';
 
 const cx = classNames.bind(styles);
 
-const OverviewCard = ({ label, value, period, sub, delay = 0 }) => (
+type OverviewCardProps = {
+    label: React.ReactNode;
+    value: React.ReactNode;
+    period?: React.ReactNode;
+    sub?: React.ReactNode;
+    delay?: number;
+};
+
+const OverviewCard = ({ label, value, period, sub, delay = 0 }: OverviewCardProps) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

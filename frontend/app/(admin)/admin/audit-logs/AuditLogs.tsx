@@ -5,9 +5,10 @@ import {Badge, Form} from 'react-bootstrap';
 
 import {formatDateTime} from '@/app/utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/components/admin/common';
-import {useAuditLogs} from '@/app/features/admin/overview/hooks/useAuditLogs';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import {useAuditLogs, type AuditLogRow} from './_hooks/useAuditLogs';
 
-const methodColorMap = {
+const methodColorMap: Record<string, string> = {
   GET: 'info',
   POST: 'primary',
   PUT: 'warning',
@@ -15,7 +16,7 @@ const methodColorMap = {
   DELETE: 'danger',
 };
 
-function AuditLogsPage() {
+function AuditLogs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -50,17 +51,17 @@ function AuditLogsPage() {
     });
   }, [auditLogs, searchTerm, statusFilter]);
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'created_at',
       header: 'Thời gian',
-      render: (log) => formatDateTime(log.created_at),
+      render: (log: AuditLogRow) => formatDateTime(log.created_at),
     },
     {key: 'action', header: 'Hành động'},
     {
       key: 'endpoint',
       header: 'API',
-      render: (log) => (
+      render: (log: AuditLogRow) => (
         <div className="d-flex align-items-center gap-2">
           <Badge bg={methodColorMap[log.http_method] || 'secondary'}>
             {log.http_method}
@@ -72,7 +73,7 @@ function AuditLogsPage() {
     {
       key: 'details',
       header: 'Nội dung thay đổi',
-      render: (log) =>
+      render: (log: AuditLogRow) =>
         log.details ? (
           <span title={log.details} style={{whiteSpace: 'pre-wrap', wordBreak: 'break-word'}}>
             {log.details}
@@ -84,13 +85,13 @@ function AuditLogsPage() {
     {
       key: 'full_name',
       header: 'Người thực hiện',
-      render: (log) => log.full_name || log.user_name || 'Unknown',
+      render: (log: AuditLogRow) => log.full_name || log.user_name || 'Unknown',
     },
-    {key: 'ip_address', header: 'IP', render: (log) => log.ip_address || '-'},
+    {key: 'ip_address', header: 'IP', render: (log: AuditLogRow) => log.ip_address || '-'},
     {
       key: 'success',
       header: 'Trạng thái',
-      render: (log) => (
+      render: (log: AuditLogRow) => (
         <Badge bg={log.success ? 'success' : 'danger'}>
           {log.success ? 'Thanh cong' : 'That bai'}
         </Badge>
@@ -126,7 +127,7 @@ function AuditLogsPage() {
         columns={columns}
         data={filteredLogs}
         loading={loading}
-        getRowKey={(log) => log.audit_log_id}
+        getRowKey={(log: AuditLogRow) => log.audit_log_id}
         page={currentPage - 1}
         totalPages={totalPages}
         totalElements={totalElements}
@@ -138,4 +139,4 @@ function AuditLogsPage() {
   );
 }
 
-export default AuditLogsPage;
+export default AuditLogs;

@@ -6,20 +6,20 @@ import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 import TrafficHeatmap from '@/app/components/admin/TrafficHeatmap';
-import OverviewCard from './OverviewCard';
+import OverviewCard from '@/app/components/admin/OverviewCard';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
-import { useDashboardStats, useTrafficHeatmap } from '@/app/features/admin/overview/hooks/useDashboardStats';
+import { useDashboardStats, useTrafficHeatmap } from '@/app/hooks/useDashboardStats';
 
-const localISODate = (d = new Date()) => {
+const localISODate = (d: Date = new Date()) => {
     const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
     return local.toISOString().slice(0, 10);
 };
 
-import styles from './AdminDashboardPage.module.scss';
+import styles from './AdminDashboard.module.scss';
 
 const cx = classNames.bind(styles);
 
-const TrafficHeatmapCard = ({ delay }) => {
+const TrafficHeatmapCard = ({ delay }: { delay: number }) => {
     const today = localISODate();
     const [endDate, setEndDate] = useState(today);
     const { heatmap = [] } = useTrafficHeatmap(endDate);
@@ -46,7 +46,7 @@ const TrafficHeatmapCard = ({ delay }) => {
     );
 };
 
-const AdminDashboardPage = () => {
+const AdminDashboard = () => {
     const { stats, traffic, isLoading, isError } = useDashboardStats();
 
     return (
@@ -123,4 +123,4 @@ const AdminDashboardPage = () => {
     );
 };
 
-export default AdminDashboardPage;
+export default AdminDashboard;

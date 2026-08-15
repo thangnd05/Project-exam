@@ -12,19 +12,28 @@ import {
 import { TopTestsTable } from '@/app/components/admin/ContentInsightsTables';
 import LocationsMap, { TopCountriesList } from '@/app/components/admin/LocationsMap';
 import { AdminPageHeader } from '@/app/components/admin/common';
-import OverviewCard from './OverviewCard';
+import OverviewCard from '@/app/components/admin/OverviewCard';
 import {
     useDashboardStats,
     useMonthlyPerformance,
     useContentInsights,
     useTrafficLocations,
-} from '@/app/features/admin/overview/hooks/useDashboardStats';
+} from '@/app/hooks/useDashboardStats';
 
-import styles from './AnalyticsPage.module.scss';
+import styles from './Analytics.module.scss';
 
 const cx = classNames.bind(styles);
 
-const ChartCard = ({ icon, title, height, delay, action, children }) => (
+type ChartCardProps = {
+    icon?: React.ReactNode;
+    title: React.ReactNode;
+    height?: number | string;
+    delay?: number;
+    action?: React.ReactNode;
+    children?: React.ReactNode;
+};
+
+const ChartCard = ({ icon, title, height, delay, action, children }: ChartCardProps) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -39,7 +48,7 @@ const ChartCard = ({ icon, title, height, delay, action, children }) => (
     </motion.div>
 );
 
-const monthLabel = (month) => {
+const monthLabel = (month: string) => {
     const [y, m] = (month || '').split('-');
     return y && m ? `Tháng ${Number(m)}/${y}` : month;
 };
@@ -49,7 +58,7 @@ const currentMonthKey = () => {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 };
 
-const AnalyticsPage = () => {
+const Analytics = () => {
     const { stats, statusDistribution, isLoading, isError } = useDashboardStats();
 
     const currentYear = new Date().getFullYear();
@@ -214,4 +223,4 @@ const AnalyticsPage = () => {
     );
 };
 
-export default AnalyticsPage;
+export default Analytics;

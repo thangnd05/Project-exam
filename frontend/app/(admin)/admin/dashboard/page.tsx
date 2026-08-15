@@ -1,5 +1,5 @@
-import AdminDashboardPage from '@/app/features/admin/overview/AdminDashboardPage';
+import AdminDashboard from './AdminDashboard';
 
 export default function Page() {
-  return <AdminDashboardPage />;
+  return <AdminDashboard />;
 }

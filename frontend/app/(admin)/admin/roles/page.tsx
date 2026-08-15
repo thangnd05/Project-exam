@@ -1,5 +1,5 @@
-import RolesManagementPage from '@/app/features/admin/access/RolesManagementPage';
+import RolesManagement from './RolesManagement';
 
 export default function Page() {
-  return <RolesManagementPage />;
+  return <RolesManagement />;
 }

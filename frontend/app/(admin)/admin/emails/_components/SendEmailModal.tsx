@@ -7,7 +7,8 @@ import {toast} from 'react-toastify';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import {AdminFieldError} from '@/app/components/admin/common';
-import {useEmailAudience, useEmailMutations} from './hooks/useAdminEmails';
+import type {EmailResponse} from '@/app/types';
+import {useEmailAudience, useEmailMutations} from '../_hooks/useAdminEmails';
 
 const PREMIUM_FILTERS = [
   {value: 'ALL', label: 'Tất cả'},
@@ -15,15 +16,21 @@ const PREMIUM_FILTERS = [
   {value: 'NORMAL', label: 'Thường'},
 ];
 
+type SendEmailModalProps = {
+  show: boolean;
+  email: EmailResponse | null;
+  onClose: () => void;
+};
+
 /**
  * Chọn người nhận rồi gửi. Backend chỉ nhận danh sách userId  mọi cách lọc (vai trò,
  * premium, từ khóa) làm ngay tại đây nên thêm tiêu chí lọc mới không phải đụng backend.
  */
-function SendEmailModal({show, email, onClose}) {
+function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
   const [keyword, setKeyword] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [premiumFilter, setPremiumFilter] = useState('ALL');
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -72,7 +79,7 @@ function SendEmailModal({show, email, onClose}) {
   const allFilteredSelected =
     filteredUsers.length > 0 && filteredUsers.every((user) => selectedSet.has(user.userId));
 
-  const toggleUser = (userId) => {
+  const toggleUser = (userId: string) => {
     setSelectedIds((previous) =>
       previous.includes(userId)
         ? previous.filter((id) => id !== userId)
@@ -98,11 +105,11 @@ function SendEmailModal({show, email, onClose}) {
     }
     setSubmitting(true);
     try {
-      await sendEmail({emailId: email.emailId, userIds: selectedIds});
+      await sendEmail({emailId: email!.emailId, userIds: selectedIds});
       toast.success(`Đã đưa ${selectedIds.length} email vào hàng gửi.`);
       onClose();
     } catch (error) {
-      setErrorMessage(error?.response?.data?.message || 'Không gửi được email.');
+      setErrorMessage((error as any)?.response?.data?.message || 'Không gửi được email.');
     } finally {
       setSubmitting(false);
     }

@@ -1,5 +1,5 @@
-import LoginAuditPage from '@/app/features/admin/overview/LoginAuditPage';
+import LoginAudit from './LoginAudit';
 
 export default function Page() {
-  return <LoginAuditPage />;
+  return <LoginAudit />;
 }

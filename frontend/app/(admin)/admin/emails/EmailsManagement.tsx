@@ -15,11 +15,13 @@ import {
   StatCard,
   StatCardGroup,
 } from '@/app/components/admin/common';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import type {EmailResponse} from '@/app/types';
 import styles from '@/app/components/admin/common/adminKit.module.scss';
-import EmailEditorModal from './EmailEditorModal';
-import EmailRecipientsModal from './EmailRecipientsModal';
-import SendEmailModal from './SendEmailModal';
-import {useAutoEmails, useEmailMutations, useManualEmails} from './hooks/useAdminEmails';
+import EmailEditorModal from './_components/EmailEditorModal';
+import EmailRecipientsModal from './_components/EmailRecipientsModal';
+import SendEmailModal from './_components/SendEmailModal';
+import {useAutoEmails, useEmailMutations, useManualEmails} from './_hooks/useAdminEmails';
 
 const cx = classNames.bind(styles);
 
@@ -30,16 +32,16 @@ const TABS = [
   {key: 'manual', label: 'Soạn & gửi'},
 ];
 
-function EmailsManagementPage() {
+function EmailsManagement() {
   const [activeTab, setActiveTab] = useState('auto');
   const [keyword, setKeyword] = useState('');
   const [manualPage, setManualPage] = useState(0);
 
-  const [editingEmail, setEditingEmail] = useState(null);
+  const [editingEmail, setEditingEmail] = useState<EmailResponse | null>(null);
   const [showEditor, setShowEditor] = useState(false);
-  const [sendingEmail, setSendingEmail] = useState(null);
-  const [logEmailId, setLogEmailId] = useState(null);
-  const [deletingEmail, setDeletingEmail] = useState(null);
+  const [sendingEmail, setSendingEmail] = useState<EmailResponse | null>(null);
+  const [logEmailId, setLogEmailId] = useState<string | null>(null);
+  const [deletingEmail, setDeletingEmail] = useState<EmailResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
   const {emails: autoEmails, isLoading: autoLoading} = useAutoEmails();
@@ -78,7 +80,7 @@ function EmailsManagementPage() {
     );
   }, [manualData.content]);
 
-  const openEditor = (email) => {
+  const openEditor = (email: EmailResponse | null) => {
     setEditingEmail(email);
     setShowEditor(true);
   };
@@ -91,20 +93,20 @@ function EmailsManagementPage() {
   const handleDelete = async () => {
     setErrorMessage('');
     try {
-      await removeEmail(deletingEmail.emailId);
+      await removeEmail(deletingEmail!.emailId);
       toast.success('Đã xóa email.');
       setDeletingEmail(null);
     } catch (error) {
-      setErrorMessage(error?.response?.data?.message || 'Không xóa được email.');
+      setErrorMessage((error as any)?.response?.data?.message || 'Không xóa được email.');
     }
   };
 
-  const formatDate = (value) => (value ? new Date(value).toLocaleString('vi-VN') : '—');
+  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString('vi-VN') : '—');
 
-  const statusColumn = {
+  const statusColumn: AdminTableColumn = {
     key: 'active',
     header: 'Trạng thái',
-    render: (email) =>
+    render: (email: EmailResponse) =>
       email.active ? (
         <span className="badge bg-success">Đang bật</span>
       ) : (
@@ -112,12 +114,12 @@ function EmailsManagementPage() {
       ),
   };
 
-  const sendCountColumns = [
-    {key: 'sentCount', header: 'Đã gửi', render: (email) => email.sentCount},
+  const sendCountColumns: AdminTableColumn[] = [
+    {key: 'sentCount', header: 'Đã gửi', render: (email: EmailResponse) => email.sentCount},
     {
       key: 'failedCount',
       header: 'Lỗi',
-      render: (email) =>
+      render: (email: EmailResponse) =>
         email.failedCount > 0 ? (
           <span className="text-danger fw-semibold">{email.failedCount}</span>
         ) : (
@@ -126,11 +128,11 @@ function EmailsManagementPage() {
     },
   ];
 
-  const autoColumns = [
+  const autoColumns: AdminTableColumn[] = [
     {
       key: 'name',
       header: 'Mẫu email',
-      render: (email) => (
+      render: (email: EmailResponse) => (
         <div className="d-flex flex-column">
           <span className="fw-semibold">{email.name}</span>
           <span className="text-muted small">{email.description}</span>
@@ -138,31 +140,31 @@ function EmailsManagementPage() {
         </div>
       ),
     },
-    {key: 'subject', header: 'Tiêu đề', render: (email) => email.subject},
+    {key: 'subject', header: 'Tiêu đề', render: (email: EmailResponse) => email.subject},
     statusColumn,
     ...sendCountColumns,
   ];
 
-  const manualColumns = [
+  const manualColumns: AdminTableColumn[] = [
     {
       key: 'name',
       header: 'Email',
-      render: (email) => (
+      render: (email: EmailResponse) => (
         <div className="d-flex flex-column">
           <span className="fw-semibold">{email.name || email.subject}</span>
           <span className="text-muted small">{email.subject}</span>
         </div>
       ),
     },
-    {key: 'totalCount', header: 'Người nhận', render: (email) => email.totalCount},
+    {key: 'totalCount', header: 'Người nhận', render: (email: EmailResponse) => email.totalCount},
     ...sendCountColumns,
     {
       key: 'pendingCount',
       header: 'Đang chờ',
-      render: (email) => email.pendingCount,
+      render: (email: EmailResponse) => email.pendingCount,
     },
     statusColumn,
-    {key: 'createdAt', header: 'Ngày tạo', render: (email) => formatDate(email.createdAt)},
+    {key: 'createdAt', header: 'Ngày tạo', render: (email: EmailResponse) => formatDate(email.createdAt)},
   ];
 
   const isAutoTab = activeTab === 'auto';
@@ -220,9 +222,9 @@ function EmailsManagementPage() {
           columns={autoColumns}
           data={filteredAuto}
           loading={autoLoading}
-          getRowKey={(email) => email.emailId}
+          getRowKey={(email: EmailResponse) => email.emailId}
           emptyText="Chưa có mẫu email nào."
-          rowActions={(email) => (
+          rowActions={(email: EmailResponse) => (
             <>
               <button title="Sửa nội dung" onClick={() => openEditor(email)}>
                 <Edit size={14} />
@@ -239,14 +241,14 @@ function EmailsManagementPage() {
           columns={manualColumns}
           data={manualData.content}
           loading={manualLoading}
-          getRowKey={(email) => email.emailId}
+          getRowKey={(email: EmailResponse) => email.emailId}
           emptyText="Chưa có email nào được soạn."
           itemLabel="email"
           page={manualData.currentPage}
           totalPages={manualData.totalPages}
           totalElements={manualData.totalElements}
           onPageChange={setManualPage}
-          rowActions={(email) => (
+          rowActions={(email: EmailResponse) => (
             <>
               <button title="Sửa nội dung" onClick={() => openEditor(email)}>
                 <Edit size={14} />
@@ -290,4 +292,4 @@ function EmailsManagementPage() {
   );
 }
 
-export default EmailsManagementPage;
+export default EmailsManagement;

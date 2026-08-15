@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import {Edit, Plus, ShieldCheck, Trash2} from 'lucide-react';
 
-import {useRoles} from '@/app/features/admin/access/hooks/useRoles';
+import {useRoles, type AdminRoleRow} from './_hooks/useRoles';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -14,23 +14,30 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/components/admin/common';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import type {PermissionResponse} from '@/app/types';
 
-const emptyForm = {
+type RoleFormState = {
+  role_name: string;
+  description: string;
+};
+
+const emptyForm: RoleFormState = {
   role_name: '',
   description: '',
 };
 
-function RolesManagementPage() {
+function RolesManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingRoleId, setEditingRoleId] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
+  const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<RoleFormState>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deletingRole, setDeletingRole] = useState(null);
+  const [deletingRole, setDeletingRole] = useState<AdminRoleRow | null>(null);
 
-  const [permRole, setPermRole] = useState(null);
-  const [permSelected, setPermSelected] = useState(() => new Set());
+  const [permRole, setPermRole] = useState<AdminRoleRow | null>(null);
+  const [permSelected, setPermSelected] = useState<Set<string>>(() => new Set());
   const [permSaving, setPermSaving] = useState(false);
 
   const {
@@ -44,23 +51,23 @@ function RolesManagementPage() {
   } = useRoles();
 
   const permissionGroups = useMemo(() => {
-    const groups = new Map();
+    const groups = new Map<string, PermissionResponse[]>();
     permissionCatalog.forEach((permission) => {
       const groupName = permission.groupName || 'Khác';
       if (!groups.has(groupName)) {
         groups.set(groupName, []);
       }
-      groups.get(groupName).push(permission);
+      groups.get(groupName)!.push(permission);
     });
     return Array.from(groups.entries());
   }, [permissionCatalog]);
 
-  const openPermissionModal = (role) => {
+  const openPermissionModal = (role: AdminRoleRow) => {
     setPermRole(role);
     setPermSelected(new Set(role.permissions || []));
   };
 
-  const togglePermission = (code) => {
+  const togglePermission = (code: string) => {
     setPermSelected((previous) => {
       const next = new Set(previous);
       if (next.has(code)) {
@@ -72,7 +79,7 @@ function RolesManagementPage() {
     });
   };
 
-  const toggleGroup = (codes, allChecked) => {
+  const toggleGroup = (codes: string[], allChecked: boolean) => {
     setPermSelected((previous) => {
       const next = new Set(previous);
       codes.forEach((code) => (allChecked ? next.delete(code) : next.add(code)));
@@ -123,7 +130,7 @@ function RolesManagementPage() {
     setShowFormModal(true);
   };
 
-  const openEditModal = (role) => {
+  const openEditModal = (role: AdminRoleRow) => {
     setEditingRoleId(role.role_id);
     setFormState({
       role_name: role.role_name,
@@ -179,17 +186,17 @@ function RolesManagementPage() {
     }
   };
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'role_name',
       header: 'Tên vai trò',
-      render: (role) => <Badge bg="primary">{role.role_name}</Badge>,
+      render: (role: AdminRoleRow) => <Badge bg="primary">{role.role_name}</Badge>,
     },
-    {key: 'description', header: 'Mô tả', render: (role) => role.description || '-'},
+    {key: 'description', header: 'Mô tả', render: (role: AdminRoleRow) => role.description || '-'},
     {
       key: 'permissions',
       header: 'Số quyền',
-      render: (role) => (
+      render: (role: AdminRoleRow) => (
         <Badge bg={role.permissions?.length ? 'success' : 'secondary'}>
           {role.permissions?.length || 0}
         </Badge>
@@ -223,8 +230,8 @@ function RolesManagementPage() {
         columns={columns}
         data={filteredRoles}
         loading={loading}
-        getRowKey={(role) => role.role_id}
-        rowActions={(role) => (
+        getRowKey={(role: AdminRoleRow) => role.role_id}
+        rowActions={(role: AdminRoleRow) => (
           <>
             <button
               onClick={() => openPermissionModal(role)}
@@ -333,7 +340,8 @@ function RolesManagementPage() {
               Tích vào hành động mà vai trò này được phép thực hiện.
             </p>
             {permissionGroups.map(([groupName, items]) => {
-              const codes = items.map((item) => item.code);
+              // `code!`: BE luôn trả code, type PermissionResponse khai báo optional.
+              const codes = items.map((item) => item.code!);
               const allChecked = codes.every((code) => permSelected.has(code));
               return (
                 <div key={groupName} className="border rounded p-3">
@@ -353,8 +361,8 @@ function RolesManagementPage() {
                         key={permission.code}
                         type="checkbox"
                         id={`perm-${permission.code}`}
-                        checked={permSelected.has(permission.code)}
-                        onChange={() => togglePermission(permission.code)}
+                        checked={permSelected.has(permission.code!)}
+                        onChange={() => togglePermission(permission.code!)}
                         label={
                           <span>
                             {permission.description || permission.code}{' '}
@@ -387,4 +395,4 @@ function RolesManagementPage() {
   );
 }
 
-export default RolesManagementPage;
+export default RolesManagement;

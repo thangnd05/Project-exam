@@ -6,14 +6,17 @@ import {getRoles, updateRolePermissions} from '@/app/apis/roleApi';
 import {getPermissions} from '@/app/apis/permissionApi';
 import {CURRENT_USER_QUERY_KEY} from '@/app/contexts/AuthContext';
 
+/** Ma trận quyền theo vai trò: roleId -> tập code quyền được tick. */
+export type PermissionMatrix = Record<string, Set<string>>;
+
 export const permissionsKeys = {
   roles: () => ['admin-roles'],
   permissions: () => ['admin-permissions'],
 };
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: never[] = [];
 
-const asArray = (data) => (Array.isArray(data) ? data : []);
+const asArray = <T,>(data: T[]): T[] => (Array.isArray(data) ? data : []);
 
 export function usePermissionsMatrix() {
   const qc = useQueryClient();
@@ -31,7 +34,7 @@ export function usePermissionsMatrix() {
   });
 
   const saveMutation = useMutation({
-    mutationFn: ({dirtyRoleIds, matrix}) =>
+    mutationFn: ({dirtyRoleIds, matrix}: {dirtyRoleIds: string[]; matrix: PermissionMatrix}) =>
       Promise.all(
         dirtyRoleIds.map((roleId) =>
           updateRolePermissions(roleId, Array.from(matrix[roleId] || [])),

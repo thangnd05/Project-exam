@@ -1,5 +1,5 @@
-import UsersManagementPage from '@/app/features/admin/access/UsersManagementPage';
+import UsersManagement from './UsersManagement';
 
 export default function Page() {
-  return <UsersManagementPage />;
+  return <UsersManagement />;
 }

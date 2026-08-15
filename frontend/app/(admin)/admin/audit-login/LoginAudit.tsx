@@ -5,9 +5,10 @@ import {Badge, Form} from 'react-bootstrap';
 
 import {formatDateTime} from '@/app/utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/components/admin/common';
-import {useLoginAudit} from '@/app/features/admin/overview/hooks/useLoginAudit';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import {useLoginAudit, type LoginAuditRow} from './_hooks/useLoginAudit';
 
-function LoginAuditPage() {
+function LoginAudit() {
   const ITEMS_PER_PAGE = 20;
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,19 +41,19 @@ function LoginAuditPage() {
     });
   }, [loginAuditRows, searchTerm, statusFilter]);
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'login_time',
       header: 'Thời gian',
-      render: (row) => formatDateTime(row.login_time),
+      render: (row: LoginAuditRow) => formatDateTime(row.login_time),
     },
-    {key: 'action', header: 'Action', render: (row) => row.action || '—'},
-    {key: 'user_id', header: 'User ID', render: (row) => row.user_id ?? '—'},
-    {key: 'ip_address', header: 'IP', render: (row) => row.ip_address || '—'},
+    {key: 'action', header: 'Action', render: (row: LoginAuditRow) => row.action || '—'},
+    {key: 'user_id', header: 'User ID', render: (row: LoginAuditRow) => row.user_id ?? '—'},
+    {key: 'ip_address', header: 'IP', render: (row: LoginAuditRow) => row.ip_address || '—'},
     {
       key: 'status',
       header: 'Trạng thái',
-      render: (row) => (
+      render: (row: LoginAuditRow) => (
         <Badge bg={row.status === 'SUCCESS' ? 'success' : 'danger'}>
           {row.status === 'SUCCESS' ? 'Thành công' : 'Thất bại'}
         </Badge>
@@ -61,12 +62,12 @@ function LoginAuditPage() {
     {
       key: 'failure_reason',
       header: 'Lý do thất bại',
-      render: (row) => row.failure_reason || '—',
+      render: (row: LoginAuditRow) => row.failure_reason || '—',
     },
     {
       key: 'user_agent',
       header: 'User agent',
-      render: (row) => (
+      render: (row: LoginAuditRow) => (
         <span title={row.user_agent || ''}>
           {(row.user_agent || '').length > 48
             ? `${(row.user_agent || '').slice(0, 48)}…`
@@ -104,7 +105,7 @@ function LoginAuditPage() {
         data={filteredRows}
         loading={loading}
         emptyText="Không có bản ghi phù hợp bộ lọc hiện tại."
-        getRowKey={(row) => row.id}
+        getRowKey={(row: LoginAuditRow) => row.id}
         page={currentPage - 1}
         totalPages={totalPages}
         totalElements={totalElements}
@@ -116,4 +117,4 @@ function LoginAuditPage() {
   );
 }
 
-export default LoginAuditPage;
+export default LoginAudit;

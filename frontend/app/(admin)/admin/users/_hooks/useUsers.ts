@@ -5,14 +5,44 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {keepPreviousData} from '@/app/configs/queryClient';
 import {getRoles} from '@/app/apis/roleApi';
 import {createUser, deleteUser, getUsers, updateUser} from '@/app/apis/userApi';
+import type {PageResponse, RoleResponse, UserResponse, UserUpsertRequest} from '@/app/types';
+
+/** Hàng người dùng đã chuẩn hoá (snake_case) cho bảng admin. */
+export interface AdminUserRow {
+  user_id: string;
+  user_name: string;
+  full_name: string;
+  email: string;
+  role_id: string;
+  verified: boolean | null;
+  is_premium: boolean;
+  created_at: string | null;
+}
+
+/** Vai trò đã chuẩn hoá cho dropdown lọc/gán vai trò. */
+export interface AdminUserRoleOption {
+  role_id: string;
+  role_name: string;
+  description: string;
+}
+
+interface UseUsersParams {
+  page: number;
+  size: number;
+  keyword?: string;
+  roleId?: string;
+  verified?: boolean;
+}
 
 export const usersKeys = {
-  list: (params) => ['admin-users', params],
-  stat: (scope) => ['admin-users', 'stat', scope],
+  list: (params: unknown) => ['admin-users', params],
+  stat: (scope: string) => ['admin-users', 'stat', scope],
   roles: () => ['admin-roles'],
 };
 
-const normalizeUser = (user) => ({
+// `any` có chủ đích: BE trả camelCase (UserResponse) nhưng normalize còn fallback
+// các field snake_case/legacy (user_id, username...) không có trong type.
+const normalizeUser = (user: any): AdminUserRow => ({
   user_id: String(user.userId ?? user.user_id ?? user.id ?? ''),
   user_name: user.userName ?? user.user_name ?? user.username ?? '',
   full_name: user.fullName ?? user.full_name ?? user.username ?? '',
@@ -26,20 +56,20 @@ const normalizeUser = (user) => ({
   created_at: user.createdAt ?? user.created_at ?? null,
 });
 
-const normalizeUsersPage = (userPage) => ({
+const normalizeUsersPage = (userPage: PageResponse<UserResponse>) => ({
   users: (userPage?.content || []).map(normalizeUser),
   totalElements: userPage?.totalElements || 0,
   totalPages: Math.max(userPage?.totalPages || 1, 1),
 });
 
-const normalizeRoles = (rolesData) =>
+const normalizeRoles = (rolesData: RoleResponse[]): AdminUserRoleOption[] =>
   (Array.isArray(rolesData) ? rolesData : []).map((role) => ({
     role_id: String(role.roleId),
     role_name: role.roleName || '',
     description: role.description || '',
   }));
 
-export function useUsers({page, size, keyword, roleId, verified}) {
+export function useUsers({page, size, keyword, roleId, verified}: UseUsersParams) {
   const queryClient = useQueryClient();
 
   const params = {
@@ -67,7 +97,7 @@ export function useUsers({page, size, keyword, roleId, verified}) {
     (role) => role.role_name === 'TEACHER',
   )?.role_id;
 
-  const readTotal = (userPage) => userPage?.totalElements || 0;
+  const readTotal = (userPage: PageResponse<UserResponse>) => userPage?.totalElements || 0;
 
   const totalStatQuery = useQuery({
     queryKey: usersKeys.stat('total'),
@@ -89,14 +119,14 @@ export function useUsers({page, size, keyword, roleId, verified}) {
   });
 
   const createUserMutation = useMutation({
-    mutationFn: (payload) => createUser(payload),
+    mutationFn: (payload: UserUpsertRequest) => createUser(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['admin-users']});
     },
   });
 
   const updateUserMutation = useMutation({
-    mutationFn: ({userId, values}) => {
+    mutationFn: ({userId, values}: {userId: string; values: Record<string, unknown>}) => {
       const formData = new FormData();
       formData.append('user', JSON.stringify(values));
       return updateUser(userId, formData);
@@ -107,7 +137,7 @@ export function useUsers({page, size, keyword, roleId, verified}) {
   });
 
   const deleteUserMutation = useMutation({
-    mutationFn: (userId) => deleteUser(userId),
+    mutationFn: (userId: string) => deleteUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['admin-users']});
     },

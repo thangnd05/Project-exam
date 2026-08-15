@@ -9,7 +9,7 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import useDebouncedValue from '@/app/hooks/useDebouncedValue';
-import {useUsers} from '@/app/features/admin/access/hooks/useUsers';
+import {useUsers, type AdminUserRow} from './_hooks/useUsers';
 import {
   AdminFieldError,
   AdminPageHeader,
@@ -18,11 +18,30 @@ import {
   StatCard,
   StatCardGroup,
 } from '@/app/components/admin/common';
-import styles from './UsersManagementPage.module.scss';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import styles from './UsersManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-const emptyCreateForm = {
+type CreateFormState = {
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string;
+  roleId: string;
+  verified: boolean;
+  isPremium: boolean;
+};
+
+type EditFormState = {
+  fullName: string;
+  userName: string;
+  email: string;
+  verified: boolean;
+  isPremium: boolean;
+};
+
+const emptyCreateForm: CreateFormState = {
   fullName: '',
   userName: '',
   email: '',
@@ -32,7 +51,7 @@ const emptyCreateForm = {
   isPremium: false,
 };
 
-const roleColors = {
+const roleColors: Record<string, string> = {
   ADMIN: 'danger',
   TEACHER: 'warning',
   USER: 'primary',
@@ -40,18 +59,18 @@ const roleColors = {
 
 const ITEMS_PER_PAGE = 10;
 
-function UsersManagementPage() {
+function UsersManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteErrorMessage, setDeleteErrorMessage] = useState('');
-  const [userToDelete, setUserToDelete] = useState(null);
+  const [userToDelete, setUserToDelete] = useState<AdminUserRow | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [createForm, setCreateForm] = useState(emptyCreateForm);
+  const [createForm, setCreateForm] = useState<CreateFormState>(emptyCreateForm);
   const [createError, setCreateError] = useState('');
-  const [editingUser, setEditingUser] = useState(null);
-  const [editForm, setEditForm] = useState({
+  const [editingUser, setEditingUser] = useState<AdminUserRow | null>(null);
+  const [editForm, setEditForm] = useState<EditFormState>({
     fullName: '',
     userName: '',
     email: '',
@@ -96,7 +115,7 @@ function UsersManagementPage() {
     (rolesIsError ? 'Không thể tải danh sách vai trò.' : '');
 
   const roleNameById = useMemo(() => {
-    const roleMap = {};
+    const roleMap: Record<string, string> = {};
     roles.forEach((role) => {
       roleMap[role.role_id] = role.role_name;
     });
@@ -120,7 +139,8 @@ function UsersManagementPage() {
     setShowCreateModal(false);
   };
 
-  const updateCreateField = (field) => (event) => {
+  // Event dùng chung cho cả Form.Control/Select/Check nên để ChangeEvent<any> có chủ đích.
+  const updateCreateField = (field: keyof CreateFormState) => (event: React.ChangeEvent<any>) => {
     const value =
       field === 'verified' || field === 'isPremium'
         ? event.target.checked
@@ -143,7 +163,8 @@ function UsersManagementPage() {
         userName,
         email,
         password: createForm.password,
-        roleId: createForm.roleId || null,
+        // `as any`: API type khai báo roleId?: string nhưng behavior cũ gửi null khi bỏ trống — giữ nguyên. // TODO
+        roleId: (createForm.roleId || null) as any,
         verified: createForm.verified,
         isPremium: createForm.isPremium,
       });
@@ -151,14 +172,14 @@ function UsersManagementPage() {
       setCurrentPage(1);
     } catch (error) {
       setCreateError(
-        error?.response?.data?.message || 'Không thể tạo người dùng.',
+        (error as any)?.response?.data?.message || 'Không thể tạo người dùng.',
       );
     }
   };
 
   const updating = updateUserMutation.isPending;
 
-  const openEditModal = (user) => {
+  const openEditModal = (user: AdminUserRow) => {
     setEditError('');
     setEditForm({
       fullName: user.full_name || '',
@@ -177,7 +198,7 @@ function UsersManagementPage() {
     setEditingUser(null);
   };
 
-  const updateEditField = (field) => (event) => {
+  const updateEditField = (field: keyof EditFormState) => (event: React.ChangeEvent<any>) => {
     setEditForm((previous) => ({...previous, [field]: event.target.value}));
   };
 
@@ -192,7 +213,7 @@ function UsersManagementPage() {
     setEditError('');
     try {
       await updateUserMutation.mutateAsync({
-        userId: editingUser.user_id,
+        userId: editingUser!.user_id,
         values: {
           fullName,
           userName,
@@ -204,7 +225,7 @@ function UsersManagementPage() {
       setEditingUser(null);
     } catch (error) {
       setEditError(
-        error?.response?.data?.message || 'Không thể cập nhật người dùng.',
+        (error as any)?.response?.data?.message || 'Không thể cập nhật người dùng.',
       );
     }
   };
@@ -222,11 +243,11 @@ function UsersManagementPage() {
     }
   };
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'user',
       header: 'Người dùng',
-      render: (user) => (
+      render: (user: AdminUserRow) => (
         <div className={cx('userCell')}>
           <div className={cx('userAvatar', {premium: user.is_premium})}>
             {(user.full_name || '?').charAt(0)}
@@ -241,18 +262,18 @@ function UsersManagementPage() {
     {
       key: 'role',
       header: 'Vai trò',
-      render: (user) => {
+      render: (user: AdminUserRow) => {
         const roleName = roleNameById[user.role_id] || 'USER';
         return (
           <Badge bg={roleColors[roleName] || 'secondary'}>{roleName}</Badge>
         );
       },
     },
-    {key: 'email', header: 'Email', render: (user) => user.email},
+    {key: 'email', header: 'Email', render: (user: AdminUserRow) => user.email},
     {
       key: 'status',
       header: 'Trạng thái',
-      render: (user) => (
+      render: (user: AdminUserRow) => (
         <Badge
           bg={
             user.verified === true
@@ -273,7 +294,7 @@ function UsersManagementPage() {
     {
       key: 'premium',
       header: 'Premium',
-      render: (user) =>
+      render: (user: AdminUserRow) =>
         user.is_premium ? (
           <span className={cx('premiumBadge')}>Premium</span>
         ) : (
@@ -283,7 +304,7 @@ function UsersManagementPage() {
     {
       key: 'created_at',
       header: 'Ngày tạo',
-      render: (user) =>
+      render: (user: AdminUserRow) =>
         user.created_at
           ? new Date(user.created_at).toLocaleDateString('vi-VN')
           : '-',
@@ -351,14 +372,14 @@ function UsersManagementPage() {
         columns={columns}
         data={users}
         loading={loading}
-        getRowKey={(user) => user.user_id}
+        getRowKey={(user: AdminUserRow) => user.user_id}
         page={safeCurrentPage - 1}
         totalPages={totalPages}
         totalElements={totalElements}
         pageSize={ITEMS_PER_PAGE}
         itemLabel="người dùng"
         onPageChange={(p) => setCurrentPage(p + 1)}
-        rowActions={(user) => (
+        rowActions={(user: AdminUserRow) => (
           <>
             <button title="Sửa" onClick={() => openEditModal(user)}>
               <Edit size={16} />
@@ -528,4 +549,4 @@ function UsersManagementPage() {
   );
 }
 
-export default UsersManagementPage;
+export default UsersManagement;

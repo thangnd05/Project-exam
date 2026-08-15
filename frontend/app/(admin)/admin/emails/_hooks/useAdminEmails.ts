@@ -15,13 +15,23 @@ import {
   testSendEmail,
   updateEmail,
 } from '@/app/apis/emailApi';
+import type {
+  EmailPreviewRequest,
+  EmailRecipientResponse,
+  EmailResponse,
+  EmailSaveRequest,
+  PageResponse,
+} from '@/app/types';
 
 export const emailKeys = {
   auto: ['admin-emails', 'auto'],
-  manual: (page, size) => ['admin-emails', 'manual', page, size],
-  recipients: (emailId, page) => ['admin-emails', 'recipients', emailId, page],
+  manual: (page: number, size: number) => ['admin-emails', 'manual', page, size],
+  recipients: (emailId: string | null | undefined, page: number) => ['admin-emails', 'recipients', emailId, page],
   audience: ['admin-emails', 'audience'],
 };
+
+// Trang rỗng fallback chỉ cần đúng các field UI dùng (không có size/hasNext của PageResponse).
+type EmailListPage<T> = Pick<PageResponse<T>, 'content' | 'totalPages' | 'totalElements' | 'currentPage'>;
 
 const emptyPage = {content: [], totalPages: 1, totalElements: 0, currentPage: 0};
 
@@ -34,33 +44,33 @@ export function useAutoEmails() {
   };
 }
 
-export function useManualEmails(page, size) {
+export function useManualEmails(page: number, size: number) {
   const query = useQuery({
     queryKey: emailKeys.manual(page, size),
     queryFn: () => getManualEmails({page, size}),
   });
   return {
-    page: query.data ?? emptyPage,
+    page: (query.data ?? emptyPage) as EmailListPage<EmailResponse>,
     isLoading: query.isLoading,
     isError: query.isError,
   };
 }
 
-export function useEmailRecipients(emailId, page, size) {
+export function useEmailRecipients(emailId: string | null | undefined, page: number, size: number) {
   const query = useQuery({
     queryKey: emailKeys.recipients(emailId, page),
-    queryFn: () => getEmailRecipients(emailId, {page, size}),
+    queryFn: () => getEmailRecipients(emailId as string, {page, size}),
     enabled: Boolean(emailId),
     // Worker gửi nền nên trạng thái đổi sau khi mở bảng  tự làm mới trong lúc đang xem.
     refetchInterval: 5000,
   });
   return {
-    page: query.data ?? emptyPage,
+    page: (query.data ?? emptyPage) as EmailListPage<EmailRecipientResponse>,
     isLoading: query.isLoading,
   };
 }
 
-export function useEmailAudience(enabled) {
+export function useEmailAudience(enabled: boolean) {
   const query = useQuery({
     queryKey: emailKeys.audience,
     queryFn: getEmailAudience,
@@ -78,18 +88,18 @@ export function useEmailMutations() {
 
   const create = useMutation({mutationFn: createEmail, onSuccess: invalidate});
   const update = useMutation({
-    mutationFn: ({emailId, payload}) => updateEmail(emailId, payload),
+    mutationFn: ({emailId, payload}: {emailId: string; payload: EmailSaveRequest}) => updateEmail(emailId, payload),
     onSuccess: invalidate,
   });
   const remove = useMutation({mutationFn: deleteEmail, onSuccess: invalidate});
   const send = useMutation({
-    mutationFn: ({emailId, userIds}) => sendEmail(emailId, userIds),
+    mutationFn: ({emailId, userIds}: {emailId: string; userIds: string[]}) => sendEmail(emailId, userIds),
     onSuccess: invalidate,
   });
   const retry = useMutation({mutationFn: retryFailedEmail, onSuccess: invalidate});
   const preview = useMutation({mutationFn: previewEmail});
   const testSend = useMutation({
-    mutationFn: ({emailId, payload}) => testSendEmail(emailId, payload),
+    mutationFn: ({emailId, payload}: {emailId: string; payload: EmailPreviewRequest}) => testSendEmail(emailId, payload),
     onSuccess: invalidate,
   });
 

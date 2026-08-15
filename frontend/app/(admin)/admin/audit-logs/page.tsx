@@ -1,5 +1,5 @@
-import AuditLogsPage from '@/app/features/admin/overview/AuditLogsPage';
+import AuditLogs from './AuditLogs';
 
 export default function Page() {
-  return <AuditLogsPage />;
+  return <AuditLogs />;
 }

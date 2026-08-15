@@ -19,12 +19,22 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {AdminFieldError} from '@/app/components/admin/common';
-import {useEmailMutations} from './hooks/useAdminEmails';
+import {EmailType} from '@/app/enums';
+import type {EmailResponse} from '@/app/types';
+import {useEmailMutations} from '../_hooks/useAdminEmails';
 import styles from './EmailEditorModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-const emptyForm = {name: '', description: '', subject: '', bodyHtml: '', active: true};
+type EmailFormState = {
+  name: string;
+  description: string;
+  subject: string;
+  bodyHtml: string;
+  active: boolean;
+};
+
+const emptyForm: EmailFormState = {name: '', description: '', subject: '', bodyHtml: '', active: true};
 
 const QUILL_MODULES = {
   toolbar: [
@@ -48,18 +58,24 @@ const QUILL_FORMATS = [
   'link', 'blockquote',
 ];
 
+type EmailEditorModalProps = {
+  show: boolean;
+  email: EmailResponse | null;
+  onClose: () => void;
+};
+
 /**
  * Soạn nội dung email bằng trình soạn thảo. Backend tự đổi HTML của trình soạn thảo sang
  * style inline lúc gửi (EmailHtmlNormalizer) vì hộp thư không đọc CSS ngoài.
  */
-function EmailEditorModal({show, email, onClose}) {
-  const isAuto = email?.type === 'AUTO';
+function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
+  const isAuto = email?.type === EmailType.AUTO;
   const isEditing = Boolean(email?.emailId);
   // Khung chung là HTML email viết tay (div lồng nhau, style inline)  nạp vào trình soạn
   // thảo là mất hết bố cục, nên chỉ cho sửa ở dạng HTML.
   const isLayout = email?.code === 'LAYOUT_BASE';
 
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState<EmailFormState>(emptyForm);
   const [errorMessage, setErrorMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
@@ -87,7 +103,8 @@ function EmailEditorModal({show, email, onClose}) {
     setTestEmail('');
   }, [show, email]);
 
-  const setField = (field, value) => setForm((previous) => ({...previous, [field]: value}));
+  const setField = (field: keyof EmailFormState, value: string | boolean) =>
+    setForm((previous) => ({...previous, [field]: value}));
 
   const hasHandwrittenLayout = useMemo(
     () => /<(div|table|td)\b/i.test(form.bodyHtml),
@@ -121,14 +138,14 @@ function EmailEditorModal({show, email, onClose}) {
         active: form.active,
       };
       if (isEditing) {
-        await updateEmail({emailId: email.emailId, payload});
+        await updateEmail({emailId: email!.emailId, payload});
       } else {
         await createEmail(payload);
       }
       toast.success('Đã lưu nội dung email.');
       onClose();
     } catch (error) {
-      setErrorMessage(error?.response?.data?.message || 'Không thể lưu email. Vui lòng thử lại.');
+      setErrorMessage((error as any)?.response?.data?.message || 'Không thể lưu email. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
@@ -141,9 +158,9 @@ function EmailEditorModal({show, email, onClose}) {
     }
     try {
       const result = await previewEmail({subject: form.subject, bodyHtml: form.bodyHtml});
-      setPreviewHtml(result.bodyHtml);
+      setPreviewHtml(result.bodyHtml ?? '');
     } catch (error) {
-      setErrorMessage(error?.response?.data?.message || 'Không tạo được bản xem trước.');
+      setErrorMessage((error as any)?.response?.data?.message || 'Không tạo được bản xem trước.');
     }
   };
 
@@ -158,16 +175,16 @@ function EmailEditorModal({show, email, onClose}) {
     }
     try {
       await testSendEmail({
-        emailId: email.emailId,
+        emailId: email!.emailId,
         payload: {subject: form.subject, bodyHtml: form.bodyHtml, toEmail: testEmail || undefined},
       });
       toast.info('Đã đưa email thử vào hàng gửi, kiểm tra hộp thư sau ít giây.');
     } catch (error) {
-      setErrorMessage(error?.response?.data?.message || 'Không gửi thử được.');
+      setErrorMessage((error as any)?.response?.data?.message || 'Không gửi thử được.');
     }
   };
 
-  const insertVariable = (variable) => {
+  const insertVariable = (variable: string) => {
     setField('bodyHtml', `${form.bodyHtml}{{${variable}}}`);
   };
 
@@ -189,7 +206,7 @@ function EmailEditorModal({show, email, onClose}) {
     >
       {isAuto && (
         <div className="alert alert-info py-2 small">
-          Mẫu tự động <b>{email.code}</b>  {email.description}
+          Mẫu tự động <b>{email!.code}</b>  {email!.description}
         </div>
       )}
 
@@ -257,10 +274,10 @@ function EmailEditorModal({show, email, onClose}) {
         </div>
       )}
 
-      {email?.availableVars?.length > 0 && (
+      {(email?.availableVars?.length ?? 0) > 0 && (
         <div className="mb-3 small text-muted">
           Biến dùng được (bấm để chèn vào cuối nội dung):{' '}
-          {email.availableVars.map((variable) => (
+          {email!.availableVars!.map((variable) => (
             <button
               key={variable}
               type="button"

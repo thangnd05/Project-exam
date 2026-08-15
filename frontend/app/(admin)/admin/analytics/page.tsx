@@ -1,5 +1,5 @@
-import AnalyticsPage from '@/app/features/admin/overview/AnalyticsPage';
+import Analytics from './Analytics';
 
 export default function Page() {
-  return <AnalyticsPage />;
+  return <Analytics />;
 }

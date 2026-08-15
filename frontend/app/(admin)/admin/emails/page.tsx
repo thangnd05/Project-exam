@@ -1,5 +1,5 @@
-import EmailsManagementPage from '@/app/features/admin/system/EmailsManagementPage';
+import EmailsManagement from './EmailsManagement';
 
 export default function Page() {
-  return <EmailsManagementPage />;
+  return <EmailsManagement />;
 }

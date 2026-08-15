@@ -7,30 +7,31 @@ import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 
 import {AdminFieldError, AdminPageHeader} from '@/app/components/admin/common';
-import {usePermissionsMatrix} from '@/app/features/admin/access/hooks/usePermissionsMatrix';
+import {usePermissionsMatrix, type PermissionMatrix} from './_hooks/usePermissionsMatrix';
+import type {PermissionResponse, RoleResponse} from '@/app/types';
 import styles from '@/app/components/admin/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
 const PROTECTED_ROLE = 'ADMIN';
 
-const buildMatrix = (roleList) => {
-  const next = {};
+const buildMatrix = (roleList: RoleResponse[]): PermissionMatrix => {
+  const next: PermissionMatrix = {};
   roleList.forEach((role) => {
     next[role.roleId] = new Set(role.permissions || []);
   });
   return next;
 };
 
-function PermissionsManagementPage() {
+function PermissionsManagement() {
   const {roles, permissions, isLoading, isError, saveMutation} = usePermissionsMatrix();
   const loading = isLoading;
   const saving = saveMutation.isPending;
 
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [matrix, setMatrix] = useState({});
-  const [original, setOriginal] = useState({});
+  const [matrix, setMatrix] = useState<PermissionMatrix>({});
+  const [original, setOriginal] = useState<PermissionMatrix>({});
 
   useEffect(() => {
     setMatrix(buildMatrix(roles));
@@ -40,22 +41,22 @@ function PermissionsManagementPage() {
   const displayError = errorMessage || (isError ? 'Không thể tải dữ liệu phân quyền.' : '');
 
   const permissionGroups = useMemo(() => {
-    const groups = new Map();
+    const groups = new Map<string, PermissionResponse[]>();
     permissions.forEach((permission) => {
       const groupName = permission.groupName || 'Khác';
       if (!groups.has(groupName)) {
         groups.set(groupName, []);
       }
-      groups.get(groupName).push(permission);
+      groups.get(groupName)!.push(permission);
     });
     return Array.from(groups.entries());
   }, [permissions]);
 
-  const isProtected = (role) => role.roleName === PROTECTED_ROLE;
+  const isProtected = (role: RoleResponse) => role.roleName === PROTECTED_ROLE;
 
-  const hasCode = (roleId, code) => Boolean(matrix[roleId]?.has(code));
+  const hasCode = (roleId: string, code: string) => Boolean(matrix[roleId]?.has(code));
 
-  const toggleCell = (roleId, code) => {
+  const toggleCell = (roleId: string, code: string) => {
     setMatrix((previous) => {
       const next = {...previous};
       const set = new Set(next[roleId] || []);
@@ -69,7 +70,7 @@ function PermissionsManagementPage() {
     });
   };
 
-  const toggleGroupForRole = (roleId, codes, allChecked) => {
+  const toggleGroupForRole = (roleId: string, codes: string[], allChecked: boolean) => {
     setMatrix((previous) => {
       const next = {...previous};
       const set = new Set(next[roleId] || []);
@@ -101,7 +102,7 @@ function PermissionsManagementPage() {
       await saveMutation.mutateAsync({dirtyRoleIds, matrix});
 
       setOriginal(() => {
-        const snapshot = {};
+        const snapshot: PermissionMatrix = {};
         Object.keys(matrix).forEach((roleId) => {
           snapshot[roleId] = new Set(matrix[roleId]);
         });
@@ -170,7 +171,8 @@ function PermissionsManagementPage() {
           </thead>
           <tbody>
             {permissionGroups.map(([groupName, items]) => {
-              const codes = items.map((item) => item.code);
+              // `code!`: BE luôn trả code, type PermissionResponse khai báo optional.
+              const codes = items.map((item) => item.code!);
               return (
                 <React.Fragment key={groupName}>
                   <tr className="table-light">
@@ -193,9 +195,9 @@ function PermissionsManagementPage() {
                             <Form.Check
                               type="checkbox"
                               className="d-flex justify-content-center"
-                              checked={locked ? true : hasCode(role.roleId, permission.code)}
+                              checked={locked ? true : hasCode(role.roleId, permission.code!)}
                               disabled={locked || saving}
-                              onChange={() => toggleCell(role.roleId, permission.code)}
+                              onChange={() => toggleCell(role.roleId, permission.code!)}
                               aria-label={`${role.roleName} - ${permission.code}`}
                             />
                           </td>
@@ -232,4 +234,4 @@ function PermissionsManagementPage() {
   );
 }
 
-export default PermissionsManagementPage;
+export default PermissionsManagement;

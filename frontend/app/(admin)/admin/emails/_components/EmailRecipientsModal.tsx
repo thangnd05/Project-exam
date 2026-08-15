@@ -7,18 +7,27 @@ import {toast} from 'react-toastify';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {AdminFieldError, AdminTable, StatCard, StatCardGroup} from '@/app/components/admin/common';
-import {useEmailMutations, useEmailRecipients} from './hooks/useAdminEmails';
+import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import {EmailStatus, EmailType} from '@/app/enums';
+import type {EmailRecipientResponse, EmailResponse} from '@/app/types';
+import {useEmailMutations, useEmailRecipients} from '../_hooks/useAdminEmails';
 
 const PAGE_SIZE = 20;
 
-const STATUS_VARIANTS = {
+const STATUS_VARIANTS: Record<EmailStatus, string> = {
   SENT: 'bg-success',
   FAILED: 'bg-danger',
   PENDING: 'bg-secondary',
 };
 
+type EmailRecipientsModalProps = {
+  show: boolean;
+  email: EmailResponse | null;
+  onClose: () => void;
+};
+
 /** Nhật ký gửi của một email: ai nhận, thành công hay lỗi, lỗi vì sao. */
-function EmailRecipientsModal({show, email, onClose}) {
+function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps) {
   const [page, setPage] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
   const [retrying, setRetrying] = useState(false);
@@ -37,22 +46,22 @@ function EmailRecipientsModal({show, email, onClose}) {
     setErrorMessage('');
     setRetrying(true);
     try {
-      await retryFailed(email.emailId);
+      await retryFailed(email!.emailId);
       toast.info('Đã đưa các email lỗi vào hàng gửi lại.');
     } catch (error) {
-      setErrorMessage(error?.response?.data?.message || 'Không gửi lại được.');
+      setErrorMessage((error as any)?.response?.data?.message || 'Không gửi lại được.');
     } finally {
       setRetrying(false);
     }
   };
 
-  const formatDate = (value) => (value ? new Date(value).toLocaleString('vi-VN') : '—');
+  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString('vi-VN') : '—');
 
-  const columns = [
+  const columns: AdminTableColumn[] = [
     {
       key: 'recipient',
       header: 'Người nhận',
-      render: (row) => (
+      render: (row: EmailRecipientResponse) => (
         <div className="d-flex flex-column">
           <span className="fw-semibold">{row.fullName || '(tài khoản đã xóa)'}</span>
           <span className="text-muted small">{row.toEmail}</span>
@@ -62,8 +71,8 @@ function EmailRecipientsModal({show, email, onClose}) {
     {
       key: 'status',
       header: 'Trạng thái',
-      render: (row) => (
-        <span className={`badge ${STATUS_VARIANTS[row.status] || 'bg-secondary'}`}>
+      render: (row: EmailRecipientResponse) => (
+        <span className={`badge ${STATUS_VARIANTS[row.status as EmailStatus] || 'bg-secondary'}`}>
           {row.statusLabel}
         </span>
       ),
@@ -71,15 +80,15 @@ function EmailRecipientsModal({show, email, onClose}) {
     {
       key: 'error',
       header: 'Lỗi',
-      render: (row) => (
+      render: (row: EmailRecipientResponse) => (
         <span className="small text-danger">{row.errorMessage || '—'}</span>
       ),
     },
-    {key: 'sentAt', header: 'Gửi lúc', render: (row) => formatDate(row.sentAt)},
-    {key: 'createdAt', header: 'Xếp hàng lúc', render: (row) => formatDate(row.createdAt)},
+    {key: 'sentAt', header: 'Gửi lúc', render: (row: EmailRecipientResponse) => formatDate(row.sentAt)},
+    {key: 'createdAt', header: 'Xếp hàng lúc', render: (row: EmailRecipientResponse) => formatDate(row.createdAt)},
   ];
 
-  const canRetry = email?.type === 'MANUAL' && (email?.failedCount ?? 0) > 0;
+  const canRetry = email?.type === EmailType.MANUAL && (email?.failedCount ?? 0) > 0;
 
   return (
     <BaseModal
@@ -99,10 +108,10 @@ function EmailRecipientsModal({show, email, onClose}) {
         {canRetry && (
           <ButtonPrime variant="outline" onClick={handleRetry} disabled={retrying}>
             <RefreshCw size={16} className="me-1" />
-            Gửi lại {email.failedCount} email lỗi
+            Gửi lại {email!.failedCount} email lỗi
           </ButtonPrime>
         )}
-        {email?.type === 'AUTO' && (
+        {email?.type === EmailType.AUTO && (
           <span className="small text-muted">
             Email tự động không gửi lại được  nội dung phụ thuộc dữ liệu của lần gửi đó.
           </span>
@@ -113,7 +122,7 @@ function EmailRecipientsModal({show, email, onClose}) {
         columns={columns}
         data={recipientPage.content}
         loading={isLoading}
-        getRowKey={(row) => row.recipientId}
+        getRowKey={(row: EmailRecipientResponse) => row.recipientId}
         emptyText="Email này chưa gửi cho ai."
         page={recipientPage.currentPage}
         totalPages={recipientPage.totalPages}

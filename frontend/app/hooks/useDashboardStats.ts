@@ -9,12 +9,20 @@ import {
   getTrafficHeatmap,
   getTrafficLocations,
 } from '@/app/apis/dashboardApi';
+import type {
+  DashboardStats,
+  DashboardTraffic,
+  DayHours,
+  MonthlyPerformanceResponse,
+  NameValue,
+  TrafficLocationsResponse,
+} from '@/app/types';
 
 export const dashboardKeys = {
   stats: ['admin-dashboard-stats'],
-  monthlyPerformance: (year) => ['admin-dashboard-monthly-performance', year ?? 'current'],
-  trafficHeatmap: (endDate) => ['admin-dashboard-traffic-heatmap', endDate ?? 'today'],
-  trafficLocations: (month) => ['admin-dashboard-traffic-locations', month ?? 'current'],
+  monthlyPerformance: (year?: number) => ['admin-dashboard-monthly-performance', year ?? 'current'],
+  trafficHeatmap: (endDate?: string) => ['admin-dashboard-traffic-heatmap', endDate ?? 'today'],
+  trafficLocations: (month?: string) => ['admin-dashboard-traffic-locations', month ?? 'current'],
   contentInsights: ['admin-dashboard-content-insights'],
 };
 
@@ -27,25 +35,32 @@ export function useDashboardStats() {
     refetchOnWindowFocus: true,
   });
 
+  const stats: Partial<DashboardStats> = query.data?.stats ?? {};
+  const traffic: DashboardTraffic = query.data?.traffic ?? {
+    visitsToday: 0,
+    heatmap: [],
+    topCountries: [],
+  };
+  const statusDistribution: NameValue[] = query.data?.statusDistribution ?? [];
+
   return {
-    stats: query.data?.stats ?? {},
-    traffic: query.data?.traffic ?? {
-      visitsToday: 0,
-      heatmap: [],
-      topCountries: [],
-    },
-    statusDistribution: query.data?.statusDistribution ?? [],
+    stats,
+    traffic,
+    statusDistribution,
     isLoading: query.isLoading,
     isError: query.isError,
   };
 }
 
-export function useMonthlyPerformance(year) {
-  const query = useQuery({
+export function useMonthlyPerformance(year?: number) {
+  // Generic tường minh vì spread `as any` bên dưới làm TS mất suy luận kiểu từ queryFn.
+  const query = useQuery<MonthlyPerformanceResponse>({
     queryKey: dashboardKeys.monthlyPerformance(year),
     queryFn: () => getMonthlyPerformance(year),
     staleTime: 60 * 1000,
-    keepPreviousData: true,
+    // `as any`: TanStack v5 đã bỏ option boolean `keepPreviousData` (hiện là no-op) —
+    // giữ nguyên từ bản .js, không đổi behavior. // TODO: cân nhắc placeholderData: keepPreviousData
+    ...({keepPreviousData: true} as any),
   });
 
   return {
@@ -71,12 +86,14 @@ export function useContentInsights() {
   };
 }
 
-export function useTrafficLocations(month) {
-  const query = useQuery({
+export function useTrafficLocations(month?: string) {
+  // Generic tường minh vì spread `as any` bên dưới làm TS mất suy luận kiểu từ queryFn.
+  const query = useQuery<TrafficLocationsResponse>({
     queryKey: dashboardKeys.trafficLocations(month),
     queryFn: () => getTrafficLocations(month),
     staleTime: 60 * 1000,
-    keepPreviousData: true,
+    // `as any`: như trên — option v4 đã bị bỏ ở v5, giữ nguyên từ bản .js. // TODO
+    ...({keepPreviousData: true} as any),
   });
 
   return {
@@ -89,12 +106,14 @@ export function useTrafficLocations(month) {
   };
 }
 
-export function useTrafficHeatmap(endDate) {
-  const query = useQuery({
+export function useTrafficHeatmap(endDate?: string) {
+  // Generic tường minh vì spread `as any` bên dưới làm TS mất suy luận kiểu từ queryFn.
+  const query = useQuery<DayHours[]>({
     queryKey: dashboardKeys.trafficHeatmap(endDate),
     queryFn: () => getTrafficHeatmap(endDate),
     staleTime: 30 * 1000,
-    keepPreviousData: true,
+    // `as any`: như trên — option v4 đã bị bỏ ở v5, giữ nguyên từ bản .js. // TODO
+    ...({keepPreviousData: true} as any),
   });
 
   return {

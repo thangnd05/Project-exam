@@ -1,5 +1,5 @@
-import PermissionsManagementPage from '@/app/features/admin/access/PermissionsManagementPage';
+import PermissionsManagement from './PermissionsManagement';
 
 export default function Page() {
-  return <PermissionsManagementPage />;
+  return <PermissionsManagement />;
 }
