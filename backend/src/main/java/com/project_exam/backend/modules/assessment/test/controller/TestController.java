@@ -8,6 +8,7 @@ import com.project_exam.backend.modules.assessment.test.dto.AddQuestionsToTestRe
 import com.project_exam.backend.modules.assessment.test.dto.AddRandomQuestionsToTestRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.AddRandomQuestionsResponse;
 import com.project_exam.backend.modules.assessment.test.dto.CanStartTestResponse;
+import com.project_exam.backend.modules.assessment.test.dto.CertificateExamListResponse;
 import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
@@ -222,6 +223,20 @@ public class TestController {
             userId = null;
         }
         return ResponseEntity.ok(testService.getAdminTestsByExamTypePaged(examTypeId, page, size, userId));
+    }
+
+    @GetMapping("/certificate-exams/by-exam-type/{examTypeId}")
+    public ResponseEntity<CertificateExamListResponse> getCertificateExamsByExamType(
+            @PathVariable String examTypeId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId;
+        try {
+            userId = authUtils.getUserId(httpRequest);
+        } catch (Exception e) {
+            userId = null;
+        }
+        return ResponseEntity.ok(testService.getCertificateExamsByExamType(examTypeId, userId));
     }
 
     @GetMapping("/collections/by-exam-type/{examTypeId}")

@@ -3,7 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { FaBullseye } from 'react-icons/fa';
-import { IoDocumentTextOutline, IoFolderOpenOutline, IoChevronForward, IoSchoolOutline } from 'react-icons/io5';
+import {
+  IoDocumentTextOutline,
+  IoFolderOpenOutline,
+  IoChevronForward,
+  IoSchoolOutline,
+  IoRibbonOutline,
+} from 'react-icons/io5';
+import TestCard from '~/features/tests/components/TestCard/TestCard';
 import routes, { buildExamTypeCollectionPath, buildExamTypeDetailPath } from '~/shared/config/Routes';
 import { useAuth } from '~/shared/hooks/useAuth';
 
@@ -22,7 +29,7 @@ function TestByExamTypePage() {
   const [countdowns, setCountdowns] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
 
-  const { tests, totalPages, examTypeName, folders, children, isLoading } =
+  const { tests, totalPages, examTypeName, folders, children, certificateExam, isLoading } =
     useTestsByExamType(examTypeId, currentPage);
 
   useEffect(() => {
@@ -114,6 +121,41 @@ function TestByExamTypePage() {
     </div>
   );
 
+  /*
+    Khu thi lấy chứng chỉ tách khỏi danh sách đề thường (backend đã loại các đề này khỏi
+    danh sách phẳng) để người học thấy ngay đích cuối của loại đề. Backend trả mảng rỗng
+    khi loại đề chưa có mẫu chứng chỉ đang bật, lúc đó khu này tự ẩn.
+  */
+  const certificateTests = certificateExam?.tests ?? [];
+  const certificateSection = certificateTests.length > 0 && (
+    <div className={cx('certificate-section')}>
+      <div className={cx('certificate-head')}>
+        <span className={cx('certificate-icon')}>
+          <IoRibbonOutline />
+        </span>
+        <div className={cx('certificate-heading')}>
+          <span className={cx('certificate-title')}>Thi lấy chứng chỉ</span>
+          <span className={cx('certificate-desc')}>
+            Đạt {certificateExam.passScore} điểm để nhận
+            {certificateExam.certificateTitle ? ` ${certificateExam.certificateTitle}` : ' chứng chỉ'}
+            {certificateExam.validMonths
+              ? ` (hiệu lực ${certificateExam.validMonths} tháng)`
+              : ''}
+            .
+          </span>
+        </div>
+        {certificateExam.alreadyOwned && (
+          <span className={cx('certificate-owned')}>Bạn đã có chứng chỉ này</span>
+        )}
+      </div>
+      <div className={cx('certificate-grid')}>
+        {certificateTests.map((test) => (
+          <TestCard key={test.testId} test={test} countdowns={countdowns} />
+        ))}
+      </div>
+    </div>
+  );
+
   const folderSection = folders.length > 0 && (
     <div className={cx('folder-section')}>
       <div className={cx('folder-section-title')}>
@@ -151,7 +193,14 @@ function TestByExamTypePage() {
       tests={tests}
       countdowns={countdowns}
       emptyState={emptyState}
-      topSlot={folderSection}
+      topSlot={
+        (certificateSection || folderSection) && (
+          <>
+            {certificateSection}
+            {folderSection}
+          </>
+        )
+      }
       footer={
         <Pagination
           currentPage={currentPage}

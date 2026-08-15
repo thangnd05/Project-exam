@@ -103,3 +103,72 @@
   font-size: 1.8rem;
   flex-shrink: 0;
 }
+
+/*
+  Khu "thi lấy chứng chỉ": viền và nền pha màu thương hiệu để nổi hẳn so với khu bộ đề,
+  vì đây là bài thi dẫn tới chứng chỉ chứ không phải đề luyện thường.
+*/
+.certificate-section {
+  margin-bottom: 28px;
+  padding: 20px 22px 24px;
+  border: 1px solid var(--primary-alpha-35);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--primary-alpha-08), transparent 60%), var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.certificate-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.certificate-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primary-alpha-15);
+  color: var(--primary);
+  font-size: 2.2rem;
+}
+
+.certificate-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.certificate-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--dark-color);
+}
+
+.certificate-desc {
+  font-size: var(--font-size-ssm);
+  color: var(--text-secondary);
+}
+
+.certificate-owned {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  color: var(--success-text);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.certificate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34rem, 1fr));
+  gap: 3rem;
+}
