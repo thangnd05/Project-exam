@@ -1,5 +1,5 @@
-import TestByCollectionPage from '@/app/features/tests/exam/exam-types/detail/TestByCollectionPage';
+import TestByCollection from './TestByCollection';
 
 export default function Page() {
-  return <TestByCollectionPage />;
+  return <TestByCollection />;
 }

@@ -21,7 +21,7 @@ import {
   IoImageOutline,
   IoRocketOutline,
 } from 'react-icons/io5';
-import EditQuestionModal from '@/app/features/tests/question-bank/modals/EditQuestionModal';
+import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
 import { PermissionCode } from '@/app/enums';
 import type { CreateTestRequest, TestAdminResponse, TestResponse } from '@/app/types';
 import createModalStyles from './CreateTestModal.module.scss';

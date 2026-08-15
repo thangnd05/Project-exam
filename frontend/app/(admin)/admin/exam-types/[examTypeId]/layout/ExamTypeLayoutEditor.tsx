@@ -38,8 +38,6 @@ import { brandColors } from '@/app/assets/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
-// `any` có chủ đích: brandColors.js dựng object bằng Object.defineProperties nên TS không thấy key.
-const brandColorsAny: any = brandColors;
 
 const FONT_OPTIONS = ['Inter', 'Roboto', 'Arial', 'Times New Roman', 'Georgia'];
 
@@ -377,7 +375,7 @@ function ExamTypeLayoutEditor() {
               <label>Màu chủ đạo</label>
               <input
                 type="color"
-                value={config.theme.primary || brandColorsAny.primary}
+                value={config.theme.primary || brandColors.primary}
                 onChange={(e) => patchTheme({ primary: e.target.value })}
               />
             </div>

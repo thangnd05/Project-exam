@@ -1,9 +1,12 @@
+/**
+ * Chỉ khai các field cây cần tới; KHÔNG thêm index signature vì như vậy các DTO chuẩn
+ * (QuestionCollectionResponse...) sẽ không truyền vào được.
+ */
 export type CollectionNode = {
   collectionId: string | number;
   parentId?: string | number | null;
   displayOrder?: number | string | null;
   name?: string | null;
-  [key: string]: unknown;
 };
 
 export const buildCollectionTree = <T extends CollectionNode>(

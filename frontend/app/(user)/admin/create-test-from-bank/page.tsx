@@ -1,5 +1,5 @@
-import CreateTestFromBankPage from '@/app/features/tests/create-test-from-bank/CreateTestFromBankPage';
+import CreateTestFromBank from './CreateTestFromBank';
 
 export default function Page() {
-  return <CreateTestFromBankPage />;
+  return <CreateTestFromBank />;
 }

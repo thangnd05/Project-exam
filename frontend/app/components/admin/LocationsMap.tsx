@@ -11,9 +11,7 @@ import type { CountryTraffic } from '@/app/types/admin';
 
 const cx = classNames.bind(styles);
 
-// `any` có chủ đích: brandColors.js (file JS) dựng object bằng Object.defineProperties
-// (getter động) nên TS suy ra {} — đọc thuộc tính qua any, như ProfileOverview.tsx đã làm.
-const brand: any = brandColors;
+const brand = brandColors;
 
 const norm = (s?: string) =>
     (s || '')

@@ -1,5 +1,5 @@
-import TestStartPage from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage';
+import TestStart from './TestStart';
 
 export default function Page() {
-  return <TestStartPage />;
+  return <TestStart />;
 }

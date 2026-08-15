@@ -29,9 +29,9 @@ import { useHasPermission } from '@/app/hooks/usePermission';
 import { brandColors } from '@/app/assets/styles/brandColors';
 import CoinPriceField from '@/app/components/tests/CoinPriceField';
 import { getQuestionDisplayNumber } from '@/app/utils/questionNumber';
-import EditQuestionModal from '@/app/features/tests/question-bank/modals/EditQuestionModal';
+import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import { useExamCategories } from '@/app/features/tests/create-test-from-bank/hooks/useCreateTestFromBank';
+import { useExamCategories } from '@/app/hooks/useExamCategories';
 import {
   useBankTestBuilder,
   SELECTION_MODES,
@@ -46,8 +46,6 @@ import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-// `any` có chủ đích: brandColors.js dựng object bằng Object.defineProperties nên TS không thấy key.
-const brandColorsAny: any = brandColors;
 
 const COLLECTION_SCOPED_MODES: string[] = [
   SELECTION_MODES.RANDOM_BY_COLLECTION,
@@ -107,8 +105,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     costCoins: '',
   });
 
-  // useExamCategories vẫn nằm ở hook .js của trang create-test-from-bank (batch sau) nên nới về any[].
-  const examCategories = useExamCategories() as any[];
+  const examCategories = useExamCategories();
 
   const [notification, setNotification] = useState<{ type?: string; message?: string }>({});
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
@@ -511,10 +508,10 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   fontSize: '1.15rem',
                   fontWeight: 600,
                   color: bankSource === BANK_SOURCES.ADMIN
-                    ? brandColorsAny.primaryHover
+                    ? brandColors.primaryHover
                     : bankSource === BANK_SOURCES.CLASS ? '#047857' : '#475569',
                   background: bankSource === BANK_SOURCES.ADMIN
-                    ? brandColorsAny.brand100
+                    ? brandColors.brand100
                     : bankSource === BANK_SOURCES.CLASS ? '#d1fae5' : '#f1f5f9',
                   padding: '2px 10px',
                   borderRadius: 999,

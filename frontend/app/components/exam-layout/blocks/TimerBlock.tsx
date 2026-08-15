@@ -3,8 +3,8 @@
 import { IoTimeOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
-// Các block dùng chung class của trang làm bài nên vẫn đọc scss ở features/tests (giữ nguyên giao diện).
-import styles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
+// Các block dùng chung class của trang làm bài; scss đặt cạnh engine để bớt import chéo.
+import styles from '@/app/components/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 

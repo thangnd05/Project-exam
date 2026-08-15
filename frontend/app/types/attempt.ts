@@ -45,9 +45,10 @@ export interface UserTestUpdateRequest {
 export interface UserAnswerRequest {
   userTestId?: string;
   questionId?: string;
-  selectedAnswerId?: string;
-  selectedAnswerIds?: string[];
-  answerText?: string;
+  /* Trang làm bài gửi thẳng null cho ô chưa chọn (BE hiểu null = xoá đáp án cũ). */
+  selectedAnswerId?: string | null;
+  selectedAnswerIds?: string[] | null;
+  answerText?: string | null;
 }
 
 export interface UserAnswerResponse {

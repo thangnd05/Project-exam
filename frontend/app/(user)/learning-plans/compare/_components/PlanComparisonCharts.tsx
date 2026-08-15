@@ -30,8 +30,7 @@ export type PlanComparisonChartRow = {
 
 const cx = classNames.bind(styles);
 
-// brandColors là Proxy .js chưa có type — cast any có chủ đích
-const COLOR_ACTIVE = (brandColors as any).primary;
+const COLOR_ACTIVE = brandColors.primary;
 const COLOR_COMPLETED = '#10b981';
 const COLOR_REPLACED = '#94a3b8';
 const COLOR_ABANDONED = '#ef4444';

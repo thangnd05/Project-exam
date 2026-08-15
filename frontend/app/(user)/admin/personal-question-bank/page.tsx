@@ -1,5 +1,5 @@
-import PersonalQuestionBankPage from '@/app/features/tests/question-bank/PersonalQuestionBankPage';
+import PersonalQuestionBank from './PersonalQuestionBank';
 
 export default function Page() {
-  return <PersonalQuestionBankPage />;
+  return <PersonalQuestionBank />;
 }

@@ -6,7 +6,7 @@ import { Container } from 'react-bootstrap';
 import { IoGridOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
-import TestStartDashboard from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
+import TestStartDashboard from '@/app/components/tests/TestStartDashboard';
 import QuestionAreaBlock from '@/app/components/exam-layout/blocks/QuestionAreaBlock';
 import TimerBlock from '@/app/components/exam-layout/blocks/TimerBlock';
 import ProgressBlock from '@/app/components/exam-layout/blocks/ProgressBlock';
@@ -23,16 +23,12 @@ import type {
   ExamUserAnswers,
   QuestionIndexMap,
 } from '@/app/components/exam-layout/examLayoutTypes';
-// Trang làm bài giữ scss riêng ở features/tests, engine layout dùng lại class của nó.
-import pageStyles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
+// Trang làm bài và engine layout dùng chung class; scss đặt cạnh engine để bớt import chéo.
+import pageStyles from '@/app/components/exam-layout/TestStart.module.scss';
 import zoneStyles from '@/app/components/exam-layout/examLayout.module.scss';
 
 const cx = classNames.bind(pageStyles);
 const zx = classNames.bind(zoneStyles);
-
-// TestStartDashboard vẫn là .js ở features/tests (batch sau) nên TS suy props từ destructure và
-// coi prop có default là bắt buộc — nới về any tại chỗ import, gỡ khi file đó chuyển TS.
-const TestStartDashboardLoose = TestStartDashboard as any;
 
 function buildThemeStyle(theme: LayoutTheme = {}): React.CSSProperties {
   // CSS custom property (--primary...) không nằm trong CSSProperties nên gom vào record rồi cast.
@@ -169,7 +165,7 @@ function ExamLayoutRenderer({
 
         return (
           <div className={zx('sideNavInline')}>
-            <TestStartDashboardLoose
+            <TestStartDashboard
               allQuestions={allQuestions}
               userAnswers={userAnswers}
               onScrollToQuestion={navigateToQuestion}
@@ -343,7 +339,7 @@ function ExamLayoutRenderer({
           role="dialog"
           aria-label="Danh sách câu hỏi"
         >
-          <TestStartDashboardLoose
+          <TestStartDashboard
             allQuestions={allQuestions}
             userAnswers={userAnswers}
             onScrollToQuestion={(id: string) => {

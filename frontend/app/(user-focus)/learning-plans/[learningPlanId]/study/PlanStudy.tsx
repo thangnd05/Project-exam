@@ -16,18 +16,14 @@ import PlanPartTaskList from '@/app/components/learning-plans/PlanPartTaskList/P
 import { useSubmitSession } from './_hooks/useSubmitSession';
 import { usePlanSession } from './_hooks/usePlanSession';
 import { planNoticeText, planStageLabel, taskDisplayName } from '@/app/utils/planLabels';
-import TestStartDashboard from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
+import TestStartDashboard from '@/app/components/tests/TestStartDashboard';
 import ProgressBlock from '@/app/components/exam-layout/blocks/ProgressBlock';
 import SubmitBlock from '@/app/components/exam-layout/blocks/SubmitBlock';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
-import examStyles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
+import examStyles from '@/app/components/exam-layout/TestStart.module.scss';
 import { MediaType, PassageType, QuestionType } from '@/app/enums';
 import type { PassageResponse, QuestionResponse } from '@/app/types';
 
-// TODO: TestStartDashboard vẫn nằm ở features/tests/.../testStart (.js, không thuộc batch chuyển
-// exam-layout) — TS suy props từ destructure nên bắt buộc columns/canNavigateToQuestion dù runtime
-// cho phép bỏ trống. Cast any có chủ đích, bỏ khi trang làm bài chuyển sang TS.
-const TestStartDashboardLoose = TestStartDashboard as any;
 const cx = classNames.bind(styles);
 
 const ex = classNames.bind(examStyles);
@@ -497,7 +493,7 @@ function PlanStudy() {
 
             {(session.questions?.length ?? 0) > 0 && (
               <div className={cx('studySidebar')}>
-                <TestStartDashboardLoose
+                <TestStartDashboard
                   allQuestions={orderedQuestions}
                   userAnswers={navAnswers}
                   onScrollToQuestion={scrollToQuestion}

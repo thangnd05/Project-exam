@@ -1,5 +1,5 @@
-import TestByExamTypePage from '@/app/features/tests/exam/exam-types/detail/TestByExamTypePage';
+import TestByExamType from './TestByExamType';
 
 export default function Page() {
-  return <TestByExamTypePage />;
+  return <TestByExamType />;
 }

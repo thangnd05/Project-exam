@@ -26,9 +26,7 @@ import {
 
 const cx = classNames.bind(styles);
 
-// any có chủ đích: brandColors.js (file JS) dựng object bằng Object.defineProperties nên TS
-// suy ra {} — cast để đọc key màu, không đổi hành vi.
-const chartColors: any = brandColors;
+const chartColors = brandColors;
 
 const TARGET_VISIBLE_COUNT = 2;
 

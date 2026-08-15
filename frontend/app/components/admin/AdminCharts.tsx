@@ -26,9 +26,7 @@ import type { TooltipContentProps } from 'recharts';
 import { brandColors } from '@/app/assets/styles/brandColors';
 import type { MonthPerformance, NameValue } from '@/app/types/admin';
 
-// `any` có chủ đích: brandColors.js (file JS) dựng object bằng Object.defineProperties
-// (getter động) nên TS suy ra {} — đọc thuộc tính qua any, như ProfileOverview.tsx đã làm.
-const brand: any = brandColors;
+const brand = brandColors;
 
 // Bản ghi theo ngày cho các chart truy cập/hoạt động (BE trả field nào thì chart đọc field đó).
 type DayTrafficDatum = { day?: string; users?: number; exams?: number; guests?: number };

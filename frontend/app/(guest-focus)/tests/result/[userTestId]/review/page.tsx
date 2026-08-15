@@ -1,5 +1,5 @@
-import TestReviewPage from '@/app/features/tests/exam/exam-types/detail/result/TestReviewPage';
+import TestReview from './TestReview';
 
 export default function Page() {
-  return <TestReviewPage />;
+  return <TestReview />;
 }

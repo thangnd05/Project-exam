@@ -21,8 +21,7 @@ const cx = classNames.bind(styles);
 
 const READINESS_COLOR = '#16a34a';
 const BAR_TARGET_MET = '#16a34a';
-// `any` có chủ đích: brandColors.js dựng object bằng Object.defineProperties nên TS không thấy key.
-const brand: any = brandColors;
+const brand = brandColors;
 const BAR_DEFAULT = brand.primary;
 const BAR_BELOW = brand.unique;
 

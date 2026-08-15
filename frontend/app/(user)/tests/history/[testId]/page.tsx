@@ -1,5 +1,5 @@
-import TestHistoryPage from '@/app/features/tests/history/TestHistoryPage';
+import TestHistory from './TestHistory';
 
 export default function Page() {
-  return <TestHistoryPage />;
+  return <TestHistory />;
 }

@@ -1,5 +1,5 @@
-import TestLeaderboardPage from '@/app/features/tests/leaderboard/TestLeaderboardPage';
+import TestLeaderboard from './TestLeaderboard';
 
 export default function Page() {
-  return <TestLeaderboardPage />;
+  return <TestLeaderboard />;
 }

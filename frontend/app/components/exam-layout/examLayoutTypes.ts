@@ -2,7 +2,7 @@ import type { PassageResponse, QuestionResponse } from '@/app/types';
 
 /**
  * Kiểu dữ liệu bài làm đi qua engine layout (trang làm bài + preview của layout builder).
- * Dữ liệu thật đến từ useTestSession (còn .js) và dữ liệu mẫu từ sampleExamData, cấu trúc
+ * Dữ liệu thật đến từ useTestSession và dữ liệu mẫu từ sampleExamData, cấu trúc
  * rộng hơn TestPartResponse một chút (passage có thể null) nên khai riêng ở đây.
  */
 export type ExamPassage = PassageResponse | null | undefined;
@@ -20,11 +20,14 @@ export type ExamPart = {
   questionGroups?: ExamQuestionGroup[];
 };
 
-/** Đáp án người dùng đang chọn, gom theo questionId. */
+/**
+ * Đáp án người dùng đang chọn, gom theo questionId.
+ * Cho phép null vì useTestSession khôi phục bài dở từ API ghi thẳng `|| null` vào các field.
+ */
 export type ExamUserAnswer = {
-  selectedAnswerId?: string;
-  selectedAnswerIds?: string[];
-  answerText?: string;
+  selectedAnswerId?: string | null;
+  selectedAnswerIds?: string[] | null;
+  answerText?: string | null;
 };
 
 export type ExamUserAnswers = Record<string, ExamUserAnswer>;
