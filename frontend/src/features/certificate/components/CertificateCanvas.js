@@ -5,26 +5,21 @@ import styles from './CertificateCanvas.module.scss';
 
 const cx = classNames.bind(styles);
 
+/* Chữ trên chứng chỉ để tiếng Anh cho giống chứng chỉ quốc tế, nên ngày cũng theo
+   kiểu Anh ("15 August 2026") chứ không phải 15/08/2026. */
 const formatDate = (value) => {
   if (!value) return '--';
-  return new Date(value).toLocaleDateString('vi-VN', {
+  return new Date(value).toLocaleDateString('en-GB', {
     day: '2-digit',
-    month: '2-digit',
+    month: 'long',
     year: 'numeric',
   });
 };
 
-/**
- * Bản vẽ chứng chỉ dùng chung cho trang xem, trang tra cứu công khai và khung xem trước
- * ở trang quản trị  sửa một chỗ là ba nơi đổi theo, không có bản sao nào lệch.
- *
- * Tỉ lệ A4 ngang cố định qua aspect-ratio, chữ dùng đơn vị cqw nên phóng to thu nhỏ
- * vẫn cân; nhờ vậy in ra giấy giống hệt trên màn hình.
- *
- * `design` là bản chụp lúc cấp (certificate.design), không phải cấu hình hiện tại của mẫu.
- */
 function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, expiresAt, watermark }) {
   const accent = design?.accentColor;
+  const issuedYear = issuedAt ? new Date(issuedAt).getFullYear() : null;
+  const signatureName = design?.signatureName || design?.issuerName;
 
   return (
     <div
@@ -35,27 +30,34 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
       }}
     >
       <div className={cx('frame')}>
+        <span className={cx('corner', 'cornerTl')} aria-hidden="true" />
+        <span className={cx('corner', 'cornerTr')} aria-hidden="true" />
+        <span className={cx('corner', 'cornerBl')} aria-hidden="true" />
+        <span className={cx('corner', 'cornerBr')} aria-hidden="true" />
+
         {watermark && <span className={cx('watermark')}>{watermark}</span>}
 
         <header className={cx('head')}>
           {design?.logoUrl ? (
             <img className={cx('logo')} src={design.logoUrl} alt="" />
           ) : (
-            <span className={cx('logoFallback')}>{design?.issuerName || 'CHỨNG NHẬN'}</span>
+            <span className={cx('emblem')} aria-hidden="true" />
           )}
           {design?.issuerName && <p className={cx('issuer')}>{design.issuerName}</p>}
+          <span className={cx('ornament')} aria-hidden="true" />
         </header>
 
         <div className={cx('body')}>
-          <h1 className={cx('title')}>{design?.title || 'Chứng nhận hoàn thành'}</h1>
+          <h1 className={cx('title')}>{design?.title || 'Certificate of Achievement'}</h1>
           {design?.subtitle && <p className={cx('subtitle')}>{design.subtitle}</p>}
 
-          <p className={cx('presentedTo')}>Chứng nhận này được trao cho</p>
+          <p className={cx('presentedTo')}>This certificate is proudly presented to</p>
           <p className={cx('recipient')}>{recipientName || '---'}</p>
 
           {design?.examTypeName && (
             <p className={cx('reason')}>
-              đã hoàn thành và đạt yêu cầu bài thi <strong>{design.examTypeName}</strong>
+              for successfully completing and passing the{' '}
+              <strong>{design.examTypeName}</strong> examination
             </p>
           )}
           {design?.footerNote && <p className={cx('note')}>{design.footerNote}</p>}
@@ -63,15 +65,21 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
 
         <footer className={cx('foot')}>
           <div className={cx('footCol')}>
-            <span className={cx('footLabel')}>Ngày cấp</span>
+            <span className={cx('footLabel')}>Date of issue</span>
             <span className={cx('footValue')}>{formatDate(issuedAt)}</span>
             {expiresAt && (
-              <span className={cx('footHint')}>Có hiệu lực đến {formatDate(expiresAt)}</span>
+              <span className={cx('footHint')}>Valid until {formatDate(expiresAt)}</span>
             )}
           </div>
 
           <div className={cx('footCol', 'codeCol')}>
-            <span className={cx('footLabel')}>Mã tra cứu</span>
+            <span className={cx('seal')} aria-hidden="true">
+              <span className={cx('sealRing')}>
+                <span className={cx('sealMark')}>★</span>
+                {issuedYear && <span className={cx('sealYear')}>{issuedYear}</span>}
+              </span>
+            </span>
+            <span className={cx('footLabel')}>Verification code</span>
             <span className={cx('code')}>{certificateCode || '---'}</span>
           </div>
 
@@ -79,10 +87,10 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
             {design?.signatureImageUrl && (
               <img className={cx('signature')} src={design.signatureImageUrl} alt="" />
             )}
-            <span className={cx('signName')}>{design?.signatureName || ''}</span>
-            {design?.signatureTitle && (
-              <span className={cx('footHint')}>{design.signatureTitle}</span>
-            )}
+            <span className={cx('signName')}>{signatureName || ''}</span>
+            <span className={cx('footHint')}>
+              {design?.signatureTitle || 'Authorized signature'}
+            </span>
           </div>
         </footer>
       </div>

@@ -82,6 +82,7 @@ function CertificatesManagementPage() {
   const [issuedKeyword, setIssuedKeyword] = useState('');
   const [issuedStatus, setIssuedStatus] = useState('');
   const [revokingCertificate, setRevokingCertificate] = useState(null);
+  const [deletingCertificate, setDeletingCertificate] = useState(null);
 
   const issuedParams = useMemo(
     () => ({
@@ -98,7 +99,9 @@ function CertificatesManagementPage() {
     totalPages,
     totalElements,
     isLoading: issuedLoading,
+    isError: issuedError,
     revokeMutation,
+    deleteMutation: deleteIssuedMutation,
   } = useIssuedCertificates(issuedParams);
 
   const filteredTemplates = templates.filter((item) => {
@@ -187,6 +190,16 @@ function CertificatesManagementPage() {
     }
   };
 
+  const handleConfirmDeleteIssued = async () => {
+    if (!deletingCertificate) return;
+    try {
+      await deleteIssuedMutation.mutateAsync(deletingCertificate.certificateId);
+      setDeletingCertificate(null);
+    } catch (error) {
+      setErrorMessage('Không thể xoá chứng chỉ này.');
+    }
+  };
+
   const handleConfirmRevoke = async () => {
     if (!revokingCertificate) return;
     try {
@@ -269,6 +282,8 @@ function CertificatesManagementPage() {
 
       <AdminFieldError message={errorMessage} />
       {isError && <AdminFieldError message="Không tải được danh sách mẫu chứng chỉ." />}
+      {/* Không báo lỗi thì bảng rỗng trông y hệt "chưa cấp chứng chỉ nào". */}
+      {issuedError && <AdminFieldError message="Không tải được danh sách chứng chỉ đã cấp." />}
 
       <Nav variant="tabs" activeKey={tab} onSelect={(key) => setTab(key || 'templates')}>
         <Nav.Item>
@@ -344,18 +359,28 @@ function CertificatesManagementPage() {
             totalPages={totalPages}
             totalElements={totalElements}
             onPageChange={setIssuedPage}
-            rowActions={(item) =>
-              item.status === 'ACTIVE' ? (
+            rowActions={(item) => (
+              <>
+                {item.status === 'ACTIVE' && (
+                  <Button
+                    variant="light"
+                    size="sm"
+                    title="Thu hồi chứng chỉ"
+                    onClick={() => setRevokingCertificate(item)}
+                  >
+                    <ShieldX size={16} />
+                  </Button>
+                )}
                 <Button
                   variant="light"
                   size="sm"
-                  title="Thu hồi chứng chỉ"
-                  onClick={() => setRevokingCertificate(item)}
+                  title="Xoá hẳn chứng chỉ"
+                  onClick={() => setDeletingCertificate(item)}
                 >
-                  <ShieldX size={16} />
+                  <Trash2 size={16} />
                 </Button>
-              ) : null
-            }
+              </>
+            )}
           />
         </>
       )}
@@ -376,6 +401,15 @@ function CertificatesManagementPage() {
         onClose={() => setDeletingTemplate(null)}
         onConfirm={handleConfirmDelete}
         message={`Xoá mẫu chứng chỉ "${deletingTemplate?.title || ''}"? Loại đề này sẽ ngừng cấp chứng chỉ mới. Chứng chỉ đã cấp vẫn giữ nguyên vì đã lưu bản chụp riêng.`}
+      />
+
+      <ConfirmDeleteModal
+        show={Boolean(deletingCertificate)}
+        onClose={() => setDeletingCertificate(null)}
+        onConfirm={handleConfirmDeleteIssued}
+        message={`Xoá hẳn chứng chỉ ${deletingCertificate?.certificateCode || ''} của ${
+          deletingCertificate?.recipientName || ''
+        }? Mã này sẽ không tra cứu được nữa và không khôi phục lại được. Nếu chỉ muốn vô hiệu hoá mà vẫn giữ dấu vết thì dùng thu hồi.`}
       />
 
       <ConfirmModal

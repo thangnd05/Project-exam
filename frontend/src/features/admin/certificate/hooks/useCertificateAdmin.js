@@ -5,6 +5,7 @@ import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import {
   createCertificateTemplate,
   deleteCertificateTemplate,
+  deleteIssuedCertificate,
   getCertificateTemplates,
   getIssuedCertificates,
   revokeCertificate,
@@ -53,10 +54,20 @@ export function useIssuedCertificates(params) {
     queryFn: () => getIssuedCertificates(params),
   });
 
+  // Cả thu hồi lẫn xoá đều đổi số chứng chỉ còn hiệu lực nên phải làm mới cả bảng mẫu.
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-certificates', 'issued'] });
+    queryClient.invalidateQueries({ queryKey: certificateAdminKeys.templates });
+  };
+
   const revokeMutation = useMutation({
     mutationFn: ({ certificateId, reason }) => revokeCertificate(certificateId, reason),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['admin-certificates', 'issued'] }),
+    onSuccess: invalidateAll,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (certificateId) => deleteIssuedCertificate(certificateId),
+    onSuccess: invalidateAll,
   });
 
   return {
@@ -66,5 +77,6 @@ export function useIssuedCertificates(params) {
     isLoading: listQuery.isLoading,
     isError: listQuery.isError,
     revokeMutation,
+    deleteMutation,
   };
 }

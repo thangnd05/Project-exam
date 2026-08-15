@@ -73,4 +73,11 @@ public class CertificateAdminController {
         String reason = request == null ? null : request.getReason();
         return ResponseEntity.ok(certificateAdminService.revoke(certificateId, reason));
     }
+
+    @DeleteMapping("/{certificateId}")
+    public ResponseEntity<MessageResponse> deleteIssued(@PathVariable String certificateId) {
+        authUtils.requirePermission(PermissionCatalog.CERTIFICATE_MANAGE);
+        certificateAdminService.deleteIssued(certificateId);
+        return ResponseEntity.ok(MessageResponse.of("Đã xoá chứng chỉ"));
+    }
 }

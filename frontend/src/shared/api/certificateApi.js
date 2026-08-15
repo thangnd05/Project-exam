@@ -44,3 +44,8 @@ export const getIssuedCertificates = (params) => {
 export const revokeCertificate = (certificateId, reason) => {
   return axios.post(`${ADMIN_BASE_URL}/${certificateId}/revoke`, { reason }).then((res) => res.data);
 };
+
+/** Xoá hẳn chứng chỉ đã cấp (khác thu hồi: mã tra cứu biến mất luôn). */
+export const deleteIssuedCertificate = (certificateId) => {
+  return axios.delete(`${ADMIN_BASE_URL}/${certificateId}`).then((res) => res.data);
+};

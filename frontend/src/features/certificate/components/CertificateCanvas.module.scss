@@ -2,6 +2,9 @@
   Mọi kích thước bên trong tính theo cqw (phần trăm bề rộng của chính chứng chỉ) nên
   chứng chỉ co giãn nguyên khối: xem trên điện thoại, trên trang admin hay in ra giấy
   đều giữ đúng bố cục.
+
+  Màu trang trí đều pha từ --certificate-accent bằng color-mix, vì accent là mã màu tự do
+  admin nhập ở mẫu  không tách được ra kênh RGB để dùng rgb(... / alpha).
 */
 .canvas {
   container-type: inline-size;
@@ -14,12 +17,17 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   overflow: hidden;
+  /* Giữ nền hoa văn và con dấu khi in  mặc định trình duyệt bỏ hết màu nền. */
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 
   --certificate-accent: var(--brand-600);
+  /* Chữ trang trọng: bộ serif có sẵn trên mọi máy, không phải tải font ngoài. */
+  --certificate-serif: Georgia, 'Times New Roman', serif;
 }
 
 .canvas.hasBackground .frame {
-  background: rgb(255 255 255 / 0.88);
+  background: color-mix(in srgb, var(--white) 88%, transparent);
 }
 
 .frame {
@@ -28,12 +36,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 4cqw 5cqw;
+  padding: 3.4cqw 5cqw;
   border: 0.35cqw solid var(--certificate-accent);
   border-radius: var(--radius-md);
   text-align: center;
+  overflow: hidden;
 }
 
+/* Viền trong mảnh, tạo khung kép kiểu văn bằng. */
 .frame::before {
   content: '';
   position: absolute;
@@ -42,6 +52,85 @@
   border-radius: var(--radius-sm);
   opacity: 0.45;
   pointer-events: none;
+}
+
+/*
+  Hoa văn nền: quầng sáng accent ở đỉnh + lưới chéo rất mờ. Đủ để tờ giấy không trắng
+  trơn nhưng vẫn in ra sạch, không nuốt mực.
+*/
+.frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(
+      circle at 50% -10%,
+      color-mix(in srgb, var(--certificate-accent) 14%, transparent),
+      transparent 55%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--certificate-accent) 5%, transparent) 0 0.15cqw,
+      transparent 0.15cqw 2.4cqw
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, var(--certificate-accent) 5%, transparent) 0 0.15cqw,
+      transparent 0.15cqw 2.4cqw
+    );
+  pointer-events: none;
+}
+
+/* Nội dung phải nằm trên lớp hoa văn. */
+.head,
+.body,
+.foot,
+.corner,
+.watermark {
+  position: relative;
+  z-index: 1;
+}
+
+/* Góc trang trí: hai nét vuông góc ở bốn góc khung. */
+.corner {
+  position: absolute;
+  width: 5cqw;
+  height: 5cqw;
+  border: 0.3cqw solid var(--certificate-accent);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.cornerTl {
+  top: 1.9cqw;
+  left: 1.9cqw;
+  border-right: 0;
+  border-bottom: 0;
+  border-top-left-radius: var(--radius-sm);
+}
+
+.cornerTr {
+  top: 1.9cqw;
+  right: 1.9cqw;
+  border-left: 0;
+  border-bottom: 0;
+  border-top-right-radius: var(--radius-sm);
+}
+
+.cornerBl {
+  bottom: 1.9cqw;
+  left: 1.9cqw;
+  border-right: 0;
+  border-top: 0;
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.cornerBr {
+  bottom: 1.9cqw;
+  right: 1.9cqw;
+  border-left: 0;
+  border-top: 0;
+  border-bottom-right-radius: var(--radius-sm);
 }
 
 .watermark {
@@ -56,13 +145,14 @@
   opacity: 0.16;
   white-space: nowrap;
   pointer-events: none;
+  z-index: 2;
 }
 
 .head {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6cqw;
+  gap: 0.7cqw;
 }
 
 .logo {
@@ -71,10 +161,25 @@
   object-fit: contain;
 }
 
-.logoFallback {
-  font-size: 2.2cqw;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.4cqw;
+/* Huy hiệu thay logo khi mẫu chưa gắn ảnh: vòng tròn accent có ngôi sao ở giữa. */
+.emblem {
+  position: relative;
+  width: 6.4cqw;
+  height: 6.4cqw;
+  border-radius: 50%;
+  border: 0.28cqw solid var(--certificate-accent);
+  background: color-mix(in srgb, var(--certificate-accent) 10%, transparent);
+}
+
+.emblem::before {
+  content: '★';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3cqw;
+  line-height: 1;
   color: var(--certificate-accent);
 }
 
@@ -86,6 +191,37 @@
   color: var(--text-secondary);
 }
 
+/* Dải phân cách  ◆  giữa phần đầu và phần thân. */
+.ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1cqw;
+  width: 34cqw;
+  margin-top: 0.6cqw;
+  color: var(--certificate-accent);
+}
+
+.ornament::before,
+.ornament::after {
+  content: '';
+  flex: 1;
+  height: 0.12cqw;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--certificate-accent) 70%, transparent)
+  );
+}
+
+.ornament::after {
+  background: linear-gradient(
+    to left,
+    transparent,
+    color-mix(in srgb, var(--certificate-accent) 70%, transparent)
+  );
+}
+
 .body {
   display: flex;
   flex-direction: column;
@@ -95,8 +231,10 @@
 
 .title {
   margin: 0;
-  font-size: 4.6cqw;
+  font-family: var(--certificate-serif);
+  font-size: 5.4cqw;
   font-weight: var(--font-weight-bold);
+  letter-spacing: 0.15cqw;
   line-height: 1.15;
   color: var(--certificate-accent);
 }
@@ -108,22 +246,46 @@
 }
 
 .presentedTo {
-  margin: 1.2cqw 0 0;
-  font-size: 1.7cqw;
+  margin: 1.4cqw 0 0;
+  font-size: 1.6cqw;
+  font-style: italic;
+  letter-spacing: 0.1cqw;
   color: var(--text-secondary);
 }
 
+/*
+  Tên người nhận là điểm nhìn chính: chữ serif lớn, gạch chân bằng dải accent mờ dần
+  hai đầu thay cho đường kẻ ngang cứng.
+*/
 .recipient {
+  position: relative;
   margin: 0;
-  padding-bottom: 0.8cqw;
-  border-bottom: 0.15cqw solid var(--border-color);
-  font-size: 4.2cqw;
+  padding: 0 4cqw 1.1cqw;
+  font-family: var(--certificate-serif);
+  font-size: 4.6cqw;
   font-weight: var(--font-weight-bold);
+  letter-spacing: 0.1cqw;
   color: var(--text-color);
 }
 
+.recipient::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.18cqw;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--certificate-accent) 75%, transparent) 20%,
+    color-mix(in srgb, var(--certificate-accent) 75%, transparent) 80%,
+    transparent
+  );
+}
+
 .reason {
-  margin: 0.6cqw 0 0;
+  margin: 0.8cqw 0 0;
   font-size: 1.9cqw;
   color: var(--text-color);
 }
@@ -132,6 +294,7 @@
   margin: 0;
   max-width: 70cqw;
   font-size: 1.5cqw;
+  font-style: italic;
   color: var(--text-secondary);
 }
 
@@ -152,6 +315,7 @@
 .codeCol {
   text-align: center;
   align-items: center;
+  gap: 0.4cqw;
 }
 
 .signCol {
@@ -185,18 +349,66 @@
   color: var(--certificate-accent);
 }
 
+/* Con dấu tròn ở giữa chân trang, ngay trên mã tra cứu. */
+.seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 9.6cqw;
+  height: 9.6cqw;
+  margin-bottom: 0.6cqw;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 32% 28%,
+      color-mix(in srgb, var(--white) 45%, var(--certificate-accent)),
+      var(--certificate-accent) 70%
+    );
+  box-shadow: 0 0.4cqw 1cqw color-mix(in srgb, var(--certificate-accent) 35%, transparent);
+}
+
+.sealRing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1cqw;
+  width: 82%;
+  height: 82%;
+  border-radius: 50%;
+  border: 0.14cqw dashed color-mix(in srgb, var(--white) 75%, transparent);
+  color: var(--white);
+}
+
+.sealMark {
+  font-size: 2.6cqw;
+  line-height: 1;
+}
+
+.sealYear {
+  font-size: 1.2cqw;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.12cqw;
+}
+
 .signature {
   max-height: 5cqw;
   max-width: 22cqw;
   object-fit: contain;
 }
 
+/*
+  Luôn có dòng kẻ chữ ký kể cả khi mẫu chưa nhập tên  chỗ ký để trống vẫn đúng kiểu
+  văn bằng, còn hơn một cột trống trơ.
+*/
 .signName {
-  padding-top: 0.4cqw;
-  border-top: 0.12cqw solid var(--border-color);
-  font-size: 1.8cqw;
+  min-height: 2.2cqw;
+  min-width: 20cqw;
+  padding-top: 0.5cqw;
+  border-top: 0.12cqw solid color-mix(in srgb, var(--certificate-accent) 55%, transparent);
+  font-family: var(--certificate-serif);
+  font-size: 1.9cqw;
   font-weight: var(--font-weight-semibold);
   color: var(--text-color);
-  min-width: 18cqw;
   text-align: center;
 }

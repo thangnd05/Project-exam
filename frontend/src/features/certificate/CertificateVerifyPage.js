@@ -23,14 +23,14 @@ const STATE_VIEW = {
     tone: 'invalid',
     heading: 'Chứng chỉ đã bị thu hồi',
     message: 'Chứng chỉ từng được cấp nhưng đã bị thu hồi, không còn giá trị sử dụng.',
-    watermark: 'ĐÃ THU HỒI',
+    watermark: 'REVOKED',
   },
   EXPIRED: {
     icon: Clock,
     tone: 'warning',
     heading: 'Chứng chỉ đã hết hạn',
     message: 'Chứng chỉ này đã quá thời hạn hiệu lực.',
-    watermark: 'HẾT HẠN',
+    watermark: 'EXPIRED',
   },
   NOT_FOUND: {
     icon: ShieldAlert,

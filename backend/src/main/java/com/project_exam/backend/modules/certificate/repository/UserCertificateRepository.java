@@ -38,9 +38,8 @@ public interface UserCertificateRepository extends JpaRepository<UserCertificate
             SELECT c FROM UserCertificate c
             WHERE (:examTypeId IS NULL OR c.examTypeId = :examTypeId)
               AND (:status IS NULL OR c.status = :status)
-              AND (:keyword IS NULL
-                   OR LOWER(c.recipientName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR LOWER(c.certificateCode) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              AND (LOWER(c.recipientName) LIKE :keyword
+                   OR LOWER(c.certificateCode) LIKE :keyword)
             """)
     Page<UserCertificate> search(@Param("examTypeId") String examTypeId,
                                  @Param("status") UserCertificate.Status status,

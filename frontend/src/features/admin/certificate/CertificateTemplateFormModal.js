@@ -212,7 +212,7 @@ function CertificateTemplateFormModal({
             recipientName="Nguyễn Văn A"
             certificateCode="EXAM-2026-XXXXXX"
             issuedAt={new Date().toISOString()}
-            watermark="XEM TRƯỚC"
+            watermark="PREVIEW"
           />
         </Col>
       </Row>

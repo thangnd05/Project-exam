@@ -89,7 +89,7 @@ function CertificateDetailPage() {
             certificateCode={certificate.certificateCode}
             issuedAt={certificate.issuedAt}
             expiresAt={certificate.expiresAt}
-            watermark={revoked ? 'ĐÃ THU HỒI' : expired ? 'HẾT HẠN' : undefined}
+            watermark={revoked ? 'REVOKED' : expired ? 'EXPIRED' : undefined}
           />
         </div>
       </Container>

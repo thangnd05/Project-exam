@@ -139,7 +139,9 @@ public class CertificateAdminService {
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "issuedAt"));
 
         UserCertificate.Status statusFilter = parseStatus(status);
-        String keywordFilter = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        String keywordFilter = (keyword == null || keyword.isBlank())
+                ? "%"
+                : "%" + keyword.trim().toLowerCase() + "%";
         String examTypeFilter = (examTypeId == null || examTypeId.isBlank()) ? null : examTypeId;
 
         Page<UserCertificate> result = userCertificateRepository
@@ -159,6 +161,18 @@ public class CertificateAdminService {
         certificate.setRevokedAt(Instant.now());
         certificate.setRevokedReason(reason);
         return certificateMapper.toResponse(userCertificateRepository.save(certificate), true);
+    }
+
+    /**
+     * Xoá hẳn một chứng chỉ đã cấp. Khác thu hồi: thu hồi giữ lại dấu vết để người tra cứu
+     * biết chứng chỉ từng tồn tại nhưng hết giá trị, còn xoá là mã tra cứu biến mất hoàn toàn.
+     * Dành cho bản cấp nhầm/cấp thử, nên để đó chỉ làm bẩn dữ liệu.
+     */
+    @Transactional
+    public void deleteIssued(String certificateId) {
+        UserCertificate certificate = userCertificateRepository.findById(certificateId)
+                .orElseThrow(() -> new NotFoundException("Chứng chỉ không tồn tại"));
+        userCertificateRepository.delete(certificate);
     }
 
     private UserCertificate.Status parseStatus(String raw) {

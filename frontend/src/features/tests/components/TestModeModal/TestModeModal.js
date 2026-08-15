@@ -185,8 +185,7 @@ function TestModeModal({ show, test, onClose, onStart }) {
             className={cx('exam-start')}
             onClick={handleStartFull}
           >
-            <IoPlayOutline />
-            Bắt đầu thi thử
+            Bắt đầu thi
           </button>
         </div>
       ) : (
