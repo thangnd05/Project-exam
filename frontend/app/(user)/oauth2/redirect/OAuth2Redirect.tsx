@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
-import { fetchCurrentUser } from '@/app/features/user/login/hooks/useAuthActions';
+import { fetchCurrentUser } from '@/app/hooks/useAuthActions';
 import { claimGuestAfterLogin, takeOAuthRedirect } from '@/app/utils/authRedirect';
 
 function OAuth2Redirect() {

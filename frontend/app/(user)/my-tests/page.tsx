@@ -1,5 +1,5 @@
-import MyTestPage from '@/app/features/user/mytest/MyTestPage';
+import MyTest from './MyTest';
 
 export default function Page() {
-  return <MyTestPage />;
+  return <MyTest />;
 }

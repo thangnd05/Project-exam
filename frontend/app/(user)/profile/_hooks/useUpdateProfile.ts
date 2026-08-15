@@ -7,7 +7,7 @@ export const profileKeys = {
   me: () => ['my-info'],
 };
 
-export function useMyInfo(enabled) {
+export function useMyInfo(enabled?: boolean) {
   const query = useQuery({
     queryKey: profileKeys.me(),
     queryFn: getMyInfo,
@@ -21,10 +21,15 @@ export function useMyInfo(enabled) {
   };
 }
 
+interface UpdateProfileVariables {
+  userId: string;
+  formData: FormData;
+}
+
 export function useUpdateProfile() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, formData }) => updateUser(userId, formData),
+    mutationFn: ({ userId, formData }: UpdateProfileVariables) => updateUser(userId, formData),
     onSuccess: () => qc.invalidateQueries({ queryKey: profileKeys.me() }),
   });
 }

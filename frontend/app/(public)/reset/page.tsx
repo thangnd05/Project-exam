@@ -1,4 +1,4 @@
-import ResetPassWord from '@/app/features/user/login/ResetPasswordPage';
+import ResetPassWord from './ResetPassword';
 
 export default function Page() {
   return <ResetPassWord />;

@@ -3,21 +3,29 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '@/app/configs/queryClient';
 import { getMyPosts, getCategories, deletePost } from '@/app/apis/postApi';
+import type { CategoryResponse, PageResponse, PostSummaryResponse } from '@/app/types';
+
+interface MyPostsParams {
+  page?: number;
+  size?: number;
+  keyword?: string;
+  status?: string;
+}
 
 export const myPostsKeys = {
   all: ['my-posts'],
-  list: (params) => ['my-posts', 'list', params],
+  list: (params: MyPostsParams) => ['my-posts', 'list', params],
   categories: ['post-categories'],
 };
 
-const normalizePage = (data) => ({
+const normalizePage = (data: PageResponse<PostSummaryResponse>) => ({
   posts: Array.isArray(data?.content) ? data.content : [],
   totalPages: data?.totalPages || 0,
 });
 
-const normalizeCategories = (data) => (Array.isArray(data) ? data : []);
+const normalizeCategories = (data: CategoryResponse[]) => (Array.isArray(data) ? data : []);
 
-export function useMyPosts({ page, size, keyword, status }) {
+export function useMyPosts({ page, size, keyword, status }: MyPostsParams) {
   const qc = useQueryClient();
 
   const apiParams = {

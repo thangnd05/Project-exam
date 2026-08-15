@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {useState} from 'react';
 import classNames from 'classnames/bind';
-import style from './login.module.scss';
+import style from '../login/login.module.scss';
 import routes from '@/app/configs/Routes';
 import {Form, Button} from 'react-bootstrap';
-import { useForgotPasswordMutation } from '@/app/features/user/login/hooks/useAuthActions';
+import { useForgotPasswordMutation } from '@/app/hooks/useAuthActions';
 
 const cx = classNames.bind(style);
 
@@ -20,7 +20,7 @@ function ForgotPassword() {
   const router = useRouter();
   const forgotPasswordMutation = useForgotPasswordMutation();
 
-  const handleReset = async (e) => {
+  const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setMessage('');
@@ -35,8 +35,8 @@ function ForgotPassword() {
       setTimeout(() => {
         router.push(routes.reset);
       }, 6000);
-    } catch (error) {
-
+    } catch (error: any) {
+      // any có chủ đích: lỗi axios (error.response) chưa có type dùng chung trong dự án
       if (error.response) {
         setError(error.response.data.message || 'Đã xảy ra lỗi!');
       } else {
@@ -60,10 +60,10 @@ function ForgotPassword() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập email!');
+            onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+              (e.target as HTMLInputElement).setCustomValidity('Vui lòng nhập email!');
             }}
-            onInput={(e) => e.target.setCustomValidity('')}
+            onInput={(e: React.FormEvent<HTMLInputElement>) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </Form.Group>
 

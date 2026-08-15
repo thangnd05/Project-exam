@@ -9,24 +9,25 @@ import { toast } from 'react-toastify';
 import {
   useLoginMutation,
   useRegisterMutation,
-} from '@/app/features/user/login/hooks/useAuthActions';
+} from '@/app/hooks/useAuthActions';
 import {
   getRedirectTarget,
   saveOAuthRedirect,
   claimGuestAfterLogin,
 } from '@/app/utils/authRedirect';
+import routes from '@/app/configs/Routes';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import { FcGoogle } from "react-icons/fc";
 import { name } from '@/app/assets/images';
-import RecaptchaCheckbox from '@/app/components/Recaptcha/RecaptchaCheckbox';
+import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/components/Recaptcha/RecaptchaCheckbox';
 
 const cx = classNames.bind(style);
 
 // Chưa cấu hình khóa (máy dev) thì bỏ qua bước xác minh thay vì chặn đăng ký.
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 
-function LoginPage() {
+function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
 
   const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -37,7 +38,7 @@ function LoginPage() {
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState('');
-  const recaptchaRef = useRef(null);
+  const recaptchaRef = useRef<RecaptchaCheckboxHandle | null>(null);
 
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -73,7 +74,7 @@ function LoginPage() {
     }
   }, [user, router, searchParams]);
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
@@ -96,7 +97,8 @@ function LoginPage() {
       } else {
         throw new Error("User data invalid");
       }
-    } catch (err) {
+    } catch (err: any) {
+      // any có chủ đích: lỗi axios (err.response) chưa có type dùng chung trong dự án
       setMessage(
         err.response?.data?.message ||
         "Đăng nhập thất bại. Vui lòng thử lại!"
@@ -107,7 +109,7 @@ function LoginPage() {
     }
   };
 
-  const handleRegister = async (e) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (RECAPTCHA_SITE_KEY && !recaptchaToken) {
       setMessage('Vui lòng xác nhận bạn không phải là người máy.');
@@ -132,7 +134,8 @@ function LoginPage() {
       toast.success('Đăng ký thành công! Đăng nhập để bắt đầu nhé.');
       // toast.info('Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
       setIsSignUp(false);
-    } catch (err) {
+    } catch (err: any) {
+      // any có chủ đích: lỗi axios (err.response) chưa có type dùng chung trong dự án
       const errorMessage =
         err.response?.data?.message ||
         (err.response?.status === 500
@@ -250,4 +253,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default Login;

@@ -9,10 +9,10 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   LineChart, Line
 } from 'recharts';
-import ChangePasswordModal from './modals/ChangePasswordModal';
-import UpdateProfileModal from './modals/UpdateProfileModal';
-import ProfileSectionModal from './ProfileSectionModal';
-import styles from './ProfileOverviewPage.module.scss';
+import ChangePasswordModal from './_components/ChangePasswordModal';
+import UpdateProfileModal from './_components/UpdateProfileModal';
+import ProfileSectionModal from '@/app/components/ProfileSectionModal/ProfileSectionModal';
+import styles from './ProfileOverview.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import { brandColors } from '@/app/assets/styles/brandColors';
@@ -22,37 +22,42 @@ import {
   useProfileOverview,
   useMyTargets,
   useMyActivity,
-} from '@/app/features/user/profile/hooks/useProfileDashboard';
+} from './_hooks/useProfileDashboard';
 
 const cx = classNames.bind(styles);
 
+// any có chủ đích: brandColors.js (file JS) dựng object bằng Object.defineProperties nên TS
+// suy ra {} — cast để đọc key màu, không đổi hành vi.
+const chartColors: any = brandColors;
+
 const TARGET_VISIBLE_COUNT = 2;
 
-const formatDateTime = (value) => {
+const formatDateTime = (value?: string | null) => {
   if (!value) return '--';
   const parsedDate = new Date(value);
   if (Number.isNaN(parsedDate.getTime())) return '--';
   return parsedDate.toLocaleString('vi-VN');
 };
 
-const formatNumber = (value) => {
+/* Các format helper nhận unknown vì dữ liệu tới từ nhiều nguồn (API + recharts formatter) */
+const formatNumber = (value: unknown) => {
   const safeValue = Number(value) || 0;
   return safeValue.toLocaleString('vi-VN');
 };
 
-const formatMonthLabel = (value) => {
+const formatMonthLabel = (value?: string) => {
   if (!value) return '';
   const [year, month] = value.split('-');
   return `Tháng ${Number(month)}/${year}`;
 };
 
-const formatMonthShort = (value) => {
+const formatMonthShort = (value?: string) => {
   if (!value) return '';
   const [, month] = value.split('-');
   return `T${Number(month)}`;
 };
 
-const formatDuration = (minutes) => {
+const formatDuration = (minutes: unknown) => {
   const total = Math.max(0, Math.round(Number(minutes) || 0));
   const h = Math.floor(total / 60);
   const m = total % 60;
@@ -60,12 +65,12 @@ const formatDuration = (minutes) => {
   return `${m}p`;
 };
 
-function ProfileOverviewPage() {
+function ProfileOverview() {
   const router = useRouter();
   const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
-  const [activeSection, setActiveSection] = useState(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   const [showAllTargets, setShowAllTargets] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
@@ -300,7 +305,7 @@ function ProfileOverviewPage() {
                             labelFormatter={(d) => `Ngày ${d}`}
                             formatter={(value) => [formatDuration(value), 'Thời gian']}
                           />
-                          <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={28} fill={brandColors.primary} />
+                          <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={28} fill={chartColors.primary} />
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
@@ -346,7 +351,7 @@ function ProfileOverviewPage() {
                           <Line
                             type="monotone"
                             dataKey="minutes"
-                            stroke={brandColors.primary}
+                            stroke={chartColors.primary}
                             strokeWidth={2}
                             dot={{ r: 4 }}
                             activeDot={{ r: 6 }}
@@ -441,7 +446,7 @@ function ProfileOverviewPage() {
                                 size="sm"
                                 className={cx('targetActionFlex')}
                                 onClick={() =>
-                                  router.push(`${routes.targetDashboard}?examTypeId=${encodeURIComponent(target.examTypeId)}`)
+                                  router.push(`${routes.targetDashboard}?examTypeId=${encodeURIComponent(target.examTypeId ?? '')}`)
                                 }
                               >
                                 Dashboard
@@ -451,7 +456,7 @@ function ProfileOverviewPage() {
                                 size="sm"
                                 className={cx('targetActionFlex')}
                                 onClick={() =>
-                                  router.push(`${routes.generatePlan}?examTypeId=${encodeURIComponent(target.examTypeId)}`)
+                                  router.push(`${routes.generatePlan}?examTypeId=${encodeURIComponent(target.examTypeId ?? '')}`)
                                 }
                               >
                                 Sinh lộ trình
@@ -505,4 +510,4 @@ function ProfileOverviewPage() {
   );
 }
 
-export default ProfileOverviewPage;
+export default ProfileOverview;

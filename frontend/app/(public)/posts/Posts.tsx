@@ -10,7 +10,7 @@ import routes from '@/app/configs/Routes';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import Pagination from '@/app/components/Pagination/Pagination';
 import CreatePostModal from '@/app/components/CreatePostModal/CreatePostModal';
-import ProfileSectionModal from '@/app/features/user/profile/ProfileSectionModal';
+import ProfileSectionModal from '@/app/components/ProfileSectionModal/ProfileSectionModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);

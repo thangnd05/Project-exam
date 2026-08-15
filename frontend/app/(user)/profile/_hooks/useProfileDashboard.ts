@@ -7,27 +7,44 @@ import { getExamTypes } from '@/app/apis/examTypeApi';
 import { getExamParts } from '@/app/apis/examPartApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { sortPartsByLookup } from '@/app/utils/partOrder';
+import type {
+  ExamPartResponse,
+  ExamTypeResponse,
+  UserTargetPartResponse,
+  UserTargetResponse,
+} from '@/app/types';
+
+/* Part requirement đã gắn thêm tên Part (join từ danh sách exam parts ở FE) */
+export interface ProfileTargetPart extends UserTargetPartResponse {
+  examPartName?: string;
+}
+
+/* Mục tiêu hiển thị ở dashboard cá nhân: target + tên loại đề + parts đã sort/đặt tên */
+export interface ProfileTarget extends Omit<UserTargetResponse, 'partRequirements'> {
+  examTypeName?: string;
+  partRequirements: ProfileTargetPart[];
+}
 
 export const profileDashboardKeys = {
   overview: () => ['profile-overview'],
   targets: () => ['profile-targets'],
-  activity: (month, year) => ['profile-activity', month || '', year || ''],
+  activity: (month?: string, year?: string) => ['profile-activity', month || '', year || ''],
 };
 
-const fetchMyTargets = async () => {
+const fetchMyTargets = async (): Promise<ProfileTarget[]> => {
   const [examTypes, examParts] = await Promise.all([
-    getExamTypes().catch(() => []),
-    getExamParts().catch(() => []),
+    getExamTypes().catch(() => [] as ExamTypeResponse[]),
+    getExamParts().catch(() => [] as ExamPartResponse[]),
   ]);
   if (!Array.isArray(examTypes) || examTypes.length === 0) {
     return [];
   }
-  const partNameById = new Map();
+  const partNameById = new Map<string, string | undefined>();
   (examParts || []).forEach((p) => partNameById.set(p.examPartId, p.name));
   const results = await Promise.all(
     examTypes.map((et) =>
       getUserTarget(et.examTypeId)
-        .then((data) =>
+        .then((data): ProfileTarget | null =>
           data?.hasTarget
             ? {
                 ...data,
@@ -45,7 +62,7 @@ const fetchMyTargets = async () => {
         .catch(() => null)
     )
   );
-  return results.filter(Boolean);
+  return results.filter((target): target is ProfileTarget => Boolean(target));
 };
 
 export function useProfileOverview() {
@@ -72,7 +89,7 @@ export function useMyTargets() {
   };
 }
 
-export function useMyActivity(selectedMonth, selectedYear) {
+export function useMyActivity(selectedMonth?: string, selectedYear?: string) {
   const query = useQuery({
     queryKey: profileDashboardKeys.activity(selectedMonth, selectedYear),
     queryFn: () =>

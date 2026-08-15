@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
 import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, IoSearchOutline, IoEllipsisVertical, IoPencilOutline, IoTrashOutline, IoChevronBackOutline, IoChevronForwardOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
@@ -12,23 +12,24 @@ import { fetchPostById } from '@/app/hooks/usePosts';
 import CreatePostModal from '@/app/components/CreatePostModal/CreatePostModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import routes from '@/app/configs/Routes';
-import { useMyPosts } from '@/app/features/user/profile/hooks/useMyPosts';
+import { useMyPosts } from '../_hooks/useMyPosts';
+import type { PostResponse, PostSummaryResponse } from '@/app/types';
 import styles from './PostsListPage.module.scss';
 
 const cx = classNames.bind(styles);
 
 const PAGE_SIZE = 5;
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: (i) => ({
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: { duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
-const STATUS_LABEL = {
+const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
   PENDING: { text: 'Chờ duyệt', cls: 'pending' },
   APPROVED: { text: 'Đã duyệt', cls: 'approved' },
 };
@@ -39,25 +40,29 @@ const FILTER_OPTIONS = [
   { value: 'PENDING', label: 'Chờ duyệt' },
 ];
 
-const formatDate = (value) => {
+const formatDate = (value?: string | null) => {
   if (!value) return '--';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '--';
   return d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
-const formatCount = (n) => {
+const formatCount = (n: unknown) => {
   const v = Number(n) || 0;
   if (v >= 1000) return `${(v / 1000).toFixed(1).replace(/\.0$/, '')}k`;
   return String(v);
 };
 
-function MyPostsPage({ embedded = false }) {
+type MyPostsPageProps = {
+  embedded?: boolean;
+};
+
+function MyPostsPage({ embedded = false }: MyPostsPageProps) {
   const router = useRouter();
-  const [actionLoadingId, setActionLoadingId] = useState(null);
-  const [editingPost, setEditingPost] = useState(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [editingPost, setEditingPost] = useState<PostResponse | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [deletingPost, setDeletingPost] = useState(null);
+  const [deletingPost, setDeletingPost] = useState<PostSummaryResponse | null>(null);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -90,7 +95,7 @@ function MyPostsPage({ embedded = false }) {
 
   const hasActiveFilter = statusFilter !== 'ALL' || debouncedSearch.trim().length > 0;
 
-  const handleEdit = async (postId) => {
+  const handleEdit = async (postId: string) => {
     setActionLoadingId(postId);
     try {
       const fullPost = await fetchPostById(postId);
@@ -126,7 +131,7 @@ function MyPostsPage({ embedded = false }) {
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
-    const pages = [];
+    const pages: Array<number | string> = [];
     for (let i = 0; i < totalPages; i++) {
       if (
         i === 0 ||
@@ -240,7 +245,7 @@ function MyPostsPage({ embedded = false }) {
         {!loading && !errorMessage && posts.length > 0 && (
           <div className={cx('list')}>
             {posts.map((post, index) => {
-              const status = STATUS_LABEL[post.status] || { text: post.status, cls: '' };
+              const status = (post.status && STATUS_LABEL[post.status]) || { text: post.status || '', cls: '' };
               const detailUrl = routes.postDetail.replace(':postId', post.id);
               return (
                 <motion.article

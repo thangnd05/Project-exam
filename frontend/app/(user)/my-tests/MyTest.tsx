@@ -10,25 +10,31 @@ import {
   IoDocumentTextOutline,
 } from 'react-icons/io5';
 
-import styles from './MyTestPage.module.scss';
+import styles from './MyTest.module.scss';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useMyTests, useDeleteTest, useInvalidateMyTests } from '@/app/hooks/useMyTests';
 import CreateTestModal from '@/app/features/tests/components/CreateTestModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import TestListContainer from '@/app/features/tests/components/TestListContainer/TestListContainer';
 import Pagination from '@/app/components/Pagination/Pagination';
+import type { TestResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 const PAGE_SIZE = 12;
 
-function MyTestPage() {
+// TODO(tests-batch): 2 component dưới còn là .js (features/tests chưa chuyển TS) — TS suy props
+// sai (never[]/thiếu optional) nên nới về any, gỡ cast khi chuyển batch tests.
+const TestListContainerLoose = TestListContainer as React.ComponentType<any>;
+const CreateTestModalLoose = CreateTestModal as React.ComponentType<any>;
+
+function MyTest() {
   const { user } = useAuth();
   const router = useRouter();
 
-  const [countdowns, setCountdowns] = useState({});
+  const [countdowns, setCountdowns] = useState<Record<string, number>>({});
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [testToDelete, setTestToDelete] = useState(null);
+  const [testToDelete, setTestToDelete] = useState<TestResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
 
   const { tests, totalPages, isLoading: loading, isError } = useMyTests({
@@ -38,7 +44,7 @@ function MyTestPage() {
   const deleteTestMutation = useDeleteTest();
   const invalidateMyTests = useInvalidateMyTests();
 
-  const handleDeleteTest = (testId) => {
+  const handleDeleteTest = (testId: string) => {
     const selectedTest = tests.find((testItem) => testItem.testId === testId);
     setTestToDelete(selectedTest || null);
     setShowDeleteModal(true);
@@ -80,11 +86,11 @@ function MyTestPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
-      const updated = {};
+      const updated: Record<string, number> = {};
 
       tests.forEach((t) => {
         if (t.availableFrom) {
-          const diff = new Date(t.availableFrom) - now;
+          const diff = new Date(t.availableFrom).getTime() - now.getTime();
           if (diff > 0) updated[t.testId] = diff;
         }
       });
@@ -98,7 +104,8 @@ function MyTestPage() {
   if (loading) {
     return (
       <div className={cx('loading-box')}>
-        <Spinner animation="grow" variant="primary" size="lg" />
+        {/* size "lg" nằm ngoài type của react-bootstrap (chỉ có 'sm') nhưng code cũ vẫn truyền — giữ nguyên hành vi */}
+        <Spinner animation="grow" variant="primary" size={'lg' as any} />
         <p>Đang tải bộ sưu tập đề thi...</p>
       </div>
     );
@@ -118,7 +125,7 @@ function MyTestPage() {
 
   return (
     <>
-      <TestListContainer
+      <TestListContainerLoose
         title="Bài kiểm tra của tôi"
         label="QUẢN LÝ ĐỀ THI"
         actionText="Tạo đề thi mới"
@@ -138,7 +145,7 @@ function MyTestPage() {
         }
       />
 
-      <CreateTestModal
+      <CreateTestModalLoose
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSuccess={() => {
@@ -163,4 +170,4 @@ function MyTestPage() {
   );
 }
 
-export default MyTestPage;
+export default MyTest;

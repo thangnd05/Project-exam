@@ -9,32 +9,37 @@ import {toast} from 'react-toastify';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
-import {useMyEvaluations} from '@/app/features/user/profile/hooks/useMyEvaluations';
+import {useMyEvaluations} from '../_hooks/useMyEvaluations';
+import type { EvaluationResponse } from '@/app/types';
 import styles from './MyEvaluationsPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-const formatDateTime = (value) => {
+const formatDateTime = (value?: string | null) => {
   if (!value) return '--';
   const parsedDate = new Date(value);
   if (Number.isNaN(parsedDate.getTime())) return '--';
   return parsedDate.toLocaleString('vi-VN');
 };
 
-function MyEvaluationsPage({ embedded = false }) {
+type MyEvaluationsPageProps = {
+  embedded?: boolean;
+};
+
+function MyEvaluationsPage({ embedded = false }: MyEvaluationsPageProps) {
   const router = useRouter();
   const {evaluations, isLoading: loading, isError, updateMutation, deleteMutation} =
     useMyEvaluations();
   const errorMessage = isError
     ? 'Không tải được danh sách đánh giá. Vui lòng thử lại sau.'
     : '';
-  const [editingEvaluationId, setEditingEvaluationId] = useState(null);
+  const [editingEvaluationId, setEditingEvaluationId] = useState<string | null>(null);
   const [editRating, setEditRating] = useState(0);
   const [editContent, setEditContent] = useState('');
-  const [actionLoadingId, setActionLoadingId] = useState(null);
-  const [deletingEvaluationId, setDeletingEvaluationId] = useState(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [deletingEvaluationId, setDeletingEvaluationId] = useState<string | null>(null);
 
-  const startEditEvaluation = (evaluation) => {
+  const startEditEvaluation = (evaluation: EvaluationResponse) => {
     setEditingEvaluationId(evaluation.id);
     setEditRating(Number(evaluation.rating || 0));
     setEditContent(evaluation.content || '');
@@ -46,7 +51,7 @@ function MyEvaluationsPage({ embedded = false }) {
     setEditContent('');
   };
 
-  const handleUpdateEvaluation = async (evaluationId) => {
+  const handleUpdateEvaluation = async (evaluationId: string) => {
     const trimmedContent = editContent.trim();
     if (!editRating || editRating < 1 || editRating > 5) {
       toast.error('Vui lòng chọn số sao từ 1 đến 5.');

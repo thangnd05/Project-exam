@@ -1,5 +1,5 @@
-import ProfileOverviewPage from '@/app/features/user/profile/ProfileOverviewPage';
+import ProfileOverview from './ProfileOverview';
 
 export default function Page() {
-  return <ProfileOverviewPage />;
+  return <ProfileOverview />;
 }

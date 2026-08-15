@@ -2,12 +2,19 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyEvaluations, updateEvaluation, deleteEvaluation } from '@/app/apis/evaluationApi';
+import type { EvaluationResponse } from '@/app/types';
 
 export const myEvaluationsKeys = {
   list: () => ['my-evaluations'],
 };
 
-const normalizeEvaluations = (data) => (Array.isArray(data) ? data : []);
+const normalizeEvaluations = (data: EvaluationResponse[]) => (Array.isArray(data) ? data : []);
+
+interface UpdateEvaluationVariables {
+  evaluationId: string;
+  rating: number;
+  content: string;
+}
 
 export function useMyEvaluations() {
   const queryClient = useQueryClient();
@@ -19,14 +26,14 @@ export function useMyEvaluations() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ evaluationId, rating, content }) =>
+    mutationFn: ({ evaluationId, rating, content }: UpdateEvaluationVariables) =>
       updateEvaluation(evaluationId, { rating, content }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: myEvaluationsKeys.list() }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (evaluationId) => deleteEvaluation(evaluationId),
+    mutationFn: (evaluationId: string) => deleteEvaluation(evaluationId),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: myEvaluationsKeys.list() }),
   });

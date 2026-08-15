@@ -9,12 +9,18 @@ import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scss';
 import styles from './UpdateProfileModal.module.scss';
-import { useMyInfo, useUpdateProfile } from '@/app/features/user/profile/hooks/useUpdateProfile';
+import { useMyInfo, useUpdateProfile } from '../_hooks/useUpdateProfile';
 
 const cmx = classNames.bind(commonModalStyles);
 const cx = classNames.bind(styles);
 
-function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
+type UpdateProfileModalProps = {
+  show: boolean;
+  onHide: () => void;
+  onUpdateSuccess?: () => void;
+};
+
+function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModalProps) {
   const { userInfo, isLoading: loading, isError } = useMyInfo(show);
   const updateProfileMutation = useUpdateProfile();
   const submitting = updateProfileMutation.isPending;
@@ -25,10 +31,10 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     userName: ''
   });
 
-  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState('');
 
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const resetForm = useCallback(() => {
     setFormValues({ fullName: '', email: '', userName: '' });
@@ -60,15 +66,15 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
     }
   }, [show, resetForm]);
 
-  const updateField = (fieldName, fieldValue) => {
+  const updateField = (fieldName: string, fieldValue: string) => {
     setFormValues((prev) => ({
       ...prev,
       [fieldName]: fieldValue,
     }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
         toast.warning('Vui lòng chọn file hình ảnh (jpg, png, v.v.).');
@@ -100,7 +106,11 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
       return;
     }
 
-    if (!userInfo?.userId) {
+    // any có chủ đích: code cũ đọc userInfo.userId trong khi type UserResponse (khớp BE) chỉ có
+    // `id` — giữ nguyên hành vi khi chuyển TS, cần đối chiếu lại BE trước khi sửa logic.
+    const userId = (userInfo as any)?.userId;
+
+    if (!userId) {
       toast.error('Lỗi dữ liệu. Không tìm thấy ID người dùng.');
       return;
     }
@@ -109,11 +119,11 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
       const formData = new FormData();
 
       const userPayload = {
-        userId: userInfo.userId,
+        userId,
         userName: formValues.userName,
         fullName: formValues.fullName,
         email: formValues.email,
-        verified: userInfo.verified
+        verified: userInfo?.verified
       };
 
       formData.append('user', JSON.stringify(userPayload));
@@ -122,14 +132,15 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }) {
         formData.append('avatar', avatarFile);
       }
 
-      await updateProfileMutation.mutateAsync({ userId: userInfo.userId, formData });
+      await updateProfileMutation.mutateAsync({ userId, formData });
 
       toast.success('Cập nhật thông tin thành công!');
       if (onUpdateSuccess) {
         onUpdateSuccess();
       }
       closeModal();
-    } catch (error) {
+    } catch (error: any) {
+      // any có chủ đích: lỗi axios (error.response) chưa có type dùng chung trong dự án
       const apiMessage = error.response?.data?.message || 'Cập nhật thất bại. Vui lòng thử lại.';
       toast.error(apiMessage);
     }

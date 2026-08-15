@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import { useVerifyEmailMutation } from '@/app/features/user/login/hooks/useAuthActions';
+import { useVerifyEmailMutation } from '@/app/hooks/useAuthActions';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './VerifyEmailPage.module.scss';
 
@@ -90,3 +90,7 @@ export default function VerifyEmailPage() {
   );
 }
 */
+
+// Toàn bộ component đang nằm trong comment (tính năng đã tắt); export rỗng để file vẫn là
+// module hợp lệ với isolatedModules.
+export {};

@@ -4,48 +4,53 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
 import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, IoSearchOutline, IoEllipsisVertical, IoChevronBackOutline, IoChevronForwardOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import routes from '@/app/configs/Routes';
-import { useSavedPosts, useUnsavePost } from '@/app/features/user/profile/hooks/useSavedPosts';
+import { useSavedPosts, useUnsavePost } from '@/app/hooks/useSavedPosts';
+import type { PostSummaryResponse } from '@/app/types';
 import styles from './PostsListPage.module.scss';
 
 const cx = classNames.bind(styles);
 
 const PAGE_SIZE = 5;
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: (i) => ({
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: { duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
-const formatDate = (value) => {
+const formatDate = (value?: string | null) => {
   if (!value) return '--';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '--';
   return d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
-const formatCount = (n) => {
+const formatCount = (n: unknown) => {
   const v = Number(n) || 0;
   if (v >= 1000) return `${(v / 1000).toFixed(1).replace(/\.0$/, '')}k`;
   return String(v);
 };
 
-function SavedPostsPage({ embedded = false }) {
+type SavedPostsPageProps = {
+  embedded?: boolean;
+};
+
+function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
   const router = useRouter();
-  const [actionLoadingId, setActionLoadingId] = useState(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
-  const [unsavingPost, setUnsavingPost] = useState(null);
+  const [unsavingPost, setUnsavingPost] = useState<PostSummaryResponse | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -85,7 +90,7 @@ function SavedPostsPage({ embedded = false }) {
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
-    const pages = [];
+    const pages: Array<number | string> = [];
     for (let i = 0; i < totalPages; i++) {
       if (
         i === 0 ||

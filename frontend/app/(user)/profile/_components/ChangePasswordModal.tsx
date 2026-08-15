@@ -1,7 +1,7 @@
 'use client';
 
 import {useState} from 'react';
-import { useChangePassword } from '@/app/features/user/profile/hooks/useChangePassword';
+import { useChangePassword } from '../_hooks/useChangePassword';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
@@ -10,7 +10,12 @@ import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scs
 
 const cmx = classNames.bind(commonModalStyles);
 
-function ChangePasswordModal({show, onHide}) {
+type ChangePasswordModalProps = {
+  show: boolean;
+  onHide: () => void;
+};
+
+function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
   const changePasswordMutation = useChangePassword();
   const submitting = changePasswordMutation.isPending;
   const [formValues, setFormValues] = useState({
@@ -19,7 +24,7 @@ function ChangePasswordModal({show, onHide}) {
     confirmNewPassword: '',
   });
 
-  const updateField = (fieldName, fieldValue) => {
+  const updateField = (fieldName: string, fieldValue: string) => {
     setFormValues((prev) => ({
       ...prev,
       [fieldName]: fieldValue,

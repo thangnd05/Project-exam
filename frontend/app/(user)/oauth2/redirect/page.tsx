@@ -1,4 +1,4 @@
-import OAuth2Redirect from '@/app/features/user/login/OAuth2Redirect';
+import OAuth2Redirect from './OAuth2Redirect';
 
 export default function Page() {
   return <OAuth2Redirect />;

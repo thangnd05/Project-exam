@@ -1,4 +1,4 @@
-import Login from '@/app/features/user/login/LoginPage';
+import Login from './Login';
 
 export const metadata = {
   title: 'Đăng nhập',

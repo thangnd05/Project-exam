@@ -4,15 +4,17 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {useState} from 'react';
 import classNames from 'classnames/bind';
-import style from './login.module.scss';
+import style from '../login/login.module.scss';
 import routes from '@/app/configs/Routes';
 import {Form, Button} from 'react-bootstrap';
-import { useResetPasswordMutation } from '@/app/features/user/login/hooks/useAuthActions';
+import { useResetPasswordMutation } from '@/app/hooks/useAuthActions';
 
 const cx = classNames.bind(style);
 
 function ResetPassWord() {
-  const [searchParams] = useSearchParams();
+  // useSearchParams của Next trả thẳng ReadonlyURLSearchParams (bản react-router cũ trả tuple
+  // nên destructure [searchParams] — leftover đó khiến .get() không chạy, đã sửa khi chuyển TS).
+  const searchParams = useSearchParams();
   // Link trong email đặt lại mật khẩu trỏ tới /reset?token=... nên điền sẵn giúp người dùng;
   // ô nhập vẫn giữ để ai copy token thủ công vẫn dùng được.
   const [token, setToken] = useState(() => searchParams.get('token') || '');
@@ -23,7 +25,7 @@ function ResetPassWord() {
   const router = useRouter();
   const resetPasswordMutation = useResetPasswordMutation();
 
-  const handleResetPassword = async (e) => {
+  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
     setError('');
@@ -40,8 +42,8 @@ function ResetPassWord() {
       setTimeout(() => {
         router.push(routes.login);
       }, 2000);
-    } catch (err) {
-
+    } catch (err: any) {
+      // any có chủ đích: lỗi axios (err.response) chưa có type dùng chung trong dự án
       if (err.response && err.response.status === 400) {
         setError('Token không hợp lệ hoặc đã hết hạn!');
       }
@@ -65,10 +67,10 @@ function ResetPassWord() {
             required
             value={token}
             onChange={(e) => setToken(e.target.value)}
-            onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập token!');
+            onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+              (e.target as HTMLInputElement).setCustomValidity('Vui lòng nhập token!');
             }}
-            onInput={(e) => e.target.setCustomValidity('')}
+            onInput={(e: React.FormEvent<HTMLInputElement>) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </Form.Group>
 
@@ -80,10 +82,10 @@ function ResetPassWord() {
             required
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            onInvalid={(e) => {
-              e.target.setCustomValidity('Vui lòng nhập mật khẩu mới!');
+            onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+              (e.target as HTMLInputElement).setCustomValidity('Vui lòng nhập mật khẩu mới!');
             }}
-            onInput={(e) => e.target.setCustomValidity('')}
+            onInput={(e: React.FormEvent<HTMLInputElement>) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </Form.Group>
 
@@ -95,10 +97,10 @@ function ResetPassWord() {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            onInvalid={(e) => {
-              e.target.setCustomValidity('Xác nhận mật khẩu mới!');
+            onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+              (e.target as HTMLInputElement).setCustomValidity('Xác nhận mật khẩu mới!');
             }}
-            onInput={(e) => e.target.setCustomValidity('')}
+            onInput={(e: React.FormEvent<HTMLInputElement>) => (e.target as HTMLInputElement).setCustomValidity('')}
           />
         </Form.Group>
 
