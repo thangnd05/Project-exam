@@ -110,11 +110,16 @@
 */
 .certificate-section {
   margin-bottom: 28px;
-  padding: 20px 22px 24px;
+  padding: 16px 22px;
   border: 1px solid var(--primary-alpha-35);
   border-radius: var(--radius-xl);
   background: linear-gradient(135deg, var(--primary-alpha-08), transparent 60%), var(--bg-white);
   box-shadow: var(--shadow-sm);
+}
+
+/* Mở ra mới cần chỗ cho lưới đề bên dưới; lúc đóng khu này chỉ cao bằng một thanh tiêu đề. */
+.certificate-section.open {
+  padding-bottom: 24px;
 }
 
 .certificate-head {
@@ -122,7 +127,39 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 14px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.certificate-section.open .certificate-head {
   margin-bottom: 18px;
+}
+
+.certificate-chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 2rem;
+  color: var(--primary);
+  transition: transform 0.25s ease;
+}
+
+.certificate-section.open .certificate-chevron {
+  transform: rotate(180deg);
+}
+
+.certificate-count {
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--primary-alpha-15);
+  color: var(--primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  vertical-align: middle;
 }
 
 .certificate-icon {

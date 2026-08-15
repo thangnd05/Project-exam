@@ -9,6 +9,7 @@ import {
   IoChevronForward,
   IoSchoolOutline,
   IoRibbonOutline,
+  IoChevronDown,
 } from 'react-icons/io5';
 import TestCard from '~/features/tests/components/TestCard/TestCard';
 import routes, { buildExamTypeCollectionPath, buildExamTypeDetailPath } from '~/shared/config/Routes';
@@ -28,6 +29,7 @@ function TestByExamTypePage() {
 
   const [countdowns, setCountdowns] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
+  const [certificateOpen, setCertificateOpen] = useState(false);
 
   const { tests, totalPages, examTypeName, folders, children, certificateExam, isLoading } =
     useTestsByExamType(examTypeId, currentPage);
@@ -128,13 +130,23 @@ function TestByExamTypePage() {
   */
   const certificateTests = certificateExam?.tests ?? [];
   const certificateSection = certificateTests.length > 0 && (
-    <div className={cx('certificate-section')}>
-      <div className={cx('certificate-head')}>
+    <div className={cx('certificate-section', { open: certificateOpen })}>
+      {/* Mặc định đóng: phần lớn lượt vào trang là để luyện đề, thi lấy chứng chỉ chỉ mở khi cần. */}
+      <button
+        type="button"
+        className={cx('certificate-head')}
+        onClick={() => setCertificateOpen((prev) => !prev)}
+        aria-expanded={certificateOpen}
+        aria-controls="certificate-exams"
+      >
         <span className={cx('certificate-icon')}>
           <IoRibbonOutline />
         </span>
-        <div className={cx('certificate-heading')}>
-          <span className={cx('certificate-title')}>Thi lấy chứng chỉ</span>
+        <span className={cx('certificate-heading')}>
+          <span className={cx('certificate-title')}>
+            Thi lấy chứng chỉ
+            <span className={cx('certificate-count')}>{certificateTests.length} đề</span>
+          </span>
           <span className={cx('certificate-desc')}>
             Đạt {certificateExam.passScore} điểm để nhận
             {certificateExam.certificateTitle ? ` ${certificateExam.certificateTitle}` : ' chứng chỉ'}
@@ -143,16 +155,20 @@ function TestByExamTypePage() {
               : ''}
             .
           </span>
-        </div>
+        </span>
         {certificateExam.alreadyOwned && (
           <span className={cx('certificate-owned')}>Bạn đã có chứng chỉ này</span>
         )}
-      </div>
-      <div className={cx('certificate-grid')}>
-        {certificateTests.map((test) => (
-          <TestCard key={test.testId} test={test} countdowns={countdowns} />
-        ))}
-      </div>
+        <IoChevronDown className={cx('certificate-chevron')} />
+      </button>
+
+      {certificateOpen && (
+        <div className={cx('certificate-grid')} id="certificate-exams">
+          {certificateTests.map((test) => (
+            <TestCard key={test.testId} test={test} countdowns={countdowns} />
+          ))}
+        </div>
+      )}
     </div>
   );
 
