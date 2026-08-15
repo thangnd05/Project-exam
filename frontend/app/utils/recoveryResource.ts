@@ -2,19 +2,29 @@ import routes from '@/app/configs/Routes';
 
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i;
 
-export const isMarkdownResource = (resource) => {
+export type RecoveryResourceLike = {
+  resourceId?: string | number | null;
+  originalFileName?: string | null;
+  url?: string | null;
+  resourceUrl?: string | null;
+};
+
+export const isMarkdownResource = (resource: RecoveryResourceLike | null | undefined): boolean => {
   const fileName = resource?.originalFileName || resource?.url || '';
   return MARKDOWN_FILE_PATTERN.test(fileName);
 };
 
-export const getRecoveryResourceViewPath = (resourceId) => {
+export const getRecoveryResourceViewPath = (resourceId: string | number | null | undefined): string | null => {
   if (!resourceId) {
     return null;
   }
   return routes.recoveryResourceView.replace(':resourceId', String(resourceId));
 };
 
-export const getRecoveryResourceOpenUrl = (resource, apiBase = '') => {
+export const getRecoveryResourceOpenUrl = (
+  resource: RecoveryResourceLike | null | undefined,
+  apiBase = '',
+): string | null => {
   if (!resource) {
     return null;
   }
@@ -33,7 +43,10 @@ export const getRecoveryResourceOpenUrl = (resource, apiBase = '') => {
   return resource.url || resource.resourceUrl || null;
 };
 
-export const getRecoveryResourceLinkProps = (resource, apiBase = '') => {
+export const getRecoveryResourceLinkProps = (
+  resource: RecoveryResourceLike | null | undefined,
+  apiBase = '',
+): { href: string; external: boolean } | null => {
   const url = getRecoveryResourceOpenUrl(resource, apiBase);
   if (!url) {
     return null;

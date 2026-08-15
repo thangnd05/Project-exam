@@ -1,11 +1,28 @@
-export const formatCountdown = (ms) => {
+type TestScheduleLike = {
+  testId?: string | number;
+  availableFrom?: string | null;
+  availableTo?: string | null;
+  canDoTest?: boolean | null;
+  maxAttempts?: number | null;
+  remainingAttempts?: number | null;
+  durationMinutes?: number | null;
+};
+
+export type TestStatusInfo = {
+  status: 'open' | 'locked' | 'expired';
+  statusLabel: string;
+  buttonText: string;
+  canStart: boolean;
+};
+
+export const formatCountdown = (ms: number): string => {
     const totalSeconds = Math.floor(ms / 1000);
     const m = Math.floor(totalSeconds / 60);
     const s = totalSeconds % 60;
     return `${m}p ${s}s`;
 };
 
-export const formatDateTime = (dateStr) => {
+export const formatDateTime = (dateStr: string | null | undefined): string => {
     if (!dateStr) return '—';
     return new Date(dateStr).toLocaleString('vi-VN', {
         month: '2-digit',
@@ -15,7 +32,7 @@ export const formatDateTime = (dateStr) => {
     });
 };
 
-export const formatFullDateTime = (dateStr) => {
+export const formatFullDateTime = (dateStr: string | null | undefined): string => {
     if (!dateStr) return '—';
     return new Date(dateStr).toLocaleString('vi-VN', {
         day: '2-digit',
@@ -27,12 +44,16 @@ export const formatFullDateTime = (dateStr) => {
     });
 };
 
-export const getTestStatus = (test, now, countdowns) => {
+export const getTestStatus = (
+    test: TestScheduleLike,
+    now: Date,
+    countdowns?: Record<string | number, number> | null,
+): TestStatusInfo => {
     const availableFrom = test.availableFrom ? new Date(test.availableFrom) : null;
     const availableTo = test.availableTo ? new Date(test.availableTo) : null;
-    const remainingTime = countdowns?.[test.testId];
+    const remainingTime = test.testId != null ? countdowns?.[test.testId] : undefined;
 
-    let status = 'open';
+    let status: TestStatusInfo['status'] = 'open';
     let statusLabel = 'Đang diễn ra';
     let buttonText = 'Bắt đầu';
     let canStart = true;
@@ -64,7 +85,7 @@ export const getTestStatus = (test, now, countdowns) => {
     return { status, statusLabel, buttonText, canStart };
 };
 
-export const calculateAllowedTime = (test) => {
+export const calculateAllowedTime = (test: TestScheduleLike): number | null => {
     const now = new Date();
     const availableTo = test.availableTo ? new Date(test.availableTo) : null;
 
@@ -75,7 +96,7 @@ export const calculateAllowedTime = (test) => {
     let allowedTime = test.durationMinutes * 60;
 
     if (availableTo) {
-        const timeUntilClose = Math.floor((availableTo - now) / 1000);
+        const timeUntilClose = Math.floor((availableTo.getTime() - now.getTime()) / 1000);
         if (timeUntilClose < allowedTime) {
             allowedTime = timeUntilClose;
         }

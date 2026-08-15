@@ -2,7 +2,7 @@
  * Rút gọn số lớn cho UI chật (header badge…).
  * Hover/tooltip nên dùng formatFullNumber để hiện số dư chính xác.
  */
-export function formatCompactNumber(value) {
+export function formatCompactNumber(value: number | string | null | undefined): string {
   const n = Number(value);
   if (!Number.isFinite(n) || n < 0) {
     return '0';
@@ -29,7 +29,7 @@ export function formatCompactNumber(value) {
   return `${String(oneDec).replace('.', ',')}M`;
 }
 
-export function formatFullNumber(value) {
+export function formatFullNumber(value: number | string | null | undefined): string {
   const n = Number(value);
   if (!Number.isFinite(n)) {
     return '0';

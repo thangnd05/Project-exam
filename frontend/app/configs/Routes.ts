@@ -85,15 +85,19 @@ const routes = {
   oauth2Redirect: '/oauth2/redirect',
 
   notFoundPage: '/not-found',
-  notFound: '*',
-};
+} as const;
 
-export function buildExamTypeDetailPath(examTypeId) {
+export type RouteKey = keyof typeof routes;
+
+export function buildExamTypeDetailPath(examTypeId: string | number | null | undefined): string {
   if (!examTypeId) return routes.home;
   return `/exam-types/${encodeURIComponent(examTypeId)}`;
 }
 
-export function buildExamTypeCollectionPath(examTypeId, collectionId) {
+export function buildExamTypeCollectionPath(
+  examTypeId: string | number | null | undefined,
+  collectionId: string | number | null | undefined,
+): string {
   if (!examTypeId || !collectionId) return routes.home;
   return `/exam-types/${encodeURIComponent(examTypeId)}/collections/${encodeURIComponent(collectionId)}`;
 }

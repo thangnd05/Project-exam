@@ -1,4 +1,4 @@
-import { PERMISSIONS as P } from './permissions';
+import { PERMISSIONS as P, type PermissionCode } from './permissions';
 
 /**
  * Quyền tối thiểu để mở từng trang admin — đúng quyền mà backend đòi ở API của trang đó,
@@ -8,7 +8,7 @@ import { PERMISSIONS as P } from './permissions';
  * sidebar mà người dùng không mở được. Thêm trang admin mới thì khai ở đây, nếu không
  * trang đó sẽ KHÔNG bị chặn quyền.
  */
-export const adminPermissionByPath = {
+export const adminPermissionByPath: Record<string, PermissionCode> = {
   '/admin/dashboard': P.DASHBOARD_VIEW,
   '/admin/users': P.USER_MANAGE,
   '/admin/roles': P.ROLE_MANAGE,
@@ -47,7 +47,7 @@ export default adminPermissionByPath;
  * còn pathname là '/admin/exam-types/abc-123/layout'. Tra thẳng sẽ trả undefined ⇒ trang đó
  * mất luôn lớp kiểm quyền, nên phải so khớp theo mẫu.
  */
-export function findAdminPermission(pathname) {
+export function findAdminPermission(pathname: string | null | undefined): PermissionCode | undefined {
   if (!pathname) return undefined;
   const direct = adminPermissionByPath[pathname];
   if (direct) return direct;

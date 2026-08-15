@@ -1,5 +1,5 @@
 /**
- * Mã quyền dùng ở FE  phải khớp từng chữ với PermissionCatalog.java bên backend.
+ * Mã quyền dùng ở FE — phải khớp từng chữ với PermissionCatalog.java bên backend.
  * Danh sách quyền của người đang đăng nhập lấy từ /api/auth/me (AuthContext.permissions).
  */
 export const PERMISSIONS = {
@@ -33,4 +33,6 @@ export const PERMISSIONS = {
   AUDIT_VIEW: 'AUDIT:VIEW',
   DASHBOARD_VIEW: 'DASHBOARD:VIEW',
   EMAIL_MANAGE: 'EMAIL:MANAGE',
-};
+} as const;
+
+export type PermissionCode = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
