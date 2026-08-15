@@ -8,7 +8,7 @@ import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { isPracticeAttempt } from '@/app/utils/planLabels';
 import type { PlanResponse, UserTestResponse } from '@/app/types';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

@@ -5,21 +5,35 @@ import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { getEnhancedResult } from '@/app/apis/enhancedResultApi';
+import type {
+  EnhancedResultResponse,
+  ExamTypeResponse,
+  UserTargetResponse,
+  UserTestResponse,
+} from '@/app/types';
 
 export const targetAchievedKeys = {
   examTypes: ['exam-types', 'standard'],
-  detail: (examTypeId) => ['target-achieved', examTypeId],
+  detail: (examTypeId?: string) => ['target-achieved', examTypeId],
 };
 
-const normalizeExamTypes = (data) => (Array.isArray(data) ? data : data?.content ?? []);
+// API có nơi trả mảng trần, có nơi bọc page {content} — any có chủ đích để giữ nhánh phòng thủ cũ.
+const normalizeExamTypes = (data: any): ExamTypeResponse[] =>
+  (Array.isArray(data) ? data : data?.content ?? []);
 
-async function fetchTargetAchieved(examTypeId) {
+type TargetAchievedData = {
+  target: UserTargetResponse | null;
+  latestMock: UserTestResponse | null;
+  enhanced: EnhancedResultResponse | null;
+};
+
+async function fetchTargetAchieved(examTypeId: string): Promise<TargetAchievedData> {
   const target = await getUserTarget(examTypeId).catch(() => null);
 
   const completed = await getMyCompletedUserTests(examTypeId);
   const latestMock = completed[0] || null;
 
-  let enhanced = null;
+  let enhanced: EnhancedResultResponse | null = null;
   if (latestMock?.userTestId) {
     try {
       const r = await getEnhancedResult(latestMock.userTestId);
@@ -32,7 +46,7 @@ async function fetchTargetAchieved(examTypeId) {
   return { target, latestMock, enhanced };
 }
 
-export function useTargetAchieved(examTypeId) {
+export function useTargetAchieved(examTypeId: string) {
   const examTypesQuery = useQuery({
     queryKey: targetAchievedKeys.examTypes,
     queryFn: getStandardExamTypes,
@@ -53,6 +67,7 @@ export function useTargetAchieved(examTypeId) {
     latestMock: detailQuery.data?.latestMock ?? null,
     enhanced: detailQuery.data?.enhanced ?? null,
     isLoading: detailQuery.isLoading,
-    error: err ? (err?.response?.data?.message || err.message) : null,
+    // Giữ nguyên cách lấy message của bản .js (axios error không có type sẵn).
+    error: err ? ((err as any)?.response?.data?.message || err.message) : null,
   };
 }

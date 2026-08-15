@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import classNames from 'classnames/bind';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import ReviewQuestionCard from '@/app/components/Review/ReviewQuestionCard';
 import ReviewFooterNav from '@/app/components/Review/ReviewFooterNav';
 import { QuestionType } from '@/app/enums';

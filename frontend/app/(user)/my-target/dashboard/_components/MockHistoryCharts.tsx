@@ -14,21 +14,39 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import styles from '../MockHistoryPanel.module.scss';
+import styles from './MockHistoryPanel.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
 const READINESS_COLOR = '#16a34a';
 const BAR_TARGET_MET = '#16a34a';
-const BAR_DEFAULT = brandColors.primary;
-const BAR_BELOW = brandColors.unique;
+// `any` có chủ đích: brandColors.js dựng object bằng Object.defineProperties nên TS không thấy key.
+const brand: any = brandColors;
+const BAR_DEFAULT = brand.primary;
+const BAR_BELOW = brand.unique;
 
-function MockHistoryTooltip({ active, payload }) {
+export type MockChartPoint = {
+  key: string;
+  order: number;
+  dateLabel: string;
+  fullDate: string;
+  totalScore: number | null;
+  readinessScore: number | null;
+  isTargetMet?: boolean | null;
+};
+
+type MockHistoryTooltipProps = {
+  active?: boolean;
+  // payload của recharts tooltip — any có chủ đích, chỉ đọc payload[0].payload.
+  payload?: any[];
+};
+
+function MockHistoryTooltip({ active, payload }: MockHistoryTooltipProps) {
   if (!active || !payload?.length) {
     return null;
   }
-  const row = payload[0]?.payload;
+  const row: MockChartPoint | undefined = payload[0]?.payload;
   if (!row) {
     return null;
   }
@@ -56,7 +74,14 @@ function MockHistoryTooltip({ active, payload }) {
   );
 }
 
-function MockHistoryCharts({ chartData, targetScore, loading, examTypeName }) {
+type MockHistoryChartsProps = {
+  chartData: MockChartPoint[];
+  targetScore?: number | null;
+  loading?: boolean;
+  examTypeName?: string;
+};
+
+function MockHistoryCharts({ chartData, targetScore, loading, examTypeName }: MockHistoryChartsProps) {
   const scores = chartData
     .map((p) => p.totalScore)
     .filter((v) => v != null);

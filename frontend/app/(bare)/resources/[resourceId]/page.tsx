@@ -1,5 +1,5 @@
-import RecoveryResourceViewPage from '@/app/features/diagnostic/resources/RecoveryResourceViewPage';
+import RecoveryResourceView from './RecoveryResourceView';
 
 export default function Page() {
-  return <RecoveryResourceViewPage />;
+  return <RecoveryResourceView />;
 }

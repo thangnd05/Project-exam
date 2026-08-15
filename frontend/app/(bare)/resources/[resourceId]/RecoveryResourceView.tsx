@@ -7,13 +7,13 @@ import classNames from 'classnames/bind';
 import { Spinner } from 'react-bootstrap';
 import { Printer } from 'lucide-react';
 import routes from '@/app/configs/Routes';
-import { useRecoveryResourceView } from '@/app/features/diagnostic/resources/hooks/useRecoveryResourceView';
-import styles from './RecoveryResourceViewPage.module.scss';
+import { useRecoveryResourceView } from './_hooks/useRecoveryResourceView';
+import styles from './RecoveryResourceView.module.scss';
 
 const cx = classNames.bind(styles);
 
-function RecoveryResourceViewPage() {
-  const { resourceId } = useParams();
+function RecoveryResourceView() {
+  const { resourceId } = useParams<{ resourceId: string }>();
   const {
     resource,
     markdownHtml,
@@ -87,4 +87,4 @@ function RecoveryResourceViewPage() {
   );
 }
 
-export default RecoveryResourceViewPage;
+export default RecoveryResourceView;

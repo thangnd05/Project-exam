@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import classNames from 'classnames/bind';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
-import { TERM_TIPS } from '@/app/features/diagnostic/termTips';
-import { buildGaugeView } from '@/app/features/diagnostic/target/utils/readiness-label';
+import { TERM_TIPS } from '@/app/utils/termTips';
+import { buildGaugeView } from '@/app/utils/readiness-label';
 import styles from './Result.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 

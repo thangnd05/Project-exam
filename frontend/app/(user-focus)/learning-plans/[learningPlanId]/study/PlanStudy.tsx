@@ -19,7 +19,7 @@ import { planNoticeText, planStageLabel, taskDisplayName } from '@/app/utils/pla
 import TestStartDashboard from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
 import ProgressBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/ProgressBlock';
 import SubmitBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/SubmitBlock';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import examStyles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
 import { MediaType, PassageType, QuestionType } from '@/app/enums';
 import type { PassageResponse, QuestionResponse } from '@/app/types';

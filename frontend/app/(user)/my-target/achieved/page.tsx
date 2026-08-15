@@ -1,5 +1,5 @@
-import TargetAchievedPage from '@/app/features/diagnostic/target/TargetAchievedPage';
+import TargetAchieved from './TargetAchieved';
 
 export default function Page() {
-  return <TargetAchievedPage />;
+  return <TargetAchieved />;
 }

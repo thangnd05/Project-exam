@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import routes from '@/app/configs/Routes';
-import { buildRecoveryMessage } from '@/app/features/diagnostic/target/utils/readiness-label';
+import { buildRecoveryMessage } from '@/app/utils/readiness-label';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);

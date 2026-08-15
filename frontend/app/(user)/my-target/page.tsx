@@ -1,5 +1,5 @@
-import UserTargetPage from '@/app/features/diagnostic/target/UserTargetPage';
+import UserTarget from './UserTarget';
 
 export default function Page() {
-  return <UserTargetPage />;
+  return <UserTarget />;
 }

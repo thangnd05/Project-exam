@@ -1,4 +1,4 @@
-import MockHistoryRedirect from '@/app/features/diagnostic/mock-history/MockHistoryRedirect';
+import MockHistoryRedirect from './MockHistoryRedirect';
 
 export default function Page() {
   return <MockHistoryRedirect />;

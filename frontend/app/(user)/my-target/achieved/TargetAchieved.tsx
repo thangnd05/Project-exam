@@ -5,21 +5,23 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
-import { useTargetAchieved } from '@/app/features/diagnostic/target/hooks/useTargetAchieved';
+import { useTargetAchieved } from '@/app/hooks/useTargetAchieved';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
-function suggestNextTarget(current) {
+function suggestNextTarget(current: number | null | undefined): number | null {
   if (current == null) return null;
   const step = 50;
   const next = Math.min(990, Math.round((current + step) / 10) * 10);
   return next > current ? next : current + 10;
 }
 
-function TargetAchievedPage() {
-  const [searchParams] = useSearchParams();
+function TargetAchieved() {
+  // Bản .js cũ destructure kiểu react-router `const [searchParams] = ...` — useSearchParams
+  // của Next trả thẳng ReadonlyURLSearchParams, sửa lại để gọi .get() đúng.
+  const searchParams = useSearchParams();
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
 
   const { examTypes, target, latestMock, enhanced, isLoading: loading, error } =
@@ -92,13 +94,13 @@ function TargetAchievedPage() {
         </div>
       )}
 
-      {!loading && isAchieved && (
+      {!loading && isAchieved && target && (
         <>
           <div className={cx('hero')}>
             <h1 className={cx('heroTitle')}>Bạn đã đạt mục tiêu!</h1>
             <p className={cx('heroSubtitle')}>
               Mục tiêu: <strong>{target.targetScore}</strong>
-              {enhancedMatches && enhanced?.totalScore != null && (
+              {enhancedMatches && enhanced?.totalScore != null && target.targetScore != null && (
                 <>
                   {' · '}Điểm đạt được:{' '}
                   <strong className={cx('successText')}>{enhanced.totalScore}</strong>
@@ -196,4 +198,4 @@ function TargetAchievedPage() {
   );
 }
 
-export default TargetAchievedPage;
+export default TargetAchieved;

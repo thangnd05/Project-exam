@@ -20,10 +20,10 @@ import {
   planStatusLabel,
   taskDisplayName,
 } from '@/app/utils/planLabels';
-import { TERM_TIPS } from '@/app/features/diagnostic/termTips';
+import { TERM_TIPS } from '@/app/utils/termTips';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { LearningPlanStatus, PlanStage } from '@/app/enums';
 import type { PlanResponse, PlanTaskResponse } from '@/app/types';
 

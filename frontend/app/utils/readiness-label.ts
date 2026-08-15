@@ -1,4 +1,8 @@
-const READINESS_COPY = {
+import type { EnhancedResultResponse } from '@/app/types';
+
+type ReadinessCopy = { label: string; message: string };
+
+const READINESS_COPY: Record<string, ReadinessCopy> = {
   READY: {
     label: 'Sẵn sàng',
     message: 'Bạn có thể cân nhắc đăng ký thi nếu duy trì kết quả ổn định.',
@@ -17,7 +21,7 @@ const READINESS_COPY = {
   },
 };
 
-const READINESS_CLASS = {
+const READINESS_CLASS: Record<string, string> = {
   READY: 'readinessReady',
   ALMOST_READY: 'readinessAlmost',
   NEEDS_IMPROVEMENT: 'readinessNeeds',
@@ -34,27 +38,50 @@ const QUICK_CHALLENGE_TIERS = [
 
 const NEXT_READINESS_STEP = 10;
 
-function readinessCopy(level) {
-  return READINESS_COPY[level] || READINESS_COPY.NOT_READY;
+function readinessCopy(level?: string | null): ReadinessCopy {
+  return (level && READINESS_COPY[level]) || READINESS_COPY.NOT_READY;
 }
 
-export function getReadinessLabel(level) {
+export function getReadinessLabel(level?: string | null): string {
   if (!level) return '—';
   return readinessCopy(level).label;
 }
 
-export function getReadinessMessage(level) {
+export function getReadinessMessage(level?: string | null): string | null {
   if (!level) return null;
   return readinessCopy(level).message;
 }
 
-export function getReadinessClassName(level, pageCx) {
-  const key = READINESS_CLASS[level] || 'readinessNotReady';
+export function getReadinessClassName(
+  level: string | null | undefined,
+  pageCx: (className: string) => string,
+): string {
+  const key = (level && READINESS_CLASS[level]) || 'readinessNotReady';
   return pageCx(key);
 }
 
+export interface GaugeView {
+  gaugePercentage: number;
+  displayValue: string;
+  gaugeLabel: string;
+  gaugeTitle: string;
+  gaugeMessage: string | null;
+  gaugeLevel: string | null;
+}
+
 /** Dựng dữ liệu hiển thị cho card gauge từ facts của enhanced result. */
-export function buildGaugeView(enhanced) {
+export function buildGaugeView(
+  enhanced: Pick<
+    EnhancedResultResponse,
+    | 'examCategoryCode'
+    | 'percentage'
+    | 'hasTarget'
+    | 'targetScore'
+    | 'totalScore'
+    | 'readinessScore'
+    | 'readinessLevel'
+  >,
+): GaugeView {
   const {
     examCategoryCode, percentage, hasTarget, targetScore,
     totalScore, readinessScore, readinessLevel,
@@ -102,7 +129,17 @@ export function buildGaugeView(enhanced) {
 }
 
 /** Text cho khối "Việc cần làm ngay"; null = không có gì cần nhắc. */
-export function buildRecoveryMessage({ hasTarget, isTargetMet, readinessScore, readinessLevel }) {
+export function buildRecoveryMessage({
+  hasTarget,
+  isTargetMet,
+  readinessScore,
+  readinessLevel,
+}: {
+  hasTarget?: boolean;
+  isTargetMet?: boolean | null;
+  readinessScore?: number | null;
+  readinessLevel?: string | null;
+}): string | null {
   if (hasTarget && isTargetMet !== true) {
     return 'Mục tiêu của bạn: Lấp đầy khoảng trống kiến thức để đạt target. '
       + 'Hãy lập kế hoạch học để luyện tập theo những phần thi bạn chưa đạt mục tiêu đề ra.';

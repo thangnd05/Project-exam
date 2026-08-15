@@ -6,6 +6,7 @@ import { marked } from 'marked';
 import { getResourceById, viewResourceContent } from '@/app/apis/recoveryResourceApi';
 import { isMarkdownResource } from '@/app/utils/recoveryResource';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
+import type { RecoveryResourceResponse } from '@/app/types';
 
 const API_BASE = getApiBaseUrl();
 
@@ -15,16 +16,21 @@ marked.setOptions({
 });
 
 export const recoveryResourceViewKeys = {
-  detail: (id) => ['recovery-resource-view', id],
+  detail: (id?: string) => ['recovery-resource-view', id],
 };
 
-const EMPTY_VIEW = { resource: null, markdownHtml: '' };
+type RecoveryResourceView = {
+  resource: RecoveryResourceResponse | null;
+  markdownHtml: string;
+};
 
-export function useRecoveryResourceView(resourceId) {
+const EMPTY_VIEW: RecoveryResourceView = { resource: null, markdownHtml: '' };
+
+export function useRecoveryResourceView(resourceId?: string) {
   const query = useQuery({
     queryKey: recoveryResourceViewKeys.detail(resourceId),
-    queryFn: async () => {
-      const data = await getResourceById(resourceId);
+    queryFn: async (): Promise<RecoveryResourceView> => {
+      const data = await getResourceById(resourceId as string);
 
       if (!isMarkdownResource(data)) {
         const viewUrl = API_BASE
@@ -34,8 +40,9 @@ export function useRecoveryResourceView(resourceId) {
         return EMPTY_VIEW;
       }
 
-      const markdownText = await viewResourceContent(resourceId);
-      const renderedHtml = marked.parse(markdownText);
+      const markdownText = await viewResourceContent(resourceId as string);
+      // marked.parse khai báo string | Promise<string>; không bật async nên luôn là string.
+      const renderedHtml = marked.parse(markdownText) as string;
       return { resource: data, markdownHtml: DOMPurify.sanitize(renderedHtml) };
     },
     enabled: !!resourceId,

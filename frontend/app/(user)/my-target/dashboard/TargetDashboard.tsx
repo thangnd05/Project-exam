@@ -2,22 +2,29 @@
 
 
 import { useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames/bind';
+// classnames thường cho gọi trực tiếp classNames(a, b) — bản 'classnames/bind' khai báo
+// this-context nên TS không cho gọi unbound; runtime hai bản là cùng một hàm.
+import classNames from 'classnames';
+import classNamesBind from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import TargetPlanTabs from '@/app/features/diagnostic/TargetPlanTabs';
+import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
 import { sortPartsByLookup } from '@/app/utils/partOrder';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
-import MockHistoryPanel from '@/app/features/diagnostic/mock-history/MockHistoryPanel';
-import TargetDashboardPartChart from './components/TargetDashboardPartChart';
-import { useTargetDashboard } from '@/app/features/diagnostic/target/hooks/useTargetDashboard';
-import { getReadinessClassName, getReadinessLabel } from './utils/readiness-label';
-import pageStyles from './TargetDashboardPage.module.scss';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+// Bản .js cũ dùng useSearchParamsState mà quên import (chạy tới trang này là ReferenceError) —
+// bổ sung import đúng hook dùng chung khi chuyển sang TS.
+import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
+import MockHistoryPanel from './_components/MockHistoryPanel';
+import TargetDashboardPartChart, { type PartChartRow } from './_components/TargetDashboardPartChart';
+import { useTargetDashboard } from '@/app/hooks/useTargetDashboard';
+import { getReadinessClassName, getReadinessLabel } from '@/app/utils/readiness-label';
+import { LearningPlanStatus } from '@/app/enums';
+import pageStyles from './TargetDashboard.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
-const cx = classNames.bind(styles);
-const pageCx = classNames.bind(pageStyles);
+const cx = classNamesBind.bind(styles);
+const pageCx = classNamesBind.bind(pageStyles);
 
-function TargetDashboardPage() {
+function TargetDashboard() {
   const [searchParams, setSearchParams] = useSearchParamsState();
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
 
@@ -39,7 +46,7 @@ function TargetDashboardPage() {
   }, [examTypes, examTypeId]);
 
   const activePlan = useMemo(
-    () => (plans || []).find((p) => p.status === 'ACTIVE') || null,
+    () => (plans || []).find((p) => p.status === LearningPlanStatus.ACTIVE) || null,
     [plans],
   );
 
@@ -51,7 +58,7 @@ function TargetDashboardPage() {
     return examTypeId ? `/learning-plans/generate?examTypeId=${examTypeId}` : '/learning-plans/generate';
   }, [activePlan, latestMock, examTypeId]);
 
-  const partNameOf = (id) =>
+  const partNameOf = (id: string) =>
     examParts.find((p) => p.examPartId === id)?.name || id;
 
   const enhancedMatchesType =
@@ -75,7 +82,7 @@ function TargetDashboardPage() {
     };
   }, [mockScore, targetScore]);
 
-  const partChartRows = useMemo(() => {
+  const partChartRows = useMemo<PartChartRow[]>(() => {
     if (!target?.partRequirements?.length) {
       return [];
     }
@@ -290,4 +297,4 @@ function TargetDashboardPage() {
   );
 }
 
-export default TargetDashboardPage;
+export default TargetDashboard;

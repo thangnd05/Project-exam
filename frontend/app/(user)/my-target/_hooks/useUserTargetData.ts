@@ -14,14 +14,15 @@ export const userTargetKeys = {
   examParts: ['exam-parts'],
   skills: ['skills'],
   scoringConversions: ['scoring-conversions'],
-  milestones: (examTypeId) => ['milestones', examTypeId],
-  current: (examTypeId) => ['user-target', examTypeId],
+  milestones: (examTypeId?: string) => ['milestones', examTypeId],
+  current: (examTypeId?: string) => ['user-target', examTypeId],
 };
 
-const asArray = (data) =>
+// API có nơi trả mảng trần, có nơi bọc page {content} — giữ nhánh phòng thủ của bản .js cũ.
+const asArray = <T>(data: T[] | { content?: T[] } | null | undefined): T[] =>
   Array.isArray(data) ? data : Array.isArray(data?.content) ? data.content : [];
 
-export function useUserTargetData(selectedExamTypeId) {
+export function useUserTargetData(selectedExamTypeId?: string) {
   const examTypesQuery = useQuery({
     queryKey: userTargetKeys.examTypes,
     queryFn: getStandardExamTypes,
@@ -58,7 +59,7 @@ export function useUserTargetData(selectedExamTypeId) {
   };
 }
 
-export function useCurrentUserTarget(selectedExamTypeId) {
+export function useCurrentUserTarget(selectedExamTypeId?: string) {
   const query = useQuery({
     queryKey: userTargetKeys.current(selectedExamTypeId),
     queryFn: () => getUserTarget(selectedExamTypeId),

@@ -18,7 +18,7 @@ import {
   planStatusLabel,
   planStatusVariant,
 } from '@/app/utils/planLabels';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { LearningPlanStatus } from '@/app/enums';
 import type { PlanListItem } from '../_hooks/useLearningPlanList';
 

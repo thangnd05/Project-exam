@@ -3,27 +3,33 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import classNames from 'classnames/bind';
+// classnames thường cho gọi trực tiếp classNames(a, b) — bản 'classnames/bind' khai báo
+// this-context nên TS không cho gọi unbound; runtime hai bản là cùng một hàm.
+import classNames from 'classnames';
+import classNamesBind from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import TargetPlanTabs from '@/app/features/diagnostic/TargetPlanTabs';
-import planStyles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
-import styles from './UserTargetPage.module.scss';
+import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
+import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
+import styles from './UserTarget.module.scss';
 import { sortPartsByLookup } from '@/app/utils/partOrder';
 import useMilestoneScoring from '@/app/hooks/useMilestoneScoring';
-import { useCurrentUserTarget, useUserTargetData } from '@/app/features/diagnostic/target/hooks/useUserTargetData';
+import type { MilestoneResponse } from '@/app/types';
+import { useCurrentUserTarget, useUserTargetData } from './_hooks/useUserTargetData';
 import {
   useSaveUserTarget,
   useDeleteUserTarget,
-} from '@/app/features/diagnostic/target/hooks/useUserTargetMutations';
+} from './_hooks/useUserTargetMutations';
 
-const cx = classNames.bind(styles);
-const planCx = classNames.bind(planStyles);
+const cx = classNamesBind.bind(styles);
+const planCx = classNamesBind.bind(planStyles);
 
-function UserTargetPage() {
-  const [searchParams] = useSearchParams();
+function UserTarget() {
+  // Bản .js cũ destructure kiểu react-router `const [searchParams] = ...` — useSearchParams
+  // của Next trả thẳng ReadonlyURLSearchParams, sửa lại để gọi .get() đúng.
+  const searchParams = useSearchParams();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [targetScore, setTargetScore] = useState('');
-  const [customParts, setCustomParts] = useState({});
+  const [customParts, setCustomParts] = useState<Record<string, number>>({});
 
   const { target, isError: targetIsError } = useCurrentUserTarget(selectedExamTypeId);
   const currentTarget = target?.hasTarget ? target : null;
@@ -56,7 +62,8 @@ function UserTargetPage() {
     examTypes,
     examParts,
     skills,
-    scoringConversions,
+    // ConversionLike của hook bắt buộc numCorrect/convertedScore, response BE để optional — any có chủ đích.
+    scoringConversions: scoringConversions as any,
     selectedExamTypeId,
   });
 
@@ -69,9 +76,9 @@ function UserTargetPage() {
     }
     if (target?.hasTarget) {
       setTargetScore(String(target.targetScore || ''));
-      const cp = {};
+      const cp: Record<string, number> = {};
       (target.partRequirements || []).forEach((p) => {
-        cp[p.examPartId] = p.requiredPercentage;
+        if (p.requiredPercentage != null) cp[p.examPartId] = p.requiredPercentage;
       });
       setCustomParts(cp);
     } else if (target || targetIsError) {
@@ -80,7 +87,7 @@ function UserTargetPage() {
     }
   }, [selectedExamTypeId, target, targetIsError]);
 
-  const matchedMilestone = useMemo(() => {
+  const matchedMilestone = useMemo<MilestoneResponse | null>(() => {
     if (!targetScore) return null;
     return milestones.find((m) => m.milestoneScore === Number(targetScore)) || null;
   }, [targetScore, milestones]);
@@ -90,8 +97,9 @@ function UserTargetPage() {
     if (!targetScore || filteredParts.length === 0) return [];
     if (matchedMilestone && matchedMilestone.partRequirements) {
       const mapped = matchedMilestone.partRequirements.map((pr) => ({
-        examPartId: pr.examPartId,
-        requiredPercentage: pr.requiredPercentage,
+        // BE luôn trả examPartId cho part requirement của milestone.
+        examPartId: pr.examPartId as string,
+        requiredPercentage: pr.requiredPercentage ?? 0,
       }));
       return sortPartsByLookup(mapped, filteredParts);
     }
@@ -151,11 +159,11 @@ function UserTargetPage() {
     });
   };
 
-  const handlePartChange = (examPartId, value) => {
+  const handlePartChange = (examPartId: string, value: number) => {
     setCustomParts((prev) => ({ ...prev, [examPartId]: value }));
   };
 
-  const handleResetPart = (examPartId) => {
+  const handleResetPart = (examPartId: string) => {
     setCustomParts((prev) => {
       const next = { ...prev };
       delete next[examPartId];
@@ -167,7 +175,7 @@ function UserTargetPage() {
 
   const scoreEstimateBlock = (() => {
     if (!targetScore || partRequirements.length === 0) return null;
-    const partsConfig = {};
+    const partsConfig: Record<string, number> = {};
     partRequirements.forEach((pr) => {
       partsConfig[pr.examPartId] =
         customParts[pr.examPartId] !== undefined
@@ -207,7 +215,7 @@ function UserTargetPage() {
         <h2 className={classNames(planCx('title'), cx('pageTitle'))}>Mục tiêu của tôi</h2>
       </div>
 
-      {hasSavedTarget && (
+      {hasSavedTarget && currentTarget && (
         <section className={cx('currentTargetCard')} aria-label="Mục tiêu hiện tại">
           <div className={cx('currentTargetHeader')}>
             <span className={cx('currentTargetLabel')}>Mục tiêu hiện tại</span>
@@ -216,7 +224,7 @@ function UserTargetPage() {
           <div className={cx('currentTargetParts')}>
             {sortPartsByLookup(currentTarget.partRequirements || [], examParts).map((p) => {
               const total = getPartTotal(p.examPartId);
-              const num = percentToNum(p.requiredPercentage, total);
+              const num = percentToNum(p.requiredPercentage ?? 0, total);
               return (
                 <span key={p.examPartId} className={cx('currentTargetBadge')}>
                   {getPartName(p.examPartId)}: {num}/{total} ({p.requiredPercentage}%)
@@ -386,7 +394,7 @@ function UserTargetPage() {
 
           {targetScore && hasSavedTarget && (
             <div className={planCx('alert', 'alertWarning')} style={{ marginTop: '0.8rem' }}>
-              Bạn đang chỉnh sửa mục tiêu nó sẽ được ghi đè lên mục tiêu hiện tại. 
+              Bạn đang chỉnh sửa mục tiêu nó sẽ được ghi đè lên mục tiêu hiện tại.
             </div>
           )}
 
@@ -423,4 +431,4 @@ function UserTargetPage() {
   );
 }
 
-export default UserTargetPage;
+export default UserTarget;

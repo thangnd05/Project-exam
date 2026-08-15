@@ -1,5 +1,5 @@
-import TargetDashboardPage from '@/app/features/diagnostic/target/TargetDashboardPage';
+import TargetDashboard from './TargetDashboard';
 
 export default function Page() {
-  return <TargetDashboardPage />;
+  return <TargetDashboard />;
 }

@@ -6,13 +6,13 @@ import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import TargetPlanTabs from '@/app/features/diagnostic/TargetPlanTabs';
+import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import PlanComparisonCharts from './_components/PlanComparisonCharts';
 import { usePlanComparison } from './_hooks/usePlanComparison';
 import { planStageLabel, planStatusLabel, planStatusVariant } from '@/app/utils/planLabels';
 import pageStyles from './PlanComparison.module.scss';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { LearningPlanStatus } from '@/app/enums';
 
 const cx = classNames.bind(styles);

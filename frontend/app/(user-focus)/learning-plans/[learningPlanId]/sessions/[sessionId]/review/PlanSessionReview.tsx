@@ -6,7 +6,7 @@ import classNames from 'classnames/bind';
 import PlanResultView from '@/app/components/learning-plans/PlanResultView/PlanResultView';
 import { toPlanResult } from '@/app/utils/planResult';
 import { usePlanSessionReview } from './_hooks/usePlanSessionReview';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 

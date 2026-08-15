@@ -8,14 +8,28 @@ import { getUserTarget } from '@/app/apis/userTargetApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { getEnhancedResult } from '@/app/apis/enhancedResultApi';
 import { sortByPartOrder } from '@/app/utils/partOrder';
+import type {
+  EnhancedResultResponse,
+  PlanResponse,
+  UserTargetResponse,
+  UserTestResponse,
+} from '@/app/types';
 
 export const targetDashboardKeys = {
   examTypes: ['exam-types', 'standard'],
   examParts: ['exam-parts'],
-  dashboard: (examTypeId) => ['target-dashboard', examTypeId],
+  dashboard: (examTypeId?: string) => ['target-dashboard', examTypeId],
 };
 
-const EMPTY_DASHBOARD = {
+type DashboardData = {
+  target: UserTargetResponse | null;
+  plans: PlanResponse[];
+  latestMock: UserTestResponse | null;
+  recentMocks: UserTestResponse[];
+  latestEnhanced: EnhancedResultResponse | null;
+};
+
+const EMPTY_DASHBOARD: DashboardData = {
   target: null,
   plans: [],
   latestMock: null,
@@ -23,7 +37,7 @@ const EMPTY_DASHBOARD = {
   latestEnhanced: null,
 };
 
-async function fetchDashboard(examTypeId) {
+async function fetchDashboard(examTypeId: string): Promise<DashboardData> {
   const target = await getUserTarget(examTypeId).catch(() => null);
   const plans = (await listPlans(examTypeId).catch(() => [])) || [];
 
@@ -31,7 +45,7 @@ async function fetchDashboard(examTypeId) {
   const latestMock = completed[0] || null;
   const recentMocks = completed.slice(0, 5);
 
-  let latestEnhanced = null;
+  let latestEnhanced: EnhancedResultResponse | null = null;
   if (completed[0]?.userTestId) {
     try {
       const r = await getEnhancedResult(completed[0].userTestId);
@@ -44,7 +58,7 @@ async function fetchDashboard(examTypeId) {
   return { target, plans, latestMock, recentMocks, latestEnhanced };
 }
 
-export function useTargetDashboard(examTypeId) {
+export function useTargetDashboard(examTypeId: string) {
   const examTypesQuery = useQuery({
     queryKey: targetDashboardKeys.examTypes,
     queryFn: getStandardExamTypes,
@@ -74,7 +88,8 @@ export function useTargetDashboard(examTypeId) {
     latestEnhanced: data.latestEnhanced,
     isLoading: dashboardQuery.isLoading,
     error: dashboardQuery.error
-      ? dashboardQuery.error?.response?.data?.message || dashboardQuery.error.message
+      // Giữ nguyên cách lấy message của bản .js (axios error không có type sẵn).
+      ? (dashboardQuery.error as any)?.response?.data?.message || dashboardQuery.error.message
       : null,
   };
 }

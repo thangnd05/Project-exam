@@ -8,7 +8,7 @@ import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '@/app/utils/format-date-time';
 import { useTaskHistory } from './_hooks/useTaskHistory';
 import { taskDisplayName, taskStatusLabel } from '@/app/utils/planLabels';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { SessionStatus } from '@/app/enums';
 
 const cx = classNames.bind(styles);

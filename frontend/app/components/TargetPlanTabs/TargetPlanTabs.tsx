@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import classNames from 'classnames/bind';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -13,7 +13,12 @@ const TABS = [
   { key: 'overview', label: 'Tổng quan', path: '/my-target/dashboard' },
 ];
 
-function TargetPlanTabs({ active, examTypeId }) {
+type TargetPlanTabsProps = {
+  active?: 'target' | 'plan' | 'compare' | 'overview';
+  examTypeId?: string | null;
+};
+
+function TargetPlanTabs({ active, examTypeId }: TargetPlanTabsProps) {
   const qs = examTypeId ? `?examTypeId=${encodeURIComponent(examTypeId)}` : '';
   return (
     <nav className={cx('pageTabs')} aria-label="Mục tiêu và kế hoạch học">

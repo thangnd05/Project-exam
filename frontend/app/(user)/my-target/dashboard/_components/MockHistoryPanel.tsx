@@ -12,19 +12,23 @@ import {
   formatDayMonth,
   formatHourMinute24,
 } from '@/app/utils/format-date-time';
-import MockHistoryCharts from './components/MockHistoryCharts';
-import { useMockHistory } from '@/app/features/diagnostic/mock-history/hooks/useMockHistory';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import type { EnhancedResultResponse } from '@/app/types';
+import MockHistoryCharts, { type MockChartPoint } from './MockHistoryCharts';
+import { useMockHistory } from '../_hooks/useMockHistory';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
 const PAGE_SIZE = 10;
 
 const enhancedResultKeys = {
-  detail: (userTestId) => ['enhanced-result', userTestId],
+  detail: (userTestId: string) => ['enhanced-result', userTestId],
 };
 
-function formatDuration(seconds) {
+// Entry trong map enhancedById: hoặc data enhanced, hoặc marker lỗi {error: true}.
+type EnhancedEntry = Partial<EnhancedResultResponse> & { error?: boolean };
+
+function formatDuration(seconds: number | null | undefined): string {
   if (seconds == null) return '—';
   const sec = Math.max(0, Math.floor(Number(seconds)));
   const days = Math.floor(sec / 86400);
@@ -41,11 +45,16 @@ function formatDuration(seconds) {
   return `${minutes}m ${remSeconds}s`;
 }
 
-function MockHistoryPanel({ examTypeId, examTypeName }) {
+type MockHistoryPanelProps = {
+  examTypeId: string;
+  examTypeName?: string;
+};
+
+function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
   const [tableOpen, setTableOpen] = useState(false);
   const [page, setPage] = useState(0);
 
-  const [requestedIds, setRequestedIds] = useState(() => new Set());
+  const [requestedIds, setRequestedIds] = useState<Set<string>>(() => new Set());
 
   const {
     chartTests,
@@ -74,7 +83,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
     })),
   });
 
-  const enhancedQueryById = {};
+  const enhancedQueryById: Record<string, (typeof enhancedQueries)[number] | undefined> = {};
   enhancedIds.forEach((id, i) => {
     enhancedQueryById[id] = enhancedQueries[i];
   });
@@ -87,7 +96,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
     .join('|');
 
   const enhancedById = useMemo(() => {
-    const map = {};
+    const map: Record<string, EnhancedEntry> = {};
     enhancedIds.forEach((id, i) => {
       const q = enhancedQueries[i];
       if (!q) return;
@@ -103,10 +112,10 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
     return q ? q.isLoading : true;
   });
 
-  const chartData = useMemo(() => {
+  const chartData = useMemo<MockChartPoint[]>(() => {
     const chronological = [...chartTests].reverse();
 
-    const dayCounts = chronological.reduce((acc, t) => {
+    const dayCounts = chronological.reduce<Record<string, number>>((acc, t) => {
       const day = formatDayMonth(t.finishedAt);
       acc[day] = (acc[day] || 0) + 1;
       return acc;
@@ -116,7 +125,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
       const e = enhancedById[t.userTestId];
       const enhancedLoaded = e && !e.error;
       const totalScore = enhancedLoaded ? (e.totalScore ?? t.totalScore ?? null) : (t.totalScore ?? null);
-      const readinessScore = enhancedLoaded ? e.readinessScore : null;
+      const readinessScore = enhancedLoaded ? e.readinessScore ?? null : null;
 
       const day = formatDayMonth(t.finishedAt);
       const time = formatHourMinute24(t.finishedAt);
@@ -134,7 +143,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
     });
   }, [chartTests, enhancedById]);
 
-  const loadEnhanced = (userTestId) => {
+  const loadEnhanced = (userTestId: string) => {
 
     setRequestedIds((prev) => {
       if (prev.has(userTestId)) return prev;

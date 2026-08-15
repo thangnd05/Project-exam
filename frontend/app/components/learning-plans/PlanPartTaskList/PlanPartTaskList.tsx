@@ -15,8 +15,8 @@ import {
 } from 'lucide-react';
 import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
-import { TERM_TIPS } from '@/app/features/diagnostic/termTips';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import { TERM_TIPS } from '@/app/utils/termTips';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '@/app/utils/taskProgress';
 import { TaskStatus } from '@/app/enums';
 import type { PlanPartGroupResponse, PlanTaskResponse } from '@/app/types';

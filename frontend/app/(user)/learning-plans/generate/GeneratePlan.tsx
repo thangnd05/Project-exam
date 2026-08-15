@@ -8,12 +8,12 @@ import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import LearningPlanList from './_components/LearningPlanList';
 import PlanPartTaskList from '@/app/components/learning-plans/PlanPartTaskList/PlanPartTaskList';
-import TargetPlanTabs from '@/app/features/diagnostic/TargetPlanTabs';
+import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
-import { TERM_TIPS } from '@/app/features/diagnostic/termTips';
+import { TERM_TIPS } from '@/app/utils/termTips';
 import { buildPlanSummary, isPracticeAttempt, planStageLabel } from '@/app/utils/planLabels';
-import { getReadinessLabel } from '@/app/features/diagnostic/target/utils/readiness-label';
-import styles from '@/app/features/diagnostic/styles/PersonalizedPlan.module.scss';
+import { getReadinessLabel } from '@/app/utils/readiness-label';
+import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import type { PlanResponse } from '@/app/types';
 import {
   useCompletedUserTests,

@@ -5,19 +5,25 @@ import { keepPreviousData } from '@/app/configs/queryClient';
 import { getMockHistory } from '@/app/apis/userTestApi';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
+import type { UserTargetResponse } from '@/app/types';
 
 export const CHART_FETCH_LIMIT = 25;
 
 export const mockHistoryKeys = {
   examTypes: ['exam-types', 'standard'],
-  chart: (examTypeId) => ['mock-history-chart', examTypeId || ''],
-  table: (examTypeId, page, size) => ['mock-history-table', examTypeId || '', page, size],
-  userTarget: (examTypeId) => ['user-target', examTypeId],
+  chart: (examTypeId?: string) => ['mock-history-chart', examTypeId || ''],
+  table: (examTypeId: string | undefined, page: number, size: number) =>
+    ['mock-history-table', examTypeId || '', page, size],
+  userTarget: (examTypeId?: string) => ['user-target', examTypeId],
 };
 
-const selectTargetScore = (data) => (data?.hasTarget ? data.targetScore : null);
+const selectTargetScore = (data: UserTargetResponse) =>
+  (data?.hasTarget ? data.targetScore : null);
 
-export function useMockHistory(examTypeFilter, { page = 0, size = 10 } = {}) {
+export function useMockHistory(
+  examTypeFilter: string,
+  { page = 0, size = 10 }: { page?: number; size?: number } = {},
+) {
   const examTypesQuery = useQuery({
     queryKey: mockHistoryKeys.examTypes,
     queryFn: getStandardExamTypes,
@@ -49,7 +55,8 @@ export function useMockHistory(examTypeFilter, { page = 0, size = 10 } = {}) {
     chartTests: chartQuery.data?.content ?? [],
     tablePage: tableQuery.data ?? null,
     isLoading: chartQuery.isLoading || tableQuery.isLoading,
-    error: err ? err?.response?.data?.message || err.message : null,
+    // Giữ nguyên cách lấy message của bản .js (axios error không có type sẵn).
+    error: err ? (err as any)?.response?.data?.message || err.message : null,
     targetScore: examTypeFilter ? targetQuery.data ?? null : null,
   };
 }

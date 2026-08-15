@@ -1,18 +1,26 @@
 'use client';
 
 import classNames from 'classnames/bind';
-import styles from '../TargetDashboardPage.module.scss';
+import styles from '../TargetDashboard.module.scss';
 
 const cx = classNames.bind(styles);
 
-function formatPercent(value) {
+export type PartChartRow = {
+  key: string;
+  name: string;
+  aim: number;
+  current: number | null;
+  reached: boolean;
+};
+
+function formatPercent(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) {
     return '—';
   }
   return `${Number(value).toFixed(1)}%`;
 }
 
-function PartRowTooltip({ row }) {
+function PartRowTooltip({ row }: { row: PartChartRow }) {
   const hasCurrent = row.current != null;
 
   return (
@@ -26,7 +34,7 @@ function PartRowTooltip({ row }) {
         <strong>{hasCurrent ? formatPercent(row.current) : '—'}</strong>
       </div>
       <p className={cx('partChartTooltipStatus')}>
-        {!hasCurrent
+        {row.current == null
           ? 'Chưa có dữ liệu thi thử'
           : row.reached
             ? 'Đạt aim'
@@ -36,7 +44,7 @@ function PartRowTooltip({ row }) {
   );
 }
 
-function TargetDashboardPartChart({ rows }) {
+function TargetDashboardPartChart({ rows }: { rows: PartChartRow[] }) {
   if (!rows.length) {
     return (
       <p className={cx('emptyPartHint')}>
@@ -54,7 +62,7 @@ function TargetDashboardPartChart({ rows }) {
       <ul className={cx('partCompareList')}>
         {rows.map((row) => {
           const hasCurrent = row.current != null;
-          const currentPct = hasCurrent ? Math.min(100, Math.max(0, row.current)) : 0;
+          const currentPct = row.current != null ? Math.min(100, Math.max(0, row.current)) : 0;
           const aimPct = Math.min(100, Math.max(0, row.aim));
 
           return (
