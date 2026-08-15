@@ -1,5 +1,5 @@
-import ExamTypeLayoutEditorPage from '@/app/features/admin/exam-content/ExamTypeLayoutEditorPage';
+import ExamTypeLayoutEditor from './ExamTypeLayoutEditor';
 
 export default function Page() {
-  return <ExamTypeLayoutEditorPage />;
+  return <ExamTypeLayoutEditor />;
 }

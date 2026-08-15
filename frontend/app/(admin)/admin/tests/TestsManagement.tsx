@@ -12,19 +12,32 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/components/admin/common';
-import { useAdminTests } from '@/app/features/admin/exam-content/hooks/useAdminTests';
+import { useAdminTests } from './_hooks/useAdminTests';
+import type { ExamTypeResponse, TestAdminResponse } from '@/app/types';
 
-const parseOptionalId = (value) => {
+const parseOptionalId = (value: string) => {
   const trimmed = String(value).trim();
   return trimmed === '' ? null : trimmed;
 };
 
-const getUserIdValue = (user) => user?.id ?? user?.userId ?? user?.user_id ?? null;
+// `any` có chủ đích: 2 helper phòng thủ nhiều shape user cũ (id/userId/user_id, fullName/full_name...)
+// mà UserResponse hiện tại không khai đủ.
+const getUserIdValue = (user: any) => user?.id ?? user?.userId ?? user?.user_id ?? null;
 
-const getUserDisplayName = (user) =>
+const getUserDisplayName = (user: any) =>
   user?.fullName ?? user?.full_name ?? user?.username ?? user?.userName ?? null;
 
-const createEmptyForm = (examTypes = []) => ({
+type TestFormState = {
+  title: string;
+  description: string;
+  examTypeId: string;
+  durationMinutes: number;
+  maxAttempts: number;
+  classId: string;
+  chapterId: string;
+};
+
+const createEmptyForm = (examTypes: ExamTypeResponse[] = []): TestFormState => ({
   title: '',
   description: '',
   examTypeId: String(examTypes[0]?.examTypeId ?? ''),
@@ -34,7 +47,7 @@ const createEmptyForm = (examTypes = []) => ({
   chapterId: '',
 });
 
-function TestsManagementPage() {
+function TestsManagement() {
   const {
     tests,
     examTypes,
@@ -47,8 +60,8 @@ function TestsManagementPage() {
   } = useAdminTests();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingTestId, setEditingTestId] = useState(null);
-  const [formState, setFormState] = useState(createEmptyForm());
+  const [editingTestId, setEditingTestId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<TestFormState>(createEmptyForm());
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -72,7 +85,8 @@ function TestsManagementPage() {
         )?.name || `ID ${test.examTypeId}`
       ).toLowerCase();
       return (
-        test.title.toLowerCase().includes(keyword) ||
+        // BE luôn trả title — non-null assertion để giữ nguyên biểu thức gốc
+        test.title!.toLowerCase().includes(keyword) ||
         (test.description || '').toLowerCase().includes(keyword) ||
         typeName.includes(keyword)
       );
@@ -84,16 +98,16 @@ function TestsManagementPage() {
     setEditingTestId(null);
   };
 
-  const openEditModal = (test) => {
+  const openEditModal = (test: TestAdminResponse) => {
     setEditingTestId(test.testId);
     setFormState({
-      title: test.title,
+      title: test.title!,
       description: test.description || '',
       examTypeId: String(test.examTypeId || ''),
       durationMinutes: test.durationMinutes || 60,
       maxAttempts: test.maxAttempts || 1,
       classId: test.classId ?? '',
-      chapterId: test.chapterId ?? '',
+      chapterId: (test as any).chapterId ?? '',
     });
     setShowFormModal(true);
   };
@@ -108,7 +122,9 @@ function TestsManagementPage() {
       return;
     }
 
-    const payload = {
+    // `any` có chủ đích: BE chấp nhận null để gỡ liên kết (classId/chapterId/description...)
+    // trong khi DTO FE khai optional string nên ép kiểu tại đây.
+    const payload: any = {
       title: normalizedTitle,
       description: formState.description.trim() || null,
       examTypeId: String(formState.examTypeId),
@@ -131,7 +147,7 @@ function TestsManagementPage() {
     }
   };
 
-  const handleDelete = async (testId) => {
+  const handleDelete = async (testId: string) => {
     setErrorMessage('');
     try {
       await deleteTest(testId);
@@ -145,7 +161,7 @@ function TestsManagementPage() {
     {
       key: 'examTypeId',
       header: 'Loại kỳ thi',
-      render: (test) => (
+      render: (test: TestAdminResponse) => (
         <Badge bg="secondary">
           {examTypes.find(
             (item) => String(item.examTypeId) === String(test.examTypeId),
@@ -156,8 +172,8 @@ function TestsManagementPage() {
     {
       key: 'durationMinutes',
       header: 'Thời lượng',
-      render: (test) =>
-        test.durationMinutes != null && test.durationMinutes !== ''
+      render: (test: TestAdminResponse) =>
+        test.durationMinutes != null && String(test.durationMinutes) !== ''
           ? `${test.durationMinutes} phút`
           : 'Không giới hạn',
     },
@@ -165,15 +181,15 @@ function TestsManagementPage() {
     {
       key: 'classChapter',
       header: 'Lớp / chương',
-      render: (test) =>
-        test.classId != null || test.chapterId != null
-          ? `Lớp ${test.classId ?? '—'} / Chương ${test.chapterId ?? '—'}`
+      render: (test: TestAdminResponse) =>
+        test.classId != null || (test as any).chapterId != null
+          ? `Lớp ${test.classId ?? '—'} / Chương ${(test as any).chapterId ?? '—'}`
           : '—',
     },
     {
       key: 'createdBy',
       header: 'Người tạo',
-      render: (test) =>
+      render: (test: TestAdminResponse) =>
         getUserDisplayName(
           users.find(
             (user) => String(getUserIdValue(user)) === String(test.createdBy),
@@ -208,8 +224,8 @@ function TestsManagementPage() {
         columns={columns}
         data={filteredTests}
         loading={loading}
-        getRowKey={(test) => test.testId}
-        rowActions={(test) => (
+        getRowKey={(test: TestAdminResponse) => test.testId}
+        rowActions={(test: TestAdminResponse) => (
           <>
             <button type="button" onClick={() => openEditModal(test)} title="Sửa">
               <Edit size={14} />
@@ -353,4 +369,4 @@ function TestsManagementPage() {
   );
 }
 
-export default TestsManagementPage;
+export default TestsManagement;

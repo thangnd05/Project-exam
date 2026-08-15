@@ -4,6 +4,24 @@ import {Form} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 
+export type TagFormState = {
+  name: string;
+  parentId: string | null;
+  examTypeId: string;
+  sortOrder: number | null;
+};
+
+type TagFormModalProps = {
+  show: boolean;
+  isEditing: boolean;
+  formState: TagFormState;
+  examTypes: Array<{id: string; name?: string}>;
+  parentOptions: Array<{tagId: string; name?: string}>;
+  onChangeField: (field: keyof TagFormState, value: string | number | null) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+};
+
 function TagFormModal({
   show,
   isEditing,
@@ -13,7 +31,7 @@ function TagFormModal({
   onChangeField,
   onClose,
   onSubmit,
-}) {
+}: TagFormModalProps) {
   return (
     <BaseModal
       show={show}

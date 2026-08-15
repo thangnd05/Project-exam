@@ -5,7 +5,7 @@ import {Button, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {useExamParts} from '@/app/features/admin/exam-content/hooks/useExamParts';
+import {useExamParts, type ExamPartItem} from './_hooks/useExamParts';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -15,11 +15,20 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/components/admin/common';
-import styles from './ExamPartsManagementPage.module.scss';
+import styles from './ExamPartsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-const emptyForm = {
+type ExamPartFormState = {
+  exam_type_id: string;
+  skill_id: string;
+  name: string;
+  description: string;
+  default_num_questions: number | string;
+  display_order: number | string;
+};
+
+const emptyForm: ExamPartFormState = {
   exam_type_id: '',
   skill_id: '',
   name: '',
@@ -28,7 +37,7 @@ const emptyForm = {
   display_order: 999,
 };
 
-function ExamPartsManagementPage() {
+function ExamPartsManagement() {
   const {
     examParts,
     examTypes,
@@ -42,14 +51,14 @@ function ExamPartsManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [examTypeFilter, setExamTypeFilter] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingPartId, setEditingPartId] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
+  const [editingPartId, setEditingPartId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<ExamPartFormState>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deletingExamPart, setDeletingExamPart] = useState(null);
+  const [deletingExamPart, setDeletingExamPart] = useState<ExamPartItem | null>(null);
 
   const getExamTypeName = useCallback(
-    (examTypeId) => {
+    (examTypeId: string) => {
       return (
         examTypes.find((examType) => examType.exam_type_id === examTypeId)?.name ||
         'Không xác định'
@@ -75,12 +84,12 @@ function ExamPartsManagementPage() {
         })
       : scopedParts;
 
-    const groups = new Map();
+    const groups = new Map<string, ExamPartItem[]>();
     filteredParts.forEach((examPart) => {
       if (!groups.has(examPart.exam_type_id)) {
         groups.set(examPart.exam_type_id, []);
       }
-      groups.get(examPart.exam_type_id).push(examPart);
+      groups.get(examPart.exam_type_id)!.push(examPart);
     });
 
     return [...groups.entries()]
@@ -113,7 +122,7 @@ function ExamPartsManagementPage() {
     setShowFormModal(true);
   };
 
-  const openEditModal = (examPart) => {
+  const openEditModal = (examPart: ExamPartItem) => {
     setEditingPartId(examPart.exam_part_id);
     setFormState({
       exam_type_id: examPart.exam_type_id,
@@ -133,6 +142,7 @@ function ExamPartsManagementPage() {
       return;
     }
 
+    // BE chấp nhận skillId null để bỏ gán skill — DTO FE khai optional nên ép kiểu tại đây
     const payload = {
       examTypeId: formState.exam_type_id,
       skillId: formState.skill_id || null,
@@ -140,7 +150,7 @@ function ExamPartsManagementPage() {
       description: formState.description.trim(),
       defaultNumQuestions: Number(formState.default_num_questions),
       displayOrder: Number(formState.display_order) || 999,
-    };
+    } as any;
 
     setSubmitting(true);
     setErrorMessage('');
@@ -176,7 +186,7 @@ function ExamPartsManagementPage() {
     }
   };
 
-  const getSkillName = (skillId) => {
+  const getSkillName = (skillId: string | null) => {
     if (!skillId) {
       return '-';
     }
@@ -186,11 +196,11 @@ function ExamPartsManagementPage() {
   const columns = [
     {key: 'display_order', header: 'Thứ tự', align: 'center'},
     {key: 'name', header: 'Tên phần thi'},
-    {key: 'skill', header: 'Skill', render: (examPart) => getSkillName(examPart.skill_id)},
+    {key: 'skill', header: 'Skill', render: (examPart: ExamPartItem) => getSkillName(examPart.skill_id)},
     {key: 'default_num_questions', header: 'Số câu mặc định', align: 'center'},
   ];
 
-  const renderRowActions = (examPart) => (
+  const renderRowActions = (examPart: ExamPartItem) => (
     <>
       <button onClick={() => openEditModal(examPart)} title="Sửa">
         <Edit size={14} />
@@ -248,7 +258,7 @@ function ExamPartsManagementPage() {
           columns={columns}
           data={[]}
           loading
-          getRowKey={(examPart) => examPart.exam_part_id}
+          getRowKey={(examPart: ExamPartItem) => examPart.exam_part_id}
           rowActions={renderRowActions}
         />
       ) : groupedExamParts.length === 0 ? (
@@ -257,7 +267,7 @@ function ExamPartsManagementPage() {
           columns={columns}
           data={[]}
           emptyText="Không có phần thi nào."
-          getRowKey={(examPart) => examPart.exam_part_id}
+          getRowKey={(examPart: ExamPartItem) => examPart.exam_part_id}
           rowActions={renderRowActions}
         />
       ) : (
@@ -274,7 +284,7 @@ function ExamPartsManagementPage() {
                 showIndex
                 columns={columns}
                 data={group.parts}
-                getRowKey={(examPart) => examPart.exam_part_id}
+                getRowKey={(examPart: ExamPartItem) => examPart.exam_part_id}
                 rowActions={renderRowActions}
               />
             </section>
@@ -414,4 +424,4 @@ function ExamPartsManagementPage() {
   );
 }
 
-export default ExamPartsManagementPage;
+export default ExamPartsManagement;

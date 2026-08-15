@@ -5,7 +5,9 @@ type PartLike = {
   display_order?: number | string | null;
   partName?: string | null;
   examPartName?: string | null;
-  [key: string]: unknown;
+  // any (không phải unknown) để interface response (ExamPartResponse...) thoả ràng buộc
+  // index signature — type-only, không đổi behavior.
+  [key: string]: any;
 };
 
 const extractNumberFromName = (name: unknown): number | null => {

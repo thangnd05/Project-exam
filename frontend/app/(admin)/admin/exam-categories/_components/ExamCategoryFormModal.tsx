@@ -4,6 +4,24 @@ import {Form} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 
+export type ExamCategoryFormState = {
+  code: string;
+  name: string;
+  description: string;
+  guestAllowed: boolean;
+  certificateEligible: boolean;
+  displayOrder: number;
+};
+
+type ExamCategoryFormModalProps = {
+  show: boolean;
+  isEditing: boolean;
+  formState: ExamCategoryFormState;
+  onChangeField: (field: keyof ExamCategoryFormState, value: string | number | boolean) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+};
+
 function ExamCategoryFormModal({
   show,
   isEditing,
@@ -11,7 +29,7 @@ function ExamCategoryFormModal({
   onChangeField,
   onClose,
   onSubmit,
-}) {
+}: ExamCategoryFormModalProps) {
   return (
     <BaseModal
       show={show}

@@ -9,12 +9,20 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
-import {useAdminQuestionCollections} from '@/app/features/admin/exam-content/hooks/useAdminQuestionCollections';
-import styles from './QuestionCollectionsManagementPage.module.scss';
+import {useAdminQuestionCollections, type CollectionItem} from './_hooks/useAdminQuestionCollections';
+import styles from './QuestionCollectionsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-const defaultFormState = {
+type CollectionFormState = {
+  name: string;
+  description: string;
+  parentId: string;
+  examTypeId: string;
+  displayOrder: string;
+};
+
+const defaultFormState: CollectionFormState = {
   name: '',
   description: '',
   parentId: '',
@@ -22,10 +30,24 @@ const defaultFormState = {
   displayOrder: '',
 };
 
-const extractApiErrorMessage = (error, fallback) =>
+const extractApiErrorMessage = (error: any, fallback: string) =>
   error?.response?.data?.message || error?.response?.data?.error || error?.message || fallback;
 
-function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, keyword, examTypeName}) {
+type CollectionNode = CollectionItem & {children?: CollectionNode[]};
+
+type CollectionTreeNodeProps = {
+  node: CollectionNode;
+  level: number;
+  expandedIds: Set<string>;
+  toggleExpand: (id: string) => void;
+  onEdit: (node: CollectionNode) => void;
+  onDelete: (node: CollectionNode) => void;
+  onAddChild: (node: CollectionNode) => void;
+  keyword: string;
+  examTypeName: (id: string) => string;
+};
+
+function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, keyword, examTypeName}: CollectionTreeNodeProps) {
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedIds.has(node.collection_id);
   const kw = keyword.trim().toLowerCase();
@@ -33,7 +55,7 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
     !kw || node.name.toLowerCase().includes(kw) || (node.description || '').toLowerCase().includes(kw);
   const childrenMatchSearch =
     hasChildren &&
-    node.children.some(
+    node.children!.some(
       (c) => c.name.toLowerCase().includes(kw) || (c.description || '').toLowerCase().includes(kw),
     );
 
@@ -58,7 +80,7 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
             <span className={cx('examTypeBadge')}>{examTypeName(node.exam_type_id)}</span>
           )}
           {hasChildren && (
-            <span className={cx('childCount')}>{node.children.length} nhóm con</span>
+            <span className={cx('childCount')}>{node.children!.length} nhóm con</span>
           )}
           <span
             className={cx('questionCount', {empty: !node.question_count})}
@@ -87,7 +109,7 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
       </div>
       {hasChildren && (isExpanded || Boolean(kw)) && (
         <div className={cx('childrenWrapper')}>
-          {node.children.map((child) => (
+          {node.children!.map((child) => (
             <CollectionTreeNode
               key={child.collection_id}
               node={child}
@@ -112,15 +134,15 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
   return nodeContent;
 }
 
-function QuestionCollectionsManagementPage() {
+function QuestionCollectionsManagement() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formState, setFormState] = useState(defaultFormState);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<CollectionFormState>(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [deletingItem, setDeletingItem] = useState(null);
-  const [expandedIds, setExpandedIds] = useState(new Set());
+  const [deletingItem, setDeletingItem] = useState<CollectionItem | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const {
     collections: collectionList,
@@ -135,7 +157,7 @@ function QuestionCollectionsManagementPage() {
     deleteCollection,
   } = useAdminQuestionCollections();
 
-  const applyDefaultExpanded = useCallback((list) => {
+  const applyDefaultExpanded = useCallback((list: CollectionItem[]) => {
     setExpandedIds(new Set(list.filter((c) => c.child_count > 0).map((c) => c.collection_id)));
   }, []);
 
@@ -147,24 +169,24 @@ function QuestionCollectionsManagementPage() {
   }, [collectionsLoaded, collectionList, applyDefaultExpanded]);
 
   const examTypeName = useCallback(
-    (id) => examTypes.find((t) => String(t.examTypeId) === String(id))?.name || '',
+    (id: string) => examTypes.find((t) => String(t.examTypeId) === String(id))?.name || '',
     [examTypes],
   );
 
   const collectionTree = useMemo(() => {
     const byId = new Map(collectionList.map((c) => [c.collection_id, c]));
-    const childrenOf = new Map();
-    const roots = [];
+    const childrenOf = new Map<string, CollectionItem[]>();
+    const roots: CollectionItem[] = [];
     collectionList.forEach((c) => {
       if (c.parent_id && byId.has(c.parent_id)) {
         if (!childrenOf.has(c.parent_id)) childrenOf.set(c.parent_id, []);
-        childrenOf.get(c.parent_id).push(c);
+        childrenOf.get(c.parent_id)!.push(c);
       } else {
         roots.push(c);
       }
     });
 
-    const byOrder = (a, b) => {
+    const byOrder = (a: CollectionItem, b: CollectionItem) => {
       const ao = a.display_order == null ? Number.MAX_SAFE_INTEGER : a.display_order;
       const bo = b.display_order == null ? Number.MAX_SAFE_INTEGER : b.display_order;
       if (ao !== bo) return ao - bo;
@@ -175,7 +197,7 @@ function QuestionCollectionsManagementPage() {
       .map((root) => ({...root, children: (childrenOf.get(root.collection_id) || []).sort(byOrder)}));
   }, [collectionList]);
 
-  const toggleExpand = useCallback((id) => {
+  const toggleExpand = useCallback((id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -210,14 +232,14 @@ function QuestionCollectionsManagementPage() {
     setShowModal(true);
   };
 
-  const openCreateChildModal = (parent) => {
+  const openCreateChildModal = (parent: CollectionNode) => {
     resetForm();
 
     setFormState({name: '', description: '', parentId: parent.collection_id, examTypeId: parent.exam_type_id || '', displayOrder: ''});
     setShowModal(true);
   };
 
-  const openEditModal = (collection) => {
+  const openEditModal = (collection: CollectionNode) => {
     setEditingId(collection.collection_id);
     setFormState({
       name: collection.name,
@@ -245,6 +267,7 @@ function QuestionCollectionsManagementPage() {
 
       const trimmedOrder = String(formState.displayOrder).trim();
       const parsedOrder = trimmedOrder === '' ? null : Number.parseInt(trimmedOrder, 10);
+      // BE chấp nhận displayOrder null để gỡ ghim thứ tự — DTO FE khai optional nên ép kiểu tại đây
       const payload = {
         name: normalizedName,
         description: formState.description.trim(),
@@ -252,7 +275,7 @@ function QuestionCollectionsManagementPage() {
 
         examTypeId: payloadParentId ? '' : (formState.examTypeId || ''),
         displayOrder: Number.isNaN(parsedOrder) ? null : parsedOrder,
-      };
+      } as any;
 
       if (editingId) {
         await updateCollection({id: editingId, payload});
@@ -479,4 +502,4 @@ function QuestionCollectionsManagementPage() {
   );
 }
 
-export default QuestionCollectionsManagementPage;
+export default QuestionCollectionsManagement;

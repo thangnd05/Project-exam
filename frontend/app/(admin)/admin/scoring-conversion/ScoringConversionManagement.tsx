@@ -19,7 +19,7 @@ import {
 import styles from '@/app/components/admin/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
-import {useScoringConversion} from '@/app/features/admin/exam-content/hooks/useScoringConversion';
+import {useScoringConversion, type ScoringRuleItem} from './_hooks/useScoringConversion';
 
 const defaultFormState = {
   exam_type_id: '',
@@ -28,7 +28,7 @@ const defaultFormState = {
   converted_score: '',
 };
 
-function ScoringConversionManagementPage() {
+function ScoringConversionManagement() {
   const [keyword, setKeyword] = useState('');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [activeSkillId, setActiveSkillId] = useState('all');
@@ -36,8 +36,8 @@ function ScoringConversionManagementPage() {
   const [showJsonCreateForm, setShowJsonCreateForm] = useState(false);
   const [jsonCreateValue, setJsonCreateValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const jsonTextareaRef = useRef(null);
-  const [deletingRule, setDeletingRule] = useState(null);
+  const jsonTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [deletingRule, setDeletingRule] = useState<ScoringRuleItem | null>(null);
 
   const {
     examTypes,
@@ -82,17 +82,17 @@ function ScoringConversionManagementPage() {
     });
   }, [examTypeFilter, examTypes, keyword, scoringRules, skills]);
 
-  const getExamTypeName = (examTypeId) => {
+  const getExamTypeName = (examTypeId: string) => {
     return (
       examTypes.find((examType) => examType.exam_type_id === examTypeId)?.name || '-'
     );
   };
 
-  const getSkillName = (skillId) => {
+  const getSkillName = (skillId: string) => {
     return skills.find((skill) => skill.skill_id === skillId)?.name || '-';
   };
 
-  const isDuplicateRule = (examTypeId, skillId, numCorrect) => {
+  const isDuplicateRule = (examTypeId: string, skillId: string, numCorrect: number) => {
     return scoringRules.some(
       (rule) =>
         rule.exam_type_id === examTypeId &&
@@ -196,14 +196,14 @@ function ScoringConversionManagementPage() {
     {
       key: 'exam_type',
       header: 'Loại kỳ thi',
-      render: (rule) => getExamTypeName(rule.exam_type_id),
+      render: (rule: ScoringRuleItem) => getExamTypeName(rule.exam_type_id),
     },
-    {key: 'skill', header: 'Kỹ năng', render: (rule) => getSkillName(rule.skill_id)},
-    {key: 'num_correct', header: 'Số câu đúng', render: (rule) => rule.num_correct},
+    {key: 'skill', header: 'Kỹ năng', render: (rule: ScoringRuleItem) => getSkillName(rule.skill_id)},
+    {key: 'num_correct', header: 'Số câu đúng', render: (rule: ScoringRuleItem) => rule.num_correct},
     {
       key: 'converted_score',
       header: 'Điểm quy đổi',
-      render: (rule) => rule.converted_score,
+      render: (rule: ScoringRuleItem) => rule.converted_score,
     },
   ];
 
@@ -375,8 +375,8 @@ function ScoringConversionManagementPage() {
         columns={columns}
         data={filteredRules}
         loading={loading}
-        getRowKey={(rule) => rule.conversion_id}
-        rowActions={(rule) => (
+        getRowKey={(rule: ScoringRuleItem) => rule.conversion_id}
+        rowActions={(rule: ScoringRuleItem) => (
           <button className="danger" title="Xóa" onClick={() => setDeletingRule(rule)}>
             <Trash2 size={14} />
           </button>
@@ -398,4 +398,4 @@ function ScoringConversionManagementPage() {
   );
 }
 
-export default ScoringConversionManagementPage;
+export default ScoringConversionManagement;

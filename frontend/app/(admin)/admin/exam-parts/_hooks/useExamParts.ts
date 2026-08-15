@@ -11,6 +11,7 @@ import {
 } from '@/app/apis/examPartApi';
 import { getExamTypes } from '@/app/apis/examTypeApi';
 import { getSkills } from '@/app/apis/skillApi';
+import type { ExamPartRequest, ExamPartResponse, ExamTypeResponse, SkillResponse } from '@/app/types';
 
 export const examPartsKeys = {
   examParts: ['exam-parts'],
@@ -18,9 +19,30 @@ export const examPartsKeys = {
   skills: ['skills'],
 };
 
-const toArray = (data) => (Array.isArray(data) ? data : data?.content ?? []);
+export type ExamPartItem = {
+  exam_part_id: string;
+  exam_type_id: string;
+  skill_id: string | null;
+  name: string;
+  description: string;
+  default_num_questions: number | undefined;
+  display_order: number;
+};
 
-const mapExamPartFromApi = (item) => ({
+export type ExamPartExamTypeOption = {
+  exam_type_id: string;
+  name: string;
+};
+
+export type ExamPartSkillOption = {
+  skill_id: string;
+  name: string;
+};
+
+const toArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
+  Array.isArray(data) ? data : data?.content ?? [];
+
+const mapExamPartFromApi = (item: ExamPartResponse): ExamPartItem => ({
   exam_part_id: String(item.examPartId),
   exam_type_id: String(item.examTypeId),
   skill_id: item.skillId ? String(item.skillId) : null,
@@ -30,12 +52,12 @@ const mapExamPartFromApi = (item) => ({
   display_order: item.displayOrder ?? 999,
 });
 
-const mapExamTypeFromApi = (item) => ({
+const mapExamTypeFromApi = (item: ExamTypeResponse): ExamPartExamTypeOption => ({
   exam_type_id: String(item.examTypeId),
   name: item.name || '',
 });
 
-const mapSkillFromApi = (item) => ({
+const mapSkillFromApi = (item: SkillResponse): ExamPartSkillOption => ({
   skill_id: String(item.skillId),
   name: item.name || '',
 });
@@ -45,9 +67,9 @@ export function useExamParts() {
     queryKey: examPartsKeys.examParts,
     list: getExamParts,
     mapItem: mapExamPartFromApi,
-    create: (payload) => createExamPart(payload),
-    update: ({ id, payload }) => updateExamPart(id, payload),
-    remove: (id) => deleteExamPart(id),
+    create: (payload: ExamPartRequest) => createExamPart(payload),
+    update: ({ id, payload }: { id: string; payload: ExamPartRequest }) => updateExamPart(id, payload),
+    remove: (id: string) => deleteExamPart(id),
   });
 
   const examTypesQuery = useQuery({
@@ -63,7 +85,7 @@ export function useExamParts() {
   });
 
   return {
-    examParts: crud.items,
+    examParts: crud.items as ExamPartItem[],
     examTypes: examTypesQuery.data ?? [],
     skills: skillsQuery.data ?? [],
     isLoading:

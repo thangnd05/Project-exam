@@ -9,15 +9,18 @@ import classNames from 'classnames/bind';
 import routes from '@/app/configs/Routes';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import ExamTypeFormModal from '../modals/ExamTypeFormModal';
+import ExamTypeFormModal, {type ExamTypeFormState} from './_components/ExamTypeFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
-import {useExamTypes} from '@/app/features/admin/exam-content/hooks/useExamTypes';
+import {useExamTypes} from '@/app/hooks/useExamTypes';
+import type {ExamTypeResponse} from '@/app/types';
 
-import styles from './QuestionCollectionsManagementPage.module.scss';
+// Dùng chung bộ style cây 2 cấp với trang bộ sưu tập câu hỏi (một nguồn duy nhất,
+// đổi style cây là cả 2 trang cùng ăn theo).
+import styles from '@/app/(admin)/admin/question-collections/QuestionCollectionsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-const emptyForm = {
+const emptyForm: ExamTypeFormState = {
   name: '',
   description: '',
   image_url: '',
@@ -27,7 +30,22 @@ const emptyForm = {
   parent_id: '',
 };
 
-const mapExamTypeFromApi = (item) => ({
+type ExamTypeItem = {
+  exam_type_id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  duration_minutes: number | '';
+  scoring_method: string;
+  flexible: boolean;
+  parent_id: string;
+  parent_name: string;
+  child_count: number;
+};
+
+type ExamTypeNode = ExamTypeItem & {children?: ExamTypeNode[]};
+
+const mapExamTypeFromApi = (item: ExamTypeResponse): ExamTypeItem => ({
   exam_type_id: String(item.examTypeId),
   name: item.name || '',
   description: item.description || '',
@@ -40,7 +58,7 @@ const mapExamTypeFromApi = (item) => ({
   child_count: typeof item.childCount === 'number' ? item.childCount : 0,
 });
 
-const buildExamTypePayload = (formState, {hasChildren} = {}) => {
+const buildExamTypePayload = (formState: ExamTypeFormState, {hasChildren}: {hasChildren?: boolean} = {}) => {
   const durationValue = String(formState.duration_minutes).trim();
   const durationMinutes = durationValue ? Number(durationValue) : null;
 
@@ -56,7 +74,19 @@ const buildExamTypePayload = (formState, {hasChildren} = {}) => {
   };
 };
 
-function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEditLayout, onDelete, onAddChild, keyword}) {
+type ExamTypeTreeNodeProps = {
+  node: ExamTypeNode;
+  level: number;
+  expandedIds: Set<string>;
+  toggleExpand: (id: string) => void;
+  onEdit: (node: ExamTypeNode) => void;
+  onEditLayout: (node: ExamTypeNode) => void;
+  onDelete: (node: ExamTypeNode) => void;
+  onAddChild: (node: ExamTypeNode) => void;
+  keyword: string;
+};
+
+function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEditLayout, onDelete, onAddChild, keyword}: ExamTypeTreeNodeProps) {
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedIds.has(node.exam_type_id);
   const kw = keyword.trim().toLowerCase();
@@ -67,7 +97,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
     node.scoring_method.toLowerCase().includes(kw);
   const childrenMatchSearch =
     hasChildren &&
-    node.children.some(
+    node.children!.some(
       (c) => c.name.toLowerCase().includes(kw) || (c.description || '').toLowerCase().includes(kw),
     );
 
@@ -88,7 +118,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
             {level === 0 ? <FolderTree size={16} /> : <Library size={15} />}
           </span>
           <span className={cx('collectionName', {root: level === 0})}>{node.name}</span>
-          {hasChildren && <span className={cx('childCount')}>{node.children.length} loại con</span>}
+          {hasChildren && <span className={cx('childCount')}>{node.children!.length} loại con</span>}
           {node.flexible && <Badge bg="info">Linh hoạt</Badge>}
           <Badge bg="primary">{node.scoring_method}</Badge>
           {node.duration_minutes !== '' && node.duration_minutes != null && (
@@ -115,7 +145,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
       </div>
       {hasChildren && (isExpanded || Boolean(kw)) && (
         <div className={cx('childrenWrapper')}>
-          {node.children.map((child) => (
+          {node.children!.map((child) => (
             <ExamTypeTreeNode
               key={child.exam_type_id}
               node={child}
@@ -140,18 +170,18 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
   return nodeContent;
 }
 
-function ExamTypesManagementPage() {
+function ExamTypesManagement() {
   const router = useRouter();
   const {examTypeList, isLoading: loading, isError, createMutation, updateMutation, deleteMutation} =
     useExamTypes();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingTypeId, setEditingTypeId] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
+  const [editingTypeId, setEditingTypeId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<ExamTypeFormState>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deletingExamType, setDeletingExamType] = useState(null);
-  const [expandedIds, setExpandedIds] = useState(new Set());
+  const [deletingExamType, setDeletingExamType] = useState<ExamTypeItem | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const examTypes = useMemo(() => examTypeList.map(mapExamTypeFromApi), [examTypeList]);
 
@@ -161,23 +191,23 @@ function ExamTypesManagementPage() {
 
   const examTypeTree = useMemo(() => {
     const byId = new Map(examTypes.map((t) => [t.exam_type_id, t]));
-    const childrenOf = new Map();
-    const roots = [];
+    const childrenOf = new Map<string, ExamTypeItem[]>();
+    const roots: ExamTypeItem[] = [];
     examTypes.forEach((t) => {
       if (t.parent_id && byId.has(t.parent_id)) {
         if (!childrenOf.has(t.parent_id)) childrenOf.set(t.parent_id, []);
-        childrenOf.get(t.parent_id).push(t);
+        childrenOf.get(t.parent_id)!.push(t);
       } else {
         roots.push(t);
       }
     });
-    const byName = (a, b) => a.name.localeCompare(b.name);
+    const byName = (a: ExamTypeItem, b: ExamTypeItem) => a.name.localeCompare(b.name);
     return roots
       .sort(byName)
       .map((root) => ({...root, children: (childrenOf.get(root.exam_type_id) || []).sort(byName)}));
   }, [examTypes]);
 
-  const toggleExpand = useCallback((id) => {
+  const toggleExpand = useCallback((id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -212,17 +242,17 @@ function ExamTypesManagementPage() {
     setShowFormModal(true);
   };
 
-  const openCreateChildModal = (parent) => {
+  const openCreateChildModal = (parent: ExamTypeNode) => {
     resetForm();
     setFormState({...emptyForm, parent_id: parent.exam_type_id});
     setShowFormModal(true);
   };
 
-  const openLayoutEditor = (examType) => {
+  const openLayoutEditor = (examType: ExamTypeNode) => {
     router.push(routes.adminExamTypeLayout.replace(':examTypeId', examType.exam_type_id));
   };
 
-  const openEditModal = (examType) => {
+  const openEditModal = (examType: ExamTypeNode) => {
     setEditingTypeId(examType.exam_type_id);
     setFormState({
       name: examType.name,
@@ -245,7 +275,7 @@ function ExamTypesManagementPage() {
       setErrorMessage('Tên loại kỳ thi không được để trống.');
       return;
     }
-    if (durationValue && (!Number.isFinite(parsedDuration) || parsedDuration <= 0)) {
+    if (durationValue && (!Number.isFinite(parsedDuration) || (parsedDuration as number) <= 0)) {
       setErrorMessage('Thời lượng phải là số lớn hơn 0 hoặc để trống.');
       return;
     }
@@ -253,7 +283,8 @@ function ExamTypesManagementPage() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      const payload = buildExamTypePayload(formState, {hasChildren: editingHasChildren});
+      // BE chấp nhận durationMinutes null để gỡ giá trị — DTO FE khai optional nên ép kiểu tại đây
+      const payload = buildExamTypePayload(formState, {hasChildren: editingHasChildren}) as any;
       if (editingTypeId) {
         await updateMutation.mutateAsync({id: editingTypeId, payload});
       } else {
@@ -265,7 +296,7 @@ function ExamTypesManagementPage() {
       }
       setShowFormModal(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(
         error?.response?.data?.message || 'Không thể lưu loại kỳ thi. Vui lòng thử lại.',
       );
@@ -281,7 +312,7 @@ function ExamTypesManagementPage() {
     try {
       await deleteMutation.mutateAsync(deletingExamType.exam_type_id);
       setDeletingExamType(null);
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage(
         error?.response?.data?.message || 'Không thể xóa loại kỳ thi này.',
       );
@@ -290,7 +321,7 @@ function ExamTypesManagementPage() {
     }
   };
 
-  const deleteMessage = deletingExamType?.child_count > 0
+  const deleteMessage = deletingExamType && deletingExamType.child_count > 0
     ? `Loại "${deletingExamType?.name}" đang chứa ${deletingExamType.child_count} loại con  backend sẽ chặn xoá. Hãy xoá/tách loại con trước.`
     : `Bạn có chắc muốn xóa "${deletingExamType?.name || ''}" không?`;
 
@@ -359,7 +390,7 @@ function ExamTypesManagementPage() {
         parentOptions={parentOptions}
         editingHasChildren={editingHasChildren}
         onChangeField={(fieldName, value) =>
-          setFormState((previous) => ({...previous, [fieldName]: value}))
+          setFormState((previous) => ({...previous, [fieldName]: value} as ExamTypeFormState))
         }
         onClose={() => {
           if (submitting) return;
@@ -382,4 +413,4 @@ function ExamTypesManagementPage() {
   );
 }
 
-export default ExamTypesManagementPage;
+export default ExamTypesManagement;

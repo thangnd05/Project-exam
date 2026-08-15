@@ -1,5 +1,5 @@
-import TestsManagementPage from '@/app/features/admin/exam-content/TestsManagementPage';
+import TestsManagement from './TestsManagement';
 
 export default function Page() {
-  return <TestsManagementPage />;
+  return <TestsManagement />;
 }

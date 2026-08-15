@@ -7,6 +7,27 @@ import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 
 const scoringMethodOptions = ['DEFAULT', 'TOEIC_SCALE', 'IELTS_BAND', 'AWS_SCALE'];
 
+export type ExamTypeFormState = {
+  name: string;
+  description: string;
+  image_url: string;
+  duration_minutes: number | string;
+  scoring_method: string;
+  flexible: boolean;
+  parent_id: string;
+};
+
+type ExamTypeFormModalProps = {
+  show: boolean;
+  isEditing: boolean;
+  formState: ExamTypeFormState;
+  parentOptions?: Array<{exam_type_id: string; name: string}>;
+  editingHasChildren?: boolean;
+  onChangeField: (field: keyof ExamTypeFormState, value: string | boolean) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+};
+
 function ExamTypeFormModal({
   show,
   isEditing,
@@ -16,7 +37,7 @@ function ExamTypeFormModal({
   onChangeField,
   onClose,
   onSubmit,
-}) {
+}: ExamTypeFormModalProps) {
   return (
     <BaseModal
       show={show}

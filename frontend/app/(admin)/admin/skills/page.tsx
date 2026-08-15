@@ -1,5 +1,5 @@
-import SkillsManagementPage from '@/app/features/admin/exam-content/SkillsManagementPage';
+import SkillsManagement from './SkillsManagement';
 
 export default function Page() {
-  return <SkillsManagementPage />;
+  return <SkillsManagement />;
 }

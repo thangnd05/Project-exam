@@ -1,5 +1,5 @@
-import ExamCategoriesManagementPage from '@/app/features/admin/exam-content/ExamCategoriesManagementPage';
+import ExamCategoriesManagement from './ExamCategoriesManagement';
 
 export default function Page() {
-  return <ExamCategoriesManagementPage />;
+  return <ExamCategoriesManagement />;
 }

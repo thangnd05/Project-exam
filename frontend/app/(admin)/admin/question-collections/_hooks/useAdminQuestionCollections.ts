@@ -8,13 +8,31 @@ import {
   updateQuestionCollection,
 } from '@/app/apis/questionCollectionApi';
 import { getExamTypes } from '@/app/apis/examTypeApi';
+import type {
+  ExamTypeResponse,
+  QuestionCollectionRequest,
+  QuestionCollectionResponse,
+} from '@/app/types';
 
 export const questionCollectionKeys = {
   all: ['admin-question-collections'],
   examTypes: ['admin-question-collections', 'exam-types'],
 };
 
-const mapCollectionFromApi = (collection) => ({
+export type CollectionItem = {
+  collection_id: string;
+  name: string;
+  description: string;
+  question_count: number;
+  parent_id: string;
+  parent_name: string;
+  child_count: number;
+  total_question_count: number;
+  exam_type_id: string;
+  display_order: number | null;
+};
+
+const mapCollectionFromApi = (collection: QuestionCollectionResponse): CollectionItem => ({
   collection_id: String(collection.collectionId),
   name: collection.name || '',
   description: collection.description || '',
@@ -30,8 +48,11 @@ const mapCollectionFromApi = (collection) => ({
   display_order: typeof collection.displayOrder === 'number' ? collection.displayOrder : null,
 });
 
-const normalizeCollections = (data) => (Array.isArray(data) ? data : []).map(mapCollectionFromApi);
-const normalizeExamTypes = (data) =>
+const normalizeCollections = (data: QuestionCollectionResponse[]): CollectionItem[] =>
+  (Array.isArray(data) ? data : []).map(mapCollectionFromApi);
+// `any` có chủ đích: giữ nhánh phòng thủ data?.data / data?.content của code cũ
+// dù API hiện tại đã trả thẳng mảng ExamTypeResponse[].
+const normalizeExamTypes = (data: any): ExamTypeResponse[] =>
   Array.isArray(data) ? data : data?.data ?? data?.content ?? [];
 
 export function useAdminQuestionCollections() {
@@ -48,13 +69,14 @@ export function useAdminQuestionCollections() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (payload) => createQuestionCollection(payload),
+    mutationFn: (payload: QuestionCollectionRequest) => createQuestionCollection(payload),
   });
   const updateMutation = useMutation({
-    mutationFn: ({ id, payload }) => updateQuestionCollection(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: QuestionCollectionRequest }) =>
+      updateQuestionCollection(id, payload),
   });
   const deleteMutation = useMutation({
-    mutationFn: (id) => deleteQuestionCollection(id),
+    mutationFn: (id: string) => deleteQuestionCollection(id),
   });
 
   return {

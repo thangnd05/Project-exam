@@ -4,29 +4,38 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {getExamTypes} from '@/app/apis/examTypeApi';
 import {createTag, deleteTag, getTagTreeByExamType, getTagsFlatByExamType, updateTag} from '@/app/apis/tagApi';
-import {examTypeKeys} from '@/app/features/admin/exam-content/hooks/useExamTypes';
+import {examTypeKeys} from '@/app/hooks/useExamTypes';
+import type {TagRequest, TagResponse} from '@/app/types';
 
 export const tagKeys = {
   all: ['admin-tags'],
-  byExamType: (examTypeId) => ['admin-tags', examTypeId ?? null],
+  byExamType: (examTypeId?: string | null) => ['admin-tags', examTypeId ?? null],
 };
+
+// API luôn trả name cho tag — ép required để trang tree khỏi phải check undefined.
+export interface AdminTag extends TagResponse {
+  name: string;
+  children?: AdminTag[];
+}
+
+export type TagExamTypeOption = {id: string; name?: string};
 
 export function useTags() {
   const qc = useQueryClient();
   const invalidate = () => qc.invalidateQueries({queryKey: tagKeys.all});
 
   const createMutation = useMutation({
-    mutationFn: createTag,
+    mutationFn: (payload: TagRequest) => createTag(payload),
     onSuccess: invalidate,
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({tagId, payload}) => updateTag(tagId, payload),
+    mutationFn: ({tagId, payload}: {tagId: string; payload: TagRequest}) => updateTag(tagId, payload),
     onSuccess: invalidate,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteTag,
+    mutationFn: (tagId: string) => deleteTag(tagId),
     onSuccess: invalidate,
   });
 
@@ -37,7 +46,7 @@ export function useAdminExamTypesForTags() {
   const query = useQuery({
     queryKey: examTypeKeys.all,
     queryFn: getExamTypes,
-    select: (list) => list.map((item) => ({ id: item.examTypeId, name: item.name })),
+    select: (list): TagExamTypeOption[] => list.map((item) => ({ id: item.examTypeId, name: item.name })),
   });
 
   return {
@@ -47,23 +56,23 @@ export function useAdminExamTypesForTags() {
   };
 }
 
-export function useTagTree(examTypeId) {
+export function useTagTree(examTypeId?: string) {
   const treeQuery = useQuery({
     queryKey: [...tagKeys.byExamType(examTypeId), 'tree'],
-    queryFn: () => getTagTreeByExamType(examTypeId),
+    queryFn: () => getTagTreeByExamType(examTypeId as string),
     enabled: !!examTypeId,
   });
   const flatQuery = useQuery({
     queryKey: [...tagKeys.byExamType(examTypeId), 'flat'],
-    queryFn: () => getTagsFlatByExamType(examTypeId),
+    queryFn: () => getTagsFlatByExamType(examTypeId as string),
     enabled: !!examTypeId,
   });
 
   const refetch = () => Promise.all([treeQuery.refetch(), flatQuery.refetch()]);
 
   return {
-    tagTree: treeQuery.data ?? [],
-    flatTags: flatQuery.data ?? [],
+    tagTree: (treeQuery.data ?? []) as AdminTag[],
+    flatTags: (flatQuery.data ?? []) as AdminTag[],
     isLoading: treeQuery.isLoading || flatQuery.isLoading,
     isError: treeQuery.isError || flatQuery.isError,
     refetch,

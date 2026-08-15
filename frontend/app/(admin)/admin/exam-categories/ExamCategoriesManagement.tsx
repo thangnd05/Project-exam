@@ -5,16 +5,16 @@ import {Badge, Button} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import ExamCategoryFormModal from '../modals/ExamCategoryFormModal';
+import ExamCategoryFormModal, {type ExamCategoryFormState} from './_components/ExamCategoryFormModal';
 import {
   AdminFieldError,
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
 } from '@/app/components/admin/common';
-import {useExamCategories} from '@/app/features/admin/exam-content/hooks/useExamCategories';
+import {useExamCategories, type ExamCategoryItem} from './_hooks/useExamCategories';
 
-const emptyForm = {
+const emptyForm: ExamCategoryFormState = {
   code: '',
   name: '',
   description: '',
@@ -23,7 +23,7 @@ const emptyForm = {
   displayOrder: 0,
 };
 
-const buildPayload = (formState) => ({
+const buildPayload = (formState: ExamCategoryFormState) => ({
   code: formState.code.trim(),
   name: formState.name.trim(),
   description: formState.description?.trim() || null,
@@ -32,7 +32,7 @@ const buildPayload = (formState) => ({
   displayOrder: Number(formState.displayOrder) || 0,
 });
 
-function ExamCategoriesManagementPage() {
+function ExamCategoriesManagement() {
   const {
     categories,
     isLoading: loading,
@@ -43,10 +43,10 @@ function ExamCategoriesManagementPage() {
   } = useExamCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<ExamCategoryFormState>(emptyForm);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deletingItem, setDeletingItem] = useState(null);
+  const [deletingItem, setDeletingItem] = useState<ExamCategoryItem | null>(null);
 
   const submitting =
     createMutation.isPending ||
@@ -75,7 +75,7 @@ function ExamCategoriesManagementPage() {
     setShowFormModal(true);
   };
 
-  const openEditModal = (item) => {
+  const openEditModal = (item: ExamCategoryItem) => {
     setEditingId(item.examCategoryId);
     setFormState({
       code: item.code,
@@ -102,7 +102,8 @@ function ExamCategoriesManagementPage() {
 
     setErrorMessage('');
     try {
-      const payload = buildPayload(formState);
+      // BE chấp nhận description null để xoá mô tả — DTO FE khai optional string nên ép kiểu tại đây
+      const payload = buildPayload(formState) as any;
       if (editingId) {
         await updateMutation.mutateAsync({id: editingId, payload});
       } else {
@@ -110,7 +111,7 @@ function ExamCategoriesManagementPage() {
       }
       setShowFormModal(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       const msg =
         error.response?.data?.message ||
         error.response?.data ||
@@ -134,13 +135,13 @@ function ExamCategoriesManagementPage() {
     {
       key: 'code',
       header: 'Code',
-      render: (item) => <Badge bg="primary">{item.code}</Badge>,
+      render: (item: ExamCategoryItem) => <Badge bg="primary">{item.code}</Badge>,
     },
     {key: 'name', header: 'Tên'},
     {
       key: 'guestAllowed',
       header: 'Guest',
-      render: (item) =>
+      render: (item: ExamCategoryItem) =>
         item.guestAllowed ? (
           <Badge bg="success">Cho phép</Badge>
         ) : (
@@ -150,7 +151,7 @@ function ExamCategoriesManagementPage() {
     {
       key: 'certificateEligible',
       header: 'Chứng chỉ',
-      render: (item) =>
+      render: (item: ExamCategoryItem) =>
         item.certificateEligible ? (
           <Badge bg="warning" text="dark">Có cấp</Badge>
         ) : (
@@ -158,7 +159,7 @@ function ExamCategoriesManagementPage() {
         ),
     },
     {key: 'displayOrder', header: 'Thứ tự'},
-    {key: 'description', header: 'Mô tả', render: (item) => item.description || '-'},
+    {key: 'description', header: 'Mô tả', render: (item: ExamCategoryItem) => item.description || '-'},
   ];
 
   return (
@@ -192,8 +193,8 @@ function ExamCategoriesManagementPage() {
         columns={columns}
         data={filtered}
         loading={loading}
-        getRowKey={(item) => item.examCategoryId}
-        rowActions={(item) => (
+        getRowKey={(item: ExamCategoryItem) => item.examCategoryId}
+        rowActions={(item: ExamCategoryItem) => (
           <>
             <button onClick={() => openEditModal(item)} title="Sửa">
               <Edit size={14} />
@@ -237,4 +238,4 @@ function ExamCategoriesManagementPage() {
   );
 }
 
-export default ExamCategoriesManagementPage;
+export default ExamCategoriesManagement;

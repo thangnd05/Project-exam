@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import classNames from 'classnames/bind';
 
-import {useExamTypeById, useOwnExamTypeLayout, useUpdateExamTypeLayout} from '@/app/features/admin/exam-content/hooks/useExamTypes';
+import {useExamTypeById, useOwnExamTypeLayout, useUpdateExamTypeLayout} from '@/app/hooks/useExamTypes';
 import { resolveLayoutConfig } from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,
@@ -32,21 +32,33 @@ import {
   sampleAllQuestions,
   sampleQuestionIndexMap,
 } from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/sampleExamData';
-import styles from './ExamTypeLayoutEditorPage.module.scss';
+import styles from './ExamTypeLayoutEditor.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
+// TODO(tests-batch): các module examLayout của features/tests vẫn là .js — dùng `any`
+// cho config/block cho tới khi batch tests chuyển sang TS.
+type LayoutConfig = any;
+type LayoutBlock = any;
+
+// TODO(tests-batch): TS suy props của ExamLayoutRenderer.js bắt buộc cả nhóm props điều hướng
+// (goNext/goPrev/goToQuestion/canNavigateToQuestion) mà call-site gốc không truyền — cast any chờ batch tests.
+const ExamLayoutRendererAny = ExamLayoutRenderer as any;
+
+// `any` có chủ đích: brandColors.js dựng object bằng Object.defineProperties nên TS không thấy key.
+const brandColorsAny: any = brandColors;
+
 const FONT_OPTIONS = ['Inter', 'Roboto', 'Arial', 'Times New Roman', 'Georgia'];
 
-const formatTime = (seconds) => {
+const formatTime = (seconds: number | null | undefined) => {
   if (seconds === null || seconds === undefined) return '--:--';
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 };
 
-function alignOptionsFor(zone) {
+function alignOptionsFor(zone: string) {
   if (zone === ZONES.LEFT || zone === ZONES.RIGHT) {
     return [
       { value: 'start', label: 'Trên' },
@@ -60,28 +72,28 @@ function alignOptionsFor(zone) {
     { value: 'right', label: 'Phải' },
   ];
 }
-function alignDefaultFor(zone) {
+function alignDefaultFor(zone: string) {
   if (zone === ZONES.LEFT || zone === ZONES.RIGHT) return 'start';
   if (zone === ZONES.BOTTOM) return 'right';
   return 'left';
 }
 
-function normalizeOrders(blocks) {
-  const counters = {};
+function normalizeOrders(blocks: LayoutBlock[]) {
+  const counters: Record<string, number> = {};
   return blocks.map((b) => {
     counters[b.zone] = (counters[b.zone] || 0) + 1;
     return { ...b, order: counters[b.zone] };
   });
 }
 
-function ExamTypeLayoutEditorPage() {
-  const { examTypeId } = useParams();
+function ExamTypeLayoutEditor() {
+  const { examTypeId } = useParams<{examTypeId: string}>();
   const router = useRouter();
 
-  const [config, setConfig] = useState(defaultLayoutConfig);
-  const [selectedId, setSelectedId] = useState(null);
-  const [dragId, setDragId] = useState(null);
-  const [dropZone, setDropZone] = useState(null);
+  const [config, setConfig] = useState<LayoutConfig>(defaultLayoutConfig);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dropZone, setDropZone] = useState<string | null>(null);
 
   const saveLayout = useUpdateExamTypeLayout();
   const saving = saveLayout.isPending;
@@ -97,12 +109,12 @@ function ExamTypeLayoutEditorPage() {
     }
   }, [layout]);
 
-  const updateBlocks = useCallback((fn) => {
-    setConfig((c) => ({ ...c, blocks: normalizeOrders(fn(c.blocks)) }));
+  const updateBlocks = useCallback((fn: (blocks: LayoutBlock[]) => LayoutBlock[]) => {
+    setConfig((c: LayoutConfig) => ({ ...c, blocks: normalizeOrders(fn(c.blocks)) }));
   }, []);
 
   const moveBlock = useCallback(
-    (blockId, targetZone, targetBlockId = null) => {
+    (blockId: string, targetZone: string, targetBlockId: string | null = null) => {
       updateBlocks((blocks) => {
         const moving = blocks.find((b) => b.id === blockId);
         if (!moving) return blocks;
@@ -129,12 +141,12 @@ function ExamTypeLayoutEditorPage() {
   );
 
   const toggleVisible = useCallback(
-    (id) => updateBlocks((blocks) => blocks.map((b) => (b.id === id ? { ...b, visible: b.visible === false } : b))),
+    (id: string) => updateBlocks((blocks) => blocks.map((b) => (b.id === id ? { ...b, visible: b.visible === false } : b))),
     [updateBlocks],
   );
 
   const patchBlockProps = useCallback(
-    (id, patch) =>
+    (id: string, patch: Record<string, unknown>) =>
       updateBlocks((blocks) =>
         blocks.map((b) => (b.id === id ? { ...b, props: { ...b.props, ...patch } } : b)),
       ),
@@ -142,12 +154,12 @@ function ExamTypeLayoutEditorPage() {
   );
 
   const patchBlockField = useCallback(
-    (id, patch) => updateBlocks((blocks) => blocks.map((b) => (b.id === id ? { ...b, ...patch } : b))),
+    (id: string, patch: Record<string, unknown>) => updateBlocks((blocks) => blocks.map((b) => (b.id === id ? { ...b, ...patch } : b))),
     [updateBlocks],
   );
 
   const removeBlock = useCallback(
-    (id) => {
+    (id: string) => {
       updateBlocks((blocks) => blocks.filter((b) => b.id !== id));
       setSelectedId((prev) => (prev === id ? null : prev));
     },
@@ -155,7 +167,7 @@ function ExamTypeLayoutEditorPage() {
   );
 
   const addBlock = useCallback(
-    (type) => {
+    (type: string) => {
       const id = `${type}-${Date.now()}`;
       updateBlocks((blocks) => [
         ...blocks,
@@ -167,11 +179,11 @@ function ExamTypeLayoutEditorPage() {
   );
 
   const patchTheme = useCallback(
-    (patch) => setConfig((c) => ({ ...c, theme: { ...c.theme, ...patch } })),
+    (patch: Record<string, unknown>) => setConfig((c: LayoutConfig) => ({ ...c, theme: { ...c.theme, ...patch } })),
     [],
   );
   const patchQuestionArea = useCallback(
-    (patch) => setConfig((c) => ({ ...c, questionArea: { ...c.questionArea, ...patch } })),
+    (patch: Record<string, unknown>) => setConfig((c: LayoutConfig) => ({ ...c, questionArea: { ...c.questionArea, ...patch } })),
     [],
   );
 
@@ -185,34 +197,34 @@ function ExamTypeLayoutEditorPage() {
       {examTypeId, config: JSON.stringify(config)},
       {
         onSuccess: () => toast.success('Đã lưu giao diện làm bài cho loại đề này.'),
-        onError: (err) =>
+        onError: (err: any) =>
           toast.error(err?.response?.data?.message || 'Lưu thất bại. Vui lòng thử lại.'),
       },
     );
   }, [config, examTypeId, saveLayout]);
 
-  const handleDropOnZone = (zone) => {
+  const handleDropOnZone = (zone: string) => {
     if (dragId) moveBlock(dragId, zone);
     setDragId(null);
     setDropZone(null);
   };
-  const handleDropOnBlock = (targetBlock) => {
+  const handleDropOnBlock = (targetBlock: LayoutBlock) => {
     if (dragId) moveBlock(dragId, targetBlock.zone, targetBlock.id);
     setDragId(null);
     setDropZone(null);
   };
 
   const blocksByZone = useMemo(() => {
-    const map = {};
+    const map: Record<string, LayoutBlock[]> = {};
     ZONE_META.forEach((z) => {
       map[z.key] = config.blocks
-        .filter((b) => b.zone === z.key && b.type !== BLOCK_TYPES.QUESTION_AREA)
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        .filter((b: LayoutBlock) => b.zone === z.key && b.type !== BLOCK_TYPES.QUESTION_AREA)
+        .sort((a: LayoutBlock, b: LayoutBlock) => (a.order ?? 0) - (b.order ?? 0));
     });
     return map;
   }, [config.blocks]);
 
-  const selectedBlock = config.blocks.find((b) => b.id === selectedId) || null;
+  const selectedBlock = config.blocks.find((b: LayoutBlock) => b.id === selectedId) || null;
 
   if (loading) {
     return (
@@ -346,7 +358,7 @@ function ExamTypeLayoutEditorPage() {
             <span>Nhấp vào yếu tố để chỉnh</span>
           </div>
           <div className={cx('previewCanvas')} onClick={() => setSelectedId(null)}>
-            <ExamLayoutRenderer
+            <ExamLayoutRendererAny
               config={config}
               isPractice={false}
               visibleParts={sampleExamData.visibleParts}
@@ -373,7 +385,7 @@ function ExamTypeLayoutEditorPage() {
               <label>Màu chủ đạo</label>
               <input
                 type="color"
-                value={config.theme.primary || brandColors.primary}
+                value={config.theme.primary || brandColorsAny.primary}
                 onChange={(e) => patchTheme({ primary: e.target.value })}
               />
             </div>
@@ -573,4 +585,4 @@ function ExamTypeLayoutEditorPage() {
   );
 }
 
-export default ExamTypeLayoutEditorPage;
+export default ExamTypeLayoutEditor;

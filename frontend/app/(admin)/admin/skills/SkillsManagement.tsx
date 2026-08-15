@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
-import {useSkills} from '@/app/features/admin/exam-content/hooks/useSkills';
+import {useSkills, type SkillItem} from './_hooks/useSkills';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -20,7 +20,7 @@ const defaultFormState = {
   description: '',
 };
 
-function SkillsManagementPage() {
+function SkillsManagement() {
   const {
     skillList,
     isLoading: loading,
@@ -31,11 +31,11 @@ function SkillsManagementPage() {
   } = useSkills();
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingSkillId, setEditingSkillId] = useState(null);
+  const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
   const [formState, setFormState] = useState(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [deletingSkill, setDeletingSkill] = useState(null);
+  const [deletingSkill, setDeletingSkill] = useState<SkillItem | null>(null);
 
   const displayError =
     errorMessage || (isError ? 'Không thể tải danh sách kỹ năng.' : '');
@@ -64,7 +64,7 @@ function SkillsManagementPage() {
     setShowModal(true);
   };
 
-  const openEditModal = (skill) => {
+  const openEditModal = (skill: SkillItem) => {
     setEditingSkillId(skill.skill_id);
     setFormState({
       name: skill.name,
@@ -74,7 +74,7 @@ function SkillsManagementPage() {
     setShowModal(true);
   };
 
-  const hasDuplicateSkillName = (skillName) => {
+  const hasDuplicateSkillName = (skillName: string) => {
     const normalizedName = skillName.trim().toLowerCase();
     return skillList.some((skill) => {
       if (editingSkillId && skill.skill_id === editingSkillId) {
@@ -138,7 +138,7 @@ function SkillsManagementPage() {
 
   const columns = [
     {key: 'name', header: 'Tên kỹ năng'},
-    {key: 'description', header: 'Mô tả', render: (skill) => skill.description || '-'},
+    {key: 'description', header: 'Mô tả', render: (skill: SkillItem) => skill.description || '-'},
   ];
 
   return (
@@ -167,8 +167,8 @@ function SkillsManagementPage() {
         columns={columns}
         data={filteredSkills}
         loading={loading}
-        getRowKey={(skill) => skill.skill_id}
-        rowActions={(skill) => (
+        getRowKey={(skill: SkillItem) => skill.skill_id}
+        rowActions={(skill: SkillItem) => (
           <>
             <button title="Sửa" onClick={() => openEditModal(skill)}>
               <Edit size={14} />
@@ -249,4 +249,4 @@ function SkillsManagementPage() {
   );
 }
 
-export default SkillsManagementPage;
+export default SkillsManagement;

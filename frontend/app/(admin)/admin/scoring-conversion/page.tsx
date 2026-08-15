@@ -1,5 +1,5 @@
-import ScoringConversionManagementPage from '@/app/features/admin/exam-content/ScoringConversionManagementPage';
+import ScoringConversionManagement from './ScoringConversionManagement';
 
 export default function Page() {
-  return <ScoringConversionManagementPage />;
+  return <ScoringConversionManagement />;
 }

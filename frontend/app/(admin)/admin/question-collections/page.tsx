@@ -1,5 +1,5 @@
-import QuestionCollectionsManagementPage from '@/app/features/admin/exam-content/QuestionCollectionsManagementPage';
+import QuestionCollectionsManagement from './QuestionCollectionsManagement';
 
 export default function Page() {
-  return <QuestionCollectionsManagementPage />;
+  return <QuestionCollectionsManagement />;
 }

@@ -1,5 +1,5 @@
-import ExamTypesManagementPage from '@/app/features/admin/exam-content/ExamTypesManagementPage';
+import ExamTypesManagement from './ExamTypesManagement';
 
 export default function Page() {
-  return <ExamTypesManagementPage />;
+  return <ExamTypesManagement />;
 }

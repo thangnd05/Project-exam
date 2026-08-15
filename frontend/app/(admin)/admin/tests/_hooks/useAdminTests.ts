@@ -4,17 +4,25 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAdminTests, updateTest, deleteTest } from '@/app/apis/testApi';
 import { getExamTypes } from '@/app/apis/examTypeApi';
 import { getUsers } from '@/app/apis/userApi';
+import type {
+  CreateTestRequest,
+  ExamTypeResponse,
+  PageResponse,
+  TestAdminResponse,
+  UserResponse,
+} from '@/app/types';
 
 const USERS_PARAMS = { page: 0, size: 200 };
 
 export const adminTestsKeys = {
   tests: ['admin-tests'],
   examTypes: ['admin-exam-types'],
-  users: (params) => ['admin-users', params],
+  users: (params: typeof USERS_PARAMS) => ['admin-users', params],
 };
 
-const toArray = (data) => (Array.isArray(data) ? data : []);
-const toUsers = (data) => (Array.isArray(data?.content) ? data.content : []);
+const toArray = <T,>(data: T[]): T[] => (Array.isArray(data) ? data : []);
+const toUsers = (data: PageResponse<UserResponse>): UserResponse[] =>
+  Array.isArray(data?.content) ? data.content : [];
 
 export function useAdminTests() {
   const qc = useQueryClient();
@@ -22,12 +30,12 @@ export function useAdminTests() {
   const testsQuery = useQuery({
     queryKey: adminTestsKeys.tests,
     queryFn: getAdminTests,
-    select: toArray,
+    select: toArray<TestAdminResponse>,
   });
   const examTypesQuery = useQuery({
     queryKey: adminTestsKeys.examTypes,
     queryFn: getExamTypes,
-    select: toArray,
+    select: toArray<ExamTypeResponse>,
   });
   const usersQuery = useQuery({
     queryKey: adminTestsKeys.users(USERS_PARAMS),
@@ -39,12 +47,13 @@ export function useAdminTests() {
     qc.invalidateQueries({ queryKey: adminTestsKeys.tests });
 
   const updateMutation = useMutation({
-    mutationFn: ({ testId, payload }) => updateTest(testId, payload),
+    mutationFn: ({ testId, payload }: { testId: string; payload: CreateTestRequest }) =>
+      updateTest(testId, payload),
     onSuccess: invalidateTests,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (testId) => deleteTest(testId),
+    mutationFn: (testId: string) => deleteTest(testId),
     onSuccess: invalidateTests,
   });
 

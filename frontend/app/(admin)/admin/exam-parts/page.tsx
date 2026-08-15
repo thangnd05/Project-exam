@@ -1,5 +1,5 @@
-import ExamPartsManagementPage from '@/app/features/admin/exam-content/ExamPartsManagementPage';
+import ExamPartsManagement from './ExamPartsManagement';
 
 export default function Page() {
-  return <ExamPartsManagementPage />;
+  return <ExamPartsManagement />;
 }

@@ -1,5 +1,5 @@
-import TagsManagementPage from '@/app/features/admin/exam-content/TagsManagementPage';
+import TagsManagement from './TagsManagement';
 
 export default function Page() {
-  return <TagsManagementPage />;
+  return <TagsManagement />;
 }

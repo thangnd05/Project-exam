@@ -12,9 +12,9 @@ import {
     AdminToolbar,
     AdminTable,
 } from '@/app/components/admin/common';
-import { useCategories } from '@/app/features/admin/exam-content/hooks/useCategories';
+import { useCategories, type AdminCategory } from './_hooks/useCategories';
 
-const CategoriesManagementPage = () => {
+const CategoriesManagement = () => {
     const {
         categories,
         isLoading: loading,
@@ -24,8 +24,8 @@ const CategoriesManagementPage = () => {
     } = useCategories();
     const [searchQuery, setSearchQuery] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const [editingCategory, setEditingCategory] = useState(null);
-    const [deletingCategory, setDeletingCategory] = useState(null);
+    const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
+    const [deletingCategory, setDeletingCategory] = useState<AdminCategory | null>(null);
     const [formData, setFormData] = useState({ name: '' });
 
     const filteredCategories = categories.filter(c =>
@@ -38,7 +38,7 @@ const CategoriesManagementPage = () => {
         setShowModal(true);
     };
 
-    const openEditModal = (category) => {
+    const openEditModal = (category: AdminCategory) => {
         setEditingCategory(category);
         setFormData({ name: category.name });
         setShowModal(true);
@@ -72,7 +72,7 @@ const CategoriesManagementPage = () => {
 
     const columns = [
         { key: 'name', header: 'Tên danh mục' },
-        { key: 'slug', header: 'Slug', render: (item) => item.slug || '-' },
+        { key: 'slug', header: 'Slug', render: (item: AdminCategory) => item.slug || '-' },
     ];
 
     return (
@@ -100,8 +100,8 @@ const CategoriesManagementPage = () => {
                 columns={columns}
                 data={filteredCategories}
                 loading={loading}
-                getRowKey={(item) => item.id}
-                rowActions={(item) => (
+                getRowKey={(item: AdminCategory) => item.id}
+                rowActions={(item: AdminCategory) => (
                     <>
                         <button onClick={() => openEditModal(item)} title="Sửa">
                             <Edit size={14} />
@@ -155,4 +155,4 @@ const CategoriesManagementPage = () => {
     );
 };
 
-export default CategoriesManagementPage;
+export default CategoriesManagement;

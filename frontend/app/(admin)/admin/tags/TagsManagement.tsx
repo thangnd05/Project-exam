@@ -6,21 +6,34 @@ import classNames from 'classnames/bind';
 import {ChevronDown, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import TagFormModal from '../modals/TagFormModal';
+import TagFormModal, {type TagFormState} from './_components/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
-import {useAdminExamTypesForTags, useTagTree, useTags} from '@/app/features/admin/exam-content/hooks/useTags';
-import styles from './TagsManagementPage.module.scss';
+import {useAdminExamTypesForTags, useTagTree, useTags, type AdminTag} from './_hooks/useTags';
+import type {TagResponse} from '@/app/types';
+import styles from './TagsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-const emptyForm = {name: '', parentId: null, examTypeId: '', sortOrder: null};
+const emptyForm: TagFormState = {name: '', parentId: null, examTypeId: '', sortOrder: null};
 
-function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, searchTerm}) {
+type TagTreeNodeProps = {
+  tag: AdminTag;
+  flatTags: AdminTag[];
+  level: number;
+  expandedIds: Set<string>;
+  toggleExpand: (tagId: string) => void;
+  onEdit: (tag: AdminTag) => void;
+  onDelete: (tag: AdminTag) => void;
+  onAddChild: (tag: AdminTag) => void;
+  searchTerm: string;
+};
+
+function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, searchTerm}: TagTreeNodeProps) {
   const hasChildren = tag.children && tag.children.length > 0;
   const isExpanded = expandedIds.has(tag.tagId);
   const keyword = searchTerm.trim().toLowerCase();
   const matchesSearch = !keyword || tag.name.toLowerCase().includes(keyword);
-  const childrenMatchSearch = hasChildren && tag.children.some(function checkMatch(c) {
+  const childrenMatchSearch = hasChildren && tag.children!.some(function checkMatch(c: AdminTag): boolean {
     if (c.name.toLowerCase().includes(keyword)) return true;
     return c.children?.some(checkMatch) || false;
   });
@@ -45,7 +58,7 @@ function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, o
             {tag.name}
           </span>
           {hasChildren && (
-            <span className={cx('childCount')}>{tag.children.length}</span>
+            <span className={cx('childCount')}>{tag.children!.length}</span>
           )}
         </div>
         <div className={cx('treeNodeActions')}>
@@ -62,7 +75,7 @@ function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, o
       </div>
       {hasChildren && isExpanded && (
         <div className={cx('childrenWrapper')}>
-          {tag.children.map((child) => (
+          {tag.children!.map((child) => (
             <TagTreeNode
               key={child.tagId}
               tag={child}
@@ -88,15 +101,15 @@ function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, o
   return nodeContent;
 }
 
-function TagsManagementPage() {
+function TagsManagement() {
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingTagId, setEditingTagId] = useState(null);
-  const [formState, setFormState] = useState(emptyForm);
+  const [editingTagId, setEditingTagId] = useState<string | null>(null);
+  const [formState, setFormState] = useState<TagFormState>(emptyForm);
   const [errorMessage, setErrorMessage] = useState('');
-  const [deletingTag, setDeletingTag] = useState(null);
-  const [expandedIds, setExpandedIds] = useState(new Set());
+  const [deletingTag, setDeletingTag] = useState<AdminTag | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [preserveExpandedOnRefetch, setPreserveExpandedOnRefetch] = useState(false);
 
   const { examTypes = [] } = useAdminExamTypesForTags();
@@ -130,7 +143,7 @@ function TagsManagementPage() {
     setExpandedIds(new Set(tagTree.map((t) => t.tagId)));
   }, [tagTree, preserveExpandedOnRefetch]);
 
-  const fetchTags = useCallback(async (examTypeIdOverride, {preserveExpanded = false} = {}) => {
+  const fetchTags = useCallback(async (examTypeIdOverride?: string, {preserveExpanded = false} = {}) => {
     const examTypeId = examTypeIdOverride || selectedExamTypeId;
     if (!examTypeId) return;
     setPreserveExpandedOnRefetch(preserveExpanded);
@@ -139,7 +152,7 @@ function TagsManagementPage() {
     setPreserveExpandedOnRefetch(false);
   }, [refetchTags, selectedExamTypeId]);
 
-  const toggleExpand = useCallback((tagId) => {
+  const toggleExpand = useCallback((tagId: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(tagId)) next.delete(tagId);
@@ -149,10 +162,10 @@ function TagsManagementPage() {
   }, []);
 
   const expandAll = useCallback(() => {
-    const allIds = new Set();
-    const collect = (nodes) => {
+    const allIds = new Set<string>();
+    const collect = (nodes: AdminTag[]) => {
       for (const n of nodes) {
-        if (n.children?.length > 0) {
+        if (n.children && n.children.length > 0) {
           allIds.add(n.tagId);
           collect(n.children);
         }
@@ -181,7 +194,7 @@ function TagsManagementPage() {
     setShowFormModal(true);
   };
 
-  const openCreateChildModal = (parentTag) => {
+  const openCreateChildModal = (parentTag: AdminTag) => {
     resetForm();
     setFormState({
       name: '',
@@ -192,7 +205,7 @@ function TagsManagementPage() {
     setShowFormModal(true);
   };
 
-  const openEditModal = (tag) => {
+  const openEditModal = (tag: AdminTag) => {
     setEditingTagId(tag.tagId);
     setFormState({
       name: tag.name,
@@ -214,14 +227,15 @@ function TagsManagementPage() {
       return;
     }
     setErrorMessage('');
+    // BE chấp nhận parentId/sortOrder null để gỡ giá trị — DTO FE khai optional nên ép kiểu tại đây
     const payload = {
       name: formState.name.trim(),
       examTypeId,
       parentId: formState.parentId || null,
       sortOrder: formState.sortOrder ?? null,
-    };
+    } as any;
 
-    const onSuccess = (savedTag) => {
+    const onSuccess = (savedTag: TagResponse) => {
       const targetExamTypeId = savedTag?.examTypeId || examTypeId;
       if (targetExamTypeId !== selectedExamTypeId) {
         setSelectedExamTypeId(targetExamTypeId);
@@ -241,7 +255,7 @@ function TagsManagementPage() {
         });
       }
     };
-    const onError = (error) => {
+    const onError = (error: any) => {
       const apiMessage = error?.response?.data?.message;
       setErrorMessage(apiMessage || 'Không thể lưu tag. Vui lòng thử lại.');
     };
@@ -349,7 +363,7 @@ function TagsManagementPage() {
         examTypes={examTypes}
         parentOptions={parentOptions}
         onChangeField={(field, value) =>
-          setFormState((prev) => ({...prev, [field]: value}))
+          setFormState((prev) => ({...prev, [field]: value} as TagFormState))
         }
         onClose={() => {
           if (submitting) return;
@@ -373,4 +387,4 @@ function TagsManagementPage() {
   );
 }
 
-export default TagsManagementPage;
+export default TagsManagement;
