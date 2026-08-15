@@ -370,3 +370,36 @@
     box-shadow: 0 4px 10px var(--primary-alpha-15) !important;
   }
 }
+
+/*
+  Tab của trang quản trị. Bootstrap để tab chưa chọn màu xanh link và viền hộp;
+  ở đây đổi sang chữ xám + gạch chân, tab đang chọn mới ăn màu thương hiệu.
+*/
+.tabs {
+  border-bottom: 2px solid var(--border-color);
+  gap: 4px;
+
+  :global(.nav-link) {
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    padding: 12px 20px;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    background: transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+
+    &:hover,
+    &:focus {
+      color: var(--text-color);
+      border-bottom-color: var(--border-color);
+    }
+
+    &:global(.active) {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: transparent;
+    }
+  }
+}

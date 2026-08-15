@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Badge, Button, Form, Nav } from 'react-bootstrap';
+import { Badge, Button, Form } from 'react-bootstrap';
 import { Edit, Plus, Trash2, ShieldX } from 'lucide-react';
 
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
@@ -9,6 +9,7 @@ import {
   AdminFieldError,
   AdminPageHeader,
   AdminTable,
+  AdminTabs,
   AdminToolbar,
   StatCard,
   StatCardGroup,
@@ -285,14 +286,14 @@ function CertificatesManagementPage() {
       {/* Không báo lỗi thì bảng rỗng trông y hệt "chưa cấp chứng chỉ nào". */}
       {issuedError && <AdminFieldError message="Không tải được danh sách chứng chỉ đã cấp." />}
 
-      <Nav variant="tabs" activeKey={tab} onSelect={(key) => setTab(key || 'templates')}>
-        <Nav.Item>
-          <Nav.Link eventKey="templates">Mẫu chứng chỉ</Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link eventKey="issued">Chứng chỉ đã cấp</Nav.Link>
-        </Nav.Item>
-      </Nav>
+      <AdminTabs
+        activeKey={tab}
+        onSelect={setTab}
+        items={[
+          {key: 'templates', label: 'Mẫu chứng chỉ'},
+          {key: 'issued', label: 'Chứng chỉ đã cấp'},
+        ]}
+      />
 
       {tab === 'templates' ? (
         <>

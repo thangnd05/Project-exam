@@ -101,9 +101,6 @@ function Header() {
               >
                 Chứng chỉ
               </NavLink>
-              {/* Các mục dưới đây đều là trang riêng tư nhưng vẫn hiện khi chưa đăng nhập:
-                  ProtectedRoute sẽ đưa về trang đăng nhập kèm lời nhắc rồi quay lại đúng
-                  trang này sau khi đăng nhập xong. */}
               <NavLink
                 to={routes.myTarget}
                 className={({isActive}) => cx('home', {active: isActive})}
