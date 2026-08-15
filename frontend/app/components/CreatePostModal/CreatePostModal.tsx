@@ -8,18 +8,8 @@ import classNames from 'classnames/bind';
 import { FaEdit, FaImage, FaTag } from 'react-icons/fa';
 import { useAuth } from '@/app/hooks/useAuth';
 import routes from '@/app/configs/Routes';
-import dynamic from 'next/dynamic';
 import type { CategoryResponse, PostResponse } from '@/app/types';
-
-// Quill chạm `document` ngay khi module được nạp nên không import tĩnh được: Next sẽ thực thi
-// file này cả ở phía server. Nạp động với ssr:false để nó chỉ tồn tại trên trình duyệt.
-// any có chủ đích: next/dynamic trả về ComponentType không khai báo ref, trong khi react-quill
-// là class component cần ref để lấy editor instance — runtime vẫn hoạt động như cũ.
-const ReactQuill: any = dynamic(() => import('react-quill'), {
-  ssr: false,
-  loading: () => <div style={{ minHeight: 200, color: 'var(--text-secondary)' }}>Đang tải trình soạn thảo...</div>,
-});
-import 'react-quill/dist/quill.snow.css';
+import RichTextEditor, { type RichTextEditorHandle } from '@/app/components/RichTextEditor/RichTextEditor';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
@@ -73,8 +63,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
     setInlineImages([]);
   }, [show, editingPost]);
 
-  // any có chủ đích: ref trỏ vào instance ReactQuill nhưng type đã mất qua next/dynamic
-  const quillRef = useRef<any>(null);
+  const quillRef = useRef<RichTextEditorHandle>(null);
 
   const imageHandler = useCallback(() => {
     const input = document.createElement('input');
@@ -91,7 +80,8 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
           const base64Url = e.target?.result as string;
           setInlineImages((prev) => [...prev, { file, base64Url }]);
 
-          const quill = quillRef.current.getEditor();
+          const quill = quillRef.current?.getEditor();
+          if (!quill) return;
           const range = quill.getSelection(true);
           quill.insertEmbed(range.index, 'image', base64Url);
         };
@@ -251,7 +241,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       <div className={cx('formGroup', 'mt-4')}>
         <label className={cx('label')}>Nội dung chi tiết</label>
         <div className={cx('quillWrapper')}>
-          <ReactQuill
+          <RichTextEditor
             ref={quillRef}
             theme="snow"
             value={content}
