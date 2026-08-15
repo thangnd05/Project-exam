@@ -3,8 +3,13 @@
 **Đã xong.** react-router-dom đã gỡ khỏi dependencies. Mỗi URL giờ là một file `page.tsx`, điều
 hướng do Next lo, 404 là HTTP 404 thật chứ không phải trang JS vẽ ra.
 
-Phiên bản: **Next 14.2 + React 18** — cố tình không lên Next 15/React 19 vì `react-quill@2` còn
-dùng `findDOMNode`, API đã bị xoá ở React 19.
+Phiên bản: **Next 16.3 + React 19.2** — ngang với `edusoft-lms`. `react-quill` (thứ chặn đường vì
+dùng `findDOMNode`) đã được thay bằng `app/components/RichTextEditor` dựng trên `quill@2`.
+
+Build chạy bằng **Turbopack** (mặc định của Next 16). Vì vậy `next.config.mjs` **không được** khai
+`webpack:` — Next 16 sẽ báo lỗi build. Alias `@/` do `paths` trong `tsconfig.json` lo, và
+`sassOptions` phải dùng `loadPaths` (tên của Sass API hiện đại) chứ `includePaths` không còn tác
+dụng với Turbopack.
 
 ## Chạy
 
@@ -122,9 +127,17 @@ HTML của trang riêng tư vẫn được gửi về trước rồi mới chuy�
 đúng chuẩn Next, nhưng chưa tận dụng được điểm mạnh nhất của App Router. Bắt đầu từ trang danh
 sách bài viết và trang chủ.
 
-**Ưu tiên 4 — nâng Next 16 + React 19** cho khớp `edusoft-lms`. Chặn đường: `react-quill@2` dùng
-`findDOMNode` (đã bị xoá ở React 19) — phải thay bằng wrapper viết trên `quill@2` (đã có sẵn
-trong dependencies) ở CreatePostModal và EmailEditorModal trước.
+**Vặt:** `next/image` thay `<img>`; `generateMetadata` cho các trang chi tiết còn thiếu (loại đề,
+tra cứu chứng chỉ); dọn override Bootstrap trong `app/assets/styles/global-overrides.scss`.
 
-**Vặt:** `next/image` thay `<img>`; `generateMetadata` cho các trang chi tiết còn thiếu; dọn
-override Bootstrap trong `app/assets/styles/global-overrides.scss`.
+## Bẫy của Next 16 đã vấp (ghi lại để khỏi vấp lại)
+
+**`params` là Promise.** Từ Next 15 `params`/`searchParams`/`cookies()`/`headers()` là bất đồng bộ,
+Next 16 bỏ hẳn cách truy cập đồng bộ. Trang `/posts/[postId]` tự khai kiểu `params` bằng tay nên
+TypeScript không phát hiện thiếu `await` — `generateMetadata` âm thầm rơi vào nhánh trả `{}`, mất
+sạch thẻ OG riêng của từng bài. Cách tránh: **luôn dùng `PageProps<'/route'>`** do `next typegen`
+sinh, đừng tự khai kiểu params.
+
+**Đừng tin `pnpm start` đang chạy là bản mới.** Nếu cổng 3000 còn tiến trình cũ, `next start` báo
+`EADDRINUSE` rồi thoát, và trình duyệt vẫn nhận HTML của bản build cũ — rất dễ kết luận nhầm là
+bản sửa không có tác dụng.
