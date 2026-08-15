@@ -91,6 +91,7 @@ export const publicRoutes = [
   { path: routes.postDetail, component: PostDetailPage },
   { path: routes.recoveryResourceView, component: RecoveryResourceViewPage, noLayout: true },
   // [TẮT XÁC THỰC EMAIL] { path: routes.verifyEmail, component: VerifyEmailPage },
+  { path: routes.certificateVerifyHome, component: CertificateVerifyPage },
   { path: routes.certificateVerify, component: CertificateVerifyPage },
   { path: routes.notFoundPage, component: NotFoundPage, noLayout: true },
   { path: routes.notFound, component: NotFoundPage, noLayout: true },

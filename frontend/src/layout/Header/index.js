@@ -87,11 +87,19 @@ function Header() {
           {/* Zone 2  Primary navigation (desktop) */}
           <nav className={cx('zoneCenter')} aria-label="Điều hướng chính">
             <div className={cx('navTrack')}>
+              {/* TẠM: nhường chỗ "Bài viết" cho tra cứu chứng chỉ, bỏ comment để trả lại như cũ.
               <NavLink
                 to={routes.posts}
                 className={({isActive}) => cx('home', {active: isActive})}
               >
                 Bài viết
+              </NavLink>
+              */}
+              <NavLink
+                to={routes.certificateVerifyHome}
+                className={({isActive}) => cx('home', {active: isActive})}
+              >
+                Chứng chỉ
               </NavLink>
               {/* Các mục dưới đây đều là trang riêng tư nhưng vẫn hiện khi chưa đăng nhập:
                   ProtectedRoute sẽ đưa về trang đăng nhập kèm lời nhắc rồi quay lại đúng

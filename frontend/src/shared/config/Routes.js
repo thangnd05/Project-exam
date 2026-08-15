@@ -52,6 +52,8 @@ const routes = {
 
   myCertificates: '/my-certificates',
   certificateDetail: '/certificates/:certificateId',
+  /* Vào thẳng trang tra cứu (chưa có mã) để link được từ menu; có mã thì dùng certificateVerify. */
+  certificateVerifyHome: '/certificates/verify',
   certificateVerify: '/certificates/verify/:code',
 
   generatePlan: '/learning-plans/generate',
