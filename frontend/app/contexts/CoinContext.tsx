@@ -6,11 +6,16 @@ import { queryClient } from '@/app/configs/queryClient';
 import { getMyCoins } from '@/app/apis/coinApi';
 import { useAuth } from '@/app/hooks/useAuth';
 
-export const CoinContext = createContext(null);
+export type CoinContextValue = {
+  balance: number;
+  refreshCoins: () => Promise<void>;
+};
+
+export const CoinContext = createContext<CoinContextValue | null>(null);
 
 export const COINS_QUERY_KEY = ['myCoins'];
 
-export const CoinProvider = ({ children }) => {
+export const CoinProvider = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
 
   const { data } = useQuery({

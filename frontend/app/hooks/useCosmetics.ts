@@ -1,9 +1,9 @@
 'use client';
 
 import { useContext } from 'react';
-import { CosmeticContext } from '@/app/contexts/CosmeticContext';
+import { CosmeticContext, type CosmeticContextValue } from '@/app/contexts/CosmeticContext';
 
-export const useCosmetics = () => {
+export const useCosmetics = (): CosmeticContextValue => {
   const context = useContext(CosmeticContext);
   if (context === null) {
     throw new Error('useCosmetics must be used within a CosmeticProvider');

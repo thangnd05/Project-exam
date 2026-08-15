@@ -6,11 +6,38 @@ import { toast } from 'react-toastify';
 import { queryClient } from '@/app/configs/queryClient';
 import { getCurrentUser, logout as logoutRequest } from '@/app/apis/authApi';
 
-export const AuthContext = createContext(null);
+export type AuthUser = {
+  userId: string;
+  userName?: string | null;
+  fullName?: string | null;
+  email?: string | null;
+  roleId?: string | number | null;
+  roleName?: string | null;
+  permissions: string[];
+  avatarUrl?: string | null;
+  isPremium: boolean;
+};
+
+export type AuthContextValue = {
+  user: AuthUser | null;
+  loading: boolean;
+  login: (userData: unknown) => void;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  userId?: string;
+  roleId?: string | number | null;
+  roleName?: string | null;
+  permissions: string[];
+  avatarUrl?: string | null;
+  isPremium: boolean;
+  isAuthenticated: boolean;
+};
+
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const CURRENT_USER_QUERY_KEY = ['currentUser'];
 
-const normalizeUser = (data) => ({
+const normalizeUser = (data: any): AuthUser => ({
   userId: data.id,
   userName: data.userName,
   fullName: data.fullName,
@@ -23,11 +50,11 @@ const normalizeUser = (data) => ({
   isPremium: data.isPremium === true,
 });
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const expiredToastShownRef = useRef(false);
 
-  const userRef = useRef(null);
+  const userRef = useRef<AuthUser | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: CURRENT_USER_QUERY_KEY,
@@ -46,18 +73,19 @@ export const AuthProvider = ({ children }) => {
   );
 
   useEffect(() => {
-    if (window.google) {
-      window.google.accounts.id.initialize({
+    const google = (window as any).google;
+    if (google) {
+      google.accounts.id.initialize({
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         auto_select: false,
         itp_support: true,
       });
-      window.google.accounts.id.cancel();
+      google.accounts.id.cancel();
     }
   }, []);
 
   useEffect(() => {
-    const handleAuthExpired = (e) => {
+    const handleAuthExpired = (e: Event) => {
 
       if (!userRef.current) return;
 
@@ -67,7 +95,9 @@ export const AuthProvider = ({ children }) => {
 
       if (!expiredToastShownRef.current) {
         expiredToastShownRef.current = true;
-        const reason = e?.detail?.reason || 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.';
+        const reason =
+          (e as CustomEvent<{ reason?: string }>)?.detail?.reason ||
+          'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.';
         toast.info(reason);
       }
 
@@ -93,7 +123,7 @@ export const AuthProvider = ({ children }) => {
     document.documentElement.dataset.theme = user?.isPremium ? 'premium' : 'normal';
   }, [user?.isPremium]);
 
-  const login = useCallback((userData) => {
+  const login = useCallback((userData: unknown) => {
     queryClient.setQueryData(CURRENT_USER_QUERY_KEY, userData);
   }, []);
 
@@ -109,7 +139,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const value = useMemo(
+  const value = useMemo<AuthContextValue>(
     () => ({
       user,
       loading,

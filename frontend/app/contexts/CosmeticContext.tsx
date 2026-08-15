@@ -6,11 +6,19 @@ import { queryClient } from '@/app/configs/queryClient';
 import { getMyEquippedCosmetics } from '@/app/apis/cosmeticApi';
 import { useAuth } from '@/app/hooks/useAuth';
 
-export const CosmeticContext = createContext(null);
+export type EquippedCosmetic = Record<string, any>;
+
+export type CosmeticContextValue = {
+  frame: EquippedCosmetic | null;
+  badge: EquippedCosmetic | null;
+  refreshCosmetics: () => Promise<void>;
+};
+
+export const CosmeticContext = createContext<CosmeticContextValue | null>(null);
 
 export const EQUIPPED_COSMETICS_QUERY_KEY = ['myEquippedCosmetics'];
 
-export const CosmeticProvider = ({ children }) => {
+export const CosmeticProvider = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
 
   const { data } = useQuery({

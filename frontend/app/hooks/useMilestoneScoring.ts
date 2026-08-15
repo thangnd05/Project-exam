@@ -7,9 +7,34 @@ const SCALE_SPAN = 900;
 const SCALE_MAX = SCALE_MIN + SCALE_SPAN;
 const DEFAULT_MAX_SCORE = 990;
 
-export const percentToNum = (percent, total) =>
+type ExamTypeLike = { examTypeId: string | number; scoringMethod?: string | null; [key: string]: any };
+type ExamPartLike = {
+  examPartId: string;
+  name?: string | null;
+  defaultNumQuestions?: number | null;
+  skillId?: string;
+  [key: string]: any;
+};
+type SkillLike = { skillId: string; name?: string | null; [key: string]: any };
+type ConversionLike = {
+  examTypeId: string | number;
+  skillId: string;
+  numCorrect: number;
+  convertedScore: number;
+  [key: string]: any;
+};
+
+export type ScoreEstimate = {
+  totalScore: number;
+  scaled?: boolean;
+  totalCorrect?: number;
+  totalQuestions?: number;
+  skillDetails: Array<{ skillName: string; numCorrect: number; convertedScore: number }>;
+};
+
+export const percentToNum = (percent: number | string, total: number): number =>
   total > 0 ? Math.round((Number(percent) * total) / 100) : 0;
-export const numToPercent = (num, total) =>
+export const numToPercent = (num: number | string, total: number): number =>
   total > 0 ? Math.round((Number(num) / total) * 100) : 0;
 
 export default function useMilestoneScoring({
@@ -18,6 +43,12 @@ export default function useMilestoneScoring({
   skills = [],
   scoringConversions = [],
   selectedExamTypeId = '',
+}: {
+  examTypes?: ExamTypeLike[];
+  examParts?: ExamPartLike[];
+  skills?: SkillLike[];
+  scoringConversions?: ConversionLike[];
+  selectedExamTypeId?: string | number;
 }) {
 
   const selectedExamType = useMemo(
@@ -29,17 +60,17 @@ export default function useMilestoneScoring({
   const maxScore = isScaled ? SCALE_MAX : DEFAULT_MAX_SCORE;
 
   const getPartTotal = useCallback(
-    (examPartId) =>
+    (examPartId: string) =>
       examParts.find((p) => p.examPartId === examPartId)?.defaultNumQuestions || 0,
     [examParts],
   );
   const getPartName = useCallback(
-    (examPartId) => examParts.find((p) => p.examPartId === examPartId)?.name || examPartId,
+    (examPartId: string) => examParts.find((p) => p.examPartId === examPartId)?.name || examPartId,
     [examParts],
   );
 
   const evenPctForScore = useCallback(
-    (score) =>
+    (score: number | string) =>
       isScaled
         ? Math.max(0, Math.min(100, Math.round(((Number(score) - SCALE_MIN) / SCALE_SPAN) * 100)))
         : Math.min(100, Math.round((Number(score) / DEFAULT_MAX_SCORE) * 100)),
@@ -47,7 +78,10 @@ export default function useMilestoneScoring({
   );
 
   const estimateScore = useCallback(
-    (partsConfig, examTypeId = selectedExamTypeId) => {
+    (
+      partsConfig: Record<string, number | string> | null | undefined,
+      examTypeId: string | number = selectedExamTypeId,
+    ): ScoreEstimate | null => {
       if (!examTypeId || !partsConfig || Object.keys(partsConfig).length === 0) return null;
 
       if (isScaled) {
@@ -65,19 +99,20 @@ export default function useMilestoneScoring({
         return { totalScore, scaled: true, totalCorrect, totalQuestions, skillDetails: [] };
       }
 
-      const correctBySkill = {};
+      const correctBySkill: Record<string, number> = {};
       for (const [examPartId, pct] of Object.entries(partsConfig)) {
         const part = examParts.find((p) => p.examPartId === examPartId);
         if (!part) continue;
         const numCorrect = percentToNum(pct, part.defaultNumQuestions || 0);
-        correctBySkill[part.skillId] = (correctBySkill[part.skillId] || 0) + numCorrect;
+        const skillKey = String(part.skillId);
+        correctBySkill[skillKey] = (correctBySkill[skillKey] || 0) + numCorrect;
       }
 
       const relevantConversions = scoringConversions.filter((c) => c.examTypeId === examTypeId);
       if (relevantConversions.length === 0) return null;
 
       let totalScore = 0;
-      const skillDetails = [];
+      const skillDetails: ScoreEstimate['skillDetails'] = [];
       for (const [skillId, numCorrect] of Object.entries(correctBySkill)) {
         const skillConversions = relevantConversions
           .filter((c) => c.skillId === skillId)
@@ -101,7 +136,7 @@ export default function useMilestoneScoring({
   );
 
   const formatEstimateDetail = useCallback(
-    (est) => {
+    (est: ScoreEstimate | null | undefined): string => {
       if (!est) return '';
       return est.scaled
         ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX})`

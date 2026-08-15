@@ -6,10 +6,10 @@ import { getMyTests, deleteTest } from '@/app/apis/testApi';
 
 export const myTestKeys = {
   all: ['my-tests'],
-  list: (page, size) => ['my-tests', { page, size }],
+  list: (page: number, size: number) => ['my-tests', { page, size }],
 };
 
-export function useMyTests({ page = 0, size = 12 } = {}) {
+export function useMyTests({ page = 0, size = 12 }: { page?: number; size?: number } = {}) {
   const query = useQuery({
     queryKey: myTestKeys.list(page, size),
     queryFn: () => getMyTests({ page, size }),
@@ -27,7 +27,7 @@ export function useMyTests({ page = 0, size = 12 } = {}) {
 export function useDeleteTest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (testId) => deleteTest(testId),
+    mutationFn: (testId: string) => deleteTest(testId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: myTestKeys.all });
     },

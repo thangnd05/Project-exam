@@ -7,7 +7,7 @@ import { getExamPartsByExamType } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
 import { sortByPartOrder } from '../utils/partOrder';
 
-const normalizeList = (payload) => {
+const normalizeList = (payload: any): any[] => {
     if (Array.isArray(payload)) {
         return payload;
     }
@@ -23,11 +23,11 @@ const normalizeList = (payload) => {
 export const baseMetaKeys = {
     examTypes: ['base-meta', 'exam-types'],
     questionCollections: ['base-meta', 'question-collections'],
-    examParts: (examTypeId) => ['base-meta', 'exam-parts', examTypeId],
-    tagsFlat: (examTypeId) => ['base-meta', 'tags-flat', examTypeId],
+    examParts: (examTypeId: string | number | null | undefined) => ['base-meta', 'exam-parts', examTypeId],
+    tagsFlat: (examTypeId: string | number | null | undefined) => ['base-meta', 'tags-flat', examTypeId],
 };
 
-export const useBaseMetaData = (examTypeId) => {
+export const useBaseMetaData = (examTypeId?: string | number | null) => {
     const examTypesQuery = useQuery({
         queryKey: baseMetaKeys.examTypes,
         queryFn: getExamTypes,
@@ -44,14 +44,14 @@ export const useBaseMetaData = (examTypeId) => {
         queryKey: baseMetaKeys.examParts(examTypeId),
         queryFn: () => getExamPartsByExamType(examTypeId),
         enabled: !!examTypeId,
-        select: (data) => sortByPartOrder(normalizeList(data)),
+        select: (data: any) => sortByPartOrder(normalizeList(data)),
     });
 
     const availableTagsQuery = useQuery({
         queryKey: baseMetaKeys.tagsFlat(examTypeId),
         queryFn: () => getTagsFlatByExamType(examTypeId),
         enabled: !!examTypeId,
-        select: (tags) => (Array.isArray(tags) ? tags : []),
+        select: (tags: any) => (Array.isArray(tags) ? tags : []),
     });
 
     return {
