@@ -2,15 +2,50 @@
 
 import { useState } from 'react';
 import { getQuestionsByPart } from '@/app/apis/questionApi';
+import type { QuestionResponse } from '@/app/types';
 
 export const SELECTION_MODES = {
   MANUAL: 'manual',
   RANDOM: 'random',
   RANDOM_BY_COLLECTION: 'random_by_collection',
   SEQUENTIAL: 'sequential',
+} as const;
+
+export type SelectionMode = (typeof SELECTION_MODES)[keyof typeof SELECTION_MODES];
+
+/** Câu hỏi lấy từ kho: QuestionResponse của BE + vài field cũ (id/passageId) mà bản JS vẫn fallback. */
+export type BankQuestion = QuestionResponse & {
+  id?: string;
+  passageId?: string | null;
 };
 
-export const defaultPartConfig = () => ({
+export interface PartConfig {
+  mode: SelectionMode;
+  randomCount: string;
+  fromIndex: string;
+  toIndex: string;
+  selectedIds: string[];
+  bankQuestions: BankQuestion[];
+  loading: boolean;
+  expanded: boolean;
+}
+
+export type PartConfigMap = Record<string, PartConfig>;
+
+/** Tham số lọc kho câu hỏi của getQuestionsByPart (kho cá nhân / lớp / quản trị). */
+export interface BankLoadParams {
+  classId?: string;
+  chapterId?: string;
+  bank?: string;
+}
+
+export interface PassageGroup {
+  groupKey: string;
+  passageId: string | null;
+  questions: BankQuestion[];
+}
+
+export const defaultPartConfig = (): PartConfig => ({
   mode: SELECTION_MODES.RANDOM,
   randomCount: '',
   fromIndex: '',
@@ -21,9 +56,9 @@ export const defaultPartConfig = () => ({
   expanded: true,
 });
 
-export const groupQuestionsByPassage = (questions) => {
+export const groupQuestionsByPassage = (questions: BankQuestion[] | null | undefined): PassageGroup[] => {
   if (!questions?.length) return [];
-  const map = new Map();
+  const map = new Map<string, PassageGroup>();
   questions.forEach((q) => {
     const id = q.questionId ?? q.id;
     const passageId = q.passageId ?? q.passage?.passageId ?? null;
@@ -31,39 +66,45 @@ export const groupQuestionsByPassage = (questions) => {
     if (!map.has(groupKey)) {
       map.set(groupKey, { groupKey, passageId, questions: [] });
     }
-    map.get(groupKey).questions.push(q);
+    map.get(groupKey)!.questions.push(q);
   });
   return Array.from(map.values());
 };
 
-export function useBankTestBuilder({ getScopedQuestions } = {}) {
-  const [partConfigs, setPartConfigs] = useState({});
+export interface UseBankTestBuilderOptions {
+  getScopedQuestions?: (cfg: PartConfig | undefined) => BankQuestion[];
+}
 
-  const scopeOf = (cfg) =>
+export function useBankTestBuilder({ getScopedQuestions }: UseBankTestBuilderOptions = {}) {
+  const [partConfigs, setPartConfigs] = useState<PartConfigMap>({});
+
+  const scopeOf = (cfg: PartConfig | undefined): BankQuestion[] =>
     getScopedQuestions ? getScopedQuestions(cfg) : cfg?.bankQuestions || [];
 
-  const updatePartConfig = (examPartId, field, value) => {
+  const updatePartConfig = (examPartId: string, field: string, value: any) => {
     setPartConfigs((prev) => ({
       ...prev,
-      [examPartId]: { ...prev[examPartId], [field]: value },
+      [examPartId]: { ...prev[examPartId], [field]: value } as PartConfig,
     }));
   };
 
-  const togglePartExpanded = (examPartId) => {
+  const togglePartExpanded = (examPartId: string) => {
     setPartConfigs((prev) => ({
       ...prev,
       [examPartId]: { ...prev[examPartId], expanded: !prev[examPartId].expanded },
     }));
   };
 
-  const loadQuestionsForPart = (examPartId, params = {}) => {
+  const loadQuestionsForPart = (examPartId: string, params: BankLoadParams = {}) => {
     setPartConfigs((prev) => ({
       ...prev,
       [examPartId]: { ...prev[examPartId], loading: true },
     }));
     return getQuestionsByPart(examPartId, params)
       .then((data) => {
-        const list = Array.isArray(data) ? data : data?.data ?? data?.questions ?? [];
+        // API đã trả mảng, vẫn giữ fallback data/questions của bản JS cho response cũ.
+        const raw = data as any;
+        const list: BankQuestion[] = Array.isArray(raw) ? raw : raw?.data ?? raw?.questions ?? [];
         setPartConfigs((prev) => ({
           ...prev,
           [examPartId]: { ...prev[examPartId], bankQuestions: list, loading: false },
@@ -78,12 +119,12 @@ export function useBankTestBuilder({ getScopedQuestions } = {}) {
       });
   };
 
-  const toggleGroup = (examPartId, groupKey) => {
+  const toggleGroup = (examPartId: string, groupKey: string) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return;
     const group = groupQuestionsByPassage(scopeOf(cfg)).find((g) => g.groupKey === groupKey);
     if (!group) return;
-    const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean);
+    const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean) as string[];
     const selectedSet = new Set(cfg.selectedIds || []);
     const allSelected = ids.every((id) => selectedSet.has(id));
     if (allSelected) ids.forEach((id) => selectedSet.delete(id));
@@ -91,24 +132,24 @@ export function useBankTestBuilder({ getScopedQuestions } = {}) {
     updatePartConfig(examPartId, 'selectedIds', Array.from(selectedSet));
   };
 
-  const isGroupSelected = (examPartId, groupKey) => {
+  const isGroupSelected = (examPartId: string, groupKey: string) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return false;
     const group = groupQuestionsByPassage(scopeOf(cfg)).find((g) => g.groupKey === groupKey);
     if (!group) return false;
-    const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean);
+    const ids = group.questions.map((q) => q.questionId ?? q.id).filter(Boolean) as string[];
     const selectedSet = new Set(cfg.selectedIds || []);
     return ids.length > 0 && ids.every((id) => selectedSet.has(id));
   };
 
-  const toggleSelectAll = (examPartId, checked) => {
+  const toggleSelectAll = (examPartId: string, checked: boolean) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return;
-    const ids = scopeOf(cfg).map((q) => q.questionId ?? q.id).filter(Boolean);
+    const ids = scopeOf(cfg).map((q) => q.questionId ?? q.id).filter(Boolean) as string[];
     updatePartConfig(examPartId, 'selectedIds', checked ? ids : []);
   };
 
-  const getPartEffectiveCount = (examPartId) => {
+  const getPartEffectiveCount = (examPartId: string) => {
     const cfg = partConfigs[examPartId];
     if (!cfg) return 0;
     const scoped = scopeOf(cfg);
@@ -132,7 +173,7 @@ export function useBankTestBuilder({ getScopedQuestions } = {}) {
     return (cfg.selectedIds || []).filter((id) => scopedIds.has(id)).length;
   };
 
-  const hasPartWithQuestions = (part) => {
+  const hasPartWithQuestions = (part: { examPartId: string }) => {
     const cfg = partConfigs[part.examPartId];
     if (!cfg) return false;
     const scoped = scopeOf(cfg);

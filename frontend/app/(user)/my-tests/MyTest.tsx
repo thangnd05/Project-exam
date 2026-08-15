@@ -13,19 +13,14 @@ import {
 import styles from './MyTest.module.scss';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useMyTests, useDeleteTest, useInvalidateMyTests } from '@/app/hooks/useMyTests';
-import CreateTestModal from '@/app/features/tests/components/CreateTestModal';
+import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import TestListContainer from '@/app/features/tests/components/TestListContainer/TestListContainer';
+import TestListContainer from '@/app/components/tests/TestListContainer/TestListContainer';
 import Pagination from '@/app/components/Pagination/Pagination';
 import type { TestResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 const PAGE_SIZE = 12;
-
-// TODO(tests-batch): 2 component dưới còn là .js (features/tests chưa chuyển TS) — TS suy props
-// sai (never[]/thiếu optional) nên nới về any, gỡ cast khi chuyển batch tests.
-const TestListContainerLoose = TestListContainer as React.ComponentType<any>;
-const CreateTestModalLoose = CreateTestModal as React.ComponentType<any>;
 
 function MyTest() {
   const { user } = useAuth();
@@ -125,7 +120,7 @@ function MyTest() {
 
   return (
     <>
-      <TestListContainerLoose
+      <TestListContainer
         title="Bài kiểm tra của tôi"
         label="QUẢN LÝ ĐỀ THI"
         actionText="Tạo đề thi mới"
@@ -145,7 +140,7 @@ function MyTest() {
         }
       />
 
-      <CreateTestModalLoose
+      <CreateTestModal
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSuccess={() => {

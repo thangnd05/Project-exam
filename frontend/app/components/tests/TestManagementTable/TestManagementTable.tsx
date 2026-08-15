@@ -13,16 +13,26 @@ import {
 import classNames from 'classnames/bind';
 import styles from './TestManagementTable.module.scss';
 import {getTestStatus} from '@/app/utils/testStatusHelper';
-import EditTestModal from '@/app/features/tests/components/EditTestModal';
+import type {TestStatusInfo} from '@/app/utils/testStatusHelper';
+import EditTestModal from '@/app/components/tests/EditTestModal';
+import type {EditableTest} from '@/app/components/tests/EditTestModal';
+import type {TestResponse} from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}) => {
+type TestManagementTableProps = {
+  tests: TestResponse[];
+  onDelete?: (testId: string) => void;
+  onRefresh?: () => void;
+  countdowns?: Record<string, number>;
+};
+
+const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManagementTableProps) => {
   const router = useRouter();
   const now = new Date();
-  const [editingTest, setEditingTest] = React.useState(null);
+  const [editingTest, setEditingTest] = React.useState<EditableTest | null>(null);
 
-  const getBadgeVariant = (status) => {
+  const getBadgeVariant = (status: TestStatusInfo['status']) => {
     switch (status) {
       case 'open':
         return 'success';

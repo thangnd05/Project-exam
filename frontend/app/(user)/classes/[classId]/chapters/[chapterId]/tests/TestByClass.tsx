@@ -9,15 +9,10 @@ import { toast } from 'react-toastify';
 
 import styles from './TestByClass.module.scss';
 import { useTestByClass } from './_hooks/useTestByClass';
-import CreateTestModalJs from '@/app/features/tests/components/CreateTestModal';
+import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import TestListContainerJs from '@/app/features/tests/components/TestListContainer/TestListContainer';
+import TestListContainer from '@/app/components/tests/TestListContainer/TestListContainer';
 import type { TestResponse } from '@/app/types';
-
-// TODO(tests-batch): component feature tests còn là .js nên TS suy props sai
-// (coi prop không default là bắt buộc). Bỏ cast khi features/tests chuyển sang TS.
-const CreateTestModal = CreateTestModalJs as React.ComponentType<any>;
-const TestListContainer = TestListContainerJs as React.ComponentType<any>;
 
 const cx = classNames.bind(styles);
 

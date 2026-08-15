@@ -6,30 +6,75 @@ import { Container } from 'react-bootstrap';
 import { IoGridOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
-import TestStartDashboard from '../TestStartDashboard';
-import QuestionAreaBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/QuestionAreaBlock';
-import TimerBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/TimerBlock';
-import ProgressBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/ProgressBlock';
-import SubmitBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/SubmitBlock';
-import QuestionNavBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/QuestionNavBlock';
-import BannerBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/BannerBlock';
-import { BLOCK_TYPES, ZONES } from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/layoutSchema';
-import pageStyles from '../TestStartPage.module.scss';
-import zoneStyles from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/examLayout.module.scss';
+import TestStartDashboard from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
+import QuestionAreaBlock from '@/app/components/exam-layout/blocks/QuestionAreaBlock';
+import TimerBlock from '@/app/components/exam-layout/blocks/TimerBlock';
+import ProgressBlock from '@/app/components/exam-layout/blocks/ProgressBlock';
+import SubmitBlock from '@/app/components/exam-layout/blocks/SubmitBlock';
+import QuestionNavBlock from '@/app/components/exam-layout/blocks/QuestionNavBlock';
+import BannerBlock from '@/app/components/exam-layout/blocks/BannerBlock';
+import { BLOCK_TYPES, ZONES } from '@/app/components/exam-layout/layoutSchema';
+import type { LayoutBlock, LayoutConfig, LayoutTheme } from '@/app/components/exam-layout/layoutSchema';
+import type {
+  AnswerChangeHandler,
+  ExamFlowStep,
+  ExamPart,
+  ExamQuestion,
+  ExamUserAnswers,
+  QuestionIndexMap,
+} from '@/app/components/exam-layout/examLayoutTypes';
+// Trang làm bài giữ scss riêng ở features/tests, engine layout dùng lại class của nó.
+import pageStyles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
+import zoneStyles from '@/app/components/exam-layout/examLayout.module.scss';
 
 const cx = classNames.bind(pageStyles);
 const zx = classNames.bind(zoneStyles);
 
-function buildThemeStyle(theme = {}) {
-  const style = {};
+// TestStartDashboard vẫn là .js ở features/tests (batch sau) nên TS suy props từ destructure và
+// coi prop có default là bắt buộc — nới về any tại chỗ import, gỡ khi file đó chuyển TS.
+const TestStartDashboardLoose = TestStartDashboard as any;
+
+function buildThemeStyle(theme: LayoutTheme = {}): React.CSSProperties {
+  // CSS custom property (--primary...) không nằm trong CSSProperties nên gom vào record rồi cast.
+  const style: Record<string, string> = {};
   if (theme.primary) {
     style['--primary'] = theme.primary;
     style['--primary-color'] = theme.primary;
   }
   if (theme.font) style['--font-family'] = theme.font;
   if (theme.radius != null) style['--exam-radius'] = `${theme.radius}px`;
-  return style;
+  return style as React.CSSProperties;
 }
+
+type ExamLayoutRendererProps = {
+  config: LayoutConfig;
+  isPractice?: boolean;
+  visibleParts: ExamPart[];
+  questionIndexMap: QuestionIndexMap;
+  userAnswers: ExamUserAnswers;
+  handleAnswerChange: AnswerChangeHandler;
+  allQuestions: ExamQuestion[];
+  timeLeft?: number | null;
+  formatTime: (seconds: number) => string;
+  isSubmitting?: boolean;
+  handleSubmit?: () => void;
+  /** preview = render trong layout builder (không gắn portal/scroll của trang làm bài) */
+  preview?: boolean;
+  /** interactive = cho phép click chọn yếu tố trong layout builder */
+  interactive?: boolean;
+  selectedId?: string | null;
+  onSelectBlock?: (blockId: string) => void;
+
+  /** Chế độ PAGED: từng câu/nhóm kiểu TOEIC */
+  isPaged?: boolean;
+  flowSteps?: ExamFlowStep[];
+  currentStepIndex?: number;
+  canGoPrev?: boolean;
+  goNext?: () => void;
+  goPrev?: () => void;
+  goToQuestion?: (questionId: string) => void;
+  canNavigateToQuestion?: (questionId: string) => boolean;
+};
 
 function ExamLayoutRenderer({
   config,
@@ -56,7 +101,7 @@ function ExamLayoutRenderer({
   goPrev,
   goToQuestion,
   canNavigateToQuestion,
-}) {
+}: ExamLayoutRendererProps) {
   const [showInfoPanel, setShowInfoPanel] = useState(false);
 
   const answered = Object.keys(userAnswers).length;
@@ -66,21 +111,21 @@ function ExamLayoutRenderer({
     ? new Set((flowSteps[currentStepIndex]?.questions || []).map((q) => q.questionId))
     : null;
 
-  const byZone = (zone) =>
+  const byZone = (zone: string) =>
     (config.blocks || [])
       .filter(
         (b) => b.visible !== false && b.type !== BLOCK_TYPES.QUESTION_AREA && b.zone === zone,
       )
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-  const scrollToQuestion = (questionId) => {
+  const scrollToQuestion = (questionId: string) => {
     const element = document.getElementById(`q-${questionId}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
-  const navigateToQuestion = (questionId) => {
+  const navigateToQuestion = (questionId: string) => {
     if (isPaged) {
       goToQuestion?.(questionId);
     } else {
@@ -94,7 +139,7 @@ function ExamLayoutRenderer({
     currentQuestionIds: currentStepQuestionIds,
   };
 
-  const renderBlockNode = (block, zone) => {
+  const renderBlockNode = (block: LayoutBlock, zone: string) => {
     switch (block.type) {
       case BLOCK_TYPES.TIMER:
         return <TimerBlock timeLeft={timeLeft} formatTime={formatTime} />;
@@ -124,7 +169,7 @@ function ExamLayoutRenderer({
 
         return (
           <div className={zx('sideNavInline')}>
-            <TestStartDashboard
+            <TestStartDashboardLoose
               allQuestions={allQuestions}
               userAnswers={userAnswers}
               onScrollToQuestion={navigateToQuestion}
@@ -138,8 +183,8 @@ function ExamLayoutRenderer({
     }
   };
 
-  const blockWrapStyle = (block, zone) => {
-    const style = {};
+  const blockWrapStyle = (block: LayoutBlock, zone: string) => {
+    const style: React.CSSProperties = {};
     const spacing = block.props?.spacing;
     if (spacing !== undefined && spacing !== null && spacing !== '') {
       style.padding = `${spacing}px`;
@@ -159,13 +204,13 @@ function ExamLayoutRenderer({
     return style;
   };
 
-  const wrap = (block, node, zone) => {
+  const wrap = (block: LayoutBlock, node: React.ReactNode, zone: string) => {
     const posStyle = blockWrapStyle(block, zone);
     if (!interactive && Object.keys(posStyle).length === 0) {
       return <Fragment key={block.id}>{node}</Fragment>;
     }
     const selected = selectedId === block.id;
-    const interactiveStyle = interactive
+    const interactiveStyle: React.CSSProperties = interactive
       ? {
           cursor: 'pointer',
           borderRadius: 8,
@@ -193,8 +238,8 @@ function ExamLayoutRenderer({
     );
   };
 
-  const isPill = (b) => b.type === BLOCK_TYPES.TIMER || b.type === BLOCK_TYPES.PROGRESS;
-  const footerGroupOf = (b) => {
+  const isPill = (b: LayoutBlock) => b.type === BLOCK_TYPES.TIMER || b.type === BLOCK_TYPES.PROGRESS;
+  const footerGroupOf = (b: LayoutBlock) => {
     const a = b.align || 'right';
     if (a === 'left') return 'left';
     if (a === 'center') return 'center';
@@ -210,7 +255,7 @@ function ExamLayoutRenderer({
   const hasNav = (config.blocks || []).some(
     (b) => b.visible !== false && b.type === BLOCK_TYPES.QUESTION_NAV,
   );
-  const isNavOnly = (blocks) =>
+  const isNavOnly = (blocks: LayoutBlock[]) =>
     blocks.length > 0 && blocks.every((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
 
   const questionArea = (
@@ -229,7 +274,7 @@ function ExamLayoutRenderer({
       goPrev={goPrev}
     />
   );
-  const renderFooterGroup = (blocks) => {
+  const renderFooterGroup = (blocks: LayoutBlock[]) => {
     const navs = blocks.filter((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
     const pills = blocks.filter(isPill);
     const others = blocks.filter((b) => !isPill(b) && b.type !== BLOCK_TYPES.QUESTION_NAV);
@@ -298,10 +343,10 @@ function ExamLayoutRenderer({
           role="dialog"
           aria-label="Danh sách câu hỏi"
         >
-          <TestStartDashboard
+          <TestStartDashboardLoose
             allQuestions={allQuestions}
             userAnswers={userAnswers}
-            onScrollToQuestion={(id) => {
+            onScrollToQuestion={(id: string) => {
               navigateToQuestion(id);
               setShowInfoPanel(false);
             }}
@@ -311,7 +356,7 @@ function ExamLayoutRenderer({
       </div>
     ) : null;
 
-  const wrapperStyle = preview
+  const wrapperStyle: React.CSSProperties = preview
     ? { ...buildThemeStyle(config.theme), position: 'relative' }
     : {
         ...buildThemeStyle(config.theme),

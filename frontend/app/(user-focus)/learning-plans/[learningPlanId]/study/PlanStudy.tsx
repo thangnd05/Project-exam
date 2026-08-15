@@ -17,15 +17,16 @@ import { useSubmitSession } from './_hooks/useSubmitSession';
 import { usePlanSession } from './_hooks/usePlanSession';
 import { planNoticeText, planStageLabel, taskDisplayName } from '@/app/utils/planLabels';
 import TestStartDashboard from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartDashboard';
-import ProgressBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/ProgressBlock';
-import SubmitBlock from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/SubmitBlock';
+import ProgressBlock from '@/app/components/exam-layout/blocks/ProgressBlock';
+import SubmitBlock from '@/app/components/exam-layout/blocks/SubmitBlock';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import examStyles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
 import { MediaType, PassageType, QuestionType } from '@/app/enums';
 import type { PassageResponse, QuestionResponse } from '@/app/types';
 
-// TODO: TestStartDashboard còn là .js — TS suy props từ destructure (bắt buộc columns/canNavigateToQuestion
-// dù runtime cho phép bỏ trống). Cast any có chủ đích, bỏ khi component chuyển TS.
+// TODO: TestStartDashboard vẫn nằm ở features/tests/.../testStart (.js, không thuộc batch chuyển
+// exam-layout) — TS suy props từ destructure nên bắt buộc columns/canNavigateToQuestion dù runtime
+// cho phép bỏ trống. Cast any có chủ đích, bỏ khi trang làm bài chuyển sang TS.
 const TestStartDashboardLoose = TestStartDashboard as any;
 const cx = classNames.bind(styles);
 

@@ -12,15 +12,13 @@ import {
   updateExamTypeLayout,
 } from '@/app/apis/examTypeApi';
 import {useAdminCrud} from '@/app/hooks/useAdminCrud';
+import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {ExamTypeLayoutResponse, ExamTypeRequest, ExamTypeResponse} from '@/app/types';
 
 // Hook dùng chung cho nhiều route admin (exam-types, exam-types/[examTypeId]/layout)
 // và tags (_hooks/useTags dùng lại examTypeKeys) nên đặt ở app/hooks thay vì _hooks của 1 route.
-export const examTypeKeys = {
-  all: ['exam-types'],
-  detail: (examTypeId?: string | null) => ['exam-type', examTypeId ?? null],
-  layout: (examTypeId?: string | null) => ['exam-type-layout', examTypeId ?? null],
-};
+// Key gom ở app/hooks/examTypeKeys.ts, re-export tại đây để các import cũ giữ nguyên.
+export {examTypeKeys};
 
 export function useExamTypes() {
   const crud = useAdminCrud({

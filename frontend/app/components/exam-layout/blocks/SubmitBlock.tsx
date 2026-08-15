@@ -3,11 +3,18 @@
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 
-import styles from '../../TestStartPage.module.scss';
+// Các block dùng chung class của trang làm bài nên vẫn đọc scss ở features/tests (giữ nguyên giao diện).
+import styles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-function SubmitBlock({ onSubmit, isSubmitting, label = 'Nộp bài thi' }) {
+type SubmitBlockProps = {
+  onSubmit?: () => void;
+  isSubmitting?: boolean;
+  label?: string;
+};
+
+function SubmitBlock({ onSubmit, isSubmitting, label = 'Nộp bài thi' }: SubmitBlockProps) {
   return (
     <button
       type="button"

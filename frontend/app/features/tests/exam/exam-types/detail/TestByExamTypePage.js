@@ -13,12 +13,12 @@ import {
   IoRibbonOutline,
   IoChevronDown,
 } from 'react-icons/io5';
-import TestCard from '@/app/features/tests/components/TestCard/TestCard';
+import TestCard from '@/app/components/tests/TestCard/TestCard';
 import routes, { buildExamTypeCollectionPath, buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
 
 import style from './TestByExamTypePage.module.scss';
-import TestListContainer from '@/app/features/tests/components/TestListContainer/TestListContainer';
+import TestListContainer from '@/app/components/tests/TestListContainer/TestListContainer';
 import Pagination from '@/app/components/Pagination/Pagination';
 import { useTestsByExamType } from '@/app/features/tests/exam/exam-types/detail/hooks/useTestsByExamType';
 

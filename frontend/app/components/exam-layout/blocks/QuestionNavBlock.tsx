@@ -3,11 +3,19 @@
 import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
-import styles from '../../TestStartPage.module.scss';
+// Các block dùng chung class của trang làm bài nên vẫn đọc scss ở features/tests (giữ nguyên giao diện).
+import styles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
-function QuestionNavBlock({ open, onToggle, toggleLabel = 'Câu hỏi', hideLabel = 'Ẩn' }) {
+type QuestionNavBlockProps = {
+  open?: boolean;
+  onToggle?: () => void;
+  toggleLabel?: string;
+  hideLabel?: string;
+};
+
+function QuestionNavBlock({ open, onToggle, toggleLabel = 'Câu hỏi', hideLabel = 'Ẩn' }: QuestionNavBlockProps) {
   return (
     <button
       type="button"

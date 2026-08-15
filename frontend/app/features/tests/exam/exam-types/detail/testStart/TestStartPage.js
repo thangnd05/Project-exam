@@ -4,7 +4,7 @@
 import { useRouter } from 'next/navigation';
 import TestStateScreens from './TestStateScreens';
 import { useTestSession } from '@/app/features/tests/exam/exam-types/detail/testStart/hooks/useTestSession';
-import ExamLayoutRenderer from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/ExamLayoutRenderer';
+import ExamLayoutRenderer from '@/app/components/exam-layout/ExamLayoutRenderer';
 
 const STATE_SCREEN_STATUSES = ['loading', 'payment', 'no-attempts', 'locked', 'closed'];
 

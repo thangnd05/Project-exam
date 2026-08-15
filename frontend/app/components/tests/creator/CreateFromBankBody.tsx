@@ -27,7 +27,7 @@ import {
 import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import { brandColors } from '@/app/assets/styles/brandColors';
-import CoinPriceField from '@/app/features/tests/components/CoinPriceField';
+import CoinPriceField from '@/app/components/tests/CoinPriceField';
 import { getQuestionDisplayNumber } from '@/app/utils/questionNumber';
 import EditQuestionModal from '@/app/features/tests/question-bank/modals/EditQuestionModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -37,12 +37,19 @@ import {
   SELECTION_MODES,
   defaultPartConfig,
   groupQuestionsByPassage,
-} from '@/app/features/tests/hooks/useBankTestBuilder';
+} from '@/app/hooks/useBankTestBuilder';
+import type { BankLoadParams, BankQuestion, PartConfig } from '@/app/hooks/useBankTestBuilder';
+import { PermissionCode } from '@/app/enums';
+import type { CreateTestRequest } from '@/app/types';
+import type { CreateTestMode } from './CreateTestFormBody';
 import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-const COLLECTION_SCOPED_MODES = [
+// `any` có chủ đích: brandColors.js dựng object bằng Object.defineProperties nên TS không thấy key.
+const brandColorsAny: any = brandColors;
+
+const COLLECTION_SCOPED_MODES: string[] = [
   SELECTION_MODES.RANDOM_BY_COLLECTION,
   SELECTION_MODES.SEQUENTIAL,
   SELECTION_MODES.MANUAL,
@@ -52,16 +59,41 @@ const BANK_SOURCES = {
   PERSONAL: 'personal',
   ADMIN: 'admin',
   CLASS: 'class',
-};
+} as const;
+
+type BankSource = (typeof BANK_SOURCES)[keyof typeof BANK_SOURCES];
 
 const ALL_CHAPTERS = '__ALL__';
 
-const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, chapterId }) => {
+/** Form tạo đề từ kho: mọi ô input là chuỗi, ép số lúc submit. */
+type BankTestInfo = {
+  title: string;
+  description: string;
+  durationMinutes: string;
+  maxAttempts: string;
+  examTypeId: string;
+  examCategoryId: string;
+  collectionId: string;
+  bannerUrl: string;
+  availableFrom: string;
+  availableTo: string;
+  costCoins: string;
+};
+
+type CreateFromBankBodyProps = {
+  onCancel?: () => void;
+  onSuccess?: () => void;
+  mode?: CreateTestMode;
+  classId?: string;
+  chapterId?: string;
+};
+
+const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, chapterId }: CreateFromBankBodyProps) => {
   const isClassMode = mode === 'class' && !!classId;
 
-  const canAccessAdminBank = useHasPermission('QUESTION:MANAGE');
+  const canAccessAdminBank = useHasPermission(PermissionCode.QUESTION_MANAGE);
 
-  const [testInfo, setTestInfo] = useState({
+  const [testInfo, setTestInfo] = useState<BankTestInfo>({
     title: '',
     description: '',
     durationMinutes: '',
@@ -75,23 +107,24 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     costCoins: '',
   });
 
-  const examCategories = useExamCategories();
+  // useExamCategories vẫn nằm ở hook .js của trang create-test-from-bank (batch sau) nên nới về any[].
+  const examCategories = useExamCategories() as any[];
 
-  const [notification, setNotification] = useState({});
-  const [editingQuestionId, setEditingQuestionId] = useState(null);
-  const [editingPartId, setEditingPartId] = useState(null);
-  const [bankSource, setBankSource] = useState(isClassMode ? BANK_SOURCES.CLASS : BANK_SOURCES.PERSONAL);
-  const [chapters, setChapters] = useState([]);
-  const [selectedChapterId, setSelectedChapterId] = useState(chapterId || ALL_CHAPTERS);
+  const [notification, setNotification] = useState<{ type?: string; message?: string }>({});
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [editingPartId, setEditingPartId] = useState<string | null>(null);
+  const [bankSource, setBankSource] = useState<BankSource>(isClassMode ? BANK_SOURCES.CLASS : BANK_SOURCES.PERSONAL);
+  const [chapters, setChapters] = useState<any[]>([]);
+  const [selectedChapterId, setSelectedChapterId] = useState<string>(chapterId || ALL_CHAPTERS);
 
   const { examTypes, examParts, questionCollections } = useBaseMetaData(testInfo.examTypeId);
   const collectionScopeIds = testInfo.collectionId
     ? getCollectionWithDescendantIds(questionCollections, testInfo.collectionId).map(String)
     : null;
 
-  const getScopedQuestions = (cfg) => {
+  const getScopedQuestions = (cfg: PartConfig | undefined): BankQuestion[] => {
     const list = cfg?.bankQuestions || [];
-    if (!collectionScopeIds || !COLLECTION_SCOPED_MODES.includes(cfg?.mode)) return list;
+    if (!collectionScopeIds || !COLLECTION_SCOPED_MODES.includes(cfg?.mode as string)) return list;
     const scope = new Set(collectionScopeIds);
     return list.filter((q) => q.collectionId != null && scope.has(String(q.collectionId)));
   };
@@ -109,10 +142,10 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     hasPartWithQuestions,
   } = useBankTestBuilder({ getScopedQuestions });
 
-  const buildLoadParams = (source = bankSource, chapterFilter = selectedChapterId) => {
+  const buildLoadParams = (source: BankSource = bankSource, chapterFilter = selectedChapterId): BankLoadParams => {
     if (source === BANK_SOURCES.ADMIN) return { bank: 'admin' };
     if (source === BANK_SOURCES.CLASS && classId) {
-      const params = { classId };
+      const params: BankLoadParams = { classId };
       if (chapterFilter && chapterFilter !== ALL_CHAPTERS) params.chapterId = chapterFilter;
       return params;
     }
@@ -121,7 +154,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
   useEffect(() => {
     if (!isClassMode) return;
-    getChaptersByClass(classId)
+    getChaptersByClass(classId as string)
       .then((data) => {
         const list = Array.isArray(data) ? data : [];
         setChapters(list);
@@ -137,12 +170,12 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
       setPartConfigs({});
       return;
     }
-    const initial = {};
-    examParts.forEach((p) => {
+    const initial: Record<string, PartConfig> = {};
+    examParts.forEach((p: any) => {
       initial[p.examPartId] = { ...defaultPartConfig(), expanded: false, loading: true };
     });
     setPartConfigs(initial);
-    examParts.forEach((part) => {
+    examParts.forEach((part: any) => {
       loadQuestionsForPart(part.examPartId, buildLoadParams(bankSource, selectedChapterId));
     });
 
@@ -155,14 +188,14 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     }
   };
 
-  const handleExamTypeChange = (value) => {
+  const handleExamTypeChange = (value: string) => {
     setTestInfo((prev) => ({ ...prev, examTypeId: value }));
   };
 
-  const applyModeToAllParts = (modeValue) => {
+  const applyModeToAllParts = (modeValue: PartConfig['mode']) => {
     setPartConfigs((prev) => {
       const next = { ...prev };
-      (examParts || []).forEach((p) => {
+      (examParts || []).forEach((p: any) => {
         next[p.examPartId] = { ...(next[p.examPartId] || defaultPartConfig()), mode: modeValue };
       });
       return next;
@@ -170,7 +203,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   };
 
   const createTestMutation = useMutation({
-    mutationFn: async (partsToAdd) => {
+    mutationFn: async (partsToAdd: any[]) => {
+      // BE phân biệt `null` (không đặt) với field vắng mặt, CreateTestRequest khai optional
+      // -> cast qua unknown để giữ nguyên body request của bản JS.
       const testData = await createTest({
         title: testInfo.title.trim(),
         description: testInfo.description || null,
@@ -185,9 +220,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         chapterId: isClassMode ? (chapterId || null) : null,
         collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
         costCoins: testInfo.costCoins && Number(testInfo.costCoins) > 0 ? Number(testInfo.costCoins) : null,
-      });
+      } as unknown as CreateTestRequest);
 
-      const newTestId = testData.testId ?? testData.id;
+      const newTestId = testData.testId ?? (testData as any).id;
       if (!newTestId) throw new Error('Không nhận được testId từ server.');
 
       for (const part of partsToAdd) {
@@ -200,7 +235,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
           examPartId: String(part.examPartId),
           numQuestions,
         });
-        const newPartId = partData.testPartId ?? partData.id;
+        const newPartId = partData.testPartId ?? (partData as any).id;
         if (!newPartId) throw new Error(`Không nhận được testPartId cho part ${part.name}.`);
 
         if (cfg.mode === SELECTION_MODES.MANUAL) {
@@ -233,13 +268,13 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
       toast.success('Đã tạo đề thi từ kho câu hỏi!');
       onSuccess?.();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       const msg = error.response?.data?.message ?? error.response?.data ?? error.message;
       setNotification({ type: 'danger', message: 'Lỗi: ' + (typeof msg === 'string' ? msg : JSON.stringify(msg)) });
     },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e?: React.FormEvent) => {
     if (e?.preventDefault) e.preventDefault();
 
     if (!testInfo.title?.trim() || !testInfo.examTypeId) {
@@ -257,8 +292,8 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     createTestMutation.mutate(partsToAdd);
   };
 
-  const totalSelected = (examParts || []).reduce((sum, p) => sum + getPartEffectiveCount(p.examPartId), 0);
-  const hasAnyPartWithQuestions = (examParts || []).some((p) => getPartEffectiveCount(p.examPartId) > 0);
+  const totalSelected = (examParts || []).reduce((sum: number, p: any) => sum + getPartEffectiveCount(p.examPartId), 0);
+  const hasAnyPartWithQuestions = (examParts || []).some((p: any) => getPartEffectiveCount(p.examPartId) > 0);
 
   return (
     <>
@@ -313,7 +348,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 >
                   <option value="">-- Chọn --</option>
 
-                  {(examTypes || []).filter((t) => !t.childCount).map((t) => (
+                  {(examTypes || []).filter((t: any) => !t.childCount).map((t: any) => (
                     <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>
                   ))}
                 </select>
@@ -331,7 +366,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   <option value="">-- Trống --</option>
                   {buildCollectionTree(
                     (questionCollections || []).filter(
-                      (c) => !testInfo.examTypeId || !c.examTypeId || String(c.examTypeId) === String(testInfo.examTypeId),
+                      (c: any) => !testInfo.examTypeId || !c.examTypeId || String(c.examTypeId) === String(testInfo.examTypeId),
                     ),
                   ).map((c) => (
                     <option key={c.collectionId} value={c.collectionId}>
@@ -372,7 +407,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   aria-label="Phân loại bài thi"
                 >
                   <option value="">-- Không phân loại --</option>
-                  {examCategories.map((c) => (
+                  {examCategories.map((c: any) => (
                     <option key={c.examCategoryId} value={c.examCategoryId}>
                       {c.name}
                     </option>
@@ -456,7 +491,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 aria-label="Chọn chapter trong lớp"
               >
                 <option value={ALL_CHAPTERS}>Tất cả chapter của lớp</option>
-                {chapters.map((c) => (
+                {chapters.map((c: any) => (
                   <option key={c.chapterId} value={c.chapterId}>
                     {c.title || `Chapter ${c.chapterId}`}
                   </option>
@@ -476,10 +511,10 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   fontSize: '1.15rem',
                   fontWeight: 600,
                   color: bankSource === BANK_SOURCES.ADMIN
-                    ? brandColors.primaryHover
+                    ? brandColorsAny.primaryHover
                     : bankSource === BANK_SOURCES.CLASS ? '#047857' : '#475569',
                   background: bankSource === BANK_SOURCES.ADMIN
-                    ? brandColors.brand100
+                    ? brandColorsAny.brand100
                     : bankSource === BANK_SOURCES.CLASS ? '#d1fae5' : '#f1f5f9',
                   padding: '2px 10px',
                   borderRadius: 999,
@@ -489,7 +524,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   ? 'Kho quản trị'
                   : bankSource === BANK_SOURCES.CLASS
                     ? `Kho lớp học${selectedChapterId && selectedChapterId !== ALL_CHAPTERS
-                      ? ` · ${chapters.find((c) => c.chapterId === selectedChapterId)?.title || 'Chapter'}`
+                      ? ` · ${chapters.find((c: any) => c.chapterId === selectedChapterId)?.title || 'Chapter'}`
                       : ' · Tất cả chapter'}`
                     : 'Kho cá nhân'}
               </span>
@@ -524,7 +559,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
               </button>
             </div>
 
-            {(examParts || []).map((part) => {
+            {(examParts || []).map((part: any) => {
               const cfg = partConfigs[part.examPartId] ?? defaultPartConfig();
               const totalInBank = (cfg.bankQuestions || []).length;
               const scopedQuestions = getScopedQuestions(cfg);

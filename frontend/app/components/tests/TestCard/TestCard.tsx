@@ -18,12 +18,14 @@ import {
     formatDateTime,
     formatFullDateTime,
 } from '@/app/utils/testStatusHelper';
-import TestModeModal from '@/app/features/tests/components/TestModeModal/TestModeModal';
+import TestModeModal from '@/app/components/tests/TestModeModal/TestModeModal';
+import type { TestModeSelection } from '@/app/components/tests/TestModeModal/TestModeModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import type { TestResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const DEFAULT_BANNERS = {
+const DEFAULT_BANNERS: Record<string, string> = {
     open: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop',
     locked: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1200&auto=format&fit=crop',
     expired: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200&auto=format&fit=crop',
@@ -63,7 +65,12 @@ const getSubjectBanner = (title = '', status = 'open') => {
     return DEFAULT_BANNERS[status] || DEFAULT_BANNERS.open;
 };
 
-function TestCard({ test, countdowns }) {
+type TestCardProps = {
+    test: TestResponse;
+    countdowns?: Record<string, number>;
+};
+
+function TestCard({ test, countdowns }: TestCardProps) {
     const router = useRouter();
     const now = new Date();
     const [showModeModal, setShowModeModal] = useState(false);
@@ -79,7 +86,7 @@ function TestCard({ test, countdowns }) {
         setShowModeModal(true);
     };
 
-    const handleSelectMode = ({ mode, examPartIds }) => {
+    const handleSelectMode = ({ mode, examPartIds }: TestModeSelection) => {
         setShowModeModal(false);
         const allowedTime = calculateAllowedTime(test);
         const params = new URLSearchParams();
@@ -107,7 +114,7 @@ function TestCard({ test, countdowns }) {
                     {statusLabel}
                 </div>
 
-                {test.costCoins > 0 && (
+                {(test.costCoins ?? 0) > 0 && (
                     <div className={cx('cost-badge', { owned: test.owned })}>
                         {test.owned ? (
                             <IoLockOpenOutline size={14} />

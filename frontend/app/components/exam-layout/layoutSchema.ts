@@ -4,7 +4,9 @@ export const ZONES = {
   RIGHT: 'RIGHT',
   BOTTOM: 'BOTTOM',
   FLOAT: 'FLOAT',
-};
+} as const;
+
+export type Zone = (typeof ZONES)[keyof typeof ZONES];
 
 export const BLOCK_TYPES = {
   QUESTION_AREA: 'questionArea',
@@ -14,9 +16,55 @@ export const BLOCK_TYPES = {
   QUESTION_NAV: 'questionNav',
   BANNER: 'banner',
   TITLE: 'title',
-};
+} as const;
 
-export const ZONE_META = [
+export type BlockType = (typeof BLOCK_TYPES)[keyof typeof BLOCK_TYPES];
+
+/** Thuộc tính riêng của từng yếu tố, layout builder (trang admin) chỉnh trực tiếp. */
+export interface LayoutBlockProps {
+  label?: string;
+  toggleLabel?: string;
+  hideLabel?: string;
+  navColumns?: number;
+  url?: string;
+  spacing?: number | string;
+  [key: string]: unknown;
+}
+
+export interface LayoutBlock {
+  id: string;
+  type: string;
+  zone: string;
+  align?: string;
+  order?: number;
+  visible?: boolean;
+  props?: LayoutBlockProps;
+}
+
+export interface LayoutTheme {
+  primary?: string | null;
+  font?: string | null;
+  radius?: number | null;
+  density?: string;
+}
+
+export interface LayoutQuestionArea {
+  passagePosition?: string;
+  /** 'scroll' = cuộn hết đề, 'paged' = từng câu/nhóm kiểu TOEIC (xem memory paged-presentation-mode) */
+  navigationMode?: string;
+  columns?: number;
+  maxWidth?: number | null;
+  cardShadow?: boolean;
+}
+
+export interface LayoutConfig {
+  version?: number;
+  theme: LayoutTheme;
+  questionArea: LayoutQuestionArea;
+  blocks: LayoutBlock[];
+}
+
+export const ZONE_META: Array<{ key: string; label: string }> = [
   { key: ZONES.TOP, label: 'Trên (thanh đầu trang)' },
   { key: ZONES.LEFT, label: 'Trái (cột bên)' },
   { key: ZONES.RIGHT, label: 'Phải (cột bên)' },
@@ -24,7 +72,7 @@ export const ZONE_META = [
   { key: ZONES.FLOAT, label: 'Nổi (góc màn hình)' },
 ];
 
-export const BLOCK_META = {
+export const BLOCK_META: Record<string, { label: string }> = {
   [BLOCK_TYPES.TIMER]: { label: 'Đồng hồ' },
   [BLOCK_TYPES.PROGRESS]: { label: 'Tiến độ' },
   [BLOCK_TYPES.SUBMIT]: { label: 'Nút nộp bài' },
@@ -33,9 +81,9 @@ export const BLOCK_META = {
   [BLOCK_TYPES.TITLE]: { label: 'Tiêu đề' },
 };
 
-export const ADDABLE_BLOCK_TYPES = [BLOCK_TYPES.BANNER];
+export const ADDABLE_BLOCK_TYPES: string[] = [BLOCK_TYPES.BANNER];
 
-export const defaultLayoutConfig = {
+export const defaultLayoutConfig: LayoutConfig = {
   version: 1,
   theme: {
     primary: null,

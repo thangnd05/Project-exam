@@ -3,6 +3,16 @@
 import { Col } from 'react-bootstrap';
 import { IoRocketOutline } from 'react-icons/io5';
 import { useHasPermission } from '@/app/hooks/usePermission';
+import { PermissionCode } from '@/app/enums';
+
+type CoinPriceFieldProps = {
+  value?: string | number;
+  onChange: (value: string) => void;
+  isPublic?: boolean;
+  md?: number;
+  groupClassName?: string;
+  inputClassName?: string;
+};
 
 const CoinPriceField = ({
   value,
@@ -11,8 +21,8 @@ const CoinPriceField = ({
   md = 4,
   groupClassName,
   inputClassName,
-}) => {
-  const canSetPricing = useHasPermission('TEST:MANAGE_PRICING');
+}: CoinPriceFieldProps) => {
+  const canSetPricing = useHasPermission(PermissionCode.TEST_MANAGE_PRICING);
   if (!canSetPricing || !isPublic) return null;
 
   return (

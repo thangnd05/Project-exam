@@ -5,12 +5,13 @@ import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
 import TagSelector from '@/app/components/TagSelector/TagSelector';
+import type { DraftQuestion } from '@/app/hooks/useCreateTest';
 
 const cx = classNames.bind(styles);
 
 const ACCEPT_MEDIA = 'image/*,audio/*';
 
-const getQuestionSummary = (question) => {
+const getQuestionSummary = (question: DraftQuestion) => {
     const text = (question.questionText || '').trim();
     const preview = text
         ? (text.length > 60 ? `${text.slice(0, 60)}…` : text)
@@ -22,6 +23,29 @@ const getQuestionSummary = (question) => {
         parts.push(`${correctCount} đúng`);
     }
     return parts.join(' · ');
+};
+
+type QuestionBlockProps = {
+    question: DraftQuestion;
+    index: number;
+    removeQuestionFn: (index: number) => void;
+    updateQuestionTextFn: (index: number, value: string) => void;
+    /** field/value động theo tên field của DraftQuestion nên để any có chủ đích */
+    updateQuestionFieldFn?: (index: number, field: string, value: any) => void;
+    updateAnswerFn: (index: number, answerIndex: number, field: string, value: any) => void;
+    addAnswerFn?: (index: number) => void;
+    removeAnswerFn?: (index: number, answerIndex: number) => void;
+    addMediaFilesFn: (index: number, files: FileList | null) => void;
+    removeMediaFileFn: (index: number, fileIndex: number) => void;
+    setPassageTypeFn?: (index: number, passageType: string) => void;
+    // Tag lấy từ useBaseMetaData (chưa typed) nên để any có chủ đích.
+    availableTags?: any[];
+    withMedia?: boolean;
+    minQuestions?: number;
+    radioGroupPrefix?: string;
+    collapsible?: boolean;
+    isCollapsed?: boolean;
+    onToggleCollapsed?: (index: number) => void;
 };
 
 const QuestionBlock = ({
@@ -43,7 +67,7 @@ const QuestionBlock = ({
     collapsible = false,
     isCollapsed = false,
     onToggleCollapsed,
-}) => {
+}: QuestionBlockProps) => {
     const selectedTagIds = question.tagIds || [];
     const isMsq = question.questionType === 'MSQ';
     const collapsed = collapsible && isCollapsed;

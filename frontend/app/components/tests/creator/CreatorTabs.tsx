@@ -2,11 +2,17 @@
 
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
-import { CREATOR_TYPES } from '@/app/features/tests/hooks/useCreateTest';
+import { CREATOR_TYPES } from '@/app/hooks/useCreateTest';
+import type { CreatorType } from '@/app/hooks/useCreateTest';
 
 const cx = classNames.bind(styles);
 
-const CreatorTabs = ({ activeCreatorType, setCreatorType }) => {
+type CreatorTabsProps = {
+    activeCreatorType: CreatorType;
+    setCreatorType: (creatorType: CreatorType) => void;
+};
+
+const CreatorTabs = ({ activeCreatorType, setCreatorType }: CreatorTabsProps) => {
     return (
         <div className={cx('creatorTypeTabs')}>
             <button

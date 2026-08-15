@@ -8,8 +8,8 @@ import { checkActiveUserTest, startUserTest, submitUserTest } from '@/app/apis/u
 import { getAnswersByUserTest, batchSaveAnswers } from '@/app/apis/userAnswerApi';
 import { getUserTestInfo, purchaseTestAccess } from '@/app/apis/testApi';
 import { getExamTypeLayout } from '@/app/apis/examTypeApi';
-import { resolveLayoutConfig } from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/resolveLayoutConfig';
-import { defaultLayoutConfig } from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/layoutSchema';
+import { resolveLayoutConfig } from '@/app/components/exam-layout/resolveLayoutConfig';
+import { defaultLayoutConfig } from '@/app/components/exam-layout/layoutSchema';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { AuthContext } from '@/app/contexts/AuthContext';
 import { useStreak } from '@/app/hooks/useStreak';

@@ -9,7 +9,7 @@ import { getExamCategories } from '@/app/apis/examCategoryApi';
 import { useAuth } from '@/app/hooks/useAuth';
 import { PERMISSIONS } from '@/app/configs/permissions';
 import { fromDateTimeLocalInput } from '@/app/utils/format-date-time';
-import { SELECTION_MODES } from '@/app/features/tests/hooks/useBankTestBuilder';
+import { SELECTION_MODES } from '@/app/hooks/useBankTestBuilder';
 
 const emptyTestInfo = () => ({
   title: '',

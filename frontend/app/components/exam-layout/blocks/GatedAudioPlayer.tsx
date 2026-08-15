@@ -6,16 +6,24 @@ import classNames from 'classnames/bind';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
-import styles from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/GatedAudioPlayer.module.scss';
+import styles from '@/app/components/exam-layout/blocks/GatedAudioPlayer.module.scss';
 
 const cx = classNames.bind(styles);
 
-function GatedAudioPlayer({ urls = [], onCompleted }) {
-  const audioRef = useRef(null);
+/** Audio khoá (gated): người làm bài không tua được, nghe hết clip mới sang bước kế (chế độ PAGED). */
+type GatedAudioPlayerProps = {
+  urls?: string[];
+  onCompleted?: () => void;
+};
+
+type PlayerPhase = 'loading' | 'playing' | 'armNeeded' | 'ended';
+
+function GatedAudioPlayer({ urls = [], onCompleted }: GatedAudioPlayerProps) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const completedRef = useRef(false);
 
   const [clipIdx, setClipIdx] = useState(0);
-  const [phase, setPhase] = useState('loading');
+  const [phase, setPhase] = useState<PlayerPhase>('loading');
 
   const total = urls.length;
 
@@ -71,7 +79,7 @@ function GatedAudioPlayer({ urls = [], onCompleted }) {
 
       <audio
         ref={audioRef}
-        src={getFullMediaUrl(urls[clipIdx])}
+        src={getFullMediaUrl(urls[clipIdx]) ?? undefined}
         onTimeUpdate={handleTimeUpdateGuarded}
         onSeeking={handleSeeking}
         onEnded={handleEnded}

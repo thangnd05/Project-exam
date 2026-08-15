@@ -8,7 +8,7 @@ import classNames from 'classnames/bind';
 
 import {getExamTypeChildren, getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {buildExamTypeDetailPath} from '@/app/configs/Routes';
-import {examTypeKeys} from '@/app/features/tests/exam/exam-types/examTypeKeys';
+import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import styles from './ExamTypeGrid.module.scss';
 

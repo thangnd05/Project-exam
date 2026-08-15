@@ -17,7 +17,7 @@ import {
 import classNames from 'classnames/bind';
 
 import {useExamTypeById, useOwnExamTypeLayout, useUpdateExamTypeLayout} from '@/app/hooks/useExamTypes';
-import { resolveLayoutConfig } from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/resolveLayoutConfig';
+import { resolveLayoutConfig } from '@/app/components/exam-layout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,
   BLOCK_META,
@@ -25,26 +25,18 @@ import {
   ZONES,
   BLOCK_TYPES,
   ADDABLE_BLOCK_TYPES,
-} from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/layoutSchema';
-import ExamLayoutRenderer from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/ExamLayoutRenderer';
+} from '@/app/components/exam-layout/layoutSchema';
+import type { LayoutBlock, LayoutConfig } from '@/app/components/exam-layout/layoutSchema';
+import ExamLayoutRenderer from '@/app/components/exam-layout/ExamLayoutRenderer';
 import {
   sampleExamData,
   sampleAllQuestions,
   sampleQuestionIndexMap,
-} from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/sampleExamData';
+} from '@/app/components/exam-layout/sampleExamData';
 import styles from './ExamTypeLayoutEditor.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 
 const cx = classNames.bind(styles);
-
-// TODO(tests-batch): các module examLayout của features/tests vẫn là .js — dùng `any`
-// cho config/block cho tới khi batch tests chuyển sang TS.
-type LayoutConfig = any;
-type LayoutBlock = any;
-
-// TODO(tests-batch): TS suy props của ExamLayoutRenderer.js bắt buộc cả nhóm props điều hướng
-// (goNext/goPrev/goToQuestion/canNavigateToQuestion) mà call-site gốc không truyền — cast any chờ batch tests.
-const ExamLayoutRendererAny = ExamLayoutRenderer as any;
 
 // `any` có chủ đích: brandColors.js dựng object bằng Object.defineProperties nên TS không thấy key.
 const brandColorsAny: any = brandColors;
@@ -358,7 +350,7 @@ function ExamTypeLayoutEditor() {
             <span>Nhấp vào yếu tố để chỉnh</span>
           </div>
           <div className={cx('previewCanvas')} onClick={() => setSelectedId(null)}>
-            <ExamLayoutRendererAny
+            <ExamLayoutRenderer
               config={config}
               isPractice={false}
               visibleParts={sampleExamData.visibleParts}

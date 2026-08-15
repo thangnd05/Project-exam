@@ -22,18 +22,36 @@ import {
   IoRocketOutline,
 } from 'react-icons/io5';
 import EditQuestionModal from '@/app/features/tests/question-bank/modals/EditQuestionModal';
+import { PermissionCode } from '@/app/enums';
+import type { CreateTestRequest, TestAdminResponse, TestResponse } from '@/app/types';
 import createModalStyles from './CreateTestModal.module.scss';
 
 const cxCreate = classNames.bind(createModalStyles);
 
-const EditTestModal = ({ show, onHide, test, onSuccess }) => {
-  const canSetPricing = useHasPermission('TEST:MANAGE_PRICING');
-  const [examTypes, setExamTypes] = useState([]);
-  const [examCategories, setExamCategories] = useState([]);
-  const [questionCollections, setQuestionCollections] = useState([]);
+/** Đề truyền vào có thể là TestResponse hoặc dữ liệu cũ (id / examType lồng) từ trang quản lý. */
+export type EditableTest = TestResponse & {
+  id?: string;
+  examType?: { examTypeId?: string };
+};
+
+type EditTestModalProps = {
+  show: boolean;
+  onHide: () => void;
+  test: EditableTest | null;
+  onSuccess: () => void;
+};
+
+type UpdateTestVariables = { testId: string; payload: CreateTestRequest };
+
+const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) => {
+  const canSetPricing = useHasPermission(PermissionCode.TEST_MANAGE_PRICING);
+  // Các list dưới đây nhận nhiều dạng response cũ (mảng | {data} | {content}) nên để any[] có chủ đích.
+  const [examTypes, setExamTypes] = useState<any[]>([]);
+  const [examCategories, setExamCategories] = useState<any[]>([]);
+  const [questionCollections, setQuestionCollections] = useState<any[]>([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
-  const [testDetail, setTestDetail] = useState(null);
-  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [testDetail, setTestDetail] = useState<TestAdminResponse | null>(null);
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -41,12 +59,12 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     examTypeId: '',
     examCategoryId: '',
     collectionId: '',
-    durationMinutes: '',
-    maxAttempts: '',
+    durationMinutes: '' as string | number,
+    maxAttempts: '' as string | number,
     bannerUrl: '',
     availableFrom: '',
     availableTo: '',
-    costCoins: '',
+    costCoins: '' as string | number,
   });
 
   useEffect(() => {
@@ -76,7 +94,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     }
   }, [show, test]);
 
-  const fetchTestDetail = async (id) => {
+  const fetchTestDetail = async (id?: string) => {
     if (!id) return;
     setLoadingDetail(true);
     try {
@@ -85,7 +103,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
 
       if (data?.examCategoryId) {
         setFormData((prev) =>
-          prev.examCategoryId ? prev : { ...prev, examCategoryId: data.examCategoryId },
+          prev.examCategoryId ? prev : { ...prev, examCategoryId: data.examCategoryId as string },
         );
       }
     } catch (error) {
@@ -98,7 +116,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
 
   const fetchExamTypes = async () => {
     try {
-      const data = await getExamTypes();
+      const data: any = await getExamTypes();
       if (data?.data) {
         setExamTypes(data.data);
       } else if (Array.isArray(data)) {
@@ -111,7 +129,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
 
   const fetchExamCategories = async () => {
     try {
-      const data = await getExamCategories();
+      const data: any = await getExamCategories();
       setExamCategories(Array.isArray(data) ? data : (data?.data || []));
     } catch (error) {
       console.error('Failed to load exam categories', error);
@@ -121,7 +139,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
 
   const fetchQuestionCollections = async () => {
     try {
-      const data = await getQuestionCollections();
+      const data: any = await getQuestionCollections();
       setQuestionCollections(Array.isArray(data) ? data : (data?.data || data?.content || []));
     } catch (error) {
       console.error('Failed to load collections', error);
@@ -133,7 +151,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
     () =>
       buildCollectionTree(
         (questionCollections || []).filter(
-          (c) =>
+          (c: any) =>
             !formData.examTypeId ||
             !c.examTypeId ||
             String(c.examTypeId) === String(formData.examTypeId),
@@ -143,12 +161,12 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
   );
 
   const updateMutation = useMutation({
-    mutationFn: ({ testId, payload }) => updateTest(testId, payload),
+    mutationFn: ({ testId, payload }: UpdateTestVariables) => updateTest(testId, payload),
     onSuccess: () => {
       toast.success('Cập nhật đề thi thành công!');
       onSuccess();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       const msg = error.response?.data?.message ?? error.message;
       toast.error(`Lỗi khi cập nhật: ${msg}`);
     },
@@ -178,31 +196,36 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       bannerUrl: formData.bannerUrl || null,
       availableFrom: fromDateTimeLocalInput(formData.availableFrom),
       availableTo: fromDateTimeLocalInput(formData.availableTo),
-      classId: test.classId ? String(test.classId) : null,
-      chapterId: test.chapterId ? String(test.chapterId) : null,
+      classId: test!.classId ? String(test!.classId) : null,
+      chapterId: test!.chapterId ? String(test!.chapterId) : null,
 
       costCoins: formData.costCoins === '' || formData.costCoins === null
         ? null
         : Number(formData.costCoins),
     };
 
-    updateMutation.mutate({ testId: test.testId || test.id, payload });
+    // BE nhận `null` để xoá field (khác undefined) nên giữ nguyên payload, cast qua unknown.
+    updateMutation.mutate({
+      testId: (test!.testId || test!.id) as string,
+      payload: payload as unknown as CreateTestRequest,
+    });
   };
 
   const groupedQuestions = useMemo(() => {
     if (!testDetail?.parts) return [];
-    return testDetail.parts.map((part, partIndex) => {
+    // Response cũ có part.examPart / part.questions phẳng nên duyệt bằng any có chủ đích.
+    return (testDetail.parts as any[]).map((part: any, partIndex: number) => {
       const partName =
         part?.examPart?.name ||
         part?.examPartName ||
         part?.name ||
         `Part ${partIndex + 1}`;
-      const questionRows = [];
+      const questionRows: Array<{ questionId: string; questionText: string }> = [];
       const groups = Array.isArray(part?.questionGroups) ? part.questionGroups : [];
 
-      groups.forEach((group) => {
+      groups.forEach((group: any) => {
         const questions = Array.isArray(group?.questions) ? group.questions : [];
-        questions.forEach((q) => {
+        questions.forEach((q: any) => {
           const id = q?.questionId ?? q?.id;
           if (!id) return;
           questionRows.push({
@@ -213,7 +236,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
       });
 
       const directQuestions = Array.isArray(part?.questions) ? part.questions : [];
-      directQuestions.forEach((q) => {
+      directQuestions.forEach((q: any) => {
         const id = q?.questionId ?? q?.id;
         if (!id) return;
         questionRows.push({
@@ -305,7 +328,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
                 >
                   <option value="">-- Chọn loại --</option>
 
-                  {examTypes.filter((type) => !type.childCount).map((type) => (
+                  {examTypes.filter((type: any) => !type.childCount).map((type: any) => (
                     <option key={type.examTypeId} value={type.examTypeId}>
                       {type.name}
                     </option>
@@ -326,7 +349,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }) => {
                   aria-label="Phân loại bài thi"
                 >
                   <option value="">-- Không phân loại --</option>
-                  {examCategories.map((c) => (
+                  {examCategories.map((c: any) => (
                     <option key={c.examCategoryId} value={c.examCategoryId}>
                       {c.name}
                     </option>

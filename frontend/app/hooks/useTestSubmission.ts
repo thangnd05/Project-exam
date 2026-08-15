@@ -11,14 +11,38 @@ import {
   bulkCreateQuestionGroups,
 } from '@/app/apis/questionApi';
 import { toast } from 'react-toastify';
-import { CREATOR_TYPES } from '@/app/features/tests/hooks/useCreateTest';
+import { CREATOR_TYPES } from '@/app/hooks/useCreateTest';
+import type {
+  CreatorNotification,
+  CreatorType,
+  DraftGroup,
+  DraftQuestion,
+  TestInfoForm,
+} from '@/app/hooks/useCreateTest';
+import type { CreateTestRequest } from '@/app/types';
 
 const TOAST_VALIDATION_MS = 8000;
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const MAX_REQUEST_SIZE_BYTES = 50 * 1024 * 1024;
 
-const formatMB = (bytes) => `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+const formatMB = (bytes: number) => `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+
+export interface UseTestSubmissionOptions {
+  mode?: string;
+  classId?: string | null;
+  chapterId?: string | null;
+  testInfo: TestInfoForm;
+  questions: DraftQuestion[];
+  groups: DraftGroup[];
+  documentFile: File | null;
+  setQuestions: (questions: DraftQuestion[]) => void;
+  setGroups: (groups: DraftGroup[]) => void;
+  setDocumentFile: (file: File | null) => void;
+  setNotification: (notification: CreatorNotification) => void;
+  emptyQuestion: DraftQuestion;
+  createInitialGroup: () => DraftGroup;
+}
 
 export const useTestSubmission = ({
     mode,
@@ -34,7 +58,7 @@ export const useTestSubmission = ({
     setNotification,
     emptyQuestion,
     createInitialGroup,
-}) => {
+}: UseTestSubmissionOptions) => {
     const queryClient = useQueryClient();
 
     const invalidateQuestionBank = () => {
@@ -42,26 +66,26 @@ export const useTestSubmission = ({
       queryClient.invalidateQueries({ queryKey: ['question-bank'] });
     };
 
-    const hasQuestionContent = (question) => {
+    const hasQuestionContent = (question: DraftQuestion) => {
         const hasQuestionText = Boolean(question?.questionText?.trim());
         const hasUploadedMedia = Array.isArray(question?.mediaFiles) && question.mediaFiles.length > 0;
         const hasMediaUrl = Boolean(question?.mediaUrl?.trim());
         return hasQuestionText || hasUploadedMedia || hasMediaUrl;
     };
 
-    const hasAtLeastOneCorrectAnswer = (question) =>
+    const hasAtLeastOneCorrectAnswer = (question: DraftQuestion) =>
         Array.isArray(question?.answers) && question.answers.some((answer) => Boolean(answer?.isCorrect));
 
-    const hasValidManualQuestion = (question) => {
+    const hasValidManualQuestion = (question: DraftQuestion) => {
         if (!hasQuestionContent(question)) {
             return false;
         }
         return hasAtLeastOneCorrectAnswer(question);
     };
 
-    const validateCorrectAnswerSelection = (creatorType) => {
+    const validateCorrectAnswerSelection = (creatorType: CreatorType) => {
         if (creatorType === CREATOR_TYPES.PASSAGE) {
-            const invalidRefs = [];
+            const invalidRefs: string[] = [];
             groups.forEach((group, gIndex) => {
                 (group.questions || []).forEach((q, qIndex) => {
                     if (hasQuestionContent(q) && !hasAtLeastOneCorrectAnswer(q)) {
@@ -72,7 +96,7 @@ export const useTestSubmission = ({
             return invalidRefs;
         }
 
-        const invalidRefs = [];
+        const invalidRefs: string[] = [];
         questions.forEach((q, index) => {
             if (hasQuestionContent(q) && !hasAtLeastOneCorrectAnswer(q)) {
                 invalidRefs.push(`Câu ${index + 1}`);
@@ -81,8 +105,8 @@ export const useTestSubmission = ({
         return invalidRefs;
     };
 
-    const collectMediaFiles = (creatorType) => {
-        const files = [];
+    const collectMediaFiles = (creatorType: CreatorType) => {
+        const files: File[] = [];
         if (creatorType === CREATOR_TYPES.PASSAGE) {
             groups.forEach((group) => {
                 (group.passage?.mediaFiles || []).forEach((f) => files.push(f));
@@ -98,7 +122,7 @@ export const useTestSubmission = ({
         return files;
     };
 
-    const validateUploadSize = (creatorType) => {
+    const validateUploadSize = (creatorType: CreatorType) => {
         const files = collectMediaFiles(creatorType);
         const oversized = files.find((f) => f.size > MAX_FILE_SIZE_BYTES);
         if (oversized) {
@@ -116,9 +140,11 @@ export const useTestSubmission = ({
     };
 
     const mutation = useMutation({
-        mutationFn: async (creatorType) => {
+        mutationFn: async (creatorType: CreatorType) => {
             if (creatorType === CREATOR_TYPES.TEST) {
                 const manualQuestions = questions.filter(hasValidManualQuestion);
+                // BE phân biệt `null` (xoá/không đặt) với field vắng mặt, trong khi CreateTestRequest
+                // khai optional -> cast qua unknown để giữ nguyên body request của bản JS.
                 const testData = await createTest({
                     title: testInfo.title,
                     description: testInfo.description,
@@ -143,14 +169,15 @@ export const useTestSubmission = ({
                         testInfo.costCoins && Number(testInfo.costCoins) > 0
                             ? Number(testInfo.costCoins)
                             : null,
-                });
-                const newTestId = testData.testId || testData.id;
+                } as unknown as CreateTestRequest);
+                // Một số response cũ trả `id` thay vì `testId` — giữ fallback của bản JS.
+                const newTestId = testData.testId || (testData as any).id;
                 const partData = await createTestPart({
                     testId: String(newTestId),
                     examPartId: String(testInfo.examPartId),
                     numQuestions: manualQuestions.length,
                 });
-                const newPartId = partData.testPartId || partData.id;
+                const newPartId = partData.testPartId || (partData as any).id;
 
                 if (documentFile) {
                     const documentFormData = new FormData();
@@ -295,7 +322,7 @@ export const useTestSubmission = ({
                 setGroups([createInitialGroup()]);
             }
         },
-        onError: (error) => {
+        onError: (error: any) => {
             const msg =
                 error.response?.data?.detail ||
                 error.response?.data?.message ||
@@ -305,7 +332,7 @@ export const useTestSubmission = ({
         },
     });
 
-    const handleSubmit = async (creatorType) => {
+    const handleSubmit = async (creatorType: CreatorType) => {
         if (creatorType === CREATOR_TYPES.TEST) {
             if (!testInfo.title || !testInfo.examTypeId || !testInfo.examPartId) {
                 toast.warning('Vui lòng điền đủ thông tin!', { autoClose: TOAST_VALIDATION_MS });

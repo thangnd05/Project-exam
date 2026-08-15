@@ -3,9 +3,20 @@
 import classNames from 'classnames/bind';
 import BaseModal from '@/app/components/modal/BaseModal';
 import CreateTestFormBody from './creator/CreateTestFormBody';
+import type { CreateTestMode } from './creator/CreateTestFormBody';
 import styles from './CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
+
+type CreateTestModalProps = {
+  show?: boolean;
+  onClose: () => void;
+  /** 'personal' = đề cá nhân, 'class' = đề trong lớp/chapter */
+  mode?: CreateTestMode;
+  classId?: string;
+  chapterId?: string;
+  onSuccess?: () => void;
+};
 
 const CreateTestModal = ({
   show,
@@ -14,7 +25,7 @@ const CreateTestModal = ({
   classId,
   chapterId,
   onSuccess,
-}) => {
+}: CreateTestModalProps) => {
   const handleSuccess = () => {
     onSuccess?.();
     onClose();

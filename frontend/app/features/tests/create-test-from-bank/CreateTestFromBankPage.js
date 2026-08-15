@@ -15,7 +15,7 @@ import {
   Settings,
   Shuffle,
 } from 'lucide-react';
-import CoinPriceField from '@/app/features/tests/components/CoinPriceField';
+import CoinPriceField from '@/app/components/tests/CoinPriceField';
 import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
 import { getQuestionDisplayNumber } from '@/app/utils/questionNumber';
 import EditQuestionModal from '@/app/features/tests/question-bank/modals/EditQuestionModal';
@@ -26,7 +26,7 @@ import {
   SELECTION_MODES,
   defaultPartConfig,
   groupQuestionsByPassage,
-} from '@/app/features/tests/hooks/useBankTestBuilder';
+} from '@/app/hooks/useBankTestBuilder';
 import {
   emptyTestInfo,
   useCreateTestFromBank,

@@ -11,7 +11,7 @@ import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
 import QuickTestOrbit, {type QuickTestOrbitHandle} from './QuickTestOrbit';
 import QuickTestConfirmModal from './QuickTestConfirmModal';
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
-import {examTypeKeys} from '@/app/features/tests/exam/exam-types/examTypeKeys';
+import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import {name as brandName} from '@/app/assets/images';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {QuickChallengeCardResponse} from '@/app/types/test';

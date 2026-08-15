@@ -9,6 +9,15 @@ import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 
+type FormFooterProps = {
+    loading?: boolean;
+    onAddQuestion?: () => void;
+    onCancel?: () => void;
+    onSubmit?: () => void;
+    submitLabel?: string;
+    showAddBtn?: boolean;
+};
+
 const FormFooter = ({
     loading,
     onAddQuestion,
@@ -16,7 +25,7 @@ const FormFooter = ({
     onSubmit,
     submitLabel = 'Lưu & Xuất bản',
     showAddBtn = true,
-}) => {
+}: FormFooterProps) => {
     return (
         <div className={cx('footer')}>
             {showAddBtn && (

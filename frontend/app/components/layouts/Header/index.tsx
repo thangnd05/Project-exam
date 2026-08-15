@@ -14,7 +14,7 @@ import {name} from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
 import CreateClassModal from '@/app/components/CreateClassModal/CreateClassModal';
-import CreateTestModalJs from '@/app/features/tests/components/CreateTestModal';
+import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
@@ -22,7 +22,6 @@ import {useCosmetics} from '@/app/hooks/useCosmetics';
 
 // Component feature còn là .js nên TS suy props sai (coi prop không default là bắt buộc).
 // Cast any tạm thời — bỏ cast khi file này chuyển sang TS.
-const CreateTestModal = CreateTestModalJs as React.ComponentType<any>;
 
 const cx = classNames.bind(style);
 

@@ -18,29 +18,46 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import RecoveryResourceLink from '@/app/components/RecoveryResourceLink';
 import { getTestPartsSummary } from '@/app/apis/testApi';
 import { getResourcesByParts } from '@/app/apis/recoveryResourceApi';
+import type { TestPartSummaryResponse, TestResponse } from '@/app/types';
 import styles from './TestModeModal.module.scss';
 
 const cx = classNames.bind(styles);
 
 export const testModeKeys = {
-  parts: (testId) => ['test-parts-summary', testId],
-  partResources: (testId) => ['test-part-resources', testId],
+  parts: (testId?: string) => ['test-parts-summary', testId],
+  partResources: (testId?: string) => ['test-part-resources', testId],
 };
 
-const normalizeParts = (data) => (Array.isArray(data) ? data : []);
+/** BE luôn trả examPartId ở parts-summary — siết lại để dùng làm key/Set. */
+type PartSummary = TestPartSummaryResponse & { examPartId: string };
 
-function TestModeModal({ show, test, onClose, onStart }) {
-  const [tab, setTab] = useState('exam');
-  const [selected, setSelected] = useState(() => new Set());
+/** Lựa chọn chế độ làm bài: 'full' = full test có giờ, 'practice' = luyện theo Part (không giờ). */
+export type TestModeSelection = {
+  mode: 'full' | 'practice';
+  examPartIds?: string[];
+};
+
+type TestModeModalProps = {
+  show?: boolean;
+  test?: TestResponse | null;
+  onClose?: () => void;
+  onStart?: (selection: TestModeSelection) => void;
+};
+
+const normalizeParts = <T,>(data: T[] | null | undefined): T[] => (Array.isArray(data) ? data : []);
+
+function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
+  const [tab, setTab] = useState<'exam' | 'practice'>('exam');
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
 
   const partsQuery = useQuery({
     queryKey: testModeKeys.parts(test?.testId),
-    queryFn: () => getTestPartsSummary(test.testId),
+    queryFn: () => getTestPartsSummary(test?.testId as string),
     enabled: !!show && !!test?.testId,
     select: normalizeParts,
   });
 
-  const parts = partsQuery.data ?? [];
+  const parts = (partsQuery.data ?? []) as PartSummary[];
   const loading = partsQuery.isLoading;
 
   const partResourcesQuery = useQuery({
@@ -69,11 +86,11 @@ function TestModeModal({ show, test, onClose, onStart }) {
   );
 
   const grouped = useMemo(() => {
-    const map = new Map();
+    const map = new Map<string, PartSummary[]>();
     parts.forEach((p) => {
       const key = p.skillName || 'Khác';
       if (!map.has(key)) map.set(key, []);
-      map.get(key).push(p);
+      map.get(key)!.push(p);
     });
     return [...map.entries()];
   }, [parts]);
@@ -92,7 +109,7 @@ function TestModeModal({ show, test, onClose, onStart }) {
     setSelected(allSelected ? new Set() : new Set(parts.map((p) => p.examPartId)));
   };
 
-  const togglePart = (examPartId) => {
+  const togglePart = (examPartId: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(examPartId)) next.delete(examPartId);

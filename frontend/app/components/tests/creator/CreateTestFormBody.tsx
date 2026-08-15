@@ -20,8 +20,9 @@ import {
 import { Trash, PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
-import { useCreateTest, CREATOR_TYPES } from '@/app/features/tests/hooks/useCreateTest';
-import CoinPriceField from '@/app/features/tests/components/CoinPriceField';
+import { useCreateTest, CREATOR_TYPES } from '@/app/hooks/useCreateTest';
+import type { CreatorType, DraftGroup, DraftQuestion } from '@/app/hooks/useCreateTest';
+import CoinPriceField from '@/app/components/tests/CoinPriceField';
 import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
@@ -40,6 +41,21 @@ const ACCEPT_BY_TYPE = {
   DOCUMENT: '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
+/** 'personal' = đề cá nhân, 'class' = đề gắn với lớp + chapter */
+export type CreateTestMode = 'personal' | 'class';
+
+type CreateTestFormBodyProps = {
+  mode?: CreateTestMode;
+  classId?: string;
+  chapterId?: string;
+  creatorType?: CreatorType;
+  onCreatorTypeChange?: (creatorType: CreatorType) => void;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+  embedded?: boolean;
+  showCreatorTypeTabs?: boolean;
+};
+
 const CreateTestFormBody = ({
   mode = 'personal',
   classId,
@@ -50,12 +66,12 @@ const CreateTestFormBody = ({
   onCancel,
   embedded = false,
   showCreatorTypeTabs = true,
-}) => {
+}: CreateTestFormBodyProps) => {
   const router = useRouter();
-  const [creatorTypeLocal, setCreatorTypeLocal] = useState(creatorTypeProp);
+  const [creatorTypeLocal, setCreatorTypeLocal] = useState<CreatorType>(creatorTypeProp);
   const isControlled = typeof onCreatorTypeChange === 'function';
   const activeCreatorType = isControlled ? creatorTypeProp : creatorTypeLocal;
-  const setCreatorType = isControlled ? (v) => onCreatorTypeChange(v) : setCreatorTypeLocal;
+  const setCreatorType = isControlled ? (v: CreatorType) => onCreatorTypeChange?.(v) : setCreatorTypeLocal;
 
   const {
     examTypes,
@@ -103,10 +119,10 @@ const CreateTestFormBody = ({
 
   const [className, setClassName] = useState('');
   const [chapterName, setChapterName] = useState('');
-  const [groupDocumentFiles, setGroupDocumentFiles] = useState({});
-  const [bulkPassageFile, setBulkPassageFile] = useState(null);
-  const [collapsedGroups, setCollapsedGroups] = useState(() => new Set());
-  const [collapsedQuestions, setCollapsedQuestions] = useState(() => new Set());
+  const [groupDocumentFiles, setGroupDocumentFiles] = useState<Record<number, File | null>>({});
+  const [bulkPassageFile, setBulkPassageFile] = useState<File | null>(null);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<number>>(() => new Set());
+  const [collapsedQuestions, setCollapsedQuestions] = useState<Set<number>>(() => new Set());
 
   useEffect(() => {
     if (mode === 'class' && classId) {
@@ -124,7 +140,7 @@ const CreateTestFormBody = ({
     });
   }, [groups.length]);
 
-  const toggleGroupCollapsed = (gIndex) => {
+  const toggleGroupCollapsed = (gIndex: number) => {
     setCollapsedGroups((prev) => {
       const next = new Set(prev);
       if (next.has(gIndex)) {
@@ -143,7 +159,7 @@ const CreateTestFormBody = ({
     });
   }, [questions.length]);
 
-  const toggleQuestionCollapsed = (qIndex) => {
+  const toggleQuestionCollapsed = (qIndex: number) => {
     setCollapsedQuestions((prev) => {
       const next = new Set(prev);
       if (next.has(qIndex)) {
@@ -155,7 +171,7 @@ const CreateTestFormBody = ({
     });
   };
 
-  const getGroupSummary = (group) => {
+  const getGroupSummary = (group: DraftGroup) => {
     const questionCount = group.questions?.length ?? 0;
     const hasPassage =
       Boolean(group.passage?.content?.trim()) ||
@@ -181,7 +197,7 @@ const CreateTestFormBody = ({
     }
   };
 
-  const handleDocumentFileChange = (event) => {
+  const handleDocumentFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] || null;
     setDocumentFile(selectedFile);
     if (selectedFile) {
@@ -189,29 +205,30 @@ const CreateTestFormBody = ({
     }
   };
 
-  const normTag = (s) => (s || '').trim().toLowerCase();
-  const resolveTagNamesToIds = (tagNames = []) => {
+  const normTag = (s?: string | null) => (s || '').trim().toLowerCase();
+  // availableTags đến từ useBaseMetaData (chưa typed) nên tag để any có chủ đích.
+  const resolveTagNamesToIds = (tagNames: string[] = []): string[] => {
     if (!tagNames.length || !availableTags.length) return [];
-    const byId = new Map(availableTags.map((t) => [t.tagId, t]));
-    const byName = new Map();
-    availableTags.forEach((t) => {
+    const byId = new Map<string, any>(availableTags.map((t: any) => [t.tagId, t]));
+    const byName = new Map<string, any[]>();
+    availableTags.forEach((t: any) => {
       const k = normTag(t.name);
       if (!byName.has(k)) byName.set(k, []);
-      byName.get(k).push(t);
+      byName.get(k)!.push(t);
     });
     const partName = examParts.find(
-      (p) => String(p.examPartId) === String(testInfo.examPartId),
+      (p: any) => String(p.examPartId) === String(testInfo.examPartId),
     )?.name || '';
     const partRootId = availableTags.find(
-      (t) => (t.parentId == null || t.parentId === '' || !byId.has(t.parentId))
+      (t: any) => (t.parentId == null || t.parentId === '' || !byId.has(t.parentId))
         && normTag(t.name) === normTag(partName),
     )?.tagId || null;
 
-    const ids = [];
+    const ids: string[] = [];
     tagNames.forEach((rawSpec) => {
       const spec = (rawSpec || '').trim();
       if (!spec) return;
-      let parentName = null;
+      let parentName: string | null = null;
       let childName = spec;
       const gt = spec.indexOf('>');
       if (gt >= 0) {
@@ -222,13 +239,13 @@ const CreateTestFormBody = ({
       if (!cands.length) return;
       let chosen = null;
       if (parentName) {
-        chosen = cands.find((t) => {
+        chosen = cands.find((t: any) => {
           const p = t.parentId ? byId.get(t.parentId) : null;
           return p && normTag(p.name) === normTag(parentName);
         });
       } else if (partRootId) {
-        chosen = cands.find((t) => t.parentId === partRootId)
-          || cands.find((t) => t.tagId === partRootId);
+        chosen = cands.find((t: any) => t.parentId === partRootId)
+          || cands.find((t: any) => t.tagId === partRootId);
       }
       if (!chosen && !parentName && cands.length === 1) chosen = cands[0];
       if (chosen && !ids.includes(chosen.tagId)) ids.push(chosen.tagId);
@@ -236,9 +253,10 @@ const CreateTestFormBody = ({
     return ids;
   };
 
-  const normalizeParsedQuestions = (parsedQuestions = []) => (
+  // Câu hỏi parse từ file Word (previewDocument) — cấu trúc lỏng nên nhận any rồi chuẩn hoá về DraftQuestion.
+  const normalizeParsedQuestions = (parsedQuestions: any[] = []): DraftQuestion[] => (
     parsedQuestions.map((question) => {
-      const tagNames = question.tagNames || [];
+      const tagNames: string[] = question.tagNames || [];
       const tagIds = [...(question.tagIds || []), ...resolveTagNamesToIds(tagNames)]
         .filter((v, i, a) => a.indexOf(v) === i);
       return {
@@ -251,7 +269,7 @@ const CreateTestFormBody = ({
         tagIds,
         tagNames,
         answers: (question.answers && question.answers.length > 0)
-          ? question.answers.map((ans, idx) => ({
+          ? question.answers.map((ans: any, idx: number) => ({
             answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),
             answerText: ans.answerText || "",
             isCorrect: Boolean(ans.isCorrect),
@@ -265,7 +283,7 @@ const CreateTestFormBody = ({
     })
   );
 
-  const handlePreviewQuestionsFromDocument = async (fileInput = documentFile) => {
+  const handlePreviewQuestionsFromDocument = async (fileInput: File | null = documentFile) => {
     if (!fileInput) {
       toast.warning('Vui lòng chọn file Word trước khi nạp câu hỏi.');
       return;
@@ -288,7 +306,7 @@ const CreateTestFormBody = ({
       setQuestions(normalizedQuestions);
       setDocumentFile(null);
       toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi từ Word.`);
-    } catch (error) {
+    } catch (error: any) {
       const message =
         error.response?.data?.detail ||
         error.response?.data?.message ||
@@ -297,7 +315,7 @@ const CreateTestFormBody = ({
     }
   };
 
-  const handleGroupDocumentFileChange = (gIndex, event) => {
+  const handleGroupDocumentFileChange = (gIndex: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] || null;
     setGroupDocumentFiles((prev) => ({ ...prev, [gIndex]: selectedFile }));
     if (selectedFile) {
@@ -305,7 +323,10 @@ const CreateTestFormBody = ({
     }
   };
 
-  const handlePreviewGroupQuestionsFromDocument = async (gIndex, fileInput = groupDocumentFiles[gIndex]) => {
+  const handlePreviewGroupQuestionsFromDocument = async (
+    gIndex: number,
+    fileInput: File | null = groupDocumentFiles[gIndex],
+  ) => {
     if (!fileInput) {
       toast.warning('Vui lòng chọn file Word trước khi nạp nhóm câu hỏi.');
       return;
@@ -327,7 +348,7 @@ const CreateTestFormBody = ({
       setGroupQuestions(gIndex, normalizedQuestions);
       setGroupDocumentFiles((prev) => ({ ...prev, [gIndex]: null }));
       toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi cho nhóm ${gIndex + 1}.`);
-    } catch (error) {
+    } catch (error: any) {
       const message =
         error.response?.data?.detail ||
         error.response?.data?.message ||
@@ -336,7 +357,7 @@ const CreateTestFormBody = ({
     }
   };
 
-  const handleBulkPassageFileChange = (event) => {
+  const handleBulkPassageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0] || null;
     setBulkPassageFile(selectedFile);
     if (selectedFile) {
@@ -344,7 +365,7 @@ const CreateTestFormBody = ({
     }
   };
 
-  const handlePreviewBulkPassageFromDocument = async (fileInput = bulkPassageFile) => {
+  const handlePreviewBulkPassageFromDocument = async (fileInput: File | null = bulkPassageFile) => {
     if (!fileInput) {
       toast.warning('Vui lòng chọn file Word trước khi nạp passage.');
       return;
@@ -362,7 +383,7 @@ const CreateTestFormBody = ({
         return;
       }
 
-      const normalizedGroups = parsedGroups.map((group) => ({
+      const normalizedGroups: DraftGroup[] = parsedGroups.map((group: any) => ({
         passage: {
           content: group.passage?.content || '',
           contentTranslation: group.passage?.contentTranslation || '',
@@ -377,7 +398,7 @@ const CreateTestFormBody = ({
       setGroups(normalizedGroups);
       setBulkPassageFile(null);
       toast.success(`Đã nạp ${normalizedGroups.length} nhóm passage từ Word.`);
-    } catch (error) {
+    } catch (error: any) {
       const message =
         error.response?.data?.detail ||
         error.response?.data?.message ||
@@ -388,7 +409,7 @@ const CreateTestFormBody = ({
 
   const collectionOptions = buildCollectionTree(
     (questionCollections || []).filter(
-      (c) =>
+      (c: any) =>
         !testInfo.examTypeId ||
         !c.examTypeId ||
         String(c.examTypeId) === String(testInfo.examTypeId),
@@ -477,7 +498,7 @@ const CreateTestFormBody = ({
                 <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => handleExamTypeChange(e.target.value)}>
                   <option value="">-- Chọn --</option>
 
-                  {examTypes.filter((t) => !t.childCount).map((t) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
+                  {examTypes.filter((t: any) => !t.childCount).map((t: any) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
                 </select>
               </div>
             </Col>
@@ -486,7 +507,7 @@ const CreateTestFormBody = ({
                 <label>Phần thi *</label>
                 <select className={cx('inputModern')} value={testInfo.examPartId} onChange={(e) => setTestInfo({ ...testInfo, examPartId: e.target.value })} disabled={!testInfo.examTypeId}>
                   <option value="">-- Chọn part --</option>
-                  {examParts.map((p) => <option key={p.examPartId} value={p.examPartId}>{p.name}</option>)}
+                  {examParts.map((p: any) => <option key={p.examPartId} value={p.examPartId}>{p.name}</option>)}
                 </select>
               </div>
             </Col>
@@ -513,7 +534,7 @@ const CreateTestFormBody = ({
                     <option value="">-- Trống --</option>
                     {collectionOptions.map((c) => (
                       <option key={c.collectionId} value={c.collectionId}>
-                        {c.depth > 0 ? `    └ ${c.name}` : c.name}
+                        {c.depth > 0 ? `    └ ${c.name}` : c.name}
                       </option>
                     ))}
                   </select>
@@ -763,7 +784,7 @@ const CreateTestFormBody = ({
                   />
                   {groupDocumentFiles[gIndex] && (
                     <small className="text-muted d-block mt-2">
-                      Đang nạp cho nhóm {gIndex + 1}: {groupDocumentFiles[gIndex].name}
+                      Đang nạp cho nhóm {gIndex + 1}: {groupDocumentFiles[gIndex]?.name}
                     </small>
                   )}
                 </div>

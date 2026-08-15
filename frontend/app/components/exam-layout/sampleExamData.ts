@@ -1,4 +1,8 @@
-export const sampleExamData = {
+import { PassageType, QuestionType } from '@/app/enums';
+import type { ExamPart, ExamQuestion, QuestionIndexMap } from '@/app/components/exam-layout/examLayoutTypes';
+
+// Dữ liệu mẫu cho phần xem trước của layout builder (trang admin exam-types/[examTypeId]/layout).
+export const sampleExamData: { visibleParts: ExamPart[] } = {
   visibleParts: [
     {
       testPartId: 'sample-part-1',
@@ -6,13 +10,13 @@ export const sampleExamData = {
         {
           passage: {
             passageId: 'sample-passage-1',
-            passageType: 'READING',
+            passageType: PassageType.READING,
             content: 'Đoạn văn mẫu để xem bố cục vùng đọc.',
           },
           questions: [
             {
               questionId: 'sample-q-1',
-              questionType: 'MCQ',
+              questionType: QuestionType.MCQ,
               questionText: 'Nội dung câu hỏi mẫu (có đoạn văn).',
               answers: [
                 { answerId: 'a1', answerLabel: 'A', answerText: 'Đáp án A' },
@@ -28,7 +32,7 @@ export const sampleExamData = {
           questions: [
             {
               questionId: 'sample-q-2',
-              questionType: 'MCQ',
+              questionType: QuestionType.MCQ,
               questionText: 'Nội dung câu hỏi mẫu (không có đoạn văn).',
               answers: [
                 { answerId: 'b1', answerLabel: 'A', answerText: 'Đáp án A' },
@@ -44,11 +48,14 @@ export const sampleExamData = {
   ],
 };
 
-export const sampleAllQuestions = sampleExamData.visibleParts
-  .flatMap((p) => p.questionGroups)
-  .flatMap((g) => g.questions);
+export const sampleAllQuestions: ExamQuestion[] = sampleExamData.visibleParts
+  .flatMap((p) => p.questionGroups || [])
+  .flatMap((g) => g.questions || []);
 
-export const sampleQuestionIndexMap = sampleAllQuestions.reduce((map, q, i) => {
-  map[q.questionId] = i + 1;
-  return map;
-}, {});
+export const sampleQuestionIndexMap: QuestionIndexMap = sampleAllQuestions.reduce(
+  (map: QuestionIndexMap, q, i) => {
+    map[q.questionId] = i + 1;
+    return map;
+  },
+  {},
+);

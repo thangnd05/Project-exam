@@ -6,26 +6,56 @@ import classNames from 'classnames/bind';
 
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import GatedAudioPlayer from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/blocks/GatedAudioPlayer';
-import styles from '../../TestStartPage.module.scss';
+import GatedAudioPlayer from '@/app/components/exam-layout/blocks/GatedAudioPlayer';
+import { MediaType, PassageType, QuestionType } from '@/app/enums';
+import type { PassageMediaResponse } from '@/app/types';
+import type {
+  AnswerChangeHandler,
+  ExamFlowStep,
+  ExamPart,
+  ExamPassage,
+  ExamQuestion,
+  ExamUserAnswers,
+  QuestionIndexMap,
+} from '@/app/components/exam-layout/examLayoutTypes';
+import type { LayoutQuestionArea } from '@/app/components/exam-layout/layoutSchema';
+// Các block dùng chung class của trang làm bài nên vẫn đọc scss ở features/tests (giữ nguyên giao diện).
+import styles from '@/app/features/tests/exam/exam-types/detail/testStart/TestStartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
 // BE trả PassageResponse { content, mediaUrl, passageType, passageMedias[] }
 // và PassageMediaResponse { mediaUrl, mediaType, content }.
-const mediaListOf = (passage) =>
-  Array.isArray(passage?.passageMedias) ? passage.passageMedias : [];
+const mediaListOf = (passage: ExamPassage): PassageMediaResponse[] =>
+  Array.isArray(passage?.passageMedias) ? passage!.passageMedias! : [];
 
-const isListening = (passage) => passage?.passageType === 'LISTENING';
+const isListening = (passage: ExamPassage) => passage?.passageType === PassageType.LISTENING;
 
-const getAudioUrls = (passage) => {
+const getAudioUrls = (passage: ExamPassage): string[] => {
   const urls = mediaListOf(passage)
-    .filter((m) => m?.mediaType === 'AUDIO' && m?.mediaUrl)
-    .map((m) => m.mediaUrl);
+    .filter((m) => m?.mediaType === MediaType.AUDIO && m?.mediaUrl)
+    .map((m) => m.mediaUrl as string);
   if (urls.length === 0 && passage?.mediaUrl && isListening(passage)) {
     urls.push(passage.mediaUrl);
   }
   return urls;
+};
+
+type QuestionAreaBlockProps = {
+  isPractice?: boolean;
+  visibleParts: ExamPart[];
+  questionIndexMap: QuestionIndexMap;
+  userAnswers: ExamUserAnswers;
+  handleAnswerChange: AnswerChangeHandler;
+  config?: LayoutQuestionArea;
+
+  /** Chế độ PAGED: hiện từng câu/nhóm kiểu TOEIC (nghe tự chuyển, đọc bấm) */
+  isPaged?: boolean;
+  flowSteps?: ExamFlowStep[];
+  currentStepIndex?: number;
+  canGoPrev?: boolean;
+  goNext?: () => void;
+  goPrev?: () => void;
 };
 
 function QuestionAreaBlock({
@@ -42,9 +72,9 @@ function QuestionAreaBlock({
   canGoPrev = false,
   goNext,
   goPrev,
-}) {
+}: QuestionAreaBlockProps) {
 
-  const pagedRootRef = useRef(null);
+  const pagedRootRef = useRef<HTMLDivElement | null>(null);
   useLayoutEffect(() => {
     if (!isPaged) return;
     let p = pagedRootRef.current?.parentElement;
@@ -58,10 +88,10 @@ function QuestionAreaBlock({
   }, [isPaged, currentStepIndex]);
 
   const useSide = (config?.passagePosition ?? 'side') === 'side';
-  const hasPassageContent = (passage) =>
+  const hasPassageContent = (passage: ExamPassage) =>
     mediaListOf(passage).length > 0 || Boolean(passage?.content || passage?.mediaUrl);
 
-  const renderPassageText = (text, key) => (
+  const renderPassageText = (text: string | null | undefined, key: string) => (
     <div key={key} className={cx('passage-content')}>
       {String(text)
         .split(/\n+/)
@@ -75,7 +105,7 @@ function QuestionAreaBlock({
     </div>
   );
 
-  const renderPassage = (passage, opts = {}) => {
+  const renderPassage = (passage: ExamPassage, opts: { suppressAudio?: boolean } = {}) => {
     const suppressAudio = opts.suppressAudio === true;
     const content = passage?.content;
     const mediaList = mediaListOf(passage);
@@ -85,7 +115,7 @@ function QuestionAreaBlock({
     const hasContent = !!content;
     const hasAnyMedia = hasMediaList || !!singleMediaUrl;
     const hasNonAudioMedia =
-      hasMediaList && mediaList.some((m) => m?.mediaType !== 'AUDIO');
+      hasMediaList && mediaList.some((m) => m?.mediaType !== MediaType.AUDIO);
 
     if (suppressAudio ? !hasContent && !hasNonAudioMedia : !hasContent && !hasAnyMedia) return null;
 
@@ -97,28 +127,28 @@ function QuestionAreaBlock({
         {hasMediaList &&
           mediaList.map((m, idx) => {
             const type = m.mediaType;
-            if (type === 'TEXT') {
+            if (type === MediaType.TEXT) {
               return m.content ? renderPassageText(m.content, `media-${idx}`) : null;
             }
             const url = m.mediaUrl;
             if (!url) return null;
-            if (type === 'AUDIO') {
+            if (type === MediaType.AUDIO) {
               if (suppressAudio) return null;
               return (
                 <div key={idx} className="mb-3">
                   <audio
                     controls
-                    src={getFullMediaUrl(url)}
+                    src={getFullMediaUrl(url) ?? undefined}
                     className={cx('audio-player')}
                   />
                 </div>
               );
             }
-            if (type === 'IMAGE') {
+            if (type === MediaType.IMAGE) {
               return (
                 <div key={idx} className={cx('passage-image-box')}>
                   <img
-                    src={getFullMediaUrl(url)}
+                    src={getFullMediaUrl(url) ?? undefined}
                     alt={`Passage ${idx + 1}`}
                     className={cx('passage-image')}
                   />
@@ -131,7 +161,7 @@ function QuestionAreaBlock({
             <div className="mb-4">
               <audio
                 controls
-                src={getFullMediaUrl(singleMediaUrl)}
+                src={getFullMediaUrl(singleMediaUrl) ?? undefined}
                 className={cx('audio-player')}
               />
             </div>
@@ -140,7 +170,7 @@ function QuestionAreaBlock({
     );
   };
 
-  const renderQuestionOnly = (q, absoluteIndex) => {
+  const renderQuestionOnly = (q: ExamQuestion, absoluteIndex: number) => {
     return (
       <div key={q.questionId} id={`q-${q.questionId}`} className={cx('question-card')}>
         <span className={cx('q-text')}>
@@ -148,7 +178,7 @@ function QuestionAreaBlock({
           {q.questionText}
         </span>
 
-        {q.questionType === 'MCQ' && (
+        {q.questionType === QuestionType.MCQ && (
           <div className={cx('mcq-group')}>
             {q.answers?.map((a) => (
               <div
@@ -174,7 +204,7 @@ function QuestionAreaBlock({
           </div>
         )}
 
-        {q.questionType === 'MSQ' && (
+        {q.questionType === QuestionType.MSQ && (
           <div className={cx('mcq-group')}>
             {q.answers?.map((a) => {
               const chosen = (userAnswers[q.questionId]?.selectedAnswerIds || []).includes(
@@ -196,7 +226,7 @@ function QuestionAreaBlock({
           </div>
         )}
 
-        {q.questionType === 'FILL_BLANK' && (
+        {q.questionType === QuestionType.FILL_BLANK && (
           <input
             type="text"
             className={cx('fill-input')}
@@ -206,7 +236,7 @@ function QuestionAreaBlock({
           />
         )}
 
-        {q.questionType === 'ESSAY' && (
+        {q.questionType === QuestionType.ESSAY && (
           <textarea
             className={cx('essay-input')}
             value={userAnswers[q.questionId]?.answerText || ''}
@@ -218,7 +248,7 @@ function QuestionAreaBlock({
     );
   };
 
-  const renderQuestionCard = (q, absoluteIndex) => {
+  const renderQuestionCard = (q: ExamQuestion, absoluteIndex: number) => {
     const hasPassage = hasPassageContent(q.passage);
     const split = hasPassage && useSide;
     const questionCard = renderQuestionOnly(q, absoluteIndex);
@@ -261,7 +291,7 @@ function QuestionAreaBlock({
     const showManualNext = !gated && !isLast;
 
     const passageText = String(passage?.content ?? '').trim();
-    const hasNonAudioMedia = mediaListOf(passage).some((m) => m?.mediaType !== 'AUDIO');
+    const hasNonAudioMedia = mediaListOf(passage).some((m) => m?.mediaType !== MediaType.AUDIO);
     const passageContentToShow = gated
       ? Boolean(passageText) || hasNonAudioMedia
       : hasPassageContent(passage);

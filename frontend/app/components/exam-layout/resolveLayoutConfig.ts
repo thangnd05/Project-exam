@@ -1,6 +1,7 @@
-import { defaultLayoutConfig, BLOCK_TYPES } from '@/app/features/tests/exam/exam-types/detail/testStart/examLayout/layoutSchema';
+import { defaultLayoutConfig, BLOCK_TYPES } from '@/app/components/exam-layout/layoutSchema';
+import type { LayoutBlock, LayoutConfig } from '@/app/components/exam-layout/layoutSchema';
 
-export function resolveLayoutConfig(raw) {
+export function resolveLayoutConfig(raw: unknown): LayoutConfig {
   const parsed = parseRaw(raw);
   if (!parsed || !Array.isArray(parsed.blocks) || parsed.blocks.length === 0) {
     return defaultLayoutConfig;
@@ -13,11 +14,11 @@ export function resolveLayoutConfig(raw) {
       ...defaultLayoutConfig.questionArea,
       ...(parsed.questionArea || {}),
     },
-    blocks: ensureQuestionNav(parsed.blocks.map((b) => ({ visible: true, props: {}, ...b }))),
+    blocks: ensureQuestionNav(parsed.blocks.map((b: LayoutBlock) => ({ visible: true, props: {}, ...b }))),
   };
 }
 
-function ensureQuestionNav(blocks) {
+function ensureQuestionNav(blocks: LayoutBlock[]): LayoutBlock[] {
   const hasNav = blocks.some((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
   if (hasNav) return blocks;
   const defaultNav = defaultLayoutConfig.blocks.find(
@@ -26,11 +27,13 @@ function ensureQuestionNav(blocks) {
   return defaultNav ? [defaultNav, ...blocks] : blocks;
 }
 
-function parseRaw(raw) {
+// Layout lưu ở DB dạng chuỗi JSON (ExamTypeLayoutResponse.config) hoặc object đã parse,
+// nên đầu vào là unknown và trả về any có chủ đích trước khi merge với default.
+function parseRaw(raw: unknown): any {
   if (!raw) return null;
 
   const source =
-    typeof raw === 'object' && raw !== null && 'config' in raw ? raw.config : raw;
+    typeof raw === 'object' && raw !== null && 'config' in raw ? (raw as any).config : raw;
   if (!source) return null;
   if (typeof source === 'object') return source;
   if (typeof source === 'string') {

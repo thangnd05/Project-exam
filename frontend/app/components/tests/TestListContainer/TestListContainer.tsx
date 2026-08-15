@@ -4,23 +4,46 @@ import { useState } from 'react';
 import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
+import type {Variants} from 'framer-motion';
 import {IoListOutline, IoGridOutline} from 'react-icons/io5';
 
 import styles from './TestListContainer.module.scss';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
-import TestCard from '@/app/features/tests/components/TestCard/TestCard';
-import TestManagementTable from '@/app/features/tests/components/TestManagementTable/TestManagementTable';
+import TestCard from '@/app/components/tests/TestCard/TestCard';
+import TestManagementTable from '@/app/components/tests/TestManagementTable/TestManagementTable';
+import type {TestResponse} from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: {opacity: 0, y: 24},
-  visible: (i) => ({
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {duration: 0.5, delay: i * 0.06, ease: [0.22, 1, 0.36, 1]},
   }),
+};
+
+type TestListContainerProps = {
+  title: string;
+  label?: string;
+  badgeLabel?: React.ReactNode;
+  actionText?: string;
+  actionIcon?: React.ElementType;
+  onAction?: () => void;
+  secondaryActionText?: string;
+  secondaryActionIcon?: React.ElementType;
+  onSecondaryAction?: () => void;
+  tests?: TestResponse[];
+  countdowns?: Record<string, number>;
+  handleDeleteTest?: (testId: string) => void;
+  emptyState?: React.ReactNode;
+  // Prop nhận vào nhưng hiện chưa dùng — giữ nguyên như bản JS cũ
+  loading?: boolean;
+  onRefresh?: () => void;
+  footer?: React.ReactNode;
+  topSlot?: React.ReactNode;
 };
 
 const TestListContainer = ({
@@ -41,7 +64,7 @@ const TestListContainer = ({
   onRefresh,
   footer,
   topSlot,
-}) => {
+}: TestListContainerProps) => {
   const [viewMode, setViewMode] = useState('grid');
 
   return (
