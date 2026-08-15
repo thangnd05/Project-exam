@@ -4,10 +4,11 @@ import { IoPeopleOutline, IoKeyOutline, IoPersonOutline } from 'react-icons/io5'
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import styles from './ClassCard.module.scss';
+import type { ClassStudentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const copyToClipboard = async (text) => {
+const copyToClipboard = async (text: string) => {
   if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(text);
     return;
@@ -23,10 +24,17 @@ const copyToClipboard = async (text) => {
   document.body.removeChild(textarea);
 };
 
-const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }) => {
+type ClassCardProps = {
+  classData: ClassStudentResponse;
+  role?: 'teacher' | 'student';
+  onViewTests?: (classId: string) => void;
+  onManageMembers?: (e: React.MouseEvent, classId: string) => void;
+};
+
+const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }: ClassCardProps) => {
   const classQr = classData.classQr ;
 
-  const handleCopyCode = async (e) => {
+  const handleCopyCode = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!classQr) return;
     try {

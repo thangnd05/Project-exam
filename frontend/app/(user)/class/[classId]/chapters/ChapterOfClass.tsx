@@ -8,19 +8,20 @@ import { toast } from 'react-toastify';
 import { IoBookOutline, IoDocumentTextOutline, IoCalendarOutline, IoAdd, IoGridOutline, IoListOutline } from 'react-icons/io5';
 
 import styles from './ChapterOfClass.module.scss';
-import CreateChapterModal from '../modals/CreateChapterModal';
-import UpdateChapterModal from '../modals/UpdateChapterModal';
+import CreateChapterModal from './_components/CreateChapterModal';
+import UpdateChapterModal from './_components/UpdateChapterModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
-import ChapterManagementTable from '../components/ChapterManagementTable/ChapterManagementTable';
+import ChapterManagementTable from './_components/ChapterManagementTable/ChapterManagementTable';
 import routes from '@/app/configs/Routes';
-import { useChaptersOfClass } from '@/app/features/classes/chapters/hooks/useChaptersOfClass';
+import { useChaptersOfClass } from './_hooks/useChaptersOfClass';
+import type { ChapterResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
 const ChapterOfClass = () => {
-  const { classId } = useParams();
+  const { classId } = useParams<{ classId: string }>();
   const router = useRouter();
 
   const {
@@ -38,10 +39,10 @@ const ChapterOfClass = () => {
   const [showCreateChapter, setShowCreateChapter] = useState(false);
   const [showUpdateChapter, setShowUpdateChapter] = useState(false);
   const [showDeleteChapter, setShowDeleteChapter] = useState(false);
-  const [selectedChapter, setSelectedChapter] = useState(null);
+  const [selectedChapter, setSelectedChapter] = useState<ChapterResponse | null>(null);
   const [viewMode, setViewMode] = useState('grid');
 
-  const handleViewTests = (chapterId) => {
+  const handleViewTests = (chapterId: string) => {
     const path = routes.classChapterTests
       .replace(':classId', classId)
       .replace(':chapterId', chapterId);
@@ -49,12 +50,12 @@ const ChapterOfClass = () => {
     router.push(path);
   };
 
-  const handleEditChapter = (chapter) => {
+  const handleEditChapter = (chapter: ChapterResponse) => {
     setSelectedChapter(chapter);
     setShowUpdateChapter(true);
   };
 
-  const handleDeleteChapterClick = (chapter) => {
+  const handleDeleteChapterClick = (chapter: ChapterResponse) => {
     setSelectedChapter(chapter);
     setShowDeleteChapter(true);
   };
@@ -67,7 +68,8 @@ const ChapterOfClass = () => {
     try {
       await deleteChapterMutation.mutateAsync(selectedChapter.chapterId);
       toast.success('Xóa chương thành công!');
-    } catch (error) {
+    } catch (error: any) {
+      // any có chủ đích: lỗi Axios, đọc error.response.data.message (BE không có type lỗi)
       toast.error(
         error.response?.data?.message ||
         'Không thể xóa chương. Vui lòng thử lại.',
@@ -149,7 +151,8 @@ const ChapterOfClass = () => {
                       <IoCalendarOutline />
                       <span>
                         Cập nhật:{' '}
-                        {new Date(chapter.createdAt).toLocaleDateString(
+                        {/* createdAt optional theo type nhưng BE luôn trả — giữ hành vi bản JS cũ */}
+                        {new Date(chapter.createdAt!).toLocaleDateString(
                           'vi-VN',
                         )}
                       </span>

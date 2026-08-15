@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import { useCreateChapter } from '@/app/features/classes/chapters/hooks/useChaptersOfClass';
+import { useCreateChapter } from '../_hooks/useChaptersOfClass';
 import { toast } from 'react-toastify';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -11,7 +11,14 @@ import styles from '@/app/components/modal/CommonFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-const CreateChapterModal = ({ show, onClose, classId, onSuccess }) => {
+type CreateChapterModalProps = {
+    show: boolean;
+    onClose: () => void;
+    classId: string;
+    onSuccess?: () => void;
+};
+
+const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapterModalProps) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const createMutation = useCreateChapter(classId);

@@ -7,21 +7,22 @@ import { Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 
-import styles from './MyClassPage.module.scss';
+import styles from './MyClass.module.scss';
 import routes from '@/app/configs/Routes';
-import ClassListContainer from './components/ClassListContainer/ClassListContainer';
-import EditClassModal from './modals/EditClassModal';
+import ClassListContainer from './_components/ClassListContainer/ClassListContainer';
+import EditClassModal from './_components/EditClassModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import {
   myClassesKeys,
   useMyClasses,
   useDeleteClass,
-} from '@/app/features/classes/hooks/useMyClasses';
+} from '@/app/hooks/useMyClasses';
+import type { ClassStudentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const MyClassesPage = () => {
-  const [selectedClass, setSelectedClass] = useState(null);
+const MyClasses = () => {
+  const [selectedClass, setSelectedClass] = useState<ClassStudentResponse | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter();
@@ -38,23 +39,23 @@ const MyClassesPage = () => {
 
   const message = classesMessage || (isError ? 'Không thể kết nối đến máy chủ ' : '');
 
-  const handleViewTests = (classId) => {
+  const handleViewTests = (classId: string) => {
     const path = routes.classChapterPage.replace(':classId', classId);
     router.push(path);
   };
 
-  const handleManageMembers = (e, classId) => {
+  const handleManageMembers = (e: React.MouseEvent, classId: string) => {
     e.stopPropagation();
     const path = routes.classMemberManagement.replace(':classId', classId);
     router.push(path);
   };
 
-  const handleEditClass = (classData) => {
+  const handleEditClass = (classData: ClassStudentResponse) => {
     setSelectedClass(classData);
     setShowEditModal(true);
   };
 
-  const handleDeleteClass = (classData) => {
+  const handleDeleteClass = (classData: ClassStudentResponse) => {
     setSelectedClass(classData);
     setShowDeleteModal(true);
   };
@@ -74,7 +75,7 @@ const MyClassesPage = () => {
     });
   };
 
-  const handleManageStudents = (classId) => {
+  const handleManageStudents = (classId: string) => {
     const path = routes.classMemberManagement.replace(':classId', classId);
     router.push(path);
   };
@@ -86,7 +87,8 @@ const MyClassesPage = () => {
   if (loading) {
     return (
       <div className={cx('loading-container')}>
-        <Spinner animation="grow" variant="primary" size="lg" />
+        {/* size 'lg' as any: type react-bootstrap chỉ nhận 'sm' nhưng bản JS cũ truyền 'lg' */}
+        <Spinner animation="grow" variant="primary" size={'lg' as any} />
         <p>Đang chuẩn bị giảng đường của bạn...</p>
       </div>
     );
@@ -137,4 +139,4 @@ const MyClassesPage = () => {
   );
 };
 
-export default MyClassesPage;
+export default MyClasses;

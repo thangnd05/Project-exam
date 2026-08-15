@@ -1,5 +1,5 @@
-import TestByClassPage from '@/app/features/classes/class-tests/TestByClassPage';
+import TestByClass from './TestByClass';
 
 export default function Page() {
-  return <TestByClassPage />;
+  return <TestByClass />;
 }

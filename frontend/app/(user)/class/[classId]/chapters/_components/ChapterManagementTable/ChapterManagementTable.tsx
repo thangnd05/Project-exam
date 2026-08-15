@@ -4,10 +4,18 @@ import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {IoPencilOutline, IoTrashOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './ChapterManagementTable.module.scss';
+import type { ChapterResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}) {
+type ChapterManagementTableProps = {
+  chapters: ChapterResponse[];
+  onViewTests: (chapterId: string) => void;
+  onEdit: (chapter: ChapterResponse) => void;
+  onDelete: (chapter: ChapterResponse) => void;
+};
+
+function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: ChapterManagementTableProps) {
   return (
     <div className={cx('table-responsive')}>
       <Table hover className={cx('management-table')}>
@@ -36,7 +44,8 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}) {
               </td>
               <td>
                 <span className={cx('chapter-date')}>
-                  {new Date(chapter.createdAt).toLocaleDateString('vi-VN')}
+                  {/* createdAt optional theo type nhưng BE luôn trả — giữ hành vi bản JS cũ */}
+                  {new Date(chapter.createdAt!).toLocaleDateString('vi-VN')}
                 </span>
               </td>
               <td>

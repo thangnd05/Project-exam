@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseMutationOptions } from '@tanstack/react-query';
 import {
   getChaptersByClass,
   createChapter,
@@ -8,16 +9,19 @@ import {
   deleteChapter,
 } from '@/app/apis/chapterApi';
 import { getClassById } from '@/app/apis/classApi';
+import type { ChapterRequest, ChapterResponse } from '@/app/types';
 
 export const chapterKeys = {
-  list: (classId) => ['chapters', classId],
-  classInfo: (classId) => ['class-info', classId],
+  list: (classId: string) => ['chapters', classId],
+  classInfo: (classId: string) => ['class-info', classId],
 };
 
-const normalizeChapters = (data) =>
-  Array.isArray(data) ? data : data?.content ?? [];
+// API trả mảng, nhưng giữ nhánh phòng hờ dạng phân trang { content } như bản JS cũ
+// (data as any vì nhánh { content } không nằm trong kiểu trả về đã khai báo của API)
+const normalizeChapters = (data: ChapterResponse[]): ChapterResponse[] =>
+  Array.isArray(data) ? data : ((data as any)?.content ?? []);
 
-export function useChaptersOfClass(classId) {
+export function useChaptersOfClass(classId: string) {
   const qc = useQueryClient();
 
   const chaptersQuery = useQuery({
@@ -33,7 +37,7 @@ export function useChaptersOfClass(classId) {
     enabled: !!classId,
   });
 
-  const deleteChapterMutation = useMutation({
+  const deleteChapterMutation = useMutation<void, any, string>({
     mutationFn: (chapterId) => deleteChapter(chapterId),
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: chapterKeys.list(classId) }),
@@ -53,9 +57,18 @@ export function useChaptersOfClass(classId) {
   };
 }
 
-export function useCreateChapter(classId, { onSuccess, onError } = {}) {
+// error để any có chủ đích: consumer đọc error.response?.data?.message theo shape của axios.
+type MutationCallbacks<TData, TVariables> = Pick<
+  UseMutationOptions<TData, any, TVariables>,
+  'onSuccess' | 'onError'
+>;
+
+export function useCreateChapter(
+  classId: string,
+  { onSuccess, onError }: MutationCallbacks<ChapterResponse, ChapterRequest> = {},
+) {
   const qc = useQueryClient();
-  return useMutation({
+  return useMutation<ChapterResponse, any, ChapterRequest>({
     mutationFn: (payload) => createChapter(payload),
     onSuccess: (...args) => {
       qc.invalidateQueries({ queryKey: chapterKeys.list(classId) });
@@ -65,9 +78,15 @@ export function useCreateChapter(classId, { onSuccess, onError } = {}) {
   });
 }
 
-export function useUpdateChapter(classId, { onSuccess, onError } = {}) {
+export function useUpdateChapter(
+  classId: string,
+  {
+    onSuccess,
+    onError,
+  }: MutationCallbacks<ChapterResponse, { chapterId: string; payload: ChapterRequest }> = {},
+) {
   const qc = useQueryClient();
-  return useMutation({
+  return useMutation<ChapterResponse, any, { chapterId: string; payload: ChapterRequest }>({
     mutationFn: ({ chapterId, payload }) => updateChapter(chapterId, payload),
     onSuccess: (...args) => {
       qc.invalidateQueries({ queryKey: chapterKeys.list(classId) });

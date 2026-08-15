@@ -1,4 +1,4 @@
-import ChapterOfClass from '@/app/features/classes/chapters/ChapterOfClass';
+import ChapterOfClass from './ChapterOfClass';
 
 export default function Page() {
   return <ChapterOfClass />;

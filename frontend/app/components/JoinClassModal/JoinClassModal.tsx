@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { Alert } from "react-bootstrap";
-import { useJoinClass } from '@/app/features/classes/hooks/useMyClasses';
+import { useJoinClass } from '@/app/hooks/useMyClasses';
 import classNames from "classnames/bind";
 import { FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "@/app/hooks/useAuth";
@@ -14,7 +14,12 @@ import styles from "@/app/components/modal/CommonFormModal.module.scss";
 
 const cx = classNames.bind(styles);
 
-function JoinClassModal({ show, onClose }) {
+type JoinClassModalProps = {
+    show: boolean;
+    onClose: () => void;
+};
+
+function JoinClassModal({ show, onClose }: JoinClassModalProps) {
     const [code, setCode] = useState("");
 
     const [message, setMessage] = useState("");

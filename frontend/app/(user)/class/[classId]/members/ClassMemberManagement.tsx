@@ -7,22 +7,27 @@ import classNames from 'classnames/bind';
 import { IoPeopleOutline, IoCheckmarkCircle, IoTimeOutline, IoPersonRemoveOutline, IoSearchOutline, IoRefreshOutline, IoChevronDown, IoChevronUp } from 'react-icons/io5';
 import { Spinner, Badge, Table, Tabs, Tab } from 'react-bootstrap';
 
-import styles from './ClassMemberManagementPage.module.scss';
+import styles from './ClassMemberManagement.module.scss';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import { useClassMembers } from '@/app/features/classes/members/hooks/useClassMembers';
+import { useClassMembers } from './_hooks/useClassMembers';
+import { ClassMemberStatus } from '@/app/enums';
+import type { ClassMemberResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const ClassMemberManagementPage = () => {
-  const { classId } = useParams();
+type SortKey = 'fullName' | 'joinedAt';
+type SortConfig = { key: SortKey; direction: 'asc' | 'desc' };
+
+const ClassMemberManagement = () => {
+  const { classId } = useParams<{ classId: string }>();
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [memberToDelete, setMemberToDelete] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: 'joinedAt', direction: 'desc' });
+  const [memberToDelete, setMemberToDelete] = useState<ClassMemberResponse | null>(null);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'joinedAt', direction: 'desc' });
 
   const {
     classInfo,
@@ -36,14 +41,15 @@ const ClassMemberManagementPage = () => {
     refreshMembers,
   } = useClassMembers(classId);
 
-  const handleApproveMember = async (userId) => {
+  const handleApproveMember = async (userId?: string) => {
     try {
       await approveMemberMutation.mutateAsync({
         classId: String(classId),
         userId: String(userId),
       });
       toast.success('Duyệt học sinh thành công!');
-    } catch (err) {
+    } catch (err: any) {
+      // any có chủ đích: lỗi Axios, đọc err.response.data.error (BE không có type lỗi)
       console.error('Lỗi duyệt học sinh:', err);
       const msg = err?.response?.data?.error || 'Không thể duyệt học sinh';
       toast.error(msg);
@@ -58,7 +64,8 @@ const ClassMemberManagementPage = () => {
     try {
       const result = await approveAllMutation.mutateAsync(classId);
       toast.success(result.message || 'Đã duyệt tất cả học sinh!');
-    } catch (err) {
+    } catch (err: any) {
+      // any có chủ đích: lỗi Axios, đọc err.response.data.error (BE không có type lỗi)
       console.error('Lỗi duyệt tất cả:', err);
       const msg = err?.response?.data?.error || 'Không thể duyệt tất cả';
       toast.error(msg);
@@ -75,25 +82,27 @@ const ClassMemberManagementPage = () => {
       toast.success('Đã xóa học sinh khỏi lớp!');
       setShowDeleteModal(false);
       setMemberToDelete(null);
-    } catch (err) {
+    } catch (err: any) {
+      // any có chủ đích: lỗi Axios, đọc err.response.data.error (BE không có type lỗi)
       console.error('Lỗi xóa học sinh:', err);
       const msg = err?.response?.data?.error || 'Không thể xóa học sinh';
       toast.error(msg);
     }
   };
 
-  const handleSort = (key) => {
+  const handleSort = (key: SortKey) => {
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
-  const getSortedMembers = (members) => {
+  const getSortedMembers = (members: ClassMemberResponse[]) => {
     const sorted = [...members];
     sorted.sort((a, b) => {
-      let aVal = a[sortConfig.key];
-      let bVal = b[sortConfig.key];
+      // any có chủ đích: giá trị so sánh đổi kiểu string -> number tuỳ cột (giữ logic bản JS cũ)
+      let aVal: any = a[sortConfig.key];
+      let bVal: any = b[sortConfig.key];
       if (sortConfig.key === 'fullName') {
         aVal = String(aVal || '').toLowerCase();
         bVal = String(bVal || '').toLowerCase();
@@ -109,7 +118,7 @@ const ClassMemberManagementPage = () => {
     return sorted;
   };
 
-  const getFilteredMembers = (members) => {
+  const getFilteredMembers = (members: ClassMemberResponse[]) => {
     const filtered = members.filter((m) =>
       `${m.fullName || ''}`
         .toLowerCase()
@@ -118,7 +127,7 @@ const ClassMemberManagementPage = () => {
     return getSortedMembers(filtered);
   };
 
-  const formatDate = (dateStr) => {
+  const formatDate = (dateStr?: string) => {
     if (!dateStr) return '-';
     const d = new Date(dateStr);
     return d.toLocaleDateString('vi-VN', {
@@ -130,12 +139,12 @@ const ClassMemberManagementPage = () => {
     });
   };
 
-  const getStatusBadge = (status) => {
-    const statusMap = {
+  const getStatusBadge = (status?: ClassMemberStatus) => {
+    const statusMap: Record<string, { variant: string; label?: React.ReactNode; icon?: React.ReactNode }> = {
       APPROVED: { variant: 'success', label: 'Đã duyệt' },
       PENDING: { variant: 'warning', label: 'Chờ duyệt'},
     };
-    const s = statusMap[status] || { variant: 'secondary', label: status, icon: null };
+    const s = statusMap[status as string] || { variant: 'secondary', label: status, icon: null };
     return (
       <Badge bg={s.variant} className={cx('status-badge')}>
         {s.icon} {s.label}
@@ -143,12 +152,12 @@ const ClassMemberManagementPage = () => {
     );
   };
 
-  const renderSortIcon = (key) => {
+  const renderSortIcon = (key: SortKey) => {
     if (sortConfig.key !== key) return null;
     return sortConfig.direction === 'asc' ? <IoChevronUp /> : <IoChevronDown />;
   };
 
-  const renderMemberRow = (member, showActions = false) => (
+  const renderMemberRow = (member: ClassMemberResponse, showActions = false) => (
     <tr key={member.id} className={cx('member-row')}>
       <td className={cx('td-id')}>
         <span className={cx('user-id')}>{member.fullName || 'Chưa cập nhật tên'}</span>
@@ -158,7 +167,7 @@ const ClassMemberManagementPage = () => {
       {showActions && (
         <td className={cx('td-actions')}>
           <div className={cx('action-buttons')}>
-            {member.status === 'PENDING' && (
+            {member.status === ClassMemberStatus.PENDING && (
               <ButtonPrime
                 variant="primary"
                 size="sm"
@@ -189,7 +198,7 @@ const ClassMemberManagementPage = () => {
     </tr>
   );
 
-  const EmptyState = ({ message, icon: Icon }) => (
+  const EmptyState = ({ message, icon: Icon }: { message: string; icon: React.ElementType }) => (
     <div className={cx('empty-state')}>
       <div className={cx('empty-icon-wrapper')}>
         <Icon />
@@ -202,14 +211,15 @@ const ClassMemberManagementPage = () => {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('loading-container')}>
-          <Spinner animation="grow" variant="primary" size="lg" />
+          {/* size 'lg' as any: type react-bootstrap chỉ nhận 'sm' nhưng bản JS cũ truyền 'lg' */}
+          <Spinner animation="grow" variant="primary" size={'lg' as any} />
           <p>Đang tải danh sách học sinh...</p>
         </div>
       </div>
     );
   }
 
-  const approvedMembers = allMembers.filter((m) => m.status === 'APPROVED');
+  const approvedMembers = allMembers.filter((m) => m.status === ClassMemberStatus.APPROVED);
   const filteredApproved = getFilteredMembers(approvedMembers);
   const filteredPending = getFilteredMembers(pendingMembers);
 
@@ -408,4 +418,4 @@ const ClassMemberManagementPage = () => {
   );
 };
 
-export default ClassMemberManagementPage;
+export default ClassMemberManagement;

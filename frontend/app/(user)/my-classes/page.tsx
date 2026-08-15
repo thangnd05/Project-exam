@@ -1,5 +1,5 @@
-import MyClassesPage from '@/app/features/classes/MyClassPage';
+import MyClasses from './MyClass';
 
 export default function Page() {
-  return <MyClassesPage />;
+  return <MyClasses />;
 }

@@ -7,24 +7,30 @@ import classNames from 'classnames/bind';
 import { IoDocumentTextOutline, IoAddCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 
-import styles from './TestByClassPage.module.scss';
-import { useTestByClass } from '@/app/features/classes/class-tests/hooks/useTestByClass';
-import CreateTestModal from '@/app/features/tests/components/CreateTestModal';
+import styles from './TestByClass.module.scss';
+import { useTestByClass } from './_hooks/useTestByClass';
+import CreateTestModalJs from '@/app/features/tests/components/CreateTestModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import TestListContainer from '@/app/features/tests/components/TestListContainer/TestListContainer';
+import TestListContainerJs from '@/app/features/tests/components/TestListContainer/TestListContainer';
+import type { TestResponse } from '@/app/types';
+
+// TODO(tests-batch): component feature tests còn là .js nên TS suy props sai
+// (coi prop không default là bắt buộc). Bỏ cast khi features/tests chuyển sang TS.
+const CreateTestModal = CreateTestModalJs as React.ComponentType<any>;
+const TestListContainer = TestListContainerJs as React.ComponentType<any>;
 
 const cx = classNames.bind(styles);
 
-function TestByClassPage() {
-  const { classId, chapterId } = useParams();
+function TestByClass() {
+  const { classId, chapterId } = useParams<{ classId: string; chapterId: string }>();
   const { className, tests, isLoading, refetchTests, deleteTestMutation } =
     useTestByClass(classId, chapterId);
-  const [countdowns, setCountdowns] = useState({});
+  const [countdowns, setCountdowns] = useState<Record<string, number>>({});
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [testToDelete, setTestToDelete] = useState(null);
+  const [testToDelete, setTestToDelete] = useState<TestResponse | null>(null);
 
-  const handleDeleteTest = (testId) => {
+  const handleDeleteTest = (testId: string) => {
     const selectedTest = tests.find((testItem) => testItem.testId === testId);
     setTestToDelete(selectedTest || null);
     setShowDeleteModal(true);
@@ -50,10 +56,11 @@ function TestByClassPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
-      const updatedCountdowns = {};
+      const updatedCountdowns: Record<string, number> = {};
       tests.forEach((test) => {
         if (test.availableFrom) {
-          const diff = new Date(test.availableFrom) - now;
+          // .getTime() để trừ 2 mốc thời gian (bản JS cũ trừ trực tiếp 2 Date)
+          const diff = new Date(test.availableFrom).getTime() - now.getTime();
           if (diff > 0) updatedCountdowns[test.testId] = diff;
         }
       });
@@ -125,4 +132,4 @@ function TestByClassPage() {
   );
 }
 
-export default TestByClassPage;
+export default TestByClass;

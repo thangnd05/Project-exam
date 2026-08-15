@@ -8,10 +8,21 @@ import {
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './ClassManagementTable.module.scss';
+import type { ClassStudentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }) => {
+// Hàng trong bảng = lớp của tôi + cờ isTeacher gắn thêm ở ClassListContainer
+type ClassRow = ClassStudentResponse & { isTeacher?: boolean };
+
+type ClassManagementTableProps = {
+  classes: ClassRow[];
+  onEdit?: (clazz: ClassRow) => void;
+  onDelete?: (clazz: ClassRow) => void;
+  onManageStudents?: (classId: string) => void;
+};
+
+const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: ClassManagementTableProps) => {
   return (
     <div className={cx('table-responsive')}>
       <Table hover className={cx('management-table')}>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import {Container} from 'react-bootstrap';
 import {motion} from 'framer-motion';
+import type {Variants} from 'framer-motion';
 import {
   IoListOutline,
   IoGridOutline,
@@ -15,10 +16,11 @@ import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
 import ClassCard from '../ClassCard/ClassCard';
 import ClassManagementTable from '../ClassManagementTable/ClassManagementTable';
+import type { ClassStudentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const sectionHeaderVariants = {
+const sectionHeaderVariants: Variants = {
   hidden: {opacity: 0, y: 16},
   visible: {
     opacity: 1,
@@ -27,9 +29,9 @@ const sectionHeaderVariants = {
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: {opacity: 0, y: 24},
-  visible: (i) => ({
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -40,13 +42,28 @@ const cardVariants = {
   }),
 };
 
-const emptyVariants = {
+const emptyVariants: Variants = {
   hidden: {opacity: 0, scale: 0.97},
   visible: {
     opacity: 1,
     scale: 1,
     transition: {duration: 0.5, ease: [0.22, 1, 0.36, 1]},
   },
+};
+
+type ClassListContainerProps = {
+  title: string;
+  label?: string;
+  description?: React.ReactNode;
+  teachingClasses?: ClassStudentResponse[];
+  learningClasses?: ClassStudentResponse[];
+  onViewTests?: (classId: string) => void;
+  onManageMembers?: (e: React.MouseEvent, classId: string) => void;
+  onEditClass?: (classData: ClassStudentResponse) => void;
+  onDeleteClass?: (classData: ClassStudentResponse) => void;
+  onManageStudents?: (classId: string) => void;
+  // Prop nhận vào nhưng hiện chưa dùng — giữ nguyên như bản JS cũ
+  emptyMessage?: React.ReactNode;
 };
 
 const ClassListContainer = ({
@@ -61,7 +78,7 @@ const ClassListContainer = ({
   onDeleteClass,
   onManageStudents,
   emptyMessage,
-}) => {
+}: ClassListContainerProps) => {
   const [viewMode, setViewMode] = useState('grid');
   const hasTeaching = teachingClasses.length > 0;
   const hasLearning = learningClasses.length > 0;

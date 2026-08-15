@@ -1,5 +1,5 @@
-import ClassMemberManagementPage from '@/app/features/classes/members/ClassMemberManagementPage';
+import ClassMemberManagement from './ClassMemberManagement';
 
 export default function Page() {
-  return <ClassMemberManagementPage />;
+  return <ClassMemberManagement />;
 }

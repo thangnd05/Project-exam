@@ -1,16 +1,25 @@
 'use client';
 
 import {useEffect, useState} from 'react';
-import { useUpdateChapter } from '@/app/features/classes/chapters/hooks/useChaptersOfClass';
+import { useUpdateChapter } from '../_hooks/useChaptersOfClass';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scss';
+import type { ChapterResponse } from '@/app/types';
 
 const cx = classNames.bind(commonModalStyles);
 
-function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}) {
+type UpdateChapterModalProps = {
+  show: boolean;
+  onClose: () => void;
+  chapter?: ChapterResponse | null;
+  classId: string;
+  onSuccess?: () => void;
+};
+
+function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: UpdateChapterModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const updateMutation = useUpdateChapter(classId);

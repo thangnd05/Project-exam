@@ -1,70 +1,74 @@
 'use client';
 
-import {useState, useEffect} from 'react';
-import {Alert} from 'react-bootstrap';
-import {toast} from 'react-toastify';
-import { getClassById } from '@/app/apis/classApi';
-import { useUpdateClass } from '@/app/features/classes/hooks/useMyClasses';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Alert } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+import { useCreateClass } from '@/app/hooks/useMyClasses';
 import classNames from 'classnames/bind';
-import {FaEdit, FaInfoCircle} from 'react-icons/fa';
+import { FaEdit, FaInfoCircle } from 'react-icons/fa';
+import { useAuth } from '@/app/hooks/useAuth';
+import routes from '@/app/configs/Routes';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-function EditClassModal({show, onClose, classData, onSuccess}) {
+type CreateClassModalProps = {
+  show: boolean;
+  onClose: () => void;
+};
+
+function CreateClassModal({ show, onClose }: CreateClassModalProps) {
   const [className, setClassName] = useState('');
   const [description, setDescription] = useState('');
+
   const [message, setMessage] = useState('');
   const [type, setType] = useState('info');
 
-  const updateMutation = useUpdateClass();
-  const loading = updateMutation.isPending;
+  const { user } = useAuth();
+  const router = useRouter();
+  const createMutation = useCreateClass();
+  const loading = createMutation.isPending;
 
-  useEffect(() => {
-    if (show) {
-      setClassName(classData?.className || '');
-      setDescription(classData?.description || '');
-      setMessage('');
-
-      if (classData?.classId && !classData?.description) {
-        getClassById(classData.classId)
-          .then((data) => {
-            setClassName(data.className || '');
-            setDescription(data.description || '');
-          })
-          .catch((err) => {
-            console.error('Error fetching class details:', err);
-          });
-      }
-    }
-  }, [classData, show]);
-
-  const handleUpdate = () => {
+  const handleCreate = () => {
     setMessage('');
 
-    if (!className.trim()) {
-      setType('danger');
-      setMessage('Vui lòng nhập tên lớp học!');
+    if (!user) {
+      setType('warning');
+      setMessage(' Bạn cần đăng nhập trước khi tạo lớp!');
+
+      setTimeout(() => {
+        onClose();
+        router.push(routes.login);
+      }, 1200);
+
       return;
     }
 
-    updateMutation.mutate(
+    if (!className.trim()) {
+      setType('danger');
+      setMessage(' Vui lòng nhập tên lớp học!');
+      return;
+    }
+
+    createMutation.mutate(
+      { className, description },
       {
-        classId: classData.classId,
-        payload: { className, description },
-      },
-      {
-        onSuccess: (data) => {
-          toast.success('Cập nhật lớp học thành công!');
-          onSuccess?.(data);
+        onSuccess: () => {
+          toast.success('Tạo lớp học thành công!');
+
+          setClassName('');
+          setDescription('');
           onClose();
+
+          router.push(routes.myClasses);
         },
         onError: (err) => {
           setType('danger');
           setMessage(
-            err.response?.data?.error || 'Có lỗi xảy ra khi cập nhật lớp học!',
+            err.response?.data?.message || ' Có lỗi xảy ra khi tạo lớp học!',
           );
         },
       },
@@ -75,20 +79,21 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
     <CommonFormModal
       show={show}
       onHide={onClose}
-      title="Chỉnh sửa lớp học"
+      title="Tạo lớp học mới"
       footer={
         <ModalActionFooter
           cancelLabel="Để sau"
-          submitLabel="Lưu thay đổi"
+          submitLabel="Tạo lớp ngay"
           loadingLabel="Đang xử lý..."
           loading={loading}
           onCancel={onClose}
-          onSubmit={handleUpdate}
+          onSubmit={handleCreate}
         />
       }
     >
+
       {message && (
-        <Alert variant={type} style={{margin: '1.5rem 2rem', fontSize: 'var(--font-size-ssm)'}}>
+        <Alert variant={type} style={{ margin: '1.5rem 2rem', fontSize: 'var(--font-size-ssm)' }}>
           {message}
         </Alert>
       )}
@@ -102,7 +107,7 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
           <input
             type="text"
             className={cx('inputControl')}
-            placeholder="Nhập tên lớp học"
+            placeholder="Nhập tên lớp học (ví dụ: Lớp Tiếng Anh 10A1)"
             value={className}
             onChange={(e) => setClassName(e.target.value)}
             disabled={loading}
@@ -131,4 +136,4 @@ function EditClassModal({show, onClose, classData, onSuccess}) {
   );
 }
 
-export default EditClassModal;
+export default CreateClassModal;

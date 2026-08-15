@@ -11,16 +11,20 @@ import {
   approveAllMembers,
   removeMember,
 } from '@/app/apis/classMemberApi';
+import type { ClassMemberActionRequest, ClassMemberResponse, MessageResponse } from '@/app/types';
 
 export const classMemberKeys = {
-  info: (classId) => ['class-info', classId],
-  members: (classId) => ['class-members', classId],
-  pending: (classId) => ['class-pending', classId],
+  info: (classId: string) => ['class-info', classId],
+  members: (classId: string) => ['class-members', classId],
+  pending: (classId: string) => ['class-pending', classId],
 };
 
-const normalizeList = (data) => (Array.isArray(data) ? data : data?.content ?? []);
+// API trả mảng, nhưng giữ nhánh phòng hờ dạng phân trang { content } như bản JS cũ
+// (data as any vì nhánh { content } không nằm trong kiểu trả về đã khai báo của API)
+const normalizeList = (data: ClassMemberResponse[]): ClassMemberResponse[] =>
+  (Array.isArray(data) ? data : ((data as any)?.content ?? []));
 
-export function useClassMembers(classId) {
+export function useClassMembers(classId: string) {
   const qc = useQueryClient();
 
   const infoQuery = useQuery({
@@ -71,17 +75,18 @@ export function useClassMembers(classId) {
   const refreshMembers = () =>
     Promise.all([membersQuery.refetch(), pendingQuery.refetch()]);
 
-  const approveMemberMutation = useMutation({
+  // error để any có chủ đích: consumer đọc err.response?.data?.error theo shape của axios.
+  const approveMemberMutation = useMutation<MessageResponse, any, ClassMemberActionRequest>({
     mutationFn: approveMember,
     onSuccess: invalidateMembers,
   });
 
-  const approveAllMutation = useMutation({
+  const approveAllMutation = useMutation<MessageResponse, any, string>({
     mutationFn: approveAllMembers,
     onSuccess: invalidateMembers,
   });
 
-  const removeMemberMutation = useMutation({
+  const removeMemberMutation = useMutation<void, any, ClassMemberActionRequest>({
     mutationFn: removeMember,
     onSuccess: invalidateMembers,
   });

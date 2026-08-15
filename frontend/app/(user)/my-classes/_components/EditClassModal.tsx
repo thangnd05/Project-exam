@@ -1,69 +1,79 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Alert } from 'react-bootstrap';
-import { toast } from 'react-toastify';
-import { useCreateClass } from '@/app/features/classes/hooks/useMyClasses';
+import {useState, useEffect} from 'react';
+import {Alert} from 'react-bootstrap';
+import {toast} from 'react-toastify';
+import { getClassById } from '@/app/apis/classApi';
+import { useUpdateClass } from '@/app/hooks/useMyClasses';
 import classNames from 'classnames/bind';
-import { FaEdit, FaInfoCircle } from 'react-icons/fa';
-import { useAuth } from '@/app/hooks/useAuth';
-import routes from '@/app/configs/Routes';
+import {FaEdit, FaInfoCircle} from 'react-icons/fa';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
+import type { ClassResponse, ClassStudentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-function CreateClassModal({ show, onClose }) {
+type EditClassModalProps = {
+  show: boolean;
+  onClose: () => void;
+  // Lớp chọn từ danh sách my-classes (không có description) — modal tự fetch chi tiết khi thiếu
+  classData?: (ClassStudentResponse & { description?: string }) | null;
+  onSuccess?: (data: ClassResponse) => void;
+};
+
+function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalProps) {
   const [className, setClassName] = useState('');
   const [description, setDescription] = useState('');
-
   const [message, setMessage] = useState('');
   const [type, setType] = useState('info');
 
-  const { user } = useAuth();
-  const router = useRouter();
-  const createMutation = useCreateClass();
-  const loading = createMutation.isPending;
+  const updateMutation = useUpdateClass();
+  const loading = updateMutation.isPending;
 
-  const handleCreate = () => {
-    setMessage('');
+  useEffect(() => {
+    if (show) {
+      setClassName(classData?.className || '');
+      setDescription(classData?.description || '');
+      setMessage('');
 
-    if (!user) {
-      setType('warning');
-      setMessage(' Bạn cần đăng nhập trước khi tạo lớp!');
-
-      setTimeout(() => {
-        onClose();
-        router.push(routes.login);
-      }, 1200);
-
-      return;
+      if (classData?.classId && !classData?.description) {
+        getClassById(classData.classId)
+          .then((data) => {
+            setClassName(data.className || '');
+            setDescription(data.description || '');
+          })
+          .catch((err) => {
+            console.error('Error fetching class details:', err);
+          });
+      }
     }
+  }, [classData, show]);
+
+  const handleUpdate = () => {
+    setMessage('');
 
     if (!className.trim()) {
       setType('danger');
-      setMessage(' Vui lòng nhập tên lớp học!');
+      setMessage('Vui lòng nhập tên lớp học!');
       return;
     }
 
-    createMutation.mutate(
-      { className, description },
+    updateMutation.mutate(
       {
-        onSuccess: () => {
-          toast.success('Tạo lớp học thành công!');
-
-          setClassName('');
-          setDescription('');
+        classId: classData!.classId,
+        payload: { className, description },
+      },
+      {
+        onSuccess: (data) => {
+          toast.success('Cập nhật lớp học thành công!');
+          onSuccess?.(data);
           onClose();
-
-          router.push(routes.myClasses);
         },
         onError: (err) => {
           setType('danger');
           setMessage(
-            err.response?.data?.message || ' Có lỗi xảy ra khi tạo lớp học!',
+            err.response?.data?.error || 'Có lỗi xảy ra khi cập nhật lớp học!',
           );
         },
       },
@@ -74,21 +84,20 @@ function CreateClassModal({ show, onClose }) {
     <CommonFormModal
       show={show}
       onHide={onClose}
-      title="Tạo lớp học mới"
+      title="Chỉnh sửa lớp học"
       footer={
         <ModalActionFooter
           cancelLabel="Để sau"
-          submitLabel="Tạo lớp ngay"
+          submitLabel="Lưu thay đổi"
           loadingLabel="Đang xử lý..."
           loading={loading}
           onCancel={onClose}
-          onSubmit={handleCreate}
+          onSubmit={handleUpdate}
         />
       }
     >
-
       {message && (
-        <Alert variant={type} style={{ margin: '1.5rem 2rem', fontSize: 'var(--font-size-ssm)' }}>
+        <Alert variant={type} style={{margin: '1.5rem 2rem', fontSize: 'var(--font-size-ssm)'}}>
           {message}
         </Alert>
       )}
@@ -102,7 +111,7 @@ function CreateClassModal({ show, onClose }) {
           <input
             type="text"
             className={cx('inputControl')}
-            placeholder="Nhập tên lớp học (ví dụ: Lớp Tiếng Anh 10A1)"
+            placeholder="Nhập tên lớp học"
             value={className}
             onChange={(e) => setClassName(e.target.value)}
             disabled={loading}
@@ -131,4 +140,4 @@ function CreateClassModal({ show, onClose }) {
   );
 }
 
-export default CreateClassModal;
+export default EditClassModal;
