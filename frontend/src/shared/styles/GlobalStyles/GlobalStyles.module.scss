@@ -1,5 +1,8 @@
 @import 'normalize.css';
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* Playfair Display: chữ serif cho chứng chỉ. Phải là webfont chứ không dùng font hệ thống
+   (Georgia/Times) vì máy Linux thường không có, rơi về DejaVu Serif  font này thiếu chữ
+   Việt dựng sẵn nên "ắ" bị vỡ thành "ă" + dấu sắc rời. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap');
 
 :root {
   /* ══════════════════════════════════════════════════════════════

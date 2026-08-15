@@ -22,8 +22,9 @@
   -webkit-print-color-adjust: exact;
 
   --certificate-accent: var(--brand-600);
-  /* Chữ trang trọng: bộ serif có sẵn trên mọi máy, không phải tải font ngoài. */
-  --certificate-serif: Georgia, 'Times New Roman', serif;
+  /* Chữ trang trọng. Playfair Display có sẵn bộ chữ Việt nên tên có dấu (ắ, ễ, ừ...)
+     hiện đúng ở mọi máy; các font dự phòng chỉ dùng khi tải webfont thất bại. */
+  --certificate-serif: 'Playfair Display', 'Noto Serif', Georgia, 'Times New Roman', serif;
 }
 
 .canvas.hasBackground .frame {
@@ -391,21 +392,21 @@
   letter-spacing: 0.12cqw;
 }
 
+/*
+  Ảnh chữ ký thường có nhiều khoảng trắng ở dưới nên hạ xuống sát tên người ký
+  bằng margin âm, cho giống nét ký tay đặt ngay trên dòng tên.
+*/
 .signature {
-  max-height: 5cqw;
-  max-width: 22cqw;
+  max-height: 12cqw;
+  max-width: 30cqw;
+  margin-bottom: -2cqw;
   object-fit: contain;
 }
 
-/*
-  Luôn có dòng kẻ chữ ký kể cả khi mẫu chưa nhập tên  chỗ ký để trống vẫn đúng kiểu
-  văn bằng, còn hơn một cột trống trơ.
-*/
+/* Giữ chỗ ký cố định kể cả khi mẫu chưa nhập tên, tránh cột chữ ký nhảy layout. */
 .signName {
   min-height: 2.2cqw;
   min-width: 20cqw;
-  padding-top: 0.5cqw;
-  border-top: 0.12cqw solid color-mix(in srgb, var(--certificate-accent) 55%, transparent);
   font-family: var(--certificate-serif);
   font-size: 1.9cqw;
   font-weight: var(--font-weight-semibold);
