@@ -17,6 +17,7 @@ public class ExamCategoryResponse {
     private String name;
     private String description;
     private Boolean guestAllowed;
+    private Boolean certificateEligible;
     private Integer displayOrder;
     private Instant createdAt;
 }

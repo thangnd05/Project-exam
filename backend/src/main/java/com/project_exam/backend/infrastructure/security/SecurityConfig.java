@@ -139,6 +139,7 @@ public class SecurityConfig {
                                 "/api/tags/**",
                                 "/api/recovery-resources/**",
                                 "/api/milestones/**",
+                                "/api/certificates/verify/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**").permitAll()
 

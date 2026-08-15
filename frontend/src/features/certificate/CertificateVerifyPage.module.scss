@@ -1,0 +1,136 @@
+.wrapper {
+  min-height: 100vh;
+  padding: 4rem 0 6rem;
+}
+
+.container {
+  max-width: 102rem;
+}
+
+.head {
+  text-align: center;
+  margin-bottom: 2.4rem;
+
+  h1 {
+    margin: 0 0 0.8rem;
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-color);
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+  }
+}
+
+.searchForm {
+  display: flex;
+  gap: 1.2rem;
+  max-width: 64rem;
+  margin: 0 auto 2.4rem;
+
+  :global(.form-control) {
+    height: 4.8rem;
+    font-size: var(--font-size-base);
+    text-transform: uppercase;
+  }
+}
+
+/* Nhãn nút ngắn nên không được xuống dòng khi ô nhập chiếm hết chỗ. */
+.searchButton {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.hint {
+  margin: 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+
+  code {
+    font-family: 'Courier New', monospace;
+    color: var(--text-color);
+  }
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 4rem 0;
+  color: var(--text-secondary);
+}
+
+/*
+  Kết quả chỉ là một dải trạng thái mảnh phía trên, phần nhìn chính nhường cho tấm
+  chứng chỉ bên dưới  để người tra cứu đối chiếu thẳng với bản đang cầm.
+*/
+.status {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  max-width: 96rem;
+  margin: 0 auto 2rem;
+  padding: 1.6rem 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-white);
+}
+
+.status.valid {
+  border-color: var(--success-border);
+
+  .statusIcon,
+  .statusHeading {
+    color: var(--success-text);
+  }
+}
+
+.status.invalid {
+  border-color: var(--danger-border);
+
+  .statusIcon,
+  .statusHeading {
+    color: var(--danger-text);
+  }
+}
+
+.status.warning {
+  border-color: var(--amber-200);
+
+  .statusIcon,
+  .statusHeading {
+    color: var(--amber-700);
+  }
+}
+
+.statusIcon {
+  flex-shrink: 0;
+}
+
+.statusText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.statusHeading {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.statusMessage {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.canvasWrap {
+  margin: 0 auto;
+  max-width: 96rem;
+}

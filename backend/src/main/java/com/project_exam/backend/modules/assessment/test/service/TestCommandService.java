@@ -15,6 +15,7 @@ import com.project_exam.backend.modules.assessment.attempt.domain.UserAnswer;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,33 @@ public class TestCommandService {
     private final UserAnswerRepository userAnswerRepository;
     private final TestPartRepository testPartRepository;
     private final TestQuestionRepository testQuestionRepository;
+    private final ExamCategoryRepository examCategoryRepository;
 
     public Test save(Test test) {
         return testRepository.save(test);
+    }
+
+    /**
+     * Lọc nhóm đề trước khi gán cho bài kiểm tra.
+     *
+     * Nhóm đề có cờ certificate_eligible sinh ra chứng chỉ khi người học đạt điểm, nên người
+     * dùng thường không được tự gắn: nếu không chặn thì ai cũng tạo được một đề 5 câu tự soạn,
+     * gắn nhóm "Full Mock" rồi tự cấp chứng chỉ cho mình. Cùng cách costCoins chỉ nhận khi có
+     * quyền TEST:MANAGE_PRICING.
+     *
+     * Trả về null (không gán nhóm) thay vì ném lỗi để luồng tạo đề cá nhân vẫn chạy bình thường.
+     */
+    public String sanitizeExamCategoryId(String examCategoryId) {
+        if (examCategoryId == null || examCategoryId.isBlank()) {
+            return null;
+        }
+        if (authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
+            return examCategoryId;
+        }
+        boolean certificateEligible = examCategoryRepository.findById(examCategoryId)
+                .map(c -> Boolean.TRUE.equals(c.getCertificateEligible()))
+                .orElse(false);
+        return certificateEligible ? null : examCategoryId;
     }
 
     @Transactional
@@ -97,7 +122,7 @@ public class TestCommandService {
         if (request.getChapterId() != null) test.setChapterId(request.getChapterId());
 
         if (request.getExamCategoryId() != null) {
-            test.setExamCategoryId(request.getExamCategoryId().isBlank() ? null : request.getExamCategoryId());
+            test.setExamCategoryId(sanitizeExamCategoryId(request.getExamCategoryId()));
         }
 
         if (request.getCollectionId() != null) {

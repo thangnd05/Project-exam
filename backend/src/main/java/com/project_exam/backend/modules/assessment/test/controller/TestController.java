@@ -115,7 +115,7 @@ public class TestController {
         test.setMaxAttempts(request.getMaxAttempts());
         test.setClassId(request.getClassId());
         test.setChapterId(request.getChapterId());
-        test.setExamCategoryId(request.getExamCategoryId());
+        test.setExamCategoryId(testCommandService.sanitizeExamCategoryId(request.getExamCategoryId()));
         test.setCollectionId(request.getCollectionId());
         test.setAvailableFrom(request.getAvailableFrom());
         test.setAvailableTo(request.getAvailableTo());

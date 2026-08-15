@@ -67,6 +67,19 @@ function ExamCategoryFormModal({
             Bật cho Quick Challenge (không cần đăng ký). Tắt cho Full Mock Exam.
           </Form.Text>
         </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Check
+            type="switch"
+            id="certificate-eligible-switch"
+            label="Cấp chứng chỉ khi đạt điểm"
+            checked={!!formState.certificateEligible}
+            onChange={(event) => onChangeField('certificateEligible', event.target.checked)}
+          />
+          <Form.Text className="text-muted">
+            Bật cho Full Mock. Người dùng thường sẽ không gán được nhóm này khi tự tạo đề,
+            tránh việc tự cấp chứng chỉ cho mình.
+          </Form.Text>
+        </Form.Group>
         <Form.Group>
           <Form.Label>Thứ tự hiển thị</Form.Label>
           <Form.Control

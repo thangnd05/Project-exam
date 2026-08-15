@@ -19,5 +19,7 @@ public class ExamCategoryRequest {
 
     private Boolean guestAllowed;
 
+    private Boolean certificateEligible;
+
     private Integer displayOrder;
 }

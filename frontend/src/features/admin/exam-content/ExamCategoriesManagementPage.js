@@ -17,6 +17,7 @@ const emptyForm = {
   name: '',
   description: '',
   guestAllowed: false,
+  certificateEligible: false,
   displayOrder: 0,
 };
 
@@ -25,6 +26,7 @@ const buildPayload = (formState) => ({
   name: formState.name.trim(),
   description: formState.description?.trim() || null,
   guestAllowed: !!formState.guestAllowed,
+  certificateEligible: !!formState.certificateEligible,
   displayOrder: Number(formState.displayOrder) || 0,
 });
 
@@ -78,6 +80,7 @@ function ExamCategoriesManagementPage() {
       name: item.name,
       description: item.description || '',
       guestAllowed: !!item.guestAllowed,
+      certificateEligible: !!item.certificateEligible,
       displayOrder: item.displayOrder ?? 0,
     });
     setShowFormModal(true);
@@ -138,6 +141,16 @@ function ExamCategoriesManagementPage() {
       render: (item) =>
         item.guestAllowed ? (
           <Badge bg="success">Cho phép</Badge>
+        ) : (
+          <Badge bg="secondary">Không</Badge>
+        ),
+    },
+    {
+      key: 'certificateEligible',
+      header: 'Chứng chỉ',
+      render: (item) =>
+        item.certificateEligible ? (
+          <Badge bg="warning" text="dark">Có cấp</Badge>
         ) : (
           <Badge bg="secondary">Không</Badge>
         ),

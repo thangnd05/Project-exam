@@ -16,6 +16,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultRes
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
+import com.project_exam.backend.modules.certificate.service.CertificateService;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
 import com.project_exam.backend.modules.assessment.attempt.util.AttemptTimeUtil;
 import com.project_exam.backend.modules.assessment.attempt.mapper.LeaderboardMapper;
@@ -94,6 +95,7 @@ public class UserTestService {
     private final EnhancedResultService enhancedResultService;
     private final UserTargetRepository userTargetRepository;
     private final UserTargetProgressService userTargetProgressService;
+    private final CertificateService certificateService;
 
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
@@ -182,7 +184,20 @@ public class UserTestService {
 
         UserTest saved = userTestRepository.save(userTest);
         syncTargetProgressAfterSubmit(saved, test.getExamTypeId());
+        issueCertificateAfterSubmit(saved);
         return saved;
+    }
+
+    /**
+     * Chấm xong thì xét cấp chứng chỉ. Chạy sau khi commit và nuốt lỗi: chứng chỉ là phần
+     * thưởng, hỏng thì cũng không được làm lượt nộp bài thất bại.
+     */
+    private void issueCertificateAfterSubmit(UserTest userTest) {
+        if (userTest.getUserId() == null || userTest.isPractice()) {
+            return;
+        }
+        String userTestId = userTest.getUserTestId();
+        AfterCommitTasks.runQuietly(() -> certificateService.issueIfEligible(userTestId));
     }
 
     /**

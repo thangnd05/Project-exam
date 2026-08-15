@@ -28,6 +28,7 @@ import {
   Coins,
   Sparkles,
   Flame,
+  Award,
   Mail,
 } from 'lucide-react';
 import routes from '~/shared/config/Routes';
@@ -71,6 +72,7 @@ const adminRouteGroups = [
     items: [
       {path: routes.adminTests, icon: <FileStack size={20} />, label: 'Quản lý đề thi'},
       {path: routes.adminRecoveryResources, icon: <BookOpen size={20} />, label: 'Kho tài liệu'},
+      {path: routes.adminCertificates, icon: <Award size={20} />, label: 'Chứng chỉ'},
     ],
   },
   {

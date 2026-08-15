@@ -33,6 +33,9 @@ const ClassMemberManagementPage = lazy(() => import('~/features/classes/members/
 const CreateTestFromBankPage = lazy(() => import('~/features/tests/create-test-from-bank/CreateTestFromBankPage'));
 const PersonalQuestionBankPage = lazy(() => import('~/features/tests/question-bank/PersonalQuestionBankPage'));
 const ProfileOverviewPage = lazy(() => import('~/features/user/profile/ProfileOverviewPage'));
+const MyCertificatesPage = lazy(() => import('~/features/certificate/MyCertificatesPage'));
+const CertificateDetailPage = lazy(() => import('~/features/certificate/CertificateDetailPage'));
+const CertificateVerifyPage = lazy(() => import('~/features/certificate/CertificateVerifyPage'));
 
 const AdminDashboardPage = lazy(() => import('~/features/admin/overview/AdminDashboardPage'));
 const UsersManagementPage = lazy(() => import('~/features/admin/access/UsersManagementPage'));
@@ -60,6 +63,7 @@ const CoinsManagementPage = lazy(() => import('~/features/admin/gamification/Coi
 const QuestsManagementPage = lazy(() => import('~/features/admin/gamification/QuestsManagementPage'));
 const CosmeticsManagementPage = lazy(() => import('~/features/admin/gamification/CosmeticsManagementPage'));
 const StreakRecoverManagementPage = lazy(() => import('~/features/admin/gamification/StreakRecoverManagementPage'));
+const CertificatesManagementPage = lazy(() => import('~/features/admin/certificate/CertificatesManagementPage'));
 const UserTargetPage = lazy(() => import('~/features/diagnostic/target/UserTargetPage'));
 const TargetDashboardPage = lazy(() => import('~/features/diagnostic/target/TargetDashboardPage'));
 const TargetAchievedPage = lazy(() => import('~/features/diagnostic/target/TargetAchievedPage'));
@@ -87,6 +91,7 @@ export const publicRoutes = [
   { path: routes.postDetail, component: PostDetailPage },
   { path: routes.recoveryResourceView, component: RecoveryResourceViewPage, noLayout: true },
   // [TẮT XÁC THỰC EMAIL] { path: routes.verifyEmail, component: VerifyEmailPage },
+  { path: routes.certificateVerify, component: CertificateVerifyPage },
   { path: routes.notFoundPage, component: NotFoundPage, noLayout: true },
   { path: routes.notFound, component: NotFoundPage, noLayout: true },
 ];
@@ -123,6 +128,7 @@ export const adminRoutes = [
   { path: routes.adminQuests, component: QuestsManagementPage, permission: P.QUEST_MANAGE },
   { path: routes.adminCosmetics, component: CosmeticsManagementPage, permission: P.COSMETIC_MANAGE },
   { path: routes.adminStreakRecover, component: StreakRecoverManagementPage, permission: P.STREAK_CONFIG_MANAGE },
+  { path: routes.adminCertificates, component: CertificatesManagementPage, permission: P.CERTIFICATE_MANAGE },
 ];
 
 /** Tra quyền theo path, để sidebar ẩn mục mà người dùng không mở được. */
@@ -156,6 +162,8 @@ export const privateRoutes = [
   { path: routes.albumDelta, component: AlbumDetailPage },
   { path: routes.vocaPratice, component: PracticePage },
   { path: routes.MyTest, component: MyTestPage },
+  { path: routes.myCertificates, component: MyCertificatesPage },
+  { path: routes.certificateDetail, component: CertificateDetailPage },
   { path: routes.oauth2Redirect, component: OAuth2Redirect },
   { path: routes.classChapterPage, component: ChapterOfClass },
   { path: routes.classMemberManagement, component: ClassMemberManagementPage },

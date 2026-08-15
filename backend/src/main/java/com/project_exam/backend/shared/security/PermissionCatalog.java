@@ -43,6 +43,8 @@ public final class PermissionCatalog {
     public static final String COIN_MANAGE = "COIN:MANAGE";
     public static final String STREAK_CONFIG_MANAGE = "STREAK_CONFIG:MANAGE";
 
+    public static final String CERTIFICATE_MANAGE = "CERTIFICATE:MANAGE";
+
     public static final String AUDIT_VIEW = "AUDIT:VIEW";
     public static final String DASHBOARD_VIEW = "DASHBOARD:VIEW";
     public static final String EMAIL_MANAGE = "EMAIL:MANAGE";
@@ -90,6 +92,8 @@ public final class PermissionCatalog {
             new Def(COSMETIC_MANAGE, G_GAME, "Quản lý vật phẩm trang trí"),
             new Def(COIN_MANAGE, G_GAME, "Quản lý xu người dùng"),
             new Def(STREAK_CONFIG_MANAGE, G_GAME, "Quản lý cấu hình streak"),
+
+            new Def(CERTIFICATE_MANAGE, G_TEST, "Quản lý mẫu chứng chỉ và chứng chỉ đã cấp"),
 
             new Def(AUDIT_VIEW, G_SYSTEM, "Xem nhật ký hoạt động"),
             new Def(DASHBOARD_VIEW, G_SYSTEM, "Xem tổng quan Dashboard quản trị (thống kê hệ thống)"),

@@ -29,6 +29,13 @@ public class ExamCategory {
     @Column(name = "guest_allowed", nullable = false)
     private Boolean guestAllowed = false;
 
+    /**
+     * Bài thi thuộc nhóm này khi đạt điểm thì được cấp chứng chỉ. Đặt cờ ở đây thay vì
+     * dò code 'FULL_MOCK' trong Java để admin đổi/thêm nhóm đề không phải sửa code.
+     */
+    @Column(name = "certificate_eligible", nullable = false)
+    private Boolean certificateEligible = false;
+
     @Column(name = "display_order")
     private Integer displayOrder = 0;
 

@@ -217,6 +217,9 @@ function Header() {
                       <Dropdown.Item as={Link} to={routes.profile}>
                         Hồ sơ
                       </Dropdown.Item>
+                      <Dropdown.Item as={Link} to={routes.myCertificates}>
+                        Chứng chỉ của tôi
+                      </Dropdown.Item>
                       <Dropdown.Item onClick={handleLogout}>Đăng xuất</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>

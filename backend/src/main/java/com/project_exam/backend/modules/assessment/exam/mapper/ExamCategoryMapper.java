@@ -14,6 +14,7 @@ public class ExamCategoryMapper {
                 .name(c.getName())
                 .description(c.getDescription())
                 .guestAllowed(c.getGuestAllowed())
+                .certificateEligible(c.getCertificateEligible())
                 .displayOrder(c.getDisplayOrder())
                 .createdAt(c.getCreatedAt())
                 .build();

@@ -29,7 +29,7 @@ import CoinPriceField from '~/features/tests/components/CoinPriceField';
 import { getQuestionDisplayNumber } from '~/shared/utils/questionNumber';
 import EditQuestionModal from '~/features/tests/question-bank/modals/EditQuestionModal';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
-import { getExamCategories } from '~/shared/api/examCategoryApi';
+import { useExamCategories } from '~/features/tests/create-test-from-bank/hooks/useCreateTestFromBank';
 import {
   useBankTestBuilder,
   SELECTION_MODES,
@@ -73,7 +73,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     costCoins: '',
   });
 
-  const [examCategories, setExamCategories] = useState([]);
+  const examCategories = useExamCategories();
 
   const [notification, setNotification] = useState({});
   const [editingQuestionId, setEditingQuestionId] = useState(null);
@@ -116,12 +116,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     }
     return {};
   };
-
-  useEffect(() => {
-    getExamCategories()
-      .then((list) => setExamCategories(Array.isArray(list) ? list : []))
-      .catch(() => setExamCategories([]));
-  }, []);
 
   useEffect(() => {
     if (!isClassMode) return;

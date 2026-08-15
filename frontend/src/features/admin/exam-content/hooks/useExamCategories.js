@@ -16,6 +16,7 @@ const mapFromApi = (item) => ({
   name: item.name || '',
   description: item.description || '',
   guestAllowed: !!item.guestAllowed,
+  certificateEligible: !!item.certificateEligible,
   displayOrder: item.displayOrder ?? 0,
 });
 

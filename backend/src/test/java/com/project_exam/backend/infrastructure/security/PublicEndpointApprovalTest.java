@@ -47,6 +47,7 @@ class PublicEndpointApprovalTest {
             new String[]{"GET", "/api/tags/**"},
             new String[]{"GET", "/api/recovery-resources/**"},
             new String[]{"GET", "/api/milestones/**"},
+            new String[]{"GET", "/api/certificates/verify/**"},
             new String[]{"*", "/api/user-tests/guest"},
             new String[]{"*", "/api/user-tests/guest/**"},
             new String[]{"*", "/api/user-tests/*/guest-submit"},
@@ -138,6 +139,10 @@ class PublicEndpointApprovalTest {
             "GET /api/user-answers/guest/user-test/{userTestId}",
             "GET /api/user-answers/guest/user-test/{userTestId}/result",
             "GET /api/user-answers/guest/user-test/{userTestId}/result/enhanced",
+
+            // Tra cứu chứng chỉ bằng mã in trên chứng chỉ: nhà tuyển dụng cầm link phải xem
+            // được mà không cần tài khoản. Chỉ trả tên người nhận + tình trạng, không có điểm.
+            "GET /api/certificates/verify/{code}",
 
             // Đếm lượt truy cập, gọi từ mọi trang kể cả khách.
             "POST /api/analytics/visit"

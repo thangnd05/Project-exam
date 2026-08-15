@@ -16,6 +16,7 @@ import { AuthContext } from "~/shared/context/AuthContext";
 import { getGuestSessionId, guestHeaders } from "~/shared/utils/guestSession";
 import { useTestResult } from "~/features/tests/exam/exam-types/detail/result/hooks/useTestResult";
 import ButtonPrime from "~/shared/ui/Button/ButtonPrime";
+import CertificateBanner from "./components/CertificateBanner";
 import ReadinessGauge from "./components/ReadinessGauge";
 import RecoveryPlan from "./components/RecoveryPlan";
 import TagAnalysisTable from "./components/TagAnalysisTable";
@@ -85,6 +86,8 @@ const TestResultPage = () => {
   return (
     <div className={cx("wrapper")}>
       <Container>
+
+        <CertificateBanner userTestId={userTestId} enabled={!authLoading && isAuthenticated} />
 
         <div className={cx("result-layout")}>
 

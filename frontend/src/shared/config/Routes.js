@@ -42,12 +42,17 @@ const routes = {
   adminQuests: '/admin/quests',
   adminCosmetics: '/admin/cosmetics',
   adminStreakRecover: '/admin/streak-recover',
+  adminCertificates: '/admin/certificates',
 
   testHistory: '/tests/history/:testId',
   testLeaderboard: '/tests/leaderboard/:testId',
   examTypeDetail: '/exam-types/:examTypeId',
   examTypeCollection: '/exam-types/:examTypeId/collections/:collectionId',
   MyTest: '/my-tests',
+
+  myCertificates: '/my-certificates',
+  certificateDetail: '/certificates/:certificateId',
+  certificateVerify: '/certificates/verify/:code',
 
   generatePlan: '/learning-plans/generate',
   planCompare: '/learning-plans/compare',

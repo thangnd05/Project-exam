@@ -81,6 +81,7 @@ public class ExamCategoryService {
 
     private void applyOptionalFields(ExamCategory category, ExamCategoryRequest request) {
         if (request.getGuestAllowed() != null) category.setGuestAllowed(request.getGuestAllowed());
+        if (request.getCertificateEligible() != null) category.setCertificateEligible(request.getCertificateEligible());
         if (request.getDisplayOrder() != null) category.setDisplayOrder(request.getDisplayOrder());
     }
 

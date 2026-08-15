@@ -1,0 +1,202 @@
+/*
+  Mọi kích thước bên trong tính theo cqw (phần trăm bề rộng của chính chứng chỉ) nên
+  chứng chỉ co giãn nguyên khối: xem trên điện thoại, trên trang admin hay in ra giấy
+  đều giữ đúng bố cục.
+*/
+.canvas {
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 297 / 210;
+  background-color: var(--bg-white);
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+
+  --certificate-accent: var(--brand-600);
+}
+
+.canvas.hasBackground .frame {
+  background: rgb(255 255 255 / 0.88);
+}
+
+.frame {
+  position: absolute;
+  inset: 2.5cqw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4cqw 5cqw;
+  border: 0.35cqw solid var(--certificate-accent);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.frame::before {
+  content: '';
+  position: absolute;
+  inset: 0.9cqw;
+  border: 0.12cqw solid var(--certificate-accent);
+  border-radius: var(--radius-sm);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  font-size: 9cqw;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.8cqw;
+  color: var(--danger-text);
+  opacity: 0.16;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6cqw;
+}
+
+.logo {
+  max-height: 7cqw;
+  max-width: 30cqw;
+  object-fit: contain;
+}
+
+.logoFallback {
+  font-size: 2.2cqw;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.4cqw;
+  color: var(--certificate-accent);
+}
+
+.issuer {
+  margin: 0;
+  font-size: 1.7cqw;
+  letter-spacing: 0.25cqw;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8cqw;
+}
+
+.title {
+  margin: 0;
+  font-size: 4.6cqw;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.15;
+  color: var(--certificate-accent);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 2cqw;
+  color: var(--text-secondary);
+}
+
+.presentedTo {
+  margin: 1.2cqw 0 0;
+  font-size: 1.7cqw;
+  color: var(--text-secondary);
+}
+
+.recipient {
+  margin: 0;
+  padding-bottom: 0.8cqw;
+  border-bottom: 0.15cqw solid var(--border-color);
+  font-size: 4.2cqw;
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+}
+
+.reason {
+  margin: 0.6cqw 0 0;
+  font-size: 1.9cqw;
+  color: var(--text-color);
+}
+
+.note {
+  margin: 0;
+  max-width: 70cqw;
+  font-size: 1.5cqw;
+  color: var(--text-secondary);
+}
+
+.foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: end;
+  gap: 2cqw;
+}
+
+.footCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3cqw;
+  text-align: left;
+}
+
+.codeCol {
+  text-align: center;
+  align-items: center;
+}
+
+.signCol {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.footLabel {
+  font-size: 1.3cqw;
+  text-transform: uppercase;
+  letter-spacing: 0.15cqw;
+  color: var(--text-secondary);
+}
+
+.footValue {
+  font-size: 1.8cqw;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+}
+
+.footHint {
+  font-size: 1.3cqw;
+  color: var(--text-secondary);
+}
+
+.code {
+  font-family: 'Courier New', monospace;
+  font-size: 1.9cqw;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.15cqw;
+  color: var(--certificate-accent);
+}
+
+.signature {
+  max-height: 5cqw;
+  max-width: 22cqw;
+  object-fit: contain;
+}
+
+.signName {
+  padding-top: 0.4cqw;
+  border-top: 0.12cqw solid var(--border-color);
+  font-size: 1.8cqw;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+  min-width: 18cqw;
+  text-align: center;
+}

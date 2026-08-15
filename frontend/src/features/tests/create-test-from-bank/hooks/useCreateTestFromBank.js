@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '~/shared/api/testApi';
 import { createTestPart } from '~/shared/api/testPartApi';
 import { getExamCategories } from '~/shared/api/examCategoryApi';
+import { useAuth } from '~/shared/hooks/useAuth';
+import { PERMISSIONS } from '~/shared/config/permissions';
 import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
 import { SELECTION_MODES } from '~/features/tests/hooks/useBankTestBuilder';
 
@@ -21,6 +23,7 @@ const emptyTestInfo = () => ({
 });
 
 export function useExamCategories() {
+  const { permissions } = useAuth();
   const [examCategories, setExamCategories] = useState([]);
 
   useEffect(() => {
@@ -29,7 +32,20 @@ export function useExamCategories() {
       .catch(() => setExamCategories([]));
   }, []);
 
-  return examCategories;
+  /*
+    Nhóm đề có cấp chứng chỉ chỉ dành cho người quản trị đề. Backend cũng bỏ qua nếu người
+    dùng thường gửi lên, ẩn luôn ở đây để không ai chọn rồi thắc mắc sao lưu xong lại mất.
+  */
+  const canPickCertificateCategory =
+    Array.isArray(permissions) && permissions.includes(PERMISSIONS.TEST_MANAGE);
+
+  return useMemo(
+    () =>
+      examCategories.filter(
+        (category) => canPickCertificateCategory || !category.certificateEligible,
+      ),
+    [examCategories, canPickCertificateCategory],
+  );
 }
 
 export function useCreateTestFromBank({
