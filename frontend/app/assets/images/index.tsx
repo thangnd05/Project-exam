@@ -8,14 +8,14 @@ import dignos from './dignos.png';
 import learningPlan from './learningplan.png';
 
 const images = {
-    noImage,
-    avtImage,
-    logo,
-    membership,
-    logoW,
-    quickImage,
-    dignos,
-    learningPlan,
+    noImage: noImage.src,
+    avtImage: avtImage.src,
+    logo: logo.src,
+    membership: membership.src,
+    logoW: logoW.src,
+    quickImage: quickImage.src,
+    dignos: dignos.src,
+    learningPlan: learningPlan.src,
 };
 
 type SearchIconProps = {

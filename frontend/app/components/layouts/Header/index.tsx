@@ -178,18 +178,10 @@ function Header() {
             <div className={cx('desktopUtils')}>
               {!user ? (
                 <div className={cx('authLinks')}>
-                  <Link
-                    href={routes.login}
-                    {...({state: {mode: 'signin'}} as any)}
-                    className={cx('home')}
-                  >
+                  <Link href={`${routes.login}?mode=signin`} className={cx('home')}>
                     Đăng nhập
                   </Link>
-                  <Link
-                    href={routes.login}
-                    {...({state: {mode: 'signup'}} as any)}
-                    className={cx('home')}
-                  >
+                  <Link href={`${routes.login}?mode=signup`} className={cx('home')}>
                     Đăng ký
                   </Link>
                 </div>

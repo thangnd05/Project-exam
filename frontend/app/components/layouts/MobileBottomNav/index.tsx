@@ -314,16 +314,14 @@ function MobileBottomNav() {
                     ) : (
                       <>
                         <Link
-                          href={routes.login}
-                          {...({state: {mode: 'signin'}} as any)}
+                          href={`${routes.login}?mode=signin`}
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
                           Đăng nhập
                         </Link>
                         <Link
-                          href={routes.login}
-                          {...({state: {mode: 'signup'}} as any)}
+                          href={`${routes.login}?mode=signup`}
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
