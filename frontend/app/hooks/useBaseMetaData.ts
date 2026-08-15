@@ -42,14 +42,14 @@ export const useBaseMetaData = (examTypeId?: string | number | null) => {
 
     const examPartsQuery = useQuery({
         queryKey: baseMetaKeys.examParts(examTypeId),
-        queryFn: () => getExamPartsByExamType(examTypeId),
+        queryFn: () => getExamPartsByExamType(String(examTypeId)),
         enabled: !!examTypeId,
         select: (data: any) => sortByPartOrder(normalizeList(data)),
     });
 
     const availableTagsQuery = useQuery({
         queryKey: baseMetaKeys.tagsFlat(examTypeId),
-        queryFn: () => getTagsFlatByExamType(examTypeId),
+        queryFn: () => getTagsFlatByExamType(String(examTypeId)),
         enabled: !!examTypeId,
         select: (tags: any) => (Array.isArray(tags) ? tags : []),
     });

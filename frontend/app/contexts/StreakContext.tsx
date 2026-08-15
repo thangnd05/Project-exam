@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '@/app/configs/queryClient';
 import { getMyStreak } from '@/app/apis/streakApi';
 import { useAuth } from '@/app/hooks/useAuth';
+import type { StreakResponse } from '@/app/types';
 
 export type StreakContextValue = {
   currentStreak: number;
@@ -21,14 +22,6 @@ export const StreakContext = createContext<StreakContextValue | null>(null);
 
 export const STREAK_QUERY_KEY = ['myStreak'];
 
-type StreakData = {
-  currentStreak?: number;
-  longestStreak?: number;
-  lostStreak?: number;
-  canRecover?: boolean;
-  recoverCost?: number;
-};
-
 export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   const [justIncreased, setJustIncreased] = useState(false);
@@ -39,7 +32,7 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
     enabled: isAuthenticated,
   });
 
-  const streak: StreakData | null = isAuthenticated ? data : null;
+  const streak: StreakResponse | null = isAuthenticated ? data ?? null : null;
   const currentStreak = streak?.currentStreak ?? 0;
   const longestStreak = streak?.longestStreak ?? 0;
   const lostStreak = streak?.lostStreak ?? 0;
@@ -48,9 +41,9 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshStreak = useCallback(async () => {
     if (!isAuthenticated) return;
-    const before = queryClient.getQueryData<StreakData>(STREAK_QUERY_KEY)?.currentStreak ?? 0;
+    const before = queryClient.getQueryData<StreakResponse>(STREAK_QUERY_KEY)?.currentStreak ?? 0;
     await queryClient.refetchQueries({ queryKey: STREAK_QUERY_KEY });
-    const after = queryClient.getQueryData<StreakData>(STREAK_QUERY_KEY)?.currentStreak ?? 0;
+    const after = queryClient.getQueryData<StreakResponse>(STREAK_QUERY_KEY)?.currentStreak ?? 0;
     if (after > before) setJustIncreased(true);
   }, [isAuthenticated]);
 
