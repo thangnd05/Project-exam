@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
@@ -50,7 +53,7 @@ const formatCount = (n) => {
 };
 
 function MyPostsPage({ embedded = false }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [editingPost, setEditingPost] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -180,7 +183,7 @@ function MyPostsPage({ embedded = false }) {
               <h1 className={cx('title')}>Bài viết của tôi</h1>
               <p className={cx('subtitle')}>Quản lý và theo dõi trạng thái các bài viết của bạn.</p>
             </div>
-            <button type="button" className={cx('backLink')} onClick={() => navigate(routes.profile)}>
+            <button type="button" className={cx('backLink')} onClick={() => router.push(routes.profile)}>
               Trở lại hồ sơ
             </button>
           </header>
@@ -229,7 +232,7 @@ function MyPostsPage({ embedded = false }) {
             {hasActiveFilter ? (
               <>Không có bài viết nào khớp với bộ lọc hiện tại.</>
             ) : (
-              <>Bạn chưa đăng bài viết nào. <Link to={routes.posts}>Tạo bài viết đầu tiên</Link>.</>
+              <>Bạn chưa đăng bài viết nào. <Link href={routes.posts}>Tạo bài viết đầu tiên</Link>.</>
             )}
           </Alert>
         )}
@@ -249,7 +252,7 @@ function MyPostsPage({ embedded = false }) {
                   animate="visible"
                   whileHover={{ y: -4 }}
                 >
-                  <Link to={detailUrl} className={cx('thumbnailLink')}>
+                  <Link href={detailUrl} className={cx('thumbnailLink')}>
                     {post.thumbnailUrl ? (
                       <img
                         src={post.thumbnailUrl}
@@ -270,7 +273,7 @@ function MyPostsPage({ embedded = false }) {
                       <span className={cx('date')}>{formatDate(post.createdAt)}</span>
                     </div>
 
-                    <Link to={detailUrl} className={cx('cardTitleLink')}>
+                    <Link href={detailUrl} className={cx('cardTitleLink')}>
                       <h3 className={cx('cardTitle')}>{post.title}</h3>
                     </Link>
 
@@ -290,7 +293,7 @@ function MyPostsPage({ embedded = false }) {
                       <Dropdown.Item onClick={() => handleEdit(post.id)}>
                         <IoPencilOutline /> Chỉnh sửa
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => navigate(detailUrl)}>
+                      <Dropdown.Item onClick={() => router.push(detailUrl)}>
                         <IoEyeOutline /> Xem chi tiết
                       </Dropdown.Item>
                       <Dropdown.Divider />

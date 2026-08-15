@@ -1,3 +1,5 @@
+'use client';
+
 import { IoTimeOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 

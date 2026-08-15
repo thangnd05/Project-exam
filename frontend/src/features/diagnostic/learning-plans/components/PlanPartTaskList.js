@@ -1,5 +1,7 @@
+'use client';
+
+import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {
   BookOpen,
@@ -402,7 +404,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
       </button>
     ) : (
       <Link
-        to={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
+        href={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
         className={cx('btn', 'btnPrimary', 'stageCta')}
         aria-disabled={!canStudy}
         onClick={(e) => {
@@ -497,7 +499,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
           {studyButton}
           {task.attemptCount > 0 && (
             <Link
-              to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
+              href={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
               <History size={14} /> Lịch sử
@@ -505,7 +507,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
           )}
           {isPassed && (
             <Link
-              to={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/result`}
+              href={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/result`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
               Xem giải thích

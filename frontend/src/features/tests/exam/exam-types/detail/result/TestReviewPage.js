@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useContext, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
 import { IoHomeOutline } from "react-icons/io5";
@@ -53,7 +55,7 @@ const getQuestionStatus = (q, userAnswer) => {
 
 const TestReviewPage = () => {
   const { userTestId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
   const isGuest = !authLoading && !isAuthenticated;
   const guestCfg = useMemo(
@@ -289,7 +291,7 @@ const TestReviewPage = () => {
           <Alert variant="warning">{error}</Alert>
           <ButtonPrime
             variant="outline"
-            onClick={() => navigate(`/tests/result/${userTestId}`)}
+            onClick={() => router.push(`/tests/result/${userTestId}`)}
           >
             Quay lại kết quả
           </ButtonPrime>
@@ -303,11 +305,11 @@ const TestReviewPage = () => {
         <div className={cx("back-bar")}>
           <ButtonPrime
             variant="outline"
-            onClick={() => navigate(`/tests/result/${userTestId}`)}
+            onClick={() => router.push(`/tests/result/${userTestId}`)}
           >
             Quay lại kết quả
           </ButtonPrime>
-          <ButtonPrime variant="ghost" onClick={() => navigate("/")}>
+          <ButtonPrime variant="ghost" onClick={() => router.push("/")}>
             <IoHomeOutline /> Trang chủ
           </ButtonPrime>
         </div>

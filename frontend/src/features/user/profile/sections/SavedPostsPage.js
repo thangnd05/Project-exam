@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
@@ -37,7 +40,7 @@ const formatCount = (n) => {
 };
 
 function SavedPostsPage({ embedded = false }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -137,7 +140,7 @@ function SavedPostsPage({ embedded = false }) {
               <h1 className={cx('title')}>Bài viết đã lưu</h1>
               <p className={cx('subtitle')}>Những bài viết bạn đã đánh dấu để xem lại.</p>
             </div>
-            <button type="button" className={cx('backLink')} onClick={() => navigate(routes.profile)}>
+            <button type="button" className={cx('backLink')} onClick={() => router.push(routes.profile)}>
               Trở lại hồ sơ
             </button>
           </header>
@@ -190,7 +193,7 @@ function SavedPostsPage({ embedded = false }) {
                   animate="visible"
                   whileHover={{ y: -4 }}
                 >
-                  <Link to={detailUrl} className={cx('thumbnailLink')}>
+                  <Link href={detailUrl} className={cx('thumbnailLink')}>
                     {post.thumbnailUrl ? (
                       <img
                         src={post.thumbnailUrl}
@@ -221,7 +224,7 @@ function SavedPostsPage({ embedded = false }) {
                       <span className={cx('date')}>{formatDate(post.createdAt)}</span>
                     </div>
 
-                    <Link to={detailUrl} className={cx('cardTitleLink')}>
+                    <Link href={detailUrl} className={cx('cardTitleLink')}>
                       <h3 className={cx('cardTitle')}>{post.title}</h3>
                     </Link>
 
@@ -238,7 +241,7 @@ function SavedPostsPage({ embedded = false }) {
                       <IoEllipsisVertical />
                     </Dropdown.Toggle>
                     <Dropdown.Menu className={cx('menuDropdown')}>
-                      <Dropdown.Item onClick={() => navigate(detailUrl)}>
+                      <Dropdown.Item onClick={() => router.push(detailUrl)}>
                         <IoEyeOutline /> Xem chi tiết
                       </Dropdown.Item>
                       <Dropdown.Divider />

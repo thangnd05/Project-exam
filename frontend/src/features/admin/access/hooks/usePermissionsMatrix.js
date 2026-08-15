@@ -1,3 +1,5 @@
+'use client';
+
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {getRoles, updateRolePermissions} from '~/shared/api/roleApi';

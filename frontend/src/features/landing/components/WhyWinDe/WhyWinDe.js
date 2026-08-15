@@ -1,3 +1,5 @@
+'use client';
+
 import {motion} from 'framer-motion';
 import classNames from 'classnames/bind';
 import styles from './WhyWinDe.module.scss';

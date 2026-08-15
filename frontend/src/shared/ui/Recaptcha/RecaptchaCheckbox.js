@@ -1,3 +1,5 @@
+'use client';
+
 import {forwardRef, useEffect, useImperativeHandle, useRef} from 'react';
 
 const SCRIPT_ID = 'google-recaptcha-script';

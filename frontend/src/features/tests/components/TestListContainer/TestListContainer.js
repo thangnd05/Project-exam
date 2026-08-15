@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation } from '@tanstack/react-query';
 import { updateVocabulary } from '~/shared/api/vocabularyApi';
 

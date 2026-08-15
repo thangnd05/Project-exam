@@ -1,5 +1,7 @@
+'use client';
+
+
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
@@ -16,7 +18,7 @@ const cx = classNames.bind(styles);
 const pageCx = classNames.bind(pageStyles);
 
 function TargetDashboardPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParamsState();
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
 
   const {
@@ -130,7 +132,7 @@ function TargetDashboardPage() {
       {!loading && !target?.hasTarget && examTypeId && (
         <div className={cx('alert', 'alertInfo')}>
           <span>Bạn chưa đặt mục tiêu cho kỳ thi này.</span>
-          <ButtonPrime as="link" to={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
+          <ButtonPrime as="link" href={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
             Đặt mục tiêu
           </ButtonPrime>
         </div>
@@ -148,7 +150,7 @@ function TargetDashboardPage() {
               </p>
               <ButtonPrime
                 as="link"
-                to={`/my-target/achieved?examTypeId=${examTypeId}`}
+                href={`/my-target/achieved?examTypeId=${examTypeId}`}
                 variant="success"
                 size="sm"
               >
@@ -223,7 +225,7 @@ function TargetDashboardPage() {
                   <div className={pageCx('statTileFooter')}>
                     <ButtonPrime
                       as="link"
-                      to={`/learning-plans/${activePlan.learningPlanId}`}
+                      href={`/learning-plans/${activePlan.learningPlanId}`}
                       variant="primary"
                       size="sm"
                     >
@@ -238,7 +240,7 @@ function TargetDashboardPage() {
                     <div className={pageCx('statTileFooter')}>
                       <ButtonPrime
                         as="link"
-                        to={`/learning-plans/generate?userTestId=${latestMock.userTestId}`}
+                        href={`/learning-plans/generate?userTestId=${latestMock.userTestId}`}
                         variant="primary"
                         size="sm"
                       >
@@ -269,13 +271,13 @@ function TargetDashboardPage() {
       {/* Hành động chốt trang  đặt cuối để người dùng đọc hết số liệu rồi mới quyết. */}
       {!loading && (
         <div className={cx('actionBar', 'dashboardFooterActions')}>
-          <ButtonPrime as="link" to={nextStepTo} variant="primary" size="lg">
+          <ButtonPrime as="link" href={nextStepTo} variant="primary" size="lg">
             {activePlan ? 'Vào lộ trình đang học' : 'Lập lộ trình ôn'}
           </ButtonPrime>
           {latestMock?.userTestId && (
             <ButtonPrime
               as="link"
-              to={`/tests/result/${latestMock.userTestId}`}
+              href={`/tests/result/${latestMock.userTestId}`}
               variant="outline"
               size="lg"
             >

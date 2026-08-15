@@ -1,3 +1,5 @@
+'use client';
+
 import styles from '../policy/poliSer.module.scss';
 import classNames from 'classnames/bind';
 import {name} from '~/shared/assets/images';

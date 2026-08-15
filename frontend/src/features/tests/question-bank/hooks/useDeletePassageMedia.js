@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deletePassageMedia } from '~/shared/api/passageMediaApi';
 import { questionDetailKeys } from '~/features/tests/question-bank/hooks/useQuestionDetail';

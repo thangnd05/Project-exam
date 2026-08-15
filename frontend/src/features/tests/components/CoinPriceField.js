@@ -1,3 +1,5 @@
+'use client';
+
 import { Col } from 'react-bootstrap';
 import { IoRocketOutline } from 'react-icons/io5';
 import { useHasPermission } from '~/shared/hooks/usePermission';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Container } from "react-bootstrap";
 import classNames from "classnames/bind";
 import style from "./poliSer.module.scss";

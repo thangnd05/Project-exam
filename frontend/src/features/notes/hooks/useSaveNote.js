@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNote, updateNote } from '~/shared/api/noteApi';
 import { noteKeys } from '~/features/notes/hooks/useNotes';

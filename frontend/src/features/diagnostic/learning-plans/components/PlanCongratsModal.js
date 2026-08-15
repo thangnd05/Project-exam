@@ -1,3 +1,5 @@
+'use client';
+
 import ReactDOM from 'react-dom';
 import classNames from 'classnames/bind';
 import { Trophy, X } from 'lucide-react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { getPlanById, getTaskSessions } from '~/shared/api/learningPlanApi';
 import { planDetailKeys } from '~/features/diagnostic/learning-plans/hooks/usePlanDetail';

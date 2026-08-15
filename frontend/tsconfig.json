@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  },
+  // Cố tình KHÔNG đưa **/*.js vào: 528 file .js hiện có chạy nguyên qua allowJs mà không bị
+  // type-check (đỡ hàng nghìn lỗi implicit any). Viết file MỚI bằng .tsx/.ts là được check ngay;
+  // file cũ đổi đuôi dần khi nào đụng tới.
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

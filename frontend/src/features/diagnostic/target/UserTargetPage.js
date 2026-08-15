@@ -1,5 +1,7 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
@@ -225,7 +227,7 @@ function UserTargetPage() {
           <div className={planCx('actionBar')} style={{ marginTop: '1rem' }}>
             <ButtonPrime
               as="link"
-              to={
+              href={
                 selectedExamTypeId
                   ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
                   : '/learning-plans/generate'

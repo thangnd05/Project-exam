@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import routes from '~/shared/config/Routes';
@@ -16,7 +18,7 @@ function RecoveryPlan({
   readinessLevel,
   isGuest,
 }) {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const recoveryMessage = buildRecoveryMessage({
     hasTarget, isTargetMet, readinessScore, readinessLevel,
@@ -30,7 +32,7 @@ function RecoveryPlan({
   const handleGoToTarget = () => {
     const params = new URLSearchParams();
     if (examTypeId) params.set('examTypeId', String(examTypeId));
-    navigate(`${routes.myTarget}?${params.toString()}`);
+    router.push(`${routes.myTarget}?${params.toString()}`);
   };
 
   const handleGoToPlan = () => {
@@ -38,7 +40,7 @@ function RecoveryPlan({
     if (userTestId) params.set('userTestId', userTestId);
     if (examTypeId) params.set('examTypeId', String(examTypeId));
     const qs = params.toString();
-    navigate(qs ? `${routes.generatePlan}?${qs}` : routes.generatePlan);
+    router.push(qs ? `${routes.generatePlan}?${qs}` : routes.generatePlan);
   };
 
   return (

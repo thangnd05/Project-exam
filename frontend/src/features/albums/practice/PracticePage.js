@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import {useParams} from 'react-router-dom';
 import { getTtsUrl } from '~/shared/utils/mediaUrl';
 import { useStreak } from '~/shared/hooks/useStreak';
 import { useMarkVocabKnown } from '~/features/albums/practice/hooks/useMarkVocabKnown';

@@ -1,5 +1,7 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {useNavigate} from 'react-router-dom';
 import { IoPencilOutline, IoTrashOutline, IoPlayOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './AlbumManagementTable.module.scss';
@@ -7,7 +9,7 @@ import styles from './AlbumManagementTable.module.scss';
 const cx = classNames.bind(styles);
 
 const AlbumManagementTable = ({albums, onDelete, onEdit}) => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className={cx('table-responsive')}>
@@ -39,7 +41,7 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}) => {
                         className={cx('btn-action', 'stats')}
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/albums/${album.albumId}`);
+                          router.push(`/albums/${album.albumId}`);
                         }}
                       >
                         <IoPlayOutline />

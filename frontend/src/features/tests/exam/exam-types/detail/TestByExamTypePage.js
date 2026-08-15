@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { FaBullseye } from 'react-icons/fa';
@@ -24,7 +26,7 @@ const cx = classNames.bind(style);
 
 function TestByExamTypePage() {
   const { examTypeId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuth();
 
   const [countdowns, setCountdowns] = useState({});
@@ -76,7 +78,7 @@ function TestByExamTypePage() {
               key={child.examTypeId}
               type="button"
               className={cx('folder-card')}
-              onClick={() => navigate(buildExamTypeDetailPath(child.examTypeId))}
+              onClick={() => router.push(buildExamTypeDetailPath(child.examTypeId))}
             >
               <span className={cx('folder-card-icon')}>
                 <IoSchoolOutline />
@@ -107,10 +109,10 @@ function TestByExamTypePage() {
 
   const handleOpenTarget = () => {
     if (!user) {
-      navigate(routes.login);
+      router.push(routes.login);
       return;
     }
-    navigate(`${routes.myTarget}?examTypeId=${examTypeId}`);
+    router.push(`${routes.myTarget}?examTypeId=${examTypeId}`);
   };
 
   const emptyState = (
@@ -183,7 +185,7 @@ function TestByExamTypePage() {
             key={folder.collectionId}
             type="button"
             className={cx('folder-card')}
-            onClick={() => navigate(buildExamTypeCollectionPath(examTypeId, folder.collectionId))}
+            onClick={() => router.push(buildExamTypeCollectionPath(examTypeId, folder.collectionId))}
           >
             <span className={cx('folder-card-icon')}>
               <IoFolderOpenOutline />

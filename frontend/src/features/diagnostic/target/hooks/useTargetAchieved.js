@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { getMyCompletedUserTests } from '~/shared/api/userTestApi';
 import { getStandardExamTypes } from '~/shared/api/examTypeApi';

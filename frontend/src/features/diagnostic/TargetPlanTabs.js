@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import classNames from 'classnames/bind';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';
 
@@ -18,7 +20,7 @@ function TargetPlanTabs({ active, examTypeId }) {
       {TABS.map((tab) => (
         <Link
           key={tab.key}
-          to={`${tab.path}${qs}`}
+          href={`${tab.path}${qs}`}
           className={cx('pageTab', { active: tab.key === active })}
           aria-current={tab.key === active ? 'page' : undefined}
         >

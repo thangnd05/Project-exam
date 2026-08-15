@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { getUserTestMeta, getReviewTest } from '~/shared/api/userTestApi';
 import { getAnswersByUserTest } from '~/shared/api/userAnswerApi';

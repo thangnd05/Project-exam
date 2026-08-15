@@ -1,6 +1,8 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import {Table, Badge, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {useNavigate} from 'react-router-dom';
 import {
   IoPencilOutline,
   IoTrashOutline,
@@ -16,7 +18,7 @@ import EditTestModal from '~/features/tests/components/EditTestModal';
 const cx = classNames.bind(styles);
 
 const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const now = new Date();
   const [editingTest, setEditingTest] = React.useState(null);
 
@@ -107,7 +109,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}) => {
                         variant="link"
                         className={cx('btn-action', 'stats')}
                         onClick={() =>
-                          navigate(`/tests/history/${test.testId}`)
+                          router.push(`/tests/history/${test.testId}`)
                         }
                       >
                         <IoStatsChartOutline />

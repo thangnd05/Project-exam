@@ -1,11 +1,13 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '~/shared/hooks/useAuth';
 import { fetchCurrentUser } from '~/features/user/login/hooks/useAuthActions';
 import { claimGuestAfterLogin, takeOAuthRedirect } from '~/shared/utils/authRedirect';
 
 function OAuth2Redirect() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const { login } = useAuth();
 
     useEffect(() => {
@@ -18,16 +20,16 @@ function OAuth2Redirect() {
                     await claimGuestAfterLogin();
                     login(userData);
 
-                    navigate(takeOAuthRedirect('/'), { replace: true });
+                    router.replace(takeOAuthRedirect('/'));
                 }
             } catch (error) {
                 console.error("Lỗi đồng bộ tài khoản:", error);
-                navigate('/login?error=oauth2_failed');
+                router.push('/login?error=oauth2_failed');
             }
         };
 
         syncUser();
-    }, [login, navigate]);
+    }, [login, router]);
 
     return (
         <div className="flex justify-center items-center h-screen">

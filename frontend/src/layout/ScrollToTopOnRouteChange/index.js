@@ -1,22 +1,24 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
 import {useEffect} from 'react';
-import {useLocation} from 'react-router-dom';
 
 const ScrollHandler = () => {
-  const location = useLocation();
+  const pathname = usePathname();
 
   useEffect(() => {
     const saveScrollPosition = () => {
-      sessionStorage.setItem('scroll_' + location.pathname, window.scrollY);
+      sessionStorage.setItem('scroll_' + pathname, window.scrollY);
     };
 
     return () => {
       saveScrollPosition();
     };
-  }, [location.pathname]);
+  }, [pathname]);
 
   useEffect(() => {
     const scrollPosition = sessionStorage.getItem(
-      'scroll_' + location.pathname,
+      'scroll_' + pathname,
     );
 
     if (scrollPosition !== null) {
@@ -24,7 +26,7 @@ const ScrollHandler = () => {
     } else {
       window.scrollTo(0, 0);
     }
-  }, [location.pathname]);
+  }, [pathname]);
 
   return null;
 };

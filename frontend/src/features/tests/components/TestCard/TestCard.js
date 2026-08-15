@@ -1,5 +1,7 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     IoTimeOutline,
     IoCalendarOutline,
@@ -62,7 +64,7 @@ const getSubjectBanner = (title = '', status = 'open') => {
 };
 
 function TestCard({ test, countdowns }) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const now = new Date();
     const [showModeModal, setShowModeModal] = useState(false);
 
@@ -86,9 +88,7 @@ function TestCard({ test, countdowns }) {
             if (examPartIds?.length) params.set('parts', examPartIds.join(','));
         }
         const qs = params.toString();
-        navigate(`/tests/${test.testId}/start${qs ? `?${qs}` : ''}`, {
-            state: { allowedTime },
-        });
+        router.push(`/tests/${test.testId}/start${qs ? `?${qs}` : ''}`);
     };
 
     return (
@@ -169,7 +169,7 @@ function TestCard({ test, countdowns }) {
                         size="sm"
                         className={cx('btn-outline-modern')}
                         onClick={() =>
-                            navigate(`/tests/history/${test.testId}`)
+                            router.push(`/tests/history/${test.testId}`)
                         }
                     >
                         Lịch sử
@@ -183,7 +183,7 @@ function TestCard({ test, countdowns }) {
                             title="Bảng xếp hạng"
                             aria-label="Bảng xếp hạng"
                             onClick={() =>
-                                navigate(`/tests/leaderboard/${test.testId}`)
+                                router.push(`/tests/leaderboard/${test.testId}`)
                             }
                         >
                             <svg

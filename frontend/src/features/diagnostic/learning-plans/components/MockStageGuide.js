@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
@@ -55,7 +57,7 @@ function MockStageGuide({ plan }) {
               </div>
               {!freshMock && (
                 <Link
-                  to={mockTestsTo}
+                  href={mockTestsTo}
                   className={cx('btn', 'btnPrimary', 'btnSm')}
                   style={{ marginTop: 8 }}
                 >
@@ -91,7 +93,7 @@ function MockStageGuide({ plan }) {
                 </>
               )}
             </span>
-            <Link to={generateTo} className={cx('btn', 'btnPrimary', 'btnSm')}>
+            <Link href={generateTo} className={cx('btn', 'btnPrimary', 'btnSm')}>
               Sinh lộ trình từ bài này
             </Link>
           </div>

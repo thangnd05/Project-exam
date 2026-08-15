@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { IoText, IoLanguage } from 'react-icons/io5';
 import { toast } from 'react-toastify';

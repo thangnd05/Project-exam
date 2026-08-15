@@ -1,3 +1,5 @@
+'use client';
+
 import { useAuth } from './useAuth';
 
 export const usePermission = () => {

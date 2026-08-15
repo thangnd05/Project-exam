@@ -1,6 +1,9 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import {Button, Dropdown, Image} from 'react-bootstrap';
 import {useState} from 'react';
-import {Link, NavLink, useNavigate} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
@@ -27,11 +30,12 @@ function Header() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await logout();
-    navigate(routes.home);
+    router.push(routes.home);
   };
 
   /**
@@ -43,7 +47,7 @@ function Header() {
       return false;
     }
     toast.warning(message);
-    navigate(routes.login, {state: {mode: 'signin'}});
+    router.push(`${routes.login}?mode=signin`);
     return true;
   };
 
@@ -60,7 +64,7 @@ function Header() {
     } else if (modalType === 'create') {
       setShowCreateModal(true);
     } else {
-      navigate(targetRoute);
+      router.push(targetRoute);
     }
   };
 
@@ -70,7 +74,7 @@ function Header() {
         <div className={cx('barRow')}>
           {/* Zone 1  Brand */}
           <div className={cx('zoneLeft')}>
-            <Link to={routes.home} className={cx('brand')}>
+            <Link href={routes.home} className={cx('brand')}>
               <span className={cx('brandInner')}>
                 <Image
                   src={images.logoW}
@@ -88,37 +92,37 @@ function Header() {
           <nav className={cx('zoneCenter')} aria-label="Điều hướng chính">
             <div className={cx('navTrack')}>
               {/* TẠM: nhường chỗ "Bài viết" cho tra cứu chứng chỉ, bỏ comment để trả lại như cũ.
-              <NavLink
-                to={routes.posts}
-                className={({isActive}) => cx('home', {active: isActive})}
+              <Link
+                href={routes.posts}
+                className={cx('home', {active: pathname === routes.posts})}
               >
                 Bài viết
-              </NavLink>
+              </Link>
               */}
-              <NavLink
-                to={routes.certificateVerifyHome}
-                className={({isActive}) => cx('home', {active: isActive})}
+              <Link
+                href={routes.certificateVerifyHome}
+                className={cx('home', {active: pathname === routes.certificateVerifyHome})}
               >
                 Chứng chỉ
-              </NavLink>
-              <NavLink
-                to={routes.myTarget}
-                className={({isActive}) => cx('home', {active: isActive})}
+              </Link>
+              <Link
+                href={routes.myTarget}
+                className={cx('home', {active: pathname === routes.myTarget})}
               >
                 Lộ trình
-              </NavLink>
-              <NavLink
-                to={routes.myAlbums}
-                className={({isActive}) => cx('home', {active: isActive})}
+              </Link>
+              <Link
+                href={routes.myAlbums}
+                className={cx('home', {active: pathname === routes.myAlbums})}
               >
                 Từ vựng
-              </NavLink>
-              <NavLink
-                to={routes.MyTest}
-                className={({isActive}) => cx('home', {active: isActive})}
+              </Link>
+              <Link
+                href={routes.MyTest}
+                className={cx('home', {active: pathname === routes.MyTest})}
               >
                 Bài đã tạo
-              </NavLink>
+              </Link>
               <Dropdown className={cx('customMenu')} align="start">
                 <Dropdown.Toggle
                   as="button"
@@ -167,14 +171,14 @@ function Header() {
               {!user ? (
                 <div className={cx('authLinks')}>
                   <Link
-                    to={routes.login}
+                    href={routes.login}
                     state={{mode: 'signin'}}
                     className={cx('home')}
                   >
                     Đăng nhập
                   </Link>
                   <Link
-                    to={routes.login}
+                    href={routes.login}
                     state={{mode: 'signup'}}
                     className={cx('home')}
                   >
@@ -219,10 +223,10 @@ function Header() {
                       </div>
                     </Dropdown.Toggle>
                     <Dropdown.Menu className={cx('custom-dropdown')}>
-                      <Dropdown.Item as={Link} to={routes.profile}>
+                      <Dropdown.Item as={Link} href={routes.profile}>
                         Hồ sơ
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={routes.myCertificates}>
+                      <Dropdown.Item as={Link} href={routes.myCertificates}>
                         Chứng chỉ của tôi
                       </Dropdown.Item>
                       <Dropdown.Item onClick={handleLogout}>Đăng xuất</Dropdown.Item>

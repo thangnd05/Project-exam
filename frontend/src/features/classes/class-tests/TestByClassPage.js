@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { IoDocumentTextOutline, IoAddCircleOutline } from 'react-icons/io5';

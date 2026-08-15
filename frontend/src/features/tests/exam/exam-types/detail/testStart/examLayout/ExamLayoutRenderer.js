@@ -1,3 +1,5 @@
+'use client';
+
 import { Fragment, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Container } from 'react-bootstrap';

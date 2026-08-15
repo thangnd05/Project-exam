@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { buyCosmetic, equipCosmetic, unequipCosmetic } from '~/shared/api/cosmeticApi';
 import { COINS_QUERY_KEY } from '~/shared/context/CoinContext';

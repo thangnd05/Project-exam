@@ -57,3 +57,9 @@ frontend/.pnpm-store/
 
 # Claude Code local config (settings tự thay đổi theo permission grant)
 .claude/
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+frontend/*.tsbuildinfo

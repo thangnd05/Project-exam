@@ -1,3 +1,5 @@
+'use client';
+
 import { IoTrashOutline } from 'react-icons/io5';
 import ConfirmModal from './ConfirmModal';
 

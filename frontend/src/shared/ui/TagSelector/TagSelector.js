@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo, useState } from 'react';
 import { Badge } from 'react-bootstrap';
 import { ChevronDown, ChevronRight } from 'lucide-react';

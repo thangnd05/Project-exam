@@ -1,5 +1,7 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {useNavigate} from 'react-router-dom';
 import {Badge, Button, Spinner} from 'react-bootstrap';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Paintbrush, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
@@ -139,7 +141,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
 }
 
 function ExamTypesManagementPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {examTypeList, isLoading: loading, isError, createMutation, updateMutation, deleteMutation} =
     useExamTypes();
   const [searchTerm, setSearchTerm] = useState('');
@@ -217,7 +219,7 @@ function ExamTypesManagementPage() {
   };
 
   const openLayoutEditor = (examType) => {
-    navigate(routes.adminExamTypeLayout.replace(':examTypeId', examType.exam_type_id));
+    router.push(routes.adminExamTypeLayout.replace(':examTypeId', examType.exam_type_id));
   };
 
   const openEditModal = (examType) => {

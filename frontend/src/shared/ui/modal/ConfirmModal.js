@@ -1,3 +1,6 @@
+'use client';
+
+import { useMounted } from '~/shared/hooks/useMounted';
 import ReactDOM from 'react-dom';
 import { IoClose, IoWarningOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
@@ -16,7 +19,10 @@ const ConfirmModal = ({
     confirmText = 'Xác nhận',
     cancelText = 'Hủy bỏ',
 }) => {
-    if (!show) return null;
+  const mounted = useMounted();
+
+  // Portal cần document.body -> chỉ dựng sau khi đã ở client (xem useMounted).
+    if (!show || !mounted) return null;
 
     return ReactDOM.createPortal(
         <div className={cx('overlay')} onClick={onClose}>

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { getQuestionById } from '~/shared/api/questionApi';

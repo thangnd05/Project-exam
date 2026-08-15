@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { restoreStreak } from '~/shared/api/streakApi';
 import { STREAK_QUERY_KEY } from '~/shared/context/StreakContext';

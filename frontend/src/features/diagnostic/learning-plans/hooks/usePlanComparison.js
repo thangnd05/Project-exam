@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { getStandardExamTypes } from '~/shared/api/examTypeApi';
 import { listPlans } from '~/shared/api/learningPlanApi';

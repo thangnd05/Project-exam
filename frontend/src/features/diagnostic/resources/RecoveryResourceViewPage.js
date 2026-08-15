@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { Spinner } from 'react-bootstrap';
 import { Printer } from 'lucide-react';
@@ -59,7 +62,7 @@ function RecoveryResourceViewPage() {
             <Printer size={16} />
             In / Lưu PDF
           </button>
-          <Link to={routes.home} className={cx('actionBtn')}>
+          <Link href={routes.home} className={cx('actionBtn')}>
             Về trang chủ
           </Link>
         </div>

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';

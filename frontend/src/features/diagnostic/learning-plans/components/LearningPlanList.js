@@ -1,5 +1,7 @@
+'use client';
+
+import Link from 'next/link';
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
-import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
@@ -204,13 +206,13 @@ const LearningPlanList = forwardRef(function LearningPlanList(
               </button>
             )}
             <Link
-              to={`/learning-plans/${p.learningPlanId}#chon-ai-hoc`}
+              href={`/learning-plans/${p.learningPlanId}#chon-ai-hoc`}
               className={cx('btn', 'btnPrimary', 'btnSm')}
             >
               Chọn ải
             </Link>
             <Link
-              to={`/learning-plans/${p.learningPlanId}`}
+              href={`/learning-plans/${p.learningPlanId}`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
               Xem
@@ -285,7 +287,7 @@ const LearningPlanList = forwardRef(function LearningPlanList(
           {(showCompareLink || showRefreshButton) && (
             <div className={cx('actionBar')}>
               {showCompareLink && (
-                <Link to={compareHref} className={cx('btn', 'btnOutline', 'btnSm')}>
+                <Link href={compareHref} className={cx('btn', 'btnOutline', 'btnSm')}>
                   So sánh lộ trình
                 </Link>
               )}

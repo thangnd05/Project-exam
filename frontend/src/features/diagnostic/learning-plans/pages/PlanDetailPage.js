@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { ClipboardCheck, Play } from 'lucide-react';
@@ -82,7 +85,7 @@ function PlanDetailPage() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
-          <Link to="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
+          <Link href="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
             Quay lại
           </Link>
         </div>
@@ -118,14 +121,14 @@ function PlanDetailPage() {
         planSequence={plan.planSequence}
       />
       <div className={cx('headerBar')}>
-        <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+        <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
           Quay lại
         </Link>
         <div className={cx('headerActions')}>
-          <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+          <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
             Tất cả lộ trình
           </Link>
-          <Link to="/learning-plans/generate" className={cx('btn', 'btnPrimary', 'btnSm')}>
+          <Link href="/learning-plans/generate" className={cx('btn', 'btnPrimary', 'btnSm')}>
             Sinh lộ trình mới
           </Link>
         </div>
@@ -138,7 +141,7 @@ function PlanDetailPage() {
           <span>Lộ trình này đã được thay bằng lộ trình mới hơn.</span>
           {plan.replacedByPlanId && (
             <Link
-              to={`/learning-plans/${plan.replacedByPlanId}`}
+              href={`/learning-plans/${plan.replacedByPlanId}`}
               className={cx('btn', 'btnPrimary', 'btnSm')}
             >
               Xem lộ trình mới
@@ -162,7 +165,7 @@ function PlanDetailPage() {
           >
             {resyncMutation.isPending ? 'Đang cập nhật...' : 'Cập nhật theo mục tiêu mới'}
           </button>
-          <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+          <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
             Sinh lộ trình từ bài thi khác
           </Link>
         </div>
@@ -208,7 +211,7 @@ function PlanDetailPage() {
       >
         {!isReplaced && isMockStage && (
           <div className={cx('planHeroCtaBox')}>
-            <Link to={mockTestsTo} className={cx('planHeroCta')}>
+            <Link href={mockTestsTo} className={cx('planHeroCta')}>
               <ClipboardCheck size={16} /> Làm bài thi thử
             </Link>
             <span className={cx('planHeroCtaHint')}>Chấm lại độ sẵn sàng thật</span>
@@ -217,7 +220,7 @@ function PlanDetailPage() {
 
         {!isReplaced && !isMockStage && recommendedTask && (
           <Link
-            to={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
+            href={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
             className={cx('planHeroCta')}
           >
             <Play size={16} /> Vào ải ngay
@@ -234,7 +237,7 @@ function PlanDetailPage() {
             đã luyện. Làm bài thi thử trọn đề rồi sinh lại để có lộ trình đầy đủ.
           </span>
           <Link
-            to={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
+            href={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
             className={cx('btn', 'btnPrimary', 'btnSm')}
           >
             Sinh lộ trình mới

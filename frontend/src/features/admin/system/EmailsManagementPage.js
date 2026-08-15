@@ -1,3 +1,5 @@
+'use client';
+
 import {useMemo, useState} from 'react';
 import {Button} from 'react-bootstrap';
 import {Edit, History, Plus, Send, Trash2} from 'lucide-react';

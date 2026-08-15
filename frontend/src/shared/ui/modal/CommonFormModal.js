@@ -1,3 +1,5 @@
+'use client';
+
 import BaseModal from './BaseModal';
 
 const SIZE_MAX_WIDTH = {

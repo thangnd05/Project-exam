@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';

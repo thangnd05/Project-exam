@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';

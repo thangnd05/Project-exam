@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import { useTargetAchieved } from '~/features/diagnostic/target/hooks/useTargetAchieved';
@@ -38,7 +41,7 @@ function TargetAchievedPage() {
   return (
     <div className={cx('wrapper')}>
       <div className={cx('headerBar')}>
-        <ButtonPrime as="link" to="/my-target/dashboard" variant="ghost" size="sm">
+        <ButtonPrime as="link" href="/my-target/dashboard" variant="ghost" size="sm">
           ← Tổng quan mục tiêu
         </ButtonPrime>
       </div>
@@ -64,7 +67,7 @@ function TargetAchievedPage() {
       {!loading && !target?.hasTarget && (
         <div className={cx('alert', 'alertInfo')}>
           <span>Bạn chưa đặt mục tiêu cho kỳ thi này.</span>
-          <ButtonPrime as="link" to={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
+          <ButtonPrime as="link" href={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
             Đặt mục tiêu
           </ButtonPrime>
         </div>
@@ -80,7 +83,7 @@ function TargetAchievedPage() {
           </span>
           <ButtonPrime
             as="link"
-            to={`/my-target/dashboard?examTypeId=${examTypeId}`}
+            href={`/my-target/dashboard?examTypeId=${examTypeId}`}
             variant="outline"
             size="sm"
           >
@@ -124,7 +127,7 @@ function TargetAchievedPage() {
                     <div className={cx('suggestValue')}>{nextSuggestion}</div>
                     <ButtonPrime
                       as="link"
-                      to={`/my-target?examTypeId=${examTypeId}&suggest=${nextSuggestion}`}
+                      href={`/my-target?examTypeId=${examTypeId}&suggest=${nextSuggestion}`}
                       variant="success"
                       size="sm"
                     >
@@ -136,7 +139,7 @@ function TargetAchievedPage() {
                     <div className={cx('suggestValue')}>{Math.min(990, nextSuggestion + 50)}</div>
                     <ButtonPrime
                       as="link"
-                      to={`/my-target?examTypeId=${examTypeId}&suggest=${Math.min(990, nextSuggestion + 50)}`}
+                      href={`/my-target?examTypeId=${examTypeId}&suggest=${Math.min(990, nextSuggestion + 50)}`}
                       variant="outline"
                       size="sm"
                     >
@@ -148,7 +151,7 @@ function TargetAchievedPage() {
                     <div className={cx('suggestValue')} style={{ fontSize: 'var(--font-size-lg)' }}>—</div>
                     <ButtonPrime
                       as="link"
-                      to={`/my-target?examTypeId=${examTypeId}`}
+                      href={`/my-target?examTypeId=${examTypeId}`}
                       variant="outline"
                       size="sm"
                     >
@@ -165,23 +168,23 @@ function TargetAchievedPage() {
             <div className={cx('cardBody')}>
               <ul style={{ paddingLeft: '2rem', margin: 0, fontSize: 'var(--font-size-ssm)' }}>
                 <li>
-                  <Link to={`/my-target?examTypeId=${examTypeId}`}>Đặt mục tiêu mới</Link>
+                  <Link href={`/my-target?examTypeId=${examTypeId}`}>Đặt mục tiêu mới</Link>
                   {' '}— chỉnh điểm + aim từng Part.
                 </li>
                 <li>
-                  <Link to={`/learning-plans/compare?examTypeId=${examTypeId}`}>
+                  <Link href={`/learning-plans/compare?examTypeId=${examTypeId}`}>
                     Xem hành trình các lộ trình
                   </Link>
                   {' '}— độ sẵn sàng #1 → #N qua từng bài thi thử.
                 </li>
                 <li>
-                  <Link to={`/my-target/dashboard?examTypeId=${examTypeId}`}>
+                  <Link href={`/my-target/dashboard?examTypeId=${examTypeId}`}>
                     Tổng quan mục tiêu
                   </Link>
                   {' '}— biểu đồ độ sẵn sàng theo thời gian và các bài đã làm.
                 </li>
                 <li>
-                  <Link to="/">Làm thêm bài</Link>
+                  <Link href="/">Làm thêm bài</Link>
                   {' '}— duy trì phong độ, chờ thi thật.
                 </li>
               </ul>

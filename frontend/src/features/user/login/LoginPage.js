@@ -1,6 +1,9 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { getApiBaseUrl } from '~/shared/utils/mediaUrl';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '~/shared/hooks/useAuth';
 import { toast } from 'react-toastify';
 import {
@@ -21,7 +24,7 @@ import RecaptchaCheckbox from '~/shared/ui/Recaptcha/RecaptchaCheckbox';
 const cx = classNames.bind(style);
 
 // Chưa cấu hình khóa (máy dev) thì bỏ qua bước xác minh thay vì chặn đăng ký.
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 
 function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -41,33 +44,34 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const { user, login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const loginMutation = useLoginMutation();
   const registerMutation = useRegisterMutation();
 
   const backendBaseUrl = getApiBaseUrl();
   const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
 
+  // Trước kia hai thứ này đi qua location.state của react-router; Next không có nên chuyển
+  // sang query: ?mode=signin|signup và ?flash=<thông báo>. Xem shared/ui/AuthGuard.js.
   useEffect(() => {
-
-    if (location.state?.mode) {
-      setIsSignUp(location.state.mode === 'signup');
+    const mode = searchParams.get('mode');
+    if (mode) {
+      setIsSignUp(mode === 'signup');
     }
 
-    if (location.state?.flashMessage) {
-      setMessage(location.state.flashMessage);
+    const flash = searchParams.get('flash');
+    if (flash) {
+      setMessage(flash);
       setMessageType('error');
-
-      window.history.replaceState({}, document.title);
     }
-  }, [location.state]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (user) {
-      navigate(getRedirectTarget(location), { replace: true });
+      router.replace(getRedirectTarget(searchParams));
     }
-  }, [user, navigate, location]);
+  }, [user, router, searchParams]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -154,7 +158,7 @@ function LoginPage() {
             <h1>Tạo tài khoản</h1>
             <div className={cx('social-login')}>
               <div className={cx('social-btns')}>
-                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FcGoogle size={24} /></a>
+                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FcGoogle size={24} /></a>
               </div>
             </div>
 
@@ -196,7 +200,7 @@ function LoginPage() {
             <h1>Đăng nhập</h1>
             <div className={cx('social-login')}>
               <div className={cx('social-btns')}>
-                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(location))}><FcGoogle size={24} /></a>
+                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FcGoogle size={24} /></a>
               </div>
             </div>
             <div className={cx('input-box')}>
@@ -206,7 +210,7 @@ function LoginPage() {
               <input type="password" placeholder="Mật khẩu" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} disabled={loading} />
             </div>
 
-            <Link to="/forgot-password" className={cx('forgot-link')}>Bạn quên mật khẩu?</Link>
+            <Link href={routes.forgot} className={cx('forgot-link')}>Bạn quên mật khẩu?</Link>
             {!isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
 
             <button type="submit" className={cx('login-btn')} disabled={loading}>

@@ -1,8 +1,17 @@
+'use client';
+
 import {useEffect, useMemo, useState} from 'react';
 import {Form} from 'react-bootstrap';
 import {Eye, Send} from 'lucide-react';
 import {toast} from 'react-toastify';
-import ReactQuill from 'react-quill';
+import dynamic from 'next/dynamic';
+
+// Quill chạm `document` ngay khi module được nạp nên không import tĩnh được: Next sẽ thực thi
+// file này cả ở phía server. Nạp động với ssr:false để nó chỉ tồn tại trên trình duyệt.
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <div style={{ minHeight: 200, color: 'var(--text-secondary)' }}>Đang tải trình soạn thảo...</div>,
+});
 import classNames from 'classnames/bind';
 import 'react-quill/dist/quill.snow.css';
 

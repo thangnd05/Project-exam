@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import worldGeo from 'world-atlas/countries-110m.json';

@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
 import TargetPlanTabs from '~/features/diagnostic/TargetPlanTabs';
@@ -14,7 +17,7 @@ const cx = classNames.bind(styles);
 const pageCx = classNames.bind(pageStyles);
 
 function PlanComparisonPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParamsState();
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
 
   const { examTypes, plans, isLoading: loading, error } = usePlanComparison(examTypeId);
@@ -86,7 +89,7 @@ function PlanComparisonPage() {
       {!loading && sorted.length === 0 && (
         <div className={cx('alert', 'alertInfo')}>
           <span>Chưa có lộ trình nào cho kỳ thi này.</span>
-          <ButtonPrime as="link" to="/learning-plans/generate" variant="primary" size="sm">
+          <ButtonPrime as="link" href="/learning-plans/generate" variant="primary" size="sm">
             Sinh lộ trình đầu tiên
           </ButtonPrime>
         </div>
@@ -142,7 +145,7 @@ function PlanComparisonPage() {
                     <li>
                       <strong>Bài thi nguồn:</strong>{' '}
                       {p.sourceUserTestId ? (
-                        <Link to={`/tests/result/${p.sourceUserTestId}`}>Xem kết quả</Link>
+                        <Link href={`/tests/result/${p.sourceUserTestId}`}>Xem kết quả</Link>
                       ) : '—'}
                     </li>
                     <li className={cx('muted')}>
@@ -150,7 +153,7 @@ function PlanComparisonPage() {
                     </li>
                     {p.replacedByPlanId && (
                       <li>
-                        <Link to={`/learning-plans/${p.replacedByPlanId}`}>
+                        <Link href={`/learning-plans/${p.replacedByPlanId}`}>
                           Đã thay bằng lộ trình kế tiếp
                         </Link>
                       </li>
@@ -160,7 +163,7 @@ function PlanComparisonPage() {
                   <div className={pageCx('planCardActions')}>
                     <ButtonPrime
                       as="link"
-                      to={`/learning-plans/${p.learningPlanId}`}
+                      href={`/learning-plans/${p.learningPlanId}`}
                       variant="outline"
                       size="sm"
                     >
@@ -169,7 +172,7 @@ function PlanComparisonPage() {
                     {p.status === 'ACTIVE' && (
                       <ButtonPrime
                         as="link"
-                        to={`/learning-plans/${p.learningPlanId}/study`}
+                        href={`/learning-plans/${p.learningPlanId}/study`}
                         variant="primary"
                         size="sm"
                       >

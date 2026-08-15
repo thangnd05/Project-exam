@@ -1,5 +1,7 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
@@ -23,7 +25,7 @@ const normalizeExamTypes = (payload) => {
 };
 
 function HeroSection() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
   const [activeIdx, setActiveIdx] = useState(0);
   const [pendingTest, setPendingTest] = useState(null);
@@ -62,11 +64,9 @@ function HeroSection() {
 
   const startTest = useCallback(
     (test) => {
-      navigate(`/tests/${test.testId}/start`, {
-        state: {allowedTime: calculateAllowedTime(test)},
-      });
+      router.push(`/tests/${test.testId}/start`);
     },
-    [navigate],
+    [router],
   );
 
   const requestStart = useCallback((test) => {

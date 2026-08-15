@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
 import { standardizeVocabularies } from '~/shared/api/vocabularyApi';

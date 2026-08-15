@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';

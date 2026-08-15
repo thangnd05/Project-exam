@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Badge, Button } from 'react-bootstrap';
 import { Eye, CheckCircle, Trash2 } from 'lucide-react';

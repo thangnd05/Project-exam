@@ -1,3 +1,5 @@
+'use client';
+
 import { Spinner, Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {

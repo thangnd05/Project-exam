@@ -1,5 +1,5 @@
 export const getApiBaseUrl = () =>
-  (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '');
+  (process.env.NEXT_PUBLIC_API_BASE_URL || '').trim().replace(/\/$/, '');
 
 export const getFullMediaUrl = (url) => {
   if (!url) return null;

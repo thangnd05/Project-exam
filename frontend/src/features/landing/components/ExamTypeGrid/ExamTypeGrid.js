@@ -1,5 +1,7 @@
+'use client';
+
+import Link from 'next/link';
 import {useCallback, useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
 import classNames from 'classnames/bind';
@@ -304,7 +306,7 @@ function ExamTypeCard({type, onOpenParent, onPrefetch}) {
   }
 
   return (
-    <Link to={buildExamTypeDetailPath(type.examTypeId)} className={className} aria-label={label}>
+    <Link href={buildExamTypeDetailPath(type.examTypeId)} className={className} aria-label={label}>
       {body}
     </Link>
   );

@@ -1,3 +1,5 @@
+'use client';
+
 import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 

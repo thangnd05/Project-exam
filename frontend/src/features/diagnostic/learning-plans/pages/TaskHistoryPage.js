@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import RecoveryResourceLink from '~/shared/resources/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '~/shared/utils/format-date-time';
@@ -49,7 +52,7 @@ function TaskHistoryPage() {
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertWarning')}>
           <span>Không tìm thấy ải này trong plan.</span>
-          <Link to={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnOutline', 'btnSm')}>
+          <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnOutline', 'btnSm')}>
             Về plan
           </Link>
         </div>
@@ -66,13 +69,13 @@ function TaskHistoryPage() {
     <div className={cx('wrapper')}>
       <div className={cx('headerBar')}>
         <Link
-          to={`/learning-plans/${learningPlanId}`}
+          href={`/learning-plans/${learningPlanId}`}
           className={cx('btn', 'btnGhost', 'btnSm')}
         >
           ← Lộ trình #{plan.planSequence ?? '?'}
         </Link>
         <Link
-          to={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
+          href={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
           className={cx('btn', 'btnPrimary', 'btnSm')}
         >
           Học tiếp ải này
@@ -240,7 +243,7 @@ function TaskHistoryPage() {
                   <td className={cx('right')}>
                     {s.status === 'SUBMITTED' ? (
                       <Link
-                        to={`/learning-plans/${learningPlanId}/sessions/${s.sessionId}/review?taskId=${taskId}`}
+                        href={`/learning-plans/${learningPlanId}/sessions/${s.sessionId}/review?taskId=${taskId}`}
                         className={cx('btn', 'btnOutline', 'btnSm')}
                       >
                         Xem đáp án

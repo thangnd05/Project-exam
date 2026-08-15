@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAdminTests, updateTest, deleteTest } from '~/shared/api/testApi';
 import { getExamTypes } from '~/shared/api/examTypeApi';

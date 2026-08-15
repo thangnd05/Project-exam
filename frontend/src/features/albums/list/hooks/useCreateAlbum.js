@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createAlbum } from '~/shared/api/vocabularyAlbumApi';
 import { albumKeys } from '~/features/albums/list/hooks/useMyAlbums';

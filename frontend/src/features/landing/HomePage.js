@@ -1,3 +1,5 @@
+'use client';
+
 import HeroSection from './components/HeroSection/HeroSection';
 import JourneySection from './components/JourneySection/JourneySection';
 import ExamTypeGrid from './components/ExamTypeGrid/ExamTypeGrid';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
   IoPencilOutline,

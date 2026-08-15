@@ -1,12 +1,21 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { FaEdit, FaImage, FaTag } from 'react-icons/fa';
 import { useAuth } from '~/shared/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 import routes from '~/shared/config/Routes';
-import ReactQuill from 'react-quill';
+import dynamic from 'next/dynamic';
+
+// Quill chạm `document` ngay khi module được nạp nên không import tĩnh được: Next sẽ thực thi
+// file này cả ở phía server. Nạp động với ssr:false để nó chỉ tồn tại trên trình duyệt.
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <div style={{ minHeight: 200, color: 'var(--text-secondary)' }}>Đang tải trình soạn thảo...</div>,
+});
 import 'react-quill/dist/quill.snow.css';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
@@ -25,7 +34,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
   const [inlineImages, setInlineImages] = useState([]);
 
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const savePostMutation = useSavePost({
     onSuccess: () => {
@@ -104,7 +113,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       toast.warning(' Bạn cần đăng nhập trước khi đăng bài viết!');
       setTimeout(() => {
         onClose();
-        navigate(routes.login);
+        router.push(routes.login);
       }, 1200);
       return;
     }

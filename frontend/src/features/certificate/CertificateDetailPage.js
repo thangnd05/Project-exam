@@ -1,4 +1,6 @@
-import { useParams, useNavigate } from 'react-router-dom';
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -13,7 +15,7 @@ const cx = classNames.bind(styles);
 
 function CertificateDetailPage() {
   const { certificateId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { data: certificate, isLoading, isError } = useCertificateDetail(certificateId);
 
   const verifyUrl = certificate
@@ -42,7 +44,7 @@ function CertificateDetailPage() {
     return (
       <Container className={cx('state')}>
         <Alert variant="danger">Không tìm thấy chứng chỉ này hoặc bạn không có quyền xem.</Alert>
-        <ButtonPrime variant="primary" onClick={() => navigate('/my-certificates')}>
+        <ButtonPrime variant="primary" onClick={() => router.push('/my-certificates')}>
           Về danh sách chứng chỉ
         </ButtonPrime>
       </Container>
@@ -56,7 +58,7 @@ function CertificateDetailPage() {
     <div className={cx('wrapper')}>
       <Container>
         <div className={cx('topBar')}>
-          <ButtonPrime variant="ghost" size="sm" onClick={() => navigate('/my-certificates')}>
+          <ButtonPrime variant="ghost" size="sm" onClick={() => router.push('/my-certificates')}>
             <ArrowLeft size={16} /> Chứng chỉ của tôi
           </ButtonPrime>
 

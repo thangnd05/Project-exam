@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
 import { useMutation } from '@tanstack/react-query';

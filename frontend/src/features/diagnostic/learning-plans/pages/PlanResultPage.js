@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import PlanCongratsModal, { markCongratsSeen } from '../components/PlanCongratsModal';
 import PlanResultView from '../components/PlanResultView';
@@ -11,7 +13,7 @@ const cx = classNames.bind(styles);
 
 function PlanResultPage() {
   const { learningPlanId, taskId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [showCongrats, setShowCongrats] = useState(false);
 
   const { result: sessionResult, isLoading, error: loadError } = usePlanResult(
@@ -19,8 +21,8 @@ function PlanResultPage() {
     taskId,
   );
 
-  const goToPicker = () => navigate(`/learning-plans/${learningPlanId}`);
-  const retry = () => navigate(`/learning-plans/${learningPlanId}/study?taskId=${taskId}`);
+  const goToPicker = () => router.push(`/learning-plans/${learningPlanId}`);
+  const retry = () => router.push(`/learning-plans/${learningPlanId}/study?taskId=${taskId}`);
 
   // Vượt ải cuối → toàn bộ lộ trình đã xong: bật modal chúc mừng
   // và đánh dấu đã xem để trang kế hoạch không hiện lại lần nữa.

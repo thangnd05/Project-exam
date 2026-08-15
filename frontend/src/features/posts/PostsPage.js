@@ -1,5 +1,7 @@
+'use client';
+
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
@@ -128,7 +130,7 @@ function PostsPage() {
           <AnimatePresence mode="popLayout">
           {posts.map((post, index) => (
             <MotionLink
-              to={routes.postDetail.replace(':postId', post.id)}
+              href={routes.postDetail.replace(':postId', post.id)}
               key={post.id}
               className={cx('postCard')}
               custom={index}

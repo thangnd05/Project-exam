@@ -1,3 +1,6 @@
+'use client';
+
+import { useMounted } from '~/shared/hooks/useMounted';
 import {useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {IoClose} from 'react-icons/io5';
@@ -35,7 +38,11 @@ function BaseModal({
     };
   }, [show, closeOnEsc, onClose]);
 
-  if (!show) return null;
+  const mounted = useMounted();
+
+
+  // Portal cần document.body -> chỉ dựng sau khi đã ở client (xem useMounted).
+  if (!show || !mounted) return null;
 
   return ReactDOM.createPortal(
     <div

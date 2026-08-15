@@ -1,5 +1,7 @@
+'use client';
+
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useQueries } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { ChevronDown } from 'lucide-react';
@@ -155,7 +157,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
         {!loading && totalElements === 0 && (
           <div className={cx('alert', 'alertInfo')} style={{ marginBottom: 0 }}>
             <span>Chưa có bài thi đầy đủ nào để thống kê.</span>
-            <Link to="/" className={cx('btn', 'btnPrimary', 'btnSm')}>
+            <Link href="/" className={cx('btn', 'btnPrimary', 'btnSm')}>
               Làm bài đầu tiên
             </Link>
           </div>
@@ -248,7 +250,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }) {
                         <td className={cx('small')}>{formatDuration(t.durationTaken)}</td>
                         <td>
                           <Link
-                            to={`/tests/result/${t.userTestId}`}
+                            href={`/tests/result/${t.userTestId}`}
                             className={cx('btn', 'btnOutline', 'btnSm')}
                           >
                             Chẩn đoán

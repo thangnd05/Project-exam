@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '~/shared/config/queryClient';

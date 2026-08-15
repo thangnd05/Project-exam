@@ -1,3 +1,5 @@
+'use client';
+
 import { Form, Row, Col } from 'react-bootstrap';
 
 import BaseModal from '~/shared/ui/modal/BaseModal';

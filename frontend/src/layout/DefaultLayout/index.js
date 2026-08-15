@@ -1,7 +1,9 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
 import {useLayoutEffect, useRef} from 'react';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
-import {useLocation} from 'react-router-dom';
 import styles from './DefaultLayout.module.scss';
 import Header from '../Header';
 import Footer from '../Footer';
@@ -17,9 +19,9 @@ function DefaultLayout({
   hideScrollToTop = false,
   examMode = false,
 }) {
-  const location = useLocation();
+  const pathname = usePathname();
   const showMobileNav = !hideFooter;
-  const flushTop = !examMode && location.pathname === '/';
+  const flushTop = !examMode && pathname === '/';
   const wrapperRef = useRef(null);
 
   useLayoutEffect(() => {
@@ -51,7 +53,7 @@ function DefaultLayout({
           <div className={cx('pageWrap')}>{noContainer ? children : <div>{children}</div>}</div>
         ) : (
           <motion.div
-            key={location.pathname}
+            key={pathname}
             initial={{opacity: 0}}
             animate={{opacity: 1}}
             transition={{duration: 0.2, ease: 'easeOut'}}

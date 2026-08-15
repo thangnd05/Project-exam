@@ -1,5 +1,9 @@
+'use client';
+
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useSearchParamsState } from '~/shared/hooks/useSearchParamsState';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import ButtonPrime from '~/shared/ui/Button/ButtonPrime';
@@ -112,8 +116,8 @@ function PassageBox({ passage }) {
 
 function PlanStudyPage() {
   const { learningPlanId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParamsState();
+  const router = useRouter();
   const { refreshStreak } = useStreak();
   const taskIdFromUrl = searchParams.get('taskId');
 
@@ -162,7 +166,7 @@ function PlanStudyPage() {
   }, [selections, answersStorageKey, session?.sessionId]);
 
   const goToPicker = () => {
-    navigate(`/learning-plans/${learningPlanId}`);
+    router.push(`/learning-plans/${learningPlanId}`);
   };
 
   const startTask = (taskId) => {
@@ -211,7 +215,7 @@ function PlanStudyPage() {
           if (res?.passed) refreshStreak();
 
           const taskId = taskIdFromUrl || session?.activeTask?.taskId;
-          navigate(`/learning-plans/${learningPlanId}/tasks/${taskId}/result`);
+          router.push(`/learning-plans/${learningPlanId}/tasks/${taskId}/result`);
         },
         onError: (err) => setFormError(err?.response?.data?.message || err.message),
       },
@@ -226,7 +230,7 @@ function PlanStudyPage() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
-          <Link to={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
+          <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
             ← Kế hoạch
           </Link>
         </div>
@@ -254,13 +258,13 @@ function PlanStudyPage() {
           </span>
           <div className={cx('actionBar')}>
             <Link
-              to={buildExamTypeDetailPath(session.examTypeId)}
+              href={buildExamTypeDetailPath(session.examTypeId)}
               className={cx('btn', 'btnPrimary', 'btnSm')}
             >
               Làm bài thi thử
             </Link>
             <Link
-              to={`/learning-plans/${learningPlanId}`}
+              href={`/learning-plans/${learningPlanId}`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
               Xem bước tiếp theo
@@ -275,7 +279,7 @@ function PlanStudyPage() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
-          <Link to={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
+          <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
             ← Kế hoạch
           </Link>
         </div>

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Braces, Plus, Trash2} from 'lucide-react';

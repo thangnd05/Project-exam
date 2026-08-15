@@ -1,3 +1,6 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
@@ -5,7 +8,6 @@ import { useCreateClass } from '~/features/classes/hooks/useMyClasses';
 import classNames from 'classnames/bind';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '~/shared/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 import routes from '~/shared/config/Routes';
 import CommonFormModal from '~/shared/ui/modal/CommonFormModal';
 import ModalActionFooter from '~/shared/ui/modal/ModalActionFooter';
@@ -21,7 +23,7 @@ function CreateClassModal({ show, onClose }) {
   const [type, setType] = useState('info');
 
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const createMutation = useCreateClass();
   const loading = createMutation.isPending;
 
@@ -34,7 +36,7 @@ function CreateClassModal({ show, onClose }) {
 
       setTimeout(() => {
         onClose();
-        navigate(routes.login);
+        router.push(routes.login);
       }, 1200);
 
       return;
@@ -56,7 +58,7 @@ function CreateClassModal({ show, onClose }) {
           setDescription('');
           onClose();
 
-          navigate(routes.myClasses);
+          router.push(routes.myClasses);
         },
         onError: (err) => {
           setType('danger');

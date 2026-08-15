@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { useAlbumVocabularies, useDeleteVocabulary } from '~/features/albums/detail/hooks/useAlbumVocabularies';
 import { getTtsUrl } from '~/shared/utils/mediaUrl';
 import {
@@ -33,7 +35,7 @@ const AlbumDetailPage = () => {
   const [flashMode, setFlashMode] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const {
     vocabularies = [],
@@ -112,7 +114,7 @@ const AlbumDetailPage = () => {
         />
 
         <div className={cx('custom-actions')}>
-          <ButtonPrime variant="ghost" onClick={() => navigate(-1)}>
+          <ButtonPrime variant="ghost" onClick={() => router.back()}>
             <IoChevronBack />
             Quay lại album
           </ButtonPrime>
@@ -120,7 +122,7 @@ const AlbumDetailPage = () => {
           <div className={cx('mode-group')}>
             <button
               className={cx('btn-mode', { active: !flashMode })}
-              onClick={() => navigate(`/practice/${albumId}`)}
+              onClick={() => router.push(`/practice/${albumId}`)}
               disabled={vocabularies.length === 0}
             >
               <IoSchoolOutline />

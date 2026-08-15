@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import classNames from 'classnames/bind';
 import InfoTip from '~/shared/ui/InfoTip/InfoTip';
 import { TERM_TIPS } from '~/features/diagnostic/termTips';
@@ -22,7 +24,7 @@ const COLOR_MAP = {
 };
 
 function ReadinessGauge({ enhanced }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { examCategoryCode, examTypeId, readinessLevel, hasTarget, correct, total } = enhanced;
 
   const { gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage, gaugeLevel } =
@@ -89,7 +91,7 @@ function ReadinessGauge({ enhanced }) {
         <div
           className={cx('actionButton')}
           style={{ backgroundColor: effectiveColor }}
-          onClick={() => navigate(`/exam-types/${examTypeId}`)}
+          onClick={() => router.push(`/exam-types/${examTypeId}`)}
         >
           Làm Full Mock Exam để biết khả năng của bản thân
         </div>

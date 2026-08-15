@@ -1,3 +1,5 @@
+'use client';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleDollarToSlot } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';

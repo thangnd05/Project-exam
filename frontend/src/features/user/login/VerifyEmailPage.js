@@ -1,7 +1,9 @@
+'use client';
+
 // [TẮT XÁC THỰC EMAIL] Trang xác thực qua link trong mail  đã bỏ khỏi router, giữ lại phòng khi cần bật lại.
 /*
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
@@ -19,7 +21,7 @@ const TITLES = {
 
 export default function VerifyEmailPage() {
   const [params] = useSearchParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const token = params.get('token');
 
   const [status, setStatus] = useState('loading');
@@ -39,7 +41,7 @@ export default function VerifyEmailPage() {
         setMsg(data.message || 'Tài khoản của bạn đã được xác thực. Đang chuyển đến trang đăng nhập...');
 
         setTimeout(() => {
-          navigate('/login');
+          router.push('/login');
         }, 2000);
       },
       onError: (err) => {
@@ -47,11 +49,11 @@ export default function VerifyEmailPage() {
         setMsg(err.response?.data?.message || 'Liên kết xác thực không hợp lệ hoặc đã hết hạn.');
 
         setTimeout(() => {
-          navigate('/register');
+          router.push('/register');
         }, 2500);
       },
     });
-  }, [token, navigate]);
+  }, [token, router]);
 
   return (
     <div className={cx('wrapper')}>
@@ -68,15 +70,15 @@ export default function VerifyEmailPage() {
         {status !== 'loading' && (
           <div className={cx('actions')}>
             {status === 'success' ? (
-              <ButtonPrime variant="primary" onClick={() => navigate('/login')}>
+              <ButtonPrime variant="primary" onClick={() => router.push('/login')}>
                 Đến trang đăng nhập
               </ButtonPrime>
             ) : (
               <>
-                <ButtonPrime variant="outline" onClick={() => navigate('/login')}>
+                <ButtonPrime variant="outline" onClick={() => router.push('/login')}>
                   Đăng nhập
                 </ButtonPrime>
-                <ButtonPrime variant="primary" onClick={() => navigate('/register')}>
+                <ButtonPrime variant="primary" onClick={() => router.push('/register')}>
                   Đăng ký lại
                 </ButtonPrime>
               </>

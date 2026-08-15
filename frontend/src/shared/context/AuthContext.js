@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
@@ -46,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         auto_select: false,
         itp_support: true,
       });

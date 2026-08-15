@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
 import { getMyTests, deleteTest } from '~/shared/api/testApi';

@@ -1,7 +1,9 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 import { IoClipboardOutline, IoLockClosedOutline, IoSchoolOutline, IoStatsChartOutline } from 'react-icons/io5';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
@@ -59,7 +61,7 @@ const formatDuration = (minutes) => {
 };
 
 function ProfileOverviewPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
@@ -201,16 +203,16 @@ function ProfileOverviewPage() {
               <section className={cx('quickActionsCard')}>
                 <h3 className={cx('cardTitle')}>Truy cập nhanh</h3>
                 <div className={cx('quickActionsList')}>
-                  <button onClick={() => navigate(routes.home)} className={cx('actionBtn')}>
+                  <button onClick={() => router.push(routes.home)} className={cx('actionBtn')}>
                     <span>Làm bài thi mới</span>
                   </button>
-                  <button onClick={() => navigate(routes.myAlbums)} className={cx('actionBtn')}>
+                  <button onClick={() => router.push(routes.myAlbums)} className={cx('actionBtn')}>
                     <span>Thẻ ghi nhớ</span>
                   </button>
-                  <button onClick={() => navigate(routes.myClasses)} className={cx('actionBtn')}>
+                  <button onClick={() => router.push(routes.myClasses)} className={cx('actionBtn')}>
                     <span>Lớp học của tôi</span>
                   </button>
-                  <button onClick={() => navigate(routes.personalQuestionBank)} className={cx('actionBtn')}>
+                  <button onClick={() => router.push(routes.personalQuestionBank)} className={cx('actionBtn')}>
                     <span>Ngân hàng câu hỏi</span>
                   </button>
                   <button onClick={() => setActiveSection('evaluations')} className={cx('actionBtn')}>
@@ -367,7 +369,7 @@ function ProfileOverviewPage() {
                     <ButtonPrime
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(routes.myTarget)}
+                      onClick={() => router.push(routes.myTarget)}
                     >
                       Quản lý mục tiêu
                     </ButtonPrime>
@@ -382,7 +384,7 @@ function ProfileOverviewPage() {
                       </p>
                       <ButtonPrime
                         variant="primary"
-                        onClick={() => navigate(routes.myTarget)}
+                        onClick={() => router.push(routes.myTarget)}
                       >
                         Đặt mục tiêu ngay
                       </ButtonPrime>
@@ -439,9 +441,7 @@ function ProfileOverviewPage() {
                                 size="sm"
                                 className={cx('targetActionFlex')}
                                 onClick={() =>
-                                  navigate(
-                                    `${routes.targetDashboard}?examTypeId=${encodeURIComponent(target.examTypeId)}`
-                                  )
+                                  router.push(`${routes.targetDashboard}?examTypeId=${encodeURIComponent(target.examTypeId)}`)
                                 }
                               >
                                 Dashboard
@@ -451,9 +451,7 @@ function ProfileOverviewPage() {
                                 size="sm"
                                 className={cx('targetActionFlex')}
                                 onClick={() =>
-                                  navigate(
-                                    `${routes.generatePlan}?examTypeId=${encodeURIComponent(target.examTypeId)}`
-                                  )
+                                  router.push(`${routes.generatePlan}?examTypeId=${encodeURIComponent(target.examTypeId)}`)
                                 }
                               >
                                 Sinh lộ trình

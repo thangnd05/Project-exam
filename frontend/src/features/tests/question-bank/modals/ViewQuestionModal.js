@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
 import {Spinner, Alert} from 'react-bootstrap';
 import BaseModal from '~/shared/ui/modal/BaseModal';

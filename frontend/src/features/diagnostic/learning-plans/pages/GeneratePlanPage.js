@@ -1,5 +1,9 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSearchParamsState } from '~/shared/hooks/useSearchParamsState';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '~/shared/utils/format-date-time';
 import LearningPlanList from '../components/LearningPlanList';
@@ -20,8 +24,8 @@ import {
 const cx = classNames.bind(styles);
 
 function GeneratePlanPage() {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter();
+  const [searchParams, setSearchParams] = useSearchParamsState();
 
   const [userTestId, setUserTestId] = useState(searchParams.get('userTestId') || '');
 
@@ -187,7 +191,7 @@ function GeneratePlanPage() {
             Sang tab <strong>Mục tiêu</strong> đặt trước (có mốc gợi ý sẵn), rồi quay lại đây sinh lộ trình.
           </span>
           <Link
-            to={`/my-target?examTypeId=${encodeURIComponent(sourceExamTypeId)}`}
+            href={`/my-target?examTypeId=${encodeURIComponent(sourceExamTypeId)}`}
             className={cx('btn', 'btnPrimary', 'btnSm')}
           >
             Đặt mục tiêu
@@ -299,7 +303,7 @@ function GeneratePlanPage() {
             <button
               type="button"
               className={cx('btn', 'btnPrimary', 'btnSm')}
-              onClick={() => navigate(`/learning-plans/${result.learningPlanId}#chon-ai-hoc`)}
+              onClick={() => router.push(`/learning-plans/${result.learningPlanId}#chon-ai-hoc`)}
             >
               Chọn ải để học
             </button>

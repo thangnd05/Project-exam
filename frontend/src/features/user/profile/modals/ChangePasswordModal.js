@@ -1,3 +1,5 @@
+'use client';
+
 import {useState} from 'react';
 import { useChangePassword } from '~/features/user/profile/hooks/useChangePassword';
 import classNames from 'classnames/bind';

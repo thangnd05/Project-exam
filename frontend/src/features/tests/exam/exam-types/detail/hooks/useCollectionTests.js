@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
 import { getTestsByCollection, getTestCollectionsByExamType } from '~/shared/api/testApi';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getMyClasses, joinClass } from '~/shared/api/classMemberApi';
 import { createClass, updateClass, deleteClass } from '~/shared/api/classApi';

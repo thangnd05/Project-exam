@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '~/shared/api/userTestApi';
@@ -18,7 +20,7 @@ import { useExamFlowNavigation } from './useExamFlowNavigation';
 
 export function useTestSession() {
   const { testId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [searchParams] = useSearchParams();
 
   const isPractice = searchParams.get('mode') === 'practice';
@@ -118,12 +120,14 @@ export function useTestSession() {
         setTest(enriched);
 
         if (testData.status === 'LOGIN_REQUIRED') {
-          navigate('/login', {
-            state: {
-              from: { pathname: `/tests/${testId}/start` },
-              flashMessage: 'Bạn cần đăng nhập để làm bài thi này!',
-            },
-          });
+          // `from` + `flash` đi qua query string (Next không có location.state) — cùng giao
+          // ước với AuthGuard, LoginPage đọc hai tham số này.
+          router.push(
+            `/login?${new URLSearchParams({
+              from: `/tests/${testId}/start`,
+              flash: 'Bạn cần đăng nhập để làm bài thi này!',
+            }).toString()}`,
+          );
           return;
         }
 
@@ -204,7 +208,7 @@ export function useTestSession() {
       .catch(() => setStatus('error'));
     // flow.restoreStepState is stable
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testId, sessionKey, isPractice, selectedPartIds, navigate, isGuest, guestCfg]);
+  }, [testId, sessionKey, isPractice, selectedPartIds, router, isGuest, guestCfg]);
 
   useEffect(() => {
     if (!testId || authLoading) return;
@@ -329,14 +333,12 @@ export function useTestSession() {
       sessionStorage.removeItem(`userTest-${sessionKey}`);
       sessionStorage.removeItem(`userTestState-${sessionKey}`);
       if (!isGuest) refreshStreak();
-      navigate(`/tests/result/${userTestId}`, {
-        state: { score: result.totalScore },
-      });
+      router.push(`/tests/result/${userTestId}`);
     } catch (err) {
       if (err?.response?.status === 409) {
         sessionStorage.removeItem(`userTest-${sessionKey}`);
         sessionStorage.removeItem(`userTestState-${sessionKey}`);
-        navigate(`/tests/result/${userTestId}`);
+        router.push(`/tests/result/${userTestId}`);
         return;
       }
       toast.error(getApiErrorMessage(err, 'Nộp bài thất bại! Vui lòng thử lại.'));

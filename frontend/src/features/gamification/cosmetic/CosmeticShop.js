@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';

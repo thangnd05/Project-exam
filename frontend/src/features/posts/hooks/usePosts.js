@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '~/shared/config/queryClient';
 import { getPosts, getCategories, getPostById, getComments } from '~/shared/api/postApi';

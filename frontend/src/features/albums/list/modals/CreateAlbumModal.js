@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from "react";
 import { toast } from 'react-toastify';
 import { useCreateAlbum } from '~/features/albums/list/hooks/useCreateAlbum';

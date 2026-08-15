@@ -40,9 +40,7 @@
     align-items: center;
     gap: 10px;
   }
-}
-
-.tableWrapper {
+}.tableWrapper {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: 16px;
@@ -137,16 +135,12 @@
       border-color: var(--slate-200);
     }
   }
-}
-
-.stateCell {
+}.stateCell {
   text-align: center;
   padding: 32px 0 !important;
   color: var(--text-secondary);
   font-size: 1.4rem;
-}
-
-.tableFooter {
+}.tableFooter {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -155,21 +149,15 @@
   padding: 16px 20px;
   border-top: 1px solid var(--border-color);
   background: var(--bg-white);
-}
-
-.footerInfo {
+}.footerInfo {
   color: var(--text-secondary);
   font-size: 1.3rem;
   font-weight: 500;
-}
-
-.pager {
+}.pager {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.pagerBtn {
+}.pagerBtn {
   min-width: 36px;
   height: 36px;
   padding: 0 8px;
@@ -212,17 +200,11 @@
     background: var(--slate-50);
     border-color: var(--slate-200);
   }
-}
-
-.center {
+}.center {
   text-align: center;
-}
-
-.right {
+}.right {
   text-align: right;
-}
-
-.actions {
+}.actions {
   display: inline-flex;
   gap: 8px;
 
@@ -259,9 +241,7 @@
       transform: translateY(0);
     }
   }
-}
-
-.card {
+}.card {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: 16px;
@@ -273,9 +253,7 @@
     box-shadow: 0 6px 16px rgb(var(--slate-900-rgb) / 0.04);
     transform: translateY(-1px);
   }
-}
-
-.errorText {
+}.errorText {
   margin: 0;
   color: var(--danger-text);
   background-color: var(--danger-bg);
@@ -287,66 +265,28 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.statGroup {
+}.statGroup {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
-}
-
-.statCard {
+}.statCard {
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: 22px 24px;
-}
-
-.statLabel {
+}.statLabel {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--slate-400);
-}
-
-.statValue {
+}.statValue {
   margin-top: 12px;
   font-size: 30px;
   font-weight: 700;
   line-height: 1;
   color: var(--text-color);
-}
-
-:global(input.form-control),
-:global(.form-select) {
-  height: 42px;
-}
-
-:global(.form-control),
-:global(.form-select) {
-  padding: 10px 16px;
-  font-size: 1.4rem;
-  font-weight: 500;
-  color: var(--text-color);
-  background-color: var(--bg-white);
-  border: 1px solid var(--slate-200);
-  border-radius: 12px;
-  transition: all 0.2s ease-in-out;
-  box-shadow: none;
-
-  &:hover {
-    border-color: var(--slate-300);
-  }
-
-  &:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgb(var(--teal-600-rgb) / 0.06);
-    outline: none;
-  }
-}
-
-.pillBtn {
+}.pillBtn {
   background-color: var(--bg-white) !important;
   border: 1px solid var(--slate-200) !important;
   color: var(--slate-600) !important;
@@ -372,8 +312,7 @@
 }
 
 /*
-  Tab của trang quản trị. Bootstrap để tab chưa chọn màu xanh link và viền hộp;
-  ở đây đổi sang chữ xám + gạch chân, tab đang chọn mới ăn màu thương hiệu.
+  Tab của trang quản trị. Bootstrap để tab chưa chọn màu xanh link và viền hộp;ở đây đổi sang chữ xám + gạch chân, tab đang chọn mới ăn màu thương hiệu.
 */
 .tabs {
   border-bottom: 2px solid var(--border-color);

@@ -1,5 +1,7 @@
+'use client';
+
+import Link from 'next/link';
 import {Container} from 'react-bootstrap';
-import {Link} from 'react-router-dom';
 import {useEffect, useRef, useState} from 'react';
 import {motion, useInView} from 'framer-motion';
 import {FaFacebookSquare, FaInstagram, FaYoutube} from 'react-icons/fa';
@@ -115,7 +117,7 @@ function Footer() {
               <ul className={styles.linkList}>
                 {LINKS.map(({to, label}) => (
                   <li key={to}>
-                    <Link className={styles.footerLink} to={to}>
+                    <Link className={styles.footerLink} href={to}>
                       {label}
                     </Link>
                   </li>

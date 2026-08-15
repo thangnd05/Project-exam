@@ -1,3 +1,5 @@
+'use client';
+
 import styles from './BackgroundDecor.module.scss';
 
 function BackgroundDecor() {

@@ -2,22 +2,12 @@
   min-height: 100vh;
   padding: 32px 16px 64px;
   background: var(--bg-body);
-}
-
-:global(body.recovery-resource-print-page) {
-  background: var(--bg-body);
-}
-
-.container {
+}.container {
   max-width: 900px;
   margin: 0 auto;
-}
-
-.header {
+}.header {
   margin-bottom: 24px;
-}
-
-.backLink {
+}.backLink {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -32,22 +22,16 @@
   &:hover {
     text-decoration: underline;
   }
-}
-
-.title {
+}.title {
   margin: 0 0 8px;
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   color: var(--text-color);
-}
-
-.description {
+}.description {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.6;
-}
-
-.readHint {
+}.readHint {
   margin: 12px 0 0;
   padding: 12px 16px;
   border-radius: var(--radius-md);
@@ -55,9 +39,7 @@
   color: var(--accent-color);
   font-size: var(--font-size-base);
   line-height: 1.55;
-}
-
-.markdownBody {
+}.markdownBody {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -139,25 +121,19 @@
     padding: 8px 12px;
     text-align: left;
   }
-}
-
-.stateBox {
+}.stateBox {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   min-height: 240px;
   color: var(--text-secondary);
-}
-
-.actions {
+}.actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 20px;
-}
-
-.actionBtn {
+}.actionBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -185,40 +161,17 @@
     }
   }
 }
-
 @media print {
-  :global(body.recovery-resource-print-page) {
-    background: var(--bg-white) !important;
-  }
-
-  :global(body.recovery-resource-print-page *) {
-    visibility: hidden;
-  }
-
-  :global(body.recovery-resource-print-page #recovery-resource-print-root),
-  :global(body.recovery-resource-print-page #recovery-resource-print-root *) {
-    visibility: visible;
-  }
-
-  :global(body.recovery-resource-print-page #recovery-resource-print-root) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
-
-  .wrapper {
+.wrapper {
     background: var(--bg-white);
     padding: 0;
     min-height: auto;
   }
-
-  .noPrint {
+.noPrint {
     display: none !important;
     visibility: hidden !important;
   }
-
-  .markdownBody {
+.markdownBody {
     border: none;
     border-radius: 0;
     padding: 0;

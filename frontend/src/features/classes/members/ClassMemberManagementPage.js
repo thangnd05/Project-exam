@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { IoPeopleOutline, IoCheckmarkCircle, IoTimeOutline, IoPersonRemoveOutline, IoSearchOutline, IoRefreshOutline, IoChevronDown, IoChevronUp } from 'react-icons/io5';
@@ -15,7 +17,7 @@ const cx = classNames.bind(styles);
 
 const ClassMemberManagementPage = () => {
   const { classId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -214,7 +216,7 @@ const ClassMemberManagementPage = () => {
   return (
     <div className={cx('wrapper')}>
 
-      <button className={cx('back-btn')} onClick={() => navigate(-1)}>
+      <button className={cx('back-btn')} onClick={() => router.back()}>
         <span>Quay lại</span>
       </button>
 

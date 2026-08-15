@@ -3,7 +3,7 @@
  * SVG inline, <input type="color">)  nơi không viết được var(--...) trong CSS.
  *
  * KHÔNG khai màu ở đây. Giá trị đọc thẳng từ các primitive `--brand-*-rgb`
- * trong GlobalStyles.module.scss, nên đổi tông vẫn chỉ sửa đúng một file.
+ * trong GlobalStyles.scss, nên đổi tông vẫn chỉ sửa đúng một file.
  * Các hằng dưới đây chỉ là phao cứu sinh khi chưa có DOM (test, SSR).
  */
 

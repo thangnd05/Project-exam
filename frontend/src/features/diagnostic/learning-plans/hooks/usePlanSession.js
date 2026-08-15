@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { getCurrentSession, startTaskSession } from '~/shared/api/learningPlanApi';
 import { getApiErrorMessage } from '~/shared/utils/apiError';

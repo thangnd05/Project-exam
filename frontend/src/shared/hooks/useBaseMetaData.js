@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { getExamTypes } from '~/shared/api/examTypeApi';
 import { getQuestionCollections } from '~/shared/api/questionCollectionApi';

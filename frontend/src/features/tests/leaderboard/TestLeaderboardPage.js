@@ -1,4 +1,6 @@
-import {useNavigate, useParams} from 'react-router-dom';
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import {Alert, Container, Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { IoPodiumOutline } from 'react-icons/io5';
@@ -46,7 +48,7 @@ function TrophyIcon({rank}) {
 
 function TestLeaderboardPage() {
   const {testId} = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const {
     testTitle,
     rawRows,
@@ -88,7 +90,7 @@ function TestLeaderboardPage() {
           <ButtonPrime
             variant="outline"
             onClick={() =>
-              navigate(routes.testHistory.replace(':testId', String(testId)))
+              router.push(routes.testHistory.replace(':testId', String(testId)))
             }
           >
             Quay lại lịch sử

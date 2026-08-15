@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { uploadPostImage, createPost, updatePost } from '~/shared/api/postApi';

@@ -1,3 +1,5 @@
+'use client';
+
 import {Nav} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import styles from './adminKit.module.scss';

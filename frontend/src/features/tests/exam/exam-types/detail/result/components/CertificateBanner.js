@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import classNames from 'classnames/bind';
 import { Award, Target } from 'lucide-react';
 
@@ -17,7 +19,7 @@ const formatDate = (value) =>
  * Đề không thuộc nhóm cấp chứng chỉ thì không hiện gì.
  */
 function CertificateBanner({ userTestId, enabled }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   // Khách làm bài không bao giờ được cấp chứng chỉ nên chỉ hỏi khi đã biết chắc là người đã đăng nhập.
   const { data } = useAttemptCertificate(userTestId, enabled);
 
@@ -36,7 +38,7 @@ function CertificateBanner({ userTestId, enabled }) {
             (cần {data.passScore} điểm, bạn đạt {data.score} điểm).
           </p>
         </div>
-        <ButtonPrime variant="outline" onClick={() => navigate('/learning-plans/generate')}>
+        <ButtonPrime variant="outline" onClick={() => router.push('/learning-plans/generate')}>
           Lập lộ trình ôn tập
         </ButtonPrime>
       </div>
@@ -63,7 +65,7 @@ function CertificateBanner({ userTestId, enabled }) {
       </div>
       <ButtonPrime
         variant="primary"
-        onClick={() => navigate(`/certificates/${certificate?.certificateId}`)}
+        onClick={() => router.push(`/certificates/${certificate?.certificateId}`)}
       >
         Xem chứng chỉ
       </ButtonPrime>

@@ -1,0 +1,131 @@
+// Mixin dùng chung cho các *.module.scss (nút, kích thước...).
+//
+// Tách khỏi GlobalStyles.scss vì hai file phục vụ hai việc khác nhau:
+//   - GlobalStyles.scss: CSS global thật (token :root, reset, utility) — nạp MỘT LẦN ở app/layout.js
+//   - mixins.scss: chỉ có @mixin, không sinh ra CSS khi import — module nào cần thì @import
+//
+// Trước đây 34 file module @import thẳng GlobalStyles.module.scss chỉ để lấy mixin, kéo theo
+// ~785 dòng token bị nhân bản vào từng file. Giờ import file này thì không còn nhân bản nữa.
+
+@mixin primaryGradientButton {
+  background: var(--primary-btn-bg);
+  border-color: transparent;
+  color: var(--primary-btn-fg);
+  transition: all 0.25s ease;
+  box-shadow: var(--primary-btn-shadow);
+
+  /* Hover: viền brand hiện ra như nút ghost "Khám phá kỳ thi". Nền giữ trắng
+     nên viền là tín hiệu chính; base đã có border 1px trong suốt sẵn để không
+     nhảy layout khi viền xuất hiện. */
+  &:hover {
+    background: var(--primary-btn-bg);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--primary-btn-shadow-hover);
+    color: var(--primary-btn-fg-hover);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    transform: none;
+    box-shadow: var(--primary-btn-shadow-disabled);
+  }
+}
+
+@mixin buttonBase {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.25;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+@mixin buttonOutline {
+  background: var(--bg-white);
+  border-color: var(--border-color);
+  color: var(--text-color);
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+@mixin buttonGhost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-color);
+
+  &:hover {
+    background: var(--hover-color);
+  }
+}
+
+@mixin buttonDanger {
+  background: linear-gradient(135deg, var(--red-500) 0%, var(--red-600) 100%);
+  border-color: transparent;
+  color: var(--white);
+  box-shadow: 0 8px 18px rgb(var(--red-600-rgb) / 0.24);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgb(var(--red-600-rgb) / 0.32);
+    color: var(--white);
+  }
+}
+
+@mixin buttonDangerGhost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--danger-text);
+
+  &:hover {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+  }
+}
+
+@mixin buttonSuccess {
+  background: linear-gradient(135deg, var(--green-500) 0%, var(--green-600) 100%);
+  border-color: transparent;
+  color: var(--white);
+  box-shadow: 0 8px 18px rgb(var(--green-600-rgb) / 0.24);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgb(var(--green-600-rgb) / 0.32);
+    color: var(--white);
+  }
+}
+
+@mixin buttonSizeSm {
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-sm);
+}
+
+@mixin buttonSizeMd {
+  padding: 0.9rem 1.8rem;
+  font-size: var(--font-size-ssm);
+}
+
+@mixin buttonSizeLg {
+  padding: 1.1rem 2.2rem;
+  font-size: var(--font-size-base);
+}

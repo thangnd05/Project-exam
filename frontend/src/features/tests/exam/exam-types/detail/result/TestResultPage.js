@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useContext, useMemo } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import { toast } from "react-toastify";
 import classNames from "classnames/bind";
@@ -26,8 +28,8 @@ const cx = classNames.bind(styles);
 
 const TestResultPage = () => {
   const { userTestId } = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
   const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
   const isGuest = !authLoading && !isAuthenticated;
   const guestCfg = useMemo(
@@ -56,7 +58,7 @@ const TestResultPage = () => {
       toast.warning("Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.");
       return;
     }
-    navigate(`/tests/result/${userTestId}/review`);
+    router.push(`/tests/result/${userTestId}/review`);
   };
 
   if (loading)
@@ -76,7 +78,7 @@ const TestResultPage = () => {
       <div className={cx("wrapper")}>
         <Container>
           <Alert variant="danger">{error}</Alert>
-          <ButtonPrime variant="primary" className="mt-3" onClick={() => navigate("/")}>
+          <ButtonPrime variant="primary" className="mt-3" onClick={() => router.push("/")}>
             Quay lại trang chủ
           </ButtonPrime>
         </Container>
@@ -107,9 +109,10 @@ const TestResultPage = () => {
                   <>
                     <span className={cx("label")}>Điểm số</span>
                     <div className={cx("points")}>
-                      {result?.totalScore?.toFixed(2) ||
-                        location.state?.score?.toFixed(2) ||
-                        "0.00"}
+                      {/* Bản react-router cũ còn nhánh location.state?.score do trang trước
+                          truyền sang; Next không có location.state nên bỏ — `result` từ API
+                          vốn đã là nguồn chính, nhánh kia chỉ là dự phòng. */}
+                      {result?.totalScore?.toFixed(2) || "0.00"}
                     </div>
                   </>
                 )}
@@ -173,12 +176,12 @@ const TestResultPage = () => {
 
               <ButtonPrime
                 variant="ghost"
-                onClick={() => navigate(`/tests/history/${testId}`)}
+                onClick={() => router.push(`/tests/history/${testId}`)}
               >
                 <IoSchoolOutline /> Lịch sử bài thi
               </ButtonPrime>
 
-              <ButtonPrime variant="primary" onClick={() => navigate("/")}>
+              <ButtonPrime variant="primary" onClick={() => router.push("/")}>
                 <IoHomeOutline /> Trang chủ
               </ButtonPrime>
             </div>

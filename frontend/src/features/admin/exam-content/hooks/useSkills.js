@@ -1,3 +1,5 @@
+'use client';
+
 import {createSkill, deleteSkill, getSkills, updateSkill} from '~/shared/api/skillApi';
 import {useAdminCrud} from '~/features/admin/hooks/useAdminCrud';
 

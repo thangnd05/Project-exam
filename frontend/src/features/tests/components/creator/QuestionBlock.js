@@ -1,3 +1,5 @@
+'use client';
+
 import { Row, Col, Button } from 'react-bootstrap';
 import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';

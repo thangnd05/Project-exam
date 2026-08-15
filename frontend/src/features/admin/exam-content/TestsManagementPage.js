@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import {Edit, Trash2} from 'lucide-react';

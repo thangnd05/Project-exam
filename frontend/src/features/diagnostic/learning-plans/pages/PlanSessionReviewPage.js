@@ -1,4 +1,7 @@
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import classNames from 'classnames/bind';
 import PlanResultView from '../components/PlanResultView';
 import { toPlanResult } from '../planResult';
@@ -11,7 +14,7 @@ function PlanSessionReviewPage() {
   const { learningPlanId, sessionId } = useParams();
   const [searchParams] = useSearchParams();
   const taskId = searchParams.get('taskId');
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const { review, isLoading, error: loadError } = usePlanSessionReview(
     learningPlanId,
@@ -22,13 +25,11 @@ function PlanSessionReviewPage() {
     ? `/learning-plans/${learningPlanId}/tasks/${taskId}/history`
     : `/learning-plans/${learningPlanId}`;
 
-  const goToPicker = () => navigate(`/learning-plans/${learningPlanId}`);
+  const goToPicker = () => router.push(`/learning-plans/${learningPlanId}`);
   const retry = () =>
-    navigate(
-      taskId
+    router.push(taskId
         ? `/learning-plans/${learningPlanId}/study?taskId=${taskId}`
-        : `/learning-plans/${learningPlanId}`,
-    );
+        : `/learning-plans/${learningPlanId}`);
 
   if (isLoading) {
     return (
@@ -44,7 +45,7 @@ function PlanSessionReviewPage() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
-          <Link to={backTo} className={cx('btn', 'btnGhost', 'btnSm')}>
+          <Link href={backTo} className={cx('btn', 'btnGhost', 'btnSm')}>
             ← {taskId ? 'Lịch sử ải' : 'Kế hoạch'}
           </Link>
         </div>
@@ -58,7 +59,7 @@ function PlanSessionReviewPage() {
   return (
     <div className={cx('wrapper', 'studyWide')}>
       <div className={cx('headerBar')}>
-        <Link to={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+        <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
           Quay lại
         </Link>
       </div>

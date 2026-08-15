@@ -1,3 +1,5 @@
+'use client';
+
 import {useEffect, useMemo, useState} from 'react';
 import {Form, Spinner} from 'react-bootstrap';
 import {toast} from 'react-toastify';

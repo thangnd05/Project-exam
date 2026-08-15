@@ -1,4 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { Award, ExternalLink } from 'lucide-react';
@@ -15,7 +17,7 @@ const formatDate = (value) =>
   value ? new Date(value).toLocaleDateString('vi-VN') : '--';
 
 function MyCertificatesPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { data: certificates = [], isLoading, isError } = useMyCertificates();
 
   const activeCount = certificates.filter(
@@ -54,7 +56,7 @@ function MyCertificatesPage() {
             <p>
               Hoàn thành một bài thi thử toàn phần và đạt điểm yêu cầu để nhận chứng chỉ đầu tiên.
             </p>
-            <ButtonPrime variant="primary" onClick={() => navigate('/')}>
+            <ButtonPrime variant="primary" onClick={() => router.push('/')}>
               Tìm bài thi thử
             </ButtonPrime>
           </div>
@@ -70,7 +72,7 @@ function MyCertificatesPage() {
                   <button
                     type="button"
                     className={cx('preview', { dimmed: revoked || expired })}
-                    onClick={() => navigate(`/certificates/${certificate.certificateId}`)}
+                    onClick={() => router.push(`/certificates/${certificate.certificateId}`)}
                     aria-label={`Xem chứng chỉ ${certificate.design?.title || ''}`}
                   >
                     <CertificateCanvas
@@ -95,7 +97,7 @@ function MyCertificatesPage() {
                       <ButtonPrime
                         variant="primary"
                         size="sm"
-                        onClick={() => navigate(`/certificates/${certificate.certificateId}`)}
+                        onClick={() => router.push(`/certificates/${certificate.certificateId}`)}
                       >
                         Xem & tải về
                       </ButtonPrime>

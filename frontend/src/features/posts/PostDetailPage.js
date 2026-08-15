@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import DOMPurify from 'dompurify';
 import classNames from 'classnames/bind';
@@ -28,7 +31,7 @@ function PostDetailPage() {
   const { postId } = useParams();
   const { user } = useAuth();
   const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
-  const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const [liked, setLiked] = useState(false);
@@ -396,7 +399,7 @@ function PostDetailPage() {
           Không tải được bài viết. Vui lòng kiểm tra kết nối và thử lại.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <ButtonPrime variant="outline" onClick={() => navigate(routes.posts || '/posts')}>
+          <ButtonPrime variant="outline" onClick={() => router.push(routes.posts || '/posts')}>
             Về danh sách
           </ButtonPrime>
           <ButtonPrime onClick={() => refetch()}>Thử lại</ButtonPrime>
@@ -439,11 +442,11 @@ function PostDetailPage() {
         </div>
 
         <div className={cx('breadcrumbs')}>
-          <Link to={routes.home}>Trang chủ</Link>
+          <Link href={routes.home}>Trang chủ</Link>
           <ChevronRight size={14} />
-          <Link to={routes.posts}>Blog</Link>
+          <Link href={routes.posts}>Blog</Link>
           <ChevronRight size={14} />
-          <Link to="#">{post.categories?.[0]?.name || 'Blog'}</Link>
+          <Link href="#">{post.categories?.[0]?.name || 'Blog'}</Link>
           <ChevronRight size={14} />
           <span className={cx('current')}>{post.title}</span>
         </div>
@@ -463,7 +466,7 @@ function PostDetailPage() {
               badge={post.equippedBadge}
             />
             <div className={cx('authorInfo')}>
-              <Link to="#">{post.authorName}</Link>
+              <Link href="#">{post.authorName}</Link>
             </div>
           </div>
           <div className={cx('metaSide')}>
@@ -512,7 +515,7 @@ function PostDetailPage() {
               <Slider {...sliderSettings}>
                 {relatedPosts.map(rel => (
                   <div key={rel.id} className={cx('sliderItem')}>
-                    <div className={cx('relatedCard')} onClick={() => navigate(routes.postDetail.replace(':postId', rel.id))}>
+                    <div className={cx('relatedCard')} onClick={() => router.push(routes.postDetail.replace(':postId', rel.id))}>
                       <div className={cx('imgWrap')}>
                         <img src={rel.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=400&q=80'} alt={rel.title} />
                       </div>

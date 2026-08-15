@@ -1,6 +1,10 @@
+'use client';
+
+import { useMounted } from '~/shared/hooks/useMounted';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {
   faBook,
@@ -42,8 +46,10 @@ function isHiddenRoute(pathname) {
 }
 
 function MobileBottomNav() {
-  const {pathname} = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  // Bảng chọn dùng portal vào document.body nên phải chờ đã ở client mới dựng.
+  const mounted = useMounted();
+  const router = useRouter();
   const {user, logout, roleName} = useAuth();
   // Tạo bài kiểm tra là việc của quản trị, người dùng thường không thấy nút này.
   const canCreateTest = roleName === 'ADMIN';
@@ -92,7 +98,7 @@ function MobileBottomNav() {
       return false;
     }
     toast.warning(message);
-    navigate(routes.login, {state: {mode: 'signin'}});
+    router.push(`${routes.login}?mode=signin`);
     setActiveSheet(null);
     return true;
   };
@@ -108,7 +114,7 @@ function MobileBottomNav() {
     } else if (modalType === 'create') {
       setShowCreateClassModal(true);
     } else if (targetRoute) {
-      navigate(targetRoute);
+      router.push(targetRoute);
     }
     setActiveSheet(null);
   };
@@ -116,7 +122,7 @@ function MobileBottomNav() {
   const handleLogout = async () => {
     await logout();
     setActiveSheet(null);
-    navigate(routes.home);
+    router.push(routes.home);
   };
 
   const closeSheet = () => setActiveSheet(null);
@@ -125,7 +131,7 @@ function MobileBottomNav() {
     <>
       <nav className={cx('bottomNav')} aria-label="Điều hướng chính">
         <Link
-          to={routes.home}
+          href={routes.home}
           className={cx('tab', {active: isHomeActive})}
           aria-current={isHomeActive ? 'page' : undefined}
         >
@@ -134,7 +140,7 @@ function MobileBottomNav() {
         </Link>
 
         <Link
-          to={routes.posts}
+          href={routes.posts}
           className={cx('tab', {active: isPostsActive})}
           aria-current={isPostsActive ? 'page' : undefined}
         >
@@ -188,7 +194,8 @@ function MobileBottomNav() {
         </button>
       </nav>
 
-      {createPortal(
+      {mounted &&
+        createPortal(
         <div
           className={cx('sheetOverlay', {open: sheetOpen})}
           onClick={closeSheet}
@@ -272,14 +279,14 @@ function MobileBottomNav() {
                     {/* Vẫn hiện khi chưa đăng nhập: ProtectedRoute sẽ đưa về trang đăng nhập
                         kèm lời nhắc rồi quay lại đúng trang này sau khi đăng nhập. */}
                     <Link
-                      to={routes.myTarget}
+                      href={routes.myTarget}
                       className={cx('menuItem')}
                       onClick={closeSheet}
                     >
                       Lộ trình
                     </Link>
                     <Link
-                      to={routes.myAlbums}
+                      href={routes.myAlbums}
                       className={cx('menuItem')}
                       onClick={closeSheet}
                     >
@@ -287,7 +294,7 @@ function MobileBottomNav() {
                       Từ vựng
                     </Link>
                     <Link
-                      to={routes.MyTest}
+                      href={routes.MyTest}
                       className={cx('menuItem')}
                       onClick={closeSheet}
                     >
@@ -295,7 +302,7 @@ function MobileBottomNav() {
                     </Link>
                     {user ? (
                       <Link
-                        to={routes.profile}
+                        href={routes.profile}
                         className={cx('menuItem')}
                         onClick={closeSheet}
                       >
@@ -304,7 +311,7 @@ function MobileBottomNav() {
                     ) : (
                       <>
                         <Link
-                          to={routes.login}
+                          href={routes.login}
                           state={{mode: 'signin'}}
                           className={cx('menuItem')}
                           onClick={closeSheet}
@@ -312,7 +319,7 @@ function MobileBottomNav() {
                           Đăng nhập
                         </Link>
                         <Link
-                          to={routes.login}
+                          href={routes.login}
                           state={{mode: 'signup'}}
                           className={cx('menuItem')}
                           onClick={closeSheet}

@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 
 import { useCrudMutations } from '~/features/admin/hooks/useAdminCrud';

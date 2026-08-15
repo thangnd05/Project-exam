@@ -1,3 +1,6 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {motion} from 'framer-motion';
 import {FaStar} from 'react-icons/fa';
@@ -8,7 +11,6 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import {toast} from 'react-toastify';
 import {useAuth} from '~/shared/hooks/useAuth';
-import {useNavigate} from 'react-router-dom';
 import routes from '~/shared/config/Routes';
 import EvaluationModal from './modals/EvaluationModal';
 import {useEvaluations} from '~/features/landing/components/Evaluation/hooks/useEvaluations';
@@ -27,7 +29,7 @@ const fadeUp = {
 
 const Evaluation = () => {
   const {user} = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [showModal, setShowModal] = useState(false);
 
@@ -65,7 +67,7 @@ const Evaluation = () => {
   const handleWriteReviewClick = () => {
     if (!user) {
       toast.warning(' Bạn cần đăng nhập để gửi đánh giá!');
-      navigate(routes.login);
+      router.push(routes.login);
       return;
     }
     setShowModal(true);

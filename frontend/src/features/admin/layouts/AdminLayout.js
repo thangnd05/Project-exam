@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import {Link, useLocation} from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
 import {
@@ -32,7 +35,7 @@ import {
   Mail,
 } from 'lucide-react';
 import routes from '~/shared/config/Routes';
-import { adminPermissionByPath } from '~/app/routes';
+import { adminPermissionByPath } from '~/shared/config/adminPermissions';
 import { useAuth } from '~/shared/hooks/useAuth';
 import styles from './AdminLayout.module.scss';
 
@@ -110,7 +113,7 @@ const adminRouteGroups = [
 function AdminLayout({children}) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
   const {permissions} = useAuth();
 
   // Chỉ hiện mục mà vai trò hiện tại mở được  bấm vào rồi mới ăn 403 thì rất khó chịu.
@@ -139,7 +142,7 @@ function AdminLayout({children}) {
     return () => mql.removeEventListener('change', sync);
   }, []);
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => pathname === path;
 
   return (
     <div className={cx('adminWrapper')}>
@@ -176,7 +179,7 @@ function AdminLayout({children}) {
                 {group.items.map((route) => (
                   <Link
                     key={route.path}
-                    to={route.path}
+                    href={route.path}
                     className={cx('navItem', {active: isActive(route.path)})}
                     onClick={() => setMobileOpen(false)}
                     title={collapsed ? route.label : ''}
@@ -200,7 +203,7 @@ function AdminLayout({children}) {
 
           <div className={cx('bottomSection')}>
             <Link
-              to={routes.home}
+              href={routes.home}
               className={cx('navItem')}
               title={collapsed ? 'Về trang chủ' : ''}
             >
@@ -220,7 +223,7 @@ function AdminLayout({children}) {
         <main className={cx('content')}>
           <AnimatePresence mode="wait">
             <motion.div
-              key={location.pathname}
+              key={pathname}
               initial={{opacity: 0, y: 20}}
               animate={{opacity: 1, y: 0}}
               exit={{opacity: 0, y: -20}}

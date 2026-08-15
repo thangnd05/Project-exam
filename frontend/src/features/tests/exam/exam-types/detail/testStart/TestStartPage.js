@@ -1,5 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
 
+
+import { useRouter } from 'next/navigation';
 import TestStateScreens from './TestStateScreens';
 import { useTestSession } from '~/features/tests/exam/exam-types/detail/testStart/hooks/useTestSession';
 import ExamLayoutRenderer from '~/features/tests/exam/exam-types/detail/testStart/examLayout/ExamLayoutRenderer';
@@ -7,7 +9,7 @@ import ExamLayoutRenderer from '~/features/tests/exam/exam-types/detail/testStar
 const STATE_SCREEN_STATUSES = ['loading', 'payment', 'no-attempts', 'locked', 'closed'];
 
 function TestStartPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {
     isPractice,
     status,
@@ -51,7 +53,7 @@ function TestStartPage() {
         purchasing={purchasing}
         preCountdown={preCountdown}
         formatTime={formatTime}
-        onBack={() => navigate(-1)}
+        onBack={() => router.back()}
         onPurchase={handlePurchase}
       />
     );

@@ -1,37 +1,27 @@
 .wrapper {
   padding: 3rem 0 6rem;
-}
-
-.state {
+}.state {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.6rem;
   padding: 8rem 0;
   color: var(--text-secondary);
-}
-
-.topBar {
+}.topBar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1.2rem;
   margin-bottom: 2rem;
-}
-
-.actions {
+}.actions {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-}
-
-.printArea {
+}.printArea {
   margin: 0 auto;
   max-width: 96rem;
-}
-
-.shareBox {
+}.shareBox {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -41,48 +31,27 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   background: var(--surface-tint);
-}
-
-.shareLabel {
+}.shareLabel {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-secondary);
-}
-
-.shareUrl {
+}.shareUrl {
   font-size: var(--font-size-base);
   color: var(--primary);
   word-break: break-all;
-}
-
-.shareHint {
+}.shareHint {
   margin: 0;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
-
-/*
-  In chỉ ra đúng tấm chứng chỉ: ẩn hết phần còn lại của trang rồi kéo khung chứng chỉ
-  ra chiếm trọn khổ giấy. Nhờ vậy không cần thư viện xuất PDF nào  trình duyệt tự lo,
-  và chữ tiếng Việt vẫn sắc nét vì là chữ thật chứ không phải ảnh.
-*/
 @media print {
-  :global(body) {
-    background: var(--white);
-  }
-
-  :global(body) * {
-    visibility: hidden;
-  }
-
-  .printArea,
+.printArea,
   .printArea * {
     visibility: visible;
   }
-
-  .printArea {
+.printArea {
     position: fixed;
     top: 0;
     left: 0;
@@ -92,7 +61,6 @@
     padding: 0;
   }
 }
-
 @page {
   size: A4 landscape;
   margin: 10mm;

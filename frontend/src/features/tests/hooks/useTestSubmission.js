@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fromDateTimeLocalInput } from '~/shared/utils/format-date-time';
 import { createTest } from '~/shared/api/testApi';

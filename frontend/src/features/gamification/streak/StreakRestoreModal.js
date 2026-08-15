@@ -1,3 +1,5 @@
+'use client';
+
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { Flame, CircleDollarSign } from 'lucide-react';

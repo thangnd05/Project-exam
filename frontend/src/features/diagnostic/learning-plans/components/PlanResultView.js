@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from '~/features/diagnostic/styles/PersonalizedPlan.module.scss';

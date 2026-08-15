@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Spinner } from 'react-bootstrap';
 import {
@@ -74,7 +76,7 @@ function normalizeOrders(blocks) {
 
 function ExamTypeLayoutEditorPage() {
   const { examTypeId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [config, setConfig] = useState(defaultLayoutConfig);
   const [selectedId, setSelectedId] = useState(null);
@@ -224,7 +226,7 @@ function ExamTypeLayoutEditorPage() {
     <div className={cx('editor')}>
       <div className={cx('header')}>
         <div className={cx('headerLeft')}>
-          <button className={cx('backBtn')} onClick={() => navigate(-1)}>
+          <button className={cx('backBtn')} onClick={() => router.back()}>
             <ArrowLeft size={16} /> Quay lại
           </button>
           <div>

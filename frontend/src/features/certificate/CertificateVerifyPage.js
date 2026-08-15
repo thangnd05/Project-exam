@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { BadgeCheck, Search, ShieldAlert, ShieldX, Clock } from 'lucide-react';
@@ -42,7 +44,7 @@ const STATE_VIEW = {
 
 function CertificateVerifyPage() {
   const { code } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [searchCode, setSearchCode] = useState(code || '');
 
   const { data: result, isLoading, isError } = useCertificateVerification(code);
@@ -51,7 +53,7 @@ function CertificateVerifyPage() {
     event.preventDefault();
     const trimmed = searchCode.trim();
     if (trimmed) {
-      navigate(`/certificates/verify/${encodeURIComponent(trimmed)}`);
+      router.push(`/certificates/verify/${encodeURIComponent(trimmed)}`);
     }
   };
 

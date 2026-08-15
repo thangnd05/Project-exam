@@ -1,9 +1,12 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {useState} from 'react';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import routes from '~/shared/config/Routes';
 import {Form, Button} from 'react-bootstrap';
-import {Link, useNavigate} from 'react-router-dom';
 import { useForgotPasswordMutation } from '~/features/user/login/hooks/useAuthActions';
 
 const cx = classNames.bind(style);
@@ -14,7 +17,7 @@ function ForgotPassword() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
+  const router = useRouter();
   const forgotPasswordMutation = useForgotPasswordMutation();
 
   const handleReset = async (e) => {
@@ -30,7 +33,7 @@ function ForgotPassword() {
       setError('Token chỉ có thời lượng là 5 phút');
 
       setTimeout(() => {
-        navigate(routes.reset);
+        router.push(routes.reset);
       }, 6000);
     } catch (error) {
 
@@ -69,7 +72,7 @@ function ForgotPassword() {
             <input type="checkbox" />
             <span>Ghi nhớ</span>
           </label>
-          <Link to={routes.login}>Đăng Nhập</Link>
+          <Link href={routes.login}>Đăng Nhập</Link>
         </div>
 
         {message && (
@@ -89,7 +92,7 @@ function ForgotPassword() {
 
         <div className={cx('register-link')}>
           <span>Chưa có tài khoản? </span>
-          <Link to={routes.register}>Đăng ký</Link>
+          <Link href={`${routes.login}?mode=signup`}>Đăng ký</Link>
         </div>
       </Form>
     </div>

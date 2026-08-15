@@ -1,4 +1,4 @@
-@use 'shared/styles/GlobalStyles/GlobalStyles.module.scss' as globalStyles;
+@use 'shared/styles/mixins.scss' as globalStyles;
 
 .wrapper {
   max-width: 112rem;

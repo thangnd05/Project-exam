@@ -1,5 +1,7 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Spinner, Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -44,7 +46,7 @@ function MyAlbumsPage() {
   const [editingAlbum, setEditingAlbum] = useState(null);
   const [albumToDelete, setAlbumToDelete] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const { albums, isLoading: loading, refetchAlbums, deleteAlbumMutation } = useMyAlbums();
 
@@ -134,7 +136,7 @@ function MyAlbumsPage() {
                   <motion.div
                     key={album.albumId}
                     className={cx('album-card')}
-                    onClick={() => navigate(`/albums/${album.albumId}`)}
+                    onClick={() => router.push(`/albums/${album.albumId}`)}
                     custom={index}
                     initial="hidden"
                     animate="visible"

@@ -1,3 +1,5 @@
+'use client';
+
 import styles from './intro.module.scss';
 import {name} from '~/shared/assets/images';
 import classNames from 'classnames/bind';

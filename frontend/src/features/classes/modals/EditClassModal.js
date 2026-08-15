@@ -1,3 +1,5 @@
+'use client';
+
 import {useState, useEffect} from 'react';
 import {Alert} from 'react-bootstrap';
 import {toast} from 'react-toastify';

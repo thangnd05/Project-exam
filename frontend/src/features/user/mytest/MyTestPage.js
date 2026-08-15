@@ -1,5 +1,7 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -21,7 +23,7 @@ const PAGE_SIZE = 12;
 
 function MyTestPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [countdowns, setCountdowns] = useState({});
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -65,9 +67,9 @@ function MyTestPage() {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      router.push('/login');
     }
-  }, [user, navigate]);
+  }, [user, router]);
 
   useEffect(() => {
     if (isError) {

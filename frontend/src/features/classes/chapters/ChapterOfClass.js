@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
@@ -19,7 +21,7 @@ const cx = classNames.bind(styles);
 
 const ChapterOfClass = () => {
   const { classId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const {
     chapters,
@@ -44,7 +46,7 @@ const ChapterOfClass = () => {
       .replace(':classId', classId)
       .replace(':chapterId', chapterId);
 
-    navigate(path);
+    router.push(path);
   };
 
   const handleEditChapter = (chapter) => {
@@ -88,7 +90,7 @@ const ChapterOfClass = () => {
   return (
     <div className={cx('wrapper')}>
       <Container className={cx('container')}>
-        <button className={cx('btn-back')} onClick={() => navigate(-1)}>
+        <button className={cx('btn-back')} onClick={() => router.back()}>
           Quay lại lớp học
         </button>
 

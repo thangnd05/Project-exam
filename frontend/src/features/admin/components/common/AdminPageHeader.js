@@ -1,3 +1,5 @@
+'use client';
+
 import PageHeader from '~/shared/ui/PageHeader/PageHeader';
 
 function AdminPageHeader({title, description, children}) {

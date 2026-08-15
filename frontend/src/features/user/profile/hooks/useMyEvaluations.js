@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyEvaluations, updateEvaluation, deleteEvaluation } from '~/shared/api/evaluationApi';
 

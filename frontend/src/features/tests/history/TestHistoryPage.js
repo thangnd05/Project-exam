@@ -1,4 +1,6 @@
-import { useParams, useNavigate } from 'react-router-dom';
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useTestHistory } from '~/features/tests/history/hooks/useTestHistory';
 import { Container, Table, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -12,7 +14,7 @@ const cx = classNames.bind(style);
 
 function TestHistoryPage() {
   const { testId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const { attempts, testInfo, isLoading } = useTestHistory(testId);
 
@@ -28,7 +30,7 @@ function TestHistoryPage() {
   };
 
   const handleViewResult = (userTestId) => {
-    navigate(`/tests/result/${userTestId}`);
+    router.push(`/tests/result/${userTestId}`);
   };
 
   if (isLoading) {
@@ -45,7 +47,7 @@ function TestHistoryPage() {
       <Container>
 
         <div className={cx('header-top')}>
-          <ButtonPrime variant="outline" onClick={() => navigate(-1)}>
+          <ButtonPrime variant="outline" onClick={() => router.back()}>
             Quay lại
           </ButtonPrime>
         </div>

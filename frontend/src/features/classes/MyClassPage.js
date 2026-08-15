@@ -1,6 +1,8 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -22,7 +24,7 @@ const MyClassesPage = () => {
   const [selectedClass, setSelectedClass] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const qc = useQueryClient();
 
   const {
@@ -38,13 +40,13 @@ const MyClassesPage = () => {
 
   const handleViewTests = (classId) => {
     const path = routes.classChapterPage.replace(':classId', classId);
-    navigate(path);
+    router.push(path);
   };
 
   const handleManageMembers = (e, classId) => {
     e.stopPropagation();
     const path = routes.classMemberManagement.replace(':classId', classId);
-    navigate(path);
+    router.push(path);
   };
 
   const handleEditClass = (classData) => {
@@ -74,7 +76,7 @@ const MyClassesPage = () => {
 
   const handleManageStudents = (classId) => {
     const path = routes.classMemberManagement.replace(':classId', classId);
-    navigate(path);
+    router.push(path);
   };
 
   const handleEditSuccess = () => {

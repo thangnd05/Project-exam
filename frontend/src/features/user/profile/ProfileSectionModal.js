@@ -1,3 +1,5 @@
+'use client';
+
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import MyEvaluationsPage from './sections/MyEvaluationsPage';
 import MyPostsPage from './sections/MyPostsPage';

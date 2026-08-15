@@ -1,3 +1,5 @@
+'use client';
+
 import {useEffect, useState} from 'react';
 import { useUpdateChapter } from '~/features/classes/chapters/hooks/useChaptersOfClass';
 import {toast} from 'react-toastify';

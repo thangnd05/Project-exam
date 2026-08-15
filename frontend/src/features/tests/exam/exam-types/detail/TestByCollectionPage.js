@@ -1,5 +1,7 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import routes, { buildExamTypeDetailPath } from '~/shared/config/Routes';
@@ -12,7 +14,7 @@ const PAGE_SIZE = 12;
 
 function TestByCollectionPage() {
   const { examTypeId, collectionId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [countdowns, setCountdowns] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
@@ -57,7 +59,7 @@ function TestByCollectionPage() {
   );
 
   const goBack = () =>
-    navigate(examTypeId ? buildExamTypeDetailPath(examTypeId) : routes.home);
+    router.push(examTypeId ? buildExamTypeDetailPath(examTypeId) : routes.home);
 
   return (
     <TestListContainer

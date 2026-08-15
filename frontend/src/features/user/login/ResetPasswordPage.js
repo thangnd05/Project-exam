@@ -1,9 +1,12 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {useState} from 'react';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import routes from '~/shared/config/Routes';
 import {Form, Button} from 'react-bootstrap';
-import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import { useResetPasswordMutation } from '~/features/user/login/hooks/useAuthActions';
 
 const cx = classNames.bind(style);
@@ -17,7 +20,7 @@ function ResetPassWord() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const router = useRouter();
   const resetPasswordMutation = useResetPasswordMutation();
 
   const handleResetPassword = async (e) => {
@@ -35,7 +38,7 @@ function ResetPassWord() {
 
       setMessage('Đặt lại mật khẩu thành công!');
       setTimeout(() => {
-        navigate(routes.login);
+        router.push(routes.login);
       }, 2000);
     } catch (err) {
 
@@ -112,7 +115,7 @@ function ResetPassWord() {
 
         <div className={cx('register-link')}>
           <span>Nhớ lại mật khẩu? </span>
-          <Link to={routes.forgot}>Quên</Link>
+          <Link href={routes.forgot}>Quên</Link>
         </div>
       </Form>
     </div>

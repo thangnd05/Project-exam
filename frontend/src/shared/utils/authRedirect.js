@@ -4,11 +4,17 @@ import { getGuestSessionId, clearGuestSessionId } from '~/shared/utils/guestSess
 
 const OAUTH_REDIRECT_KEY = 'postLoginRedirect';
 
-export const getRedirectTarget = (location, fallback = '/') => {
-  const from = location?.state?.from;
-  if (from && from.pathname) {
-    return `${from.pathname}${from.search || ''}${from.hash || ''}`;
-  }
+/**
+ * Nơi cần quay lại sau khi đăng nhập.
+ *
+ * Bản react-router cũ nhận cả object `location` rồi đọc `location.state.from`. Next không có
+ * location.state nên giao ước đổi thành query `?from=`; hàm này giờ nhận URLSearchParams
+ * (kết quả của useSearchParams). Chỉ chấp nhận đường dẫn nội bộ bắt đầu bằng '/' để không ai
+ * dựng được link `?from=https://...` đưa người dùng ra ngoài sau khi đăng nhập.
+ */
+export const getRedirectTarget = (searchParams, fallback = '/') => {
+  const from = searchParams?.get?.('from');
+  if (from && from.startsWith('/') && !from.startsWith('//')) return from;
   return fallback;
 };
 

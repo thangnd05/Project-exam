@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IoPlay } from 'react-icons/io5';
 import classNames from 'classnames/bind';

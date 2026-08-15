@@ -1,3 +1,5 @@
+'use client';
+
 import { Spinner } from 'react-bootstrap';
 import { PlusCircle } from 'lucide-react';
 import { IoRocketOutline } from 'react-icons/io5';

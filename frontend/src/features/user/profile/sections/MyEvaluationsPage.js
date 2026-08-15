@@ -1,7 +1,9 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import classNames from 'classnames/bind';
 import {Alert, Spinner} from 'react-bootstrap';
-import {useNavigate} from 'react-router-dom';
 import { IoCalendarOutline, IoStar } from 'react-icons/io5';
 import {toast} from 'react-toastify';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';
@@ -20,7 +22,7 @@ const formatDateTime = (value) => {
 };
 
 function MyEvaluationsPage({ embedded = false }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {evaluations, isLoading: loading, isError, updateMutation, deleteMutation} =
     useMyEvaluations();
   const errorMessage = isError
@@ -106,7 +108,7 @@ function MyEvaluationsPage({ embedded = false }) {
             <button
               type="button"
               className={cx('backBtn')}
-              onClick={() => navigate(routes.profile)}
+              onClick={() => router.push(routes.profile)}
             >
               Quay lại profile
             </button>

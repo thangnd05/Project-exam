@@ -1,10 +1,12 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { Alert } from "react-bootstrap";
 import { useJoinClass } from '~/features/classes/hooks/useMyClasses';
 import classNames from "classnames/bind";
 import { FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "~/shared/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import routes from "~/shared/config/Routes";
 import CommonFormModal from "~/shared/ui/modal/CommonFormModal";
 import ModalActionFooter from "~/shared/ui/modal/ModalActionFooter";
@@ -19,7 +21,7 @@ function JoinClassModal({ show, onClose }) {
     const [type, setType] = useState("info");
 
     const { user } = useAuth();
-    const navigate = useNavigate();
+    const router = useRouter();
     const joinMutation = useJoinClass();
     const loading = joinMutation.isPending;
 
@@ -32,7 +34,7 @@ function JoinClassModal({ show, onClose }) {
 
             setTimeout(() => {
                 onClose();
-                navigate(routes.login);
+                router.push(routes.login);
             }, 1200);
 
             return;
@@ -54,7 +56,7 @@ function JoinClassModal({ show, onClose }) {
                     setTimeout(() => {
                         setCode("");
                         onClose();
-                        navigate(routes.myClasses);
+                        router.push(routes.myClasses);
                     }, 1500);
                 },
                 onError: (err) => {

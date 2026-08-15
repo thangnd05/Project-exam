@@ -1,3 +1,5 @@
+'use client';
+
 import { Spinner, Row, Col } from 'react-bootstrap';
 import BaseModal from '~/shared/ui/modal/BaseModal';
 import ConfirmDeleteModal from '~/shared/ui/modal/ConfirmDeleteModal';

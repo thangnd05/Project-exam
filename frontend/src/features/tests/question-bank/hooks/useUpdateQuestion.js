@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateQuestion } from '~/shared/api/questionApi';
 import { questionDetailKeys } from '~/features/tests/question-bank/hooks/useQuestionDetail';

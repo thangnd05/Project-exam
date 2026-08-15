@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { getQuestionById } from '~/shared/api/questionApi';
 

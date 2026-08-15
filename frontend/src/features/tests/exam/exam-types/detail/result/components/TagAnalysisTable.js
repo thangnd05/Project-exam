@@ -1,5 +1,7 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./TagAnalysisTable.module.scss";
 
@@ -25,7 +27,7 @@ const accuracy = (correct, total) =>
   total > 0 ? ((correct / total) * 100).toFixed(2) : "0.00";
 
 function TagAnalysisTable({ enhanced, userTestId }) {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const tabs = useMemo(() => {
     const parts = enhanced?.partBreakdown || [];
@@ -53,7 +55,7 @@ function TagAnalysisTable({ enhanced, userTestId }) {
   if (!hasData) return null;
 
   const goToQuestion = (questionId) => {
-    navigate(`/tests/result/${userTestId}/review#rq-${questionId}`);
+    router.push(`/tests/result/${userTestId}/review#rq-${questionId}`);
   };
 
   return (

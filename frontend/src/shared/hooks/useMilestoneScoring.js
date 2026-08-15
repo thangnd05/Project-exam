@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useMemo } from 'react';
 
 const SCALE_MIN = 100;

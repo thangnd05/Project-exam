@@ -1,3 +1,5 @@
+'use client';
+
 import { IoPeopleOutline, IoKeyOutline, IoPersonOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';

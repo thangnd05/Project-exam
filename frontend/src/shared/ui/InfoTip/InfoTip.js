@@ -1,3 +1,5 @@
+'use client';
+
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Info } from 'lucide-react';
 import classNames from 'classnames/bind';

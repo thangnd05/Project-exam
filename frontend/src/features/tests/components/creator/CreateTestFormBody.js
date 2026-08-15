@@ -1,3 +1,6 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
 import { getClassById } from '~/shared/api/classApi';
@@ -17,7 +20,6 @@ import {
 import { Trash, PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import { useCreateTest, CREATOR_TYPES } from '~/features/tests/hooks/useCreateTest';
 import CoinPriceField from '~/features/tests/components/CoinPriceField';
 import QuestionBlock from './QuestionBlock';
@@ -49,7 +51,7 @@ const CreateTestFormBody = ({
   embedded = false,
   showCreatorTypeTabs = true,
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [creatorTypeLocal, setCreatorTypeLocal] = useState(creatorTypeProp);
   const isControlled = typeof onCreatorTypeChange === 'function';
   const activeCreatorType = isControlled ? creatorTypeProp : creatorTypeLocal;
@@ -422,7 +424,7 @@ const CreateTestFormBody = ({
               size="md"
               onClick={() => {
                 onCancel?.();
-                navigate(routes.personalQuestionBank);
+                router.push(routes.personalQuestionBank);
               }}
             >
               Mở kho lưu trữ
