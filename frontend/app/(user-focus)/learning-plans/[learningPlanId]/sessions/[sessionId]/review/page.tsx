@@ -1,5 +1,5 @@
-import PlanSessionReviewPage from '@/app/features/diagnostic/learning-plans/pages/PlanSessionReviewPage';
+import PlanSessionReview from './PlanSessionReview';
 
 export default function Page() {
-  return <PlanSessionReviewPage />;
+  return <PlanSessionReview />;
 }

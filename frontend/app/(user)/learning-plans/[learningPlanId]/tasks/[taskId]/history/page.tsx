@@ -1,5 +1,5 @@
-import TaskHistoryPage from '@/app/features/diagnostic/learning-plans/pages/TaskHistoryPage';
+import TaskHistory from './TaskHistory';
 
 export default function Page() {
-  return <TaskHistoryPage />;
+  return <TaskHistory />;
 }

@@ -1,5 +1,5 @@
-import PlanDetailPage from '@/app/features/diagnostic/learning-plans/pages/PlanDetailPage';
+import PlanDetail from './PlanDetail';
 
 export default function Page() {
-  return <PlanDetailPage />;
+  return <PlanDetail />;
 }

@@ -1,5 +1,5 @@
-import PlanComparisonPage from '@/app/features/diagnostic/learning-plans/pages/PlanComparisonPage';
+import PlanComparison from './PlanComparison';
 
 export default function Page() {
-  return <PlanComparisonPage />;
+  return <PlanComparison />;
 }

@@ -1,5 +1,5 @@
-import GeneratePlanPage from '@/app/features/diagnostic/learning-plans/pages/GeneratePlanPage';
+import GeneratePlan from './GeneratePlan';
 
 export default function Page() {
-  return <GeneratePlanPage />;
+  return <GeneratePlan />;
 }

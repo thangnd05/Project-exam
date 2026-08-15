@@ -7,8 +7,8 @@ import {
 } from '@/app/apis/userTargetApi';
 import { targetDashboardKeys } from '@/app/features/diagnostic/target/hooks/useTargetDashboard';
 import { targetAchievedKeys } from '@/app/features/diagnostic/target/hooks/useTargetAchieved';
-import { generatePlanKeys } from '@/app/features/diagnostic/learning-plans/hooks/useGeneratePlan';
-import { invalidatePlanQueries } from '@/app/features/diagnostic/learning-plans/hooks/plan-cache';
+import { generatePlanKeys } from '@/app/hooks/useGeneratePlan';
+import { invalidatePlanQueries } from '@/app/hooks/plan-cache';
 
 // Các truy vấn đang hiển thị mục tiêu theo examTypeId (dashboard, đã đạt, trang sinh lộ trình,
 // và mục tiêu hiện tại ở trang Mục tiêu của tôi). Kèm cả các query plan vì đổi/xoá mục tiêu
