@@ -7,7 +7,21 @@ import styles from './Button.module.scss';
 
 const cx = classNames.bind(styles);
 
-const ButtonPrime = forwardRef(function ButtonPrime(
+type ButtonPrimeProps = {
+  as?: 'button' | 'link' | 'a';
+  variant?: 'primary' | 'outline' | 'ghost' | 'danger' | 'dangerGhost' | 'success';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
+  fullWidth?: boolean;
+  loading?: boolean;
+  disabled?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+  type?: 'button' | 'submit' | 'reset';
+  // Các prop còn lại chuyển thẳng xuống button/Link/a (href, onClick, aria-*...)
+  [key: string]: any;
+};
+
+const ButtonPrime = forwardRef<any, ButtonPrimeProps>(function ButtonPrime(
   {
     as = 'button',
     variant = 'primary',
@@ -34,7 +48,7 @@ const ButtonPrime = forwardRef(function ButtonPrime(
 
   if (as === 'link') {
     return (
-      <Link ref={ref} className={classes} aria-disabled={disabled || loading} {...rest}>
+      <Link ref={ref} className={classes} aria-disabled={disabled || loading} {...(rest as any)}>
         {loading ? 'Đang xử lý...' : children}
       </Link>
     );

@@ -7,11 +7,17 @@ import styles from './Pagination.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Pagination({ currentPage = 0, totalPages = 0, onChange }) {
+type PaginationProps = {
+  currentPage?: number;
+  totalPages?: number;
+  onChange?: (page: number) => void;
+};
+
+function Pagination({ currentPage = 0, totalPages = 0, onChange }: PaginationProps) {
 
   const total = Math.max(totalPages, 1);
 
-  const pages = [];
+  const pages: Array<number | '...'> = [];
   for (let i = 0; i < total; i++) {
     if (
       i === 0 ||
@@ -24,7 +30,7 @@ function Pagination({ currentPage = 0, totalPages = 0, onChange }) {
     }
   }
 
-  const go = (p) => {
+  const go = (p: number | '...') => {
     if (typeof p === 'number' && p !== currentPage) onChange?.(p);
   };
 

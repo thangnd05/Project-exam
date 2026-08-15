@@ -5,7 +5,7 @@ import {useEffect} from 'react';
 
 import {trackVisit} from '@/app/apis/analyticsApi';
 
-let lastPath = null;
+let lastPath: string | null = null;
 let lastTime = 0;
 
 const VisitTracker = () => {

@@ -8,6 +8,19 @@ import classNames from 'classnames/bind';
 import styles from './BaseModal.module.scss';
 
 const cx = classNames.bind(styles);
+
+type BaseModalProps = {
+  show?: boolean;
+  onClose?: () => void;
+  title?: React.ReactNode;
+  headerExtra?: React.ReactNode;
+  footer?: React.ReactNode;
+  maxWidth?: number | string;
+  closeOnOverlay?: boolean;
+  closeOnEsc?: boolean;
+  children?: React.ReactNode;
+};
+
 function BaseModal({
   show,
   onClose,
@@ -18,11 +31,11 @@ function BaseModal({
   closeOnOverlay = true,
   closeOnEsc = true,
   children,
-}) {
+}: BaseModalProps) {
   useEffect(() => {
     if (!show) return undefined;
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (closeOnEsc && event.key === 'Escape') {
         onClose?.();
       }

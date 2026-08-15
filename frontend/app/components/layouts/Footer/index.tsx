@@ -4,13 +4,14 @@ import Link from 'next/link';
 import {Container} from 'react-bootstrap';
 import {useEffect, useRef, useState} from 'react';
 import {motion, useInView} from 'framer-motion';
+import type {Transition} from 'framer-motion';
 import {FaFacebookSquare, FaInstagram, FaYoutube} from 'react-icons/fa';
 
 import styles from './footer.module.scss';
 import images from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 
-function useCountUp(target, isActive, duration = 1400) {
+function useCountUp(target: number, isActive: boolean, duration = 1400) {
   const [value, setValue] = useState(0);
   const startedRef = useRef(false);
 
@@ -18,9 +19,9 @@ function useCountUp(target, isActive, duration = 1400) {
     if (!isActive || startedRef.current) return undefined;
     startedRef.current = true;
     const start = performance.now();
-    let raf;
+    let raf: number;
 
-    const tick = (now) => {
+    const tick = (now: number) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
@@ -58,10 +59,18 @@ const fadeUp = {
   initial: {opacity: 0, y: 18},
   whileInView: {opacity: 1, y: 0},
   viewport: {once: true, amount: 0.3},
-  transition: {duration: 0.55, ease: [0.22, 1, 0.36, 1]},
+  transition: {duration: 0.55, ease: [0.22, 1, 0.36, 1]} as Transition,
 };
 
-const StatCard = ({target, suffix, label, isActive, index}) => {
+type StatCardProps = {
+  target: number;
+  suffix: string;
+  label: string;
+  isActive: boolean;
+  index: number;
+};
+
+const StatCard = ({target, suffix, label, isActive, index}: StatCardProps) => {
   const value = useCountUp(target, isActive);
 
   return (
@@ -82,7 +91,7 @@ const StatCard = ({target, suffix, label, isActive, index}) => {
 };
 
 function Footer() {
-  const statsRef = useRef(null);
+  const statsRef = useRef<HTMLDivElement>(null);
   const inView = useInView(statsRef, {once: true, amount: 0.35});
 
   return (

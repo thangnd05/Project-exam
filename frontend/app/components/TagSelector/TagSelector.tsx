@@ -8,14 +8,22 @@ import styles from './TagSelector.module.scss';
 
 const cx = classNames.bind(styles);
 
-const isRoot = (tag, byId) => {
+// Tag từ API (tagId, parentId, name...) — chưa có type riêng nên để any có chủ đích.
+type TagSelectorProps = {
+    tags?: any[];
+    selectedIds?: any[];
+    onToggle?: (tagId: any) => void;
+    label?: string;
+};
+
+const isRoot = (tag: any, byId: Map<any, any>) => {
     const pid = tag.parentId;
     if (pid == null || pid === '') return true;
 
     return !byId.has(pid);
 };
 
-const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân loại' }) => {
+const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân loại' }: TagSelectorProps) => {
     const { byId, childrenOf, roots, hasHierarchy } = useMemo(() => {
         const map = new Map(tags.map((t) => [t.tagId, t]));
         const children = new Map();
@@ -28,19 +36,19 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
         const rootList = tags.filter((t) => isRoot(t, map));
         return {
             byId: map,
-            childrenOf: (id) => children.get(id) || [],
+            childrenOf: (id: any): any[] => children.get(id) || [],
             roots: rootList,
             hasHierarchy: children.size > 0,
         };
     }, [tags]);
 
-    const [openOverride, setOpenOverride] = useState({});
+    const [openOverride, setOpenOverride] = useState<Record<string, boolean>>({});
 
     const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
     if (tags.length === 0) return null;
 
-    const Chip = ({ tag }) => {
+    const Chip = ({ tag }: { tag: any }) => {
         const selected = selectedSet.has(tag.tagId);
         return (
             <Badge
@@ -55,7 +63,7 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
         );
     };
 
-    const countSelectedDescendants = (tagId) => {
+    const countSelectedDescendants = (tagId: any): number => {
         let count = 0;
         childrenOf(tagId).forEach((c) => {
             if (selectedSet.has(c.tagId)) count += 1;
@@ -64,7 +72,7 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
         return count;
     };
 
-    const renderNode = (tag) => {
+    const renderNode = (tag: any): React.ReactNode => {
         const kids = childrenOf(tag.tagId);
         if (kids.length === 0) {
             return <Chip key={tag.tagId} tag={tag} />;

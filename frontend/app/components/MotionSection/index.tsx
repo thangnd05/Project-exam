@@ -1,8 +1,9 @@
 'use client';
 
 import {motion} from 'framer-motion';
+import type {Variants} from 'framer-motion';
 
-const defaultVariants = {
+const defaultVariants: Variants = {
   hidden: {opacity: 0, y: 32},
   visible: {
     opacity: 1,
@@ -11,7 +12,7 @@ const defaultVariants = {
   },
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -21,16 +22,35 @@ const staggerContainer = {
   },
 };
 
+type MotionItemProps = {
+  children?: React.ReactNode;
+  className?: string;
+  variants?: Variants;
+  // Các prop motion còn lại (initial, animate, transition...) chuyển thẳng xuống motion.div
+  [key: string]: any;
+};
+
 export const MotionItem = ({
   children,
   className,
   variants = defaultVariants,
   ...rest
-}) => (
+}: MotionItemProps) => (
   <motion.div className={className} variants={variants} {...rest}>
     {children}
   </motion.div>
 );
+
+type MotionSectionProps = {
+  children?: React.ReactNode;
+  className?: string;
+  as?: any;
+  amount?: number;
+  once?: boolean;
+  stagger?: boolean;
+  // Các prop motion còn lại chuyển thẳng xuống component
+  [key: string]: any;
+};
 
 const MotionSection = ({
   children,
@@ -40,7 +60,7 @@ const MotionSection = ({
   once = true,
   stagger = false,
   ...rest
-}) => {
+}: MotionSectionProps) => {
   return (
     <Component
       className={className}

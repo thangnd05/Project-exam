@@ -14,7 +14,11 @@ import { Spinner } from 'react-bootstrap';
 import routes from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
 
-function Fallback({ label }) {
+type FallbackProps = {
+  label: string;
+};
+
+function Fallback({ label }: FallbackProps) {
   return (
     <div
       style={{
@@ -32,14 +36,13 @@ function Fallback({ label }) {
   );
 }
 
-/**
- * @param {{
- *   children: React.ReactNode,
- *   requiredPermission?: string,
- *   allowGuest?: boolean,
- * }} props
- */
-function AuthGuard({ children, requiredPermission, allowGuest = false }) {
+type AuthGuardProps = {
+  children: React.ReactNode;
+  requiredPermission?: string;
+  allowGuest?: boolean;
+};
+
+function AuthGuard({ children, requiredPermission, allowGuest = false }: AuthGuardProps) {
   const { isAuthenticated, loading, permissions } = useAuth();
   const router = useRouter();
   const pathname = usePathname();

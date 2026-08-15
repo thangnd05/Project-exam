@@ -3,7 +3,15 @@
 import { IoTrashOutline } from 'react-icons/io5';
 import ConfirmModal from './ConfirmModal';
 
-const ConfirmDeleteModal = ({ show, onClose, onConfirm, title, message }) => (
+type ConfirmDeleteModalProps = {
+    show?: boolean;
+    onClose?: () => void;
+    onConfirm?: () => void;
+    title?: string;
+    message?: React.ReactNode;
+};
+
+const ConfirmDeleteModal = ({ show, onClose, onConfirm, title, message }: ConfirmDeleteModalProps) => (
     <ConfirmModal
         show={show}
         onClose={onClose}

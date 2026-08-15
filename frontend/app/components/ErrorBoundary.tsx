@@ -1,10 +1,20 @@
 'use client';
 
 import { Component } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import ButtonPrime from './Button/ButtonPrime';
 
-class ErrorBoundary extends Component {
-  constructor(props) {
+type ErrorBoundaryProps = {
+  children?: ReactNode;
+  fallback?: ReactNode;
+};
+
+type ErrorBoundaryState = {
+  hasError: boolean;
+};
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
@@ -13,7 +23,7 @@ class ErrorBoundary extends Component {
     return { hasError: true };
   }
 
-  componentDidCatch(error, info) {
+  componentDidCatch(error: Error, info: ErrorInfo) {
 
     console.error('ErrorBoundary caught:', error, info);
   }

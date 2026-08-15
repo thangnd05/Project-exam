@@ -1,9 +1,16 @@
 import { getRecoveryResourceLinkProps } from '@/app/utils/recoveryResource';
+import type { RecoveryResourceLike } from '@/app/utils/recoveryResource';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
 
 const API_BASE = getApiBaseUrl();
 
-function RecoveryResourceLink({ resource, className, children }) {
+type RecoveryResourceLinkProps = {
+  resource?: RecoveryResourceLike | null;
+  className?: string;
+  children?: React.ReactNode;
+};
+
+function RecoveryResourceLink({ resource, className, children }: RecoveryResourceLinkProps) {
   const linkProps = getRecoveryResourceLinkProps(resource, API_BASE);
   if (!linkProps) {
     return null;

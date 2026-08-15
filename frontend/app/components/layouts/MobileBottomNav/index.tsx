@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {FontAwesomeIcon as FontAwesomeIconBase} from '@fortawesome/react-fontawesome';
 import {
   faBook,
   faChalkboardUser,
@@ -25,10 +25,21 @@ import {useCosmetics} from '@/app/hooks/useCosmetics';
 import images from '@/app/assets/images';
 import JoinClassModal from '@/app/features/classes/modals/JoinClassModal';
 import CreateClassModal from '@/app/features/classes/modals/CreateClassModal';
-import CreateTestModal from '@/app/features/tests/components/CreateTestModal';
-import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
-import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
-import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import CreateTestModalJs from '@/app/features/tests/components/CreateTestModal';
+import StreakBadgeJs from '@/app/features/gamification/streak/StreakBadge';
+import CoinQuestMenuJs from '@/app/features/gamification/coin/CoinQuestMenu';
+import AvatarWithCosmeticJs from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+
+// react-fontawesome 0.1.x kéo fontawesome-common-types 0.3 lệch với 6.7 của icon pack
+// -> IconProp không khớp. Cast any tạm thời cho tới khi nâng cấp react-fontawesome.
+const FontAwesomeIcon = FontAwesomeIconBase as React.ComponentType<any>;
+
+// Các component feature còn là .js nên TS suy props sai (coi prop không default là bắt buộc).
+// Cast any tạm thời — bỏ cast khi các file này chuyển sang TS.
+const CreateTestModal = CreateTestModalJs as React.ComponentType<any>;
+const StreakBadge = StreakBadgeJs as React.ComponentType<any>;
+const CoinQuestMenu = CoinQuestMenuJs as React.ComponentType<any>;
+const AvatarWithCosmetic = AvatarWithCosmeticJs as React.ComponentType<any>;
 
 const cx = classNames.bind(styles);
 
@@ -41,7 +52,7 @@ const HIDDEN_PREFIXES = [
   '/admin',
 ];
 
-function isHiddenRoute(pathname) {
+function isHiddenRoute(pathname: string) {
   return HIDDEN_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
@@ -54,7 +65,7 @@ function MobileBottomNav() {
   // Tạo bài kiểm tra là việc của quản trị, người dùng thường không thấy nút này.
   const canCreateTest = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
-  const [activeSheet, setActiveSheet] = useState(null);
+  const [activeSheet, setActiveSheet] = useState<'class' | 'menu' | null>(null);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateClassModal, setShowCreateClassModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
@@ -66,7 +77,7 @@ function MobileBottomNav() {
     if (!sheetOpen) return undefined;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const onKey = (e) => e.key === 'Escape' && setActiveSheet(null);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setActiveSheet(null);
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prevOverflow;
@@ -93,7 +104,7 @@ function MobileBottomNav() {
    * Thao tác mở modal không đi qua router nên ProtectedRoute không chặn được  phải tự
    * kiểm tra đăng nhập tại đây.
    */
-  const requireLogin = (message) => {
+  const requireLogin = (message: string) => {
     if (user) {
       return false;
     }
@@ -105,7 +116,7 @@ function MobileBottomNav() {
 
   const handleCreateTest = () => setShowCreateTestModal(true);
 
-  const handleClassAction = (modalType, targetRoute) => {
+  const handleClassAction = (modalType: string | null, targetRoute?: string) => {
     if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
       return;
     }
@@ -312,7 +323,7 @@ function MobileBottomNav() {
                       <>
                         <Link
                           href={routes.login}
-                          state={{mode: 'signin'}}
+                          {...({state: {mode: 'signin'}} as any)}
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
@@ -320,7 +331,7 @@ function MobileBottomNav() {
                         </Link>
                         <Link
                           href={routes.login}
-                          state={{mode: 'signup'}}
+                          {...({state: {mode: 'signup'}} as any)}
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >

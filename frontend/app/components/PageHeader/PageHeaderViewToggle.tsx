@@ -1,12 +1,23 @@
 'use client';
 
-import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './PageHeader.module.scss';
 
 const cx = classNames.bind(styles);
 
-function PageHeaderViewToggle({options, activeKey, onChange}) {
+type PageHeaderViewToggleOption = {
+  key: string;
+  title?: string;
+  icon?: React.ElementType;
+};
+
+type PageHeaderViewToggleProps = {
+  options: PageHeaderViewToggleOption[];
+  activeKey: string;
+  onChange: (key: string) => void;
+};
+
+function PageHeaderViewToggle({options, activeKey, onChange}: PageHeaderViewToggleProps) {
   return (
     <div className={cx('viewToggle')}>
       {options.map((option) => {
@@ -27,17 +38,5 @@ function PageHeaderViewToggle({options, activeKey, onChange}) {
     </div>
   );
 }
-
-PageHeaderViewToggle.propTypes = {
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      title: PropTypes.string,
-      icon: PropTypes.elementType,
-    }),
-  ).isRequired,
-  activeKey: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
 
 export default PageHeaderViewToggle;

@@ -8,6 +8,18 @@ import styles from './ConfirmModal.module.scss';
 
 const cx = classNames.bind(styles);
 
+type ConfirmModalProps = {
+    show?: boolean;
+    onClose?: () => void;
+    onConfirm?: () => void;
+    title?: string;
+    message?: React.ReactNode;
+    icon?: React.ElementType;
+    variant?: string;
+    confirmText?: string;
+    cancelText?: string;
+};
+
 const ConfirmModal = ({
     show,
     onClose,
@@ -18,7 +30,7 @@ const ConfirmModal = ({
     variant = 'primary',
     confirmText = 'Xác nhận',
     cancelText = 'Hủy bỏ',
-}) => {
+}: ConfirmModalProps) => {
   const mounted = useMounted();
 
   // Portal cần document.body -> chỉ dựng sau khi đã ở client (xem useMounted).

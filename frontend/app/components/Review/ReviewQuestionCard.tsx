@@ -5,6 +5,22 @@ import styles from '@/app/assets/styles/ReviewQuestions.module.scss';
 
 const cx = classNames.bind(styles);
 
+type ReviewQuestionCardProps = {
+  id?: string;
+  number?: number;
+  status?: string;
+  questionText?: React.ReactNode;
+  mode?: 'options' | 'fill';
+  /** Đáp án từ API (answerId, answerLabel, answerText, isCorrect) — chưa có type riêng */
+  answers?: any[];
+  selectedAnswerIds?: any[];
+  correctAnswerId?: any;
+  userAnswerText?: string;
+  correctAnswerText?: string;
+  explanation?: string;
+  canReview?: boolean;
+};
+
 function ReviewQuestionCard({
   id,
   number,
@@ -18,7 +34,7 @@ function ReviewQuestionCard({
   correctAnswerText,
   explanation,
   canReview = true,
-}) {
+}: ReviewQuestionCardProps) {
   return (
     <div id={id} className={cx('questionItem', status)}>
       <span className={cx('qText')}>

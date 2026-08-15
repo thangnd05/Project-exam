@@ -8,7 +8,7 @@ const ScrollHandler = () => {
 
   useEffect(() => {
     const saveScrollPosition = () => {
-      sessionStorage.setItem('scroll_' + pathname, window.scrollY);
+      sessionStorage.setItem('scroll_' + pathname, String(window.scrollY));
     };
 
     return () => {

@@ -12,22 +12,30 @@ import MobileBottomNav from '../MobileBottomNav';
 
 const cx = classNames.bind(styles);
 
+type DefaultLayoutProps = {
+  children?: React.ReactNode;
+  noContainer?: boolean;
+  hideFooter?: boolean;
+  hideScrollToTop?: boolean;
+  examMode?: boolean;
+};
+
 function DefaultLayout({
   children,
   noContainer = false,
   hideFooter = false,
   hideScrollToTop = false,
   examMode = false,
-}) {
+}: DefaultLayoutProps) {
   const pathname = usePathname();
   const showMobileNav = !hideFooter;
   const flushTop = !examMode && pathname === '/';
-  const wrapperRef = useRef(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
     const header = wrapper?.firstElementChild;
-    if (!flushTop || !header) return undefined;
+    if (!flushTop || !wrapper || !header) return undefined;
 
     const apply = () =>
       wrapper.style.setProperty(

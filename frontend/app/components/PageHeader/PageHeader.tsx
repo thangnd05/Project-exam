@@ -1,10 +1,31 @@
 'use client';
 
-import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './PageHeader.module.scss';
 
 const cx = classNames.bind(styles);
+
+type PageHeaderProps = {
+  title: string;
+  label?: string;
+  badgeLabel?: React.ReactNode;
+  onAction?: () => void;
+  actionText?: string;
+  actionIcon?: React.ElementType;
+  onSecondaryAction?: () => void;
+  secondaryActionText?: string;
+  secondaryActionIcon?: React.ElementType;
+  className?: string;
+  description?: React.ReactNode;
+  labelClassName?: string;
+  /* Khối riêng của trang, nằm ngay dưới tiêu đề (hàng badge, chip...) */
+  meta?: React.ReactNode;
+  /* Khối riêng của trang, chạy hết chiều ngang dưới cùng banner (thanh tiến độ...) */
+  footer?: React.ReactNode;
+  /* Banner gọn hơn (padding + tiêu đề nhỏ lại) */
+  compact?: boolean;
+  children?: React.ReactNode;
+};
 
 const PageHeader = ({
   title,
@@ -23,7 +44,7 @@ const PageHeader = ({
   footer,
   compact = false,
   children,
-}) => {
+}: PageHeaderProps) => {
   return (
     <div className={cx('headerHero', { hasFooter: Boolean(footer), compact }, className)}>
       {/* display:contents khi không có footer -> giữ nguyên layout của các trang cũ */}
@@ -56,24 +77,6 @@ const PageHeader = ({
       {footer && <div className={cx('heroFooter')}>{footer}</div>}
     </div>
   );
-};
-
-PageHeader.propTypes = {
-  title: PropTypes.string.isRequired,
-  label: PropTypes.string,
-  badgeLabel: PropTypes.node,
-  onAction: PropTypes.func,
-  actionText: PropTypes.string,
-  actionIcon: PropTypes.elementType,
-  className: PropTypes.string,
-  description: PropTypes.node,
-  labelClassName: PropTypes.string,
-  /* Khối riêng của trang, nằm ngay dưới tiêu đề (hàng badge, chip...) */
-  meta: PropTypes.node,
-  /* Khối riêng của trang, chạy hết chiều ngang dưới cùng banner (thanh tiến độ...) */
-  footer: PropTypes.node,
-  /* Banner gọn hơn (padding + tiêu đề nhỏ lại) */
-  compact: PropTypes.bool,
 };
 
 export default PageHeader;

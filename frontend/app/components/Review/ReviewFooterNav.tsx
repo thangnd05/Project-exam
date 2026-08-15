@@ -8,12 +8,24 @@ import styles from '@/app/assets/styles/ReviewFooter.module.scss';
 
 const cx = classNames.bind(styles);
 
-function ReviewFooterNav({ items = [], correctCount = 0, onSelect }) {
+// Item dựng từ data API (chưa có type riêng) -> id để any có chủ đích.
+type ReviewFooterNavItem = {
+  id: any;
+  status?: string;
+};
+
+type ReviewFooterNavProps = {
+  items?: ReviewFooterNavItem[];
+  correctCount?: number;
+  onSelect?: (id: any) => void;
+};
+
+function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFooterNavProps) {
   const [open, setOpen] = useState(false);
 
   if (items.length === 0) return null;
 
-  const pick = (id) => {
+  const pick = (id: any) => {
     onSelect?.(id);
     setOpen(false);
   };

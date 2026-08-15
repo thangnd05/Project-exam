@@ -14,11 +14,18 @@ import {name} from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 import JoinClassModal from '@/app/features/classes/modals/JoinClassModal';
 import CreateClassModal from '@/app/features/classes/modals/CreateClassModal';
-import CreateTestModal from '@/app/features/tests/components/CreateTestModal';
-import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
-import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
-import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import CreateTestModalJs from '@/app/features/tests/components/CreateTestModal';
+import StreakBadgeJs from '@/app/features/gamification/streak/StreakBadge';
+import CoinQuestMenuJs from '@/app/features/gamification/coin/CoinQuestMenu';
+import AvatarWithCosmeticJs from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import {useCosmetics} from '@/app/hooks/useCosmetics';
+
+// Các component feature còn là .js nên TS suy props sai (coi prop không default là bắt buộc).
+// Cast any tạm thời — bỏ cast khi các file này chuyển sang TS.
+const CreateTestModal = CreateTestModalJs as React.ComponentType<any>;
+const StreakBadge = StreakBadgeJs as React.ComponentType<any>;
+const CoinQuestMenu = CoinQuestMenuJs as React.ComponentType<any>;
+const AvatarWithCosmetic = AvatarWithCosmeticJs as React.ComponentType<any>;
 
 const cx = classNames.bind(style);
 
@@ -42,7 +49,7 @@ function Header() {
    * Các thao tác mở modal không đi qua router nên ProtectedRoute không chặn được  phải tự
    * kiểm tra đăng nhập tại đây.
    */
-  const requireLogin = (message) => {
+  const requireLogin = (message: string) => {
     if (user) {
       return false;
     }
@@ -53,7 +60,11 @@ function Header() {
 
   const handleCreateTest = () => setShowCreateTestModal(true);
 
-  const handleClassAction = (e, targetRoute, modalType = null) => {
+  const handleClassAction = (
+    e: React.MouseEvent<HTMLElement>,
+    targetRoute: string | null,
+    modalType: string | null = null,
+  ) => {
     e.preventDefault();
     if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
       return;
@@ -64,7 +75,8 @@ function Header() {
     } else if (modalType === 'create') {
       setShowCreateModal(true);
     } else {
-      router.push(targetRoute);
+      // Nhánh này chỉ chạy khi được gọi kèm targetRoute (không có modalType).
+      router.push(targetRoute as string);
     }
   };
 
@@ -172,14 +184,14 @@ function Header() {
                 <div className={cx('authLinks')}>
                   <Link
                     href={routes.login}
-                    state={{mode: 'signin'}}
+                    {...({state: {mode: 'signin'}} as any)}
                     className={cx('home')}
                   >
                     Đăng nhập
                   </Link>
                   <Link
                     href={routes.login}
-                    state={{mode: 'signup'}}
+                    {...({state: {mode: 'signup'}} as any)}
                     className={cx('home')}
                   >
                     Đăng ký

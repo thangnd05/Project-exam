@@ -7,7 +7,13 @@ import styles from './InfoTip.module.scss';
 
 const cx = classNames.bind(styles);
 
-function InfoTip({ text, placement = 'top', className }) {
+type InfoTipProps = {
+  text?: string;
+  placement?: React.ComponentProps<typeof OverlayTrigger>['placement'];
+  className?: string;
+};
+
+function InfoTip({ text, placement = 'top', className }: InfoTipProps) {
   if (!text) return null;
   return (
     <OverlayTrigger

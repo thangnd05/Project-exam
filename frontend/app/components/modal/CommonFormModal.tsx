@@ -8,6 +8,16 @@ const SIZE_MAX_WIDTH = {
   lg: 800,
   xl: 1140,
 };
+
+type CommonFormModalProps = {
+  show?: boolean;
+  onHide?: () => void;
+  title?: React.ReactNode;
+  children?: React.ReactNode;
+  footer?: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+};
+
 function CommonFormModal({
   show,
   onHide,
@@ -15,7 +25,7 @@ function CommonFormModal({
   children,
   footer,
   size = 'md',
-}) {
+}: CommonFormModalProps) {
   return (
     <BaseModal
       show={show}

@@ -6,6 +6,16 @@ import ButtonPrime from '../Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 
+type ModalActionFooterProps = {
+  cancelLabel?: string;
+  submitLabel?: string;
+  loadingLabel?: string;
+  loading?: boolean;
+  onCancel?: () => void;
+  onSubmit?: () => void;
+  submitIcon?: React.ElementType;
+};
+
 function ModalActionFooter({
   cancelLabel = 'Hủy',
   submitLabel = 'Lưu',
@@ -14,7 +24,7 @@ function ModalActionFooter({
   onCancel,
   onSubmit,
   submitIcon: SubmitIcon,
-}) {
+}: ModalActionFooterProps) {
 
   return (
     <>
