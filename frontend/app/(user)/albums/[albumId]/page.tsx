@@ -1,5 +1,5 @@
-import AlbumDetailPage from '@/app/features/albums/detail/AlbumDetailPage';
+import AlbumDetail from './AlbumDetail';
 
 export default function Page() {
-  return <AlbumDetailPage />;
+  return <AlbumDetail />;
 }

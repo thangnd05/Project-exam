@@ -4,9 +4,9 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
 import { useStreak } from '@/app/hooks/useStreak';
-import { useMarkVocabKnown } from '@/app/features/albums/practice/hooks/useMarkVocabKnown';
-import { useCheckPracticeAnswer } from '@/app/features/albums/practice/hooks/useCheckPracticeAnswer';
-import { useGeneratePracticeQuestion } from '@/app/features/albums/practice/hooks/useGeneratePracticeQuestion';
+import { useMarkVocabKnown } from './_hooks/useMarkVocabKnown';
+import { useCheckPracticeAnswer } from './_hooks/useCheckPracticeAnswer';
+import { useGeneratePracticeQuestion } from './_hooks/useGeneratePracticeQuestion';
 import {Container, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -22,24 +22,30 @@ import {
     ChevronRight,
     Volume2
 } from 'lucide-react';
+import type { PracticeCheckRequest, PracticeCheckResponse, PracticeQuestionResponse } from '@/app/types';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import styles from './PracticePage.module.scss';
+import styles from './Practice.module.scss';
 
 const cx = classNames.bind(styles);
 
-const PracticePage = () => {
-    const {albumId} = useParams();
-    const [question, setQuestion] = useState(null);
+// Phần tử audio có gắn thêm hàm dọn listener autoplay (giữ nguyên cơ chế của bản JS cũ)
+type AutoplayAudioElement = HTMLAudioElement & {
+    _cleanupAutoplay?: (() => void) | null;
+};
+
+const Practice = () => {
+    const {albumId} = useParams<{ albumId: string }>();
+    const [question, setQuestion] = useState<PracticeQuestionResponse | null>(null);
     const [loading, setLoading] = useState(true);
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [userAnswer, setUserAnswer] = useState({english: '', vietnamese: ''});
-    const [result, setResult] = useState(null);
+    const [result, setResult] = useState<PracticeCheckResponse | null>(null);
     const [finished, setFinished] = useState(false);
     const [loadingNext, setLoadingNext] = useState(false);
     const [knownMessage, setKnownMessage] = useState('');
     const [sessionScore, setSessionScore] = useState({correct: 0, total: 0});
-    const audioRef = useRef(null);
+    const audioRef = useRef<AutoplayAudioElement | null>(null);
     const { refreshStreak } = useStreak();
     const markMutation = useMarkVocabKnown(albumId);
     const markingKnown = markMutation.isPending;
@@ -100,12 +106,13 @@ const PracticePage = () => {
     const handleSubmit = async () => {
         if (!question) return;
 
-        const payload =
+        // Non-null (!) an toàn: nút submit chỉ bấm được khi đã chọn đáp án (canSubmit)
+        const payload: PracticeCheckRequest =
             question.type === 'MULTICHOICE'
                 ? {
                       vocabId: question.vocabId,
                       type: question.type,
-                      selectedOptionText: question.options[selectedOption],
+                      selectedOptionText: question.options![selectedOption!],
                   }
                 : {
                       vocabId: question.vocabId,
@@ -444,4 +451,4 @@ const PracticePage = () => {
     );
 };
 
-export default PracticePage;
+export default Practice;

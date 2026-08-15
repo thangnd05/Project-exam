@@ -5,30 +5,31 @@ import { useState } from 'react';
 import { Spinner, Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { IoAddCircleOutline, IoFolderOpenOutline, IoGridOutline, IoListOutline, IoAdd } from "react-icons/io5";
 
-import styles from './MyAlbumPage.module.scss';
+import styles from './MyAlbum.module.scss';
 
-import CreateAlbumModal from './modals/CreateAlbumModal';
-import UpdateAlbumModal from './modals/UpdateAlbumModal';
+import CreateAlbumModal from './_components/CreateAlbumModal';
+import UpdateAlbumModal from './_components/UpdateAlbumModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import AlbumManagementTable from './components/AlbumManagementTable/AlbumManagementTable';
-import { useMyAlbums } from '@/app/features/albums/list/hooks/useMyAlbums';
+import AlbumManagementTable from './_components/AlbumManagementTable/AlbumManagementTable';
+import { useMyAlbums } from './_hooks/useMyAlbums';
+import type { VocabularyAlbumResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-const buildRingGradient = (pct) => {
+const buildRingGradient = (pct: number) => {
   const p = Math.max(0, Math.min(100, pct));
   return `conic-gradient(var(--primary) ${p}%, #e9eef5 ${p}% 100%)`;
 };
 
-const albumCardVariants = {
+const albumCardVariants: Variants = {
   hidden: { opacity: 0, y: 24 },
-  visible: (i) => ({
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -39,18 +40,18 @@ const albumCardVariants = {
   }),
 };
 
-function MyAlbumsPage() {
+function MyAlbum() {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [editingAlbum, setEditingAlbum] = useState(null);
-  const [albumToDelete, setAlbumToDelete] = useState(null);
+  const [editingAlbum, setEditingAlbum] = useState<VocabularyAlbumResponse | null>(null);
+  const [albumToDelete, setAlbumToDelete] = useState<VocabularyAlbumResponse | null>(null);
   const [viewMode, setViewMode] = useState('grid');
   const router = useRouter();
 
   const { albums, isLoading: loading, refetchAlbums, deleteAlbumMutation } = useMyAlbums();
 
-  const handleDeleteAlbum = (album) => {
+  const handleDeleteAlbum = (album: VocabularyAlbumResponse) => {
     setAlbumToDelete(album);
     setShowDeleteModal(true);
   };
@@ -73,7 +74,7 @@ function MyAlbumsPage() {
     });
   };
 
-  const handleEditAlbum = (album) => {
+  const handleEditAlbum = (album: VocabularyAlbumResponse) => {
     setEditingAlbum(album);
     setShowEditModal(true);
   };
@@ -81,7 +82,8 @@ function MyAlbumsPage() {
   if (loading)
     return (
       <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-        <Spinner animation="grow" variant="primary" size="lg" />
+        {/* size="lg" không có trong type của react-bootstrap (chỉ 'sm') nhưng giữ nguyên DOM như bản JS cũ */}
+        <Spinner animation="grow" variant="primary" size={'lg' as any} />
         <p className="mt-3 fw-bold text-primary fs-4">Đang chuẩn bị kho tàng từ vựng...</p>
       </div>
     );
@@ -220,4 +222,4 @@ function MyAlbumsPage() {
   );
 }
 
-export default MyAlbumsPage;
+export default MyAlbum;

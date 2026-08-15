@@ -8,11 +8,19 @@ import { IoSaveOutline } from "react-icons/io5";
 import CommonFormModal from "@/app/components/modal/CommonFormModal";
 import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
-import { useUpdateAlbum } from "@/app/features/albums/list/hooks/useUpdateAlbum";
+import type { VocabularyAlbumResponse } from "@/app/types";
+import { useUpdateAlbum } from "../_hooks/useUpdateAlbum";
 
 const cx = classNames.bind(styles);
 
-function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
+type UpdateAlbumModalProps = {
+    show: boolean;
+    onClose: () => void;
+    onSuccess?: () => void;
+    album: VocabularyAlbumResponse | null;
+};
+
+function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalProps) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
@@ -50,7 +58,8 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }) {
             description: description
         };
 
-        updateMutation.mutate({ albumId: album.albumId, payload });
+        // album! an toàn: modal chỉ mở khi đã chọn album để sửa
+        updateMutation.mutate({ albumId: album!.albumId, payload });
     };
 
     return (

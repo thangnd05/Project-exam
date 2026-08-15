@@ -1,5 +1,5 @@
-import PracticePage from '@/app/features/albums/practice/PracticePage';
+import Practice from './Practice';
 
 export default function Page() {
-  return <PracticePage />;
+  return <Practice />;
 }

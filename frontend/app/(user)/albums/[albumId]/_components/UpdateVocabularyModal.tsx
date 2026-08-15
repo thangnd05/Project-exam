@@ -1,68 +1,87 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IoText, IoLanguage } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
-import { useCreateVocabulary } from '@/app/features/albums/detail/hooks/useCreateVocabulary';
+import type { VocabularyResponse } from '@/app/types';
+import { useUpdateVocabulary } from '../_hooks/useUpdateVocabulary';
 
 const cx = classNames.bind(styles);
 
-const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
-    const [newVocab, setNewVocab] = useState({
+type UpdateVocabularyModalProps = {
+    show: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+    vocab: VocabularyResponse | null;
+};
+
+const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabularyModalProps) => {
+    const [editVocab, setEditVocab] = useState({
         word: '',
         meaning: '',
         example: '',
     });
 
-    const createMutation = useCreateVocabulary(albumId);
-    const loading = createMutation.isPending;
+    useEffect(() => {
+        if (vocab) {
+            setEditVocab({
+                word: vocab.word || '',
+                meaning: vocab.meaning || '',
+                example: vocab.example || '',
+            });
+        }
+    }, [vocab, show]);
 
-    const handleChange = (e) => {
+    const updateMutation = useUpdateVocabulary({
+        onSuccess: () => {
+            toast.success(' Cập nhật từ vựng thành công!');
+            onSuccess();
+            onClose();
+        },
+        onError: (err) => {
+            console.error(' Lỗi khi cập nhật từ:', err);
+            toast.error('Có lỗi xảy ra khi cập nhật từ vựng!');
+        },
+    });
+    const loading = updateMutation.isPending;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setNewVocab({ ...newVocab, [name]: value });
+        setEditVocab({ ...editVocab, [name]: value });
     };
 
-    const handleSave = (e) => {
-        if (!newVocab.word.trim() || !newVocab.meaning.trim()) {
+    // e nhận từ onClick của footer nên luôn có mặt lúc chạy; để optional cho khớp type () => void
+    const handleUpdate = (e?: React.SyntheticEvent) => {
+        if (!editVocab.word.trim() || !editVocab.meaning.trim()) {
             toast.warning(' Vui lòng điền đầy đủ từ vựng và nghĩa!');
             return;
         }
 
-        e.preventDefault();
-        createMutation.mutate(
-            { albumId, ...newVocab },
-            {
-                onSuccess: () => {
-                    toast.success(' Thêm từ vựng thành công!');
-                    setNewVocab({ word: '', meaning: '', example: '' });
-                    onSuccess();
-                    onClose();
-                },
-                onError: (err) => {
-                    console.error(' Lỗi khi thêm từ:', err);
-                    toast.error('Có lỗi xảy ra khi thêm từ mới!');
-                },
-            },
-        );
+        e?.preventDefault();
+        // vocab! an toàn: modal chỉ mở khi đã chọn từ vựng để sửa
+        updateMutation.mutate({
+            vocabId: vocab!.vocabId,
+            data: { ...editVocab, albumId: vocab!.albumId },
+        });
     };
 
     return (
         <CommonFormModal
             show={show}
             onHide={onClose}
-            title="Thêm Từ Vựng Mới"
+            title="Chỉnh Sửa Từ Vựng"
             footer={(
                 <ModalActionFooter
                     cancelLabel="Hủy bỏ"
-                    submitLabel="Lưu từ vựng ngay"
+                    submitLabel="Lưu thay đổi"
                     loadingLabel="Đang lưu..."
                     loading={loading}
                     onCancel={onClose}
-                    onSubmit={handleSave}
+                    onSubmit={handleUpdate}
                 />
             )}
         >
@@ -77,7 +96,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                         name="word"
                         className={cx('inputControl')}
                         placeholder="Ví dụ: Excellence, Innovation..."
-                        value={newVocab.word}
+                        value={editVocab.word}
                         onChange={handleChange}
                         disabled={loading}
                         autoFocus
@@ -96,7 +115,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                         name="meaning"
                         className={cx('inputControl')}
                         placeholder="Ví dụ: Sự xuất sắc, Đổi mới..."
-                        value={newVocab.meaning}
+                        value={editVocab.meaning}
                         onChange={handleChange}
                         disabled={loading}
                     />
@@ -110,7 +129,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
                         name="example"
                         className={cx('inputControl', 'textarea')}
                         placeholder="Nhập ví dụ giúp bạn ghi nhớ từ vựng này..."
-                        value={newVocab.example}
+                        value={editVocab.example}
                         onChange={handleChange}
                         disabled={loading}
                         rows={3}
@@ -121,4 +140,4 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
     );
 };
 
-export default CreateVocabularyModal;
+export default UpdateVocabularyModal;

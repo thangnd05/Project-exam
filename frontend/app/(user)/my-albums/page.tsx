@@ -1,5 +1,5 @@
-import MyAlbumsPage from '@/app/features/albums/list/MyAlbumPage';
+import MyAlbum from './MyAlbum';
 
 export default function Page() {
-  return <MyAlbumsPage />;
+  return <MyAlbum />;
 }

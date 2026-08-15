@@ -9,11 +9,18 @@ import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
-import { useBulkCreateVocabularies } from '@/app/features/albums/detail/hooks/useBulkCreateVocabularies';
+import { useBulkCreateVocabularies } from '../_hooks/useBulkCreateVocabularies';
 
 const cx = classNames.bind(styles);
 
-const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
+type BulkCreateVocabularyModalProps = {
+    show: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+    albumId?: string;
+};
+
+const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCreateVocabularyModalProps) => {
     const [aiLoading, setAiLoading] = useState(false);
     const [jsonInput, setJsonInput] = useState('');
 
@@ -38,7 +45,8 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
 
             setJsonInput(cleanedJson);
             toast.success('Chuẩn hóa dữ liệu thành công!');
-        } catch (err) {
+        } catch (err: any) {
+            // err để any có chủ đích: có thể là SyntaxError hoặc lỗi Axios (đọc err.response)
             console.error('Lỗi chuẩn hóa AI:', err);
 
             let errorMsg;
@@ -55,14 +63,16 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
         }
     };
 
-    const handleSave = async (e) => {
-        e.preventDefault();
+    // e nhận từ onClick của footer nên luôn có mặt lúc chạy; để optional cho khớp type () => void
+    const handleSave = async (e?: React.SyntheticEvent) => {
+        e?.preventDefault();
 
         if (!jsonInput.trim()) {
             toast.warning('Vui lòng nhập dữ liệu JSON!');
             return;
         }
 
+        // payload là any có chủ đích: kết quả JSON.parse từ input người dùng, chỉ kiểm tra runtime
         let payload;
         try {
             payload = JSON.parse(jsonInput);
@@ -79,7 +89,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }) => {
             return;
         }
 
-        const processedPayload = payload.map((item) => ({
+        const processedPayload = payload.map((item: any) => ({
             ...item,
             albumId: item.albumId || albumId,
         }));

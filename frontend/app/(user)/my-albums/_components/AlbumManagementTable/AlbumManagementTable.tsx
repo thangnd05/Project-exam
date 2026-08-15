@@ -4,11 +4,18 @@ import { useRouter } from 'next/navigation';
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { IoPencilOutline, IoTrashOutline, IoPlayOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import type { VocabularyAlbumResponse } from '@/app/types';
 import styles from './AlbumManagementTable.module.scss';
 
 const cx = classNames.bind(styles);
 
-const AlbumManagementTable = ({albums, onDelete, onEdit}) => {
+type AlbumManagementTableProps = {
+  albums: VocabularyAlbumResponse[];
+  onDelete: (album: VocabularyAlbumResponse) => void;
+  onEdit: (album: VocabularyAlbumResponse) => void;
+};
+
+const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTableProps) => {
   const router = useRouter();
 
   return (

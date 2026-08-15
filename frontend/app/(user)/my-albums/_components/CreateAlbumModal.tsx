@@ -2,16 +2,22 @@
 
 import { useState } from "react";
 import { toast } from 'react-toastify';
-import { useCreateAlbum } from '@/app/features/albums/list/hooks/useCreateAlbum';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import CommonFormModal from "@/app/components/modal/CommonFormModal";
 import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
+import { useCreateAlbum } from '../_hooks/useCreateAlbum';
 
 const cx = classNames.bind(styles);
 
-function CreateAlbumModal({ show, onClose, onSuccess }) {
+type CreateAlbumModalProps = {
+    show: boolean;
+    onClose: () => void;
+    onSuccess?: () => void;
+};
+
+function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 

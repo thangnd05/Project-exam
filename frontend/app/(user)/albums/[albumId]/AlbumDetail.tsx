@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAlbumVocabularies, useDeleteVocabulary } from '@/app/features/albums/detail/hooks/useAlbumVocabularies';
+import { useAlbumVocabularies, useDeleteVocabulary } from './_hooks/useAlbumVocabularies';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
 import {
   Container,
@@ -12,26 +12,27 @@ import {
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
-import CreateVocabularyModal from './modals/CreateVocabularyModal';
-import BulkCreateVocabularyModal from './modals/BulkCreateVocabularyModal';
-import UpdateVocabularyModal from './modals/UpdateVocabularyModal';
+import CreateVocabularyModal from './_components/CreateVocabularyModal';
+import BulkCreateVocabularyModal from './_components/BulkCreateVocabularyModal';
+import UpdateVocabularyModal from './_components/UpdateVocabularyModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';
 import { IoAdd, IoFlashOutline, IoTrashOutline, IoPencilOutline, IoChevronBack, IoChevronForward, IoListOutline, IoSchoolOutline, IoVolumeHighOutline, IoCodeSlashOutline } from 'react-icons/io5';
+import type { VocabularyResponse } from '@/app/types';
 
-import styles from './AlbumDetailPage.module.scss';
+import styles from './AlbumDetail.module.scss';
 
 const cx = classNames.bind(styles);
 
-const AlbumDetailPage = () => {
-  const { albumId } = useParams();
+const AlbumDetail = () => {
+  const { albumId } = useParams<{ albumId: string }>();
   const [showModal, setShowModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [vocabToDelete, setVocabToDelete] = useState(null);
-  const [vocabToUpdate, setVocabToUpdate] = useState(null);
+  const [vocabToDelete, setVocabToDelete] = useState<VocabularyResponse | null>(null);
+  const [vocabToUpdate, setVocabToUpdate] = useState<VocabularyResponse | null>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -53,12 +54,12 @@ const AlbumDetailPage = () => {
     }
   }, []);
 
-  const handleDeleteClick = (vocab) => {
+  const handleDeleteClick = (vocab: VocabularyResponse) => {
     setVocabToDelete(vocab);
     setShowDeleteModal(true);
   };
 
-  const handleEditClick = (vocab) => {
+  const handleEditClick = (vocab: VocabularyResponse) => {
     setVocabToUpdate(vocab);
     setShowUpdateModal(true);
   };
@@ -77,7 +78,7 @@ const AlbumDetailPage = () => {
     }
   };
 
-  const playAudio = (word) => {
+  const playAudio = (word?: string) => {
     const audio = new Audio(getTtsUrl(word));
     audio.play();
   };
@@ -85,7 +86,8 @@ const AlbumDetailPage = () => {
   if (loading)
     return (
       <div className={cx('loading-box')}>
-        <Spinner animation="grow" variant="primary" size="lg" />
+        {/* size="lg" không có trong type của react-bootstrap (chỉ 'sm') nhưng giữ nguyên DOM như bản JS cũ */}
+        <Spinner animation="grow" variant="primary" size={'lg' as any} />
         <p>Đang mài giũa kiến thức...</p>
       </div>
     );
@@ -299,4 +301,4 @@ const AlbumDetailPage = () => {
   );
 };
 
-export default AlbumDetailPage;
+export default AlbumDetail;
