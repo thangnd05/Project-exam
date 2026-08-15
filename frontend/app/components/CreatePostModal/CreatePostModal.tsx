@@ -9,10 +9,13 @@ import { FaEdit, FaImage, FaTag } from 'react-icons/fa';
 import { useAuth } from '@/app/hooks/useAuth';
 import routes from '@/app/configs/Routes';
 import dynamic from 'next/dynamic';
+import type { CategoryResponse, PostResponse } from '@/app/types';
 
 // Quill chạm `document` ngay khi module được nạp nên không import tĩnh được: Next sẽ thực thi
 // file này cả ở phía server. Nạp động với ssr:false để nó chỉ tồn tại trên trình duyệt.
-const ReactQuill = dynamic(() => import('react-quill'), {
+// any có chủ đích: next/dynamic trả về ComponentType không khai báo ref, trong khi react-quill
+// là class component cần ref để lấy editor instance — runtime vẫn hoạt động như cũ.
+const ReactQuill: any = dynamic(() => import('react-quill'), {
   ssr: false,
   loading: () => <div style={{ minHeight: 200, color: 'var(--text-secondary)' }}>Đang tải trình soạn thảo...</div>,
 });
@@ -20,18 +23,27 @@ import 'react-quill/dist/quill.snow.css';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
-import { useSavePost } from '@/app/features/posts/hooks/useSavePost';
+import { useSavePost, type InlinePostImage } from '@/app/hooks/useSavePost';
 
 const cx = classNames.bind(styles);
 
-function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPost = null }) {
+type CreatePostModalProps = {
+  show: boolean;
+  onClose: () => void;
+  onRefresh?: () => void;
+  categories?: CategoryResponse[];
+  /* Bài viết đang sửa — null/không truyền khi tạo mới */
+  editingPost?: PostResponse | null;
+};
+
+function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPost = null }: CreatePostModalProps) {
   const isEditing = !!editingPost;
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
-  const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [inlineImages, setInlineImages] = useState([]);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [inlineImages, setInlineImages] = useState<InlinePostImage[]>([]);
 
   const { user } = useAuth();
   const router = useRouter();
@@ -61,7 +73,8 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
     setInlineImages([]);
   }, [show, editingPost]);
 
-  const quillRef = useRef(null);
+  // any có chủ đích: ref trỏ vào instance ReactQuill nhưng type đã mất qua next/dynamic
+  const quillRef = useRef<any>(null);
 
   const imageHandler = useCallback(() => {
     const input = document.createElement('input');
@@ -70,11 +83,12 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
     input.click();
 
     input.onchange = async () => {
-      const file = input.files[0];
+      const file = input.files?.[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          const base64Url = e.target.result;
+          // readAsDataURL luôn trả về string
+          const base64Url = e.target?.result as string;
           setInlineImages((prev) => [...prev, { file, base64Url }]);
 
           const quill = quillRef.current.getEditor();
@@ -201,7 +215,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
             type="file"
             accept="image/*"
             className="form-control"
-            onChange={(e) => setThumbnailFile(e.target.files[0])}
+            onChange={(e) => setThumbnailFile(e.target.files?.[0] ?? null)}
             disabled={loading}
             style={{ padding: '1rem', fontSize: 'var(--font-size-ssm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}
           />

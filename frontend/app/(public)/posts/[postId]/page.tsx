@@ -1,4 +1,4 @@
-import PostDetailPage from '@/app/features/posts/PostDetailPage';
+import PostDetail from './PostDetail';
 
 // Đây là chỗ Next thật sự hơn SPA: metadata được sinh Ở SERVER trước khi trả HTML, nên
 // Zalo/Facebook/Messenger — vốn KHÔNG chạy JavaScript khi bóc link — mới đọc được đúng tiêu đề
@@ -55,5 +55,5 @@ export async function generateMetadata({ params }: Params) {
 }
 
 export default function Page() {
-  return <PostDetailPage />;
+  return <PostDetail />;
 }

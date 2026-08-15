@@ -7,7 +7,24 @@ import { uploadPostImage, createPost, updatePost } from '@/app/apis/postApi';
 const DEFAULT_THUMBNAIL_URL =
   'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1350&q=80';
 
-export function useSavePost({ onSuccess } = {}) {
+/* Ảnh chèn inline trong editor: giữ file gốc + data URL base64 đã nhúng tạm vào nội dung */
+export interface InlinePostImage {
+  file: File;
+  base64Url: string;
+}
+
+interface SavePostVariables {
+  title: string;
+  content: string;
+  categoryId: string;
+  thumbnailUrl?: string;
+  thumbnailFile?: File | null;
+  inlineImages: InlinePostImage[];
+  isEditing: boolean;
+  editingPostId?: string;
+}
+
+export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
   return useMutation({
     mutationFn: async ({
       title,
@@ -18,7 +35,7 @@ export function useSavePost({ onSuccess } = {}) {
       inlineImages,
       isEditing,
       editingPostId,
-    }) => {
+    }: SavePostVariables) => {
       let finalContent = content;
 
       const imagesToUpload = inlineImages.filter((img) => finalContent.includes(img.base64Url));
@@ -54,7 +71,7 @@ export function useSavePost({ onSuccess } = {}) {
       }
 
       if (isEditing) {
-        await updatePost(editingPostId, formData);
+        await updatePost(editingPostId as string, formData);
         toast.success('Cập nhật bài viết thành công!');
       } else {
         await createPost(formData);
@@ -64,7 +81,8 @@ export function useSavePost({ onSuccess } = {}) {
     onSuccess: () => {
       if (onSuccess) onSuccess();
     },
-    onError: (err, variables) => {
+    // any có chủ đích: lỗi axios (err.response) không có type sẵn trong dự án
+    onError: (err: any, variables) => {
       toast.error(
         err.response?.data?.message || (variables.isEditing ? 'Lỗi khi cập nhật bài viết!' : 'Lỗi khi đăng bài viết!'),
       );

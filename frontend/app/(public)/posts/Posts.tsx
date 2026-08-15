@@ -3,22 +3,22 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
-import { usePosts } from '@/app/features/posts/hooks/usePosts';
+import { usePosts } from '@/app/hooks/usePosts';
 import routes from '@/app/configs/Routes';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import Pagination from '@/app/components/Pagination/Pagination';
-import CreatePostModal from './modals/CreatePostModal';
+import CreatePostModal from '@/app/components/CreatePostModal/CreatePostModal';
 import ProfileSectionModal from '@/app/features/user/profile/ProfileSectionModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);
 const MotionLink = motion.create(Link);
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 24 },
-  visible: (i) => ({
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -29,11 +29,11 @@ const cardVariants = {
   }),
 };
 
-function PostsPage() {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+function Posts() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [activeSection, setActiveSection] = useState(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
 
   const { posts, categories, totalPages, refresh } = usePosts({
@@ -148,10 +148,12 @@ function PostsPage() {
               <div className={cx('cardContent')}>
                 <div className={cx('cardMeta')}>
                   <Clock size={14} />
-                  <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
+                  <span>{new Date(post.createdAt ?? '').toLocaleDateString('vi-VN')}</span>
                 </div>
                 <h3>{post.title}</h3>
-                <p className={cx('cardExcerpt')}>{post.summary || post.title}</p>
+                {/* any có chủ đích: PostSummaryResponse từ BE không có field `summary`
+                    (runtime luôn fallback về title) — giữ nguyên biểu thức cũ, không đổi hành vi */}
+                <p className={cx('cardExcerpt')}>{(post as any).summary || post.title}</p>
                 <div className={cx('cardFooter')}>
                   <div className={cx('author')}>
                     <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} referrerPolicy="no-referrer" />
@@ -185,4 +187,4 @@ function PostsPage() {
   );
 }
 
-export default PostsPage;
+export default Posts;

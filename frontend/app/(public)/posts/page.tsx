@@ -1,4 +1,4 @@
-import PostsPage from '@/app/features/posts/PostsPage';
+import Posts from './Posts';
 
 export const metadata = {
   title: 'Bài viết',
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <PostsPage />;
+  return <Posts />;
 }

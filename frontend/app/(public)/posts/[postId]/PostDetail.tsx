@@ -19,16 +19,18 @@ import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWit
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
-import styles from './PostDetailPage.module.scss';
-import { postsKeys, usePostDetail, usePostComments, useRelatedPosts } from '@/app/features/posts/hooks/usePosts';
-import { useAddComment, useUpdateComment, useDeleteComment } from '@/app/features/posts/hooks/useComments';
-import { useToggleReact, useToggleSavePost } from '@/app/features/posts/hooks/usePostReactions';
+import styles from './PostDetail.module.scss';
+import { postsKeys, usePostDetail, usePostComments, useRelatedPosts } from '@/app/hooks/usePosts';
+import { useAddComment, useUpdateComment, useDeleteComment } from './_hooks/useComments';
+import { useToggleReact, useToggleSavePost } from './_hooks/usePostReactions';
+import { ReactType } from '@/app/enums';
+import type { CommentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 const MAX_REPLY_DEPTH = 4;
 
-function PostDetailPage() {
-  const { postId } = useParams();
+function PostDetail() {
+  const { postId } = useParams<{ postId: string }>();
   const { user } = useAuth();
   const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
   const router = useRouter();
@@ -40,13 +42,13 @@ function PostDetailPage() {
   const [saveCount, setSaveCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [deletingCommentId, setDeletingCommentId] = useState(null);
-  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
-  const [replyingToId, setReplyingToId] = useState(null);
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [replyIndentPx, setReplyIndentPx] = useState(40);
-  const [expandedReplies, setExpandedReplies] = useState({});
+  const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
 
   const { post, isLoading: loading, isError, refetch } = usePostDetail(postId);
   const { comments = [] } = usePostComments(postId);
@@ -71,7 +73,7 @@ function PostDetailPage() {
 
   useEffect(() => {
     if (!post) return;
-    setLiked(post.currentUserReactType === 'LIKE');
+    setLiked(post.currentUserReactType === ReactType.LIKE);
     setLikeCount(post.reactCounts?.LIKE || 0);
     setBookmarked(!!post.currentUserSaved);
     setSaveCount(post.saveCount || 0);
@@ -167,7 +169,7 @@ function PostDetailPage() {
     }
   };
 
-  const handleSubmitComment = (e) => {
+  const handleSubmitComment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) {
       toast.warning('Vui lòng đăng nhập để bình luận');
@@ -187,7 +189,7 @@ function PostDetailPage() {
     );
   };
 
-  const handleUpdateComment = (commentId) => {
+  const handleUpdateComment = (commentId: string) => {
     if (!editContent.trim()) return;
     updateCommentMutation.mutate(
       { commentId, data: { content: editContent } },
@@ -213,7 +215,7 @@ function PostDetailPage() {
     });
   };
 
-  const handleReply = (parentId) => {
+  const handleReply = (parentId: string) => {
     if (!replyContent.trim()) return;
     addCommentMutation.mutate(
       { postId, data: { content: replyContent, parentId } },
@@ -242,10 +244,10 @@ function PostDetailPage() {
     setLikeCount(prevLiked ? Math.max(0, prevLikeCount - 1) : prevLikeCount + 1);
 
     reactMutation.mutate(
-      { postId, type: 'LIKE' },
+      { postId, type: ReactType.LIKE },
       {
         onSuccess: (summary) => {
-          setLiked(summary.currentUserReactType === 'LIKE');
+          setLiked(summary.currentUserReactType === ReactType.LIKE);
           setLikeCount(summary.counts?.LIKE || 0);
         },
         onError: (error) => {
@@ -282,12 +284,12 @@ function PostDetailPage() {
     });
   };
 
-  const countNestedReplies = (comment) => {
+  const countNestedReplies = (comment: CommentResponse): number => {
     if (!comment?.replies || comment.replies.length === 0) return 0;
     return comment.replies.reduce((total, reply) => total + 1 + countNestedReplies(reply), 0);
   };
 
-  const renderComment = (comment, depth = 0) => {
+  const renderComment = (comment: CommentResponse, depth = 0): React.ReactNode => {
     const indentStep = depth > 0 && depth <= MAX_REPLY_DEPTH ? `${replyIndentPx}px` : '0px';
     const mentionName = comment.authorName || 'user';
     const hasReplies = comment.replies && comment.replies.length > 0;
@@ -308,7 +310,7 @@ function PostDetailPage() {
           <div className={cx('contentBox')}>
             <div className={cx('commentMeta')}>
               <span className={cx('authorName')}>{comment.authorName}</span>
-              {comment.userId === post.userId && <span className={cx('opTag')}>Tác giả</span>}
+              {comment.userId === post?.userId && <span className={cx('opTag')}>Tác giả</span>}
             </div>
 
             {editingCommentId === comment.id ? (
@@ -330,12 +332,14 @@ function PostDetailPage() {
                 setReplyingToId(comment.id);
                 setReplyContent('');
               }}>Trả lời</button>
-              <span className={cx('time')}>{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
-              {user && user.id === comment.userId && (
+              <span className={cx('time')}>{new Date(comment.createdAt ?? '').toLocaleString('vi-VN')}</span>
+              {/* any có chủ đích: code cũ so sánh `user.id` trong khi AuthUser chuẩn hoá chỉ có
+                  `userId` — giữ nguyên biểu thức để không đổi hành vi hiện tại của nút Sửa/Xóa */}
+              {user && (user as any).id === comment.userId && (
                 <>
                   <button onClick={() => {
                     setEditingCommentId(comment.id);
-                    setEditContent(comment.content);
+                    setEditContent(comment.content ?? '');
                   }}>Sửa</button>
                   <button onClick={() => setDeletingCommentId(comment.id)}>Xóa</button>
                 </>
@@ -369,7 +373,7 @@ function PostDetailPage() {
         {hasReplies && isExpanded && (
           <>
             <div className={cx('subComments')}>
-              {comment.replies.map(reply =>
+              {comment.replies?.map(reply =>
                 renderComment(
                   reply,
                   depth < MAX_REPLY_DEPTH ? depth + 1 : depth
@@ -431,7 +435,7 @@ function PostDetailPage() {
             <div className={cx('iconCircle')}><Bookmark size={20} fill={bookmarked ? 'currentColor' : 'none'} /></div>
             <span className={cx('count')}>{saveCount}</span>
           </button>
-          <button className={cx('actionBtn')} onClick={() => document.getElementById('comments').scrollIntoView({ behavior: 'smooth' })}>
+          <button className={cx('actionBtn')} onClick={() => document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' })}>
             <div className={cx('iconCircle')}><MessageCircle size={20} /></div>
             <span className={cx('count')}>{post.commentCount || 0}</span>
           </button>
@@ -470,7 +474,7 @@ function PostDetailPage() {
             </div>
           </div>
           <div className={cx('metaSide')}>
-            {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+            {new Date(post.createdAt ?? '').toLocaleDateString('vi-VN')}
           </div>
         </div>
 
@@ -521,7 +525,7 @@ function PostDetailPage() {
                       </div>
                       <span className="text-primary fw-bold small mb-2 d-block">{rel.categories?.[0]?.name || 'Blog'}</span>
                       <h4>{rel.title}</h4>
-                      <div className={cx('meta')}>{new Date(rel.createdAt).toLocaleDateString('vi-VN')}</div>
+                      <div className={cx('meta')}>{new Date(rel.createdAt ?? '').toLocaleDateString('vi-VN')}</div>
                     </div>
                   </div>
                 ))}
@@ -543,4 +547,4 @@ function PostDetailPage() {
   );
 }
 
-export default PostDetailPage;
+export default PostDetail;
