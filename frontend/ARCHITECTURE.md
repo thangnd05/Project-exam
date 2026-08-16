@@ -112,11 +112,22 @@ mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc 
   tài liệu) đã có `generateMetadata` chạy ở server qua `app/utils/serverApi.ts`. Helper đó
   không mang cookie nên chỉ gọi được endpoint `permitAll`. Trang tra cứu chứng chỉ theo mã cố
   tình để `noindex` và không đưa dữ liệu người học vào thẻ OG.
+- **`sitemap.ts` sinh động**: gộp trang tĩnh + bài viết + loại đề + tài liệu, `revalidate` 1 giờ.
+  Backend chết thì các nhánh trả `null` và sitemap co lại còn phần tĩnh, không làm build vỡ.
+- **404 cho ID không tồn tại — mới nửa vời.** Trang chi tiết gọi `notFound()` khi backend trả
+  404 (phân biệt với lỗi mạng qua `fetchPublicResource`), nên người dùng thấy đúng trang "Không
+  tìm thấy". Nhưng **HTTP status vẫn là 200**: `DefaultLayout` là client component bọc
+  `children` nên Next đã flush shell trước khi `notFound()` kịp ném — đã đo, route nằm ngoài
+  `DefaultLayout` thì trả 404 đúng. Chống index hiện dựa vào `robots: noindex` trong
+  `app/not-found.tsx`. Muốn 404 thật thì phải đưa `children` ra khỏi client boundary của
+  `DefaultLayout` (mất hiệu ứng `motion` chuyển trang), chưa làm.
 - **Ảnh & font**: ảnh tĩnh dùng `next/image` (`imageAssets` trong `app/assets/images`, dạng
-  `StaticImageData`); ảnh do người dùng/nội dung nhập vẫn để `<img>` vì URL đến từ host tuỳ ý —
-  `next/image` sẽ chặn host chưa khai trong `images.remotePatterns`. Font nạp bằng `next/font`
-  trong `layout.tsx`, dùng qua `--font-inter` / `--font-playfair`; cấm `@import` Google Fonts
-  trong SCSS.
+  `StaticImageData`). Ảnh nội dung (passage, banner đề thi) đi qua `components/MediaImage` — nó
+  tự chọn `next/image` cho host đã khai trong `images.remotePatterns` (Cloudinary, nơi hệ thống
+  upload) và lùi về `<img>` cho URL admin dán tay từ host lạ, vì `next/image` chặn cứng host
+  không khai. Thêm host mới phải khai ở cả `MediaImage` lẫn `next.config.mjs`. Font nạp bằng
+  `next/font` trong `layout.tsx`, dùng qua `--font-inter` / `--font-playfair`; cấm `@import`
+  Google Fonts trong SCSS.
 - **Thư viện nặng nạp rời** bằng `next/dynamic`: recharts (analytics, hồ sơ, so sánh lộ trình,
   lịch sử thi thử), react-simple-maps + world-atlas (bản đồ analytics), react-slick (carousel
   trang chủ và bài viết). Quill tự `import()` bên trong `RichTextEditor`. Lưu ý tuỳ chọn của

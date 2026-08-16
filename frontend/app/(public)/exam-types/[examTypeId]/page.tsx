@@ -1,5 +1,6 @@
+import { notFound } from 'next/navigation';
 import type { ExamTypeResponse } from '@/app/types';
-import { fetchPublicJson } from '@/app/utils/serverApi';
+import { fetchPublicJson, fetchPublicResource } from '@/app/utils/serverApi';
 import { toMetaDescription } from '@/app/utils/seo';
 import TestByExamType from './TestByExamType';
 
@@ -30,6 +31,12 @@ export async function generateMetadata({ params }: PageProps<'/exam-types/[examT
   };
 }
 
-export default function Page() {
+export default async function Page({ params }: PageProps<'/exam-types/[examTypeId]'>) {
+  const { examTypeId } = await params;
+  const res = await fetchPublicResource<ExamTypeResponse>(
+    `/api/exam-types/${encodeURIComponent(examTypeId)}`,
+  );
+  if (!res.ok && res.missing) notFound();
+
   return <TestByExamType />;
 }

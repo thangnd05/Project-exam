@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import type { QuestionAdminResponse } from '@/app/types';
 
 import styles from './EditQuestionModal.module.scss';
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);
 
@@ -87,10 +88,13 @@ export function PassageMediaCard({item, index, actions = null}: PassageMediaCard
       {kind === 'AUDIO' ? (
         <audio controls src={url} className={cx('existingMediaAudio')} />
       ) : kind === 'IMAGE' ? (
-        <img
+        <MediaImage
           src={url}
           alt={`passage-media-${index + 1}`}
           className={cx('existingMediaImage')}
+          width={600}
+          height={260}
+          sizes="(max-width: 768px) 100vw, 600px"
         />
       ) : (
         <div className={cx('existingMediaDoc')}>{url}</div>

@@ -1,5 +1,6 @@
+import { notFound } from 'next/navigation';
 import type { ExamTypeResponse } from '@/app/types';
-import { fetchPublicJson } from '@/app/utils/serverApi';
+import { fetchPublicJson, fetchPublicResource } from '@/app/utils/serverApi';
 import TestByCollection from './TestByCollection';
 
 // /api/question-collections yêu cầu đăng nhập nên không lấy được tên bộ đề ở server;
@@ -24,6 +25,15 @@ export async function generateMetadata({
   };
 }
 
-export default function Page() {
+export default async function Page({
+  params,
+}: PageProps<'/exam-types/[examTypeId]/collections/[collectionId]'>) {
+  const { examTypeId } = await params;
+  // Chỉ kiểm được loại đề; bộ đề nằm sau endpoint cần đăng nhập nên để client báo lỗi.
+  const res = await fetchPublicResource<ExamTypeResponse>(
+    `/api/exam-types/${encodeURIComponent(examTypeId)}`,
+  );
+  if (!res.ok && res.missing) notFound();
+
   return <TestByCollection />;
 }

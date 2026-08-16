@@ -2,6 +2,7 @@
 
 import classNames from 'classnames/bind';
 
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import styles from '@/app/components/exam-layout/examLayout.module.scss';
 
@@ -20,7 +21,7 @@ function BannerBlock({ url, showPlaceholder = false }: BannerBlockProps) {
   }
   return (
     <div className={cx('banner')}>
-      <img src={getFullMediaUrl(url) ?? undefined} alt="Banner bài thi" />
+      <MediaImage src={getFullMediaUrl(url)} alt="Banner bài thi" width={1600} height={400} sizes="100vw" />
     </div>
   );
 }

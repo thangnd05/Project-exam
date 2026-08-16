@@ -1,5 +1,6 @@
+import { notFound } from 'next/navigation';
 import type { RecoveryResourceResponse } from '@/app/types';
-import { fetchPublicJson } from '@/app/utils/serverApi';
+import { fetchPublicJson, fetchPublicResource } from '@/app/utils/serverApi';
 import { toMetaDescription } from '@/app/utils/seo';
 import RecoveryResourceView from './RecoveryResourceView';
 
@@ -23,6 +24,12 @@ export async function generateMetadata({ params }: PageProps<'/resources/[resour
   };
 }
 
-export default function Page() {
+export default async function Page({ params }: PageProps<'/resources/[resourceId]'>) {
+  const { resourceId } = await params;
+  const res = await fetchPublicResource<RecoveryResourceResponse>(
+    `/api/recovery-resources/${encodeURIComponent(resourceId)}`,
+  );
+  if (!res.ok && res.missing) notFound();
+
   return <RecoveryResourceView />;
 }

@@ -18,3 +18,4 @@ export { default as TargetPlanTabs } from './TargetPlanTabs/TargetPlanTabs';
 export { default as BackgroundDecor } from './BackgroundDecor/index';
 export { default as ButtonPrime } from './Button/ButtonPrime';
 export { default as MotionSection } from './MotionSection/index';
+export { default as MediaImage } from './MediaImage/MediaImage';

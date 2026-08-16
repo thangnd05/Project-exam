@@ -17,6 +17,7 @@ import { QuestionType } from "@/app/enums";
 import type { QuestionAdminResponse, UserAnswerResponse } from "@/app/types";
 import styles from "./TestReview.module.scss";
 import reviewQStyles from "@/app/assets/styles/ReviewQuestions.module.scss";
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);
 
@@ -235,12 +236,10 @@ const TestReview = () => {
             if (type === "IMAGE") {
               return (
                 <div key={idx} className={cx("passage-image-box")}>
-                  <img
-                    src={getFullMediaUrl(url) as string}
+                  <MediaImage
+                    src={getFullMediaUrl(url)}
                     alt={`Passage ${idx + 1}`}
                     className={cx("passage-image")}
-                    loading="lazy"
-                    decoding="async"
                   />
                 </div>
               );

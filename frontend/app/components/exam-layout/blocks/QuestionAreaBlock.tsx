@@ -20,6 +20,7 @@ import type {
 } from '@/app/components/exam-layout/examLayoutTypes';
 import type { LayoutQuestionArea } from '@/app/components/exam-layout/layoutSchema';
 import styles from '@/app/components/exam-layout/TestStart.module.scss';
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);
 
@@ -143,8 +144,8 @@ function QuestionAreaBlock({
             if (type === MediaType.IMAGE) {
               return (
                 <div key={idx} className={cx('passage-image-box')}>
-                  <img
-                    src={getFullMediaUrl(url) ?? undefined}
+                  <MediaImage
+                    src={getFullMediaUrl(url)}
                     alt={`Passage ${idx + 1}`}
                     className={cx('passage-image')}
                   />

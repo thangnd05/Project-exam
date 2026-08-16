@@ -23,6 +23,7 @@ import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss'
 import examStyles from '@/app/components/exam-layout/TestStart.module.scss';
 import { MediaType, PassageType, QuestionType } from '@/app/enums';
 import type { PassageResponse, QuestionResponse } from '@/app/types';
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);
 
@@ -95,8 +96,8 @@ function PassageBox({ passage }: { passage?: PassageResponse | null }) {
         if (m.mediaType === MediaType.IMAGE) {
           return (
             <div key={idx} className={ex('passage-image-box')}>
-              <img
-                src={getFullMediaUrl(m.mediaUrl) as string}
+              <MediaImage
+                src={getFullMediaUrl(m.mediaUrl)}
                 alt={`Passage ${idx + 1}`}
                 className={ex('passage-image')}
               />
