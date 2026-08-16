@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./TagAnalysisTable.module.scss";
 import type { EnhancedResultResponse, TagBreakdownResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 const cx = classNames.bind(styles);
 
@@ -40,7 +41,7 @@ function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
     const partTabs = parts.map((p) => ({
       key: p.examPartId,
       label: p.partName || "Phần",
-      tags: p.tags || [],
+      tags: p.tags || EMPTY_LIST,
     }));
 
     return partTabs;

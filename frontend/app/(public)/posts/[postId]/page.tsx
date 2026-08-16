@@ -1,32 +1,16 @@
+import type { PostResponse } from '@/app/types';
+import { fetchPublicJson } from '@/app/utils/serverApi';
+import { toMetaDescription } from '@/app/utils/seo';
 import PostDetail from './PostDetail';
-
-async function fetchPost(postId: string) {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
-  if (!base) return null;
-  try {
-    const res = await fetch(`${base}/api/posts/${encodeURIComponent(postId)}`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
-
-function toPlainText(html: string, max = 160) {
-  const text = (html || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
-}
 
 export async function generateMetadata({ params }: PageProps<'/posts/[postId]'>) {
   const { postId } = await params;
-  const post = await fetchPost(postId);
+  const post = await fetchPublicJson<PostResponse>(`/api/posts/${encodeURIComponent(postId)}`);
   if (!post) return {};
 
   const title = post.title || 'Bài viết';
-  const description = toPlainText(post.content) || undefined;
-  const cover = post.thumbnailUrl || post.thumbnail || undefined;
+  const description = toMetaDescription(post.content);
+  const cover = post.thumbnailUrl || undefined;
   const images = cover ? [{ url: cover }] : undefined;
 
   return {
@@ -39,7 +23,12 @@ export async function generateMetadata({ params }: PageProps<'/posts/[postId]'>)
       images,
       publishedTime: post.createdAt,
     },
-    twitter: { card: 'summary_large_image', title, description, images: cover ? [cover] : undefined },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: cover ? [cover] : undefined,
+    },
   };
 }
 

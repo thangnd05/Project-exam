@@ -8,7 +8,8 @@ import type {Transition} from 'framer-motion';
 import {FaFacebookSquare, FaInstagram, FaYoutube} from 'react-icons/fa';
 
 import styles from './footer.module.scss';
-import images from '@/app/assets/images';
+import Image from 'next/image';
+import {imageAssets} from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 
 function useCountUp(target: number, isActive: boolean, duration = 1400) {
@@ -101,7 +102,7 @@ function Footer() {
           <motion.div className={styles.brandCol} {...fadeUp}>
             <div className={styles.logoRow}>
               <div className={styles.logoWrapper}>
-                <img src={images.logoW} alt="WinDe logo" />
+                <Image src={imageAssets.logoW} alt="WinDe logo" width={34} height={34} />
               </div>
               <div className={styles.brandText}>
                 <h3 className={styles.brandName}>WinDe</h3>

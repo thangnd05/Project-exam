@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '@/app/configs/queryClient';
 import { getMyPosts, getCategories, deletePost } from '@/app/apis/postApi';
 import type { CategoryResponse, PageResponse, PostSummaryResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 interface MyPostsParams {
   page?: number;
@@ -54,12 +55,12 @@ export function useMyPosts({ page, size, keyword, status }: MyPostsParams) {
   });
 
   return {
-    posts: listQuery.data?.posts ?? [],
+    posts: listQuery.data?.posts ?? EMPTY_LIST,
     totalPages: listQuery.data?.totalPages ?? 0,
     isLoading: listQuery.isLoading,
     isError: listQuery.isError,
     refetch: listQuery.refetch,
-    categories: categoriesQuery.data ?? [],
+    categories: categoriesQuery.data ?? EMPTY_LIST,
     deleteMutation,
   };
 }

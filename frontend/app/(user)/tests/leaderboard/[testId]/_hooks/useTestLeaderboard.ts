@@ -5,6 +5,7 @@ import {useQuery} from '@tanstack/react-query';
 import {getLeaderboardByTest} from '@/app/apis/userTestApi';
 import {getUserTestInfo} from '@/app/apis/testApi';
 import type {LeaderboardMyRank, TestLeaderboardResponse, UserTestResponse} from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const testLeaderboardKeys = {
   info: (id?: string) => ['test-info', id],
@@ -57,7 +58,7 @@ export function useTestLeaderboard(testId?: string) {
 
   return {
     testTitle: infoQuery.data ?? '',
-    rawRows: leaderboard?.entries ?? [],
+    rawRows: leaderboard?.entries ?? EMPTY_LIST,
     me: leaderboard?.me ?? null,
     totalParticipants: leaderboard?.totalParticipants ?? 0,
     errorMessage,

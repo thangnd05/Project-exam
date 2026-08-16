@@ -6,6 +6,7 @@ import {getExamTypes} from '@/app/apis/examTypeApi';
 import {createTag, deleteTag, getTagTreeByExamType, getTagsFlatByExamType, updateTag} from '@/app/apis/tagApi';
 import {examTypeKeys} from '@/app/hooks/useExamTypes';
 import type {TagRequest, TagResponse} from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const tagKeys = {
   all: ['admin-tags'],
@@ -49,7 +50,7 @@ export function useAdminExamTypesForTags() {
   });
 
   return {
-    examTypes: query.data ?? [],
+    examTypes: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };

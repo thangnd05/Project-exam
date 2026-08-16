@@ -1,5 +1,7 @@
 @import 'normalize.css';
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap');
+// Font nạp bằng next/font trong app/layout.tsx (self-host, không còn round-trip sang
+// fonts.googleapis.com). Dùng qua biến --font-inter / --font-playfair, đừng viết
+// @import url(...) trở lại — nó chặn render.
 
 :root {
 
@@ -297,7 +299,7 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   --shadow-card: 0 14px 28px rgb(0 0 0 / 0.05), 0 10px 10px rgb(0 0 0 / 0.05);
 
-  --font-family: 'Inter', sans-serif;
+  --font-family: var(--font-inter), sans-serif;
   --font-weight: 600;
   --font-size: 2rem;
   --padding-top: 1rem;

@@ -13,6 +13,7 @@ import type {
   UserTargetPartResponse,
   UserTargetResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export interface ProfileTargetPart extends UserTargetPartResponse {
   examPartName?: string;
@@ -82,7 +83,7 @@ export function useMyTargets() {
     queryFn: fetchMyTargets,
   });
   return {
-    myTargets: query.data ?? [],
+    myTargets: query.data ?? EMPTY_LIST,
     loadingTargets: query.isLoading,
   };
 }

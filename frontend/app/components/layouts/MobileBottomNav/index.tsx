@@ -5,16 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBook,
-  faChalkboardUser,
-  faHome,
-  faNewspaper,
-  faPlus,
-  faUser,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 
@@ -29,6 +19,7 @@ import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
+import { FaBook, FaChalkboardUser, FaHouse, FaNewspaper, FaPlus, FaUser, FaXmark } from 'react-icons/fa6';
 
 const cx = classNames.bind(styles);
 
@@ -129,7 +120,7 @@ function MobileBottomNav() {
           className={cx('tab', {active: isHomeActive})}
           aria-current={isHomeActive ? 'page' : undefined}
         >
-          <FontAwesomeIcon icon={faHome} className={cx('tabIcon')} />
+          <FaHouse className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>Trang chủ</span>
         </Link>
 
@@ -138,7 +129,7 @@ function MobileBottomNav() {
           className={cx('tab', {active: isPostsActive})}
           aria-current={isPostsActive ? 'page' : undefined}
         >
-          <FontAwesomeIcon icon={faNewspaper} className={cx('tabIcon')} />
+          <FaNewspaper className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>Bài viết</span>
         </Link>
 
@@ -149,7 +140,7 @@ function MobileBottomNav() {
             onClick={handleCreateTest}
             aria-label="Tạo bài kiểm tra"
           >
-            <FontAwesomeIcon icon={faPlus} />
+            <FaPlus />
           </button>
         )}
 
@@ -160,7 +151,7 @@ function MobileBottomNav() {
           aria-label="Lớp học"
           aria-expanded={activeSheet === 'class'}
         >
-          <FontAwesomeIcon icon={faChalkboardUser} className={cx('tabIcon')} />
+          <FaChalkboardUser className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>Lớp học</span>
         </button>
 
@@ -182,7 +173,7 @@ function MobileBottomNav() {
               className={cx('tabAvatar')}
             />
           ) : (
-            <FontAwesomeIcon icon={faUser} className={cx('tabIcon')} />
+            <FaUser className={cx('tabIcon')} />
           )}
           <span className={cx('tabLabel')}>Menu</span>
         </button>
@@ -218,7 +209,7 @@ function MobileBottomNav() {
                 onClick={closeSheet}
                 aria-label="Đóng"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FaXmark />
               </button>
             </div>
 
@@ -282,7 +273,7 @@ function MobileBottomNav() {
                       className={cx('menuItem')}
                       onClick={closeSheet}
                     >
-                      <FontAwesomeIcon icon={faBook} className={cx('menuItemIcon')} />
+                      <FaBook className={cx('menuItemIcon')} />
                       Từ vựng
                     </Link>
                     <Link

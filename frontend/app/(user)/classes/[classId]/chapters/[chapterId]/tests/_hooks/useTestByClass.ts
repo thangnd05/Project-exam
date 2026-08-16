@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getClassById, getClassChapterTests } from '@/app/apis/classApi';
 import { deleteTest } from '@/app/apis/testApi';
 import type { TestResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const testByClassKeys = {
   classInfo: (classId: string) => ['class-info', classId],
@@ -45,7 +46,7 @@ export function useTestByClass(classId: string, chapterId: string) {
 
   return {
     className: classQuery.data ?? '',
-    tests: testsQuery.data ?? [],
+    tests: testsQuery.data ?? EMPTY_LIST,
     isLoading: testsQuery.isLoading,
     refetchTests,
     deleteTestMutation,

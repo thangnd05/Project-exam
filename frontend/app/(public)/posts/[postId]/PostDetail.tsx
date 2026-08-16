@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -10,7 +11,6 @@ import { toast } from 'react-toastify';
 import {
   Heart, Bookmark, MessageCircle, ChevronRight, Copy
 } from 'lucide-react';
-import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -25,6 +25,9 @@ import { useAddComment, useUpdateComment, useDeleteComment } from './_hooks/useC
 import { useToggleReact, useToggleSavePost } from './_hooks/usePostReactions';
 import { ReactType } from '@/app/enums';
 import type { CommentResponse } from '@/app/types';
+
+// Carousel nặng (~40KB) và luôn nằm dưới màn hình đầu — nạp khi render tới.
+const Slider = dynamic(() => import('react-slick'), { ssr: false });
 
 const cx = classNames.bind(styles);
 const MAX_REPLY_DEPTH = 4;

@@ -1,12 +1,12 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {motion, type Variants} from 'framer-motion';
 import {FaStar} from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import styles from './Evaluation.module.scss';
-import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import {toast} from 'react-toastify';
@@ -15,6 +15,9 @@ import routes from '@/app/configs/Routes';
 import EvaluationModal from './modals/EvaluationModal';
 import {useEvaluations} from './hooks/useEvaluations';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+
+// Carousel nặng (~40KB) và luôn nằm dưới màn hình đầu — nạp khi render tới.
+const Slider = dynamic(() => import('react-slick'), { ssr: false });
 
 const cx = classNames.bind(styles);
 

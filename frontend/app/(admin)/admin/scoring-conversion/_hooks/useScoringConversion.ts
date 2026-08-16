@@ -17,6 +17,7 @@ import type {
   ScoringConversionResponse,
   SkillResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const scoringConversionKeys = {
   examTypes: ['scoring-conversion', 'exam-types'],
@@ -115,9 +116,9 @@ export function useScoringConversion(activeSkillId: string, examTypeFilter: stri
   });
 
   return {
-    examTypes: examTypesQuery.data ?? [],
-    skills: skillsQuery.data ?? [],
-    scoringRules: rulesQuery.data ?? [],
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
+    skills: skillsQuery.data ?? EMPTY_LIST,
+    scoringRules: rulesQuery.data ?? EMPTY_LIST,
     isLoading:
       examTypesQuery.isLoading || skillsQuery.isLoading || rulesQuery.isLoading,
     createMutation,

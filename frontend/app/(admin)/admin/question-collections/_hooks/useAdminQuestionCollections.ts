@@ -13,6 +13,7 @@ import type {
   QuestionCollectionRequest,
   QuestionCollectionResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const questionCollectionKeys = {
   all: ['admin-question-collections'],
@@ -78,8 +79,8 @@ export function useAdminQuestionCollections() {
   });
 
   return {
-    collections: collectionsQuery.data ?? [],
-    examTypes: examTypesQuery.data ?? [],
+    collections: collectionsQuery.data ?? EMPTY_LIST,
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
     isLoading: collectionsQuery.isLoading,
     isSuccess: collectionsQuery.isSuccess,
     isError: collectionsQuery.isError,

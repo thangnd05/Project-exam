@@ -7,6 +7,7 @@ import { getAnswersByUserTest } from '@/app/apis/userAnswerApi';
 import { getUserTestInfo } from '@/app/apis/testApi';
 import { UserTestMode } from '@/app/enums';
 import type { TestAdminResponse, UserAnswerResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const testReviewKeys = {
   detail: (userTestId?: string, isGuest?: boolean) => ['test-review', userTestId, isGuest],
@@ -73,7 +74,7 @@ export function useTestReview(
 
   return {
     test: query.data?.test ?? null,
-    userAnswers: query.data?.userAnswers ?? [],
+    userAnswers: query.data?.userAnswers ?? EMPTY_LIST,
     canReview: query.data?.canReview ?? false,
     notReviewable: query.data?.notReviewable ?? false,
     isLoading: query.isLoading,

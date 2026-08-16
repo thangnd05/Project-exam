@@ -20,6 +20,7 @@ import type {
   QuestionCollectionResponse,
   QuestionResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const BANK_SCOPE = {
   ADMIN: 'admin',
@@ -149,7 +150,7 @@ export function usePersonalQuestionBank({
       map[p.examPartId] = {
         expanded: expandedParts.has(p.examPartId),
         loading: q?.isLoading ?? false,
-        questions: q?.data ?? [],
+        questions: q?.data ?? EMPTY_LIST,
       };
     });
     return map;

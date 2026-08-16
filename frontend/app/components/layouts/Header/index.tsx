@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {Button, Dropdown, Image} from 'react-bootstrap';
+import {Button, Dropdown} from 'react-bootstrap';
+import Image from 'next/image';
 import {useState} from 'react';
 import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
-import images from '@/app/assets/images';
+import images, {imageAssets} from '@/app/assets/images';
 import classNames from 'classnames/bind';
 import {useAuth} from '@/app/hooks/useAuth';
 import {name} from '@/app/assets/images';
@@ -75,10 +76,11 @@ function Header() {
             <Link href={routes.home} className={cx('brand')}>
               <span className={cx('brandInner')}>
                 <Image
-                  src={images.logoW}
+                  src={imageAssets.logoW}
                   alt="WinDe"
-                  height="32"
-                  loading="lazy"
+                  width={50}
+                  height={32}
+                  priority
                   className={cx('logo-brand')}
                 />
                 <span className={cx('brandName')}>{name}</span>

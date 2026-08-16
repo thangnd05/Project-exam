@@ -1,11 +1,10 @@
 'use client';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleDollarToSlot } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './CoinBadge.module.scss';
 import { useCoins } from '@/app/hooks/useCoins';
 import { formatCompactNumber, formatFullNumber } from '@/app/utils/formatNumber';
+import { FaCircleDollarToSlot } from 'react-icons/fa6';
 
 const cx = classNames.bind(style);
 
@@ -23,7 +22,7 @@ function CoinBadge({ className, variant = 'default' }: CoinBadgeProps) {
       className={cx('coinBadge', variant === 'onDark' && 'onDark', className)}
       title={`${fullBalance} xu  bấm để xem nhiệm vụ`}
     >
-      <FontAwesomeIcon icon={faCircleDollarToSlot} className={cx('icon')} />
+      <FaCircleDollarToSlot className={cx('icon')} />
       <span className={cx('count')}>{formatCompactNumber(balance)}</span>
     </div>
   );

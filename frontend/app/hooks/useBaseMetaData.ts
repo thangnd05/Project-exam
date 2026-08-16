@@ -6,6 +6,7 @@ import { getQuestionCollections } from '@/app/apis/questionCollectionApi';
 import { getExamPartsByExamType } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
 import { sortByPartOrder } from '../utils/partOrder';
+import { EMPTY_LIST } from '../utils/stableEmpty';
 
 const normalizeList = (payload: any): any[] => {
     if (Array.isArray(payload)) {
@@ -55,9 +56,9 @@ export const useBaseMetaData = (examTypeId?: string | number | null) => {
     });
 
     return {
-        examTypes: examTypesQuery.data ?? [],
-        examParts: examPartsQuery.data ?? [],
-        questionCollections: questionCollectionsQuery.data ?? [],
-        availableTags: availableTagsQuery.data ?? [],
+        examTypes: examTypesQuery.data ?? EMPTY_LIST,
+        examParts: examPartsQuery.data ?? EMPTY_LIST,
+        questionCollections: questionCollectionsQuery.data ?? EMPTY_LIST,
+        availableTags: availableTagsQuery.data ?? EMPTY_LIST,
     };
 };

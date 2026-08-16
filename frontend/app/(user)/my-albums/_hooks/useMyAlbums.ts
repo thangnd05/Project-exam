@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyAlbums, deleteAlbum } from '@/app/apis/vocabularyAlbumApi';
 import type { VocabularyAlbumResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const albumKeys = { my: ['my-albums'] };
 
@@ -24,7 +25,7 @@ export function useMyAlbums() {
   });
 
   return {
-    albums: albumsQuery.data ?? [],
+    albums: albumsQuery.data ?? EMPTY_LIST,
     isLoading: albumsQuery.isLoading,
     refetchAlbums: albumsQuery.refetch,
     deleteAlbumMutation,

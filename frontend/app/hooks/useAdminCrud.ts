@@ -1,6 +1,7 @@
 'use client';
 
 import {useMutation, useQuery, useQueryClient, type QueryKey} from '@tanstack/react-query';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 type CrudFn = (variables: any) => Promise<any>;
 
@@ -41,7 +42,7 @@ export function useAdminCrud({queryKey, list, create, update, remove, mapItem, s
 
   return {
     ...mutations,
-    items: listQuery.data ?? [],
+    items: listQuery.data ?? EMPTY_LIST,
     isLoading: listQuery.isLoading,
     isError: listQuery.isError,
     listQuery,

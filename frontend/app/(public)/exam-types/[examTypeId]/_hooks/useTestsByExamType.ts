@@ -14,6 +14,7 @@ import type {
   TestCollectionResponse,
   TestResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 const PAGE_SIZE = 12;
 
@@ -70,8 +71,8 @@ export function useTestsByExamType(examTypeId?: string, page = 0) {
     certificateExam: (certificateExamsQuery.data ?? null) as CertificateExamListResponse | null,
     totalPages: testsQuery.data?.totalPages ?? 0,
     examTypeName: nameQuery.data ?? '',
-    folders: foldersQuery.data ?? [],
-    children: childrenQuery.data ?? [],
+    folders: foldersQuery.data ?? EMPTY_LIST,
+    children: childrenQuery.data ?? EMPTY_LIST,
     isLoading: testsQuery.isLoading,
   };
 }

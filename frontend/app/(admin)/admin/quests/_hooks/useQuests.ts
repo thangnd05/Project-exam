@@ -4,6 +4,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {createQuest, deleteQuest, getQuests, updateQuest} from '@/app/apis/questApi';
 import type {QuestRequest, QuestResponse} from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const questKeys = {all: ['admin-quests'] as const};
 
@@ -28,7 +29,7 @@ export function useQuests() {
   const deleteMutation = useMutation({mutationFn: deleteQuest, onSuccess: invalidate});
 
   return {
-    quests: questsQuery.data ?? [],
+    quests: questsQuery.data ?? EMPTY_LIST,
     isLoading: questsQuery.isLoading,
     isError: questsQuery.isError,
     createQuest: createMutation.mutateAsync,

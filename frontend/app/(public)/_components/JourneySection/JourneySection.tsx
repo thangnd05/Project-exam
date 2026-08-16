@@ -3,7 +3,7 @@
 import {motion} from 'framer-motion';
 import classNames from 'classnames/bind';
 import styles from './JourneySection.module.scss';
-import images from '@/app/assets/images';
+import {imageAssets} from '@/app/assets/images';
 import DeviceMockup from '../DeviceMockup/DeviceMockup';
 
 const cx = classNames.bind(styles);
@@ -15,7 +15,7 @@ const steps = [
     title: 'Làm bài thử',
     text: 'Bài ngắn, khoảng 15 phút. Đủ để lộ điểm yếu mà không cần ngồi cả buổi.',
     hint: 'Có timer · như thi thật',
-    shot: images.quickImage,
+    shot: imageAssets.quickImage,
     shotAlt: 'Màn hình làm đề trên WinDe',
   },
   {
@@ -24,7 +24,7 @@ const steps = [
     title: 'Nhận chẩn đoán',
     text: 'Xem rõ kỹ năng nào đang kéo điểm và nên sửa phần nào trước.',
     hint: 'Theo từng kỹ năng',
-    shot: images.dignos,
+    shot: imageAssets.dignos,
     shotAlt: 'Trang chẩn đoán năng lực trên WinDe',
   },
   {
@@ -33,7 +33,7 @@ const steps = [
     title: 'Luyện theo kế hoạch',
     text: 'Nhận lộ trình cá nhân: đúng thứ tự, đúng chỗ còn yếu. Không còn mò giữa hàng đống tài liệu.',
     hint: 'Luyện đúng chỗ hổng',
-    shot: images.learningPlan,
+    shot: imageAssets.learningPlan,
     shotAlt: 'Trang lộ trình cá nhân trên WinDe',
   },
 ];

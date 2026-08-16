@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getSavedPosts, toggleSavePost } from '@/app/apis/postApi';
 import { keepPreviousData } from '@/app/configs/queryClient';
 import type { PageResponse, PostSummaryResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 interface SavedPostsParams {
   page?: number;
@@ -30,7 +31,7 @@ export function useSavedPosts({ page = 0, size = 10, keyword = '' }: SavedPostsP
   });
 
   return {
-    posts: query.data?.posts ?? [],
+    posts: query.data?.posts ?? EMPTY_LIST,
     totalPages: query.data?.totalPages ?? 0,
     isLoading: query.isLoading,
     isError: query.isError,

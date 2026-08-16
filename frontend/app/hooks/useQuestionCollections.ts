@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getQuestionCollections } from '@/app/apis/questionCollectionApi';
 import type { QuestionCollectionResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const questionCollectionKeys = {
   list: ['question-collections'],
@@ -19,7 +20,7 @@ export function useQuestionCollections() {
   });
 
   return {
-    questionCollections: query.data ?? [],
+    questionCollections: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };

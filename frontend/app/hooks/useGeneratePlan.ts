@@ -6,6 +6,7 @@ import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { generatePlan } from '@/app/apis/learningPlanApi';
 import { getApiErrorMessage } from '@/app/utils/apiError';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const generatePlanKeys = {
   examTypes: ['generate-plan', 'exam-types'],
@@ -23,7 +24,7 @@ export function useExamTypes() {
   });
 
   return {
-    examTypes: query.data ?? [],
+    examTypes: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };
@@ -36,7 +37,7 @@ export function useCompletedUserTests() {
   });
 
   return {
-    userTests: query.data ?? [],
+    userTests: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.isError ? getApiErrorMessage(query.error) : null,

@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFire } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import style from './StreakBadge.module.scss';
 import { useStreak } from '@/app/hooks/useStreak';
 import StreakRestoreModal from './StreakRestoreModal';
+import { FaFire } from 'react-icons/fa6';
 
 const cx = classNames.bind(style);
 
@@ -53,7 +52,7 @@ function StreakBadge({ className, variant = 'default' }: StreakBadgeProps) {
             : undefined
         }
       >
-        <FontAwesomeIcon icon={faFire} className={cx('icon')} />
+        <FaFire className={cx('icon')} />
         <span className={cx('count')}>{display}</span>
       </div>
       {recoverable && (

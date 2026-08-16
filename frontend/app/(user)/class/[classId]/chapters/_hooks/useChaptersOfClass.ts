@@ -10,6 +10,7 @@ import {
 } from '@/app/apis/chapterApi';
 import { getClassById } from '@/app/apis/classApi';
 import type { ChapterRequest, ChapterResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const chapterKeys = {
   list: (classId: string) => ['chapters', classId],
@@ -45,7 +46,7 @@ export function useChaptersOfClass(classId: string) {
     qc.invalidateQueries({ queryKey: chapterKeys.list(classId) });
 
   return {
-    chapters: chaptersQuery.data ?? [],
+    chapters: chaptersQuery.data ?? EMPTY_LIST,
     className: classInfoQuery.data?.className ?? '',
     classQr: classInfoQuery.data?.classQr ?? '',
     isLoading: chaptersQuery.isLoading,

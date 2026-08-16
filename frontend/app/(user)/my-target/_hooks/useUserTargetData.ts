@@ -8,6 +8,7 @@ import { getScoringConversions } from '@/app/apis/scoringConversionApi';
 import { getMilestones } from '@/app/apis/milestoneApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { sortByPartOrder } from '@/app/utils/partOrder';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const userTargetKeys = {
   examTypes: ['standard-exam-types'],
@@ -50,11 +51,11 @@ export function useUserTargetData(selectedExamTypeId?: string) {
   });
 
   return {
-    examTypes: examTypesQuery.data ?? [],
-    examParts: examPartsQuery.data ?? [],
-    skills: skillsQuery.data ?? [],
-    scoringConversions: scoringConversionsQuery.data ?? [],
-    milestones: milestonesQuery.data ?? [],
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
+    examParts: examPartsQuery.data ?? EMPTY_LIST,
+    skills: skillsQuery.data ?? EMPTY_LIST,
+    scoringConversions: scoringConversionsQuery.data ?? EMPTY_LIST,
+    milestones: milestonesQuery.data ?? EMPTY_LIST,
   };
 }
 

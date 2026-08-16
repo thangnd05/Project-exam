@@ -3,8 +3,7 @@
 import {useEffect, useState} from 'react';
 import classNames from 'classnames/bind';
 import styles from './ScrollToTop.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faArrowUp} from '@fortawesome/free-solid-svg-icons';
+import { FaArrowUp } from 'react-icons/fa6';
 
 const cx = classNames.bind(styles);
 
@@ -34,7 +33,7 @@ function ScrollToTop() {
       aria-hidden={!showScroll}
       tabIndex={showScroll ? 0 : -1}
     >
-      <FontAwesomeIcon icon={faArrowUp} />
+      <FaArrowUp />
     </button>
   );
 }

@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 import { createEvaluation, getAllEvaluations } from '@/app/apis/evaluationApi';
 import type { EvaluationRequest, EvaluationResponse } from '@/app/types/attempt';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const evaluationKeys = { all: ['evaluations'] };
 
@@ -25,7 +26,7 @@ export function useEvaluations() {
     qc.invalidateQueries({ queryKey: evaluationKeys.all });
 
   return {
-    reviews: query.data ?? [],
+    reviews: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
     refetch: refetchEvaluations,

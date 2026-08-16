@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyNotes, deleteNote } from '@/app/apis/noteApi';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const noteKeys = { my: ['my-notes'] };
 
@@ -20,7 +21,7 @@ export function useNotes({ enabled = true }: { enabled?: boolean } = {}) {
   });
 
   return {
-    notes: notesQuery.data ?? [],
+    notes: notesQuery.data ?? EMPTY_LIST,
     isLoading: notesQuery.isLoading,
     refetchNotes: notesQuery.refetch,
     deleteNoteMutation,

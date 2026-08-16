@@ -62,32 +62,53 @@
   }
 
   &.split-layout {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
     gap: 24px;
-    align-items: start;
+    max-height: max(380px, calc(100vh - 160px));
 
     @media (max-width: 992px) {
-      grid-template-columns: 1fr;
+      flex-direction: column;
       gap: 14px;
+      max-height: none;
     }
   }
 }
 
 .passage-column {
-  position: sticky;
-  top: 20px;
+  flex: 3 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 8px;
 
   @media (max-width: 992px) {
-    position: static;
+    flex: 0 0 auto;
+    min-height: auto;
+    overflow: visible;
+    padding-right: 0;
   }
 }
 
 .question-column {
+  flex: 2 1 0;
   min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 8px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  @media (max-width: 992px) {
+    flex: 0 0 auto;
+    min-height: auto;
+    overflow: visible;
+    padding-right: 0;
+  }
 }
 
 .passage-box {

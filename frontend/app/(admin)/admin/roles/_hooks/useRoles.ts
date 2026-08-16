@@ -13,6 +13,7 @@ import {getPermissions} from '@/app/apis/permissionApi';
 import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 import {CURRENT_USER_QUERY_KEY} from '@/app/contexts/AuthContext';
 import type {PermissionResponse, RoleRequest, RoleResponse} from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export interface AdminRoleRow {
   role_id: string;
@@ -63,7 +64,7 @@ export function useRoles() {
 
   return {
     roleList: crud.items as AdminRoleRow[],
-    permissionCatalog: permissionsQuery.data ?? [],
+    permissionCatalog: permissionsQuery.data ?? EMPTY_LIST,
     isLoading: crud.isLoading,
     createRoleMutation: crud.createMutation,
     updateRoleMutation: crud.updateMutation,

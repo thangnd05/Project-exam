@@ -11,6 +11,7 @@ import type {
   UserTargetResponse,
   UserTestResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const targetAchievedKeys = {
   examTypes: ['exam-types', 'standard'],
@@ -61,7 +62,7 @@ export function useTargetAchieved(examTypeId: string) {
   const err = detailQuery.error;
 
   return {
-    examTypes: examTypesQuery.data ?? [],
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
     target: detailQuery.data?.target ?? null,
     latestMock: detailQuery.data?.latestMock ?? null,
     enhanced: detailQuery.data?.enhanced ?? null,

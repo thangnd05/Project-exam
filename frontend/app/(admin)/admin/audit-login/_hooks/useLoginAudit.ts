@@ -5,6 +5,7 @@ import {useQuery} from '@tanstack/react-query';
 import {getLoginAuditLogs} from '@/app/apis/adminAuditApi';
 import {keepPreviousData} from '@/app/configs/queryClient';
 import type {AuditLogResponse, PageResponse} from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export interface LoginAuditRow {
   id: string;
@@ -50,7 +51,7 @@ export function useLoginAudit(page: number, size: number) {
   });
 
   return {
-    rows: query.data?.rows ?? [],
+    rows: query.data?.rows ?? EMPTY_LIST,
     totalElements: query.data?.totalElements ?? 0,
     totalPages: query.data?.totalPages ?? 1,
     isLoading: query.isLoading,

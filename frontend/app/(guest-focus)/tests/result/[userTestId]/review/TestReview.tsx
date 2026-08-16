@@ -112,10 +112,10 @@ const TestReview = () => {
   }, [flatQuestions]);
 
   const scrollToQuestion = (qid: string) => {
-    const el = document.getElementById(`rq-${qid}`);
-    if (!el) return;
-    const y = el.getBoundingClientRect().top + window.pageYOffset - 90;
-    window.scrollTo({ top: y, behavior: "smooth" });
+    // scrollIntoView cuộn cả cột câu hỏi (scroller riêng) lẫn trang, không như window.scrollTo
+    document
+      .getElementById(`rq-${qid}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   useEffect(() => {
@@ -126,8 +126,7 @@ const TestReview = () => {
     const timer = setTimeout(() => {
       const el = document.getElementById(elId);
       if (!el) return;
-      const y = el.getBoundingClientRect().top + window.pageYOffset - 90;
-      window.scrollTo({ top: y, behavior: "smooth" });
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
       el.classList.add(reviewQStyles.highlight);
       setTimeout(() => el.classList.remove(reviewQStyles.highlight), 1600);
     }, 120);

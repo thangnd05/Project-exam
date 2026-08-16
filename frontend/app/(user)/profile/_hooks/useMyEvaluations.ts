@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyEvaluations, updateEvaluation, deleteEvaluation } from '@/app/apis/evaluationApi';
 import type { EvaluationResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const myEvaluationsKeys = {
   list: () => ['my-evaluations'],
@@ -39,7 +40,7 @@ export function useMyEvaluations() {
   });
 
   return {
-    evaluations: evaluationsQuery.data ?? [],
+    evaluations: evaluationsQuery.data ?? EMPTY_LIST,
     isLoading: evaluationsQuery.isLoading,
     isError: evaluationsQuery.isError,
     updateMutation,

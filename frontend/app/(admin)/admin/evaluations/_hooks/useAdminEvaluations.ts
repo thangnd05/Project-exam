@@ -11,6 +11,7 @@ import {
 } from '@/app/apis/evaluationApi';
 import {useCrudMutations} from '@/app/hooks/useAdminCrud';
 import type {EvaluationRequest, EvaluationResponse, PageResponse} from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export interface AdminEvaluation {
   id: string;
@@ -63,7 +64,7 @@ export function useAdminEvaluations({page, size, keyword, rating}: EvaluationLis
   });
 
   return {
-    evaluationList: query.data?.list ?? [],
+    evaluationList: query.data?.list ?? EMPTY_LIST,
     totalElements: query.data?.totalElements ?? 0,
     totalPages: query.data?.totalPages ?? 1,
     isLoading: query.isLoading,

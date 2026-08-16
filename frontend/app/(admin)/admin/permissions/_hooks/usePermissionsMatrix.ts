@@ -5,6 +5,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {getRoles, updateRolePermissions} from '@/app/apis/roleApi';
 import {getPermissions} from '@/app/apis/permissionApi';
 import {CURRENT_USER_QUERY_KEY} from '@/app/contexts/AuthContext';
+import {EMPTY_LIST} from '@/app/utils/stableEmpty';
 
 export type PermissionMatrix = Record<string, Set<string>>;
 
@@ -12,8 +13,6 @@ export const permissionsKeys = {
   roles: () => ['admin-roles'],
   permissions: () => ['admin-permissions'],
 };
-
-const EMPTY_ARRAY: never[] = [];
 
 const asArray = <T,>(data: T[]): T[] => (Array.isArray(data) ? data : []);
 
@@ -46,8 +45,8 @@ export function usePermissionsMatrix() {
   });
 
   return {
-    roles: rolesQuery.data ?? EMPTY_ARRAY,
-    permissions: permissionsQuery.data ?? EMPTY_ARRAY,
+    roles: rolesQuery.data ?? EMPTY_LIST,
+    permissions: permissionsQuery.data ?? EMPTY_LIST,
     isLoading: rolesQuery.isLoading || permissionsQuery.isLoading,
     isError: rolesQuery.isError || permissionsQuery.isError,
     saveMutation,

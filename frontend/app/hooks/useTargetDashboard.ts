@@ -14,6 +14,7 @@ import type {
   UserTargetResponse,
   UserTestResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const targetDashboardKeys = {
   examTypes: ['exam-types', 'standard'],
@@ -79,8 +80,8 @@ export function useTargetDashboard(examTypeId: string) {
   const data = dashboardQuery.data ?? EMPTY_DASHBOARD;
 
   return {
-    examTypes: examTypesQuery.data ?? [],
-    examParts: examPartsQuery.data ?? [],
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
+    examParts: examPartsQuery.data ?? EMPTY_LIST,
     target: data.target,
     plans: data.plans,
     latestMock: data.latestMock,

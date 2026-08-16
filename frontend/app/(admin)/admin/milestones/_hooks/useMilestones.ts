@@ -14,6 +14,7 @@ import {
   updateMilestone as apiUpdateMilestone,
 } from '@/app/apis/milestoneApi';
 import type { MilestoneRequest } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const milestonesKeys = {
   examTypes: ['admin-milestones', 'exam-types'] as const,
@@ -74,11 +75,11 @@ export function useMilestones(examTypeFilter: string) {
     : '';
 
   return {
-    milestones: milestonesQuery.data ?? [],
-    examTypes: examTypesQuery.data ?? [],
-    examParts: examPartsQuery.data ?? [],
-    skills: skillsQuery.data ?? [],
-    scoringConversions: scoringQuery.data ?? [],
+    milestones: milestonesQuery.data ?? EMPTY_LIST,
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
+    examParts: examPartsQuery.data ?? EMPTY_LIST,
+    skills: skillsQuery.data ?? EMPTY_LIST,
+    scoringConversions: scoringQuery.data ?? EMPTY_LIST,
     isLoading: milestonesQuery.isLoading,
     loadErrorText,
     createMilestone: createMutation.mutateAsync,

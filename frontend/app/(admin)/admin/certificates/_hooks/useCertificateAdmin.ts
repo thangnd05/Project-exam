@@ -18,6 +18,7 @@ import type {
   CertificateTemplateResponse,
   ExamTypeResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export interface IssuedCertificateParams {
   examTypeId?: string;
@@ -88,7 +89,7 @@ export function useIssuedCertificates(params: IssuedCertificateParams) {
   });
 
   return {
-    certificates: listQuery.data?.content ?? [],
+    certificates: listQuery.data?.content ?? EMPTY_LIST,
     totalPages: listQuery.data?.totalPages ?? 0,
     totalElements: listQuery.data?.totalElements ?? 0,
     isLoading: listQuery.isLoading,

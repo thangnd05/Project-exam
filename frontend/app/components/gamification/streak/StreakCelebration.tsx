@@ -1,12 +1,11 @@
 'use client';
 
 import { Modal, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFire } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
 import style from './StreakCelebration.module.scss';
 import { useStreak } from '@/app/hooks/useStreak';
+import { FaFire } from 'react-icons/fa6';
 
 const cx = classNames.bind(style);
 
@@ -27,7 +26,7 @@ function StreakCelebration() {
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 14 }}
         >
-          <FontAwesomeIcon icon={faFire} />
+          <FaFire />
         </motion.div>
         <h3 className={cx('count')}>{currentStreak} ngày</h3>
         <p className={cx('title')}>Giữ lửa thành công!</p>

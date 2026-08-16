@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '@/app/configs/queryClient';
 import { getPosts, updatePostStatus, deletePost } from '@/app/apis/postApi';
 import { PostStatus } from '@/app/enums';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 interface AdminPostListParams {
   page: number;
@@ -31,7 +32,7 @@ export function useAdminPosts({ page, size, status, keyword }: AdminPostListPara
   });
 
   return {
-    posts: query.data?.content || [],
+    posts: query.data?.content || EMPTY_LIST,
     totalPages: query.data?.totalPages || 0,
     totalElements: query.data?.totalElements || 0,
     isLoading: query.isLoading,

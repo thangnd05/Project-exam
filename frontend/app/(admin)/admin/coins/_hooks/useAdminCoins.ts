@@ -10,6 +10,7 @@ import {
 import { getUsers } from '@/app/apis/userApi';
 import { useAdminCrud } from '@/app/hooks/useAdminCrud';
 import type { CoinWalletResponse, PageResponse, UserResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const coinKeys = {
   wallets: ['coin-wallets'] as const,
@@ -53,7 +54,7 @@ export function useCoinUserOptions({ enabled = false, wallets = [] }: CoinUserOp
   });
 
   return {
-    userOptions: query.data ?? [],
+    userOptions: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };

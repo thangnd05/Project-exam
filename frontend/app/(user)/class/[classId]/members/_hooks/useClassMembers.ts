@@ -12,6 +12,7 @@ import {
   removeMember,
 } from '@/app/apis/classMemberApi';
 import type { ClassMemberActionRequest, ClassMemberResponse, MessageResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const classMemberKeys = {
   info: (classId: string) => ['class-info', classId],
@@ -90,8 +91,8 @@ export function useClassMembers(classId: string) {
 
   return {
     classInfo: infoQuery.data ?? null,
-    allMembers: membersQuery.data ?? [],
-    pendingMembers: pendingQuery.data ?? [],
+    allMembers: membersQuery.data ?? EMPTY_LIST,
+    pendingMembers: pendingQuery.data ?? EMPTY_LIST,
     isLoading: infoQuery.isLoading || membersQuery.isLoading || pendingQuery.isLoading,
     actionLoading:
       approveMemberMutation.isPending ||

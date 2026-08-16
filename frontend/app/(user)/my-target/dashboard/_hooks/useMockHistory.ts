@@ -6,6 +6,7 @@ import { getMockHistory } from '@/app/apis/userTestApi';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import type { UserTargetResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const CHART_FETCH_LIMIT = 25;
 
@@ -51,8 +52,8 @@ export function useMockHistory(
   const err = tableQuery.error || chartQuery.error;
 
   return {
-    examTypes: examTypesQuery.data ?? [],
-    chartTests: chartQuery.data?.content ?? [],
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
+    chartTests: chartQuery.data?.content ?? EMPTY_LIST,
     tablePage: tableQuery.data ?? null,
     isLoading: chartQuery.isLoading || tableQuery.isLoading,
     error: err ? (err as any)?.response?.data?.message || err.message : null,

@@ -1,9 +1,26 @@
 
+import { Inter, Playfair_Display } from 'next/font/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '@/app/assets/styles/GlobalStyles/GlobalStyles.scss';
 import '@/app/assets/styles/global-overrides.scss';
 import Providers from './providers';
+
+// Self-host qua next/font: font đi kèm bundle, không còn @import chặn render sang
+// fonts.googleapis.com, và Next tự chèn fallback đo sẵn nên chữ không nhảy khi font về.
+// Bắt buộc có subset 'vietnamese' — toàn bộ nội dung là tiếng Việt.
+const inter = Inter({
+  subsets: ['latin', 'vietnamese'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['600', '700'],
+  display: 'swap',
+  variable: '--font-playfair',
+});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 const SITE_NAME = 'WinDe Exam';
@@ -49,7 +66,7 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" data-theme="normal">
+    <html lang="vi" data-theme="normal" className={`${inter.variable} ${playfair.variable}`}>
       <body>
         <noscript>Bạn cần bật JavaScript để dùng ứng dụng này.</noscript>
         <div id="root">

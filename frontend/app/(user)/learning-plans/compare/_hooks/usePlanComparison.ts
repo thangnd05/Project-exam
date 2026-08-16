@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const planComparisonKeys = {
   examTypes: () => ['exam-types', 'standard'],
@@ -27,8 +28,8 @@ export function usePlanComparison(examTypeId?: string) {
   });
 
   return {
-    examTypes: examTypesQuery.data ?? [],
-    plans: plansQuery.data ?? [],
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
+    plans: plansQuery.data ?? EMPTY_LIST,
     isLoading: plansQuery.isLoading,
     isError: plansQuery.isError,
     error: plansQuery.error

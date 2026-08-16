@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { keepPreviousData } from '@/app/configs/queryClient';
 import { getPosts, getCategories, getPostById, getComments } from '@/app/apis/postApi';
 import type { CategoryResponse, PageResponse, PostSummaryResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 const PAGE_SIZE = 9;
 
@@ -49,9 +50,9 @@ export function usePosts({ page = 0, categoryId = null, keyword = '', status = '
   const refresh = () => qc.invalidateQueries({ queryKey: ['posts'] });
 
   return {
-    posts: postsQuery.data?.posts ?? [],
+    posts: postsQuery.data?.posts ?? EMPTY_LIST,
     totalPages: postsQuery.data?.totalPages ?? 0,
-    categories: categoriesQuery.data ?? [],
+    categories: categoriesQuery.data ?? EMPTY_LIST,
     isLoading: postsQuery.isLoading || categoriesQuery.isLoading,
     refresh,
   };
@@ -95,7 +96,7 @@ export function useRelatedPosts({ categoryId, postId, enabled = true }: { catego
   });
 
   return {
-    relatedPosts: query.data ?? [],
+    relatedPosts: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };

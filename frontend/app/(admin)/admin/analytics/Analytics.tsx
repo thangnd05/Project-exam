@@ -1,16 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
-import {
-    MonthlyActivityCombo,
-    MonthlyNewUsersLine,
-    ExamTypeDonut,
-} from '@/app/components/admin/AdminCharts';
 import { TopTestsTable } from '@/app/components/admin/ContentInsightsTables';
-import LocationsMap, { TopCountriesList } from '@/app/components/admin/LocationsMap';
+import { TopCountriesList } from '@/app/components/admin/TopCountriesList';
 import { AdminPageHeader } from '@/app/components/admin/common';
 import OverviewCard from '@/app/components/admin/OverviewCard';
 import {
@@ -23,6 +19,26 @@ import {
 import styles from './Analytics.module.scss';
 
 const cx = classNames.bind(styles);
+
+// recharts (~250KB) và react-simple-maps + world-atlas (~180KB) chỉ dùng ở đúng trang này.
+// Nạp rời để chúng không lọt vào chunk dùng chung của mọi trang admin.
+// Lưu ý: tuỳ chọn của next/dynamic phải viết thẳng dạng object literal, tách ra biến là build lỗi.
+const MonthlyActivityCombo = dynamic(
+    () => import('@/app/components/admin/AdminCharts').then((m) => m.MonthlyActivityCombo),
+    { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
+);
+const MonthlyNewUsersLine = dynamic(
+    () => import('@/app/components/admin/AdminCharts').then((m) => m.MonthlyNewUsersLine),
+    { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
+);
+const ExamTypeDonut = dynamic(
+    () => import('@/app/components/admin/AdminCharts').then((m) => m.ExamTypeDonut),
+    { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
+);
+const LocationsMap = dynamic(() => import('@/app/components/admin/LocationsMap'), {
+    ssr: false,
+    loading: () => <Spinner animation="border" size="sm" />,
+});
 
 type ChartCardProps = {
     icon?: React.ReactNode;

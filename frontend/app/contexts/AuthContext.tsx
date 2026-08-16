@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { queryClient } from '@/app/configs/queryClient';
 import { getCurrentUser, logout as logoutRequest } from '@/app/apis/authApi';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export type AuthUser = {
   userId: string;
@@ -147,7 +148,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       userId: user?.userId,
       roleId: user?.roleId,
       roleName: user?.roleName,
-      permissions: user?.permissions ?? [],
+      permissions: user?.permissions ?? EMPTY_LIST,
       avatarUrl: user?.avatarUrl,
       isPremium: user?.isPremium ?? false,
       isAuthenticated: !!user?.userId,

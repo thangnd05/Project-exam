@@ -13,11 +13,15 @@ import {
   formatHourMinute24,
 } from '@/app/utils/format-date-time';
 import type { EnhancedResultResponse } from '@/app/types';
-import MockHistoryCharts, { type MockChartPoint } from './MockHistoryCharts';
+import dynamic from 'next/dynamic';
+import type { MockChartPoint } from './MockHistoryCharts';
 import { useMockHistory } from '../_hooks/useMockHistory';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
+
+// Biểu đồ recharts nằm trong tab lịch sử, người dùng phải bấm mở mới thấy — nạp khi cần.
+const MockHistoryCharts = dynamic(() => import('./MockHistoryCharts'), { ssr: false });
 
 const PAGE_SIZE = 10;
 

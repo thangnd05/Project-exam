@@ -5,17 +5,13 @@ import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
 import { IoClipboardOutline, IoLockClosedOutline, IoSchoolOutline, IoStatsChartOutline } from 'react-icons/io5';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  LineChart, Line
-} from 'recharts';
+import dynamic from 'next/dynamic';
 import ChangePasswordModal from './_components/ChangePasswordModal';
 import UpdateProfileModal from './_components/UpdateProfileModal';
 import ProfileSectionModal from '@/app/components/ProfileSectionModal/ProfileSectionModal';
 import styles from './ProfileOverview.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
-import { brandColors } from '@/app/assets/styles/brandColors';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '@/app/hooks/useCosmetics';
 import {
@@ -26,7 +22,15 @@ import {
 
 const cx = classNames.bind(styles);
 
-const chartColors = brandColors;
+// recharts nằm trong hai biểu đồ dưới màn hình đầu — tách ra để trang hồ sơ nhẹ hơn.
+const DailyActivityBar = dynamic(
+  () => import('./_components/ProfileActivityCharts').then((m) => m.DailyActivityBar),
+  { ssr: false },
+);
+const MonthlyTimeLine = dynamic(
+  () => import('./_components/ProfileActivityCharts').then((m) => m.MonthlyTimeLine),
+  { ssr: false },
+);
 
 const TARGET_VISIBLE_COUNT = 2;
 
@@ -289,22 +293,7 @@ function ProfileOverview() {
                     {loadingActivity ? (
                       <div className={cx('noDataMessage')}>Đang tải hoạt động...</div>
                     ) : activityHasData ? (
-                      <ResponsiveContainer width="100%" height={250}>
-                        <BarChart
-                          data={activityDays}
-                          margin={{ top: 10, right: 16, left: 0, bottom: 5 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="day" interval={2} tick={{ fontSize: 11 }} />
-                          <YAxis allowDecimals={false} tick={{ fontSize: 11 }} unit="p" width={40} />
-                          <RechartsTooltip
-                            cursor={{ fill: 'rgba(0,0,0,0.04)' }}
-                            labelFormatter={(d) => `Ngày ${d}`}
-                            formatter={(value) => [formatDuration(value), 'Thời gian']}
-                          />
-                          <Bar dataKey="minutes" radius={[4, 4, 0, 0]} maxBarSize={28} fill={chartColors.primary} />
-                        </BarChart>
-                      </ResponsiveContainer>
+                      <DailyActivityBar data={activityDays} />
                     ) : (
                       <div className={cx('noDataMessage')}>Không có hoạt động trong tháng này</div>
                     )}
@@ -331,30 +320,7 @@ function ProfileOverview() {
                     {loadingActivity ? (
                       <div className={cx('noDataMessage')}>Đang tải...</div>
                     ) : monthlyHasData ? (
-                      <ResponsiveContainer width="100%" height={250}>
-                        <LineChart
-                          data={monthlyTimeData}
-                          margin={{ top: 16, right: 24, left: 0, bottom: 5 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="label" interval={0} tick={{ fontSize: 11 }} />
-                          <YAxis allowDecimals={false} tick={{ fontSize: 11 }} unit="p" width={40} />
-                          <RechartsTooltip
-                            formatter={(value) => [formatDuration(value), 'Thời gian học']}
-                            labelFormatter={(label, items) =>
-                              formatMonthLabel(items?.[0]?.payload?.month) || label
-                            }
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="minutes"
-                            stroke={chartColors.primary}
-                            strokeWidth={2}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
+                      <MonthlyTimeLine data={monthlyTimeData} formatMonthLabel={formatMonthLabel} />
                     ) : (
                       <div className={cx('noDataMessage')}>Chưa có dữ liệu học trong năm này</div>
                     )}

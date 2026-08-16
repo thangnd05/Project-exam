@@ -6,6 +6,7 @@ import {keepPreviousData} from '@/app/configs/queryClient';
 import {getRoles} from '@/app/apis/roleApi';
 import {createUser, deleteUser, getUsers, updateUser} from '@/app/apis/userApi';
 import type {PageResponse, RoleResponse, UserResponse, UserUpsertRequest} from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export interface AdminUserRow {
   user_id: string;
@@ -154,7 +155,7 @@ export function useUsers({page, size, keyword, roleId, verified}: UseUsersParams
       verified: verifiedCount,
       unverified: Math.max(totalCount - verifiedCount, 0),
     },
-    roles: rolesQuery.data ?? [],
+    roles: rolesQuery.data ?? EMPTY_LIST,
     isLoading: usersQuery.isLoading,
     usersIsError: usersQuery.isError,
     rolesIsError: rolesQuery.isError,

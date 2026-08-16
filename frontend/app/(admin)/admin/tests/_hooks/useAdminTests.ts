@@ -11,6 +11,7 @@ import type {
   TestAdminResponse,
   UserResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 const USERS_PARAMS = { page: 0, size: 200 };
 
@@ -58,9 +59,9 @@ export function useAdminTests() {
   });
 
   return {
-    tests: testsQuery.data ?? [],
-    examTypes: examTypesQuery.data ?? [],
-    users: usersQuery.data ?? [],
+    tests: testsQuery.data ?? EMPTY_LIST,
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
+    users: usersQuery.data ?? EMPTY_LIST,
     isLoading:
       testsQuery.isLoading || examTypesQuery.isLoading || usersQuery.isLoading,
     isError:

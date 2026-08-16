@@ -12,6 +12,7 @@ import {
 import { getExamTypes } from '@/app/apis/examTypeApi';
 import { getSkills } from '@/app/apis/skillApi';
 import type { ExamPartRequest, ExamPartResponse, ExamTypeResponse, SkillResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const examPartsKeys = {
   examParts: ['exam-parts'],
@@ -86,8 +87,8 @@ export function useExamParts() {
 
   return {
     examParts: crud.items as ExamPartItem[],
-    examTypes: examTypesQuery.data ?? [],
-    skills: skillsQuery.data ?? [],
+    examTypes: examTypesQuery.data ?? EMPTY_LIST,
+    skills: skillsQuery.data ?? EMPTY_LIST,
     isLoading:
       crud.isLoading || examTypesQuery.isLoading || skillsQuery.isLoading,
     isError: crud.isError || examTypesQuery.isError || skillsQuery.isError,

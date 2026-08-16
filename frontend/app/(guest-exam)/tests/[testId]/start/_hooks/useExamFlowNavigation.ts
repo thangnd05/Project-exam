@@ -9,6 +9,7 @@ import type {
 } from '@/app/components/exam-layout/examLayoutTypes';
 import type { LayoutConfig } from '@/app/components/exam-layout/layoutSchema';
 import { isListeningStep, passageHasAudio } from './passageUtils';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 type UseExamFlowNavigationParams = {
   visibleParts: ExamPart[];
@@ -65,7 +66,7 @@ export function useExamFlowNavigation({
           sectionType,
           audioGated,
           passage,
-          questions: group.questions || [],
+          questions: group.questions || EMPTY_LIST,
         });
       });
     });

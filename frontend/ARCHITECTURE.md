@@ -16,8 +16,9 @@ package dùng chung nhiều app thì mới tính tiếp).
 
 ```
 frontend/
+  proxy.ts                      # chặn đăng nhập ở tầng server (Next 16 đổi tên middleware.ts)
   app/
-    layout.tsx                  # root layout: <html>, metadata/OG, nạp CSS global
+    layout.tsx                  # root layout: <html>, next/font, metadata/OG, nạp CSS global
     providers.tsx               # QueryClient + Auth/Streak/Coin/Cosmetic + Toast
     global-error.tsx            # lưới an toàn khi chính root layout lỗi
     not-found.tsx  robots.ts  sitemap.ts
@@ -92,10 +93,31 @@ mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc 
 
 ## 5. Điểm cần biết
 
-- **Auth vẫn kiểm ở client** (`AuthGuard`) vì JWT chưa nằm trong cookie httpOnly; do đó
-  chưa có `middleware.ts`. Muốn chặn ở tầng server thì phải đổi cách lưu token trước.
+- **Browser không gọi thẳng backend.** `next.config.mjs` rewrite `/api/*`,
+  `/oauth2/authorization/*`, `/login/oauth2/*` sang `API_ORIGIN`. Nhờ cùng origin, cookie
+  `accessToken` (HttpOnly do Spring set) thuộc domain FE và không cần CORS. `axios` chạy với
+  `baseURL` rỗng — đừng đặt lại `NEXT_PUBLIC_API_BASE_URL` trừ khi cố ý bỏ proxy.
+  - Backend đi kèm: `google.redirect-uri=${app.frontend.origin}/login/oauth2/code/google`,
+    và URI đó phải được khai trong Google Cloud Console.
+- **Chặn đăng nhập hai lớp.** `proxy.ts` (tên mới của `middleware.ts` từ Next 16) chỉ xem có
+  cookie `accessToken` hay không rồi đá về `/login?from=...`, bỏ được cú nháy spinner.
+  `AuthGuard` vẫn giữ vì nó mới là chỗ kiểm quyền chi tiết (`requiredPermission`) và xử lý
+  được trường hợp access token hết hạn nhưng refresh token còn sống.
+  - Đổi/bổ sung route cần đăng nhập thì phải sửa `matcher` trong `proxy.ts`, nó không tự
+    suy ra từ nhóm route.
 - **`useSearchParams` bắt buộc nằm trong `<Suspense>`** — mỗi layout nhóm đã bọc sẵn.
 - **`queryClient` là singleton module-level** (`app/configs/queryClient.ts`). Đủ dùng vì
   app render phía client; nếu sau này fetch ở server thì phải đổi sang instance mỗi request.
-- **Metadata**: mới có ở vài trang `(public)`. Trang chi tiết (bài viết, chứng chỉ, loại đề)
-  nên bổ sung `generateMetadata` để có lợi ích SEO thật.
+- **Metadata**: trang `(public)` tĩnh + các trang chi tiết công khai (bài viết, loại đề, bộ đề,
+  tài liệu) đã có `generateMetadata` chạy ở server qua `app/utils/serverApi.ts`. Helper đó
+  không mang cookie nên chỉ gọi được endpoint `permitAll`. Trang tra cứu chứng chỉ theo mã cố
+  tình để `noindex` và không đưa dữ liệu người học vào thẻ OG.
+- **Ảnh & font**: ảnh tĩnh dùng `next/image` (`imageAssets` trong `app/assets/images`, dạng
+  `StaticImageData`); ảnh do người dùng/nội dung nhập vẫn để `<img>` vì URL đến từ host tuỳ ý —
+  `next/image` sẽ chặn host chưa khai trong `images.remotePatterns`. Font nạp bằng `next/font`
+  trong `layout.tsx`, dùng qua `--font-inter` / `--font-playfair`; cấm `@import` Google Fonts
+  trong SCSS.
+- **Thư viện nặng nạp rời** bằng `next/dynamic`: recharts (analytics, hồ sơ, so sánh lộ trình,
+  lịch sử thi thử), react-simple-maps + world-atlas (bản đồ analytics), react-slick (carousel
+  trang chủ và bài viết). Quill tự `import()` bên trong `RichTextEditor`. Lưu ý tuỳ chọn của
+  `next/dynamic` phải viết thẳng dạng object literal, tách ra biến là build lỗi.

@@ -77,7 +77,7 @@
 }
 
 .class-id {
-  font-family: 'Inter', monospace;
+  font-family: var(--font-inter), monospace;
   font-weight: 600;
   color: var(--slate-500);
 }

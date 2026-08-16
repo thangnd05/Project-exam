@@ -22,6 +22,7 @@ import type {
   EmailSaveRequest,
   PageResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const emailKeys = {
   auto: ['admin-emails', 'auto'],
@@ -37,7 +38,7 @@ const emptyPage = {content: [], totalPages: 1, totalElements: 0, currentPage: 0}
 export function useAutoEmails() {
   const query = useQuery({queryKey: emailKeys.auto, queryFn: getAutoEmails});
   return {
-    emails: query.data ?? [],
+    emails: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };
@@ -75,7 +76,7 @@ export function useEmailAudience(enabled: boolean) {
     enabled: Boolean(enabled),
   });
   return {
-    users: query.data ?? [],
+    users: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
   };
 }

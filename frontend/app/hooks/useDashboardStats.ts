@@ -17,6 +17,7 @@ import type {
   NameValue,
   TrafficLocationsResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const dashboardKeys = {
   stats: ['admin-dashboard-stats'],
@@ -61,7 +62,7 @@ export function useMonthlyPerformance(year?: number) {
   });
 
   return {
-    months: query.data?.months ?? [],
+    months: query.data?.months ?? EMPTY_LIST,
     availableYears: query.data?.availableYears ?? [new Date().getFullYear()],
     isLoading: query.isLoading,
     isError: query.isError,
@@ -76,8 +77,8 @@ export function useContentInsights() {
   });
 
   return {
-    topTests: query.data?.topTests ?? [],
-    topPracticeTests: query.data?.topPracticeTests ?? [],
+    topTests: query.data?.topTests ?? EMPTY_LIST,
+    topPracticeTests: query.data?.topPracticeTests ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };
@@ -94,8 +95,8 @@ export function useTrafficLocations(month?: string) {
   return {
     month: query.data?.month ?? month,
     totalVisits: query.data?.totalVisits ?? 0,
-    availableMonths: query.data?.availableMonths ?? [],
-    topCountries: query.data?.topCountries ?? [],
+    availableMonths: query.data?.availableMonths ?? EMPTY_LIST,
+    topCountries: query.data?.topCountries ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };
@@ -110,7 +111,7 @@ export function useTrafficHeatmap(endDate?: string) {
   });
 
   return {
-    heatmap: query.data ?? [],
+    heatmap: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };

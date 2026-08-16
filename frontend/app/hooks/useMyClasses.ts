@@ -11,14 +11,15 @@ import type {
   ClassResponse,
   MyClassesResponse,
 } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const myClassesKeys = {
   all: ['my-classes'],
 };
 
 const normalizeMyClasses = (data: MyClassesResponse) => ({
-  teachingClasses: data?.teachingClasses || [],
-  learningClasses: data?.learningClasses || [],
+  teachingClasses: data?.teachingClasses || EMPTY_LIST,
+  learningClasses: data?.learningClasses || EMPTY_LIST,
   message: (data as { message?: string })?.message || '',
 });
 
@@ -30,8 +31,8 @@ export function useMyClasses() {
   });
 
   return {
-    teachingClasses: classesQuery.data?.teachingClasses ?? [],
-    learningClasses: classesQuery.data?.learningClasses ?? [],
+    teachingClasses: classesQuery.data?.teachingClasses ?? EMPTY_LIST,
+    learningClasses: classesQuery.data?.learningClasses ?? EMPTY_LIST,
     message: classesQuery.data?.message || '',
     isLoading: classesQuery.isLoading,
     isError: classesQuery.isError,

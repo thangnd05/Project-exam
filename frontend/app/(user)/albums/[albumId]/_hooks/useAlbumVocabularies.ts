@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getVocabulariesByAlbum, deleteVocabulary } from '@/app/apis/vocabularyApi';
 import type { VocabularyResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const albumDeltaKeys = {
   vocabularies: (albumId?: string) => ['album-vocabularies', albumId],
@@ -20,7 +21,7 @@ export function useAlbumVocabularies(albumId?: string) {
   });
 
   return {
-    vocabularies: query.data ?? [],
+    vocabularies: query.data ?? EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
     refetch: query.refetch,

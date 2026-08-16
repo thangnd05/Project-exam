@@ -69,7 +69,7 @@ const CreateTestFromBank = () => {
 
   useEffect(() => {
     if (!testInfo.examTypeId || !examParts?.length) {
-      setPartConfigs({});
+      setPartConfigs((prev) => (Object.keys(prev).length ? {} : prev));
       return;
     }
     const initial: PartConfigMap = {};

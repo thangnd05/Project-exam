@@ -1,13 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faNoteSticky } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 
 import { useAuth } from '@/app/hooks/useAuth';
 import NotesPanel from './NotesPanel';
 import styles from './NotesButton.module.scss';
+import { FaNoteSticky } from 'react-icons/fa6';
 
 const cx = classNames.bind(styles);
 
@@ -26,7 +25,7 @@ function NotesButton() {
         aria-label="Ghi chú của tôi"
         onClick={() => setShowPanel(true)}
       >
-        <FontAwesomeIcon icon={faNoteSticky} />
+        <FaNoteSticky />
       </button>
 
       <NotesPanel show={showPanel} onClose={() => setShowPanel(false)} />

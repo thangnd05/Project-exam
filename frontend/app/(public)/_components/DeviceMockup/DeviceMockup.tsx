@@ -1,6 +1,7 @@
 'use client';
 
 import {useState} from 'react';
+import Image, {type StaticImageData} from 'next/image';
 import classNames from 'classnames/bind';
 import styles from './DeviceMockup.module.scss';
 
@@ -37,7 +38,8 @@ function BrowserPlaceholder() {
 }
 
 type DeviceMockupProps = {
-  src?: any;
+  /** Ảnh chụp màn hình, import tĩnh từ app/assets/images để next/image có sẵn kích thước. */
+  src?: StaticImageData;
   alt?: string;
   className?: string;
 };
@@ -55,11 +57,15 @@ export default function DeviceMockup({src, alt = '', className}: DeviceMockupPro
           <span className={cx('camera')} aria-hidden="true" />
           <div className={cx('display', {displayPlaceholder: !showImg})}>
             {showImg ? (
-              <img
+              // fill: khung .display đã có position/aspect-ratio, ảnh chỉ việc phủ kín.
+              // sizes cho Next biết ảnh không bao giờ rộng quá ~640px để chọn bản nhỏ nhất.
+              <Image
                 className={cx('shot')}
                 src={src}
                 alt={alt}
-                decoding="async"
+                fill
+                sizes="(max-width: 900px) 100vw, 640px"
+                placeholder="blur"
                 draggable={false}
                 onError={() => setImgFailed(true)}
               />

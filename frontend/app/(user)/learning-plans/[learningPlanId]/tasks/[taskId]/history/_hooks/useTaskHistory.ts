@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getPlanById, getTaskSessions } from '@/app/apis/learningPlanApi';
 import { planDetailKeys } from '@/app/hooks/usePlanDetail';
 import type { TaskSessionHistoryResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const taskHistoryKeys = {
 
@@ -32,7 +33,7 @@ export function useTaskHistory(learningPlanId: string, taskId: string) {
 
   return {
     plan: planQuery.data ?? null,
-    sessions: sessionsQuery.data ?? [],
+    sessions: sessionsQuery.data ?? EMPTY_LIST,
     isLoading: planQuery.isLoading || sessionsQuery.isLoading,
     error: planQuery.isError ? errMessage(planQuery.error) : null,
     sessionsError: sessionsQuery.isError ? errMessage(sessionsQuery.error) : null,

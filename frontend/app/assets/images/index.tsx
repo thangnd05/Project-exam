@@ -7,6 +7,19 @@ import quickImage from './quick-image.png';
 import dignos from './dignos.png';
 import learningPlan from './learningplan.png';
 
+// Dạng StaticImageData đầy đủ (có width/height/blurDataURL) — dùng cho next/image.
+export const imageAssets = {
+    noImage,
+    avtImage,
+    logo,
+    membership,
+    logoW,
+    quickImage,
+    dignos,
+    learningPlan,
+};
+
+// Dạng URL chuỗi, cho những chỗ còn dùng <img> hoặc CSS background.
 const images = {
     noImage: noImage.src,
     avtImage: avtImage.src,

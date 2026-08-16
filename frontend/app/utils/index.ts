@@ -11,6 +11,7 @@ export * from './planResult';
 export * from './questionNumber';
 export * from './readiness-label';
 export * from './recoveryResource';
+export * from './stableEmpty';
 export * from './taskProgress';
 export * from './termTips';
 export * from './visitorId';

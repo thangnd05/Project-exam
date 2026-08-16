@@ -5,6 +5,7 @@ import { Badge } from 'react-bootstrap';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from './TagSelector.module.scss';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 const cx = classNames.bind(styles);
 
@@ -35,7 +36,7 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
         const rootList = tags.filter((t) => isRoot(t, map));
         return {
             byId: map,
-            childrenOf: (id: any): any[] => children.get(id) || [],
+            childrenOf: (id: any): any[] => children.get(id) || EMPTY_LIST,
             roots: rootList,
             hasHierarchy: children.size > 0,
         };
